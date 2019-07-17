@@ -1,12 +1,6 @@
 import { UpgradeArgv } from '@celo/celotool/src/cmds/deploy/upgrade'
-import sleep from 'sleep-promise'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import {
-  deletePersistentVolumeClaims,
-  installHelmChart,
-  removeHelmRelease,
-  upgradeHelmChart,
-} from 'src/lib/helm_deploy'
+import { resetAndUpgradeHelmChart, upgradeHelmChart } from 'src/lib/helm_deploy'
 import {
   uploadGenesisBlockToGoogleStorage,
   uploadStaticNodesToGoogleStorage,
@@ -26,10 +20,7 @@ export const handler = async (argv: TestnetArgv) => {
   await switchToClusterFromEnv()
 
   if (argv.reset) {
-    await removeHelmRelease(argv.celoEnv)
-    await deletePersistentVolumeClaims(argv.celoEnv)
-    await sleep(5000)
-    await installHelmChart(argv.celoEnv)
+    await resetAndUpgradeHelmChart(argv.celoEnv)
   } else {
     await upgradeHelmChart(argv.celoEnv)
   }

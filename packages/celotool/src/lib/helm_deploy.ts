@@ -2,6 +2,7 @@ import { getKubernetesClusterRegion, switchToClusterFromEnv } from '@celo/celoto
 import { ensureAuthenticatedGcloudAccount } from '@celo/celotool/src/lib/gcloud_utils'
 import { generateGenesisFromEnv } from '@celo/celotool/src/lib/generate_utils'
 import { OG_ACCOUNTS } from '@celo/celotool/src/lib/genesis_constants'
+import { getStatefulSetReplicas, scaleStatefulSet } from 'src/lib/kubernetes'
 import {
   EnvTypes,
   envVar,
@@ -598,6 +599,30 @@ export async function upgradeHelmChart(celoEnv: string) {
     `helm upgrade ${celoEnv} ../helm-charts/testnet --namespace ${celoEnv} ${parameters}`
   )
   console.info(`Helm release ${celoEnv} upgrade successful`)
+}
+
+export async function resetAndUpgradeHelmChart(celoEnv: string) {
+  const txNodesSetName = `${celoEnv}-tx-nodes`
+  const validatorsSetName = `${celoEnv}-validators`
+
+  const txNodeReplicas = await getStatefulSetReplicas(celoEnv, txNodesSetName)
+  const validatorReplicas = await getStatefulSetReplicas(celoEnv, validatorsSetName)
+
+  // scale down nodes
+  await scaleStatefulSet(celoEnv, txNodesSetName, 0)
+  await scaleStatefulSet(celoEnv, validatorsSetName, 0)
+
+  await deletePersistentVolumeClaims(celoEnv)
+  await sleep(5000)
+
+  await upgradeHelmChart(celoEnv)
+
+  // scale up nodes
+  // Note(trevor): helm upgrade only compares the current chart to the
+  // previously deployed chart when deciding what needs upgrading, so we need
+  // to manually scale up
+  await scaleStatefulSet(celoEnv, txNodesSetName, txNodeReplicas)
+  await scaleStatefulSet(celoEnv, validatorsSetName, validatorReplicas)
 }
 
 export async function removeHelmRelease(celoEnv: string) {
