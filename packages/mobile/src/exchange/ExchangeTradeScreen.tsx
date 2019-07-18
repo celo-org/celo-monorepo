@@ -185,7 +185,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   render() {
     const { t } = this.props
 
-    const dollarText = t('celoDollars') + ' (cUSD)'
+    const dollarText = t('celoDollars') + ' (cPHP)'
     const goldText = t('celoGold') + ' (cGLD)'
 
     const makerTokenText = this.isDollar() ? dollarText : goldText
