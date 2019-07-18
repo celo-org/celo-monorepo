@@ -1,6 +1,6 @@
 import { UpgradeArgv } from '@celo/celotool/src/cmds/deploy/upgrade'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { resetAndUpgradeHelmChart, upgradeHelmChart } from 'src/lib/helm_deploy'
+import { resetAndUpgradeHelmChart, upgradeHelmChart, upgradeStaticIPs } from 'src/lib/helm_deploy'
 import {
   uploadGenesisBlockToGoogleStorage,
   uploadStaticNodesToGoogleStorage,
@@ -18,6 +18,8 @@ export const builder = {}
 
 export const handler = async (argv: TestnetArgv) => {
   await switchToClusterFromEnv()
+
+  upgradeStaticIPs(argv.celoEnv)
 
   if (argv.reset) {
     await resetAndUpgradeHelmChart(argv.celoEnv)
