@@ -1,6 +1,6 @@
 export enum CURRENCY_ENUM {
   GOLD = 'Celo Gold',
-  DOLLAR = 'Celo Dollar',
+  DOLLAR = 'Celo Peso',
 }
 
 interface Currency {
