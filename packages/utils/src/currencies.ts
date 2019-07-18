@@ -20,8 +20,8 @@ export const CURRENCIES: CurrencyObject = {
     code: 'cGLD',
   },
   [CURRENCY_ENUM.DOLLAR]: {
-    singleUnit: 'Celo dollar',
-    pluralUnit: 'Celo dollars',
+    singleUnit: 'Celo peso',
+    pluralUnit: 'Celo pesos',
     symbol: '$',
     code: 'cUSD',
   },
