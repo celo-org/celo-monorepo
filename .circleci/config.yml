@@ -1,7 +1,7 @@
 # adapted from https://github.com/CircleCI-Public/circleci-demo-react-native
 # and https://github.com/facebook/react-native/blob/master/.circleci/config.yml
 
-version: 2
+version: 2.1
 
 defaults: &defaults
   working_directory: ~/app
@@ -20,6 +20,17 @@ general:
   artifacts:
     - 'mobile/coverage'
     - 'protocol/coverage'
+
+commands:
+  should_run_command:
+    description: "Decide whether a job should run or not"
+    parameters:
+      jobname:
+        type: string
+      should_run:
+        type: boolean
+    steps:
+      - run: echo Run << parameters.jobname >> - << parameters.should_run >>
 
 jobs:
   install_dependencies:
@@ -74,6 +85,16 @@ jobs:
             fi
 
       - run: npm rebuild scrypt
+
+      - run:
+          name: Check if the geth test should run
+          command: |
+            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
+            cd ~/app/packages/mobile
+            CHANGED=$(node -r ts-node/register ../../scripts/check_if_test_should_run_v2.ts --dirs ${DIRS_TO_CHECK})
+      - should_run_command:
+            jobname: geth
+            should_run: ${CHANGED}
 
       - save_cache:
           key: yarn-v2-{{ checksum "yarn.lock" }}-{{ arch }}
