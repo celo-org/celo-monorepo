@@ -1,0 +1,28 @@
+{{ if .Values.contracts.cron_jobs.enabled }}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ template "ethereum.fullname" . }}-set-exchange-rate
+  labels:
+    app: {{ template "ethereum.name" . }}
+    chart: {{ template "ethereum.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  schedule: "15 * * * *" # Every hour @ 15 past
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+          - name: set-exchange-rate
+            image: {{ .Values.monorepo.image.repository }}:{{ .Values.monorepo.image.tag }}
+            imagePullPolicy: {{ .Values.imagePullPolicy }}
+            command: ["bash", "-c", 'cd /celo-monorepo/packages/protocol && yarn run download-artifacts -n {{ template "ethereum.fullname" . }} -b {{.Values.bucket}} && yarn run set-exchange-rate -n {{ template "ethereum.fullname" . }} -f exchange_rates/oracle_exchange_rates.csv -c ''{ "host": "{{ template "ethereum.fullname" . }}-gethminer1" }''']
+            resources:
+              requests:
+                memory: 100M
+                cpu: 100m
+          restartPolicy: Never
+{{ end }}
