@@ -71,7 +71,7 @@ for (const change of changes) {
   const changedFiles = getChangedFiled(from, to)
 
   const pushedMnemonicFiles = changedFiles.filter(
-    (name) => path.basename(name).startsWith('.env.mnemonic') && path.extname(name) !== 'enc'
+    (name) => path.basename(name).startsWith('.env.mnemonic') && path.extname(name) !== '.enc'
   )
   if (pushedMnemonicFiles.length > 0) {
     console.error(`Trying to push conflicting files`)
@@ -81,7 +81,7 @@ for (const change of changes) {
   }
 
   const firstCommitDate = getDateFromFirstCommit(from, to)
-  if (firstCommitDate <= THRESHOLD_DATE) {
+  if (firstCommitDate < THRESHOLD_DATE) {
     console.error(`Trying to push a commit from a date older than ${THRESHOLD_DATE.toUTCString()}`)
     console.error(`FirstCommitDate: ${firstCommitDate.toUTCString()}`)
     console.error(chalk.red(`(${change.remoteRef}) Push rejected!`))
