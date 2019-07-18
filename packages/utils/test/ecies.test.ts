@@ -1,5 +1,5 @@
-import { ECIES } from '../src/ecies'
 import { randomBytes } from 'crypto'
+import { ECIES } from '../src/ecies'
 const eutil = require('ethereumjs-util')
 
 describe('ECIES', () => {
@@ -38,7 +38,7 @@ describe('ECIES', () => {
       const plaintext = new Buffer('spam')
       const privKey = randomBytes(32)
       const pubKey = eutil.privateToPublic(privKey)
-      const fakePrivKey = crypto.randomBytes(32)
+      const fakePrivKey = randomBytes(32)
       try {
         ECIES.Encrypt(pubKey, plaintext)
         ECIES.Decrypt(fakePrivKey, plaintext)
