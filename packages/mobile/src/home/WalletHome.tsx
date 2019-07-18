@@ -137,7 +137,6 @@ export class WalletHome extends React.PureComponent<Props> {
   componentDidMount() {
     this.props.resetStandbyTransactions()
     this.props.initializeSentryUserContext()
-    this.showTestnetBanner()
   }
 
   renderSection = ({ section: { title, bubbleText } }: { section: SectionListData<any> }) => (
@@ -146,11 +145,6 @@ export class WalletHome extends React.PureComponent<Props> {
 
   keyExtractor = (_item: any, index: number) => {
     return index.toString()
-  }
-
-  showTestnetBanner = () => {
-    const { t } = this.props
-    this.props.showMessage(t('testnetAlert.1'), null, t('dismiss'), t('testnetAlert.0'))
   }
 
   render() {
