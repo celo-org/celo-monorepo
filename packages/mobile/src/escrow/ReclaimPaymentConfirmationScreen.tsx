@@ -16,12 +16,13 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import { EscrowedPayment, reclaimPayment } from 'src/escrow/actions'
 import ReclaimPaymentConfirmationCard from 'src/escrow/ReclaimPaymentConfirmationCard'
+import { reclaimSuggestedFeeSelector } from 'src/escrow/reducer'
 import { Namespaces } from 'src/i18n'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import { getSuggestedFeeDollars } from 'src/send/selectors'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
+import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -30,7 +31,7 @@ const TAG = 'escrow/ReclaimPaymentConfirmationScreen'
 interface StateProps {
   e164PhoneNumber: string
   account: string | null
-  fee: BigNumber
+  fee: string
 }
 
 interface DispatchProps {
@@ -47,7 +48,7 @@ const mapStateToProps = (state: RootState): StateProps => {
   return {
     e164PhoneNumber: state.account.e164PhoneNumber,
     account: currentAccountSelector(state),
-    fee: getSuggestedFeeDollars(state),
+    fee: reclaimSuggestedFeeSelector(state),
   }
 }
 
@@ -97,6 +98,8 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
   render() {
     const { t, fee } = this.props
     const payment = this.getReclaimPaymentInput()
+    const convertedAmount = divideByWei(payment.amount.toString())
+    const convertedFee = divideByWei(fee.toString())
 
     return (
       <View style={styles.container}>
@@ -111,11 +114,12 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
           modifyButton={{ action: this.onPressEdit, text: t('cancel'), disabled: false }}
         >
           <ReclaimPaymentConfirmationCard
-            recipient={payment.recipient}
+            recipientPhone={payment.recipientPhone}
+            recipientContact={payment.recipientContact}
             comment={payment.message}
-            amount={payment.amount}
+            amount={new BigNumber(convertedAmount)}
             currency={CURRENCY_ENUM.DOLLAR} // User can only request in Dollars
-            fee={fee}
+            fee={new BigNumber(convertedFee)}
           />
         </ReviewFrame>
       </View>

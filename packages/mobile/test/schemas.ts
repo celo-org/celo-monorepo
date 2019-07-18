@@ -90,7 +90,7 @@ const schemaVersions = [
     },
     escrow: {
       sentEscrowedPayments: [],
-      currentPaymentId: '',
+      suggestedFee: '',
     },
   },
 ]

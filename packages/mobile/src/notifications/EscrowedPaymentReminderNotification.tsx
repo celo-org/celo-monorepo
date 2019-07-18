@@ -1,13 +1,13 @@
 import BaseNotification from '@celo/react-components/components/BaseNotification'
-import { getContactPhoneNumber } from '@celo/utils/src/contacts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Image, StyleSheet, View } from 'react-native'
 import SmsAndroid from 'react-native-sms-android'
+import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
-import { EscrowedPayment } from 'src/escrow/actions'
+import { EscrowedPayment, fetchReclaimSuggestedFee } from 'src/escrow/actions'
 import EscrowedPaymentLineItem from 'src/escrow/EscrowedPaymentLineItem'
 import { Namespaces } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
@@ -19,15 +19,20 @@ interface OwnProps {
   payment: EscrowedPayment
 }
 
-type Props = OwnProps & WithNamespaces
+interface DispatchProps {
+  fetchReclaimSuggestedFee: typeof fetchReclaimSuggestedFee
+}
+
+type Props = OwnProps & DispatchProps & WithNamespaces
+
+const mapDispatchToProps = {
+  fetchReclaimSuggestedFee,
+}
 
 export class EscrowedPaymentReminderNotification extends React.PureComponent<Props> {
   getCTA = () => {
     const { payment } = this.props
-    const recipientPhoneNumber =
-      typeof payment.recipient === 'string'
-        ? payment.recipient
-        : getContactPhoneNumber(payment.recipient)
+    const recipientPhoneNumber = payment.recipientPhone
     return [
       {
         text: this.props.t('sendMessage'),
@@ -54,6 +59,7 @@ export class EscrowedPaymentReminderNotification extends React.PureComponent<Pro
         onPress: () => {
           const reclaimPaymentInput = payment
           CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_notification)
+          this.props.fetchReclaimSuggestedFee(payment.paymentID)
           navigate(Screens.ReclaimPaymentConfirmationScreen, { reclaimPaymentInput })
         },
       },
@@ -62,8 +68,9 @@ export class EscrowedPaymentReminderNotification extends React.PureComponent<Pro
 
   getTitle() {
     const { t, payment } = this.props
-    const displayName =
-      typeof payment.recipient === 'string' ? payment.recipient : payment.recipient.displayName
+    const displayName = payment.recipientContact
+      ? payment.recipientContact.displayName
+      : payment.recipientPhone
     return t('escrowedPaymentReminder', { mobile: displayName })
   }
 
@@ -102,5 +109,8 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  withNamespaces(Namespaces.walletFlow5)(EscrowedPaymentReminderNotification)
+  connect<{}, DispatchProps>(
+    null,
+    mapDispatchToProps
+  )(withNamespaces(Namespaces.walletFlow5)(EscrowedPaymentReminderNotification))
 )

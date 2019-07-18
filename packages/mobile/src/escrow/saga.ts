@@ -20,6 +20,7 @@ import { inviteesSelector } from 'src/invite/reducer'
 import { TEMP_PW } from 'src/invite/saga'
 import { isValidPrivateKey } from 'src/invite/utils'
 import { RootState } from 'src/redux/reducers'
+import { recipientCacheSelector } from 'src/send/reducers'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
@@ -155,6 +156,7 @@ function* getSentPayments() {
     const escrow = yield call(getEscrowContract, web3)
     const account = yield call(getConnectedUnlockedAccount)
     const recipientsPhoneNumbers = yield select(inviteesSelector)
+    const recipientPhoneNumberToContact = yield select(recipientCacheSelector)
 
     Logger.debug(TAG + '@getSentPayments', 'Fetching valid sent escrowed payments')
     const sentPaymentIDs: string[] = yield escrow.methods.getSentPaymentIds(account).call()
@@ -165,14 +167,18 @@ function* getSentPayments() {
     const sentPaymentsNotifications: EscrowedPayment[] = []
     for (let i = 0; i < sentPayments.length; i++) {
       const payment = sentPayments[i]
+      const recipientPhoneNumber = recipientsPhoneNumbers[sentPaymentIDs[i].toLowerCase()]
       const transformedPayment: EscrowedPayment = {
         senderAddress: payment[1],
-        recipient: recipientsPhoneNumbers[sentPaymentIDs[i]],
+        recipientPhone: recipientPhoneNumber,
         paymentID: sentPaymentIDs[i],
         currency: SHORT_CURRENCIES.DOLLAR, // Only dollars can be escrowed
         amount: payment[3],
         timestamp: payment[6],
         expirySeconds: payment[7],
+      }
+      if (recipientPhoneNumberToContact[recipientPhoneNumber]) {
+        transformedPayment.recipientContact = recipientPhoneNumberToContact[recipientPhoneNumber]
       }
       sentPaymentsNotifications.push(transformedPayment)
     }
