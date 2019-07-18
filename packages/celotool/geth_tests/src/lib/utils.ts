@@ -149,7 +149,7 @@ export async function checkoutGethRepo(branch: string, path: string) {
     'clone',
     '--depth',
     '1',
-    'git@github.com:celo-org/celo-blockchain.git',
+    'https://github.com/celo-org/celo-blockchain.git',
     path,
     '-b',
     branch,
