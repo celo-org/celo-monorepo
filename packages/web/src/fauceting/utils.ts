@@ -31,16 +31,17 @@ export function requestStatusToState(status: RequestStatus) {
     case RequestStatus.Failed:
       return RequestState.Failed
     case RequestStatus.Working:
-      return RequestState.Started
+      return RequestState.Working
     case RequestStatus.Pending:
-      return RequestState.Started
+      return RequestState.Queued
   }
 }
 
 export enum RequestState {
   Initial,
   Invalid,
-  Started,
+  Queued,
+  Working,
   Completed,
   Failed,
 }

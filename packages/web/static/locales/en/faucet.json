@@ -34,5 +34,6 @@
   "testnetForum": "Alfajores Testnet Forum",
   "testnetAddress": "Testnet Address",
   "requestInvite": "Request Invite",
-  "accountCreated": "Account Created"
+  "accountCreated": "Account Created",
+  "invalidNumber": "Must be a valid E.164 number"
 }

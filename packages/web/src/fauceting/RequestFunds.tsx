@@ -8,6 +8,7 @@ import {
   validateBeneficary,
 } from 'src/fauceting/utils'
 import { TextInput } from 'src/forms/FormComponents'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { postForm } from 'src/shared/Form'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
@@ -17,7 +18,6 @@ import {
   RequestType,
   subscribeRequest,
 } from '../../server/FirebaseClient'
-import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 
 function send(beneficiary: string, kind: RequestType, captchaToken: string) {
   const route = kind === RequestType.Invite ? '/invite' : '/faucet'
@@ -63,7 +63,7 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
     this.setState({
       beneficiary,
       requestState:
-        this.state.requestState !== RequestState.Started
+        this.state.requestState !== RequestState.Working
           ? RequestState.Initial
           : this.state.requestState,
     })
@@ -93,7 +93,7 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
   }
 
   startRequest = () => {
-    this.setState({ requestState: RequestState.Started })
+    this.setState({ requestState: RequestState.Queued })
     return send(this.state.beneficiary, this.props.kind, this.getCaptchaToken())
   }
 
@@ -118,20 +118,20 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
     return this.isFaucet() ? this.props.t('testnetAddress') : '+1 555 555 5555'
   }
   buttonText = () => {
-    const isComplete = this.state.requestState === RequestState.Completed
+    const { requestState } = this.state
     const { t } = this.props
 
     if (this.isFaucet()) {
-      return isComplete ? t('funded') : t('getDollars')
+      return faucetButtonText({ requestState, t })
     } else {
-      return isComplete ? t('accountCreated') : t('requestInvite')
+      return inviteButtonText({ requestState, t })
     }
   }
 
   render() {
     const { requestState } = this.state
     const isInvalid = requestState === RequestState.Invalid
-    const isStarted = requestState === RequestState.Started
+    const isStarted = requestState === RequestState.Working
     return (
       <View style={standardStyles.elementalMargin}>
         <View style={standardStyles.elementalMarginBottom}>
@@ -195,13 +195,37 @@ function ContextualInfo({ requestState, t, isFaucet }: InfoProps) {
   return <Text style={contextStyle}>{text}</Text>
 }
 
+function faucetButtonText({ requestState, t }) {
+  switch (requestState) {
+    case RequestState.Queued:
+    case RequestState.Working:
+      return t('funding')
+    case RequestState.Completed:
+      return t('funded')
+    default:
+      return t('getDollars')
+  }
+}
+
+function inviteButtonText({ requestState, t }) {
+  switch (requestState) {
+    case RequestState.Queued:
+    case RequestState.Working:
+      return ''
+    case RequestState.Completed:
+      return t('accountCreated')
+    default:
+      return t('requestInvite')
+  }
+}
+
 function faucetText({ requestState, t }) {
   return (
     {
       [RequestState.Failed]: t('faucetError'),
       [RequestState.Invalid]: t('invalidAddress'),
       [RequestState.Completed]: t('faucetCompleted'),
-    }[requestState] || 'eg. c0000fab00d0000000000f00b0e0000c00c00ebd'
+    }[requestState] || 'eg. a0000aaa00a0000000000a00a0a0000a00a00aaa'
   )
 }
 
