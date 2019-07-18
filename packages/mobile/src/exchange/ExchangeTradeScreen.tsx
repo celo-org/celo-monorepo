@@ -176,7 +176,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   inputValue = () => {
     if (this.state.makerTokenAmount) {
-      return `${this.isDollar() ? '$' : ''}${this.state.makerTokenAmount}`
+      return `${this.isDollar() ? '₱' : ''}${this.state.makerTokenAmount}`
     } else {
       return ''
     }
@@ -203,7 +203,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
     const borderStyle = { borderColor: this.hasError() ? colors.errorRed : colors.dark }
 
-    const takerDisplay = `${this.isDollar() ? '' : '$'}${getMoneyDisplayValue(takerTokenAmount)}`
+    const takerDisplay = `${this.isDollar() ? '' : '₱'}${getMoneyDisplayValue(takerTokenAmount)}`
     return (
       <View style={styles.background}>
         <View>
@@ -238,7 +238,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               <View style={styles.transferMeta}>
                 <Text style={fontStyles.bodySmall}>{t('available')} </Text>
                 <Text numberOfLines={1} style={[fontStyles.bodySmallBold, inputStyle]}>
-                  {(this.isDollar() ? '$' : '') + this.getFormattedMakerBalance()}
+                  {(this.isDollar() ? '₱' : '') + this.getFormattedMakerBalance()}
                 </Text>
               </View>
             </View>

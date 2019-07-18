@@ -22,7 +22,7 @@ export const CURRENCIES: CurrencyObject = {
   [CURRENCY_ENUM.DOLLAR]: {
     singleUnit: 'Celo peso',
     pluralUnit: 'Celo pesos',
-    symbol: '$',
+    symbol: '₱',
     code: 'cPHP',
   },
 }
