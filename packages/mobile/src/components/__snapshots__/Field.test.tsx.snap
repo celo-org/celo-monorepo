@@ -1,0 +1,142 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly blank 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "rgba(255, 255, 255, 0.9)",
+        "borderBottomWidth": 0.5,
+        "borderColor": "rgba(0, 0, 0, .5)",
+        "flexDirection": "row",
+      },
+      Object {},
+      Object {
+        "height": 62,
+      },
+    ]
+  }
+>
+  <View
+    accessible={true}
+    isTVSelectable={true}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      Object {
+        "backgroundColor": "transparent",
+        "opacity": 1,
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "rgba(0, 0, 0, 0.3)",
+          "fontSize": 16,
+          "marginHorizontal": 20,
+        }
+      }
+    >
+      Input
+    </Text>
+  </View>
+  <TextInput
+    allowFontScaling={true}
+    enablesReturnKeyAutomatically={true}
+    onFocus={[Function]}
+    placeholderTextColor="rgba(0, 0, 0, .4)"
+    rejectResponderTermination={true}
+    style={
+      Array [
+        Object {
+          "color": "#555",
+          "flex": 1,
+          "fontSize": 16,
+        },
+        Object {
+          "height": undefined,
+        },
+      ]
+    }
+    underlineColorAndroid="transparent"
+  />
+</View>
+`;
+
+exports[`renders correctly when filled and last 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "rgba(255, 255, 255, 0.9)",
+        "borderBottomWidth": 0.5,
+        "borderColor": "rgba(0, 0, 0, .5)",
+        "flexDirection": "row",
+      },
+      Object {
+        "borderBottomWidth": 0,
+      },
+      Object {
+        "height": 62,
+      },
+    ]
+  }
+>
+  <View
+    accessible={true}
+    isTVSelectable={true}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      Object {
+        "backgroundColor": "transparent",
+        "opacity": 1,
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "rgba(0, 0, 0, 0.3)",
+          "fontSize": 16,
+          "marginHorizontal": 20,
+        }
+      }
+    >
+      Input
+    </Text>
+  </View>
+  <TextInput
+    allowFontScaling={true}
+    enablesReturnKeyAutomatically={true}
+    onFocus={[Function]}
+    placeholderTextColor="rgba(0, 0, 0, .4)"
+    rejectResponderTermination={true}
+    style={
+      Array [
+        Object {
+          "color": "#555",
+          "flex": 1,
+          "fontSize": 16,
+        },
+        Object {
+          "height": undefined,
+        },
+      ]
+    }
+    underlineColorAndroid="transparent"
+    value="preset value"
+  />
+</View>
+`;

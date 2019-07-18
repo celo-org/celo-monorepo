@@ -1,0 +1,10 @@
+{
+  "extends": ["@celo/typescript/tslint.json"],
+  "linterOptions": {
+    "include": ["**/*.ts"],
+    "exclude": ["types/contracts/*"]
+  },
+  "rules": {
+    "no-global-arrow-functions": false
+  }
+}

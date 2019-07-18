@@ -1,0 +1,83 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders bubble text 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "backgroundColor": "#F8F8F8",
+      "display": "flex",
+      "flexDirection": "row",
+      "height": 36,
+      "justifyContent": "space-between",
+      "paddingHorizontal": 10,
+    }
+  }
+>
+  <Text
+    style={
+      Object {
+        "color": "#81868B",
+        "fontFamily": "Hind-Medium",
+        "fontSize": 12,
+      }
+    }
+  >
+    
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "color": "#FFFFFF",
+          "fontFamily": "Hind-Bold",
+          "fontSize": 10,
+          "lineHeight": 18,
+        },
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#3C9BF4",
+          "borderRadius": 10,
+          "flexDirection": "row",
+          "height": 20,
+          "justifyContent": "space-around",
+          "margin": 5,
+          "padding": 1,
+          "textAlign": "center",
+          "width": 20,
+        },
+      ]
+    }
+  >
+    This is a Bubble
+  </Text>
+</View>
+`;
+
+exports[`renders text 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "backgroundColor": "#F8F8F8",
+      "display": "flex",
+      "flexDirection": "row",
+      "height": 36,
+      "justifyContent": "space-between",
+      "paddingHorizontal": 10,
+    }
+  }
+>
+  <Text
+    style={
+      Object {
+        "color": "#81868B",
+        "fontFamily": "Hind-Medium",
+        "fontSize": 12,
+      }
+    }
+  >
+    This is a Test
+  </Text>
+</View>
+`;

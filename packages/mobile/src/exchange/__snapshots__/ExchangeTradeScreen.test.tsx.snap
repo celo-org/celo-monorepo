@@ -1,0 +1,493 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ExchangeTradeScreen renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "stretch",
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "flexDirection": "column",
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <View>
+    <RCTScrollView
+      automaticallyAdjustContentInsets={false}
+      contentContainerStyle={
+        Object {
+          "alignItems": "flex-start",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "marginBottom": 15,
+          "paddingHorizontal": 20,
+          "paddingTop": 20,
+        }
+      }
+      contentInset={
+        Object {
+          "bottom": 0,
+        }
+      }
+      enableAutomaticScroll={true}
+      enableResetScrollToCoords={true}
+      extraHeight={75}
+      extraScrollHeight={0}
+      getScrollResponder={[Function]}
+      handleOnScroll={[Function]}
+      keyboardDismissMode="interactive"
+      keyboardOpeningTime={250}
+      keyboardShouldPersistTaps="always"
+      keyboardSpace={0}
+      onScroll={[Function]}
+      resetKeyboardSpace={[Function]}
+      scrollEventThrottle={1}
+      scrollForExtraHeightOnAndroid={[Function]}
+      scrollIntoView={[Function]}
+      scrollToEnd={[Function]}
+      scrollToFocusedInput={[Function]}
+      scrollToPosition={[Function]}
+      showsVerticalScrollIndicator={true}
+      update={[Function]}
+      viewIsInsideTabBar={false}
+    >
+      <View>
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#81868B",
+                },
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 13,
+                  "lineHeight": 18,
+                },
+              ]
+            }
+          >
+            celoDollars (cUSD)
+          </Text>
+          <TextInput
+            allowFontScaling={true}
+            autoFocus={true}
+            caretHidden={false}
+            keyboardType="decimal-pad"
+            maxLength={11}
+            onChangeText={[Function]}
+            onEndEditing={[Function]}
+            onFocus={[Function]}
+            placeholder="$0"
+            placeholderTextColor="#A3EBC6"
+            rejectResponderTermination={true}
+            style={
+              Array [
+                Object {
+                  "fontSize": 22,
+                  "lineHeight": 28,
+                },
+                Object {
+                  "fontFamily": "Hind-Regular",
+                },
+                Object {
+                  "color": "#42D689",
+                },
+                Object {
+                  "alignContent": "center",
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "justifyContent": "center",
+                  "marginHorizontal": 15,
+                  "marginVertical": 10,
+                  "paddingHorizontal": 15,
+                  "textAlign": "center",
+                  "width": "100%",
+                },
+                Object {
+                  "borderRadius": 3,
+                  "borderWidth": 1,
+                  "paddingBottom": 12,
+                  "paddingTop": 15,
+                },
+                Object {
+                  "borderColor": "#2E3338",
+                },
+              ]
+            }
+            underlineColorAndroid="transparent"
+            value=""
+          />
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 13,
+                  "lineHeight": 18,
+                }
+              }
+            >
+              available
+               
+            </Text>
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Bold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "color": "#42D689",
+                  },
+                ]
+              }
+            >
+              $200.00
+            </Text>
+          </View>
+        </View>
+        <View
+          accessible={true}
+          hitSlop={
+            Object {
+              "bottom": 10,
+              "left": 10,
+              "right": 10,
+              "top": 10,
+            }
+          }
+          isTVSelectable={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "justifyContent": "center",
+              "marginHorizontal": 15,
+              "marginVertical": 33,
+              "opacity": 1,
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height={50}
+            style={Object {}}
+            viewBox="0 0 40 40"
+            width={50}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="20"
+              cy="20"
+              fill="#42D689"
+              r="20"
+              style={Object {}}
+              transform="rotate(90 20 20)"
+            />
+            <path
+              clipRule="evenodd"
+              d="M30 16C30 15.4477 29.5523 15 29 15L17.75 15L17.75 12.8356C17.75 12.0058 16.7976 11.537 16.14 12.0432L12.0294 15.2076C11.5094 15.6079 11.5094 16.3921 12.0294 16.7924L16.14 19.9568C16.7976 20.463 17.75 19.9942 17.75 19.1644L17.75 17L29 17C29.5523 17 30 16.5523 30 16ZM11 24C11 23.4477 11.4477 23 12 23L23.25 23L23.25 20.8356C23.25 20.0058 24.2024 19.537 24.86 20.0432L28.9706 23.2076C29.4906 23.6079 29.4906 24.3921 28.9706 24.7924L24.86 27.9568C24.2024 28.463 23.25 27.9942 23.25 27.1644L23.25 25L12 25C11.4477 25 11 24.5523 11 24Z"
+              fill="white"
+              fillRule="evenodd"
+              style={Object {}}
+            />
+          </svg>
+        </View>
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#81868B",
+                },
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 13,
+                  "lineHeight": 18,
+                },
+              ]
+            }
+          >
+            celoGold (cGLD)
+          </Text>
+          <View
+            style={
+              Array [
+                Object {
+                  "paddingVertical": 18,
+                },
+                Object {
+                  "alignContent": "center",
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "justifyContent": "center",
+                  "marginHorizontal": 15,
+                  "marginVertical": 10,
+                  "paddingHorizontal": 15,
+                  "textAlign": "center",
+                  "width": "100%",
+                },
+              ]
+            }
+          >
+            <View
+              style={
+                Object {
+                  "alignItems": "flex-start",
+                  "flexDirection": "row",
+                  "height": 22,
+                  "paddingTop": 2,
+                }
+              }
+            >
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "fontSize": 22,
+                      "lineHeight": 28,
+                    },
+                    Object {
+                      "fontFamily": "Hind-Regular",
+                    },
+                    Object {
+                      "color": "#FBCC5C",
+                    },
+                  ]
+                }
+              >
+                0.00
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "fontSize": 22,
+                      "lineHeight": 28,
+                    },
+                    Object {
+                      "fontFamily": "Hind-Regular",
+                    },
+                    Object {
+                      "color": "#FBCC5C",
+                    },
+                    Object {
+                      "fontSize": 12,
+                      "lineHeight": 16,
+                    },
+                  ]
+                }
+              >
+                *
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 13,
+                  "lineHeight": 18,
+                }
+              }
+            >
+              newBalance
+               
+            </Text>
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Bold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "color": "#FBCC5C",
+                  },
+                ]
+              }
+            >
+              100.00
+            </Text>
+          </View>
+        </View>
+      </View>
+    </RCTScrollView>
+    <View
+      style={
+        Object {
+          "justifyContent": "center",
+          "paddingVertical": 10,
+        }
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "textAlign": "center",
+            },
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 16,
+              "lineHeight": 24,
+            },
+          ]
+        }
+      >
+        exchangeRate
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "textAlign": "center",
+          }
+        }
+      >
+         10 cUSD : 1 cGLD
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#81868B",
+            "fontSize": 12,
+            "textAlign": "center",
+          }
+        }
+      >
+        includeExchangeFee
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "borderTopColor": "rgba(0, 0, 0, 0.05)",
+        "borderTopWidth": 1,
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "borderRadius": 3,
+            "flexDirection": "row",
+          },
+          null,
+          null,
+          undefined,
+          Object {
+            "backgroundColor": "transparent",
+          },
+        ]
+      }
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "transparent",
+            "borderWidth": 0,
+            "flex": 1,
+            "height": 50,
+            "justifyContent": "center",
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <Text
+            accessibilityLabel="continue"
+            style={
+              Array [
+                Object {
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 16,
+                },
+                Object {
+                  "color": "#42D689",
+                },
+                Object {
+                  "paddingLeft": 5,
+                  "paddingRight": 5,
+                },
+              ]
+            }
+          >
+            continue
+          </Text>
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;

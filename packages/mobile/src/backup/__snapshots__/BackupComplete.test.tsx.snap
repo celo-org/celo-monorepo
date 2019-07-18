@@ -1,0 +1,186 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "white",
+      "flex": 1,
+      "flexDirection": "column",
+      "justifyContent": "space-between",
+      "paddingHorizontal": 20,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "paddingTop": 40,
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "marginBottom": 25,
+            "marginTop": 25,
+          },
+          Object {},
+        ]
+      }
+    >
+      <Image
+        resizeMode="contain"
+        source={
+          Object {
+            "testUri": "../../../src/images/coins-logo.png",
+          }
+        }
+        style={
+          Object {
+            "height": 50,
+            "width": 50,
+          }
+        }
+      />
+    </View>
+    <Text
+      style={
+        Array [
+          Object {
+            "fontFamily": "Hind-Light",
+            "fontSize": 22,
+            "paddingBottom": 20,
+            "textAlign": "center",
+          },
+          Object {
+            "color": "#2E3338",
+            "paddingTop": 35,
+          },
+        ]
+      }
+    >
+      backupKeySet
+    </Text>
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 16,
+          "lineHeight": 24,
+        }
+      }
+    >
+      dontLoseIt
+    </Text>
+    <View
+      accessible={true}
+      isTVSelectable={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "marginTop": 40,
+          "opacity": 1,
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "fontFamily": "Hind-Light",
+            "fontSize": 18,
+            "textAlign": "center",
+          }
+        }
+      >
+        copyToClipboard
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "borderRadius": 3,
+          "flexDirection": "row",
+        },
+        Object {
+          "marginVertical": 10,
+        },
+        Object {
+          "marginBottom": 10,
+        },
+        undefined,
+        Object {
+          "backgroundColor": "#42D689",
+        },
+      ]
+    }
+  >
+    <View
+      accessible={true}
+      isTVSelectable={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#42D689",
+          "borderColor": "#42D689",
+          "borderRadius": 3,
+          "borderWidth": 2,
+          "flex": 1,
+          "height": 50,
+          "justifyContent": "center",
+          "opacity": 1,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 16,
+              },
+              Object {
+                "color": "#FFFFFF",
+              },
+              Object {
+                "paddingLeft": 5,
+                "paddingRight": 5,
+              },
+            ]
+          }
+        >
+          done
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;

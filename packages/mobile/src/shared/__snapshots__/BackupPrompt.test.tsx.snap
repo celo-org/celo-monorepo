@@ -1,0 +1,102 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BackupPrompt renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#3C9BF4",
+      "height": 93,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "column",
+        "justifyContent": "center",
+        "opacity": 1,
+        "paddingHorizontal": 25,
+      }
+    }
+  >
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 13,
+            "lineHeight": 18,
+          },
+          Object {
+            "color": "white",
+            "marginBottom": 10,
+            "textAlign": "center",
+          },
+        ]
+      }
+    >
+      backupPrompt
+    </Text>
+    <View
+      accessible={true}
+      hitSlop={
+        Object {
+          "bottom": 7,
+          "left": 7,
+          "right": 7,
+          "top": 7,
+        }
+      }
+      isTVSelectable={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "alignItems": "center",
+          "alignSelf": "center",
+          "backgroundColor": "transparent",
+          "borderColor": "#FFFFFF",
+          "borderRadius": 2,
+          "borderWidth": 2,
+          "minWidth": 160,
+          "opacity": 1,
+          "paddingHorizontal": 16,
+          "paddingVertical": 6,
+          "textAlign": "center",
+        }
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 13,
+              "lineHeight": 17,
+            },
+            Object {
+              "lineHeight": 20,
+            },
+            Object {
+              "color": "#42D689",
+            },
+            Object {
+              "color": "#FFFFFF",
+            },
+          ]
+        }
+      >
+        getBackupKey
+      </Text>
+    </View>
+  </View>
+</View>
+`;

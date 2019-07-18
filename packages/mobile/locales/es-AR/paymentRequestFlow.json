@@ -1,0 +1,10 @@
+{
+  "requests": "Solicitudes",
+  "empty": "No tienes solicitudes de pago",
+  "paymentRequests": "Solicitudes de pago",
+  "celoDollarBalance": "Saldo en dolares Celo",
+  "pay": "Paga",
+  "decline": "Disminución",
+  "requestDeclined": "Solicitud rechazada",
+  "requestPaid": "Solicitud Pagada"
+}

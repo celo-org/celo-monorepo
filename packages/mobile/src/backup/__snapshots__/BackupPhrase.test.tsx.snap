@@ -1,0 +1,242 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "white",
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "height": 45,
+      }
+    }
+  >
+    <View
+      accessible={true}
+      isTVSelectable={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "opacity": 1,
+          "paddingHorizontal": 20,
+          "paddingVertical": 10,
+        }
+      }
+      testID="CancelButton"
+    >
+      <Text
+        style={
+          Object {
+            "color": "#42D689",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 14,
+            "lineHeight": 22,
+          }
+        }
+      >
+        cancel
+      </Text>
+    </View>
+  </View>
+  <RCTScrollView
+    automaticallyAdjustContentInsets={false}
+    contentContainerStyle={
+      Object {
+        "flex": 1,
+        "justifyContent": "space-between",
+        "paddingHorizontal": 20,
+      }
+    }
+    contentInset={
+      Object {
+        "bottom": 0,
+      }
+    }
+    enableAutomaticScroll={true}
+    enableResetScrollToCoords={true}
+    extraHeight={75}
+    extraScrollHeight={0}
+    getScrollResponder={[Function]}
+    handleOnScroll={[Function]}
+    keyboardDismissMode="interactive"
+    keyboardOpeningTime={250}
+    keyboardShouldPersistTaps="always"
+    keyboardSpace={0}
+    onScroll={[Function]}
+    resetKeyboardSpace={[Function]}
+    scrollEventThrottle={1}
+    scrollForExtraHeightOnAndroid={[Function]}
+    scrollIntoView={[Function]}
+    scrollToEnd={[Function]}
+    scrollToFocusedInput={[Function]}
+    scrollToPosition={[Function]}
+    showsVerticalScrollIndicator={true}
+    update={[Function]}
+    viewIsInsideTabBar={false}
+  >
+    <View>
+      <View>
+        <Text
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-Light",
+                "fontSize": 22,
+                "paddingBottom": 20,
+                "textAlign": "center",
+              },
+              Object {
+                "color": "#2E3338",
+                "marginVertical": 10,
+              },
+            ]
+          }
+        >
+          learnBackupKey
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 15,
+              "lineHeight": 18,
+              "paddingTop": 15,
+              "textAlign": "left",
+            }
+          }
+        >
+          learnYourKey
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 15,
+              "lineHeight": 18,
+              "paddingTop": 15,
+              "textAlign": "left",
+            }
+          }
+        >
+          keyWillBeVerified
+        </Text>
+        <View
+          style={
+            Object {
+              "alignContent": "center",
+              "backgroundColor": "#F8F8F8",
+              "justifyContent": "center",
+              "marginTop": 30,
+              "padding": 16,
+              "position": "relative",
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "fontFamily": "Hind-Light",
+                "fontSize": 18,
+                "textAlign": "left",
+              }
+            }
+          >
+            prosper winner find donate tape history measure umbrella agent patrol want rhythm old unable wash wrong need fluid hammer coach reveal plastic trust lake
+          </Text>
+        </View>
+      </View>
+      <View>
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "borderRadius": 3,
+                "flexDirection": "row",
+              },
+              Object {
+                "marginVertical": 10,
+              },
+              Object {
+                "marginBottom": 10,
+              },
+              undefined,
+              Object {
+                "backgroundColor": "#42D689",
+              },
+            ]
+          }
+        >
+          <View
+            accessible={true}
+            isTVSelectable={true}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#42D689",
+                "borderColor": "#42D689",
+                "borderRadius": 3,
+                "borderWidth": 2,
+                "flex": 1,
+                "height": 50,
+                "justifyContent": "center",
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 16,
+                    },
+                    Object {
+                      "color": "#FFFFFF",
+                    },
+                    Object {
+                      "paddingLeft": 5,
+                      "paddingRight": 5,
+                    },
+                  ]
+                }
+              >
+                continue
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+</View>
+`;

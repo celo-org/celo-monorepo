@@ -1,0 +1,29 @@
+rootProject.name = 'verifier'
+include ':@react-native-community_netinfo'
+project(':@react-native-community_netinfo').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-community/netinfo/android')
+include ':react-native-gesture-handler'
+project(':react-native-gesture-handler').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-gesture-handler/android')
+include ':@segment_analytics-react-native-firebase'
+project(':@segment_analytics-react-native-firebase').projectDir = new File(rootProject.projectDir, '../../../node_modules/@segment/analytics-react-native-firebase/android')
+include ':@segment_analytics-react-native'
+project(':@segment_analytics-react-native').projectDir = new File(rootProject.projectDir, '../../../node_modules/@segment/analytics-react-native/android')
+include ':react-native-languages'
+project(':react-native-languages').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-languages/android')
+include ':react-native-fs'
+project(':react-native-fs').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-fs/android')
+include ':react-native-firebase'
+project(':react-native-firebase').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-firebase/android')
+include ':react-native-svg'
+project(':react-native-svg').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-svg/android')
+include ':react-native-languages'
+project(':react-native-languages').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-languages/android')
+include ':react-native-config'
+project(':react-native-config').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-config/android')
+include ':react-native-splash-screen'
+project(':react-native-splash-screen').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-splash-screen/android')
+include ':react-native-restart-android'
+project(':react-native-restart-android').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-restart-android/android')
+include ':react-native-device-info'
+project(':react-native-device-info').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-device-info/android')
+include ':app'
+

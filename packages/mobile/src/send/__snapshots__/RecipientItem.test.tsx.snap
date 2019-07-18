@@ -1,0 +1,127 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RecipientItem renders correctly 1`] = `
+<View
+  accessible={true}
+  isTVSelectable={true}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={null}
+>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "height": 50,
+        "justifyContent": "space-between",
+        "paddingHorizontal": 10,
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "justifyContent": "center",
+          },
+          Object {
+            "marginRight": 10,
+          },
+        ]
+      }
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#7AD6FE",
+              "borderRadius": 20,
+              "height": 40,
+              "width": 40,
+            },
+          ]
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#FFFFFF",
+                "fontFamily": "Hind-Medium",
+                "fontSize": 16,
+              },
+              Object {
+                "fontSize": 20,
+              },
+            ]
+          }
+        >
+          J
+        </Text>
+      </View>
+    </View>
+    <View
+      style={
+        Object {
+          "flex": 1,
+          "flexDirection": "row",
+          "paddingRight": 5,
+        }
+      }
+    >
+      <Text
+        ellipsizeMode="tail"
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "lineHeight": 41,
+            },
+          ]
+        }
+      >
+        John Doe
+      </Text>
+    </View>
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 14,
+            "lineHeight": 18,
+          },
+          Object {
+            "fontFamily": "Hind-Light",
+          },
+          Object {
+            "lineHeight": 41,
+            "textAlign": "right",
+          },
+        ]
+      }
+    >
+      14155550000
+    </Text>
+  </View>
+</View>
+`;

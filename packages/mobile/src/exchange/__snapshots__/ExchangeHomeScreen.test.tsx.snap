@@ -1,0 +1,160 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "white",
+      "flex": 1,
+      "flexDirection": "column",
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "height": 40,
+      }
+    }
+  />
+  <View>
+    AccountOverviewComponent
+  </View>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "justifyContent": "center",
+        "paddingBottom": 20,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "justifyContent": "center",
+          "paddingVertical": 10,
+        }
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "textAlign": "center",
+            },
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind Siliguri",
+              "fontSize": 16,
+              "fontWeight": "400",
+              "lineHeight": 20,
+            },
+          ]
+        }
+      >
+        exchanges.rate
+         
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "letterSpacing": -0.75,
+            }
+          }
+        >
+          2
+           : 1
+        </Text>
+      </Text>
+    </View>
+    <View
+      accessible={true}
+      isTVSelectable={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "opacity": 1,
+        }
+      }
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "alignSelf": "flex-start",
+              "borderColor": "#42D689",
+              "borderRadius": 2,
+              "borderWidth": 2,
+              "justifyContent": "center",
+              "paddingHorizontal": 16,
+              "paddingVertical": 6,
+            },
+            Object {
+              "backgroundColor": "#42D689",
+            },
+            undefined,
+          ]
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind Siliguri",
+                "fontSize": 13,
+                "fontWeight": "600",
+                "lineHeight": 16,
+              },
+              Object {
+                "color": "#FFFFFF",
+              },
+              undefined,
+            ]
+          }
+        >
+          exchange
+        </Text>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "backgroundColor": "#F8F8F8",
+        "paddingHorizontal": 20,
+        "paddingVertical": 15,
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "#81868B",
+          "fontFamily": "Hind Siliguri",
+          "fontSize": 14,
+          "fontWeight": "500",
+          "textAlignVertical": "center",
+        }
+      }
+    >
+      activity
+    </Text>
+  </View>
+  <View
+    style={
+      Object {
+        "flex": 1,
+      }
+    }
+  />
+</View>
+`;

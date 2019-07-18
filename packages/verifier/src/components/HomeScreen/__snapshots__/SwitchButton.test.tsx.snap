@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "alignContent": "center",
+        "justifyContent": "center",
+      },
+      undefined,
+    ]
+  }
+>
+  <RCTSwitch
+    accessibilityRole="button"
+    onChange={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    onTintColor="#42D689"
+    style={
+      Array [
+        Object {
+          "height": 31,
+          "width": 51,
+        },
+        Object {
+          "padding": 5,
+        },
+      ]
+    }
+    thumbTintColor="#FFFFFF"
+    tintColor="#81868B"
+    value={false}
+  />
+</View>
+`;

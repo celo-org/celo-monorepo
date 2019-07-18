@@ -1,0 +1,653 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "paddingTop": 20,
+    }
+  }
+>
+  <View
+    style={
+      Array [
+        Object {
+          "backgroundColor": "#FFFFFF",
+          "flex": 1,
+        },
+        undefined,
+      ]
+    }
+  >
+    <RCTScrollView
+      contentContainerStyle={
+        Object {
+          "flex": 1,
+          "justifyContent": "space-between",
+        }
+      }
+    >
+      <View>
+        <View
+          style={
+            Object {
+              "backgroundColor": "#FFFFFF",
+              "flex": 1,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "justifyContent": "center",
+                "marginTop": 10,
+              }
+            }
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "fontFamily": "Hind-Light",
+                    "fontSize": 22,
+                    "paddingBottom": 20,
+                    "textAlign": "center",
+                  },
+                  Object {
+                    "alignSelf": "center",
+                    "color": "#2E3338",
+                    "padding": 10,
+                    "paddingBottom": 10,
+                  },
+                ]
+              }
+            >
+              reclaimPayment
+            </Text>
+          </View>
+        </View>
+        <View
+          style={
+            Object {
+              "flex": 4,
+              "marginHorizontal": 20,
+              "marginVertical": 10,
+            }
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "borderColor": "#EEEEEE",
+                  "borderRadius": 3,
+                  "borderWidth": 1,
+                },
+                Object {
+                  "flex": 1,
+                  "justifyContent": "center",
+                  "padding": 10,
+                },
+              ]
+            }
+          >
+            <View
+              style={
+                Object {
+                  "alignSelf": "center",
+                  "margin": "auto",
+                  "padding": 20,
+                }
+              }
+            >
+              <Image
+                resizeMode="contain"
+                source={
+                  Object {
+                    "testUri": "../../../src/images/coins-logo.png",
+                  }
+                }
+                style={
+                  Object {
+                    "height": 40,
+                    "width": 40,
+                  }
+                }
+              />
+            </View>
+            <View
+              style={
+                Object {
+                  "alignSelf": "center",
+                  "flexDirection": "row",
+                  "marginTop": 10,
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 24,
+                    },
+                    Object {
+                      "fontSize": 30,
+                      "height": 35,
+                      "lineHeight": 40,
+                    },
+                    Object {
+                      "color": "#42D689",
+                    },
+                  ]
+                }
+              >
+                $
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 24,
+                    },
+                    Object {
+                      "color": "#81868B",
+                      "fontSize": 48,
+                      "lineHeight": 60,
+                    },
+                    Object {
+                      "color": "#42D689",
+                    },
+                  ]
+                }
+              >
+                0.00
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "borderStyle": "solid",
+                  "borderTopColor": "#EEEEEE",
+                  "borderTopWidth": 1,
+                  "width": "100%",
+                }
+              }
+            />
+            <View
+              style={
+                Object {
+                  "padding": 20,
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "paddingTop": 6,
+                      "textAlign": "center",
+                    },
+                  ]
+                }
+              >
+                Alice The Person
+              </Text>
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Light",
+                        "fontSize": 14,
+                        "textAlignVertical": "center",
+                      },
+                      Object {
+                        "alignItems": "center",
+                        "backgroundColor": "#EEEEEE",
+                        "borderRadius": 3,
+                        "justifyContent": "center",
+                        "marginRight": 5,
+                        "paddingLeft": 6,
+                        "paddingRight": 3,
+                      },
+                    ]
+                  }
+                >
+                   +1
+                </Text>
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Light",
+                      "fontSize": 14,
+                      "textAlignVertical": "center",
+                    }
+                  }
+                >
+                  (209) 555-9790
+                </Text>
+              </View>
+            </View>
+            <View
+              style={
+                Object {
+                  "marginBottom": 10,
+                  "marginTop": 10,
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "stretch",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "flex-start",
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 16,
+                          "lineHeight": 24,
+                        },
+                        Object {
+                          "left": 1,
+                          "lineHeight": 28,
+                          "marginLeft": 10,
+                        },
+                      ]
+                    }
+                  >
+                    totalSent
+                  </Text>
+                </View>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 24,
+                      },
+                      Object {
+                        "lineHeight": 28,
+                        "marginRight": 10,
+                        "right": 1,
+                      },
+                    ]
+                  }
+                >
+                  $
+                  10.00
+                </Text>
+              </View>
+              <View
+                style={
+                  Object {
+                    "alignItems": "stretch",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "flex-start",
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 16,
+                          "lineHeight": 24,
+                        },
+                        Object {
+                          "left": 1,
+                          "lineHeight": 28,
+                          "marginLeft": 10,
+                        },
+                      ]
+                    }
+                  >
+                    securityFee
+                  </Text>
+                  <View
+                    accessible={true}
+                    hitSlop={
+                      Object {
+                        "bottom": 10,
+                        "left": 10,
+                        "right": 10,
+                        "top": 10,
+                      }
+                    }
+                    isTVSelectable={true}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
+                    style={
+                      Object {
+                        "alignItems": "center",
+                        "justifyContent": "flex-end",
+                        "opacity": 1,
+                        "paddingHorizontal": 5,
+                      }
+                    }
+                  >
+                    <Image
+                      source={
+                        Object {
+                          "testUri": "../../../src/images/info.png",
+                        }
+                      }
+                      style={
+                        Object {
+                          "height": 12,
+                          "width": 12,
+                        }
+                      }
+                    />
+                  </View>
+                </View>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 24,
+                      },
+                      Object {
+                        "lineHeight": 28,
+                        "marginRight": 10,
+                        "right": 1,
+                      },
+                    ]
+                  }
+                >
+                  -
+                  $
+                  0.00
+                </Text>
+              </View>
+              <View
+                style={
+                  Object {
+                    "alignItems": "stretch",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "flex-start",
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-Bold",
+                          "fontSize": 16,
+                          "lineHeight": 24,
+                        },
+                        Object {
+                          "left": 1,
+                          "lineHeight": 28,
+                          "marginLeft": 10,
+                        },
+                      ]
+                    }
+                  >
+                    totalRefunded
+                  </Text>
+                </View>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 16,
+                        "lineHeight": 24,
+                      },
+                      Object {
+                        "color": "#42D689",
+                        "lineHeight": 28,
+                        "marginRight": 10,
+                        "right": 1,
+                      },
+                    ]
+                  }
+                >
+                  $
+                  0.00
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+    </RCTScrollView>
+    <View
+      style={
+        Object {
+          "marginHorizontal": 20,
+        }
+      }
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "borderRadius": 3,
+              "flexDirection": "row",
+            },
+            Object {
+              "marginVertical": 10,
+            },
+            Object {
+              "marginBottom": 10,
+            },
+            undefined,
+            Object {
+              "backgroundColor": "#42D689",
+            },
+          ]
+        }
+      >
+        <View
+          accessible={true}
+          isTVSelectable={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "backgroundColor": "#42D689",
+              "borderColor": "#42D689",
+              "borderRadius": 3,
+              "borderWidth": 2,
+              "flex": 1,
+              "height": 50,
+              "justifyContent": "center",
+              "opacity": 1,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <Text
+              accessibilityLabel="global:confirm"
+              style={
+                Array [
+                  Object {
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 16,
+                  },
+                  Object {
+                    "color": "#FFFFFF",
+                  },
+                  Object {
+                    "paddingLeft": 5,
+                    "paddingRight": 5,
+                  },
+                ]
+              }
+            >
+              global:confirm
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "borderRadius": 3,
+              "flexDirection": "row",
+            },
+            null,
+            null,
+            Object {
+              "marginBottom": 10,
+            },
+            Object {
+              "backgroundColor": "transparent",
+            },
+          ]
+        }
+      >
+        <View
+          accessible={true}
+          isTVSelectable={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "backgroundColor": "transparent",
+              "borderWidth": 0,
+              "flex": 1,
+              "height": 50,
+              "justifyContent": "center",
+              "opacity": 1,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <Text
+              accessibilityLabel="cancel"
+              style={
+                Array [
+                  Object {
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 16,
+                  },
+                  Object {
+                    "color": "#42D689",
+                  },
+                  Object {
+                    "paddingLeft": 5,
+                    "paddingRight": 5,
+                  },
+                ]
+              }
+            >
+              cancel
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;

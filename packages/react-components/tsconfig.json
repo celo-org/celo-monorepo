@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "importHelpers": true,
+    "jsx": "react",
+    "lib": ["es7", "esnext", "dom"],
+    "moduleResolution": "node",
+    "noEmit": true,
+    "noUnusedLocals": true,
+    "resolveJsonModule": true,
+    "strictNullChecks": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "es2015",
+    "resolveJsonModule": true
+  },
+  "exclude": ["node_modules"]
+}

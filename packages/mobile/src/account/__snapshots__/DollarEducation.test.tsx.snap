@@ -1,0 +1,252 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DollarEducation renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "backgroundColor": "white",
+      "flex": 1,
+      "justifyContent": "center",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "flexDirection": "row",
+        "justifyContent": "flex-start",
+        "margin": 0,
+        "padding": 20,
+        "width": "100%",
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "flex": 0,
+        }
+      }
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+        testID="Education-goback"
+      >
+        <Text
+          style={
+            Object {
+              "color": "#42D689",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 14,
+              "lineHeight": 22,
+            }
+          }
+        >
+           
+          cancel
+        </Text>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "flex": 8,
+      }
+    }
+  >
+    <Swiper
+      activeDotStyle={
+        Object {
+          "backgroundColor": "#D1D5D8",
+          "borderRadius": 8,
+          "flex": 0,
+          "height": 12,
+          "width": 12,
+        }
+      }
+      containerStyle={
+        Object {
+          "alignItems": "center",
+        }
+      }
+      dotStyle={
+        Object {
+          "backgroundColor": "#D1D5D8",
+          "borderRadius": 8,
+          "flex": 0,
+          "height": 8,
+          "width": 8,
+        }
+      }
+      loop={false}
+      onIndexChanged={[Function]}
+      showsButtons={false}
+      showsPagination={true}
+      style={
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "width": 750,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "flex": 1,
+            "justifyContent": "center",
+            "marginBottom": 60,
+          }
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../src/images/stability-scale.png",
+            }
+          }
+          style={
+            Object {
+              "alignSelf": "center",
+              "height": 200,
+              "width": 200,
+            }
+          }
+        />
+        <Text
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-Light",
+                "fontSize": 22,
+                "paddingBottom": 20,
+                "textAlign": "center",
+              },
+              Object {
+                "color": "#81868B",
+                "paddingHorizontal": 20,
+                "paddingTop": 30,
+              },
+            ]
+          }
+        >
+          stableDollar
+        </Text>
+      </View>
+      <View
+        style={
+          Object {
+            "flex": 1,
+            "justifyContent": "center",
+            "marginBottom": 60,
+          }
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../src/images/send-fee.png",
+            }
+          }
+          style={
+            Object {
+              "alignSelf": "center",
+              "height": 200,
+              "width": 200,
+            }
+          }
+        />
+        <Text
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-Light",
+                "fontSize": 22,
+                "paddingBottom": 20,
+                "textAlign": "center",
+              },
+              Object {
+                "color": "#81868B",
+                "paddingHorizontal": 20,
+                "paddingTop": 30,
+              },
+            ]
+          }
+        >
+          feeTransaction
+        </Text>
+      </View>
+      <View
+        style={
+          Object {
+            "flex": 1,
+            "justifyContent": "center",
+            "marginBottom": 60,
+          }
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../src/images/send-between-phones.png",
+            }
+          }
+          style={
+            Object {
+              "alignSelf": "center",
+              "height": 200,
+              "width": 200,
+            }
+          }
+        />
+        <Text
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-Light",
+                "fontSize": 22,
+                "paddingBottom": 20,
+                "textAlign": "center",
+              },
+              Object {
+                "color": "#81868B",
+                "paddingHorizontal": 20,
+                "paddingTop": 30,
+              },
+            ]
+          }
+        >
+          sendCelo
+        </Text>
+      </View>
+    </Swiper>
+  </View>
+  <View
+    style={
+      Object {
+        "alignSelf": "stretch",
+        "flex": 2,
+        "justifyContent": "flex-end",
+      }
+    }
+  />
+</View>
+`;

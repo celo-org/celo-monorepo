@@ -1,0 +1,8 @@
+dist/
+tsconfig.tsbuildinfo
+
+# Firebase cache
+.firebase/
+
+
+serviceAccountKey.json

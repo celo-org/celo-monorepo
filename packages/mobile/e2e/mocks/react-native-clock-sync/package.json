@@ -1,0 +1,6 @@
+{
+  "name": "react-native-clock-sync",
+  "version": "1.0.0",
+  "description": "Sync clock across mobile devices using NTP",
+  "main": "index"
+}

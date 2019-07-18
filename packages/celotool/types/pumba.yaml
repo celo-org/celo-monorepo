@@ -1,0 +1,40 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: pumba
+spec:
+  template:
+    metadata:
+      labels:
+        app: pumba
+        com.gaiaadm.pumba: "true" # prevent pumba from killing itself
+      name: pumba
+    spec:
+      containers:
+      - image: gaiaadm/pumba:master
+        imagePullPolicy: Always
+        name: pumba
+        # Pumba command: modify it to suite your needs
+        # Currently: randomly try to kill some container every 3 minutes
+        args:
+          - netem
+          - delay
+          - --time
+          - "2000"
+        resources:
+          requests:
+            cpu: 10m
+            memory: 5M
+          limits:
+            cpu: 100m
+            memory: 20M
+        # run on regular nodes and not api nodes where the critical infrastucure like kube-scheduler lives
+        # nodeSelector:
+        #   node-type: node
+        volumeMounts:
+          - name: dockersocket
+            mountPath: /var/run/docker.sock
+      volumes:
+        - hostPath:
+            path: /var/run/docker.sock
+          name: dockersocket

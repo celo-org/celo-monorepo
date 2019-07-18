@@ -1,0 +1,331 @@
+# adapted from https://github.com/CircleCI-Public/circleci-demo-react-native
+# and https://github.com/facebook/react-native/blob/master/.circleci/config.yml
+
+version: 2
+
+defaults: &defaults
+  working_directory: ~/app
+  docker:
+    - image: celohq/node8:gcloud-deps
+
+android-defaults: &android-defaults
+  <<: *defaults
+  docker:
+    - image: circleci/android:api-28-node8-alpha
+  environment:
+    _JAVA_OPTIONS: '-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
+    GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError"'
+
+general:
+  artifacts:
+    - 'mobile/coverage'
+    - 'protocol/coverage'
+
+jobs:
+  install_dependencies:
+    <<: *defaults
+    steps:
+      # The standard Circle CI checkout steps makes a shallow clone with the depth of 1
+      # Which means we have no way of knowing which commits are specifically in this branch.
+      # We need that for incremental testing.
+      # This checkout assumes that a single branch will not have more than a certain number commits
+      # on top of master and if it does, then the incremental testing script will fail. The committer can
+      # than squash those commits. Which is OK since we squash commits on merge to master
+      # anyways.
+      - run:
+          name: Checkout (with last 100 commits)
+          command: |
+            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+            git clone --depth 100 --no-single-branch --branch ${CIRCLE_BRANCH} git@github.com:celo-org/celo-monorepo.git ~/app
+            cd ~/app
+            set -v
+            # To get the "master" branch mapping
+            git checkout master
+            git checkout ${CIRCLE_BRANCH}
+            # Verify that these commands work, they are later called in the incremental testing script
+            # There output does not matter here, the fact that they finish successfully does.
+            git rev-parse --abbrev-ref HEAD
+            git merge-base master $(git rev-parse --abbrev-ref HEAD)
+            git log --format=format:%H $(git merge-base master $(git rev-parse --abbrev-ref HEAD))..HEAD > /dev/null
+
+      - attach_workspace:
+          at: ~/app
+
+      - restore_cache:
+          key: yarn-v2-{{ checksum "yarn.lock" }}-{{ arch }}
+
+      - run:
+          name: Delete @celo dir from node_modules (if its there)
+          command: rm -rf ~/app/node_modules/@celo
+
+      - run:
+          name: yarn
+          command: |
+            # Deals with yarn install flakiness which can come due to yarnpkg.com being
+            # unreliable. For example, https://circleci.com/gh/celo-org/celo-monorepo/82685
+            yarn install || yarn install
+
+      - run:
+          name: Fail if someone forgot to commit "yarn.lock"
+          command: |
+            if [[ $(git status --porcelain) ]]; then
+              echo "There are git differences after running yarn install"
+              exit 1
+            fi
+
+      - run: npm rebuild scrypt
+
+      - save_cache:
+          key: yarn-v2-{{ checksum "yarn.lock" }}-{{ arch }}
+          paths:
+            - node_modules
+            - packages/*/node_modules
+
+      - persist_to_workspace:
+          root: .
+          paths: .
+
+  lint-checks:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+
+      - run: yarn run ci-lint
+
+  general-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+
+      - run:
+          name: jest tests
+          command: |
+            mkdir -p test-results/jest
+            yarn run lerna --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/contractkit --ignore @celo/celocli run test
+
+  mobile-test-build-app:
+    working_directory: ~/app
+    docker:
+      - image: circleci/android:api-28
+
+    steps:
+      - attach_workspace:
+          at: ~/app
+
+      - run:
+          name: Build Android app (debug version)
+          command: |
+            set -euo pipefail
+            cd packages/mobile/android
+            ENVFILE=.env.test ./gradlew assembleDebug
+            cd -
+
+  mobile-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+
+      - run:
+          name: jest tests
+          command: |
+            mkdir -p test-results/jest
+            # Tests fail with https://stackoverflow.com/questions/38558989/node-js-heap-out-of-memory without this
+            NODE_OPTIONS="--max-old-space-size=4096" yarn --cwd packages/mobile test
+          environment:
+            JEST_JUNIT_OUTPUT: test-results/jest/junit.xml
+
+      - store_test_results:
+          path: test-results
+
+      - store_artifacts:
+          path: packages/mobile/coverage
+          destination: mobile/coverage
+
+      - run:
+          name: copy
+          command: |
+            mkdir -p packages/mobile/mobile/coverage
+            cp -r packages/mobile/coverage packages/mobile/mobile/
+      - run:
+          name: Upload to CodeCov
+          command: yarn codecov -F mobile
+
+  verification-pool-api:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+
+      - run:
+          name: jest tests
+          command: |
+            mkdir -p test-results/jest
+            yarn --cwd packages/verification-pool-api test
+          environment:
+            JEST_JUNIT_OUTPUT: test-results/jest/junit.xml
+
+  protocol-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            DIRS_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+      - run:
+          name: test
+          # Flaky tests - run them twice
+          command: yarn --cwd packages/protocol test || yarn --cwd packages/protocol test
+
+  cli-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Test
+          command: |
+            set -euo pipefail
+            yarn --cwd=packages/cli test
+
+  end-to-end-geth-transfer-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+      - run:
+          name: Setup Go language
+          command: |
+            set -e
+            set -v
+            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
+            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
+            ls /tmp/go/bin/go
+            /tmp/go/bin/go version
+      - run:
+          name: Run test
+          no_output_timeout: 20m
+          command: |
+            set -e
+            export PATH=${PATH}:/tmp/go/bin
+            go version
+            cd packages/celotool
+            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+            ./ci_test_transfers.sh checkout master
+
+  end-to-end-geth-governance-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+      - run:
+          name: Setup Go language
+          command: |
+            set -e
+            set -v
+            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
+            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
+            ls /tmp/go/bin/go
+            /tmp/go/bin/go version
+      - run:
+          name: Run test
+          no_output_timeout: 20m
+          command: |
+            set -e
+            export PATH=${PATH}:/tmp/go/bin
+            go version
+            cd packages/celotool
+            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+            ./ci_test_governance.sh checkout master
+
+  end-to-end-geth-sync-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+      - run:
+          name: Setup Go language
+          command: |
+            set -e
+            set -v
+            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
+            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
+            ls /tmp/go/bin/go
+            /tmp/go/bin/go version
+      - run:
+          name: Run test
+          command: |
+            set -e
+            export PATH=${PATH}:/tmp/go/bin
+            go version
+            cd packages/celotool
+            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+            ./ci_test_sync.sh checkout master
+
+  web:
+    working_directory: ~/app
+    docker:
+      - image: celohq/node8:gcloud
+    steps:
+      - attach_workspace:
+          at: ~/app
+
+      - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+      - run: cd packages/web && ./circle_deploy.sh
+
+workflows:
+  version: 2
+  celo-monorepo-build:
+    jobs:
+      - install_dependencies
+      - lint-checks:
+          requires:
+            - install_dependencies
+      - general-test:
+          requires:
+            - install_dependencies
+            - lint-checks
+      - mobile-test:
+          requires:
+            - install_dependencies
+            - lint-checks
+      - mobile-test-build-app:
+          requires:
+            - install_dependencies
+            - lint-checks
+      - verification-pool-api:
+          requires:
+            - install_dependencies
+            - lint-checks
+      - protocol-test:
+          requires:
+            - install_dependencies
+      - end-to-end-geth-transfer-test:
+          requires:
+            - install_dependencies
+      - end-to-end-geth-governance-test:
+          requires:
+            - install_dependencies
+      - end-to-end-geth-sync-test:
+          requires:
+            - install_dependencies

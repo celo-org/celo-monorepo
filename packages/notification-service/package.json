@@ -1,0 +1,44 @@
+{
+  "name": "@celo/notification-service",
+  "description": "A cloud service that dispatches notifications to mobile clients",
+  "version": "0.0.4",
+  "private": true,
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": "8.x"
+  },
+  "scripts": {
+    "build": "tsc",
+    "gcp-build": "npm run build",
+    "test": "",
+    "lint": "tslint -c tslint.json --project tsconfig.json",
+    "lint-checks": "yarn run lint && yarn build --noEmit",
+    "start": "node ./dist/index.js",
+    "start:local": "npm run build; cp config/config.local.env .env; node --inspect ./dist/index.js",
+    "deploy": "./deploy.sh"
+  },
+  "dependencies": {
+    "async-polling": "^0.2.1",
+    "bignumber.js": "^7.2.0",
+    "dotenv": "^6.0.0",
+    "express": "^4.16.4",
+    "firebase-admin": "^7.0.0",
+    "i18next": "^12.1.0",
+    "node-fetch": "^2.2.0",
+    "typescript": "^3.3.3",
+    "utf8": "^3.0.0",
+    "web3-eth-abi": "1.0.0-beta.37",
+    "web3-utils": "1.0.0-beta.37"
+  },
+  "devDependencies": {
+    "@google-cloud/nodejs-repo-tools": "^2.3.3",
+    "@types/async-polling": "^0.0.3",
+    "@types/dotenv": "^4.0.3",
+    "@types/express": "^4.16.1",
+    "@types/i18next": "^11.9.3",
+    "@types/node-fetch": "^2.1.2",
+    "@types/utf8": "^2.1.6",
+    "@types/web3": "^1.0.18"
+  }
+}

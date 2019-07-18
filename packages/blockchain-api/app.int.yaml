@@ -1,0 +1,12 @@
+runtime: nodejs8
+service: integration
+env_variables:
+  NODE_ENV: 'development'
+  DEPLOY_ENV: 'integration'
+  BLOCKSCOUT_API: 'https://integration-blockscout.celo-testnet.org/api'
+  # Pull addresses from the build artifacts of the network in protocol/build
+  CELO_GOLD_ADDRESS: '0x9cb31fCD259E6Dd87566945c94E2BFaDcE179feA'
+  CELO_DOLLAR_ADDRESS: '0x7DFAA4B53E7d06E9e30C4426d9692453d94A8437'
+  FAUCET_ADDRESS: '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
+  VERIFICATION_REWARDS_ADDRESS: '0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5'
+  ABE_ADDRESS: '0x4Aa7660173C3C1D4d5F4cb4090b92389Ea1F0771'

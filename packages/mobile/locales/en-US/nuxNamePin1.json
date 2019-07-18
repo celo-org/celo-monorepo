@@ -1,0 +1,64 @@
+{
+  "selectCountry": "Select Country",
+  "chooseLanguage": "Choose Language",
+  "continue": "Continue",
+  "secureAsset":
+    "Celo keeps your assets secure and enables you to send and receive value with anyone",
+  "stableAsset":
+    "Celo Dollars are a stable digital asset that tracks to the value of the US Dollar",
+  "verifyNumber": "Verify your phone number so other Celo users can find you and send you value",
+  "syncNetwork": "Syncing with Network",
+  "welcomeCelo": "Welcome to Celo",
+  "inviteText": {
+    "0":
+      "Enter your invitation code. If you do not have one, ask someone in the Celo Community to invite you. You can paste the entire invite message as your invite code.",
+    "1":
+      "By joining this network, you agree to allow us to collect anonymized information about how you use the app. Additionally, if you verify your phone number, an obfuscated copy of it will be stored on the Celo Network. Learn more at ",
+    "2": "celo.org/terms",
+    "askForInvite": {
+      "0": "Don't have a code? ",
+      "1": "Ask someone with Celo Wallet for an invite or sign up for an account at ",
+      "2": "celo.org/build/wallet"
+    }
+  },
+  "enterFullName": "Please enter your first and last name",
+  "fullName": "Full Name",
+  "InvitationCode": "Invitation Code",
+  "optIn": "Opt In",
+  "submitting": "Submitting ...",
+  "redeemingInvite": "Redeeming Invite",
+  "redeemingDescription": "Please wait. This may take a few minutes. Please keep this app open.",
+  "haveWallet": "Already have a Celo wallet? ",
+  "importIt": "Import it",
+  "cancel": "Cancel",
+  "important": "Important",
+  "createPin": {
+    "title": "Create 6 digit PIN Code",
+    "intro": "Create a PIN to secure your Celo Wallet.",
+    "why": "You'll need this PIN occasionally when you want to send Celo Dollars to your friends.",
+    "warn":
+      "Write down your 6 digit PIN code & secure it somewhere safe. You will be asked for this later to access your wallet.",
+    "yourPin": "Your PIN"
+  },
+  "verifyPin": {
+    "title": "Re-enter 6 digit PIN Code",
+    "finalPin": "Create PIN"
+  },
+  "confirmPin": {
+    "title": "Enter 6 digit PIN Code",
+    "submit": "Submit"
+  },
+  "systemAuth": {
+    "title": "Set up Celo Security",
+    "intro":
+      "We will need you to input your device's lockscreen PIN or thumbprint, if your device supports it.",
+    "why":
+      "We need this additional level of protection to ensure that the value in your wallet stays secure."
+  },
+  "goToSystemSecuritySettingsActionLabel": "Go to security",
+  "enableSystemScreenLockFailedMessage": "Failed to enable screen lock",
+  "initKeystoreFailureMessage": "Failed to init keystore",
+  "pinLostForeverMessage": "You removed the screen lock, the PIN is lost",
+  "enableScreenLockMessage":
+    "Please enable lockscreen to use Celo. If you disable lock-screen in the future, you will need your backup key to access your account."
+}

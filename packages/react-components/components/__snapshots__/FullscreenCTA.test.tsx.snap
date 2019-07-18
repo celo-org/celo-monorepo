@@ -1,0 +1,149 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FullscreenCTA renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "height": 1334,
+      "justifyContent": "space-between",
+      "paddingBottom": 30,
+      "paddingHorizontal": 20,
+      "paddingTop": 55,
+      "width": 750,
+    }
+  }
+>
+  <View
+    style={Object {}}
+  >
+    <Text
+      style={
+        Object {
+          "fontFamily": "Hind-Light",
+          "fontSize": 22,
+          "paddingBottom": 20,
+          "textAlign": "center",
+        }
+      }
+    >
+      App Update
+    </Text>
+    <Text
+      style={
+        Object {
+          "fontFamily": "Hind-Light",
+          "fontSize": 18,
+          "textAlign": "center",
+        }
+      }
+    >
+      Please upgrade your app
+    </Text>
+  </View>
+  <View>
+    <Text
+      ellipsizeMode="tail"
+      numberOfLines={10}
+      style={
+        Object {
+          "backgroundColor": "rgba(238, 238, 238, 0.75)",
+          "borderRadius": 25,
+          "fontFamily": "Hind-Regular",
+          "fontSize": 12,
+          "padding": 15,
+        }
+      }
+    >
+      Update your app to make sure you are safe
+    </Text>
+  </View>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "borderRadius": 3,
+            "flexDirection": "row",
+          },
+          Object {
+            "marginVertical": 10,
+          },
+          Object {
+            "marginBottom": 10,
+          },
+          undefined,
+          Object {
+            "backgroundColor": "#42D689",
+          },
+        ]
+      }
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "#42D689",
+            "borderColor": "#42D689",
+            "borderRadius": 3,
+            "borderWidth": 2,
+            "flex": 1,
+            "height": 50,
+            "justifyContent": "center",
+            "opacity": 1,
+          }
+        }
+        testID="ErrorContinueButton"
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 16,
+                },
+                Object {
+                  "color": "#FFFFFF",
+                },
+                Object {
+                  "paddingLeft": 5,
+                  "paddingRight": 5,
+                },
+              ]
+            }
+          >
+            click Here!
+          </Text>
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;

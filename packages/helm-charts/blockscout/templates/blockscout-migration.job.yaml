@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-migration
+  labels:
+    app: blockscout
+    chart: blockscout
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: blockscout-migration
+spec:
+  template:
+    spec:
+      containers:
+      - name: blockscout-web
+        image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.webTag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command: ["/bin/sh"]
+        args: ["-c", "echo Sleeping for 15; sleep 15; mix ecto.migrate"]
+        resources:
+          requests:
+            memory: 250M
+            cpu: 200m
+        env:
+{{ include "celo.blockscout-env-vars" .  | indent 10 }}
+{{ include "celo.blockscout-db-sidecar" .  | indent 6 }}
+      restartPolicy: Never
+  backoffLimit: 0

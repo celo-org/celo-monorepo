@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "red",
+      "height": 36,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "center",
+        "opacity": 1,
+        "paddingHorizontal": 25,
+      }
+    }
+  >
+    <Text>
+      Hi
+    </Text>
+  </View>
+</View>
+`;

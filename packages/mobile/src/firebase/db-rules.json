@@ -1,0 +1,37 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid",
+        "address": {
+          ".validate": "newData.isString() && newData.val().length === 42"
+        }
+      }
+    },
+    "versions": {
+      "$verion_string": {
+        ".read": true,
+        ".write": false
+      }
+    },
+    "lastBlockNotified": {
+      ".read": false,
+      ".write": false
+    },
+    "registrations": {
+      "$address": {
+        ".read":
+          "auth.uid != null && $address === root.child('users').child(auth.uid).child('address').val()",
+        ".write":
+          "auth.uid != null && $address === root.child('users').child(auth.uid).child('address').val()"
+      }
+    },
+    "pendingRequests": {
+      ".read":
+        "auth.uid != null && (query.orderByChild == 'requesterAddress' || query.orderByChild == 'requesteeAddress') && query.equalTo == root.child('users').child(auth.uid).child('address').val()",
+      ".write": true,
+      ".indexOn": ["requesterAddress", "requesteeAddress"]
+    }
+  }
+}

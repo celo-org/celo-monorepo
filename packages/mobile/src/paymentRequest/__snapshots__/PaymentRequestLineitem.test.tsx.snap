@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<Text
+  ellipsizeMode="middle"
+  numberOfLines={1}
+  style={
+    Object {
+      "flexDirection": "row",
+    }
+  }
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "color": "#81868B",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 14,
+          "lineHeight": 20,
+        },
+      ]
+    }
+  >
+    +14155552671
+     - 
+    Hey thanks for the loan, Ill pay you back ASAP. LOVE YOU
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "color": "#81868B",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 14,
+          "lineHeight": 20,
+        },
+        Object {
+          "fontFamily": "Hind-SemiBold",
+        },
+      ]
+    }
+  >
+     
+    24
+  </Text>
+</Text>
+`;

@@ -1,0 +1,12 @@
+{
+  "receivedPayment": "Received Payment",
+  "from": "from",
+  "celoWallet": "Celo Wallet",
+  "at": "at",
+  "receivedDollars": "Received Celo Dollars",
+  "verificationMessage": "You paid a fee to verify your account. Welcome to Celo!",
+  "receivedAmountFromCelo": {
+    "0": "You received ",
+    "1": " from Celo!"
+  }
+}

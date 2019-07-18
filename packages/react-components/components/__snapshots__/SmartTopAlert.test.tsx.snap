@@ -1,0 +1,81 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SmartTopAlert renders correctly 1`] = `
+<View
+  accessible={true}
+  isTVSelectable={true}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    Object {
+      "opacity": 1,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "backgroundColor": "#3C9BF4",
+        "height": 36,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "flexDirection": "row",
+          "justifyContent": "center",
+          "opacity": 1,
+          "paddingHorizontal": 25,
+        }
+      }
+    >
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 13,
+              "lineHeight": 18,
+            },
+            Object {
+              "color": "white",
+              "lineHeight": 20,
+              "textAlign": "center",
+            },
+            false,
+          ]
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "white",
+                "lineHeight": 20,
+                "textAlign": "center",
+              },
+              Object {
+                "fontFamily": "Hind-SemiBold",
+              },
+            ]
+          }
+        >
+           
+          Smart Top Alert
+           
+        </Text>
+        dont get funny
+      </Text>
+    </View>
+  </View>
+</View>
+`;

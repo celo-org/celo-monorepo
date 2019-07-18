@@ -1,0 +1,17 @@
+imagePullPolicy: IfNotPresent
+promtosd:
+  image:
+    repository: gcr.io/google-containers/prometheus-to-sd
+    tag: v0.3.2
+  port: 6060
+blockscout:
+  image:
+    repository: gcr.io/celo-testnet/blockscout
+    webTag: web
+    indexerTag: indexer
+  db:
+    # ip: must be provided at runtime # IP address of the postgres DB
+    # connection_name: must be provided at runtime # name of the cloud sql connection
+    # username: blockscout
+    # password: password
+    name: blockscout

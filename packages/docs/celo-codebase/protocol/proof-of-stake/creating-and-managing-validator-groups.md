@@ -1,0 +1,7 @@
+# Creating and Managing Validator Groups
+
+Any account that meets minimum stake and notice period requirements can register as an empty validator group. Similarly to registering a validator, a minimum stake of one Celo Gold and a notice period of 60 days is required to create a validator group in the Alfajores Testnet. The account that creates a validator group is able to deregister that group if it is empty. The account owner controls the list of validators in their group and can remove validators from it.
+
+Validators can join a validator group as long as the validator group owner accepts its affiliation request and that there are no more than a certain maximum number of validators in the group.
+
+Each validator group maintains an ordered list of active validators that gets updated at the end of each epoch. Validators that leave a group are removed from the list at that time. The ordering of the list is managed by the validator group owner. When a validator group is elected following the [D’Hondt method](https://medium.com/r/?url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FD%2527Hondt_method), validators in that group are appointed a consensus participation slot starting at the top of the list and going down it until all slots for that group are appointed. If for that validator group, there are more validators than appointed slots, validators at the bottom of the list are not eligible to participate in the consensus protocol and do not earn a fixed Celo Dollar reward for that epoch.

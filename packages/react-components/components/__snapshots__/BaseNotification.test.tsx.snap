@@ -1,0 +1,101 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BaseNotification renders correctly 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "padding": 10,
+        "width": "100%",
+      },
+      undefined,
+    ]
+  }
+>
+  <View
+    style={
+      Object {
+        "flex": 1,
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Hind-Bold",
+          "fontSize": 14,
+          "lineHeight": 18,
+        }
+      }
+    >
+      Test
+    </Text>
+    <View>
+      <View
+        style={
+          Object {
+            "justifyContent": "space-between",
+            "minHeight": 70,
+          }
+        }
+      >
+        <Text>
+          Test
+        </Text>
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+              "marginTop": 15,
+            }
+          }
+        >
+          <View
+            accessible={true}
+            isTVSelectable={true}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "opacity": 1,
+              }
+            }
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "color": "#42D689",
+                    "fontFamily": "Hind-Medium",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "paddingEnd": 15,
+                  },
+                ]
+              }
+            >
+              it goes boom
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;

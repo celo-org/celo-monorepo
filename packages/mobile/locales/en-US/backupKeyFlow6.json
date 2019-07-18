@@ -1,0 +1,83 @@
+{
+  "readOnlyMode": "Read Only Mode Set Backup Key to continue sending and receiving Celo Dollars",
+  "getBackupKey": "Get Backup Key",
+  "learnBackupKey": "Learn Your Backup Key",
+  "editProfile": "Edit Profile",
+  "backupKey": "Backup Key",
+  "inviteFriends": "Invite Friends",
+  "verifierApp": "Verifier App",
+  "languageSettings": "Language Settings",
+  "cancel": "Cancel",
+  "backupKeyImportance": {
+    "0":
+      "If you lose your phone or delete the Celo app, you will lose all of the gold and dollars in your wallet.",
+    "1":
+      "You can back up your wallet by writing down a Backup Key on a piece of paper and storing it securely. This allows you to restore your wallet in the future if you need to.",
+    "2":
+      "Don’t take a screenshot or save it in your phone notes. Make sure to write the Backup Key down and keep it safe."
+  },
+  "setBackupKey": "Set Backup Key",
+  "skip": "Skip",
+  "areYouSure": "Are you sure?",
+  "backupSkipText": {
+    "0": "Without a Backup Key, you can lose access to your wallet ",
+    "1": "forever."
+  },
+  "shareBackupKey": "Share Backup Key",
+  "backupRecovery": "Share your Backup Key with only one other person who you completely trust.",
+  "sendWhatsApp": "Send with WhatsApp",
+  "continue": "Continue",
+  "securityTips": "Security Tips",
+  "backupKeySummary": {
+    "0": "Write this phrase down on a piece of paper and keep it somewhere safe.",
+    "1": "Don’t show your phrase to anyone else. They can access your wallet if they see it."
+  },
+  "learnYourKey": "Write down or memorize your Backup Key.",
+  "keyWillBeVerified": "Once you have finished, we will verify that you know the key correctly.",
+  "question": "Question",
+  "questionPhrase": {
+    "0": "What is the ",
+    "1": " word of your Backup Key?"
+  },
+  "question1": "What is the 1st word of your Backup Key?",
+  "question2": "What is the 2nd word of your Backup Key?",
+  "question3": "What is the 3rd word of your Backup Key?",
+  "question4": "What is the 4th word of your Backup Key?",
+  "question5": "What is the 5th word of your Backup Key?",
+  "question6": "What is the 6th word of your Backup Key?",
+  "question7": "What is the 7th word of your Backup Key?",
+  "question8": "What is the 8th word of your Backup Key?",
+  "question9": "What is the 9th word of your Backup Key?",
+  "question10": "What is the 10th word of your Backup Key?",
+  "question11": "What is the 11th word of your Backup Key?",
+  "question12": "What is the 12th word of your Backup Key?",
+  "question13": "What is the 13th word of your Backup Key?",
+  "question14": "What is the 14th word of your Backup Key?",
+  "question15": "What is the 15th word of your Backup Key?",
+  "question16": "What is the 16th word of your Backup Key?",
+  "question17": "What is the 17th word of your Backup Key?",
+  "question18": "What is the 18th word of your Backup Key?",
+  "question19": "What is the 19th word of your Backup Key?",
+  "question20": "What is the 20th word of your Backup Key?",
+  "question21": "What is the 21st word of your Backup Key?",
+  "question22": "What is the 22nd word of your Backup Key?",
+  "question23": "What is the 23rd word of your Backup Key?",
+  "question24": "What is the 24th word of your Backup Key?",
+  "submit": "Submit",
+  "dontKnow": "Don't Know? ",
+  "return": "Return to backup key",
+  "tryAgain": "Try Again",
+  "backToKey":
+    "We will take you back to the screen with your backup key so that you ensure you wrote it down correctly.",
+  "seeBackupKey": "See Backup Key",
+  "backupKeySet": "Backup Key Set",
+  "dontLoseIt":
+    "Please do not lose this key. It is critical that you maintain this in a safe place, as this is the only way to unlock your wallet should you lose your phone.",
+  "done": "Done",
+  "whatsappMessage":
+    "Important: please keep this private. \n\nI'm sending you the Backup Phrase to my Celo Wallet: ",
+  "backupPrompt":
+    "For the security of your funds, your account is frozen until you get your Backup Key",
+  "copyToClipboard": "Copy To Clipboard",
+  "copiedToClipboard": "Copied To Clipboard"
+}

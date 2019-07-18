@@ -1,0 +1,107 @@
+{
+  "name": "@celo/celocli",
+  "description": "CLI Tool for transacting with the Celo protocol",
+  "version": "0.0.6",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "repository": "celo-org/celo-monorepo",
+  "homepage": "https://github.com/celo-org/celo-monorepo",
+  "bugs": "https://github.com/celo-org/celo-monorepo/issues?utf8=%E2%9C%93&q=label%3Acli+",
+  "types": "lib/index.d.ts",
+  "main": "lib/index.js",
+  "bin": {
+    "celocli": "./bin/run"
+  },
+  "keywords": [
+    "celo",
+    "celocli",
+    "celo-cli"
+  ],
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "scripts": {
+    "setup:environment": "./import_contract_types_from_sdk.sh",
+    "build": "rm -rf lib && yarn run prepack",
+    "lint": "tslint -c tslint.json --project tsconfig.json",
+    "lint-checks": "yarn run lint",
+    "postpack": "rm -f oclif.manifest.json",
+    "posttest": "tslint -p . -t stylish",
+    "prepack": "tsc -b && oclif-dev manifest && oclif-dev readme",
+    "test": "export TZ=UTC && jest --ci --silent --coverage",
+    "version": "oclif-dev readme && git add README.md"
+  },
+  "dependencies": {
+    "@oclif/command": "^1",
+    "@oclif/config": "^1",
+    "@oclif/plugin-help": "^2",
+    "bip32": "^1.0.2",
+    "bip39": "^2.5.0",
+    "bn.js": "^5.0.0",
+    "chalk": "^2.4.2",
+    "cli-table": "^0.3.1",
+    "cli-ux": "^5.3.1",
+    "debug": "^4.1.1",
+    "elliptic": "^6.4.1",
+    "events": "^3.0.0",
+    "firebase": "^6.2.4",
+    "fs-extra": "^8.1.0",
+    "path": "^0.12.7",
+    "tslib": "^1",
+    "web3": "1.0.0-beta.37"
+  },
+  "devDependencies": {
+    "@oclif/dev-cli": "^1",
+    "@types/bip32": "^1.0.1",
+    "@types/bip39": "^2.4.2",
+    "@types/elliptic": "^6.4.9",
+    "@types/jest": "^24.0.15",
+    "@types/mocha": "^5.2.7",
+    "@types/cli-table": "^0.3.0",
+    "@types/debug": "^4.1.4",
+    "@types/fs-extra": "^8.0.0",
+    "@types/node": "^10",
+    "@types/web3": "^1.0.18",
+    "globby": "^8",
+    "ts-node": "^8",
+    "tslint": "^5",
+    "typescript": "^3.3.3"
+  },
+  "files": [
+    "README.md",
+    "/bin",
+    "/lib",
+    "/oclif.manifest.json"
+  ],
+  "oclif": {
+    "commands": "./lib/commands",
+    "topics": {
+      "account": {
+        "description": "Manage your account, send and receive Celo Gold and Celo Dollars"
+      },
+      "bonds": {
+        "description": "Manage bonded deposits to participate in governance and earn rewards"
+      },
+      "config": {
+        "description": "Configure CLI options which persist across commands"
+      },
+      "node": {
+        "description": "Manage your full node"
+      },
+      "validator": {
+        "description": "View validator information and register your own"
+      },
+      "validatorgroup": {
+        "description": "View validator group information and cast votes"
+      },
+      "exchange": {
+        "description": "Commands for interacting with the Exchange"
+      }
+    },
+    "bin": "celocli",
+    "plugins": [
+      "@oclif/plugin-help"
+    ],
+    "repositoryPrefix": "https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/<%- commandPath %>"
+  }
+}

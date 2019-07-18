@@ -1,0 +1,89 @@
+{
+  "pageTitle": "Celo: A platform for fast, secure, stable digital payments",
+  "subtitle":
+    "A platform for fast, secure, stable digital payments to any mobile number at a fraction of today’s cost.",
+  "parallax": {
+    "0": "Earn cryptocurrency on your smartphone.",
+    "1": "Your phone number is your bank account.",
+    "2": "Send payments to anyone anywhere."
+  },
+  "hero": {
+    "tag":
+      "An open platform for fast, secure, stable digital payments to any mobile number at a fraction of today’s cost.",
+    "backers": "See More Backers",
+    "emailButton": "Get Our Newsletter"
+  },
+  "mission": {
+    "title": "Mission & Meaning",
+    "text": {
+      "0": "",
+      "1": "Celo, pronounced /ˈtselo/, ",
+      "2":
+        "means ‘purpose’ in Esperanto. In a similar spirit, we are aiming to create a new platform to connect people globally and bring financial stability to those who need it most. We believe blockchain technology is one of the most exciting innovations in recent history and as a team we look to push the boundaries of what is possible with it today. More importantly, we are driven by purpose -- to solve real-world problems such as lack of access to sound currency, or friction for cash-transfer programs aimed to alleviate poverty. Our mission is to build a monetary system that creates the conditions for prosperity for all.",
+      "3":
+        "If you are passionate about our mission and want to join us, learn about current opportunities here:"
+    }
+  },
+  "blog": {
+    "asseenon": "As seen on",
+    "prelude": "Read more about ",
+    "linktext": "what we're building at Celo"
+  },
+  "research": {
+    "header": "Early User Research Findings",
+    "1":
+      "As we’re building our mobile-first stable currency, we’re in our target markets doing initial research to better understand our users’ needs. Read more about the market research we’re doing ",
+    "here": "here",
+    "15": ".",
+    "2":
+      "In the spirit of decentralization, we’ve established a fellowship program open to those who’d like to collaborate with Celo, from any location and for a flexible amount of time. We’re accepting project proposals now. Please ",
+    "3": "reach out",
+    "4": " to us."
+  },
+  "aboutUsTitle": "About Us",
+  "aboutUsDescription": "Our core team, contributors, and backers",
+  "aboutUsLink": "Meet the team",
+  "applicationsTitle": "Applications",
+  "applicationsDescription":
+    "Build on top of the Celo platform to support global financial inclusion",
+  "applicationsLink": "Stay updated",
+  "technologyTitle": "Technology",
+  "technologyDescription": "Sending money is as easy as sending a text",
+  "technologyLink": "Find out how",
+  "whitePaper": "White Paper",
+  "stabilityAnalysis": "Stability Analysis",
+  "readMore": "Read more about our technology",
+
+  "stayConnected": "Stay Connected",
+
+  "systemsApproach": "We embrace a full-stack approach, reimagining technology at each layer",
+  "designedWithCommunities": "Our innovations are designed with communities around the world",
+  "buildOnCelo": "Build on Celo",
+  "buildOnCeloCopy":
+    "Celo is a platform that is open and open-source, allowing for an ecosystem of powerful applications built on top, including easier cash transfer programs, peer-to-peer lending, collaborative small-scale insurance, and other digital assets and wallets.",
+  "verifyToEarn": "Earn with Celo",
+  "verifyToEarnCopy":
+    "Celo increases access by enabling anyone with even a simple Android smartphone to participate and earn Celo for decentralized verifications.",
+  "mobileFirstPlatform": "Mobile-First Platform",
+  "mobileFirstPlatformCopy":
+    "To create a truly inclusive financial system, we started by building an infrastructure to serve those excluded from the current system. Celo’s protocol includes unique features that create a seamless user experience on mobile phones.",
+
+  "whitepaperCopy":
+    "Celo is a proof-of-stake based blockchain with smart contracts. The technology uses a phone number-based identity system with address-based encryption and eigentrust-based reputation.",
+  "stabilityAnalysisCopy":
+    "Celo’s stablecoins are stable value currencies, implemented by an algorithmic reserve-backed stabilization mechanism. The first stablecoin, cUSD, is pegged to the US Dollar.",
+  "downloadPDF": "Download .PDF",
+  "learnMore": "Learn More",
+  "hero3":
+    "Celo is an open platform that makes financial tools accessible to anyone with a mobile phone",
+  "workOnCelo": "Work on Celo in San Francisco, Berlin, and around the world",
+  "viewRoles": "View Open Roles",
+  "stayConnectedThanks":
+    "Thanks for your contact info! We look forward to having you in the Celo community, expect our newsletter soon.",
+  "submit": "Submit",
+  "signUp": "Sign Up",
+  "reachOut": "Reach out to participate in Celo’s ecosystem",
+  "receiveUpdates": "Receive the latest updates to your inbox",
+  "startConversation": "Start A Conversation",
+  "recentNews": "Recent News"
+}

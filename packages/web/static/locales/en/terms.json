@@ -1,0 +1,14 @@
+{
+  "title": "Celo Terms of Use and FAQ",
+  "metaDescription": "",
+  "helpfulLinks": "Helpful Links",
+  "privacy": "A Note on Privacy",
+  "privacyNote":
+    "The Alfajores Celo Test Network stores phone number hashes to allow for payments to a phone number. By verifying your phone number, you consent to having your hashed phone number stored on the Celo Blockchain.",
+  "privacyLink": "Privacy Documentation",
+  "privacyPolicy": "Privacy Policy",
+  "userAgreementLink": "User Agreement",
+  "faq": "FAQ",
+  "disclaimer": "Disclaimer",
+  "agreementTitle": "User Agreement and Terms:\n Celo Alfajores Testnet"
+}

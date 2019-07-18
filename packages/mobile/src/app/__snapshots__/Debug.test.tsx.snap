@@ -1,0 +1,215 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Debug renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "justifyContent": "space-between",
+      "paddingHorizontal": 10,
+      "paddingVertical": 5,
+    }
+  }
+>
+  <Text
+    onPress={[Function]}
+    style={
+      Object {
+        "fontSize": 11,
+        "marginTop": 5,
+      }
+    }
+  >
+    Device Id: undefined | Phone Number: +14155556666
+  </Text>
+  <Text
+    onPress={[Function]}
+    style={
+      Object {
+        "fontSize": 11,
+        "marginTop": 5,
+      }
+    }
+  >
+    Version: undefined | Build Number: undefined | Api Level: undefined
+  </Text>
+  <Text
+    style={
+      Object {
+        "fontSize": 11,
+        "marginTop": 5,
+      }
+    }
+  >
+    Pin Set: false
+  </Text>
+  <Text
+    onPress={[Function]}
+    style={
+      Object {
+        "fontSize": 11,
+        "marginTop": 5,
+      }
+    }
+  >
+    Address: 0x0000000000000000000000000000000000007E57
+  </Text>
+  <Text
+    style={
+      Object {
+        "fontSize": 11,
+        "marginTop": 5,
+      }
+    }
+  >
+    Latest Block: 0
+  </Text>
+  <View
+    style={
+      Array [
+        Object {
+          "flex": 1,
+        },
+        Object {
+          "flex": 1,
+          "marginTop": 8,
+        },
+      ]
+    }
+  >
+    <Text>
+      React-Native Logs
+    </Text>
+    <RCTScrollView
+      onContentSizeChange={[Function]}
+    >
+      <View>
+        <Text
+          onPress={[Function]}
+          style={
+            Object {
+              "fontSize": 10,
+            }
+          }
+        >
+          
+        </Text>
+      </View>
+    </RCTScrollView>
+  </View>
+  <View
+    style={
+      Array [
+        Object {
+          "flex": 1,
+        },
+        Object {
+          "flex": 1,
+          "marginTop": 8,
+        },
+      ]
+    }
+  >
+    <Text>
+      Geth Logs
+    </Text>
+    <RCTScrollView
+      onContentSizeChange={[Function]}
+    >
+      <View>
+        <Text
+          onPress={[Function]}
+          style={
+            Object {
+              "fontSize": 10,
+            }
+          }
+        >
+          
+        </Text>
+      </View>
+    </RCTScrollView>
+  </View>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "borderRadius": 3,
+          "flexDirection": "row",
+        },
+        Object {
+          "marginVertical": 10,
+        },
+        Object {
+          "marginBottom": 10,
+        },
+        Object {
+          "marginBottom": 0,
+          "marginHorizontal": 0,
+          "marginTop": 10,
+        },
+        Object {
+          "backgroundColor": "#42D689",
+        },
+      ]
+    }
+  >
+    <View
+      accessible={true}
+      isTVSelectable={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#42D689",
+          "borderColor": "#42D689",
+          "borderRadius": 3,
+          "borderWidth": 2,
+          "flex": 1,
+          "height": 50,
+          "justifyContent": "center",
+          "opacity": 1,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 16,
+              },
+              Object {
+                "color": "#FFFFFF",
+              },
+              Object {
+                "paddingLeft": 5,
+                "paddingRight": 5,
+              },
+            ]
+          }
+        >
+          Email logs to support
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;

@@ -1,0 +1,105 @@
+{
+  "Choose Language": "Choose Language",
+  "syncText": {
+    "0": "Celo keeps your assets secure and enables you to send and receive value with anyone",
+    "1": "Celo Dollars are a stable digital asset that tracks to the value of the US Dollar",
+    "2": "Verify your phone number so other Celo users can find you and send you value"
+  },
+  "progressBarText": "Syncing with Network",
+  "Welcome to Celo": "Welcome to Celo",
+  "inviteText": {
+    "0":
+      "Enter your invitation code. If you do not have one, ask someone in the Celo Community to invite you.",
+    "1":
+      "By joining this application, you agree to share your name & phone number with us. Learn more at ",
+    "2": "celo.org"
+  },
+  "namePrompt": "Please enter your first and last name",
+  "importPrompt": {
+    "0": "Already have a Celo wallet? ",
+    "1": "Import it"
+  },
+  "activity": "Activity",
+  "Full Name": "Full Name",
+  "Invitation Code": "Invitation Code",
+  "Opt in": "Opt in",
+  "Continue": "Continue",
+  "available": "Available",
+  "cancel": "Cancel",
+  "continue": "Continue",
+  "edit": "Edit",
+  "exchange": "Exchange",
+  "newBalance": "New Balance",
+  "send": "Send",
+  "payment": "Payment",
+  "skip": "Skip",
+  "submit": "Submit",
+  "wallet": "Wallet",
+  "backupKey": "Backup Phrase",
+  "backupIntro": {
+    "0":
+      "If you lose your phone or delete the Celo app, you will lose all of the gold and dollars in your wallet.",
+    "1":
+      "You can back up your wallet by writing down a backup phrase on a piece of paper and storing it securely. This will allow you to restore your wallet in the future if you need to.",
+    "2":
+      "Don't take a screenshot or save on your phone notes. Make sure to write the backup phrase down and keep it safe."
+  },
+  "areYouSure?": "Are you sure?",
+  "backupSkipText": {
+    "0": "Without a Backup Phrase, you can lose access to your wallet ",
+    "1": "forever"
+  },
+  "shareBackupText": "Share your Backup Phrase with one other person who you completely trust.",
+  "securityTips": {
+    "title": "Security Tips",
+    "text": {
+      "0": "Write this phrase down on a piece of paper and keep it somewhere safe. ",
+      "1": "Don’t show your phrase to anyone else. They can access your wallet if they see it."
+    }
+  },
+  "Send with Whatsapp": "Send with Whatsapp",
+  "whatsappMessage":
+    "Important: please keep this private. \n\nI'm sending you the Backup Phrase to my Celo Wallet: ",
+  "setBackupInfo":
+    "Once you have finished, we will verify that you wrote down the Backup Phrase correctly.",
+  "Question": "Question",
+  "questionPhrase": {
+    "0": "What is the ",
+    "1": " word of your Backup Phrase?"
+  },
+  "Don't Know?": "Don't Know?",
+  "Return to backup phrase": "Return to backup phrase",
+  "Try Again": "Try Again",
+  "wrongAnswerText":
+    "We will take you back to the screen with your backup phrase so that you ensure you wrote it down correctly.",
+  "See Backup Key": "See Backup Phrase",
+  "Backup Key Set": "Backup Phrase Set",
+  "backupCompleteText":
+    "Please do not lose this phrase. It is critical that you maintain this in a safe place, as this is the only way to unlock your wallet should you lose your phone.",
+  "Done": "Done",
+  "pending": "Pending",
+  "date_at_time": "at",
+  "edit_profile": "Edit Profile",
+  "backup_key": "Backup Phrase",
+  "invite": "Invite",
+  "celo_rewards": "Celo Rewards",
+  "language_settings": "Language Settings",
+  "edit_name": "Edit Name",
+  "exchanges": {
+    "includesFee": "*includes Exchange Fee",
+    "rate": "Exchange Rate",
+    "review": "Review Exchange",
+    "fee": "Fee"
+  },
+  "faq_terms_footer": "<0>Test FAQ is </0><1>here</1><2> Terms of service are </2><3>here</3>",
+  "celoDollars": "Celo Dollars",
+  "celoGold": "Celo Gold",
+  "invalidInvitation": "Invalid Invitation Code ",
+  "incorrectPin": "Incorrect PIN",
+  "photosNUX": {
+    "0": "Celo uses your address book to show photos",
+    "1": "You can change a photo by updating your contacts",
+    "2": "Only you can see these photos locally on your phone"
+  },
+  "backToWallet": "Back to Wallet"
+}

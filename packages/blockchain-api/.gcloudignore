@@ -1,0 +1,8 @@
+# Exclude compiled .js files
+*.js
+*.js.map
+dist/
+
+# Exclude dependencies
+node_modules/
+.env

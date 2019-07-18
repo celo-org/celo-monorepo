@@ -1,0 +1,146 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SimpleNotification renders correctly 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "padding": 10,
+        "width": "100%",
+      },
+      Object {
+        "borderColor": "#EEEEEE",
+        "borderRadius": 3,
+        "borderWidth": 1,
+      },
+    ]
+  }
+>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "flexDirection": "column",
+        "paddingRight": 10,
+      }
+    }
+  >
+    <Image
+      resizeMode="contain"
+      source={
+        Object {
+          "testUri": "../../../src/images/placeholder.png",
+        }
+      }
+      style={
+        Object {
+          "height": 30,
+          "width": 30,
+        }
+      }
+    />
+  </View>
+  <View
+    style={
+      Object {
+        "flex": 1,
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Hind-Bold",
+          "fontSize": 14,
+          "lineHeight": 18,
+        }
+      }
+    >
+      Test
+    </Text>
+    <View>
+      <View
+        style={
+          Object {
+            "justifyContent": "space-between",
+            "minHeight": 70,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "marginTop": 5,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": 20,
+              }
+            }
+          >
+            Gold is where you can choose to store Celo dollars you have
+          </Text>
+        </View>
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+              "marginTop": 15,
+            }
+          }
+        >
+          <View
+            accessible={true}
+            isTVSelectable={true}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "opacity": 1,
+              }
+            }
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "color": "#42D689",
+                    "fontFamily": "Hind-Medium",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "paddingEnd": 15,
+                  },
+                ]
+              }
+            >
+              it goes boom
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;

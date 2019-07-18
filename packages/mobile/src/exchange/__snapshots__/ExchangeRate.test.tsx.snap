@@ -1,0 +1,148 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`isnt overly precise, it rounds 1`] = `
+<View
+  style={
+    Object {
+      "justifyContent": "center",
+      "paddingVertical": 10,
+    }
+  }
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "textAlign": "center",
+        },
+        Object {
+          "color": "#81868B",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 16,
+          "lineHeight": 24,
+        },
+      ]
+    }
+  >
+    exchangeRate
+  </Text>
+  <Text
+    style={
+      Object {
+        "color": "#2E3338",
+        "textAlign": "center",
+      }
+    }
+  >
+     0.8573 cUSD : 1 cGLD
+  </Text>
+</View>
+`;
+
+exports[`renders correctly with an exchange rate  and show fine print 1`] = `
+<View
+  style={
+    Object {
+      "justifyContent": "center",
+      "paddingVertical": 10,
+    }
+  }
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "textAlign": "center",
+        },
+        Object {
+          "color": "#81868B",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 16,
+          "lineHeight": 24,
+        },
+      ]
+    }
+  >
+    exchangeRate
+  </Text>
+  <Text
+    style={
+      Object {
+        "color": "#2E3338",
+        "textAlign": "center",
+      }
+    }
+  >
+     0.1 cGLD : 1 cUSD
+  </Text>
+  <Text
+    style={
+      Object {
+        "color": "#81868B",
+        "fontSize": 12,
+        "textAlign": "center",
+      }
+    }
+  >
+    includeExchangeFee
+  </Text>
+</View>
+`;
+
+exports[`renders correctly with infinity exchange rate 1`] = `
+<View
+  style={
+    Object {
+      "justifyContent": "center",
+      "paddingVertical": 10,
+    }
+  }
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "textAlign": "center",
+        },
+        Object {
+          "color": "#81868B",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 16,
+          "lineHeight": 24,
+        },
+      ]
+    }
+  >
+    loadingExchangeRate
+  </Text>
+</View>
+`;
+
+exports[`renders correctly with no exchange rate 1`] = `
+<View
+  style={
+    Object {
+      "justifyContent": "center",
+      "paddingVertical": 10,
+    }
+  }
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "textAlign": "center",
+        },
+        Object {
+          "color": "#81868B",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 16,
+          "lineHeight": 24,
+        },
+      ]
+    }
+  >
+    loadingExchangeRate
+  </Text>
+</View>
+`;

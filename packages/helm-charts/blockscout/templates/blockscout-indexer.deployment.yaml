@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-indexer
+  labels:
+    app: blockscout
+    chart: blockscout
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: blockscout-indexer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blockscout
+      release: {{ .Release.Name }}
+      component: blockscout-indexer
+  template:
+    metadata:
+      labels:
+        app: blockscout
+        release: {{ .Release.Name }}
+        component: blockscout-indexer
+    spec:
+      containers:
+      - name: blockscout-indexer
+        image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.indexerTag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        ports:
+        - name: http
+          containerPort: 4000
+        resources:
+          requests:
+            memory: 1G
+            cpu: 250m
+        env:
+{{ include "celo.blockscout-env-vars" .  | indent 10 }}
+{{ include "celo.blockscout-db-sidecar" .  | indent 6 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}

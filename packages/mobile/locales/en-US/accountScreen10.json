@@ -1,0 +1,24 @@
+{
+  "backupKey": "Backup Key",
+  "invite": "Invite",
+  "celoRewards": "Celo Rewards",
+  "languageSettings": "Language Settings",
+  "licenses": "Licenses",
+  "sendIssueReport": "Send an Issue Report",
+  "analytics": "Analytics",
+  "shareAnalytics": "Share Analytics",
+  "shareAnalytics_detail":
+    "We collect anonymized data about how you use Celo to help improve the application for everyone.",
+  "testFaqHere": "<0>Test FAQ is </0><1>here</1>",
+  "termsOfServiceHere": "<0>Terms of service are </0><1>here</1>",
+  "editProfile": "Edit Profile",
+  "cancel": "Cancel",
+  "changeProfilePhoto": "Change Profile Photo",
+  "editName": "Edit Name",
+  "submit": "Submit",
+  "chooseLanguage": "Choose Language",
+  "continue": "Continue",
+  "yourName": "Your Name",
+  "version": "Version:",
+  "addressCopied": "Address copied to clipboard"
+}

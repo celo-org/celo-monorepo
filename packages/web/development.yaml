@@ -1,0 +1,17 @@
+runtime: nodejs8
+env: standard
+service: website-development
+instance_class: F2
+env_variables:
+  NODE_ENV: "production"
+  DEPLOY_ENV: "development"
+
+handlers:
+  - url: /_next/static
+    static_dir: .next/static
+
+  - url: /static
+    static_dir: static
+
+  - url: /.*
+    script: auto

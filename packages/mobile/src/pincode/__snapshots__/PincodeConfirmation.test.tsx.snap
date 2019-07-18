@@ -1,0 +1,272 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PincodeConfirmation renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "white",
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "height": 35,
+        "paddingRight": 10,
+        "paddingTop": 10,
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+        "width": 70,
+        "zIndex": 100,
+      }
+    }
+  >
+    <Text
+      accessible={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+    >
+         
+    </Text>
+  </View>
+  <RCTScrollView>
+    <View>
+      <View
+        style={
+          Object {
+            "flexDirection": "row",
+            "margin": 0,
+            "padding": 20,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+            }
+          }
+        >
+          <View
+            accessible={true}
+            isTVSelectable={true}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "opacity": 1,
+              }
+            }
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "color": "#42D689",
+                    "fontFamily": "Hind-Medium",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  },
+                  undefined,
+                ]
+              }
+            >
+              cancel
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "paddingLeft": 20,
+            "paddingTop": 30,
+          }
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../src/images/coins-logo.png",
+            }
+          }
+          style={
+            Object {
+              "height": 50,
+              "width": 50,
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          Object {
+            "paddingHorizontal": 25,
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-Light",
+                "fontSize": 22,
+                "paddingBottom": 20,
+                "textAlign": "center",
+              },
+              Object {
+                "color": "#2E3338",
+                "padding": 25,
+                "textAlign": "center",
+              },
+            ]
+          }
+        >
+          confirmPin.title
+        </Text>
+        <View
+          style={
+            Array [
+              Object {
+                "paddingHorizontal": 60,
+                "paddingVertical": 15,
+              },
+              undefined,
+            ]
+          }
+        >
+          <TextInput
+            allowFontScaling={true}
+            autoFocus={true}
+            keyboardType="numeric"
+            maxLength={6}
+            onChangeText={[Function]}
+            onSubmitEditing={[Function]}
+            placeholder="createPin.yourPin"
+            rejectResponderTermination={true}
+            secureTextEntry={true}
+            style={
+              Array [
+                Object {
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 3,
+                  "borderWidth": 1,
+                  "fontSize": 24,
+                  "padding": 7,
+                },
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "textAlign": "center",
+                },
+              ]
+            }
+            textContentType="password"
+            underlineColorAndroid="transparent"
+            value=""
+          />
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "borderRadius": 3,
+            "flexDirection": "row",
+          },
+          null,
+          null,
+          Object {
+            "paddingHorizontal": 20,
+            "paddingVertical": 5,
+          },
+          Object {
+            "backgroundColor": "#A3EBC6",
+          },
+        ]
+      }
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "#A3EBC6",
+            "borderWidth": 0,
+            "flex": 1,
+            "height": 50,
+            "justifyContent": "center",
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 16,
+                },
+                Object {
+                  "color": "#FFFFFF",
+                },
+                Object {
+                  "paddingLeft": 5,
+                  "paddingRight": 5,
+                },
+              ]
+            }
+          >
+            confirmPin.submit
+          </Text>
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;

@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "typescript-tslint-plugin"
+      }
+    ],
+    "baseUrl": ".",
+    "lib": ["es7", "es2017"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "target": "es6",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "eth-lib": ["types/eth-lib"],
+      "@google-cloud/monitoring": ["types/monitoring"]
+    }
+  },
+  "include": ["src/**/*", "lib/**/*", "index.d.ts"],
+  "exclude": ["./node_modules/**/*"]
+}

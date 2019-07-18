@@ -1,0 +1,55 @@
+{{ if not (eq (.Values.geth.tx_nodes | toString) "og") }}
+{{ range $index, $e := until (.Values.geth.tx_nodes | int) }}
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "ethereum.fullname" $ }}-service-{{ $index }}
+  labels:
+    app: {{ template "ethereum.name" $ }}
+    chart: {{ template "ethereum.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+    component: tx_nodes
+spec:
+  selector:
+    app: {{ template "ethereum.name" $ }}
+    release: {{ $.Release.Name }}
+    component: tx_nodes
+    statefulset.kubernetes.io/pod-name: {{ template "ethereum.fullname" $ }}-tx-nodes-{{ $index | toString }}
+  type: LoadBalancer
+  loadBalancerIP: {{ index $.Values.geth (print "tx_nodes_" $index "IpAddress") }}
+  ports:
+  - name: discovery
+    port: 30303
+    protocol: UDP
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "ethereum.fullname" $ }}-service-{{ $index }}-tcp
+  labels:
+    app: {{ template "ethereum.name" $ }}
+    chart: {{ template "ethereum.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+    component: tx_nodes
+spec:
+  selector:
+    app: {{ template "ethereum.name" $ }}
+    release: {{ $.Release.Name }}
+    component: tx_nodes
+    statefulset.kubernetes.io/pod-name: {{ template "ethereum.fullname" $ }}-tx-nodes-{{ $index | toString }}
+  type: LoadBalancer
+  loadBalancerIP: {{ index $.Values.geth (print "tx_nodes_" $index "IpAddress") }}
+  ports:
+  - name: discovery
+    port: 30303
+    protocol: TCP
+  - name: rpc
+    port: 8545
+  - name: ws
+    port: 8546
+---
+{{ end }}
+{{ end }}

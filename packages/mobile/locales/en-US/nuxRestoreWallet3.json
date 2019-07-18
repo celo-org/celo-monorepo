@@ -1,0 +1,22 @@
+{
+  "welcomeCelo": "Welcome to Celo",
+  "enterInvite":
+    "Enter your invitation code. If you do not have one, ask someone in the Celo Community to invite you. By joining this application, you agree to share your name & phone number with us. Learn more at celo.org",
+  "fullName": "Full Name",
+  "invitationCode": "Invitation Code",
+  "submit": "Submit",
+  "alreadyHaveWallet": "Already have a Celo Wallet? Restore it",
+  "restoreYourWallet": {
+    "title": "Restore your Celo Wallet",
+    "userYourBackupKey":
+      "Already have a Celo Wallet? Use your secure Backup Key to restore your wallet to this phone.",
+    "warning": "Warning ",
+    "restoreInPrivate": "Restore your Wallet in private "
+  },
+  "backupKeyPrompt": "Backup Key",
+  "tip": "Tip: ",
+  "backupKeyTip": "Backup Key words are separated by a space",
+  "continue": "Continue",
+  "cancel": "Cancel",
+  "restoreWallet": "Restore Celo Wallet"
+}

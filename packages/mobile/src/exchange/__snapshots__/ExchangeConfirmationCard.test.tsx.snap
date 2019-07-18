@@ -1,0 +1,625 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly with giant numbers 1`] = `
+<View
+  style={
+    Object {
+      "borderColor": "#EEEEEE",
+      "borderWidth": 1,
+      "flex": 1,
+      "justifyContent": "center",
+      "minHeight": 300,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "justifyContent": "center",
+        "marginTop": 20,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "alignItems": "flex-start",
+          "flexDirection": "row",
+          "marginTop": 5,
+        }
+      }
+    >
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "color": "#42D689",
+              "fontSize": 21,
+              "lineHeight": 29,
+              "transform": Array [
+                Object {
+                  "translateY": 2,
+                },
+              ],
+            },
+          ]
+        }
+      >
+        $
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "paddingHorizontal": 3,
+            },
+            Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "color": "#42D689",
+              "fontSize": 36,
+              "lineHeight": 47,
+            },
+          ]
+        }
+      >
+        24,000,000.00
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "justifyContent": "center",
+          "marginHorizontal": 10,
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={20}
+        style={Object {}}
+        viewBox="0 0 16 14"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          clipRule="evenodd"
+          d="M15.7083 7.57011L15.7064 7.57199L9.83868 13.4397C9.44968 13.8287 8.81899 13.8287 8.42999 13.4397C8.04099 13.0507 8.04099 12.42 8.42999 12.031L12.5952 7.8658L1.85618 7.8658C1.3039 7.8658 0.856182 7.41808 0.856182 6.8658C0.856182 6.31351 1.3039 5.8658 1.85618 5.8658L12.5953 5.8658L8.43008 1.7006C8.04108 1.3116 8.04108 0.680914 8.43008 0.291917C8.81907 -0.0970799 9.44976 -0.0970798 9.83876 0.291917L15.7083 6.16143C16.0973 6.55043 16.0973 7.18112 15.7083 7.57011Z"
+          fill="#D1D5D8"
+          fillRule="evenodd"
+          style={Object {}}
+        />
+      </svg>
+    </View>
+    <View
+      style={
+        Object {
+          "alignItems": "flex-start",
+          "flexDirection": "row",
+          "marginTop": 5,
+        }
+      }
+    >
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "paddingHorizontal": 3,
+            },
+            Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "color": "#FBCC5C",
+              "fontSize": 36,
+              "lineHeight": 47,
+            },
+          ]
+        }
+      >
+        18,000,000,000.00
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "marginVertical": 10,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "justifyContent": "center",
+          "paddingVertical": 10,
+        }
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "textAlign": "center",
+            },
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 16,
+              "lineHeight": 24,
+            },
+          ]
+        }
+      >
+        exchangeRate
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "textAlign": "center",
+          }
+        }
+      >
+         0.1312 cUSD : 1 cGLD
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "marginBottom": 20,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "borderBottomColor": "#EEEEEE",
+          "borderBottomWidth": 1,
+          "margin": 10,
+        }
+      }
+    />
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "justifyContent": "center",
+          "paddingBottom": 20,
+          "paddingTop": 30,
+        }
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+              "fontSize": 20,
+              "lineHeight": 32,
+            },
+            Object {
+              "marginVertical": 10,
+            },
+          ]
+        }
+      >
+        newBalance
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "alignSelf": "stretch",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "marginHorizontal": 10,
+          "marginVertical": 5,
+          "paddingHorizontal": 40,
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 16,
+            "lineHeight": 24,
+          }
+        }
+      >
+        celoDollars
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 16,
+              "letterSpacing": -0.75,
+              "lineHeight": 20,
+            },
+            Object {
+              "color": "#42D689",
+            },
+          ]
+        }
+      >
+        $
+        10000000
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "alignSelf": "stretch",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "marginHorizontal": 10,
+          "marginVertical": 5,
+          "paddingHorizontal": 40,
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 16,
+            "lineHeight": 24,
+          }
+        }
+      >
+        celoGold
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 16,
+              "letterSpacing": -0.75,
+              "lineHeight": 20,
+            },
+            Object {
+              "color": "#FBCC5C",
+            },
+          ]
+        }
+      >
+        10030000
+      </Text>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`renders correctly with no exchange rate 1`] = `
+<View
+  style={
+    Object {
+      "borderColor": "#EEEEEE",
+      "borderWidth": 1,
+      "flex": 1,
+      "justifyContent": "center",
+      "minHeight": 300,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "justifyContent": "center",
+        "marginTop": 20,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "alignItems": "flex-start",
+          "flexDirection": "row",
+          "marginTop": 5,
+        }
+      }
+    >
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "paddingHorizontal": 3,
+            },
+            Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "color": "#FBCC5C",
+              "fontSize": 36,
+              "lineHeight": 47,
+            },
+          ]
+        }
+      >
+        20.00
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "justifyContent": "center",
+          "marginHorizontal": 10,
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={20}
+        style={Object {}}
+        viewBox="0 0 16 14"
+        width={20}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          clipRule="evenodd"
+          d="M15.7083 7.57011L15.7064 7.57199L9.83868 13.4397C9.44968 13.8287 8.81899 13.8287 8.42999 13.4397C8.04099 13.0507 8.04099 12.42 8.42999 12.031L12.5952 7.8658L1.85618 7.8658C1.3039 7.8658 0.856182 7.41808 0.856182 6.8658C0.856182 6.31351 1.3039 5.8658 1.85618 5.8658L12.5953 5.8658L8.43008 1.7006C8.04108 1.3116 8.04108 0.680914 8.43008 0.291917C8.81907 -0.0970799 9.44976 -0.0970798 9.83876 0.291917L15.7083 6.16143C16.0973 6.55043 16.0973 7.18112 15.7083 7.57011Z"
+          fill="#D1D5D8"
+          fillRule="evenodd"
+          style={Object {}}
+        />
+      </svg>
+    </View>
+    <View
+      style={
+        Object {
+          "alignItems": "flex-start",
+          "flexDirection": "row",
+          "marginTop": 5,
+        }
+      }
+    >
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "color": "#42D689",
+              "fontSize": 21,
+              "lineHeight": 29,
+              "transform": Array [
+                Object {
+                  "translateY": 2,
+                },
+              ],
+            },
+          ]
+        }
+      >
+        $
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "paddingHorizontal": 3,
+            },
+            Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "color": "#42D689",
+              "fontSize": 36,
+              "lineHeight": 47,
+            },
+          ]
+        }
+      >
+        1.99
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "marginVertical": 10,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "justifyContent": "center",
+          "paddingVertical": 10,
+        }
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "textAlign": "center",
+            },
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 16,
+              "lineHeight": 24,
+            },
+          ]
+        }
+      >
+        exchangeRate
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "textAlign": "center",
+          }
+        }
+      >
+         2 cGLD : 1 cUSD
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "marginBottom": 20,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "borderBottomColor": "#EEEEEE",
+          "borderBottomWidth": 1,
+          "margin": 10,
+        }
+      }
+    />
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "justifyContent": "center",
+          "paddingBottom": 20,
+          "paddingTop": 30,
+        }
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+              "fontSize": 20,
+              "lineHeight": 32,
+            },
+            Object {
+              "marginVertical": 10,
+            },
+          ]
+        }
+      >
+        newBalance
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "alignSelf": "stretch",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "marginHorizontal": 10,
+          "marginVertical": 5,
+          "paddingHorizontal": 40,
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 16,
+            "lineHeight": 24,
+          }
+        }
+      >
+        celoDollars
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 16,
+              "letterSpacing": -0.75,
+              "lineHeight": 20,
+            },
+            Object {
+              "color": "#42D689",
+            },
+          ]
+        }
+      >
+        $
+        189.9
+      </Text>
+    </View>
+    <View
+      style={
+        Object {
+          "alignSelf": "stretch",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "marginHorizontal": 10,
+          "marginVertical": 5,
+          "paddingHorizontal": 40,
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 16,
+            "lineHeight": 24,
+          }
+        }
+      >
+        celoGold
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 16,
+              "letterSpacing": -0.75,
+              "lineHeight": 20,
+            },
+            Object {
+              "color": "#FBCC5C",
+            },
+          ]
+        }
+      >
+        207.81
+      </Text>
+    </View>
+  </View>
+</View>
+`;

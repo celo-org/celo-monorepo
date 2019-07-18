@@ -1,0 +1,9 @@
+{
+  "text": "E2E Run",
+  "attachments": [
+    {
+      "color": "danger",
+      "text": "Tests Failed!"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "disclaimer":
+    "Nothing herein constitutes an offer to sell, or the solicitation of an offer to buy, any securities or tokens.",
+  "About Us": "About Us",
+  "Join Us": "Join Us",
+  "Home": "Home",
+  "Join": "Join",
+  "Technology": "Technology",
+  "Applications": "Applications",
+  "Community": "Community",
+  "Connect": "Connect",
+  "Medium": "Medium",
+  "blog": "Blog",
+  "Twitter": "Twitter",
+  "github": "GitHub",
+  "Privacy Policy": "Privacy Policy",
+  "weUseCookies": "We use cookies on our website",
+  "weUseCookiesReasons":
+    "to better understand how visitors use our site so that we can improve the experience.",
+  "cookiesPrivacyInfo":
+    "By continuing to use this site, you consent to our use of cookies in accordance with our",
+  "cookiesPrivacyPolicy": "Privacy Policy.",
+  "cookiesAgree": "agree",
+  "cookiesDisagree": "disagree",
+  "trueGold": ["真金不怕火煉", "True gold fears no fire"],
+  "copyRight": "Designed & Built by C Labs, © Celo 2019",
+  "blueBanner": "Join us for our special global announcement"
+}

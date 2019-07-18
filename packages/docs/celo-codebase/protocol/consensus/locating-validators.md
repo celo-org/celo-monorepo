@@ -1,0 +1,7 @@
+# Locating Validators
+
+All our nodes \(including our validators\) will initially use Ethereum's V4 discovery protocol to find other nodes within the network. Details of that protocol can be found here: [https://github.com/ethereum/devp2p/blob/master/discv4.md](https://github.com/ethereum/devp2p/blob/master/discv4.md) .
+
+Once they are connected to other peers, the validators will then attempt to establish direct subprotocol connections to the rest of the validators, as opposed to communicate to them via gossip messages, to send all consensus related messages. The reason that the validators do this is to minimize the total number of consensus messages sent throughout the network \(for performance reasons when validating blocks\), and to minimize the exposure of validator's enodeURLs to be known to only registered validators.
+
+The way that validators do that is that they will periodically gossip a new subprotocol message type that we call an _IstanbulAnnounce_ message. Within that message's payload, the validators will broadcast their enodeURL \(encrypted with all registered validators' public key\), that will be propagated to all full nodes and validators within the network. Once a validator first hears of another validator's enodeURL via _IstanbulAnnounce_, it will decrypt the enodeURL and establish a peer connection to it, and all subsequent consensus related messages will be sent via those direct subprotocol connections.

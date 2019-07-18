@@ -1,0 +1,529 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Pincode renders correctly for education 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "white",
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "height": 35,
+        "paddingRight": 10,
+        "paddingTop": 10,
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+        "width": 70,
+        "zIndex": 100,
+      }
+    }
+  >
+    <Text
+      accessible={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+    >
+         
+    </Text>
+  </View>
+  <RCTScrollView>
+    <View>
+      <View
+        style={
+          Object {
+            "flexDirection": "row",
+            "margin": 0,
+            "padding": 20,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+            }
+          }
+        >
+          <View
+            accessible={true}
+            isTVSelectable={true}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "opacity": 1,
+              }
+            }
+            testID="CancelPincodeButton"
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "color": "#42D689",
+                    "fontFamily": "Hind-Medium",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  },
+                  undefined,
+                ]
+              }
+            >
+              cancel
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "paddingLeft": 20,
+            "paddingTop": 30,
+          }
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../src/images/coins-logo.png",
+            }
+          }
+          style={
+            Object {
+              "height": 50,
+              "width": 50,
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          Object {
+            "flex": 1,
+            "paddingHorizontal": 25,
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-Light",
+                "fontSize": 22,
+                "paddingBottom": 20,
+                "textAlign": "center",
+              },
+              Object {
+                "color": "#2E3338",
+                "padding": 25,
+                "textAlign": "center",
+              },
+            ]
+          }
+          testID="PincodeTitle"
+        >
+          createPin.title
+        </Text>
+        <View
+          style={
+            Object {
+              "marginVertical": 10,
+              "paddingHorizontal": 20,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 16,
+                "lineHeight": 24,
+              }
+            }
+          >
+            createPin.intro createPin.why
+          </Text>
+        </View>
+        <View
+          style={
+            Array [
+              Object {
+                "marginVertical": 10,
+                "paddingHorizontal": 20,
+              },
+            ]
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 16,
+                "lineHeight": 24,
+              }
+            }
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Bold",
+                    "fontSize": 16,
+                    "lineHeight": 24,
+                  },
+                ]
+              }
+            >
+              important
+               
+            </Text>
+            createPin.warn
+          </Text>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "borderRadius": 3,
+            "flexDirection": "row",
+          },
+          Object {
+            "marginVertical": 10,
+          },
+          Object {
+            "marginBottom": 10,
+          },
+          Object {
+            "paddingHorizontal": 20,
+            "paddingVertical": 5,
+          },
+          Object {
+            "backgroundColor": "transparent",
+          },
+        ]
+      }
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "transparent",
+            "borderColor": "#42D689",
+            "borderRadius": 3,
+            "borderWidth": 2,
+            "flex": 1,
+            "height": 50,
+            "justifyContent": "center",
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 16,
+                },
+                Object {
+                  "color": "#42D689",
+                },
+                Object {
+                  "paddingLeft": 5,
+                  "paddingRight": 5,
+                },
+              ]
+            }
+          >
+            continue
+          </Text>
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Pincode renders correctly for pin enter 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "white",
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <Connect(DevSkipButton)
+    nextScreen="RedeemInvite"
+  />
+  <ScrollViewMock>
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+          "margin": 0,
+          "padding": 20,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "flex": 1,
+          }
+        }
+      >
+        <Link
+          onPress={[Function]}
+          testID="CancelPincodeButton"
+        >
+          cancel
+        </Link>
+      </View>
+    </View>
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "paddingLeft": 20,
+          "paddingTop": 30,
+        }
+      }
+    >
+      <Logo
+        height={50}
+        type="COLOR"
+      />
+    </View>
+    <View
+      style={
+        Object {
+          "flex": 1,
+          "paddingHorizontal": 25,
+        }
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Light",
+              "fontSize": 22,
+              "paddingBottom": 20,
+              "textAlign": "center",
+            },
+            Object {
+              "color": "#2E3338",
+              "padding": 25,
+              "textAlign": "center",
+            },
+          ]
+        }
+      >
+        createPin.title
+      </Text>
+      <NumberInput
+        autoFocus={true}
+        isSensitiveInput={true}
+        keyboardType="numeric"
+        onChange={[Function]}
+        onSubmit={[Function]}
+        placeholder="createPin.yourPin"
+        textContentType="password"
+        value=""
+      />
+    </View>
+  </ScrollViewMock>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+      }
+    }
+  >
+    <Button
+      disabled={true}
+      onPress={[Function]}
+      standard={true}
+      style={
+        Object {
+          "paddingHorizontal": 20,
+          "paddingVertical": 5,
+        }
+      }
+      text="continue"
+      type="Primary"
+    />
+  </View>
+</View>
+`;
+
+exports[`Pincode renders correctly for pin re-enter 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "white",
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <Connect(DevSkipButton)
+    nextScreen="RedeemInvite"
+  />
+  <ScrollViewMock>
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+          "margin": 0,
+          "padding": 20,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "flex": 1,
+          }
+        }
+      >
+        <Link
+          onPress={[Function]}
+          testID="CancelPincodeButton"
+        >
+          cancel
+        </Link>
+      </View>
+    </View>
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "paddingLeft": 20,
+          "paddingTop": 30,
+        }
+      }
+    >
+      <Logo
+        height={50}
+        type="COLOR"
+      />
+    </View>
+    <View
+      style={
+        Object {
+          "flex": 1,
+          "paddingHorizontal": 25,
+        }
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Light",
+              "fontSize": 22,
+              "paddingBottom": 20,
+              "textAlign": "center",
+            },
+            Object {
+              "color": "#2E3338",
+              "padding": 25,
+              "textAlign": "center",
+            },
+          ]
+        }
+      >
+        verifyPin.title
+      </Text>
+      <NumberInput
+        autoFocus={true}
+        isSensitiveInput={true}
+        keyboardType="numeric"
+        onChange={[Function]}
+        onSubmit={[Function]}
+        placeholder="createPin.yourPin"
+        textContentType="password"
+        value=""
+      />
+    </View>
+  </ScrollViewMock>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+      }
+    }
+  >
+    <Button
+      disabled={false}
+      onPress={[Function]}
+      standard={true}
+      style={
+        Object {
+          "paddingHorizontal": 20,
+          "paddingVertical": 5,
+        }
+      }
+      text="verifyPin.finalPin"
+      type="Primary"
+    />
+  </View>
+</View>
+`;

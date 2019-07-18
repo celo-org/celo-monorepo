@@ -1,0 +1,55 @@
+{{ if not (eq (.Values.geth.validators | toString) "og") }}
+{{ range $index, $e := until (.Values.geth.validators | int) }}
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "ethereum.fullname" $ }}-validators-{{ $index }}
+  labels:
+    app: {{ template "ethereum.name" $ }}
+    chart: {{ template "ethereum.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+    component: validators
+spec:
+  selector:
+    app: {{ template "ethereum.name" $ }}
+    release: {{ $.Release.Name }}
+    component: validators
+    statefulset.kubernetes.io/pod-name: {{ template "ethereum.fullname" $ }}-validators-{{ $index | toString }}
+  type: LoadBalancer
+  {{ if ($.Values.geth.static_ips) }}
+  loadBalancerIP: {{ index $.Values.geth (print "validators_" $index "IpAddress") }}
+  {{ end }}
+  ports:
+  - name: discovery
+    port: 30303
+    protocol: UDP
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "ethereum.fullname" $ }}-validators-{{ $index }}-tcp
+  labels:
+    app: {{ template "ethereum.name" $ }}
+    chart: {{ template "ethereum.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+    component: validators
+spec:
+  selector:
+    app: {{ template "ethereum.name" $ }}
+    release: {{ $.Release.Name }}
+    component: validators
+    statefulset.kubernetes.io/pod-name: {{ template "ethereum.fullname" $ }}-validators-{{ $index | toString }}
+  type: LoadBalancer
+  {{ if ($.Values.geth.static_ips) }}
+  loadBalancerIP: {{ index $.Values.geth (print "validators_" $index "IpAddress") }}
+  {{ end }}
+  ports:
+  - name: discovery
+    port: 30303
+    protocol: TCP
+---
+{{ end }}
+{{ end }}

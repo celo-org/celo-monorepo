@@ -1,0 +1,1030 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PaymentRequestListScreen renders correctly with no requests 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "flex": 0,
+        "flexDirection": "row",
+        "padding": 10,
+      }
+    }
+  >
+    <Image
+      resizeMode="contain"
+      source={
+        Object {
+          "testUri": "../../../src/images/celo-account.png",
+        }
+      }
+      style={
+        Object {
+          "height": 40,
+          "width": 40,
+        }
+      }
+    />
+    <View
+      style={
+        Object {
+          "flex": 1,
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "paddingStart": 10,
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 14,
+            "lineHeight": 18,
+          }
+        }
+      >
+        celoDollarBalance
+      </Text>
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "color": "#42D689",
+            },
+          ]
+        }
+      >
+        $
+        120
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "#F8F8F8",
+        "display": "flex",
+        "flexDirection": "row",
+        "height": 36,
+        "justifyContent": "space-between",
+        "paddingHorizontal": 10,
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "#81868B",
+          "fontFamily": "Hind-Medium",
+          "fontSize": 12,
+        }
+      }
+    >
+      requests
+    </Text>
+  </View>
+  <Text
+    style={
+      Array [
+        Object {
+          "color": "#81868B",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 16,
+          "lineHeight": 24,
+        },
+        Object {
+          "marginTop": 30,
+          "textAlign": "center",
+        },
+      ]
+    }
+  >
+    empty
+  </Text>
+</View>
+`;
+
+exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "flex": 0,
+        "flexDirection": "row",
+        "padding": 10,
+      }
+    }
+  >
+    <Image
+      resizeMode="contain"
+      source={
+        Object {
+          "testUri": "../../../src/images/celo-account.png",
+        }
+      }
+      style={
+        Object {
+          "height": 40,
+          "width": 40,
+        }
+      }
+    />
+    <View
+      style={
+        Object {
+          "flex": 1,
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "paddingStart": 10,
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 14,
+            "lineHeight": 18,
+          }
+        }
+      >
+        celoDollarBalance
+      </Text>
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "color": "#42D689",
+            },
+          ]
+        }
+      >
+        $
+        120
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "#F8F8F8",
+        "display": "flex",
+        "flexDirection": "row",
+        "height": 36,
+        "justifyContent": "space-between",
+        "paddingHorizontal": 10,
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "#81868B",
+          "fontFamily": "Hind-Medium",
+          "fontSize": 12,
+        }
+      }
+    >
+      requests
+    </Text>
+  </View>
+  <RCTScrollView>
+    <View>
+      <View
+        style={
+          Array [
+            Object {
+              "borderColor": "#EEEEEE",
+              "borderRadius": 3,
+              "borderWidth": 1,
+            },
+            Object {
+              "margin": 10,
+            },
+          ]
+        }
+      >
+        <View>
+          <View
+            accessible={true}
+            isTVSelectable={true}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "padding": 10,
+                    "width": "100%",
+                  },
+                  false,
+                ]
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "column",
+                    "paddingRight": 10,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                      },
+                      undefined,
+                    ]
+                  }
+                >
+                  <View
+                    style={
+                      Array [
+                        Object {
+                          "alignItems": "center",
+                          "justifyContent": "center",
+                        },
+                        Object {
+                          "backgroundColor": "#7AD6FE",
+                          "borderRadius": 15,
+                          "height": 30,
+                          "width": 30,
+                        },
+                      ]
+                    }
+                  >
+                    <Text
+                      style={
+                        Array [
+                          Object {
+                            "color": "#FFFFFF",
+                            "fontFamily": "Hind-Medium",
+                            "fontSize": 16,
+                          },
+                          Object {
+                            "fontSize": 15,
+                          },
+                        ]
+                      }
+                    >
+                      +
+                    </Text>
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  Object {
+                    "flex": 1,
+                    "justifyContent": "space-between",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    }
+                  }
+                >
+                  +1555-867-5309
+                </Text>
+                <View>
+                  <View
+                    style={
+                      Object {
+                        "justifyContent": "space-between",
+                        "minHeight": 70,
+                      }
+                    }
+                  >
+                    <View
+                      style={Object {}}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#81868B",
+                              "fontFamily": "Hind-Regular",
+                              "fontSize": 14,
+                              "lineHeight": 20,
+                            },
+                            Object {
+                              "paddingTop": 10,
+                            },
+                          ]
+                        }
+                      >
+                        Just the best
+                      </Text>
+                    </View>
+                    <View
+                      style={
+                        Object {
+                          "flexDirection": "row",
+                          "marginTop": 15,
+                        }
+                      }
+                    >
+                      <View
+                        accessible={true}
+                        isTVSelectable={true}
+                        onResponderGrant={[Function]}
+                        onResponderMove={[Function]}
+                        onResponderRelease={[Function]}
+                        onResponderTerminate={[Function]}
+                        onResponderTerminationRequest={[Function]}
+                        onStartShouldSetResponder={[Function]}
+                        style={
+                          Object {
+                            "opacity": 1,
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            Array [
+                              Object {
+                                "color": "#81868B",
+                                "fontFamily": "Hind-Regular",
+                                "fontSize": 13,
+                                "lineHeight": 18,
+                              },
+                              Object {
+                                "color": "#42D689",
+                                "fontFamily": "Hind-Medium",
+                                "fontSize": 14,
+                                "lineHeight": 18,
+                              },
+                              Object {
+                                "paddingEnd": 15,
+                              },
+                            ]
+                          }
+                        >
+                          pay
+                        </Text>
+                      </View>
+                      <View
+                        accessible={true}
+                        isTVSelectable={true}
+                        onResponderGrant={[Function]}
+                        onResponderMove={[Function]}
+                        onResponderRelease={[Function]}
+                        onResponderTerminate={[Function]}
+                        onResponderTerminationRequest={[Function]}
+                        onStartShouldSetResponder={[Function]}
+                        style={
+                          Object {
+                            "opacity": 1,
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            Array [
+                              Object {
+                                "color": "#81868B",
+                                "fontFamily": "Hind-Regular",
+                                "fontSize": 13,
+                                "lineHeight": 18,
+                              },
+                              Object {
+                                "color": "#42D689",
+                                "fontFamily": "Hind-Medium",
+                                "fontSize": 14,
+                                "lineHeight": 18,
+                              },
+                              Object {
+                                "paddingEnd": 15,
+                              },
+                            ]
+                          }
+                        >
+                          decline
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  Object {
+                    "paddingLeft": 10,
+                  }
+                }
+              >
+                <View>
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-SemiBold",
+                          "fontSize": 14,
+                          "lineHeight": 18,
+                        },
+                        Object {
+                          "color": "#81868B",
+                        },
+                      ]
+                    }
+                  >
+                    $
+                    20
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "borderBottomColor": "#EEEEEE",
+                "borderBottomWidth": 1,
+                "marginLeft": 50,
+              }
+            }
+          />
+        </View>
+        <View>
+          <View
+            accessible={true}
+            isTVSelectable={true}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "padding": 10,
+                    "width": "100%",
+                  },
+                  false,
+                ]
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "column",
+                    "paddingRight": 10,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                      },
+                      undefined,
+                    ]
+                  }
+                >
+                  <View
+                    style={
+                      Array [
+                        Object {
+                          "alignItems": "center",
+                          "justifyContent": "center",
+                        },
+                        Object {
+                          "backgroundColor": "#7AD6FE",
+                          "borderRadius": 15,
+                          "height": 30,
+                          "width": 30,
+                        },
+                      ]
+                    }
+                  >
+                    <Text
+                      style={
+                        Array [
+                          Object {
+                            "color": "#FFFFFF",
+                            "fontFamily": "Hind-Medium",
+                            "fontSize": 16,
+                          },
+                          Object {
+                            "fontSize": 15,
+                          },
+                        ]
+                      }
+                    >
+                      +
+                    </Text>
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  Object {
+                    "flex": 1,
+                    "justifyContent": "space-between",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    }
+                  }
+                >
+                  +14155550000
+                </Text>
+                <View>
+                  <View
+                    style={
+                      Object {
+                        "justifyContent": "space-between",
+                        "minHeight": 70,
+                      }
+                    }
+                  >
+                    <View
+                      style={Object {}}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#81868B",
+                              "fontFamily": "Hind-Regular",
+                              "fontSize": 14,
+                              "lineHeight": 20,
+                            },
+                            Object {
+                              "paddingTop": 10,
+                            },
+                          ]
+                        }
+                      >
+                        Just the best for the best. Thanos & Zeus Gods of ultimate Power
+                      </Text>
+                    </View>
+                    <View
+                      style={
+                        Object {
+                          "flexDirection": "row",
+                          "marginTop": 15,
+                        }
+                      }
+                    >
+                      <View
+                        accessible={true}
+                        isTVSelectable={true}
+                        onResponderGrant={[Function]}
+                        onResponderMove={[Function]}
+                        onResponderRelease={[Function]}
+                        onResponderTerminate={[Function]}
+                        onResponderTerminationRequest={[Function]}
+                        onStartShouldSetResponder={[Function]}
+                        style={
+                          Object {
+                            "opacity": 1,
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            Array [
+                              Object {
+                                "color": "#81868B",
+                                "fontFamily": "Hind-Regular",
+                                "fontSize": 13,
+                                "lineHeight": 18,
+                              },
+                              Object {
+                                "color": "#42D689",
+                                "fontFamily": "Hind-Medium",
+                                "fontSize": 14,
+                                "lineHeight": 18,
+                              },
+                              Object {
+                                "paddingEnd": 15,
+                              },
+                            ]
+                          }
+                        >
+                          pay
+                        </Text>
+                      </View>
+                      <View
+                        accessible={true}
+                        isTVSelectable={true}
+                        onResponderGrant={[Function]}
+                        onResponderMove={[Function]}
+                        onResponderRelease={[Function]}
+                        onResponderTerminate={[Function]}
+                        onResponderTerminationRequest={[Function]}
+                        onStartShouldSetResponder={[Function]}
+                        style={
+                          Object {
+                            "opacity": 1,
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            Array [
+                              Object {
+                                "color": "#81868B",
+                                "fontFamily": "Hind-Regular",
+                                "fontSize": 13,
+                                "lineHeight": 18,
+                              },
+                              Object {
+                                "color": "#42D689",
+                                "fontFamily": "Hind-Medium",
+                                "fontSize": 14,
+                                "lineHeight": 18,
+                              },
+                              Object {
+                                "paddingEnd": 15,
+                              },
+                            ]
+                          }
+                        >
+                          decline
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  Object {
+                    "paddingLeft": 10,
+                  }
+                }
+              >
+                <View>
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-SemiBold",
+                          "fontSize": 14,
+                          "lineHeight": 18,
+                        },
+                        Object {
+                          "color": "#81868B",
+                        },
+                      ]
+                    }
+                  >
+                    $
+                    102
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "borderBottomColor": "#EEEEEE",
+                "borderBottomWidth": 1,
+                "marginLeft": 50,
+              }
+            }
+          />
+        </View>
+        <View>
+          <View
+            accessible={true}
+            isTVSelectable={true}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "padding": 10,
+                    "width": "100%",
+                  },
+                  false,
+                ]
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "column",
+                    "paddingRight": 10,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                      },
+                      undefined,
+                    ]
+                  }
+                >
+                  <View
+                    style={
+                      Array [
+                        Object {
+                          "alignItems": "center",
+                          "justifyContent": "center",
+                        },
+                        Object {
+                          "backgroundColor": "#7AD6FE",
+                          "borderRadius": 15,
+                          "height": 30,
+                          "width": 30,
+                        },
+                      ]
+                    }
+                  >
+                    <Text
+                      style={
+                        Array [
+                          Object {
+                            "color": "#FFFFFF",
+                            "fontFamily": "Hind-Medium",
+                            "fontSize": 16,
+                          },
+                          Object {
+                            "fontSize": 15,
+                          },
+                        ]
+                      }
+                    >
+                      +
+                    </Text>
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  Object {
+                    "flex": 1,
+                    "justifyContent": "space-between",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Bold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    }
+                  }
+                >
+                  +14155550000
+                </Text>
+                <View>
+                  <View
+                    style={
+                      Object {
+                        "justifyContent": "space-between",
+                        "minHeight": 70,
+                      }
+                    }
+                  >
+                    <View
+                      style={Object {}}
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#81868B",
+                              "fontFamily": "Hind-Regular",
+                              "fontSize": 14,
+                              "lineHeight": 20,
+                            },
+                            Object {
+                              "paddingTop": 10,
+                            },
+                          ]
+                        }
+                      >
+                        Just the best but less
+                      </Text>
+                    </View>
+                    <View
+                      style={
+                        Object {
+                          "flexDirection": "row",
+                          "marginTop": 15,
+                        }
+                      }
+                    >
+                      <View
+                        accessible={true}
+                        isTVSelectable={true}
+                        onResponderGrant={[Function]}
+                        onResponderMove={[Function]}
+                        onResponderRelease={[Function]}
+                        onResponderTerminate={[Function]}
+                        onResponderTerminationRequest={[Function]}
+                        onStartShouldSetResponder={[Function]}
+                        style={
+                          Object {
+                            "opacity": 1,
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            Array [
+                              Object {
+                                "color": "#81868B",
+                                "fontFamily": "Hind-Regular",
+                                "fontSize": 13,
+                                "lineHeight": 18,
+                              },
+                              Object {
+                                "color": "#42D689",
+                                "fontFamily": "Hind-Medium",
+                                "fontSize": 14,
+                                "lineHeight": 18,
+                              },
+                              Object {
+                                "paddingEnd": 15,
+                              },
+                            ]
+                          }
+                        >
+                          pay
+                        </Text>
+                      </View>
+                      <View
+                        accessible={true}
+                        isTVSelectable={true}
+                        onResponderGrant={[Function]}
+                        onResponderMove={[Function]}
+                        onResponderRelease={[Function]}
+                        onResponderTerminate={[Function]}
+                        onResponderTerminationRequest={[Function]}
+                        onStartShouldSetResponder={[Function]}
+                        style={
+                          Object {
+                            "opacity": 1,
+                          }
+                        }
+                      >
+                        <Text
+                          style={
+                            Array [
+                              Object {
+                                "color": "#81868B",
+                                "fontFamily": "Hind-Regular",
+                                "fontSize": 13,
+                                "lineHeight": 18,
+                              },
+                              Object {
+                                "color": "#42D689",
+                                "fontFamily": "Hind-Medium",
+                                "fontSize": 14,
+                                "lineHeight": 18,
+                              },
+                              Object {
+                                "paddingEnd": 15,
+                              },
+                            ]
+                          }
+                        >
+                          decline
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  Object {
+                    "paddingLeft": 10,
+                  }
+                }
+              >
+                <View>
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-SemiBold",
+                          "fontSize": 14,
+                          "lineHeight": 18,
+                        },
+                        Object {
+                          "color": "#81868B",
+                        },
+                      ]
+                    }
+                  >
+                    $
+                    1
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+</View>
+`;

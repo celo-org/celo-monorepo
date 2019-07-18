@@ -1,0 +1,19 @@
+.gcloudignore
+.git
+.gitignore
+
+# Exclude compiled .js files
+*.js
+*.js.map
+dist/
+
+# Logs
+*.log
+
+# Exclude dependencies
+node_modules/
+
+# Exclude secrets
+serviceAccountKey.json
+circle_deploy.sh
+config/

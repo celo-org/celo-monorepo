@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "ethereum.fullname" . }}-geth-config
+  labels:
+    app: {{ template "ethereum.name" . }}
+    chart: {{ template "ethereum.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  networkid: "{{ .Values.geth.genesis.networkId }}"
+  gethtx1NodeId: {{ .Values.geth.account.gethtx1.nodeId }}
+  gethtx2NodeId: {{ .Values.geth.account.gethtx2.nodeId }}
+  gethtx3NodeId: {{ .Values.geth.account.gethtx3.nodeId }}
+  gethtx4NodeId: {{ .Values.geth.account.gethtx4.nodeId }}
+  genesis.json: {{ .Values.geth.genesisFile | b64dec | quote }}

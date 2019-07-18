@@ -1,0 +1,68 @@
+{
+  "selectCountry": "Seleccionar país",
+  "chooseLanguage": "Elegir idioma",
+  "continue": "Continuar",
+  "secureAsset":
+    "Celo mantiene su patrimonio seguro y le permite enviar capital a quien quiera y recibirlos de cualquier persona",
+  "stableAsset":
+    "Los Celo Dólares constituyen un activo digital estable que está alineado con el valor del dólar estadounidense",
+  "verifyNumber":
+    "Verifique su número de teléfono para conectarse con otros usuarios y recibir dinero",
+  "syncNetwork": "Sincronizando con la red",
+  "welcomeCelo": "Le damos la bienvenida a Celo",
+  "inviteText": {
+    "0":
+      "Ingrese su código de invitación. Si no tiene uno, pídale a alguien de la comunidad de Celo que lo invite. Puede pegar el mensaje de invitación completo como su código de invitación.",
+    "1":
+      "Al aceptar la solicitud, usted acepta permitirnos recopilar información que nos ayude a mejorar la experiencia. Obtenga más información en ",
+    "2": "celo.org",
+    "askForInvite": {
+      "0": "¿No tiene un código? ",
+      "1":
+        "Solicite una invitación a alguien con Celo Wallet o regístrese para obtener una cuenta de testnet en ",
+      "2": "celo.org/build/wallet"
+    }
+  },
+  "enterFullName": "Ingrese su nombre y apellido",
+  "fullName": "Nombre completo",
+  "InvitationCode": "Código de invitación",
+  "optIn": "Inscribirse",
+  "submitting": "Enviando ...",
+  "redeemingInvite": "Confirmando invitación",
+  "redeemingDescription":
+    "Por favor espere. Esto puede tomar algunos miniutos. Por favor dejá la aplicación abierta.",
+  "haveWallet": "¿Ya tiene una billetera de Celo? ",
+  "importIt": "Importar",
+  "invalidInvite": "Código de invitación inválido",
+  "cancel": "Cancelar",
+  "important": "Importante",
+  "createPin": {
+    "title": "Crear un código PIN de 6 dígitos",
+    "intro": "Cree un PIN para proteger su billetera de Celo.",
+    "why": "En ciertos casos, necesitará este PIN para enviar Celo Dólares a sus amigos.",
+    "warn":
+      "escriba su código PIN de 6 dígitos en un papel y guárdelo en algún sitio seguro. Se lo solicitaremos más tarde para acceder a su billetera.",
+    "yourPin": "Su PIN"
+  },
+  "verifyPin": {
+    "title": "Repetir el código PIN de 6 dígitos",
+    "finalPin": "Crear PIN"
+  },
+  "confirmPin": {
+    "title": "Ingrese el código PIN de 6 dígitos",
+    "submit": "Enviar"
+  },
+  "systemAuth": {
+    "title": "Configura la seguridad Celo",
+    "intro":
+      "Necesitaremos que ingreses el código de bloqueo de pantalla de tu dispositivo o tu huella, si el mismo lo soporta.",
+    "why":
+      "Necesitamos este nivel de protección adicional para asegurar que el contenido de tu billetera se encuentra a salvo."
+  },
+  "goToSystemSecuritySettingsActionLabel": "Vaya a seguridad",
+  "enableSystemScreenLockFailedMessage": "Error al intentar habilitar el bloqueo de pantalla",
+  "initKeystoreFailureMessage": "Error al recuperar la clave",
+  "pinLostForeverMessage": "Eliminaste el bloqueo de pantalla, el PIN se perdió",
+  "enableScreenLockMessage":
+    "Por favor habilitá el bloqueo de pantalla para usar Celo. Si deshabilitás el bloqueo de pantalla en el futuro, vas a necesitar tu clave de respaldo para acceder a tu cuenta"
+}

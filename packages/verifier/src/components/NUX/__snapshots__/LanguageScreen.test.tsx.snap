@@ -1,0 +1,280 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "white",
+      "flex": 1,
+      "justifyContent": "space-between",
+      "paddingTop": 70,
+    }
+  }
+>
+  <RCTScrollView>
+    <View>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+          }
+        }
+      >
+        <Image
+          resizeMode="contain"
+          style={
+            Object {
+              "height": 40,
+              "margin": 20,
+            }
+          }
+        />
+      </View>
+      <Text
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Light",
+              "fontSize": 22,
+              "paddingBottom": 20,
+              "textAlign": "center",
+            },
+            Object {
+              "color": "#2E3338",
+              "textAlign": "center",
+            },
+          ]
+        }
+        testID="ChooseLanguageTitle"
+      >
+        chooseLanguage
+      </Text>
+      <View
+        style={
+          Object {
+            "borderBottomWidth": 1,
+            "borderColor": "#EEEEEE",
+            "height": 5,
+          }
+        }
+        testID="line"
+      />
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+        testID="ChooseLanguage/en-US"
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "height": 60,
+              },
+              false,
+            ]
+          }
+        >
+          <View
+            style={
+              Object {
+                "marginHorizontal": 12,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 12,
+                  "borderWidth": 2,
+                  "height": 24,
+                  "paddingTop": 2,
+                  "width": 24,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "#EEEEEE",
+                "height": 60,
+                "justifyContent": "center",
+                "width": 702,
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontSize": 16,
+                }
+              }
+            >
+              English
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+        testID="ChooseLanguage/es-AR"
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "height": 60,
+              },
+              false,
+            ]
+          }
+        >
+          <View
+            style={
+              Object {
+                "marginHorizontal": 12,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 12,
+                  "borderWidth": 2,
+                  "height": 24,
+                  "paddingTop": 2,
+                  "width": 24,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "#EEEEEE",
+                "height": 60,
+                "justifyContent": "center",
+                "width": 702,
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontSize": 16,
+                }
+              }
+            >
+              Español (AR)
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "borderRadius": 3,
+          "flexDirection": "row",
+        },
+        null,
+        null,
+        undefined,
+        Object {
+          "backgroundColor": "#42D689",
+        },
+      ]
+    }
+  >
+    <View
+      accessible={true}
+      isTVSelectable={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#42D689",
+          "borderWidth": 0,
+          "flex": 1,
+          "height": 50,
+          "justifyContent": "center",
+          "opacity": 1,
+        }
+      }
+      testID="ChooseLanguageButton"
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 16,
+              },
+              Object {
+                "color": "#FFFFFF",
+              },
+              Object {
+                "paddingLeft": 5,
+                "paddingRight": 5,
+              },
+            ]
+          }
+        >
+          continue
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;

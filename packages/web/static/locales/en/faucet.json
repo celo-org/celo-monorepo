@@ -1,0 +1,35 @@
+{
+  "pageTitle": "Fund Your Testnet Account",
+  "description": "Get Your Testnet Address Funded",
+  "title": "Fund your Testnet Account",
+  "addFunds": "Add Funds",
+  "addFundsText":
+    "Enter the address of your Alfajores Testnet account to receive additional funds. Each request adds 10 Celo Dollars and 5 Celo Gold.\n\nIn the Celo Wallet, you can find your address by pressing the Settings cog icon at the top right. Press the address to copy it to your device’s clipboard.",
+  "getDollars": "Add Funds",
+  "whatsNext": "What's Next",
+  "getTestnetText":
+    "If you have an Android device, you can set up a funded account on the Alfajores Testnet by requesting a <0>Celo Wallet invite</0>. You can also <2>create an account via the command line<2>.",
+  "getTestnetAddress": "Create an Account",
+  "buildLocally": "Build the Celo Wallet locally.",
+  "buildLocallyText":
+    "Follow these instructions to build the Wallet from source, pointed at the Alfajores Testnet.",
+  "buildLocallyLink": "Read the Wallet Tutorial",
+  "youCanUse":
+    "You can access an existing account from the Celo Wallet by pressing 'Import It' on the first screen and entering your seed phrase.",
+  "viewAccountInfo": "View account information. ",
+  "checkYourBalance": "Check your balance and transaction history",
+  "celoWallet": "Celo Wallet",
+  "blockScout": "BlockScout",
+  "interestedInNode": "Interested in running your own node? ",
+  "faucetError": "Unable to faucet - please try again",
+  "faucetCompleted": "Faucet Completed",
+  "invalidAddress": "Enter an Address",
+  "interestedInNodeText": "Follow our step-by-step guide.",
+  "learnMore": "Read the Docs",
+  "haveAnAccount": "Have an Account?",
+  "hittingIssues": "Hitting Issues?",
+  "hittingIssuesText": "",
+  "askQustionsOnForum": "Get Help from the Celo Community.",
+  "findAnswers": "Find answers and ask questions in the Forum",
+  "testnetForum": "Alfajores Testnet Forum"
+}

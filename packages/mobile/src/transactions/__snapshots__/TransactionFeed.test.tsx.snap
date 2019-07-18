@@ -1,0 +1,2728 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`filters out Failed 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "paddingHorizontal": 20,
+      "paddingVertical": 20,
+    }
+  }
+>
+  <Image
+    resizeMode="contain"
+    source={
+      Object {
+        "testUri": "../../../src/images/exchange.png",
+      }
+    }
+    style={
+      Object {
+        "height": 108,
+        "marginVertical": 20,
+        "width": 108,
+      }
+    }
+  />
+  <Text
+    style={
+      Array [
+        Object {
+          "color": "#81868B",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 16,
+          "lineHeight": 24,
+        },
+        Object {
+          "marginBottom": 10,
+          "textAlign": "center",
+        },
+      ]
+    }
+  >
+    noExchangeActivity
+     
+  </Text>
+</View>
+`;
+
+exports[`renders for error 1`] = `
+<RCTScrollView
+  data={
+    Array [
+      Object {
+        "address": "0072bvy2o23u",
+        "comment": "Eye for an Eye",
+        "id": "0110",
+        "status": "Pending",
+        "symbol": "Celo Dollar",
+        "timestamp": 1542406112,
+        "type": "SENT",
+        "value": "100",
+      },
+      Object {
+        "id": "0112",
+        "inSymbol": "Celo Dollar",
+        "inValue": "20",
+        "outSymbol": "Celo Gold",
+        "outValue": "30",
+        "status": "Pending",
+        "timestamp": 1542409112,
+        "type": "EXCHANGED",
+      },
+    ]
+  }
+  disableVirtualization={false}
+  getItem={[Function]}
+  getItemCount={[Function]}
+  horizontal={false}
+  initialNumToRender={10}
+  keyExtractor={[Function]}
+  maxToRenderPerBatch={10}
+  numColumns={1}
+  onContentSizeChange={[Function]}
+  onEndReachedThreshold={2}
+  onLayout={[Function]}
+  onMomentumScrollEnd={[Function]}
+  onScroll={[Function]}
+  onScrollBeginDrag={[Function]}
+  onScrollEndDrag={[Function]}
+  removeClippedSubviews={false}
+  renderItem={[Function]}
+  scrollEventThrottle={50}
+  stickyHeaderIndices={Array []}
+  updateCellsBatchingPeriod={50}
+  viewabilityConfigCallbackPairs={Array []}
+  windowSize={21}
+>
+  <View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingLeft": 10,
+              "paddingTop": 20,
+            }
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "column",
+                },
+                Object {
+                  "opacity": 0.3,
+                },
+              ]
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  undefined,
+                ]
+              }
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "backgroundColor": "#FEB45E",
+                      "borderRadius": 20,
+                      "height": 40,
+                      "width": 40,
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#FFFFFF",
+                        "fontFamily": "Hind-Medium",
+                        "fontSize": 16,
+                      },
+                      Object {
+                        "fontSize": 20,
+                      },
+                    ]
+                  }
+                >
+                  #
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "rgba(134, 138, 141, 0.15)",
+                "flex": 1,
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "marginLeft": 10,
+                "paddingRight": 10,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "flex-start",
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "opacity": 0.3,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    }
+                  }
+                >
+                  Sent
+                </Text>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#81868B",
+                        "fontFamily": "Hind-Light",
+                        "fontSize": 16,
+                        "lineHeight": 24,
+                      },
+                      Object {
+                        "paddingTop": 10,
+                      },
+                    ]
+                  }
+                >
+                  Eye for an Eye
+                </Text>
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "paddingBottom": 10,
+                      "paddingTop": 25,
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingPayment
+                </Text>
+                 undefined
+              </Text>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "flex-start",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-end",
+                  },
+                  Object {
+                    "opacity": 0.3,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "#81868B",
+                    },
+                  ]
+                }
+              >
+                
+                $
+                100.00
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingLeft": 10,
+              "paddingTop": 20,
+            }
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "borderBottomWidth": 1,
+                  "borderColor": "rgba(134, 138, 141, 0.15)",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "paddingRight": 10,
+                },
+                false,
+              ]
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "flex-start",
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "opacity": 0.3,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    }
+                  }
+                >
+                  exchange
+                </Text>
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "paddingBottom": 10,
+                      "paddingTop": 25,
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingExchange
+                </Text>
+                 undefined
+              </Text>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "flex-start",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-end",
+                  },
+                  Object {
+                    "opacity": 0.3,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "rgba(0, 0, 0, .4)",
+                    },
+                  ]
+                }
+              >
+                $
+                20.00
+              </Text>
+              <View
+                style={
+                  Object {
+                    "paddingBottom": 5,
+                    "paddingHorizontal": 5,
+                  }
+                }
+              >
+                <svg
+                  fill="none"
+                  height="6"
+                  style={Object {}}
+                  viewBox="0 0 9 6"
+                  width="9"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    clip-rule="evenodd"
+                    d="M5.0998 5.45001L8.39993 3.02504L5.0998 0.600067V2.22512L0.399933 2.22512V3.82518L5.0998 3.82518V5.45001Z"
+                    fill="rgba(0, 0, 0, .4)"
+                    fill-rule="evenodd"
+                    style={Object {}}
+                  />
+                </svg>
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "rgba(0, 0, 0, .4)",
+                    },
+                  ]
+                }
+              >
+                30.00
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</RCTScrollView>
+`;
+
+exports[`renders for gold to dollar exchange properly 1`] = `
+<RCTScrollView
+  data={
+    Array [
+      Object {
+        "address": "0072bvy2o23u",
+        "comment": "Eye for an Eye",
+        "id": "0110",
+        "status": "Pending",
+        "symbol": "Celo Dollar",
+        "timestamp": 1542406112,
+        "type": "SENT",
+        "value": "100",
+      },
+      Object {
+        "id": "0112",
+        "inSymbol": "Celo Dollar",
+        "inValue": "20",
+        "outSymbol": "Celo Gold",
+        "outValue": "30",
+        "status": "Pending",
+        "timestamp": 1542409112,
+        "type": "EXCHANGED",
+      },
+      Object {
+        "__typename": "Exchange",
+        "hash": "0x00000000000000000000",
+        "inSymbol": "Celo Dollar",
+        "inValue": 30,
+        "outSymbol": "Celo Gold",
+        "outValue": 200,
+        "timestamp": 1542306118,
+        "type": "EXCHANGED",
+      },
+    ]
+  }
+  disableVirtualization={false}
+  getItem={[Function]}
+  getItemCount={[Function]}
+  horizontal={false}
+  initialNumToRender={10}
+  keyExtractor={[Function]}
+  maxToRenderPerBatch={10}
+  numColumns={1}
+  onContentSizeChange={[Function]}
+  onEndReachedThreshold={2}
+  onLayout={[Function]}
+  onMomentumScrollEnd={[Function]}
+  onScroll={[Function]}
+  onScrollBeginDrag={[Function]}
+  onScrollEndDrag={[Function]}
+  removeClippedSubviews={false}
+  renderItem={[Function]}
+  scrollEventThrottle={50}
+  stickyHeaderIndices={Array []}
+  updateCellsBatchingPeriod={50}
+  viewabilityConfigCallbackPairs={Array []}
+  windowSize={21}
+>
+  <View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingLeft": 10,
+              "paddingTop": 20,
+            }
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "column",
+                },
+                Object {
+                  "opacity": 0.3,
+                },
+              ]
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  undefined,
+                ]
+              }
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "backgroundColor": "#FEB45E",
+                      "borderRadius": 20,
+                      "height": 40,
+                      "width": 40,
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#FFFFFF",
+                        "fontFamily": "Hind-Medium",
+                        "fontSize": 16,
+                      },
+                      Object {
+                        "fontSize": 20,
+                      },
+                    ]
+                  }
+                >
+                  #
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "rgba(134, 138, 141, 0.15)",
+                "flex": 1,
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "marginLeft": 10,
+                "paddingRight": 10,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "flex-start",
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "opacity": 0.3,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    }
+                  }
+                >
+                  Sent
+                </Text>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#81868B",
+                        "fontFamily": "Hind-Light",
+                        "fontSize": 16,
+                        "lineHeight": 24,
+                      },
+                      Object {
+                        "paddingTop": 10,
+                      },
+                    ]
+                  }
+                >
+                  Eye for an Eye
+                </Text>
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "paddingBottom": 10,
+                      "paddingTop": 25,
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingPayment
+                </Text>
+                 undefined
+              </Text>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "flex-start",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-end",
+                  },
+                  Object {
+                    "opacity": 0.3,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "#81868B",
+                    },
+                  ]
+                }
+              >
+                
+                $
+                100.00
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingLeft": 10,
+              "paddingTop": 20,
+            }
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "column",
+                  "height": 40,
+                  "justifyContent": "center",
+                  "width": 40,
+                },
+                Object {
+                  "opacity": 0.3,
+                },
+              ]
+            }
+          >
+            <Image
+              resizeMode="contain"
+              source={
+                Object {
+                  "testUri": "../../../src/transactions/ExchangeGreenGold.png",
+                }
+              }
+              style={
+                Object {
+                  "width": 40,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Array [
+                Object {
+                  "borderBottomWidth": 1,
+                  "borderColor": "rgba(134, 138, 141, 0.15)",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "paddingRight": 10,
+                },
+                Object {
+                  "marginLeft": 10,
+                },
+              ]
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "flex-start",
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "opacity": 0.3,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    }
+                  }
+                >
+                  exchange
+                </Text>
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "paddingBottom": 10,
+                      "paddingTop": 25,
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingExchange
+                </Text>
+                 undefined
+              </Text>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "flex-start",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-end",
+                  },
+                  Object {
+                    "opacity": 0.3,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "rgba(0, 0, 0, .4)",
+                    },
+                  ]
+                }
+              >
+                $
+                20.00
+              </Text>
+              <View
+                style={
+                  Object {
+                    "paddingBottom": 5,
+                    "paddingHorizontal": 5,
+                  }
+                }
+              >
+                <svg
+                  fill="none"
+                  height="6"
+                  style={Object {}}
+                  viewBox="0 0 9 6"
+                  width="9"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    clip-rule="evenodd"
+                    d="M5.0998 5.45001L8.39993 3.02504L5.0998 0.600067V2.22512L0.399933 2.22512V3.82518L5.0998 3.82518V5.45001Z"
+                    fill="rgba(0, 0, 0, .4)"
+                    fill-rule="evenodd"
+                    style={Object {}}
+                  />
+                </svg>
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "rgba(0, 0, 0, .4)",
+                    },
+                  ]
+                }
+              >
+                30.00
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingLeft": 10,
+              "paddingTop": 20,
+            }
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "column",
+                  "height": 40,
+                  "justifyContent": "center",
+                  "width": 40,
+                },
+                Object {
+                  "opacity": 1,
+                },
+              ]
+            }
+          >
+            <Image
+              resizeMode="contain"
+              source={
+                Object {
+                  "testUri": "../../../src/transactions/ExchangeGreenGold.png",
+                }
+              }
+              style={
+                Object {
+                  "width": 40,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Array [
+                Object {
+                  "borderBottomWidth": 1,
+                  "borderColor": "rgba(134, 138, 141, 0.15)",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "paddingRight": 10,
+                },
+                Object {
+                  "marginLeft": 10,
+                },
+              ]
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "flex-start",
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "opacity": 1,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    }
+                  }
+                >
+                  exchange
+                </Text>
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "paddingBottom": 10,
+                      "paddingTop": 25,
+                    },
+                  ]
+                }
+              />
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "flex-start",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-end",
+                  },
+                  Object {
+                    "opacity": 1,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "#42D689",
+                    },
+                  ]
+                }
+              >
+                $
+                30.00
+              </Text>
+              <View
+                style={
+                  Object {
+                    "paddingBottom": 5,
+                    "paddingHorizontal": 5,
+                  }
+                }
+              >
+                <svg
+                  fill="none"
+                  height="6"
+                  style={Object {}}
+                  viewBox="0 0 9 6"
+                  width="9"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    clip-rule="evenodd"
+                    d="M5.0998 5.45001L8.39993 3.02504L5.0998 0.600067V2.22512L0.399933 2.22512V3.82518L5.0998 3.82518V5.45001Z"
+                    fill="rgba(0, 0, 0, .4)"
+                    fill-rule="evenodd"
+                    style={Object {}}
+                  />
+                </svg>
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "#FBCC5C",
+                    },
+                  ]
+                }
+              >
+                200.00
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</RCTScrollView>
+`;
+
+exports[`renders for loading 1`] = `
+<RCTScrollView
+  data={
+    Array [
+      Object {
+        "address": "0072bvy2o23u",
+        "comment": "Eye for an Eye",
+        "id": "0110",
+        "status": "Pending",
+        "symbol": "Celo Dollar",
+        "timestamp": 1542406112,
+        "type": "SENT",
+        "value": "100",
+      },
+      Object {
+        "id": "0112",
+        "inSymbol": "Celo Dollar",
+        "inValue": "20",
+        "outSymbol": "Celo Gold",
+        "outValue": "30",
+        "status": "Pending",
+        "timestamp": 1542409112,
+        "type": "EXCHANGED",
+      },
+    ]
+  }
+  disableVirtualization={false}
+  getItem={[Function]}
+  getItemCount={[Function]}
+  horizontal={false}
+  initialNumToRender={10}
+  keyExtractor={[Function]}
+  maxToRenderPerBatch={10}
+  numColumns={1}
+  onContentSizeChange={[Function]}
+  onEndReachedThreshold={2}
+  onLayout={[Function]}
+  onMomentumScrollEnd={[Function]}
+  onScroll={[Function]}
+  onScrollBeginDrag={[Function]}
+  onScrollEndDrag={[Function]}
+  removeClippedSubviews={false}
+  renderItem={[Function]}
+  scrollEventThrottle={50}
+  stickyHeaderIndices={Array []}
+  updateCellsBatchingPeriod={50}
+  viewabilityConfigCallbackPairs={Array []}
+  windowSize={21}
+>
+  <View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingLeft": 10,
+              "paddingTop": 20,
+            }
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "column",
+                },
+                Object {
+                  "opacity": 0.3,
+                },
+              ]
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  undefined,
+                ]
+              }
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "backgroundColor": "#FEB45E",
+                      "borderRadius": 20,
+                      "height": 40,
+                      "width": 40,
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#FFFFFF",
+                        "fontFamily": "Hind-Medium",
+                        "fontSize": 16,
+                      },
+                      Object {
+                        "fontSize": 20,
+                      },
+                    ]
+                  }
+                >
+                  #
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "rgba(134, 138, 141, 0.15)",
+                "flex": 1,
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "marginLeft": 10,
+                "paddingRight": 10,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "flex-start",
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "opacity": 0.3,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    }
+                  }
+                >
+                  Sent
+                </Text>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#81868B",
+                        "fontFamily": "Hind-Light",
+                        "fontSize": 16,
+                        "lineHeight": 24,
+                      },
+                      Object {
+                        "paddingTop": 10,
+                      },
+                    ]
+                  }
+                >
+                  Eye for an Eye
+                </Text>
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "paddingBottom": 10,
+                      "paddingTop": 25,
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingPayment
+                </Text>
+                 undefined
+              </Text>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "flex-start",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-end",
+                  },
+                  Object {
+                    "opacity": 0.3,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "#81868B",
+                    },
+                  ]
+                }
+              >
+                
+                $
+                100.00
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingLeft": 10,
+              "paddingTop": 20,
+            }
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "column",
+                  "height": 40,
+                  "justifyContent": "center",
+                  "width": 40,
+                },
+                Object {
+                  "opacity": 0.3,
+                },
+              ]
+            }
+          >
+            <Image
+              resizeMode="contain"
+              source={
+                Object {
+                  "testUri": "../../../src/transactions/ExchangeGreenGold.png",
+                }
+              }
+              style={
+                Object {
+                  "width": 40,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Array [
+                Object {
+                  "borderBottomWidth": 1,
+                  "borderColor": "rgba(134, 138, 141, 0.15)",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "paddingRight": 10,
+                },
+                Object {
+                  "marginLeft": 10,
+                },
+              ]
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "flex-start",
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "opacity": 0.3,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    }
+                  }
+                >
+                  exchange
+                </Text>
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "paddingBottom": 10,
+                      "paddingTop": 25,
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingExchange
+                </Text>
+                 undefined
+              </Text>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "flex-start",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-end",
+                  },
+                  Object {
+                    "opacity": 0.3,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "rgba(0, 0, 0, .4)",
+                    },
+                  ]
+                }
+              >
+                $
+                20.00
+              </Text>
+              <View
+                style={
+                  Object {
+                    "paddingBottom": 5,
+                    "paddingHorizontal": 5,
+                  }
+                }
+              >
+                <svg
+                  fill="none"
+                  height="6"
+                  style={Object {}}
+                  viewBox="0 0 9 6"
+                  width="9"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    clip-rule="evenodd"
+                    d="M5.0998 5.45001L8.39993 3.02504L5.0998 0.600067V2.22512L0.399933 2.22512V3.82518L5.0998 3.82518V5.45001Z"
+                    fill="rgba(0, 0, 0, .4)"
+                    fill-rule="evenodd"
+                    style={Object {}}
+                  />
+                </svg>
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "rgba(0, 0, 0, .4)",
+                    },
+                  ]
+                }
+              >
+                30.00
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</RCTScrollView>
+`;
+
+exports[`renders for no transactions 1`] = `
+<RCTScrollView
+  data={
+    Array [
+      Object {
+        "address": "0072bvy2o23u",
+        "comment": "Eye for an Eye",
+        "id": "0110",
+        "status": "Pending",
+        "symbol": "Celo Dollar",
+        "timestamp": 1542406112,
+        "type": "SENT",
+        "value": "100",
+      },
+      Object {
+        "id": "0112",
+        "inSymbol": "Celo Dollar",
+        "inValue": "20",
+        "outSymbol": "Celo Gold",
+        "outValue": "30",
+        "status": "Pending",
+        "timestamp": 1542409112,
+        "type": "EXCHANGED",
+      },
+    ]
+  }
+  disableVirtualization={false}
+  getItem={[Function]}
+  getItemCount={[Function]}
+  horizontal={false}
+  initialNumToRender={10}
+  keyExtractor={[Function]}
+  maxToRenderPerBatch={10}
+  numColumns={1}
+  onContentSizeChange={[Function]}
+  onEndReachedThreshold={2}
+  onLayout={[Function]}
+  onMomentumScrollEnd={[Function]}
+  onScroll={[Function]}
+  onScrollBeginDrag={[Function]}
+  onScrollEndDrag={[Function]}
+  removeClippedSubviews={false}
+  renderItem={[Function]}
+  scrollEventThrottle={50}
+  stickyHeaderIndices={Array []}
+  updateCellsBatchingPeriod={50}
+  viewabilityConfigCallbackPairs={Array []}
+  windowSize={21}
+>
+  <View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingLeft": 10,
+              "paddingTop": 20,
+            }
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "column",
+                },
+                Object {
+                  "opacity": 0.3,
+                },
+              ]
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  undefined,
+                ]
+              }
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "backgroundColor": "#FEB45E",
+                      "borderRadius": 20,
+                      "height": 40,
+                      "width": 40,
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#FFFFFF",
+                        "fontFamily": "Hind-Medium",
+                        "fontSize": 16,
+                      },
+                      Object {
+                        "fontSize": 20,
+                      },
+                    ]
+                  }
+                >
+                  #
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "rgba(134, 138, 141, 0.15)",
+                "flex": 1,
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "marginLeft": 10,
+                "paddingRight": 10,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "flex-start",
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "opacity": 0.3,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    }
+                  }
+                >
+                  Sent
+                </Text>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#81868B",
+                        "fontFamily": "Hind-Light",
+                        "fontSize": 16,
+                        "lineHeight": 24,
+                      },
+                      Object {
+                        "paddingTop": 10,
+                      },
+                    ]
+                  }
+                >
+                  Eye for an Eye
+                </Text>
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "paddingBottom": 10,
+                      "paddingTop": 25,
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingPayment
+                </Text>
+                 undefined
+              </Text>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "flex-start",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-end",
+                  },
+                  Object {
+                    "opacity": 0.3,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "#81868B",
+                    },
+                  ]
+                }
+              >
+                
+                $
+                100.00
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingLeft": 10,
+              "paddingTop": 20,
+            }
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "column",
+                  "height": 40,
+                  "justifyContent": "center",
+                  "width": 40,
+                },
+                Object {
+                  "opacity": 0.3,
+                },
+              ]
+            }
+          >
+            <Image
+              resizeMode="contain"
+              source={
+                Object {
+                  "testUri": "../../../src/transactions/ExchangeGreenGold.png",
+                }
+              }
+              style={
+                Object {
+                  "width": 40,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Array [
+                Object {
+                  "borderBottomWidth": 1,
+                  "borderColor": "rgba(134, 138, 141, 0.15)",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "paddingRight": 10,
+                },
+                Object {
+                  "marginLeft": 10,
+                },
+              ]
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "flex-start",
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "opacity": 0.3,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    }
+                  }
+                >
+                  exchange
+                </Text>
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "paddingBottom": 10,
+                      "paddingTop": 25,
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingExchange
+                </Text>
+                 undefined
+              </Text>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "flex-start",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-end",
+                  },
+                  Object {
+                    "opacity": 0.3,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "rgba(0, 0, 0, .4)",
+                    },
+                  ]
+                }
+              >
+                $
+                20.00
+              </Text>
+              <View
+                style={
+                  Object {
+                    "paddingBottom": 5,
+                    "paddingHorizontal": 5,
+                  }
+                }
+              >
+                <svg
+                  fill="none"
+                  height="6"
+                  style={Object {}}
+                  viewBox="0 0 9 6"
+                  width="9"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    clip-rule="evenodd"
+                    d="M5.0998 5.45001L8.39993 3.02504L5.0998 0.600067V2.22512L0.399933 2.22512V3.82518L5.0998 3.82518V5.45001Z"
+                    fill="rgba(0, 0, 0, .4)"
+                    fill-rule="evenodd"
+                    style={Object {}}
+                  />
+                </svg>
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "rgba(0, 0, 0, .4)",
+                    },
+                  ]
+                }
+              >
+                30.00
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</RCTScrollView>
+`;
+
+exports[`renders for standbyTransactions 1`] = `
+<RCTScrollView
+  data={
+    Array [
+      Object {
+        "address": "0072bvy2o23u",
+        "comment": "Eye for an Eye",
+        "id": "0110",
+        "status": "Pending",
+        "symbol": "Celo Dollar",
+        "timestamp": 1542406112,
+        "type": "SENT",
+        "value": "100",
+      },
+      Object {
+        "id": "0112",
+        "inSymbol": "Celo Dollar",
+        "inValue": "20",
+        "outSymbol": "Celo Gold",
+        "outValue": "30",
+        "status": "Pending",
+        "timestamp": 1542409112,
+        "type": "EXCHANGED",
+      },
+    ]
+  }
+  disableVirtualization={false}
+  getItem={[Function]}
+  getItemCount={[Function]}
+  horizontal={false}
+  initialNumToRender={10}
+  keyExtractor={[Function]}
+  maxToRenderPerBatch={10}
+  numColumns={1}
+  onContentSizeChange={[Function]}
+  onEndReachedThreshold={2}
+  onLayout={[Function]}
+  onMomentumScrollEnd={[Function]}
+  onScroll={[Function]}
+  onScrollBeginDrag={[Function]}
+  onScrollEndDrag={[Function]}
+  removeClippedSubviews={false}
+  renderItem={[Function]}
+  scrollEventThrottle={50}
+  stickyHeaderIndices={Array []}
+  updateCellsBatchingPeriod={50}
+  viewabilityConfigCallbackPairs={Array []}
+  windowSize={21}
+>
+  <View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingLeft": 10,
+              "paddingTop": 20,
+            }
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "column",
+                },
+                Object {
+                  "opacity": 0.3,
+                },
+              ]
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  undefined,
+                ]
+              }
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "backgroundColor": "#FEB45E",
+                      "borderRadius": 20,
+                      "height": 40,
+                      "width": 40,
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#FFFFFF",
+                        "fontFamily": "Hind-Medium",
+                        "fontSize": 16,
+                      },
+                      Object {
+                        "fontSize": 20,
+                      },
+                    ]
+                  }
+                >
+                  #
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "rgba(134, 138, 141, 0.15)",
+                "flex": 1,
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "marginLeft": 10,
+                "paddingRight": 10,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "flex-start",
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "opacity": 0.3,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    }
+                  }
+                >
+                  Sent
+                </Text>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#81868B",
+                        "fontFamily": "Hind-Light",
+                        "fontSize": 16,
+                        "lineHeight": 24,
+                      },
+                      Object {
+                        "paddingTop": 10,
+                      },
+                    ]
+                  }
+                >
+                  Eye for an Eye
+                </Text>
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "paddingBottom": 10,
+                      "paddingTop": 25,
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingPayment
+                </Text>
+                 undefined
+              </Text>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "flex-start",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-end",
+                  },
+                  Object {
+                    "opacity": 0.3,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "#81868B",
+                    },
+                  ]
+                }
+              >
+                
+                $
+                100.00
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingLeft": 10,
+              "paddingTop": 20,
+            }
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "column",
+                  "height": 40,
+                  "justifyContent": "center",
+                  "width": 40,
+                },
+                Object {
+                  "opacity": 0.3,
+                },
+              ]
+            }
+          >
+            <Image
+              resizeMode="contain"
+              source={
+                Object {
+                  "testUri": "../../../src/transactions/ExchangeGreenGold.png",
+                }
+              }
+              style={
+                Object {
+                  "width": 40,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Array [
+                Object {
+                  "borderBottomWidth": 1,
+                  "borderColor": "rgba(134, 138, 141, 0.15)",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "paddingRight": 10,
+                },
+                Object {
+                  "marginLeft": 10,
+                },
+              ]
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flex": 1,
+                  "justifyContent": "flex-start",
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "opacity": 0.3,
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    }
+                  }
+                >
+                  exchange
+                </Text>
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 13,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "paddingBottom": 10,
+                      "paddingTop": 25,
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingExchange
+                </Text>
+                 undefined
+              </Text>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "flex-start",
+                    "flexDirection": "row",
+                    "justifyContent": "flex-end",
+                  },
+                  Object {
+                    "opacity": 0.3,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "rgba(0, 0, 0, .4)",
+                    },
+                  ]
+                }
+              >
+                $
+                20.00
+              </Text>
+              <View
+                style={
+                  Object {
+                    "paddingBottom": 5,
+                    "paddingHorizontal": 5,
+                  }
+                }
+              >
+                <svg
+                  fill="none"
+                  height="6"
+                  style={Object {}}
+                  viewBox="0 0 9 6"
+                  width="9"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    clip-rule="evenodd"
+                    d="M5.0998 5.45001L8.39993 3.02504L5.0998 0.600067V2.22512L0.399933 2.22512V3.82518L5.0998 3.82518V5.45001Z"
+                    fill="rgba(0, 0, 0, .4)"
+                    fill-rule="evenodd"
+                    style={Object {}}
+                  />
+                </svg>
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "rgba(0, 0, 0, .4)",
+                    },
+                  ]
+                }
+              >
+                30.00
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</RCTScrollView>
+`;

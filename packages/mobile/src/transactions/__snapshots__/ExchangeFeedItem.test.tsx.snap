@@ -1,0 +1,171 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ExchangeFeedItem renders correctly 1`] = `
+<View
+  accessible={true}
+  isTVSelectable={true}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    Object {
+      "opacity": 1,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "paddingLeft": 10,
+        "paddingTop": 20,
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "borderBottomWidth": 1,
+            "borderColor": "rgba(134, 138, 141, 0.15)",
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+            "paddingRight": 10,
+          },
+          false,
+        ]
+      }
+    >
+      <View
+        style={
+          Object {
+            "flex": 1,
+            "justifyContent": "flex-start",
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "opacity": 1,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 14,
+                "lineHeight": 18,
+              }
+            }
+          >
+            exchange
+          </Text>
+        </View>
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 13,
+                "lineHeight": 18,
+              },
+              Object {
+                "paddingBottom": 10,
+                "paddingTop": 25,
+              },
+            ]
+          }
+        >
+          Dec 31 at 5:00 PM
+        </Text>
+      </View>
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "alignSelf": "flex-start",
+              "flexDirection": "row",
+              "justifyContent": "flex-end",
+            },
+            Object {
+              "opacity": 1,
+            },
+          ]
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 16,
+                "lineHeight": 20,
+              },
+              Object {
+                "color": "#42D689",
+              },
+            ]
+          }
+        >
+          $
+          1.00
+        </Text>
+        <View
+          style={
+            Object {
+              "paddingBottom": 5,
+              "paddingHorizontal": 5,
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height="6"
+            style={Object {}}
+            viewBox="0 0 9 6"
+            width="9"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              clip-rule="evenodd"
+              d="M5.0998 5.45001L8.39993 3.02504L5.0998 0.600067V2.22512L0.399933 2.22512V3.82518L5.0998 3.82518V5.45001Z"
+              fill="rgba(0, 0, 0, .4)"
+              fill-rule="evenodd"
+              style={Object {}}
+            />
+          </svg>
+        </View>
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 16,
+                "lineHeight": 20,
+              },
+              Object {
+                "color": "#FBCC5C",
+              },
+            ]
+          }
+        >
+          10.00
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;

@@ -1,0 +1,1480 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly when Dollar education NUX flow hasn't been completed 1`] = `
+<View
+  testID="SnapshotAccountOverview"
+>
+  <View>
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+          "paddingBottom": 5,
+          "paddingHorizontal": 20,
+          "paddingTop": 15,
+          "position": "relative",
+        }
+      }
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "alignItems": "center",
+              "justifyContent": "center",
+            },
+          ]
+        }
+        testID="SnapshotAccountOverview/dollarBalance"
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "lineHeight": 30,
+              },
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 13,
+                "lineHeight": 18,
+              },
+            ]
+          }
+        >
+          celoDollars cUSD
+        </Text>
+        <View
+          accessible={true}
+          isTVSelectable={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "opacity": 1,
+              "overflow": "visible",
+              "paddingLeft": 10,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "flex-start",
+                "flexDirection": "row",
+                "marginTop": 5,
+              }
+            }
+          >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#42D689",
+                    "fontSize": 21,
+                    "lineHeight": 29,
+                    "transform": Array [
+                      Object {
+                        "translateY": 2,
+                      },
+                    ],
+                  },
+                ]
+              }
+            >
+              $
+            </Text>
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "paddingHorizontal": 3,
+                  },
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#42D689",
+                    "fontSize": 36,
+                    "lineHeight": 47,
+                  },
+                ]
+              }
+            >
+              55.00
+            </Text>
+          </View>
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "justifyContent": "center",
+                },
+                Object {
+                  "height": 15,
+                  "width": 15,
+                },
+                Object {
+                  "padding": 10,
+                },
+              ]
+            }
+          >
+            <View
+              style={
+                Object {
+                  "backgroundColor": "#3C9BF4",
+                  "borderRadius": 2.5,
+                  "height": 5,
+                  "opacity": 1,
+                  "transform": Array [
+                    Object {
+                      "scale": 1,
+                    },
+                    Object {
+                      "perspective": 1000,
+                    },
+                  ],
+                  "width": 5,
+                }
+              }
+            />
+            <View
+              style={
+                Object {
+                  "backgroundColor": "#3C9BF4",
+                  "borderRadius": 2.5,
+                  "height": 5,
+                  "position": "absolute",
+                  "width": 5,
+                }
+              }
+            />
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "alignSelf": "center",
+            "backgroundColor": "#EEEEEE",
+            "height": 50,
+            "marginTop": 10,
+            "width": 1,
+          }
+        }
+      />
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+          ]
+        }
+        testID="SnapshotAccountOverview/goldBalance"
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "lineHeight": 30,
+              },
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 13,
+                "lineHeight": 18,
+              },
+            ]
+          }
+        >
+          celoGold cGLD
+        </Text>
+        <View
+          accessible={true}
+          isTVSelectable={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "opacity": 1,
+              "overflow": "visible",
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "flex-start",
+                "flexDirection": "row",
+                "marginTop": 5,
+              }
+            }
+          >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "paddingHorizontal": 3,
+                  },
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#FBCC5C",
+                    "fontSize": 36,
+                    "lineHeight": 47,
+                  },
+                ]
+              }
+            >
+              55.00
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`renders correctly when Gold education NUX flow hasn't been completed 1`] = `
+<View
+  testID="SnapshotAccountOverview"
+>
+  <View>
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+          "paddingBottom": 5,
+          "paddingHorizontal": 20,
+          "paddingTop": 15,
+          "position": "relative",
+        }
+      }
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "alignItems": "center",
+              "justifyContent": "center",
+            },
+          ]
+        }
+        testID="SnapshotAccountOverview/dollarBalance"
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "lineHeight": 30,
+              },
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 13,
+                "lineHeight": 18,
+              },
+            ]
+          }
+        >
+          celoDollars cUSD
+        </Text>
+        <View
+          accessible={true}
+          isTVSelectable={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "opacity": 1,
+              "overflow": "visible",
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "flex-start",
+                "flexDirection": "row",
+                "marginTop": 5,
+              }
+            }
+          >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#42D689",
+                    "fontSize": 21,
+                    "lineHeight": 29,
+                    "transform": Array [
+                      Object {
+                        "translateY": 2,
+                      },
+                    ],
+                  },
+                ]
+              }
+            >
+              $
+            </Text>
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "paddingHorizontal": 3,
+                  },
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#42D689",
+                    "fontSize": 36,
+                    "lineHeight": 47,
+                  },
+                ]
+              }
+            >
+              55.00
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "alignSelf": "center",
+            "backgroundColor": "#EEEEEE",
+            "height": 50,
+            "marginTop": 10,
+            "width": 1,
+          }
+        }
+      />
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+          ]
+        }
+        testID="SnapshotAccountOverview/goldBalance"
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "lineHeight": 30,
+              },
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 13,
+                "lineHeight": 18,
+              },
+            ]
+          }
+        >
+          celoGold cGLD
+        </Text>
+        <View
+          accessible={true}
+          isTVSelectable={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "opacity": 1,
+              "overflow": "visible",
+              "paddingLeft": 10,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "flex-start",
+                "flexDirection": "row",
+                "marginTop": 5,
+              }
+            }
+          >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "paddingHorizontal": 3,
+                  },
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#FBCC5C",
+                    "fontSize": 36,
+                    "lineHeight": 47,
+                  },
+                ]
+              }
+            >
+              55.00
+            </Text>
+          </View>
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "justifyContent": "center",
+                },
+                Object {
+                  "height": 15,
+                  "width": 15,
+                },
+                Object {
+                  "padding": 10,
+                },
+              ]
+            }
+          >
+            <View
+              style={
+                Object {
+                  "backgroundColor": "#3C9BF4",
+                  "borderRadius": 2.5,
+                  "height": 5,
+                  "opacity": 1,
+                  "transform": Array [
+                    Object {
+                      "scale": 1,
+                    },
+                    Object {
+                      "perspective": 1000,
+                    },
+                  ],
+                  "width": 5,
+                }
+              }
+            />
+            <View
+              style={
+                Object {
+                  "backgroundColor": "#3C9BF4",
+                  "borderRadius": 2.5,
+                  "height": 5,
+                  "position": "absolute",
+                  "width": 5,
+                }
+              }
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`renders correctly when balance is out of sync 1`] = `
+<View
+  testID="SnapshotAccountOverview"
+>
+  <View>
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+          "paddingBottom": 5,
+          "paddingHorizontal": 20,
+          "paddingTop": 15,
+          "position": "relative",
+        }
+      }
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "alignItems": "center",
+              "justifyContent": "center",
+            },
+          ]
+        }
+        testID="SnapshotAccountOverview/dollarBalance"
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "lineHeight": 30,
+              },
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 13,
+                "lineHeight": 18,
+              },
+            ]
+          }
+        >
+          celoDollars cUSD
+        </Text>
+        <View
+          accessible={true}
+          isTVSelectable={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "opacity": 1,
+              "overflow": "visible",
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "flex-start",
+                "flexDirection": "row",
+                "marginTop": 5,
+              }
+            }
+          >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#D4EEE0",
+                    "fontSize": 21,
+                    "lineHeight": 29,
+                    "transform": Array [
+                      Object {
+                        "translateY": 2,
+                      },
+                    ],
+                  },
+                ]
+              }
+            >
+              $
+            </Text>
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "paddingHorizontal": 3,
+                  },
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#D4EEE0",
+                    "fontSize": 36,
+                    "lineHeight": 47,
+                  },
+                ]
+              }
+            >
+              55.00
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "alignSelf": "center",
+            "backgroundColor": "#EEEEEE",
+            "height": 50,
+            "marginTop": 10,
+            "width": 1,
+          }
+        }
+      />
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+          ]
+        }
+        testID="SnapshotAccountOverview/goldBalance"
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "lineHeight": 30,
+              },
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 13,
+                "lineHeight": 18,
+              },
+            ]
+          }
+        >
+          celoGold cGLD
+        </Text>
+        <View
+          accessible={true}
+          isTVSelectable={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "opacity": 1,
+              "overflow": "visible",
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "flex-start",
+                "flexDirection": "row",
+                "marginTop": 5,
+              }
+            }
+          >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "paddingHorizontal": 3,
+                  },
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#F4E8BE",
+                    "fontSize": 36,
+                    "lineHeight": 47,
+                  },
+                ]
+              }
+            >
+              55.00
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "center",
+          "paddingBottom": 13,
+          "paddingHorizontal": 50,
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "color": "#3C9BF4",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 13,
+            "lineHeight": 18,
+            "paddingRight": 5,
+          }
+        }
+      >
+        balanceNeedUpdating
+      </Text>
+      <View
+        accessible={true}
+        hitSlop={
+          Object {
+            "bottom": 7,
+            "left": 7,
+            "right": 7,
+            "top": 7,
+          }
+        }
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "alignItems": "center",
+            "alignSelf": "flex-start",
+            "backgroundColor": "transparent",
+            "borderColor": "#3C9BF4",
+            "borderRadius": 2,
+            "borderWidth": 2,
+            "color": "#3C9BF4",
+            "fontSize": 12,
+            "minWidth": 0,
+            "opacity": 1,
+            "paddingHorizontal": 5,
+            "paddingVertical": 2,
+            "textAlign": "center",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 13,
+                "lineHeight": 17,
+              },
+              Object {
+                "lineHeight": 20,
+              },
+              Object {
+                "color": "#42D689",
+              },
+              Object {
+                "color": "#3C9BF4",
+                "fontSize": 12,
+              },
+            ]
+          }
+        >
+          refreshBalances
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`renders correctly when not ready 1`] = `
+<View
+  testID="SnapshotAccountOverview"
+>
+  <View>
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+          "paddingBottom": 5,
+          "paddingHorizontal": 20,
+          "paddingTop": 15,
+          "position": "relative",
+        }
+      }
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "alignItems": "center",
+              "justifyContent": "center",
+            },
+          ]
+        }
+        testID="SnapshotAccountOverview/dollarBalance"
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "lineHeight": 30,
+              },
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 13,
+                "lineHeight": 18,
+              },
+            ]
+          }
+        >
+          celoDollars cUSD
+        </Text>
+        <View
+          accessible={true}
+          isTVSelectable={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "opacity": 1,
+              "overflow": "visible",
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "flex-start",
+                "flexDirection": "row",
+                "marginTop": 5,
+              }
+            }
+          >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#42D689",
+                    "fontSize": 21,
+                    "lineHeight": 29,
+                    "transform": Array [
+                      Object {
+                        "translateY": 2,
+                      },
+                    ],
+                  },
+                ]
+              }
+            >
+              $
+            </Text>
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "paddingHorizontal": 3,
+                  },
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#42D689",
+                    "fontSize": 36,
+                    "lineHeight": 47,
+                  },
+                ]
+              }
+            >
+              55.00
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "alignSelf": "center",
+            "backgroundColor": "#EEEEEE",
+            "height": 50,
+            "marginTop": 10,
+            "width": 1,
+          }
+        }
+      />
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+          ]
+        }
+        testID="SnapshotAccountOverview/goldBalance"
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "lineHeight": 30,
+              },
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 13,
+                "lineHeight": 18,
+              },
+            ]
+          }
+        >
+          celoGold cGLD
+        </Text>
+        <View
+          accessible={true}
+          isTVSelectable={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "opacity": 1,
+              "overflow": "visible",
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "flex-start",
+                "flexDirection": "row",
+                "marginTop": 5,
+              }
+            }
+          >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "paddingHorizontal": 3,
+                  },
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#FBCC5C",
+                    "fontSize": 36,
+                    "lineHeight": 47,
+                  },
+                ]
+              }
+            >
+              55.00
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`renders correctly when ready 1`] = `
+<View
+  testID="SnapshotAccountOverview"
+>
+  <View>
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+          "paddingBottom": 5,
+          "paddingHorizontal": 20,
+          "paddingTop": 15,
+          "position": "relative",
+        }
+      }
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "alignItems": "center",
+              "justifyContent": "center",
+            },
+          ]
+        }
+        testID="SnapshotAccountOverview/dollarBalance"
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "lineHeight": 30,
+              },
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 13,
+                "lineHeight": 18,
+              },
+            ]
+          }
+        >
+          celoDollars cUSD
+        </Text>
+        <View
+          accessible={true}
+          isTVSelectable={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "opacity": 1,
+              "overflow": "visible",
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "flex-start",
+                "flexDirection": "row",
+                "marginTop": 5,
+              }
+            }
+          >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#42D689",
+                    "fontSize": 21,
+                    "lineHeight": 29,
+                    "transform": Array [
+                      Object {
+                        "translateY": 2,
+                      },
+                    ],
+                  },
+                ]
+              }
+            >
+              $
+            </Text>
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "paddingHorizontal": 3,
+                  },
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#42D689",
+                    "fontSize": 36,
+                    "lineHeight": 47,
+                  },
+                ]
+              }
+            >
+              55.00
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "alignSelf": "center",
+            "backgroundColor": "#EEEEEE",
+            "height": 50,
+            "marginTop": 10,
+            "width": 1,
+          }
+        }
+      />
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+          ]
+        }
+        testID="SnapshotAccountOverview/goldBalance"
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "lineHeight": 30,
+              },
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 13,
+                "lineHeight": 18,
+              },
+            ]
+          }
+        >
+          celoGold cGLD
+        </Text>
+        <View
+          accessible={true}
+          isTVSelectable={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "opacity": 1,
+              "overflow": "visible",
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "flex-start",
+                "flexDirection": "row",
+                "marginTop": 5,
+              }
+            }
+          >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "paddingHorizontal": 3,
+                  },
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#FBCC5C",
+                    "fontSize": 36,
+                    "lineHeight": 47,
+                  },
+                ]
+              }
+            >
+              55.00
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`renders correctly when transaction pending 1`] = `
+<View
+  testID="SnapshotAccountOverview"
+>
+  <View>
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+          "paddingBottom": 5,
+          "paddingHorizontal": 20,
+          "paddingTop": 15,
+          "position": "relative",
+        }
+      }
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "alignItems": "center",
+              "justifyContent": "center",
+            },
+          ]
+        }
+        testID="SnapshotAccountOverview/dollarBalance"
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "lineHeight": 30,
+              },
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 13,
+                "lineHeight": 18,
+              },
+            ]
+          }
+        >
+          celoDollars cUSD
+        </Text>
+        <View
+          accessible={true}
+          isTVSelectable={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "opacity": 1,
+              "overflow": "visible",
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "flex-start",
+                "flexDirection": "row",
+                "marginTop": 5,
+              }
+            }
+          >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#42D689",
+                    "fontSize": 21,
+                    "lineHeight": 29,
+                    "transform": Array [
+                      Object {
+                        "translateY": 2,
+                      },
+                    ],
+                  },
+                ]
+              }
+            >
+              $
+            </Text>
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "paddingHorizontal": 3,
+                  },
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#42D689",
+                    "fontSize": 36,
+                    "lineHeight": 47,
+                  },
+                ]
+              }
+            >
+              55.00
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "alignSelf": "center",
+            "backgroundColor": "#EEEEEE",
+            "height": 50,
+            "marginTop": 10,
+            "width": 1,
+          }
+        }
+      />
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+          ]
+        }
+        testID="SnapshotAccountOverview/goldBalance"
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "lineHeight": 30,
+              },
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 13,
+                "lineHeight": 18,
+              },
+            ]
+          }
+        >
+          celoGold cGLD
+        </Text>
+        <View
+          accessible={true}
+          isTVSelectable={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "opacity": 1,
+              "overflow": "visible",
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "flex-start",
+                "flexDirection": "row",
+                "marginTop": 5,
+              }
+            }
+          >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "paddingHorizontal": 3,
+                  },
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#FBCC5C",
+                    "fontSize": 36,
+                    "lineHeight": 47,
+                  },
+                ]
+              }
+            >
+              55.00
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;

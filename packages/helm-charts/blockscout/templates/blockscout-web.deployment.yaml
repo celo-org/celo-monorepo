@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-web
+  labels:
+    app: blockscout
+    chart: blockscout
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: blockscout-web
+spec:
+  replicas: {{ .Values.blockscout.replicas }}
+  selector:
+    matchLabels:
+      app: blockscout
+      release: {{ .Release.Name }}
+      component: blockscout-web
+  template:
+    metadata:
+      labels:
+        app: blockscout
+        release: {{ .Release.Name }}
+        component: blockscout-web
+    spec:
+      containers:
+      - name: blockscout-web
+        image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.webTag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        ports:
+        - name: http
+          containerPort: 4000
+        resources:
+          requests:
+            memory: 250M
+            cpu: 200m
+        env:
+          - name: PORT
+            value: "4000"
+{{ include "celo.blockscout-env-vars" .  | indent 10 }}
+{{ include "celo.prom-to-sd-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "blockscout" "metricsPort" "4000" "containerNameLabel" "blockscout-web") | indent 6 }}
+{{ include "celo.blockscout-db-sidecar" .  | indent 6 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}

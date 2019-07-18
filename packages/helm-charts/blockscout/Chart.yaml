@@ -1,0 +1,8 @@
+name: blockscout
+version: 0.0.1
+description: Chart which is used to deploy a blockscout setup for a celo testnet
+keywords:
+- ethereum
+- blockchain
+- blockscout
+appVersion: v1.7.3

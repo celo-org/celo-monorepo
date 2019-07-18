@@ -1,0 +1,26 @@
+{
+  "presets": ["next/babel", "@zeit/next-typescript/babel"],
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "root": ["./"],
+        "alias": {
+          "src": "./src"
+        }
+      }
+    ],
+    ["react-native-web", { "commonjs": true }],
+    [
+      "react-css-modules",
+      {
+        "filetypes": {
+          ".scss": {
+            "syntax": "postcss-scss"
+          }
+        },
+        "generateScopedName": "[local]___[hash:base64:5]"
+      }
+    ]
+  ]
+}

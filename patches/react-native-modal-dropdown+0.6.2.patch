@@ -1,0 +1,9 @@
+patch-package
+--- a/node_modules/react-native-modal-dropdown/index.js
++++ b/node_modules/react-native-modal-dropdown/index.js
+@@ -4,4 +4,3 @@
+ 
+ import ModalDropdown from './components/ModalDropdown';
+ export default ModalDropdown;
+\ No newline at end of file
+-module.exports = ModalDropdown;

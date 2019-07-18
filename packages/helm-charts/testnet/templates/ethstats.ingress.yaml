@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "ethereum.fullname" . }}-ethstats-ingress
+  labels:
+    app: {{ template "ethereum.name" . }}
+    chart: {{ template "ethereum.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: ethstats
+  annotations:
+    kubernetes.io/tls-acme: "true"
+spec:
+  tls:
+  - hosts:
+    - {{ .Release.Name }}-ethstats.{{ .Values.domain.name }}.org
+    secretName: {{ template "ethereum.fullname" . }}-ethstats-tls
+  rules:
+  - host: {{ .Release.Name }}-ethstats.{{ .Values.domain.name }}.org
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ template "ethereum.fullname" . }}-ethstats
+          servicePort: 80

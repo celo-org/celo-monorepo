@@ -1,0 +1,77 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "ethereum.fullname" . }}-bootnode
+  labels:
+    app: {{ template "ethereum.name" . }}
+    chart: {{ template "ethereum.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: bootnode
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "ethereum.name" . }}
+      release: {{ .Release.Name }}
+      component: bootnode
+  template:
+    metadata:
+      labels:
+        app: {{ template "ethereum.name" . }}
+        release: {{ .Release.Name }}
+        component: bootnode
+    spec:
+      containers:
+      - name: bootnode
+        image: {{ .Values.bootnode.image.repository }}:{{ .Values.bootnode.image.tag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - |
+          set -euo pipefail
+          NAT_FLAG=""
+          [[ "$IP_ADDRESS" != "none" ]] && NAT_FLAG="--nat=extip:$IP_ADDRESS"
+          /usr/local/bin/bootnode --nodekey=/etc/bootnode/node.key --verbosity=1 ${NAT_FLAG}
+        env:
+        - name: IP_ADDRESS
+          value: {{ default "none" .Values.geth.bootnodeIpAddress }}
+        volumeMounts:
+        - name: data
+          mountPath: /etc/bootnode
+        - name: artifacts
+          mountPath: /etc/artifacts
+        ports:
+        - name: discovery
+          containerPort: 30301
+          protocol: UDP
+      initContainers:
+      - name: genkey
+        image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - "celotooljs.sh generate bip32 --mnemonic \"$MNEMONIC\" --accountType load_testing --index 0 > /etc/bootnode/node.key"
+        env:
+        - name: MNEMONIC
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "ethereum.fullname" . }}-geth-account
+              key: mnemonic
+        volumeMounts:
+        - name: data
+          mountPath: /etc/bootnode
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: artifacts
+        persistentVolumeClaim:
+          claimName: {{ template "ethereum.fullname" . }}-artifacts-pvc
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}

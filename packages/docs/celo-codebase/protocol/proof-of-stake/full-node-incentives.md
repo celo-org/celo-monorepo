@@ -1,0 +1,5 @@
+# Full Node Incentives
+
+In order to deliver on Celo’s mission to make financial services accessible to anyone with a mobile phone, it’s likely that the vast majority of full nodes in the Celo network will need to serve light or ultralight clients. In Ethereum right now, there are few incentives to run a full node that is not mining. Few nodes serve light clients, and this results in a poor experience for mobile wallets.
+
+Celo addresses this by adding direct financial incentives for nodes to serve light clients by paying them a portion of the transaction fee \(see Gas Pricing for more details\). The recipient of this portion of the transaction fee is specified in the transaction and is automatically set to the full node’s address when transactions are sent by light clients. Full nodes specify a minimum gas price that they’re willing to accept for their services and may refuse to forward any transactions sent by light clients for which it will not receive the fee or for which it deems the fee insufficient.

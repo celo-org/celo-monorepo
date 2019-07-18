@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.environment }}-load-test-config
+  labels:
+    app: load-test
+    chart: load-test
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: load-test
+data:
+  envname: {{ .Values.environment }}
+  staticnodes: |-
+    {{ .Values.enodes | b64dec }}

@@ -1,0 +1,9 @@
+{
+  "paymentReceivedTitle": "Pago Recibido",
+  "paymentReceivedBody": "Has recibido {{amount}} {{currency}}",
+  "dollar": "Celo Dólar",
+  "dollar_plural": "Celo Dólares",
+  "gold": "Celo Oro",
+  "paymentRequestedTitle": "Pago solicitado",
+  "paymentRequestedBody": "Se ha solicitado pago de {{amount}} {{currency}}."
+}

@@ -1,0 +1,46 @@
+{
+  "name": "@celo/celotool",
+  "version": "1.0.0",
+  "description": "Celotool is our hub for all scripts that people need to run within the monorepo",
+  "main": "index.js",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@celo/contractkit": "0.0.1",
+    "@google-cloud/monitoring": "0.7.1",
+    "@google-cloud/pubsub": "^0.28.1",
+    "@google-cloud/storage": "^2.4.3",
+    "@types/bip32": "^1.0.1",
+    "@types/bip39": "^2.4.2",
+    "bip32": "^1.0.2",
+    "bip39": "^2.5.0",
+    "dotenv": "6.1.0",
+    "js-yaml": "^3.12.0",
+    "lodash": "^4.17.14",
+    "moment": "^2.22.1",
+    "node-fetch": "^2.2.0",
+    "prompts": "1.2.0",
+    "sleep-promise": "^8.0.1",
+    "tsconfig-paths": "3.6.0",
+    "web3": "1.0.0-beta.37",
+    "web3-eth-admin": "1.0.0-beta.55",
+    "yargs": "12.0.2"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^4.0.3",
+    "@types/jest": "^24.0.13",
+    "@types/prompts": "^1.1.1",
+    "@types/web3": "^1.0.18",
+    "@types/yargs": "^12.0.1",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.0",
+    "ts-node": "^7.0.1"
+  },
+  "scripts": {
+    "cli": "TS_NODE_FILES=true ts-node -r tsconfig-paths/register src/cli.ts",
+    "test": "jest",
+    "lint": "tslint -c tslint.json --project tsconfig.json",
+    "lint-checks": "yarn run lint && tsc --project tsconfig.json --noEmit"
+  },
+  "private": true
+}

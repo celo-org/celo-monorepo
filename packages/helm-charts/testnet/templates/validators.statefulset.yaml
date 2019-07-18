@@ -1,0 +1,201 @@
+{{ if not (eq (.Values.geth.validators | toString) "og") }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: validators
+  labels:
+    component: validators
+spec:
+  ports:
+  - port: 80
+    name: web
+  clusterIP: None
+  selector:
+    component: validators
+---
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: {{ template "ethereum.fullname" . }}-validators
+  labels:
+{{ include "standard.labels" .  | indent 4 }}
+    component: validators
+spec:
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+  replicas: {{ .Values.geth.validators }}
+  serviceName: validators
+  selector:
+    matchLabels:
+{{ include "standard.labels" .  | indent 6 }}
+      component: validators
+  template:
+    metadata:
+      labels:
+{{ include "standard.labels" .  | indent 8 }}
+        component: validators
+    spec:
+      initContainers:
+{{ include "celo.init-genesis-container" .  | indent 6 }}
+      - name: get-account
+        image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
+        imagePullPolicy: IfNotPresent
+        command:
+          - bash
+          - "-c"
+          - |
+            [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
+            RID=${BASH_REMATCH[1]}
+            echo -n $RID >/root/.celo/replica_id
+            echo "Generating private key for rid=$RID"
+            celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $RID > /root/.celo/pkey
+            echo 'Generating address'
+            celotooljs.sh generate account-address --private-key `cat /root/.celo/pkey` > /root/.celo/address
+            echo $IP_ADDRESSES | cut -d '/' -f $((RID + 1)) > /root/.celo/ipAddress
+            echo -n "Generating IP address for validator: "
+            cat /root/.celo/ipAddress
+            celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType load_testing --index 0 > /root/.celo/bootnodeEnodeAddress
+            echo -n "Generating Bootnode enode address for the validator: "
+            cat /root/.celo/bootnodeEnodeAddress
+            [[ "$BOOTNODE_IP_ADDRESS" == 'none' ]] && BOOTNODE_IP_ADDRESS=${{ .Release.Namespace | upper }}_BOOTNODE_SERVICE_HOST
+            echo `cat /root/.celo/bootnodeEnodeAddress`@$BOOTNODE_IP_ADDRESS:30301 > /root/.celo/bootnodeEnode
+            echo -n "Generating Bootnode enode for the validator: "
+            cat /root/.celo/bootnodeEnode
+        env:
+        - name: REPLICA_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MNEMONIC
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "ethereum.fullname" . }}-geth-account
+              key: mnemonic
+        - name: IP_ADDRESSES
+          value: {{ .Values.geth.validator_ip_addresses }}
+        - name: BOOTNODE_IP_ADDRESS
+          value: "{{ default "none" .Values.geth.bootnodeIpAddress  }}"
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+      - name: import-geth-account
+        image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - |
+          geth account import --password /root/.celo/account/accountSecret /root/.celo/pkey || true
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+        - name: account
+          mountPath: "/root/.celo/account"
+          readOnly: true
+      containers:
+      - name: geth
+        image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - |-
+          set -euo pipefail
+          ACCOUNT_ADDRESS=`cat /root/.celo/address`
+          RID=`cat /root/.celo/replica_id`
+          FAULTY_NODE_FLAGS=`if [ "$RID" -lt "$FAULTY_NODES" ]; then echo -n "--istanbul.faultymode $FAULTY_NODE_TYPE"; fi`
+          NAT_FLAG=""
+          [[ "$STATIC_IPS_FOR_GETH_NODES" == "true" ]] && NAT_FLAG="--nat=extip:`cat /root/.celo/ipAddress`"
+          geth \
+            --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
+            --password=/root/.celo/account/accountSecret \
+            --unlock=${ACCOUNT_ADDRESS} \
+            --mine \
+            --rpc \
+            --rpcaddr 0.0.0.0 \
+            --rpcapi=eth,net,web3,debug{{ if .Values.geth.admin_rpc_enabled }},admin{{ end }} \
+            --rpccorsdomain='*' \
+            --rpcvhosts=* \
+            --ws \
+            --wsaddr 0.0.0.0 \
+            --wsorigins=* \
+            --wsapi=eth,net,web3,debug \
+            --nodekey=/root/.celo/pkey \
+            --etherbase=${ACCOUNT_ADDRESS} \
+            --networkid=${NETWORK_ID} \
+            --syncmode=full \
+            --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
+            --miner.verificationpool=${VERIFICATION_POOL_URL} \
+            --consoleformat=json \
+            --consoleoutput=stdout \
+            --verbosity={{ .Values.geth.verbosity }} \
+            --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
+            ${FAULTY_NODE_FLAGS} \
+            --istanbul.blockperiod={{ .Values.geth.blocktime }} \
+            --maxpeers={{ mul 2 (add .Values.geth.validators .Values.geth.tx_nodes) }} \
+            ${NAT_FLAG}
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: ETHSTATS_SVC
+          value: {{ template "ethereum.fullname" . }}-ethstats.{{ .Release.Namespace }}
+        - name: ETHSTATS_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "ethereum.fullname" . }}-ethstats
+              key: WS_SECRET
+        - name: NETWORK_ID
+          valueFrom:
+            configMapKeyRef:
+              name: {{ template "ethereum.fullname" . }}-geth-config
+              key: networkid
+        - name: VERIFICATION_POOL_URL
+          value: {{ .Values.geth.miner.verificationpool }}
+        - name: FAULTY_NODES
+          value: {{ .Values.geth.faultyValidators | quote }}
+        - name: FAULTY_NODE_TYPE
+          value: {{ .Values.geth.faultyValidatorType | quote }}
+        - name: STATIC_IPS_FOR_GETH_NODES
+          value: "{{ default "false" .Values.geth.static_ips }}"
+        ports:
+        - name: discovery-udp
+          containerPort: 30303
+          protocol: UDP
+        - name: discovery-tcp
+          containerPort: 30303
+        - name: rpc
+          containerPort: 8545
+        - name: ws
+          containerPort: 8546
+        resources:
+          requests:
+            memory: {{ .Values.geth.node.memory_request }}
+            cpu: {{ .Values.geth.node.cpu_request }}
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+        - name: account
+          mountPath: /root/.celo/account
+          readOnly: true
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: config
+        configMap:
+          name: {{ template "ethereum.fullname" . }}-geth-config
+      - name: account
+        secret:
+          secretName: {{ template "ethereum.fullname" . }}-geth-account
+{{ end }}

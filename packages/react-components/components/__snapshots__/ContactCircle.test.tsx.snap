@@ -1,0 +1,50 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContactCircle renders correctly 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "alignItems": "center",
+        "flexDirection": "row",
+        "justifyContent": "center",
+      },
+      undefined,
+    ]
+  }
+>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "justifyContent": "center",
+        },
+        Object {
+          "backgroundColor": "#7AD6FE",
+          "borderRadius": 15,
+          "height": 30,
+          "width": 30,
+        },
+      ]
+    }
+  >
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#FFFFFF",
+            "fontFamily": "Hind-Medium",
+            "fontSize": 16,
+          },
+          Object {
+            "fontSize": 15,
+          },
+        ]
+      }
+    >
+      J
+    </Text>
+  </View>
+</View>
+`;

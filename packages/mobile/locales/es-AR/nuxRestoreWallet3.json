@@ -1,0 +1,22 @@
+{
+  "welcomeCelo": "Le damos la bienvenida a Celo",
+  "enterInvite":
+    "Ingrese su código de invitación. Si no tiene uno, pídale a alguien de la comunidad de Celo que lo invite.\n\nAl unirse a esta aplicación, acuerda compartir su nombre y número telefónico con nosotros. Obtenga más información en celo.org",
+  "fullName": "Nombre completo",
+  "invitationCode": "Código de invitación",
+  "submit": "Enviar",
+  "alreadyHaveWallet": "¿Ya tiene una billetera de Celo? Restáurela",
+  "restoreWallet": "Restaurar la billetera de Celo",
+  "restoreYourWallet": {
+    "title": "Restaurar su billetera de Celo",
+    "userYourBackupKey":
+      "¿Ya tiene una billetera de Celo? Use su clave de respaldo segura para restaurar su billetera a este teléfono.",
+    "warning": "¡Cuidado! ",
+    "restoreInPrivate": "Hágalo en privado"
+  },
+  "backupKeyPrompt": "Clave de respaldo",
+  "tip": "Consejo: ",
+  "backupKeyTip": "las palabras de la clave de respaldo están separadas por un espacio",
+  "continue": "Continuar",
+  "cancel": "Cancelar"
+}

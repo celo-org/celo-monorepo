@@ -1,0 +1,341 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PhoneNumberInput when defaultCountry renders defaults 1`] = `
+<View
+  style={
+    Array [
+      undefined,
+      Object {
+        "position": "relative",
+      },
+    ]
+  }
+>
+  <View
+    style={
+      Array [
+        Object {
+          "borderColor": "#D1D5D8",
+          "borderRadius": 3,
+          "borderWidth": 1,
+        },
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#EEEEEE",
+          "flexDirection": "row",
+          "paddingHorizontal": 16,
+          "paddingVertical": 11,
+        },
+      ]
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "#FFFFFF",
+          "fontSize": 23,
+        }
+      }
+    >
+      🇦🇷
+    </Text>
+    <Text
+      style={
+        Object {
+          "fontSize": 15,
+          "marginLeft": 30,
+        }
+      }
+    >
+      Argentina
+    </Text>
+  </View>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "marginTop": 5,
+          "paddingVertical": 2,
+        },
+        Object {
+          "borderColor": "#D1D5D8",
+          "borderRadius": 3,
+          "borderWidth": 1,
+        },
+      ]
+    }
+  >
+    <Text
+      style={
+        Object {
+          "lineHeight": 35,
+          "textAlign": "center",
+          "width": 60,
+        }
+      }
+    >
+      +54
+    </Text>
+    <View
+      style={
+        Object {
+          "borderColor": "#D1D5D8",
+          "borderRightWidth": 1,
+          "height": 35,
+        }
+      }
+    />
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#FFFFFF",
+            "flex": 1,
+            "marginLeft": 2,
+          },
+        ]
+      }
+    >
+      <TextInput
+        allowFontScaling={true}
+        autoCorrect={true}
+        autoFocus={false}
+        keyboardType="phone-pad"
+        onBlur={[Function]}
+        onChangeText={[Function]}
+        onFocus={[Function]}
+        placeholder=""
+        rejectResponderTermination={true}
+        secureTextEntry={false}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "padding": 8,
+            },
+            Object {
+              "backgroundColor": "#FFFFFF",
+              "flex": 1,
+            },
+          ]
+        }
+        testID="PhoneNumberField"
+        textContentType="none"
+        underlineColorAndroid="transparent"
+        value=""
+      />
+    </View>
+  </View>
+</View>
+`;
+
+exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
+<View
+  style={
+    Array [
+      undefined,
+      Object {
+        "position": "relative",
+      },
+    ]
+  }
+>
+  <View
+    style={
+      Array [
+        Object {
+          "zIndex": 1,
+        },
+        undefined,
+      ]
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "borderColor": "#b9b9b9",
+            "borderRadius": 1,
+            "borderWidth": 1,
+          },
+          Array [
+            Object {
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "borderWidth": 1,
+            },
+            Object {
+              "padding": 3,
+            },
+          ],
+        ]
+      }
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "center",
+            },
+            Array [
+              Object {
+                "backgroundColor": "white",
+                "height": 40,
+                "paddingLeft": 3,
+              },
+              undefined,
+            ],
+          ]
+        }
+      >
+        <TextInput
+          allowFontScaling={true}
+          autoCorrect={false}
+          autoFocus={false}
+          keyboardType="default"
+          onBlur={[Function]}
+          onChangeText={[Function]}
+          onFocus={[Function]}
+          placeholder=""
+          rejectResponderTermination={true}
+          secureTextEntry={false}
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-Regular",
+              },
+              Object {
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "padding": 8,
+              },
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "flex": 1,
+              },
+            ]
+          }
+          testID="CountryNameField"
+          textContentType="none"
+          underlineColorAndroid="transparent"
+          value=""
+        />
+      </View>
+    </View>
+    <View
+      onStartShouldSetResponderCapture={[Function]}
+      style={
+        Object {
+          "flex": 1,
+          "padding": 0,
+          "position": "relative",
+          "top": 3,
+        }
+      }
+    />
+  </View>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "marginTop": 5,
+          "paddingVertical": 2,
+        },
+        Object {
+          "borderColor": "#D1D5D8",
+          "borderRadius": 3,
+          "borderWidth": 1,
+        },
+      ]
+    }
+  >
+    <Text
+      style={
+        Object {
+          "lineHeight": 35,
+          "textAlign": "center",
+          "width": 60,
+        }
+      }
+    >
+      
+    </Text>
+    <View
+      style={
+        Object {
+          "borderColor": "#D1D5D8",
+          "borderRightWidth": 1,
+          "height": 35,
+        }
+      }
+    />
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#FFFFFF",
+            "flex": 1,
+            "marginLeft": 2,
+          },
+        ]
+      }
+    >
+      <TextInput
+        allowFontScaling={true}
+        autoCorrect={true}
+        autoFocus={false}
+        keyboardType="phone-pad"
+        onBlur={[Function]}
+        onChangeText={[Function]}
+        onFocus={[Function]}
+        placeholder=""
+        rejectResponderTermination={true}
+        secureTextEntry={false}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "padding": 8,
+            },
+            Object {
+              "backgroundColor": "#FFFFFF",
+              "flex": 1,
+            },
+          ]
+        }
+        testID="PhoneNumberField"
+        textContentType="none"
+        underlineColorAndroid="transparent"
+        value=""
+      />
+    </View>
+  </View>
+</View>
+`;

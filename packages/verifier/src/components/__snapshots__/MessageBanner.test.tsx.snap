@@ -1,0 +1,143 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Message Banner when message and title passed in renders title with message 1`] = `
+<View
+  accessible={true}
+  isTVSelectable={true}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    Object {
+      "opacity": 1,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "backgroundColor": "#3C9BF4",
+        "height": 36,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "flexDirection": "row",
+          "justifyContent": "center",
+          "opacity": 1,
+          "paddingHorizontal": 25,
+        }
+      }
+    >
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 13,
+              "lineHeight": 18,
+            },
+            Object {
+              "color": "white",
+              "lineHeight": 20,
+              "textAlign": "center",
+            },
+            false,
+          ]
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "white",
+                "lineHeight": 20,
+                "textAlign": "center",
+              },
+              Object {
+                "fontFamily": "Hind-SemiBold",
+              },
+            ]
+          }
+        >
+           
+          Declaration
+           
+        </Text>
+        I am the concensus
+      </Text>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Message Banner when message passed in renders message 1`] = `
+<View
+  accessible={true}
+  isTVSelectable={true}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    Object {
+      "opacity": 1,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "backgroundColor": "#3C9BF4",
+        "height": 36,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "flexDirection": "row",
+          "justifyContent": "center",
+          "opacity": 1,
+          "paddingHorizontal": 25,
+        }
+      }
+    >
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 13,
+              "lineHeight": 18,
+            },
+            Object {
+              "color": "white",
+              "lineHeight": 20,
+              "textAlign": "center",
+            },
+            false,
+          ]
+        }
+      >
+        This is your shadow speaking
+      </Text>
+    </View>
+  </View>
+</View>
+`;

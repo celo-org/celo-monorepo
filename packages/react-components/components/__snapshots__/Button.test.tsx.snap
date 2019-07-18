@@ -1,0 +1,165 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Button when type is SECONDARY renders 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "alignItems": "center",
+        "borderRadius": 3,
+        "flexDirection": "row",
+      },
+      Object {
+        "marginVertical": 10,
+      },
+      Object {
+        "marginBottom": 10,
+      },
+      undefined,
+      Object {
+        "backgroundColor": "transparent",
+      },
+    ]
+  }
+>
+  <View
+    accessible={true}
+    isTVSelectable={true}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderColor": "#42D689",
+        "borderRadius": 3,
+        "borderWidth": 2,
+        "flex": 1,
+        "height": 50,
+        "justifyContent": "center",
+        "opacity": 1,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+        }
+      }
+    >
+      <Text>
+        child text
+      </Text>
+      <Text
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 16,
+            },
+            Object {
+              "color": "#42D689",
+            },
+            Object {
+              "paddingLeft": 5,
+              "paddingRight": 5,
+            },
+          ]
+        }
+      >
+        Button
+      </Text>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Button when type is TERTIARY renders 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "alignItems": "center",
+        "borderRadius": 3,
+        "flexDirection": "row",
+      },
+      Object {
+        "marginVertical": 10,
+      },
+      Object {
+        "marginBottom": 10,
+      },
+      undefined,
+      Object {
+        "backgroundColor": "transparent",
+      },
+    ]
+  }
+>
+  <View
+    accessible={true}
+    isTVSelectable={true}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "transparent",
+        "borderColor": "transparent",
+        "borderRadius": 3,
+        "borderWidth": 2,
+        "flex": 1,
+        "height": 50,
+        "justifyContent": "center",
+        "opacity": 1,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+        }
+      }
+    >
+      <Text>
+        child text
+      </Text>
+      <Text
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 16,
+            },
+            Object {
+              "color": "#2E3338",
+            },
+            Object {
+              "paddingLeft": 5,
+              "paddingRight": 5,
+            },
+          ]
+        }
+      >
+        Button
+      </Text>
+    </View>
+  </View>
+</View>
+`;

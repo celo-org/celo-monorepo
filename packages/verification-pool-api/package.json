@@ -1,0 +1,60 @@
+{
+  "name": "@celo/verification-pool-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mobile verification pool firebase API",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "main": "lib/src/index.js",
+  "scripts": {
+    "build": "./build.sh -e",
+    "get-config": "firebase functions:config:get",
+    "set-config": "ts-node ./deployment/set-config.ts --celo-env",
+    "set-env": "ts-node ./deployment/set-env.ts --celo-env",
+    "deploy": "ts-node ./deployment/deploy.ts --celo-env",
+    "delete": " ts-node ./deployment/delete.ts --celo-env",
+    "shell": "firebase functions:shell",
+    "start": "yarn run shell",
+    "logs": "firebase functions:log",
+    "lint-checks": "yarn run lint && yarn run compile-typescript",
+    "lint": "tslint -c tslint.json --project tsconfig.json",
+    "compile-typescript": "tsc",
+    "test": "jest --ci --coverage --runInBand --detectOpenHandles",
+    "test:verbose": "jest --ci --verbose --runInBand --detectOpenHandles"
+  },
+  "dependencies": {
+    "bignumber.js": "^7.2.0",
+    "eth-lib": "^0.2.8",
+    "ethereumjs-util": "^5.2.0",
+    "express": "^4.16.4",
+    "firebase-admin": "^7.0.0",
+    "firebase-functions": "^2.2.0",
+    "google-libphonenumber": "^3.2.1",
+    "lodash": "^4.17.14",
+    "sleep-promise": "^8.0.1",
+    "twilio": "^3.23.2",
+    "web3": "1.0.0-beta.37",
+    "web3-core-helpers": "1.0.0-beta.37",
+    "web3-utils": "^1.0.0-beta.37"
+  },
+  "devDependencies": {
+    "@types/express": "^4.16.1",
+    "@types/google-libphonenumber": "^7.4.17",
+    "@types/jest": "^24.0.13",
+    "@types/minimist": "^1.2.0",
+    "@types/supertest": "^2.0.7",
+    "@types/web3": "^1.0.18",
+    "firebase-bolt": "^0.8.3",
+    "firebase-functions-test": "^0.1.6",
+    "firebase-tools": "^6.3.1",
+    "jest": "^24.8.0",
+    "minimist": "^1.2.0",
+    "supertest": "^3.4.2",
+    "ts-jest": "^24.0.0",
+    "ts-node": "^7.0.1",
+    "typescript": "^3.3.3"
+  },
+  "engines": {
+    "node": "8"
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "readOnlyMode":
+    "Modo de solo lectura: cree la clave de respaldo para seguir enviando y recibiendo Celo Dólares",
+  "getBackupKey": "Obtener clave de respaldo",
+  "learnBackupKey": "Aprenda su clave de respaldo",
+  "editProfile": "Editar perfil",
+  "backupKey": "Clave de respaldo",
+  "inviteFriends": "Invitar a amigos",
+  "verifierApp": "Apli del verificador",
+  "languageSettings": "Configuración de idioma",
+  "cancel": "Cancelar",
+  "backupKeyImportance": {
+    "0":
+      "Si pierde su teléfono o elimina la aplicación de Celo, perderá todo el oro y los dólares de su billetera.",
+    "1":
+      "Puede hacer un respaldo de la billetera si escribe una clave de respaldo en un papel y la guarda en algún sitio seguro. Así, podrá restaurar la billetera en el futuro de ser necesario.",
+    "2":
+      "No haga una captura de pantalla ni la guarde en las notas de su teléfono. Asegúrese de escribir la clave de respaldo a mano y mantenerla segura."
+  },
+  "setBackupKey": "Crear clave de respaldo",
+  "skip": "Saltar paso",
+  "areYouSure": "¿Está seguro?",
+  "needBackupKey": "Sin una clave de respaldo, puede perder el acceso a la billetera para siempre.",
+  "shareBackupKey": "Compartir clave de respaldo",
+  "backupRecovery":
+    "Comparta la clave de respaldo con una sola persona en la que confíe plenamente.",
+  "backupSkipText": {
+    "0": "Comparta la clave de respaldo con una sola persona en la que confíe ",
+    "1": "plenamente."
+  },
+  "sendWhatsApp": "Enviar por WhatsApp",
+  "continue": "Continuar",
+  "securityTips": "Consejos de seguridad",
+  "backupKeySummary": {
+    "0": "Escriba esta frase en un papel y guárdela en algún sitio seguro.",
+    "1": "No le muestre la frase a nadie. Si alguien la sabe, podrá acceder a su billetera."
+  },
+  "learnYourKey": "Escriba o memorice su clave de respaldo.",
+  "keyWillBeVerified":
+    "Una vez que haya terminado, verificaremos que conoce la clave correctamente.",
+  "question": "Pregunta",
+  "questionPhrase": {
+    "0": "¿Cuál es la ",
+    "1": " palabra de su clave de respaldo?"
+  },
+  "question1": "¿Cuál es la 1.ª palabra de su clave de respaldo?",
+  "question2": "¿Cuál es la 2.ª palabra de su clave de respaldo?",
+  "question3": "¿Cuál es la 3.ª palabra de su clave de respaldo?",
+  "question4": "¿Cuál es la 4.ª palabra de su clave de respaldo?",
+  "question5": "¿Cuál es la 5.ª palabra de su clave de respaldo?",
+  "question6": "¿Cuál es la 6.ª palabra de su clave de respaldo?",
+  "question7": "¿Cuál es la 7.ª palabra de su clave de respaldo?",
+  "question8": "¿Cuál es la 8.ª palabra de su clave de respaldo?",
+  "question9": "¿Cuál es la 9.ª palabra de su clave de respaldo?",
+  "question10": "¿Cuál es la 10.ª palabra de su clave de respaldo?",
+  "question11": "¿Cuál es la 11.ª palabra de su clave de respaldo?",
+  "question12": "¿Cuál es la 12.ª palabra de su clave de respaldo?",
+  "question13": "¿Cuál es la 13.ª palabra de su clave de respaldo?",
+  "question14": "¿Cuál es la 14.ª palabra de su clave de respaldo?",
+  "question15": "¿Cuál es la 15.ª palabra de su clave de respaldo?",
+  "question16": "¿Cuál es la 16.ª palabra de su clave de respaldo?",
+  "question17": "¿Cuál es la 17.ª palabra de su clave de respaldo?",
+  "question18": "¿Cuál es la 18.ª palabra de su clave de respaldo?",
+  "question19": "¿Cuál es la 19.ª palabra de su clave de respaldo?",
+  "question20": "¿Cuál es la 20.ª palabra de su clave de respaldo?",
+  "question21": "¿Cuál es la 21.ª palabra de su clave de respaldo?",
+  "question22": "¿Cuál es la 22.ª palabra de su clave de respaldo?",
+  "question23": "¿Cuál es la 23.ª palabra de su clave de respaldo?",
+  "question24": "¿Cuál es la 24.ª palabra de su clave de respaldo?",
+  "submit": "Enviar",
+  "dontKnow": "¿No la sabe? ",
+  "return": "Vuelva a la clave de respaldo",
+  "tryAgain": "Reintentar",
+  "backToKey":
+    "Le llevaremos a la pantalla con su clave de respaldo para que verifique que la escribió correctamente.",
+  "seeBackupKey": "Ver clave de respaldo",
+  "backupKeySet": "Clave de respaldo creada",
+  "dontLoseIt":
+    "No pierda esta clave. Es de suma importancia que la mantenga en un lugar seguro, ya que es la única forma de desbloquear su billetera si pierde su celular.",
+  "done": "Listo",
+  "whatsappMessage":
+    "Importante: por favor mantenga esto privado. \n\nTe estoy enviando la frase de respaldo a mi Billetera de Celo: ",
+  "backupPrompt":
+    "Para la seguridad de sus fondos, su cuenta está congelada hasta que obtenga su clave de respaldo",
+  "copyToClipboard": "Copiar al portapapeles",
+  "copiedToClipboard": "Copiada al portapapeles"
+}

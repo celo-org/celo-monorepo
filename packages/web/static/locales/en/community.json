@@ -1,0 +1,133 @@
+{
+  "pageTitle": "Celo: A global crypto community building prosperity for all",
+  "title": "Community",
+  "cover": {
+    "title": "A global community of creators",
+    "joinMovement": "Join the movement",
+    "button": "Stay connected"
+  },
+  "titleText":
+    "We are a community of creators -- developers, designers, doers -- who are motivated by the power of accessible financial tools to make the world a better place.",
+  "tenetTitle": "What we care about",
+  "tenetSubtitle": "Our community tenets",
+  "tenets": {
+    "1": "Designing for All",
+    "2": "Innovating on Money",
+    "3": "Striving for Beauty",
+    "4": "Embodying Humility",
+    "subtitles": {
+      "1":
+        "We believe that, to create a truly inclusive financial system, we must begin by serving those who need it most.",
+      "2":
+        "We recognize that the features of money, like the features of any widely used technology, have a considerable impact on society.",
+      "3": "We aim, as best we can, to create beauty.",
+      "4": "We strive to think lightly of ourselves and deeply of the world."
+    },
+    "text": {
+      "1":
+        "Globally, about one in every three adults do not have a bank account.  As a simple consequence of this, they don’t have a straightforward means of receiving or storing value across distance, and therefore are excluded from a large part of the global economy. They don’t have a way of establishing assets or credit history on which to receive loans. They can’t receive remittances without a large processing fee. In this context, the simple ability to store and transmit small quantities of money with little overhead can have a transformative impact.\n\nWe believe that to create a truly inclusive financial system, we must start by building an infrastructure to serve those excluded from the current system. Further, we believe that if we are able do so, the resulting system will be more useful, more resilient, more full-featured, and more accessible for everybody.\n\nTherefore, when we design our tools, we keep in the front of our mind the people who need them the most.  This is our primary motivation",
+      "2":
+        "The primary features of society’s media of exchange have changed little since the Bank of Sweden and Bank of England started issuing notes in the late 1600’s. Our means of payment are, by and large, loaned into existence, national in nature, fractional reserve backed, and established by fiat. While this design has been and will continue to be useful for a large variety of transactions, it obscures a vast design space, some of which has been explored on the margins, including: time banks, mutual credit, local currencies backed by local goods, demurrage-charged currencies, natural-capital backed currencies, money gifted into existence through a basic income, and others.\n\nWe believe that many of these features have great potential for positive impact, and that we would be well-served to have a world in which the way value is stored and transmitted is more an ecology than a monoculture.",
+      "3":
+        "There are two twin truths around which we orient our values and culture: that each person has a unique purpose, and that everyone is connected.  We believe that a financial environment that supports both of these complementary truths -- that connects us to one another and supports each person in following their own path -- can help to create a more beautiful world.  So, too, we believe that a working environment that supports these truths -- that fosters our intrinsic connectedness to one another, and gives focus to each person’s unique purpose through project choice and thoughtful reflection -- can help to create a more beautiful working community.  Therefore, we strive to lean into these truths.  More generally, we try, as much as possible, to create beauty in each of the little things we do.",
+      "4":
+        "To do any of the things we aim to do -- design for many people, innovate on the medium of exchange, strive to create beauty in the little things -- requires us to be humble, to be empathetic, to learn from our mistakes and others’ successes.  Even more than audacity, doing anything meaningful requires humility."
+    }
+  },
+  "tententDesignText": [
+    "Globally, about one in every three adults do not have a bank account. As a simple consequence of this, they don’t have a straightforward means of receiving or storing value across distance, and therefore are excluded from a large part of the global economy. They don’t have a way of establishing assets or credit history on which to receive loans. They can’t receive remittances without a large processing fee. In this context, the simple ability to store and transmit small quantities of money with little overhead can have a transformative impact.",
+    "We believe that to create a truly inclusive financial system, we must start by building an infrastructure to serve those excluded from the current system. Further, we believe that if we are able do so, the resulting system will be more useful, more resilient, more full-featured, and more accessible for everybody.",
+    "Therefore, when we design our tools, we keep in the front of our mind the people who need them the most. This is our primary motivation."
+  ],
+  "tenetInnovateText": [
+    "The primary features of society’s media of exchange have changed little since the Bank of Sweden and Bank of England started issuing notes in the late 1600’s. Our means of payment are, by and large, loaned into existence, national in nature, fractional reserve backed, and established by fiat. While this design has been and will continue to be useful for a large variety of transactions, it obscures a vast design space, some of which has been explored on the margins, including: time banks, mutual credit, local currencies backed by local goods, demurrage-charged currencies, natural-capital backed currencies, money gifted into existence through a basic income, and others.",
+    "We believe that many of these features have great potential for positive impact, and that we would be well-served to have a world in which the way value is stored and transmitted is more an ecology than a monoculture."
+  ],
+  "tenetStriveText": [
+    "There are two twin truths around which we orient our values and culture: that each person has a unique purpose, and that everyone is connected.  We believe that a financial environment that supports both of these complementary truths -- that connects us to one another and supports each person in following their own path -- can help to create a more beautiful world.  So, too, we believe that a working environment that supports these truths -- that fosters our intrinsic connectedness to one another, and gives focus to each person’s unique purpose through project choice and thoughtful reflection -- can help to create a more beautiful working community.  Therefore, we strive to lean into these truths.  More generally, we try, as much as possible, to create beauty in each of the little things we do."
+  ],
+  "tenetHumilityText": [
+    "To do any of the things we aim to do -- design for many people, innovate on the medium of exchange, strive to create beauty in the little things -- requires us to be humble, to be empathetic, to learn from our mistakes and others’ successes.  Even more than audacity, doing anything meaningful requires humility."
+  ],
+  "codeOfConduct": {
+    "title": "Our Foundation",
+    "text":
+      "Shared norms and behaviors are the foundation of a beautiful community. Please read and support the effort.",
+    "button": "Read Code"
+  },
+  "communityTenets": "Celo Community Tenets",
+  "communityGuidelines": "Community Guidelines",
+  "writingAbout": "What We're Writing About",
+  "recentNews": "Recent news from the core Celo team.",
+  "whereToSayHello": "Where to Say Hello",
+  "hearFromCelo": "Hear from the Celo team at these upcoming events",
+  "comeMeetUsAt": "Come meet us at these upcoming events.",
+  "readMoreOn": "Read More On",
+  "contactUs": "Questions? Email us",
+  "readMore": "Read More",
+  "learnMore": "Learn More",
+  "interested": "Interested in what we are building?",
+  "interestedText": {
+    "0":
+      "Stay up-to-date by signing up for our newsletter.  If you'd like to share, we'd love to learn more about you so that we can collectively build the Celo community. Our",
+    "1": "Privacy Policy",
+    "2": "will apply to any information you choose to provide."
+  },
+  "celoFellow": {
+    "title": "Celo Fellowships: Decentralized and Connected",
+    "heading": "Let’s collaborate",
+    "text":
+      "Let’s chat about building a new monetary system that creates the conditions for prosperity for all. We are open to working with bright and innovative people all over the world for short, fixed-term projects.",
+    "callForProp": "Read More in our Call for Proposals"
+  },
+  "submit": "Submit",
+  "events": {
+    "pastEvents": "Past Events",
+    "upcomingEvents": "Upcoming Events",
+    "highlightEvent": "Highlight Event",
+    "title": "Connect in person",
+    "events": "Events",
+    "recap": "Event Recap",
+    "refineBy": "Refine By",
+    "reppingCelo": "Want to host a Celo Meet-up?",
+    "eventPage": "Event Page"
+  },
+  "articles": {
+    "title": "Community voices"
+  },
+  "fellows": {
+    "title": "Have an idea for the Celo ecosystem? Propose a project as a Fellow.",
+    "button": "Call for Proposals",
+    "formTitle": "Start your fellowship application"
+  },
+  "form": {
+    "name": "Full name",
+    "company": "Company",
+    "role": "Role",
+    "email": "Email",
+    "subscribe": "Subscribe",
+    "ideas": "What do you want to create?",
+    "deliverables": "What are your expected deliverables?",
+    "bio": "Tell us about yourself",
+    "resume": "Link to LinkedIn or other personal website",
+    "fellowshipSubmitted": "Thank You",
+    "interests": {
+      "topic": "Interest",
+      "partnership": "Partnership opportunities",
+      "community": "Developer community",
+      "jobs": "Jobs at Celo",
+      "other": "Other"
+    }
+  },
+  "validationErrors": {
+    "email": "Please enter a valid email address",
+    "generic": "Oops I’m blank!"
+  },
+  "website": "WEBSITE",
+  "recap": "RECAP",
+  "stayConnected": "Stay connected",
+  "stayConnectedThanks": "Thanks for joining the Celo community, expect our newsletter soon.",
+  "readMoreFromOurBlog": "Read more on our blog",
+  "receiveUpdates": "Receive the latest updates to your inbox",
+  "signUp": "Sign Up"
+}

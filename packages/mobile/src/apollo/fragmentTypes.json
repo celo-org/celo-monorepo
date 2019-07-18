@@ -1,0 +1,11 @@
+{
+  "__schema": {
+    "types": [
+      {
+        "kind": "UNION",
+        "name": "Event",
+        "possibleTypes": [{ "name": "Exchange" }, { "name": "Transfer" }]
+      }
+    ]
+  }
+}

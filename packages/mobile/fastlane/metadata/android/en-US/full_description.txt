@@ -1,0 +1,19 @@
+TESTNET INFORMATION & PRIVACY STATEMENT
+This application connects to ‘Alfajores’, a test network running the Celo Protocol. Any balance amounts on this network are not redeemable for real value. The Alfajores Network stores phone number hashes to allow for payments to a phone number. By verifying your phone number, you consent to having your hashed phone number stored on the Celo Blockchain.
+
+To learn more, please read our <a href="https://docs.celo.org/community/code-of-conduct">Code of Conduct</a> and <a href="http://celo.org/terms">Terms</a>
+
+ABOUT THIS APP
+Celo lets you easily send and request value from anyone, anywhere.
+
+SAVE & SPEND STABLE VALUE
+Send, request, and save Celo Dollars, which are stable relative to US Dollars. Easily verify ownership of your phone number to get started. After that, sending or requesting payment from a friend is easy - all you need is their phone number and a small fee.
+
+SAFE & SECURE
+Securely send value to any mobile phone number or receive value at your phone number. To keep your value secure, protect your wallet with a Backup Key. This key protects your funds so that only you can access them -- don’t lose it!
+
+EXCHANGE FOR CELO GOLD
+Exchange Celo Dollars for Celo Gold.
+
+LEARN MORE
+To learn more about Celo, please visit <a href="http://celo.org/">celo.org</a>

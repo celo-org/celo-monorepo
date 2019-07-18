@@ -1,0 +1,12 @@
+runtime: nodejs8
+service: alfajoresstaging
+env_variables:
+  NODE_ENV: 'development'
+  DEPLOY_ENV: 'alfajoresstaging'
+  BLOCKSCOUT_API: 'https://alfajoresstaging-blockscout.celo-testnet.org/api'
+  # Pull addresses from the build artifacts of the network in protocol/build
+  CELO_GOLD_ADDRESS: '0xD016D1654bb83d99b70c3Be3771C2719b2497bc1'
+  CELO_DOLLAR_ADDRESS: '0xaEeF69188629296468940f6a4479b37926EBCaDB'
+  FAUCET_ADDRESS: '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
+  VERIFICATION_REWARDS_ADDRESS: '0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5'
+  ABE_ADDRESS: '0x13da91B4b00703915B74C9279B5F67a830dD8ec1'

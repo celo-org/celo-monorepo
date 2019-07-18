@@ -1,0 +1,22 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "composite": true,
+    "declaration": true,
+    "jsx": "preserve",
+    "lib": ["dom", "es2015", "es2016"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": false,
+    "skipLibCheck": true,
+    "sourceMap": false,
+    "target": "es6",
+    "esModuleInterop": true,
+    "outDir": "./lib",
+    "rootDir": "./src"
+  }
+}

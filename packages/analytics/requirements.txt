@@ -1,0 +1,4 @@
+apache-beam==2.8.0
+google-cloud-logging==1.2.0
+google-cloud-storage==1.13.0
+python-dateutil==2.6.0

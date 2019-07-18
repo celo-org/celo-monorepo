@@ -1,0 +1,6 @@
+{
+  "extends": ["@celo/typescript/tslint.json"],
+  "linterOptions": {
+    "include": ["**/*.ts"]
+  }
+}

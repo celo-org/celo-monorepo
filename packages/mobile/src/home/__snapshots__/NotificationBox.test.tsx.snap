@@ -1,0 +1,1221 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`NotificationBox Backup too late test 1`] = `
+<View
+  style={
+    Object {
+      "maxWidth": 750,
+      "width": 750,
+    }
+  }
+>
+  <RCTScrollView
+    horizontal={true}
+    onScroll={[Function]}
+    pagingEnabled={true}
+    showsHorizontalScrollIndicator={false}
+  >
+    <View>
+      <View
+        style={
+          Object {
+            "margin": 10,
+            "width": 730,
+          }
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "padding": 10,
+                "width": "100%",
+              },
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 3,
+                "borderWidth": 1,
+              },
+            ]
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "paddingRight": 10,
+              }
+            }
+          >
+            <Image
+              resizeMode="contain"
+              source={
+                Object {
+                  "testUri": "../../../src/images/backup-icon.png",
+                }
+              }
+              style={
+                Object {
+                  "height": 30,
+                  "width": 30,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Bold",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                }
+              }
+            >
+              getBackupKey
+            </Text>
+            <View>
+              <View
+                style={
+                  Object {
+                    "justifyContent": "space-between",
+                    "minHeight": 70,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "marginTop": 5,
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      Object {
+                        "color": "#81868B",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 20,
+                      }
+                    }
+                  >
+                    setBackupKey
+                  </Text>
+                </View>
+                <View
+                  style={
+                    Object {
+                      "flexDirection": "row",
+                      "marginTop": 15,
+                    }
+                  }
+                >
+                  <View
+                    accessible={true}
+                    isTVSelectable={true}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
+                    style={
+                      Object {
+                        "opacity": 1,
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        Array [
+                          Object {
+                            "color": "#81868B",
+                            "fontFamily": "Hind-Regular",
+                            "fontSize": 13,
+                            "lineHeight": 18,
+                          },
+                          Object {
+                            "color": "#42D689",
+                            "fontFamily": "Hind-Medium",
+                            "fontSize": 14,
+                            "lineHeight": 18,
+                          },
+                          Object {
+                            "paddingEnd": 15,
+                          },
+                        ]
+                      }
+                    >
+                      getBackupKey
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "margin": 10,
+            "width": 730,
+          }
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "padding": 10,
+                "width": "100%",
+              },
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 3,
+                "borderWidth": 1,
+              },
+            ]
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "paddingRight": 10,
+              }
+            }
+          >
+            <Image
+              resizeMode="contain"
+              source={
+                Object {
+                  "testUri": "../../../src/images/Invite-Friends.png",
+                }
+              }
+              style={
+                Object {
+                  "height": 30,
+                  "width": 30,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Bold",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                }
+              }
+            >
+              inviteFlow11:inviteFriendsToCelo
+            </Text>
+            <View>
+              <View
+                style={
+                  Object {
+                    "justifyContent": "space-between",
+                    "minHeight": 70,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "marginTop": 5,
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      Object {
+                        "color": "#81868B",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 20,
+                      }
+                    }
+                  >
+                    inviteFlow11:inviteAnyone
+                  </Text>
+                </View>
+                <View
+                  style={
+                    Object {
+                      "flexDirection": "row",
+                      "marginTop": 15,
+                    }
+                  }
+                >
+                  <View
+                    accessible={true}
+                    isTVSelectable={true}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
+                    style={
+                      Object {
+                        "opacity": 1,
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        Array [
+                          Object {
+                            "color": "#81868B",
+                            "fontFamily": "Hind-Regular",
+                            "fontSize": 13,
+                            "lineHeight": 18,
+                          },
+                          Object {
+                            "color": "#42D689",
+                            "fontFamily": "Hind-Medium",
+                            "fontSize": 14,
+                            "lineHeight": 18,
+                          },
+                          Object {
+                            "paddingEnd": 15,
+                          },
+                        ]
+                      }
+                    >
+                      global:inviteFriends
+                    </Text>
+                  </View>
+                  <View
+                    accessible={true}
+                    isTVSelectable={true}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
+                    style={
+                      Object {
+                        "opacity": 1,
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        Array [
+                          Object {
+                            "color": "#81868B",
+                            "fontFamily": "Hind-Regular",
+                            "fontSize": 13,
+                            "lineHeight": 18,
+                          },
+                          Object {
+                            "color": "#42D689",
+                            "fontFamily": "Hind-Medium",
+                            "fontSize": 14,
+                            "lineHeight": 18,
+                          },
+                          Object {
+                            "paddingEnd": 15,
+                          },
+                        ]
+                      }
+                    >
+                      maybeLater
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "display": "flex",
+        "flexDirection": "row",
+        "justifyContent": "center",
+        "paddingBottom": 10,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "backgroundColor": "#42D689",
+          "borderRadius": 8,
+          "flex": 0,
+          "height": 8,
+          "marginHorizontal": 5,
+          "width": 8,
+        }
+      }
+    />
+    <View
+      style={
+        Object {
+          "backgroundColor": "#D1D5D8",
+          "borderRadius": 8,
+          "flex": 0,
+          "height": 6,
+          "marginHorizontal": 5,
+          "width": 6,
+        }
+      }
+    />
+  </View>
+</View>
+`;
+
+exports[`NotificationBox Educations not completed yet 1`] = `
+<View
+  style={
+    Object {
+      "maxWidth": 750,
+      "width": 750,
+    }
+  }
+>
+  <RCTScrollView
+    horizontal={true}
+    onScroll={[Function]}
+    pagingEnabled={true}
+    showsHorizontalScrollIndicator={false}
+  >
+    <View>
+      <View
+        style={
+          Object {
+            "margin": 10,
+            "width": 730,
+          }
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "padding": 10,
+                "width": "100%",
+              },
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 3,
+                "borderWidth": 1,
+              },
+            ]
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "paddingRight": 10,
+              }
+            }
+          >
+            <Image
+              resizeMode="contain"
+              source={
+                Object {
+                  "testUri": "../../../src/images/home-icon.png",
+                }
+              }
+              style={
+                Object {
+                  "height": 30,
+                  "width": 30,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Bold",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                }
+              }
+            >
+              celoGold
+            </Text>
+            <View>
+              <View
+                style={
+                  Object {
+                    "justifyContent": "space-between",
+                    "minHeight": 70,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "marginTop": 5,
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      Object {
+                        "color": "#81868B",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 20,
+                      }
+                    }
+                  >
+                    exchangeFlow9:whatIsGold
+                  </Text>
+                </View>
+                <View
+                  style={
+                    Object {
+                      "flexDirection": "row",
+                      "marginTop": 15,
+                    }
+                  }
+                >
+                  <View
+                    accessible={true}
+                    isTVSelectable={true}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
+                    style={
+                      Object {
+                        "opacity": 1,
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        Array [
+                          Object {
+                            "color": "#81868B",
+                            "fontFamily": "Hind-Regular",
+                            "fontSize": 13,
+                            "lineHeight": 18,
+                          },
+                          Object {
+                            "color": "#42D689",
+                            "fontFamily": "Hind-Medium",
+                            "fontSize": 14,
+                            "lineHeight": 18,
+                          },
+                          Object {
+                            "paddingEnd": 15,
+                          },
+                        ]
+                      }
+                    >
+                      exchange
+                    </Text>
+                  </View>
+                  <View
+                    accessible={true}
+                    isTVSelectable={true}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
+                    style={
+                      Object {
+                        "opacity": 1,
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        Array [
+                          Object {
+                            "color": "#81868B",
+                            "fontFamily": "Hind-Regular",
+                            "fontSize": 13,
+                            "lineHeight": 18,
+                          },
+                          Object {
+                            "color": "#42D689",
+                            "fontFamily": "Hind-Medium",
+                            "fontSize": 14,
+                            "lineHeight": 18,
+                          },
+                          Object {
+                            "paddingEnd": 15,
+                          },
+                        ]
+                      }
+                    >
+                      maybeLater
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+</View>
+`;
+
+exports[`NotificationBox Payment Requests exist 1`] = `
+<View
+  style={
+    Object {
+      "maxWidth": 750,
+      "width": 750,
+    }
+  }
+>
+  <RCTScrollView
+    horizontal={true}
+    onScroll={[Function]}
+    pagingEnabled={true}
+    showsHorizontalScrollIndicator={false}
+  >
+    <View>
+      <View
+        style={
+          Object {
+            "margin": 10,
+            "width": 730,
+          }
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "padding": 10,
+                "width": "100%",
+              },
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 3,
+                "borderWidth": 1,
+              },
+            ]
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "paddingRight": 10,
+              }
+            }
+          >
+            <Image
+              resizeMode="contain"
+              source={
+                Object {
+                  "testUri": "../../../src/images/send-dollar.png",
+                }
+              }
+              style={
+                Object {
+                  "height": 30,
+                  "width": 30,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Bold",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                }
+              }
+            >
+              paymentRequest
+            </Text>
+            <View>
+              <View
+                style={
+                  Object {
+                    "justifyContent": "space-between",
+                    "minHeight": 70,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "flexDirection": "row",
+                      "marginTop": 5,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "flex": 1,
+                      }
+                    }
+                  >
+                    <Text
+                      ellipsizeMode="middle"
+                      numberOfLines={1}
+                      style={
+                        Object {
+                          "flexDirection": "row",
+                        }
+                      }
+                    >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#81868B",
+                              "fontFamily": "Hind-Regular",
+                              "fontSize": 14,
+                              "lineHeight": 20,
+                            },
+                          ]
+                        }
+                      >
+                        +14155550000
+                         - 
+                        Rent request for June, it is already late!!!
+                      </Text>
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#81868B",
+                              "fontFamily": "Hind-Regular",
+                              "fontSize": 14,
+                              "lineHeight": 20,
+                            },
+                            Object {
+                              "fontFamily": "Hind-SemiBold",
+                            },
+                          ]
+                        }
+                      >
+                         
+                        12.34
+                      </Text>
+                    </Text>
+                  </View>
+                </View>
+                <View
+                  style={
+                    Object {
+                      "flexDirection": "row",
+                      "marginTop": 15,
+                    }
+                  }
+                >
+                  <View
+                    accessible={true}
+                    isTVSelectable={true}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
+                    style={
+                      Object {
+                        "opacity": 1,
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        Array [
+                          Object {
+                            "color": "#81868B",
+                            "fontFamily": "Hind-Regular",
+                            "fontSize": 13,
+                            "lineHeight": 18,
+                          },
+                          Object {
+                            "color": "#42D689",
+                            "fontFamily": "Hind-Medium",
+                            "fontSize": 14,
+                            "lineHeight": 18,
+                          },
+                          Object {
+                            "paddingEnd": 15,
+                          },
+                        ]
+                      }
+                    >
+                      review
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+</View>
+`;
+
+exports[`NotificationBox Simple test 1`] = `
+<View
+  style={
+    Object {
+      "maxWidth": 750,
+      "width": 750,
+    }
+  }
+>
+  <RCTScrollView
+    horizontal={true}
+    onScroll={[Function]}
+    pagingEnabled={true}
+    showsHorizontalScrollIndicator={false}
+  >
+    <View>
+      <View
+        style={
+          Object {
+            "margin": 10,
+            "width": 730,
+          }
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "padding": 10,
+                "width": "100%",
+              },
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 3,
+                "borderWidth": 1,
+              },
+            ]
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "paddingRight": 10,
+              }
+            }
+          >
+            <Image
+              resizeMode="contain"
+              source={
+                Object {
+                  "testUri": "../../../src/images/backup-icon.png",
+                }
+              }
+              style={
+                Object {
+                  "height": 30,
+                  "width": 30,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Bold",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                }
+              }
+            >
+              getBackupKey
+            </Text>
+            <View>
+              <View
+                style={
+                  Object {
+                    "justifyContent": "space-between",
+                    "minHeight": 70,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "marginTop": 5,
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      Object {
+                        "color": "#81868B",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 20,
+                      }
+                    }
+                  >
+                    setBackupKey
+                  </Text>
+                </View>
+                <View
+                  style={
+                    Object {
+                      "flexDirection": "row",
+                      "marginTop": 15,
+                    }
+                  }
+                >
+                  <View
+                    accessible={true}
+                    isTVSelectable={true}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
+                    style={
+                      Object {
+                        "opacity": 1,
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        Array [
+                          Object {
+                            "color": "#81868B",
+                            "fontFamily": "Hind-Regular",
+                            "fontSize": 13,
+                            "lineHeight": 18,
+                          },
+                          Object {
+                            "color": "#42D689",
+                            "fontFamily": "Hind-Medium",
+                            "fontSize": 14,
+                            "lineHeight": 18,
+                          },
+                          Object {
+                            "paddingEnd": 15,
+                          },
+                        ]
+                      }
+                    >
+                      getBackupKey
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "margin": 10,
+            "width": 730,
+          }
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "flexDirection": "row",
+                "justifyContent": "space-between",
+                "padding": 10,
+                "width": "100%",
+              },
+              Object {
+                "borderColor": "#EEEEEE",
+                "borderRadius": 3,
+                "borderWidth": 1,
+              },
+            ]
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "paddingRight": 10,
+              }
+            }
+          >
+            <Image
+              resizeMode="contain"
+              source={
+                Object {
+                  "testUri": "../../../src/images/Invite-Friends.png",
+                }
+              }
+              style={
+                Object {
+                  "height": 30,
+                  "width": 30,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Bold",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                }
+              }
+            >
+              inviteFlow11:inviteFriendsToCelo
+            </Text>
+            <View>
+              <View
+                style={
+                  Object {
+                    "justifyContent": "space-between",
+                    "minHeight": 70,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "marginTop": 5,
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      Object {
+                        "color": "#81868B",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 20,
+                      }
+                    }
+                  >
+                    inviteFlow11:inviteAnyone
+                  </Text>
+                </View>
+                <View
+                  style={
+                    Object {
+                      "flexDirection": "row",
+                      "marginTop": 15,
+                    }
+                  }
+                >
+                  <View
+                    accessible={true}
+                    isTVSelectable={true}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
+                    style={
+                      Object {
+                        "opacity": 1,
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        Array [
+                          Object {
+                            "color": "#81868B",
+                            "fontFamily": "Hind-Regular",
+                            "fontSize": 13,
+                            "lineHeight": 18,
+                          },
+                          Object {
+                            "color": "#42D689",
+                            "fontFamily": "Hind-Medium",
+                            "fontSize": 14,
+                            "lineHeight": 18,
+                          },
+                          Object {
+                            "paddingEnd": 15,
+                          },
+                        ]
+                      }
+                    >
+                      global:inviteFriends
+                    </Text>
+                  </View>
+                  <View
+                    accessible={true}
+                    isTVSelectable={true}
+                    onResponderGrant={[Function]}
+                    onResponderMove={[Function]}
+                    onResponderRelease={[Function]}
+                    onResponderTerminate={[Function]}
+                    onResponderTerminationRequest={[Function]}
+                    onStartShouldSetResponder={[Function]}
+                    style={
+                      Object {
+                        "opacity": 1,
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        Array [
+                          Object {
+                            "color": "#81868B",
+                            "fontFamily": "Hind-Regular",
+                            "fontSize": 13,
+                            "lineHeight": 18,
+                          },
+                          Object {
+                            "color": "#42D689",
+                            "fontFamily": "Hind-Medium",
+                            "fontSize": 14,
+                            "lineHeight": 18,
+                          },
+                          Object {
+                            "paddingEnd": 15,
+                          },
+                        ]
+                      }
+                    >
+                      maybeLater
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "display": "flex",
+        "flexDirection": "row",
+        "justifyContent": "center",
+        "paddingBottom": 10,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "backgroundColor": "#42D689",
+          "borderRadius": 8,
+          "flex": 0,
+          "height": 8,
+          "marginHorizontal": 5,
+          "width": 8,
+        }
+      }
+    />
+    <View
+      style={
+        Object {
+          "backgroundColor": "#D1D5D8",
+          "borderRadius": 8,
+          "flex": 0,
+          "height": 6,
+          "marginHorizontal": 5,
+          "width": 6,
+        }
+      }
+    />
+  </View>
+</View>
+`;

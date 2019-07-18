@@ -1,0 +1,657 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ImportWallet renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "height": 45,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "alignItems": "flex-start",
+        }
+      }
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+            "paddingHorizontal": 20,
+            "paddingVertical": 10,
+          }
+        }
+        testID="CancelButton"
+      >
+        <Text
+          style={
+            Object {
+              "color": "#42D689",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 14,
+              "lineHeight": 22,
+            }
+          }
+        >
+          cancel
+        </Text>
+      </View>
+    </View>
+  </View>
+  <RCTScrollView
+    automaticallyAdjustContentInsets={false}
+    contentContainerStyle={
+      Object {
+        "paddingHorizontal": 20,
+      }
+    }
+    contentInset={
+      Object {
+        "bottom": 0,
+      }
+    }
+    enableAutomaticScroll={true}
+    enableResetScrollToCoords={true}
+    extraHeight={75}
+    extraScrollHeight={0}
+    getScrollResponder={[Function]}
+    handleOnScroll={[Function]}
+    keyboardDismissMode="interactive"
+    keyboardOpeningTime={250}
+    keyboardShouldPersistTaps="always"
+    keyboardSpace={0}
+    onScroll={[Function]}
+    resetKeyboardSpace={[Function]}
+    scrollEventThrottle={1}
+    scrollForExtraHeightOnAndroid={[Function]}
+    scrollIntoView={[Function]}
+    scrollToEnd={[Function]}
+    scrollToFocusedInput={[Function]}
+    scrollToPosition={[Function]}
+    showsVerticalScrollIndicator={true}
+    update={[Function]}
+    viewIsInsideTabBar={false}
+  >
+    <View>
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "marginBottom": 25,
+              "marginTop": 25,
+            },
+            Object {},
+          ]
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../src/images/coins-logo.png",
+            }
+          }
+          style={
+            Object {
+              "height": 50,
+              "width": 50,
+            }
+          }
+        />
+      </View>
+      <Text
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Light",
+              "fontSize": 22,
+              "paddingBottom": 20,
+              "textAlign": "center",
+            },
+            Object {
+              "color": "#2E3338",
+              "textAlign": "center",
+            },
+          ]
+        }
+      >
+        restoreYourWallet.title
+      </Text>
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 16,
+              "lineHeight": 24,
+            },
+            Object {
+              "paddingBottom": 15,
+            },
+          ]
+        }
+      >
+        restoreYourWallet.userYourBackupKey
+      </Text>
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 16,
+              "lineHeight": 24,
+            },
+            Object {
+              "paddingBottom": 15,
+            },
+          ]
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#FD785B",
+              },
+              Object {
+                "fontFamily": "Hind-Medium",
+              },
+            ]
+          }
+        >
+          restoreYourWallet.warning
+        </Text>
+        restoreYourWallet.restoreInPrivate
+      </Text>
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "backgroundColor": "white",
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "borderWidth": 1,
+              "flexDirection": "row",
+              "height": 62,
+              "marginVertical": 5,
+            },
+            Object {
+              "height": 124,
+            },
+            null,
+          ]
+        }
+      >
+        <TextInput
+          allowFontScaling={true}
+          autoCapitalize="none"
+          autoCorrect={false}
+          enablesReturnKeyAutomatically={true}
+          multiline={true}
+          onChangeText={[Function]}
+          onEndEditing={[Function]}
+          placeholder="backupKeyPrompt"
+          placeholderTextColor="#D1D5D8"
+          rejectResponderTermination={true}
+          style={
+            Object {
+              "color": "#555",
+              "flex": 1,
+              "fontFamily": "Hind-Regular",
+              "fontSize": 16,
+              "marginLeft": 10,
+            }
+          }
+          testID="ImportWalletBackupKeyInputField"
+          underlineColorAndroid="transparent"
+          value=""
+        />
+      </View>
+      <Text
+        style={
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 13,
+            "lineHeight": 18,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "fontFamily": "Hind-Medium",
+            }
+          }
+        >
+          tip
+        </Text>
+        backupKeyTip
+      </Text>
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "borderRadius": 3,
+          "flexDirection": "row",
+        },
+        null,
+        null,
+        undefined,
+        Object {
+          "backgroundColor": "#A3EBC6",
+        },
+      ]
+    }
+  >
+    <View
+      accessible={true}
+      isTVSelectable={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#A3EBC6",
+          "borderWidth": 0,
+          "flex": 1,
+          "height": 50,
+          "justifyContent": "center",
+          "opacity": 1,
+        }
+      }
+      testID="ImportWalletButton"
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 16,
+              },
+              Object {
+                "color": "#FFFFFF",
+              },
+              Object {
+                "paddingLeft": 5,
+                "paddingRight": 5,
+              },
+            ]
+          }
+        >
+          restoreWallet
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`ImportWallet renders with an error 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "height": 45,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "alignItems": "flex-start",
+        }
+      }
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+            "paddingHorizontal": 20,
+            "paddingVertical": 10,
+          }
+        }
+        testID="CancelButton"
+      >
+        <Text
+          style={
+            Object {
+              "color": "#42D689",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 14,
+              "lineHeight": 22,
+            }
+          }
+        >
+          cancel
+        </Text>
+      </View>
+    </View>
+  </View>
+  <RCTScrollView
+    automaticallyAdjustContentInsets={false}
+    contentContainerStyle={
+      Object {
+        "paddingHorizontal": 20,
+      }
+    }
+    contentInset={
+      Object {
+        "bottom": 0,
+      }
+    }
+    enableAutomaticScroll={true}
+    enableResetScrollToCoords={true}
+    extraHeight={75}
+    extraScrollHeight={0}
+    getScrollResponder={[Function]}
+    handleOnScroll={[Function]}
+    keyboardDismissMode="interactive"
+    keyboardOpeningTime={250}
+    keyboardShouldPersistTaps="always"
+    keyboardSpace={0}
+    onScroll={[Function]}
+    resetKeyboardSpace={[Function]}
+    scrollEventThrottle={1}
+    scrollForExtraHeightOnAndroid={[Function]}
+    scrollIntoView={[Function]}
+    scrollToEnd={[Function]}
+    scrollToFocusedInput={[Function]}
+    scrollToPosition={[Function]}
+    showsVerticalScrollIndicator={true}
+    update={[Function]}
+    viewIsInsideTabBar={false}
+  >
+    <View>
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "marginBottom": 25,
+              "marginTop": 25,
+            },
+            Object {},
+          ]
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../src/images/coins-logo.png",
+            }
+          }
+          style={
+            Object {
+              "height": 50,
+              "width": 50,
+            }
+          }
+        />
+      </View>
+      <Text
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Light",
+              "fontSize": 22,
+              "paddingBottom": 20,
+              "textAlign": "center",
+            },
+            Object {
+              "color": "#2E3338",
+              "textAlign": "center",
+            },
+          ]
+        }
+      >
+        restoreYourWallet.title
+      </Text>
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 16,
+              "lineHeight": 24,
+            },
+            Object {
+              "paddingBottom": 15,
+            },
+          ]
+        }
+      >
+        restoreYourWallet.userYourBackupKey
+      </Text>
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 16,
+              "lineHeight": 24,
+            },
+            Object {
+              "paddingBottom": 15,
+            },
+          ]
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#FD785B",
+              },
+              Object {
+                "fontFamily": "Hind-Medium",
+              },
+            ]
+          }
+        >
+          restoreYourWallet.warning
+        </Text>
+        restoreYourWallet.restoreInPrivate
+      </Text>
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "backgroundColor": "white",
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "borderWidth": 1,
+              "flexDirection": "row",
+              "height": 62,
+              "marginVertical": 5,
+            },
+            Object {
+              "height": 124,
+            },
+            Object {
+              "borderColor": "#FD785B",
+            },
+          ]
+        }
+      >
+        <TextInput
+          allowFontScaling={true}
+          autoCapitalize="none"
+          autoCorrect={false}
+          enablesReturnKeyAutomatically={true}
+          multiline={true}
+          onChangeText={[Function]}
+          onEndEditing={[Function]}
+          placeholder="backupKeyPrompt"
+          placeholderTextColor="#D1D5D8"
+          rejectResponderTermination={true}
+          style={
+            Object {
+              "color": "#555",
+              "flex": 1,
+              "fontFamily": "Hind-Regular",
+              "fontSize": 16,
+              "marginLeft": 10,
+            }
+          }
+          testID="ImportWalletBackupKeyInputField"
+          underlineColorAndroid="transparent"
+          value=""
+        />
+      </View>
+      <Text
+        style={
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 13,
+            "lineHeight": 18,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "fontFamily": "Hind-Medium",
+            }
+          }
+        >
+          tip
+        </Text>
+        backupKeyTip
+      </Text>
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "borderRadius": 3,
+          "flexDirection": "row",
+        },
+        null,
+        null,
+        undefined,
+        Object {
+          "backgroundColor": "#A3EBC6",
+        },
+      ]
+    }
+  >
+    <View
+      accessible={true}
+      isTVSelectable={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#A3EBC6",
+          "borderWidth": 0,
+          "flex": 1,
+          "height": 50,
+          "justifyContent": "center",
+          "opacity": 1,
+        }
+      }
+      testID="ImportWalletButton"
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 16,
+              },
+              Object {
+                "color": "#FFFFFF",
+              },
+              Object {
+                "paddingLeft": 5,
+                "paddingRight": 5,
+              },
+            ]
+          }
+        >
+          restoreWallet
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;

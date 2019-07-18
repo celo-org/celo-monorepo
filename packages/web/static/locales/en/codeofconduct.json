@@ -1,0 +1,51 @@
+{
+  "Title": "Celo Community Code of Conduct",
+  "Purpose": "1. Purpose",
+  "PurposeText":
+    "The Celo Code of Conduct is one of the ways we bring our value of connectedness into practice. A primary goal of the Celo community is to be inclusive to the largest number of contributors, with the most varied and diverse backgrounds possible. As such, we are committed to providing a friendly, safe and welcoming environment for all, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.\n\nWe invite all those who participate in the Celo community to help us create safe and positive experiences for everyone.",
+  "OpenSource": "2. Open Source Citizenship",
+  "Scope": "3. Scope",
+  "ScopeText":
+    "We expect all community participants (contributors, paid or otherwise; sponsors; C Labs employees; and other guests) to abide by this Code of Conduct in all community venues–online and in-person–as well as in all one-on-one communications pertaining to community business.\n\nThis Code of Conduct and its related procedures also applies to unacceptable behavior occurring outside the scope of community activities when such behavior has the potential to adversely affect the safety and well-being of community members.",
+  "ExpectedBehavior": "4. Expected Behavior",
+  "ExpectedBehaviorText":
+    "The following behaviors are expected and requested of all community members:",
+  "BehaviorsBullets": [
+    "Exercise consideration and respect in your speech and actions. Use welcoming and inclusive language.",
+    "Attempt collaboration before conflict.",
+    "Refrain from demeaning, discriminatory, or harassing behavior and speech.",
+    "Be mindful of your surroundings and of your fellow participants. Alert community leaders if you notice  a dangerous situation, someone in distress, or violations of this Code of Conduct, even if they seem inconsequential.",
+    "Remember that community event venues may be shared with members of the public; please be respectful to all patrons of these locations."
+  ],
+  "UnacceptableBehavior": "5. Unacceptable Behavior",
+  "UnacceptableBehaviorText":
+    "The following behaviors are considered harassment and are unacceptable within our community. Please note that this is not a comprehensive list, and in general, anything which could reasonably be considered inappropriate in a professional setting is unacceptable.",
+  "UnacceptableBehaviorsBullets": [
+    "Violence, threats of violence or violent language directed against another person.",
+    "Sexist, racist, homophobic, transphobic, ableist or otherwise discriminatory jokes and language.",
+    "Posting or displaying sexually explicit or violent material.",
+    "Posting or threatening to post other people’s personally identifying information (\"doxing\").",
+    "Personal insults, including those related to gender, sexual orientation, race, religion, or disability.",
+    "Inappropriate photography or recording.",
+    "Inappropriate physical contact. You should have someone’s consent before touching them.",
+    "Sexual attention, including sexualized comments or jokes; inappropriate touching, groping, and unwelcome sexual advances.",
+    "Deliberate intimidation, stalking or following (online or in person).",
+    "Advocating for, or encouraging, any of the above behavior.",
+    "Sustained disruption of community events, including talks and presentations."
+  ],
+  "Consequences": "6. Consequences of Unacceptable Behavior",
+  "ConsequencesText":
+    "Unacceptable behavior from any community member, including sponsors and those with decision-making authority, will not be tolerated.\n\nAnyone asked to stop unacceptable behavior is expected to comply immediately.\n\nIf a community member engages in unacceptable behavior, the community organizers may take any action they deem appropriate, up to and including a temporary ban or permanent expulsion from the community without warning (and without refund in the case of a paid event).",
+  "Reporting": "7. Reporting Guidelines",
+  "Grievances": "8. Addressing Grievances",
+  "License": "9. License and attribution",
+  "OpenSourceText":
+    "A supplemental goal of this Code of Conduct is to increase open source citizenship by encouraging participants to recognize and strengthen the relationships between our actions and their effects on our community.\n\nCommunities mirror the societies in which they exist and positive action is essential to counteract the many forms of inequality and abuses of power that exist in society.\n\n If you see someone who is making an extra effort to ensure our community is welcoming, friendly, and encourages all participants to contribute to the fullest extent, let us know by emailing <1></1>.",
+  "ReportingText":
+    "If you are subject to or witness unacceptable behavior, or have any other concerns, please notify <1></1> as soon as possible.",
+  "GrievancesText":
+    "If you feel you have been falsely or unfairly accused of violating this Code of Conduct, you should notify <1></1> with a concise description of your grievance.",
+  "LicenseText":
+    "This Code of Conduct is distributed under a <2></2> license. Portions of text derived from the <6></6> , the <10></10>, the <13></13>, and the <16></16>.",
+  "LastUpdated": "Last updated June 12, 2018"
+}

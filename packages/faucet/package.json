@@ -1,0 +1,47 @@
+{
+  "name": "celo-faucet-app",
+  "version": "1.0.0",
+  "description": "Faucet Web application for Celo",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "engines": {
+    "node": "8"
+  },
+  "scripts": {
+    "preserve": "yarn run build",
+    "serve": "cross-env NODE_ENV=production fi rebase serve",
+    "deploy": "firebase deploy",
+    "clean": "rimraf dist",
+    "build:contracts": "yarn run --cwd=../celotool cli copy-contract-artifacts --output-path=../faucet/src/generated --celo-env=integration --contracts=StableToken",
+    "build": "tsc --project .",
+    "lint:types-functions": "tsc --project . --noEmit",
+    "lint:functions": "tslint --project .",
+    "lint": "yarn lint:functions && yarn lint:types-functions",
+    "lint-checks": "yarn lint",
+    "transfer-funds": "ts-node scripts/transfer-funds.ts",
+    "cli": "ts-node scripts/cli.ts"
+  },
+  "dependencies": {
+    "debug": "^4.1.1",
+    "eth-lib": "^0.2.8",
+    "firebase": "^6.2.2",
+    "firebase-admin": "^7.0.0",
+    "firebase-functions": "^2.2.2",
+    "rlp": "^2.2.3",
+    "twilio": "^3.23.2",
+    "web3": "1.0.0-beta.37",
+    "web3-core-helpers": "1.0.0-beta.37"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.4",
+    "@types/twilio": "^0.0.10",
+    "@types/web3": "^1.0.19",
+    "cross-env": "5.2.0",
+    "firebase-bolt": "^0.8.4",
+    "firebase-tools": "^7.0.1",
+    "rimraf": "2.6.3",
+    "typescript": "^3.3.0",
+    "yargs": "^13.2.4"
+  }
+}

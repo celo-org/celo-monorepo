@@ -1,0 +1,135 @@
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: {{ .Values.environment }}-load-test
+  labels:
+    app: load-test
+    chart: load-test
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: load-test
+spec:
+  podManagementPolicy: "Parallel"
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: load-test
+      release: {{ .Release.Name }}
+      component: load-test
+  template:
+    metadata:
+      labels:
+        app: load-test
+        release: {{ .Release.Name }}
+        component: load-test
+    spec:
+      initContainers:
+      - name: load-test-compute-pk
+        image: {{ .Values.imageRepository }}:{{ .Values.imageTag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command:
+          - bash
+          - "-c"
+          - |
+            [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
+            RID=${BASH_REMATCH[1]}
+            echo "Generating private key for rid=$RID"
+            /celo-monorepo/packages/celotool/bin/celotooljs.sh generate bip32 --mnemonic "$SECRET_MNEMONIC" --accountType load_testing --index $RID >> /root/.celo/pkey
+        env:
+        - name: REPLICA_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: SECRET_MNEMONIC
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.environment }}-load-test-secrets
+              key: mnemonic
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+      - name: load-test-init-geth
+        image: {{ .Values.gethImageRepository }}:{{ .Values.gethImageTag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        args:
+        - "init"
+        - "/root/genesis.json"
+        volumeMounts:
+        - name: geth-config
+          mountPath:  /root
+        - name: data
+          mountPath: /root/.celo
+      containers:
+      - name: geth
+        image: {{ .Values.gethImageRepository }}:{{ .Values.gethImageTag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - "cat /root/staticnodes >> /root/.celo/static-nodes.json && \
+          geth \
+          --rpc \
+          --rpcapi=eth,net,web3,debug,admin,personal \
+          --rpccorsdomain='*' \
+          --rpcvhosts=* \
+          --ws \
+          --wsorigins=* \
+          --wsapi=eth,net,web3,debug \
+          --networkid={{ .Values.networkID }} \
+          --syncmode=celolatest \
+          --consoleformat=json \
+          --consoleoutput=stdout \
+          --verbosity={{ .Values.geth.verbosity }}"
+        ports:
+        - name: discovery-udp
+          containerPort: 30303
+          protocol: UDP
+        - name: discovery-tcp
+          containerPort: 30303
+        - name: rpc
+          containerPort: 8545
+        - name: ws
+          containerPort: 8546
+        resources:
+          requests:
+            memory: 412Mi
+            cpu: 200m
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+        - name: starting-files
+          mountPath:  /root
+      - name: load-test
+        image: {{ .Values.imageRepository }}:{{ .Values.imageTag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command:
+          - bash
+          - "-c"
+          - |
+            CELOTOOL="/celo-monorepo/packages/celotool/bin/celotooljs.sh";
+            ENV_NAME="{{ .Values.environment }}";
+
+            cd /celo-monorepo/packages/contractkit && yarn run build $ENV_NAME
+
+            $CELOTOOL geth simulate-client --delay 5 --data-dir /root/.celo -e $ENV_NAME --private-key /root/.celo/pkey --blockscout {{ .Values.blockscoutProb }} --load-test-id "{{ .Values.loadTestID }}"
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 200m
+        volumeMounts:
+        - name: starting-files
+          mountPath: /root
+        - name: data
+          mountPath: /root/.celo
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: secrets
+        secret:
+          secretName: {{ .Values.environment }}-load-test-secrets
+      - name: starting-files
+        configMap:
+          name: {{ .Values.environment }}-load-test-config
+      - name: geth-config
+        configMap:
+          name: {{ .Values.environment }}-geth-config

@@ -1,0 +1,23 @@
+{
+  "backupKey": "Clave de respaldo",
+  "invite": "Invitar",
+  "celoRewards": "Recompensas Celo",
+  "languageSettings": "Configuración de idioma",
+  "sendIssueReport": "Reportar un incidente",
+  "analytics": "Estadisticas de uso",
+  "shareAnalytics": "Compartir estadisticas de uso",
+  "shareAnalytics_detail":
+    "Recopilamos datos anónimos sobre cómo utiliza Celo para ayudar a mejorar la aplicación para todos.",
+  "testFaqHere": "<1>Aquí</1><0> están las preguntas frecuentes de la prueba. </0>",
+  "termsOfServiceHere": "<1>Aquí</1><0> están las Condiciones de servicio.</0>",
+  "editProfile": "Editar perfil",
+  "cancel": "Cancelar",
+  "changeProfilePhoto": "Cambiar la foto de perfil",
+  "editName": "Editar el nombre",
+  "submit": "Enviar",
+  "chooseLanguage": "Elegir idioma",
+  "continue": "Continuar",
+  "yourName": "Tu Nombre",
+  "version": "Versión:",
+  "addressCopied": "Dirección copiada al portapapeles"
+}

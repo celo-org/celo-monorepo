@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders banner when app is disconnected 1`] = `
+<Text
+  style={
+    Array [
+      Object {
+        "color": "#81868B",
+        "fontFamily": "Hind-Regular",
+        "fontSize": 13,
+        "lineHeight": 18,
+        "textAlign": "center",
+      },
+      Object {
+        "color": "rgba(46, 51, 56, 0.4)",
+      },
+      Object {
+        "fontFamily": "Hind-Bold",
+      },
+    ]
+  }
+>
+  connectingToCelo
+</Text>
+`;

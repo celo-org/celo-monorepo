@@ -1,0 +1,10 @@
+{
+  "requests": "Requests",
+  "empty": "You have no Payment Requests",
+  "paymentRequests": "Payment Requests",
+  "celoDollarBalance": "Celo Dollar Balance",
+  "pay": "Pay",
+  "decline": "Decline",
+  "requestDeclined": "Request Declined",
+  "requestPaid": "Request Paid"
+}

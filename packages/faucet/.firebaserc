@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "celo-faucet"
+  },
+  "targets": {
+    "celo-faucet": {
+      "database": {
+        "faucet": [
+          "celo-faucet"
+        ]
+      }
+    }
+  }
+}

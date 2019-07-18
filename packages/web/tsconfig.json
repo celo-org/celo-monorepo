@@ -1,0 +1,22 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": false,
+    "baseUrl": ".",
+    "jsx": "preserve",
+    "lib": ["dom", "es2015", "es2016"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "preserveConstEnums": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "target": "esnext",
+    "paths": {
+      "next-i18next": ["src/next-i18next-aug.d.ts"]
+    }
+  }
+}

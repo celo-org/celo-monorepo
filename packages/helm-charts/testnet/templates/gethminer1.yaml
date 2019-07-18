@@ -1,0 +1,30 @@
+{{ if eq (.Values.geth.validators | toString) "og" }}
+{{ template "celo.miner-deployment" (dict "Values" .Values "Files" .Files "Release" .Release "Chart" .Chart "Node" .Values.geth.account.gethminer1 ) }}
+---
+{{ template "celo.node-pvc" dict "Values" .Values "Release" .Release "Chart" .Chart "pvc_name" "gethminer1-pvc" }}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "ethereum.fullname" . }}-gethminer1
+  labels:
+    app: {{ template "ethereum.name" . }}
+    chart: {{ template "ethereum.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: gethminer1
+spec:
+  selector:
+    app: {{ template "ethereum.name" . }}
+    release: {{ .Release.Name }}
+    component: gethminer1
+  type: {{ .Values.geth.miner.service.type }}
+  sessionAffinity: ClientIP
+  ports:
+  - name: discovery
+    port: 30303
+  - name: rpc
+    port: 8545
+  - name: ws
+    port: 8546
+{{ end }}

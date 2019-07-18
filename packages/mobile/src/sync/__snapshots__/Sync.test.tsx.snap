@@ -1,0 +1,569 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly when dev Mode disabled 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "white",
+      "flex": 1,
+      "flexDirection": "column",
+      "justifyContent": "space-between",
+      "paddingBottom": 15,
+      "paddingHorizontal": 10,
+      "paddingTop": 70,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "height": 35,
+        "paddingRight": 10,
+        "paddingTop": 10,
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+        "width": 70,
+        "zIndex": 100,
+      }
+    }
+  >
+    <Text
+      accessible={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+    >
+         
+    </Text>
+  </View>
+  <RCTScrollView>
+    <View>
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "marginBottom": 25,
+              "marginTop": 25,
+            },
+            Object {},
+          ]
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../src/images/coins-logo.png",
+            }
+          }
+          style={
+            Object {
+              "height": 50,
+              "width": 50,
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          Object {
+            "flexDirection": "row",
+            "paddingBottom": 50,
+            "paddingHorizontal": 40,
+          }
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../src/images/send-receive.png",
+            }
+          }
+          style={
+            Object {
+              "height": 65,
+              "marginRight": 25,
+              "width": 70,
+            }
+          }
+        />
+        <View
+          style={
+            Object {
+              "flex": 1,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 16,
+                "lineHeight": 24,
+              }
+            }
+          >
+            secureAsset
+          </Text>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "flexDirection": "row",
+            "paddingBottom": 50,
+            "paddingHorizontal": 40,
+          }
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../src/images/stability-scale.png",
+            }
+          }
+          style={
+            Object {
+              "height": 65,
+              "marginRight": 25,
+              "width": 70,
+            }
+          }
+        />
+        <View
+          style={
+            Object {
+              "flex": 1,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 16,
+                "lineHeight": 24,
+              }
+            }
+          >
+            stableAsset
+          </Text>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "flexDirection": "row",
+            "paddingBottom": 50,
+            "paddingHorizontal": 40,
+          }
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../src/images/verify-phone.png",
+            }
+          }
+          style={
+            Object {
+              "height": 65,
+              "marginRight": 25,
+              "width": 70,
+            }
+          }
+        />
+        <View
+          style={
+            Object {
+              "flex": 1,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 16,
+                "lineHeight": 24,
+              }
+            }
+          >
+            verifyNumber
+          </Text>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+      }
+    }
+  >
+    <View
+      animated={true}
+      animationConfig={
+        Object {
+          "bounciness": 0,
+        }
+      }
+      animationType="spring"
+      indeterminate={false}
+      onLayout={[Function]}
+      progress={0.24}
+      style={
+        Array [
+          Object {
+            "backgroundColor": "#D1D5D8",
+            "borderColor": "transparent",
+            "borderRadius": 4,
+            "borderWidth": 1,
+            "overflow": "hidden",
+            "width": 710,
+          },
+          undefined,
+        ]
+      }
+      useNativeDriver={false}
+    >
+      <View
+        style={
+          Object {
+            "backgroundColor": "#42D689",
+            "height": 2,
+            "transform": Array [
+              Object {
+                "translateX": -2.842170943040401e-14,
+              },
+              Object {
+                "translateX": -269.04,
+              },
+              Object {
+                "scaleX": 0.24007599999999998,
+              },
+            ],
+          }
+        }
+      />
+    </View>
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 13,
+            "lineHeight": 18,
+          },
+          Object {
+            "color": "#2E3338",
+            "paddingVertical": 10,
+          },
+        ]
+      }
+    >
+      syncNetwork
+       (
+      24
+      %)
+    </Text>
+  </View>
+</View>
+`;
+
+exports[`renders correctly when dev Mode enabled 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "white",
+      "flex": 1,
+      "flexDirection": "column",
+      "justifyContent": "space-between",
+      "paddingBottom": 15,
+      "paddingHorizontal": 10,
+      "paddingTop": 70,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "height": 35,
+        "paddingRight": 10,
+        "paddingTop": 10,
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+        "width": 70,
+        "zIndex": 100,
+      }
+    }
+  >
+    <Text
+      accessible={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+    >
+         
+    </Text>
+  </View>
+  <RCTScrollView>
+    <View>
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "marginBottom": 25,
+              "marginTop": 25,
+            },
+            Object {},
+          ]
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../src/images/coins-logo.png",
+            }
+          }
+          style={
+            Object {
+              "height": 50,
+              "width": 50,
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          Object {
+            "flexDirection": "row",
+            "paddingBottom": 50,
+            "paddingHorizontal": 40,
+          }
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../src/images/send-receive.png",
+            }
+          }
+          style={
+            Object {
+              "height": 65,
+              "marginRight": 25,
+              "width": 70,
+            }
+          }
+        />
+        <View
+          style={
+            Object {
+              "flex": 1,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 16,
+                "lineHeight": 24,
+              }
+            }
+          >
+            secureAsset
+          </Text>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "flexDirection": "row",
+            "paddingBottom": 50,
+            "paddingHorizontal": 40,
+          }
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../src/images/stability-scale.png",
+            }
+          }
+          style={
+            Object {
+              "height": 65,
+              "marginRight": 25,
+              "width": 70,
+            }
+          }
+        />
+        <View
+          style={
+            Object {
+              "flex": 1,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 16,
+                "lineHeight": 24,
+              }
+            }
+          >
+            stableAsset
+          </Text>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "flexDirection": "row",
+            "paddingBottom": 50,
+            "paddingHorizontal": 40,
+          }
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../src/images/verify-phone.png",
+            }
+          }
+          style={
+            Object {
+              "height": 65,
+              "marginRight": 25,
+              "width": 70,
+            }
+          }
+        />
+        <View
+          style={
+            Object {
+              "flex": 1,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 16,
+                "lineHeight": 24,
+              }
+            }
+          >
+            verifyNumber
+          </Text>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+      }
+    }
+  >
+    <View
+      animated={true}
+      animationConfig={
+        Object {
+          "bounciness": 0,
+        }
+      }
+      animationType="spring"
+      indeterminate={false}
+      onLayout={[Function]}
+      progress={0.24}
+      style={
+        Array [
+          Object {
+            "backgroundColor": "#D1D5D8",
+            "borderColor": "transparent",
+            "borderRadius": 4,
+            "borderWidth": 1,
+            "overflow": "hidden",
+            "width": 710,
+          },
+          undefined,
+        ]
+      }
+      useNativeDriver={false}
+    >
+      <View
+        style={
+          Object {
+            "backgroundColor": "#42D689",
+            "height": 2,
+            "transform": Array [
+              Object {
+                "translateX": -2.842170943040401e-14,
+              },
+              Object {
+                "translateX": -269.04,
+              },
+              Object {
+                "scaleX": 0.24007599999999998,
+              },
+            ],
+          }
+        }
+      />
+    </View>
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 13,
+            "lineHeight": 18,
+          },
+          Object {
+            "color": "#2E3338",
+            "paddingVertical": 10,
+          },
+        ]
+      }
+    >
+      syncNetwork
+       (
+      24
+      %)
+    </Text>
+  </View>
+</View>
+`;

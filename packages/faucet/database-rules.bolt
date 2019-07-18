@@ -1,0 +1,65 @@
+/**
+ * Node Types
+ */
+type Request {
+  beneficiary: String,       // Address or phone number for the request's beneficiary
+  txHash: String | Null,     // Transaction Hash for the executed Request
+  status: RequestStatus,     // Request Status enum
+  type: RequestType,         // Request Type enum
+}
+
+type Account {
+  pk: String,                     // Account's private key
+  address: String,                // Accounts's Address
+  locked: Boolean,                // Lock status
+}
+
+/**
+ * Node Paths
+ */
+
+path /{net}/requests {
+  // Only admin access
+  read() { false }
+  write() { false }
+}
+
+path /{net}/requests/{id} is Request {
+  read() { true }
+  write() { isNew(this) }
+}
+
+path /{net}/accounts/{account} is Account {
+  // Only admin access
+  read() { false }
+  write() { false }
+}
+
+/**
+ * Helper Functions
+ */
+
+isLoggedIn() { auth != null }
+
+isNew(ref) { prior(ref) == null }
+
+
+/**
+ * Leaf Node Types
+ */
+
+type RequestStatus extends String {
+  validate() { 
+    this == 'Pending' ||
+    this == 'Working' ||
+    this == 'Done'    ||
+    this == 'Failed'
+  }
+}
+
+type RequestType extends String {
+  validate() {
+    this == 'Faucet' ||
+    this == 'Invite'
+  }
+}

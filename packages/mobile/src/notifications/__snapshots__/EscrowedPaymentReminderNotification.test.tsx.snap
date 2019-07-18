@@ -1,0 +1,207 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "padding": 10,
+        "width": "100%",
+      },
+      Object {
+        "borderColor": "#EEEEEE",
+        "borderRadius": 3,
+        "borderWidth": 1,
+      },
+    ]
+  }
+>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "flexDirection": "column",
+        "paddingRight": 10,
+      }
+    }
+  >
+    <Image
+      resizeMode="contain"
+      source={
+        Object {
+          "testUri": "../../../src/images/Invite-Friends.png",
+        }
+      }
+      style={
+        Object {
+          "height": 30,
+          "width": 30,
+        }
+      }
+    />
+  </View>
+  <View
+    style={
+      Object {
+        "flex": 1,
+        "justifyContent": "space-between",
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Hind-Bold",
+          "fontSize": 14,
+          "lineHeight": 18,
+        }
+      }
+    >
+      escrowedPaymentReminder
+    </Text>
+    <View>
+      <View
+        style={
+          Object {
+            "justifyContent": "space-between",
+            "minHeight": 70,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+              "marginTop": 5,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "flex": 1,
+              }
+            }
+          >
+            <Text
+              ellipsizeMode="middle"
+              numberOfLines={1}
+              style={
+                Object {
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 20,
+                    },
+                  ]
+                }
+              >
+                (209) 555-9790
+                 - 
+              </Text>
+            </Text>
+          </View>
+        </View>
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+              "marginTop": 15,
+            }
+          }
+        >
+          <View
+            accessible={true}
+            isTVSelectable={true}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "opacity": 1,
+              }
+            }
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "color": "#42D689",
+                    "fontFamily": "Hind-Medium",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "paddingEnd": 15,
+                  },
+                ]
+              }
+            >
+              sendMessage
+            </Text>
+          </View>
+          <View
+            accessible={true}
+            isTVSelectable={true}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "opacity": 1,
+              }
+            }
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "color": "#42D689",
+                    "fontFamily": "Hind-Medium",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "paddingEnd": 15,
+                  },
+                ]
+              }
+            >
+              reclaimPayment
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;

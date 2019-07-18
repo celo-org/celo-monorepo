@@ -1,0 +1,193 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders exchange 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "paddingHorizontal": 20,
+      "paddingVertical": 20,
+    }
+  }
+>
+  <Image
+    resizeMode="contain"
+    source={
+      Object {
+        "testUri": "../../../src/images/exchange.png",
+      }
+    }
+    style={
+      Object {
+        "height": 108,
+        "marginVertical": 20,
+        "width": 108,
+      }
+    }
+  />
+  <Text
+    style={
+      Array [
+        Object {
+          "color": "#81868B",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 16,
+          "lineHeight": 24,
+        },
+        Object {
+          "marginBottom": 10,
+          "textAlign": "center",
+        },
+      ]
+    }
+  >
+    noExchangeActivity
+     
+  </Text>
+</View>
+`;
+
+exports[`renders home 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "paddingHorizontal": 20,
+      "paddingVertical": 20,
+    }
+  }
+>
+  <Image
+    resizeMode="contain"
+    source={
+      Object {
+        "testUri": "../../../src/images/shiny-dollar.png",
+      }
+    }
+    style={
+      Object {
+        "height": 108,
+        "marginVertical": 20,
+        "width": 108,
+      }
+    }
+  />
+  <Text
+    style={
+      Array [
+        Object {
+          "color": "#81868B",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 16,
+          "lineHeight": 24,
+        },
+        Object {
+          "marginBottom": 10,
+          "textAlign": "center",
+        },
+      ]
+    }
+  >
+    noTransactionActivity
+     
+  </Text>
+  <View
+    accessible={true}
+    hitSlop={
+      Object {
+        "bottom": 7,
+        "left": 7,
+        "right": 7,
+        "top": 7,
+      }
+    }
+    isTVSelectable={true}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      Object {
+        "alignItems": "center",
+        "alignSelf": "center",
+        "backgroundColor": "#42D689",
+        "borderRadius": 2,
+        "marginTop": 20,
+        "minWidth": 160,
+        "opacity": 1,
+        "paddingHorizontal": 18,
+        "paddingVertical": 8,
+        "textAlign": "center",
+      }
+    }
+  >
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 13,
+            "lineHeight": 17,
+          },
+          Object {
+            "lineHeight": 20,
+          },
+          Object {
+            "color": "#FFFFFF",
+          },
+          undefined,
+        ]
+      }
+    >
+      sendCeloDollars
+    </Text>
+  </View>
+</View>
+`;
+
+exports[`renders loading 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "paddingHorizontal": 20,
+      "paddingVertical": 20,
+    }
+  }
+>
+  <ActivityIndicator
+    animating={true}
+    color="#42D689"
+    hidesWhenStopped={true}
+    size="large"
+    style={
+      Object {
+        "height": 108,
+        "marginVertical": 20,
+        "width": 108,
+      }
+    }
+  />
+  <Text
+    style={
+      Array [
+        Object {
+          "color": "#81868B",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 16,
+          "lineHeight": 24,
+        },
+        Object {
+          "marginBottom": 10,
+          "textAlign": "center",
+        },
+      ]
+    }
+  >
+    loadingActivity
+  </Text>
+</View>
+`;

@@ -1,0 +1,24 @@
+coverage:
+  status:
+    project:
+      default: off
+      mobile:
+        paths: "packages/mobile/"
+        flags: mobile
+        threshold: 40%
+        target: 10%
+      # protocol:
+      #   paths: "packages/protocol/"
+      #   flags: protocol
+      #   threshold: 5%
+      #   target: 90%
+    patch:
+      default: off
+
+flags:
+  mobile:
+    paths:
+      - packages/mobile/
+  # protocol:
+  #   paths:
+  #     - packages/protocol/

@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<View
+  accessible={true}
+  isTVSelectable={true}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    Object {
+      "opacity": 1,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "alignContent": "center",
+        "backgroundColor": "#45CD86",
+        "height": 64,
+        "justifyContent": "center",
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "alignItems": "flex-end",
+          "color": "white",
+          "flexDirection": "column",
+          "fontSize": 16,
+          "textAlign": "center",
+        }
+      }
+    >
+       
+      test
+       
+    </Text>
+  </View>
+</View>
+`;

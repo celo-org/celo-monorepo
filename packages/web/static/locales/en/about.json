@@ -1,0 +1,33 @@
+{
+  "pageTitle": "About Celo: Learn more about Celo’s team",
+  "description": "Meet the core contributors working on Celo and see our backer list.",
+  "join": "Join us",
+  "aboutUs": "About us",
+  "ourTeam": "Our Team",
+  "celoBackers": "Celo Backers",
+  "coreContributors": "Core Contributors",
+  "InNoOrder": "In no particular order",
+  "Engineering": "Engineering",
+  "People": "People",
+  "Communication": "Communication",
+  "Design": "Design",
+  "Community": "Community",
+  "Business": "Business",
+  "Press and Media": "Press and Media",
+  "Media Inquiries": "For media inquiries, please contact us at ",
+  "Finance": "Finance",
+  "Engineering Intern": "Engineering Intern",
+  "Go-to-Market": "Go-to-Market",
+  "Operations": "Operations",
+  "Product": "Product",
+  "Legal": "Legal",
+  "missionMeaning": "Mission & Meaning",
+  "joinUsText":
+    "We are growing a team with all kinds of different perspectives, experiences and backgrounds to create products that are used and loved by people all around the world.",
+  "joinUsBtn": "JOIN US",
+  "pressText": "For media inquiries, please contact us at",
+  "missionText":
+    "Celo, pronounced /ˈtselo/, means ‘purpose’ in Esperanto. In a similar spirit, we are aiming to create a new platform to connect people globally and bring financial stability to those who need it most. We believe blockchain technology is one of the most exciting innovations in recent history and as a team we look to push the boundaries of what is possible with it today. More importantly, we are driven by purpose -- to solve real-world problems such as lack of access to sound currency, or friction for cash-transfer programs aimed to alleviate poverty. Our mission is to build a monetary system that creates the conditions for prosperity for all.",
+  "celoBackersText":
+    "Celo is supported by over 40 investors, including prominent venture funds, C-level operators, academics, and experts across a wide range of fields, including in no particular order"
+}

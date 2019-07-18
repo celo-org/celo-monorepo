@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <color name="celo_background">#45CD85</color>
+  <color name="celo_notification">#42D689</color>
+  <color name="primary_dark">#000000</color>
+</resources>

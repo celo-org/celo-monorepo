@@ -1,0 +1,29 @@
+# Source: https://doc.mergify.io/getting-started.html#configuration
+pull_request_rules:
+  - name: Automatically merge on CI success and code review
+    conditions:
+      # Add this label when you are ready to automerge the pull request.       
+      - label=automerge
+      # At least one approval required
+      - "#approved-reviews-by>=1"
+      # No pending changes requested
+      - "#changes-requested-reviews-by=0"
+      # Only enable this when the pull request is being merged into master
+      - "base=master"
+      # List of all the tests that should pass.
+      - "status-success=ci/circleci: general-test"
+      - "status-success=ci/circleci: install_dependencies"
+      - "status-success=ci/circleci: lint-checks"
+      - "status-success=ci/circleci: mobile-test"
+      - "status-success=ci/circleci: protocol-test"
+      - "status-success=ci/circleci: verification-pool-api"
+      - "status-success=ci/circleci: end-to-end-geth-transfer-test"
+      - "status-success=ci/circleci: end-to-end-geth-sync-test"
+      - "status-success=ci/circleci: end-to-end-geth-governance-test"
+    actions:
+      merge:
+        method: squash
+        # https://doc.mergify.io/strict-workflow.html
+        strict: true
+      # Delete the branch
+      delete_head_branch:

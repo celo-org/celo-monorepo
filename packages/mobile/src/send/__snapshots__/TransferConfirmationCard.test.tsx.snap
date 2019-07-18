@@ -1,0 +1,845 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "borderColor": "#EEEEEE",
+        "borderRadius": 3,
+        "borderWidth": 1,
+      },
+      Object {
+        "flex": 1,
+        "flexDirection": "column",
+        "justifyContent": "flex-start",
+        "padding": 20,
+      },
+    ]
+  }
+>
+  <Image
+    source={
+      Object {
+        "testUri": "../../../src/images/coins-logo.png",
+      }
+    }
+    style={
+      Object {
+        "alignSelf": "center",
+        "height": 40,
+        "marginBottom": 40,
+        "marginTop": 30,
+        "width": 40,
+      }
+    }
+  />
+  <View
+    style={
+      Object {
+        "alignSelf": "center",
+        "flexDirection": "row",
+        "marginHorizontal": 25,
+        "marginTop": 15,
+      }
+    }
+  >
+    <Text
+      style={
+        Array [
+          Object {
+            "fontFamily": "Hind-Regular",
+            "fontSize": 34,
+          },
+          Object {
+            "color": "#42D689",
+          },
+        ]
+      }
+    >
+      +
+    </Text>
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 24,
+            "textAlignVertical": "top",
+          },
+          Object {
+            "color": "#42D689",
+          },
+        ]
+      }
+    >
+      $
+    </Text>
+    <Text
+      ellipsizeMode="tail"
+      numberOfLines={1}
+      style={
+        Array [
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 48,
+            "lineHeight": 64,
+          },
+          Object {
+            "color": "#42D689",
+          },
+        ]
+      }
+    >
+      100.00
+    </Text>
+  </View>
+  <Text
+    style={
+      Object {
+        "color": "#81868B",
+        "fontFamily": "Hind-Light",
+        "fontSize": 14,
+        "lineHeight": 18,
+        "textAlign": "center",
+      }
+    }
+  >
+    receiveFlow8:receivedAmountFromCelo.0
+    $
+    100.00
+    receiveFlow8:receivedAmountFromCelo.1
+  </Text>
+</View>
+`;
+
+exports[`TransferConfirmationCard renders correctly for received transaction drilldown 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "borderColor": "#EEEEEE",
+        "borderRadius": 3,
+        "borderWidth": 1,
+      },
+      Object {
+        "flex": 1,
+        "flexDirection": "column",
+        "justifyContent": "flex-start",
+        "padding": 20,
+      },
+    ]
+  }
+>
+  <View
+    style={
+      Object {
+        "marginTop": 5,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "flexDirection": "column",
+          "justifyContent": "center",
+          "marginBottom": 10,
+        }
+      }
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "center",
+            },
+            Object {
+              "alignSelf": "center",
+              "margin": "auto",
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "justifyContent": "center",
+              },
+              Object {
+                "backgroundColor": "#7AD6FE",
+                "borderRadius": 20,
+                "height": 40,
+                "width": 40,
+              },
+            ]
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#FFFFFF",
+                  "fontFamily": "Hind-Medium",
+                  "fontSize": 16,
+                },
+                Object {
+                  "fontSize": 20,
+                },
+              ]
+            }
+          >
+            #
+          </Text>
+        </View>
+      </View>
+      <Text
+        ellipsizeMode="tail"
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "marginHorizontal": 20,
+              "paddingTop": 6,
+              "textAlign": "center",
+            },
+          ]
+        }
+      >
+        #000000000000000...
+      </Text>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "alignSelf": "center",
+            "flexDirection": "row",
+            "justifyContent": "center",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Light",
+                "fontSize": 14,
+                "textAlignVertical": "center",
+              },
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#EEEEEE",
+                "borderRadius": 3,
+                "justifyContent": "center",
+                "marginRight": 5,
+                "paddingLeft": 6,
+                "paddingRight": 3,
+              },
+            ]
+          }
+        >
+           +1
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Light",
+              "fontSize": 14,
+              "textAlignVertical": "center",
+            }
+          }
+        >
+          (415) 555-0000
+        </Text>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "alignSelf": "center",
+        "flexDirection": "row",
+        "marginHorizontal": 25,
+        "marginTop": 15,
+      }
+    }
+  >
+    <Text
+      style={
+        Array [
+          Object {
+            "fontFamily": "Hind-Regular",
+            "fontSize": 34,
+          },
+          Object {
+            "color": "#42D689",
+          },
+        ]
+      }
+    >
+      +
+    </Text>
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 24,
+            "textAlignVertical": "top",
+          },
+          Object {
+            "color": "#42D689",
+          },
+        ]
+      }
+    >
+      $
+    </Text>
+    <Text
+      ellipsizeMode="tail"
+      numberOfLines={1}
+      style={
+        Array [
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 48,
+            "lineHeight": 64,
+          },
+          Object {
+            "color": "#42D689",
+          },
+        ]
+      }
+    >
+      100.00
+    </Text>
+  </View>
+  <View
+    style={
+      Object {
+        "alignItems": "stretch",
+        "flexDirection": "column",
+      }
+    }
+  />
+</View>
+`;
+
+exports[`TransferConfirmationCard renders correctly for sent transaction drilldown 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "borderColor": "#EEEEEE",
+        "borderRadius": 3,
+        "borderWidth": 1,
+      },
+      Object {
+        "flex": 1,
+        "flexDirection": "column",
+        "justifyContent": "flex-start",
+        "padding": 20,
+      },
+    ]
+  }
+>
+  <View
+    style={
+      Object {
+        "marginTop": 5,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "flexDirection": "column",
+          "justifyContent": "center",
+          "marginBottom": 10,
+        }
+      }
+    >
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "center",
+            },
+            Object {
+              "alignSelf": "center",
+              "margin": "auto",
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "justifyContent": "center",
+              },
+              Object {
+                "backgroundColor": "#7AD6FE",
+                "borderRadius": 20,
+                "height": 40,
+                "width": 40,
+              },
+            ]
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#FFFFFF",
+                  "fontFamily": "Hind-Medium",
+                  "fontSize": 16,
+                },
+                Object {
+                  "fontSize": 20,
+                },
+              ]
+            }
+          >
+            #
+          </Text>
+        </View>
+      </View>
+      <Text
+        ellipsizeMode="tail"
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "marginHorizontal": 20,
+              "paddingTop": 6,
+              "textAlign": "center",
+            },
+          ]
+        }
+      >
+        #000000000000000...
+      </Text>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "alignSelf": "center",
+            "flexDirection": "row",
+            "justifyContent": "center",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Light",
+                "fontSize": 14,
+                "textAlignVertical": "center",
+              },
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#EEEEEE",
+                "borderRadius": 3,
+                "justifyContent": "center",
+                "marginRight": 5,
+                "paddingLeft": 6,
+                "paddingRight": 3,
+              },
+            ]
+          }
+        >
+           +1
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Light",
+              "fontSize": 14,
+              "textAlignVertical": "center",
+            }
+          }
+        >
+          (415) 555-0000
+        </Text>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "alignSelf": "center",
+        "flexDirection": "row",
+        "marginHorizontal": 25,
+        "marginTop": 15,
+      }
+    }
+  >
+    <Text
+      style={
+        Array [
+          Object {
+            "fontFamily": "Hind-Regular",
+            "fontSize": 34,
+          },
+          Object {
+            "color": "#81868B",
+          },
+        ]
+      }
+    >
+      
+    </Text>
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 24,
+            "textAlignVertical": "top",
+          },
+          Object {
+            "color": "#81868B",
+          },
+        ]
+      }
+    >
+      $
+    </Text>
+    <Text
+      ellipsizeMode="tail"
+      numberOfLines={1}
+      style={
+        Array [
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 48,
+            "lineHeight": 64,
+          },
+          Object {
+            "color": "#81868B",
+          },
+        ]
+      }
+    >
+      100.00
+    </Text>
+  </View>
+  <View
+    style={
+      Object {
+        "alignItems": "stretch",
+        "flexDirection": "column",
+      }
+    }
+  >
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Light",
+            "fontSize": 14,
+            "lineHeight": 18,
+            "textAlign": "center",
+          },
+          Object {
+            "paddingTop": 5,
+          },
+        ]
+      }
+    >
+      Rent request for June, it is already late!!!
+    </Text>
+    <View
+      style={
+        Object {
+          "borderStyle": "solid",
+          "borderTopColor": "#EEEEEE",
+          "borderTopWidth": 1,
+          "marginTop": 10,
+          "width": "100%",
+        }
+      }
+    />
+    <View
+      style={
+        Object {
+          "alignItems": "stretch",
+          "justifyContent": "center",
+          "marginBottom": 10,
+          "marginTop": 10,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "flex-start",
+              "flexDirection": "row",
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": 20,
+              }
+            }
+          >
+            securityFee
+          </Text>
+          <View
+            accessible={true}
+            hitSlop={
+              Object {
+                "bottom": 10,
+                "left": 10,
+                "right": 10,
+                "top": 10,
+              }
+            }
+            isTVSelectable={true}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "alignItems": "center",
+                "justifyContent": "flex-end",
+                "opacity": 1,
+                "paddingHorizontal": 5,
+              }
+            }
+          >
+            <Image
+              source={
+                Object {
+                  "testUri": "../../../src/images/info.png",
+                }
+              }
+              style={
+                Object {
+                  "height": 12,
+                  "width": 12,
+                }
+              }
+            />
+          </View>
+        </View>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 20,
+            }
+          }
+        >
+          $
+          0.0100
+        </Text>
+      </View>
+      <View
+        style={
+          Object {
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "flex-start",
+              "flexDirection": "row",
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": 20,
+              }
+            }
+          >
+            total
+          </Text>
+        </View>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 20,
+            }
+          }
+        >
+          $
+          100.0100
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`TransferConfirmationCard renders correctly for verification fee drilldown 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "borderColor": "#EEEEEE",
+        "borderRadius": 3,
+        "borderWidth": 1,
+      },
+      Object {
+        "flex": 1,
+        "flexDirection": "column",
+        "justifyContent": "flex-start",
+        "padding": 20,
+      },
+    ]
+  }
+>
+  <Image
+    source={
+      Object {
+        "testUri": "../../../src/images/coins-logo.png",
+      }
+    }
+    style={
+      Object {
+        "alignSelf": "center",
+        "height": 40,
+        "marginBottom": 40,
+        "marginTop": 30,
+        "width": 40,
+      }
+    }
+  />
+  <View
+    style={
+      Object {
+        "alignSelf": "center",
+        "flexDirection": "row",
+        "marginHorizontal": 25,
+        "marginTop": 15,
+      }
+    }
+  >
+    <Text
+      style={
+        Array [
+          Object {
+            "fontFamily": "Hind-Regular",
+            "fontSize": 34,
+          },
+          Object {
+            "color": "#81868B",
+          },
+        ]
+      }
+    >
+      
+    </Text>
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 24,
+            "textAlignVertical": "top",
+          },
+          Object {
+            "color": "#81868B",
+          },
+        ]
+      }
+    >
+      $
+    </Text>
+    <Text
+      ellipsizeMode="tail"
+      numberOfLines={1}
+      style={
+        Array [
+          Object {
+            "color": "#81868B",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 48,
+            "lineHeight": 64,
+          },
+          Object {
+            "color": "#81868B",
+          },
+        ]
+      }
+    >
+      0.30
+    </Text>
+  </View>
+  <Text
+    style={
+      Object {
+        "color": "#81868B",
+        "fontFamily": "Hind-Light",
+        "fontSize": 14,
+        "lineHeight": 18,
+        "textAlign": "center",
+      }
+    }
+  >
+    receiveFlow8:verificationMessage
+  </Text>
+</View>
+`;

@@ -1,0 +1,25 @@
+{
+  "celoDollars": "Celo Dollars",
+  "celoGold": "Celo Gold",
+  "getStarted": "Get Started",
+  "getBackupKey": "Get Backup Key",
+  "setYourBackupKey":
+    "Set up your Backup Key to enable account recovery and improve account security",
+  "activity": "Activity",
+  "cancel": "Cancel",
+  "stableDollar": "Celo Dollar is a stable digital asset that tracks to the value of the US Dollar",
+  "feeTransaction": "Sending transactions cost a small fee",
+  "sendCelo": "Send Celo Dollars to anyone with a mobile phone",
+  "sendCeloDollars": "Send Celo Dollars",
+  "backToWallet": "Back to Wallet",
+  "celoLikeGold": "Celo Gold is like real gold",
+  "goldFluctuates": "There’s a limited amount of Celo Gold and the value can go up and down",
+  "exchange": "Exchange Gold for Dollars at any time",
+  "exchangeGold": "Exchange for Gold",
+  "addressPhotos": "Celo uses your address book to show photos",
+  "changePhotos": "You can change a photo by updating your contacts",
+  "localPhotos": "Only you can see these photos locally on your phone",
+  "allowContactAccess": "Allow Celo Wallet to have access to your contact photos",
+  "deny": "Deny",
+  "allow": "Allow"
+}

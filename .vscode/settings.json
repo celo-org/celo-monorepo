@@ -1,0 +1,42 @@
+{
+  "search.exclude": {
+    "**/node_modules": false
+  },
+  "files.exclude": {
+    "**/*.js": { "when": "$(basename).ts" },
+    "**/*.js.map": true
+  },
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": false
+  },
+  "[javascript]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": false
+    }
+  },
+  "[javascriptreact]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
+  "[typescript]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
+  "[typescriptreact]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
+  "javascript.format.enable": false,
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "tslint.jsEnable": true
+}
