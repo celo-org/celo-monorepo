@@ -41,7 +41,6 @@ import { RootState } from 'src/redux/reducers'
 import { updateSuggestedFee } from 'src/send/actions'
 import LabeledTextInput from 'src/send/LabeledTextInput'
 import { getSuggestedFeeDollars } from 'src/send/selectors'
-import { CeloDefaultRecipient } from 'src/send/Send'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
@@ -138,7 +137,7 @@ export class SendAmount extends React.PureComponent<Props, State> {
     Logger.debug(TAG, 'Updating fee')
     const params = {
       // Just use a default here since it doesn't matter for fee estimation
-      recipientAddress: CeloDefaultRecipient.address!,
+      recipientAddress: '0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10',
       amount: parseInputAmount(this.state.amount).toString(),
       comment: this.state.reason,
     }

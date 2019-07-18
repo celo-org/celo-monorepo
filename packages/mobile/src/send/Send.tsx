@@ -27,8 +27,6 @@ import {
   filterRecipients,
   NumberToRecipient,
   Recipient,
-  RecipientKind,
-  RecipientWithQrCode,
 } from 'src/utils/recipient'
 
 interface State {
@@ -69,17 +67,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
 let recentCache: Recipient[] | null = null
 
 const THROTTLE_TIME = 50
-
-const defaultRecipientPhoneNumber = '+10000000000'
-
-// For alfajores-net users to be able to send a small transaction to a sample address (remove post-alfajores)
-export const CeloDefaultRecipient: RecipientWithQrCode = {
-  address: '0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10',
-  displayName: 'Celo Default Recipient',
-  displayPhoneNumber: defaultRecipientPhoneNumber,
-  kind: RecipientKind.QrCode,
-  e164PhoneNumber: defaultRecipientPhoneNumber,
-}
 
 type FilterType = (searchQuery: string) => Recipient[]
 class Send extends React.Component<Props, State> {
@@ -124,7 +111,7 @@ class Send extends React.Component<Props, State> {
   updateFilters() {
     this.setState(
       {
-        recentRecipients: [CeloDefaultRecipient, ...this.state.recentRecipients],
+        recentRecipients: this.state.recentRecipients,
       },
       () => {
         this.recentRecipientsFilter = filterRecipientFactory(this.state.recentRecipients, false)
@@ -182,9 +169,7 @@ class Send extends React.Component<Props, State> {
       return
     }
 
-    if (recipient.e164PhoneNumber !== defaultRecipientPhoneNumber) {
-      this.props.storePhoneNumberInRecents(recipient.e164PhoneNumber)
-    }
+    this.props.storePhoneNumberInRecents(recipient.e164PhoneNumber)
     navigate(Screens.SendAmount, { recipient })
   }
 
