@@ -257,18 +257,6 @@ export class RedeemInvite extends React.Component<Props, State> {
           )}
         </ScrollView>
         <View style={styles.bottomContainer}>
-          <Text style={[styles.dark, styles.askInvite]}>
-            <Text style={[fontStyles.bodySmallBold, styles.askInvite]}>
-              {t('inviteText.askForInvite.0')}
-            </Text>
-            {t('inviteText.askForInvite.1')}
-            <Text
-              onPress={goToWalletLandingPage}
-              style={[fontStyles.bodySmallBold, fontStyles.linkInline, styles.askInvite]}
-            >
-              {t('inviteText.askForInvite.2')}
-            </Text>
-          </Text>
           <GethAwareButton
             standard={false}
             type={BtnTypes.PRIMARY}

@@ -1,6 +1,6 @@
 export enum CURRENCY_ENUM {
   GOLD = 'Celo Gold',
-  DOLLAR = 'Celo Dollar',
+  DOLLAR = 'Celo Peso',
 }
 
 interface Currency {
@@ -20,10 +20,10 @@ export const CURRENCIES: CurrencyObject = {
     code: 'cGLD',
   },
   [CURRENCY_ENUM.DOLLAR]: {
-    singleUnit: 'Celo dollar',
-    pluralUnit: 'Celo dollars',
-    symbol: '$',
-    code: 'cUSD',
+    singleUnit: 'Celo peso',
+    pluralUnit: 'Celo pesos',
+    symbol: '₱',
+    code: 'cPHP',
   },
 }
 

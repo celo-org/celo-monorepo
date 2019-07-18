@@ -82,7 +82,7 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
 
     return (
       <View style={style.feeContainer}>
-        <LineItemRow currencySymbol={'$'} amount={total} title={t('totalSent')} />
+        <LineItemRow currencySymbol={'₱'} amount={total} title={t('totalSent')} />
         <LineItemRow
           currencySymbol={currencySymbol}
           amount={fee}
@@ -91,7 +91,7 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
           negative={true}
         />
         <LineItemRow
-          currencySymbol={'$'}
+          currencySymbol={'₱'}
           amount={amountWithFees}
           title={t('totalRefunded')}
           boldedStyle={true}

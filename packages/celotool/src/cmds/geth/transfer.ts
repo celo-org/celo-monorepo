@@ -8,7 +8,7 @@ export const command = 'transfer <senderAddress> <receiverAddress> <token> <amou
 export const describe = 'command for transfering tokens between accounts'
 
 const CELO_GOLD = 'cGLD'
-const CELO_DOLLARS = 'cUSD'
+const CELO_DOLLARS = 'cPHP'
 
 interface TransferArgv extends GethArgv {
   senderAddress: string

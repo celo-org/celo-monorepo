@@ -1,6 +1,6 @@
 {
   "cancel": "Cancel",
-  "dollarsSent": "Dollars Sent",
+  "dollarsSent": "Pesos Sent",
   "to": "To",
   "send": "Send",
   "request": "Request",
@@ -15,7 +15,7 @@
     "Try entering a phone number if you are unable to find who you're looking for",
   "sendTo": "Send to",
   "amount": "Amount",
-  "celoDollarsAvailable": "Celo Dollars Available",
+  "celoDollarsAvailable": "Celo Pesos Available",
   "for": "For",
   "groceriesRent": "Groceries, rent, etc. (Optional)",
   "fee": "Fee",

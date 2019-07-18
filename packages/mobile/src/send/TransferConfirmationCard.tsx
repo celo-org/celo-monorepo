@@ -197,7 +197,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
           {!!fee && (
             <View style={style.feeContainer}>
               {this.props.type === TransactionTypes.PAY_REQUEST && (
-                <LineItemRow currencySymbol={'$'} amount={total} title={t('dollarsSent')} />
+                <LineItemRow currencySymbol={'₱'} amount={total} title={t('dollarsSent')} />
               )}
               <LineItemRow
                 currencySymbol={currencyStyle.symbol}
@@ -205,7 +205,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
                 title={address ? t('securityFee') : t('inviteAndSecurityFee')}
                 titleIcon={<FeeIcon />}
               />
-              <LineItemRow currencySymbol={'$'} amount={amountWithFees} title={t('total')} />
+              <LineItemRow currencySymbol={'₱'} amount={amountWithFees} title={t('total')} />
             </View>
           )}
         </View>

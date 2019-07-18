@@ -115,14 +115,14 @@ export class ExchangeFeedItem extends React.PureComponent<Props> {
             </View>
             <View style={[styles.amountContainer, opacityStyle]}>
               <Text style={[fontStyles.activityCurrency, inStyle]}>
-                {inCurrency === CURRENCY_ENUM.DOLLAR && '$'}
+                {inCurrency === CURRENCY_ENUM.DOLLAR && '₱'}
                 {getMoneyDisplayValue(inValue)}
               </Text>
               <View style={styles.arrow}>
                 <ExchangeArrow />
               </View>
               <Text style={[fontStyles.activityCurrency, outStyle]}>
-                {outCurrency === CURRENCY_ENUM.DOLLAR && '$'}
+                {outCurrency === CURRENCY_ENUM.DOLLAR && '₱'}
                 {getMoneyDisplayValue(outValue)}
               </Text>
             </View>

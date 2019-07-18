@@ -50,7 +50,7 @@ export function getCurrencyStyles(currency: string, type: string): CurrencySymbo
   ) {
     return {
       color: colors.darkSecondary,
-      symbol: currency === CURRENCY_ENUM.DOLLAR ? '$' : '',
+      symbol: currency === CURRENCY_ENUM.DOLLAR ? '₱' : '',
       direction: '',
     }
   }
@@ -63,7 +63,7 @@ export function getCurrencyStyles(currency: string, type: string): CurrencySymbo
     if (currency === CURRENCY_ENUM.DOLLAR) {
       return {
         color: colors.celoGreen,
-        symbol: '$',
+        symbol: '₱',
         direction: '+',
       }
     }

@@ -373,7 +373,7 @@ export class SendAmount extends React.PureComponent<Props, State> {
           <LabeledTextInput
             ref={this.amountInput}
             keyboardType="numeric"
-            title={'$'}
+            title={'₱'}
             placeholder={t('amount')}
             labelStyle={style.amountLabel as TextStyle}
             placeholderColor={colors.celoGreenInactive}

@@ -1,5 +1,5 @@
 {
-  "celoDollars": "Celo Dollars",
+  "celoDollars": "Celo Pesos",
   "celoGold": "Celo Gold",
   "getStarted": "Get Started",
   "paymentRequest": "Payment Request",
@@ -23,8 +23,8 @@
     "Earn Celo Gold by allowing the network to send verification texts from your phone",
   "startEarning": "Start Earning",
   "learnMore": "Learn More",
-  "goldIsWhereYouSave": "Gold is where you can save Celo Dollars you have",
-  "manageCeloDollars": "Manage Celo Dollars",
+  "goldIsWhereYouSave": "Gold is where you can save Celo Pesos you have",
+  "manageCeloDollars": "Manage Celo Pesos",
   "dinner": "Dinner",
   "at": "at",
   "bikeParts": "Bike Parts",
@@ -47,7 +47,7 @@
     "0": "Unable to load your feed",
     "1": "Please try again later"
   },
-  "sendCeloDollars": "Send Celo Dollars",
+  "sendCeloDollars": "Send Celo Pesos",
   "noTransactionActivity": "You will see your sent and received payments here",
   "noExchangeActivity": "You will see completed exchanges here",
   "maybeLater": "Maybe Later",
