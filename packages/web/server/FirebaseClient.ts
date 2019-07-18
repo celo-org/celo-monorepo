@@ -10,12 +10,17 @@ function getFirebase() {
   return firebase
 }
 
+function getDB() {
+  return getFirebase().database()
+}
+
 // Don't do this. It hangs next.js build process: https://github.com/zeit/next.js/issues/6824
 // const db = firebase.database()
 
 const NETWORK = 'alfajores'
 
 export type Address = string
+type E164Number = string
 
 export enum RequestStatus {
   Pending = 'Pending',
@@ -30,37 +35,39 @@ export enum RequestType {
 }
 
 export interface RequestRecord {
-  beneficiary: Address
+  beneficiary: Address | E164Number
   status: RequestStatus
-  txHash?: string
   type: RequestType
+  dollarTxHash?: string
+  goldTxHash?: string
+  escrowTxHash?: string // only on Invites
 }
 
-const noop = () => {
-  /* noop*/
-}
-
-async function sendRequest(
-  beneficiary: Address,
-  type: RequestType,
-  onChange: (request: RequestRecord) => void
-) {
+export async function sendRequest(beneficiary: Address | E164Number, type: RequestType) {
   const newRequest: RequestRecord = {
     beneficiary,
     status: RequestStatus.Pending,
     type,
   }
-
-  onChange(newRequest)
-  const ref = await getFirebase()
-    .database()
+  const ref = await getDB()
     .ref(`${NETWORK}/requests`)
     .push(newRequest)
 
+  return ref.key
+}
+
+export async function subscribeRequest(key: string, onChange: (record: RequestRecord) => void) {
+  const ref = await getDB().ref(`${NETWORK}/requests/${key}`)
+
+  // not sure if there is really a need for a promise here
   return new Promise<RequestRecord>((resolve) => {
     const listener = ref.on('value', (snap) => {
       const record = snap.val() as RequestRecord
-      onChange(record)
+
+      if (record) {
+        onChange(record)
+        console.log('record', record)
+      }
 
       if (record.status === RequestStatus.Done || record.status === RequestStatus.Failed) {
         ref.off('value', listener)
@@ -68,18 +75,4 @@ async function sendRequest(
       }
     })
   })
-}
-
-export async function startFundRequest(
-  beneficiary: Address,
-  onChange: (request: RequestRecord) => void = noop
-) {
-  return sendRequest(beneficiary, RequestType.Faucet, onChange)
-}
-
-export async function startInviteRequest(
-  beneficiary: Address, // This is actually a phone number
-  onChange: (request: RequestRecord) => void = noop
-) {
-  return sendRequest(beneficiary, RequestType.Invite, onChange)
 }
