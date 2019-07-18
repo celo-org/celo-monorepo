@@ -31,5 +31,8 @@
   "hittingIssuesText": "",
   "askQustionsOnForum": "Get Help from the Celo Community.",
   "findAnswers": "Find answers and ask questions in the Forum",
-  "testnetForum": "Alfajores Testnet Forum"
+  "testnetForum": "Alfajores Testnet Forum",
+  "testnetAddress": "Testnet Address",
+  "requestInvite": "Request Invite",
+  "accountCreated": "Account Created"
 }
