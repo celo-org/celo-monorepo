@@ -93,9 +93,9 @@ library FractionUtil {
   }
 
   /**
-   * @dev Returns an integer that is the fraction time an integer.
+   * @dev Returns a fraction that is the fraction times a fraction.
    * @param x A Fraction struct.
-   * @param y An integer.
+   * @param y A Fraction struct.
    * @return x * y
    */
   function mul(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
@@ -113,7 +113,7 @@ library FractionUtil {
   }
 
   /**
-   * @dev Returns the inverse of the fraction
+   * @dev Returns the inverse of the fraction.
    * @param x A Fraction struct.
    * @return 1 / x
    */
@@ -129,6 +129,17 @@ library FractionUtil {
       x.denominator,
       x.numerator
     );
+  }
+
+  /**
+   * @dev Returns a fraction that is the fraction divided by a fraction.
+   * @param x A Fraction struct.
+   * @param y A Fraction struct.
+   * @return x / y
+   */
+  function div(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
+    require(y.numerator != 0);
+    return Fraction(x.numerator.mul(y.denominator), x.denominator.mul(y.numerator));
   }
 
   /**

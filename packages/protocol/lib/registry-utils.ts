@@ -20,13 +20,13 @@ export const hasEntryInRegistry: string[] = [
   attestationsRegistryId,
   escrowRegistryId,
   exchangeRegistryId,
-  goldTokenRegistryId,
   gasCurrencyWhitelistRegistryId,
   gasPriceMinimumRegistryId,
-  sortedOraclesRegistryId,
-  stableTokenRegistryId,
+  goldTokenRegistryId,
   randomRegistryId,
   reserveRegistryId,
+  sortedOraclesRegistryId,
+  stableTokenRegistryId,
 ]
 
 export default {

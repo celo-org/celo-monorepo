@@ -1,5 +1,6 @@
 /* tslint:disable:no-console */
 
+import { toFixed } from '@celo/protocol/lib/fixidity'
 import { governanceRegistryId } from '@celo/protocol/lib/registry-utils'
 import {
   deployProxyAndImplementation,
@@ -28,6 +29,10 @@ const initializeArgs = async (networkName: string): Promise<any[]> => {
     config.governance.approvalStageDuration,
     config.governance.referendumStageDuration,
     config.governance.executionStageDuration,
+    toFixed(config.governance.participationBaseline).toString(),
+    toFixed(config.governance.participationFloor).toString(),
+    toFixed(config.governance.updateCoefficient).toString(),
+    toFixed(config.governance.criticalBaselineLevel).toString(),
   ]
 }
 

@@ -18,6 +18,7 @@ contract MockBondedDeposits is IBondedDeposits {
   mapping(address => address) public validators;
   // Maps an account address to their rewards delegate.
   mapping(address => address) public rewarders;
+  uint256 public totalWeight;
 
   function initialize(address, uint256) external {}
   function setCumulativeRewardWeight(uint256) external {}
@@ -41,6 +42,10 @@ contract MockBondedDeposits is IBondedDeposits {
 
   function setWeight(address account, uint256 weight) external {
     weights[account] = weight;
+  }
+
+  function setTotalWeight(uint256 weight) external {
+    totalWeight = weight;
   }
 
   function setBondedDeposit(address account, uint256 noticePeriod, uint256 value) external {
