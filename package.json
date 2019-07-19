@@ -13,16 +13,16 @@
     "prettify:diff": "yarn run prettier --config .prettierrc.js --list-different '**/*.+(ts|tsx|js|jsx)'",
     "reset": "yarn reset-modules && yarn reset-cache",
     "reset-cache": "yarn reset-yarn && yarn reset-rn",
-    "keys:decrypt": "bash scripts/key_placer.sh decrypt",
-    "keys:encrypt": "bash scripts/key_placer.sh encrypt", 
     "reset-modules": "rm -rf node_modules/ packages/*/node_modules",
     "reset-rn": "watchman watch-del-all; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/haste-map-*; rm -rf $TMPDIR/metro-symbolicate*",
     "reset-yarn": "yarn cache clean",
     "test": "yarn run lerna run test",
     "report-coverage": "yarn run lerna run test-coverage",
     "test:watch": "node node_modules/jest/bin/jest.js --watch",
-    "postinstall": "yarn run lerna run postinstall && patch-package && sh scripts/custom_patch_packages.sh && yarn keys:decrypt",
-    "preinstall": "bash scripts/create_key_templates.sh"
+    "postinstall": "yarn run lerna --concurrency 1 run postinstall && patch-package && sh scripts/custom_patch_packages.sh && yarn keys:decrypt",
+    "preinstall": "bash scripts/create_key_templates.sh",
+    "keys:decrypt": "bash scripts/key_placer.sh decrypt",
+    "keys:encrypt": "bash scripts/key_placer.sh encrypt" 
   },
   "workspaces": {
     "packages": [
@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "husky": "^0.14.3",
-    "lerna": "^2.10.1",
+    "lerna": "^3.16.0",
     "patch-package": "^5.1.1",
     "postinstall-postinstall": "^1.0.0",
     "prettier": "1.13.5",

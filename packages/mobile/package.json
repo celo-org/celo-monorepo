@@ -1,6 +1,6 @@
 {
   "name": "@celo/mobile",
-  "version": "1.0.1",
+  "version": "1.3.0",
   "author": "Celo",
   "license": "Apache-2.0",
   "private": true,
@@ -33,7 +33,7 @@
     "test:unlock": "./scripts/unlock.sh",
     "deploy:update-version": "./scripts/update-version.sh",
     "prepare": "patch-package",
-    "postinstall": "sh scripts/fix_rn_version.sh; patch-package && yarn update-disclaimer",
+    "postinstall": "sh scripts/fix_rn_version.sh; patch-package",
     "update-disclaimer": "yarn licenses generate-disclaimer > LicenseDisclaimer.txt && mkdir -p android/app/src/main/assets/custom && cp LicenseDisclaimer.txt android/app/src/main/assets/custom/LicenseDisclaimer.txt",
     "test-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'"
   },
