@@ -256,7 +256,7 @@ jobs:
           no_output_timeout: 20m
           command: |
             set -e
-            export PATH=${PATH}:/tmp/go/bin
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
@@ -290,7 +290,7 @@ jobs:
           name: Run test
           command: |
             set -e
-            export PATH=${PATH}:/tmp/go/bin
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config

@@ -1,9 +1,9 @@
 /* tslint:disable:no-console */
-import { NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
 import {
   BLSPrivateKeyToProcessedPrivateKey,
   BLSPrivateKeyToPublic,
 } from '@celo/celotool/src/lib/bls_utils'
+import { NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
 import {
   add0x,
   generateAccountAddressFromPrivateKey,
