@@ -104,10 +104,12 @@ function inviteText({ requestState, t }) {
 const styles = StyleSheet.create({
   log: {
     marginLeft: 10,
-    marginTop: 10,
+    marginTop: 20,
   },
   ticker: {
     marginLeft: 20,
+    justifyContent: 'center',
+    height: '100%',
   },
   statusesContainerLog: {
     position: 'absolute',
@@ -116,5 +118,6 @@ const styles = StyleSheet.create({
   },
   statusesContainerTicker: {
     alignContent: 'center',
+    height: '100%',
   },
 })
