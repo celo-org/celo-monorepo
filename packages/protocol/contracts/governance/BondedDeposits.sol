@@ -12,6 +12,7 @@ import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/IERC20Token.sol";
 import "../common/Signatures.sol";
+// TODO(asa): Move to common
 import "../stability/FractionUtil.sol";
 
 contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, UsingRegistry {
@@ -39,8 +40,8 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     // The weight of the account in validator elections, governance, and block rewards.
     uint256 weight;
     // Each account may delegate their right to receive rewards, vote, and register a Validator or
-    // Validator group to exactly one address each, respectively. This address must not hold an 
-    // account and must not be delegated to by any other account or by the same account for any 
+    // Validator group to exactly one address each, respectively. This address must not hold an
+    // account and must not be delegated to by any other account or by the same account for any
     // other purpose.
     address[3] delegates;
     // Frozen accounts may not vote, but may redact votes.
@@ -141,7 +142,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
       ).reduce();
       cumulativeRewardWeights[block.number] = previousCumulativeRewardWeight.add(
         currentRewardWeight
-      ).reduce();
+      );
     } else {
       cumulativeRewardWeights[block.number] = previousCumulativeRewardWeight;
     }
@@ -214,7 +215,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
    * @dev v, r, s constitute `delegate`'s signature on `msg.sender`.
    */
   function delegateRole(
-    DelegateRole role, 
+    DelegateRole role,
     address delegate,
     uint8 v,
     bytes32 r,
@@ -476,11 +477,11 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
    * @return The associated account.
    */
   function getAccountFromDelegateAndRole(
-    address accountOrDelegate, 
+    address accountOrDelegate,
     DelegateRole role
   )
-    public 
-    view 
+    public
+    view
     returns (address)
   {
     address delegatingAccount = delegations[accountOrDelegate];
@@ -514,7 +515,6 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     return (governance.isVoting(voter) || validators.isVoting(voter));
   }
 
-  // TODO(asa): Update this when decision made.
   /**
    * @notice Returns the weight of a deposit for a given notice period.
    * @param value The value of the deposit.
@@ -522,7 +522,10 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
    * @return The weight of the deposit.
    */
   function getDepositWeight(uint256 value, uint256 noticePeriod) public pure returns (uint256) {
-    return value.mul(noticePeriod);
+     uint256 precision = 10000;
+     uint256 noticeDays = noticePeriod.div(1 days);
+     uint256 preciseMultiplier = sqrt(noticeDays).mul(precision).div(30).add(precision);
+     return preciseMultiplier.mul(value).div(precision);
   }
 
   /**
@@ -532,12 +535,12 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
    * @return The rewards recipient for the account.
    */
   function getDelegateFromAccountAndRole(
-    address account, 
+    address account,
     DelegateRole role
-  ) 
-    public 
-    view 
-    returns (address) 
+  )
+    public
+    view
+    returns (address)
   {
     address delegate = accounts[account].delegates[uint256(role)];
     if (delegate == address(0)) {

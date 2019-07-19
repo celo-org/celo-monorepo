@@ -27,7 +27,7 @@ contract UsingBondedDeposits is UsingRegistry {
    */
   function getAccountFromVoter(address accountOrDelegate) internal view returns (address) {
     return getBondedDeposits().getAccountFromDelegateAndRole(
-      accountOrDelegate, 
+      accountOrDelegate,
       IBondedDeposits.DelegateRole.Voting
     );
   }
@@ -39,7 +39,7 @@ contract UsingBondedDeposits is UsingRegistry {
    */
   function getValidatorFromAccount(address account) internal view returns (address) {
     return getBondedDeposits().getDelegateFromAccountAndRole(
-      account, 
+      account,
       IBondedDeposits.DelegateRole.Validating
     );
   }
@@ -52,7 +52,7 @@ contract UsingBondedDeposits is UsingRegistry {
    */
   function getAccountFromValidator(address accountOrDelegate) internal view returns (address) {
     return getBondedDeposits().getAccountFromDelegateAndRole(
-      accountOrDelegate, 
+      accountOrDelegate,
       IBondedDeposits.DelegateRole.Validating
     );
   }
