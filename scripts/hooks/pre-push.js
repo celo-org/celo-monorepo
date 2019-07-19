@@ -17,15 +17,22 @@ const THRESHOLD_DATE = new Date('2019-07-17')
 /// UTILITY FUNCTIONS
 ////////////////////////////////////////////////////////////////
 
+function mergeBaseFor(refA, refB) {
+  return exec(`git merge-base ${refA} ${refB}`)
+}
+
 function getCommitRange(change, remoteName) {
   if (change.remoteSHA === '0000000000000000000000000000000000000000') {
     // pushing a new branch
     // => commit range = changes from master
-    const fromSHA = exec(`git merge-base ${remoteName}/master ${change.localSHA}`)
+    const fromSHA = mergeBaseFor(`${remoteName}/master`, change.localSHA)
     return [fromSHA, change.localSHA]
   } else {
+    // push can be fast forward or not (push -f)
+    // so we get the common ancestor and commits from there
+    const fromSHA = mergeBaseFor(change.remoteSHA, change.localSHA)
     // assuming a fast forward => fromSHA is remoteBranch current HEAD
-    return [change.remoteSHA, change.localSHA]
+    return [fromSHA, change.remoteSHA, change.localSHA]
   }
 }
 
