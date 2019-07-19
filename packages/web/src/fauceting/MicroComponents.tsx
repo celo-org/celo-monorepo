@@ -56,12 +56,12 @@ export function ButtonWithFeedback({ requestState, isFaucet, t, onSubmit, captch
     requestState === RequestState.Initial || requestState === RequestState.Invalid
   const isInvalid = requestState === RequestState.Invalid
   const isStarted = requestState === RequestState.Working
-
+  const isEnded = requestState === RequestState.Completed || requestState === RequestState.Failed
   const icon = isStarted && <ActivityIndicator color={colors.primary} size={'small'} />
 
   return (
     <Button
-      disabled={isInvalid || !captchaOK || isStarted}
+      disabled={isInvalid || !captchaOK || isStarted || isEnded}
       kind={isNotStarted ? BTN.PRIMARY : BTN.SECONDARY}
       text={buttonText({ requestState, t })}
       onPress={onSubmit}
