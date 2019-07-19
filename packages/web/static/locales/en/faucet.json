@@ -37,7 +37,7 @@
   "done": "Done",
   "inviteError": "Unable to complete - double check your number",
   "invalidNumber": "Must be a valid E.164 number",
-  "cUSDsent": "cUSD Sending",
-  "cGLDsent": "cGLD Sending",
-  "walletBuilt": "Wallet Building"
+  "cUSDsent": "cUSD Sent",
+  "cGLDsent": "cGLD Sent",
+  "walletBuilt": "Wallet Built"
 }
