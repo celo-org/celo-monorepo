@@ -29,7 +29,7 @@ const parseValidatorParams = (validatorParams: any) => {
     name: validatorParams[1],
     url: validatorParams[2],
     publicKeysData: validatorParams[3],
-    affiliation: validatorParams[5],
+    affiliation: validatorParams[4],
   }
 }
 
