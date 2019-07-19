@@ -16,6 +16,9 @@ echo "Restoring yarn configs"
 yarn config set version-tag-prefix "v"
 yarn config set version-git-message "v%s"
 
+echo "Update license list and disclaimer"
+yarn update-disclaimer
+
 echo "Done"
 echo "YOU HAVE CREATED A NEW TAG, RUN git push origin --tags TO PUBLISH IT TO GITHUB"
 echo "YOU HAVE CREATED A NEW TAG, RUN git push origin --tags TO PUBLISH IT TO GITHUB"
