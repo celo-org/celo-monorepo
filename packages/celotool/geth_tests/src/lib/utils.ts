@@ -1,12 +1,14 @@
 const assert = require('chai').assert
 const fs = require('fs')
 import {
+  add0x,
   AccountType,
   ConsensusType,
   generateGenesis,
   generatePrivateKey,
   generatePublicKeyFromPrivateKey,
   getValidators,
+  Validator,
 } from '@celo/celotool/src/lib/generate_utils'
 import { getEnodeAddress } from '@celo/celotool/src/lib/geth'
 import { spawn } from 'child_process'
@@ -166,7 +168,7 @@ export async function setupTestDir(testDir: string) {
   await execCmd('mkdir', [testDir])
 }
 
-export async function writeGenesis(validators: string[], path: string) {
+export async function writeGenesis(validators: Validator[], path: string) {
   const blockTime = 0
   const epochLength = 10
   const genesis = generateGenesis(
@@ -276,11 +278,11 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   await sleep(1)
 }
 
-function add0x(str: string) {
-  return '0x' + str
-}
-
-export async function migrateContracts(validatorPrivateKeys: string[], to: number = 1000) {
+export async function migrateContracts(
+  validatorPrivateKeys: string[],
+  to: number = 1000,
+  gethRepoPath: string
+) {
   let args = [
     '--cwd',
     `${monorepoRoot}/packages/protocol`,
@@ -291,6 +293,8 @@ export async function migrateContracts(validatorPrivateKeys: string[], to: numbe
     validatorPrivateKeys.map(add0x).join(','),
     '-t',
     to.toString(),
+    '-l',
+    gethRepoPath,
   ]
   await execCmdWithExitOnFailure('yarn', args)
 }
@@ -382,7 +386,7 @@ export function getHooks(gethConfig: GethTestConfig) {
       await initAndStartGeth(gethBinaryPath, instance)
     }
     if (gethConfig.migrate || gethConfig.migrateTo) {
-      await migrateContracts(validatorPrivateKeys, gethConfig.migrateTo)
+      await migrateContracts(validatorPrivateKeys, gethConfig.migrateTo, gethRepoPath)
     }
     await killGeth()
     await sleep(2)

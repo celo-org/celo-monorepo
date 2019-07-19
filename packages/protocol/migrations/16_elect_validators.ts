@@ -7,6 +7,11 @@ import {
   getDeployedProxiedContract,
   sendTransactionWithPrivateKey,
 } from '@celo/protocol/lib/web3-utils'
+import { exec } from 'child_process'
+import {
+  BLSPrivateKeyToPublic,
+  BLSPrivateKeyToProcessedPrivateKey,
+} from '@celo/celotool/src/lib/bls_utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { BigNumber } from 'bignumber.js'
 import * as minimist from 'minimist'
@@ -17,8 +22,28 @@ const argv = minimist(process.argv, {
   default: { keys: '' },
 })
 
+const gethRepoPath = argv.localgeth || '/tmp/geth'
+const blsPoPBinaryPath = `${gethRepoPath}/vendor/github.com/celo-org/bls-zexe/bls/target/release/examples/pop`
+
 function serializeKeystore(keystore: any) {
   return Buffer.from(JSON.stringify(keystore)).toString('base64')
+}
+
+export function execCmdWithOutput(cmd: string, args: string[], options: any = {}): Promise<Buffer> {
+  return new Promise(async (resolve, reject) => {
+    const cmdline = [cmd].concat(args).join(' ')
+    console.debug('$ ' + cmdline)
+    exec(cmdline, { ...options }, (err, stdout, _) => {
+      try {
+        if (err) {
+          throw new Error(`error executing: ${err.message}`)
+        }
+        resolve(stdout)
+      } catch (error) {
+        reject(error)
+      }
+    })
+  })
 }
 
 async function makeMinimumDeposit(bondedDeposits: BondedDepositsInstance, privateKey: string) {
@@ -83,16 +108,33 @@ async function registerValidator(
   groupAddress: string
 ) {
   const address = generateAccountAddressFromPrivateKey(validatorPrivateKey.slice(2))
-  const publicKey = add0x(generatePublicKeyFromPrivateKey(validatorPrivateKey.slice(2)))
+  const publicKey = generatePublicKeyFromPrivateKey(validatorPrivateKey.slice(2))
+  const BLSPublicKey = BLSPrivateKeyToPublic(validatorPrivateKey.slice(2))
 
   await makeMinimumDeposit(bondedDeposits, validatorPrivateKey)
+  const BLSPoP = (await execCmdWithOutput(blsPoPBinaryPath, [
+    '-k',
+    BLSPrivateKeyToProcessedPrivateKey(validatorPrivateKey.slice(2)).toString('hex'),
+  ]))
+    .toString('hex')
+    .trim()
+  const publicKeysData = publicKey + BLSPublicKey + BLSPoP
+  /*
+  console.log('---------------')
+  console.info(validatorPrivateKey)
+  console.info(publicKey)
+  console.info(BLSPublicKey)
+  console.info(BLSPoP)
+  console.info(publicKeysData)
+  console.log('---------------')
+  */
 
   // @ts-ignore
   const registerTx = validators.contract.methods.registerValidator(
     address,
     address,
     config.validators.groupUrl,
-    publicKey,
+    add0x(publicKeysData),
     config.validators.minBondedDepositNoticePeriod
   )
 

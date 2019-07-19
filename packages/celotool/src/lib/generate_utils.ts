@@ -8,6 +8,7 @@ import {
   TEMPLATE,
 } from '@celo/celotool/src/lib/genesis_constants'
 import { envVar, fetchEnv, fetchEnvOrFallback } from '@celo/celotool/src/lib/utils'
+import { BLSPrivateKeyToPublic } from '@celo/celotool/src/lib/bls_utils'
 import { ec as EC } from 'elliptic'
 import { range, repeat } from 'lodash'
 import rlp from 'rlp'
@@ -30,6 +31,11 @@ export enum ConsensusType {
   ISTANBUL = 'istanbul',
 }
 
+export interface Validator {
+  address: string
+  BLSPublicKey: string
+}
+
 export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'validator',
   'load_testing',
@@ -37,6 +43,11 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'bootnode',
   'faucet',
 ]
+
+export const add0x = (str: string) => {
+  return '0x' + str
+}
+
 
 export const coerceMnemonicAccountType = (raw: string): AccountType => {
   const index = MNEMONIC_ACCOUNT_TYPE_CHOICES.indexOf(raw)
@@ -62,7 +73,7 @@ export const generatePublicKeyFromPrivateKey = (privateKey: string) => {
 
 export const generateAccountAddressFromPrivateKey = (privateKey: string) => {
   if (!privateKey.startsWith('0x')) {
-    privateKey = '0x' + privateKey
+    privateKey = add0x(privateKey)
   }
   // @ts-ignore-next-line
   return new Web3.modules.Eth().accounts.privateKeyToAccount(privateKey).address
@@ -78,15 +89,24 @@ export const getValidatorsPrivateKeys = (mnemonic: string, n: number) => {
 export const getValidators = (mnemonic: string, n: number) => {
   return range(0, n)
     .map((i) => generatePrivateKey(mnemonic, AccountType.VALIDATOR, i))
-    .map(generateAccountAddressFromPrivateKey)
-    .map((address) => address.slice(2))
+    .map((key) => {
+      return {
+        address: generateAccountAddressFromPrivateKey(key).slice(2),
+        BLSPublicKey: BLSPrivateKeyToPublic(key),
+      }
+    })
 }
 
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
   const validators =
     validatorEnv === VALIDATOR_OG_SOURCE
-      ? OG_ACCOUNTS.map((account) => account.address)
+      ? OG_ACCOUNTS.map((account) => {
+          return {
+            address: account.address,
+            BLSPublicKey: BLSPrivateKeyToPublic(account.privateKey),
+          }
+        })
       : getValidators(fetchEnv(envVar.MNEMONIC), parseInt(validatorEnv, 10))
 
   // @ts-ignore
@@ -124,7 +144,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   )
 }
 
-const generateIstanbulExtraData = (validators: string[]) => {
+const generateIstanbulExtraData = (validators: Validator[]) => {
   const istanbulVanity = 32
   const signatureVanity = 65
 
@@ -134,7 +154,9 @@ const generateIstanbulExtraData = (validators: string[]) => {
     rlp
       // @ts-ignore
       .encode([
-        validators.map((validator) => Buffer.from(validator, 'hex')),
+        validators.map((validator) => Buffer.from(validator.address, 'hex')),
+        validators.map((validator) => Buffer.from(validator.BLSPublicKey, 'hex')),
+        [],
         [],
         Buffer.from(repeat('0', signatureVanity * 2), 'hex'),
         [],
@@ -144,7 +166,7 @@ const generateIstanbulExtraData = (validators: string[]) => {
 }
 
 export const generateGenesis = (
-  validators: string[],
+  validators: Validator[],
   consensusType: ConsensusType,
   contracts: string[],
   blockTime: number,
@@ -176,7 +198,7 @@ export const generateGenesis = (
   }
 
   for (const validator of validators) {
-    genesis.alloc[validator] = {
+    genesis.alloc[validator.address] = {
       balance: DEFAULT_BALANCE,
     }
   }
@@ -185,7 +207,7 @@ export const generateGenesis = (
     genesis.alloc[contract] = {
       code: PROXY_CONTRACT_CODE,
       storage: {
-        [CONTRACT_OWNER_STORAGE_LOCATION]: validators[0],
+        [CONTRACT_OWNER_STORAGE_LOCATION]: validators[0].address,
       },
       balance: '0',
     }
