@@ -12,7 +12,7 @@ import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/IERC20Token.sol";
 import "../common/Signatures.sol";
-import "../common/FractionUtil.sol";
+import "../stability/FractionUtil.sol";
 
 contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, UsingRegistry {
 
