@@ -7,18 +7,16 @@ import thunk from 'redux-thunk'
 import rootReducer from 'src/redux/reducers'
 import { rootSaga } from 'src/redux/sagas'
 
-let extrSettings = {}
-if (__DEV__) {
-  extrSettings = { timeout: 10000 }
-}
-
-const persistConfig = {
+const persistConfig: any = {
   key: 'root',
   version: -1, // default is -1, increment as we make migrations
   storage,
   blacklist: ['home', 'geth', 'exchange', 'networkInfo', 'alert'],
   stateReconciler: autoMergeLevel2,
-  ...extrSettings,
+}
+
+if (__DEV__) {
+  persistConfig.timeout = 10000
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
