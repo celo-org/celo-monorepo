@@ -88,6 +88,7 @@ function faucetText({ requestState, t }) {
     {
       [RequestState.Failed]: t('faucetError'),
       [RequestState.Invalid]: t('invalidAddress'),
+      [RequestState.BadChecksum]: t('badChecksum'),
     }[requestState] || `eg. ${EXAMPLE_ADDRESS}`
   )
 }

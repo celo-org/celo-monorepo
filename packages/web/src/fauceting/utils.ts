@@ -52,6 +52,7 @@ export function requestStatusToState(status: RequestStatus) {
 export enum RequestState {
   Initial,
   Invalid,
+  BadChecksum,
   Working,
   Completed,
   Failed,
