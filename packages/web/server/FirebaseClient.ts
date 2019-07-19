@@ -20,7 +20,7 @@ function getDB() {
 const NETWORK = 'alfajores'
 
 export type Address = string
-type E164Number = string
+export type E164Number = string
 
 export enum RequestStatus {
   Pending = 'Pending',

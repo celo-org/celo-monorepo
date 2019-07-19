@@ -27,7 +27,23 @@ export function ContextualInfo({ requestState, t, isFaucet }: InfoProps) {
   return <Text style={contextStyle}>{text}</Text>
 }
 
-export function HashingStatus({ isFaucet, dollarTxHash, goldTxHash, escrowTxHash, t, done }) {
+interface HashProps {
+  isFaucet: boolean
+  dollarTxHash: string | null
+  goldTxHash: string | null
+  escrowTxHash: string | null
+  done: boolean
+  t: I18nProps['t']
+}
+
+export function HashingStatus({
+  isFaucet,
+  dollarTxHash,
+  goldTxHash,
+  escrowTxHash,
+  t,
+  done,
+}: HashProps) {
   return (
     <View
       style={isFaucet ? [std.row, styles.statusesContainerTicker] : styles.statusesContainerLog}
@@ -51,7 +67,21 @@ export function HashingStatus({ isFaucet, dollarTxHash, goldTxHash, escrowTxHash
   )
 }
 
-export function ButtonWithFeedback({ requestState, isFaucet, t, onSubmit, captchaOK }) {
+interface ButtonProps {
+  requestState: RequestState
+  isFaucet: boolean
+  t: I18nProps['t']
+  onSubmit: () => void
+  captchaOK: boolean
+}
+
+export function ButtonWithFeedback({
+  requestState,
+  isFaucet,
+  t,
+  onSubmit,
+  captchaOK,
+}: ButtonProps) {
   const isNotStarted =
     requestState === RequestState.Initial || requestState === RequestState.Invalid
   const isInvalid = requestState === RequestState.Invalid
@@ -72,7 +102,12 @@ export function ButtonWithFeedback({ requestState, isFaucet, t, onSubmit, captch
   )
 }
 
-function buttonText({ requestState, t }) {
+interface TextFuncArgs {
+  t: I18nProps['t']
+  requestState: RequestState
+}
+
+function buttonText({ requestState, t }: TextFuncArgs) {
   switch (requestState) {
     case RequestState.Working:
       return ''
@@ -83,7 +118,7 @@ function buttonText({ requestState, t }) {
   }
 }
 
-function faucetText({ requestState, t }) {
+function faucetText({ requestState, t }: TextFuncArgs) {
   return (
     {
       [RequestState.Failed]: t('faucetError'),
@@ -93,7 +128,7 @@ function faucetText({ requestState, t }) {
   )
 }
 
-function inviteText({ requestState, t }) {
+function inviteText({ requestState, t }: TextFuncArgs) {
   return (
     {
       [RequestState.Failed]: t('inviteError'),
