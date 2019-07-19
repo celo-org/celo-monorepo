@@ -238,8 +238,8 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
    * @dev Fails if `msg.sender` is not the owner or rewards recipient of the account.
    */
   function redeemRewards() external nonReentrant returns (uint256) {
-    require(false, "Disabled")
-    address account = getAccountFromDelegateAndRole(msg.sender, DelegateRole.Rewards);
+    require(false, "Disabled");
+    address account = getAccountFromRewardsRecipient(msg.sender);
     return _redeemRewards(account);
   }
 
