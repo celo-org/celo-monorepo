@@ -11,19 +11,13 @@ import "./interfaces/IValidators.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/IERC20Token.sol";
-// TODO(asa): Move to common
-import "../stability/FractionUtil.sol";
-
+import "../common/Signatures.sol";
+import "../common/FractionUtil.sol";
 
 contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, UsingRegistry {
 
   using FractionUtil for FractionUtil.Fraction;
   using SafeMath for uint256;
-
-  enum DepositType {
-    Bonded,
-    Notified
-  }
 
   // TODO(asa): Remove index for gas efficiency if two updates to the same slot costs extra gas.
   struct Deposit {
@@ -40,39 +34,20 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     uint256[] availabilityTimes;
   }
 
-  struct Rewards {
-    // Each account may delegate their right to receive rewards rewards to exactly one address.
-    // This address must not hold an account and must not be delegated to by any other account or
-    // by the same account for any other purpose.
-    address delegate;
-    // The timestamp of the last time that rewards were redeemed.
-    uint96 lastRedeemed;
-  }
-
-  struct Voting {
-    // Each account may delegate their right to vote to exactly one address. This address must not
-    // hold an account and must not be delegated to by any other account or by the same account
-    // for any other purpose.
-    address delegate;
-    // Frozen accounts may not vote, but may redact votes.
-    bool frozen;
-  }
-
-  struct Validating {
-    // Each account may delegate the right to register a Validator or Validator Group to exactly
-    // one address. This address must not hold an account and must not be delegated to by any other
-    // account or by the same account for any other purpose.
-    address delegate;
-  }
-
   struct Account {
     bool exists;
     // The weight of the account in validator elections, governance, and block rewards.
     uint256 weight;
-    Voting voting;
-    Rewards rewards;
+    // Each account may delegate their right to receive rewards, vote, and register a Validator or
+    // Validator group to exactly one address each, respectively. This address must not hold an 
+    // account and must not be delegated to by any other account or by the same account for any 
+    // other purpose.
+    address[3] delegates;
+    // Frozen accounts may not vote, but may redact votes.
+    bool votingFrozen;
+    // The timestamp of the last time that rewards were redeemed.
+    uint96 rewardsLastRedeemed;
     Deposits deposits;
-    Validating validating;
   }
 
   // TODO(asa): Add minNoticePeriod
@@ -88,7 +63,8 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     uint256 maxNoticePeriod
   );
 
-  event VotingDelegated(
+  event RoleDelegated(
+    DelegateRole role,
     address indexed account,
     address delegate
   );
@@ -99,16 +75,6 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
 
   event VotingUnfrozen(
     address indexed account
-  );
-
-  event ValidatingDelegated(
-    address indexed account,
-    address delegate
-  );
-
-  event RewardsDelegated(
-    address indexed account,
-    address delegate
   );
 
   event DepositBonded(
@@ -143,31 +109,6 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     uint256 increase
   );
 
-  modifier isAccount(address account) {
-    require(accounts[account].exists);
-    _;
-  }
-
-  modifier isNotAccount(address account) {
-    require(!accounts[account].exists);
-    _;
-  }
-
-  // Reverts if rewards, voting, or validating rights have been delegated to `account`.
-  modifier isNotDelegate(address account) {
-    require(delegations[account] == address(0));
-    _;
-  }
-
-  // TODO(asa): Allow users to notify if they would continue to meet the registration
-  // requirements.
-  modifier isNotValidating(address account) {
-    address validator = getValidatorFromAccount(account);
-    IValidators validators = IValidators(registry.getAddressFor(VALIDATORS_REGISTRY_ID));
-    require(!validators.isValidating(validator));
-    _;
-  }
-
   function initialize(address registryAddress, uint256 _maxNoticePeriod) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -200,7 +141,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
       ).reduce();
       cumulativeRewardWeights[block.number] = previousCumulativeRewardWeight.add(
         currentRewardWeight
-      );
+      ).reduce();
     } else {
       cumulativeRewardWeights[block.number] = previousCumulativeRewardWeight;
     }
@@ -221,13 +162,12 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
    */
   function createAccount()
     external
-    isNotAccount(msg.sender)
-    isNotDelegate(msg.sender)
     returns (bool)
   {
+    require(isNotAccount(msg.sender) && isNotDelegate(msg.sender));
     Account storage account = accounts[msg.sender];
     account.exists = true;
-    account.rewards.lastRedeemed = uint96(block.number);
+    account.rewardsLastRedeemed = uint96(block.number);
     return true;
   }
 
@@ -237,60 +177,29 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
    * @dev Fails if `msg.sender` is not the owner or rewards recipient of the account.
    */
   function redeemRewards() external nonReentrant returns (uint256) {
-    address account = getAccountFromRewardsRecipient(msg.sender);
+    address account = getAccountFromDelegateAndRole(msg.sender, DelegateRole.Rewards);
     return _redeemRewards(account);
-  }
-
-  /**
-   * @notice Delegates the voting power of `msg.sender`'s account to another address.
-   * @param delegate The address to delegate to.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev Fails if the delegate address is already a delegate or has an account .
-   * @dev Fails if the current account is already voting.
-   * @dev v, r, s constitute `delegate`'s signature on `msg.sender`.
-   */
-  function delegateVoting(
-    address delegate,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  )
-    external
-    nonReentrant
-    isAccount(msg.sender)
-    isNotAccount(delegate)
-    isNotDelegate(delegate)
-  {
-    // TODO(asa): Consider an additional prefix here.
-    address signer = getSignerOfAddress(msg.sender, v, r, s);
-    require(signer == delegate);
-    require(!isVoting(msg.sender));
-    Account storage account = accounts[msg.sender];
-    delegations[account.voting.delegate] = address(0);
-    account.voting.delegate = delegate;
-    delegations[delegate] = msg.sender;
-    emit VotingDelegated(msg.sender, delegate);
   }
 
   /**
    * @notice Freezes the voting power of `msg.sender`'s account.
    */
-  function freezeVoting() external isAccount(msg.sender) {
+  function freezeVoting() external {
+    require(isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
-    require(account.voting.frozen == false);
-    account.voting.frozen = true;
+    require(account.votingFrozen == false);
+    account.votingFrozen = true;
     emit VotingFrozen(msg.sender);
   }
 
   /**
    * @notice Unfreezes the voting power of `msg.sender`'s account.
    */
-  function unfreezeVoting() external isAccount(msg.sender) {
+  function unfreezeVoting() external {
+    require(isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
-    require(account.voting.frozen == true);
-    account.voting.frozen = false;
+    require(account.votingFrozen == true);
+    account.votingFrozen = false;
     emit VotingUnfrozen(msg.sender);
   }
 
@@ -304,7 +213,8 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
    * @dev Fails if the current account is already participating in validation.
    * @dev v, r, s constitute `delegate`'s signature on `msg.sender`.
    */
-  function delegateValidating(
+  function delegateRole(
+    DelegateRole role, 
     address delegate,
     uint8 v,
     bytes32 r,
@@ -312,53 +222,25 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
   )
     external
     nonReentrant
-    isAccount(msg.sender)
-    isNotValidating(msg.sender)
-    isNotAccount(delegate)
-    isNotDelegate(delegate)
   {
-    // TODO(asa): Consider an additional prefix here.
-    address signer = getSignerOfAddress(msg.sender, v, r, s);
-    require(signer == delegate);
-    Account storage account = accounts[msg.sender];
-    delegations[account.validating.delegate] = address(0);
-    account.validating.delegate = delegate;
-    delegations[delegate] = msg.sender;
-    emit ValidatingDelegated(msg.sender, delegate);
-  }
+    require(isAccount(msg.sender) && isNotAccount(delegate) && isNotDelegate(delegate));
 
-  /**
-   * @notice Delegates the rewards of `msg.sender`'s account to another address.
-   * @param delegate The address to delegate to.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev Fails if the address is already a delegate or has an account .
-   * @dev Fails if the current account is already participating in validation.
-   * @dev v, r, s constitute `delegate`'s signature on `msg.sender`.
-   * @dev Any accumulated rewards will be first paid out to the previous rewards recipient.
-   */
-  function delegateRewards(
-    address delegate,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  )
-    external
-    nonReentrant
-    isAccount(msg.sender)
-    isNotAccount(delegate)
-    isNotDelegate(delegate)
-  {
-    _redeemRewards(msg.sender);
-    // TODO(asa): Consider an additional prefix here.
-    address signer = getSignerOfAddress(msg.sender, v, r, s);
+    address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
     require(signer == delegate);
+
+    if (role == DelegateRole.Validating) {
+      require(isNotValidating(msg.sender));
+    } else if (role == DelegateRole.Voting) {
+      require(!isVoting(msg.sender));
+    } else if (role == DelegateRole.Rewards) {
+      _redeemRewards(msg.sender);
+    }
+
     Account storage account = accounts[msg.sender];
-    delegations[account.rewards.delegate] = address(0);
-    account.rewards.delegate = delegate;
+    delegations[account.delegates[uint256(role)]] = address(0);
+    account.delegates[uint256(role)] = delegate;
     delegations[delegate] = msg.sender;
-    emit RewardsDelegated(msg.sender, delegate);
+    emit RoleDelegated(role, msg.sender, delegate);
   }
 
   /**
@@ -371,11 +253,11 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
   )
     external
     nonReentrant
-    isAccount(msg.sender)
     payable
     returns (uint256)
   {
-    require(!isVoting(msg.sender));
+    require(isAccount(msg.sender) && !isVoting(msg.sender));
+
     _redeemRewards(msg.sender);
     require(msg.value > 0 && noticePeriod <= maxNoticePeriod);
     Account storage account = accounts[msg.sender];
@@ -397,11 +279,9 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
   )
     external
     nonReentrant
-    isAccount(msg.sender)
-    isNotValidating(msg.sender)
     returns (uint256)
   {
-    require(!isVoting(msg.sender));
+    require(isAccount(msg.sender) && isNotValidating(msg.sender) && !isVoting(msg.sender));
     _redeemRewards(msg.sender);
     Account storage account = accounts[msg.sender];
     Deposit storage bonded = account.deposits.bonded[noticePeriod];
@@ -429,12 +309,11 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
   )
     external
     nonReentrant
-    isAccount(msg.sender)
     returns (uint256)
   {
+    require(isAccount(msg.sender) && !isVoting(msg.sender));
     // solhint-disable-next-line not-rely-on-time
     require(availabilityTime > now);
-    require(!isVoting(msg.sender));
     _redeemRewards(msg.sender);
     Account storage account = accounts[msg.sender];
     Deposit storage notified = account.deposits.notified[availabilityTime];
@@ -458,13 +337,12 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
   )
     external
     nonReentrant
-    isAccount(msg.sender)
     returns (uint256)
   {
-    require(!isVoting(msg.sender));
-    _redeemRewards(msg.sender);
+    require(isAccount(msg.sender) && !isVoting(msg.sender));
     // solhint-disable-next-line not-rely-on-time
     require(now >= availabilityTime);
+    _redeemRewards(msg.sender);
     Account storage account = accounts[msg.sender];
     Deposit storage notified = account.deposits.notified[availabilityTime];
     uint256 value = notified.value;
@@ -491,10 +369,9 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
   )
     external
     nonReentrant
-    isAccount(msg.sender)
     returns (uint256)
   {
-    require(!isVoting(msg.sender));
+    require(isAccount(msg.sender) && !isVoting(msg.sender));
     _redeemRewards(msg.sender);
     require(value > 0 && increase > 0);
     Account storage account = accounts[msg.sender];
@@ -515,7 +392,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
    * @dev Frozen accounts can retract existing votes but not make future votes.
    */
   function isVotingFrozen(address account) external view returns (bool) {
-    return accounts[account].voting.frozen;
+    return accounts[account].votingFrozen;
   }
 
   /**
@@ -525,7 +402,12 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
    */
   function getRewardsLastRedeemed(address _account) external view returns (uint96) {
     Account storage account = accounts[_account];
-    return account.rewards.lastRedeemed;
+    return account.rewardsLastRedeemed;
+  }
+
+  function isValidating(address validator) public view returns (bool) {
+    IValidators validators = IValidators(registry.getAddressFor(VALIDATORS_REGISTRY_ID));
+    return validators.isValidating(validator);
   }
 
   /**
@@ -587,31 +469,23 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
   }
 
   /**
-   * @notice Returns the account associated with the provided account or voting delegate.
+   * @notice Returns the account associated with the provided delegate and role.
    * @param accountOrDelegate The address of the account or voting delegate.
+   * @param role The delegate role to query for.
    * @dev Fails if the `accountOrDelegate` is a non-voting delegate.
    * @return The associated account.
    */
-  function getAccountFromVoter(address accountOrDelegate) external view returns (address) {
+  function getAccountFromDelegateAndRole(
+    address accountOrDelegate, 
+    DelegateRole role
+  )
+    public 
+    view 
+    returns (address)
+  {
     address delegatingAccount = delegations[accountOrDelegate];
     if (delegatingAccount != address(0)) {
-      require(accounts[delegatingAccount].voting.delegate == accountOrDelegate);
-      return delegatingAccount;
-    } else {
-      return accountOrDelegate;
-    }
-  }
-
-  /**
-   * @notice Returns the account associated with the provided account or validating delegate.
-   * @param accountOrDelegate The address of the account or validating delegate.
-   * @dev Fails if the `accountOrDelegate` is a non-validating delegate.
-   * @return The associated account.
-   */
-  function getAccountFromValidator(address accountOrDelegate) external view returns (address) {
-    address delegatingAccount = delegations[accountOrDelegate];
-    if (delegatingAccount != address(0)) {
-      require(accounts[delegatingAccount].validating.delegate == accountOrDelegate);
+      require(accounts[delegatingAccount].delegates[uint256(role)] == accountOrDelegate);
       return delegatingAccount;
     } else {
       return accountOrDelegate;
@@ -629,82 +503,43 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
   }
 
   /**
-   * @notice Returns the account associated with the provided account or rewards delegate.
-   * @param accountOrDelegate The address of the account or rewards delegate.
-   * @dev Fails if the `accountOrDelegate` is a non-rewards delegate.
-   * @return The associated account.
-   */
-  function getAccountFromRewardsRecipient(address accountOrDelegate) public view returns (address) {
-    address delegatingAccount = delegations[accountOrDelegate];
-    if (delegatingAccount != address(0)) {
-      require(accounts[delegatingAccount].rewards.delegate == accountOrDelegate);
-      return delegatingAccount;
-    } else {
-      return accountOrDelegate;
-    }
-  }
-
-  /**
    * @notice Returns whether or not a specified account is voting.
    * @param account The address of the account.
    * @return Whether or not the account is voting.
    */
   function isVoting(address account) public view returns (bool) {
-    address voter = getVoterFromAccount(account);
+    address voter = getDelegateFromAccountAndRole(account, DelegateRole.Voting);
     IGovernance governance = IGovernance(registry.getAddressFor(GOVERNANCE_REGISTRY_ID));
     IValidators validators = IValidators(registry.getAddressFor(VALIDATORS_REGISTRY_ID));
     return (governance.isVoting(voter) || validators.isVoting(voter));
   }
 
+  // TODO(asa): Update this when decision made.
   /**
    * @notice Returns the weight of a deposit for a given notice period.
    * @param value The value of the deposit.
    * @param noticePeriod The notice period of the deposit.
    * @return The weight of the deposit.
-   * @dev A deposit's weight is (1 + sqrt(noticePeriodDays) / 30) * value.
    */
   function getDepositWeight(uint256 value, uint256 noticePeriod) public pure returns (uint256) {
-    uint256 precision = 10000;
-    uint256 noticeDays = noticePeriod.div(1 days);
-    uint256 preciseMultiplier = sqrt(noticeDays).mul(precision).div(30).add(precision);
-    return preciseMultiplier.mul(value).div(precision);
+    return value.mul(noticePeriod);
   }
 
   /**
-   * @notice Returns the rewards recipient for a specified account.
+   * @notice Returns the delegate for a specified account and role.
    * @param account The address of the account.
+   * @param role The role to query for.
    * @return The rewards recipient for the account.
    */
-  function getRewardsRecipientFromAccount(address account) public view returns (address) {
-    address delegate = accounts[account].rewards.delegate;
-    if (delegate == address(0)) {
-      return account;
-    } else {
-      return delegate;
-    }
-  }
-
-  /**
-   * @notice Returns the address authorized to vote on behalf of a specified account.
-   * @param account The address of the account.
-   * @return The address authorized to vote on behalf of the account
-   */
-  function getVoterFromAccount(address account) public view returns (address) {
-    address delegate = accounts[account].voting.delegate;
-    if (delegate == address(0)) {
-      return account;
-    } else {
-      return delegate;
-    }
-  }
-
-  /**
-   * @notice Returns the address authorized to validate on behalf of a specified account.
-   * @param account The address of the account.
-   * @return The address authorized to validate on behalf of the account
-   */
-  function getValidatorFromAccount(address account) public view returns (address) {
-    address delegate = accounts[account].validating.delegate;
+  function getDelegateFromAccountAndRole(
+    address account, 
+    DelegateRole role
+  ) 
+    public 
+    view 
+    returns (address) 
+  {
+    address delegate = accounts[account].delegates[uint256(role)];
     if (delegate == address(0)) {
       return account;
     } else {
@@ -720,10 +555,9 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
    */
   function _redeemRewards(address _account) private returns (uint256) {
     Account storage account = accounts[_account];
-    Rewards storage rewards = account.rewards;
     uint256 rewardBlockNumber = block.number.sub(1);
     FractionUtil.Fraction storage previousCumulativeRewardWeight = cumulativeRewardWeights[
-      rewards.lastRedeemed
+      account.rewardsLastRedeemed
     ];
     FractionUtil.Fraction storage cumulativeRewardWeight = cumulativeRewardWeights[
       rewardBlockNumber
@@ -738,9 +572,9 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     );
     require(rewardWeight.exists(), "Rewards weight does not exist");
     uint256 value = rewardWeight.mul(account.weight);
-    rewards.lastRedeemed = uint96(rewardBlockNumber);
+    account.rewardsLastRedeemed = uint96(rewardBlockNumber);
     if (value > 0) {
-      address recipient = getRewardsRecipientFromAccount(_account);
+      address recipient = getDelegateFromAccountAndRole(_account, DelegateRole.Rewards);
       IERC20Token goldToken = IERC20Token(registry.getAddressFor(GOLD_TOKEN_REGISTRY_ID));
       require(goldToken.transfer(recipient, value));
       emit Withdrawal(recipient, value);
@@ -877,44 +711,24 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     list.length = lastIndex;
   }
 
-  /**
-   * @notice Given a signed address, returns the signer of the address.
-   * @param message The address that was signed.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   */
-  function getSignerOfAddress(
-    address message,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  )
-    private
-    pure
-    returns (address)
-  {
-    bytes32 hash = keccak256(abi.encodePacked(message));
-    bytes memory prefix = "\x19Ethereum Signed Message:\n32";
-    bytes32 prefixedHash = keccak256(abi.encodePacked(prefix, hash));
-    return ecrecover(prefixedHash, v, r, s);
+  function isAccount(address account) internal view returns (bool) {
+    return (accounts[account].exists);
   }
 
-  /**
-   * @notice Approxmiates the square root of x using the Bablyonian method.
-   * @param x The number to take the square root of.
-   * @return An approximation of the square root of x.
-   * @dev The error can be large for smaller numbers, so we multiply by the square of `precision`.
-   */
-  function sqrt(uint256 x) private pure returns (FractionUtil.Fraction memory) {
-    uint256 precision = 100;
-    uint256 px = x.mul(precision.mul(precision));
-    uint256 z = px.add(1).div(2);
-    uint256 y = px;
-    while (z < y) {
-      y = z;
-      z = px.div(z).add(z).div(2);
-    }
-    return FractionUtil.Fraction(y, precision);
+  function isNotAccount(address account) internal view returns (bool) {
+    return (!accounts[account].exists);
+  }
+
+  // Reverts if rewards, voting, or validating rights have been delegated to `account`.
+  function isNotDelegate(address account) internal view returns (bool) {
+    return (delegations[account] == address(0));
+  }
+
+  // TODO(asa): Allow users to notify if they would continue to meet the registration
+  // requirements.
+  function isNotValidating(address account) internal view returns (bool) {
+    address validator = getDelegateFromAccountAndRole(account, DelegateRole.Validating);
+    IValidators validators = IValidators(registry.getAddressFor(VALIDATORS_REGISTRY_ID));
+    return (!validators.isValidating(validator));
   }
 }
