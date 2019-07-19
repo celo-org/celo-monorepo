@@ -4,6 +4,7 @@ import {
   BLSPrivateKeyToPublic,
 } from '@celo/celotool/src/lib/bls_utils'
 import { NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
+import { config } from '@celo/protocol/migrationsConfig'
 import {
   add0x,
   generateAccountAddressFromPrivateKey,
@@ -12,7 +13,6 @@ import {
   sendTransactionWithPrivateKey,
 } from '@celo/protocol/lib/web3-utils'
 import { exec } from 'child_process'
-import { config } from '@celo/protocol/migrationsConfig'
 import { BigNumber } from 'bignumber.js'
 import * as minimist from 'minimist'
 import { BondedDepositsInstance, ValidatorsInstance } from 'types'
