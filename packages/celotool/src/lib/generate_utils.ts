@@ -48,7 +48,6 @@ export const add0x = (str: string) => {
   return '0x' + str
 }
 
-
 export const coerceMnemonicAccountType = (raw: string): AccountType => {
   const index = MNEMONIC_ACCOUNT_TYPE_CHOICES.indexOf(raw)
   if (index === -1) {
