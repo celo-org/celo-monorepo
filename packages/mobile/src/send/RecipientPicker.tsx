@@ -1,3 +1,4 @@
+import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import SectionHead from '@celo/react-components/components/SectionHead'
 import ForwardChevron from '@celo/react-components/icons/ForwardChevron'
 import QRCode from '@celo/react-components/icons/QRCode'
@@ -9,6 +10,7 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import {
   ListRenderItemInfo,
+  PermissionsAndroid,
   SectionList,
   SectionListData,
   StyleSheet,
@@ -52,8 +54,10 @@ interface Props {
   searchQuery: string
   sections: Section[]
   defaultCountryCode: string
+  hasAcceptedContactPermission: boolean
   onSelectRecipient(recipient: Recipient): void
   onSearchQueryChanged(searchQuery: string): void
+  onPermissionsAccepted(): void
 }
 
 type RecipientProps = Props & WithNamespaces
@@ -108,6 +112,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
       <Text style={[fontStyles.bodySmall, style.emptyViewBodySmall]}>
         {this.props.t('searchForSomeone')}
       </Text>
+      {this.renderRequestContactPermission()}
     </View>
   )
 
@@ -125,6 +130,30 @@ export class RecipientPicker extends React.Component<RecipientProps> {
         {this.renderItemSeparator()}
       </>
     )
+  }
+
+  renderRequestContactPermission = () => {
+    return (
+      <>
+        {!this.props.hasAcceptedContactPermission && (
+          <Button
+            text={this.props.t('askForContactsPermissionAction')}
+            style={style.button}
+            onPress={this.requestContactsPermission}
+            standard={true}
+            type={BtnTypes.SECONDARY}
+          />
+        )}
+      </>
+    )
+  }
+
+  requestContactsPermission = async () => {
+    const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS)
+
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      this.props.onPermissionsAccepted()
+    }
   }
 
   render() {
@@ -160,6 +189,12 @@ const style = StyleSheet.create({
   body: {
     flex: 1,
   },
+  button: {
+    marginTop: 30,
+    paddingHorizontal: 20,
+    paddingVertical: 5,
+  },
+
   label: {
     alignSelf: 'center',
     color: colors.dark,

@@ -3,7 +3,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { PermissionsAndroid, StyleSheet, View } from 'react-native'
 import { NavigationInjectedProps, NavigationScreenProps, withNavigation } from 'react-navigation'
 import { connect } from 'react-redux'
 import { defaultCountryCodeSelector } from 'src/account/reducer'
@@ -15,6 +15,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import CancelButton from 'src/components/CancelButton'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import { Namespaces } from 'src/i18n'
+import { importContacts } from 'src/identity/actions'
 import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -25,6 +26,7 @@ import { filterRecipients, NumberToRecipient, Recipient } from 'src/utils/recipi
 
 interface State {
   searchQuery: string
+  hasGivenPermission: boolean
 }
 
 interface Section {
@@ -41,6 +43,13 @@ interface StateProps {
 interface DispatchProps {
   showError: typeof showError
   hideAlert: typeof hideAlert
+  importContacts: typeof importContacts
+}
+
+const mapDispatchToProps = {
+  showError,
+  hideAlert,
+  importContacts,
 }
 
 type Props = StateProps & DispatchProps & WithNamespaces & NavigationInjectedProps
@@ -62,12 +71,16 @@ class Invite extends React.Component<Props, State> {
     headerLeft: <CancelButton eventName={CustomEventNames.invite_cancel} />,
   })
 
-  state: State = {
-    searchQuery: '',
-  }
+  state: State = { searchQuery: '', hasGivenPermission: true }
 
   async componentDidMount() {
     this.props.navigation.setParams({ title: this.props.t('invite') })
+
+    PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_CONTACTS).then(
+      (hasPermissions) => {
+        this.setState({ hasGivenPermission: hasPermissions })
+      }
+    )
   }
 
   updateToField = (value: string) => {
@@ -105,6 +118,11 @@ class Invite extends React.Component<Props, State> {
       .filter((section) => section.data.length > 0)
   }
 
+  onPermissionsAccepted = async () => {
+    this.props.importContacts()
+    this.setState({ hasGivenPermission: true })
+  }
+
   render() {
     return (
       <View style={style.container}>
@@ -112,9 +130,11 @@ class Invite extends React.Component<Props, State> {
           sections={this.buildSections()}
           searchQuery={this.state.searchQuery}
           defaultCountryCode={this.props.defaultCountryCode}
+          hasAcceptedContactPermission={this.state.hasGivenPermission}
           onSelectRecipient={this.onSelectRecipient}
           onSearchQueryChanged={this.onSearchQueryChanged}
           showQRCode={false}
+          onPermissionsAccepted={this.onPermissionsAccepted}
         />
       </View>
     )
@@ -138,11 +158,8 @@ const style = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect(
+  connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
-    {
-      showError,
-      hideAlert,
-    }
+    mapDispatchToProps
   )(withNamespaces(Namespaces.sendFlow7)(withNavigation(Invite)))
 )
