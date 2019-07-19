@@ -9,8 +9,8 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { exec } from 'child_process'
 import {
-  BLSPrivateKeyToPublic,
   BLSPrivateKeyToProcessedPrivateKey,
+  BLSPrivateKeyToPublic,
 } from '@celo/celotool/src/lib/bls_utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { BigNumber } from 'bignumber.js'
