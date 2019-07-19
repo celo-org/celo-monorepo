@@ -77,7 +77,9 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   }
 
   struct ThresholdParameters {
+    // Support threshold for proposal passing at typical participation level
     FractionUtil.Fraction baseThreshold;
+    // Factor inversely related to threshold sensitivity
     FractionUtil.Fraction kFactor;
   }
 
@@ -1120,9 +1122,9 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     view
     returns (ThresholdParameters memory)
   {
-    // Default to a simple majority and k = 0.5.
+    // Default to a 3/5 supermajority and k = 1/5
     ThresholdParameters memory thresholdParameters =
-      ThresholdParameters(FractionUtil.Fraction(1, 2), FractionUtil.Fraction(1, 2));
+      ThresholdParameters(FractionUtil.Fraction(3, 5), FractionUtil.Fraction(1, 5));
     if (constitution[destination].functionThresholds[functionId].baseThreshold.exists()) {
       thresholdParameters = constitution[destination].functionThresholds[functionId];
     } else if (constitution[destination].defaultParameters.baseThreshold.exists()) {

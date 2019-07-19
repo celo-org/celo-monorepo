@@ -59,10 +59,10 @@ contract Quorum is IQuorum, Ownable, Initializable {
    *   It is paramterized by a base threshold and a sensitivity coefficient.
    * @param totalVotes The total number of votes on the proposal.
    * @param totalWeight The total account weight across the network.
-   * @param baseThresholdNumerator The numerator of the quorum ratio.
-   * @param baseThresholdDenominator The denominator of the quorum ratio.
-   * @param kFactorNumerator The numerator of the quorum ratio.
-   * @param kFactorDenominator The denominator of the quorum ratio.
+   * @param baseThresholdNumerator The numerator of the base threshold.
+   * @param baseThresholdDenominator The denominator of the base threshold.
+   * @param kFactorNumerator The numerator of the sensitivity factor.
+   * @param kFactorDenominator The denominator of the sensitivity factor.
    */
   function threshold(
     uint256 totalVotes,
