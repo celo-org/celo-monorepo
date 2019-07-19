@@ -28,8 +28,6 @@ const initializeArgs = async (networkName: string): Promise<any[]> => {
     config.governance.approvalStageDuration,
     config.governance.referendumStageDuration,
     config.governance.executionStageDuration,
-    config.governance.initialQuorumNumerator,
-    config.governance.initialQuorumDenominator,
   ]
 }
 
@@ -65,6 +63,7 @@ module.exports = deployProxyAndImplementation<GovernanceInstance>(
       'GasCurrencyWhitelist',
       'GasPriceMinimum',
       'Governance',
+      'Quorum',
       'Registry',
       'Reserve',
       'SortedOracles',

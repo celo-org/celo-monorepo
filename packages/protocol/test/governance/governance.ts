@@ -1,4 +1,4 @@
-import { bondedDepositsRegistryId } from '@celo/protocol/lib/registry-utils'
+import { bondedDepositsRegistryId, quorumRegistryId } from '@celo/protocol/lib/registry-utils'
 import {
   assertBalance,
   assertEqualBN,
@@ -15,6 +15,8 @@ import {
   GovernanceInstance,
   MockBondedDepositsContract,
   MockBondedDepositsInstance,
+  MockQuorumContract,
+  MockQuorumInstance,
   RegistryContract,
   RegistryInstance,
   TestTransactionsContract,
@@ -23,6 +25,7 @@ import {
 
 const Governance: GovernanceContract = artifacts.require('Governance')
 const MockBondedDeposits: MockBondedDepositsContract = artifacts.require('MockBondedDeposits')
+const MockQuorum: MockQuorumContract = artifacts.require('MockQuorum')
 const Registry: RegistryContract = artifacts.require('Registry')
 const TestTransactions: TestTransactionsContract = artifacts.require('TestTransactions')
 
@@ -59,6 +62,7 @@ enum VoteValue {
 contract('Governance', (accounts: string[]) => {
   let governance: GovernanceInstance
   let mockBondedDeposits: MockBondedDepositsInstance
+  let mockQuorum: MockQuorumInstance
   let testTransactions: TestTransactionsInstance
   let registry: RegistryInstance
   const nullFunctionId = '0x00000000'
@@ -74,14 +78,13 @@ contract('Governance', (accounts: string[]) => {
   const approvalStageDuration = 1 * 60 // 1 minute
   const referendumStageDuration = 5 * 60 // 5 minutes
   const executionStageDuration = 1 * 60 // 1 minute
-  const initialQuorumNumerator = 80
-  const initialQuorumDenominator = 100
   let transactionSuccess1
   let transactionSuccess2
   let transactionFail
   beforeEach(async () => {
     governance = await Governance.new()
     mockBondedDeposits = await MockBondedDeposits.new()
+    mockQuorum = await MockQuorum.new()
     registry = await Registry.new()
     testTransactions = await TestTransactions.new()
     await governance.initialize(
@@ -93,11 +96,10 @@ contract('Governance', (accounts: string[]) => {
       dequeueFrequency,
       approvalStageDuration,
       referendumStageDuration,
-      executionStageDuration,
-      initialQuorumNumerator,
-      initialQuorumDenominator
+      executionStageDuration
     )
     await registry.setAddressFor(bondedDepositsRegistryId, mockBondedDeposits.address)
+    await registry.setAddressFor(quorumRegistryId, mockQuorum.address)
     transactionSuccess1 = {
       value: 0,
       destination: testTransactions.address,
@@ -131,6 +133,7 @@ contract('Governance', (accounts: string[]) => {
         'hex'
       ),
     }
+    mockQuorum.setThresholdReturn(50, 100)
   })
 
   describe('#initialize()', () => {
@@ -186,9 +189,7 @@ contract('Governance', (accounts: string[]) => {
           dequeueFrequency,
           approvalStageDuration,
           referendumStageDuration,
-          executionStageDuration,
-          initialQuorumNumerator,
-          initialQuorumDenominator
+          executionStageDuration
         )
       )
     })
@@ -568,7 +569,7 @@ contract('Governance', (accounts: string[]) => {
         assert.equal(tNum.toNumber(), 1)
         assert.equal(tDenom.toNumber(), 2)
         assert.equal(kNum.toNumber(), 1)
-        assert.equal(kDenom.toNumber(), 1)
+        assert.equal(kDenom.toNumber(), 2)
       })
 
       it('should emit the ConstitutionSet event', async () => {
@@ -733,18 +734,23 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when making a proposal with zero transactions', () => {
       it('should register the proposal', async () => {
+        const beforeTimestamp = (await web3.eth.getBlock('latest')).timestamp
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         await governance.propose([], [], [], [], { value: minDeposit })
+        const afterTimestamp = (await web3.eth.getBlock('latest')).timestamp
         const proposal = parseProposalParams(await governance.getProposal(proposalId))
         assert.equal(proposal.proposer, accounts[0])
         assert.equal(proposal.deposit, minDeposit)
-        assert.equal(proposal.timestamp, (await web3.eth.getBlock('latest')).timestamp)
+        assert.isTrue(proposal.timestamp >= beforeTimestamp)
+        assert.isTrue(proposal.timestamp <= afterTimestamp)
         assert.equal(proposal.transactionCount, 0)
       })
 
       it('should emit the ProposalQueued event', async () => {
+        const beforeTimestamp = (await web3.eth.getBlock('latest')).timestamp
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         const resp = await governance.propose([], [], [], [], { value: minDeposit })
+        const afterTimestamp = (await web3.eth.getBlock('latest')).timestamp
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
         assertLogMatches2(log, {
@@ -753,15 +759,18 @@ contract('Governance', (accounts: string[]) => {
             proposalId: new BigNumber(1),
             proposer: accounts[0],
             deposit: new BigNumber(minDeposit),
-            timestamp: new BigNumber((await web3.eth.getBlock('latest')).timestamp),
+            timestamp: matchAny,
             transactionCount: 0,
           },
         })
+        assert.isTrue(log.args.timestamp.toNumber() >= beforeTimestamp)
+        assert.isTrue(log.args.timestamp.toNumber() <= afterTimestamp)
       })
     })
 
     describe('when making a proposal with one transaction', () => {
       it('should register the proposal', async () => {
+        const beforeTimestamp = (await web3.eth.getBlock('latest')).timestamp
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
@@ -770,10 +779,12 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
+        const afterTimestamp = (await web3.eth.getBlock('latest')).timestamp
         const proposal = parseProposalParams(await governance.getProposal(proposalId))
         assert.equal(proposal.proposer, accounts[0])
         assert.equal(proposal.deposit, minDeposit)
-        assert.equal(proposal.timestamp, (await web3.eth.getBlock('latest')).timestamp)
+        assert.isTrue(proposal.timestamp >= beforeTimestamp)
+        assert.isTrue(proposal.timestamp <= afterTimestamp)
         assert.equal(proposal.transactionCount, 1)
       })
 
@@ -797,6 +808,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should emit the ProposalQueued event', async () => {
+        const beforeTimestamp = (await web3.eth.getBlock('latest')).timestamp
         const resp = await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
@@ -805,6 +817,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
+        const afterTimestamp = (await web3.eth.getBlock('latest')).timestamp
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
         assertLogMatches2(log, {
@@ -813,15 +826,18 @@ contract('Governance', (accounts: string[]) => {
             proposalId: new BigNumber(1),
             proposer: accounts[0],
             deposit: new BigNumber(minDeposit),
-            timestamp: new BigNumber((await web3.eth.getBlock('latest')).timestamp),
+            timestamp: matchAny,
             transactionCount: 1,
           },
         })
+        assert.isTrue(log.args.timestamp.toNumber() >= beforeTimestamp)
+        assert.isTrue(log.args.timestamp.toNumber() <= afterTimestamp)
       })
     })
 
     describe('when making a proposal with two transactions', () => {
       it('should register the proposal', async () => {
+        const beforeTimestamp = (await web3.eth.getBlock('latest')).timestamp
         await governance.propose(
           [transactionSuccess1.value, transactionSuccess2.value],
           [transactionSuccess1.destination, transactionSuccess2.destination],
@@ -831,10 +847,12 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
+        const afterTimestamp = (await web3.eth.getBlock('latest')).timestamp
         const proposal = parseProposalParams(await governance.getProposal(proposalId))
         assert.equal(proposal.proposer, accounts[0])
         assert.equal(proposal.deposit, minDeposit)
-        assert.equal(proposal.timestamp, (await web3.eth.getBlock('latest')).timestamp)
+        assert.isTrue(proposal.timestamp >= beforeTimestamp)
+        assert.isTrue(proposal.timestamp <= afterTimestamp)
         assert.equal(proposal.transactionCount, 2)
       })
 
@@ -867,6 +885,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should emit the ProposalQueued event', async () => {
+        const beforeTimestamp = (await web3.eth.getBlock('latest')).timestamp
         const resp = await governance.propose(
           [transactionSuccess1.value, transactionSuccess2.value],
           [transactionSuccess1.destination, transactionSuccess2.destination],
@@ -876,6 +895,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
+        const afterTimestamp = (await web3.eth.getBlock('latest')).timestamp
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
         assertLogMatches2(log, {
@@ -884,10 +904,12 @@ contract('Governance', (accounts: string[]) => {
             proposalId: new BigNumber(1),
             proposer: accounts[0],
             deposit: new BigNumber(minDeposit),
-            timestamp: new BigNumber((await web3.eth.getBlock('latest')).timestamp),
+            timestamp: matchAny,
             transactionCount: 2,
           },
         })
+        assert.isTrue(log.args.timestamp.toNumber() >= beforeTimestamp)
+        assert.isTrue(log.args.timestamp.toNumber() <= afterTimestamp)
       })
     })
 
@@ -1338,6 +1360,13 @@ contract('Governance', (accounts: string[]) => {
         const emptyIndex = await governance.emptyIndices(0)
         assert.equal(emptyIndex.toNumber(), index)
       })
+
+      it('should not update quorum', async () => {
+        const expectedCount = (await mockQuorum.updateCallCount()).toNumber()
+        await governance.approve(proposalId, index)
+        const updateCount = (await mockQuorum.updateCallCount()).toNumber()
+        assert.equal(updateCount, expectedCount)
+      })
     })
   })
 
@@ -1500,11 +1529,19 @@ contract('Governance', (accounts: string[]) => {
         assert.equal(emptyIndex.toNumber(), index)
       })
 
-      it('should emit the QuorumUpdated event', async () => {
-        const resp = await governance.vote(proposalId, index, value)
-        assert.equal(resp.logs.length, 1)
-        const quorumUpdatedLog = resp.logs[0]
-        assert.equal(quorumUpdatedLog.event, 'QuorumUpdated', `Log event name doesn\'t match`)
+      it('should update quorum with participation values', async () => {
+        const expectedCount = (await mockQuorum.updateCallCount()).toNumber()
+        const [yes, no, abstain] = await governance.getVoteTotals(proposalId)
+        const expectedTotalVotes = yes.toNumber() + no.toNumber() + abstain.toNumber()
+        const expectedTotalWeight = (await mockBondedDeposits.totalWeight()).toNumber()
+
+        await governance.vote(proposalId, index, value)
+
+        const updateCount = (await mockQuorum.updateCallCount()).toNumber()
+        const [totalVotes, totalWeight] = await mockQuorum.getLastUpdateCall()
+        assert.equal(updateCount, expectedCount + 1)
+        assert.equal(totalVotes.toNumber(), expectedTotalVotes)
+        assert.equal(totalWeight.toNumber(), expectedTotalWeight)
       })
     })
   })
@@ -1549,18 +1586,31 @@ contract('Governance', (accounts: string[]) => {
           assert.isFalse(await governance.proposalExists(proposalId))
         })
 
-        it('should emit the ProposalExecuted and QuorumUpdated event', async () => {
+        it('should emit the ProposalExecuted event', async () => {
           const resp = await governance.execute(proposalId, index)
-          assert.equal(resp.logs.length, 2)
-          const proposalExecutedLog = resp.logs[0]
-          assertLogMatches2(proposalExecutedLog, {
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          assertLogMatches2(log, {
             event: 'ProposalExecuted',
             args: {
               proposalId: new BigNumber(proposalId),
             },
           })
-          const quorumUpdatedLog = resp.logs[1]
-          assert.equal(quorumUpdatedLog.event, 'QuorumUpdated', `Log event name doesn\'t match`)
+        })
+
+        it('should update quorum with participation values', async () => {
+          const expectedCount = (await mockQuorum.updateCallCount()).toNumber()
+          const [yes, no, abstain] = await governance.getVoteTotals(proposalId)
+          const expectedTotalVotes = yes.toNumber() + no.toNumber() + abstain.toNumber()
+          const expectedTotalWeight = (await mockBondedDeposits.totalWeight()).toNumber()
+
+          await governance.execute(proposalId, index)
+
+          const updateCount = (await mockQuorum.updateCallCount()).toNumber()
+          const [totalVotes, totalWeight] = await mockQuorum.getLastUpdateCall()
+          assert.equal(updateCount, expectedCount + 1)
+          assert.equal(totalVotes.toNumber(), expectedTotalVotes)
+          assert.equal(totalWeight.toNumber(), expectedTotalWeight)
         })
       })
 
@@ -1624,9 +1674,9 @@ contract('Governance', (accounts: string[]) => {
           assert.isFalse(await governance.proposalExists(proposalId))
         })
 
-        it('should emit the ProposalExecuted event and QuorumUpdated event', async () => {
+        it('should emit the ProposalExecuted event', async () => {
           const resp = await governance.execute(proposalId, index)
-          assert.equal(resp.logs.length, 2)
+          assert.equal(resp.logs.length, 1)
           const log = resp.logs[0]
           assertLogMatches2(log, {
             event: 'ProposalExecuted',
@@ -1634,8 +1684,21 @@ contract('Governance', (accounts: string[]) => {
               proposalId: new BigNumber(proposalId),
             },
           })
-          const quorumUpdatedLog = resp.logs[1]
-          assert.equal(quorumUpdatedLog.event, 'QuorumUpdated', `Log event name doesn\'t match`)
+        })
+
+        it('should update quorum with participation values', async () => {
+          const expectedCount = (await mockQuorum.updateCallCount()).toNumber()
+          const [yes, no, abstain] = await governance.getVoteTotals(proposalId)
+          const expectedTotalVotes = yes.toNumber() + no.toNumber() + abstain.toNumber()
+          const expectedTotalWeight = (await mockBondedDeposits.totalWeight()).toNumber()
+
+          await governance.execute(proposalId, index)
+
+          const updateCount = (await mockQuorum.updateCallCount()).toNumber()
+          const [totalVotes, totalWeight] = await mockQuorum.getLastUpdateCall()
+          assert.equal(updateCount, expectedCount + 1)
+          assert.equal(totalVotes.toNumber(), expectedTotalVotes)
+          assert.equal(totalWeight.toNumber(), expectedTotalWeight)
         })
       })
 
@@ -1719,11 +1782,19 @@ contract('Governance', (accounts: string[]) => {
         assert.isFalse(await governance.proposalExists(proposalId))
       })
 
-      it('should emit the QuorumUpdated event', async () => {
-        const resp = await governance.execute(proposalId, index)
-        assert.equal(resp.logs.length, 1)
-        const quorumUpdatedLog = resp.logs[0]
-        assert.equal(quorumUpdatedLog.event, 'QuorumUpdated', `Log event name doesn\'t match`)
+      it('should update quorum with participation values', async () => {
+        const expectedCount = (await mockQuorum.updateCallCount()).toNumber()
+        const [yes, no, abstain] = await governance.getVoteTotals(proposalId)
+        const expectedTotalVotes = yes.toNumber() + no.toNumber() + abstain.toNumber()
+        const expectedTotalWeight = (await mockBondedDeposits.totalWeight()).toNumber()
+
+        await governance.execute(proposalId, index)
+
+        const updateCount = (await mockQuorum.updateCallCount()).toNumber()
+        const [totalVotes, totalWeight] = await mockQuorum.getLastUpdateCall()
+        assert.equal(updateCount, expectedCount + 1)
+        assert.equal(totalVotes.toNumber(), expectedTotalVotes)
+        assert.equal(totalWeight.toNumber(), expectedTotalWeight)
       })
     })
   })
@@ -1830,13 +1901,14 @@ contract('Governance', (accounts: string[]) => {
       await governance.approve(proposalId, index)
       await timeTravel(approvalStageDuration, web3)
       await mockBondedDeposits.setWeight(account, weight)
-      await mockBondedDeposits.setWeight(otherAccount, weight * 10)
+      await mockBondedDeposits.setWeight(otherAccount, weight * 99)
       await governance.vote(proposalId, index, VoteValue.Yes)
     })
 
     describe('when proposal meets all passing conditions', () => {
       beforeEach(async () => {
         await governance.vote(proposalId, index, VoteValue.Abstain, { from: otherAccount })
+        await mockQuorum.setThresholdReturn(70, 100)
       })
 
       it('should return true', async () => {
@@ -1848,6 +1920,7 @@ contract('Governance', (accounts: string[]) => {
     describe('when proposal does not have sufficient support', () => {
       beforeEach(async () => {
         await governance.vote(proposalId, index, VoteValue.No, { from: otherAccount })
+        await mockQuorum.setThresholdReturn(70, 100)
       })
 
       it('should return false', async () => {
@@ -1857,9 +1930,48 @@ contract('Governance', (accounts: string[]) => {
     })
 
     describe('when proposal does not meet quorum', () => {
+      beforeEach(async () => {
+        await mockQuorum.setThresholdReturn(110, 100)
+      })
+
       it('should return false', async () => {
         const isPassing = await governance.isProposalPassing(proposalId)
         assert.isFalse(isPassing)
+      })
+    })
+  })
+
+  describe('#getProposalThreshold', () => {
+    const weight = 10
+    const proposalId = 1
+    const index = 0
+
+    describe('when using a proposal with two transactions', () => {
+      beforeEach(async () => {
+        await governance.propose(
+          [transactionSuccess1.value, transactionSuccess2.value],
+          [transactionSuccess1.destination, transactionSuccess2.destination],
+          // @ts-ignore
+          Buffer.concat([transactionSuccess1.data, transactionSuccess2.data]),
+          [transactionSuccess1.data.length, transactionSuccess2.data.length],
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await timeTravel(dequeueFrequency, web3)
+        await governance.approve(proposalId, index)
+        await timeTravel(approvalStageDuration, web3)
+        await mockBondedDeposits.setWeight(account, weight)
+        await mockBondedDeposits.setWeight(otherAccount, weight * 99)
+        await governance.vote(proposalId, index, VoteValue.Yes)
+        await governance.vote(proposalId, index, VoteValue.Abstain, { from: otherAccount })
+        await mockQuorum.setThresholdReturn(70, 100)
+      })
+
+      it('should return the strictest threshold', async () => {
+        // const [qNum, qDenom] = await governance.getQuorum()
+        const [tNum, tDenom] = await governance.getProposalThreshold(proposalId)
+        // threshold is equivalent to 70/100
+        assert.isTrue(tNum.toNumber() * 100 == tDenom.toNumber() * 70)
       })
     })
   })

@@ -132,7 +132,7 @@ library FractionUtil {
   }
 
   /**
-   * @dev Returns an integer that is the fraction divided by a fraction.
+   * @dev Returns a fraction that is the fraction divided by a fraction.
    * @param x A Fraction struct.
    * @param y A Fraction struct.
    * @return x / y
@@ -244,61 +244,13 @@ library FractionUtil {
     pure
     returns (Fraction memory)
   {
-    uint256 limit = 1;
-    for (uint256 i = 0; i < maxDigits; i = i.add(1)) {
-      limit = limit.mul(10);
-    }
+    uint256 limit = 10**maxDigits;
     uint256 num = x.numerator;
     uint256 denom = x.denominator;
-    while (num > limit || denom > limit) {
+    while ((num > limit || denom > limit) && denom >= 10) {
       num = num.div(10);
       denom = denom.div(10);
     }
-    require(denom > 0);
     return Fraction(num, denom);
-  }
-
-  /**
-   * @dev Returns an approximation of the power x^y using Newton's method.
-   * @param x A Fraction struct.
-   * @param y A Fraction struct.
-   * @param iterationCount The number of iterations in Newton's method to use.
-   */
-  function powApprox(
-    Fraction memory x,
-    Fraction memory y,
-    uint256 iterationCount
-  )
-    internal
-    pure
-    returns (Fraction memory)
-  {
-    uint256 yN = y.numerator;
-    uint256 yD = y.denominator;
-    uint256 intPower = yN.div(yD);
-    yN = yN.sub(intPower.mul(yD));
-    Fraction memory ret = Fraction(1, 1);
-    for (uint256 i = 0; i < intPower; i = i.add(1)) {
-      ret = ret.mul(x);
-    }
-    ret = ret.round(10);
-    if (yN != 0) {
-      Fraction memory xPowC = Fraction(1, 1);
-      for (uint256 i = 0; i < yN; i = i.add(1)) {
-        xPowC = xPowC.mul(x);
-      }
-      xPowC = xPowC.round(10);
-      for (uint256 it = 0; it < iterationCount; it = it.add(1)) {
-        Fraction memory temp = xPowC;
-        for (uint256 i = 0; i < yD.sub(1); i = i.add(1)) {
-          temp = temp.div(ret);
-        }
-        ret.numerator = ret.numerator.mul(yD.sub(1));
-        ret = ret.add(temp);
-        ret.denominator = ret.denominator.div(yD);
-      }
-      ret = ret.round(10);
-    }
-    return ret;
   }
 }

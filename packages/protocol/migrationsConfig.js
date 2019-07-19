@@ -27,8 +27,6 @@ const defaultConfig = {
     minDeposit: 1, // 1 cGLD
     queueExpiry: 7 * 24 * 60 * 60, // 1 week
     referendumStageDuration: 15 * 60, // 15 minutes
-    initialQuorumNumerator: 80,
-    initialQuorumDenominator: 100,
   },
   gasPriceMinimum: {
     initialMinimum: 10000,
@@ -44,6 +42,12 @@ const defaultConfig = {
       numerator: 1,
       denominator: 2,
     },
+  },
+  quorum: {
+    initialQuorumNumerator: 80,
+    initialQuorumDenominator: 100,
+    quorumFloorNumerator: 5,
+    quorumFloorDenominator: 100,
   },
   registryProxyPredeployedAddress: '0x000000000000000000000000000000000000ce10',
   reserve: {

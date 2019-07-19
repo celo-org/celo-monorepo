@@ -9,6 +9,7 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "./IntegerSortedLinkedList.sol";
 import "./UsingBondedDeposits.sol";
 import "./interfaces/IGovernance.sol";
+import "./interfaces/IQuorum.sol";
 import "../stability/FractionUtil.sol";
 import "../common/Initializable.sol";
 
@@ -56,8 +57,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   // TODO(asa): Reduce storage usage here.
   struct VoteTotals {
     uint256 abstain;
-    uint256 yes;
     uint256 no;
+    uint256 yes;
   }
 
   struct Transaction {
@@ -108,7 +109,6 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   SortedLinkedList.List private queue;
   uint256[] public dequeued;
   uint256[] public emptyIndices;
-  FractionUtil.Fraction private quorum;
 
   event ApproverSet(
     address approver
@@ -149,16 +149,6 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     uint256 thresholdDenominator,
     uint256 kFactorNumerator,
     uint256 kFactorDenominator
-  );
-
-  event QuorumUpdated(
-    uint256 quorumNumerator,
-    uint256 quorumDenominator
-  );
-
-  event QuorumUpdated(
-    uint256 quorumNumerator,
-    uint256 quorumDenominator
   );
 
   event ProposalQueued(
@@ -233,9 +223,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     uint256 _dequeueFrequency,
     uint256 approvalStageDuration,
     uint256 referendumStageDuration,
-    uint256 executionStageDuration,
-    uint256 initialQuorumNumerator,
-    uint256 initialQuorumDenominator
+    uint256 executionStageDuration
   )
     external
     initializer
@@ -260,7 +248,6 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     stageDurations.approval = approvalStageDuration;
     stageDurations.referendum = referendumStageDuration;
     stageDurations.execution = executionStageDuration;
-    quorum = FractionUtil.Fraction(initialQuorumNumerator, initialQuorumDenominator);
     // solhint-disable-next-line not-rely-on-time
     lastDequeue = now;
   }
@@ -370,7 +357,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     onlyOwner
   {
     // TODO(asa): https://github.com/celo-org/celo-monorepo/pull/3414#discussion_r283588332
-    require(destination != address(0) && thresholdNumerator > 0 && thresholdDenominator > 0 && kFactorDenominator > 0);
+    require(destination != address(0) && thresholdNumerator > 0
+      && thresholdDenominator > 0 && kFactorDenominator > 0);
     ThresholdParameters memory thresholdParameters = ThresholdParameters(
       FractionUtil.Fraction(thresholdNumerator, thresholdDenominator),
       FractionUtil.Fraction(kFactorNumerator, kFactorDenominator));
@@ -656,7 +644,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
         proposalId
       );
     }
-    // must have executed fully or proposal has expired if code reaches this point
+    // proposal must have executed fully or expired if this point reached
     deleteDequeuedProposal(proposal, proposalId, index);
     return !expired;
   }
@@ -938,35 +926,57 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
    * @return Whether or not the proposal is passing.
    */
   function _isProposalPassing(Proposal storage proposal) private view returns (bool) {
-    uint256 forAndAgainstVotes = proposal.votes.yes.add(proposal.votes.no);
-    FractionUtil.Fraction memory proposalQuorum = FractionUtil.Fraction(
-      forAndAgainstVotes.add(proposal.votes.abstain),
-      totalWeight()
-    );
-    if (proposalQuorum.isLessThan(quorum)) {
-      return false;
-    }
-    // yesRatio can be undefined, which is not a problem for isGreaterThan
-    FractionUtil.Fraction memory yesRatio = FractionUtil.Fraction(
+    // supportRatio can be undefined, which is not a problem for isGreaterThan
+    FractionUtil.Fraction memory supportRatio = FractionUtil.Fraction(
       proposal.votes.yes,
-      forAndAgainstVotes
+      proposal.votes.yes.add(proposal.votes.no)
     );
-    FractionUtil.Fraction memory half = FractionUtil.Fraction(1, 2);
+    FractionUtil.Fraction memory threshold = _getProposalThreshold(proposal);
+    return supportRatio.isGreaterThan(threshold);
+  }
+
+  function getProposalThreshold(uint256 proposalId) external view returns (uint256, uint256) {
+    Proposal storage proposal = proposals[proposalId];
+    FractionUtil.Fraction memory threshold = _getProposalThreshold(proposal);
+    return (threshold.numerator, threshold.denominator);
+  }
+
+  function _getProposalThreshold(
+    Proposal storage proposal
+  )
+    private
+    view
+    returns (FractionUtil.Fraction memory)
+  {
+    uint256 totalVotes = proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain);
+    uint256 totalWeight_ = totalWeight();
+    if (totalWeight_ == 0) {
+      return FractionUtil.Fraction(0, 0);
+    }
+    FractionUtil.Fraction memory proposalThreshold = FractionUtil.Fraction(1, 2);
+    IQuorum quorum = IQuorum(registry.getAddressForOrDie(QUORUM_REGISTRY_ID));
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
       bytes4 functionId = extractFunctionSignature(proposal.transactions[i].data);
       ThresholdParameters memory thresholdParameters = _getConstitution(
         proposal.transactions[i].destination,
         functionId
       );
-      FractionUtil.Fraction memory threshold = thresholdParameters.baseThreshold
-        .sub(half)
-        .div(proposalQuorum.div(quorum).powApprox(thresholdParameters.kFactor, 10))
-        .add(half);
-      if (yesRatio.isLessThanOrEqualTo(threshold)) {
-        return false;
+      (uint256 thresholdNumerator, uint256 thresholdDenominator) = quorum.threshold(
+        totalVotes,
+        totalWeight_,
+        thresholdParameters.baseThreshold.numerator,
+        thresholdParameters.baseThreshold.denominator,
+        thresholdParameters.kFactor.numerator,
+        thresholdParameters.kFactor.denominator
+      );
+      // threshold can be undefined, not a problem for isLessThan
+      FractionUtil.Fraction memory threshold =
+        FractionUtil.Fraction(thresholdNumerator, thresholdDenominator);
+      if (proposalThreshold.isLessThan(threshold)) {
+        proposalThreshold = threshold;
       }
     }
-    return true;
+    return proposalThreshold;
   }
 
   function getDequeuedProposalStage(uint256 dequeueTime) external view returns (ProposalStage) {
@@ -1016,27 +1026,38 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   }
 
   /**
-   * @notice Deletes a dequeued proposal.
+   * @notice Deletes a dequeued proposal. Updates quorum if the proposal has been approved
+   *   and thus received a referendum.
    * @param proposal The proposal struct.
    * @param proposalId The ID of the proposal to delete.
    * @param index The index of the proposal ID in `dequeued`.
    */
-  function deleteDequeuedProposal(Proposal storage proposal, uint256 proposalId, uint256 index) private {
-    updateQuorum(proposal);
+  function deleteDequeuedProposal(
+    Proposal storage proposal,
+    uint256 proposalId,
+    uint256 index
+  )
+    private
+  {
+    if (proposal.approved) {
+      updateQuorum(proposal);
+    }
     dequeued[index] = 0;
     emptyIndices.push(index);
     delete proposals[proposalId];
   }
 
+  /**
+   * @notice Updates quorum using the total number of votes on the proposal
+   *   and the total network weight.
+   * @param proposal The proposal struct.
+   */
   function updateQuorum(Proposal storage proposal) private {
-    FractionUtil.Fraction memory proposalQuorum = FractionUtil.Fraction(
-      proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain),
-      totalWeight()
-    );
-    if (FractionUtil.exists(proposalQuorum)) {
-      quorum = quorum.mul(FractionUtil.Fraction(4, 5)).add(proposalQuorum.mul(FractionUtil.Fraction(1, 5)));
-      // quorum = quorum.round(10);
-      emit QuorumUpdated(quorum.numerator, quorum.denominator);
+    uint256 totalWeight_ = totalWeight();
+    if (totalWeight_ > 0) {
+      uint256 totalVotes = proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain);
+      IQuorum quorum = IQuorum(registry.getAddressForOrDie(QUORUM_REGISTRY_ID));
+      quorum.updateQuorumBaseline(totalVotes, totalWeight_);
     }
   }
 
@@ -1099,9 +1120,9 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     view
     returns (ThresholdParameters memory)
   {
-    // Default to a simple majority and k = 1.
+    // Default to a simple majority and k = 0.5.
     ThresholdParameters memory thresholdParameters =
-      ThresholdParameters(FractionUtil.Fraction(1, 2), FractionUtil.Fraction(1, 1));
+      ThresholdParameters(FractionUtil.Fraction(1, 2), FractionUtil.Fraction(1, 2));
     if (constitution[destination].functionThresholds[functionId].baseThreshold.exists()) {
       thresholdParameters = constitution[destination].functionThresholds[functionId];
     } else if (constitution[destination].defaultParameters.baseThreshold.exists()) {
