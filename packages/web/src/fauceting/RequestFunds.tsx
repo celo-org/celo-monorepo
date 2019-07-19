@@ -1,7 +1,9 @@
 import * as React from 'react'
 import ReCAPTCHA from 'react-google-recaptcha'
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
+import { ButtonWithFeedback, ContextualInfo, HashingStatus } from 'src/fauceting/MicroComponents'
 import {
+  formatNumber,
   getCaptchaKey,
   RequestState,
   requestStatusToState,
@@ -9,9 +11,8 @@ import {
 } from 'src/fauceting/utils'
 import { TextInput } from 'src/forms/FormComponents'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
-import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { postForm } from 'src/shared/Form'
-import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import { colors, standardStyles } from 'src/styles'
 import {
   RequestRecord,
   RequestStatus,
@@ -24,24 +25,13 @@ function send(beneficiary: string, kind: RequestType, captchaToken: string) {
   return postForm(route, { captchaToken, beneficiary })
 }
 
-function formatNumber(number: string) {
-  if (number.length === 1 && number.startsWith('+')) {
-    return ''
-  }
-  if (number.startsWith('+')) {
-    return number
-  } else {
-    return `+${number}`
-  }
-}
-
 interface State {
   beneficiary: string
-  country: string
   captchaOK: boolean
   requestState: RequestState
   dollarTxHash?: string
   goldTxHash?: string
+  escrowTxHash?: string
 }
 
 interface Props {
@@ -51,10 +41,10 @@ interface Props {
 class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
   state: State = {
     beneficiary: '',
-    country: '',
     requestState: RequestState.Initial,
     captchaOK: false,
   }
+
   recaptchaRef = React.createRef<ReCAPTCHA>()
 
   setBeneficiary = ({ nativeEvent }) => {
@@ -88,12 +78,14 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
     const { status, key } = await res.json()
 
     this.updateStatus(status)
-    this.subscribe(key)
+    if (key) {
+      this.subscribe(key)
+    }
     this.resetCaptcha()
   }
 
   startRequest = () => {
-    this.setState({ requestState: RequestState.Queued })
+    this.setState({ requestState: RequestState.Working })
     return send(this.state.beneficiary, this.props.kind, this.getCaptchaToken())
   }
 
@@ -106,8 +98,14 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
   }
 
   onUpdates = (record: RequestRecord) => {
-    const { status, dollarTxHash, goldTxHash } = record
-    this.setState({ requestState: requestStatusToState(status), dollarTxHash, goldTxHash })
+    const { status, dollarTxHash, goldTxHash, escrowTxHash } = record
+
+    this.setState({
+      requestState: requestStatusToState(status),
+      dollarTxHash,
+      goldTxHash,
+      escrowTxHash,
+    })
   }
 
   isFaucet = () => {
@@ -117,21 +115,10 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
   getPlaceholder = () => {
     return this.isFaucet() ? this.props.t('testnetAddress') : '+1 555 555 5555'
   }
-  buttonText = () => {
-    const { requestState } = this.state
-    const { t } = this.props
-
-    if (this.isFaucet()) {
-      return faucetButtonText({ requestState, t })
-    } else {
-      return inviteButtonText({ requestState, t })
-    }
-  }
 
   render() {
-    const { requestState } = this.state
+    const { requestState, dollarTxHash, goldTxHash, escrowTxHash } = this.state
     const isInvalid = requestState === RequestState.Invalid
-    const isStarted = requestState === RequestState.Working
     return (
       <View style={standardStyles.elementalMargin}>
         <View style={standardStyles.elementalMarginBottom}>
@@ -157,16 +144,24 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
           t={this.props.t}
           isFaucet={this.isFaucet()}
         />
-        <View style={[standardStyles.row, standardStyles.elementalMarginTop]}>
-          <Button
-            disabled={isInvalid || !this.state.captchaOK || isStarted}
-            kind={isStarted ? BTN.SECONDARY : BTN.PRIMARY}
-            text={this.buttonText()}
-            onPress={this.onSubmit}
-            iconLeft={isStarted && <ActivityIndicator color={colors.primary} size={'large'} />}
-            align="flex-start"
-            size={this.isFaucet() ? SIZE.normal : SIZE.big}
+        <View style={[this.isFaucet() && standardStyles.row, standardStyles.elementalMarginTop]}>
+          <ButtonWithFeedback
+            requestState={requestState}
+            isFaucet={this.isFaucet()}
+            captchaOK={this.state.captchaOK}
+            onSubmit={this.onSubmit}
+            t={this.props.t}
           />
+          <View>
+            <HashingStatus
+              done={requestState === RequestState.Completed}
+              isFaucet={this.isFaucet()}
+              dollarTxHash={dollarTxHash}
+              goldTxHash={goldTxHash}
+              escrowTxHash={escrowTxHash}
+              t={this.props.t}
+            />
+          </View>
         </View>
       </View>
     )
@@ -174,70 +169,6 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
 }
 
 export default withNamespaces(NameSpaces.faucet)(RequestFunds)
-
-interface InfoProps {
-  requestState: RequestState
-  t: I18nProps['t']
-  isFaucet: boolean
-}
-
-const BAD_STATES = new Set([RequestState.Failed, RequestState.Invalid])
-
-function ContextualInfo({ requestState, t, isFaucet }: InfoProps) {
-  const contextStyle = [
-    fonts.small,
-    !isFaucet && textStyles.invert,
-    BAD_STATES.has(requestState) && textStyles.error,
-  ]
-
-  const text = isFaucet ? faucetText({ requestState, t }) : inviteText({ requestState, t })
-
-  return <Text style={contextStyle}>{text}</Text>
-}
-
-function faucetButtonText({ requestState, t }) {
-  switch (requestState) {
-    case RequestState.Queued:
-    case RequestState.Working:
-      return t('funding')
-    case RequestState.Completed:
-      return t('funded')
-    default:
-      return t('getDollars')
-  }
-}
-
-function inviteButtonText({ requestState, t }) {
-  switch (requestState) {
-    case RequestState.Queued:
-    case RequestState.Working:
-      return ''
-    case RequestState.Completed:
-      return t('accountCreated')
-    default:
-      return t('requestInvite')
-  }
-}
-
-function faucetText({ requestState, t }) {
-  return (
-    {
-      [RequestState.Failed]: t('faucetError'),
-      [RequestState.Invalid]: t('invalidAddress'),
-      [RequestState.Completed]: t('faucetCompleted'),
-    }[requestState] || 'eg. a0000aaa00a0000000000a00a0a0000a00a00aaa'
-  )
-}
-
-function inviteText({ requestState, t }) {
-  return (
-    {
-      [RequestState.Failed]: t('inviteError'),
-      [RequestState.Invalid]: t('invalidNumber'),
-      [RequestState.Completed]: t('accountCreated'),
-    }[requestState] || ''
-  )
-}
 
 const styles = StyleSheet.create({
   error: {

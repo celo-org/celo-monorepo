@@ -19,9 +19,20 @@ function validateNumber(number: string) {
   return E164RegEx.test(number)
 }
 
-// TODO actually validate
-export function validateAddress(address: string) {
-  return address.length > 0
+export function formatNumber(number: string) {
+  if (number === '+') {
+    return ''
+  }
+  if (number.startsWith('+')) {
+    return number
+  } else {
+    return `+${number}`
+  }
+}
+
+// This is only a basic validation
+function validateAddress(address: string) {
+  return /^(0x)?[0-9a-f]{40}$/i.test(address)
 }
 
 export function requestStatusToState(status: RequestStatus) {
@@ -31,16 +42,14 @@ export function requestStatusToState(status: RequestStatus) {
     case RequestStatus.Failed:
       return RequestState.Failed
     case RequestStatus.Working:
-      return RequestState.Working
     case RequestStatus.Pending:
-      return RequestState.Queued
+      return RequestState.Working
   }
 }
 
 export enum RequestState {
   Initial,
   Invalid,
-  Queued,
   Working,
   Completed,
   Failed,

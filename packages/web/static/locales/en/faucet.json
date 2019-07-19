@@ -33,7 +33,10 @@
   "findAnswers": "Find answers and ask questions in the Forum",
   "testnetForum": "Alfajores Testnet Forum",
   "testnetAddress": "Testnet Address",
-  "requestInvite": "Request Invite",
-  "accountCreated": "Account Created",
-  "invalidNumber": "Must be a valid E.164 number"
+  "getStarted": "Get Started",
+  "done": "Done",
+  "invalidNumber": "Must be a valid E.164 number",
+  "cUSDsent": "cUSD Sent",
+  "cGLDsent": "cGLD Sent",
+  "walletBuilt": "Wallet Built"
 }
