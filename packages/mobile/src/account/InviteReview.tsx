@@ -15,6 +15,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import GethAwareButton from 'src/geth/GethAwareButton'
+import { Namespaces } from 'src/i18n'
 import SMSLogo from 'src/icons/InviteSendReceive'
 import WhatsAppLogo from 'src/icons/WhatsAppLogo'
 import { isPhoneNumberVerified } from 'src/identity/verification'
@@ -123,16 +124,7 @@ export class InviteReview extends React.Component<Props, State> {
       throw new Error("Can't send to recipient without valid e164 number")
     }
 
-    // TODO: Improve this by not checking for checking specifically for
-    // this display name. Requires improvements in recipient handling
-    // here and in previous screen
-    this.props.sendInvite(
-      recipient.displayName === this.props.t('sendFlow7:mobileNumber')
-        ? ''
-        : ' ' + recipient.displayName,
-      recipient.e164PhoneNumber,
-      inviteMode
-    )
+    this.props.sendInvite(recipient.displayName, recipient.e164PhoneNumber, inviteMode)
   }
 
   onEdit = () => {
@@ -219,5 +211,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces('inviteFlow11')(InviteReview))
+  )(withNamespaces(Namespaces.inviteFlow11)(InviteReview))
 )
