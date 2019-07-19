@@ -54,7 +54,8 @@ fastlane/report.xml
 
 # Bundle artifact
 *.jsbundle
-
+.bundle
+vendor/
 
 fastlane/google-play-service-account.json
 
