@@ -22,14 +22,14 @@ Validators are eligible for epoch payments if they proposed at least one block d
 
 - The annual cost of running and securing a validator node, including overhead: 60,000 Celo Dollar
 - Profit margin: $$20\%$$
-- Flat fee to validators : $$annual_val_fee = \frac{60,000}{1 - 0.2} = 75,\!000$$ Celo Dollar
+- Flat fee to validators : $$annual\_val\_fee = \frac{60,000}{1 - 0.2} = 75,\!000$$ Celo Dollar
 
-The flat fee is multiplied by a $$performance_factor$$ that accounts for the validators’ uptime performance during the epoch. Desired validator epoch rewards thus results as:
+The flat fee is multiplied by a $$performance\_factor$$ that accounts for the validators’ uptime performance during the epoch. Desired validator epoch rewards thus results as:
 
 $$
-des_val_rewards =
+des\_val\_rewards =
 
-performance_factor \frac{annual_val_fee}{epochs_per_annum}
+performance\_factor \frac{annual\_val\_fee}{epochs\_per\_annum}
 $$
 
 Validator epoch rewards are distributed in Celo Dollars and the reserve receives the equivalent amount of Celo Gold as compensation for minting the required Celo Dollars disbursements.
@@ -40,7 +40,7 @@ The proposed scheme to determine desired rewards for staking aims at achieving a
 
 Stakers are eligible for epoch payments if they voted for a validator group that had a validator elected during the epoch. The total desired epoch payments to stakers are calculated with respect to the difference between the target percentage of Celo Gold bonded and the current percentage of Celo Gold bonded \(relative to outstanding Celo Gold\). The target percentage of bonded Celo Gold is governable and set to 50% initially. The protocol dynamically increases \(decreases\) the rewards for staking if the current percentage of bonded Celo Gold is below \(above\) the target. Additionally, the total rewards, defined as a percentage of total bonded Celo Gold, are constrained to remain in a governable interval $$[y_{min}, y_{max}]$$.
 
-The total rewards for staking are distributed proportional to the bonded weight of the each account and adjusted by a $$group_performance_factor$$ that accounts for the uptime performance of the elected validator group.
+The total rewards for staking are distributed proportional to the bonded weight of the each account and adjusted by a $$group\_performance\_factor$$ that accounts for the uptime performance of the elected validator group.
 
 ### Community Fund & Reserve
 
