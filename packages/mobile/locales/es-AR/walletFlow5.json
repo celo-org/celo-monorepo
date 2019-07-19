@@ -11,7 +11,7 @@
   "setBackupKey":
     "Configure su clave de respaldo para mejorar la seguridad y habilitar la recuperación de la cuenta",
   "activity": "Actividad",
-  "wallet": "Billetera",
+  "wallet": "Monedero",
   "send": "Envío",
   "sent": "Envió",
   "received": "Recibido",
@@ -62,5 +62,5 @@
     "1":
       "Un recordatorio amistoso de que está utilizando una compilación de Testnet - los saldos aquí no son reales."
   },
-  "dismiss": "Despedir"
+  "dismiss": "Ocultar"
 }

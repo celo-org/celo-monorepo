@@ -8,7 +8,7 @@
   "next": "Siguiente",
   "downloadRewards": "Descargar Recompensas Celo",
   "chooseLanguage": "Elegir idioma",
-  "wallet": "Billetera",
+  "wallet": "Monedero",
   "payments": "Pagos",
   "send": "Envío",
   "exchange": "Cambio",
@@ -30,9 +30,9 @@
   "manageCeloDollars": "Administrar Celo Dólares",
   "sendCeloDollars": "Enviar Celo Dólares",
   "startEarning": "Comenzar a ganar",
-  "backToWallet": "Volver a la Billetera",
+  "backToWallet": "Volver a el Monedero",
   "exchangeForGold": "Cambiar a Oro",
-  "restoreCeloWallet": "Restaurar la billetera de Celo",
+  "restoreCeloWallet": "Restaurar el Monedero Celo",
   "invalidKey": "Clave de respaldo inválida ",
   "invalidPhone": "Número de teléfono inválido",
   "invalidAmount": "Monto invalido",
@@ -61,7 +61,7 @@
   "restartApp": "Reiniciar la aplicación",
   "loading": "Cargando…",
   "invalidBackup": "Clave de respaldo inválida",
-  "importBackupFailed": "No se pudo importar la billetera",
+  "importBackupFailed": "No se pudo importar el monedero",
   "inviteFailed": "Falló el envío de la invitación",
   "importContactsFailed": "Error al importar contactos",
   "sendPaymentFailed": "Falla en el envío de pago",
@@ -79,7 +79,7 @@
   "thisVersionIsInsecure": "Esta versión es insegura.",
   "update": "Actualizar",
   "qrFailedNoAddress":
-    "Código QR no se pudo leer. Motivo: no se encontró la dirección de la billetera.",
+    "Código QR no se pudo leer. Motivo: no se encontró la dirección de el monedero.",
   "qrFailedInvalidAddress":
     "Código QR no se pudo leer. Razón: la dirección de la cartera no es válida."
 }
