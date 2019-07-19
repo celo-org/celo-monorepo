@@ -160,8 +160,9 @@ const generateIstanbulExtraData = (validators: Validator[]) => {
         [],
         [],
         Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
-        Buffer.from(repeat('0', validators.length * 2), 'hex'),
+        new Buffer(0),
         Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
+        new Buffer(0),
       ])
       .toString('hex')
   )
