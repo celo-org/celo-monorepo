@@ -13,12 +13,7 @@ import { TextInput } from 'src/forms/FormComponents'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { postForm } from 'src/shared/Form'
 import { colors, standardStyles } from 'src/styles'
-import {
-  RequestRecord,
-  RequestStatus,
-  RequestType,
-  subscribeRequest,
-} from '../../server/FirebaseClient'
+import { RequestRecord, RequestType, subscribeRequest } from '../../server/FirebaseClient'
 
 function send(beneficiary: string, kind: RequestType, captchaToken: string) {
   const route = kind === RequestType.Invite ? '/invite' : '/faucet'
@@ -29,9 +24,9 @@ interface State {
   beneficiary: string
   captchaOK: boolean
   requestState: RequestState
-  dollarTxHash?: string
-  goldTxHash?: string
-  escrowTxHash?: string
+  dollarTxHash?: string | null
+  goldTxHash?: string | null
+  escrowTxHash?: string | null
 }
 
 interface Props {
@@ -83,7 +78,7 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
     const res = await this.startRequest()
     const { status, key } = await res.json()
 
-    this.updateStatus(status)
+    this.setState({ requestState: requestStatusToState(status) })
     if (key) {
       this.subscribe(key)
     }
@@ -95,23 +90,29 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
     return send(this.state.beneficiary, this.props.kind, this.getCaptchaToken())
   }
 
-  updateStatus = (status: RequestStatus) => {
-    this.setState({ requestState: requestStatusToState(status) })
-  }
-
   subscribe = (key: string) => {
     subscribeRequest(key, this.onUpdates)
   }
 
   onUpdates = (record: RequestRecord) => {
     const { status, dollarTxHash, goldTxHash, escrowTxHash } = record
+    const requestState = requestStatusToState(status)
 
-    this.setState({
-      requestState: requestStatusToState(status),
-      dollarTxHash,
-      goldTxHash,
-      escrowTxHash,
-    })
+    if (requestState === RequestState.Completed || requestState === RequestState.Failed) {
+      this.setState({
+        requestState,
+        dollarTxHash: null,
+        goldTxHash: null,
+        escrowTxHash: null,
+      })
+    } else {
+      this.setState({
+        requestState,
+        dollarTxHash,
+        goldTxHash,
+        escrowTxHash,
+      })
+    }
   }
 
   isFaucet = () => {
