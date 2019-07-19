@@ -1,6 +1,10 @@
 /* tslint:disable:no-console */
 import { NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
 import {
+  BLSPrivateKeyToProcessedPrivateKey,
+  BLSPrivateKeyToPublic,
+} from '@celo/celotool/src/lib/bls_utils'
+import {
   add0x,
   generateAccountAddressFromPrivateKey,
   generatePublicKeyFromPrivateKey,
@@ -8,10 +12,6 @@ import {
   sendTransactionWithPrivateKey,
 } from '@celo/protocol/lib/web3-utils'
 import { exec } from 'child_process'
-import {
-  BLSPrivateKeyToProcessedPrivateKey,
-  BLSPrivateKeyToPublic,
-} from '@celo/celotool/src/lib/bls_utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { BigNumber } from 'bignumber.js'
 import * as minimist from 'minimist'
