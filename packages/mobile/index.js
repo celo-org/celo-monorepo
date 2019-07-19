@@ -6,6 +6,10 @@ import App from 'src/app/App'
 import { installSentry } from 'src/sentry/Sentry'
 import { Sentry } from 'react-native-sentry'
 import { onBackgroundNotification } from 'src/firebase/firebase'
+import { YellowBox } from 'react-native'
+
+// To avoid "Remote debugger in background tab" warning
+YellowBox.ignoreWarnings(['Remote debugger'])
 
 // Set this to true, if you are modifying Sentry and want to test your changes
 const enableSentryOnDebugBuild = false
