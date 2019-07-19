@@ -1,10 +1,14 @@
 pragma solidity ^0.5.8;
 
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+
 
  /**
  * @title A mock BondedDeposits for testing.
  */
 contract MockBondedDeposits {
+  using SafeMath for uint256;
+
   mapping(address => mapping(uint256 => uint256)) public bonded;
   mapping(address => uint256) public weights;
   mapping(address => bool) public frozen;
@@ -14,9 +18,19 @@ contract MockBondedDeposits {
   mapping(address => address) public voters;
   // Maps an account address to their validating delegate.
   mapping(address => address) public validators;
+  uint256 public totalWeight;
 
   function setWeight(address account, uint256 weight) external {
-    weights[account] = weight;
+    uint256 difference;
+    if (weight >= weights[account]) {
+      difference = weight.sub(weights[account]);
+      weights[account] = weights[account].add(difference);
+      totalWeight = totalWeight.add(difference);
+    } else {
+      difference = weights[account].sub(weight);
+      weights[account] = weights[account].sub(difference);
+      totalWeight = totalWeight.sub(difference);
+    }
   }
 
   function setBondedDeposit(address account, uint256 noticePeriod, uint256 value) external {

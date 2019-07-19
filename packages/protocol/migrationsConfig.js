@@ -27,6 +27,8 @@ const defaultConfig = {
     minDeposit: 1, // 1 cGLD
     queueExpiry: 7 * 24 * 60 * 60, // 1 week
     referendumStageDuration: 15 * 60, // 15 minutes
+    initialQuorumNumerator: 80,
+    initialQuorumDenominator: 100,
   },
   gasPriceMinimum: {
     initialMinimum: 10000,

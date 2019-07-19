@@ -10,7 +10,7 @@ interface IGovernance {
   function setApprovalStageDuration(uint256) external;
   function setReferendumStageDuration(uint256) external;
   function setExecutionStageDuration(uint256) external;
-  function setConstitution(address, bytes4, uint256, uint256) external;
+  function setConstitution(address, bytes4, uint256, uint256, uint256, uint256) external;
 
   function propose(
     uint256[] calldata,
@@ -28,7 +28,12 @@ interface IGovernance {
   function getApprovalStageDuration() external view returns (uint256);
   function getReferendumStageDuration() external view returns (uint256);
   function getExecutionStageDuration() external view returns (uint256);
-  function getConstitution(address, bytes4) external view returns (uint256, uint256);
+  
+  function getConstitution(
+    address,
+    bytes4
+  ) external view returns (uint256, uint256, uint256, uint256);
+  
   function proposalExists(uint256) external view returns (bool);
   function getProposal(uint256) external view returns (address, uint256, uint256, uint256);
 

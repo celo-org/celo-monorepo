@@ -75,11 +75,16 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     bool approved;
   }
 
+  struct ThresholdParameters {
+    FractionUtil.Fraction baseThreshold;
+    FractionUtil.Fraction kFactor;
+  }
+
   struct ContractConstitution {
-    FractionUtil.Fraction defaultThreshold;
+    ThresholdParameters defaultParameters;
     // Maps a function ID to a corresponding passing function, overriding the
     // default.
-    mapping(bytes4 => FractionUtil.Fraction) functionThresholds;
+    mapping(bytes4 => ThresholdParameters) functionThresholds;
   }
 
   struct StageDurations {
@@ -103,6 +108,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   SortedLinkedList.List private queue;
   uint256[] public dequeued;
   uint256[] public emptyIndices;
+  FractionUtil.Fraction private quorum;
 
   event ApproverSet(
     address approver
@@ -139,8 +145,20 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   event ConstitutionSet(
     address indexed destination,
     bytes4 indexed functionId,
-    uint256 numerator,
-    uint256 denominator
+    uint256 thresholdNumerator,
+    uint256 thresholdDenominator,
+    uint256 kFactorNumerator,
+    uint256 kFactorDenominator
+  );
+
+  event QuorumUpdated(
+    uint256 quorumNumerator,
+    uint256 quorumDenominator
+  );
+
+  event QuorumUpdated(
+    uint256 quorumNumerator,
+    uint256 quorumDenominator
   );
 
   event ProposalQueued(
@@ -215,7 +233,9 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     uint256 _dequeueFrequency,
     uint256 approvalStageDuration,
     uint256 referendumStageDuration,
-    uint256 executionStageDuration
+    uint256 executionStageDuration,
+    uint256 initialQuorumNumerator,
+    uint256 initialQuorumDenominator
   )
     external
     initializer
@@ -240,6 +260,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     stageDurations.approval = approvalStageDuration;
     stageDurations.referendum = referendumStageDuration;
     stageDurations.execution = executionStageDuration;
+    quorum = FractionUtil.Fraction(initialQuorumNumerator, initialQuorumDenominator);
     // solhint-disable-next-line not-rely-on-time
     lastDequeue = now;
   }
@@ -327,35 +348,49 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   }
 
   /**
-   * @notice Updates the ratio of yes:yes+no votes needed for a specific class of proposals to pass.
+   * @notice Updates the yes:yes+no threshold curve for a specific class of proposals to pass.
    * @param destination The destination of proposals for which this threshold should apply.
    * @param functionId The function ID of proposals for which this threshold should apply. Zero
    *   will set the default.
-   * @param numerator The numerator of the threshold.
-   * @param denominator The denominator of the threshold.
+   * @param thresholdNumerator The numerator of the base threshold.
+   * @param thresholdDenominator The denominator of the base threshold.
+   * @param kFactorNumerator The numerator of the sensitivity factor.
+   * @param kFactorDenominator The denominator of the sensitivity factor.
    * @dev If no constitution is explicitly set the default is a simple majority, i.e. 1:2.
    */
   function setConstitution(
     address destination,
     bytes4 functionId,
-    uint256 numerator,
-    uint256 denominator
+    uint256 thresholdNumerator,
+    uint256 thresholdDenominator,
+    uint256 kFactorNumerator,
+    uint256 kFactorDenominator
   )
     external
     onlyOwner
   {
     // TODO(asa): https://github.com/celo-org/celo-monorepo/pull/3414#discussion_r283588332
-    require(destination != address(0) && numerator > 0 && denominator > 0);
-    FractionUtil.Fraction memory threshold = FractionUtil.Fraction(numerator, denominator);
+    require(destination != address(0) && thresholdNumerator > 0 && thresholdDenominator > 0 && kFactorDenominator > 0);
+    ThresholdParameters memory thresholdParameters = ThresholdParameters(
+      FractionUtil.Fraction(thresholdNumerator, thresholdDenominator),
+      FractionUtil.Fraction(kFactorNumerator, kFactorDenominator));
     FractionUtil.Fraction memory majority = FractionUtil.Fraction(1, 2);
     FractionUtil.Fraction memory unanimous = FractionUtil.Fraction(1, 1);
-    require(threshold.isGreaterThan(majority) && threshold.isLessThanOrEqualTo(unanimous));
+    require(thresholdParameters.baseThreshold.isGreaterThan(majority)
+      && thresholdParameters.baseThreshold.isLessThanOrEqualTo(unanimous));
     if (functionId == 0) {
-      constitution[destination].defaultThreshold = threshold;
+      constitution[destination].defaultParameters = thresholdParameters;
     } else {
-      constitution[destination].functionThresholds[functionId] = threshold;
+      constitution[destination].functionThresholds[functionId] = thresholdParameters;
     }
-    emit ConstitutionSet(destination, functionId, numerator, denominator);
+    emit ConstitutionSet(
+      destination,
+      functionId,
+      thresholdNumerator,
+      thresholdDenominator,
+      kFactorNumerator,
+      kFactorDenominator
+    );
   }
 
   /**
@@ -512,8 +547,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     dequeueProposalsIfReady();
     Proposal storage proposal = proposals[proposalId];
     require(_proposalExists(proposal) && dequeued[index] == proposalId);
-    if (isDequeuedProposalExpired(proposalId)) {
-      deleteDequeuedProposal(proposalId, index);
+    if (isDequeuedProposalExpired(proposal)) {
+      deleteDequeuedProposal(proposal, proposalId, index);
       return false;
     }
     ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
@@ -544,8 +579,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     dequeueProposalsIfReady();
     Proposal storage proposal = proposals[proposalId];
     require(_proposalExists(proposal) && dequeued[index] == proposalId);
-    if (isDequeuedProposalExpired(proposalId)) {
-      deleteDequeuedProposal(proposalId, index);
+    if (isDequeuedProposalExpired(proposal)) {
+      deleteDequeuedProposal(proposal, proposalId, index);
       return false;
     }
     ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
@@ -598,14 +633,14 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     dequeueProposalsIfReady();
     Proposal storage proposal = proposals[proposalId];
     require(_proposalExists(proposal) && dequeued[index] == proposalId);
-    bool expired = isDequeuedProposalExpired(proposalId);
+    bool expired = isDequeuedProposalExpired(proposal);
     if (!expired) {
       // TODO(asa): Think through the effects of changing the passing function
       ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
       require(
         proposal.approved &&
         stage == ProposalStage.Execution &&
-        isProposalPassing(proposalId)
+        _isProposalPassing(proposal)
       );
       for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
         bool transactionExecuted = externalCall(
@@ -622,7 +657,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
       );
     }
     // must have executed fully or proposal has expired if code reaches this point
-    deleteDequeuedProposal(proposalId, index);
+    deleteDequeuedProposal(proposal, proposalId, index);
     return !expired;
   }
 
@@ -675,10 +710,14 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   )
     external
     view
-    returns (uint256, uint256)
+    returns (uint256, uint256, uint256, uint256)
   {
-    FractionUtil.Fraction memory threshold = _getConstitution(destination, functionId);
-    return (threshold.numerator, threshold.denominator);
+    ThresholdParameters memory thresholdParameters = _getConstitution(destination, functionId);
+    return (
+      thresholdParameters.baseThreshold.numerator,
+      thresholdParameters.baseThreshold.denominator,
+      thresholdParameters.kFactor.numerator,
+      thresholdParameters.kFactor.denominator);
   }
 
   /**
@@ -883,26 +922,46 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     return queue.contains(proposalId) && now < proposals[proposalId].timestamp.add(queueExpiry);
   }
 
-  // TODO(asa): Pass proposal as argument for gas optimization
   /**
    * @notice Returns whether or not a particular proposal is passing according to the constitution.
    * @param proposalId The ID of the proposal.
    * @return Whether or not the proposal is passing.
    */
-  function isProposalPassing(uint256 proposalId) public view returns (bool) {
+  function isProposalPassing(uint256 proposalId) external view returns (bool) {
     Proposal storage proposal = proposals[proposalId];
+    return _isProposalPassing(proposal);
+  }
+
+  /**
+   * @notice Returns whether or not a particular proposal is passing according to the constitution.
+   * @param proposal The proposal struct.
+   * @return Whether or not the proposal is passing.
+   */
+  function _isProposalPassing(Proposal storage proposal) private view returns (bool) {
+    uint256 forAndAgainstVotes = proposal.votes.yes.add(proposal.votes.no);
+    FractionUtil.Fraction memory proposalQuorum = FractionUtil.Fraction(
+      forAndAgainstVotes.add(proposal.votes.abstain),
+      totalWeight()
+    );
+    if (proposalQuorum.isLessThan(quorum)) {
+      return false;
+    }
     // yesRatio can be undefined, which is not a problem for isGreaterThan
     FractionUtil.Fraction memory yesRatio = FractionUtil.Fraction(
       proposal.votes.yes,
-      proposal.votes.yes.add(proposal.votes.no)
+      forAndAgainstVotes
     );
-
+    FractionUtil.Fraction memory half = FractionUtil.Fraction(1, 2);
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
       bytes4 functionId = extractFunctionSignature(proposal.transactions[i].data);
-      FractionUtil.Fraction memory threshold = _getConstitution(
+      ThresholdParameters memory thresholdParameters = _getConstitution(
         proposal.transactions[i].destination,
         functionId
       );
+      FractionUtil.Fraction memory threshold = thresholdParameters.baseThreshold
+        .sub(half)
+        .div(proposalQuorum.div(quorum).powApprox(thresholdParameters.kFactor, 10))
+        .add(half);
       if (yesRatio.isLessThanOrEqualTo(threshold)) {
         return false;
       }
@@ -958,13 +1017,27 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
 
   /**
    * @notice Deletes a dequeued proposal.
+   * @param proposal The proposal struct.
    * @param proposalId The ID of the proposal to delete.
    * @param index The index of the proposal ID in `dequeued`.
    */
-  function deleteDequeuedProposal(uint256 proposalId, uint256 index) private {
+  function deleteDequeuedProposal(Proposal storage proposal, uint256 proposalId, uint256 index) private {
+    updateQuorum(proposal);
     dequeued[index] = 0;
     emptyIndices.push(index);
     delete proposals[proposalId];
+  }
+
+  function updateQuorum(Proposal storage proposal) private {
+    FractionUtil.Fraction memory proposalQuorum = FractionUtil.Fraction(
+      proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain),
+      totalWeight()
+    );
+    if (FractionUtil.exists(proposalQuorum)) {
+      quorum = quorum.mul(FractionUtil.Fraction(4, 5)).add(proposalQuorum.mul(FractionUtil.Fraction(1, 5)));
+      // quorum = quorum.round(10);
+      emit QuorumUpdated(quorum.numerator, quorum.denominator);
+    }
   }
 
   /**
@@ -986,11 +1059,10 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   // TODO(asa): Pass the proposal as an argument for gas optimization
   /**
    * @notice Returns whether or not a dequeued proposal has expired.
-   * @param proposalId The ID of the proposal to delete.
+   * @param proposal The proposal struct.
    * @return Whether or not the dequeued proposal has expired.
    */
-  function isDequeuedProposalExpired(uint256 proposalId) private view returns (bool) {
-    Proposal storage proposal = proposals[proposalId];
+  function isDequeuedProposalExpired(Proposal storage proposal) private view returns (bool) {
     ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
     // The proposal is considered expired under the following conditions:
     //   1. Past the approval stage and not approved.
@@ -998,7 +1070,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     //   3. Past the execution stage.
     return (
       (stage > ProposalStage.Execution) ||
-      (stage > ProposalStage.Referendum && !isProposalPassing(proposalId)) ||
+      (stage > ProposalStage.Referendum && !_isProposalPassing(proposal)) ||
       (stage > ProposalStage.Approval && !proposal.approved)
     );
   }
@@ -1025,16 +1097,17 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   )
     private
     view
-    returns (FractionUtil.Fraction memory)
+    returns (ThresholdParameters memory)
   {
-    // Default to a simple majority.
-    FractionUtil.Fraction memory threshold = FractionUtil.Fraction(1, 2);
-    if (constitution[destination].functionThresholds[functionId].exists()) {
-      threshold = constitution[destination].functionThresholds[functionId];
-    } else if (constitution[destination].defaultThreshold.exists()) {
-      threshold = constitution[destination].defaultThreshold;
+    // Default to a simple majority and k = 1.
+    ThresholdParameters memory thresholdParameters =
+      ThresholdParameters(FractionUtil.Fraction(1, 2), FractionUtil.Fraction(1, 1));
+    if (constitution[destination].functionThresholds[functionId].baseThreshold.exists()) {
+      thresholdParameters = constitution[destination].functionThresholds[functionId];
+    } else if (constitution[destination].defaultParameters.baseThreshold.exists()) {
+      thresholdParameters = constitution[destination].defaultParameters;
     }
-    return threshold;
+    return thresholdParameters;
   }
 
   // call has been separated into its own function in order to take advantage

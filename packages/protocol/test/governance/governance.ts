@@ -54,7 +54,6 @@ enum VoteValue {
   Yes,
 }
 
-// TODO(asa): Test isProposalPassing
 // TODO(asa): Test dequeueProposalsIfReady
 // TODO(asa): Dequeue explicitly to make the gas cost of operations more clear
 contract('Governance', (accounts: string[]) => {
@@ -65,6 +64,7 @@ contract('Governance', (accounts: string[]) => {
   const nullFunctionId = '0x00000000'
   const account = accounts[0]
   const approver = accounts[0]
+  const otherAccount = accounts[1]
   const nonOwner = accounts[1]
   const nonApprover = accounts[1]
   const concurrentProposals = 1
@@ -74,6 +74,8 @@ contract('Governance', (accounts: string[]) => {
   const approvalStageDuration = 1 * 60 // 1 minute
   const referendumStageDuration = 5 * 60 // 5 minutes
   const executionStageDuration = 1 * 60 // 1 minute
+  const initialQuorumNumerator = 80
+  const initialQuorumDenominator = 100
   let transactionSuccess1
   let transactionSuccess2
   let transactionFail
@@ -91,7 +93,9 @@ contract('Governance', (accounts: string[]) => {
       dequeueFrequency,
       approvalStageDuration,
       referendumStageDuration,
-      executionStageDuration
+      executionStageDuration,
+      initialQuorumNumerator,
+      initialQuorumDenominator
     )
     await registry.setAddressFor(bondedDepositsRegistryId, mockBondedDeposits.address)
     transactionSuccess1 = {
@@ -182,7 +186,9 @@ contract('Governance', (accounts: string[]) => {
           dequeueFrequency,
           approvalStageDuration,
           referendumStageDuration,
-          executionStageDuration
+          executionStageDuration,
+          initialQuorumNumerator,
+          initialQuorumDenominator
         )
       )
     })
@@ -459,8 +465,10 @@ contract('Governance', (accounts: string[]) => {
 
   // TODO(asa): Verify that when we set the constitution for a function ID then the proper constitution is applied to a proposal.
   describe('#setConstitution', () => {
-    const numerator = 2
-    const denominator = 3
+    const thresholdNumerator = 2
+    const thresholdDenominator = 3
+    const kFactorNumerator = 2
+    const kFactorDenominator = 3
     let functionId
     let differentFunctionId
     let destination
@@ -476,18 +484,32 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should set the default threshold', async () => {
-        await governance.setConstitution(destination, functionId, numerator, denominator)
-        const [num, denom] = await governance.getConstitution(destination, differentFunctionId)
-        assert.equal(num.toNumber(), numerator)
-        assert.equal(denom.toNumber(), denominator)
+        await governance.setConstitution(
+          destination,
+          functionId,
+          thresholdNumerator,
+          thresholdDenominator,
+          kFactorNumerator,
+          kFactorDenominator
+        )
+        const [tNum, tDenom, kNum, kDenom] = await governance.getConstitution(
+          destination,
+          differentFunctionId
+        )
+        assert.equal(tNum.toNumber(), thresholdNumerator)
+        assert.equal(tDenom.toNumber(), thresholdDenominator)
+        assert.equal(kNum.toNumber(), kFactorNumerator)
+        assert.equal(kDenom.toNumber(), kFactorDenominator)
       })
 
       it('should emit the ConstitutionSet event', async () => {
         const resp = await governance.setConstitution(
           destination,
           functionId,
-          numerator,
-          denominator
+          thresholdNumerator,
+          thresholdDenominator,
+          kFactorNumerator,
+          kFactorDenominator
         )
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
@@ -496,8 +518,10 @@ contract('Governance', (accounts: string[]) => {
           args: {
             destination,
             functionId: web3.utils.padRight(functionId, 64),
-            numerator: new BigNumber(numerator),
-            denominator: new BigNumber(denominator),
+            thresholdNumerator: new BigNumber(thresholdNumerator),
+            thresholdDenominator: new BigNumber(thresholdDenominator),
+            kFactorNumerator: new BigNumber(kFactorNumerator),
+            kFactorDenominator: new BigNumber(kFactorDenominator),
           },
         })
       })
@@ -510,25 +534,51 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should set the function threshold', async () => {
-        await governance.setConstitution(destination, functionId, numerator, denominator)
-        const [num, denom] = await governance.getConstitution(destination, functionId)
-        assert.equal(num.toNumber(), numerator)
-        assert.equal(denom.toNumber(), denominator)
+        await governance.setConstitution(
+          destination,
+          functionId,
+          thresholdNumerator,
+          thresholdDenominator,
+          kFactorNumerator,
+          kFactorDenominator
+        )
+        const [tNum, tDenom, kNum, kDenom] = await governance.getConstitution(
+          destination,
+          functionId
+        )
+        assert.equal(tNum.toNumber(), thresholdNumerator)
+        assert.equal(tDenom.toNumber(), thresholdDenominator)
+        assert.equal(kNum.toNumber(), kFactorNumerator)
+        assert.equal(kDenom.toNumber(), kFactorDenominator)
       })
 
       it('should not set the default threshold', async () => {
-        await governance.setConstitution(destination, functionId, numerator, denominator)
-        const [num, denom] = await governance.getConstitution(destination, differentFunctionId)
-        assert.equal(num.toNumber(), 1)
-        assert.equal(denom.toNumber(), 2)
+        await governance.setConstitution(
+          destination,
+          functionId,
+          thresholdNumerator,
+          thresholdDenominator,
+          kFactorNumerator,
+          kFactorDenominator
+        )
+        const [tNum, tDenom, kNum, kDenom] = await governance.getConstitution(
+          destination,
+          differentFunctionId
+        )
+        assert.equal(tNum.toNumber(), 1)
+        assert.equal(tDenom.toNumber(), 2)
+        assert.equal(kNum.toNumber(), 1)
+        assert.equal(kDenom.toNumber(), 1)
       })
 
       it('should emit the ConstitutionSet event', async () => {
         const resp = await governance.setConstitution(
           destination,
           functionId,
-          numerator,
-          denominator
+          thresholdNumerator,
+          thresholdDenominator,
+          kFactorNumerator,
+          kFactorDenominator
         )
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
@@ -537,8 +587,10 @@ contract('Governance', (accounts: string[]) => {
           args: {
             destination,
             functionId: web3.utils.padRight(functionId, 64),
-            numerator: new BigNumber(numerator),
-            denominator: new BigNumber(denominator),
+            thresholdNumerator: new BigNumber(thresholdNumerator),
+            thresholdDenominator: new BigNumber(thresholdDenominator),
+            kFactorNumerator: new BigNumber(kFactorNumerator),
+            kFactorDenominator: new BigNumber(kFactorDenominator),
           },
         })
       })
@@ -546,31 +598,93 @@ contract('Governance', (accounts: string[]) => {
 
     it('should revert when the destination is the null address', async () => {
       await assertRevert(
-        governance.setConstitution(NULL_ADDRESS, nullFunctionId, numerator, denominator)
+        governance.setConstitution(
+          NULL_ADDRESS,
+          nullFunctionId,
+          thresholdNumerator,
+          thresholdDenominator,
+          kFactorNumerator,
+          kFactorDenominator
+        )
       )
     })
 
-    it('should revert when the numerator is zero', async () => {
-      await assertRevert(governance.setConstitution(destination, nullFunctionId, 0, denominator))
+    it('should revert when the threshold numerator is zero', async () => {
+      await assertRevert(
+        governance.setConstitution(
+          destination,
+          nullFunctionId,
+          0,
+          thresholdDenominator,
+          kFactorNumerator,
+          kFactorDenominator
+        )
+      )
     })
 
-    it('should revert when the denominator is zero', async () => {
-      await assertRevert(governance.setConstitution(destination, nullFunctionId, numerator, 0))
+    it('should revert when the threshold denominator is zero', async () => {
+      await assertRevert(
+        governance.setConstitution(
+          destination,
+          nullFunctionId,
+          thresholdNumerator,
+          0,
+          kFactorNumerator,
+          kFactorDenominator
+        )
+      )
+    })
+
+    it('should revert when the kFactor denominator is zero', async () => {
+      await assertRevert(
+        governance.setConstitution(
+          destination,
+          nullFunctionId,
+          thresholdNumerator,
+          thresholdDenominator,
+          kFactorNumerator,
+          0
+        )
+      )
     })
 
     it('should revert when the threshold is not greater than a majority', async () => {
-      await assertRevert(governance.setConstitution(destination, nullFunctionId, 1, 2))
+      await assertRevert(
+        governance.setConstitution(
+          destination,
+          nullFunctionId,
+          1,
+          2,
+          kFactorNumerator,
+          kFactorDenominator
+        )
+      )
     })
 
     it('should revert when the threshold is greater than 100%', async () => {
-      await assertRevert(governance.setConstitution(destination, nullFunctionId, 101, 100))
+      await assertRevert(
+        governance.setConstitution(
+          destination,
+          nullFunctionId,
+          101,
+          100,
+          kFactorNumerator,
+          kFactorDenominator
+        )
+      )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(
-        governance.setConstitution(destination, nullFunctionId, numerator, denominator, {
-          from: nonOwner,
-        })
+        governance.setConstitution(
+          destination,
+          nullFunctionId,
+          thresholdNumerator,
+          thresholdDenominator,
+          kFactorNumerator,
+          kFactorDenominator,
+          { from: nonOwner }
+        )
       )
     })
   })
@@ -898,7 +1012,6 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
-        const otherAccount = accounts[1]
         await mockBondedDeposits.setWeight(otherAccount, weight)
         await governance.upvote(otherProposalId, proposalId, 0, { from: otherAccount })
         await timeTravel(queueExpiry, web3)
@@ -1386,6 +1499,13 @@ contract('Governance', (accounts: string[]) => {
         const emptyIndex = await governance.emptyIndices(0)
         assert.equal(emptyIndex.toNumber(), index)
       })
+
+      it('should emit the QuorumUpdated event', async () => {
+        const resp = await governance.vote(proposalId, index, value)
+        assert.equal(resp.logs.length, 1)
+        const quorumUpdatedLog = resp.logs[0]
+        assert.equal(quorumUpdatedLog.event, 'QuorumUpdated', `Log event name doesn\'t match`)
+      })
     })
   })
 
@@ -1429,16 +1549,18 @@ contract('Governance', (accounts: string[]) => {
           assert.isFalse(await governance.proposalExists(proposalId))
         })
 
-        it('should emit the ProposalExecuted event', async () => {
+        it('should emit the ProposalExecuted and QuorumUpdated event', async () => {
           const resp = await governance.execute(proposalId, index)
-          assert.equal(resp.logs.length, 1)
-          const log = resp.logs[0]
-          assertLogMatches2(log, {
+          assert.equal(resp.logs.length, 2)
+          const proposalExecutedLog = resp.logs[0]
+          assertLogMatches2(proposalExecutedLog, {
             event: 'ProposalExecuted',
             args: {
               proposalId: new BigNumber(proposalId),
             },
           })
+          const quorumUpdatedLog = resp.logs[1]
+          assert.equal(quorumUpdatedLog.event, 'QuorumUpdated', `Log event name doesn\'t match`)
         })
       })
 
@@ -1502,9 +1624,9 @@ contract('Governance', (accounts: string[]) => {
           assert.isFalse(await governance.proposalExists(proposalId))
         })
 
-        it('should emit the ProposalExecuted event', async () => {
+        it('should emit the ProposalExecuted event and QuorumUpdated event', async () => {
           const resp = await governance.execute(proposalId, index)
-          assert.equal(resp.logs.length, 1)
+          assert.equal(resp.logs.length, 2)
           const log = resp.logs[0]
           assertLogMatches2(log, {
             event: 'ProposalExecuted',
@@ -1512,6 +1634,8 @@ contract('Governance', (accounts: string[]) => {
               proposalId: new BigNumber(proposalId),
             },
           })
+          const quorumUpdatedLog = resp.logs[1]
+          assert.equal(quorumUpdatedLog.event, 'QuorumUpdated', `Log event name doesn\'t match`)
         })
       })
 
@@ -1595,9 +1719,11 @@ contract('Governance', (accounts: string[]) => {
         assert.isFalse(await governance.proposalExists(proposalId))
       })
 
-      it('should not emit the ProposalExecuted event', async () => {
+      it('should emit the QuorumUpdated event', async () => {
         const resp = await governance.execute(proposalId, index)
-        assert.equal(resp.logs.length, 0)
+        assert.equal(resp.logs.length, 1)
+        const quorumUpdatedLog = resp.logs[0]
+        assert.equal(quorumUpdatedLog.event, 'QuorumUpdated', `Log event name doesn\'t match`)
       })
     })
   })
@@ -1683,6 +1809,57 @@ contract('Governance', (accounts: string[]) => {
         it('should return false', async () => {
           assert.isFalse(await governance.isVoting(account))
         })
+      })
+    })
+  })
+
+  describe('#isProposalPassing', () => {
+    const weight = 10
+    const proposalId = 1
+    const index = 0
+    beforeEach(async () => {
+      await governance.propose(
+        [transactionSuccess1.value],
+        [transactionSuccess1.destination],
+        transactionSuccess1.data,
+        [transactionSuccess1.data.length],
+        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+        { value: minDeposit }
+      )
+      await timeTravel(dequeueFrequency, web3)
+      await governance.approve(proposalId, index)
+      await timeTravel(approvalStageDuration, web3)
+      await mockBondedDeposits.setWeight(account, weight)
+      await mockBondedDeposits.setWeight(otherAccount, weight * 10)
+      await governance.vote(proposalId, index, VoteValue.Yes)
+    })
+
+    describe('when proposal meets all passing conditions', () => {
+      beforeEach(async () => {
+        await governance.vote(proposalId, index, VoteValue.Abstain, { from: otherAccount })
+      })
+
+      it('should return true', async () => {
+        const isPassing = await governance.isProposalPassing(proposalId)
+        assert.isTrue(isPassing)
+      })
+    })
+
+    describe('when proposal does not have sufficient support', () => {
+      beforeEach(async () => {
+        await governance.vote(proposalId, index, VoteValue.No, { from: otherAccount })
+      })
+
+      it('should return false', async () => {
+        const isPassing = await governance.isProposalPassing(proposalId)
+        assert.isFalse(isPassing)
+      })
+    })
+
+    describe('when proposal does not meet quorum', () => {
+      it('should return false', async () => {
+        const isPassing = await governance.isProposalPassing(proposalId)
+        assert.isFalse(isPassing)
       })
     })
   })

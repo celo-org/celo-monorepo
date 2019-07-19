@@ -93,9 +93,9 @@ library FractionUtil {
   }
 
   /**
-   * @dev Returns an integer that is the fraction time an integer.
+   * @dev Returns a fraction that is the fraction times a fraction.
    * @param x A Fraction struct.
-   * @param y An integer.
+   * @param y A Fraction struct.
    * @return x * y
    */
   function mul(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
@@ -113,7 +113,7 @@ library FractionUtil {
   }
 
   /**
-   * @dev Returns the inverse of the fraction
+   * @dev Returns the inverse of the fraction.
    * @param x A Fraction struct.
    * @return 1 / x
    */
@@ -129,6 +129,17 @@ library FractionUtil {
       x.denominator,
       x.numerator
     );
+  }
+
+  /**
+   * @dev Returns an integer that is the fraction divided by a fraction.
+   * @param x A Fraction struct.
+   * @param y A Fraction struct.
+   * @return x / y
+   */
+  function div(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
+    require(y.numerator != 0);
+    return Fraction(x.numerator.mul(y.denominator), x.denominator.mul(y.numerator));
   }
 
   /**
@@ -216,5 +227,78 @@ library FractionUtil {
     returns (bool)
   {
     return isLessThanOrEqualTo(x, z) && isLessThanOrEqualTo(z, y);
+  }
+
+  /**
+   * @dev Returns a fraction approximately equal to x whose numerator
+   *   and denominator have base-10 representations at most maxDigits long.
+   * @param x A Fraction struct.
+   * @param maxDigits The maximum numerator and denominator base-10 length.
+   * @return An approximation to x.
+   */
+  function round(
+    Fraction memory x,
+    uint256 maxDigits
+  )
+    internal
+    pure
+    returns (Fraction memory)
+  {
+    uint256 limit = 1;
+    for (uint256 i = 0; i < maxDigits; i = i.add(1)) {
+      limit = limit.mul(10);
+    }
+    uint256 num = x.numerator;
+    uint256 denom = x.denominator;
+    while (num > limit || denom > limit) {
+      num = num.div(10);
+      denom = denom.div(10);
+    }
+    require(denom > 0);
+    return Fraction(num, denom);
+  }
+
+  /**
+   * @dev Returns an approximation of the power x^y using Newton's method.
+   * @param x A Fraction struct.
+   * @param y A Fraction struct.
+   * @param iterationCount The number of iterations in Newton's method to use.
+   */
+  function powApprox(
+    Fraction memory x,
+    Fraction memory y,
+    uint256 iterationCount
+  )
+    internal
+    pure
+    returns (Fraction memory)
+  {
+    uint256 yN = y.numerator;
+    uint256 yD = y.denominator;
+    uint256 intPower = yN.div(yD);
+    yN = yN.sub(intPower.mul(yD));
+    Fraction memory ret = Fraction(1, 1);
+    for (uint256 i = 0; i < intPower; i = i.add(1)) {
+      ret = ret.mul(x);
+    }
+    ret = ret.round(10);
+    if (yN != 0) {
+      Fraction memory xPowC = Fraction(1, 1);
+      for (uint256 i = 0; i < yN; i = i.add(1)) {
+        xPowC = xPowC.mul(x);
+      }
+      xPowC = xPowC.round(10);
+      for (uint256 it = 0; it < iterationCount; it = it.add(1)) {
+        Fraction memory temp = xPowC;
+        for (uint256 i = 0; i < yD.sub(1); i = i.add(1)) {
+          temp = temp.div(ret);
+        }
+        ret.numerator = ret.numerator.mul(yD.sub(1));
+        ret = ret.add(temp);
+        ret.denominator = ret.denominator.div(yD);
+      }
+      ret = ret.round(10);
+    }
+    return ret;
   }
 }

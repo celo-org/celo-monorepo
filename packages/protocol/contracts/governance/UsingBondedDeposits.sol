@@ -59,6 +59,14 @@ contract UsingBondedDeposits is UsingRegistry {
   }
 
   /**
+   * @notice Returns the total weight across all accounts.
+   * @return The total weight.
+   */
+  function totalWeight() internal view returns (uint256) {
+    return getBondedDeposits().totalWeight();
+  }
+
+  /**
    * @notice Returns the bonded deposit value for particular account and notice period.
    * @param account The address of the account.
    * @param noticePeriod The notice period of the bonded deposit.

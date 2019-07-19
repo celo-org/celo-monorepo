@@ -28,6 +28,8 @@ const initializeArgs = async (networkName: string): Promise<any[]> => {
     config.governance.approvalStageDuration,
     config.governance.referendumStageDuration,
     config.governance.executionStageDuration,
+    config.governance.initialQuorumNumerator,
+    config.governance.initialQuorumDenominator,
   ]
 }
 
