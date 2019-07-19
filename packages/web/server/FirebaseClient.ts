@@ -59,20 +59,15 @@ export async function sendRequest(beneficiary: Address | E164Number, type: Reque
 export async function subscribeRequest(key: string, onChange: (record: RequestRecord) => void) {
   const ref = await getDB().ref(`${NETWORK}/requests/${key}`)
 
-  // not sure if there is really a need for a promise here
-  return new Promise<RequestRecord>((resolve) => {
-    const listener = ref.on('value', (snap) => {
-      const record = snap.val() as RequestRecord
+  const listener = ref.on('value', (snap) => {
+    const record = snap.val() as RequestRecord
 
-      if (record) {
-        onChange(record)
-        console.log('record', record)
-      }
+    if (record) {
+      onChange(record)
+    }
 
-      if (record.status === RequestStatus.Done || record.status === RequestStatus.Failed) {
-        ref.off('value', listener)
-        resolve(record)
-      }
-    })
+    if (record.status === RequestStatus.Done || record.status === RequestStatus.Failed) {
+      ref.off('value', listener)
+    }
   })
 }
