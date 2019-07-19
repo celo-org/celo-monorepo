@@ -2,7 +2,7 @@ import { getKubernetesClusterRegion, switchToClusterFromEnv } from '@celo/celoto
 import { ensureAuthenticatedGcloudAccount } from '@celo/celotool/src/lib/gcloud_utils'
 import { generateGenesisFromEnv } from '@celo/celotool/src/lib/generate_utils'
 import { OG_ACCOUNTS } from '@celo/celotool/src/lib/genesis_constants'
-import { getStatefulSetReplicas, scaleStatefulSet } from 'src/lib/kubernetes'
+import { getStatefulSetReplicas, scaleStatefulSet } from '@celo/celotool/src/lib/kubernetes'
 import {
   EnvTypes,
   envVar,
