@@ -204,7 +204,7 @@ jobs:
             DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
             ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
       - run:
-          name: Setup Go language
+          name: Setup languages
           command: |
             set -e
             set -v
@@ -213,16 +213,18 @@ jobs:
             ls /tmp/go/bin/go
             /tmp/go/bin/go version
             curl https://sh.rustup.rs -sSf | sh -s -- -y
+            rustup install nightly
+            rustup default nightly
       - run:
           name: Run test
           no_output_timeout: 20m
           command: |
             set -e
-            export PATH=${PATH}:/tmp/go/bin
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_transfers.sh checkout master
+            ./ci_test_transfers.sh checkout kobigurk/bls
 
   end-to-end-geth-governance-test:
     <<: *defaults
