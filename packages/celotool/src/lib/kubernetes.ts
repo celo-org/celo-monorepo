@@ -1,4 +1,4 @@
-import { envVar, execCmdWithExitOnFailure, fetchEnv } from 'src/lib/utils'
+import { envVar, execCmdWithExitOnFailure, fetchEnv } from '@celo/celotool/src/lib/utils'
 
 const NUMBER_OF_TX_NODES = 4
 
