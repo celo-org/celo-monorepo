@@ -23,6 +23,7 @@
 ARG geth_tag=master
 ARG geth_project=celo-testnet
 
+# Get geth and related files
 FROM us.gcr.io/$geth_project/geth:$geth_tag as geth
 
 ARG celo_env
@@ -33,7 +34,8 @@ RUN curl --fail https://www.googleapis.com/storage/v1/b/genesis_blocks/o/${celo_
 RUN curl --fail https://www.googleapis.com/storage/v1/b/static_nodes/o/${celo_env}?alt=media > /celo/static-nodes.json
 RUN ls /usr/local/bin/geth
 
-FROM node:8 as node
+# Build Celocli
+FROM node:8-alpine as node
 
 ARG celo_env
 ARG network_id=44781
@@ -43,32 +45,26 @@ ARG sync_mode=ultralight
 RUN echo "geth_tag is ${geth_tag}"
 RUN echo "Env is ${celo_env}"
 
-RUN apt-get update
-RUN apt-get install lsb-release -y
-# Without this, geth will fail with a confusing "No such file or directory" error. 
-RUN apt-get install musl-dev -y
+RUN apk update
+# Required for celocli
+RUN apk add python git make gcc g++
+
+WORKDIR /celo-monorepo/
+RUN npm install @celo/celocli
+
+# Build the combined image
+FROM node:8-alpine as final_image
+
+RUN apk update
+# Without this, geth will fail with a confusing "No such file or directory" error.
+RUN apk add musl-dev
+# Required for start_geth.sh
+RUN apk add bash
 
 WORKDIR /celo-monorepo/
 
-COPY lerna.json /celo-monorepo/lerna.json
-COPY scripts /celo-monorepo/scripts
-COPY package.json /celo-monorepo/package.json
-COPY yarn.lock /celo-monorepo/yarn.lock
-COPY .prettierrc.js /celo-monorepo/.prettierrc.js
-COPY packages/utils /celo-monorepo/packages/utils
-COPY packages/cli /celo-monorepo/packages/cli
-COPY packages/contractkit /celo-monorepo/packages/contractkit
-COPY packages/typescript /celo-monorepo/packages/typescript
-
 RUN echo "Dir is ${PWD}"
 RUN echo "env is ${celo_env}"
-
-RUN yarn install || yarn install
-
-RUN yarn --cwd=/celo-monorepo/packages/cli run setup:environment ${celo_env}
-RUN yarn --cwd=/celo-monorepo/packages/cli build
-RUN ls /celo-monorepo/packages/cli/bin/run
-RUN ln -s /celo-monorepo/packages/cli/bin/run /celocli
 
 COPY --from=geth /usr/local/bin/geth /usr/local/bin/geth
 RUN mkdir /celo
@@ -77,6 +73,8 @@ COPY --from=geth /celo/static-nodes.json /celo
 COPY packages/cli/start_geth.sh /celo/start_geth.sh
 RUN chmod ugo+x /celo/start_geth.sh
 RUN ls /usr/local/bin/geth
+COPY --from=node /celo-monorepo/node_modules /celo-monorepo/node_modules 
+RUN ln -s /celo-monorepo/node_modules/.bin/celocli /celocli
 
 EXPOSE 8545 8546 30303 30303/udp
 ENTRYPOINT ["/celo/start_geth.sh", "/usr/local/bin/geth", "alfajores", "ultralight", "44781", "/root/.celo", "/celo/genesis.json", "/celo/static-nodes.json"]
