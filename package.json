@@ -24,6 +24,12 @@
     "keys:decrypt": "bash scripts/key_placer.sh decrypt",
     "keys:encrypt": "bash scripts/key_placer.sh encrypt" 
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged",
+      "pre-push": "node ./scripts/hooks/pre-push.js"
+    }
+  },
   "workspaces": {
     "packages": [
       "packages/*"
@@ -42,12 +48,12 @@
     ]
   },
   "devDependencies": {
-    "husky": "^0.14.3",
+    "husky": "^3.0.0",
     "lerna": "^3.16.0",
     "patch-package": "^5.1.1",
     "postinstall-postinstall": "^1.0.0",
     "prettier": "1.13.5",
-    "pretty-quick": "^1.4.1",
+    "pretty-quick": "^1.11.1",
     "solc": "0.5.8",
     "tslint": "^5.12.1",
     "typescript-tslint-plugin": "^0.5.0"
