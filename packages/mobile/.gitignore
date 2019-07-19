@@ -52,10 +52,12 @@ fastlane/report.xml
 */fastlane/Preview.html
 */fastlane/screenshots
 
-# Bundle artifact
-*.jsbundle
+# Ruby gem artifacts
 .bundle
 vendor/
+
+# Bundle artifact
+*.jsbundle
 
 fastlane/google-play-service-account.json
 
