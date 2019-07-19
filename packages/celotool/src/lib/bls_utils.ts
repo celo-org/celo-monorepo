@@ -26,9 +26,7 @@ const MODULUSMASK = 31
 
 export const BLSPrivateKeyToProcessedPrivateKey = (privateKeyHex: string) => {
   for (let i = 0; i < 256; i++) {
-    //console.log('BLSPrivateKeyToProcessedPrivateKey try ' + i)
     const originalPrivateKeyBytes = Buffer.from(privateKeyHex, 'hex')
-    //console.log(`original private key: ${originalPrivateKeyBytes.toString('hex')}`);
 
     const iBuffer = new Buffer(1)
     iBuffer[0] = i
@@ -38,6 +36,8 @@ export const BLSPrivateKeyToProcessedPrivateKey = (privateKeyHex: string) => {
       originalPrivateKeyBytes,
     ])
     const privateKeyBLSBytes = keccak256(keyBytes)
+
+    // tslint:disable-next-line:no-bitwise
     privateKeyBLSBytes[0] &= MODULUSMASK
 
     const privateKeyNum = BigInteger.fromBuffer(privateKeyBLSBytes)
@@ -46,7 +46,6 @@ export const BLSPrivateKeyToProcessedPrivateKey = (privateKeyHex: string) => {
     }
 
     const privateKeyBytes = reverse(privateKeyNum.toBuffer())
-    //console.log(`private key: ${privateKeyBytes.toString('hex')}`);
 
     return privateKeyBytes
   }
@@ -66,17 +65,13 @@ export const BLSPrivateKeyToPublic = (privateKeyHex: string) => {
   while (publicKeyXHex.length < 96) {
     publicKeyXHex = publicKeyXHex + '00'
   }
-  //console.log('public key');
-  //console.log(publicKeyXHex);
 
   let publicKeyYHex = publicKeyYBytes.toString('hex')
   while (publicKeyYHex.length < 96) {
     publicKeyYHex = publicKeyYHex + '00'
   }
-  //console.log(publicKeyYHex);
 
-  let publicKeyHex = publicKeyXHex + publicKeyYHex
-  //console.log(`public key: ${publicKeyHex}`);
+  const publicKeyHex = publicKeyXHex + publicKeyYHex
 
   return publicKeyHex
 }

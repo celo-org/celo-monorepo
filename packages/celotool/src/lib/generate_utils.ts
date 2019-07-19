@@ -1,3 +1,4 @@
+import { BLSPrivateKeyToPublic } from '@celo/celotool/src/lib/bls_utils'
 import {
   CONTRACT_ADDRESSES,
   CONTRACT_OWNER_STORAGE_LOCATION,
@@ -8,7 +9,6 @@ import {
   TEMPLATE,
 } from '@celo/celotool/src/lib/genesis_constants'
 import { envVar, fetchEnv, fetchEnvOrFallback } from '@celo/celotool/src/lib/utils'
-import { BLSPrivateKeyToPublic } from '@celo/celotool/src/lib/bls_utils'
 import { ec as EC } from 'elliptic'
 import { range, repeat } from 'lodash'
 import rlp from 'rlp'
@@ -145,7 +145,6 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
 
 const generateIstanbulExtraData = (validators: Validator[]) => {
   const istanbulVanity = 32
-  //const signatureVanity = 65
   const blsSignatureVanity = 192
 
   return (
