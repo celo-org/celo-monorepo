@@ -30,6 +30,8 @@ export function formatNumber(number: string) {
   }
 }
 
+export const EXAMPLE_ADDRESS = 'a0000aaa00a0000...a00a0a0000a00a00aa'
+
 // This is only a basic validation
 function validateAddress(address: string) {
   return /^(0x)?[0-9a-f]{40}$/i.test(address)

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
-import { RequestState } from 'src/fauceting/utils'
+import { EXAMPLE_ADDRESS, RequestState } from 'src/fauceting/utils'
 import { I18nProps } from 'src/i18n'
 import Checkmark from 'src/icons/Checkmark'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
@@ -88,7 +88,7 @@ function faucetText({ requestState, t }) {
     {
       [RequestState.Failed]: t('faucetError'),
       [RequestState.Invalid]: t('invalidAddress'),
-    }[requestState] || 'eg. a0000aaa00a0000000000a00a0a0000a00a00aaa'
+    }[requestState] || `eg. ${EXAMPLE_ADDRESS}`
   )
 }
 
