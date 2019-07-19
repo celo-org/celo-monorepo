@@ -161,7 +161,6 @@
     "enzyme-to-json": "^3.3.5",
     "escape-string-regexp": "^1.0.5",
     "graphql-code-generator": "^0.16.1",
-    "husky": "^0.14.3",
     "jest": "^24.8.0",
     "jest-fetch-mock": "^2.1.2",
     "jest-junit": "^6.3.0",
