@@ -22,23 +22,36 @@ const h = new BigInteger('30631250834960419227450344600217059328')
 const curve = new Curve(p, a, b, Gx, Gy, n, h)
 const g = Point.fromAffine(curve, Gx, Gy)
 
+const MODULUSMASK = 31
+
 export const BLSPrivateKeyToProcessedPrivateKey = (privateKeyHex: string) => {
-  const originalPrivateKeyBytes = Buffer.from(privateKeyHex, 'hex')
-  //console.log(`original private key: ${originalPrivateKeyBytes.toString('hex')}`);
+  for (let i = 0; i < 256; i++) {
+    //console.log('BLSPrivateKeyToProcessedPrivateKey try ' + i)
+    const originalPrivateKeyBytes = Buffer.from(privateKeyHex, 'hex')
+    //console.log(`original private key: ${originalPrivateKeyBytes.toString('hex')}`);
 
-  const part1Bytes = Buffer.concat([Buffer.from('01', 'hex'), originalPrivateKeyBytes])
+    const iBuffer = new Buffer(1)
+    iBuffer[0] = i
+    const keyBytes = Buffer.concat([
+      Buffer.from('ecdsatobls', 'utf8'),
+      iBuffer,
+      originalPrivateKeyBytes,
+    ])
+    const privateKeyBLSBytes = keccak256(keyBytes)
+    privateKeyBLSBytes[0] &= MODULUSMASK
 
-  const part2Bytes = Buffer.concat([Buffer.from('02', 'hex'), originalPrivateKeyBytes])
+    const privateKeyNum = BigInteger.fromBuffer(privateKeyBLSBytes)
+    if (privateKeyNum.compareTo(n) >= 0) {
+      continue
+    }
 
-  const privateKeyBeforeMod = Buffer.concat([keccak256(part1Bytes), keccak256(part2Bytes)])
+    const privateKeyBytes = reverse(privateKeyNum.toBuffer())
+    //console.log(`private key: ${privateKeyBytes.toString('hex')}`);
 
-  const privateKeyNum = BigInteger.fromBuffer(privateKeyBeforeMod)
+    return privateKeyBytes
+  }
 
-  const privateKey = privateKeyNum.mod(n)
-  const privateKeyBytes = reverse(privateKey.toBuffer())
-  //console.log(`private key: ${privateKeyBytes.toString('hex')}`);
-
-  return privateKeyBytes
+  throw new Error("couldn't derive BLS key from ECDSA key")
 }
 
 export const BLSPrivateKeyToPublic = (privateKeyHex: string) => {
@@ -53,6 +66,7 @@ export const BLSPrivateKeyToPublic = (privateKeyHex: string) => {
   while (publicKeyXHex.length < 96) {
     publicKeyXHex = publicKeyXHex + '00'
   }
+  //console.log('public key');
   //console.log(publicKeyXHex);
 
   let publicKeyYHex = publicKeyYBytes.toString('hex')
