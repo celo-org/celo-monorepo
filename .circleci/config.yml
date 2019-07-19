@@ -212,6 +212,7 @@ jobs:
             tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
             ls /tmp/go/bin/go
             /tmp/go/bin/go version
+            curl https://sh.rustup.rs -sSf | sh -s -- -y
       - run:
           name: Run test
           no_output_timeout: 20m
