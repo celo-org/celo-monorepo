@@ -42,8 +42,8 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
 
   recaptchaRef = React.createRef<ReCAPTCHA>()
 
-  setBeneficiary = ({ nativeEvent }) => {
-    const { value } = nativeEvent.target
+  setBeneficiary = ({ currentTarget }: React.SyntheticEvent<HTMLInputElement>) => {
+    const { value } = currentTarget
     const beneficiary = this.props.kind === RequestType.Invite ? formatNumber(value) : value
     this.setState({
       beneficiary,
