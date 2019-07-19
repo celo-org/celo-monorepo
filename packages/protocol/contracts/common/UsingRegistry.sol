@@ -19,6 +19,7 @@ contract UsingRegistry is Ownable {
   string constant GAS_CURRENCY_WHITELIST_REGISTRY_ID = "GasCurrencyWhitelist";
   string constant GOLD_TOKEN_REGISTRY_ID = "GoldToken";
   string constant GOVERNANCE_REGISTRY_ID = "Governance";
+  string constant QUORUM_REGISTRY_ID = "Quorum";
   string constant RESERVE_REGISTRY_ID = "Reserve";
   string constant RANDOM_REGISTRY_ID = "Random";
   string constant SORTED_ORACLES_REGISTRY_ID = "SortedOracles";

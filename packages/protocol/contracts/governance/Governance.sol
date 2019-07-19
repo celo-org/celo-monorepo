@@ -10,6 +10,7 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "./IntegerSortedLinkedList.sol";
 import "./UsingBondedDeposits.sol";
 import "./interfaces/IGovernance.sol";
+import "./interfaces/IQuorum.sol";
 import "../common/Initializable.sol";
 
 
@@ -32,6 +33,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     Queued,
     Approval,
     Referendum,
+    Tally,
     Execution,
     Expiration
   }
@@ -41,6 +43,12 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     Abstain,
     No,
     Yes
+  }
+
+  enum TallyResult {
+    None,
+    Fail,
+    Pass
   }
 
   struct VoteRecord {
@@ -59,8 +67,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   // TODO(asa): Reduce storage usage here.
   struct VoteTotals {
     uint256 abstain;
-    uint256 yes;
     uint256 no;
+    uint256 yes;
   }
 
   struct Transaction {
@@ -76,6 +84,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     VoteTotals votes;
     Transaction[] transactions;
     bool approved;
+    bool passed;
+    TallyResult tally;
   }
 
   struct ContractConstitution {
@@ -88,6 +98,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   struct StageDurations {
     uint256 approval;
     uint256 referendum;
+    uint256 tally;
     uint256 execution;
   }
 
@@ -181,6 +192,11 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     uint256 weight
   );
 
+  event ProposalTallied(
+    uint256 indexed proposalId,
+    bool passed
+  );
+
   event ProposalExecuted(
     uint256 indexed proposalId
   );
@@ -217,6 +233,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     uint256 _dequeueFrequency,
     uint256 approvalStageDuration,
     uint256 referendumStageDuration,
+    uint256 tallyStageDuration,
     uint256 executionStageDuration
   )
     external
@@ -230,6 +247,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
       _dequeueFrequency != 0 &&
       approvalStageDuration != 0 &&
       referendumStageDuration != 0 &&
+      tallyStageDuration != 0 &&
       executionStageDuration != 0
     );
     _transferOwnership(msg.sender);
@@ -241,6 +259,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     dequeueFrequency = _dequeueFrequency;
     stageDurations.approval = approvalStageDuration;
     stageDurations.referendum = referendumStageDuration;
+    stageDurations.tally = tallyStageDuration;
     stageDurations.execution = executionStageDuration;
     // solhint-disable-next-line not-rely-on-time
     lastDequeue = now;
@@ -329,7 +348,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   }
 
   /**
-   * @notice Updates the ratio of yes:yes+no votes needed for a specific class of proposals to pass.
+   * @notice Updates the yes:yes+no threshold curve for a specific class of proposals to pass.
    * @param destination The destination of proposals for which this threshold should apply.
    * @param functionId The function ID of proposals for which this threshold should apply. Zero
    *   will set the default.
@@ -347,7 +366,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     // TODO(asa): https://github.com/celo-org/celo-monorepo/pull/3414#discussion_r283588332
     require(destination != address(0));
     // Threshold has to be greater than majority and not greater than unaninimty
-    require(threshold > HALF && threshold <= FixidityLib.fixed1());
+    require(threshold >= HALF && threshold <= FixidityLib.fixed1());
     if (functionId == 0) {
       constitution[destination].defaultThreshold = threshold;
     } else {
@@ -510,7 +529,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     dequeueProposalsIfReady();
     Proposal storage proposal = proposals[proposalId];
     require(_proposalExists(proposal) && dequeued[index] == proposalId);
-    if (isDequeuedProposalExpired(proposalId)) {
+    if (isDequeuedProposalExpired(proposal)) {
       deleteDequeuedProposal(proposalId, index);
       return false;
     }
@@ -542,7 +561,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     dequeueProposalsIfReady();
     Proposal storage proposal = proposals[proposalId];
     require(_proposalExists(proposal) && dequeued[index] == proposalId);
-    if (isDequeuedProposalExpired(proposalId)) {
+    if (isDequeuedProposalExpired(proposal)) {
       deleteDequeuedProposal(proposalId, index);
       return false;
     }
@@ -586,6 +605,34 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   /* solhint-enable code-complexity */
 
   /**
+   * @notice Tallies the referendum vote of a proposal and sets its tally to
+   *   "Pass" or "Fail". Updates quorum.
+   * @param proposalId The ID of the proposal to vote on.
+   * @param index The index of the proposal ID in `dequeued`.
+   * @return Whether or not the proposal passed.
+   */
+  function tally(uint256 proposalId, uint256 index) external returns (bool) {
+    dequeueProposalsIfReady();
+    Proposal storage proposal = proposals[proposalId];
+    require(_proposalExists(proposal) && dequeued[index] == proposalId);
+    if (isDequeuedProposalExpired(proposal)) {
+      deleteDequeuedProposal(proposalId, index);
+      return false;
+    }
+    ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
+    require(
+      proposal.approved &&
+      proposal.tally == TallyResult.None &&
+      stage == ProposalStage.Tally
+    );
+    bool passed = _isProposalPassing(proposal);
+    proposal.tally = passed ? TallyResult.Pass : TallyResult.Fail;
+    emit ProposalTallied(proposalId, passed);
+    updateQuorum(proposal);
+    return passed;
+  }
+
+  /**
    * @notice Executes a proposal in the execution stage, removing it from `dequeued`.
    * @param proposalId The ID of the proposal to vote on.
    * @param index The index of the proposal ID in `dequeued`.
@@ -596,14 +643,14 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     dequeueProposalsIfReady();
     Proposal storage proposal = proposals[proposalId];
     require(_proposalExists(proposal) && dequeued[index] == proposalId);
-    bool expired = isDequeuedProposalExpired(proposalId);
+    bool expired = isDequeuedProposalExpired(proposal);
     if (!expired) {
       // TODO(asa): Think through the effects of changing the passing function
       ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
       require(
         proposal.approved &&
         stage == ProposalStage.Execution &&
-        isProposalPassing(proposalId)
+        proposal.tally == TallyResult.Pass
       );
       for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
         bool transactionExecuted = externalCall(
@@ -619,7 +666,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
         proposalId
       );
     }
-    // must have executed fully or proposal has expired if code reaches this point
+    // proposal must have executed fully or expired if this point reached
     deleteDequeuedProposal(proposalId, index);
     return !expired;
   }
@@ -724,6 +771,15 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   }
 
   /**
+   * @notice Returns the tally result of the proposal.
+   * @param proposalId The ID of the proposal.
+   * @return The tally result of the proposal.
+   */
+  function getTally(uint256 proposalId) external view returns (uint256) {
+    return uint256(proposals[proposalId].tally);
+  }
+
+  /**
    * @notice Returns the referendum vote totals for a proposal.
    * @param proposalId The ID of the proposal.
    * @return The yes, no, and abstain vote totals.
@@ -806,10 +862,10 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     Voter storage voter = voters[account];
     bool isVotingQueue = voter.upvotedProposal != 0 && isQueued(voter.upvotedProposal);
     Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
-    bool isVotingReferendum = (
-      _getDequeuedProposalStage(proposal.timestamp) == ProposalStage.Referendum
-    );
-    return isVotingQueue || isVotingReferendum;
+    ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
+    bool isVotingReferendum = (stage == ProposalStage.Referendum);
+    bool isVotingTally = (stage == ProposalStage.Tally);
+    return isVotingQueue || isVotingReferendum || isVotingTally;
   }
 
   /**
@@ -862,34 +918,55 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     return queue.contains(proposalId) && now < proposals[proposalId].timestamp.add(queueExpiry);
   }
 
-  // TODO(asa): Pass proposal as argument for gas optimization
   /**
    * @notice Returns whether or not a particular proposal is passing according to the constitution.
    * @param proposalId The ID of the proposal.
    * @return Whether or not the proposal is passing.
    */
-  function isProposalPassing(uint256 proposalId) public view returns (bool) {
+  function isProposalPassing(uint256 proposalId) external view returns (bool) {
     Proposal storage proposal = proposals[proposalId];
+    return _isProposalPassing(proposal);
+  }
 
-    uint256 yesNoVotes = proposal.votes.yes.add(proposal.votes.no);
-    if (yesNoVotes == 0) {
-      return false;
-    }
-    int256 yesRatio = FixidityLib.newFixed(int256(proposal.votes.yes)).divide(
-      FixidityLib.newFixed(int256(yesNoVotes))
-    );
+  /**
+   * @notice Returns whether or not a particular proposal is passing according to the constitution.
+   * @param proposal The proposal struct.
+   * @return Whether or not the proposal is passing.
+   */
+  function _isProposalPassing(Proposal storage proposal) private view returns (bool) {
+    int256 totalWeightFixed = FixidityLib.newFixed(int256(totalWeight()));
+    int256 yesRatio = FixidityLib.newFixed(int256(proposal.votes.yes)).divide(totalWeightFixed);
+    int256 abstainRatio = FixidityLib.newFixed(int256(proposal.votes.abstain)).divide(totalWeightFixed);
+    int256 participation = FixidityLib.newFixed(
+      int256(proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain))
+    ).divide(totalWeightFixed);
+    IQuorum quorum = IQuorum(registry.getAddressForOrDie(QUORUM_REGISTRY_ID));
+    int256 quorumBaseline = quorum.quorumBaseline();
+    int256 adjustedTotalRatio =
+      (participation > quorumBaseline ? participation : quorumBaseline).subtract(abstainRatio);
+    int256 supportRatio = yesRatio.divide(adjustedTotalRatio);
+    int256 threshold = _getProposalThreshold(proposal);
+    return supportRatio > threshold;
+  }
 
+  function getProposalThreshold(uint256 proposalId) external view returns (int256) {
+    Proposal storage proposal = proposals[proposalId];
+    return _getProposalThreshold(proposal);
+  }
+
+  function _getProposalThreshold(Proposal storage proposal) private view returns (int256) {
+    int256 proposalThreshold = HALF;
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
       bytes4 functionId = extractFunctionSignature(proposal.transactions[i].data);
       int256 threshold = getConstitution(
         proposal.transactions[i].destination,
         functionId
       );
-      if (yesRatio <= threshold) {
-        return false;
+      if (proposalThreshold < threshold) {
+        proposalThreshold = threshold;
       }
     }
-    return true;
+    return proposalThreshold;
   }
 
   function getDequeuedProposalStage(uint256 dequeueTime) external view returns (ProposalStage) {
@@ -909,6 +986,9 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     } else if (now >= stageStartTime(dequeueTime, ProposalStage.Execution)) {
       return ProposalStage.Execution;
     // solhint-disable-next-line not-rely-on-time
+    } else if (now >= stageStartTime(dequeueTime, ProposalStage.Tally)) {
+      return ProposalStage.Tally;
+    // solhint-disable-next-line not-rely-on-time
     } else if (now >= stageStartTime(dequeueTime, ProposalStage.Referendum)) {
       return ProposalStage.Referendum;
     } else {
@@ -927,12 +1007,15 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
       return dequeueTime;
     } else if (stage == ProposalStage.Referendum) {
       return dequeueTime.add(stageDurations.approval);
-    } else if (stage == ProposalStage.Execution) {
+    } else if (stage == ProposalStage.Tally) {
       return dequeueTime.add(stageDurations.approval).add(stageDurations.referendum);
+    } else if (stage == ProposalStage.Execution) {
+      return dequeueTime.add(stageDurations.approval).add(stageDurations.referendum)
+        .add(stageDurations.tally);
     } else if (stage == ProposalStage.Expiration) {
-      return dequeueTime.add(stageDurations.approval).add(stageDurations.referendum).add(
-        stageDurations.execution
-      );
+      return dequeueTime.add(stageDurations.approval).add(stageDurations.referendum)
+        .add(stageDurations.tally)
+        .add(stageDurations.execution);
     } else {
       require(false);
     }
@@ -943,10 +1026,30 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
    * @param proposalId The ID of the proposal to delete.
    * @param index The index of the proposal ID in `dequeued`.
    */
-  function deleteDequeuedProposal(uint256 proposalId, uint256 index) private {
+  function deleteDequeuedProposal(
+    uint256 proposalId,
+    uint256 index
+  )
+    private
+  {
     dequeued[index] = 0;
     emptyIndices.push(index);
     delete proposals[proposalId];
+  }
+
+  /**
+   * @notice Updates quorum using the total number of votes on the proposal
+   *   and the total network weight.
+   * @param proposal The proposal struct.
+   */
+  function updateQuorum(Proposal storage proposal) private {
+    uint256 totalWeight_ = totalWeight();
+    if (totalWeight_ > 0) {
+      uint256 totalVotes = proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain);
+      int256 participation = FixidityLib.newFixed(int256(totalVotes)).divide(FixidityLib.newFixed(int256(totalWeight_)));
+      IQuorum quorum = IQuorum(registry.getAddressForOrDie(QUORUM_REGISTRY_ID));
+      quorum.updateQuorumBaseline(participation);
+    }
   }
 
   /**
@@ -968,19 +1071,20 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   // TODO(asa): Pass the proposal as an argument for gas optimization
   /**
    * @notice Returns whether or not a dequeued proposal has expired.
-   * @param proposalId The ID of the proposal to delete.
+   * @param proposal The proposal struct.
    * @return Whether or not the dequeued proposal has expired.
    */
-  function isDequeuedProposalExpired(uint256 proposalId) private view returns (bool) {
-    Proposal storage proposal = proposals[proposalId];
+  function isDequeuedProposalExpired(Proposal storage proposal) private view returns (bool) {
     ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
     // The proposal is considered expired under the following conditions:
     //   1. Past the approval stage and not approved.
-    //   2. Past the referendum stage and not passed.
-    //   3. Past the execution stage.
+    //   2. Past the referendum stage and not passing.
+    //   3. Past the tally stage and not passed.
+    //   4. Past the execution stage.
     return (
       (stage > ProposalStage.Execution) ||
-      (stage > ProposalStage.Referendum && !isProposalPassing(proposalId)) ||
+      (stage > ProposalStage.Tally && proposal.tally != TallyResult.Pass) ||
+      (stage > ProposalStage.Referendum && !_isProposalPassing(proposal)) ||
       (stage > ProposalStage.Approval && !proposal.approved)
     );
   }
@@ -1009,8 +1113,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     view
     returns (int256)
   {
-    // Default to a simple majority.
-    int256 threshold = HALF;
+    // Default to a 70% supermajority.
+    int256 threshold = FixidityLib.newFixed(7).divide(FixidityLib.newFixed(10));
     if (constitution[destination].functionThresholds[functionId] != 0) {
       threshold = constitution[destination].functionThresholds[functionId];
     } else if (constitution[destination].defaultThreshold != 0) {

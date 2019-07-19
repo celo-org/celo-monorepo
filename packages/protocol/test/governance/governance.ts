@@ -1,4 +1,4 @@
-import { bondedDepositsRegistryId } from '@celo/protocol/lib/registry-utils'
+import { bondedDepositsRegistryId, quorumRegistryId } from '@celo/protocol/lib/registry-utils'
 import {
   assertBalance,
   assertEqualBN,
@@ -16,6 +16,8 @@ import {
   GovernanceInstance,
   MockBondedDepositsContract,
   MockBondedDepositsInstance,
+  MockQuorumContract,
+  MockQuorumInstance,
   RegistryContract,
   RegistryInstance,
   TestTransactionsContract,
@@ -24,6 +26,7 @@ import {
 
 const Governance: GovernanceContract = artifacts.require('Governance')
 const MockBondedDeposits: MockBondedDepositsContract = artifacts.require('MockBondedDeposits')
+const MockQuorum: MockQuorumContract = artifacts.require('MockQuorum')
 const Registry: RegistryContract = artifacts.require('Registry')
 const TestTransactions: TestTransactionsContract = artifacts.require('TestTransactions')
 
@@ -55,17 +58,24 @@ enum VoteValue {
   Yes,
 }
 
-// TODO(asa): Test isProposalPassing
+enum TallyResult {
+  None = 0,
+  Fail,
+  Pass,
+}
+
 // TODO(asa): Test dequeueProposalsIfReady
 // TODO(asa): Dequeue explicitly to make the gas cost of operations more clear
 contract('Governance', (accounts: string[]) => {
   let governance: GovernanceInstance
   let mockBondedDeposits: MockBondedDepositsInstance
+  let mockQuorum: MockQuorumInstance
   let testTransactions: TestTransactionsInstance
   let registry: RegistryInstance
   const nullFunctionId = '0x00000000'
   const account = accounts[0]
   const approver = accounts[0]
+  const otherAccount = accounts[1]
   const nonOwner = accounts[1]
   const nonApprover = accounts[1]
   const concurrentProposals = 1
@@ -74,6 +84,7 @@ contract('Governance', (accounts: string[]) => {
   const dequeueFrequency = 10 * 60 // 10 minutes
   const approvalStageDuration = 1 * 60 // 1 minute
   const referendumStageDuration = 5 * 60 // 5 minutes
+  const tallyStageDuration = 5 * 60 // 5 minutes
   const executionStageDuration = 1 * 60 // 1 minute
   let transactionSuccess1
   let transactionSuccess2
@@ -81,6 +92,7 @@ contract('Governance', (accounts: string[]) => {
   beforeEach(async () => {
     governance = await Governance.new()
     mockBondedDeposits = await MockBondedDeposits.new()
+    mockQuorum = await MockQuorum.new()
     registry = await Registry.new()
     testTransactions = await TestTransactions.new()
     await governance.initialize(
@@ -92,9 +104,11 @@ contract('Governance', (accounts: string[]) => {
       dequeueFrequency,
       approvalStageDuration,
       referendumStageDuration,
+      tallyStageDuration,
       executionStageDuration
     )
     await registry.setAddressFor(bondedDepositsRegistryId, mockBondedDeposits.address)
+    await registry.setAddressFor(quorumRegistryId, mockQuorum.address)
     transactionSuccess1 = {
       value: 0,
       destination: testTransactions.address,
@@ -183,6 +197,7 @@ contract('Governance', (accounts: string[]) => {
           dequeueFrequency,
           approvalStageDuration,
           referendumStageDuration,
+          tallyStageDuration,
           executionStageDuration
         )
       )
@@ -460,7 +475,7 @@ contract('Governance', (accounts: string[]) => {
 
   // TODO(asa): Verify that when we set the constitution for a function ID then the proper constitution is applied to a proposal.
   describe('#setConstitution', () => {
-    const threshold = toFixed(2 / 3)
+    const threshold = toFixed(60 / 100)
     let functionId
     let differentFunctionId
     let destination
@@ -603,18 +618,23 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when making a proposal with zero transactions', () => {
       it('should register the proposal', async () => {
+        const beforeTimestamp = (await web3.eth.getBlock('latest')).timestamp
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         await governance.propose([], [], [], [], { value: minDeposit })
+        const afterTimestamp = (await web3.eth.getBlock('latest')).timestamp
         const proposal = parseProposalParams(await governance.getProposal(proposalId))
         assert.equal(proposal.proposer, accounts[0])
         assert.equal(proposal.deposit, minDeposit)
-        assert.equal(proposal.timestamp, (await web3.eth.getBlock('latest')).timestamp)
+        assert.isTrue(proposal.timestamp >= beforeTimestamp)
+        assert.isTrue(proposal.timestamp <= afterTimestamp)
         assert.equal(proposal.transactionCount, 0)
       })
 
       it('should emit the ProposalQueued event', async () => {
+        const beforeTimestamp = (await web3.eth.getBlock('latest')).timestamp
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         const resp = await governance.propose([], [], [], [], { value: minDeposit })
+        const afterTimestamp = (await web3.eth.getBlock('latest')).timestamp
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
         assertLogMatches2(log, {
@@ -623,15 +643,18 @@ contract('Governance', (accounts: string[]) => {
             proposalId: new BigNumber(1),
             proposer: accounts[0],
             deposit: new BigNumber(minDeposit),
-            timestamp: new BigNumber((await web3.eth.getBlock('latest')).timestamp),
+            timestamp: matchAny,
             transactionCount: 0,
           },
         })
+        assert.isTrue(log.args.timestamp.toNumber() >= beforeTimestamp)
+        assert.isTrue(log.args.timestamp.toNumber() <= afterTimestamp)
       })
     })
 
     describe('when making a proposal with one transaction', () => {
       it('should register the proposal', async () => {
+        const beforeTimestamp = (await web3.eth.getBlock('latest')).timestamp
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
@@ -640,10 +663,12 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
+        const afterTimestamp = (await web3.eth.getBlock('latest')).timestamp
         const proposal = parseProposalParams(await governance.getProposal(proposalId))
         assert.equal(proposal.proposer, accounts[0])
         assert.equal(proposal.deposit, minDeposit)
-        assert.equal(proposal.timestamp, (await web3.eth.getBlock('latest')).timestamp)
+        assert.isTrue(proposal.timestamp >= beforeTimestamp)
+        assert.isTrue(proposal.timestamp <= afterTimestamp)
         assert.equal(proposal.transactionCount, 1)
       })
 
@@ -667,6 +692,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should emit the ProposalQueued event', async () => {
+        const beforeTimestamp = (await web3.eth.getBlock('latest')).timestamp
         const resp = await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
@@ -675,6 +701,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
+        const afterTimestamp = (await web3.eth.getBlock('latest')).timestamp
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
         assertLogMatches2(log, {
@@ -683,15 +710,18 @@ contract('Governance', (accounts: string[]) => {
             proposalId: new BigNumber(1),
             proposer: accounts[0],
             deposit: new BigNumber(minDeposit),
-            timestamp: new BigNumber((await web3.eth.getBlock('latest')).timestamp),
+            timestamp: matchAny,
             transactionCount: 1,
           },
         })
+        assert.isTrue(log.args.timestamp.toNumber() >= beforeTimestamp)
+        assert.isTrue(log.args.timestamp.toNumber() <= afterTimestamp)
       })
     })
 
     describe('when making a proposal with two transactions', () => {
       it('should register the proposal', async () => {
+        const beforeTimestamp = (await web3.eth.getBlock('latest')).timestamp
         await governance.propose(
           [transactionSuccess1.value, transactionSuccess2.value],
           [transactionSuccess1.destination, transactionSuccess2.destination],
@@ -701,10 +731,12 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
+        const afterTimestamp = (await web3.eth.getBlock('latest')).timestamp
         const proposal = parseProposalParams(await governance.getProposal(proposalId))
         assert.equal(proposal.proposer, accounts[0])
         assert.equal(proposal.deposit, minDeposit)
-        assert.equal(proposal.timestamp, (await web3.eth.getBlock('latest')).timestamp)
+        assert.isTrue(proposal.timestamp >= beforeTimestamp)
+        assert.isTrue(proposal.timestamp <= afterTimestamp)
         assert.equal(proposal.transactionCount, 2)
       })
 
@@ -737,6 +769,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should emit the ProposalQueued event', async () => {
+        const beforeTimestamp = (await web3.eth.getBlock('latest')).timestamp
         const resp = await governance.propose(
           [transactionSuccess1.value, transactionSuccess2.value],
           [transactionSuccess1.destination, transactionSuccess2.destination],
@@ -746,6 +779,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
+        const afterTimestamp = (await web3.eth.getBlock('latest')).timestamp
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
         assertLogMatches2(log, {
@@ -754,10 +788,12 @@ contract('Governance', (accounts: string[]) => {
             proposalId: new BigNumber(1),
             proposer: accounts[0],
             deposit: new BigNumber(minDeposit),
-            timestamp: new BigNumber((await web3.eth.getBlock('latest')).timestamp),
+            timestamp: matchAny,
             transactionCount: 2,
           },
         })
+        assert.isTrue(log.args.timestamp.toNumber() >= beforeTimestamp)
+        assert.isTrue(log.args.timestamp.toNumber() <= afterTimestamp)
       })
     })
 
@@ -882,7 +918,6 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
-        const otherAccount = accounts[1]
         await mockBondedDeposits.setWeight(otherAccount, weight)
         await governance.upvote(otherProposalId, proposalId, 0, { from: otherAccount })
         await timeTravel(queueExpiry, web3)
@@ -1209,6 +1244,13 @@ contract('Governance', (accounts: string[]) => {
         const emptyIndex = await governance.emptyIndices(0)
         assert.equal(emptyIndex.toNumber(), index)
       })
+
+      it('should not update quorum', async () => {
+        const expectedCount = (await mockQuorum.updateCallCount()).toNumber()
+        await governance.approve(proposalId, index)
+        const updateCount = (await mockQuorum.updateCallCount()).toNumber()
+        assert.equal(updateCount, expectedCount)
+      })
     })
   })
 
@@ -1373,6 +1415,119 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
+  describe('#tally()', () => {
+    const weight = 10
+    const proposalId = 1
+    const index = 0
+
+    beforeEach(async () => {
+      await governance.propose(
+        [transactionSuccess1.value],
+        [transactionSuccess1.destination],
+        transactionSuccess1.data,
+        [transactionSuccess1.data.length],
+        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+        { value: minDeposit }
+      )
+      await timeTravel(dequeueFrequency, web3)
+      await governance.approve(proposalId, index)
+      await timeTravel(approvalStageDuration, web3)
+      await mockBondedDeposits.setWeight(account, weight)
+    })
+
+    describe('when the proposal is passing', () => {
+      beforeEach(async () => {
+        await governance.vote(proposalId, index, VoteValue.Yes)
+        await timeTravel(referendumStageDuration, web3)
+      })
+
+      it('should return true', async () => {
+        const passed = await governance.tally.call(proposalId, index)
+        assert.isTrue(passed)
+      })
+
+      it('should set the tally result', async () => {
+        await governance.tally(proposalId, index)
+        assert.equal(await governance.getTally(proposalId, index), TallyResult.Pass)
+      })
+
+      it('should emit the ProposalTallied event', async () => {
+        const resp = await governance.tally(proposalId, index)
+        assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        assertLogMatches2(log, {
+          event: 'ProposalTallied',
+          args: {
+            proposalId: new BigNumber(proposalId),
+            passed: true,
+          },
+        })
+      })
+    })
+
+    describe('when the proposal is failing', () => {
+      beforeEach(async () => {
+        await governance.vote(proposalId, index, VoteValue.No)
+        await timeTravel(referendumStageDuration, web3)
+      })
+
+      it('should return false', async () => {
+        const passed = await governance.tally.call(proposalId, index)
+        assert.isFalse(passed)
+      })
+
+      it('should set the tally result', async () => {
+        await governance.tally(proposalId, index)
+        assert.equal(await governance.getTally(proposalId, index), TallyResult.Fail)
+      })
+
+      it('should emit the ProposalTallied event', async () => {
+        const resp = await governance.tally(proposalId, index)
+        assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        assertLogMatches2(log, {
+          event: 'ProposalTallied',
+          args: {
+            proposalId: new BigNumber(proposalId),
+            passed: false,
+          },
+        })
+      })
+    })
+
+    it('should update quorum with participation values', async () => {
+      await governance.vote(proposalId, index, VoteValue.Yes)
+      await timeTravel(referendumStageDuration, web3)
+
+      const expectedCount = (await mockQuorum.updateCallCount()).toNumber()
+      const [yes, no, abstain] = await governance.getVoteTotals(proposalId)
+      const expectedTotalVotes = yes.toNumber() + no.toNumber() + abstain.toNumber()
+      const expectedTotalWeight = (await mockBondedDeposits.totalWeight()).toNumber()
+
+      await governance.vote(proposalId, index, value)
+
+      const updateCount = (await mockQuorum.updateCallCount()).toNumber()
+      const [totalVotes, totalWeight] = await mockQuorum.getLastUpdateCall()
+      assert.equal(updateCount, expectedCount + 1)
+      assert.equal(totalVotes.toNumber(), expectedTotalVotes)
+      assert.equal(totalWeight.toNumber(), expectedTotalWeight)
+    })
+
+    it('should revert if the proposal has already been tallied', async () => {
+      await governance.vote(proposalId, index, VoteValue.Yes)
+      await timeTravel(referendumStageDuration, web3)
+      await governance.tally(proposalId, index)
+      await assertRevert(governance.tally(proposalId, index))
+    })
+
+    it('should revert if the proposal is past the tally stage', async () => {
+      await governance.vote(proposalId, index, VoteValue.Yes)
+      await timeTravel(referendumStageDuration, web3)
+      await timeTravel(tallyStageDuration, web3)
+      await assertRevert(governance.tally(proposalId, index))
+    })
+  })
+
   describe('#execute()', () => {
     const weight = 10
     const proposalId = 1
@@ -1396,6 +1551,8 @@ contract('Governance', (accounts: string[]) => {
           await mockBondedDeposits.setWeight(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
+          await governance.tally(proposalId, index)
+          await timeTravel(tallyStageDuration, web3)
         })
 
         it('should return true', async () => {
@@ -1442,6 +1599,8 @@ contract('Governance', (accounts: string[]) => {
           await mockBondedDeposits.setWeight(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
+          await governance.tally(proposalId, index)
+          await timeTravel(tallyStageDuration, web3)
         })
 
         it('should revert', async () => {
@@ -1468,6 +1627,8 @@ contract('Governance', (accounts: string[]) => {
           await mockBondedDeposits.setWeight(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
+          await governance.tally(proposalId, index)
+          await timeTravel(tallyStageDuration, web3)
         })
 
         it('should return true', async () => {
@@ -1517,6 +1678,8 @@ contract('Governance', (accounts: string[]) => {
             await mockBondedDeposits.setWeight(account, weight)
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
+            await governance.tally(proposalId, index)
+            await timeTravel(tallyStageDuration, web3)
           })
 
           it('should revert', async () => {
@@ -1541,12 +1704,38 @@ contract('Governance', (accounts: string[]) => {
             await mockBondedDeposits.setWeight(account, weight)
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
+            await governance.tally(proposalId, index)
+            await timeTravel(tallyStageDuration, web3)
           })
 
           it('should revert', async () => {
             await assertRevert(governance.execute(proposalId, index))
           })
         })
+      })
+    })
+
+    describe('when the proposal was not tallied', () => {
+      beforeEach(async () => {
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await timeTravel(dequeueFrequency, web3)
+        await governance.approve(proposalId, index)
+        await timeTravel(approvalStageDuration, web3)
+        await mockBondedDeposits.setWeight(account, weight)
+        await governance.vote(proposalId, index, value)
+        await timeTravel(referendumStageDuration, web3)
+        await timeTravel(tallyStageDuration, web3)
+      })
+
+      it('should revert', async () => {
+        await assertRevert(governance.execute(proposalId, index))
       })
     })
 
@@ -1566,6 +1755,8 @@ contract('Governance', (accounts: string[]) => {
         await mockBondedDeposits.setWeight(account, weight)
         await governance.vote(proposalId, index, value)
         await timeTravel(referendumStageDuration, web3)
+        await governance.tally(proposalId, index)
+        await timeTravel(tallyStageDuration, web3)
         await timeTravel(executionStageDuration, web3)
       })
 
@@ -1577,11 +1768,6 @@ contract('Governance', (accounts: string[]) => {
       it('should delete the proposal', async () => {
         await governance.execute(proposalId, index)
         assert.isFalse(await governance.proposalExists(proposalId))
-      })
-
-      it('should not emit the ProposalExecuted event', async () => {
-        const resp = await governance.execute(proposalId, index)
-        assert.equal(resp.logs.length, 0)
       })
     })
   })
@@ -1659,9 +1845,10 @@ contract('Governance', (accounts: string[]) => {
         assert.isTrue(await governance.isVoting(account))
       })
 
-      describe('when that proposal is no longer in the referendum stage', () => {
+      describe('when that proposal is no longer in the referendum and tally stage', () => {
         beforeEach(async () => {
           await timeTravel(referendumStageDuration, web3)
+          await timeTravel(tallyStageDuration, web3)
         })
 
         it('should return false', async () => {
@@ -1670,4 +1857,6 @@ contract('Governance', (accounts: string[]) => {
       })
     })
   })
+
+  // TODO(brice): Rewrite isProposalPassing() tests
 })

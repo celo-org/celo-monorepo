@@ -93,9 +93,9 @@ library FractionUtil {
   }
 
   /**
-   * @dev Returns an integer that is the fraction time an integer.
+   * @dev Returns a fraction that is the fraction times a fraction.
    * @param x A Fraction struct.
-   * @param y An integer.
+   * @param y A Fraction struct.
    * @return x * y
    */
   function mul(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
@@ -113,7 +113,7 @@ library FractionUtil {
   }
 
   /**
-   * @dev Returns the inverse of the fraction
+   * @dev Returns the inverse of the fraction.
    * @param x A Fraction struct.
    * @return 1 / x
    */
@@ -129,6 +129,17 @@ library FractionUtil {
       x.denominator,
       x.numerator
     );
+  }
+
+  /**
+   * @dev Returns a fraction that is the fraction divided by a fraction.
+   * @param x A Fraction struct.
+   * @param y A Fraction struct.
+   * @return x / y
+   */
+  function div(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
+    require(y.numerator != 0);
+    return Fraction(x.numerator.mul(y.denominator), x.denominator.mul(y.numerator));
   }
 
   /**
@@ -216,5 +227,30 @@ library FractionUtil {
     returns (bool)
   {
     return isLessThanOrEqualTo(x, z) && isLessThanOrEqualTo(z, y);
+  }
+
+  /**
+   * @dev Returns a fraction approximately equal to x whose numerator
+   *   and denominator have base-10 representations at most maxDigits long.
+   * @param x A Fraction struct.
+   * @param maxDigits The maximum numerator and denominator base-10 length.
+   * @return An approximation to x.
+   */
+  function round(
+    Fraction memory x,
+    uint256 maxDigits
+  )
+    internal
+    pure
+    returns (Fraction memory)
+  {
+    uint256 limit = 10**maxDigits;
+    uint256 num = x.numerator;
+    uint256 denom = x.denominator;
+    while ((num > limit || denom > limit) && denom >= 10) {
+      num = num.div(10);
+      denom = denom.div(10);
+    }
+    return Fraction(num, denom);
   }
 }
