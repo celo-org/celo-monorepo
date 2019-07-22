@@ -190,6 +190,13 @@ android {
             signingConfig signingConfigs.release
             matchingFallbacks = ['release']
         }
+
+        pilot {
+            applicationIdSuffix ".pilot"
+            minifyEnabled enableProguardInReleaseBuilds
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
+        }
     }
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
