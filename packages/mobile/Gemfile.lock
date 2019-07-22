@@ -161,8 +161,4 @@ DEPENDENCIES
   fastlane!
 
 BUNDLED WITH
-<<<<<<< HEAD
-   2.0.2
-=======
    1.17.2
->>>>>>> master
