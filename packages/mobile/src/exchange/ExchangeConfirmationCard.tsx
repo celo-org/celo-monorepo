@@ -40,7 +40,7 @@ class ExchangeConfirmationCard extends React.PureComponent<Props> {
         <View style={styles.tabular}>
           <Text style={fontStyles.bodySecondary}>{t('celoDollars')}</Text>
           <Text numberOfLines={1} style={[fontStyles.currency, styles.dollar]}>
-            ${newDollarBalance}
+            ₱{newDollarBalance}
           </Text>
         </View>
 

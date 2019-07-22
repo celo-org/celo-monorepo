@@ -78,6 +78,15 @@ platform :android do
     build(environment: env, sdkEnv: sdkEnv)
     fastlane_supply(env, 'internal', env)
   end
+
+  desc 'Ship Pilot to Playstore Internal'
+  lane :pilot do
+    env = 'pilot'
+    sdkEnv = 'pilot'
+    clean
+    build(environment: env, sdkEnv: sdkEnv)
+    fastlane_supply(env, 'internal', env)
+  end
 end
 
 

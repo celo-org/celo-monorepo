@@ -92,7 +92,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   setExchangeAmount = (amount: string) => {
     // remove $ we inserted for display purposes
-    amount = amount.replace(/\$/g, '')
+    amount = amount.replace(/\₱/g, '')
 
     this.setState({ makerTokenAmount: amount }, () => {
       this.updateError(amount)
@@ -143,7 +143,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     const { dollarBalance, goldBalance } = this.props
     return isDollar
       ? getNewTakerBalance(goldBalance, takerTokenAmount)
-      : `$${getNewTakerBalance(dollarBalance, takerTokenAmount)}`
+      : `₱${getNewTakerBalance(dollarBalance, takerTokenAmount)}`
   }
 
   hasError = () => {
@@ -224,7 +224,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
                 onFocus={this.recordFocus}
                 value={this.inputValue()}
                 placeholderTextColor={placeholderColor}
-                placeholder={this.isDollar() ? '$0' : '0'}
+                placeholder={this.isDollar() ? '₱0' : '0'}
                 underlineColorAndroid={'transparent'}
                 style={[
                   styles.input,

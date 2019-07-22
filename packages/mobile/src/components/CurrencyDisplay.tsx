@@ -48,7 +48,7 @@ export default class CurrencyDisplay extends React.PureComponent<Props> {
       <View style={styles.container}>
         {this.props.type === CURRENCY_ENUM.DOLLAR ? (
           <Text numberOfLines={1} style={[fontStyles.regular, this.symbolStyle(fontSize)]}>
-            $
+            ₱
           </Text>
         ) : null}
         <Text numberOfLines={1} style={[styles.currency, fontStyles.regular, dollarStyle]}>
