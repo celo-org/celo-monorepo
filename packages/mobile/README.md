@@ -88,6 +88,18 @@ that you want to use with the app, you can run
 yarn run build-sdk TESTNET
 ```
 
+## Migrating networks
+
+To migrate to a new network, update the environment configuration files within the app and its dependencies:
+
+Update `.env.ENV-NAME` and `packages/mobile/.env.ENV-NAME` with the new network name and settings. 
+
+For the blockchain api, update `packages/blockchain-api/app.ENV-NAME.yaml` with the new contract addresses, which can be found using `celotooljs` or by looking at the address of the smart contracts in `/packages/protocol/build/ENV-NAME/contracts`.
+
+For the notification service, update `packages/notification-service/app.ENV-NAME.yaml` and `packages/notification-service/config/config.ENV-NAME.env` with the new contract addresses.
+
+Deploy the blockchain api by running `celotooljs deploy initial blockchain-api --config app.ENV-NAME.yaml -e ENV-NAME`
+
 ## Snapshot Testing
 
 We use Jest [snapshot testing][jest] to assert that no intentional changes to the
