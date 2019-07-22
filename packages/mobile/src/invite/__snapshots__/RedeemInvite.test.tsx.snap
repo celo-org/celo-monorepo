@@ -150,24 +150,6 @@ exports[`RedeemInvite renders correctly 1`] = `
             inviteText.2
           </Text>
         </Text>
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#81868B",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 13,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#2E3338",
-                "textAlign": "center",
-              },
-            ]
-          }
-        >
-          enterFullName
-        </Text>
         <View
           style={
             Object {
@@ -695,24 +677,6 @@ exports[`RedeemInvite renders with an error 1`] = `
           >
             inviteText.2
           </Text>
-        </Text>
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#81868B",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 13,
-                "lineHeight": 18,
-              },
-              Object {
-                "color": "#2E3338",
-                "textAlign": "center",
-              },
-            ]
-          }
-        >
-          enterFullName
         </Text>
         <View
           style={
