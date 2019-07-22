@@ -65,6 +65,7 @@ const schemaVersions = [
       e164NumberToAddress: {},
       startedVerification: false,
       askedContactsPermission: false,
+      isLoadingImportContacts: false,
     },
     account: {
       name: 'John Doe',

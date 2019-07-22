@@ -18,6 +18,7 @@ import CancelButton from 'src/components/CancelButton'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import GethAwareButton from 'src/geth/GethAwareButton'
+import { Namespaces } from 'src/i18n'
 import NuxLogo from 'src/icons/NuxLogo'
 import {
   cancelVerification,
@@ -371,5 +372,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces('nuxVerification2')(Verifying))
+  )(withNamespaces(Namespaces.nuxVerification2)(Verifying))
 )

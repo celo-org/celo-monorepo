@@ -18,6 +18,7 @@ export interface State {
   e164NumberToAddress: E164NumberToAddressType
   startedVerification: boolean
   askedContactsPermission: boolean
+  isLoadingImportContacts: boolean
 }
 
 const initialState = {
@@ -28,6 +29,7 @@ const initialState = {
   e164NumberToAddress: {},
   startedVerification: false,
   askedContactsPermission: false,
+  isLoadingImportContacts: false,
 }
 
 export const reducer = (state: State | undefined = initialState, action: ActionTypes): State => {
@@ -72,6 +74,17 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
         },
       }
     case Actions.IMPORT_CONTACTS:
+      return {
+        ...state,
+        isLoadingImportContacts: true,
+        askedContactsPermission: true,
+      }
+    case Actions.END_IMPORT_CONTACTS:
+      return {
+        ...state,
+        isLoadingImportContacts: false,
+      }
+    case Actions.DENY_IMPORT_CONTACTS:
       return {
         ...state,
         askedContactsPermission: true,
