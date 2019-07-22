@@ -1,3 +1,6 @@
+# We use kaniko for building docker images
+# More details: https://github.com/GoogleContainerTools/kaniko
+
 steps:
   
 - name: gcr.io/kaniko-project/executor:latest
@@ -6,6 +9,8 @@ steps:
     "--cache=true",
     "--destination=gcr.io/$PROJECT_ID/celo-monorepo:celotool-$COMMIT_SHA"
   ]
+  id: Build celotool docker image
+  waitFor: ['-']
 
 - name: gcr.io/kaniko-project/executor:latest
   args: [
@@ -13,5 +18,18 @@ steps:
     "--cache=true",
     "--destination=gcr.io/$PROJECT_ID/celo-monorepo:transaction-metrics-exporter-$COMMIT_SHA"
   ]
+  id: Build transaction metrics exporter docker image
+  waitFor: ['-']
+
+- name: gcr.io/kaniko-project/executor:latest
+  args: [
+    "--dockerfile=dockerfiles/cli/Dockerfile.cli",
+    "--cache=true",
+    "--destination=gcr.io/$PROJECT_ID/celocli:$COMMIT_SHA",
+    "--build-arg",
+    "celo_env=alfajores"
+  ]
+  id: Build CLI docker image
+  waitFor: ['-']
 
 timeout: 3000s
