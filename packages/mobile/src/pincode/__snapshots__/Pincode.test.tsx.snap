@@ -364,14 +364,31 @@ exports[`Pincode renders correctly for pin enter 1`] = `
       >
         createPin.title
       </Text>
-      <NumberInput
+      <TextInput
+        allowFontScaling={true}
         autoFocus={true}
-        isSensitiveInput={true}
         keyboardType="numeric"
-        onChange={[Function]}
-        onSubmit={[Function]}
+        maxLength={6}
+        onChangeText={[Function]}
+        onSubmitEditing={[Function]}
         placeholder="createPin.yourPin"
+        rejectResponderTermination={true}
+        secureTextEntry={true}
+        style={
+          Object {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#D1D5D8",
+            "borderRadius": 3,
+            "borderWidth": 1,
+            "fontSize": 24,
+            "marginHorizontal": 60,
+            "marginVertical": 15,
+            "padding": 7,
+            "textAlign": "center",
+          }
+        }
         textContentType="password"
+        underlineColorAndroid="transparent"
         value=""
       />
     </View>
@@ -474,14 +491,31 @@ exports[`Pincode renders correctly for pin re-enter 1`] = `
       >
         verifyPin.title
       </Text>
-      <NumberInput
+      <TextInput
+        allowFontScaling={true}
         autoFocus={true}
-        isSensitiveInput={true}
         keyboardType="numeric"
-        onChange={[Function]}
-        onSubmit={[Function]}
+        maxLength={6}
+        onChangeText={[Function]}
+        onSubmitEditing={[Function]}
         placeholder="createPin.yourPin"
+        rejectResponderTermination={true}
+        secureTextEntry={true}
+        style={
+          Object {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#D1D5D8",
+            "borderRadius": 3,
+            "borderWidth": 1,
+            "fontSize": 24,
+            "marginHorizontal": 60,
+            "marginVertical": 15,
+            "padding": 7,
+            "textAlign": "center",
+          }
+        }
         textContentType="password"
+        underlineColorAndroid="transparent"
         value=""
       />
     </View>

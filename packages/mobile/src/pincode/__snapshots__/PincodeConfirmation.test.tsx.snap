@@ -143,47 +143,32 @@ exports[`PincodeConfirmation renders correctly 1`] = `
         >
           confirmPin.title
         </Text>
-        <View
+        <TextInput
+          allowFontScaling={true}
+          autoFocus={true}
+          keyboardType="numeric"
+          onChangeText={[Function]}
+          onSubmitEditing={[Function]}
+          placeholder="createPin.yourPin"
+          rejectResponderTermination={true}
+          secureTextEntry={true}
           style={
-            Array [
-              Object {
-                "paddingHorizontal": 60,
-                "paddingVertical": 15,
-              },
-              undefined,
-            ]
-          }
-        >
-          <TextInput
-            allowFontScaling={true}
-            autoFocus={true}
-            keyboardType="numeric"
-            maxLength={6}
-            onChangeText={[Function]}
-            onSubmitEditing={[Function]}
-            placeholder="createPin.yourPin"
-            rejectResponderTermination={true}
-            secureTextEntry={true}
-            style={
-              Array [
-                Object {
-                  "borderColor": "#D1D5D8",
-                  "borderRadius": 3,
-                  "borderWidth": 1,
-                  "fontSize": 24,
-                  "padding": 7,
-                },
-                Object {
-                  "backgroundColor": "#FFFFFF",
-                  "textAlign": "center",
-                },
-              ]
+            Object {
+              "backgroundColor": "#FFFFFF",
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "borderWidth": 1,
+              "fontSize": 24,
+              "marginHorizontal": 60,
+              "marginVertical": 15,
+              "padding": 7,
+              "textAlign": "center",
             }
-            textContentType="password"
-            underlineColorAndroid="transparent"
-            value=""
-          />
-        </View>
+          }
+          textContentType="password"
+          underlineColorAndroid="transparent"
+          value=""
+        />
       </View>
     </View>
   </RCTScrollView>

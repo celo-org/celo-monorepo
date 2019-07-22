@@ -1,11 +1,10 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import Link from '@celo/react-components/components/Link'
-import NumberInput from '@celo/react-components/components/NumberInput'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import DevSkipButton from 'src/components/DevSkipButton'
@@ -61,15 +60,16 @@ class PincodeConfirmation extends React.Component<Props, State> {
           </View>
           <View style={style.pincodeContent}>
             <Text style={[fontStyles.h1, style.h1]}>{t('confirmPin.title')}</Text>
-            <NumberInput
+            <TextInput
               value={this.state.pin}
-              onChange={this.onChangePin}
-              onSubmit={this.confirmPin}
-              isSensitiveInput={true}
-              keyboardType="numeric"
-              textContentType="password"
-              placeholder={t('createPin.yourPin')}
+              onChangeText={this.onChangePin}
+              onSubmitEditing={this.confirmPin}
               autoFocus={true}
+              keyboardType="numeric"
+              placeholder={t('createPin.yourPin')}
+              secureTextEntry={true}
+              style={style.numberInput}
+              textContentType="password"
             />
           </View>
         </ScrollView>
@@ -104,6 +104,17 @@ const style = StyleSheet.create({
   },
   pincodeFooter: {
     alignItems: 'center',
+  },
+  numberInput: {
+    borderWidth: 1,
+    borderColor: colors.inputBorder,
+    borderRadius: 3,
+    padding: 7,
+    fontSize: 24,
+    marginHorizontal: 60,
+    marginVertical: 15,
+    textAlign: 'center',
+    backgroundColor: '#FFFFFF',
   },
   h1: {
     textAlign: 'center',
