@@ -47,7 +47,7 @@ const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect 
 let AssignAccountLock = false
 
 // checks if web3 claims it is currently syncing or not
-function* checkWeb3SyncProgressClaim() {
+export function* checkWeb3SyncProgressClaim() {
   Logger.debug(TAG, 'Checking sync progress claim')
   while (true) {
     try {

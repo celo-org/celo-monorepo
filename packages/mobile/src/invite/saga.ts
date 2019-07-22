@@ -31,6 +31,7 @@ import {
 import { createInviteCode } from 'src/invite/utils'
 import { navigate, navigateReset } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { RootState } from 'src/redux/reducers'
 import { transferStableToken } from 'src/stableToken/actions'
 import { createTransaction } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
@@ -191,6 +192,8 @@ function* redeemSuccess(name: string, account: string) {
   navigateReset(Screens.VerifyEducation)
 }
 
+export const web3ReadySelectr = (state: RootState) => state.web3.isReady
+
 export function* redeemInviteSaga(action: RedeemInviteAction) {
   const { inviteCode, name } = action
 
@@ -212,8 +215,14 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
 
     // Check that the balance of the new account is not 0
     const StableToken = yield call(getStableTokenContract, web3)
+
+    // yield call(checkWeb3SyncProgressClaim)
+    const web3Ready = yield select(web3ReadySelectr)
+    Logger.debug(TAG + '@redeemInviteCode', 'Web3: ' + web3Ready)
     const stableBalance = new BigNumber(yield call(StableToken.methods.balanceOf(tempAccount).call))
     Logger.debug(TAG + '@redeemInviteCode', 'Temporary account balance: ' + stableBalance)
+
+    throw 'FAIL'
 
     if (stableBalance.isLessThan(1)) {
       // check if new user account has already been created
