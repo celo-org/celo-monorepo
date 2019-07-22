@@ -1,5 +1,5 @@
 runtime: nodejs8
-service: alfajores
+service: pilot
 env_variables:
   NODE_ENV: 'production'
   DEPLOY_ENV: 'pilot'
