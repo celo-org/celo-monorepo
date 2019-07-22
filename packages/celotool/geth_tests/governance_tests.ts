@@ -89,7 +89,6 @@ describe('governance tests', () => {
   let web3: any
   let bondedDeposits: any
   let gasPrice: number
-  let goldTokenAddress: string
   let goldToken: any
 
   before(async function(this: any) {
@@ -105,7 +104,7 @@ describe('governance tests', () => {
     const bondedDepositsAddress = await getContractAddress('BondedDepositsProxy')
     const checksumAddress = web3.utils.toChecksumAddress(bondedDepositsAddress)
     bondedDeposits = new web3.eth.Contract(bondedDepositsAbi, checksumAddress)
-    goldTokenAddress = await getContractAddress('GoldTokenProxy')
+    const goldTokenAddress = await getContractAddress('GoldTokenProxy')
     const goldChecksumAddress = web3.utils.toChecksumAddress(goldTokenAddress)
     goldToken = new web3.eth.Contract(erc20Abi, goldChecksumAddress)
     gasPrice = parseInt(await web3.eth.getGasPrice(), 10)

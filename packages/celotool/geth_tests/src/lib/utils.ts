@@ -9,11 +9,11 @@ import {
   getValidators,
 } from '@celo/celotool/src/lib/generate_utils'
 import { getEnodeAddress } from '@celo/celotool/src/lib/geth'
-import { spawn } from 'child_process'
+import { spawn, ChildProcess } from 'child_process'
 import path from 'path'
 import { Admin } from 'web3-eth-admin'
 
-interface GethInstanceConfig {
+export interface GethInstanceConfig {
   name: string
   validating: boolean
   syncmode: string
@@ -23,9 +23,10 @@ interface GethInstanceConfig {
   privateKey?: string
   etherbase?: string
   peers?: string[]
+  pid?: number
 }
 
-interface GethTestConfig {
+export interface GethTestConfig {
   migrate?: boolean
   migrateTo?: number
   instances: GethInstanceConfig[]
@@ -35,10 +36,16 @@ const testDir = '/tmp/e2e'
 const genesisPath = `${testDir}/genesis.json`
 const networkid = 1101
 
-export function execCmd(cmd: string, args: string[], options: any = {}, logsFilepath: string = '') {
+export function execCmd(
+  cmd: string,
+  args: string[],
+  options: any = {},
+  logsFilepath: string = '',
+  callback?: (process: ChildProcess) => void
+) {
   return new Promise(async (resolve, reject) => {
     console.debug('$ ' + [cmd].concat(args).join(' '))
-    let process
+    let process: ChildProcess
     if (!logsFilepath) {
       process = spawn(cmd, args, { ...options, stdio: 'inherit' })
     } else {
@@ -57,6 +64,9 @@ export function execCmd(cmd: string, args: string[], options: any = {}, logsFile
         reject(error)
       }
     })
+    if (callback) {
+      callback(process)
+    }
   })
 }
 
@@ -207,6 +217,12 @@ export async function killGeth() {
   await execCmd('pkill', ['-9', 'geth'])
 }
 
+export async function killInstance(instance: GethInstanceConfig) {
+  if (instance.pid) {
+    await execCmd('kill', ['-9', instance.pid.toString()])
+  }
+}
+
 export async function addStaticPeers(datadir: string, enodes: string[]) {
   fs.writeFileSync(`${datadir}/static-nodes.json`, JSON.stringify(enodes))
 }
@@ -271,9 +287,13 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   if (mine) {
     gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
   }
-  execCmd(gethBinaryPath, gethArgs, {}, `${datadir}/logs.txt`)
+  let pid = 0
+  execCmd(gethBinaryPath, gethArgs, {}, `${datadir}/logs.txt`, (process: ChildProcess) => {
+    pid = process.pid
+  })
   // Give some time for geth to come up
   await sleep(1)
+  instance.pid = pid
 }
 
 function add0x(str: string) {
@@ -408,11 +428,16 @@ export function getHooks(gethConfig: GethTestConfig) {
     }
   }
 
+  const restartInstance = async (instance: GethInstanceConfig) => {
+    await killInstance(instance)
+    await initAndStartGeth(gethBinaryPath, instance)
+  }
+
   const after = async () => {
     await killGeth()
   }
 
-  return { before, after, restart, gethBinaryPath }
+  return { before, after, restart, restartInstance, gethBinaryPath }
 }
 
 export async function assertRevert(promise: any, errorMessage: string = '') {
