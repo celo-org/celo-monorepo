@@ -2,7 +2,7 @@
 import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
 import { uploadArtifacts } from '@celo/celotool/src/lib/artifacts'
 import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
-import { envVar, execCmd, fetchEnv } from '@celo/celotool/src/lib/utils'
+import { ensure0x, envVar, execCmd, fetchEnv } from '@celo/celotool/src/lib/utils'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import {
   AccountType,
@@ -20,25 +20,22 @@ export const builder = {}
 
 function minerForEnv() {
   if (fetchEnv(envVar.VALIDATORS) === 'og') {
-    return '0x' + OG_ACCOUNTS[0].address
+    return ensure0x(OG_ACCOUNTS[0].address)
   } else {
     return generateAccountAddressFromPrivateKey(
       generatePrivateKey(fetchEnv(envVar.MNEMONIC), AccountType.VALIDATOR, 0)
     )
   }
 }
-function add0x(msg: string) {
-  return '0x' + msg
-}
 
 function getValidatorKeys() {
   if (fetchEnv(envVar.VALIDATORS) === 'og') {
-    return OG_ACCOUNTS.map((account) => account.privateKey).map(add0x)
+    return OG_ACCOUNTS.map((account) => account.privateKey).map(ensure0x)
   } else {
     return getValidatorsPrivateKeys(
       fetchEnv(envVar.MNEMONIC),
       parseInt(fetchEnv(envVar.VALIDATORS), 10)
-    ).map(add0x)
+    ).map(ensure0x)
   }
 }
 

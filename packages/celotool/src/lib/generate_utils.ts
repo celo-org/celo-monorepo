@@ -7,7 +7,13 @@ import {
   PROXY_CONTRACT_CODE,
   TEMPLATE,
 } from '@celo/celotool/src/lib/genesis_constants'
-import { envVar, fetchEnv, fetchEnvOrFallback } from '@celo/celotool/src/lib/utils'
+import {
+  ensure0x,
+  envVar,
+  fetchEnv,
+  fetchEnvOrFallback,
+  strip0x,
+} from '@celo/celotool/src/lib/utils'
 import { ec as EC } from 'elliptic'
 import { range, repeat } from 'lodash'
 import rlp from 'rlp'
@@ -61,11 +67,8 @@ export const generatePublicKeyFromPrivateKey = (privateKey: string) => {
 }
 
 export const generateAccountAddressFromPrivateKey = (privateKey: string) => {
-  if (!privateKey.startsWith('0x')) {
-    privateKey = '0x' + privateKey
-  }
-  // @ts-ignore-next-line
-  return new Web3.modules.Eth().accounts.privateKeyToAccount(privateKey).address
+  // @ts-ignore
+  return new Web3.modules.Eth().accounts.privateKeyToAccount(ensure0x(privateKey)).address
 }
 
 const DEFAULT_BALANCE = '1000000000000000000000000'
@@ -79,7 +82,7 @@ export const getValidators = (mnemonic: string, n: number) => {
   return range(0, n)
     .map((i) => generatePrivateKey(mnemonic, AccountType.VALIDATOR, i))
     .map(generateAccountAddressFromPrivateKey)
-    .map((address) => address.slice(2))
+    .map(strip0x)
 }
 
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {

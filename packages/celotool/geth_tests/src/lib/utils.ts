@@ -9,6 +9,7 @@ import {
   getValidators,
 } from '@celo/celotool/src/lib/generate_utils'
 import { getEnodeAddress } from '@celo/celotool/src/lib/geth'
+import { ensure0x } from '@celo/celotool/src/lib/utils'
 import { spawn } from 'child_process'
 import path from 'path'
 import { Admin } from 'web3-eth-admin'
@@ -276,10 +277,6 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   await sleep(1)
 }
 
-function add0x(str: string) {
-  return '0x' + str
-}
-
 export async function migrateContracts(validatorPrivateKeys: string[], to: number = 1000) {
   let args = [
     '--cwd',
@@ -288,7 +285,7 @@ export async function migrateContracts(validatorPrivateKeys: string[], to: numbe
     '-n',
     'testing',
     '-k',
-    validatorPrivateKeys.map(add0x).join(','),
+    validatorPrivateKeys.map(ensure0x).join(','),
     '-t',
     to.toString(),
   ]
