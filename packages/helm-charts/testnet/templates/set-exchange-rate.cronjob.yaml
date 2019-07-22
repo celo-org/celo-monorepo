@@ -19,7 +19,7 @@ spec:
           - name: set-exchange-rate
             image: {{ .Values.monorepo.image.repository }}:{{ .Values.monorepo.image.tag }}
             imagePullPolicy: {{ .Values.imagePullPolicy }}
-            command: ["bash", "-c", 'cd /celo-monorepo/packages/protocol && yarn run download-artifacts -n {{ template "ethereum.fullname" . }} -b {{.Values.bucket}} && yarn run set-exchange-rate -n {{ template "ethereum.fullname" . }} -f exchange_rates/oracle_exchange_rates.csv -c ''{ "host": "{{ template "ethereum.fullname" . }}-gethminer1" }''']
+            command: ["bash", "-c", 'cd /celo-monorepo/packages/protocol && yarn run download-artifacts -n {{ template "ethereum.fullname" . }} -b {{.Values.bucket}} && yarn run set-exchange-rate -n {{ template "ethereum.fullname" . }} -f exchange_rates/oracle_exchange_rates.csv -c ''{ "host": "{{ template "ethereum.fullname" . }}-tx-nodes-0" }''']
             resources:
               requests:
                 memory: 100M
