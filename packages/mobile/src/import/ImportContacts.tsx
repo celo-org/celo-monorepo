@@ -11,7 +11,7 @@ import { Namespaces } from 'src/i18n'
 import VerifyAddressBook from 'src/icons/VerifyAddressBook'
 import { denyImportContacts, importContacts } from 'src/identity/actions'
 import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { Screens, Stacks } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { requestContactsPermission } from 'src/utils/androidPermissions'
@@ -54,7 +54,7 @@ class ImportContacts extends React.Component<Props> {
   }
 
   nextScreen = () => {
-    navigate(Screens.VerifyEducation)
+    navigate(Stacks.AppStack)
   }
 
   onPressEnable = async () => {
