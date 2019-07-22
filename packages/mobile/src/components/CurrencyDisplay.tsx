@@ -2,14 +2,16 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import { CURRENCY_ENUM as Tokens } from 'src/geth/consts'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
+
+const DOLLAR_TO_PH = 51
 
 interface Props {
   // TODO: Should be Bignumber
   amount: string | null | number
   size: number
-  type: CURRENCY_ENUM
+  type: Tokens
   balanceOutOfSync: boolean
 }
 
@@ -19,11 +21,11 @@ export default class CurrencyDisplay extends React.PureComponent<Props> {
   color() {
     const { balanceOutOfSync } = this.props
     if (balanceOutOfSync) {
-      return this.props.type === CURRENCY_ENUM.DOLLAR
+      return this.props.type === Tokens.DOLLAR
         ? colors.celoGreenInactiveExtra
         : colors.celoGoldInactive
     } else {
-      return this.props.type === CURRENCY_ENUM.DOLLAR ? colors.celoGreen : colors.celoGold
+      return this.props.type === Tokens.DOLLAR ? colors.celoGreen : colors.celoGold
     }
   }
 
@@ -46,14 +48,23 @@ export default class CurrencyDisplay extends React.PureComponent<Props> {
     const dollarStyle = { fontSize, lineHeight: Math.round(fontSize * 1.3), color: this.color() }
     return (
       <View style={styles.container}>
-        {this.props.type === CURRENCY_ENUM.DOLLAR ? (
-          <Text numberOfLines={1} style={[fontStyles.regular, this.symbolStyle(fontSize)]}>
-            ₱
+        {this.props.type === Tokens.DOLLAR ? (
+          <View style={styles.stableCurrencyContainer}>
+            <Text numberOfLines={1} style={[styles.currency, fontStyles.regular, dollarStyle]}>
+              {'₱' + DOLLAR_TO_PH * this.amount()}
+            </Text>
+            <Text
+              numberOfLines={1}
+              style={[styles.currency, fontStyles.regular, styles.dollarConversionText]}
+            >
+              {'($' + this.amount() + ')'}
+            </Text>
+          </View>
+        ) : (
+          <Text numberOfLines={1} style={[styles.currency, fontStyles.regular, dollarStyle]}>
+            {this.amount()}
           </Text>
-        ) : null}
-        <Text numberOfLines={1} style={[styles.currency, fontStyles.regular, dollarStyle]}>
-          {this.amount()}
-        </Text>
+        )}
       </View>
     )
   }
@@ -65,7 +76,14 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginTop: 5,
   },
+  stableCurrencyContainer: {
+    alignItems: 'center',
+  },
   currency: {
     paddingHorizontal: 3,
+  },
+  dollarConversionText: {
+    color: colors.darkSecondary,
+    fontSize: 16,
   },
 })
