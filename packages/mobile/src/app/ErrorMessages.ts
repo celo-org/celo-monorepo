@@ -12,6 +12,7 @@ export enum ErrorMessages {
   IMPORT_BACKUP_FAILED = 'importBackupFailed',
   INVALID_PHONE_NUMBER = 'nuxVerification2:invalidPhone',
   NOT_READY_FOR_CODE = 'nuxVerification2:notReadyForCode',
+  EMPTY_INVITE_CODE = 'nuxNamePin1:emptyInviteCode',
   EMPTY_VERIFICATION_CODE = 'nuxVerification2:emptyVerificationCode',
   INVALID_ATTESTATION_CODE = 'nuxVerification2:invalidVerificationCode',
   REPEAT_VERIFICATION_CODE = 'nuxVerification2:repeatVerificationCode',

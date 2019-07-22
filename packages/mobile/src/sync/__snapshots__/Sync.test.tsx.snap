@@ -10,7 +10,7 @@ exports[`renders correctly when dev Mode disabled 1`] = `
       "justifyContent": "space-between",
       "paddingBottom": 15,
       "paddingHorizontal": 10,
-      "paddingTop": 70,
+      "paddingTop": 30,
     }
   }
 >
@@ -263,9 +263,9 @@ exports[`renders correctly when dev Mode disabled 1`] = `
       style={
         Array [
           Object {
-            "color": "#81868B",
+            "color": "#2E3338",
             "fontFamily": "Hind-Regular",
-            "fontSize": 13,
+            "fontSize": 14,
             "lineHeight": 18,
           },
           Object {
@@ -294,7 +294,7 @@ exports[`renders correctly when dev Mode enabled 1`] = `
       "justifyContent": "space-between",
       "paddingBottom": 15,
       "paddingHorizontal": 10,
-      "paddingTop": 70,
+      "paddingTop": 30,
     }
   }
 >
@@ -547,9 +547,9 @@ exports[`renders correctly when dev Mode enabled 1`] = `
       style={
         Array [
           Object {
-            "color": "#81868B",
+            "color": "#2E3338",
             "fontFamily": "Hind-Regular",
-            "fontSize": 13,
+            "fontSize": 14,
             "lineHeight": 18,
           },
           Object {

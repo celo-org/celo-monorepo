@@ -24,7 +24,10 @@ import { initializeFirebase } from 'src/services/FirebaseDb'
 import ErrorBoundary from 'src/shared/ErrorBoundary'
 import ErrorScreen from 'src/shared/ErrorScreen'
 
-YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated'])
+YellowBox.ignoreWarnings([
+  'Warning: isMounted(...) is deprecated',
+  'Remote debugger', // To avoid "Remote debugger in background tab" warning
+])
 
 const commonScreens = {
   [Screens.Error]: ErrorScreen,

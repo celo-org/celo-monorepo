@@ -61,7 +61,7 @@ exports[`ImportWallet renders correctly 1`] = `
     automaticallyAdjustContentInsets={false}
     contentContainerStyle={
       Object {
-        "paddingHorizontal": 20,
+        "paddingHorizontal": 10,
       }
     }
     contentInset={
@@ -195,7 +195,7 @@ exports[`ImportWallet renders correctly 1`] = `
               "borderRadius": 3,
               "borderWidth": 1,
               "flexDirection": "row",
-              "height": 62,
+              "height": 60,
               "marginVertical": 5,
             },
             Object {
@@ -233,9 +233,9 @@ exports[`ImportWallet renders correctly 1`] = `
       <Text
         style={
           Object {
-            "color": "#81868B",
+            "color": "#2E3338",
             "fontFamily": "Hind-Regular",
-            "fontSize": 13,
+            "fontSize": 14,
             "lineHeight": 18,
           }
         }
@@ -388,7 +388,7 @@ exports[`ImportWallet renders with an error 1`] = `
     automaticallyAdjustContentInsets={false}
     contentContainerStyle={
       Object {
-        "paddingHorizontal": 20,
+        "paddingHorizontal": 10,
       }
     }
     contentInset={
@@ -522,7 +522,7 @@ exports[`ImportWallet renders with an error 1`] = `
               "borderRadius": 3,
               "borderWidth": 1,
               "flexDirection": "row",
-              "height": 62,
+              "height": 60,
               "marginVertical": 5,
             },
             Object {
@@ -562,9 +562,9 @@ exports[`ImportWallet renders with an error 1`] = `
       <Text
         style={
           Object {
-            "color": "#81868B",
+            "color": "#2E3338",
             "fontFamily": "Hind-Regular",
-            "fontSize": 13,
+            "fontSize": 14,
             "lineHeight": 18,
           }
         }
