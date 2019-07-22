@@ -36,6 +36,8 @@ import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import Logger from 'src/utils/Logger'
 
+const TAG = 'invite/RedeemInvite'
+
 function goToCeloSite() {
   Linking.openURL('https://celo.org/terms')
 }
@@ -75,15 +77,19 @@ const hasDisplayedError = (error: ErrorMessages | null) => {
 }
 
 export const extractInviteCodeFromReferrerData = (referrerData: string) => {
-  if (referrerData !== null && referrerData !== 'NOT AVAILABLE') {
-    const params = new URLSearchParamsReal(decodeURIComponent(referrerData))
-    const inviteCode = params.get('invite-code')
-    if (inviteCode) {
-      return inviteCode.replace(' ', '+')
-    }
+  if (!referrerData || referrerData.toLowerCase() === 'not available') {
+    Logger.debug(TAG, 'No referrer data found')
+    return null
   }
-  return null
+  const params = new URLSearchParamsReal(decodeURIComponent(referrerData))
+  const inviteCode = params.get('invite-code')
+  if (inviteCode) {
+    return inviteCode.replace(' ', '+')
+  } else {
+    return null
+  }
 }
+
 export class RedeemInvite extends React.Component<Props, State> {
   static navigationOptions = {
     header: null,
@@ -121,15 +127,16 @@ export class RedeemInvite extends React.Component<Props, State> {
     // following command to test sending the referrer intent on the dev version of the app:
     // yarn send-debug-invite-code
     try {
+      Logger.debug(TAG, 'Checking for referrer data')
       const referrerData: string = await RNAndroidBroadcastReceiverForReferrer.getReferrerData()
-      Logger.info('invite/RedeemInvite/prefillInviteCode', 'Referrer Data: ' + referrerData)
       const inviteCode = extractInviteCodeFromReferrerData(referrerData)
       if (inviteCode) {
+        Logger.debug(TAG, 'Found invite code in referrer data')
         this.setState({ inviteCode })
       }
     } catch (error) {
-      Logger.info('invite/RedeemInvite/prefillInviteCode', 'Unknown error fetching referrer data')
-      Logger.showError(error)
+      Logger.error(TAG, 'Unknown error fetching referrer data', error)
+      Logger.showError('Error prefilling invite code')
     }
   }
 
@@ -178,7 +185,7 @@ export class RedeemInvite extends React.Component<Props, State> {
       if (this.scrollView && this.scrollView.current) {
         this.scrollView.current.scrollToEnd()
       }
-    }, 1000) // This timeout must long enough or it doesnt not work
+    }, 1000) // This timeout must long enough or it does not not work
   }
 
   render() {
@@ -208,7 +215,6 @@ export class RedeemInvite extends React.Component<Props, State> {
                   {t('inviteText.2')}
                 </Text>
               </Text>
-              <Text style={[fontStyles.bodySmall, styles.darkCenter]}>{t('enterFullName')}</Text>
               <View style={componentStyles.row}>
                 <TextInput
                   onFocus={this.scrollToEnd}

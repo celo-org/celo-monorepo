@@ -1,5 +1,5 @@
 import { validateMnemonic } from 'bip39'
-import { ReactNativeBip39MnemonicGenerator } from './key_generator'
+import { ReactNativeBip39MnemonicGenerator } from '../../src/utils/key_generator'
 
 describe('Mnemonic validation', () => {
   it('should generatet 24 word mnemonic', () => {
