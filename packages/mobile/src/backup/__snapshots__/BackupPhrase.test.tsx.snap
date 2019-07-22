@@ -108,7 +108,7 @@ exports[`renders correctly 1`] = `
         <Text
           style={
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
               "fontSize": 15,
               "lineHeight": 18,
@@ -122,7 +122,7 @@ exports[`renders correctly 1`] = `
         <Text
           style={
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
               "fontSize": 15,
               "lineHeight": 18,
