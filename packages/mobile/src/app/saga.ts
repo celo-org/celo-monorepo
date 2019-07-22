@@ -1,4 +1,3 @@
-import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import DeviceInfo from 'react-native-device-info'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { all, call, put, select, spawn, take } from 'redux-saga/effects'
@@ -20,10 +19,12 @@ export function* waitForRehydrate() {
 
 interface PersistedStateProps {
   language: string | null
-  inviteCodeEntered: boolean
   e164Number: string
   numberVerified: boolean
   pincodeSet: boolean
+  redeemComplete: boolean
+  startedVerification: boolean
+  askedContactsPermission: boolean
 }
 
 const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null => {
@@ -32,10 +33,12 @@ const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null 
   }
   return {
     language: state.app.language,
-    inviteCodeEntered: state.app.inviteCodeEntered,
     e164Number: state.account.e164PhoneNumber,
     numberVerified: state.app.numberVerified,
     pincodeSet: state.account.pincodeSet,
+    redeemComplete: state.invite.redeemComplete,
+    startedVerification: state.identity.startedVerification,
+    askedContactsPermission: state.identity.askedContactsPermission,
   }
 }
 
@@ -58,7 +61,15 @@ export function* navigateToProperScreen() {
     return
   }
 
-  const { language, inviteCodeEntered, e164Number, numberVerified, pincodeSet } = mappedState
+  const {
+    language,
+    e164Number,
+    numberVerified,
+    pincodeSet,
+    redeemComplete,
+    startedVerification,
+    askedContactsPermission,
+  } = mappedState
 
   if (language) {
     yield put(setLanguage(language))
@@ -70,13 +81,17 @@ export function* navigateToProperScreen() {
     navigate(Stacks.NuxStack)
   } else if (!inSync) {
     navigate(Screens.SetClock)
+  } else if (!e164Number) {
+    navigate(Screens.JoinCelo)
   } else if (!pincodeSet) {
     navigate(Screens.Pincode)
-  } else if (inviteCodeEntered === false) {
-    navigate(Screens.RedeemInvite)
-  } else if (!isE164Number(e164Number)) {
+  } else if (!redeemComplete) {
+    navigate(Screens.EnterInviteCode)
+  } else if (!askedContactsPermission) {
+    navigate(Screens.ImportContacts)
+  } else if (!startedVerification) {
     navigate(Screens.VerifyEducation)
-  } else if (numberVerified === false) {
+  } else if (!numberVerified) {
     navigate(Screens.VerifyVerifying)
   } else {
     navigate(Stacks.AppStack)

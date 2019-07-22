@@ -2313,6 +2313,7 @@ exports[`renders the Input step correctly 1`] = `
               "marginTop": 10,
             },
             Object {
+              "backgroundColor": "#FFFFFF",
               "position": "relative",
             },
           ]
@@ -2343,6 +2344,10 @@ exports[`renders the Input step correctly 1`] = `
                     "borderWidth": 1,
                   },
                   Object {
+                    "height": 50,
+                  },
+                  Object {
+                    "marginTop": 1,
                     "padding": 3,
                   },
                 ],
@@ -2378,6 +2383,7 @@ exports[`renders the Input step correctly 1`] = `
                 onChangeText={[Function]}
                 onFocus={[Function]}
                 placeholder="country"
+                placeholderTextColor="#D1D5D8"
                 rejectResponderTermination={true}
                 secureTextEntry={false}
                 style={
@@ -2461,11 +2467,15 @@ exports[`renders the Input step correctly 1`] = `
                   "flexDirection": "row",
                   "justifyContent": "center",
                 },
-                Object {
-                  "backgroundColor": "#FFFFFF",
-                  "flex": 1,
-                  "marginLeft": 2,
-                },
+                Array [
+                  Object {
+                    "height": 50,
+                  },
+                  Object {
+                    "flex": 1,
+                    "marginLeft": 9,
+                  },
+                ],
               ]
             }
           >
@@ -2478,6 +2488,7 @@ exports[`renders the Input step correctly 1`] = `
               onChangeText={[Function]}
               onFocus={[Function]}
               placeholder="phoneNumber"
+              placeholderTextColor="#D1D5D8"
               rejectResponderTermination={true}
               secureTextEntry={false}
               style={

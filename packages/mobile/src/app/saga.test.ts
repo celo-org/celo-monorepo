@@ -30,6 +30,8 @@ const initialState = {
   verify: {},
   web3: {},
   account: {},
+  invite: {},
+  identity: {},
 }
 
 const numberVerified = {
@@ -45,6 +47,14 @@ const numberVerified = {
   },
   account: {
     pincodeSet: true,
+    e164PhoneNumber: '+1234',
+  },
+  invite: {
+    redeemComplete: true,
+  },
+  identity: {
+    startedVerification: false,
+    askedContactsPermission: true,
   },
 }
 
@@ -94,4 +104,5 @@ describe('Upload Comment Key Saga', () => {
 
 navigationSagaTest('Navigates to the nux stack with no state', null, Stacks.NuxStack)
 navigationSagaTest('Navigates to the nux stack with no language', initialState, Stacks.NuxStack)
+
 navigationSagaTest('Navigates to the verify screen', numberVerified, Screens.VerifyEducation)
