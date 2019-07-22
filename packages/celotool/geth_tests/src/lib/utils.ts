@@ -2,9 +2,9 @@ import {
   AccountType,
   ConsensusType,
   generateGenesis,
-  generatePrivateKey,
   generatePublicKeyFromPrivateKey,
-  getValidators,
+  getPrivateKeysFor,
+  privateKey2GethAddress,
 } from '@celo/celotool/src/lib/generate_utils'
 import { getEnodeAddress } from '@celo/celotool/src/lib/geth'
 import { ensure0x } from '@celo/celotool/src/lib/utils'
@@ -360,10 +360,8 @@ export function getHooks(gethConfig: GethTestConfig) {
     'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
   const numValidators = validatorInstances.length
-  const validators = getValidators(mnemonic, numValidators)
-  const validatorPrivateKeys = validators.map((_: any, i: number) =>
-    generatePrivateKey(mnemonic, AccountType.VALIDATOR, i)
-  )
+  const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
+  const validators = validatorPrivateKeys.map(privateKey2GethAddress)
   const validatorEnodes = validatorPrivateKeys.map((x: any, i: number) =>
     getEnodeAddress(generatePublicKeyFromPrivateKey(x), '127.0.0.1', validatorInstances[i].port)
   )

@@ -8,7 +8,7 @@ import {
   AccountType,
   generateAccountAddressFromPrivateKey,
   generatePrivateKey,
-  getValidatorsPrivateKeys,
+  getPrivateKeysFor,
 } from 'src/lib/generate_utils'
 import { OG_ACCOUNTS } from 'src/lib/genesis_constants'
 
@@ -32,7 +32,8 @@ function getValidatorKeys() {
   if (fetchEnv(envVar.VALIDATORS) === 'og') {
     return OG_ACCOUNTS.map((account) => account.privateKey).map(ensure0x)
   } else {
-    return getValidatorsPrivateKeys(
+    return getPrivateKeysFor(
+      AccountType.VALIDATOR,
       fetchEnv(envVar.MNEMONIC),
       parseInt(fetchEnv(envVar.VALIDATORS), 10)
     ).map(ensure0x)
