@@ -69,10 +69,10 @@ export const fontStyles = StyleSheet.create({
     color: colors.darkSecondary,
   },
   bodySmall: {
-    fontSize: 13,
+    fontSize: 14,
     lineHeight: 18,
     fontFamily: HindSilguri.Regular,
-    color: colors.darkSecondary,
+    color: colors.dark,
   },
   bodySmallBold: {
     fontSize: 14,

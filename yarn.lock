@@ -22863,6 +22863,10 @@ react-native-secure-randombytes@^2.2.3:
   dependencies:
     buffer "^4.9.1"
 
+"react-native-send-intent@git+ssh://git@github.com/celo-org/react-native-send-intent#8039938":
+  version "1.0.30"
+  resolved "git+ssh://git@github.com/celo-org/react-native-send-intent#80399380eef368b9a8ab1ee1db07e193e6f89826"
+
 react-native-sentry@^0.38.3:
   version "0.38.3"
   resolved "https://registry.yarnpkg.com/react-native-sentry/-/react-native-sentry-0.38.3.tgz#2ab72786b8755a806c0774ec4a47ac8dd595fb8c"

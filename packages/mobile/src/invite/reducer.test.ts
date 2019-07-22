@@ -17,6 +17,7 @@ describe('invite/reducer', () => {
           [mockAccount]: mockE164Number,
         },
         redeemedInviteCode: '',
+        redeemComplete: false,
       })
     })
   })

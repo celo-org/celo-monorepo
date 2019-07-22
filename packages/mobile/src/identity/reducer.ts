@@ -16,6 +16,8 @@ export interface State {
   verificationFailed: boolean
   addressToE164Number: AddressToE164NumberType
   e164NumberToAddress: E164NumberToAddressType
+  startedVerification: boolean
+  askedContactsPermission: boolean
 }
 
 const initialState = {
@@ -24,6 +26,8 @@ const initialState = {
   verificationFailed: false,
   addressToE164Number: {},
   e164NumberToAddress: {},
+  startedVerification: false,
+  askedContactsPermission: false,
 }
 
 export const reducer = (state: State | undefined = initialState, action: ActionTypes): State => {
@@ -34,6 +38,7 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
         attestationCodes: [],
         numCompleteAttestations: 0,
         verificationFailed: false,
+        startedVerification: true,
       }
     case Actions.END_VERIFICATION:
       return action.success
@@ -45,8 +50,8 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
         : {
             ...state,
             verificationFailed: true,
+            startedVerification: false,
           }
-
     case Actions.INPUT_ATTESTATION_CODE:
       return {
         ...state,
@@ -65,6 +70,11 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
           ...state.e164NumberToAddress,
           ...action.e164NumberToAddress,
         },
+      }
+    case Actions.IMPORT_CONTACTS:
+      return {
+        ...state,
+        askedContactsPermission: true,
       }
     default:
       return state

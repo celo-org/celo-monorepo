@@ -76,6 +76,7 @@ export type ActionTypes =
   | InputAttestationCodeAction
   | CompleteAttestationCodeAction
   | UpdateE164PhoneNumberAddressesAction
+  | ImportContactsAction
 
 export const startVerification = (): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,

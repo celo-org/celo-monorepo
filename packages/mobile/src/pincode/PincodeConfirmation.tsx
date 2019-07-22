@@ -49,7 +49,7 @@ class PincodeConfirmation extends React.Component<Props, State> {
     const { t } = this.props
     return (
       <View style={style.pincodeContainer}>
-        <DevSkipButton nextScreen={Screens.RedeemInvite} />
+        <DevSkipButton nextScreen={Screens.JoinCelo} />
         <ScrollView>
           <View style={style.header}>
             <View style={style.goBack}>
