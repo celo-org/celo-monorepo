@@ -79,8 +79,8 @@ platform :android do
     fastlane_supply(env, 'internal', env)
   end
 
-  desc 'Ship Pilot to Playstore Internal'
-  lane :pilot do
+  desc 'Ship PH Pilot to Playstore Internal'
+  lane :phpilot do
     env = 'pilot'
     sdkEnv = 'pilot'
     clean
