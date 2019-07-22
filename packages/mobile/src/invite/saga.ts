@@ -15,7 +15,6 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { CURRENCY_ENUM, INVITE_REDEMPTION_GAS } from 'src/geth/consts'
-import { waitForGethConnectivity } from 'src/geth/saga'
 import i18n from 'src/i18n'
 import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import {
@@ -31,7 +30,7 @@ import {
 import { createInviteCode } from 'src/invite/utils'
 import { navigate, navigateReset } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { RootState } from 'src/redux/reducers'
+import { waitForNetwork } from 'src/networkInfo/saga'
 import { transferStableToken } from 'src/stableToken/actions'
 import { createTransaction } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
@@ -116,10 +115,6 @@ export function* sendInvite(
     const temporaryWalletAccount = web3.eth.accounts.create()
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
-
-    // TODO: Improve this by not checking specifically for this
-    // display name. Requires improvements in recipient handling
-    recipientName = recipientName === i18n.t('sendFlow7:mobileNumber') ? '' : ' ' + recipientName
     const msg = yield call(generateLink, inviteCode, recipientName)
 
     // Store the Temp Address locally so we know which transactions were invites
@@ -196,12 +191,11 @@ function* redeemSuccess(name: string, account: string) {
   navigateReset(Screens.VerifyEducation)
 }
 
-export const web3ReadySelectr = (state: RootState) => state.web3.isReady
-
 export function* redeemInviteSaga(action: RedeemInviteAction) {
   const { inviteCode, name } = action
 
-  yield call(waitForGethConnectivity)
+  yield call(waitForNetwork)
+  // yield call(waitForGethConnectivity)
   try {
     // Add temp wallet so we can send money from it
     let tempAccount
@@ -220,13 +214,8 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
     // Check that the balance of the new account is not 0
     const StableToken = yield call(getStableTokenContract, web3)
 
-    // yield call(checkWeb3SyncProgressClaim)
-    const web3Ready = yield select(web3ReadySelectr)
-    Logger.debug(TAG + '@redeemInviteCode', 'Web3: ' + web3Ready)
     const stableBalance = new BigNumber(yield call(StableToken.methods.balanceOf(tempAccount).call))
     Logger.debug(TAG + '@redeemInviteCode', 'Temporary account balance: ' + stableBalance)
-
-    throw 'FAIL'
 
     if (stableBalance.isLessThan(1)) {
       // check if new user account has already been created

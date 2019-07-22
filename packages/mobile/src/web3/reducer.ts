@@ -1,4 +1,5 @@
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
+import { RootState } from 'src/redux/reducers'
 import { Actions, ActionTypes, UpdateWeb3SyncProgressAction } from 'src/web3/actions'
 
 export interface State {
@@ -38,6 +39,8 @@ function calculateSyncProgress(action: UpdateWeb3SyncProgressAction) {
   const denominator = action.payload.highestBlock - action.payload.startingBlock
   return (100 * numerator) / denominator
 }
+
+export const web3ReadySelector = (state: RootState) => state.web3.isReady
 
 export const reducer = (
   state: State | undefined = initialState,

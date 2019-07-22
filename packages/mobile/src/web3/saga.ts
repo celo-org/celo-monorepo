@@ -31,6 +31,7 @@ import {
 } from 'src/web3/actions'
 import { web3 } from 'src/web3/contracts'
 import { refreshGasPrice } from 'src/web3/gas'
+import { web3ReadySelector } from 'src/web3/reducer'
 import { currentAccountSelector } from 'src/web3/selectors'
 import { Block } from 'web3/eth/types'
 
@@ -46,9 +47,24 @@ const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect 
 
 let AssignAccountLock = false
 
+export function* waitForWeb3Ready(): any {
+  const connected = yield select(web3ReadySelector)
+  if (connected) {
+    return
+  }
+
+  while (true) {
+    const action = yield take(Actions.SET_IS_READY)
+    if (action.payload.isReady) {
+      return
+    }
+  }
+}
+
 // checks if web3 claims it is currently syncing or not
 export function* checkWeb3SyncProgressClaim() {
   Logger.debug(TAG, 'Checking sync progress claim')
+  yield call(waitForGethConnectivity)
   while (true) {
     try {
       const syncProgress = yield web3.eth.isSyncing()
@@ -269,4 +285,5 @@ export function* watchRefreshGasPrice() {
 export function* web3Saga() {
   yield spawn(checkSyncProgressWorker)
   yield spawn(watchRefreshGasPrice)
+  yield spawn(checkWeb3SyncProgressClaim)
 }
