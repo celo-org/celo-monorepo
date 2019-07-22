@@ -81,6 +81,8 @@ project.ext.react = [
         devDisabledInStaging: true,
         bundleInAlfajores: true,
         devDisabledInAlfajores: true,
+        bundleInPilot: true,
+        devDisabledInPilot: true,
 ]
 
 project.ext.envConfigFiles = [
