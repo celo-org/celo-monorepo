@@ -12,6 +12,7 @@ const COUNTRY_CODES = {
   US: '+1',
   DE: '+49',
   AR: '+54',
+  PH: '+63',
 }
 
 const TEST_PHONE_NUMBERS = {
@@ -27,6 +28,7 @@ const TEST_PHONE_NUMBERS = {
   VALID_AR_3: '+54264 123-4567',
   VALID_AR_4: '9 11 12345678',
   VALID_AR_5: '(380) 15 123-4567',
+  VALID_PH_1: '+639612121027',
   INVALID_EMPTY: '',
   TOO_SHORT: '123',
 }
@@ -71,6 +73,10 @@ describe('Phone number formatting and utilities', () => {
     })
     it('Format AR phone with country code', () => {
       expect(getE164Number(TEST_PHONE_NUMBERS.VALID_AR_3, COUNTRY_CODES.AR)).toBe('+5492641234567')
+    })
+
+    it('Format PH phone with country code', () => {
+      expect(getE164Number(TEST_PHONE_NUMBERS.VALID_PH_1, COUNTRY_CODES.PH)).toBe('+639612121027')
     })
   })
 
