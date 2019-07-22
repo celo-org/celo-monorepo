@@ -204,13 +204,7 @@ export class Account extends React.Component<Props, State> {
         <DisconnectBanner />
         <View style={style.accountProfile}>
           <AccountInfo />
-          <View>
-            <TouchableOpacity onPress={this.onCopyAddressClick}>
-              <Text numberOfLines={1} ellipsizeMode={'tail'} style={style.addressText}>
-                {account}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <View />
           <SmallButton
             text={t('editProfile')}
             testID={'editProfileButton'}
