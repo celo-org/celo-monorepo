@@ -52,9 +52,12 @@ fastlane/report.xml
 */fastlane/Preview.html
 */fastlane/screenshots
 
+# Ruby gem artifacts
+.bundle
+vendor/
+
 # Bundle artifact
 *.jsbundle
-
 
 fastlane/google-play-service-account.json
 
@@ -80,3 +83,5 @@ android/app/src/alfajores/google-services.json
 android/app/src/debug/google-services.json
 android/app/src/pilot/google-services.json
 secrets.json
+android/sentry.properties
+ios/sentry.properties

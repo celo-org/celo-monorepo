@@ -1,5 +1,4 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
@@ -10,11 +9,10 @@ import { setPin } from 'src/account/actions'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces } from 'src/i18n'
-import Logo from 'src/icons/Logo'
+import BackupIcon from 'src/icons/BackupIcon'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-
 interface StateProps {
   pincodeSet: boolean
 }
@@ -53,37 +51,36 @@ class SystemAuth extends React.Component<Props> {
 
   componentDidUpdate() {
     if (this.props.pincodeSet) {
-      navigate(Screens.RedeemInvite)
+      this.nextScreen()
     }
   }
 
+  nextScreen() {
+    navigate(Screens.EnterInviteCode)
+  }
   render() {
     const { t } = this.props
     return (
       <View style={style.pincodeContainer}>
-        <DevSkipButton nextScreen={Screens.RedeemInvite} />
+        <DevSkipButton nextScreen={Screens.EnterInviteCode} />
         <ScrollView>
           <View style={style.header} />
-          <View style={style.pincodeLogo}>
-            <Logo />
-          </View>
-          <View style={style.pincodeContent}>
+          <View>
+            <BackupIcon style={style.pincodeLogo} />
             <Text style={[fontStyles.h1, style.h1]} testID="SystemAuthTitle">
               {t('systemAuth.title')}
             </Text>
-            <View style={style.explanation}>
-              <Text style={fontStyles.body}>{t('systemAuth.intro')}</Text>
-            </View>
-            <Text style={[fontStyles.body, style.explanation]}>{t('systemAuth.why')}</Text>
+            <Text style={[fontStyles.bodySmall, style.explanation]}>{t('systemAuth.secure')}</Text>
+            <Text style={[fontStyles.bodySmall, style.explanation]}>{t('systemAuth.intro')}</Text>
+            <Text style={[fontStyles.bodySmall, style.explanation]}>{t('systemAuth.why')}</Text>
           </View>
         </ScrollView>
         <View style={style.pincodeFooter}>
           <Button
-            text={t('continue')}
-            style={style.button}
-            onPress={this.setupSystemAuth}
-            standard={true}
-            type={BtnTypes.SECONDARY}
+            text={this.props.pincodeSet ? t('continue') : t('enableSecurity')}
+            onPress={this.props.pincodeSet ? this.nextScreen : this.setupSystemAuth}
+            standard={false}
+            type={BtnTypes.PRIMARY}
             disabled={this.state.isSettingPin}
             testID="SystemAuthContinue"
           />
@@ -100,19 +97,17 @@ const style = StyleSheet.create({
     justifyContent: 'space-between',
   },
   pincodeLogo: {
-    paddingTop: 30,
-    alignItems: 'center',
-    paddingLeft: 20,
-  },
-  pincodeContent: {
-    paddingHorizontal: 25,
+    alignSelf: 'center',
   },
   explanation: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     marginVertical: 10,
+    fontWeight: '300',
   },
   pincodeFooter: {
-    alignItems: 'center',
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    textAlign: 'center',
   },
   pincodeFooterText: {
     flexDirection: 'row',
@@ -121,16 +116,10 @@ const style = StyleSheet.create({
   },
   h1: {
     textAlign: 'center',
-    color: colors.dark,
     padding: 25,
   },
-  button: {
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-  },
   header: {
-    padding: 20,
-    margin: 0,
+    paddingTop: 10,
     flexDirection: 'row',
   },
 })

@@ -42,8 +42,7 @@ exports[`Pincode renders correctly for education 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "margin": 0,
-            "padding": 20,
+            "padding": 10,
           }
         }
       >
@@ -51,6 +50,7 @@ exports[`Pincode renders correctly for education 1`] = `
           style={
             Object {
               "flex": 1,
+              "paddingBottom": 21,
             }
           }
         >
@@ -74,9 +74,9 @@ exports[`Pincode renders correctly for education 1`] = `
               style={
                 Array [
                   Object {
-                    "color": "#81868B",
+                    "color": "#2E3338",
                     "fontFamily": "Hind-Regular",
-                    "fontSize": 13,
+                    "fontSize": 14,
                     "lineHeight": 18,
                   },
                   Object {
@@ -94,35 +94,29 @@ exports[`Pincode renders correctly for education 1`] = `
           </View>
         </View>
       </View>
-      <View
-        style={
+      <Image
+        source={
           Object {
-            "alignItems": "center",
-            "paddingLeft": 20,
-            "paddingTop": 30,
+            "testUri": "../../../src/images/backup-icon.png",
           }
         }
-      >
-        <Image
-          resizeMode="contain"
-          source={
+        style={
+          Array [
             Object {
-              "testUri": "../../../src/images/coins-logo.png",
-            }
-          }
-          style={
+              "height": 70,
+              "width": 80,
+            },
             Object {
-              "height": 50,
-              "width": 50,
-            }
-          }
-        />
-      </View>
+              "alignSelf": "center",
+            },
+          ]
+        }
+      />
       <View
         style={
           Object {
             "flex": 1,
-            "paddingHorizontal": 25,
+            "paddingHorizontal": 10,
           }
         }
       >
@@ -150,7 +144,6 @@ exports[`Pincode renders correctly for education 1`] = `
           style={
             Object {
               "marginVertical": 10,
-              "paddingHorizontal": 20,
             }
           }
         >
@@ -159,8 +152,8 @@ exports[`Pincode renders correctly for education 1`] = `
               Object {
                 "color": "#2E3338",
                 "fontFamily": "Hind-Regular",
-                "fontSize": 16,
-                "lineHeight": 24,
+                "fontSize": 14,
+                "lineHeight": 18,
               }
             }
           >
@@ -172,7 +165,6 @@ exports[`Pincode renders correctly for education 1`] = `
             Array [
               Object {
                 "marginVertical": 10,
-                "paddingHorizontal": 20,
               },
             ]
           }
@@ -182,8 +174,8 @@ exports[`Pincode renders correctly for education 1`] = `
               Object {
                 "color": "#2E3338",
                 "fontFamily": "Hind-Regular",
-                "fontSize": 16,
-                "lineHeight": 24,
+                "fontSize": 14,
+                "lineHeight": 18,
               }
             }
           >
@@ -193,8 +185,8 @@ exports[`Pincode renders correctly for education 1`] = `
                   Object {
                     "color": "#2E3338",
                     "fontFamily": "Hind-Bold",
-                    "fontSize": 16,
-                    "lineHeight": 24,
+                    "fontSize": 14,
+                    "lineHeight": 18,
                   },
                 ]
               }
@@ -309,15 +301,14 @@ exports[`Pincode renders correctly for pin enter 1`] = `
   }
 >
   <Connect(DevSkipButton)
-    nextScreen="RedeemInvite"
+    nextScreen="EnterInviteCode"
   />
   <ScrollViewMock>
     <View
       style={
         Object {
           "flexDirection": "row",
-          "margin": 0,
-          "padding": 20,
+          "padding": 10,
         }
       }
     >
@@ -325,6 +316,7 @@ exports[`Pincode renders correctly for pin enter 1`] = `
         style={
           Object {
             "flex": 1,
+            "paddingBottom": 21,
           }
         }
       >
@@ -336,25 +328,20 @@ exports[`Pincode renders correctly for pin enter 1`] = `
         </Link>
       </View>
     </View>
-    <View
+    <VerifyAddressBook
+      height={70}
       style={
         Object {
-          "alignItems": "center",
-          "paddingLeft": 20,
-          "paddingTop": 30,
+          "alignSelf": "center",
         }
       }
-    >
-      <Logo
-        height={50}
-        type="COLOR"
-      />
-    </View>
+      width={80}
+    />
     <View
       style={
         Object {
           "flex": 1,
-          "paddingHorizontal": 25,
+          "paddingHorizontal": 10,
         }
       }
     >
@@ -424,15 +411,14 @@ exports[`Pincode renders correctly for pin re-enter 1`] = `
   }
 >
   <Connect(DevSkipButton)
-    nextScreen="RedeemInvite"
+    nextScreen="EnterInviteCode"
   />
   <ScrollViewMock>
     <View
       style={
         Object {
           "flexDirection": "row",
-          "margin": 0,
-          "padding": 20,
+          "padding": 10,
         }
       }
     >
@@ -440,6 +426,7 @@ exports[`Pincode renders correctly for pin re-enter 1`] = `
         style={
           Object {
             "flex": 1,
+            "paddingBottom": 21,
           }
         }
       >
@@ -451,25 +438,20 @@ exports[`Pincode renders correctly for pin re-enter 1`] = `
         </Link>
       </View>
     </View>
-    <View
+    <VerifyAddressBook
+      height={70}
       style={
         Object {
-          "alignItems": "center",
-          "paddingLeft": 20,
-          "paddingTop": 30,
+          "alignSelf": "center",
         }
       }
-    >
-      <Logo
-        height={50}
-        type="COLOR"
-      />
-    </View>
+      width={80}
+    />
     <View
       style={
         Object {
           "flex": 1,
-          "paddingHorizontal": 25,
+          "paddingHorizontal": 10,
         }
       }
     >

@@ -14,7 +14,7 @@ export function* importBackupPhraseSaga(action: ImportBackupPhraseAction) {
   const account = yield call(assignAccountFromPrivateKey, privateKey)
   if (account) {
     yield put(setBackupCompleted())
-    navigateReset(Screens.VerifyEducation)
+    navigateReset(Screens.ImportContacts)
   } else {
     yield put(showError(ErrorMessages.IMPORT_BACKUP_FAILED))
   }
