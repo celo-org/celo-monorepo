@@ -29,7 +29,7 @@
     "express": "^4.16.4",
     "firebase-admin": "^7.0.0",
     "firebase-functions": "^2.2.0",
-    "google-libphonenumber": "^3.2.1",
+    "google-libphonenumber": "^3.2.3",
     "lodash": "^4.17.14",
     "sleep-promise": "^8.0.1",
     "twilio": "^3.23.2",

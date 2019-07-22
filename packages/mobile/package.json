@@ -63,7 +63,7 @@
     "dot-prop-immutable": "^1.4.0",
     "ethereumjs-util": "^5.2.0",
     "fuzzysort": "^1.1.4",
-    "google-libphonenumber": "^3.2.1",
+    "google-libphonenumber": "^3.2.3",
     "graphql": "^14.1.1",
     "hoist-non-react-statics": "^3.1.0",
     "i18next": "^11.9.1",
