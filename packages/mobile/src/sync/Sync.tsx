@@ -40,6 +40,10 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 export class Sync extends React.Component<Props> {
+  static navigationOptions = {
+    header: null,
+  }
+
   componentDidMount() {
     this.props.checkSyncProgress()
   }
@@ -51,7 +55,7 @@ export class Sync extends React.Component<Props> {
   }
 
   continue = () => {
-    const nextScreen: string = this.props.pincodeSet ? Screens.RedeemInvite : Screens.Pincode
+    const nextScreen: string = this.props.pincodeSet ? Screens.EnterInviteCode : Screens.Pincode
     Logger.debug(
       'Sync@continue',
       `Pincode set: ${this.props.pincodeSet} next Screen: ${nextScreen}`
@@ -109,7 +113,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: 'white',
     justifyContent: 'space-between',
-    paddingTop: 70,
+    paddingTop: 30,
     paddingHorizontal: 10,
     paddingBottom: 15,
   },

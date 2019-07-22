@@ -312,7 +312,7 @@ exports[`Account renders correctly 1`] = `
               Object {
                 "color": "#2E3338",
                 "fontFamily": "Hind-Light",
-                "fontSize": 13,
+                "fontSize": 14,
                 "lineHeight": 18,
                 "marginTop": 8,
               }
@@ -855,9 +855,9 @@ exports[`Account renders correctly 1`] = `
         <Text
           style={
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 13,
+              "fontSize": 14,
               "lineHeight": 18,
             }
           }
@@ -883,9 +883,9 @@ exports[`Account renders correctly 1`] = `
             style={
               Array [
                 Object {
-                  "color": "#81868B",
+                  "color": "#2E3338",
                   "fontFamily": "Hind-Regular",
-                  "fontSize": 13,
+                  "fontSize": 14,
                   "lineHeight": 18,
                 },
                 Object {
@@ -896,9 +896,9 @@ exports[`Account renders correctly 1`] = `
                 },
                 Array [
                   Object {
-                    "color": "#81868B",
+                    "color": "#2E3338",
                     "fontFamily": "Hind-Regular",
-                    "fontSize": 13,
+                    "fontSize": 14,
                     "lineHeight": 18,
                   },
                   Object {
@@ -924,9 +924,9 @@ exports[`Account renders correctly 1`] = `
         <Text
           style={
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 13,
+              "fontSize": 14,
               "lineHeight": 18,
             }
           }
@@ -952,9 +952,9 @@ exports[`Account renders correctly 1`] = `
             style={
               Array [
                 Object {
-                  "color": "#81868B",
+                  "color": "#2E3338",
                   "fontFamily": "Hind-Regular",
-                  "fontSize": 13,
+                  "fontSize": 14,
                   "lineHeight": 18,
                 },
                 Object {
@@ -965,9 +965,9 @@ exports[`Account renders correctly 1`] = `
                 },
                 Array [
                   Object {
-                    "color": "#81868B",
+                    "color": "#2E3338",
                     "fontFamily": "Hind-Regular",
-                    "fontSize": 13,
+                    "fontSize": 14,
                     "lineHeight": 18,
                   },
                   Object {
@@ -1299,7 +1299,7 @@ exports[`Account when dev mode active renders correctly 1`] = `
               Object {
                 "color": "#2E3338",
                 "fontFamily": "Hind-Light",
-                "fontSize": 13,
+                "fontSize": 14,
                 "lineHeight": 18,
                 "marginTop": 8,
               }
@@ -1981,9 +1981,9 @@ exports[`Account when dev mode active renders correctly 1`] = `
         <Text
           style={
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 13,
+              "fontSize": 14,
               "lineHeight": 18,
             }
           }
@@ -2009,9 +2009,9 @@ exports[`Account when dev mode active renders correctly 1`] = `
             style={
               Array [
                 Object {
-                  "color": "#81868B",
+                  "color": "#2E3338",
                   "fontFamily": "Hind-Regular",
-                  "fontSize": 13,
+                  "fontSize": 14,
                   "lineHeight": 18,
                 },
                 Object {
@@ -2022,9 +2022,9 @@ exports[`Account when dev mode active renders correctly 1`] = `
                 },
                 Array [
                   Object {
-                    "color": "#81868B",
+                    "color": "#2E3338",
                     "fontFamily": "Hind-Regular",
-                    "fontSize": 13,
+                    "fontSize": 14,
                     "lineHeight": 18,
                   },
                   Object {
@@ -2050,9 +2050,9 @@ exports[`Account when dev mode active renders correctly 1`] = `
         <Text
           style={
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 13,
+              "fontSize": 14,
               "lineHeight": 18,
             }
           }
@@ -2078,9 +2078,9 @@ exports[`Account when dev mode active renders correctly 1`] = `
             style={
               Array [
                 Object {
-                  "color": "#81868B",
+                  "color": "#2E3338",
                   "fontFamily": "Hind-Regular",
-                  "fontSize": 13,
+                  "fontSize": 14,
                   "lineHeight": 18,
                 },
                 Object {
@@ -2091,9 +2091,9 @@ exports[`Account when dev mode active renders correctly 1`] = `
                 },
                 Array [
                   Object {
-                    "color": "#81868B",
+                    "color": "#2E3338",
                     "fontFamily": "Hind-Regular",
-                    "fontSize": 13,
+                    "fontSize": 14,
                     "lineHeight": 18,
                   },
                   Object {

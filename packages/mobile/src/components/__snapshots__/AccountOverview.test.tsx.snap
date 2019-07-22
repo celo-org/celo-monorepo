@@ -39,9 +39,9 @@ exports[`renders correctly when Dollar education NUX flow hasn't been completed 
                 "lineHeight": 30,
               },
               Object {
-                "color": "#81868B",
+                "color": "#2E3338",
                 "fontFamily": "Hind-Regular",
-                "fontSize": 13,
+                "fontSize": 14,
                 "lineHeight": 18,
               },
             ]
@@ -200,9 +200,9 @@ exports[`renders correctly when Dollar education NUX flow hasn't been completed 
                 "lineHeight": 30,
               },
               Object {
-                "color": "#81868B",
+                "color": "#2E3338",
                 "fontFamily": "Hind-Regular",
-                "fontSize": 13,
+                "fontSize": 14,
                 "lineHeight": 18,
               },
             ]
@@ -304,9 +304,9 @@ exports[`renders correctly when Gold education NUX flow hasn't been completed 1`
                 "lineHeight": 30,
               },
               Object {
-                "color": "#81868B",
+                "color": "#2E3338",
                 "fontFamily": "Hind-Regular",
-                "fontSize": 13,
+                "fontSize": 14,
                 "lineHeight": 18,
               },
             ]
@@ -416,9 +416,9 @@ exports[`renders correctly when Gold education NUX flow hasn't been completed 1`
                 "lineHeight": 30,
               },
               Object {
-                "color": "#81868B",
+                "color": "#2E3338",
                 "fontFamily": "Hind-Regular",
-                "fontSize": 13,
+                "fontSize": 14,
                 "lineHeight": 18,
               },
             ]
@@ -569,9 +569,9 @@ exports[`renders correctly when balance is out of sync 1`] = `
                 "lineHeight": 30,
               },
               Object {
-                "color": "#81868B",
+                "color": "#2E3338",
                 "fontFamily": "Hind-Regular",
-                "fontSize": 13,
+                "fontSize": 14,
                 "lineHeight": 18,
               },
             ]
@@ -681,9 +681,9 @@ exports[`renders correctly when balance is out of sync 1`] = `
                 "lineHeight": 30,
               },
               Object {
-                "color": "#81868B",
+                "color": "#2E3338",
                 "fontFamily": "Hind-Regular",
-                "fontSize": 13,
+                "fontSize": 14,
                 "lineHeight": 18,
               },
             ]
@@ -758,7 +758,7 @@ exports[`renders correctly when balance is out of sync 1`] = `
           Object {
             "color": "#3C9BF4",
             "fontFamily": "Hind-Regular",
-            "fontSize": 13,
+            "fontSize": 14,
             "lineHeight": 18,
             "paddingRight": 5,
           }
@@ -870,9 +870,9 @@ exports[`renders correctly when not ready 1`] = `
                 "lineHeight": 30,
               },
               Object {
-                "color": "#81868B",
+                "color": "#2E3338",
                 "fontFamily": "Hind-Regular",
-                "fontSize": 13,
+                "fontSize": 14,
                 "lineHeight": 18,
               },
             ]
@@ -982,9 +982,9 @@ exports[`renders correctly when not ready 1`] = `
                 "lineHeight": 30,
               },
               Object {
-                "color": "#81868B",
+                "color": "#2E3338",
                 "fontFamily": "Hind-Regular",
-                "fontSize": 13,
+                "fontSize": 14,
                 "lineHeight": 18,
               },
             ]
@@ -1086,9 +1086,9 @@ exports[`renders correctly when ready 1`] = `
                 "lineHeight": 30,
               },
               Object {
-                "color": "#81868B",
+                "color": "#2E3338",
                 "fontFamily": "Hind-Regular",
-                "fontSize": 13,
+                "fontSize": 14,
                 "lineHeight": 18,
               },
             ]
@@ -1198,9 +1198,9 @@ exports[`renders correctly when ready 1`] = `
                 "lineHeight": 30,
               },
               Object {
-                "color": "#81868B",
+                "color": "#2E3338",
                 "fontFamily": "Hind-Regular",
-                "fontSize": 13,
+                "fontSize": 14,
                 "lineHeight": 18,
               },
             ]
@@ -1302,9 +1302,9 @@ exports[`renders correctly when transaction pending 1`] = `
                 "lineHeight": 30,
               },
               Object {
-                "color": "#81868B",
+                "color": "#2E3338",
                 "fontFamily": "Hind-Regular",
-                "fontSize": 13,
+                "fontSize": 14,
                 "lineHeight": 18,
               },
             ]
@@ -1414,9 +1414,9 @@ exports[`renders correctly when transaction pending 1`] = `
                 "lineHeight": 30,
               },
               Object {
-                "color": "#81868B",
+                "color": "#2E3338",
                 "fontFamily": "Hind-Regular",
-                "fontSize": 13,
+                "fontSize": 14,
                 "lineHeight": 18,
               },
             ]

@@ -25,7 +25,7 @@ export const componentStyles = StyleSheet.create({
     marginVertical: 5,
     alignItems: 'center',
     backgroundColor: 'white',
-    height: 62,
+    height: 60,
   },
   input: {
     marginLeft: 10,

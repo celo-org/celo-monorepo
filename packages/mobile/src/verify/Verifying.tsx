@@ -3,6 +3,7 @@ import CopyIcon from '@celo/react-components/icons/Copy'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
+import { stripHexLeader } from '@celo/utils/src/commentEncryption'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Clipboard, ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -38,8 +39,8 @@ import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'verify/verifying'
 
-function verificationCodeText(code: AttestationCode, isComplete: boolean) {
-  const text = (code && code.code) || '---'
+function verificationCodeText(attestationCode: AttestationCode, isComplete: boolean) {
+  const text = getRecodedVerificationText(attestationCode) || '---'
   return (
     <Text
       style={isComplete ? [style.textCode, style.textGreen] : style.textCode}
@@ -51,11 +52,24 @@ function verificationCodeText(code: AttestationCode, isComplete: boolean) {
   )
 }
 
+function getRecodedVerificationText(attestationCode: AttestationCode) {
+  try {
+    if (attestationCode && attestationCode.code) {
+      return Buffer.from(stripHexLeader(attestationCode.code), 'hex').toString('base64')
+    } else {
+      return null
+    }
+  } catch (error) {
+    Logger.warn(TAG, 'Could not recode verification code to base64')
+    return null
+  }
+}
+
 interface StateProps {
   numberVerified: boolean
   e164Number: string
   account: string | null
-  codes: AttestationCode[]
+  attestationCodes: AttestationCode[]
   numCompleteAttestations: number
   verificationFailed: boolean
 }
@@ -86,7 +100,7 @@ const mapStateToProps = (state: RootState): StateProps => {
   return {
     numberVerified: state.app.numberVerified,
     e164Number: state.account.e164PhoneNumber,
-    codes: state.identity.attestationCodes,
+    attestationCodes: state.identity.attestationCodes,
     numCompleteAttestations: state.identity.numCompleteAttestations,
     verificationFailed: state.identity.verificationFailed,
     account: currentAccountSelector(state),
@@ -94,6 +108,13 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 export class Verifying extends React.Component<Props, State> {
+  static navigationOptions = {
+    headerStyle: {
+      elevation: 0,
+    },
+    header: null,
+  }
+
   state = {
     useManualEntry: false,
   }
@@ -152,7 +173,7 @@ export class Verifying extends React.Component<Props, State> {
 
   onCancelVerification = () => {
     this.props.cancelVerification()
-    navigate(Screens.VerifyInput)
+    navigate(Screens.VerifyEducation)
   }
 
   onRetryVerification = () => {
@@ -177,8 +198,14 @@ export class Verifying extends React.Component<Props, State> {
 
   render() {
     const { useManualEntry } = this.state
-    const { codes, numCompleteAttestations, verificationFailed, e164Number, t } = this.props
-    const numCodesReceived = codes.length
+    const {
+      attestationCodes,
+      numCompleteAttestations,
+      verificationFailed,
+      e164Number,
+      t,
+    } = this.props
+    const numCodesReceived = attestationCodes.length
 
     return (
       <View style={style.container}>
@@ -197,9 +224,9 @@ export class Verifying extends React.Component<Props, State> {
             <Text style={style.textLight}>{t('verifying')}</Text>
             {e164Number}
           </Text>
-          {verificationCodeText(codes[0], numCompleteAttestations > 0)}
-          {verificationCodeText(codes[1], numCompleteAttestations > 1)}
-          {verificationCodeText(codes[2], numCompleteAttestations > 2)}
+          {verificationCodeText(attestationCodes[0], numCompleteAttestations > 0)}
+          {verificationCodeText(attestationCodes[1], numCompleteAttestations > 1)}
+          {verificationCodeText(attestationCodes[2], numCompleteAttestations > 2)}
           <Text
             style={[style.textStatus, verificationFailed ? style.textRed : null]}
             numberOfLines={1}
