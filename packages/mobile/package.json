@@ -105,6 +105,7 @@
     "react-native-restart-android": "^0.0.7",
     "react-native-screens": "^1.0.0-alpha.22",
     "react-native-secure-randombytes": "^2.2.3",
+    "react-native-send-intent": "git+ssh://git@github.com/celo-org/react-native-send-intent#8039938",
     "react-native-sentry": "^0.38.3",
     "react-native-shadow": "^1.2.2",
     "react-native-share": "^1.1.3",

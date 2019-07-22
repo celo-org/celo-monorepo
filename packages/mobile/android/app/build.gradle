@@ -211,6 +211,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-send-intent')
     // implementation project(':instabug-reactnative')
     // implementation project(':react-native-screens')
     implementation project(':react-native-webview')

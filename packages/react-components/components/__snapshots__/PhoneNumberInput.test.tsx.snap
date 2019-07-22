@@ -6,6 +6,7 @@ exports[`PhoneNumberInput renders correctly with minimum props 1`] = `
     Array [
       undefined,
       Object {
+        "backgroundColor": "#FFFFFF",
         "position": "relative",
       },
     ]
@@ -18,6 +19,9 @@ exports[`PhoneNumberInput renders correctly with minimum props 1`] = `
           "borderColor": "#D1D5D8",
           "borderRadius": 3,
           "borderWidth": 1,
+        },
+        Object {
+          "height": 50,
         },
         Object {
           "alignItems": "center",
@@ -94,11 +98,15 @@ exports[`PhoneNumberInput renders correctly with minimum props 1`] = `
             "flexDirection": "row",
             "justifyContent": "center",
           },
-          Object {
-            "backgroundColor": "#FFFFFF",
-            "flex": 1,
-            "marginLeft": 2,
-          },
+          Array [
+            Object {
+              "height": 50,
+            },
+            Object {
+              "flex": 1,
+              "marginLeft": 9,
+            },
+          ],
         ]
       }
     >
@@ -111,6 +119,7 @@ exports[`PhoneNumberInput renders correctly with minimum props 1`] = `
         onChangeText={[Function]}
         onFocus={[Function]}
         placeholder=""
+        placeholderTextColor="#D1D5D8"
         rejectResponderTermination={true}
         secureTextEntry={false}
         style={

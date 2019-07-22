@@ -20,6 +20,9 @@ interface Props {
   inputCountryPlaceholder?: string
   inputPhonePlaceholder?: string
   lng?: string
+  callingCode?: boolean
+  defaultCountryCode?: string
+  defaultPhoneNumber?: string
 }
 
 interface State {
@@ -43,6 +46,18 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
   componentDidMount() {
     if (this.props.defaultCountry) {
       this.onChangeCountryQuery(this.props.defaultCountry)
+    }
+
+    if (this.props.defaultCountryCode) {
+      const country = this.state.countries.getCountryByPhoneCountryCode(
+        this.props.defaultCountryCode
+      )
+
+      this.onChangeCountryQuery(country.displayName)
+    }
+
+    if (this.props.defaultPhoneNumber) {
+      this.onChangePhoneNumber(this.props.defaultPhoneNumber)
     }
   }
 
@@ -106,13 +121,20 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
   }
 
   renderItem = (countryCode: string) => {
-    const { displayName, emoji } = this.state.countries.getCountryByCode(countryCode)
+    const { displayName, emoji, countryCallingCodes } = this.state.countries.getCountryByCode(
+      countryCode
+    )
     const onPress = () => this.onChangeCountryQuery(displayName)
 
     return (
       <TouchableOpacity onPress={onPress}>
         <View style={style.selectCountry}>
           <Text style={[style.autoCompleteItemText, style.emoji]}>{emoji}</Text>
+          {this.props.callingCode && (
+            <View style={style.countrySelectText}>
+              <Text style={style.autoCompleteItemText}>{countryCallingCodes[0]}</Text>
+            </View>
+          )}
           <View style={style.countrySelectText}>
             <Text style={style.autoCompleteItemText}>{displayName}</Text>
           </View>
@@ -127,6 +149,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
       value={this.state.countryQuery}
       underlineColorAndroid="transparent"
       onFocus={this.props.onInputFocus}
+      placeholderTextColor={colors.inactive}
     />
   )
 
@@ -146,7 +169,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
             autoCapitalize="none"
             autoCorrect={false}
             listContainerStyle={style.autoCompleteDropDown}
-            inputContainerStyle={[style.borderedBox, style.inputCountry]}
+            inputContainerStyle={[style.borderedBox, style.inputBox, style.inputCountry]}
             listStyle={[style.borderedBox, style.listAutocomplete]}
             data={filteredCountries}
             defaultValue={countryQuery}
@@ -159,7 +182,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
           />
         )}
         {!!defaultDisplayName && (
-          <View style={[style.borderedBox, style.defaultCountryContainer]}>
+          <View style={[style.borderedBox, style.inputBox, style.defaultCountryContainer]}>
             <Text style={style.defaultCountryFlag}>{emoji}</Text>
             <Text style={style.defaultCountryName}>{defaultDisplayName}</Text>
           </View>
@@ -168,7 +191,8 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
           <Text style={style.phoneCountryCode}>{countryCallingCode}</Text>
           <View style={style.line} />
           <TextInput
-            style={style.phoneNumberInput}
+            style={[style.inputBox, style.phoneNumberInput]}
+            placeholderTextColor={colors.inactive}
             onChangeText={this.onChangePhoneNumber}
             onEndEditing={this.props.onEndEditingPhoneNumber}
             value={this.state.phoneNumber}
@@ -186,11 +210,15 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
 const style = StyleSheet.create({
   container: {
     position: 'relative',
+    backgroundColor: colors.background,
   },
   borderedBox: {
     borderWidth: 1,
     borderColor: colors.inputBorder,
     borderRadius: 3,
+  },
+  inputBox: {
+    height: 50,
   },
   phoneNumberContainer: {
     marginTop: 5,
@@ -200,8 +228,7 @@ const style = StyleSheet.create({
   },
   phoneNumberInput: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-    marginLeft: 2,
+    marginLeft: 9,
   },
   phoneCountryCode: {
     width: 60,
@@ -215,6 +242,7 @@ const style = StyleSheet.create({
   },
   inputCountry: {
     padding: 3,
+    marginTop: 1, // 6 vs 5 top vs bot space difference
   },
   listAutocomplete: {
     paddingHorizontal: 0,

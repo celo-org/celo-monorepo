@@ -45,7 +45,7 @@
   "congratsVerified": "¡Felicitaciones se ha verificado su usuario!",
   "copyPaste": "Copiar y Pegar ",
   "entireSmsMessage": "Mensaje completo desde tu SMS",
-  "pasteCode": "Paste Verification Code {{codeNumber}}",
+  "pasteCode": "Pegar código de verificación {{codeNumber}}",
   "startingVerification": "Verificando tu número de teléfono",
   "nextCode": "Recibiendo el Siguiente Código",
   "verificationComplete": "Verificación completa",
