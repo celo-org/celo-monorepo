@@ -1,6 +1,23 @@
-import { envVar, execCmdWithExitOnFailure, fetchEnv } from 'src/lib/utils'
+import { envVar, execCmdWithExitOnFailure, fetchEnv } from '@celo/celotool/src/lib/utils'
 
 const NUMBER_OF_TX_NODES = 4
+
+export async function scaleStatefulSet(
+  celoEnv: string,
+  resourceName: string,
+  replicaCount: number
+) {
+  await execCmdWithExitOnFailure(
+    `kubectl scale statefulset ${resourceName} --replicas=${replicaCount} --namespace ${celoEnv}`
+  )
+}
+
+export async function getStatefulSetReplicas(celoEnv: string, resourceName: string) {
+  const [replicas] = await execCmdWithExitOnFailure(
+    `kubectl get statefulset ${resourceName} --namespace ${celoEnv} -o jsonpath={.status.replicas}`
+  )
+  return parseInt(replicas, 10)
+}
 
 export async function getRandomTxNodeIP(celoEnv: string) {
   const txNodes = fetchEnv(envVar.TX_NODES)
