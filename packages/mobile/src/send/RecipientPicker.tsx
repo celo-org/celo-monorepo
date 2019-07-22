@@ -3,6 +3,7 @@ import ForwardChevron from '@celo/react-components/icons/ForwardChevron'
 import QRCode from '@celo/react-components/icons/QRCode'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
+import { isValidAddress } from '@celo/utils/lib/src/signatureUtils'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import { TranslationFunction } from 'i18next'
 import * as React from 'react'
@@ -22,7 +23,12 @@ import { Screens } from 'src/navigator/Screens'
 import LabeledTextInput from 'src/send/LabeledTextInput'
 import RecipientItem from 'src/send/RecipientItem'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { Recipient, RecipientKind, RecipientWithMobileNumber } from 'src/utils/recipient'
+import {
+  Recipient,
+  RecipientKind,
+  RecipientWithAddress,
+  RecipientWithMobileNumber,
+} from 'src/utils/recipient'
 import { assertUnreachable } from 'src/utils/typescript'
 
 const goToQrCodeScreen = () => {
@@ -75,6 +81,8 @@ export class RecipientPicker extends React.Component<RecipientProps> {
         return item.e164PhoneNumber + index
       case RecipientKind.QrCode:
         return item.address + index
+      case RecipientKind.Address:
+        return item.address + index
       default:
         throw assertUnreachable(item)
     }
@@ -93,6 +101,9 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     const parsedNumber = parsePhoneNumber(this.props.searchQuery, this.props.defaultCountryCode)
     if (parsedNumber) {
       return this.renderSendToPhoneNumber(parsedNumber.displayNumber, parsedNumber.e164Number)
+    }
+    if (isValidAddress(this.props.searchQuery)) {
+      return this.renderSendToAddress(this.props.searchQuery)
     }
     return this.renderNoContentEmptyView()
   }
@@ -118,6 +129,22 @@ export class RecipientPicker extends React.Component<RecipientProps> {
       displayName: t('mobileNumber'),
       displayPhoneNumber,
       e164PhoneNumber,
+    }
+    return (
+      <>
+        <RecipientItem recipient={recipient} onSelectRecipient={this.props.onSelectRecipient} />
+        {this.renderItemSeparator()}
+      </>
+    )
+  }
+
+  renderSendToAddress = (address: string) => {
+    const { t } = this.props
+    const recipient: RecipientWithAddress = {
+      kind: RecipientKind.Address,
+      displayName: t('walletAddress'),
+      displayPhoneNumber: address,
+      address,
     }
     return (
       <>

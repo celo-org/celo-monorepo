@@ -217,7 +217,7 @@ export function getRecipientAddress(
   recipient: Recipient,
   e164NumberToAddress: E164NumberToAddressType
 ): string | null | undefined {
-  if (recipient.kind === RecipientKind.QrCode && recipient.address) {
+  if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
     return recipient.address
   }
 
@@ -243,7 +243,7 @@ export function getRecipientVerificationStatus(
   recipient: Recipient,
   e164NumberToAddress: E164NumberToAddressType
 ): VerificationStatus {
-  if (recipient.kind === RecipientKind.QrCode && recipient.address) {
+  if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
     return VerificationStatus.VERIFIED
   }
 

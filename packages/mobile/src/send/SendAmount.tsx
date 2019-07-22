@@ -208,7 +208,9 @@ export class SendAmount extends React.PureComponent<Props, State> {
   getConfirmationInput = () => {
     const amount = parseInputAmount(this.state.amount)
     const recipient = this.getRecipient()
-    const recipientAddress = getRecipientAddress(recipient, this.props.e164NumberToAddress)
+    const recipientAddress = recipient.address
+      ? recipient.address
+      : getRecipientAddress(recipient, this.props.e164NumberToAddress)
 
     const confirmationInput: ConfirmationInput = {
       recipient,
@@ -311,8 +313,8 @@ export class SendAmount extends React.PureComponent<Props, State> {
 
   fetchLatestPhoneAddress = () => {
     const recipient = this.getRecipient()
-    if (recipient.kind === RecipientKind.QrCode) {
-      // Skip for QR codes
+    if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
+      // Skip for QR codes or Addresses
       return
     }
     if (!recipient.e164PhoneNumber) {

@@ -52,13 +52,13 @@ export const sendReducer = (
         ...state,
         suggestedFee: action.suggestedFee,
       }
-
     case Actions.STORE_PHONE_NUMBER_IN_RECENTS:
       const recentPhoneNumbers = insertAtBeginning(
         action.phoneNumber,
         state.recentPhoneNumbers || []
       ).slice(0, RECENT_PHONE_NUMBERS_TO_STORE)
       return { ...state, recentPhoneNumbers }
+
     case Actions.SET_RECIPIENT_CACHE:
       return {
         ...state,

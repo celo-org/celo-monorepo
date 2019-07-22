@@ -40,7 +40,6 @@ export interface StorePhoneNumberInRecentsAction {
   type: Actions.STORE_PHONE_NUMBER_IN_RECENTS
   phoneNumber: string
 }
-
 export interface SetRecipientCacheAction {
   type: Actions.SET_RECIPIENT_CACHE
   recipients: NumberToRecipient

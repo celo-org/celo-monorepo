@@ -1,3 +1,4 @@
+import { isValidAddress } from '@celo/utils/lib/src/signatureUtils'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as fuzzysort from 'fuzzysort'
 import { MinimalContact } from 'react-native-contacts'
@@ -10,15 +11,20 @@ export enum RecipientKind {
   MobileNumber = 'mobileNumber',
   Contact = 'contact',
   QrCode = 'QrCode',
+  Address = 'Address',
 }
 
-export type Recipient = RecipientWithMobileNumber | RecipientWithContact | RecipientWithQrCode
+export type Recipient =
+  | RecipientWithMobileNumber
+  | RecipientWithContact
+  | RecipientWithQrCode
+  | RecipientWithAddress
 
 interface IRecipient {
   kind: RecipientKind
   address?: string
   displayName: string
-  displayPhoneNumber: string
+  displayPhoneNumber?: string
   e164PhoneNumber?: string
 }
 
@@ -42,13 +48,14 @@ export interface RecipientWithQrCode extends IRecipient {
   thumbnailPath?: string
 }
 
+export interface RecipientWithAddress extends IRecipient {
+  kind: RecipientKind.Address
+  address: string
+}
+
 export interface NumberToRecipient {
   [number: string]: RecipientWithContact
 }
-
-// TODO(Rossy): Add support for sending to addresses: https://github.com/celo-org/celo-monorepo/issues/3883
-// export interface AddressOnlyRecipient extends IRecipient {
-// }
 
 export function phoneNumberToRecipient(
   e164Number: string,
@@ -231,19 +238,34 @@ export const filterRecipientFactory = (recipients: Recipient[], shouldSort?: boo
 export const buildRecentRecipients = (
   allRecipients: RecipientWithContact[],
   recentPhoneNumbers: string[],
-  defaultDisplayName: string
+  defaultDisplayNameNumber: string,
+  defaultDisplayNameAddress: string
 ): Recipient[] =>
   recentPhoneNumbers
     .map((recentNumber) => {
       const recipientsWithContacts: Recipient[] = allRecipients.filter(
-        (recipient) => recipient.e164PhoneNumber === recentNumber
+        (recipient) =>
+          recipient.e164PhoneNumber === recentNumber ||
+          (recipient.address && recipient.address === recentNumber)
       )
       if (recipientsWithContacts.length > 0) {
         return recipientsWithContacts
       }
+
+      if (isValidAddress(recentNumber)) {
+        const recipientWithAddress: RecipientWithAddress = {
+          kind: RecipientKind.Address,
+          displayName: defaultDisplayNameAddress,
+          displayPhoneNumber: recentNumber,
+          address: recentNumber,
+        }
+
+        return [recipientWithAddress]
+      }
+
       const recipientWithNumber: Recipient = {
         kind: RecipientKind.MobileNumber,
-        displayName: defaultDisplayName,
+        displayName: defaultDisplayNameNumber,
         displayPhoneNumber: recentNumber,
         e164PhoneNumber: recentNumber,
       }

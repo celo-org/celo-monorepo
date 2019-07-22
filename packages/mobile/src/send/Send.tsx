@@ -71,10 +71,11 @@ let recentCache: Recipient[] | null = null
 const THROTTLE_TIME = 50
 
 const defaultRecipientPhoneNumber = '+10000000000'
+const defaultRecipientAddress = `0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10`
 
 // For alfajores-net users to be able to send a small transaction to a sample address (remove post-alfajores)
 export const CeloDefaultRecipient: RecipientWithQrCode = {
-  address: '0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10',
+  address: defaultRecipientAddress,
   displayName: 'Celo Default Recipient',
   displayPhoneNumber: defaultRecipientPhoneNumber,
   kind: RecipientKind.QrCode,
@@ -147,7 +148,8 @@ class Send extends React.Component<Props, State> {
         recentCache = buildRecentRecipients(
           recipients,
           recentPhoneNumbers,
-          this.props.t('mobileNumber')
+          this.props.t('mobileNumber'),
+          this.props.t('walletAddress')
         )
       }
 
@@ -177,13 +179,17 @@ class Send extends React.Component<Props, State> {
     CeloAnalytics.track(CustomEventNames.send_input, {
       selectedRecipientAddress: recipient.address,
     })
-    if (!recipient.e164PhoneNumber) {
+    if (!recipient.e164PhoneNumber && !recipient.address) {
       this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE, ERROR_BANNER_DURATION)
       return
     }
 
-    if (recipient.e164PhoneNumber !== defaultRecipientPhoneNumber) {
+    if (recipient.e164PhoneNumber && recipient.e164PhoneNumber !== defaultRecipientPhoneNumber) {
       this.props.storePhoneNumberInRecents(recipient.e164PhoneNumber)
+    }
+
+    if (recipient.address && recipient.address !== defaultRecipientAddress) {
+      this.props.storePhoneNumberInRecents(recipient.address)
     }
     navigate(Screens.SendAmount, { recipient })
   }
