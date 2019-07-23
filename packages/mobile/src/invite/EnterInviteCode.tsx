@@ -160,7 +160,8 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   onContinue = () => {
-    navigate(Screens.ImportContacts)
+    navigate(Screens.WalletHome)
+    // navigate(Screens.ImportContacts)
   }
 
   render() {
@@ -169,7 +170,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
     return (
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <DevSkipButton nextScreen={Screens.ImportContacts} />
+          <DevSkipButton nextScreen={Screens.WalletHome} />
           <Text style={[fontStyles.h1, styles.h1]} testID={'InviteCodeTitle'}>
             {t('inviteCodeText.title')}
           </Text>
