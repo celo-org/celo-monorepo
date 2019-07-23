@@ -122,7 +122,7 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
     await escrowTx.waitReceipt()
 
     if (config.twilioClient) {
-      const messageText = `Hello! Thanks you for joining the Celo payments network. Your invite code is: ${inviteCode}`
+      const messageText = `Hello! Thank you for joining the Celo payments network. Your invite code is: ${inviteCode}`
       await config.twilioClient.messages.create({
         body: messageText,
         from: config.twilioPhoneNumber,
