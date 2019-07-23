@@ -89,7 +89,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
   }
 
   // Stores attestations state for a single (identifier, account address) pair.
-  struct AttestationsPair {
+  struct AttestationsMapping {
     // Number of completed attestations
     uint64 completed;
     // List of issuers responsible for attestations
@@ -101,7 +101,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
   struct IdentifierState {
     // All account addresses associated with this identifier
     address[] accounts;
-    mapping(address => AttestationsPair) attestations;
+    mapping(address => AttestationsMapping) attestations;
   }
 
   mapping(bytes32 => IdentifierState) identifiers;
@@ -609,7 +609,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
    */
   function addIncompleteAttestations(
     uint256 n,
-    AttestationsPair storage state
+    AttestationsMapping storage state
   )
     internal
   {
