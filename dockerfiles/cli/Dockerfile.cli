@@ -48,7 +48,7 @@ RUN npm install @celo/celocli
 # Build the combined image
 FROM node:8-alpine as final_image
 
-ARG network_name="alfajores"
+ARG network_name="joshuahelmchartstest1"
 ARG network_id="44781"
 
 # Without musl-dev, geth will fail with a confusing "No such file or directory" error.
