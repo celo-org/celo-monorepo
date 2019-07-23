@@ -81,5 +81,6 @@
   "qrFailedNoAddress":
     "Código QR no se pudo leer. Motivo: no se encontró la dirección de la billetera.",
   "qrFailedInvalidAddress":
-    "Código QR no se pudo leer. Razón: la dirección de la cartera no es válida."
+    "Código QR no se pudo leer. Razón: la dirección de la cartera no es válida.",
+  "corruptedChainDeleted": "Se ha borrado información corrupta, por favor reinicie la applicación"
 }
