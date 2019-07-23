@@ -94,7 +94,6 @@ exports[`ImportContacts Screen renders correctly 1`] = `
         <View
           style={
             Object {
-              "fontWeight": "300",
               "marginVertical": 10,
             }
           }
@@ -122,7 +121,6 @@ exports[`ImportContacts Screen renders correctly 1`] = `
                 "lineHeight": 18,
               },
               Object {
-                "fontWeight": "300",
                 "marginVertical": 10,
               },
             ]

@@ -1,4 +1,4 @@
-import * as Crypto from 'crypto'
+import { randomBytes } from 'crypto'
 import { ec as EC } from 'elliptic'
 import {
   AES128DecryptAndHMAC,
@@ -27,7 +27,7 @@ export interface encryptionStatus {
  * @returns {Buffer} Encrypted data to sender and recipient.
  */
 export function encryptData(data: Buffer, pubKeyRecipient: Buffer, pubKeySelf: Buffer): Buffer {
-  const sessionKey: Buffer = Crypto.randomBytes(16)
+  const sessionKey: Buffer = randomBytes(16)
   const sessionKeyToSelf: Buffer = ECIESEncrypt(pubKeySelf, sessionKey)
   const sessionKeyToOther: Buffer = ECIESEncrypt(pubKeyRecipient, sessionKey)
   const ciphertext = AES128EncryptAndHMAC(sessionKey, sessionKey, data)

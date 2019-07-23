@@ -1,12 +1,11 @@
+import { randomBytes } from 'crypto'
 import { ECIES } from '../src/ecies'
-
-const crypto = require('crypto')
 const eutil = require('ethereumjs-util')
 
 describe('ECIES', () => {
   describe('encrypt', () => {
     it('should encrypt a message without error', () => {
-      const privKey = crypto.randomBytes(32)
+      const privKey = randomBytes(32)
       const pubKey = eutil.privateToPublic(privKey)
       const message = new Buffer(`foo`)
       const encrypted = ECIES.Encrypt(pubKey, message)
@@ -14,7 +13,7 @@ describe('ECIES', () => {
     })
 
     it('should throw an error if priv key is given', () => {
-      const privKey = crypto.randomBytes(32)
+      const privKey = randomBytes(32)
       const message = new Buffer('foo')
       try {
         ECIES.Encrypt(privKey, message)
@@ -28,7 +27,7 @@ describe('ECIES', () => {
   describe('roundtrip', () => {
     it('should return the same plaintext after roundtrip', () => {
       const plaintext = new Buffer('spam')
-      const privKey = crypto.randomBytes(32)
+      const privKey = randomBytes(32)
       const pubKey = eutil.privateToPublic(privKey)
       const encrypted = ECIES.Encrypt(pubKey, plaintext)
       const decrypted = ECIES.Decrypt(privKey, encrypted)
@@ -37,9 +36,9 @@ describe('ECIES', () => {
 
     it('should only decrypt if correct priv key is given', () => {
       const plaintext = new Buffer('spam')
-      const privKey = crypto.randomBytes(32)
+      const privKey = randomBytes(32)
       const pubKey = eutil.privateToPublic(privKey)
-      const fakePrivKey = crypto.randomBytes(32)
+      const fakePrivKey = randomBytes(32)
       try {
         ECIES.Encrypt(pubKey, plaintext)
         ECIES.Decrypt(fakePrivKey, plaintext)
@@ -50,8 +49,8 @@ describe('ECIES', () => {
     })
 
     it('should be able to encrypt and decrypt a longer message (1024 bytes)', () => {
-      const plaintext = crypto.randomBytes(1024)
-      const privKey = crypto.randomBytes(32)
+      const plaintext = randomBytes(1024)
+      const privKey = randomBytes(32)
       const pubKey = eutil.privateToPublic(privKey)
       const encrypted = ECIES.Encrypt(pubKey, plaintext)
       const decrypted = ECIES.Decrypt(privKey, encrypted)
@@ -64,8 +63,8 @@ describe('AES128CTR', () => {
   describe('encrypt', () => {
     it('should encrypt a message without error', () => {
       const plaintext = new Buffer('spam')
-      const encKey = crypto.randomBytes(16)
-      const macKey = crypto.randomBytes(16)
+      const encKey = randomBytes(16)
+      const macKey = randomBytes(16)
       const encrypted = ECIES.AES128EncryptAndHMAC(encKey, macKey, plaintext)
       expect(encrypted.length).toBeGreaterThanOrEqual(plaintext.length)
     })
@@ -74,8 +73,8 @@ describe('AES128CTR', () => {
   describe('roundtrip', () => {
     it('should return the same plaintext after roundtrip', () => {
       const plaintext = new Buffer('spam')
-      const encKey = crypto.randomBytes(16)
-      const macKey = crypto.randomBytes(16)
+      const encKey = randomBytes(16)
+      const macKey = randomBytes(16)
       const encrypted = ECIES.AES128EncryptAndHMAC(encKey, macKey, plaintext)
       const decrypted = ECIES.AES128DecryptAndHMAC(encKey, macKey, encrypted)
       expect(decrypted.toString()).toEqual(plaintext.toString())
@@ -83,9 +82,9 @@ describe('AES128CTR', () => {
 
     it('should only decrypt if correct priv key is given', () => {
       const plaintext = new Buffer('spam')
-      const encKey = crypto.randomBytes(16)
-      const macKey = crypto.randomBytes(16)
-      const fakeKey = crypto.randomBytes(16)
+      const encKey = randomBytes(16)
+      const macKey = randomBytes(16)
+      const fakeKey = randomBytes(16)
       const encrypted = ECIES.AES128EncryptAndHMAC(encKey, macKey, plaintext)
       console.info(encrypted.toString('hex').length)
       const decrypted = ECIES.AES128DecryptAndHMAC(fakeKey, macKey, encrypted)
@@ -93,9 +92,9 @@ describe('AES128CTR', () => {
     })
 
     it('should be able to encrypt and decrypt a longer message (1024 bytes)', () => {
-      const plaintext = crypto.randomBytes(1024)
-      const encKey = crypto.randomBytes(16)
-      const macKey = crypto.randomBytes(16)
+      const plaintext = randomBytes(1024)
+      const encKey = randomBytes(16)
+      const macKey = randomBytes(16)
       const encrypted = ECIES.AES128EncryptAndHMAC(encKey, macKey, plaintext)
       const decrypted = ECIES.AES128DecryptAndHMAC(encKey, macKey, encrypted)
       expect(decrypted.toString()).toEqual(plaintext.toString())
@@ -106,9 +105,9 @@ describe('AES128CTR', () => {
     it('should reject invalid mac', () => {
       try {
         const plaintext = new Buffer('spam')
-        const encKey = crypto.randomBytes(16)
-        const macKey = crypto.randomBytes(16)
-        const fakeKey = crypto.randomBytes(16)
+        const encKey = randomBytes(16)
+        const macKey = randomBytes(16)
+        const fakeKey = randomBytes(16)
         const encrypted = ECIES.AES128EncryptAndHMAC(encKey, macKey, plaintext)
         ECIES.AES128DecryptAndHMAC(encKey, fakeKey, encrypted)
         expect(true).toBe(false)
