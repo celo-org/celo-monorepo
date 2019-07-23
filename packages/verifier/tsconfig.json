@@ -15,5 +15,5 @@
     "baseUrl": ".",
     "lib": ["es7", "esnext", "dom"]
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "vendor", ".bundle"]
 }
