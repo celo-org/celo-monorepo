@@ -3,23 +3,35 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces } from 'src/i18n'
 import VerifyAddressBook from 'src/icons/VerifyAddressBook'
-import { importContacts } from 'src/identity/actions'
+import { denyImportContacts, importContacts } from 'src/identity/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { requestContactsPermission } from 'src/utils/androidPermissions'
 
 interface DispatchProps {
   importContacts: typeof importContacts
+  denyImportContacts: typeof denyImportContacts
 }
 
-type Props = WithNamespaces & DispatchProps
+interface StateProps {
+  isLoadingImportContacts: boolean
+}
+
+type Props = WithNamespaces & DispatchProps & StateProps
+
+const mapStateToProps = (state: RootState): StateProps => {
+  return {
+    isLoadingImportContacts: state.identity.isLoadingImportContacts,
+  }
+}
 
 class ImportContacts extends React.Component<Props> {
   static navigationOptions = {
@@ -35,26 +47,32 @@ class ImportContacts extends React.Component<Props> {
     ),
   }
 
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.isLoadingImportContacts && !this.props.isLoadingImportContacts) {
+      this.nextScreen()
+    }
+  }
+
   nextScreen = () => {
     navigate(Screens.VerifyEducation)
   }
 
   onPressEnable = async () => {
-    // TODO (Sally) Import contacts duplication
-    requestContactsPermission().then((response) => {
-      if (response) {
-        this.props.importContacts()
-      }
-      this.nextScreen()
-    })
+    const result = await requestContactsPermission()
+    if (result) {
+      this.props.importContacts()
+    } else {
+      this.onPressSkip()
+    }
   }
 
   onPressSkip = () => {
+    this.props.denyImportContacts()
     this.nextScreen()
   }
 
   render() {
-    const { t } = this.props
+    const { t, isLoadingImportContacts } = this.props
 
     return (
       <View style={style.pincodeContainer}>
@@ -73,6 +91,14 @@ class ImportContacts extends React.Component<Props> {
               {t('importContactsPermission.1')}
             </Text>
           </View>
+          {isLoadingImportContacts && (
+            <View>
+              <Text style={[fontStyles.bodySmall, style.loadingLabel]}>
+                {t('importContactsPermission.loading')}
+              </Text>
+              <ActivityIndicator size="large" color={colors.celoGreen} style={style.activity} />
+            </View>
+          )}
         </ScrollView>
         <View style={style.pincodeFooter}>
           <Button
@@ -110,7 +136,10 @@ const style = StyleSheet.create({
   },
   explanation: {
     marginVertical: 10,
-    fontWeight: '300',
+  },
+  loadingLabel: {
+    marginVertical: 20,
+    textAlign: 'center',
   },
   pincodeFooter: {
     flexDirection: 'column',
@@ -129,11 +158,17 @@ const style = StyleSheet.create({
     margin: 0,
     flexDirection: 'row',
   },
+  activity: {
+    marginTop: 10,
+  },
 })
 
 export default componentWithAnalytics(
-  connect<{}, DispatchProps>(
-    null,
-    { importContacts }
+  connect<StateProps, DispatchProps, {}, RootState>(
+    mapStateToProps,
+    {
+      importContacts,
+      denyImportContacts,
+    }
   )(withNamespaces(Namespaces.nuxNamePin1)(ImportContacts))
 )
