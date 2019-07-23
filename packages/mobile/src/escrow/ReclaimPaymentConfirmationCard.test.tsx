@@ -6,7 +6,7 @@ import * as renderer from 'react-test-renderer'
 import ReclaimPaymentConfirmationCard from 'src/escrow/ReclaimPaymentConfirmationCard'
 import {} from 'src/home/NotificationBox'
 import { createMockStore } from 'test/utils'
-import { mockE164Number, mockRecipientWithContact } from 'test/values'
+import { mockE164Number, mockRecipient } from 'test/values'
 
 const store = createMockStore()
 
@@ -16,7 +16,7 @@ describe('ReclaimPaymentConfirmationCard', () => {
       <Provider store={store}>
         <ReclaimPaymentConfirmationCard
           recipientPhone={mockE164Number}
-          recipientContact={mockRecipientWithContact}
+          recipientContact={mockRecipient}
           amount={new BigNumber(10)}
           currency={CURRENCY_ENUM.DOLLAR}
           fee={new BigNumber(0.01)}
