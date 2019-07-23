@@ -16,6 +16,8 @@ const port = parseInt(process.env.PORT, 10) || 3000
 const dev = process.env.NEXT_DEV === 'true'
 const app = next({ dev })
 const handle = app.getRequestHandler()
+import getFormattedEvents from './EventHelpers'
+import { getFormattedMediumArticles } from './mediumAPI'
 
 // Strip the leading "www." prefix from the domain
 function wwwRedirect(req, res, nextAction) {
@@ -118,6 +120,16 @@ function wwwRedirect(req, res, nextAction) {
       text: email,
     })
     res.status(204).send('ok')
+  })
+
+  server.get('/proxy/medium', async (_, res) => {
+    const articlesdata = await getFormattedMediumArticles()
+    res.json(articlesdata)
+  })
+
+  server.get('/proxy/events', async (_, res) => {
+    const events = await getFormattedEvents()
+    res.json(events)
   })
 
   server.get('*', (req, res) => {
