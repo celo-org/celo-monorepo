@@ -76,6 +76,5 @@ const styles = StyleSheet.create({
   },
   currency: {
     paddingHorizontal: 3,
-    alignText: 'center',
   },
 })
