@@ -1,6 +1,3 @@
 source "https://rubygems.org"
 
-# TODO(yerdua) [#53]: remove the git source here and switch back to RubyGems
-# when the new version is released to RubyGems. This is expected to happen
-# sometime in the week starting 2019-07-22.
-gem "fastlane", git: "https://github.com/fastlane/fastlane.git"
+gem "fastlane"

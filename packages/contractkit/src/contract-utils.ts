@@ -1,5 +1,3 @@
-import { GoldToken } from '@celo/contractkit/types/GoldToken'
-import { StableToken } from '@celo/contractkit/types/StableToken'
 import BigNumber from 'bignumber.js'
 import { values } from 'lodash'
 import Web3 from 'web3'
@@ -7,9 +5,11 @@ import Contract from 'web3/eth/contract'
 import { TransactionObject } from 'web3/eth/types'
 import { TransactionReceipt } from 'web3/types'
 import * as ContractList from '../contracts/index'
+import { GoldToken } from '../types/GoldToken'
+import { StableToken } from '../types/StableToken'
 import { Logger } from './logger'
 
-const gasInflateFactor = 1.3
+const gasInflateFactor = 1.5
 
 export function selectContractByAddress(contracts: Contract[], address: string) {
   const addresses = contracts.map((contract) => contract.options.address)

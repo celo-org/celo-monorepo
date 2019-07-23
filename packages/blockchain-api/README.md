@@ -24,7 +24,7 @@ Build and start:
 Deploy your app. The project will be built automatically by Google Cloud Build:
 
     using celotool:
-        yarn run cli deploy upgrade blockchain-api --config CONFIG_FILE --verbose --celo-env CELO_ENV
+        celotool deploy upgrade blockchain-api --config CONFIG_FILE --verbose --celo-env CELO_ENV
 
     Config files per env:
     Prod:

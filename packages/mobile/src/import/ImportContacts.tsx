@@ -138,8 +138,9 @@ const style = StyleSheet.create({
     marginVertical: 10,
   },
   loadingLabel: {
-    marginVertical: 20,
+    marginTop: 20,
     textAlign: 'center',
+    color: colors.darkSecondary,
   },
   pincodeFooter: {
     flexDirection: 'column',
@@ -159,7 +160,7 @@ const style = StyleSheet.create({
     flexDirection: 'row',
   },
   activity: {
-    marginTop: 10,
+    marginTop: 15,
   },
 })
 

@@ -27,6 +27,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ERROR_BANNER_DURATION, INPUT_DEBOUNCE_TIME } from 'src/config'
+import { DOLLAR_TO_PH } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import {
@@ -154,7 +155,9 @@ export class SendAmount extends React.PureComponent<Props, State> {
   }
 
   amountGreatherThanBalance = () => {
-    return parseInputAmount(this.state.amount).isGreaterThan(this.props.dollarBalance || 0)
+    return parseInputAmount(this.state.amount).isGreaterThan(
+      (this.props.dollarBalance || new BigNumber(0)).times(5)
+    )
   }
 
   getAmountIsValid = () => {
@@ -185,7 +188,8 @@ export class SendAmount extends React.PureComponent<Props, State> {
   }
 
   onAmountChanged = (amount: string) => {
-    this.setState({ amount })
+    const amountInDollars = +amount / DOLLAR_TO_PH
+    this.setState({ amount: String(amountInDollars) })
     this.calculateFeeDebounced()
   }
 

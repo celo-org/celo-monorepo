@@ -1,4 +1,4 @@
-import { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import PhoneNumberInput from '@celo/react-components/components/PhoneNumberInput'
 import TextInput from '@celo/react-components/components/TextInput'
 import colors from '@celo/react-components/styles/colors'
@@ -13,7 +13,6 @@ import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton'
 import DevSkipButton from 'src/components/DevSkipButton'
-import GethAwareButton from 'src/geth/GethAwareButton'
 import { Namespaces } from 'src/i18n'
 import NuxLogo from 'src/icons/NuxLogo'
 import { redeemComplete } from 'src/invite/actions'
@@ -247,7 +246,7 @@ export class JoinCelo extends React.Component<Props, State> {
             />
           </View>
         </ScrollView>
-        <GethAwareButton
+        <Button
           standard={false}
           type={BtnTypes.PRIMARY}
           text={t('continue')}
