@@ -11,7 +11,7 @@ const commonProps = {
   requester: {
     kind: RecipientKind.MobileNumber,
     e164PhoneNumber: '5126608970',
-    displayPhoneNumber: '5126608970',
+    displayKey: '5126608970',
     address: '0x91623f625e23ac1400',
     displayName: '5126608970',
     contact: undefined,

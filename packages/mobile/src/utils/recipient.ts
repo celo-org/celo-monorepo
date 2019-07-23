@@ -24,7 +24,7 @@ interface IRecipient {
   kind: RecipientKind
   address?: string
   displayName: string
-  displayPhoneNumber?: string
+  displayKey?: string
   e164PhoneNumber?: string
 }
 
@@ -67,7 +67,7 @@ export function phoneNumberToRecipient(
     ? {
         kind: RecipientKind.Contact,
         e164PhoneNumber: e164Number,
-        displayPhoneNumber: e164Number,
+        displayKey: e164Number,
         address: address || undefined,
         phoneNumberLabel: recipient.phoneNumberLabel,
         displayName: recipient.displayName,
@@ -77,7 +77,7 @@ export function phoneNumberToRecipient(
     : {
         kind: RecipientKind.MobileNumber,
         e164PhoneNumber: e164Number,
-        displayPhoneNumber: e164Number,
+        displayKey: e164Number,
         address: address || undefined,
         displayName: e164Number,
       }
@@ -116,7 +116,7 @@ export function contactsToRecipients(
           e164NumberToRecipients[parsedNumber.e164Number] = {
             kind: RecipientKind.Contact,
             displayName: contact.displayName,
-            displayPhoneNumber: parsedNumber.displayNumber,
+            displayKey: parsedNumber.displayNumber,
             e164PhoneNumber: parsedNumber.e164Number,
             phoneNumberLabel: phoneNumber.label,
             address: e164NumberToAddress[parsedNumber.e164Number] || undefined,
@@ -127,7 +127,7 @@ export function contactsToRecipients(
           otherRecipients[phoneNumber.number] = {
             kind: RecipientKind.Contact,
             displayName: contact.displayName,
-            displayPhoneNumber: phoneNumber.number,
+            displayKey: phoneNumber.number,
             phoneNumberLabel: phoneNumber.label,
             contactId: contact.recordID,
             thumbnailPath: contact.thumbnailPath,
@@ -237,27 +237,27 @@ export const filterRecipientFactory = (recipients: Recipient[], shouldSort?: boo
 
 export const buildRecentRecipients = (
   allRecipients: RecipientWithContact[],
-  recentPhoneNumbers: string[],
+  recentKeys: string[],
   defaultDisplayNameNumber: string,
   defaultDisplayNameAddress: string
 ): Recipient[] =>
-  recentPhoneNumbers
-    .map((recentNumber) => {
+  recentKeys
+    .map((recentKey) => {
       const recipientsWithContacts: Recipient[] = allRecipients.filter(
         (recipient) =>
-          recipient.e164PhoneNumber === recentNumber ||
-          (recipient.address && recipient.address === recentNumber)
+          recipient.e164PhoneNumber === recentKey ||
+          (recipient.address && recipient.address === recentKey)
       )
       if (recipientsWithContacts.length > 0) {
         return recipientsWithContacts
       }
 
-      if (isValidAddress(recentNumber)) {
+      if (isValidAddress(recentKey)) {
         const recipientWithAddress: RecipientWithAddress = {
           kind: RecipientKind.Address,
           displayName: defaultDisplayNameAddress,
-          displayPhoneNumber: recentNumber,
-          address: recentNumber,
+          displayKey: recentKey.substring(0, 17) + '...',
+          address: recentKey,
         }
 
         return [recipientWithAddress]
@@ -266,8 +266,8 @@ export const buildRecentRecipients = (
       const recipientWithNumber: Recipient = {
         kind: RecipientKind.MobileNumber,
         displayName: defaultDisplayNameNumber,
-        displayPhoneNumber: recentNumber,
-        e164PhoneNumber: recentNumber,
+        displayKey: recentKey,
+        e164PhoneNumber: recentKey,
       }
       return [recipientWithNumber]
     })

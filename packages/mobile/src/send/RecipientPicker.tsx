@@ -122,12 +122,12 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     </View>
   )
 
-  renderSendToPhoneNumber = (displayPhoneNumber: string, e164PhoneNumber: string) => {
+  renderSendToPhoneNumber = (displayKey: string, e164PhoneNumber: string) => {
     const { t } = this.props
     const recipient: RecipientWithMobileNumber = {
       kind: RecipientKind.MobileNumber,
       displayName: t('mobileNumber'),
-      displayPhoneNumber,
+      displayKey,
       e164PhoneNumber,
     }
     return (
@@ -143,7 +143,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     const recipient: RecipientWithAddress = {
       kind: RecipientKind.Address,
       displayName: t('walletAddress'),
-      displayPhoneNumber: address,
+      displayKey: address.substring(2, 17) + '...',
       address,
     }
     return (

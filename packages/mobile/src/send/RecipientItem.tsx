@@ -27,6 +27,7 @@ class RecipientItem extends React.PureComponent<Props> {
             thumbnailPath={getRecipientThumbnail(recipient)}
             address={recipient.address}
             size={40}
+            recipientKind={recipient.kind}
           />
           <View style={style.nameContainer}>
             <Text
@@ -38,7 +39,7 @@ class RecipientItem extends React.PureComponent<Props> {
             </Text>
           </View>
           <Text style={[fontStyles.bodySmallSemiBold, fontStyles.light, style.phone]}>
-            {recipient.displayPhoneNumber}
+            {recipient.displayKey}
           </Text>
         </View>
       </TouchableHighlight>

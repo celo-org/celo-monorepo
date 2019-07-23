@@ -48,7 +48,7 @@ describe(watchQrCodeDetections, () => {
       recipient: {
         address: mockAccount,
         displayName: mockName,
-        displayPhoneNumber: mockE164Number,
+        displayKey: mockE164Number,
         e164PhoneNumber: mockE164Number,
         kind: RecipientKind.QrCode,
       },
@@ -66,7 +66,7 @@ describe(watchQrCodeDetections, () => {
       recipient: {
         address: mockAccount,
         displayName: '',
-        displayPhoneNumber: mockE164Number,
+        displayKey: mockE164Number,
         e164PhoneNumber: mockE164Number,
         kind: RecipientKind.QrCode,
       },
@@ -87,7 +87,7 @@ describe(watchQrCodeDetections, () => {
       recipient: {
         address: mockAccount,
         displayName: mockName,
-        displayPhoneNumber: '',
+        displayKey: '',
         e164PhoneNumber: '',
         kind: RecipientKind.QrCode,
       },

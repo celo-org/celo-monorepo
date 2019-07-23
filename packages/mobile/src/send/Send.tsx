@@ -19,7 +19,7 @@ import { E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import { storePhoneNumberInRecents } from 'src/send/actions'
+import { StoreLatestInRecents } from 'src/send/actions'
 import RecipientPicker from 'src/send/RecipientPicker'
 import {
   buildRecentRecipients,
@@ -51,7 +51,7 @@ interface StateProps {
 interface DispatchProps {
   showError: typeof showError
   hideAlert: typeof hideAlert
-  storePhoneNumberInRecents: typeof storePhoneNumberInRecents
+  StoreLatestInRecents: typeof StoreLatestInRecents
 }
 
 type Props = StateProps & DispatchProps & WithNamespaces & NavigationInjectedProps
@@ -77,7 +77,7 @@ const defaultRecipientAddress = `0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10`
 export const CeloDefaultRecipient: RecipientWithQrCode = {
   address: defaultRecipientAddress,
   displayName: 'Celo Default Recipient',
-  displayPhoneNumber: defaultRecipientPhoneNumber,
+  displayKey: defaultRecipientPhoneNumber,
   kind: RecipientKind.QrCode,
   e164PhoneNumber: defaultRecipientPhoneNumber,
 }
@@ -185,11 +185,11 @@ class Send extends React.Component<Props, State> {
     }
 
     if (recipient.e164PhoneNumber && recipient.e164PhoneNumber !== defaultRecipientPhoneNumber) {
-      this.props.storePhoneNumberInRecents(recipient.e164PhoneNumber)
+      this.props.StoreLatestInRecents(recipient.e164PhoneNumber)
     }
 
     if (recipient.address && recipient.address !== defaultRecipientAddress) {
-      this.props.storePhoneNumberInRecents(recipient.address)
+      this.props.StoreLatestInRecents(recipient.address)
     }
     navigate(Screens.SendAmount, { recipient })
   }
@@ -255,7 +255,7 @@ export default componentWithAnalytics(
     {
       showError,
       hideAlert,
-      storePhoneNumberInRecents,
+      StoreLatestInRecents,
     }
   )(withNamespaces(Namespaces.sendFlow7)(withNavigation(Send)))
 )

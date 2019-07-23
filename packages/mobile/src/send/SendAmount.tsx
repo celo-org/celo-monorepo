@@ -361,6 +361,7 @@ export class SendAmount extends React.PureComponent<Props, State> {
             e164Number={recipient.e164PhoneNumber}
             defaultCountryCode={this.props.defaultCountryCode}
             iconSize={40}
+            recipientKind={recipient.kind}
           />
           {verificationStatus === VerificationStatus.UNKNOWN && (
             <View style={style.verificationStatusContainer}>

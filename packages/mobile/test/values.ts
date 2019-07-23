@@ -37,7 +37,7 @@ export const mockRecipient: RecipientWithContact = {
   kind: RecipientKind.Contact,
   address: mockAccount,
   displayName: mockName,
-  displayPhoneNumber: '14155550000',
+  displayKey: '14155550000',
   e164PhoneNumber: mockE164Number,
   contactId: 'contactId',
   phoneNumberLabel: 'phoneNumLabel',
@@ -47,7 +47,7 @@ export const mockRecipientWithPhoneNumber: RecipientWithMobileNumber = {
   kind: RecipientKind.MobileNumber,
   address: mockAccount,
   displayName: mockName,
-  displayPhoneNumber: '14155550000',
+  displayKey: '14155550000',
   e164PhoneNumber: mockE164Number,
 }
 

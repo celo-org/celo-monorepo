@@ -19,7 +19,7 @@ describe('contactsToRecipients', () => {
     expect(recipientsWithE164Numbers[1]).toMatchObject({
       kind: RecipientKind.Contact,
       displayName: 'Alice The Person',
-      displayPhoneNumber: '(209) 555-9790',
+      displayKey: '(209) 555-9790',
       e164PhoneNumber: '+12095559790',
       phoneNumberLabel: 'mobile',
       contactId: '1',
@@ -27,7 +27,7 @@ describe('contactsToRecipients', () => {
     expect(recipientsWithE164Numbers[0]).toMatchObject({
       kind: RecipientKind.Contact,
       displayName: 'Bob Bobson',
-      displayPhoneNumber: mockDisplayNumber,
+      displayKey: mockDisplayNumber,
       e164PhoneNumber: mockE164Number,
       phoneNumberLabel: 'home',
       contactId: '2',
@@ -36,7 +36,7 @@ describe('contactsToRecipients', () => {
     expect(recipientsWithoutE164Numbers[0]).toMatchObject({
       kind: RecipientKind.Contact,
       displayName: 'Bob Bobson',
-      displayPhoneNumber: '100200',
+      displayKey: '100200',
       phoneNumberLabel: 'mobile',
       contactId: '2',
     })
