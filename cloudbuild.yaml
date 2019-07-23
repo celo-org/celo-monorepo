@@ -27,7 +27,7 @@ steps:
     "--cache=true",
     "--destination=gcr.io/$PROJECT_ID/celocli:$COMMIT_SHA",
     "--build-arg",
-    "celo_env=alfajores"
+    "celo_env=joshuahelmchartstest1"
   ]
   id: Build CLI docker image
   waitFor: ['-']
