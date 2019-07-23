@@ -32,6 +32,7 @@
     "version": "oclif-dev readme && git add README.md"
   },
   "dependencies": {
+    "@celo/contractkit": "0.0.1",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",

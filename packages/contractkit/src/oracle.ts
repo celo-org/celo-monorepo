@@ -1,6 +1,6 @@
 import { BigNumber } from 'bignumber.js'
-import { getSortedOraclesContract } from 'src/contracts'
 import Web3 from 'web3'
+import { getSortedOraclesContract } from './contracts'
 
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
