@@ -123,7 +123,6 @@ function faucetText({ requestState, t }: TextFuncArgs) {
     {
       [RequestState.Failed]: t('faucetError'),
       [RequestState.Invalid]: t('invalidAddress'),
-      [RequestState.BadChecksum]: t('badChecksum'),
     }[requestState] || `eg. ${EXAMPLE_ADDRESS}`
   )
 }

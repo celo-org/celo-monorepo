@@ -64,16 +64,11 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
     return this.recaptchaRef.current.getValue()
   }
 
-  checkCheckSum = () => {
-    // TODO check checksum if bad this.setState({requestState: RequestState.BadChecksum}) but dont abort
-  }
-
   onSubmit = async () => {
     if (!validateBeneficary(this.state.beneficiary, this.props.kind)) {
       this.setState({ requestState: RequestState.Invalid })
       return
     }
-    this.checkCheckSum()
 
     const res = await this.startRequest()
     const { status, key } = await res.json()
