@@ -44,12 +44,17 @@ export default class CurrencyDisplay extends React.PureComponent<Props> {
     const { size } = this.props
     const fontSize = size
     const dollarStyle = { fontSize, lineHeight: Math.round(fontSize * 1.3), color: this.color() }
+    let pesoAmount = DOLLAR_TO_PH * this.amount()
+    if (!pesoAmount) {
+      pesoAmount = 0
+    }
+
     return (
       <View style={styles.container}>
         {this.props.type === Tokens.DOLLAR ? (
           <View style={styles.stableCurrencyContainer}>
             <Text numberOfLines={1} style={[styles.currency, fontStyles.regular, dollarStyle]}>
-              {'₱' + DOLLAR_TO_PH * this.amount()}
+              {'₱' + pesoAmount}
             </Text>
             <Text numberOfLines={1} style={[styles.currency, fontStyles.bodySecondary]}>
               {'($' + this.amount() + ')'}
