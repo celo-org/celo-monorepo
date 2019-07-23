@@ -34,7 +34,6 @@ export class Countries {
     this.language = language ? language.toLocaleLowerCase() : 'en-us'
     this.countryMap = new Map()
     this.localizedCountries = Array()
-
     this.assignCountries()
   }
 
@@ -79,6 +78,18 @@ export class Countries {
     return country || EMPTY_COUNTRY
   }
 
+  getCountryByPhoneCountryCode(countryCode: string): LocalizedCountry {
+    if (!countryCode) {
+      return EMPTY_COUNTRY
+    }
+
+    const country = this.localizedCountries.find(
+      (c: LocalizedCountry) => c.countryCallingCodes && c.countryCallingCodes.includes(countryCode)
+    )
+
+    return country || EMPTY_COUNTRY
+  }
+
   getCountryByCode(countryCode: string): LocalizedCountry {
     const country = this.countryMap.get(countryCode)
 
@@ -111,7 +122,10 @@ export class Countries {
     return this.localizedCountries
       .filter(
         (c: LocalizedCountry) =>
-          c.names && c.names[lng] !== undefined && c.names[lng].toLowerCase().startsWith(query)
+          c.names &&
+          c.names[lng] !== undefined &&
+          (c.names[lng].toLowerCase().startsWith(query) ||
+            c.countryCallingCodes[0].startsWith('+' + query))
       )
       .map((c: LocalizedCountry) => c.alpha2)
   }

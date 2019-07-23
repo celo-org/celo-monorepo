@@ -34,5 +34,4 @@ export const rewardsAppIcon = require('src/images/Rewards-app-icon.png')
 export const inviteFriendsIcon = require('src/images/Invite-Friends.png')
 export const sendDollar = require('src/images/send-dollar.png')
 export const inviteVerifyFee = require('src/transactions/InviteVerifyFee.png')
-
 // it looks like jests tests fail when a sub component references image via this file rather than require direct

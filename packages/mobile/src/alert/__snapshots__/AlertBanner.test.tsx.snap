@@ -72,9 +72,9 @@ exports[`AlertBanner when error message passed in renders error message 1`] = `
         style={
           Array [
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 13,
+              "fontSize": 14,
               "lineHeight": 18,
             },
             Object {
@@ -136,9 +136,9 @@ exports[`AlertBanner when message and title passed in renders title with message
         style={
           Array [
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 13,
+              "fontSize": 14,
               "lineHeight": 18,
             },
             Object {
@@ -216,9 +216,9 @@ exports[`AlertBanner when message passed in renders message 1`] = `
         style={
           Array [
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 13,
+              "fontSize": 14,
               "lineHeight": 18,
             },
             Object {

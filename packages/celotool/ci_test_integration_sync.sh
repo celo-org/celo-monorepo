@@ -18,7 +18,7 @@ if [ "${1}" == "checkout" ]; then
     # this test will fail. This will force someone to keep updating the COMMIT_HASH_TO_TEST we are
     # testing. Clone up to 20 takes about 4 seconds on my machine and a full clone is
     # about 60 seconds as of May 20, 2019. The difference will only grow over time.
-    git clone --depth 20 git@github.com:celo-org/celo-blockchain.git ${GETH_DIR} && cd ${GETH_DIR} && git checkout ${COMMIT_HASH_TO_TEST} && cd -
+    git clone --depth 20 https://github.com/celo-org/celo-blockchain.git ${GETH_DIR} && cd ${GETH_DIR} && git checkout ${COMMIT_HASH_TO_TEST} && cd -
 elif [ "${1}" == "local" ]; then
     export GETH_DIR="${2}"
     echo "Testing using local geth dir ${GETH_DIR}..."

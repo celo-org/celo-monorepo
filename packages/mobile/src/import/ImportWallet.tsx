@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   scrollContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
   },
   h1: {
     textAlign: 'center',
