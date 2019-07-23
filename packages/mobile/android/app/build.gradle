@@ -231,7 +231,6 @@ dependencies {
     implementation project(':react-native-tcp')
     implementation project(':react-native-sentry')
     implementation project(':react-native-secure-randombytes')
-    implementation project(':react-native-sms-android')
     implementation project(':react-native-svg')
     implementation project(':react-native-contacts')
     implementation project(':react-native-keep-awake')
