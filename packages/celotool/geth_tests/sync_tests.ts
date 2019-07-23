@@ -8,8 +8,6 @@ import {
   sleep,
 } from '@celo/celotool/geth_tests/src/lib/utils'
 
-import { generateAccountAddressFromPrivateKey } from '@celo/celotool/src/lib/generate_utils'
-
 describe('sync tests', () => {
   const gethConfig = {
     migrate: true,
@@ -91,19 +89,19 @@ describe('sync tests', () => {
     let web3: any
     beforeEach(async function(this: any) {
       this.timeout(0) // Disable test timeout
-      web3 = new Web3('http://localhost:8547')
+      web3 = new Web3('http://localhost:8545')
       await hooks.restart()
     })
 
     it('validators should be able to recover and continue proposing blocks', async function(this: any) {
       this.timeout(0)
-      const instance: GethInstanceConfig = gethConfig.instances[1]
-      await sleep(20)
+      console.log(await web3.eth.getAccounts())
+      const instance: GethInstanceConfig = gethConfig.instances[0]
       await hooks.restartInstance(instance)
-      await sleep(100) // wait for round change / resync
-      const address = generateAccountAddressFromPrivateKey(instance.privateKey || '')
+      await sleep(60) // wait for round change / resync
+      const address = (await web3.eth.getAccounts())[0]
       const currentBlock = await web3.eth.getBlock('latest')
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < gethConfig.instances.length; i++) {
         if ((await web3.eth.getBlock(currentBlock.number - i)).miner == address) {
           return // A block proposed by validator who lost randomness was found, hence randomness was recovered
         }
