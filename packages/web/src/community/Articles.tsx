@@ -1,9 +1,9 @@
+import { Articles as Props } from 'fullstack/ArticleProps'
 import * as React from 'react'
 import FadeIn from 'react-lazyload-fadein'
 import { StyleSheet, View } from 'react-native'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Card from 'src/shared/Card'
-import { Articles as Props } from 'fullstack/ArticleProps'
 
 export default function Articles(props: Props) {
   const { articles } = props

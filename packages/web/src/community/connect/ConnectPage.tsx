@@ -14,8 +14,8 @@ import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import EventData from './EventsData'
 import ArticleData from './ArticleData'
+import EventData from './EventsData'
 
 // @ts-ignore
 const Sweep = dynamic(() => import('src/community/connect/Sweep'))
