@@ -17,13 +17,19 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
+import { Namespaces } from 'src/i18n'
+import { AddressToE164NumberType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { RootState } from 'src/redux/reducers'
 import LabeledTextInput from 'src/send/LabeledTextInput'
 import RecipientItem from 'src/send/RecipientItem'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import {
+  getRecipientFromAddress,
+  NumberToRecipient,
   Recipient,
   RecipientKind,
   RecipientWithAddress,
@@ -62,7 +68,16 @@ interface Props {
   onSearchQueryChanged(searchQuery: string): void
 }
 
-type RecipientProps = Props & WithNamespaces
+interface StateProps {
+  addressToE164Number: AddressToE164NumberType
+  recipientCache: NumberToRecipient
+}
+type RecipientProps = Props & WithNamespaces & StateProps
+
+const mapStateToProps = (state: RootState): StateProps => ({
+  addressToE164Number: state.identity.addressToE164Number,
+  recipientCache: state.send.recipientCache,
+})
 
 export class RecipientPicker extends React.Component<RecipientProps> {
   renderItem = ({ item, index }: ListRenderItemInfo<Recipient>) => (
@@ -97,12 +112,35 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     </>
   )
 
-  renderEmptyView = () => {
+  renderEmptyView = (
+    addressToE164Number: AddressToE164NumberType,
+    recipientCache: NumberToRecipient
+  ) => {
     const parsedNumber = parsePhoneNumber(this.props.searchQuery, this.props.defaultCountryCode)
     if (parsedNumber) {
       return this.renderSendToPhoneNumber(parsedNumber.displayNumber, parsedNumber.e164Number)
     }
     if (isValidAddress(this.props.searchQuery)) {
+      const existingContact = getRecipientFromAddress(
+        this.props.searchQuery,
+        addressToE164Number,
+        recipientCache
+      )
+
+      console.log('AddressToE164', { ...addressToE164Number })
+
+      if (existingContact) {
+        return (
+          <>
+            <RecipientItem
+              recipient={existingContact}
+              onSelectRecipient={this.props.onSelectRecipient}
+            />
+            {this.renderItemSeparator()}
+          </>
+        )
+      }
+
       return this.renderSendToAddress(this.props.searchQuery)
     }
     return this.renderNoContentEmptyView()
@@ -155,7 +193,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   }
 
   render() {
-    const { sections, t } = this.props
+    const { sections, t, addressToE164Number, recipientCache } = this.props
     const showFooter = sections.length > 0
 
     return (
@@ -174,7 +212,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
           sections={sections}
           ItemSeparatorComponent={this.renderItemSeparator}
           ListFooterComponent={showFooter ? this.renderFooter : undefined}
-          ListEmptyComponent={this.renderEmptyView}
+          ListEmptyComponent={this.renderEmptyView(addressToE164Number, recipientCache)}
           keyExtractor={this.keyExtractor}
           initialNumToRender={30}
         />
@@ -249,4 +287,9 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withNamespaces('sendFlow7')(RecipientPicker))
+export default componentWithAnalytics(
+  connect(
+    mapStateToProps,
+    {}
+  )(withNamespaces(Namespaces.sendFlow7)(RecipientPicker))
+)
