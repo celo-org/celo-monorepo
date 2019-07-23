@@ -5,20 +5,21 @@ import {
   ConsensusType,
   generateGenesis,
   generatePrivateKey,
-  generatePublicKeyFromPrivateKey,
   getValidators,
+  generatePublicKeyFromPrivateKey,
 } from '@celo/celotool/src/lib/generate_utils'
-import { getEnodeAddress } from '@celo/celotool/src/lib/geth'
 import { spawn } from 'child_process'
 import path from 'path'
 import { Admin } from 'web3-eth-admin'
+import { getEnodeAddress } from '@celo/celotool/src/lib/geth'
 
 interface GethInstanceConfig {
   name: string
   validating: boolean
   syncmode: string
   port: number
-  rpcport: number
+  rpcport?: number
+  wsport?: number
   lightserv?: boolean
   privateKey?: string
   etherbase?: string
@@ -149,7 +150,7 @@ export async function checkoutGethRepo(branch: string, path: string) {
     'clone',
     '--depth',
     '1',
-    'https://github.com/celo-org/celo-blockchain.git',
+    'git@github.com:celo-org/geth.git',
     path,
     '-b',
     branch,
@@ -216,8 +217,9 @@ export async function sleep(seconds: number) {
   await execCmd('sleep', [seconds.toString()])
 }
 
-export async function getEnode(rpcPort: number) {
-  const admin = new Admin(`http://localhost:${rpcPort}`)
+export async function getEnode(port: number, ws: boolean = false) {
+  let p = ws ? 'ws' : 'http'
+  const admin = new Admin(`${p}://localhost:${port}`)
   return (await admin.getNodeInfo()).enode
 }
 
@@ -226,6 +228,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   const syncmode = instance.syncmode
   const port = instance.port
   const rpcport = instance.rpcport
+  const wsport = instance.wsport
   const privateKey = instance.privateKey || ''
   const mine = instance.validating
   const lightserv = instance.lightserv || false
@@ -234,13 +237,8 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   const gethArgs = [
     '--datadir',
     datadir,
-    '--rpc',
-    '--rpcport',
-    rpcport.toString(),
     '--syncmode',
     syncmode,
-    '--wsorigins=*',
-    '--rpcapi=eth,net,web3,debug,admin,personal',
     '--debug',
     '--port',
     port.toString(),
@@ -255,6 +253,25 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     '--nat',
     'extip:127.0.0.1',
   ]
+
+  if (rpcport) {
+    gethArgs.push(
+      '--rpc',
+      '--rpcport',
+      rpcport.toString(),
+      '--rpcapi=eth,net,web3,debug,admin,personal'
+    )
+  }
+
+  if (wsport) {
+    gethArgs.push(
+      '--wsorigins=*',
+      '--ws',
+      '--wsport',
+      wsport.toString(),
+      '--wsapi=eth,net,web3,debug,admin,personal'
+    )
+  }
 
   if (unlock) {
     gethArgs.push('--password=/dev/null', `--unlock=0`)

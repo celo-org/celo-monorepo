@@ -57,7 +57,7 @@ const defaultConfig = {
     inflationPeriod: 7 * 24 * 60 * 60, // 1 week
   },
   validators: {
-    minElectableValidators: '10', // 1 is only used for tests
+    minElectableValidators: '10',
     maxElectableValidators: '100',
     minBondedDepositValue: '1000000000000000000', // 1 gold
     minBondedDepositNoticePeriod: 60 * 24 * 60 * 60, // 60 days
