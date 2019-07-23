@@ -79,6 +79,14 @@ exports[`renders correctly 1`] = `
     </Text>
     <View
       accessible={true}
+      hitSlop={
+        Object {
+          "bottom": 7,
+          "left": 7,
+          "right": 7,
+          "top": 7,
+        }
+      }
       isTVSelectable={true}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -88,18 +96,40 @@ exports[`renders correctly 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "marginTop": 40,
+          "alignItems": "center",
+          "alignSelf": "center",
+          "backgroundColor": "transparent",
+          "borderColor": "#42D689",
+          "borderRadius": 2,
+          "borderWidth": 2,
+          "fontSize": 14,
+          "marginTop": 50,
+          "minWidth": 160,
           "opacity": 1,
+          "paddingHorizontal": 16,
+          "paddingVertical": 6,
+          "textAlign": "center",
         }
       }
+      testID="pasteMessageButton"
     >
       <Text
         style={
-          Object {
-            "fontFamily": "Hind-Light",
-            "fontSize": 18,
-            "textAlign": "center",
-          }
+          Array [
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 13,
+              "lineHeight": 17,
+            },
+            Object {
+              "lineHeight": 20,
+            },
+            Object {
+              "color": "#42D689",
+            },
+            undefined,
+          ]
         }
       >
         copyToClipboard
