@@ -1,53 +1,37 @@
 import colors from '@celo/react-components/styles/colors'
-import { parseInputAmount } from '@celo/utils/src/parsing'
+import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
-import { StyleSheet, TextInput, TextInputProps, TextStyle } from 'react-native'
+import { StyleSheet, TextInput, TextInputProps } from 'react-native'
 
 interface OwnProps {
-  title?: string
+  // Require both value and onChangeText to propagate changes
   value: string
-  labelStyle?: TextStyle
+  onChangeText: TextInputProps['onChangeText']
   numberOfDecimals?: number
-  validator?: 'decimal' | 'integer' | 'phone'
   customValidator?: (input: string) => string
+  onInputChange?: () => void
 }
+
+// only require countryCallingCode when validator type is phone
+interface PhoneValidatorProps {
+  validator: 'phone'
+  countryCallingCode: string
+}
+
+interface NumberValidatorProps {
+  validator?: 'integer' | 'decimal'
+  countryCallingCode?: string
+}
+
+type ValidatorProps = PhoneValidatorProps | NumberValidatorProps
 
 interface RefProps {
   innerRef?: React.RefObject<TextInput>
 }
 
-type Props = RefProps & OwnProps & TextInputProps
+type Props = OwnProps & ValidatorProps & RefProps & TextInputProps
 
-interface State {
-  active: boolean
-  input: string
-}
-
-export class ValidatedTextInput extends React.Component<Props, State> {
-  state = {
-    active: false,
-    input: '',
-  }
-
-  onFocus = () => {
-    this.setState({ active: true })
-  }
-
-  onBlur = () => {
-    this.setState({ active: false })
-
-    let value = this.props.value
-    if (this.props.keyboardType === 'numeric' && this.props.numberOfDecimals) {
-      value = parseInputAmount(value)
-        .toFixed(this.props.numberOfDecimals)
-        .toString()
-    }
-
-    if (this.props.onChangeText) {
-      this.props.onChangeText(value)
-    }
-  }
-
+class ValidatedTextInput extends React.Component<Props> {
   validateInteger = (input: string): string => {
     return input.replace(/[^0-9]/, '')
   }
@@ -61,7 +45,9 @@ export class ValidatedTextInput extends React.Component<Props, State> {
   }
 
   validatePhone = (input: string): string => {
-    return input.replace(/[^0-9()-]/, '')
+    input = input.replace(/[^0-9()-]/, '')
+    const phoneDetails = parsePhoneNumber(input, this.props.countryCallingCode)
+    return phoneDetails.displayNumber
   }
 
   validateInput = (input: string): string => {
@@ -85,15 +71,13 @@ export class ValidatedTextInput extends React.Component<Props, State> {
       return this.validatePhone(input)
     }
 
-    return input
+    throw new Error('Unhandled input validator')
   }
 
   onChangeText = (input: string) => {
     const validated = this.validateInput(input)
-    this.setState({ input: validated })
-    if (this.props.onChangeText) {
-      this.props.onChangeText(validated)
-    }
+    // pass the validated text to parent
+    this.props.onChangeText(validated)
   }
 
   getMaxLength = () => {
@@ -102,7 +86,7 @@ export class ValidatedTextInput extends React.Component<Props, State> {
       return DEFAULT_LENGTH
     }
 
-    const decimalPos = this.state.input.indexOf('.')
+    const decimalPos = this.props.value.indexOf('.')
     if (decimalPos === -1) {
       return DEFAULT_LENGTH
     }
@@ -118,10 +102,8 @@ export class ValidatedTextInput extends React.Component<Props, State> {
         maxLength={this.getMaxLength()}
         {...this.props}
         ref={this.props.innerRef}
-        value={this.state.input}
+        value={this.props.value}
         onChangeText={this.onChangeText}
-        onFocus={this.onFocus}
-        onBlur={this.onBlur}
       />
     )
   }
