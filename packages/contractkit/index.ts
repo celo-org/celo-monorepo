@@ -76,7 +76,9 @@ export {
   getGasPriceMinimumContract,
   getGoldTokenContract,
   getStableTokenContract,
+  getSortedOraclesContract,
 } from './src/contracts'
+export { makeReportTx } from './src/oracle'
 export {
   CeloTokenType,
   allowance,
