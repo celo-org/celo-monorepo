@@ -14,11 +14,11 @@ A docker image that runs the Celo Blockchain client in full sync mode which incl
 
 `$ docker pull us.gcr.io/celo-testnet/celocli:master`
 
-To run this container, use the following command.
+For more details on configuring this container, see the [Running a Full Node](../getting-started/running-a-full-node.md) section. You can run the container with the following command.
 
 `$ docker run --name celo_cli_container -p 8545:8545 us.gcr.io/celo-testnet/celocli:master -v`
 
-Then, in a different tab, an interactive shell where the Celo CLI is available can be obtained.
+An interactive shell where the Celo CLI is available can be obtained via the following command.
 
 `$ docker exec -it celo_cli_container /bin/sh`
 
