@@ -34,7 +34,7 @@ import DisconnectBanner from 'src/shared/DisconnectBanner'
 import Logger from 'src/utils/Logger'
 
 function goToFaucet() {
-  Linking.openURL('https://celo.org/dev/faucet')
+  Linking.openURL('https://celo.org/build/wallet')
 }
 
 interface StateProps {
