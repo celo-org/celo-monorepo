@@ -39,8 +39,6 @@ const ETH_PRIVATE_KEY_LENGTH = 64
 const MNEMONIC_BIT_LENGTH = (ETH_PRIVATE_KEY_LENGTH * 8) / 2
 
 const TAG = 'web3/saga'
-// The timeout for web3 to complete syncing
-const CHECK_WEB3_SYNC_PROGRESS_TIMEOUT = 60000
 // The timeout for web3 to complete syncing and the latestBlock to be > 0
 const CHECK_SYNC_PROGRESS_TIMEOUT = 60000
 const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect to node on IPC."
@@ -64,7 +62,7 @@ export function* waitForWeb3Ready(): any {
 // checks if web3 claims it is currently syncing or not
 export function* checkWeb3SyncProgressClaim() {
   Logger.debug(TAG, 'Checking sync progress claim')
-  yield call(waitForGethConnectivity)
+  // yield call(waitForGethConnectivity)
   while (true) {
     try {
       const syncProgress = yield web3.eth.isSyncing()
@@ -73,7 +71,7 @@ export function* checkWeb3SyncProgressClaim() {
       if (typeof syncProgress === 'boolean' && !syncProgress) {
         // For some weird reason, checkSyncProgressWorker is flaky and does not work for the long running
         // sync tasks.
-        Logger.debug(TAG, 'sync complete')
+        Logger.debug(TAG, 'checkWeb3SyncProgressClaim', 'sync complete')
         yield put(setSyncProgress(100))
         yield put(setIsReady(true))
         return true
@@ -97,46 +95,15 @@ export function* checkWeb3SyncProgressClaim() {
   }
 }
 
-// Checks both web3's claim for sync progress as well as checking the latest Block it returns
-function* checkSyncProgress() {
-  while (true) {
-    Logger.debug(TAG, 'Start checking web3 sync progress')
-
-    yield call(waitForGethConnectivity)
-    Logger.debug(TAG, 'Geth is connected')
-
-    const { web3SyncTimeout } = yield race({
-      web3SyncComplete: call(checkWeb3SyncProgressClaim),
-      web3SyncTimeout: delay(CHECK_WEB3_SYNC_PROGRESS_TIMEOUT),
-    })
-
-    if (web3SyncTimeout) {
-      Logger.error(TAG, 'checking web3 sync progress timed out')
-      continue
-    }
-
-    const latestBlock: Block = yield getLatestBlock()
-    if (latestBlock && latestBlock.number > 0) {
-      yield put(setLatestBlockNumber(latestBlock.number))
-      return
-    }
-
-    Logger.error(
-      TAG,
-      `web3 indicated sync complete, yet the latest block is ${JSON.stringify(latestBlock)}`
-    )
-  }
-}
-
 // The worker listening to sync progress requests
 function* checkSyncProgressWorker() {
   while (true) {
     try {
-      yield take(Actions.REQUEST_SYNC_PROGRESS)
+      // yield take(Actions.REQUEST_SYNC_PROGRESS)
       yield call(waitForGethConnectivity)
       try {
         const { timeout } = yield race({
-          checkProgress: call(checkSyncProgress),
+          checkProgress: call(checkWeb3SyncProgressClaim),
           timeout: delay(CHECK_SYNC_PROGRESS_TIMEOUT),
         })
 
@@ -148,6 +115,17 @@ function* checkSyncProgressWorker() {
           })
           continue
         }
+
+        const latestBlock: Block = yield getLatestBlock()
+        if (latestBlock && latestBlock.number > 0) {
+          yield put(setLatestBlockNumber(latestBlock.number)) // Don't understand why we need this
+          return
+        }
+
+        Logger.error(
+          TAG,
+          `web3 indicated sync complete, yet the latest block is ${JSON.stringify(latestBlock)}`
+        )
 
         Logger.debug(TAG, 'Sync Progress Completed')
         yield put(setSyncProgress(100))
@@ -285,5 +263,5 @@ export function* watchRefreshGasPrice() {
 export function* web3Saga() {
   yield spawn(checkSyncProgressWorker)
   yield spawn(watchRefreshGasPrice)
-  yield spawn(checkWeb3SyncProgressClaim)
+  // yield spawn(checkWeb3SyncProgressClaim)
 }

@@ -14,7 +14,7 @@ import { navigateReset } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
-import { checkSyncProgress } from 'src/web3/actions'
+import { checkSyncProgress } from 'src/web3/actions' // here it's called
 const sendReceive = require('src/images/send-receive.png')
 const stabilityScale = require('src/images/stability-scale.png')
 const verifyPhone = require('src/images/verify-phone.png')
@@ -41,7 +41,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 export class Sync extends React.Component<Props> {
   componentDidMount() {
-    this.props.checkSyncProgress()
+    // this.props.checkSyncProgress()
   }
 
   componentDidUpdate() {
