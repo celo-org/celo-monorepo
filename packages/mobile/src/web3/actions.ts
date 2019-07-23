@@ -153,7 +153,6 @@ export const unlockAccount = async (account: string) => {
 export const checkSyncProgress = () => ({ type: Actions.REQUEST_SYNC_PROGRESS })
 
 export function getLatestBlock() {
-  Logger.debug(TAG, 'Getting latest block')
   return web3.eth.getBlock('latest')
 }
 

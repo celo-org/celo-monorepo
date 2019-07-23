@@ -27,6 +27,7 @@ const loggerBlacklist = [
   'WEB3/SET_COMMENT_KEY',
   'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
   'IDENTITY/FETCH_PHONE_ADDRESSES',
+  'WEB3/SET_BLOCK_NUMBER',
 ]
 
 function* loggerSaga() {

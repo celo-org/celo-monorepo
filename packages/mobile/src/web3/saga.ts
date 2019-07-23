@@ -63,21 +63,24 @@ export function* waitForWeb3Ready(): any {
 
 // checks if web3 claims it is currently syncing or not
 export function* checkWeb3SyncProgressClaim() {
-  Logger.debug(TAG, 'Checking sync progress claim')
   // yield call(waitForGethConnectivity)
   while (true) {
+    yield delay(1000) // Doesn't need to update that fast
     try {
-      const syncProgress = yield web3.eth.isSyncing()
-      Logger.debug(TAG, 'Sync progress', syncProgress)
+      const syncProgress = yield web3.eth.isSyncing() // return false when it's still syncing and thus not ready
 
       if (typeof syncProgress === 'boolean' && !syncProgress) {
-        // For some weird reason, checkSyncProgressWorker is flaky and does not work for the long running
-        // sync tasks.
-        Logger.debug(TAG, 'checkWeb3SyncProgressClaim', 'sync complete')
-        yield put(setSyncProgress(100))
-        yield put(setIsReady(true))
+        if (!(yield select(web3ReadySelector))) {
+          Logger.debug(TAG, 'checkWeb3SyncProgressClaim', 'sync complete')
+          yield put(setIsReady(true))
+          yield put(setSyncProgress(100))
+        }
+
         return true
       }
+
+      Logger.debug(TAG, 'checkWeb3SyncProgressClaim', 'sync in progress')
+      yield put(setIsReady(false))
 
       yield put(updateWeb3SyncProgress(syncProgress))
     } catch (error) {
@@ -122,17 +125,12 @@ function* checkSyncProgressWorker() {
         const latestBlock: Block = yield getLatestBlock()
         if (latestBlock && latestBlock.number > 0) {
           yield put(setLatestBlockNumber(latestBlock.number)) // Don't understand why we need this
-          return
+        } else {
+          Logger.error(
+            TAG,
+            `web3 indicated sync complete, yet the latest block is ${JSON.stringify(latestBlock)}`
+          )
         }
-
-        Logger.error(
-          TAG,
-          `web3 indicated sync complete, yet the latest block is ${JSON.stringify(latestBlock)}`
-        )
-
-        Logger.debug(TAG, 'Sync Progress Completed')
-        yield put(setSyncProgress(100))
-        yield put(setIsReady(true))
       } catch (error) {
         Logger.error(TAG, `checkSyncProgressWorker error: ${error}`)
         navigate(Screens.ErrorScreen, {
