@@ -14,7 +14,6 @@ import { navigateReset } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
-import { checkSyncProgress } from 'src/web3/actions' // here it's called
 const sendReceive = require('src/images/send-receive.png')
 const stabilityScale = require('src/images/stability-scale.png')
 const verifyPhone = require('src/images/verify-phone.png')
@@ -25,11 +24,7 @@ interface StateProps {
   pincodeSet: boolean
 }
 
-interface DispatchProps {
-  checkSyncProgress: typeof checkSyncProgress
-}
-
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & WithNamespaces
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -42,10 +37,6 @@ const mapStateToProps = (state: RootState): StateProps => {
 export class Sync extends React.Component<Props> {
   static navigationOptions = {
     header: null,
-  }
-
-  componentDidMount() {
-    // this.props.checkSyncProgress()
   }
 
   componentDidUpdate() {
@@ -137,8 +128,8 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
+  connect<StateProps, {}, {}, RootState>(
     mapStateToProps,
-    { checkSyncProgress }
+    {}
   )(withNamespaces(Namespaces.nuxNamePin1)(Sync))
 )
