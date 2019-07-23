@@ -20,7 +20,6 @@ COPY packages/utils /celo-monorepo/packages/utils
 COPY packages/typescript /celo-monorepo/packages/typescript
 COPY packages/contractkit /celo-monorepo/packages/contractkit
 COPY packages/celotool /celo-monorepo/packages/celotool
-COPY packages/protocol /celo-monorepo/packages/protocol
 
 WORKDIR /celo-monorepo
 RUN yarn install
