@@ -57,7 +57,7 @@ export enum CeloLinks {
   gitHub = 'https://github.com/celo-org',
   monorepo = 'https://github.com/celo-org/celo-monorepo',
   blockChainRepo = 'https://github.com/celo-org/celo-blockchain',
-  playStoreWallet = 'https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores',
+  playStoreWallet = 'https://play.google.com/store/apps/details?id=org.celo.mobile.pilot',
   privacyDocs = 'https://docs.celo.org/celo-codebase/protocol/privacy',
   tutorial = 'https://docs.celo.org/getting-started/faucet#creating-an-empty-account-with-the-celo-client',
   buildWalletDocs = 'https://docs.celo.org/celo-codebase/wallet/intro',
