@@ -213,7 +213,7 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
         throw e
       }
     }
-    Logger.debug(TAG + '@redeemInviteCode', 'Added temp account to wallet: ' + tempAccount)
+    Logger.debug(TAG + '@redeemInviteCode', 'Added temp account to wallet', tempAccount)
 
     // Check that the balance of the new account is not 0
     const StableToken = yield call(getStableTokenContract, web3)
