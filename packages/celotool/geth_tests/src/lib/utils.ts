@@ -5,13 +5,13 @@ import {
   ConsensusType,
   generateGenesis,
   generatePrivateKey,
-  getValidators,
   generatePublicKeyFromPrivateKey,
+  getValidators,
 } from '@celo/celotool/src/lib/generate_utils'
+import { getEnodeAddress } from '@celo/celotool/src/lib/geth'
 import { spawn } from 'child_process'
 import path from 'path'
 import { Admin } from 'web3-eth-admin'
-import { getEnodeAddress } from '@celo/celotool/src/lib/geth'
 
 interface GethInstanceConfig {
   name: string
@@ -150,7 +150,7 @@ export async function checkoutGethRepo(branch: string, path: string) {
     'clone',
     '--depth',
     '1',
-    'git@github.com:celo-org/geth.git',
+    'https://github.com/celo-org/celo-blockchain.git',
     path,
     '-b',
     branch,
