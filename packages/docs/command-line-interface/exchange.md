@@ -1,36 +1,72 @@
----
-description: >-
-  The exchange module allows you to interact with the Exchange -  the smart
-  contract that ensures Celo Dollar’s stability and provides an always-liquid
-  Celo Dollar - Celo Gold decentralized exchange.
----
+# `celocli exchange`
 
-# Exchange
+Commands for interacting with the Exchange
 
-## Commands
+- [`celocli exchange:list`](#celocli-exchangelist)
+- [`celocli exchange:selldollar SELLAMOUNT MINBUYAMOUNT FROM`](#celocli-exchangeselldollar-sellamount-minbuyamount-from)
+- [`celocli exchange:sellgold SELLAMOUNT MINBUYAMOUNT FROM`](#celocli-exchangesellgold-sellamount-minbuyamount-from)
 
-### List
+## `celocli exchange:list`
 
-List information about tokens on the exchange \(all amounts in wei\).
+List information about tokens on the exchange (all amounts in wei)
 
+```
 USAGE
+  $ celocli exchange:list
 
-`$ celocli exchange:list`
-
-Options
-
-`--amount=amount` amount of sellToken to report rates for \(defaults to 1000000000000000000\)
-
-### Selldollar, sellgold
-
-Commands for trading on the exchange.
-
-USAGE
-
-`$ celocli exchange:selldollar SELLAMOUNT MINBUYAMOUNT FROM`
-
-`$ celocli exchange:sellgold SELLAMOUNT MINBUYAMOUNT FROM`
+OPTIONS
+  -h, --help               show CLI help
+  -l, --logLevel=logLevel
+  --amount=amount          [default: 1000000000000000000] Amount of sellToken (in wei) to report rates for
 
 EXAMPLE
+  list
+```
 
-`celocli exchange:selldollar 100 300 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d`
+_See code: [src/commands/exchange/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/list.ts)_
+
+## `celocli exchange:selldollar SELLAMOUNT MINBUYAMOUNT FROM`
+
+Sell Celo dollars for Celo gold on the exchange
+
+```
+USAGE
+  $ celocli exchange:selldollar SELLAMOUNT MINBUYAMOUNT FROM
+
+ARGUMENTS
+  SELLAMOUNT    the amount of sellToken (in wei) to sell
+  MINBUYAMOUNT  the minimum amount of buyToken (in wei) expected
+  FROM
+
+OPTIONS
+  -h, --help               show CLI help
+  -l, --logLevel=logLevel
+
+EXAMPLE
+  selldollar 100 300 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+```
+
+_See code: [src/commands/exchange/selldollar.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/selldollar.ts)_
+
+## `celocli exchange:sellgold SELLAMOUNT MINBUYAMOUNT FROM`
+
+Sell Celo gold for Celo dollars on the exchange
+
+```
+USAGE
+  $ celocli exchange:sellgold SELLAMOUNT MINBUYAMOUNT FROM
+
+ARGUMENTS
+  SELLAMOUNT    the amount of sellToken (in wei) to sell
+  MINBUYAMOUNT  the minimum amount of buyToken (in wei) expected
+  FROM
+
+OPTIONS
+  -h, --help               show CLI help
+  -l, --logLevel=logLevel
+
+EXAMPLE
+  sellgold 100 300 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+```
+
+_See code: [src/commands/exchange/sellgold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/sellgold.ts)_

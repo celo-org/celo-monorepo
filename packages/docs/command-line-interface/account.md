@@ -1,65 +1,109 @@
----
-description: The account module lets you interact with and monitor your Celo account.
----
+# `celocli account`
 
-# Account
+Manage your account, send and receive Celo Gold and Celo Dollars
 
-## Commands
+- [`celocli account:balance ACCOUNT`](#celocli-accountbalance-account)
+- [`celocli account:new`](#celocli-accountnew)
+- [`celocli account:transferdollar`](#celocli-accounttransferdollar)
+- [`celocli account:transfergold`](#celocli-accounttransfergold)
+- [`celocli account:unlock`](#celocli-accountunlock)
 
-### Balance
+## `celocli account:balance ACCOUNT`
 
-View token balances given account address
+View Celo Dollar and Gold balances given account address
 
+```
 USAGE
+  $ celocli account:balance ACCOUNT
 
-`$ celocli account:balance ACCOUNT`
+OPTIONS
+  -h, --help               show CLI help
+  -l, --logLevel=logLevel
 
-### New
+EXAMPLE
+  balance 0x5409ed021d9299bf6814279a6a1411a7e866a631
+```
+
+_See code: [src/commands/account/balance.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/balance.ts)_
+
+## `celocli account:new`
 
 Creates a new account
 
+```
 USAGE
+  $ celocli account:new
 
-`$ celocli account:new`
+OPTIONS
+  -h, --help               show CLI help
+  -l, --logLevel=logLevel
 
-### Transferdollar
+EXAMPLE
+  new
+```
 
+_See code: [src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/new.ts)_
+
+## `celocli account:transferdollar`
+
+Transfer Celo Dollars
+
+```
 USAGE
+  $ celocli account:transferdollar
 
-`$ celocli account:transferdollar`
+OPTIONS
+  -h, --help                                         show CLI help
+  -l, --logLevel=logLevel
+  --amountInWei=amountInWei                          (required) Amount to transfer (in wei)
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
+  --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
 
-Options
+EXAMPLE
+  transferdollar --from 0xa0Af2E71cECc248f4a7fD606F203467B500Dd53B --to 0x5409ed021d9299bf6814279a6a1411a7e866a631
+  --amountInWei 1
+```
 
-`--amountInWei=amountInWei` \(required\) Amount to transfer \(in wei\)
+_See code: [src/commands/account/transferdollar.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/transferdollar.ts)_
 
-`--from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d` \(required\) Address of the sender
+## `celocli account:transfergold`
 
-`--to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d` \(required\) Address of the receiver
+Transfer gold
 
-### Transfergold
-
+```
 USAGE
+  $ celocli account:transfergold
 
-`$ celocli account:transfergold`
+OPTIONS
+  -h, --help                                         show CLI help
+  -l, --logLevel=logLevel
+  --amountInWei=amountInWei                          (required) Amount to transfer (in wei)
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
+  --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
 
-Options
+EXAMPLE
+  transfergold --from 0xa0Af2E71cECc248f4a7fD606F203467B500Dd53B --to 0x5409ed021d9299bf6814279a6a1411a7e866a631
+  --amountInWei 1
+```
 
-`--amountInWei=amountInWei` \(required\) Amount to transfer \(in wei\)
+_See code: [src/commands/account/transfergold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/transfergold.ts)_
 
-`--from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d` \(required\) Address of the sender
+## `celocli account:unlock`
 
-`--to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d` \(required\) Address of the receiver
+Unlock an account address to send transactions or validate blocks
 
-### Unlock
-
-Unlock an account address to send transactions
-
+```
 USAGE
+  $ celocli account:unlock
 
-`$ celocli account:unlock`
+OPTIONS
+  -h, --help                                            show CLI help
+  -l, --logLevel=logLevel
+  --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+  --password=password                                   (required)
 
-Options
+EXAMPLE
+  unlock --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --password 1234
+```
 
-`--account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d` \(required\) Account Address
-
-`--password=password` \(required\)
+_See code: [src/commands/account/unlock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/unlock.ts)_
