@@ -191,7 +191,6 @@ describe('governance tests', () => {
   before(async function(this: any) {
     this.timeout(0)
     await hooks.before()
-    await sleep(10)
   })
 
   after(hooks.after)

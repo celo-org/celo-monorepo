@@ -398,6 +398,7 @@ export function getHooks(gethConfig: GethTestConfig) {
       }
       await initAndStartGeth(gethBinaryPath, instance)
     }
+    await sleep(10)
     if (gethConfig.migrate || gethConfig.migrateTo) {
       await migrateContracts(validatorPrivateKeys, gethConfig.migrateTo)
     }
