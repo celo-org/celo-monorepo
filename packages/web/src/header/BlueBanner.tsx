@@ -73,5 +73,7 @@ const styles = StyleSheet.create({
 })
 
 export default withNamespaces('common')(({ t }: I18nProps) => (
-  <BlueBanner link="https://insidelook.splashthat.com/">{t('blueBanner')}</BlueBanner>
+  <BlueBanner link="https://medium.com/celohq/introducing-alfajores-1b162ebcb44d">
+    {t('blueBanner')}
+  </BlueBanner>
 ))
