@@ -1,12 +1,6 @@
-import { getEscrowContract, getStableTokenContract } from '@celo/contractkit/src/contracts'
 import BigNumber from 'bignumber.js'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
-import { DispatchType, GetStateType } from 'src/redux/reducers'
-import Logger from 'src/utils/Logger'
 import { RecipientWithContact } from 'src/utils/recipient'
-import { web3 } from 'src/web3/contracts'
-import { fetchGasPrice } from 'src/web3/gas'
-import { currentAccountSelector } from 'src/web3/selectors'
 
 export interface EscrowedPayment {
   senderAddress: string
@@ -32,8 +26,6 @@ export enum Actions {
   FETCH_RECLAIM_TRANSACTION_FEE = 'ESCROW/FETCH_RECLAIM_TRANSACTION_FEE',
   SET_RECLAIM_TRANSACTION_FEE = 'ESCROW/SET_RECLAIM_TRANSACTION_FEE',
 }
-
-const TAG = 'escrow/actions'
 
 export interface TransferPaymentAction {
   type: Actions.TRANSFER_PAYMENT
@@ -66,6 +58,11 @@ export interface SetReclaimTransactionFeeAction {
   suggestedFee: string
 }
 
+export interface FetchReclaimTransactionFeeAction {
+  type: Actions.FETCH_RECLAIM_TRANSACTION_FEE
+  paymentID: string
+}
+
 export type ActionTypes =
   | TransferPaymentAction
   | ReclaimPaymentAction
@@ -73,6 +70,7 @@ export type ActionTypes =
   | StoreSentPaymentsAction
   | ResendPaymentAction
   | SetReclaimTransactionFeeAction
+  | FetchReclaimTransactionFeeAction
 
 export const transferEscrowedPayment = (
   phoneHash: string,
@@ -111,29 +109,9 @@ export const setReclaimTransactionFee = (suggestedFee: string): SetReclaimTransa
   suggestedFee,
 })
 
-export const fetchReclaimSuggestedFee = (paymentID: string) => async (
-  dispatch: DispatchType,
-  getState: GetStateType
-) => {
-  try {
-    Logger.debug(`${TAG}/fetchSuggestedFee`, `Fetching reclaim transaction fee`)
-    const escrow = await getEscrowContract(web3)
-    const stableToken = await getStableTokenContract(web3)
-    const account = currentAccountSelector(getState())
-
-    const mockReclaimTx = await escrow.methods.revoke(paymentID)
-
-    const mockTxParams: any = { from: account, gasCurrency: stableToken._address }
-    const gas: BigNumber = new BigNumber(await mockReclaimTx.estimateGas(mockTxParams))
-    const gasPrice: BigNumber = new BigNumber(await fetchGasPrice())
-
-    const suggestedFeeInWei: BigNumber = gas.multipliedBy(gasPrice)
-
-    dispatch(setReclaimTransactionFee(suggestedFeeInWei.toString()))
-    Logger.debug(`${TAG}/fetchSuggestedFee`, `New reclaim tx fee is: ${suggestedFeeInWei}`)
-    return suggestedFeeInWei
-  } catch (error) {
-    Logger.error(`${TAG}/fetchSuggestedFee`, 'Error fetching reclaim transaction fee', error)
-    throw error
-  }
-}
+export const fetchReclaimTransactionFee = (
+  paymentID: string
+): FetchReclaimTransactionFeeAction => ({
+  type: Actions.FETCH_RECLAIM_TRANSACTION_FEE,
+  paymentID,
+})

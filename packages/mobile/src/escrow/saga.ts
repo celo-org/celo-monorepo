@@ -8,7 +8,9 @@ import {
   Actions,
   EscrowedPayment,
   EXPIRY_SECONDS,
+  FetchReclaimTransactionFeeAction,
   ReclaimPaymentAction,
+  setReclaimTransactionFee,
   storeSentPayments,
   TransferPaymentAction,
 } from 'src/escrow/actions'
@@ -27,6 +29,7 @@ import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
+import { fetchGasPrice } from 'src/web3/gas'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
 
 const TAG = 'escrow/saga'
@@ -171,20 +174,42 @@ function* getSentPayments() {
       const transformedPayment: EscrowedPayment = {
         senderAddress: payment[1],
         recipientPhone: recipientPhoneNumber,
+        recipientContact: recipientPhoneNumberToContact[recipientPhoneNumber] || undefined,
         paymentID: sentPaymentIDs[i],
         currency: SHORT_CURRENCIES.DOLLAR, // Only dollars can be escrowed
         amount: payment[3],
         timestamp: payment[6],
         expirySeconds: payment[7],
       }
-      if (recipientPhoneNumberToContact[recipientPhoneNumber]) {
-        transformedPayment.recipientContact = recipientPhoneNumberToContact[recipientPhoneNumber]
-      }
       sentPaymentsNotifications.push(transformedPayment)
     }
     yield put(storeSentPayments(sentPaymentsNotifications))
   } catch (e) {
     Logger.error(TAG + '@getSentPayments', 'Error fetching sent escrowed payments', e)
+    throw e
+  }
+}
+
+export function* fetchReclaimSuggestedFee(action: FetchReclaimTransactionFeeAction) {
+  try {
+    const { paymentID } = action
+    const escrow = yield call(getEscrowContract, web3)
+    const stableToken = yield call(getStableTokenContract, web3)
+    const account = yield call(getConnectedUnlockedAccount)
+
+    Logger.debug(TAG + '@fetchReclaimSuggestedFee', 'Fetching reclaim transaction fee')
+
+    const mockReclaimTx = escrow.methods.revoke(paymentID)
+    const mockTxParams: any = { from: account, gasCurrency: stableToken._address }
+    const gas = new BigNumber(yield mockReclaimTx.estimateGas(mockTxParams))
+    const gasPrice = new BigNumber(yield call(fetchGasPrice))
+    const suggestedFeeInWei = gas.multipliedBy(gasPrice)
+
+    yield put(setReclaimTransactionFee(suggestedFeeInWei.toString()))
+
+    Logger.debug(TAG + '@fetchReclaimSuggestedFee', `New reclaim tx fee is: ${suggestedFeeInWei}`)
+  } catch (e) {
+    Logger.error(TAG + '@fetchReclaimSuggestedFee', 'Error fetching reclaim transaction fee', e)
     throw e
   }
 }
@@ -201,8 +226,12 @@ export function* watchGetSentPayments() {
   yield takeLeading(Actions.GET_SENT_PAYMENTS, getSentPayments)
 }
 
-function* watchVerificationEnd() {
+export function* watchVerificationEnd() {
   yield takeLeading(IdentityActions.END_VERIFICATION, withdrawFromEscrow)
+}
+
+export function* watchFetchReclaimFee() {
+  yield takeLeading(Actions.FETCH_RECLAIM_TRANSACTION_FEE, fetchReclaimSuggestedFee)
 }
 
 export function* escrowSaga() {
@@ -210,4 +239,5 @@ export function* escrowSaga() {
   yield spawn(watchReclaimPayment)
   yield spawn(watchGetSentPayments)
   yield spawn(watchVerificationEnd)
+  yield spawn(watchFetchReclaimFee)
 }

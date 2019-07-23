@@ -7,7 +7,7 @@ import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
-import { EscrowedPayment, fetchReclaimSuggestedFee } from 'src/escrow/actions'
+import { EscrowedPayment, fetchReclaimTransactionFee } from 'src/escrow/actions'
 import EscrowedPaymentLineItem from 'src/escrow/EscrowedPaymentLineItem'
 import { Namespaces } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
@@ -20,13 +20,13 @@ interface OwnProps {
 }
 
 interface DispatchProps {
-  fetchReclaimSuggestedFee: typeof fetchReclaimSuggestedFee
+  fetchReclaimTransactionFee: typeof fetchReclaimTransactionFee
 }
 
 type Props = OwnProps & DispatchProps & WithNamespaces
 
 const mapDispatchToProps = {
-  fetchReclaimSuggestedFee,
+  fetchReclaimTransactionFee,
 }
 
 export class EscrowedPaymentReminderNotification extends React.PureComponent<Props> {
@@ -59,7 +59,7 @@ export class EscrowedPaymentReminderNotification extends React.PureComponent<Pro
         onPress: () => {
           const reclaimPaymentInput = payment
           CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_notification)
-          this.props.fetchReclaimSuggestedFee(payment.paymentID)
+          this.props.fetchReclaimTransactionFee(payment.paymentID)
           navigate(Screens.ReclaimPaymentConfirmationScreen, { reclaimPaymentInput })
         },
       },
