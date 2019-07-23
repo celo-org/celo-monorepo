@@ -9,13 +9,16 @@ import { setUserContactDetails } from 'src/account'
 import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/reducer'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { FetchPhoneAddressesAction, updateE164PhoneNumberAddresses } from 'src/identity/actions'
+import {
+  endImportContacts,
+  FetchPhoneAddressesAction,
+  updateE164PhoneNumberAddresses,
+} from 'src/identity/actions'
 import {
   AddressToE164NumberType,
   e164NumberToAddressSelector,
   E164NumberToAddressType,
 } from 'src/identity/reducer'
-import { waitForUserVerified } from 'src/identity/verification'
 import { setRecipientCache } from 'src/send/actions'
 import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
@@ -34,9 +37,6 @@ const MAPPING_CHUNK_SIZE = 50
 export function* doImportContacts() {
   try {
     yield call(getConnectedAccount)
-
-    // TODO(Rossy): After new Invite screen is in place, change this to wait for phone number inputted
-    yield call(waitForUserVerified)
 
     Logger.debug(TAG, 'Importing user contacts')
 
@@ -62,9 +62,11 @@ export function* doImportContacts() {
     yield call(lookupNewRecipients, e164NumberToAddress, e164NumberToRecipients, otherRecipients)
 
     Logger.debug(TAG, 'Done importing user contacts')
+    yield put(endImportContacts(true))
   } catch (error) {
     Logger.error(TAG, 'Error importing user contacts', error)
     yield put(showError(ErrorMessages.IMPORT_CONTACTS_FAILED))
+    yield put(endImportContacts(false))
   }
 }
 

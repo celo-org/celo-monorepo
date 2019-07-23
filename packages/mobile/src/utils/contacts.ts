@@ -4,30 +4,26 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'utils/contacts'
 
-export async function getAllContacts(): Promise<MinimalContact[] | void> {
-  let contactsReturn
-  checkContactsPermission().then((contactPermissionsGiven) => {
-    if (!contactPermissionsGiven) {
-      Logger.warn(TAG, 'Permissions not given for retrieving contacts')
-      contactsReturn = null
-    }
+export async function getAllContacts(): Promise<MinimalContact[] | null> {
+  const contactPermissionsGiven = await checkContactsPermission()
+  if (!contactPermissionsGiven) {
+    Logger.warn(TAG, 'Permissions not given for retrieving contacts')
+    return null
+  }
 
-    contactsReturn = new Promise((resolve, reject) => {
-      getMinimal((error, contacts) => {
-        if (error) {
-          Logger.error(TAG, 'Error getting all contacts', error)
-          reject(error)
-        }
+  return new Promise((resolve, reject) => {
+    getMinimal((error, contacts) => {
+      if (error) {
+        Logger.error(TAG, 'Error getting all contacts', error)
+        reject(error)
+      }
 
-        if (!contacts) {
-          Logger.error(TAG, 'Contacts is null')
-          reject('Contacts is null')
-        }
+      if (!contacts) {
+        Logger.error(TAG, 'Contacts is null')
+        reject('Contacts is null')
+      }
 
-        resolve(contacts)
-      })
+      resolve(contacts)
     })
   })
-
-  return contactsReturn
 }

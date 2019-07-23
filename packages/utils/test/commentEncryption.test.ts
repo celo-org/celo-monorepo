@@ -1,4 +1,4 @@
-import * as Crypto from 'crypto'
+import { randomBytes } from 'crypto'
 import { ec as EC } from 'elliptic'
 import {
   decompressPublicKey,
@@ -10,10 +10,10 @@ const assert = require('chai').assert
 const ec = new EC('secp256k1')
 
 describe('Comment Encryption', () => {
-  const self = ec.keyFromPrivate(Crypto.randomBytes(32))
+  const self = ec.keyFromPrivate(randomBytes(32))
   const selfPublic = Buffer.from(self.getPublic('hex'), 'hex')
   const selfPriv = Buffer.from(self.getPrivate('hex'), 'hex')
-  const recip = ec.keyFromPrivate(Crypto.randomBytes(32))
+  const recip = ec.keyFromPrivate(randomBytes(32))
   const recipPublic = Buffer.from(recip.getPublic('hex'), 'hex')
   const recipPriv = Buffer.from(recip.getPrivate('hex'), 'hex')
   const comment = 'text'
@@ -126,7 +126,7 @@ describe('Comment Encryption', () => {
 
 describe('deriveCEK', () => {
   it('should produce 32 bytes', () => {
-    const input = Crypto.randomBytes(32)
+    const input = randomBytes(32)
     const derived = deriveCEK(input.toString('hex'))
     assert(derived.length == 32)
   })
@@ -144,7 +144,7 @@ describe('deriveCEK', () => {
 
 describe('decompressPublicKey', () => {
   it('should work with compressed input', () => {
-    const privateKey = ec.keyFromPrivate(Crypto.randomBytes(32))
+    const privateKey = ec.keyFromPrivate(randomBytes(32))
     const publicKeyFull = Buffer.from(privateKey.getPublic(false, 'hex'), 'hex')
     const publicKeyCompressed = Buffer.from(privateKey.getPublic(true, 'hex'), 'hex')
     const decompressed = decompressPublicKey(publicKeyCompressed)
@@ -152,7 +152,7 @@ describe('decompressPublicKey', () => {
     assert(decompressed.length == 64)
   })
   it('should work with long form input', () => {
-    const privateKey = ec.keyFromPrivate(Crypto.randomBytes(32))
+    const privateKey = ec.keyFromPrivate(randomBytes(32))
     const publicKeyFull = Buffer.from(privateKey.getPublic(false, 'hex'), 'hex')
     const decompressed = decompressPublicKey(publicKeyFull)
     assert(Buffer.concat([Buffer.from('04', 'hex'), decompressed]).equals(publicKeyFull))
