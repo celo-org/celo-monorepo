@@ -20,11 +20,9 @@ export class BlueBanner extends React.PureComponent<Props> {
             href={this.props.link}
             style={[fonts.navigation, textStyles.medium, styles.text]}
           >
-            <Text style={styles.nowrap}>
-              {this.props.children}
-              <Text style={styles.icon}>
-                <Chevron color={colors.white} opacity={1} />
-              </Text>
+            {this.props.children}
+            <Text style={styles.icon}>
+              <Chevron color={colors.white} opacity={1} />
             </Text>
           </Text>
         </View>
@@ -60,10 +58,6 @@ const styles = StyleSheet.create({
   text: {
     color: colors.white,
     lineHeight: 20,
-  },
-  nowrap: {
-    // @ts-ignore-next-line
-    whiteSpace: 'nowrap',
   },
   icon: {
     paddingLeft: 5,
