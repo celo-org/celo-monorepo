@@ -3,16 +3,18 @@
 #
 # How to test changes to this file
 # docker build -f dockerfiles/cli/Dockerfile.cli -t gcr.io/celo-testnet/celocli:$USER . --build-arg celo_env=alfajores
-# To locally run that image
+# To run this image locally
 # docker rm cli_container; docker run --name cli_container -p 8545:8545 gcr.io/celo-testnet/celocli:$USER -v /
+# To run this image locally in ultralight mode
+# docker rm cli_container; docker run --name cli_container -p 8545:8545 -it --entrypoint=/celo/start_geth.sh gcr.io/celo-testnet/celocli:$USER "/usr/local/bin/geth" "alfajores" "full"
 # and connect to it with
 # docker exec -t -i cli_container /bin/sh
 #
 # Run commands against it using
-# docker exec -it cli_container /celocli <sub-command>
+# docker exec -it cli_container celocli <sub-command>
 # For example,
-# docker exec -it cli_container /celocli account:balance 0x456f41406B32c45D59E539e4BBA3D7898c3584dA
-# docker exec -it cli_container /celocli account:balance 0xa0Af2E71cECc248f4a7fD606F203467B500Dd53B
+# docker exec -it cli_container celocli account:balance 0x456f41406B32c45D59E539e4BBA3D7898c3584dA
+# docker exec -it cli_container celocli account:balance 0xa0Af2E71cECc248f4a7fD606F203467B500Dd53B
 #
 # To restart
 # docker start -ai cli_container
@@ -61,7 +63,7 @@ COPY --from=geth /usr/local/bin/geth /usr/local/bin/geth
 COPY --from=geth /celo/genesis.json /celo
 COPY --from=geth /celo/static-nodes.json /celo
 COPY --from=node /celo-monorepo/node_modules /celo-monorepo/node_modules 
-RUN chmod ugo+x /celo/start_geth.sh && ln -s /celo-monorepo/node_modules/.bin/celocli /celocli
+RUN chmod ugo+x /celo/start_geth.sh && ln -s /celo-monorepo/node_modules/.bin/celocli /usr/local/bin/celocli
 
 EXPOSE 8545 8546 30303 30303/udp
-ENTRYPOINT ["/celo/start_geth.sh", "/usr/local/bin/geth", "alfajores", "ultralight", "44781", "/root/.celo", "/celo/genesis.json", "/celo/static-nodes.json"]
+ENTRYPOINT ["/celo/start_geth.sh", "/usr/local/bin/geth", "alfajores", "full", "44781", "/root/.celo", "/celo/genesis.json", "/celo/static-nodes.json"]
