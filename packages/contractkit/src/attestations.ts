@@ -1,8 +1,8 @@
-import { Attestations } from '@celo/contractkit/types/Attestations'
 import { ECIES, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import { Dictionary, zip } from 'lodash'
 import * as Web3Utils from 'web3-utils'
+import { Attestations } from '../types/Attestations'
 import { CeloTokenType } from './erc20-utils'
 const parseSignature = SignatureUtils.parseSignature
 

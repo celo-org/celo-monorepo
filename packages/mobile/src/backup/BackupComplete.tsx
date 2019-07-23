@@ -1,9 +1,10 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import SmallButton from '@celo/react-components/components/SmallButton'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Clipboard, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Clipboard, StyleSheet, Text, View } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
@@ -21,6 +22,10 @@ interface State {
 }
 
 class BackupComplete extends React.Component<Props, State> {
+  static navigationOptions = {
+    header: null,
+  }
+
   state = {
     selectedAnswer: null,
   }
@@ -46,9 +51,13 @@ class BackupComplete extends React.Component<Props, State> {
           <NuxLogo />
           <Text style={[fontStyles.h1, styles.h1]}>{t('backupKeySet')}</Text>
           <Text style={fontStyles.body}>{t('dontLoseIt')}</Text>
-          <TouchableOpacity style={styles.copyToClipboardContainer} onPress={this.copyToClipboard}>
-            <Text style={fontStyles.h2}>{t('copyToClipboard')}</Text>
-          </TouchableOpacity>
+          <SmallButton
+            text={t('copyToClipboard')}
+            testID={'pasteMessageButton'}
+            onPress={this.copyToClipboard}
+            solid={false}
+            style={styles.copyToClipboardButton}
+          />
         </View>
         <Button onPress={this.onDone} text={t('done')} standard={true} type={BtnTypes.PRIMARY} />
       </View>
@@ -72,8 +81,10 @@ const styles = StyleSheet.create({
     color: colors.dark,
     paddingTop: 35,
   },
-  copyToClipboardContainer: {
-    marginTop: 40,
+  copyToClipboardButton: {
+    marginTop: 50,
+    alignSelf: 'center',
+    fontSize: 14,
   },
 })
 

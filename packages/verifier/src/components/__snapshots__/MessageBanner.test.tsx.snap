@@ -41,9 +41,9 @@ exports[`Message Banner when message and title passed in renders title with mess
         style={
           Array [
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 13,
+              "fontSize": 14,
               "lineHeight": 18,
             },
             Object {
@@ -121,9 +121,9 @@ exports[`Message Banner when message passed in renders message 1`] = `
         style={
           Array [
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 13,
+              "fontSize": 14,
               "lineHeight": 18,
             },
             Object {

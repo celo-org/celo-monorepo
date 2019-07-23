@@ -23,6 +23,7 @@ import io.sentry.RNSentryPackage;
 import com.bitgo.randombytes.RandomBytesPackage;
 import com.corbt.keepawake.KCKeepAwakePackage;
 import com.facebook.react.ReactApplication;
+import com.burnweb.rnsendintent.RNSendIntentPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
@@ -80,6 +81,7 @@ public class MainApplication extends MultiDexApplication implements ShareApplica
 
       ReactPackage basePackages[] = new ReactPackage[] {
               new MainReactPackage(),
+              new RNSendIntentPackage(),
               new RNCWebViewPackage(),
               new NetInfoPackage(),
               new RNGestureHandlerPackage(),
