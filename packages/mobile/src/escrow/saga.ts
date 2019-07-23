@@ -16,7 +16,7 @@ import {
 } from 'src/escrow/actions'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import i18n from 'src/i18n'
-import { Actions as IdentityActions } from 'src/identity/actions'
+import { Actions as IdentityActions, EndVerificationAction } from 'src/identity/actions'
 import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import { inviteesSelector } from 'src/invite/reducer'
 import { TEMP_PW } from 'src/invite/saga'
@@ -70,7 +70,15 @@ function* transferStableTokenToEscrow(action: TransferPaymentAction) {
   }
 }
 
-function* withdrawFromEscrow() {
+function* withdrawFromEscrow(action: EndVerificationAction) {
+  if (!action.success) {
+    Logger.debug(
+      TAG + '@withdrawFromEscrow',
+      'Skipping escrow withdrawal because verification failed'
+    )
+    return
+  }
+
   try {
     const escrow = yield call(getEscrowContract, web3)
     const account = yield call(getConnectedUnlockedAccount)

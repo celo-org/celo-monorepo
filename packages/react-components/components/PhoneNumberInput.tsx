@@ -131,7 +131,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
         <View style={style.selectCountry}>
           <Text style={[style.autoCompleteItemText, style.emoji]}>{emoji}</Text>
           {this.props.callingCode && (
-            <View style={style.countrySelectText}>
+            <View style={style.callingCode}>
               <Text style={style.autoCompleteItemText}>{countryCallingCodes[0]}</Text>
             </View>
           )}
@@ -290,10 +290,13 @@ const style = StyleSheet.create({
     textAlign: 'center',
     width: 22,
   },
+  callingCode: {
+    flex: 1,
+  },
   countrySelectText: {
     borderColor: colors.inactive,
     borderWidth: 0,
-    flex: 1,
+    flex: 2,
     marginLeft: 0,
     paddingStart: 0,
   },
