@@ -306,6 +306,8 @@ export async function migrateContracts(validatorPrivateKeys: string[], to: numbe
     'testing',
     '-k',
     validatorPrivateKeys.map(add0x).join(','),
+    '-m',
+    '{ "validators": { "minElectableValidators": "1" } }',
     '-t',
     to.toString(),
   ]
@@ -398,7 +400,6 @@ export function getHooks(gethConfig: GethTestConfig) {
       }
       await initAndStartGeth(gethBinaryPath, instance)
     }
-    await sleep(10)
     if (gethConfig.migrate || gethConfig.migrateTo) {
       await migrateContracts(validatorPrivateKeys, gethConfig.migrateTo)
     }

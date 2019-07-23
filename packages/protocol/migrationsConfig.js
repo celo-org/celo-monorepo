@@ -77,6 +77,7 @@ const linkedLibraries = {
   SortedFractionMedianList: ['SortedOracles', 'SortedFractionMedianListTest'],
 }
 
+console.log(argv.migration_override)
 const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
 config = { ...defaultConfig, ...migrationOverride }
 
