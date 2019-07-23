@@ -24,7 +24,7 @@ $ npm install -g @celo/celocli
 $ celocli COMMAND
 running command...
 $ celocli (-v|--version|version)
-@celo/celocli/0.0.6 darwin-x64 node-v8.12.0
+@celo/celocli/0.0.6 darwin-x64 node-v8.15.0
 $ celocli --help [COMMAND]
 USAGE
   $ celocli COMMAND
@@ -56,6 +56,7 @@ USAGE
 - [`celocli exchange:sellgold SELLAMOUNT MINBUYAMOUNT FROM`](#celocli-exchangesellgold-sellamount-minbuyamount-from)
 - [`celocli help [COMMAND]`](#celocli-help-command)
 - [`celocli node:accounts`](#celocli-nodeaccounts)
+- [`celocli oracle:report`](#celocli-oraclereport)
 - [`celocli validator:affiliation`](#celocli-validatoraffiliation)
 - [`celocli validator:list`](#celocli-validatorlist)
 - [`celocli validator:register`](#celocli-validatorregister)
@@ -68,7 +69,7 @@ USAGE
 
 ## `celocli account:balance ACCOUNT`
 
-View token balances given account address
+View Celo Dollar and Gold balances given account address
 
 ```
 USAGE
@@ -104,7 +105,7 @@ _See code: [src/commands/account/new.ts](https://github.com/celo-org/celo-monore
 
 ## `celocli account:transferdollar`
 
-Transfer dollar
+Transfer Celo Dollars
 
 ```
 USAGE
@@ -118,7 +119,7 @@ OPTIONS
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
 
 EXAMPLE
-  transfer --from 0xa0Af2E71cECc248f4a7fD606F203467B500Dd53B --to 0x5409ed021d9299bf6814279a6a1411a7e866a631
+  transferdollar --from 0xa0Af2E71cECc248f4a7fD606F203467B500Dd53B --to 0x5409ed021d9299bf6814279a6a1411a7e866a631
   --amountInWei 1
 ```
 
@@ -140,7 +141,7 @@ OPTIONS
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
 
 EXAMPLE
-  transfer --from 0xa0Af2E71cECc248f4a7fD606F203467B500Dd53B --to 0x5409ed021d9299bf6814279a6a1411a7e866a631
+  transfergold --from 0xa0Af2E71cECc248f4a7fD606F203467B500Dd53B --to 0x5409ed021d9299bf6814279a6a1411a7e866a631
   --amountInWei 1
 ```
 
@@ -148,7 +149,7 @@ _See code: [src/commands/account/transfergold.ts](https://github.com/celo-org/ce
 
 ## `celocli account:unlock`
 
-Unlock an account address to send transactions
+Unlock an account address to send transactions or validate blocks
 
 ```
 USAGE
@@ -444,6 +445,24 @@ OPTIONS
 
 _See code: [src/commands/node/accounts.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/node/accounts.ts)_
 
+## `celocli oracle:report`
+
+Make stabletoken/celo gold exchange rate report
+
+```
+USAGE
+  $ celocli oracle:report
+
+OPTIONS
+  -h, --help                                                 show CLI help
+  -l, --logLevel=logLevel
+  --denominator=denominator                                  (required) Gold component of exchange rate
+  --numerator=numerator                                      (required) Stabletoken component of exchange rate
+  --tokenAddress=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Adress of stabletoken. Defaults to cUSD if not present
+```
+
+_See code: [src/commands/oracle/report.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/oracle/report.ts)_
+
 ## `celocli validator:affiliation`
 
 Manage affiliation to a ValidatorGroup
@@ -564,9 +583,9 @@ ARGUMENTS
 OPTIONS
   -h, --help                                         show CLI help
   -l, --logLevel=logLevel
-  --accept                                           Accept a validatior whose affiliation is already set to the vgroup
+  --accept                                           Accept a validator whose affiliation is already set to the group
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) ValidatorGroup's address
-  --remove                                           Remove a validatior from the members list
+  --remove                                           Remove a validator from the members list
 
 EXAMPLES
   member --accept 0x97f7333c51897469e8d98e7af8653aab468050a3
@@ -593,7 +612,7 @@ OPTIONS
   --url=url                                          (required)
 
 EXAMPLE
-  register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --id myID --name myNAme --noticePeriod 5184000 --url
+  register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --id myID --name myName --noticePeriod 5184000 --url
   "http://vgroup.com"
 ```
 
