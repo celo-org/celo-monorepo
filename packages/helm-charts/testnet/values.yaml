@@ -58,7 +58,7 @@ geth:
 monorepo:
   image:
     repository: gcr.io/celo-testnet/celo-monorepo
-    tag: df0efafe7732b15bb62bad5fb769f33218fdf1fc
+    tag: 0548f6bf3c1bb16ac18b0563bc232fb7d68f9e42
 
 gethexporter:
   image:
