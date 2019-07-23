@@ -45,7 +45,7 @@ It will prompt you for a passphrase, ask you to confirm it, and then will output
 
 Let's save these addresses to environment variables, so that you can reference it later:
 
-``` 
+```
 $ export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
 $ export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
 ```

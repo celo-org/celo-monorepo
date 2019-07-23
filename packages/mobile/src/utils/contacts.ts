@@ -1,13 +1,13 @@
 import { getMinimal, MinimalContact } from 'react-native-contacts'
-import { requestContactsPermission } from 'src/utils/androidPermissions'
+import { checkContactsPermission } from 'src/utils/androidPermissions'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'utils/contacts'
 
 export async function getAllContacts(): Promise<MinimalContact[] | null> {
-  const contactPermissionsGiven = await requestContactsPermission()
+  const contactPermissionsGiven = await checkContactsPermission()
   if (!contactPermissionsGiven) {
-    Logger.warn(TAG, 'Permissions not give for retrieving contacts')
+    Logger.warn(TAG, 'Permissions not given for retrieving contacts')
     return null
   }
 
