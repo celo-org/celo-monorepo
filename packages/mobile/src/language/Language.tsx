@@ -11,7 +11,6 @@ import { setLanguage } from 'src/app/actions'
 import i18n, { Namespaces } from 'src/i18n'
 import logo from 'src/images/celo-logo.png'
 import { Screens } from 'src/navigator/Screens'
-import Logger from 'src/utils/Logger'
 
 interface State {
   selectedAnswer: string | null
@@ -49,18 +48,12 @@ export class Language extends React.Component<Props, State> {
   }
 
   onSubmit = () => {
-    let nextScreen = this.props.navigation.getParam('nextScreen', Screens.Sync)
+    const nextScreen = this.props.navigation.getParam('nextScreen', Screens.JoinCelo)
     CeloAnalytics.track(CustomEventNames.nux_continue, {
       nextScreen,
       selectedAnswer: this.state.selectedAnswer,
     })
-    if (nextScreen === Screens.Sync && this.props.isWeb3Ready) {
-      nextScreen = this.props.pincodeSet ? Screens.RedeemInvite : Screens.Pincode
-      Logger.debug(
-        'Sync@continue',
-        `Pincode set: ${this.props.pincodeSet} next Screen: ${nextScreen}`
-      )
-    }
+
     this.props.setLanguage(this.state.selectedAnswer, nextScreen)
   }
 

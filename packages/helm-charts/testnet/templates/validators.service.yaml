@@ -1,4 +1,4 @@
-{{ if not (eq (.Values.geth.validators | toString) "og") }}
+{{ if and (not (eq (.Values.geth.validators | toString) "og")) (not (eq .Values.bootnode.internal true)) }}
 {{ range $index, $e := until (.Values.geth.validators | int) }}
 
 kind: Service

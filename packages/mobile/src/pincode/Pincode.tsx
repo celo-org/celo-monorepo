@@ -13,13 +13,15 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import BackButton from 'src/components/BackButton'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { ERROR_BANNER_DURATION, SUPPORTS_KEYSTORE } from 'src/config'
 import { Namespaces } from 'src/i18n'
-import Logo from 'src/icons/Logo'
+import BackupIcon from 'src/icons/BackupIcon'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import SystemAuth from 'src/pincode/SystemAuth'
+import DisconnectBanner from 'src/shared/DisconnectBanner'
 
 enum Steps {
   EDUCATION = 0,
@@ -50,8 +52,19 @@ const mapDispatchToProps = {
 }
 
 export class Pincode extends React.Component<Props, State> {
-  static navigationOptions = { header: null }
-
+  static navigationOptions = {
+    headerStyle: {
+      elevation: 0,
+    },
+    headerLeftContainerStyle: { paddingHorizontal: 20 },
+    headerLeft: <BackButton />,
+    headerRightContainerStyle: { paddingRight: 15 },
+    headerRight: (
+      <View>
+        <DisconnectBanner />
+      </View>
+    ),
+  }
   state = {
     step: Steps.EDUCATION,
     pin1: '',
@@ -60,14 +73,6 @@ export class Pincode extends React.Component<Props, State> {
 
   goBack = () => {
     navigateBack()
-  }
-
-  goToImportWallet = () => {
-    if (this.state.pin1 !== '') {
-      CeloAnalytics.track(CustomEventNames.pin_value)
-    }
-    CeloAnalytics.track(CustomEventNames.pin_wallet_import)
-    navigate(Screens.ImportWallet)
   }
 
   stepForward = () => {
@@ -109,7 +114,7 @@ export class Pincode extends React.Component<Props, State> {
     const { pin1, pin2 } = this.state
     if (pin1 === pin2) {
       this.props.pincodeSet()
-      navigate(Screens.RedeemInvite)
+      navigate(Screens.EnterInviteCode)
     } else {
       this.props.showError(ErrorMessages.INCORRECT_PIN, ERROR_BANNER_DURATION)
     }
@@ -142,11 +147,13 @@ export class Pincode extends React.Component<Props, State> {
               {t('createPin.title')}
             </Text>
             <View style={style.explanation}>
-              <Text style={fontStyles.body}>{t('createPin.intro') + ' ' + t('createPin.why')}</Text>
+              <Text style={fontStyles.bodySmall}>
+                {t('createPin.intro') + ' ' + t('createPin.why')}
+              </Text>
             </View>
             <View style={[style.explanation]}>
-              <Text style={fontStyles.body}>
-                {<Text style={[fontStyles.bodyBold]}>{t('important')} </Text>}
+              <Text style={fontStyles.bodySmall}>
+                {<Text style={[fontStyles.bodySmallBold]}>{t('important')} </Text>}
                 {t('createPin.warn')}
               </Text>
             </View>
@@ -245,12 +252,10 @@ export class Pincode extends React.Component<Props, State> {
 
     return (
       <View style={style.pincodeContainer}>
-        <DevSkipButton nextScreen={Screens.RedeemInvite} />
+        <DevSkipButton nextScreen={Screens.EnterInviteCode} />
         <ScrollView>
           {this.renderHeader()}
-          <View style={style.pincodeLogo}>
-            <Logo />
-          </View>
+          <BackupIcon style={style.pincodeLogo} />
           {this.renderStep()}
         </ScrollView>
         <View style={style.pincodeFooter}>{this.renderStepButton()}</View>
@@ -260,26 +265,19 @@ export class Pincode extends React.Component<Props, State> {
 }
 
 const style = StyleSheet.create({
-  pincodeHeader: {
-    padding: 20,
-  },
   pincodeContainer: {
     flex: 1,
     backgroundColor: 'white',
     justifyContent: 'space-between',
   },
   pincodeLogo: {
-    paddingTop: 30,
-    alignItems: 'center',
-    paddingLeft: 20,
+    alignSelf: 'center',
   },
-  pincodeBody: {},
   pincodeContent: {
     flex: 1,
-    paddingHorizontal: 25,
+    paddingHorizontal: 10,
   },
   explanation: {
-    paddingHorizontal: 20,
     marginVertical: 10,
   },
   pincodeFooter: {
@@ -300,12 +298,12 @@ const style = StyleSheet.create({
     paddingVertical: 5,
   },
   header: {
-    padding: 20,
-    margin: 0,
+    padding: 10,
     flexDirection: 'row',
   },
   goBack: {
     flex: 1,
+    paddingBottom: 21,
   },
 })
 

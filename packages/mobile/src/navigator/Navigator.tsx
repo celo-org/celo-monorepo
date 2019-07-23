@@ -17,8 +17,10 @@ import Backup from 'src/backup/Backup'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
+import ImportContacts from 'src/import/ImportContacts'
 import ImportWallet from 'src/import/ImportWallet'
-import RedeemInvite from 'src/invite/RedeemInvite'
+import EnterInviteCode from 'src/invite/EnterInviteCode'
+import JoinCelo from 'src/invite/JoinCelo'
 import Language from 'src/language/Language'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import PaymentRequestListScreen from 'src/paymentRequest/PaymentRequestListScreen'
@@ -39,7 +41,6 @@ import VerifyEducation from 'src/verify/Education'
 import VerifyInput from 'src/verify/Input'
 import VerifyVerified from 'src/verify/Verified'
 import VerifyVerifying from 'src/verify/Verifying'
-
 export const navbarStyle: {
   headerMode: 'none'
 } = {
@@ -68,14 +69,15 @@ const NuxStack = createStackNavigator(
     [Screens.VerifyVerifying]: { screen: VerifyVerifying },
     [Screens.VerifyVerified]: { screen: VerifyVerified },
     [Screens.Sync]: { screen: Sync },
-    [Screens.RedeemInvite]: { screen: RedeemInvite },
     [Screens.Pincode]: { screen: Pincode },
     [Screens.ImportWallet]: { screen: ImportWallet },
     [Screens.Language]: { screen: Language },
+    [Screens.JoinCelo]: { screen: JoinCelo },
+    [Screens.EnterInviteCode]: { screen: EnterInviteCode },
+    [Screens.ImportContacts]: { screen: ImportContacts },
     ...commonScreens,
   },
   {
-    ...navbarStyle,
     ...headerArea,
     initialRouteName: Screens.Language,
   }

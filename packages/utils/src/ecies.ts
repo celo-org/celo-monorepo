@@ -6,7 +6,7 @@
  */
 'use strict'
 
-import * as Crypto from 'crypto'
+import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes } from 'crypto'
 import { ec as EC } from 'elliptic'
 const ec = new EC('secp256k1')
 
@@ -44,7 +44,7 @@ const ConcatKDF = (px: Buffer, kdLen: number) => {
   let counter = Buffer.from('00000001', 'hex')
   let k = Buffer.from('00', 'hex')
   for (let i = 0; i <= reps; i++) {
-    const hash = Crypto.createHash('sha256')
+    const hash = createHash('sha256')
     hash.update(counter)
     hash.update(px)
     k = Buffer.concat([k, hash.digest()])
@@ -65,12 +65,12 @@ export function AES128EncryptAndHMAC(
   macKey: Buffer,
   plaintext: Buffer
 ): Buffer {
-  const iv = Crypto.randomBytes(16)
-  const cipher = Crypto.createCipheriv('aes-128-ctr', encryptionKey, iv)
+  const iv = randomBytes(16)
+  const cipher = createCipheriv('aes-128-ctr', encryptionKey, iv)
   const firstChunk = cipher.update(plaintext)
   const secondChunk = cipher.final()
   const dataToMac = Buffer.concat([iv, firstChunk, secondChunk])
-  const mac = Crypto.createHmac('sha256', macKey)
+  const mac = createHmac('sha256', macKey)
     .update(dataToMac)
     .digest()
 
@@ -93,13 +93,13 @@ export function AES128DecryptAndHMAC(
   const message = ciphertext.slice(16, ciphertext.length - 32)
   const mac = ciphertext.slice(ciphertext.length - 32, ciphertext.length)
   const dataToMac = Buffer.concat([iv, message])
-  const computedMac = Crypto.createHmac('sha256', macKey)
+  const computedMac = createHmac('sha256', macKey)
     .update(dataToMac)
     .digest()
   if (!mac.equals(computedMac)) {
     throw new Error('MAC mismatch')
   }
-  const cipher = Crypto.createDecipheriv('aes-128-ctr', encryptionKey, iv)
+  const cipher = createDecipheriv('aes-128-ctr', encryptionKey, iv)
   const firstChunk = cipher.update(message)
   const secondChunk = cipher.final()
 
@@ -113,7 +113,7 @@ export function AES128DecryptAndHMAC(
  * @returns {Buffer} Encrypted message, serialized, 113+ bytes
  */
 export function Encrypt(pubKeyTo: Buffer, plaintext: Buffer) {
-  const ephemPrivKey = ec.keyFromPrivate(Crypto.randomBytes(32))
+  const ephemPrivKey = ec.keyFromPrivate(randomBytes(32))
   const ephemPubKey = ephemPrivKey.getPublic(false, 'hex')
   const ephemPubKeyEncoded = Buffer.from(ephemPubKey, 'hex')
   const px = ephemPrivKey.derive(
@@ -121,7 +121,7 @@ export function Encrypt(pubKeyTo: Buffer, plaintext: Buffer) {
   )
   const hash = ConcatKDF(px.toBuffer(), 32)
   const encryptionKey = hash.slice(0, 16)
-  const macKey = Crypto.createHash('sha256')
+  const macKey = createHash('sha256')
     .update(hash.slice(16))
     .digest()
   const message = AES128EncryptAndHMAC(encryptionKey, macKey, plaintext)
@@ -148,7 +148,7 @@ export function Decrypt(privKey: Buffer, encrypted: Buffer) {
   const hash = ConcatKDF(px.toBuffer(), 32)
   // km, ke
   const encryptionKey = hash.slice(0, 16)
-  const macKey = Crypto.createHash('sha256')
+  const macKey = createHash('sha256')
     .update(hash.slice(16))
     .digest()
 

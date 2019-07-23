@@ -63,6 +63,9 @@ const schemaVersions = [
       verificationFailed: false,
       addressToE164Number: {},
       e164NumberToAddress: {},
+      startedVerification: false,
+      askedContactsPermission: false,
+      isLoadingImportContacts: false,
     },
     account: {
       name: 'John Doe',
@@ -87,6 +90,7 @@ const schemaVersions = [
       isSendingInvite: false,
       invitees: {},
       redeemedInviteCode: '',
+      redeemComplete: false,
     },
     escrow: {
       sentEscrowedPayments: [],
