@@ -21,6 +21,7 @@ import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import {
   Actions,
   InviteBy,
+  redeemComplete,
   RedeemInviteAction,
   SendInviteAction,
   sendInviteFailure,
@@ -29,7 +30,7 @@ import {
   storeInviteeData,
 } from 'src/invite/actions'
 import { createInviteCode } from 'src/invite/utils'
-import { navigate, navigateReset } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { transferStableToken } from 'src/stableToken/actions'
 import { createTransaction } from 'src/tokens/saga'
@@ -115,6 +116,10 @@ export function* sendInvite(
     const temporaryWalletAccount = web3.eth.accounts.create()
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
+
+    // TODO: Improve this by not checking specifically for this
+    // display name. Requires improvements in recipient handling
+    recipientName = recipientName === i18n.t('sendFlow7:mobileNumber') ? '' : ' ' + recipientName
     const msg = yield call(generateLink, inviteCode, recipientName)
 
     // Store the Temp Address locally so we know which transactions were invites
@@ -188,7 +193,7 @@ function* redeemSuccess(name: string, account: string) {
   Logger.showMessage(i18n.t('inviteFlow11:redeemSuccess'))
   web3.eth.defaultAccount = account
   yield put(setName(name))
-  navigateReset(Screens.VerifyEducation)
+  yield put(redeemComplete(true))
 }
 
 export function* redeemInviteSaga(action: RedeemInviteAction) {

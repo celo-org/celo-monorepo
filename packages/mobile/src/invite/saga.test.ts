@@ -10,7 +10,13 @@ import { setName } from 'src/account'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ERROR_BANNER_DURATION } from 'src/config'
-import { InviteBy, redeemInvite, sendInvite, storeInviteeData } from 'src/invite/actions'
+import {
+  InviteBy,
+  redeemComplete,
+  redeemInvite,
+  sendInvite,
+  storeInviteeData,
+} from 'src/invite/actions'
 import { watchRedeemInvite, watchSendInvite } from 'src/invite/saga'
 import { transactionConfirmed } from 'src/transactions/actions'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -40,6 +46,11 @@ jest.mock('@celo/contractkit', () => ({
 jest.mock('src/account/actions', () => ({
   ...jest.requireActual('src/account/actions'),
   getPincode: async () => 'pin',
+}))
+
+jest.mock('src/invite/actions', () => ({
+  ...jest.requireActual('src/invite/actions'),
+  redeemComplete: () => jest.fn(),
 }))
 
 jest.mock('src/transactions/send', () => ({
@@ -101,9 +112,8 @@ describe(watchRedeemInvite, () => {
       .withState(state)
       .dispatch(redeemInvite(KEY, NAME))
       .put(setName(NAME))
+      .dispatch(redeemComplete(true))
       .run()
-
-    expect(navigateReset).toHaveBeenCalled()
   })
 
   it('fails with a valid private key but unsuccessful transfer', async () => {
@@ -150,8 +160,7 @@ describe(watchRedeemInvite, () => {
       .withState(state)
       .dispatch(redeemInvite(KEY, NAME))
       .put(setName(NAME))
+      .dispatch(redeemComplete(true))
       .run()
-
-    expect(navigateReset).toHaveBeenCalled()
   })
 })

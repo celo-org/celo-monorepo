@@ -230,9 +230,9 @@ exports[`PaymentRequestSummaryNotification renders correctly 1`] = `
               style={
                 Array [
                   Object {
-                    "color": "#81868B",
+                    "color": "#2E3338",
                     "fontFamily": "Hind-Regular",
-                    "fontSize": 13,
+                    "fontSize": 14,
                     "lineHeight": 18,
                   },
                   Object {
@@ -416,9 +416,9 @@ exports[`PaymentRequestSummaryNotification when more 1 requests renders just it 
               style={
                 Array [
                   Object {
-                    "color": "#81868B",
+                    "color": "#2E3338",
                     "fontFamily": "Hind-Regular",
-                    "fontSize": 13,
+                    "fontSize": 14,
                     "lineHeight": 18,
                   },
                   Object {
@@ -673,9 +673,9 @@ exports[`PaymentRequestSummaryNotification when more than 2 requests renders jus
               style={
                 Array [
                   Object {
-                    "color": "#81868B",
+                    "color": "#2E3338",
                     "fontFamily": "Hind-Regular",
-                    "fontSize": 13,
+                    "fontSize": 14,
                     "lineHeight": 18,
                   },
                   Object {

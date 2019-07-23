@@ -13,6 +13,8 @@ export enum Actions {
   UPDATE_E164_PHONE_NUMBER_ADDRESSES = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
   FETCH_PHONE_ADDRESSES = 'IDENTITY/FETCH_PHONE_ADDRESSES',
   IMPORT_CONTACTS = 'IDENTITY/IMPORT_CONTACTS',
+  END_IMPORT_CONTACTS = 'IDENTITY/END_IMPORT_CONTACTS',
+  DENY_IMPORT_CONTACTS = 'IDENTITY/DENY_IMPORT_CONTACTS',
 }
 
 export interface StartVerificationAction {
@@ -67,6 +69,15 @@ export interface ImportContactsAction {
   type: Actions.IMPORT_CONTACTS
 }
 
+export interface EndImportContactsAction {
+  type: Actions.END_IMPORT_CONTACTS
+  success: boolean
+}
+
+export interface DenyImportContactsAction {
+  type: Actions.DENY_IMPORT_CONTACTS
+}
+
 export type ActionTypes =
   | StartVerificationAction
   | EndVerificationAction
@@ -76,6 +87,9 @@ export type ActionTypes =
   | InputAttestationCodeAction
   | CompleteAttestationCodeAction
   | UpdateE164PhoneNumberAddressesAction
+  | ImportContactsAction
+  | EndImportContactsAction
+  | DenyImportContactsAction
 
 export const startVerification = (): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
@@ -135,4 +149,13 @@ export const updateE164PhoneNumberAddresses = (
 
 export const importContacts = (): ImportContactsAction => ({
   type: Actions.IMPORT_CONTACTS,
+})
+
+export const endImportContacts = (success: boolean): EndImportContactsAction => ({
+  type: Actions.END_IMPORT_CONTACTS,
+  success,
+})
+
+export const denyImportContacts = (): DenyImportContactsAction => ({
+  type: Actions.DENY_IMPORT_CONTACTS,
 })

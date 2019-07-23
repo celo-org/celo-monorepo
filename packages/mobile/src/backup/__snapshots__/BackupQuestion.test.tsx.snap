@@ -621,9 +621,9 @@ exports[`renders correctly on 1st question 1`] = `
     <Text
       style={
         Object {
-          "color": "#81868B",
+          "color": "#2E3338",
           "fontFamily": "Hind-Regular",
-          "fontSize": 13,
+          "fontSize": 14,
           "lineHeight": 18,
         }
       }
@@ -650,9 +650,9 @@ exports[`renders correctly on 1st question 1`] = `
         style={
           Array [
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 13,
+              "fontSize": 14,
               "lineHeight": 18,
             },
             Object {
@@ -1293,9 +1293,9 @@ exports[`renders correctly on 2nd word 1`] = `
     <Text
       style={
         Object {
-          "color": "#81868B",
+          "color": "#2E3338",
           "fontFamily": "Hind-Regular",
-          "fontSize": 13,
+          "fontSize": 14,
           "lineHeight": 18,
         }
       }
@@ -1322,9 +1322,9 @@ exports[`renders correctly on 2nd word 1`] = `
         style={
           Array [
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 13,
+              "fontSize": 14,
               "lineHeight": 18,
             },
             Object {
@@ -1965,9 +1965,9 @@ exports[`renders correctly on 3rd word 1`] = `
     <Text
       style={
         Object {
-          "color": "#81868B",
+          "color": "#2E3338",
           "fontFamily": "Hind-Regular",
-          "fontSize": 13,
+          "fontSize": 14,
           "lineHeight": 18,
         }
       }
@@ -1994,9 +1994,9 @@ exports[`renders correctly on 3rd word 1`] = `
         style={
           Array [
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 13,
+              "fontSize": 14,
               "lineHeight": 18,
             },
             Object {
@@ -2637,9 +2637,9 @@ exports[`renders correctly on 3rd word 2`] = `
     <Text
       style={
         Object {
-          "color": "#81868B",
+          "color": "#2E3338",
           "fontFamily": "Hind-Regular",
-          "fontSize": 13,
+          "fontSize": 14,
           "lineHeight": 18,
         }
       }
@@ -2666,9 +2666,9 @@ exports[`renders correctly on 3rd word 2`] = `
         style={
           Array [
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 13,
+              "fontSize": 14,
               "lineHeight": 18,
             },
             Object {
@@ -3309,9 +3309,9 @@ exports[`renders correctly on 3rd word 3`] = `
     <Text
       style={
         Object {
-          "color": "#81868B",
+          "color": "#2E3338",
           "fontFamily": "Hind-Regular",
-          "fontSize": 13,
+          "fontSize": 14,
           "lineHeight": 18,
         }
       }
@@ -3338,9 +3338,9 @@ exports[`renders correctly on 3rd word 3`] = `
         style={
           Array [
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 13,
+              "fontSize": 14,
               "lineHeight": 18,
             },
             Object {
