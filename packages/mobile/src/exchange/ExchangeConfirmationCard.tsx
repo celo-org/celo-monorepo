@@ -6,7 +6,7 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import ExchangeRate from 'src/exchange/ExchangeRate'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import { CURRENCY_ENUM, DOLLAR_TO_PH } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import RoundedArrow from 'src/shared/RoundedArrow'
 
@@ -40,7 +40,7 @@ class ExchangeConfirmationCard extends React.PureComponent<Props> {
         <View style={styles.tabular}>
           <Text style={fontStyles.bodySecondary}>{t('celoDollars')}</Text>
           <Text numberOfLines={1} style={[fontStyles.currency, styles.dollar]}>
-            ₱{newDollarBalance}
+            ₱{DOLLAR_TO_PH * +newDollarBalance}
           </Text>
         </View>
 
