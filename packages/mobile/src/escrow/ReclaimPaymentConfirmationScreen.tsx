@@ -31,7 +31,7 @@ const TAG = 'escrow/ReclaimPaymentConfirmationScreen'
 interface StateProps {
   e164PhoneNumber: string
   account: string | null
-  fee: string
+  fee: string | null
 }
 
 interface DispatchProps {
