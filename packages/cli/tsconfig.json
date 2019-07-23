@@ -17,6 +17,6 @@
     "target": "es6",
     "esModuleInterop": true,
     "outDir": "./lib",
-    "rootDir": "./src"
+    "rootDirs": ["./src", "./test"]
   }
 }
