@@ -328,7 +328,7 @@ exports[`Pincode renders correctly for pin enter 1`] = `
         </Link>
       </View>
     </View>
-    <VerifyAddressBook
+    <BackupIcon
       height={70}
       style={
         Object {
@@ -438,7 +438,7 @@ exports[`Pincode renders correctly for pin re-enter 1`] = `
         </Link>
       </View>
     </View>
-    <VerifyAddressBook
+    <BackupIcon
       height={70}
       style={
         Object {
