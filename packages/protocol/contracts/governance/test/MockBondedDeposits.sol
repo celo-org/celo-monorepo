@@ -33,6 +33,7 @@ contract MockBondedDeposits is IBondedDeposits {
   function getRewardsLastRedeemed(address) external view returns (uint96) {}
   function getNoticePeriods(address) external view returns (uint256[] memory) {}
   function getAvailabilityTimes(address) external view returns (uint256[] memory) {}
+  function delegateRole(DelegateRole, address, uint8, bytes32, bytes32) external {}
 
   function isVotingFrozen(address account) external view returns (bool) {
     return frozen[account];
