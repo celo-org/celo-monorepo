@@ -67,6 +67,7 @@
   "sendPaymentFailed": "Falla en el envío de pago",
   "paymentRequestFailed": "No se pudo enviar la solicitud de pago",
   "reclaimingEscrowedPaymentFailed": "El pago no pudo ser reclamado.",
+  "fetchingReclaimFeeFailed": "Error al obtener la tarifa sugerida.",
   "connectingToCelo": "Conectando a la red de Celo...",
   "poorConnection": {
     "0": "Mala Conexión",

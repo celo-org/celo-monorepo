@@ -3,12 +3,12 @@ import { RootState } from 'src/redux/reducers'
 
 export interface State {
   sentEscrowedPayments: EscrowedPayment[]
-  suggestedFee: string
+  suggestedFee: string | null
 }
 
 export const initialState = {
   sentEscrowedPayments: [],
-  suggestedFee: '',
+  suggestedFee: null,
 }
 
 export const escrowReducer = (state: State | undefined = initialState, action: ActionTypes) => {

@@ -136,6 +136,8 @@ function* reclaimFromEscrow(action: ReclaimPaymentAction) {
     Logger.error(TAG + '@reclaimFromEscrow', 'Error reclaiming payment from escrow', e)
     if (e.message === ErrorMessages.INCORRECT_PIN) {
       yield put(showError(ErrorMessages.INCORRECT_PIN, ERROR_BANNER_DURATION))
+    } else {
+      yield put(showError(ErrorMessages.RECLAIMING_ESCROWED_PAYMENT_FAILED, ERROR_BANNER_DURATION))
     }
     throw e
   }
@@ -209,7 +211,7 @@ export function* fetchReclaimSuggestedFee(action: FetchReclaimTransactionFeeActi
 
     Logger.debug(TAG + '@fetchReclaimSuggestedFee', `New reclaim tx fee is: ${suggestedFeeInWei}`)
   } catch (e) {
-    Logger.error(TAG + '@fetchReclaimSuggestedFee', 'Error fetching reclaim transaction fee', e)
+    yield put(showError(ErrorMessages.FETCH_RECLAIM_FEE_FAILED, ERROR_BANNER_DURATION))
     throw e
   }
 }
