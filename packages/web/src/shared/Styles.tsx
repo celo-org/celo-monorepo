@@ -1,21 +1,13 @@
 // Deprecated
 import { StyleSheet } from 'react-native'
-
+import { typeFaces } from 'src/styles'
 export const Colors = {
   DARK_GRAY: '#333638',
-  GRAY: 'rgba(0,0,0, 0.2)',
-  WHITE: '#FFFFFF',
-  PRIMARY: '#45D68A',
   TAN: '#FFF5E7',
-  GOLD: '#EFC869',
-  SPACER: 'rgba(255, 255, 255, 0.1)',
-  GREEN: '#42D689',
-  LIGHT: 'rgba(255, 255, 255, 0.5)',
-  GRAY_INACTIVE: '#D1D5D8',
 }
 
 export const Fonts = {
-  PRIMARY: 'Hind Siliguri',
+  PRIMARY: typeFaces.garamond,
 }
 
 export const TABLET_BREAKPOINT = 576
