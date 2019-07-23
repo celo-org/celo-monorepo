@@ -1,5 +1,4 @@
 import PulsingDot from '@celo/react-components/components/PulsingDot'
-import SmallButton from '@celo/react-components/components/SmallButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles, { estimateFontSize } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
@@ -19,8 +18,9 @@ import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import { showRefreshBalanceMessage } from 'src/redux/selectors'
+import { shouldUpdateBalance } from 'src/redux/selectors'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
+import Logger from 'src/utils/Logger'
 
 interface StateProps {
   exchangeRatePair: ExchangeRatePair | null
@@ -48,7 +48,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     stableEducationCompleted: state.stableToken.educationCompleted,
     goldBalance: state.goldToken.balance,
     dollarBalance: state.stableToken.balance,
-    balanceOutOfSync: showRefreshBalanceMessage(state),
+    balanceOutOfSync: shouldUpdateBalance(state),
   }
 }
 
@@ -70,8 +70,11 @@ export class AccountOverview extends React.Component<Props> {
     return fontSize
   }
 
-  refreshBalances = () => {
-    this.props.refreshAllBalances()
+  componentWillUpdate() {
+    Logger.debug('MyTAg', `checking refreshed balance ${this.props.balanceOutOfSync}`)
+    if (!this.props.balanceOutOfSync) {
+      this.props.refreshAllBalances()
+    }
   }
 
   render() {
@@ -132,18 +135,6 @@ export class AccountOverview extends React.Component<Props> {
               </TouchableOpacity>
             </View>
           </View>
-          {balanceOutOfSync && (
-            <View style={style.balanceRefreshContainer}>
-              <Text style={style.balanceRefreshText}>{t('balanceNeedUpdating')}</Text>
-              <SmallButton
-                text={t('refreshBalances')}
-                onPress={this.refreshBalances}
-                solid={false}
-                style={style.messageButton}
-                textStyle={fontStyles.messageText}
-              />
-            </View>
-          )}
         </View>
       </View>
     )
@@ -202,25 +193,6 @@ const style = StyleSheet.create({
   },
   dot: {
     padding: 10,
-  },
-  balanceRefreshContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingBottom: 13,
-    paddingHorizontal: 50,
-  },
-  balanceRefreshText: {
-    ...fontStyles.bodySmall,
-    color: colors.messageBlue,
-    paddingRight: 5,
-  },
-  messageButton: {
-    ...fontStyles.messageText,
-    borderColor: colors.messageBlue,
-    minWidth: 0,
-    paddingVertical: 2,
-    paddingHorizontal: 5,
   },
 })
 
