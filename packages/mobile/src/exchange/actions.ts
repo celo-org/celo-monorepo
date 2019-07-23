@@ -13,7 +13,7 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import { ExchangeRatePair } from 'src/exchange/reducer'
-import { CURRENCY_ENUM as Tokens } from 'src/geth/consts'
+import { CURRENCY_ENUM as Tokens, DOLLAR_TO_PH } from 'src/geth/consts'
 import { RootState } from 'src/redux/reducers'
 import {
   addStandbyTransaction,
@@ -104,12 +104,12 @@ export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: Token
       Tokens.DOLLAR,
       new BigNumber(dollarMakerAmount)
     )
-    const goldMakerExchangeRate: BigNumber = yield call(
+    const goldMakerExchangeRate: BigNumber = (yield call(
       ContractUtils.getExchangeRate,
       web3,
       Tokens.GOLD,
       new BigNumber(goldMakerAmount)
-    )
+    )).times(DOLLAR_TO_PH)
 
     if (!dollarMakerExchangeRate || !goldMakerExchangeRate) {
       Logger.error(TAG, 'Invalid exchange rate')

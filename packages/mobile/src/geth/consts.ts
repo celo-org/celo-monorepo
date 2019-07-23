@@ -20,3 +20,5 @@ export {
   resolveCurrency,
   SHORT_CURRENCIES,
 } from '@celo/utils/src/currencies'
+
+const DOLLAR_TO_PH = 51

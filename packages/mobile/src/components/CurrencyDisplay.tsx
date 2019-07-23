@@ -2,10 +2,8 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { CURRENCY_ENUM as Tokens } from 'src/geth/consts'
+import { CURRENCY_ENUM as Tokens, DOLLAR_TO_PH } from 'src/geth/consts'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
-
-const DOLLAR_TO_PH = 51
 
 interface Props {
   // TODO: Should be Bignumber
@@ -53,10 +51,7 @@ export default class CurrencyDisplay extends React.PureComponent<Props> {
             <Text numberOfLines={1} style={[styles.currency, fontStyles.regular, dollarStyle]}>
               {'₱' + DOLLAR_TO_PH * this.amount()}
             </Text>
-            <Text
-              numberOfLines={1}
-              style={[styles.currency, fontStyles.regular, styles.dollarConversionText]}
-            >
+            <Text numberOfLines={1} style={[styles.currency, fontStyles.bodySecondary]}>
               {'($' + this.amount() + ')'}
             </Text>
           </View>
@@ -81,9 +76,6 @@ const styles = StyleSheet.create({
   },
   currency: {
     paddingHorizontal: 3,
-  },
-  dollarConversionText: {
-    color: colors.darkSecondary,
-    fontSize: 16,
+    alignText: 'center',
   },
 })
