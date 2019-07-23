@@ -58,7 +58,7 @@ geth:
 celocli:
   image:
     repository: gcr.io/celo-testnet/celocli
-    tag: 78bd3588f89f548482f1dc50de354bd4076fbdf7 
+    tag: 77af23224706ff1b774305399ae3738ceaac2378 
 
 gethexporter:
   image:
