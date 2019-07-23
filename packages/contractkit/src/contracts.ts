@@ -4,12 +4,14 @@ import Escrow from '../contracts/Escrow'
 import Exchange from '../contracts/Exchange'
 import GasPriceMinimum from '../contracts/GasPriceMinimum'
 import GoldToken from '../contracts/GoldToken'
+import SortedOracles from '../contracts/SortedOracles'
 import StableToken from '../contracts/StableToken'
 import { Attestations as AttestationsType } from '../types/Attestations'
 import { Escrow as EscrowType } from '../types/Escrow'
 import { Exchange as ExchangeType } from '../types/Exchange'
 import { GasPriceMinimum as GasPriceMinimumType } from '../types/GasPriceMinimum'
 import { GoldToken as GoldTokenType } from '../types/GoldToken'
+import { SortedOracles as SortedOraclesType } from '../types/SortedOracles'
 import { StableToken as StableTokenType } from '../types/StableToken'
 
 let attestationsContract: AttestationsType | null = null
@@ -18,6 +20,7 @@ let exchangeContract: ExchangeType | null = null
 let gasPriceMinimumContract: GasPriceMinimumType | null = null
 let goldTokenContract: GoldTokenType | null = null
 let stableTokenContract: StableTokenType | null = null
+let sortedOraclesContract: SortedOraclesType | null = null
 
 export async function getAttestationsContract(web3: Web3): Promise<AttestationsType> {
   if (attestationsContract === null) {
@@ -75,4 +78,15 @@ export async function getStableTokenContract(web3: Web3): Promise<StableTokenTyp
     }
   }
   return stableTokenContract
+}
+
+export async function getSortedOraclesContract(web3: Web3): Promise<SortedOraclesType> {
+  if (sortedOraclesContract === null) {
+    try {
+      sortedOraclesContract = await SortedOracles(web3)
+    } catch (error) {
+      throw new Error(`Fail to get SortedOracles contract ${error}`)
+    }
+  }
+  return sortedOraclesContract
 }
