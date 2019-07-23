@@ -9,7 +9,7 @@ import { TransactionReceipt } from 'web3/types'
 import * as ContractList from '../contracts/index'
 import { Logger } from './logger'
 
-const gasInflateFactor = 1.3
+const gasInflateFactor = 3.6
 
 export function selectContractByAddress(contracts: Contract[], address: string) {
   const addresses = contracts.map((contract) => contract.options.address)
