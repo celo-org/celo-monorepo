@@ -55,10 +55,10 @@ geth:
     gethblockscouttx:
       nodeKey: 30e1a9d386eb6e8bd78207e2b8231fc59c63b2fd15726957d3348462de2e3205
 
-monorepo:
+celocli:
   image:
-    repository: gcr.io/celo-testnet/celo-monorepo
-    tag: 0548f6bf3c1bb16ac18b0563bc232fb7d68f9e42
+    repository: gcr.io/celo-testnet/celocli
+    tag: 78bd3588f89f548482f1dc50de354bd4076fbdf7 
 
 gethexporter:
   image:
