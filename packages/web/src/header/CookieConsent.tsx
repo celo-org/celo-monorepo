@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Link from 'src/shared/Link'
 import Responsive from 'src/shared/Responsive'
-import { Colors, CONSENT_HEIGHT, TextStyles } from 'src/shared/Styles'
+import { CONSENT_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts } from 'src/styles'
 import { agree, disagree, hasUserGivenCookiesAgreement } from '../analytics/analytics'
 
@@ -58,7 +58,7 @@ export class CookieConsent extends React.Component<I18nProps, State> {
               large={[styles.button, styles.disagreeButton]}
             >
               <View style={[styles.buttonMedium, styles.disagreeButton]} onClick={disagree}>
-                <Text style={[TextStyles.button, styles.buttonText]}>
+                <Text style={[fonts.navigation, styles.buttonText]}>
                   {t('cookiesDisagree')
                     .toString()
                     .toUpperCase()}
@@ -70,7 +70,7 @@ export class CookieConsent extends React.Component<I18nProps, State> {
               large={[styles.button, styles.agreeButton]}
             >
               <View style={[styles.buttonMedium, styles.agreeButton]} onClick={onClickAgree}>
-                <Text style={[TextStyles.button, styles.buttonText]}>
+                <Text style={[fonts.navigation, styles.buttonText]}>
                   {t('cookiesAgree')
                     .toString()
                     .toUpperCase()}
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   buttonText: {
     textAlign: 'center',
     color: colors.white,
-    fontSize: 13,
+    textRendering: 'geometricPrecision',
   },
   link: {
     color: colors.white,

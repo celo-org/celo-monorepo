@@ -97,14 +97,6 @@ export const TextStyles = StyleSheet.create({
     justifyContent: 'center',
     padding: 4,
   },
-  button: {
-    fontSize: 16,
-    lineHeight: 16,
-    fontFamily: Fonts.PRIMARY,
-    color: Colors.DARK_GRAY,
-    fontWeight: '600',
-    textRendering: 'geometricPrecision',
-  },
   small: {
     fontFamily: Fonts.PRIMARY,
     color: Colors.DARK_GRAY,
