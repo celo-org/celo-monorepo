@@ -5,6 +5,7 @@ import {
   getHooks,
   importGenesis,
   initAndStartGeth,
+  sleep,
 } from '@celo/celotool/geth_tests/src/lib/utils'
 import BigNumber from 'bignumber.js'
 const assert = require('chai').assert
