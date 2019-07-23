@@ -98,13 +98,7 @@ export class NotificationBox extends React.Component<Props, State> {
   }
 
   generalNotifications = (): Array<React.ReactElement<any>> => {
-    const {
-      t,
-      backupCompleted,
-      goldEducationCompleted,
-      dismissedEarnRewards,
-      dismissedInviteFriends,
-    } = this.props
+    const { t, backupCompleted, goldEducationCompleted, dismissedEarnRewards } = this.props
     const actions = []
 
     if (!backupCompleted) {
