@@ -1,5 +1,3 @@
-const assert = require('chai').assert
-const fs = require('fs')
 import {
   AccountType,
   ConsensusType,
@@ -10,8 +8,10 @@ import {
 } from '@celo/celotool/src/lib/generate_utils'
 import { getEnodeAddress } from '@celo/celotool/src/lib/geth'
 import { ensure0x } from '@celo/celotool/src/lib/utils'
-import { spawn } from 'child_process'
-import path from 'path'
+import { assert } from 'chai'
+import { spawn, SpawnOptions } from 'child_process'
+import fs from 'fs'
+import { join as joinPath, resolve as resolvePath } from 'path'
 import { Admin } from 'web3-eth-admin'
 
 interface GethInstanceConfig {
@@ -32,25 +32,27 @@ interface GethTestConfig {
   instances: GethInstanceConfig[]
 }
 
-const testDir = '/tmp/e2e'
-const genesisPath = `${testDir}/genesis.json`
+const TEST_DIR = '/tmp/e2e'
+const GENESIS_PATH = `${TEST_DIR}/genesis.json`
 const networkid = 1101
 
-export function execCmd(cmd: string, args: string[], options: any = {}, logsFilepath: string = '') {
-  return new Promise(async (resolve, reject) => {
+export function spawnWithLog(cmd: string, args: string[], logsFilepath: string) {
+  try {
+    fs.unlinkSync(logsFilepath)
+  } catch (error) {
+    // nothing to do
+  }
+  const logStream = fs.createWriteStream(logsFilepath, { flags: 'a' })
+  const process = spawn(cmd, args)
+  process.stdout.pipe(logStream)
+  process.stderr.pipe(logStream)
+  return process
+}
+
+export function execCmd(cmd: string, args: string[], options?: SpawnOptions) {
+  return new Promise<number>(async (resolve, reject) => {
     console.debug('$ ' + [cmd].concat(args).join(' '))
-    let process
-    if (!logsFilepath) {
-      process = spawn(cmd, args, { ...options, stdio: 'inherit' })
-    } else {
-      try {
-        fs.unlinkSync(logsFilepath)
-      } catch (error) {}
-      const logStream = fs.createWriteStream(logsFilepath, { flags: 'a' })
-      process = spawn(cmd, args, { ...options })
-      process.stdout.pipe(logStream)
-      process.stderr.pipe(logStream)
-    }
+    const process = spawn(cmd, args, { ...options, stdio: 'inherit' })
     process.on('close', (code) => {
       try {
         resolve(code)
@@ -65,18 +67,12 @@ export function execCmd(cmd: string, args: string[], options: any = {}, logsFile
 export async function execCmdWithExitOnFailure(
   cmd: string,
   args: string[],
-  options: any = {},
-  logsFilepath: string = ''
+  options?: SpawnOptions
 ) {
-  return new Promise(async (resolve, reject) => {
-    const code = await execCmd(cmd, args, options, logsFilepath)
-    if (code == 0) {
-      resolve()
-    } else {
-      process.exit(1)
-      reject()
-    }
-  })
+  const code = await execCmd(cmd, args, options)
+  if (code !== 0) {
+    process.exit(1)
+  }
 }
 
 // TODO(asa): Use the contract kit here instead
@@ -142,9 +138,9 @@ export const erc20Abi = [
   },
 ]
 
-export const monorepoRoot = path.resolve(process.cwd(), './../..')
+export const monorepoRoot = resolvePath(process.cwd(), './../..')
 
-export async function checkoutGethRepo(branch: string, path: string) {
+async function checkoutGethRepo(branch: string, path: string) {
   await execCmdWithExitOnFailure('rm', ['-rf', path])
   await execCmdWithExitOnFailure('git', [
     'clone',
@@ -158,16 +154,16 @@ export async function checkoutGethRepo(branch: string, path: string) {
   await execCmdWithExitOnFailure('git', ['checkout', branch], { cwd: path })
 }
 
-export async function buildGeth(path: string) {
+async function buildGeth(path: string) {
   await execCmdWithExitOnFailure('make', ['geth'], { cwd: path })
 }
 
-export async function setupTestDir(testDir: string) {
+async function setupTestDir(testDir: string) {
   await execCmd('rm', ['-rf', testDir])
   await execCmd('mkdir', [testDir])
 }
 
-export async function writeGenesis(validators: string[], path: string) {
+function writeGenesis(validators: string[], path: string) {
   const blockTime = 0
   const epochLength = 10
   const genesis = generateGenesis(
@@ -181,8 +177,8 @@ export async function writeGenesis(validators: string[], path: string) {
   fs.writeFileSync(path, genesis)
 }
 
-export async function importGenesis() {
-  return JSON.parse(fs.readFileSync(genesisPath))
+export function importGenesis() {
+  return JSON.parse(fs.readFileSync(GENESIS_PATH).toString())
 }
 
 export async function init(gethBinaryPath: string, datadir: string, genesisPath: string) {
@@ -204,17 +200,35 @@ export async function importPrivateKey(gethBinaryPath: string, instance: GethIns
   ])
 }
 
+export async function killPid(pid: number) {
+  await execCmd('kill', ['-9', pid.toString()])
+}
+
 export async function killGeth() {
   await execCmd('pkill', ['-9', 'geth'])
 }
 
-export async function addStaticPeers(datadir: string, enodes: string[]) {
+function addStaticPeers(datadir: string, enodes: string[]) {
   fs.writeFileSync(`${datadir}/static-nodes.json`, JSON.stringify(enodes))
 }
 
-// TODO(asa): Use sleep-promise
-export async function sleep(seconds: number) {
-  await execCmd('sleep', [seconds.toString()])
+async function isPortOpen(host: string, port: number) {
+  return (await execCmd('nc', ['-z', host, port.toString()])) === 0
+}
+
+async function waitForPortOpen(host: string, port: number, seconds: number) {
+  while (seconds > 0) {
+    if (await isPortOpen(host, port)) {
+      return true
+    }
+    seconds -= 1
+    await sleep(1)
+  }
+  return false
+}
+
+export function sleep(seconds: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, seconds * 1000))
 }
 
 export async function getEnode(rpcPort: number) {
@@ -224,11 +238,8 @@ export async function getEnode(rpcPort: number) {
 
 export async function startGeth(gethBinaryPath: string, instance: GethInstanceConfig) {
   const datadir = getDatadir(instance)
-  const syncmode = instance.syncmode
-  const port = instance.port
-  const rpcport = instance.rpcport
+  const { syncmode, port, rpcport, validating: mine } = instance
   const privateKey = instance.privateKey || ''
-  const mine = instance.validating
   const lightserv = instance.lightserv || false
   const unlock = instance.validating
   const etherbase = instance.etherbase || ''
@@ -272,13 +283,19 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   if (mine) {
     gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
   }
-  execCmd(gethBinaryPath, gethArgs, {}, `${datadir}/logs.txt`)
+  const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`)
+
   // Give some time for geth to come up
-  await sleep(1)
+  const isOpen = await waitForPortOpen('localhost', rpcport, 5)
+  if (!isOpen) {
+    throw new Error("Geth Didn't finished starting after 5 seconds")
+  }
+
+  return gethProcess.pid
 }
 
 export async function migrateContracts(validatorPrivateKeys: string[], to: number = 1000) {
-  let args = [
+  const args = [
     '--cwd',
     `${monorepoRoot}/packages/protocol`,
     'init-network',
@@ -292,9 +309,9 @@ export async function migrateContracts(validatorPrivateKeys: string[], to: numbe
   await execCmdWithExitOnFailure('yarn', args)
 }
 
-export async function getContractAddress(contractName: string) {
+export function getContractAddress(contractName: string) {
   const filePath = `${monorepoRoot}/packages/protocol/build/testing/contracts/${contractName}.json`
-  let contractData = JSON.parse(await fs.readFileSync(filePath, 'utf8'))
+  const contractData = JSON.parse(fs.readFileSync(filePath, 'utf8'))
   return contractData.networks[networkid].address
 }
 
@@ -311,36 +328,37 @@ export async function restoreDatadir(instance: GethInstanceConfig) {
   await execCmdWithExitOnFailure('cp', ['-r', snapshotdir, datadir])
 }
 
-export function getInstanceDir(instance: GethInstanceConfig) {
-  return `${testDir}/${instance.name}`
+function getInstanceDir(instance: GethInstanceConfig) {
+  return joinPath(TEST_DIR, instance.name)
 }
 
-export function getDatadir(instance: GethInstanceConfig) {
-  const instanceDir = `${testDir}/${instance.name}`
-  return `${instanceDir}/datadir`
+function getDatadir(instance: GethInstanceConfig) {
+  return joinPath(getInstanceDir(instance), 'datadir')
 }
 
-export function getSnapshotdir(instance: GethInstanceConfig) {
-  const instanceDir = `${testDir}/${instance.name}`
-  return `${instanceDir}/snapshot`
+function getSnapshotdir(instance: GethInstanceConfig) {
+  return joinPath(getInstanceDir(instance), 'snapshot')
 }
 
+/**
+ * @returns Promise<number> the geth pid number
+ */
 export async function initAndStartGeth(gethBinaryPath: string, instance: GethInstanceConfig) {
   const datadir = getDatadir(instance)
-  await init(gethBinaryPath, datadir, genesisPath)
+  await init(gethBinaryPath, datadir, GENESIS_PATH)
   if (instance.privateKey) {
     await importPrivateKey(gethBinaryPath, instance)
   }
   if (instance.peers) {
     await addStaticPeers(datadir, instance.peers)
   }
-  await startGeth(gethBinaryPath, instance)
+  return startGeth(gethBinaryPath, instance)
 }
 
 export function getHooks(gethConfig: GethTestConfig) {
   const mnemonic =
     'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
-  const validatorInstances = gethConfig.instances.filter((x: any) => x.validating == true)
+  const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
   const numValidators = validatorInstances.length
   const validators = getValidators(mnemonic, numValidators)
   const validatorPrivateKeys = validators.map((_: any, i: number) =>
@@ -354,13 +372,13 @@ export function getHooks(gethConfig: GethTestConfig) {
   const gethRepoPath = argv.localgeth || '/tmp/geth'
   const gethBinaryPath = `${gethRepoPath}/build/bin/geth`
 
-  const before = async function(this: any) {
+  const before = async () => {
     if (!argv.localgeth) {
       await checkoutGethRepo(branch, gethRepoPath)
     }
     await buildGeth(gethRepoPath)
-    await setupTestDir(testDir)
-    await writeGenesis(validators, genesisPath)
+    await setupTestDir(TEST_DIR)
+    await writeGenesis(validators, GENESIS_PATH)
     let validatorIndex = 0
     for (const instance of gethConfig.instances) {
       if (instance.validating) {
@@ -369,7 +387,7 @@ export function getHooks(gethConfig: GethTestConfig) {
         }
         // Automatically connect validator nodes to eachother.
         instance.peers = instance.peers.concat(
-          validatorEnodes.filter((_: string, i: number) => i != validatorIndex)
+          validatorEnodes.filter((_: string, i: number) => i !== validatorIndex)
         )
         if (!instance.privateKey) {
           instance.privateKey = validatorPrivateKeys[validatorIndex]
@@ -405,9 +423,7 @@ export function getHooks(gethConfig: GethTestConfig) {
     }
   }
 
-  const after = async () => {
-    await killGeth()
-  }
+  const after = () => killGeth()
 
   return { before, after, restart, gethBinaryPath }
 }
