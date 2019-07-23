@@ -1,35 +1,20 @@
-import getConfig from 'next/config'
 import * as React from 'react'
-import ReCAPTCHA from 'react-google-recaptcha'
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
+import RequestFunds from 'src/fauceting/RequestFunds'
+import { RequestState } from 'src/fauceting/utils'
 import { H1 } from 'src/fonts/Fonts'
-import { TextInput } from 'src/forms/FormComponents'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import SideTitledSection from 'src/layout/SideTitledSection'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import { postForm } from 'src/shared/Form'
 import { CeloLinks } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import { RequestStatus } from '../../server/FirebaseClient'
-
-enum RequestState {
-  Initial,
-  Invalid,
-  Started,
-  Completed,
-  Failed,
-}
-
+import { RequestType } from '../../server/FirebaseClient'
 interface State {
   address: string
   requestState: RequestState
   isCaptchaValid: boolean
-}
-
-function faucet({ captchaToken, address }) {
-  return postForm('/faucet', { captchaToken, beneficiary: address })
 }
 
 class FaucetPage extends React.Component<I18nProps, State> {
@@ -38,98 +23,17 @@ class FaucetPage extends React.Component<I18nProps, State> {
       namespacesRequired: [NameSpaces.faucet, NameSpaces.common],
     }
   }
-  recaptchaRef = React.createRef<ReCAPTCHA>()
-
-  state = {
-    address: '',
-    requestState: RequestState.Initial,
-    isCaptchaValid: false,
-  }
-
-  onTyping = ({ nativeEvent }) => {
-    const { value } = nativeEvent.target
-    this.setState({
-      address: value,
-      requestState:
-        this.state.requestState !== RequestState.Started
-          ? RequestState.Initial
-          : this.state.requestState,
-    })
-  }
-
-  onCaptcha = (value: string | null) => {
-    this.setState({ isCaptchaValid: !!value })
-  }
-
-  requestFaucet = async () => {
-    if (!(this.state.address.length > 0)) {
-      this.setState({ requestState: RequestState.Invalid })
-      return
-    }
-
-    this.setState({ requestState: RequestState.Started })
-
-    const captchaToken = this.recaptchaRef.current.getValue()
-    const res = await faucet({ captchaToken, address: this.state.address })
-    const status = (await res.json()).status as RequestStatus
-
-    if (status === RequestStatus.Done) {
-      this.setState({ requestState: RequestState.Completed })
-    } else {
-      this.setState({ requestState: RequestState.Failed })
-    }
-  }
-
-  getCaptchaKey = () => {
-    return getConfig().publicRuntimeConfig.RECAPTCHA
-  }
 
   render() {
     const { t } = this.props
-    const { requestState } = this.state
-    const hasFailed = requestState === RequestState.Failed
-    const isInvalid = requestState === RequestState.Invalid
-    const isComplete = requestState === RequestState.Completed
-    const isStarted = this.state.requestState === RequestState.Started
 
     return (
       <>
-        <OpenGraph title={t('pageTitle')} path={'/dev/faucet'} description={t('description')} />
+        <OpenGraph title={t('pageTitle')} path={CeloLinks.faucet} description={t('description')} />
         <View style={styles.container}>
           <H1 style={[textStyles.center, standardStyles.sectionMarginTablet]}>{t('title')}</H1>
           <SideTitledSection title={t('addFunds')} text={t('addFundsText')}>
-            <View style={standardStyles.elementalMargin}>
-              <ReCAPTCHA
-                sitekey={this.getCaptchaKey()}
-                onChange={this.onCaptcha}
-                ref={this.recaptchaRef}
-              />
-            </View>
-            <TextInput
-              style={[
-                fonts.p,
-                standardStyles.input,
-                standardStyles.elementalMarginTop,
-                (isInvalid || hasFailed) && styles.errorBorder,
-              ]}
-              focusStyle={standardStyles.inputFocused}
-              onChange={this.onTyping}
-              placeholder={t('Testnet Address')}
-              placeholderTextColor={colors.placeholderGray}
-              name="address"
-              type="text"
-              value={this.state.address}
-            />
-            <ContextualInfo requestState={requestState} t={this.props.t} />
-            <View style={styles.buttonContainer}>
-              <Button
-                kind={isComplete ? BTN.SECONDARY : BTN.PRIMARY}
-                text={isComplete ? t('funded') : t('getDollars')}
-                onPress={this.requestFaucet}
-                iconLeft={isStarted && <ActivityIndicator color={colors.primary} size={'large'} />}
-                disabled={!this.state.isCaptchaValid}
-              />
-            </View>
+            <RequestFunds kind={RequestType.Faucet} />
           </SideTitledSection>
           <SideTitledSection
             title={t('getTestnetAddress')}
@@ -181,26 +85,6 @@ class FaucetPage extends React.Component<I18nProps, State> {
       </>
     )
   }
-}
-
-interface InfoProps {
-  requestState: RequestState
-  t: I18nProps['t']
-}
-
-function ContextualInfo({ requestState, t }: InfoProps) {
-  const contextStyle = [RequestState.Failed, RequestState.Invalid].includes(requestState)
-    ? [fonts.small, textStyles.error, standardStyles.elementalMarginBottom]
-    : standardStyles.elementalMarginBottom
-
-  const text =
-    {
-      [RequestState.Failed]: t('faucetError'),
-      [RequestState.Invalid]: t('invalidAddress'),
-      [RequestState.Completed]: t('faucetCompleted'),
-    }[requestState] || 'eg. 0xce10....'
-
-  return <Text style={contextStyle}>{text}</Text>
 }
 
 function Link({ children, href }) {
