@@ -1,8 +1,8 @@
+import { RecipientKind } from '@celo/utils/src/recipient'
 import * as React from 'react'
 import 'react-native'
 import * as renderer from 'react-test-renderer'
 import PaymentRequestNotification from 'src/paymentRequest/PaymentRequestNotification'
-import { RecipientKind } from 'src/utils/recipient'
 const commonProps = {
   id: 1,
   amount: '24',

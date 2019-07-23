@@ -1,4 +1,5 @@
-import { contactsToRecipients, RecipientKind } from 'src/utils/recipient'
+import { RecipientKind } from '@celo/utils/src/recipient'
+import { contactsToRecipients } from 'src/utils/recipient'
 import { mockAccount, mockContactList, mockDisplayNumber, mockE164Number } from 'test/values'
 
 describe('contactsToRecipients', () => {

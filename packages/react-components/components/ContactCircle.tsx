@@ -1,7 +1,7 @@
-import { RecipientKind } from '@celo/mobile/src/utils/recipient'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { getContactNameHash } from '@celo/utils/src/contacts'
+import { RecipientKind } from '@celo/utils/src/recipient'
 import * as React from 'react'
 import { Image, StyleSheet, Text, View, ViewStyle } from 'react-native'
 import { MinimalContact } from 'react-native-contacts'
@@ -41,10 +41,10 @@ export default class ContactCircle extends React.PureComponent<Props> {
     const fontSize = size / 2.0
     const textStyle = [fontStyles.iconText, { fontSize }]
 
-    if (recipientKind === RecipientKind.Address) {
+    if (recipientKind && recipientKind === RecipientKind.Address) {
       return <Text style={textStyle}>{'0x'}</Text>
     }
-    if (recipientKind === RecipientKind.MobileNumber) {
+    if (recipientKind && recipientKind === RecipientKind.MobileNumber) {
       return <Text style={textStyle}>{'#'}</Text>
     }
 

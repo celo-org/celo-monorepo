@@ -1,18 +1,11 @@
 import { isValidAddress } from '@celo/utils/lib/src/signatureUtils'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
+import { RecipientKind } from '@celo/utils/src/recipient'
 import * as fuzzysort from 'fuzzysort'
 import { MinimalContact } from 'react-native-contacts'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import Logger from 'src/utils/Logger'
-
 const TAG = 'utils/recipient'
-
-export enum RecipientKind {
-  MobileNumber = 'mobileNumber',
-  Contact = 'contact',
-  QrCode = 'QrCode',
-  Address = 'Address',
-}
 
 export type Recipient =
   | RecipientWithMobileNumber

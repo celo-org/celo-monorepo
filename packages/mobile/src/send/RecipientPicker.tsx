@@ -5,6 +5,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { isValidAddress } from '@celo/utils/lib/src/signatureUtils'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
+import { RecipientKind } from '@celo/utils/src/recipient'
 import { TranslationFunction } from 'i18next'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
@@ -31,7 +32,6 @@ import {
   getRecipientFromAddress,
   NumberToRecipient,
   Recipient,
-  RecipientKind,
   RecipientWithAddress,
   RecipientWithMobileNumber,
 } from 'src/utils/recipient'
@@ -126,8 +126,6 @@ export class RecipientPicker extends React.Component<RecipientProps> {
         addressToE164Number,
         recipientCache
       )
-
-      console.log('AddressToE164', { ...addressToE164Number })
 
       if (existingContact) {
         return (

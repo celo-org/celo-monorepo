@@ -1,3 +1,4 @@
+import { RecipientKind } from '@celo/utils/src/recipient'
 import { isValidAddress } from '@celo/utils/src/signatureUtils'
 import { isEmpty } from 'lodash'
 import * as RNFS from 'react-native-fs'
@@ -11,12 +12,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { QrCode, StoreLatestInRecents, SVG } from 'src/send/actions'
 import Logger from 'src/utils/Logger'
-import {
-  getRecipientFromAddress,
-  NumberToRecipient,
-  Recipient,
-  RecipientKind,
-} from 'src/utils/recipient'
+import { getRecipientFromAddress, NumberToRecipient, Recipient } from 'src/utils/recipient'
 
 const TAG = 'QR/utils'
 

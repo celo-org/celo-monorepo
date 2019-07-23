@@ -1,6 +1,7 @@
 import { getAttestationsContract, lookupPhoneNumbers } from '@celo/contractkit'
 import { Attestations as AttestationsType } from '@celo/contractkit/types/Attestations'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
+import { RecipientKind } from '@celo/utils/src/recipient'
 import BigNumber from 'bignumber.js'
 import { chunk } from 'lodash'
 import { MinimalContact } from 'react-native-contacts'
@@ -22,15 +23,9 @@ import {
 import { setRecipientCache } from 'src/send/actions'
 import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
-import {
-  contactsToRecipients,
-  NumberToRecipient,
-  Recipient,
-  RecipientKind,
-} from 'src/utils/recipient'
+import { contactsToRecipients, NumberToRecipient, Recipient } from 'src/utils/recipient'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
-
 const TAG = 'identity/contactMapping'
 const MAPPING_CHUNK_SIZE = 50
 
