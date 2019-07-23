@@ -1,7 +1,9 @@
 import { StyleSheet, View } from 'react-native'
+import { RequestType } from '../../server/FirebaseClient'
+
 import AppLogo from 'src/download/AppLogo'
-import Invite from 'src/download/Invite'
 import PhoneIllo from 'src/download/PhoneIllo'
+import RequestFunds from 'src/fauceting/RequestFunds'
 import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
@@ -39,7 +41,7 @@ export default withScreenSize(
             >
               {t('coverSubTitle')}
             </H4>
-            <Invite />
+            <RequestFunds kind={RequestType.Invite} />
           </View>
           <View
             style={[
