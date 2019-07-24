@@ -69,6 +69,7 @@ const defaultConfig = {
 }
 
 const linkedLibraries = {
+  FixidityLib: ['SortedOracles', 'SortedFractionMedianList'],
   LinkedList: ['AddressLinkedList', 'SortedLinkedList'],
   SortedLinkedList: ['AddressSortedLinkedList', 'IntegerSortedLinkedList'],
   AddressLinkedList: ['Validators'],

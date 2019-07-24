@@ -133,7 +133,7 @@ module.exports = async (callback: (error?: any) => number) => {
       elements
     )
     // Report it
-    await oracles.report(stableToken.address, numerator, denominator, lesserKey, greaterKey)
+    await oracles.report(stableToken.address, numerator, lesserKey, greaterKey)
     callback()
   } catch (error) {
     callback(error)

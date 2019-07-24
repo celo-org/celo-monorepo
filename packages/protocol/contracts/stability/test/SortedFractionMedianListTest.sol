@@ -10,26 +10,24 @@ contract SortedFractionMedianListTest {
 
   function insert(
     address key,
-    uint128 numerator,
-    uint128 denominator,
+    int256 value,
     address lesserKey,
     address greaterKey
   )
     external
   {
-    list.insert(key, numerator, denominator, lesserKey, greaterKey);
+    list.insert(key, value, lesserKey, greaterKey);
   }
 
   function update(
     address key,
-    uint128 numerator,
-    uint128 denominator,
+    int256 value,
     address lesserKey,
     address greaterKey
   )
     external
   {
-    list.update(key, numerator, denominator, lesserKey, greaterKey);
+    list.update(key, value, lesserKey, greaterKey);
   }
 
   function remove(address key) external {
@@ -48,9 +46,8 @@ contract SortedFractionMedianListTest {
     external
     view
     returns (
-        address[] memory, 
-        uint256[] memory, 
-        uint256[] memory, 
+        address[] memory,
+        int256[] memory,
         SortedFractionMedianList.MedianRelation[] memory
     )
   {

@@ -1,6 +1,11 @@
 import { assertRevert, assertSameAddress, NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
+import { toFixed } from '@celo/protocol/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { SortedFractionMedianListTestContract, SortedFractionMedianListTestInstance } from 'types'
+
+// Almost never use exponential notation in toString
+// http://mikemcl.github.io/bignumber.js/#exponential-at
+BigNumber.config({ EXPONENTIAL_AT: 1e9 })
 
 const SortedFractionMedianListTest: SortedFractionMedianListTestContract = artifacts.require(
   'SortedFractionMedianListTest'
@@ -20,114 +25,60 @@ contract('SortedFractionMedianListTest', (accounts: string[]) => {
 
   describe('#insert()', () => {
     const key = accounts[9]
-    const numerator = 2
-    const denominator = 1
+    const value = toFixed(2)
+
     it('should add a single element to the list', async () => {
-      await sortedFractionMedianListTest.insert(
-        key,
-        numerator,
-        denominator,
-        NULL_ADDRESS,
-        NULL_ADDRESS
-      )
+      await sortedFractionMedianListTest.insert(key, value, NULL_ADDRESS, NULL_ADDRESS)
       assert.isTrue(await sortedFractionMedianListTest.contains(key))
-      const [keys, numerators, denominators] = await sortedFractionMedianListTest.getElements()
+      const [keys, values] = await sortedFractionMedianListTest.getElements()
       assert.equal(keys.length, 1)
-      assert.equal(numerators.length, 1)
-      assert.equal(denominators.length, 1)
+      assert.equal(values.length, 1)
       assert.equal(keys[0], key)
-      assert.equal(numerators[0].toNumber(), numerator)
-      assert.equal(denominators[0].toNumber(), denominator)
+      assert.isTrue(values[0].eq(value))
     })
 
     it('should increment numElements', async () => {
-      await sortedFractionMedianListTest.insert(
-        key,
-        numerator,
-        denominator,
-        NULL_ADDRESS,
-        NULL_ADDRESS
-      )
+      await sortedFractionMedianListTest.insert(key, value, NULL_ADDRESS, NULL_ADDRESS)
       assert.equal((await sortedFractionMedianListTest.getNumElements()).toNumber(), 1)
     })
 
     it('should update the head', async () => {
-      await sortedFractionMedianListTest.insert(
-        key,
-        numerator,
-        denominator,
-        NULL_ADDRESS,
-        NULL_ADDRESS
-      )
+      await sortedFractionMedianListTest.insert(key, value, NULL_ADDRESS, NULL_ADDRESS)
       assert.equal(await sortedFractionMedianListTest.head(), key)
     })
 
     it('should update the tail', async () => {
-      await sortedFractionMedianListTest.insert(
-        key,
-        numerator,
-        denominator,
-        NULL_ADDRESS,
-        NULL_ADDRESS
-      )
+      await sortedFractionMedianListTest.insert(key, value, NULL_ADDRESS, NULL_ADDRESS)
       assert.equal(await sortedFractionMedianListTest.tail(), key)
     })
 
     it('should update the median', async () => {
-      await sortedFractionMedianListTest.insert(
-        key,
-        numerator,
-        denominator,
-        NULL_ADDRESS,
-        NULL_ADDRESS
-      )
+      await sortedFractionMedianListTest.insert(key, value, NULL_ADDRESS, NULL_ADDRESS)
       assert.equal(await sortedFractionMedianListTest.medianKey(), key)
     })
 
     it('should revert if key is 0', async () => {
       await assertRevert(
-        sortedFractionMedianListTest.insert(
-          NULL_ADDRESS,
-          numerator,
-          denominator,
-          NULL_ADDRESS,
-          NULL_ADDRESS
-        )
+        sortedFractionMedianListTest.insert(NULL_ADDRESS, value, NULL_ADDRESS, NULL_ADDRESS)
       )
     })
 
     it('should revert if lesser is equal to key', async () => {
-      await assertRevert(
-        sortedFractionMedianListTest.insert(key, numerator, denominator, key, NULL_ADDRESS)
-      )
+      await assertRevert(sortedFractionMedianListTest.insert(key, value, key, NULL_ADDRESS))
     })
 
     it('should revert if greater is equal to key', async () => {
-      await assertRevert(
-        sortedFractionMedianListTest.insert(key, numerator, denominator, NULL_ADDRESS, key)
-      )
+      await assertRevert(sortedFractionMedianListTest.insert(key, value, NULL_ADDRESS, key))
     })
 
     describe('when an element is already in the list', () => {
       beforeEach(async () => {
-        await sortedFractionMedianListTest.insert(
-          key,
-          numerator,
-          denominator,
-          NULL_ADDRESS,
-          NULL_ADDRESS
-        )
+        await sortedFractionMedianListTest.insert(key, value, NULL_ADDRESS, NULL_ADDRESS)
       })
 
       it('should revert when inserting an element already in the list', async () => {
         await assertRevert(
-          sortedFractionMedianListTest.insert(
-            key,
-            numerator,
-            denominator,
-            NULL_ADDRESS,
-            NULL_ADDRESS
-          )
+          sortedFractionMedianListTest.insert(key, value, NULL_ADDRESS, NULL_ADDRESS)
         )
       })
     })
@@ -135,75 +86,42 @@ contract('SortedFractionMedianListTest', (accounts: string[]) => {
 
   describe('#update()', () => {
     const key = accounts[9]
-    const numerator = 2
-    const denominator = 1
-    const newNumerator = 3
-    const newDenominator = 3
+    const value = toFixed(2)
+    const newValue = toFixed(3)
     beforeEach(async () => {
-      await sortedFractionMedianListTest.insert(
-        key,
-        numerator,
-        denominator,
-        NULL_ADDRESS,
-        NULL_ADDRESS
-      )
+      await sortedFractionMedianListTest.insert(key, value, NULL_ADDRESS, NULL_ADDRESS)
     })
 
     it('should update the value for an existing element', async () => {
-      await sortedFractionMedianListTest.update(
-        key,
-        newNumerator,
-        newDenominator,
-        NULL_ADDRESS,
-        NULL_ADDRESS
-      )
+      await sortedFractionMedianListTest.update(key, newValue, NULL_ADDRESS, NULL_ADDRESS)
       assert.isTrue(await sortedFractionMedianListTest.contains(key))
-      const [keys, numerators, denominators] = await sortedFractionMedianListTest.getElements()
+      const [keys, values] = await sortedFractionMedianListTest.getElements()
       assert.equal(keys.length, 1)
-      assert.equal(numerators.length, 1)
-      assert.equal(denominators.length, 1)
+      assert.equal(values.length, 1)
       assert.equal(keys[0], key)
-      assert.equal(numerators[0].toNumber(), newNumerator)
-      assert.equal(denominators[0].toNumber(), newDenominator)
+      assert.isTrue(values[0].eq(newValue))
     })
 
     it('should revert if the key is not in the list', async () => {
       await assertRevert(
-        sortedFractionMedianListTest.update(
-          accounts[8],
-          newNumerator,
-          newDenominator,
-          NULL_ADDRESS,
-          NULL_ADDRESS
-        )
+        sortedFractionMedianListTest.update(accounts[8], newValue, NULL_ADDRESS, NULL_ADDRESS)
       )
     })
 
     it('should revert if lesser is equal to key', async () => {
-      await assertRevert(
-        sortedFractionMedianListTest.update(key, newNumerator, newDenominator, key, NULL_ADDRESS)
-      )
+      await assertRevert(sortedFractionMedianListTest.update(key, newValue, key, NULL_ADDRESS))
     })
 
     it('should revert if greater is equal to key', async () => {
-      await assertRevert(
-        sortedFractionMedianListTest.update(key, newNumerator, newDenominator, NULL_ADDRESS, key)
-      )
+      await assertRevert(sortedFractionMedianListTest.update(key, newValue, NULL_ADDRESS, key))
     })
   })
 
   describe('#remove()', () => {
     const key = accounts[9]
-    const numerator = 2
-    const denominator = 1
+    const value = toFixed(2)
     beforeEach(async () => {
-      await sortedFractionMedianListTest.insert(
-        key,
-        numerator,
-        denominator,
-        NULL_ADDRESS,
-        NULL_ADDRESS
-      )
+      await sortedFractionMedianListTest.insert(key, value, NULL_ADDRESS, NULL_ADDRESS)
     })
 
     it('should remove the element from the list', async () => {
@@ -239,8 +157,7 @@ contract('SortedFractionMedianListTest', (accounts: string[]) => {
   describe('when there are multiple inserts, updates, and removals', () => {
     interface SortedElement {
       key: string
-      numerator: BigNumber
-      denominator: BigNumber
+      value: BigNumber
     }
 
     enum SortedListActionType {
@@ -287,34 +204,23 @@ contract('SortedFractionMedianListTest', (accounts: string[]) => {
           actionType: action,
           element: {
             key,
-            numerator: BigNumber.random(20).shiftedBy(20),
-            denominator: BigNumber.random(20).shiftedBy(20),
+            value: toFixed(BigNumber.random(20).shiftedBy(20)),
           },
         })
       }
       return sequence
     }
 
-    const parseElements = (
-      keys: string[],
-      numerators: BigNumber[],
-      denominators: BigNumber[]
-    ): SortedElement[] =>
+    const parseElements = (keys: string[], values: BigNumber[]): SortedElement[] =>
       keys.map((key, i) => ({
         key: key.toLowerCase(),
-        numerator: numerators[i],
-        denominator: denominators[i],
+        value: values[i],
       }))
 
     const assertSorted = (elements: SortedElement[]) => {
       for (let i = 0; i < elements.length; i++) {
         if (i > 0) {
-          assert.isTrue(
-            elements[i].numerator
-              .div(elements[i].denominator)
-              .lte(elements[i - 1].numerator.div(elements[i - 1].denominator)),
-            'Elements not sorted'
-          )
+          assert.isTrue(elements[i].value.lte(elements[i - 1].value), 'Elements not sorted')
         }
       }
     }
@@ -342,13 +248,13 @@ contract('SortedFractionMedianListTest', (accounts: string[]) => {
     }
 
     const assertSortedFractionListInvariants = async (
-      elementsPromise: Promise<[string[], BigNumber[], BigNumber[], BigNumber[]]>,
+      elementsPromise: Promise<[string[], BigNumber[], BigNumber[]]>,
       numElementsPromise: Promise<BigNumber>,
       medianPromise: Promise<string>,
       expectedKeys: Set<string>
     ) => {
-      const [keys, numerators, denominators, relations] = await elementsPromise
-      const elements = parseElements(keys, numerators, denominators)
+      const [keys, values, relations] = await elementsPromise
+      const elements = parseElements(keys, values)
       assert.equal(
         (await numElementsPromise).toNumber(),
         expectedKeys.size,
@@ -392,8 +298,7 @@ contract('SortedFractionMedianListTest', (accounts: string[]) => {
             if (action.actionType === SortedListActionType.Insert) {
               await sortedFractionMedianListTest.insert(
                 action.element.key,
-                action.element.numerator,
-                action.element.denominator,
+                action.element.value,
                 lesser,
                 greater
               )
@@ -401,8 +306,7 @@ contract('SortedFractionMedianListTest', (accounts: string[]) => {
             } else if (action.actionType === SortedListActionType.Update) {
               await sortedFractionMedianListTest.update(
                 action.element.key,
-                action.element.numerator,
-                action.element.denominator,
+                action.element.value,
                 lesser,
                 greater
               )
@@ -431,23 +335,23 @@ contract('SortedFractionMedianListTest', (accounts: string[]) => {
       const numActions = 100
       const numKeys = 20
       const getLesserAndGreater = async (element: SortedElement) => {
-        const [keys, numerators, denominators] = await sortedFractionMedianListTest.getElements()
-        const elements = parseElements(keys, numerators, denominators)
+        const [keys, values] = await sortedFractionMedianListTest.getElements()
+        const elements = parseElements(keys, values)
         let lesser = NULL_ADDRESS
         let greater = NULL_ADDRESS
-        const value = element.numerator.div(element.denominator)
+        const value = element.value
         // Iterate from each end of the list towards the other end, saving the key with the
         // smallest value >= `value` and the key with the largest value <= `value`.
         for (let i = 0; i < elements.length; i++) {
           if (elements[i].key !== element.key.toLowerCase()) {
-            if (elements[i].numerator.div(elements[i].denominator).gte(value)) {
+            if (elements[i].value.gte(value)) {
               greater = elements[i].key
             }
           }
           const j = elements.length - i - 1
 
           if (elements[j].key !== element.key.toLowerCase()) {
-            if (elements[j].numerator.div(elements[j].denominator).lte(value)) {
+            if (elements[j].value.lte(value)) {
               lesser = elements[j].key
             }
           }

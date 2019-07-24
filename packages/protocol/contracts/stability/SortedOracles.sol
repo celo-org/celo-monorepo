@@ -1,5 +1,6 @@
 pragma solidity ^0.5.8;
 
+import "fixidity/contracts/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./SortedFractionMedianList.sol";
@@ -7,10 +8,12 @@ import "./interfaces/ISortedOracles.sol";
 import "../common/Initializable.sol";
 
 
+// TODO: don't treat timestamps as Fixidity values
 /**
  * @title Maintains a sorted list of oracle exchange rates between Celo Gold and other currencies.
  */
 contract SortedOracles is ISortedOracles, Ownable, Initializable {
+  using FixidityLib for int256;
   using SafeMath for uint256;
   using SafeMath for uint128;
   using SortedFractionMedianList for SortedFractionMedianList.List;
@@ -38,8 +41,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     address token,
     address oracle,
     uint256 timestamp,
-    uint128 numerator,
-    uint128 denominator
+    int256 value
   );
 
   event OracleReportRemoved(
@@ -49,8 +51,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
 
   event MedianUpdated(
     address token,
-    uint128 numerator,
-    uint128 denominator
+    int256 value
   );
 
   event ReportExpirySet(
@@ -125,7 +126,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     );
     for (uint256 i = 0; i < n; i++) {
       address oldest = timestamps[token].tail;
-      uint128 timestamp = timestamps[token].elements[oldest].numerator;
+      uint128 timestamp = uint128(timestamps[token].elements[oldest].value.fromFixed());
       // solhint-disable-next-line not-rely-on-time
       if (uint128(now).sub(timestamp) >= uint128(reportExpirySeconds)) {
         removeReport(token, oldest);
@@ -138,8 +139,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   /**
    * @notice Updates an oracle value and the median.
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
-   * @param numerator The amount of tokens equal to `denominator` Celo Gold.
-   * @param denominator The amount of Celo Gold equal to `numerator` tokens.
+   * @param value The amount of tokens equal to `denominator` Celo Gold.
    * @param lesserKey The element which should be just left of the new oracle value.
    * @param greaterKey The element which should be just right of the new oracle value.
    * @dev Values are passed as uint128 to avoid uint256 overflow when multiplying.
@@ -147,8 +147,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    */
   function report(
     address token,
-    uint128 numerator,
-    uint128 denominator,
+    int256 value,
     address lesserKey,
     address greaterKey
   )
@@ -156,17 +155,16 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     onlyOracle(token)
   {
     SortedFractionMedianList.Element memory originalMedian = getMedianElement(rates[token]);
-    rates[token].insertOrUpdate(msg.sender, numerator, denominator, lesserKey, greaterKey);
+    rates[token].insertOrUpdate(msg.sender, value, lesserKey, greaterKey);
     timestamps[token].insertOrUpdate(
       msg.sender,
       // solhint-disable-next-line not-rely-on-time
-      uint128(now),
-      1,
+      FixidityLib.newFixed(uint128(now)),
       getLesserTimestampKey(token, msg.sender),
       address(0)
     );
     // solhint-disable-next-line not-rely-on-time
-    emit OracleReported(token, msg.sender, now, numerator, denominator);
+    emit OracleReported(token, msg.sender, now, value);
     emitIfMedianUpdated(token, originalMedian);
   }
 
@@ -186,7 +184,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    */
   function medianRate(address token) external view returns (uint128, uint128) {
     SortedFractionMedianList.Element memory median = getMedianElement(rates[token]);
-    return (median.numerator, median.denominator);
+    return (uint128(median.value.fromFixed()), uint128(FixidityLib.fixed1()));
   }
 
   /**
@@ -201,8 +199,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     view
     returns (
         address[] memory,
-        uint256[] memory,
-        uint256[] memory,
+        int256[] memory,
         SortedFractionMedianList.MedianRelation[] memory
     )
   {
@@ -224,7 +221,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @return The median report timestamp for `token`.
    */
   function medianTimestamp(address token) external view returns (uint128) {
-    return getMedianElement(timestamps[token]).numerator;
+    return uint128(getMedianElement(timestamps[token]).value.fromFixed());
   }
 
   /**
@@ -239,8 +236,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     view
     returns (
         address[] memory,
-        uint256[] memory,
-        uint256[] memory,
+        int256[] memory,
         SortedFractionMedianList.MedianRelation[] memory
     )
   {
@@ -253,8 +249,8 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @param oracle The oracle whose report should be checked.
    */
   function reportExists(address token, address oracle) internal view returns (bool) {
-    return rates[token].elements[oracle].denominator != 0 &&
-      timestamps[token].elements[oracle].denominator != 0;
+    return rates[token].elements[oracle].value != 0 &&
+      timestamps[token].elements[oracle].value != 0;
   }
 
   /**
@@ -298,13 +294,11 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   {
     SortedFractionMedianList.Element memory newMedian = getMedianElement(rates[token]);
     if (
-      originalMedian.numerator != newMedian.numerator ||
-      originalMedian.denominator != newMedian.denominator
+      originalMedian.value != newMedian.value
     ) {
       emit MedianUpdated(
         token,
-        newMedian.numerator,
-        newMedian.denominator
+        newMedian.value
       );
     }
   }

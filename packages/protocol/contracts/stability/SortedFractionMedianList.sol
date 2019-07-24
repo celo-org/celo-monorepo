@@ -1,10 +1,10 @@
 pragma solidity ^0.5.8;
 
 
+import "fixidity/contracts/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../common/Initializable.sol";
-import "./FractionUtil.sol";
 
 
 // TODO(asa): Inherit from SortedLinkedList or AddressSortedLinkedList
@@ -14,7 +14,7 @@ import "./FractionUtil.sol";
 library SortedFractionMedianList {
 
   using SafeMath for uint256;
-  using FractionUtil for FractionUtil.Fraction;
+  using FixidityLib for int256;
 
   enum MedianRelation {
     Undefined,
@@ -30,8 +30,7 @@ library SortedFractionMedianList {
   }
 
   struct Element {
-    uint128 numerator;
-    uint128 denominator;
+    int256 value;
     address lesserKey;
     address greaterKey;
     MedianRelation relation;
@@ -48,8 +47,7 @@ library SortedFractionMedianList {
   /**
    * @notice Updates an element in the list, inserting if the key is new.
    * @param key The key of the element to update or insert.
-   * @param numerator The element value numerator.
-   * @param denominator The element value denominator.
+   * @param value The element Fixidity value.
    * @param lesserKey The key of the element which should be just left of the new value.
    * @param greaterKey The key of the element which should be just right of the new value.
    * @dev Values are passed as uint128 to avoid uint256 overflow when multiplying.
@@ -58,33 +56,30 @@ library SortedFractionMedianList {
   function insertOrUpdate(
     List storage list,
     address key,
-    uint128 numerator,
-    uint128 denominator,
+    int256 value,
     address lesserKey,
     address greaterKey
   )
     public
   {
     if (contains(list, key)) {
-      update(list, key, numerator, denominator, lesserKey, greaterKey);
+      update(list, key, value, lesserKey, greaterKey);
     } else {
-      insert(list, key, numerator, denominator, lesserKey, greaterKey);
+      insert(list, key, value, lesserKey, greaterKey);
     }
   }
 
   /**
    * @notice Inserts an element into a doubly linked list and updates the median.
    * @param key The key of the element to insert.
-   * @param numerator The element value numerator.
-   * @param denominator The element value denominator.
+   * @param value The element Fixidity value.
    * @param lesserKey The key of the element to less than the element to insert.
    * @param greaterKey The key of the element greaterKey than the element to insert.
    */
   function insert(
     List storage list,
     address key,
-    uint128 numerator,
-    uint128 denominator,
+    int256 value,
     address lesserKey,
     address greaterKey
   )
@@ -101,12 +96,11 @@ library SortedFractionMedianList {
     require(contains(list, greaterKey) || greaterKey == address(0));
     (lesserKey, greaterKey) = getLesserAndGreater(
       list,
-      numerator,
-      denominator,
+      value,
       lesserKey,
       greaterKey
     );
-    _insert(list, element, key, numerator, denominator, lesserKey, greaterKey);
+    _insert(list, element, key, value, lesserKey, greaterKey);
   }
 
   /**
@@ -157,8 +151,7 @@ library SortedFractionMedianList {
 
   /**
    * @notice Updates an element in the list.
-   * @param numerator The element value numerator.
-   * @param denominator The element value denominator.
+   * @param value The element Fixidity value.
    * @param lesserKey The key of the element which should be just left of the new value.
    * @param greaterKey The key of the element which should be just right of the new value.
    * @dev Values are passed as uint128 to avoid uint256 overflow when multiplying.
@@ -167,8 +160,7 @@ library SortedFractionMedianList {
   function update(
     List storage list,
     address key,
-    uint128 numerator,
-    uint128 denominator,
+    int256 value,
     address lesserKey,
     address greaterKey
   )
@@ -186,12 +178,11 @@ library SortedFractionMedianList {
     remove(list, key);
     (lesserKey, greaterKey) = getLesserAndGreater(
       list,
-      numerator,
-      denominator,
+      value,
       lesserKey,
       greaterKey
     );
-    _insert(list, element, key, numerator, denominator, lesserKey, greaterKey);
+    _insert(list, element, key, value, lesserKey, greaterKey);
   }
 
   /**
@@ -213,30 +204,27 @@ library SortedFractionMedianList {
   )
     public
     view
-    returns (address[] memory, uint256[] memory, uint256[] memory, MedianRelation[] memory)
+    returns (address[] memory, int256[] memory, MedianRelation[] memory)
   {
     uint256 length = list.numElements;
     address[] memory addresses = new address[](length);
-    uint256[] memory numerators = new uint256[](length);
-    uint256[] memory denominators = new uint256[](length);
+    int256[] memory values = new int256[](length);
     MedianRelation[] memory relations = new MedianRelation[](length);
     address key = list.head;
     for (uint256 i = 0; i < length; i = i.add(1)) {
       Element storage element = list.elements[key];
       addresses[i] = key;
-      numerators[i] = element.numerator;
-      denominators[i] = element.denominator;
+      values[i] = element.value;
       relations[i] = element.relation;
       key = element.lesserKey;
     }
-    return (addresses, numerators, denominators, relations);
+    return (addresses, values, relations);
   }
 
   // TODO(asa): Gas optimizations by passing in elements to isValueBetween
   /**
    * @notice Returns the keys of the elements greaterKey than and less than the provided value.
-   * @param numerator The element value numerator.
-   * @param denominator The element value denominator.
+   * @param value The element Fixidity value.
    * @param lesserKey The key of the element which could be just left of the new value.
    * @param greaterKey The key of the element which could be just right of the new value.
    * @return The correct lesserKey/greaterKey keys.
@@ -244,8 +232,7 @@ library SortedFractionMedianList {
    */
   function getLesserAndGreater(
     List storage list,
-    uint128 numerator,
-    uint128 denominator,
+    int256 value,
     address lesserKey,
     address greaterKey
   )
@@ -259,20 +246,20 @@ library SortedFractionMedianList {
     //   3. The value is just greater than the value for `lesserKey`
     //   4. The value is just less than the value for `greaterKey`
     if (lesserKey == address(0) && 
-        isValueBetween(list, numerator, denominator, lesserKey, list.tail)) 
+        isValueBetween(list, value, lesserKey, list.tail)) 
     {
       return (lesserKey, list.tail);
     } else if (
       greaterKey == address(0) &&
-      isValueBetween(list, numerator, denominator, list.head, greaterKey)
+      isValueBetween(list, value, list.head, greaterKey)
     ) {
       return (list.head, greaterKey);
     } else if (
-      isValueBetween(list, numerator, denominator, lesserKey, list.elements[lesserKey].greaterKey)
+      isValueBetween(list, value, lesserKey, list.elements[lesserKey].greaterKey)
     ) {
       return (lesserKey, list.elements[lesserKey].greaterKey);
     } else if (
-      isValueBetween(list, numerator, denominator, list.elements[greaterKey].lesserKey, greaterKey)
+      isValueBetween(list, value, list.elements[greaterKey].lesserKey, greaterKey)
     ) {
       return (list.elements[greaterKey].lesserKey, greaterKey);
     } else {
@@ -283,16 +270,14 @@ library SortedFractionMedianList {
 
   /**
    * @notice Returns whether or not a given element is between two other elements.
-   * @param numerator The element value numerator.
-   * @param denominator The element value denominator.
+   * @param value The element Fixidity value.
    * @param lesserKey The key of the element whose value should be lesserKey.
    * @param greaterKey The key of the element whose value should be greaterKey.
    * @return True if the given element is between the two other elements.
    */
   function isValueBetween(
     List storage list,
-    uint128 numerator,
-    uint128 denominator,
+    int256 value,
     address lesserKey,
     address greaterKey
   )
@@ -300,22 +285,10 @@ library SortedFractionMedianList {
     view
     returns (bool)
   {
-    Element storage lesserElement = list.elements[lesserKey];
-    Element storage greaterElement = list.elements[greaterKey];
-    FractionUtil.Fraction memory lesserValue = FractionUtil.Fraction(
-      lesserElement.numerator,
-      lesserElement.denominator
-    );
-    FractionUtil.Fraction memory greaterValue = FractionUtil.Fraction(
-      greaterElement.numerator,
-      greaterElement.denominator
-    );
-    FractionUtil.Fraction memory elementValue = FractionUtil.Fraction(
-      numerator,
-      denominator
-    );
-    bool isLesser = lesserKey == address(0) || lesserValue.isLessThanOrEqualTo(elementValue);
-    bool isGreater = greaterKey == address(0) || greaterValue.isGreaterThanOrEqualTo(elementValue);
+    int256 lesserValue = list.elements[lesserKey].value;
+    int256 greaterValue = list.elements[greaterKey].value;
+    bool isLesser = lesserKey == address(0) || lesserValue <= value;
+    bool isGreater = greaterKey == address(0) || greaterValue >= value;
     return isLesser && isGreater;
   }
 
@@ -338,8 +311,7 @@ library SortedFractionMedianList {
   /**
    * @notice Inserts an element into a doubly linked list and updates the median.
    * @param key The key of the element to insert.
-   * @param numerator The element value numerator.
-   * @param denominator The element value denominator.
+   * @param value The element Fixidity value.
    * @param lesserKey The key of the element to less than the element to insert.
    * @param greaterKey The key of the element greaterKey than the element to insert.
    */
@@ -347,15 +319,13 @@ library SortedFractionMedianList {
     List storage list,
     Element storage element,
     address key,
-    uint128 numerator,
-    uint128 denominator,
+    int256 value,
     address lesserKey,
     address greaterKey
   )
     private
   {
-    element.numerator = numerator;
-    element.denominator = denominator;
+    element.value = value;
     element.lesserKey = lesserKey;
     element.greaterKey = greaterKey;
 
