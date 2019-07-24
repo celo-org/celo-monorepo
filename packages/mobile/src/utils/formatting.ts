@@ -10,7 +10,9 @@ export const getMoneyDisplayValue = (value: number | string | BigNumber, decimal
 
 export const getLocalDisplayValue = (value: number | string | BigNumber, decimals: number = 2) => {
   const localValue = new BigNumber(DOLLAR_TO_PH).times(value)
-  return numeral(roundedDownNumber(localValue, decimals)).format('0,0.' + '0'.repeat(decimals))
+  return numeral(localValue.decimalPlaces(decimals, BigNumber.ROUND_HALF_DOWN)).format(
+    '0,0.' + '0'.repeat(decimals)
+  )
 }
 
 // like getMoneyDisplayValue but only returns cents if they are sigificant
