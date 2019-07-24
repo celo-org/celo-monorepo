@@ -18,7 +18,7 @@ import { faucetIcon, inviteVerifyFee } from 'src/images/Images'
 import { Invitees } from 'src/invite/actions'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes, TransferStandby } from 'src/transactions/reducer'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
+import { getLocalDisplayValue } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/utils/recipient'
 import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
@@ -225,7 +225,7 @@ export class TransferFeedItem extends React.PureComponent<Props> {
               <Text style={[fontStyles.activityCurrency, { color: currencyStyle.color }]}>
                 {currencyStyle.direction}
                 {currencyStyle.symbol}
-                {getMoneyDisplayValue(this.props.value)}
+                {getLocalDisplayValue(this.props.value)}
               </Text>
             </View>
           </View>
