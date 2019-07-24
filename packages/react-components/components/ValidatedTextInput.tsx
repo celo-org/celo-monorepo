@@ -37,7 +37,7 @@ interface CustomValidatorProps {
   onChangePhoneNumber?: PhoneValidatorProps['onChangePhoneNumber']
 }
 
-type ValidatorProps = PhoneValidatorProps | NumberValidatorProps | CustomValidatorProps
+export type ValidatorProps = PhoneValidatorProps | NumberValidatorProps | CustomValidatorProps
 
 interface RefProps {
   innerRef?: React.RefObject<TextInput>

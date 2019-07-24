@@ -379,18 +379,20 @@ export class SendAmount extends React.PureComponent<Props, State> {
             title={'$'}
             placeholder={t('amount')}
             labelStyle={style.amountLabel as TextStyle}
-            placeholderColor={colors.celoGreenInactive}
+            placeholderTextColor={colors.celoGreenInactive}
+            autocorrect={false}
             value={this.state.amount}
-            onValueChanged={this.onAmountChanged}
+            onChangeText={this.onAmountChanged}
             autoFocus={true}
             numberOfDecimals={this.state.numberOfDecimals}
+            validator="decimal"
           />
           <LabeledTextInput
             keyboardType="default"
             title={t('for')}
             placeholder={t('groceriesRent')}
             value={this.state.reason}
-            onValueChanged={this.onReasonChanged}
+            onChangeText={this.onReasonChanged}
           />
         </KeyboardAwareScrollView>
         {this.renderBottomContainer(amountIsValid, userHasEnough)}
