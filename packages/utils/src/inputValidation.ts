@@ -20,9 +20,11 @@ export function validateDecimal(input: string): string {
 }
 
 export function validatePhone(input: string, countryCallingCode: string): string {
-  // should this remove everything other than numbers? or allow people to type ()-
-  // don't think its worth formatting as its typed since different locations have different formats
-  input = input.replace(/[^0-9()-]/g, '')
+  input = input.replace(/[^0-9()- ]/g, '')
+  if (!countryCallingCode) {
+    return input
+  }
+
   const displayNumber = getDisplayPhoneNumber(input, countryCallingCode)
 
   if (!displayNumber) {
@@ -43,7 +45,8 @@ export function validateInput(input: string, props: BaseProps): string {
     case 'integer':
       return validateInteger(input)
     case 'phone':
-      if (!props.countryCallingCode) {
+      // countryCallingCode should be defined but it can be an empty string: no falsy null check
+      if (props.countryCallingCode === undefined) {
         throw new Error('countryCallingCode is not defined')
       }
       return validatePhone(input, props.countryCallingCode)
