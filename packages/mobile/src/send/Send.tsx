@@ -4,7 +4,7 @@ import { componentStyles } from '@celo/react-components/styles/styles'
 import { throttle } from 'lodash'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { NavigationInjectedProps, NavigationScreenProps, withNavigation } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
@@ -190,14 +190,21 @@ class Send extends React.Component<Props, State> {
 
     return (
       <View style={style.body}>
-        <RecipientPicker
-          sections={sections}
-          searchQuery={searchQuery}
-          defaultCountryCode={defaultCountryCode}
-          onSelectRecipient={this.onSelectRecipient}
-          onSearchQueryChanged={this.onSearchQueryChanged}
-          showQRCode={true}
-        />
+        {loading ? (
+          <View style={style.container}>
+            <ActivityIndicator style={style.icon} size="large" color={colors.celoGreen} />
+            <Text style={[fontStyles.bodySecondary]}>{t('loadingContacts')}</Text>
+          </View>
+        ) : (
+          <RecipientPicker
+            sections={sections}
+            searchQuery={searchQuery}
+            defaultCountryCode={defaultCountryCode}
+            onSelectRecipient={this.onSelectRecipient}
+            onSearchQueryChanged={this.onSearchQueryChanged}
+            showQRCode={true}
+          />
+        )}
       </View>
     )
   }

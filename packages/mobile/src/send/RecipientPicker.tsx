@@ -9,6 +9,7 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import {
   ListRenderItemInfo,
+  SectionList,
   SectionListData,
   StyleSheet,
   Text,
@@ -18,6 +19,7 @@ import {
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import LabeledTextInput from 'src/send/LabeledTextInput'
 import RecipientItem from 'src/send/RecipientItem'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { Recipient, RecipientKind, RecipientWithMobileNumber } from 'src/utils/recipient'
@@ -138,7 +140,23 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     return (
       <View style={style.body}>
         <DisconnectBanner />
+        <LabeledTextInput
+          keyboardType="default"
+          placeholder={t('nameOrPhoneNumber')}
+          value={this.props.searchQuery}
+          onValueChanged={this.props.onSearchQueryChanged}
+        />
         {this.props.showQRCode && <QRCodeCTA t={t} />}
+        <SectionList
+          renderItem={this.renderItem}
+          renderSectionHeader={this.renderSectionHeader}
+          sections={sections}
+          ItemSeparatorComponent={this.renderItemSeparator}
+          ListFooterComponent={showFooter ? this.renderFooter : undefined}
+          ListEmptyComponent={this.renderEmptyView}
+          keyExtractor={this.keyExtractor}
+          initialNumToRender={30}
+        />
       </View>
     )
   }
