@@ -175,7 +175,7 @@ spec:
         - name: FAULTY_NODE_TYPE
           value: {{ .Values.geth.faultyValidatorType | quote }}
         - name: STATIC_IPS_FOR_GETH_NODES
-          value: "{{ default "false" .Values.geth.static_ips }}"
+          value: "{{ default false .Values.geth.static_ips }}"
         ports:
         - name: discovery-udp
           containerPort: 30303

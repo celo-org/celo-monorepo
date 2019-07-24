@@ -1,4 +1,4 @@
-{{ if or (not (eq (.Values.geth.validators | toString) "og")) ($.Values.geth.static_ips) }}
+{{ if and (not (eq (.Values.geth.validators | toString) "og")) .Values.geth.static_ips }}
 {{ range $index, $e := until (.Values.geth.validators | int) }}
 
 kind: Service
