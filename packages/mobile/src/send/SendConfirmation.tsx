@@ -13,6 +13,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
+import { DOLLAR_TO_PH } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { InviteBy } from 'src/invite/actions'
 import { navigateBack } from 'src/navigator/NavigationService'
@@ -184,6 +185,7 @@ class SendConfirmation extends React.Component<Props, State> {
     const amountWithFees = new BigNumber(numeral(amount).value()).plus(
       this.props.suggestedFeeDollars
     )
+    const foreignAmount = amount.times(DOLLAR_TO_PH)
     const userHasEnough = amountWithFees.isLessThanOrEqualTo(currentBalance)
     const { isPaymentRequest } = this.getNavParams()
     let primaryBtnInfo = {

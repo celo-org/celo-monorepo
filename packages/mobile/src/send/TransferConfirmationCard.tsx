@@ -15,7 +15,7 @@ import { RootState } from 'src/redux/reducers'
 import FeeIcon from 'src/send/FeeIcon'
 import { TransactionTypes } from 'src/transactions/reducer'
 import { getCurrencyStyles } from 'src/transactions/TransferFeedItem'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
+import { getLocalDisplayValue } from 'src/utils/formatting'
 import { Recipient } from 'src/utils/recipient'
 
 const iconSize = 40
@@ -36,7 +36,7 @@ function LineItemRow({ currencySymbol, amount, title, titleIcon }: LineItemProps
       </View>
       <Text style={style.feeText}>
         {currencySymbol}
-        {getMoneyDisplayValue(amount, 4)}
+        {getLocalDisplayValue(amount, 4)}
       </Text>
     </View>
   )
@@ -123,7 +123,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {getMoneyDisplayValue(this.props.value)}
+            {getLocalDisplayValue(this.props.value)}
           </Text>
         </View>
       )
@@ -149,7 +149,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
         <Text style={style.pSmall}>
           {t('receiveFlow8:receivedAmountFromCelo.0')}
           {currencyStyle.symbol}
-          {getMoneyDisplayValue(this.props.value)}
+          {getLocalDisplayValue(this.props.value)}
           {t('receiveFlow8:receivedAmountFromCelo.1')}
         </Text>
       )
@@ -174,7 +174,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {getMoneyDisplayValue(this.props.value)}
+              {getLocalDisplayValue(this.props.value)}
             </Text>
           </View>
         </View>
@@ -189,7 +189,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
               <Text style={style.feeText}>
                 {`${this.props.t('paymentRequestFlow:celoDollarBalance')} `}
                 <Text style={componentStyles.colorGreen}>
-                  {getMoneyDisplayValue(this.props.dollarBalance)}
+                  {getLocalDisplayValue(this.props.dollarBalance)}
                 </Text>
               </Text>
             </View>

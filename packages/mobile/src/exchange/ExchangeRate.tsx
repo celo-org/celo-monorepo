@@ -6,7 +6,7 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { Namespaces } from 'src/i18n'
-import { getExchangeDisplayValueFromBigNum } from 'src/utils/formatting'
+import { getLocalDisplayValue } from 'src/utils/formatting'
 
 interface ExchangeRateProps {
   showFinePrint?: boolean
@@ -19,7 +19,7 @@ type Props = ExchangeRateProps & WithNamespaces
 export class ExchangeRate extends React.PureComponent<Props> {
   render() {
     const { t, rate, showFinePrint } = this.props
-    const isRateValid = !rate.isZero() && rate.isFinite()
+    const isRateValid = rate.isPositive() && rate.isFinite()
     const takerToken = this.props.makerToken === Tokens.DOLLAR ? Tokens.GOLD : Tokens.DOLLAR
 
     const makerTokenCode = CURRENCIES[this.props.makerToken].code
@@ -30,8 +30,9 @@ export class ExchangeRate extends React.PureComponent<Props> {
           {isRateValid ? t('exchangeRate') : t('loadingExchangeRate')}
         </Text>
         {isRateValid && (
-          <Text style={styles.ratio}>{` ${getExchangeDisplayValueFromBigNum(
-            rate
+          <Text style={styles.ratio}>{` ${getLocalDisplayValue(
+            rate,
+            4
           )} ${makerTokenCode} : 1 ${takerTokenCode}`}</Text>
         )}
         {showFinePrint && <Text style={styles.finePrint}>{t('includeExchangeFee')}</Text>}

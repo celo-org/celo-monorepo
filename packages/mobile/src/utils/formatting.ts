@@ -1,11 +1,16 @@
 import colors from '@celo/react-components/styles/colors'
 import BigNumber from 'bignumber.js'
-import { CURRENCY_ENUM, WEI_PER_JEM } from 'src/geth/consts'
+import { CURRENCY_ENUM, DOLLAR_TO_PH, WEI_PER_JEM } from 'src/geth/consts'
 const numeral = require('numeral')
 
 // Returns a localized string that represents the number with two decimal points. The input value is parsed without consideration for the current numeral locale, i.e. it uses `.` for the decimal separator as JS usually does
 export const getMoneyDisplayValue = (value: number | string | BigNumber, decimals: number = 2) => {
   return numeral(roundedDownNumber(value, decimals)).format('0,0.' + '0'.repeat(decimals))
+}
+
+export const getLocalDisplayValue = (value: number | string | BigNumber, decimals: number = 2) => {
+  const localValue = new BigNumber(DOLLAR_TO_PH).times(value)
+  return numeral(roundedDownNumber(localValue, decimals)).format('0,0.' + '0'.repeat(decimals))
 }
 
 // like getMoneyDisplayValue but only returns cents if they are sigificant
