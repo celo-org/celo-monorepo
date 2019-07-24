@@ -89,6 +89,10 @@ export function* navigateToProperScreen() {
     navigate(Screens.EnterInviteCode)
   } else if (!askedContactsPermission) {
     navigate(Screens.ImportContacts)
+  } else if (!startedVerification) {
+    navigate(Screens.VerifyEducation)
+  } else if (!numberVerified) {
+    navigate(Screens.VerifyVerifying)
   } else {
     navigate(Stacks.AppStack)
   }
