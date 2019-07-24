@@ -22,7 +22,7 @@ import { ERROR_BANNER_DURATION } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import ExchangeRate from 'src/exchange/ExchangeRate'
 import { ExchangeRatePair } from 'src/exchange/reducer'
-import { CURRENCY_ENUM as Token } from 'src/geth/consts'
+import { CURRENCY_ENUM as Token, DOLLAR_TO_PH } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -34,13 +34,14 @@ import {
   getRateForMakerToken,
   getTakerAmount,
 } from 'src/utils/currencyExchange'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
+import { getLocalDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
 
 const numeral = require('numeral')
 
 interface State {
   makerToken: Token
   makerTokenAmount: string
+  localMakerTokenAmount: string
 }
 
 interface StateProps {
@@ -76,6 +77,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   state = {
     makerToken: Token.DOLLAR,
     makerTokenAmount: '',
+    localMakerTokenAmount: '',
   }
 
   componentDidMount() {
@@ -93,14 +95,14 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   setExchangeAmount = (amount: string) => {
     // remove $ we inserted for display purposes
     amount = amount.replace(/\₱/g, '')
-
-    this.setState({ makerTokenAmount: amount }, () => {
-      this.updateError(amount)
+    const amountInDollars = String(+amount / DOLLAR_TO_PH)
+    this.setState({ makerTokenAmount: amountInDollars, localMakerTokenAmount: amount }, () => {
+      this.updateError(amountInDollars)
     })
   }
 
-  updateError(amount: string) {
-    if (this.getMakerBalance().isLessThan(amount)) {
+  updateError(dollarAmount: string) {
+    if (this.getMakerBalance().isLessThan(dollarAmount)) {
       this.props.showError(
         this.isDollar() ? ErrorMessages.NSF_DOLLARS : ErrorMessages.NSF_GOLD,
         ERROR_BANNER_DURATION
@@ -167,7 +169,19 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 
   getFormattedMakerBalance = () => {
-    return getMoneyDisplayValue(this.getMakerBalance())
+    if (this.state.makerToken === Token.DOLLAR) {
+      return getLocalDisplayValue(this.getMakerBalance())
+    } else {
+      return getMoneyDisplayValue(this.getMakerBalance())
+    }
+  }
+
+  getFormattedTakerBalance = (takerTokenAmount: BigNumber) => {
+    if (this.state.makerToken === Token.GOLD) {
+      return getLocalDisplayValue(takerTokenAmount)
+    } else {
+      return getMoneyDisplayValue(takerTokenAmount)
+    }
   }
 
   isDollar = () => {
@@ -175,8 +189,8 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 
   inputValue = () => {
-    if (this.state.makerTokenAmount) {
-      return `${this.isDollar() ? '₱' : ''}${this.state.makerTokenAmount}`
+    if (this.state.localMakerTokenAmount) {
+      return `${this.isDollar() ? '₱' : ''}${this.state.localMakerTokenAmount}`
     } else {
       return ''
     }
@@ -203,7 +217,9 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
     const borderStyle = { borderColor: this.hasError() ? colors.errorRed : colors.dark }
 
-    const takerDisplay = `${this.isDollar() ? '' : '₱'}${getMoneyDisplayValue(takerTokenAmount)}`
+    const takerDisplay = `${this.isDollar() ? '' : '₱'}${this.getFormattedTakerBalance(
+      takerTokenAmount
+    )}`
     return (
       <View style={styles.background}>
         <View>
