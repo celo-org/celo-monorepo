@@ -5,6 +5,7 @@
     "exclude": ["types/contracts/*"]
   },
   "rules": {
-    "no-global-arrow-functions": false
+    "no-global-arrow-functions": false,
+    "no-floating-promises": true
   }
 }
