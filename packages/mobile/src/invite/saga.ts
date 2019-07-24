@@ -41,6 +41,7 @@ import { dynamicLink } from 'src/utils/dynamicLink'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { fetchGasPrice } from 'src/web3/gas'
+import { web3ReadySelector } from 'src/web3/reducer'
 import { createNewAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -218,9 +219,11 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
 
     // Check that the balance of the new account is not 0
     const StableToken = yield call(getStableTokenContract, web3)
-
+    Logger.debug(TAG + '@redeemInviteCode', 'web3 is: ' + (yield select(web3ReadySelector)))
     const stableBalance = new BigNumber(yield call(StableToken.methods.balanceOf(tempAccount).call))
     Logger.debug(TAG + '@redeemInviteCode', 'Temporary account balance: ' + stableBalance)
+
+    throw 'FAIL'
 
     if (stableBalance.isLessThan(1)) {
       // check if new user account has already been created

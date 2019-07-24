@@ -47,7 +47,7 @@ const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect 
 
 let AssignAccountLock = false
 
-export function* waitForWeb3Ready(): any {
+export function* waitForWeb3Ready() {
   const connected = yield select(web3ReadySelector)
   if (connected) {
     return
@@ -62,23 +62,19 @@ export function* waitForWeb3Ready(): any {
 }
 
 // checks if web3 claims it is currently syncing or not
-export function* checkWeb3SyncProgressClaim() {
+function* checkWeb3SyncProgressClaim() {
   // yield call(waitForGethConnectivity)
   while (true) {
-    yield delay(1000) // Doesn't need to update that fast
     try {
       const syncProgress = yield web3.eth.isSyncing() // return false when it's still syncing and thus not ready
-
       if (typeof syncProgress === 'boolean' && !syncProgress) {
         if (!(yield select(web3ReadySelector))) {
           Logger.debug(TAG, 'checkWeb3SyncProgressClaim', 'sync complete')
           yield put(setIsReady(true))
           yield put(setSyncProgress(100))
         }
-
-        return true
+        return
       }
-
       Logger.debug(TAG, 'checkWeb3SyncProgressClaim', 'sync in progress')
       yield put(setIsReady(false))
 
@@ -102,10 +98,9 @@ export function* checkWeb3SyncProgressClaim() {
 }
 
 // The worker listening to sync progress requests
-function* checkSyncProgressWorker() {
+export function* checkSyncProgressWorker() {
   while (true) {
     try {
-      // yield take(Actions.REQUEST_SYNC_PROGRESS)
       yield call(waitForGethConnectivity)
       try {
         const { timeout } = yield race({
@@ -124,7 +119,7 @@ function* checkSyncProgressWorker() {
 
         const latestBlock: Block = yield getLatestBlock()
         if (latestBlock && latestBlock.number > 0) {
-          yield put(setLatestBlockNumber(latestBlock.number)) // Don't understand why we need this
+          yield put(setLatestBlockNumber(latestBlock.number))
         } else {
           Logger.error(
             TAG,
@@ -261,8 +256,11 @@ export function* watchRefreshGasPrice() {
   yield takeLatest(Actions.SET_GAS_PRICE, refreshGasPrice)
 }
 
+// export function* watchRequestSyncProgress() {
+//   yield takeLatest(Actions.REQUEST_SYNC_PROGRESS, checkSyncProgressWorker)
+// }
+
 export function* web3Saga() {
   yield spawn(checkSyncProgressWorker)
   yield spawn(watchRefreshGasPrice)
-  // yield spawn(checkWeb3SyncProgressClaim)
 }
