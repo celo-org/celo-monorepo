@@ -1,12 +1,12 @@
-import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { H1 } from 'src/fonts/Fonts'
-import OpenGraph from 'src/header/OpenGraph'
-import { I18nProps, withNamespaces } from 'src/i18n'
-import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Button, { BTN } from 'src/shared/Button.3'
-import { HEADER_HEIGHT } from 'src/shared/Styles'
-import { fonts, standardStyles, textStyles } from 'src/styles'
+import * as React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { H1 } from 'src/fonts/Fonts';
+import OpenGraph from 'src/header/OpenGraph';
+import { I18nProps, withNamespaces } from 'src/i18n';
+import { Cell, GridRow, Spans } from 'src/layout/GridRow';
+import Button, { BTN } from 'src/shared/Button.3';
+import { HEADER_HEIGHT } from 'src/shared/Styles';
+import { fonts, standardStyles, textStyles } from 'src/styles';
 
 const FAQs = [
   {
@@ -175,6 +175,7 @@ function Section({ title, text }) {
     </GridRow>
   )
 }
+
 export default withNamespaces('faq')(FAQ)
 
 const styles = StyleSheet.create({
