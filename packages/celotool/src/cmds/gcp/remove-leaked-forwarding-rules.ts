@@ -8,21 +8,29 @@ export const describe = 'Removes leaked forwarding rules that Kubernetes did not
 
 interface Argv extends yargs.Argv {
   keywords: string
+  project: string
 }
 
 export const builder = (argv: yargs.Argv) => {
-  return argv.option('keywords', {
-    required: false,
-    default: '',
-    type: 'string',
-    description: 'comma-separated list of keywords when matched with the rule, should be deleted',
-  })
+  return argv
+    .option('keywords', {
+      required: false,
+      default: '',
+      type: 'string',
+      description: 'comma-separated list of keywords when matched with the rule, should be deleted',
+    })
+    .option('project', {
+      alias: 'p',
+      required: true,
+      type: 'string',
+      description: 'GCP project within which to run this command',
+    })
 }
 
 export const handler = async (argv: Argv) => {
   console.info('Fetching forwarding-rules')
   let rules: any[] = await execCmdWithExitOnFailure(
-    `gcloud compute forwarding-rules list --format=json`
+    `gcloud compute forwarding-rules list --format=json --project=${argv.project}`
   ).then(([body]) => JSON.parse(body))
 
   const candidates = rules.filter((rule) => rule.target.includes('targetPools'))
@@ -36,7 +44,9 @@ export const handler = async (argv: Argv) => {
 
       try {
         await execCmd(
-          `gcloud compute target-pools get-health ${target} --region=${zone} --format=json`,
+          `gcloud compute target-pools get-health ${target} --region=${zone} --format=json --project=${
+            argv.project
+          }`,
           {},
           true
         )
@@ -63,27 +73,28 @@ export const handler = async (argv: Argv) => {
       await execCmdWithExitOnFailure(
         `gcloud compute forwarding-rules delete ${candidate.name} ${getRegionFlag(
           candidate.selfLink
-        )} -q`
+        )} -q --project=${argv.project}`
       )
       console.info(`Deleted forwarding-rule ${candidate.name}`)
 
       console.info(`Deleting target-pool ${target}`)
       await execCmdWithExitOnFailure(
-        `gcloud compute target-pools delete ${target} --region=${zone} -q`
+        `gcloud compute target-pools delete ${target} --region=${zone} -q --project=${argv.project}`
       )
       console.info(`Deleted target-pool ${target}`)
     })
   )
 
-  const keywordsToMatch = argv.keywords.split(',')
-  if (keywordsToMatch.length === 0) {
+  if (argv.keywords.length === 0) {
     console.info(`No keywords given`)
     return
   }
 
-  rules = await execCmdWithExitOnFailure(`gcloud compute forwarding-rules list --format=json`).then(
-    ([body]) => JSON.parse(body)
-  )
+  const keywordsToMatch = argv.keywords.split(',')
+
+  rules = await execCmdWithExitOnFailure(
+    `gcloud compute forwarding-rules list --format=json --project=${argv.project}`
+  ).then(([body]) => JSON.parse(body))
 
   const matchingRules = rules.filter((lb) =>
     keywordsToMatch.some(
@@ -95,7 +106,9 @@ export const handler = async (argv: Argv) => {
     matchingRules.map(async (rule) => {
       console.info(`Deleting forwarding-rule ${rule.name}`)
       await execCmdWithExitOnFailure(
-        `gcloud compute forwarding-rules delete ${rule.name} ${getRegionFlag(rule.selfLink)} -q`
+        `gcloud compute forwarding-rules delete ${rule.name} ${getRegionFlag(
+          rule.selfLink
+        )} -q --project=${argv.project}`
       )
       console.info(`Deleted forwarding-rule ${rule.name}`)
     })
