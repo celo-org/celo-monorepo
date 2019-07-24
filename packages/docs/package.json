@@ -1,0 +1,17 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "description": "Package for Celo Documentation",
+  "dependencies": {
+    "gitbook-plugin-hints": "^1.0.2",
+    "gitbook-plugin-page-ref": "^0.0.6"
+  },
+  "devDependencies": {
+    "gitbook-cli": "^2.6.9"
+  },
+  "scripts": {
+    "build": "gitbook build"
+  },
+  "author": "",
+  "license": "ISC"
+}

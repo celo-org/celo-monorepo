@@ -93,6 +93,46 @@ jobs:
 
       - run: yarn run ci-lint
 
+  build-all-packages:
+     <<: *defaults
+     steps:
+       - attach_workspace:
+          at: ~/app
+
+       - run:
+           name: Build SDK
+           command: |
+              set -e
+              yarn --cwd=packages/contractkit build alfajores
+
+       - run:
+          name: Build CLI
+          command: |
+            yarn --cwd=packages/cli setup:environment alfajores
+            yarn --cwd=packages/cli build
+
+       - run:
+          name: Build mobile
+          command: yarn --cwd=packages/mobile build
+
+       - run:
+          name: Build Verification Pool
+          command: yarn --cwd=packages/verification-pool-api compile-typescript
+
+       - run:
+          name: Build Verifier
+          command: yarn --cwd=packages/verifier build:typescript
+
+       - run:
+          name: Build Web
+          command: |
+              set -e
+              yarn --cwd=packages/web build
+
+       - run:
+          name: Build Docs
+          command: yarn --cwd=packages/docs build
+
   general-test:
     <<: *defaults
     steps:
