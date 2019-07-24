@@ -1,5 +1,4 @@
 import { validateInput } from '@celo/utils/src/inputValidation'
-import { ParsedPhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
 import { TextInput, TextInputProps } from 'react-native'
 
@@ -7,34 +6,29 @@ interface OwnProps {
   value: string
   numberOfDecimals?: number
   placeholder?: string
+  onChangeText: (input: string) => void
 }
 
 // Required props when validator type is phone
 interface PhoneValidatorProps {
   validator: 'phone'
   countryCallingCode: string
-  onChangePhoneNumber: (input: string, phoneDetails: ParsedPhoneNumber) => void
   // Following props unused w/ 'phone' validator but required to be defined
-  onChangeText?: NumberValidatorProps['onChangeText']
   customValidator?: CustomValidatorProps['customValidator']
 }
 
 interface NumberValidatorProps {
   validator?: 'integer' | 'decimal'
-  onChangeText: (input: string) => void
   // Following props unused w/ number validators but required to be defined
   countryCallingCode?: string
-  onChangePhoneNumber?: PhoneValidatorProps['onChangePhoneNumber']
   customValidator?: CustomValidatorProps['customValidator']
 }
 
 interface CustomValidatorProps {
   validator: 'custom'
   customValidator: (input: string) => string
-  onChangeText: NumberValidatorProps['onChangeText']
   // Following props unused w/ 'custom' but required to be defined
   countryCallingCode?: string
-  onChangePhoneNumber?: PhoneValidatorProps['onChangePhoneNumber']
 }
 
 export type ValidatorProps = PhoneValidatorProps | NumberValidatorProps | CustomValidatorProps
