@@ -8,10 +8,13 @@ import { Trans, WithNamespaces, withNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { MessagePhoneMapping } from 'src/app/reducer'
-import { DOLLAR_TO_PH } from 'src/geth/consts'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import { getDatetimeDisplayString, maskPhoneNumber } from 'src/utils/formatting'
+import {
+  getDatetimeDisplayString,
+  getLocalDisplayValue,
+  maskPhoneNumber,
+} from 'src/utils/formatting'
 import logger from 'src/utils/logger'
 
 const tag = 'ActivityFeedItem'
@@ -67,7 +70,6 @@ class ActivityFeedItem extends React.PureComponent<Props> {
 
   render() {
     const { timestamp, value, messagePhoneMapping, t, i18n, txComment } = this.props
-    const pesoValue = DOLLAR_TO_PH * value
     const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
     const phoneNumbers = getPhoneNumbersForVerifications(messagePhoneMapping, txComment)
 
@@ -91,7 +93,7 @@ class ActivityFeedItem extends React.PureComponent<Props> {
               </Text>
               <Text style={[fontStyles.bodySmall, styles.date]}>{dateTimeFormatted}</Text>
             </View>
-            <Text style={styles.deposit}>+ {'₱' + pesoValue}</Text>
+            <Text style={styles.deposit}>+ {'₱' + getLocalDisplayValue(value)}</Text>
           </View>
         </View>
       </Touchable>
