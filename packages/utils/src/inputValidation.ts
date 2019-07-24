@@ -4,13 +4,23 @@ interface BaseProps {
   validator?: 'phone' | 'integer' | 'decimal' | 'custom'
   customValidator?: (input: string) => string
   countryCallingCode?: string
+  lng?: string
 }
 
 export function validateInteger(input: string): string {
   return input.replace(/[^0-9]/g, '')
 }
 
-export function validateDecimal(input: string): string {
+export function validateDecimal(input: string, lng?: string): string {
+  // Comma decimal points
+  if (lng && lng === 'es-AR') {
+    return input
+      .replace(/[^0-9,]/g, '')
+      .replace(/,/, 'b')
+      .replace(/,/g, '')
+      .replace(/b/, '.')
+  }
+
   // Keep only first decimal
   return input
     .replace(/[^0-9.]/g, '')
@@ -41,7 +51,7 @@ export function validateInput(input: string, props: BaseProps): string {
 
   switch (props.validator) {
     case 'decimal':
-      return validateDecimal(input)
+      return validateDecimal(input, props.lng)
     case 'integer':
       return validateInteger(input)
     case 'phone':

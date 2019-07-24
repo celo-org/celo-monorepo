@@ -18,6 +18,7 @@ interface OwnProps {
   placeholderTextColor?: string
   autoFocus?: boolean
   numberOfDecimals?: number
+  lng?: string
   onChangeText(value: string): void
 }
 

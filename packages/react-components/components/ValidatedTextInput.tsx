@@ -6,6 +6,7 @@ interface OwnProps {
   value: string
   numberOfDecimals?: number
   placeholder?: string
+  lng?: string
   onChangeText: (input: string) => void
 }
 

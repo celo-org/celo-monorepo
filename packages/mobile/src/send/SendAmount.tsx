@@ -386,6 +386,7 @@ export class SendAmount extends React.PureComponent<Props, State> {
             autoFocus={true}
             numberOfDecimals={this.state.numberOfDecimals}
             validator="decimal"
+            lng={this.props.lng}
           />
           <LabeledTextInput
             keyboardType="default"
