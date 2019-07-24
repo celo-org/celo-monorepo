@@ -7,7 +7,7 @@
     "gitbook-plugin-page-ref": "^0.0.6"
   },
   "devDependencies": {
-    "gitbook-cli": "^2.6.9"
+    "gitbook-cli": "^2.3.2"
   },
   "scripts": {
     "build": "gitbook build"
