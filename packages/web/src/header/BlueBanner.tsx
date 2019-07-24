@@ -20,11 +20,9 @@ export class BlueBanner extends React.PureComponent<Props> {
             href={this.props.link}
             style={[fonts.navigation, textStyles.medium, styles.text]}
           >
-            <Text style={styles.nowrap}>
-              {this.props.children}
-              <Text style={styles.icon}>
-                <Chevron color={colors.white} opacity={1} />
-              </Text>
+            {this.props.children}
+            <Text style={styles.icon}>
+              <Chevron color={colors.white} opacity={1} />
             </Text>
           </Text>
         </View>
@@ -61,10 +59,6 @@ const styles = StyleSheet.create({
     color: colors.white,
     lineHeight: 20,
   },
-  nowrap: {
-    // @ts-ignore-next-line
-    whiteSpace: 'nowrap',
-  },
   icon: {
     paddingLeft: 5,
     position: 'relative',
@@ -73,5 +67,7 @@ const styles = StyleSheet.create({
 })
 
 export default withNamespaces('common')(({ t }: I18nProps) => (
-  <BlueBanner link="https://insidelook.splashthat.com/">{t('blueBanner')}</BlueBanner>
+  <BlueBanner link="https://medium.com/celohq/introducing-alfajores-1b162ebcb44d">
+    {t('blueBanner')}
+  </BlueBanner>
 ))
