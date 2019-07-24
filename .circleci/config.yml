@@ -111,6 +111,14 @@ jobs:
             yarn --cwd=packages/cli setup:environment alfajores
             yarn --cwd=packages/cli build
             yarn --cwd=packages/cli docs
+      
+       - run:
+          name: Fail if someone forgot to commit CLI docs
+          command: |
+            if [[ $(git status packages/docs --porcelain) ]]; then
+              echo "There are git differences after generating CLI docs"
+              exit 1
+            fi
 
        - run:
           name: Build mobile
