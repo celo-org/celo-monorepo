@@ -14,6 +14,6 @@ export default class SellDollar extends BaseCommand {
 
     const stableToken = await StableToken(this.web3, args.from)
 
-    doSwap(this.web3, args, stableToken, false)
+    await doSwap(this.web3, args, stableToken, false)
   }
 }
