@@ -30,7 +30,7 @@ export function validateDecimal(input: string, lng?: string): string {
 }
 
 export function validatePhone(input: string, countryCallingCode: string): string {
-  input = input.replace(/[^0-9()- ]/g, '')
+  input = input.replace(/[^0-9()\- ]/g, '')
   if (!countryCallingCode) {
     return input
   }
