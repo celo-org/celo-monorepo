@@ -535,7 +535,6 @@ async function helmParameters(celoEnv: string) {
     `--set geth.backup.enabled=${fetchEnv(envVar.GETH_NODES_BACKUP_CRONJOB_ENABLED)}`,
     `--set bootnode.image.repository=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY')}`,
     `--set bootnode.image.tag=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_TAG')}`,
-    `--set bootnode.internal=${fetchEnvOrFallback(envVar.INTERNAL_BOOTNODE, 'true')}`,
     `--set cluster.zone=${fetchEnv('KUBERNETES_CLUSTER_ZONE')}`,
     `--set cluster.name=${fetchEnv('KUBERNETES_CLUSTER_NAME')}`,
     `--set bucket=${bucketName}`,
