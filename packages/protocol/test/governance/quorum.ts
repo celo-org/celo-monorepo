@@ -1,4 +1,4 @@
-import { assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
+import { assertFractionEqual, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import { QuorumContract, QuorumInstance } from 'types'
 
@@ -44,13 +44,13 @@ contract('Quorum', () => {
     })
   })
 
-  function assertFractionEqual(num1: number, denom1: number, num2: number, denom2: number) {
-    assert.isTrue(num1 * denom2 === num2 * denom1)
-  }
-
   describe('#threshold', () => {
     it('should revert at undefined participation', async () => {
       await assertRevert(quorum.threshold(0, 0, 70, 100, 1, 2))
+    })
+
+    it('should revert at 0 participation', async () => {
+      await assertRevert(quorum.threshold(0, 100, 70, 100, 1, 2))
     })
 
     describe('when the quorum baseline is low', () => {
@@ -59,7 +59,7 @@ contract('Quorum', () => {
       const baseThresholdNumerator = 70
       const baseThresholdDenominator = 100
       const kFactorNumerator = 1
-      const kFactorDenominator = 2
+      const kFactorDenominator = 20
       beforeEach(async () => {
         quorum = await Quorum.new()
         await quorum.initialize(
@@ -81,8 +81,8 @@ contract('Quorum', () => {
           kFactorNumerator,
           kFactorDenominator
         )
-        const expectedNum = 80
-        const expectedDenom = 100
+        const expectedNum = 31
+        const expectedDenom = 40
         assertFractionEqual(tNum.toNumber(), tDenom.toNumber(), expectedNum, expectedDenom)
       })
 
@@ -97,13 +97,13 @@ contract('Quorum', () => {
           kFactorNumerator,
           kFactorDenominator
         )
-        const expectedNum = 60
-        const expectedDenom = 100
+        const expectedNum = 119
+        const expectedDenom = 200
         assertFractionEqual(tNum.toNumber(), tDenom.toNumber(), expectedNum, expectedDenom)
       })
 
       it('should return the correct threshold at high participation', async () => {
-        const totalVotes = 90
+        const totalVotes = 80
         const totalWeight = 100
         const [tNum, tDenom] = await quorum.threshold(
           totalVotes,
@@ -113,8 +113,8 @@ contract('Quorum', () => {
           kFactorNumerator,
           kFactorDenominator
         )
-        const expectedNum = 56
-        const expectedDenom = 100
+        const expectedNum = 41
+        const expectedDenom = 80
         assertFractionEqual(tNum.toNumber(), tDenom.toNumber(), expectedNum, expectedDenom)
       })
     })
@@ -125,7 +125,7 @@ contract('Quorum', () => {
       const baseThresholdNumerator = 70
       const baseThresholdDenominator = 100
       const kFactorNumerator = 1
-      const kFactorDenominator = 2
+      const kFactorDenominator = 20
       beforeEach(async () => {
         quorum = await Quorum.new()
         await quorum.initialize(
@@ -147,8 +147,8 @@ contract('Quorum', () => {
           kFactorNumerator,
           kFactorDenominator
         )
-        const expectedNum = 98
-        const expectedDenom = 100
+        const expectedNum = 35
+        const expectedDenom = 32
         assertFractionEqual(tNum.toNumber(), tDenom.toNumber(), expectedNum, expectedDenom)
       })
 
@@ -163,8 +163,8 @@ contract('Quorum', () => {
           kFactorNumerator,
           kFactorDenominator
         )
-        const expectedNum = 80
-        const expectedDenom = 100
+        const expectedNum = 31
+        const expectedDenom = 40
         assertFractionEqual(tNum.toNumber(), tDenom.toNumber(), expectedNum, expectedDenom)
       })
 
@@ -179,8 +179,8 @@ contract('Quorum', () => {
           kFactorNumerator,
           kFactorDenominator
         )
-        const expectedNum = 47
-        const expectedDenom = 70
+        const expectedNum = 271
+        const expectedDenom = 400
         assertFractionEqual(tNum.toNumber(), tDenom.toNumber(), expectedNum, expectedDenom)
       })
     })

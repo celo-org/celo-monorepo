@@ -79,7 +79,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   struct ThresholdParameters {
     // Support threshold for proposal passing at typical participation level
     FractionUtil.Fraction baseThreshold;
-    // Factor inversely related to threshold sensitivity
+    // Threshold sensitivity factor
     FractionUtil.Fraction kFactor;
   }
 
@@ -360,14 +360,17 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   {
     // TODO(asa): https://github.com/celo-org/celo-monorepo/pull/3414#discussion_r283588332
     require(destination != address(0) && thresholdNumerator > 0
-      && thresholdDenominator > 0 && kFactorDenominator > 0);
+      && thresholdDenominator > 0 && kFactorNumerator > 0 && kFactorDenominator > 0);
     ThresholdParameters memory thresholdParameters = ThresholdParameters(
       FractionUtil.Fraction(thresholdNumerator, thresholdDenominator),
       FractionUtil.Fraction(kFactorNumerator, kFactorDenominator));
     FractionUtil.Fraction memory majority = FractionUtil.Fraction(1, 2);
-    FractionUtil.Fraction memory unanimous = FractionUtil.Fraction(1, 1);
-    require(thresholdParameters.baseThreshold.isGreaterThan(majority)
-      && thresholdParameters.baseThreshold.isLessThanOrEqualTo(unanimous));
+    FractionUtil.Fraction memory baseThresholdCeiling = FractionUtil.Fraction(90, 100);
+    FractionUtil.Fraction memory kFactorCeiling = FractionUtil.Fraction(15, 100);
+    require(thresholdParameters.baseThreshold.isGreaterThanOrEqualTo(majority)
+      && thresholdParameters.baseThreshold.isLessThanOrEqualTo(baseThresholdCeiling)
+      && thresholdParameters.kFactor.isLessThanOrEqualTo(kFactorCeiling)
+    );
     if (functionId == 0) {
       constitution[destination].defaultParameters = thresholdParameters;
     } else {
@@ -952,7 +955,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   {
     uint256 totalVotes = proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain);
     uint256 totalWeight_ = totalWeight();
-    if (totalWeight_ == 0) {
+    if (totalVotes == 0 || totalWeight_ == 0) {
       return FractionUtil.Fraction(0, 0);
     }
     FractionUtil.Fraction memory proposalThreshold = FractionUtil.Fraction(1, 2);
@@ -1122,9 +1125,9 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     view
     returns (ThresholdParameters memory)
   {
-    // Default to a 3/5 supermajority and k = 1/5
+    // Default to a 70% supermajority and k = 0.05
     ThresholdParameters memory thresholdParameters =
-      ThresholdParameters(FractionUtil.Fraction(3, 5), FractionUtil.Fraction(1, 5));
+      ThresholdParameters(FractionUtil.Fraction(70, 100), FractionUtil.Fraction(5, 100));
     if (constitution[destination].functionThresholds[functionId].baseThreshold.exists()) {
       thresholdParameters = constitution[destination].functionThresholds[functionId];
     } else if (constitution[destination].defaultParameters.baseThreshold.exists()) {

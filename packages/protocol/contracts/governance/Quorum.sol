@@ -76,20 +76,26 @@ contract Quorum is IQuorum, Ownable, Initializable {
     view
     returns (uint256, uint256)
   {
-    require(totalWeight > 0 && baseThresholdDenominator > 0 && kFactorDenominator > 0);
+    require(totalVotes > 0 && totalWeight > 0
+      && baseThresholdDenominator > 0 && kFactorDenominator > 0);
     FractionUtil.Fraction memory participation = FractionUtil.Fraction(totalVotes, totalWeight);
     FractionUtil.Fraction memory quorumRatio = participation.div(quorumBaseline);
-    FractionUtil.Fraction memory baseThreshold =
+    FractionUtil.Fraction memory adjustedThreshold =
       FractionUtil.Fraction(baseThresholdNumerator, baseThresholdDenominator);
     FractionUtil.Fraction memory kFactor =
       FractionUtil.Fraction(kFactorNumerator, kFactorDenominator);
-    FractionUtil.Fraction memory half = FractionUtil.Fraction(1, 2);
-    FractionUtil.Fraction memory one = FractionUtil.Fraction(1, 1);
-    FractionUtil.Fraction memory adjustedThreshold = baseThreshold
-      .sub(half)
-      .mul(kFactor.add(one))
-      .div(kFactor.add(quorumRatio))
-      .add(half);
+    if (quorumRatio.isLessThan(FractionUtil.Fraction(1, 1))) {
+      FractionUtil.Fraction memory adjustment = kFactor.mul(quorumRatio.inverse().sub(quorumRatio));
+      adjustedThreshold = adjustedThreshold.add(adjustment);
+    } else {
+      FractionUtil.Fraction memory adjustment = kFactor.mul(quorumRatio.sub(quorumRatio.inverse()));
+      adjustedThreshold = adjustedThreshold.isGreaterThanOrEqualTo(adjustment) ?
+        adjustedThreshold.sub(adjustment) : FractionUtil.Fraction(0, 1);
+      FractionUtil.Fraction memory half = FractionUtil.Fraction(1, 2);
+      if (adjustedThreshold.isLessThan(half)) {
+        adjustedThreshold = half;
+      }
+    }
     return (adjustedThreshold.numerator, adjustedThreshold.denominator);
   }
 

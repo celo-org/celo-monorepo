@@ -2,6 +2,7 @@ import { bondedDepositsRegistryId, quorumRegistryId } from '@celo/protocol/lib/r
 import {
   assertBalance,
   assertEqualBN,
+  assertFractionEqual,
   assertLogMatches2,
   assertRevert,
   matchAny,
@@ -466,10 +467,10 @@ contract('Governance', (accounts: string[]) => {
 
   // TODO(asa): Verify that when we set the constitution for a function ID then the proper constitution is applied to a proposal.
   describe('#setConstitution', () => {
-    const thresholdNumerator = 2
-    const thresholdDenominator = 3
-    const kFactorNumerator = 2
-    const kFactorDenominator = 3
+    const thresholdNumerator = 60
+    const thresholdDenominator = 100
+    const kFactorNumerator = 1
+    const kFactorDenominator = 50
     let functionId
     let differentFunctionId
     let destination
@@ -497,10 +498,18 @@ contract('Governance', (accounts: string[]) => {
           destination,
           differentFunctionId
         )
-        assert.equal(tNum.toNumber(), thresholdNumerator)
-        assert.equal(tDenom.toNumber(), thresholdDenominator)
-        assert.equal(kNum.toNumber(), kFactorNumerator)
-        assert.equal(kDenom.toNumber(), kFactorDenominator)
+        assertFractionEqual(
+          tNum.toNumber(),
+          tDenom.toNumber(),
+          thresholdNumerator,
+          thresholdDenominator
+        )
+        assertFractionEqual(
+          kNum.toNumber(),
+          kDenom.toNumber(),
+          kFactorNumerator,
+          kFactorDenominator
+        )
       })
 
       it('should emit the ConstitutionSet event', async () => {
@@ -547,10 +556,18 @@ contract('Governance', (accounts: string[]) => {
           destination,
           functionId
         )
-        assert.equal(tNum.toNumber(), thresholdNumerator)
-        assert.equal(tDenom.toNumber(), thresholdDenominator)
-        assert.equal(kNum.toNumber(), kFactorNumerator)
-        assert.equal(kDenom.toNumber(), kFactorDenominator)
+        assertFractionEqual(
+          tNum.toNumber(),
+          tDenom.toNumber(),
+          thresholdNumerator,
+          thresholdDenominator
+        )
+        assertFractionEqual(
+          kNum.toNumber(),
+          kDenom.toNumber(),
+          kFactorNumerator,
+          kFactorDenominator
+        )
       })
 
       it('should not set the default threshold', async () => {
@@ -566,10 +583,8 @@ contract('Governance', (accounts: string[]) => {
           destination,
           differentFunctionId
         )
-        assert.equal(tNum.toNumber(), 1)
-        assert.equal(tDenom.toNumber(), 2)
-        assert.equal(kNum.toNumber(), 1)
-        assert.equal(kDenom.toNumber(), 2)
+        assertFractionEqual(tNum.toNumber(), tDenom.toNumber(), 70, 100)
+        assertFractionEqual(kNum.toNumber(), kDenom.toNumber(), 5, 100)
       })
 
       it('should emit the ConstitutionSet event', async () => {
@@ -649,13 +664,13 @@ contract('Governance', (accounts: string[]) => {
       )
     })
 
-    it('should revert when the threshold is not greater than a majority', async () => {
+    it('should revert when the threshold is less than a majority', async () => {
       await assertRevert(
         governance.setConstitution(
           destination,
           nullFunctionId,
-          1,
-          2,
+          49,
+          100,
           kFactorNumerator,
           kFactorDenominator
         )
@@ -1967,6 +1982,7 @@ contract('Governance', (accounts: string[]) => {
         await mockQuorum.setThresholdReturn(70, 100)
       })
 
+      // TODO(brice): doesn't actually check the case where two different thresholds are considered
       it('should return the strictest threshold', async () => {
         // const [qNum, qDenom] = await governance.getQuorum()
         const [tNum, tDenom] = await governance.getProposalThreshold(proposalId)

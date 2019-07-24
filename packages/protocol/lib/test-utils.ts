@@ -238,6 +238,10 @@ export function assertEqualBN(
   )
 }
 
+export function assertFractionEqual(num1: number, denom1: number, num2: number, denom2: number) {
+  assert.isTrue(num1 * denom2 === num2 * denom1)
+}
+
 export const getReserveBalance = async (web3: Web3, getContract: any): Promise<string> => {
   const reserve: ReserveInstance = await getContract('Reserve', 'proxiedContract')
   return (await web3.eth.getBalance(reserve.address)).toString()
