@@ -110,6 +110,7 @@ jobs:
           command: |
             yarn --cwd=packages/cli setup:environment alfajores
             yarn --cwd=packages/cli build
+            yarn --cwd=packages/cli docs
 
        - run:
           name: Build mobile
