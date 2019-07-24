@@ -220,7 +220,6 @@ export function* fetchReclaimSuggestedFee(action: FetchReclaimTransactionFeeActi
     Logger.debug(TAG + '@fetchReclaimSuggestedFee', `New reclaim tx fee is: ${suggestedFeeInWei}`)
   } catch (e) {
     yield put(showError(ErrorMessages.FETCH_RECLAIM_FEE_FAILED, ERROR_BANNER_DURATION))
-    throw e
   }
 }
 

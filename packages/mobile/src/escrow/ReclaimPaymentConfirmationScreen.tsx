@@ -65,6 +65,10 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
     return reclaimPaymentInput
   }
 
+  getFee = () => {
+    return this.props.fee || ''
+  }
+
   onConfirm = async () => {
     const escrowedPayment = this.getReclaimPaymentInput()
     CeloAnalytics.track(CustomEventNames.escrowed_payment_reclaimed_by_sender)
@@ -96,15 +100,10 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
   }
 
   render() {
-    const { t, fee } = this.props
+    const { t } = this.props
     const payment = this.getReclaimPaymentInput()
     const convertedAmount = divideByWei(payment.amount.toString())
-    if (!fee) {
-      Logger.error(TAG, 'Error fetching suggested reclaim fee, show error message')
-      this.props.showError(ErrorMessages.FETCH_RECLAIM_FEE_FAILED, ERROR_BANNER_DURATION)
-      return
-    }
-    const convertedFee = divideByWei(fee.toString())
+    const convertedFee = divideByWei(this.getFee().toString())
 
     return (
       <View style={styles.container}>

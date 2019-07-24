@@ -15,7 +15,7 @@ export interface EscrowedPayment {
 }
 
 // The number of seconds before the sender can reclaim the payment.
-export const EXPIRY_SECONDS = 1
+export const EXPIRY_SECONDS = 432000 // 5 days in seconds
 
 export enum Actions {
   TRANSFER_PAYMENT = 'ESCROW/TRANSFER_PAYMENT',
