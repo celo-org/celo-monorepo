@@ -22,3 +22,4 @@ export {
 } from '@celo/utils/src/currencies'
 
 export const DOLLAR_TO_PH = 51
+

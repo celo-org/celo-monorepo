@@ -13,7 +13,7 @@ import AccountOverview from 'src/components/AccountOverview'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import Activity from 'src/exchange/Activity'
 import ExchangeRate from 'src/exchange/ExchangeRate'
-import { CURRENCY_ENUM as Token } from 'src/geth/consts'
+import { CURRENCY_ENUM as Token, DOLLAR_TO_PH } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -51,6 +51,7 @@ export class ExchangeHomeScreen extends React.Component<Props> {
 
   render() {
     const { t, exchangeRate } = this.props
+    const convertedExchangeRate = exchangeRate.times(DOLLAR_TO_PH)
 
     return (
       <View style={styles.background}>
@@ -63,7 +64,7 @@ export class ExchangeHomeScreen extends React.Component<Props> {
           <View>
             <AccountOverview testID="ExchangeAccountOverview" />
             <View style={styles.lowerTop}>
-              <ExchangeRate rate={exchangeRate} makerToken={Token.DOLLAR} />
+              <ExchangeRate rate={convertedExchangeRate} makerToken={Token.DOLLAR} />
               <SmallButton
                 text={t('exchange')}
                 solid={true}
