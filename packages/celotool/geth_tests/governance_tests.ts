@@ -173,8 +173,6 @@ describe('governance tests', () => {
       { name: 'validator2', validating: true, syncmode: 'full', port: 30307, rpcport: 8549 },
       { name: 'validator3', validating: true, syncmode: 'full', port: 30309, rpcport: 8551 },
       { name: 'validator4', validating: true, syncmode: 'full', port: 30311, rpcport: 8553 },
-      { name: 'validator5', validating: true, syncmode: 'full', port: 30313, rpcport: 8555 },
-      { name: 'validator6', validating: true, syncmode: 'full', port: 30315, rpcport: 8557 },
     ],
   }
 
