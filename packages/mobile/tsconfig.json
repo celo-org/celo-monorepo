@@ -16,5 +16,5 @@
     "target": "es2015",
     "strict": true
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "vendor", ".bundle"]
 }
