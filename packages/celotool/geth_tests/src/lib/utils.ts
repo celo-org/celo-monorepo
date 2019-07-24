@@ -49,10 +49,17 @@ export function spawnWithLog(cmd: string, args: string[], logsFilepath: string) 
   return process
 }
 
-export function execCmd(cmd: string, args: string[], options?: SpawnOptions) {
+export function execCmd(
+  cmd: string,
+  args: string[],
+  options?: SpawnOptions & { silent?: boolean }
+) {
   return new Promise<number>(async (resolve, reject) => {
-    console.debug('$ ' + [cmd].concat(args).join(' '))
-    const process = spawn(cmd, args, { ...options, stdio: 'inherit' })
+    const { silent, ...spawnOptions } = options || { silent: false }
+    if (!silent) {
+      console.debug('$ ' + [cmd].concat(args).join(' '))
+    }
+    const process = spawn(cmd, args, { ...spawnOptions, stdio: silent ? 'ignore' : 'inherit' })
     process.on('close', (code) => {
       try {
         resolve(code)
@@ -67,7 +74,7 @@ export function execCmd(cmd: string, args: string[], options?: SpawnOptions) {
 export async function execCmdWithExitOnFailure(
   cmd: string,
   args: string[],
-  options?: SpawnOptions
+  options?: SpawnOptions & { silent?: boolean }
 ) {
   const code = await execCmd(cmd, args, options)
   if (code !== 0) {
@@ -182,22 +189,21 @@ export function importGenesis() {
 }
 
 export async function init(gethBinaryPath: string, datadir: string, genesisPath: string) {
-  await execCmdWithExitOnFailure('rm', ['-rf', datadir])
-  await execCmdWithExitOnFailure(gethBinaryPath, ['--datadir', datadir, 'init', genesisPath])
+  await execCmdWithExitOnFailure('rm', ['-rf', datadir], { silent: true })
+  await execCmdWithExitOnFailure(gethBinaryPath, ['--datadir', datadir, 'init', genesisPath], {
+    silent: true,
+  })
 }
 
 export async function importPrivateKey(gethBinaryPath: string, instance: GethInstanceConfig) {
   const keyFile = '/tmp/key.txt'
   fs.writeFileSync(keyFile, instance.privateKey)
-  await execCmdWithExitOnFailure(gethBinaryPath, [
-    'account',
-    'import',
-    '--datadir',
-    getDatadir(instance),
-    '--password',
-    '/dev/null',
-    keyFile,
-  ])
+  console.info(`geth:${instance.name}: import account`)
+  await execCmdWithExitOnFailure(
+    gethBinaryPath,
+    ['account', 'import', '--datadir', getDatadir(instance), '--password', '/dev/null', keyFile],
+    { silent: true }
+  )
 }
 
 export async function killPid(pid: number) {
@@ -205,7 +211,8 @@ export async function killPid(pid: number) {
 }
 
 export async function killGeth() {
-  await execCmd('pkill', ['-9', 'geth'])
+  console.info(`Killing ALL geth instances`)
+  await execCmd('pkill', ['-9', 'geth'], { silent: true })
 }
 
 function addStaticPeers(datadir: string, enodes: string[]) {
@@ -213,7 +220,7 @@ function addStaticPeers(datadir: string, enodes: string[]) {
 }
 
 async function isPortOpen(host: string, port: number) {
-  return (await execCmd('nc', ['-z', host, port.toString()])) === 0
+  return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
 }
 
 async function waitForPortOpen(host: string, port: number, seconds: number) {
@@ -288,7 +295,10 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   // Give some time for geth to come up
   const isOpen = await waitForPortOpen('localhost', rpcport, 5)
   if (!isOpen) {
-    throw new Error("Geth Didn't finished starting after 5 seconds")
+    console.error(`geth:${instance.name}: jsonRPC didn't open after 5 seconds`)
+    process.exit(1)
+  } else {
+    console.info(`geth:${instance.name}: jsonRPC port open ${rpcport}`)
   }
 
   return gethProcess.pid
@@ -317,15 +327,16 @@ export function getContractAddress(contractName: string) {
 
 export async function snapshotDatadir(instance: GethInstanceConfig) {
   // Sometimes the socket is still present, preventing us from snapshotting.
-  await execCmd('rm', [`${getDatadir(instance)}/geth.ipc`])
+  await execCmd('rm', [`${getDatadir(instance)}/geth.ipc`], { silent: true })
   await execCmdWithExitOnFailure('cp', ['-r', getDatadir(instance), getSnapshotdir(instance)])
 }
 
 export async function restoreDatadir(instance: GethInstanceConfig) {
   const datadir = getDatadir(instance)
   const snapshotdir = getSnapshotdir(instance)
-  await execCmdWithExitOnFailure('rm', ['-rf', datadir])
-  await execCmdWithExitOnFailure('cp', ['-r', snapshotdir, datadir])
+  console.info(`geth:${instance.name}: restore datadir: ${datadir}`)
+  await execCmdWithExitOnFailure('rm', ['-rf', datadir], { silent: true })
+  await execCmdWithExitOnFailure('cp', ['-r', snapshotdir, datadir], { silent: true })
 }
 
 function getInstanceDir(instance: GethInstanceConfig) {
@@ -345,6 +356,7 @@ function getSnapshotdir(instance: GethInstanceConfig) {
  */
 export async function initAndStartGeth(gethBinaryPath: string, instance: GethInstanceConfig) {
   const datadir = getDatadir(instance)
+  console.info(`geth:${instance.name}: init datadir ${datadir}`)
   await init(gethBinaryPath, datadir, GENESIS_PATH)
   if (instance.privateKey) {
     await importPrivateKey(gethBinaryPath, instance)
