@@ -175,7 +175,6 @@ function Section({ title, text }) {
     </GridRow>
   )
 }
-
 export default withNamespaces('faq')(FAQ)
 
 const styles = StyleSheet.create({
