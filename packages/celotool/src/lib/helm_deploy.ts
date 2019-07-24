@@ -57,7 +57,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
   await ensureAuthenticatedGcloudAccount()
   console.info('Creating Cloud SQL database, this might take a minute or two ...')
 
-  failIfSecretMissing(CLOUDSQL_SECRET_NAME, 'default')
+  await failIfSecretMissing(CLOUDSQL_SECRET_NAME, 'default')
 
   try {
     await execCmd(`gcloud sql instances describe ${instanceName}`)
@@ -120,7 +120,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
   await execCmdWithExitOnFailure(`gcloud sql databases create blockscout -i ${instanceName}`)
 
   console.info('Copying blockscout service account secret to namespace')
-  copySecret(CLOUDSQL_SECRET_NAME, 'default', celoEnv)
+  await copySecret(CLOUDSQL_SECRET_NAME, 'default', celoEnv)
 
   const [blockscoutDBConnectionName] = await execCmdWithExitOnFailure(
     `gcloud sql instances describe ${instanceName} --format="value(connectionName)"`
@@ -360,12 +360,17 @@ export async function createStaticIPs(celoEnv: string) {
 export async function upgradeStaticIPs(celoEnv: string) {
   const prevTxNodeCount = await getStatefulSetReplicas(celoEnv, `${celoEnv}-tx-nodes`)
   const newTxNodeCount = parseInt(fetchEnv(envVar.TX_NODES), 10)
-  upgradeNodeTypeStaticIPs(celoEnv, 'tx-nodes', prevTxNodeCount, newTxNodeCount)
+  await upgradeNodeTypeStaticIPs(celoEnv, 'tx-nodes', prevTxNodeCount, newTxNodeCount)
 
   if (useStaticIPsForGethNodes()) {
     const prevValidatorNodeCount = await getStatefulSetReplicas(celoEnv, `${celoEnv}-validators`)
     const newValidatorNodeCount = parseInt(fetchEnv(envVar.VALIDATORS), 10)
-    upgradeNodeTypeStaticIPs(celoEnv, 'validators', prevValidatorNodeCount, newValidatorNodeCount)
+    await upgradeNodeTypeStaticIPs(
+      celoEnv,
+      'validators',
+      prevValidatorNodeCount,
+      newValidatorNodeCount
+    )
   }
 }
 
@@ -608,8 +613,8 @@ export async function removeGenericHelmChart(releaseName: string) {
 }
 
 export async function installHelmChart(celoEnv: string) {
-  failIfSecretMissing(BACKUP_GCS_SECRET_NAME, 'default')
-  copySecret(BACKUP_GCS_SECRET_NAME, 'default', celoEnv)
+  await failIfSecretMissing(BACKUP_GCS_SECRET_NAME, 'default')
+  await copySecret(BACKUP_GCS_SECRET_NAME, 'default', celoEnv)
   return installGenericHelmChart(
     celoEnv,
     celoEnv,
