@@ -343,6 +343,7 @@ describe('governance tests', () => {
     it('should have produced blocks with the correct validator set', async function(this: any) {
       this.timeout(0) // Disable test timeout
       assert.equal(expectedEpochMembership.size, 3)
+      console.log(expectedEpochMembership)
       for (let [epochNumber, membership] of expectedEpochMembership) {
         let containsExpectedMember = false
         for (let i = epochNumber * epoch + 1; i < (epochNumber + 1) * epoch + 1; i++) {
