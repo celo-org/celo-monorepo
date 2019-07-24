@@ -116,6 +116,10 @@ export function* sendInvite(
     const temporaryWalletAccount = web3.eth.accounts.create()
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
+
+    // TODO: Improve this by not checking specifically for this
+    // display name. Requires improvements in recipient handling
+    recipientName = recipientName === i18n.t('sendFlow7:mobileNumber') ? '' : ' ' + recipientName
     const msg = yield call(generateLink, inviteCode, recipientName)
 
     // Store the Temp Address locally so we know which transactions were invites
