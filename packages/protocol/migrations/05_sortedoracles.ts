@@ -5,11 +5,11 @@ import {
   getDeployedProxiedContract,
   setInRegistry,
 } from '@celo/protocol/lib/web3-utils'
+import { config } from '@celo/protocol/migrationsConfig'
 import { RegistryInstance, SortedOraclesInstance } from 'types'
 
 const initializeArgs = async (): Promise<[number]> => {
-  const expirySeconds: number = 3600 // 1 hour
-  return [expirySeconds]
+  return [config.oracles.reportExpiry]
 }
 
 module.exports = deployProxyAndImplementation<SortedOraclesInstance>(
