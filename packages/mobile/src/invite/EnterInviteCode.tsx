@@ -46,7 +46,6 @@ interface StateProps {
 interface State {
   inviteCode: string
   isSubmitting: boolean
-  messageAppOpened: boolean
   appState: AppStateStatus
   validCodeInClipboard: boolean
 }
@@ -105,13 +104,13 @@ export class EnterInviteCode extends React.Component<Props, State> {
   state: State = {
     inviteCode: '',
     isSubmitting: false,
-    messageAppOpened: false,
     appState: AppState.currentState,
     validCodeInClipboard: false,
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     AppState.addEventListener('change', this.handleValidCodeInClipboard)
+    this.checkIfValidCodeInClipboard()
   }
 
   componentWillUnmount() {
@@ -119,18 +118,19 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   openMessage = () => {
-    this.setState({
-      messageAppOpened: true,
-    })
     SendIntentAndroid.openSMSApp()
+  }
+
+  checkIfValidCodeInClipboard = async () => {
+    const message = await Clipboard.getString()
+    const validCode = extractValidInviteCode(message)
+
+    this.setState({ validCodeInClipboard: validCode !== null })
   }
 
   handleValidCodeInClipboard = async (nextAppState: AppStateStatus) => {
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-      const message = await Clipboard.getString()
-      const validCode = extractValidInviteCode(message)
-
-      this.setState({ validCodeInClipboard: validCode !== null })
+      this.checkIfValidCodeInClipboard()
     }
     this.setState({ appState: nextAppState })
   }
@@ -186,7 +186,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
             <Text style={fontStyles.bodySmallBold}>{t('inviteCodeText.inviteAccepted')}</Text>
           ) : (
             !this.state.isSubmitting &&
-            (!(this.state.messageAppOpened && this.state.validCodeInClipboard) ? (
+            (!this.state.validCodeInClipboard ? (
               <View>
                 <Text style={[styles.body, styles.hint]}>
                   <Text style={fontStyles.bodySmallSemiBold}>
