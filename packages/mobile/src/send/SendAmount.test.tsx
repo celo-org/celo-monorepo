@@ -3,18 +3,11 @@ import * as React from 'react'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import sleep from 'sleep-promise'
-import { INPUT_DEBOUNCE_TIME } from 'src/config'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import SendAmount, { SendAmount as SendAmountClass } from 'src/send/SendAmount'
 import { createMockStore, getMockI18nProps } from 'test/utils'
-import {
-  mockAccount,
-  mockAccount2,
-  mockE164Number,
-  mockE164Number2,
-  mockNavigation,
-} from 'test/values'
+import { mockAccount2, mockE164Number2, mockNavigation } from 'test/values'
+
 const AMOUNT_ZERO = '0.00'
 const AMOUNT_VALID = '4.93'
 const AMOUNT_TOO_MUCH = '106.98'
@@ -30,22 +23,13 @@ const storeData = {
 const TEXT_PLACEHOLDER = 'groceriesRent'
 const AMOUNT_PLACEHOLDER = 'amount'
 
-jest.mock('src/send/actions', () => ({
-  ...jest.requireActual('src/send/actions'),
-  updateSuggestedFee: jest.fn(() => ({ type: 'b' })),
-}))
-
-const { updateSuggestedFee } = require('src/send/actions')
-
 describe('SendAmount', () => {
   beforeAll(() => {
     jest.useRealTimers()
   })
 
   describe('when commenting', () => {
-    beforeEach(() => {
-      updateSuggestedFee.mockClear()
-    })
+    beforeEach(() => {})
 
     const store = createMockStore(storeData)
     const getWrapper = () =>
@@ -56,37 +40,6 @@ describe('SendAmount', () => {
           <SendAmount navigation={mockNavigation} />
         </Provider>
       )
-
-    it('calculateFee debouncing works', async () => {
-      const wrapper = render(
-        <Provider store={createMockStore()}>
-          <SendAmountClass
-            navigation={mockNavigation}
-            {...getMockI18nProps()}
-            fetchDollarBalance={jest.fn()}
-            showMessage={jest.fn()}
-            showError={jest.fn()}
-            hideAlert={jest.fn()}
-            updateSuggestedFee={updateSuggestedFee}
-            fetchPhoneAddresses={fetchPhoneAddresses}
-            dollarBalance={new BigNumber(1)}
-            suggestedFeeDollars={new BigNumber(1)}
-            e164NumberToAddress={{ [mockE164Number]: mockAccount }}
-            defaultCountryCode={'+1'}
-          />
-        </Provider>
-      )
-      const input = wrapper.getByPlaceholder(TEXT_PLACEHOLDER)
-      const comment1 = 'first'
-      const comment2 = 'second'
-      fireEvent.changeText(input, comment1)
-      fireEvent.changeText(input, comment2)
-      fireEvent.changeText(input, comment1)
-      await sleep(INPUT_DEBOUNCE_TIME)
-
-      // Called once for debounce
-      expect(updateSuggestedFee).toHaveBeenCalledTimes(1)
-    })
 
     it('updates the comment/reason', () => {
       const wrapper = getWrapper()
@@ -110,7 +63,6 @@ describe('SendAmount', () => {
             showMessage={showMessage}
             showError={jest.fn()}
             hideAlert={jest.fn()}
-            updateSuggestedFee={jest.fn()}
             fetchPhoneAddresses={fetchPhoneAddresses}
             dollarBalance={new BigNumber(1)}
             suggestedFeeDollars={new BigNumber(1)}

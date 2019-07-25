@@ -4,6 +4,7 @@ import { devModeSelector } from 'src/account/reducer'
 import { appSaga, waitForRehydrate } from 'src/app/saga'
 import { escrowSaga } from 'src/escrow/saga'
 import { exchangeSaga } from 'src/exchange/saga'
+import { feesSaga } from 'src/fees/saga'
 import { firebaseSaga } from 'src/firebase/saga'
 import { gethSaga } from 'src/geth/saga'
 import { goldTokenSaga } from 'src/goldToken/saga'
@@ -65,4 +66,5 @@ export function* rootSaga() {
   yield spawn(firebaseSaga)
   yield spawn(inviteSaga)
   yield spawn(importSaga)
+  yield spawn(feesSaga)
 }

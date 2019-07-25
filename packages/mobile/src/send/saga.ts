@@ -25,11 +25,27 @@ import {
 } from 'src/send/actions'
 import { recipientCacheSelector } from 'src/send/reducers'
 import { transferStableToken } from 'src/stableToken/actions'
+import { BasicTokenTransfer, createTransaction } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
+import { web3 } from 'src/web3/contracts'
+import { fetchGasPrice } from 'src/web3/gas'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'send/saga'
+
+export async function getSendFee(account: string, contractGetter: any, params: BasicTokenTransfer) {
+  // create mock transaction and get gas
+  const tx = await createTransaction(contractGetter, params)
+  const txParams: any = { from: account, gasCurrency: contractGetter(web3)._address }
+  const gas: BigNumber = new BigNumber(await tx.estimateGas(txParams))
+  const gasPrice: BigNumber = new BigNumber(await fetchGasPrice())
+  Logger.debug(`${TAG}/getSendFee`, `estimated gas: ${gas}`)
+  Logger.debug(`${TAG}/getSendFee`, `gas price: ${gasPrice}`)
+  const suggestedFeeInWei: BigNumber = gas.multipliedBy(gasPrice)
+  Logger.debug(`${TAG}/getSendFee`, `New fee is: ${suggestedFeeInWei}`)
+  return suggestedFeeInWei
+}
 
 export function* watchQrCodeDetections() {
   while (true) {

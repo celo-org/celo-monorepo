@@ -1,4 +1,3 @@
-import { getStableTokenContract } from '@celo/contractkit'
 import { Avatar } from '@celo/react-components/components/Avatar'
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
@@ -6,7 +5,6 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import { parseInputAmount } from '@celo/utils/src/parsing'
 import BigNumber from 'bignumber.js'
-import { debounce } from 'lodash'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import {
@@ -26,7 +24,9 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION, INPUT_DEBOUNCE_TIME } from 'src/config'
+import { ERROR_BANNER_DURATION } from 'src/config'
+import { FeeType } from 'src/fees/actions'
+import EstimateFee from 'src/fees/EstimateFee'
 import { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import {
@@ -38,17 +38,12 @@ import { E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import { updateSuggestedFee } from 'src/send/actions'
 import LabeledTextInput from 'src/send/LabeledTextInput'
 import { getSuggestedFeeDollars } from 'src/send/selectors'
-import { CeloDefaultRecipient } from 'src/send/Send'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
-import Logger from 'src/utils/Logger'
 import { Recipient, RecipientKind } from 'src/utils/recipient'
-
-const TAG: string = 'send/SendAmount'
 
 const MAX_COMMENT_LENGTH = 70
 
@@ -73,7 +68,6 @@ interface DispatchProps {
   showMessage: typeof showMessage
   showError: typeof showError
   hideAlert: typeof hideAlert
-  updateSuggestedFee: typeof updateSuggestedFee
   fetchPhoneAddresses: typeof fetchPhoneAddresses
 }
 
@@ -100,54 +94,16 @@ export class SendAmount extends React.PureComponent<Props, State> {
 
   amountInput: React.RefObject<TextInput>
   timeout: number | null = null
-  calculateFeeDebounced: (() => void)
 
   constructor(props: Props) {
     super(props)
     this.amountInput = React.createRef<TextInput>()
-    this.calculateFeeDebounced = debounce(this.calculateFee, INPUT_DEBOUNCE_TIME)
   }
 
   componentDidMount() {
     this.props.navigation.setParams({ title: this.props.t('send_or_request') })
     this.props.fetchDollarBalance()
     this.fetchLatestPhoneAddress()
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (
-      this.getVerificationStatus(prevProps.e164NumberToAddress) === VerificationStatus.UNKNOWN &&
-      this.getVerificationStatus() !== VerificationStatus.UNKNOWN
-    ) {
-      this.calculateFeeDebounced()
-    }
-  }
-
-  calculateFee = () => {
-    if (this.amountGreatherThanBalance()) {
-      // No need to update fee as the user doesn't have enough anyways
-      return
-    }
-
-    const verificationStatus = this.getVerificationStatus()
-    if (verificationStatus === VerificationStatus.UNKNOWN) {
-      // Wait for verification status before calculating fee
-      return
-    }
-
-    Logger.debug(TAG, 'Updating fee')
-    const params = {
-      // Just use a default here since it doesn't matter for fee estimation
-      recipientAddress: CeloDefaultRecipient.address!,
-      amount: parseInputAmount(this.state.amount).toString(),
-      comment: this.state.reason,
-    }
-
-    this.props.updateSuggestedFee(
-      verificationStatus === VerificationStatus.VERIFIED,
-      getStableTokenContract,
-      params
-    )
   }
 
   componentWillUnmount() {
@@ -187,7 +143,6 @@ export class SendAmount extends React.PureComponent<Props, State> {
 
   onAmountChanged = (amount: string) => {
     this.setState({ amount })
-    this.calculateFeeDebounced()
   }
 
   onReasonChanged = (reason: string) => {
@@ -202,7 +157,6 @@ export class SendAmount extends React.PureComponent<Props, State> {
     }
 
     this.setState({ reason, characterLimitExeeded })
-    this.calculateFeeDebounced()
   }
 
   getConfirmationInput = () => {
@@ -348,6 +302,13 @@ export class SendAmount extends React.PureComponent<Props, State> {
 
     return (
       <View style={style.body}>
+        {verificationStatus !== VerificationStatus.UNKNOWN && (
+          <EstimateFee
+            feeType={
+              verificationStatus === VerificationStatus.VERIFIED ? FeeType.SEND : FeeType.INVITE
+            }
+          />
+        )}
         <KeyboardAwareScrollView
           keyboardShouldPersistTaps="always"
           contentContainerStyle={style.scrollViewContentContainer}
@@ -480,7 +441,6 @@ export default componentWithAnalytics(
       fetchDollarBalance,
       showError,
       hideAlert,
-      updateSuggestedFee,
       showMessage,
       fetchPhoneAddresses,
     }
