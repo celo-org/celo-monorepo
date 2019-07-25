@@ -59,19 +59,25 @@ export const BLSPrivateKeyToPublic = (privateKeyHex: string) => {
 
   const publicKey = g.multiply(privateKey)
   const publicKeyXBytes = reverse(publicKey.affineX.toBuffer())
+  const publicKeyYNum = BigInteger.fromBuffer(publicKey.affineY.toBuffer())
   const publicKeyYBytes = reverse(publicKey.affineY.toBuffer())
-
   let publicKeyXHex = publicKeyXBytes.toString('hex')
   while (publicKeyXHex.length < 96) {
     publicKeyXHex = publicKeyXHex + '00'
   }
+  const publicKeyXBytesPadded = Buffer.from(publicKeyXHex, 'hex')
+
+  if (publicKeyYNum.compareTo(p.subtract(new BigInteger('1')).shiftRight(1)) >= 0) {
+    publicKeyXBytesPadded[publicKeyXBytesPadded.length - 1] |= 0x80
+  }
+  publicKeyXHex = publicKeyXBytesPadded.toString('hex')
 
   let publicKeyYHex = publicKeyYBytes.toString('hex')
   while (publicKeyYHex.length < 96) {
     publicKeyYHex = publicKeyYHex + '00'
   }
 
-  const publicKeyHex = publicKeyXHex + publicKeyYHex
+  const publicKeyHex = publicKeyXHex
 
   return publicKeyHex
 }
