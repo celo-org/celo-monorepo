@@ -15,7 +15,7 @@ import { getWordlist } from 'src/backup/utils'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData } from 'src/geth/geth'
 import { waitForGethConnectivity } from 'src/geth/saga'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
 import {
@@ -82,9 +82,7 @@ function* checkWeb3SyncProgressClaim() {
         CeloAnalytics.track(CustomEventNames.blockChainCorruption, {}, true)
         const deleted = yield call(deleteChainData)
         if (deleted) {
-          navigate(Screens.ErrorScreen, {
-            errorMessage: 'corruptedChainDeleted',
-          })
+          navigateToError('corruptedChainDeleted')
         }
         throw new Error('Corrupted chain data encountered')
       } else {
