@@ -3,6 +3,14 @@
 
 version: 2
 
+parameters:
+  first_execution:
+    type: boolean
+    default: true
+  frun_protocol_tests:
+    type: boolean
+    default: true
+
 defaults: &defaults
   working_directory: ~/app
   docker:
@@ -22,6 +30,58 @@ general:
     - 'protocol/coverage'
 
 jobs:
+
+  decide_what_to_run:
+    <<: *defaults
+    steps:
+      # The standard Circle CI checkout steps makes a shallow clone with the depth of 1
+      # Which means we have no way of knowing which commits are specifically in this branch.
+      # We need that for incremental testing.
+      # This checkout assumes that a single branch will not have more than a certain number commits
+      # on top of master and if it does, then the incremental testing script will fail. The committer can
+      # than squash those commits. Which is OK since we squash commits on merge to master
+      # anyways.
+      - run:
+          name: Checkout (with last 100 commits)
+          command: |
+            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+            git clone --depth 100 --no-single-branch --branch ${CIRCLE_BRANCH} git@github.com:celo-org/celo-monorepo.git ~/app
+            cd ~/app
+            set -v
+            # To get the "master" branch mapping
+            git checkout master
+            git checkout ${CIRCLE_BRANCH}
+            # Verify that these commands work, they are later called in the incremental testing script
+            # There output does not matter here, the fact that they finish successfully does.
+            git rev-parse --abbrev-ref HEAD
+            git merge-base master $(git rev-parse --abbrev-ref HEAD)
+            git log --format=format:%H $(git merge-base master $(git rev-parse --abbrev-ref HEAD))..HEAD > /dev/null
+
+      - attach_workspace:
+          at: ~/actual-celo-monorepo
+
+      - restore_cache:
+          key: yarn-v2-{{ checksum "yarn.lock" }}-{{ arch }}
+
+      - run:
+          name: Delete @celo dir from node_modules (if its there)
+          command: rm -rf ~/app/node_modules/@celo
+
+      - run:
+          name: yarn
+          command: |
+            # Deals with yarn install flakiness which can come due to yarnpkg.com being
+            # unreliable. For example, https://circleci.com/gh/celo-org/celo-monorepo/82685
+            yarn --ignore-scripts install || yarn --ignore-scripts install
+
+      - run:
+          name: Decide which tests to run
+          command: |
+            set -e
+            DIRS_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils"
+            ./scripts/ci_run_if_test_should_run_v2.sh protocol-test ${DIRS_TO_CHECK}
+
+
   install_dependencies:
     <<: *defaults
     steps:
@@ -81,19 +141,19 @@ jobs:
             - node_modules
             - packages/*/node_modules
 
-      - run: 
-          name: Conditionally start protocol tests
-          command: |
-            DIRS_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils"
-            ./scripts/ci_run_if_test_should_run_v2.sh protocol-test ${DIRS_TO_CHECK}
+      # - run: 
+      #     name: Conditionally start protocol tests
+      #     command: |
+      #       DIRS_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils"
+      #       ./scripts/ci_run_if_test_should_run_v2.sh protocol-test ${DIRS_TO_CHECK}
 
-      - run: 
-          name: Conditionally start geth tests
-          command: |
-            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
-            ./scripts/ci_run_if_test_should_run_v2.sh end-to-end-geth-transfer-test ${DIRS_TO_CHECK}
-            ./scripts/ci_run_if_test_should_run_v2.sh end-to-end-geth-governance-test ${DIRS_TO_CHECK}
-            ./scripts/ci_run_if_test_should_run_v2.sh end-to-end-geth-sync-test ${DIRS_TO_CHECK}
+      # - run: 
+      #     name: Conditionally start geth tests
+      #     command: |
+      #       DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
+      #       ./scripts/ci_run_if_test_should_run_v2.sh end-to-end-geth-transfer-test ${DIRS_TO_CHECK}
+      #       ./scripts/ci_run_if_test_should_run_v2.sh end-to-end-geth-governance-test ${DIRS_TO_CHECK}
+      #       ./scripts/ci_run_if_test_should_run_v2.sh end-to-end-geth-sync-test ${DIRS_TO_CHECK}
 
       - persist_to_workspace:
           root: .
@@ -219,6 +279,8 @@ jobs:
 
   protocol-test:
     <<: *defaults
+    when:
+          condition: << pipeline.parameters.run_protocol_tests >>
     steps:
       - attach_workspace:
           at: ~/app
@@ -347,7 +409,11 @@ workflows:
   version: 2
   celo-monorepo-build:
     jobs:
-      - install_dependencies
+      - decide_what_to_run:
+          when: << pipeline.parameters.first_execution >>
+      - install_dependencies:
+          requires:
+            - decide_what_to_run
       - lint-checks:
           requires:
             - install_dependencies
