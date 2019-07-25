@@ -1,4 +1,9 @@
 const argv = require('minimist')(process.argv.slice(2), { string: ['migration_override'] })
+const BigNumber = require('bignumber.js')
+
+// Almost never use exponential notation in toString
+// http://mikemcl.github.io/bignumber.js/#exponential-at
+BigNumber.config({ EXPONENTIAL_AT: 1e9 })
 
 const defaultConfig = {
   attestations: {
@@ -52,8 +57,8 @@ const defaultConfig = {
     tokenName: 'Celo Dollar',
     tokenSymbol: 'cUSD',
     // 52nd root of 1.005, equivalent to 0.5% annual inflation
-    inflationRateNumerator: 100009591886,
-    inflationRateDenominator: 100000000000,
+    inflationRateNumerator: BigNumber(100009591886),
+    inflationRateDenominator: BigNumber(100000000000),
     inflationPeriod: 7 * 24 * 60 * 60, // 1 week
   },
   validators: {
@@ -69,7 +74,7 @@ const defaultConfig = {
 }
 
 const linkedLibraries = {
-  FixidityLib: ['SortedOracles', 'SortedFractionMedianList', 'BondedDeposits'],
+  FixidityLib: ['SortedOracles', 'SortedFractionMedianList', 'BondedDeposits', 'StableToken'],
   LinkedList: ['AddressLinkedList', 'SortedLinkedList'],
   SortedLinkedList: ['AddressSortedLinkedList', 'IntegerSortedLinkedList'],
   AddressLinkedList: ['Validators'],

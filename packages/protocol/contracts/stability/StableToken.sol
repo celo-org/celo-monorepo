@@ -1,11 +1,11 @@
 pragma solidity ^0.5.8;
 
+import "fixidity/contracts/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 
 import "./interfaces/IStableToken.sol";
-import "./FractionUtil.sol";
 import "../common/interfaces/IERC20Token.sol";
 import "../common/interfaces/ICeloToken.sol";
 import "../common/Initializable.sol";
@@ -17,20 +17,18 @@ import "../common/UsingRegistry.sol";
  */
 // solhint-disable-next-line max-line-length
 contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initializable, UsingRegistry {
-  using FractionUtil for FractionUtil.Fraction;
+  using FixidityLib for int256;
   using SafeMath for uint256;
 
   event MinterSet(address indexed _minter);
 
   event InflationFactorUpdated(
-    uint256 numerator,
-    uint256 denominator,
+    int256 factor,
     uint256 lastUpdated
   );
 
   event InflationParametersUpdated(
-    uint256 numerator,
-    uint256 denominator,
+    int256 rate,
     uint256 updatePeriod,
     uint256 lastUpdated
   );
@@ -64,8 +62,8 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
   // The `updatePeriod` governs often the `factor` is updated.
   // `factorLastUpdated` indicates when the inflation factor was last updated.
   struct InflationState {
-    FractionUtil.Fraction rate;
-    FractionUtil.Fraction factor;
+    int256 rate;
+    int256 factor;
     uint256 updatePeriod;
     uint256 factorLastUpdated;
   }
@@ -94,7 +92,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
    * has passed since last update.
    */
   modifier updateInflationFactor() {
-    FractionUtil.Fraction memory updatedInflationFactor;
+    int256 updatedInflationFactor;
     uint256 lastUpdated;
 
     (updatedInflationFactor, lastUpdated) = getUpdatedInflationFactor();
@@ -103,8 +101,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
       inflationState.factor = updatedInflationFactor;
       inflationState.factorLastUpdated = lastUpdated;
       emit InflationFactorUpdated(
-        inflationState.factor.numerator,
-        inflationState.factor.denominator,
+        inflationState.factor,
         inflationState.factorLastUpdated
       );
     }
@@ -116,8 +113,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
    * @param _symbol A short symbol identifying the token (e.g. "cUSD")
    * @param _decimals Tokens are divisible to this many decimal places.
    * @param registryAddress Address of the Registry contract.
-   * @param inflationRateNumerator numerator of weekly inflation rate.
-   * @param inflationRateDenominator denominator of weekly inflation rate.
+   * @param inflationRate weekly inflation rate.
    * @param inflationFactorUpdatePeriod how often the inflation factor is updated.
    */
   function initialize(
@@ -125,15 +121,14 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
     string calldata _symbol,
     uint8 _decimals,
     address registryAddress,
-    uint256 inflationRateNumerator,
-    uint256 inflationRateDenominator,
+    int256 inflationRate,
     uint256 inflationFactorUpdatePeriod
   )
     external
     initializer
   {
     require(
-      inflationRateNumerator != 0 && inflationRateDenominator != 0,
+      inflationRate != 0,
       "Must provide a non-zero inflation rate."
     );
     _transferOwnership(msg.sender);
@@ -142,8 +137,8 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
     symbol_ = _symbol;
     decimals_ = _decimals;
 
-    inflationState.rate = FractionUtil.Fraction(inflationRateNumerator, inflationRateDenominator);
-    inflationState.factor = FractionUtil.Fraction(1, 1);
+    inflationState.rate = inflationRate;
+    inflationState.factor = FixidityLib.fixed1();
     inflationState.updatePeriod = inflationFactorUpdatePeriod;
     // solhint-disable-next-line not-rely-on-time
     inflationState.factorLastUpdated = now;
@@ -163,13 +158,11 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
 
   /**
    * @notice Updates Inflation Parameters.
-   * @param rateNumerator numerator of new rate.
-   * @param rateDenominator denominator of new rate.
+   * @param rate new rate.
    * @param updatePeriod how often inflationFactor is updated.
    */
   function setInflationParameters(
-    uint256 rateNumerator,
-    uint256 rateDenominator,
+    int256 rate,
     uint256 updatePeriod
   )
     external
@@ -177,19 +170,14 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
     updateInflationFactor
   {
     require(
-      rateNumerator != 0 && rateDenominator != 0,
+      rate != 0,
       "Must provide a non-zero inflation rate."
     );
-    inflationState.rate = FractionUtil.Fraction(
-      rateNumerator,
-      rateDenominator
-    ).reduce();
-
+    inflationState.rate = rate;
     inflationState.updatePeriod = updatePeriod;
 
     emit InflationParametersUpdated(
-      inflationState.rate.numerator,
-      inflationState.rate.denominator,
+      inflationState.rate,
       inflationState.updatePeriod,
       // solhint-disable-next-line not-rely-on-time
       now
@@ -350,21 +338,19 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
 
   /**
    * @notice gets inflation parameters.
-   * @return rateNumerator, rateDenominator,
-   * factorNumerator, factorDenominator,
-   * updatePeriod
-   * factorLastUpdated
+   * @return rate
+   * @return factor
+   * @return updatePeriod
+   * @return factorLastUpdated
    */
   function getInflationParameters()
     external
     view
-    returns (uint256, uint256, uint256, uint256, uint256, uint256)
+    returns (int256, int256, uint256, uint256)
   {
     return (
-      inflationState.rate.numerator,
-      inflationState.rate.denominator,
-      inflationState.factor.numerator,
-      inflationState.factor.denominator,
+      inflationState.rate,
+      inflationState.factor,
       inflationState.updatePeriod,
       inflationState.factorLastUpdated
     );
@@ -378,7 +364,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
    * we assume any function calling this will have updated the inflation factor.
    */
   function valueToUnits(uint256 value) external view returns (uint256) {
-    FractionUtil.Fraction memory updatedInflationFactor;
+    int256 updatedInflationFactor;
 
     (updatedInflationFactor, ) = getUpdatedInflationFactor();
     return _valueToUnits(updatedInflationFactor, value);
@@ -390,11 +376,11 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
    * @return The value corresponding to `units` given the current inflation factor.
    */
   function unitsToValue(uint256 units) public view returns (uint256) {
-    FractionUtil.Fraction memory updatedInflationFactor;
+    int256 updatedInflationFactor;
 
     (updatedInflationFactor, ) = getUpdatedInflationFactor();
 
-    return updatedInflationFactor.inverse().mul(units);
+    return uint256(FixidityLib.newFixed(int256(units)).divide(updatedInflationFactor).fromFixed());
   }
 
   /**
@@ -404,25 +390,25 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
    * @dev we assume any function calling this will have updated the inflation factor.
    */
   function _valueToUnits(
-    FractionUtil.Fraction memory inflationFactor,
+    int256 inflationFactor,
     uint256 value
   )
     private
     pure
     returns (uint256)
   {
-    return inflationFactor.mul(value);
+    return uint256(inflationFactor.multiply(FixidityLib.newFixed(int256(value))).fromFixed());
   }
 
   /**
    * @notice Computes the up-to-date inflation factor.
-   * @return numerator, denominator of the current inflation factor.
+   * @return current inflation factor.
    * @return lastUpdated time when the returned inflation factor went into effect.
    */
   function getUpdatedInflationFactor()
     private
     view
-    returns (FractionUtil.Fraction memory, uint256)
+    returns (int256, uint256)
   {
     /* solhint-disable not-rely-on-time */
     if (now < inflationState.factorLastUpdated.add(inflationState.updatePeriod)) {
@@ -439,10 +425,10 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
     );
 
     (numerator, denominator) = fractionMulExp(
-      inflationState.factor.numerator,
-      inflationState.factor.denominator,
-      inflationState.rate.numerator,
-      inflationState.rate.denominator,
+      uint256(inflationState.factor),
+      uint256(FixidityLib.fixed1()),
+      uint256(inflationState.rate),
+      uint256(FixidityLib.fixed1()),
       timesToApplyInflation,
       decimals_
     );
@@ -453,10 +439,8 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
       return (inflationState.factor, inflationState.factorLastUpdated);
     }
 
-    FractionUtil.Fraction memory currentInflationFactor = FractionUtil.Fraction(
-      numerator,
-      denominator
-    ).reduce();
+    int256 currentInflationFactor =
+      FixidityLib.newFixed(int256(numerator)).divide(FixidityLib.newFixed(int256(denominator)));
 
     uint256 lastUpdated = inflationState.factorLastUpdated.add(
       inflationState.updatePeriod.mul(timesToApplyInflation)
@@ -474,7 +458,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
    * @param bDenominator Denominator of exponentiated fraction
    * @param exponent exponent to raise b to
    * @param _decimals precision
-   * @return numererator/denominator of the computed quantity (not reduced).
+   * @return numerator/denominator of the computed quantity (not reduced).
    */
   function fractionMulExp(
     uint256 aNumerator,

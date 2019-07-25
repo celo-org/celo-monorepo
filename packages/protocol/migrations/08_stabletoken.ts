@@ -1,6 +1,7 @@
 /* tslint:disable:no-console */
 import Web3 = require('web3')
 
+import { toFixed } from '@celo/protocol/lib/fixidity'
 import {
   convertToContractDecimalsBN,
   deployProxyAndImplementation,
@@ -23,14 +24,19 @@ const initializeArgs = async (): Promise<any[]> => {
     'Registry',
     artifacts
   )
+  // @ts-ignore
+  registry.numberFormat = 'BigNumber'
+
+  const rate = toFixed(
+    config.stableToken.inflationRateNumerator.div(config.stableToken.inflationRateDenominator)
+  )
 
   return [
     config.stableToken.tokenName,
     config.stableToken.tokenSymbol,
     config.stableToken.decimals,
     registry.address,
-    config.stableToken.inflationRateNumerator,
-    config.stableToken.inflationRateDenominator,
+    rate.toString(),
     config.stableToken.inflationPeriod,
   ]
 }
