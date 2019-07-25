@@ -341,17 +341,17 @@ describe('transfer tests', function(this: any) {
     expectedGasUsed: number,
     gasCurrency?: string
   ): Promise<[boolean, any, any]> => {
-    const gasPriceMinimum_ = await getGasPriceMinimum(gasCurrency)
-    assert.isAbove(gasPriceMinimum_, 0)
+    const minGasPrice = await getGasPriceMinimum(gasCurrency)
+    assert.isAbove(minGasPrice, 0)
     const receipt = await txPromise
-    const newBalances = await getBalances()
+    const balances = await getBalances()
     const tx = await web3.eth.getTransaction(receipt.transactionHash)
     const gasPrice = tx.gasPrice
     assert.isAbove(parseInt(gasPrice, 10), 0)
     const expectedTransactionFee = new BigNumber(expectedGasUsed).times(gasPrice)
     const expectedInfrastructureFeeFraction = 0.5
     const expectedTransactionFeeToInfrastructure = new BigNumber(expectedGasUsed)
-      .times(gasPriceMinimum_)
+      .times(minGasPrice)
       .times(expectedInfrastructureFeeFraction)
     const expectedTransactionFeeToRecipient = expectedTransactionFee.minus(
       expectedTransactionFeeToInfrastructure
@@ -361,7 +361,7 @@ describe('transfer tests', function(this: any) {
       infrastructure: expectedTransactionFeeToInfrastructure,
       recipient: expectedTransactionFeeToRecipient,
     }
-    return [receipt.status, newBalances, fees]
+    return [receipt.status, balances, fees]
   }
 
   const assertBalances = (
@@ -456,8 +456,7 @@ describe('transfer tests', function(this: any) {
   }
 
   const GOLD_TRANSACTION_GAS_COST = 23511
-  // const syncModes = ['full', 'fast', 'light', 'ultralight']
-  const syncModes = ['full']
+  const syncModes = ['full', 'fast', 'light', 'ultralight']
   for (const syncMode of syncModes) {
     describe(`when running ${syncMode} sync`, () => {
       describe('when transferring Celo Gold', () => {
