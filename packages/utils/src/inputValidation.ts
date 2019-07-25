@@ -1,6 +1,6 @@
 import { getDisplayPhoneNumber } from './phoneNumbers'
 
-interface BaseProps {
+export interface BaseProps {
   validator?: 'phone' | 'integer' | 'decimal' | 'custom'
   customValidator?: (input: string) => string
   countryCallingCode?: string
@@ -19,7 +19,7 @@ export function validateDecimal(input: string, lng?: string): string {
       .replace(/[^0-9,]/g, '')
       .replace(/,/, 'b')
       .replace(/,/g, '')
-      .replace(/b/, '.')
+      .replace(/b/, ',')
   }
 
   // Fall back to just period decimals
