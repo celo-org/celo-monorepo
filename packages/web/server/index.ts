@@ -68,10 +68,10 @@ function wwwRedirect(req, res, nextAction) {
   server.use(bodyParser.json())
   server.use(nextI18NextMiddleware(nextI18next))
 
-  server.post('/fellowship', (req, res) => {
+  server.post('/fellowship', async (req, res) => {
     const { ideas, email, name, bio, deliverables, resume } = req.body
 
-    submitFellowApp({
+    await submitFellowApp({
       name,
       email,
       ideas,
@@ -83,22 +83,22 @@ function wwwRedirect(req, res, nextAction) {
     res.status(204).send('ok')
   })
 
-  server.post('/faucet', (req, res) => {
-    faucetOrInviteController(req, res, RequestType.Faucet)
+  server.post('/faucet', async (req, res) => {
+    await faucetOrInviteController(req, res, RequestType.Faucet)
   })
 
-  server.post('/invite', (req, res) => {
-    faucetOrInviteController(req, res, RequestType.Invite)
+  server.post('/invite', async (req, res) => {
+    await faucetOrInviteController(req, res, RequestType.Invite)
   })
 
   server.post('/contacts', async (req, res) => {
-    addToCRM(req.body)
+    await addToCRM(req.body)
     res.status(204).send('ok')
   })
 
   server.post('/partnerships-email', async (req, res) => {
     const { email } = req.body
-    mailer({
+    await mailer({
       toName: 'Team Celo',
       toEmail: 'partnerships@celo.org',
       fromEmail: 'partnerships@celo.org',
