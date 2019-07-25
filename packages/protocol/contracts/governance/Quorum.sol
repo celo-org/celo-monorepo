@@ -84,17 +84,14 @@ contract Quorum is IQuorum, Ownable, Initializable {
       FractionUtil.Fraction(baseThresholdNumerator, baseThresholdDenominator);
     FractionUtil.Fraction memory kFactor =
       FractionUtil.Fraction(kFactorNumerator, kFactorDenominator);
-    if (quorumRatio.isLessThan(FractionUtil.Fraction(1, 1))) {
+    if (quorumRatio.isLessThanOrEqualTo(FractionUtil.Fraction(1, 1))) {
       FractionUtil.Fraction memory adjustment = kFactor.mul(quorumRatio.inverse().sub(quorumRatio));
       adjustedThreshold = adjustedThreshold.add(adjustment);
     } else {
       FractionUtil.Fraction memory adjustment = kFactor.mul(quorumRatio.sub(quorumRatio.inverse()));
-      adjustedThreshold = adjustedThreshold.isGreaterThanOrEqualTo(adjustment) ?
-        adjustedThreshold.sub(adjustment) : FractionUtil.Fraction(0, 1);
       FractionUtil.Fraction memory half = FractionUtil.Fraction(1, 2);
-      if (adjustedThreshold.isLessThan(half)) {
-        adjustedThreshold = half;
-      }
+      adjustedThreshold = adjustedThreshold.isGreaterThan(adjustment.add(half)) ?
+        adjustedThreshold.sub(adjustment) : half;
     }
     return (adjustedThreshold.numerator, adjustedThreshold.denominator);
   }
