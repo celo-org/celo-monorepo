@@ -199,8 +199,15 @@ describe('SendAmount', () => {
     const tree = renderer.create(
       <Provider store={store}>
         <SendAmount navigation={mockNavigation} />
-      </Provider>
+      </Provider>,
+      {
+        createNodeMock: (element) => {
+          console.log(element)
+          return null
+        },
+      }
     )
+    console.log(tree)
     expect(tree).toMatchSnapshot()
   })
 })

@@ -89,61 +89,29 @@ exports[`PhoneNumberInput renders correctly with minimum props 1`] = `
         }
       }
     />
-    <View
+    <TextInput
+      allowFontScaling={true}
+      countryCallingCode="1"
+      keyboardType="phone-pad"
+      onChangeText={[Function]}
+      placeholderTextColor="#D1D5D8"
+      rejectResponderTermination={true}
       style={
         Array [
           Object {
-            "alignItems": "center",
-            "flex": 1,
-            "flexDirection": "row",
-            "justifyContent": "center",
+            "height": 50,
           },
-          Array [
-            Object {
-              "height": 50,
-            },
-            Object {
-              "flex": 1,
-              "marginLeft": 9,
-            },
-          ],
+          Object {
+            "flex": 1,
+            "marginLeft": 9,
+          },
         ]
       }
-    >
-      <TextInput
-        allowFontScaling={true}
-        autoCorrect={true}
-        autoFocus={false}
-        keyboardType="phone-pad"
-        onBlur={[Function]}
-        onChangeText={[Function]}
-        onFocus={[Function]}
-        placeholder=""
-        placeholderTextColor="#D1D5D8"
-        rejectResponderTermination={true}
-        secureTextEntry={false}
-        style={
-          Array [
-            Object {
-              "fontFamily": "Hind-Regular",
-            },
-            Object {
-              "borderColor": "#D1D5D8",
-              "borderRadius": 3,
-              "padding": 8,
-            },
-            Object {
-              "backgroundColor": "#FFFFFF",
-              "flex": 1,
-            },
-          ]
-        }
-        testID="PhoneNumberField"
-        textContentType="none"
-        underlineColorAndroid="transparent"
-        value=""
-      />
-    </View>
+      testID="PhoneNumberField"
+      underlineColorAndroid="transparent"
+      validator="phone"
+      value=""
+    />
   </View>
 </View>
 `;
