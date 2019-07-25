@@ -6,14 +6,12 @@ import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-s
 import { getPincode } from 'src/account'
 import { setAccountCreationTime } from 'src/account/actions'
 import { pincodeSelector } from 'src/account/reducer'
-import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { setInviteCodeEntered } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
-import { ERROR_BANNER_DURATION } from 'src/config'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData } from 'src/geth/geth'
 import { waitForGethConnectivity } from 'src/geth/saga'
@@ -84,10 +82,9 @@ function* checkWeb3SyncProgressClaim() {
         CeloAnalytics.track(CustomEventNames.blockChainCorruption, {}, true)
         const deleted = yield call(deleteChainData)
         if (deleted) {
-          yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED, ERROR_BANNER_DURATION))
-          // navigate(Screens.ErrorScreen, {
-          //   errorMessage: 'Corrupted chain data has been deleted, please restart the app',
-          // })
+          navigate(Screens.ErrorScreen, {
+            errorMessage: 'corruptedChainDeleted',
+          })
         }
         throw new Error('Corrupted chain data encountered')
       } else {
