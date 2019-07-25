@@ -299,3 +299,6 @@ export function addCeloGethMiddleware(argv: yargs.Argv) {
 export const validateAccountAddress = (address: string) => {
   return address !== null && address.toLowerCase().startsWith('0x') && address.length === 42 // 0x followed by 40 hex-chars
 }
+
+export const ensure0x = (hexstr: string) => (hexstr.startsWith('0x') ? hexstr : '0x' + hexstr)
+export const strip0x = (hexstr: string) => (hexstr.startsWith('0x') ? hexstr.slice(2) : hexstr)
