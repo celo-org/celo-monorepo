@@ -1,12 +1,10 @@
-# `celocli exchange`
+---
+description: Commands for interacting with the Exchange
+---
 
-Commands for interacting with the Exchange
+## Commands
 
-- [`celocli exchange:list`](#celocli-exchangelist)
-- [`celocli exchange:selldollar SELLAMOUNT MINBUYAMOUNT FROM`](#celocli-exchangeselldollar-sellamount-minbuyamount-from)
-- [`celocli exchange:sellgold SELLAMOUNT MINBUYAMOUNT FROM`](#celocli-exchangesellgold-sellamount-minbuyamount-from)
-
-## `celocli exchange:list`
+### List
 
 List information about tokens on the exchange (all amounts in wei)
 
@@ -25,7 +23,7 @@ EXAMPLE
 
 _See code: [src/commands/exchange/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/list.ts)_
 
-## `celocli exchange:selldollar SELLAMOUNT MINBUYAMOUNT FROM`
+### Selldollar
 
 Sell Celo dollars for Celo gold on the exchange
 
@@ -48,7 +46,7 @@ EXAMPLE
 
 _See code: [src/commands/exchange/selldollar.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/selldollar.ts)_
 
-## `celocli exchange:sellgold SELLAMOUNT MINBUYAMOUNT FROM`
+### Sellgold
 
 Sell Celo gold for Celo dollars on the exchange
 

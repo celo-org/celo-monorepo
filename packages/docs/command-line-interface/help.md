@@ -1,10 +1,10 @@
-# `celocli help`
+---
+description: display help for celocli
+---
 
-display help for celocli
+## Commands
 
-- [`celocli help [COMMAND]`](#celocli-help-command)
-
-## `celocli help [COMMAND]`
+### Help
 
 display help for celocli
 

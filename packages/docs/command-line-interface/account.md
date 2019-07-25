@@ -1,14 +1,10 @@
-# `celocli account`
+---
+description: Manage your account, send and receive Celo Gold and Celo Dollars
+---
 
-Manage your account, send and receive Celo Gold and Celo Dollars
+## Commands
 
-- [`celocli account:balance ACCOUNT`](#celocli-accountbalance-account)
-- [`celocli account:new`](#celocli-accountnew)
-- [`celocli account:transferdollar`](#celocli-accounttransferdollar)
-- [`celocli account:transfergold`](#celocli-accounttransfergold)
-- [`celocli account:unlock`](#celocli-accountunlock)
-
-## `celocli account:balance ACCOUNT`
+### Balance
 
 View Celo Dollar and Gold balances given account address
 
@@ -26,7 +22,7 @@ EXAMPLE
 
 _See code: [src/commands/account/balance.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/balance.ts)_
 
-## `celocli account:new`
+### New
 
 Creates a new account
 
@@ -44,7 +40,7 @@ EXAMPLE
 
 _See code: [src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/new.ts)_
 
-## `celocli account:transferdollar`
+### Transferdollar
 
 Transfer Celo Dollars
 
@@ -66,7 +62,7 @@ EXAMPLE
 
 _See code: [src/commands/account/transferdollar.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/transferdollar.ts)_
 
-## `celocli account:transfergold`
+### Transfergold
 
 Transfer gold
 
@@ -88,7 +84,7 @@ EXAMPLE
 
 _See code: [src/commands/account/transfergold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/transfergold.ts)_
 
-## `celocli account:unlock`
+### Unlock
 
 Unlock an account address to send transactions or validate blocks
 

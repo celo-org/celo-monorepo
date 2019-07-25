@@ -1,11 +1,10 @@
-# `celocli config`
+---
+description: Configure CLI options which persist across commands
+---
 
-Configure CLI options which persist across commands
+## Commands
 
-- [`celocli config:get`](#celocli-configget)
-- [`celocli config:set`](#celocli-configset)
-
-## `celocli config:get`
+### Get
 
 Output network node configuration
 
@@ -20,7 +19,7 @@ OPTIONS
 
 _See code: [src/commands/config/get.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/config/get.ts)_
 
-## `celocli config:set`
+### Set
 
 Configure running node information for propogating transactions to network
 

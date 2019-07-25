@@ -115,7 +115,6 @@ jobs:
        - run:
           name: Fail if someone forgot to commit CLI docs
           command: |
-            yarn pretty-quick
             if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
               echo "There are git differences after generating CLI docs"
               exit 1

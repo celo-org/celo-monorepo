@@ -1,13 +1,10 @@
-# `celocli validator`
+---
+description: View validator information and register your own
+---
 
-View validator information and register your own
+## Commands
 
-- [`celocli validator:affiliation`](#celocli-validatoraffiliation)
-- [`celocli validator:list`](#celocli-validatorlist)
-- [`celocli validator:register`](#celocli-validatorregister)
-- [`celocli validator:show VALIDATORADDRESS`](#celocli-validatorshow-validatoraddress)
-
-## `celocli validator:affiliation`
+### Affiliation
 
 Manage affiliation to a ValidatorGroup
 
@@ -29,7 +26,7 @@ EXAMPLES
 
 _See code: [src/commands/validator/affiliation.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/affiliation.ts)_
 
-## `celocli validator:list`
+### List
 
 List existing Validators
 
@@ -47,7 +44,7 @@ EXAMPLE
 
 _See code: [src/commands/validator/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/list.ts)_
 
-## `celocli validator:register`
+### Register
 
 Register a new Validator
 
@@ -74,7 +71,7 @@ EXAMPLE
 
 _See code: [src/commands/validator/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/register.ts)_
 
-## `celocli validator:show VALIDATORADDRESS`
+### Show
 
 Show information about an existing Validator
 

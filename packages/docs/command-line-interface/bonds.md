@@ -1,16 +1,10 @@
-# `celocli bonds`
+---
+description: Manage bonded deposits to participate in governance and earn rewards
+---
 
-Manage bonded deposits to participate in governance and earn rewards
+## Commands
 
-- [`celocli bonds:deposit`](#celocli-bondsdeposit)
-- [`celocli bonds:list ACCOUNT`](#celocli-bondslist-account)
-- [`celocli bonds:notify`](#celocli-bondsnotify)
-- [`celocli bonds:register`](#celocli-bondsregister)
-- [`celocli bonds:rewards`](#celocli-bondsrewards)
-- [`celocli bonds:show ACCOUNT`](#celocli-bondsshow-account)
-- [`celocli bonds:withdraw AVAILABILITYTIME`](#celocli-bondswithdraw-availabilitytime)
-
-## `celocli bonds:deposit`
+### Deposit
 
 Create a bonded deposit given notice period and gold amount
 
@@ -33,7 +27,7 @@ EXAMPLE
 
 _See code: [src/commands/bonds/deposit.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/bonds/deposit.ts)_
 
-## `celocli bonds:list ACCOUNT`
+### List
 
 View information about all of the account's deposits
 
@@ -51,7 +45,7 @@ EXAMPLE
 
 _See code: [src/commands/bonds/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/bonds/list.ts)_
 
-## `celocli bonds:notify`
+### Notify
 
 Notify a bonded deposit given notice period and gold amount
 
@@ -74,7 +68,7 @@ EXAMPLE
 
 _See code: [src/commands/bonds/notify.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/bonds/notify.ts)_
 
-## `celocli bonds:register`
+### Register
 
 Register an account for bonded deposit eligibility
 
@@ -93,7 +87,7 @@ EXAMPLE
 
 _See code: [src/commands/bonds/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/bonds/register.ts)_
 
-## `celocli bonds:rewards`
+### Rewards
 
 Manage rewards for bonded deposit account
 
@@ -115,7 +109,7 @@ EXAMPLES
 
 _See code: [src/commands/bonds/rewards.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/bonds/rewards.ts)_
 
-## `celocli bonds:show ACCOUNT`
+### Show
 
 View bonded gold and corresponding account weight of a deposit given ID
 
@@ -138,7 +132,7 @@ EXAMPLES
 
 _See code: [src/commands/bonds/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/bonds/show.ts)_
 
-## `celocli bonds:withdraw AVAILABILITYTIME`
+### Withdraw
 
 Withdraw notified deposit given availability time
 

@@ -1,10 +1,10 @@
-# `celocli node`
+---
+description: Manage your full node
+---
 
-Manage your full node
+## Commands
 
-- [`celocli node:accounts`](#celocli-nodeaccounts)
-
-## `celocli node:accounts`
+### Accounts
 
 List node accounts
 

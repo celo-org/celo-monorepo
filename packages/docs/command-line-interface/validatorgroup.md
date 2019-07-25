@@ -1,14 +1,10 @@
-# `celocli validatorgroup`
+---
+description: View validator group information and cast votes
+---
 
-View validator group information and cast votes
+## Commands
 
-- [`celocli validatorgroup:list`](#celocli-validatorgrouplist)
-- [`celocli validatorgroup:member VALIDATORADDRESS`](#celocli-validatorgroupmember-validatoraddress)
-- [`celocli validatorgroup:register`](#celocli-validatorgroupregister)
-- [`celocli validatorgroup:show GROUPADDRESS`](#celocli-validatorgroupshow-groupaddress)
-- [`celocli validatorgroup:vote`](#celocli-validatorgroupvote)
-
-## `celocli validatorgroup:list`
+### List
 
 List existing Validator Groups
 
@@ -26,7 +22,7 @@ EXAMPLE
 
 _See code: [src/commands/validatorgroup/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/list.ts)_
 
-## `celocli validatorgroup:member VALIDATORADDRESS`
+### Member
 
 Register a new Validator Group
 
@@ -51,7 +47,7 @@ EXAMPLES
 
 _See code: [src/commands/validatorgroup/member.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/member.ts)_
 
-## `celocli validatorgroup:register`
+### Register
 
 Register a new Validator Group
 
@@ -75,7 +71,7 @@ EXAMPLE
 
 _See code: [src/commands/validatorgroup/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/register.ts)_
 
-## `celocli validatorgroup:show GROUPADDRESS`
+### Show
 
 Show information about an existing Validator Group
 
@@ -96,7 +92,7 @@ EXAMPLE
 
 _See code: [src/commands/validatorgroup/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/show.ts)_
 
-## `celocli validatorgroup:vote`
+### Vote
 
 Vote for a Validator Group
 
