@@ -155,8 +155,7 @@ const generateIstanbulExtraData = (validators: Validator[]) => {
       .encode([
         validators.map((validator) => Buffer.from(validator.address, 'hex')),
         validators.map((validator) => Buffer.from(validator.BLSPublicKey, 'hex')),
-        [],
-        [],
+        new Buffer(0),
         Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
         new Buffer(0),
         Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
