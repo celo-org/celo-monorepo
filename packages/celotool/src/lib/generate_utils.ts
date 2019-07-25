@@ -60,19 +60,19 @@ export const generatePrivateKey = (mnemonic: string, accountType: AccountType, i
   return newNode.privateKey.toString('hex')
 }
 
-export const generatePublicKeyFromPrivateKey = (privateKey: string) => {
+export const privateKeyToPublicKey = (privateKey: string) => {
   const ecPrivateKey = ec.keyFromPrivate(Buffer.from(privateKey, 'hex'))
   const ecPublicKey: string = ecPrivateKey.getPublic('hex')
   return ecPublicKey.slice(2)
 }
 
-export const generateAccountAddressFromPrivateKey = (privateKey: string) => {
+export const privateKeyToAddress = (privateKey: string) => {
   // @ts-ignore
   return new Web3.modules.Eth().accounts.privateKeyToAccount(ensure0x(privateKey)).address
 }
 
-export const privateKey2GethAddress = (privateKey: string) =>
-  strip0x(generateAccountAddressFromPrivateKey(privateKey))
+export const privateKeyToStrippedAddress = (privateKey: string) =>
+  strip0x(privateKeyToAddress(privateKey))
 
 const DEFAULT_BALANCE = '1000000000000000000000000'
 const VALIDATOR_OG_SOURCE = 'og'
@@ -81,9 +81,9 @@ export const getPrivateKeysFor = (accountType: AccountType, mnemonic: string, n:
   range(0, n).map((i) => generatePrivateKey(mnemonic, accountType, i))
 
 export const getAddressesFor = (accountType: AccountType, mnemonic: string, n: number) =>
-  getPrivateKeysFor(accountType, mnemonic, n).map(generateAccountAddressFromPrivateKey)
+  getPrivateKeysFor(accountType, mnemonic, n).map(privateKeyToAddress)
 
-export const getGethAddressesFor = (accountType: AccountType, mnemonic: string, n: number) =>
+export const getStrippedAddressesFor = (accountType: AccountType, mnemonic: string, n: number) =>
   getAddressesFor(accountType, mnemonic, n).map(strip0x)
 
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
@@ -91,7 +91,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const validators =
     validatorEnv === VALIDATOR_OG_SOURCE
       ? OG_ACCOUNTS.map((account) => account.address)
-      : getGethAddressesFor(
+      : getStrippedAddressesFor(
           AccountType.VALIDATOR,
           fetchEnv(envVar.MNEMONIC),
           parseInt(validatorEnv, 10)

@@ -1,16 +1,11 @@
 /* tslint:disable no-console */
-import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
-import { uploadArtifacts } from '@celo/celotool/src/lib/artifacts'
-import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
-import { ensure0x, envVar, execCmd, fetchEnv } from '@celo/celotool/src/lib/utils'
-import { switchToClusterFromEnv } from 'src/lib/cluster'
-import {
-  AccountType,
-  generateAccountAddressFromPrivateKey,
-  generatePrivateKey,
-  getPrivateKeysFor,
-} from 'src/lib/generate_utils'
-import { OG_ACCOUNTS } from 'src/lib/genesis_constants'
+import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial';
+import { uploadArtifacts } from '@celo/celotool/src/lib/artifacts';
+import { portForwardAnd } from '@celo/celotool/src/lib/port_forward';
+import { ensure0x, envVar, execCmd, fetchEnv } from '@celo/celotool/src/lib/utils';
+import { switchToClusterFromEnv } from 'src/lib/cluster';
+import { AccountType, generatePrivateKey, getPrivateKeysFor, privateKeyToAddress } from 'src/lib/generate_utils';
+import { OG_ACCOUNTS } from 'src/lib/genesis_constants';
 
 export const command = 'contracts'
 
@@ -22,7 +17,7 @@ function minerForEnv() {
   if (fetchEnv(envVar.VALIDATORS) === 'og') {
     return ensure0x(OG_ACCOUNTS[0].address)
   } else {
-    return generateAccountAddressFromPrivateKey(
+    return privateKeyToAddress(
       generatePrivateKey(fetchEnv(envVar.MNEMONIC), AccountType.VALIDATOR, 0)
     )
   }

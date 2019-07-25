@@ -1,18 +1,11 @@
-import {
-  AccountType,
-  ConsensusType,
-  generateGenesis,
-  generatePublicKeyFromPrivateKey,
-  getPrivateKeysFor,
-  privateKey2GethAddress,
-} from '@celo/celotool/src/lib/generate_utils'
-import { getEnodeAddress } from '@celo/celotool/src/lib/geth'
-import { ensure0x } from '@celo/celotool/src/lib/utils'
-import { assert } from 'chai'
-import { spawn, SpawnOptions } from 'child_process'
-import fs from 'fs'
-import { join as joinPath, resolve as resolvePath } from 'path'
-import { Admin } from 'web3-eth-admin'
+import { AccountType, ConsensusType, generateGenesis, getPrivateKeysFor, privateKeyToPublicKey, privateKeyToStrippedAddress } from '@celo/celotool/src/lib/generate_utils';
+import { getEnodeAddress } from '@celo/celotool/src/lib/geth';
+import { ensure0x } from '@celo/celotool/src/lib/utils';
+import { assert } from 'chai';
+import { spawn, SpawnOptions } from 'child_process';
+import fs from 'fs';
+import { join as joinPath, resolve as resolvePath } from 'path';
+import { Admin } from 'web3-eth-admin';
 
 interface GethInstanceConfig {
   name: string
@@ -373,9 +366,9 @@ export function getHooks(gethConfig: GethTestConfig) {
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
   const numValidators = validatorInstances.length
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
-  const validators = validatorPrivateKeys.map(privateKey2GethAddress)
+  const validators = validatorPrivateKeys.map(privateKeyToStrippedAddress)
   const validatorEnodes = validatorPrivateKeys.map((x: any, i: number) =>
-    getEnodeAddress(generatePublicKeyFromPrivateKey(x), '127.0.0.1', validatorInstances[i].port)
+    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
   )
   const argv = require('minimist')(process.argv.slice(2))
   const branch = argv.branch || 'master'
