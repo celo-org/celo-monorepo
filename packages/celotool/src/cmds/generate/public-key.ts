@@ -1,6 +1,11 @@
 /* tslint:disable no-console */
-import { coerceMnemonicAccountType, generatePrivateKey, MNEMONIC_ACCOUNT_TYPE_CHOICES, privateKeyToPublicKey } from 'src/lib/generate_utils';
-import * as yargs from 'yargs';
+import {
+  coerceMnemonicAccountType,
+  generatePrivateKey,
+  MNEMONIC_ACCOUNT_TYPE_CHOICES,
+  privateKeyToPublicKey,
+} from 'src/lib/generate_utils'
+import * as yargs from 'yargs'
 
 interface Bip32Argv {
   mnemonic: string

@@ -1,6 +1,6 @@
 /* tslint:disable no-console */
-import { privateKeyToAddress } from 'src/lib/generate_utils';
-import * as yargs from 'yargs';
+import { privateKeyToAddress } from 'src/lib/generate_utils'
+import * as yargs from 'yargs'
 
 interface AccountAddressArgv {
   privateKey: string
