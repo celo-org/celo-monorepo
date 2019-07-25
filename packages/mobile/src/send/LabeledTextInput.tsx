@@ -5,7 +5,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
-import { KeyboardType, StyleSheet, Text, TextInput, TextStyle, View } from 'react-native'
+import { KeyboardType, StyleSheet, Text, TextStyle, View } from 'react-native'
 import Search from 'src/icons/Search'
 
 interface OwnProps {
@@ -23,15 +23,11 @@ interface OwnProps {
   onChangeText(value: string): void
 }
 
-interface RefProps {
-  innerRef?: React.RefObject<TextInput>
-}
-
-type Props = OwnProps & RefProps & ValidatorProps
+type Props = OwnProps & ValidatorProps
 interface State {
   active: boolean
 }
-export class LabeledTextInput extends React.Component<Props, State> {
+export default class LabeledTextInput extends React.Component<Props, State> {
   state = {
     active: false,
   }
@@ -71,7 +67,6 @@ export class LabeledTextInput extends React.Component<Props, State> {
         <ValidatedTextInput
           placeholderTextColor={colors.gray}
           {...this.props}
-          ref={this.props.innerRef}
           style={style.textInput}
           onFocus={this.onFocus}
           onBlur={this.onBlur}
@@ -103,7 +98,3 @@ const style = StyleSheet.create({
     marginHorizontal: 8,
   },
 })
-
-export default React.forwardRef((props: Props, ref: React.Ref<TextInput>) => (
-  <LabeledTextInput innerRef={ref as React.RefObject<TextInput>} {...props} />
-))

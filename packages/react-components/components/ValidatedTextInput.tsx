@@ -34,13 +34,9 @@ interface CustomValidatorProps {
 
 export type ValidatorProps = PhoneValidatorProps | NumberValidatorProps | CustomValidatorProps
 
-interface RefProps {
-  innerRef?: React.RefObject<TextInput>
-}
+type Props = OwnProps & ValidatorProps & TextInputProps
 
-type Props = OwnProps & ValidatorProps & RefProps & TextInputProps
-
-export class ValidatedTextInput extends React.Component<Props> {
+export default class ValidatedTextInput extends React.Component<Props> {
   onChangeText = (input: string): void => {
     const validated = validateInput(input, this.props)
     // Don't propagate change if new change is invalid
@@ -75,14 +71,9 @@ export class ValidatedTextInput extends React.Component<Props> {
       <TextInput
         maxLength={this.getMaxLength()}
         {...this.props}
-        ref={this.props.innerRef}
         value={this.props.value}
         onChangeText={this.onChangeText}
       />
     )
   }
 }
-
-export default React.forwardRef((props: Props, ref?: React.Ref<TextInput>) => (
-  <ValidatedTextInput innerRef={ref as React.RefObject<TextInput>} {...props} />
-))
