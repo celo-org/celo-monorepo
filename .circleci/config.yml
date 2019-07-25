@@ -116,8 +116,8 @@ jobs:
           name: Fail if someone forgot to commit CLI docs
           command: |
             if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
-              echo "There are git differences after generating CLI docs"
               git --no-pager diff packages/docs/command-line-interface
+              echo "There are git differences after generating CLI docs"
               exit 1
             fi
 
