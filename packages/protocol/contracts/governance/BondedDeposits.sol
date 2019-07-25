@@ -1,5 +1,6 @@
 pragma solidity ^0.5.8;
 
+import "fixidity/contracts/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -17,6 +18,7 @@ import "../stability/FractionUtil.sol";
 
 contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, UsingRegistry {
 
+  using FixidityLib for int256;
   using FractionUtil for FractionUtil.Fraction;
   using SafeMath for uint256;
 
@@ -82,7 +84,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
   // Maps voting, rewards, and validating delegates to the account that delegated these rights.
   mapping(address => address) public delegations;
   // Maps a block number to the cumulative reward for an account with weight 1 since genesis.
-  mapping(uint256 => FractionUtil.Fraction) public cumulativeRewardWeights;
+  mapping(uint256 => int256) public cumulativeRewardWeights;
 
   event MaxNoticePeriodSet(
     uint256 maxNoticePeriod
@@ -724,22 +726,23 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     Account storage account = accounts[_account];
     Rewards storage rewards = account.rewards;
     uint256 rewardBlockNumber = block.number.sub(1);
-    FractionUtil.Fraction storage previousCumulativeRewardWeight = cumulativeRewardWeights[
+    int256 previousCumulativeRewardWeight = cumulativeRewardWeights[
       rewards.lastRedeemed
     ];
-    FractionUtil.Fraction storage cumulativeRewardWeight = cumulativeRewardWeights[
+    int256 cumulativeRewardWeight = cumulativeRewardWeights[
       rewardBlockNumber
     ];
     // We should never get here except in testing, where cumulativeRewardWeight will not be set.
-    if (!previousCumulativeRewardWeight.exists() || !cumulativeRewardWeight.exists()) {
+    if (previousCumulativeRewardWeight == 0 || cumulativeRewardWeight == 0) {
       return 0;
     }
 
-    FractionUtil.Fraction memory rewardWeight = cumulativeRewardWeight.sub(
+    int256 rewardWeight = cumulativeRewardWeight.subtract(
       previousCumulativeRewardWeight
     );
-    require(rewardWeight.exists(), "Rewards weight does not exist");
-    uint256 value = rewardWeight.mul(account.weight);
+    require(rewardWeight != 0, "Rewards weight does not exist");
+    uint256 value =
+      uint256(rewardWeight.multiply(FixidityLib.newFixed(int256(account.weight))).fromFixed());
     rewards.lastRedeemed = uint96(rewardBlockNumber);
     if (value > 0) {
       address recipient = getRewardsRecipientFromAccount(_account);
@@ -902,6 +905,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     return ecrecover(prefixedHash, v, r, s);
   }
 
+  // TODO: consider using Fixidity's roots
   /**
    * @notice Approxmiates the square root of x using the Bablyonian method.
    * @param x The number to take the square root of.
