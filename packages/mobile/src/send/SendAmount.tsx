@@ -57,7 +57,7 @@ interface State {
   amount: string
   reason: string
   numberOfDecimals: number
-  characterLimitExeeded: boolean
+  characterLimitExceeded: boolean
 }
 
 type Props = StateProps & DispatchProps & NavigationInjectedProps & WithNamespaces
@@ -96,7 +96,7 @@ export class SendAmount extends React.PureComponent<Props, State> {
     amount: '',
     reason: '',
     numberOfDecimals: 2,
-    characterLimitExeeded: false,
+    characterLimitExceeded: false,
   }
 
   amountInput: React.RefObject<TextInput>
@@ -192,17 +192,14 @@ export class SendAmount extends React.PureComponent<Props, State> {
   }
 
   onReasonChanged = (reason: string) => {
-    let characterLimitExeeded
-    if (reason.length > MAX_COMMENT_LENGTH) {
+    const characterLimitExceeded = reason.length > MAX_COMMENT_LENGTH
+    if (characterLimitExceeded) {
       this.props.showMessage(this.props.t('characterLimitExceeded', { max: MAX_COMMENT_LENGTH }))
-
-      characterLimitExeeded = true
     } else {
       this.props.hideAlert()
-      characterLimitExeeded = false
     }
 
-    this.setState({ reason, characterLimitExeeded })
+    this.setState({ reason, characterLimitExceeded })
     this.calculateFeeDebounced()
   }
 
@@ -262,15 +259,15 @@ export class SendAmount extends React.PureComponent<Props, State> {
 
   renderButtons = (amountIsValid: boolean, userHasEnough: boolean) => {
     const { t } = this.props
-    const { characterLimitExeeded } = this.state
+    const { characterLimitExceeded } = this.state
     const verificationStatus = this.getVerificationStatus()
 
     const requestDisabled =
-      !amountIsValid || verificationStatus !== VerificationStatus.VERIFIED || characterLimitExeeded
+      !amountIsValid || verificationStatus !== VerificationStatus.VERIFIED || characterLimitExceeded
     const sendDisabled =
       !amountIsValid ||
       !userHasEnough ||
-      characterLimitExeeded ||
+      characterLimitExceeded ||
       verificationStatus === VerificationStatus.UNKNOWN
 
     const separatorContainerStyle =
