@@ -81,6 +81,20 @@ jobs:
             - node_modules
             - packages/*/node_modules
 
+      - run: 
+          name: Conditionally start protocol tests
+          command: |
+            DIRS_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils"
+            ./scripts/ci_run_if_test_should_run_v2.sh protocol-test ${DIRS_TO_CHECK}
+
+      - run: 
+          name: Conditionally start geth tests
+          command: |
+            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
+            ./scripts/ci_run_if_test_should_run_v2.sh end-to-end-geth-transfer-test ${DIRS_TO_CHECK}
+            ./scripts/ci_run_if_test_should_run_v2.sh end-to-end-geth-governance-test ${DIRS_TO_CHECK}
+            ./scripts/ci_run_if_test_should_run_v2.sh end-to-end-geth-sync-test ${DIRS_TO_CHECK}
+
       - persist_to_workspace:
           root: .
           paths: .
@@ -359,12 +373,12 @@ workflows:
       - protocol-test:
           requires:
             - install_dependencies
-      - end-to-end-geth-transfer-test:
-          requires:
-            - install_dependencies
-      - end-to-end-geth-governance-test:
-          requires:
-            - install_dependencies
-      - end-to-end-geth-sync-test:
-          requires:
-            - install_dependencies
+      # - end-to-end-geth-transfer-test:
+      #     requires:
+      #       - install_dependencies
+      # - end-to-end-geth-governance-test:
+      #     requires:
+      #       - install_dependencies
+      # - end-to-end-geth-sync-test:
+      #     requires:
+      #       - install_dependencies
