@@ -7,7 +7,13 @@ import {
   PROXY_CONTRACT_CODE,
   TEMPLATE,
 } from '@celo/celotool/src/lib/genesis_constants'
-import { envVar, fetchEnv, fetchEnvOrFallback } from '@celo/celotool/src/lib/utils'
+import {
+  ensure0x,
+  envVar,
+  fetchEnv,
+  fetchEnvOrFallback,
+  strip0x,
+} from '@celo/celotool/src/lib/utils'
 import { ec as EC } from 'elliptic'
 import { range, repeat } from 'lodash'
 import rlp from 'rlp'
@@ -54,40 +60,42 @@ export const generatePrivateKey = (mnemonic: string, accountType: AccountType, i
   return newNode.privateKey.toString('hex')
 }
 
-export const generatePublicKeyFromPrivateKey = (privateKey: string) => {
+export const privateKeyToPublicKey = (privateKey: string) => {
   const ecPrivateKey = ec.keyFromPrivate(Buffer.from(privateKey, 'hex'))
   const ecPublicKey: string = ecPrivateKey.getPublic('hex')
   return ecPublicKey.slice(2)
 }
 
-export const generateAccountAddressFromPrivateKey = (privateKey: string) => {
-  if (!privateKey.startsWith('0x')) {
-    privateKey = '0x' + privateKey
-  }
-  // @ts-ignore-next-line
-  return new Web3.modules.Eth().accounts.privateKeyToAccount(privateKey).address
+export const privateKeyToAddress = (privateKey: string) => {
+  // @ts-ignore
+  return new Web3.modules.Eth().accounts.privateKeyToAccount(ensure0x(privateKey)).address
 }
+
+export const privateKeyToStrippedAddress = (privateKey: string) =>
+  strip0x(privateKeyToAddress(privateKey))
 
 const DEFAULT_BALANCE = '1000000000000000000000000'
 const VALIDATOR_OG_SOURCE = 'og'
 
-export const getValidatorsPrivateKeys = (mnemonic: string, n: number) => {
-  return range(0, n).map((i) => generatePrivateKey(mnemonic, AccountType.VALIDATOR, i))
-}
+export const getPrivateKeysFor = (accountType: AccountType, mnemonic: string, n: number) =>
+  range(0, n).map((i) => generatePrivateKey(mnemonic, accountType, i))
 
-export const getValidators = (mnemonic: string, n: number) => {
-  return range(0, n)
-    .map((i) => generatePrivateKey(mnemonic, AccountType.VALIDATOR, i))
-    .map(generateAccountAddressFromPrivateKey)
-    .map((address) => address.slice(2))
-}
+export const getAddressesFor = (accountType: AccountType, mnemonic: string, n: number) =>
+  getPrivateKeysFor(accountType, mnemonic, n).map(privateKeyToAddress)
+
+export const getStrippedAddressesFor = (accountType: AccountType, mnemonic: string, n: number) =>
+  getAddressesFor(accountType, mnemonic, n).map(strip0x)
 
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
   const validators =
     validatorEnv === VALIDATOR_OG_SOURCE
       ? OG_ACCOUNTS.map((account) => account.address)
-      : getValidators(fetchEnv(envVar.MNEMONIC), parseInt(validatorEnv, 10))
+      : getStrippedAddressesFor(
+          AccountType.VALIDATOR,
+          fetchEnv(envVar.MNEMONIC),
+          parseInt(validatorEnv, 10)
+        )
 
   // @ts-ignore
   if (![ConsensusType.CLIQUE, ConsensusType.ISTANBUL].includes(fetchEnv(envVar.CONSENSUS_TYPE))) {
