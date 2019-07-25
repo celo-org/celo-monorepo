@@ -9,7 +9,7 @@ metadata:
     heritage: {{ .Release.Service }}
     component: bootnode
 spec:
-  {{ if not (eq .Values.bootnode.internal true) }}
+  {{ if $.Values.geth.static_ips }}
   type: LoadBalancer
   loadBalancerIP: {{ .Values.geth.bootnodeIpAddress }}
   {{ end }}
