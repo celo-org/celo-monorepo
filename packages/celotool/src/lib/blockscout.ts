@@ -1,5 +1,5 @@
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
-import { execCmdWithExitOnFailure, fetchEnv } from 'src/lib/utils'
+import { execCmdWithExitOnFailure, fetchEnv, fetchEnvOrFallback } from 'src/lib/utils'
 
 export async function installHelmChart(
   celoEnv: string,
@@ -62,7 +62,7 @@ function helmParameters(
     `--set blockscout.db.password=${blockscoutDBPassword}`,
     `--set blockscout.db.connection_name=${blockscoutDBConnectionName.trim()}`,
     `--set blockscout.replicas=${fetchEnv('BLOCKSCOUT_WEB_REPLICAS')}`,
-    `--set blockscout.subnetwork=${celoEnv}`,
+    `--set blockscout.subnetwork=${fetchEnvOrFallback('BLOCKSCOUT_SUBNETWORK_NAME', celoEnv)}`,
     `--set promtosd.scrape_interval=${fetchEnv('PROMTOSD_SCRAPE_INTERVAL')}`,
     `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
   ]
