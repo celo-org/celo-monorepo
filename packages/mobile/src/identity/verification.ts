@@ -17,8 +17,9 @@ import {
 } from '@celo/contractkit'
 import { Attestations as AttestationsType } from '@celo/contractkit/types/Attestations'
 import { StableToken as StableTokenType } from '@celo/contractkit/types/StableToken'
-import { compressedPubKey, stripHexLeader } from '@celo/utils/src/commentEncryption'
+import { compressedPubKey } from '@celo/utils/src/commentEncryption'
 import { getPhoneHash, isE164Number } from '@celo/utils/src/phoneNumbers'
+import { compareAddresses } from '@celo/utils/src/signatureUtils'
 import BigNumber from 'bignumber.js'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
@@ -135,6 +136,7 @@ export function* doVerificationFlow() {
     }
 
     // Mark codes completed in previous attempts
+    // yield call(setCompletedCodes, NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining)
     yield put(completeAttestationCode(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining))
 
     // Request any additional attestations needed to be verified
@@ -263,6 +265,18 @@ async function getAttestationsStatus(
   }
 }
 
+// function* setCompletedCodes(numCodesCompleted: number) {
+//   yield all([
+//     put(completeAttestationCode(numCodesCompleted)),
+//     put(
+//       inputAttestationCode({
+//         code: ATTESTATION_CODE_PLACEHOLDER,
+//         issuer: ATTESTATION_ISSUER_PLACEHOLDER,
+//       })
+//     ),
+//   ])
+// }
+
 export async function requestNeededAttestations(
   attestationsContract: AttestationsType,
   stableTokenContract: StableTokenType,
@@ -329,7 +343,7 @@ function attestationCodeReceiver(
       if (existingCode) {
         Logger.warn(TAG + '@attestationCodeReceiver', 'Code already exists store, skipping.')
         if (action.inputType === CodeInputType.MANUAL) {
-          yield put(showError(ErrorMessages.REPEAT_VERIFICATION_CODE, ERROR_DURATION))
+          yield put(showError(ErrorMessages.REPEAT_ATTESTATION_CODE, ERROR_DURATION))
         }
         return
       }
@@ -439,7 +453,10 @@ async function setAccount(
   Logger.debug(TAG, 'Setting wallet address and public data encryption key')
   const currentWalletAddress = await getWalletAddress(attestationsContract, address)
   const currentWalletDEK = await getDataEncryptionKey(attestationsContract, address)
-  if (currentWalletAddress !== address || stripHexLeader(currentWalletDEK) !== dataKey) {
+  if (
+    !compareAddresses(currentWalletAddress, address) ||
+    !compareAddresses(currentWalletDEK, dataKey)
+  ) {
     const setAccountTx = makeSetAccountTx(attestationsContract, address, dataKey)
     return sendTransaction(setAccountTx, address, TAG, `Set Wallet Address & DEK`)
   }
