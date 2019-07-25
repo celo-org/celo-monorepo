@@ -10,6 +10,8 @@ import {
   EXPIRY_SECONDS,
   FetchReclaimTransactionFeeAction,
   ReclaimPaymentAction,
+  reclaimPaymentFailure,
+  reclaimPaymentSuccess,
   setReclaimTransactionFee,
   storeSentPayments,
   TransferPaymentAction,
@@ -21,6 +23,8 @@ import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import { inviteesSelector } from 'src/invite/reducer'
 import { TEMP_PW } from 'src/invite/saga'
 import { isValidPrivateKey } from 'src/invite/utils'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { recipientCacheSelector } from 'src/send/reducers'
 import { fetchDollarBalance } from 'src/stableToken/actions'
@@ -140,6 +144,9 @@ function* reclaimFromEscrow(action: ReclaimPaymentAction) {
 
     yield call(fetchDollarBalance)
     yield call(getSentPayments)
+
+    yield call(navigate, Screens.WalletHome)
+    yield put(reclaimPaymentSuccess())
   } catch (e) {
     Logger.error(TAG + '@reclaimFromEscrow', 'Error reclaiming payment from escrow', e)
     if (e.message === ErrorMessages.INCORRECT_PIN) {
@@ -147,6 +154,7 @@ function* reclaimFromEscrow(action: ReclaimPaymentAction) {
     } else {
       yield put(showError(ErrorMessages.RECLAIMING_ESCROWED_PAYMENT_FAILED, ERROR_BANNER_DURATION))
     }
+    yield put(reclaimPaymentFailure(e))
     throw e
   }
 }

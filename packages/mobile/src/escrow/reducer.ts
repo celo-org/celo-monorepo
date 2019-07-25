@@ -2,11 +2,13 @@ import { Actions, ActionTypes, EscrowedPayment } from 'src/escrow/actions'
 import { RootState } from 'src/redux/reducers'
 
 export interface State {
+  isReclaiming: boolean
   sentEscrowedPayments: EscrowedPayment[]
   suggestedFee: string | null
 }
 
 export const initialState = {
+  isReclaiming: false,
   sentEscrowedPayments: [],
   suggestedFee: null,
 }
@@ -22,6 +24,17 @@ export const escrowReducer = (state: State | undefined = initialState, action: A
       return {
         ...state,
         suggestedFee: action.suggestedFee,
+      }
+    case Actions.RECLAIM_PAYMENT:
+      return {
+        ...state,
+        isReclaiming: true,
+      }
+    case Actions.RECLAIM_PAYMENT_FAILURE:
+    case Actions.RECLAIM_PAYMENT_SUCCESS:
+      return {
+        ...state,
+        isReclaiming: false,
       }
     default:
       return state

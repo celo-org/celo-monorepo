@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { RecipientWithContact } from 'src/utils/recipient'
 
@@ -25,6 +26,8 @@ export enum Actions {
   RESEND_PAYMENT = 'ESCROW/RESEND_PAYMENT',
   FETCH_RECLAIM_TRANSACTION_FEE = 'ESCROW/FETCH_RECLAIM_TRANSACTION_FEE',
   SET_RECLAIM_TRANSACTION_FEE = 'ESCROW/SET_RECLAIM_TRANSACTION_FEE',
+  RECLAIM_PAYMENT_SUCCESS = 'ESCROW/RECLAIM_PAYMENT_SUCCESS',
+  RECLAIM_PAYMENT_FAILURE = 'ESCROW/RECLAIM_PAYMENT_FAILURE',
 }
 
 export interface TransferPaymentAction {
@@ -63,6 +66,15 @@ export interface FetchReclaimTransactionFeeAction {
   paymentID: string
 }
 
+export interface ReclaimPaymentSuccessAction {
+  type: Actions.RECLAIM_PAYMENT_SUCCESS
+}
+
+export interface ReclaimFailureAction {
+  type: Actions.RECLAIM_PAYMENT_FAILURE
+  error: ErrorMessages
+}
+
 export type ActionTypes =
   | TransferPaymentAction
   | ReclaimPaymentAction
@@ -71,6 +83,8 @@ export type ActionTypes =
   | ResendPaymentAction
   | SetReclaimTransactionFeeAction
   | FetchReclaimTransactionFeeAction
+  | ReclaimPaymentSuccessAction
+  | ReclaimFailureAction
 
 export const transferEscrowedPayment = (
   phoneHash: string,
@@ -114,4 +128,13 @@ export const fetchReclaimTransactionFee = (
 ): FetchReclaimTransactionFeeAction => ({
   type: Actions.FETCH_RECLAIM_TRANSACTION_FEE,
   paymentID,
+})
+
+export const reclaimPaymentSuccess = (): ReclaimPaymentSuccessAction => ({
+  type: Actions.RECLAIM_PAYMENT_SUCCESS,
+})
+
+export const reclaimPaymentFailure = (error: ErrorMessages): ReclaimFailureAction => ({
+  type: Actions.RECLAIM_PAYMENT_FAILURE,
+  error,
 })
