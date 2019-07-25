@@ -17,6 +17,8 @@ import { stableTokenSaga } from 'src/stableToken/saga'
 import Logger from 'src/utils/Logger'
 import { web3Saga } from 'src/web3/saga'
 
+const TAG = 'redux/saga'
+
 const loggerBlacklist = [
   'persist/REHYDRATE',
   'GETH_NEW_BLOCK',
@@ -38,13 +40,21 @@ function* loggerSaga() {
   }
 
   yield takeEvery('*', (action: AnyAction) => {
-    if (action && action.type && loggerBlacklist.includes(action.type)) {
-      return
-    }
     try {
-      Logger.debug('redux/saga@logger', JSON.stringify(action))
+      const actionString = JSON.stringify(action)
+      if (action && action.type && loggerBlacklist.includes(action.type)) {
+        if (__DEV__) {
+          Logger.debug(
+            `${TAG}@logger`,
+            `Action "${actionString}" is blacklisted but it's logged becuase __DEV__ == true`
+          )
+        } else {
+          return
+        }
+      }
+      Logger.debug(`${TAG}@logger`, JSON.stringify(action))
     } catch (err) {
-      Logger.warn('redux/saga@logger', 'could not log action of type', action.type)
+      Logger.warn(`${TAG}@logger`, 'could not log action of type', action.type)
     }
   })
 }
