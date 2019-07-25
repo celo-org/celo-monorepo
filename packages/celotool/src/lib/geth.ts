@@ -2,7 +2,7 @@
 import {
   AccountType,
   generatePrivateKey,
-  generatePublicKeyFromPrivateKey,
+  privateKeyToPublicKey,
 } from '@celo/celotool/src/lib/generate_utils'
 import { retrieveIPAddress } from '@celo/celotool/src/lib/helm_deploy'
 import { envVar, execCmd, execCmdWithExitOnFailure, fetchEnv } from '@celo/celotool/src/lib/utils'
@@ -85,7 +85,7 @@ export const getBootnodeEnode = async (namespace: string) => {
     AccountType.LOAD_TESTING_ACCOUNT,
     0
   )
-  const nodeId = generatePublicKeyFromPrivateKey(privateKey)
+  const nodeId = privateKeyToPublicKey(privateKey)
   return [getEnodeAddress(nodeId, ip, DISCOVERY_PORT)]
 }
 
@@ -98,7 +98,7 @@ const getEnodesWithIpAddresses = async (namespace: string, getExternalIP: boolea
   const enodes = Promise.all(
     txNodesRange.map(async (index) => {
       const privateKey = generatePrivateKey(fetchEnv(envVar.MNEMONIC), AccountType.TX_NODE, index)
-      const nodeId = generatePublicKeyFromPrivateKey(privateKey)
+      const nodeId = privateKeyToPublicKey(privateKey)
       let address: string
       if (getExternalIP) {
         address = txAddresses[index]
