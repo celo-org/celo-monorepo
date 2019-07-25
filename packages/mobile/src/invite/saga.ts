@@ -3,6 +3,7 @@ import {
   getAttestationsContract,
   getStableTokenContract,
 } from '@celo/contractkit'
+import { reTryAsync } from '@celo/utils/src/miscellaneous'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { Linking } from 'react-native'
@@ -220,10 +221,13 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
     // Check that the balance of the new account is not 0
     const StableToken = yield call(getStableTokenContract, web3)
     Logger.debug(TAG + '@redeemInviteCode', 'web3 is: ' + (yield select(web3ReadySelector)))
-    const stableBalance = new BigNumber(yield call(StableToken.methods.balanceOf(tempAccount).call))
-    Logger.debug(TAG + '@redeemInviteCode', 'Temporary account balance: ' + stableBalance)
 
-    throw 'FAIL'
+    // Try to get balance two times before failing
+    const stableBalance = new BigNumber(
+      yield call(reTryAsync, StableToken.methods.balanceOf(tempAccount).call, 2, [])
+    )
+
+    Logger.debug(TAG + '@redeemInviteCode', 'Temporary account balance: ' + stableBalance)
 
     if (stableBalance.isLessThan(1)) {
       // check if new user account has already been created
