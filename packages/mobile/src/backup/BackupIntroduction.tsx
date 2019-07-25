@@ -186,7 +186,6 @@ const styles = StyleSheet.create({
   },
   skipLink: {
     textAlign: 'center',
-    marginVertical: 0,
   },
 })
 
