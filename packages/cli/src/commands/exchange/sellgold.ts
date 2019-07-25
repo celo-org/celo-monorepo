@@ -14,6 +14,6 @@ export default class SellGold extends BaseCommand {
 
     const goldToken = await GoldToken(this.web3, args.from)
 
-    doSwap(this.web3, args, goldToken, true)
+    await doSwap(this.web3, args, goldToken, true)
   }
 }

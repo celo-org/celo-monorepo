@@ -16,7 +16,7 @@ export async function installHelmChart(
 }
 
 export async function removeHelmRelease(celoEnv: string) {
-  removeGenericHelmChart(celoEnv + '-blockscout')
+  await removeGenericHelmChart(celoEnv + '-blockscout')
 }
 
 export async function upgradeHelmChart(

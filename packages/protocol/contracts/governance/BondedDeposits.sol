@@ -180,30 +180,31 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
    * @dev Called by the EVM at the end of the block.
    */
   function setCumulativeRewardWeight(uint256 blockReward) external {
+    return;
     // TODO(asa): Modify ganache to set cumulativeRewardWeights.
     // TODO(asa): Make inheritable `onlyVm` modifier.
     // Only callable by the EVM.
-    require(msg.sender == address(0), "sender was not vm (reserved addr 0x0)");
-    FractionUtil.Fraction storage previousCumulativeRewardWeight = cumulativeRewardWeights[
-      block.number.sub(1)
-    ];
+    // require(msg.sender == address(0), "sender was not vm (reserved addr 0x0)");
+    // FractionUtil.Fraction storage previousCumulativeRewardWeight = cumulativeRewardWeights[
+    //   block.number.sub(1)
+    // ];
 
-    // This will be true the first time this is called by the EVM.
-    if (!previousCumulativeRewardWeight.exists()) {
-      previousCumulativeRewardWeight.denominator = 1;
-    }
+    // // This will be true the first time this is called by the EVM.
+    // if (!previousCumulativeRewardWeight.exists()) {
+    //   previousCumulativeRewardWeight.denominator = 1;
+    // }
 
-    if (totalWeight > 0) {
-      FractionUtil.Fraction memory currentRewardWeight = FractionUtil.Fraction(
-        blockReward,
-        totalWeight
-      ).reduce();
-      cumulativeRewardWeights[block.number] = previousCumulativeRewardWeight.add(
-        currentRewardWeight
-      );
-    } else {
-      cumulativeRewardWeights[block.number] = previousCumulativeRewardWeight;
-    }
+    // if (totalWeight > 0) {
+    //   FractionUtil.Fraction memory currentRewardWeight = FractionUtil.Fraction(
+    //     blockReward,
+    //     totalWeight
+    //   ).reduce();
+    //   cumulativeRewardWeights[block.number] = previousCumulativeRewardWeight.add(
+    //     currentRewardWeight
+    //   );
+    // } else {
+    //   cumulativeRewardWeights[block.number] = previousCumulativeRewardWeight;
+    // }
   }
 
   /**
@@ -237,6 +238,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
    * @dev Fails if `msg.sender` is not the owner or rewards recipient of the account.
    */
   function redeemRewards() external nonReentrant returns (uint256) {
+    require(false, "Disabled");
     address account = getAccountFromRewardsRecipient(msg.sender);
     return _redeemRewards(account);
   }
@@ -350,7 +352,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     isNotAccount(delegate)
     isNotDelegate(delegate)
   {
-    _redeemRewards(msg.sender);
+    // _redeemRewards(msg.sender);
     // TODO(asa): Consider an additional prefix here.
     address signer = getSignerOfAddress(msg.sender, v, r, s);
     require(signer == delegate);
@@ -376,7 +378,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     returns (uint256)
   {
     require(!isVoting(msg.sender));
-    _redeemRewards(msg.sender);
+    // _redeemRewards(msg.sender);
     require(msg.value > 0 && noticePeriod <= maxNoticePeriod);
     Account storage account = accounts[msg.sender];
     Deposit storage bonded = account.deposits.bonded[noticePeriod];
@@ -402,7 +404,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     returns (uint256)
   {
     require(!isVoting(msg.sender));
-    _redeemRewards(msg.sender);
+    // _redeemRewards(msg.sender);
     Account storage account = accounts[msg.sender];
     Deposit storage bonded = account.deposits.bonded[noticePeriod];
     require(bonded.value >= value && value > 0);
@@ -435,7 +437,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     // solhint-disable-next-line not-rely-on-time
     require(availabilityTime > now);
     require(!isVoting(msg.sender));
-    _redeemRewards(msg.sender);
+    // _redeemRewards(msg.sender);
     Account storage account = accounts[msg.sender];
     Deposit storage notified = account.deposits.notified[availabilityTime];
     require(notified.value >= value && value > 0);
@@ -462,7 +464,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     returns (uint256)
   {
     require(!isVoting(msg.sender));
-    _redeemRewards(msg.sender);
+    // _redeemRewards(msg.sender);
     // solhint-disable-next-line not-rely-on-time
     require(now >= availabilityTime);
     Account storage account = accounts[msg.sender];
@@ -495,7 +497,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     returns (uint256)
   {
     require(!isVoting(msg.sender));
-    _redeemRewards(msg.sender);
+    // _redeemRewards(msg.sender);
     require(value > 0 && increase > 0);
     Account storage account = accounts[msg.sender];
     Deposit storage bonded = account.deposits.bonded[noticePeriod];
