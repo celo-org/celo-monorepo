@@ -61,13 +61,17 @@ export enum EnvTypes {
   PRODUCTION = 'production',
 }
 
-export function execCmd(cmd: string, options: any = {}): Promise<[string, string]> {
+export function execCmd(
+  cmd: string,
+  execOptions: any = {},
+  rejectWithOutput = false
+): Promise<[string, string]> {
   return new Promise((resolve, reject) => {
     if (process.env.CELOTOOL_VERBOSE === 'true') {
       console.debug('$ ' + cmd)
     }
 
-    exec(cmd, { maxBuffer: 1024 * 1000, ...options }, (err, stdout, stderr) => {
+    exec(cmd, { maxBuffer: 1024 * 1000, ...execOptions }, (err, stdout, stderr) => {
       if (process.env.CELOTOOL_VERBOSE === 'true') {
         console.debug(stdout.toString())
       }
@@ -75,7 +79,11 @@ export function execCmd(cmd: string, options: any = {}): Promise<[string, string
         console.error(stderr.toString())
       }
       if (err) {
-        reject(err)
+        if (rejectWithOutput) {
+          reject([err, stdout.toString(), stderr.toString()])
+        } else {
+          reject(err)
+        }
       } else {
         resolve([stdout.toString(), stderr.toString()])
       }
