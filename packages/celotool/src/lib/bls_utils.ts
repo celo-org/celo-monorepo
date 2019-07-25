@@ -68,6 +68,7 @@ export const BLSPrivateKeyToPublic = (privateKeyHex: string) => {
   const publicKeyXBytesPadded = Buffer.from(publicKeyXHex, 'hex')
 
   if (publicKeyYNum.compareTo(p.subtract(new BigInteger('1')).shiftRight(1)) >= 0) {
+    // tslint:disable-next-line:no-bitwise
     publicKeyXBytesPadded[publicKeyXBytesPadded.length - 1] |= 0x80
   }
   publicKeyXHex = publicKeyXBytesPadded.toString('hex')
