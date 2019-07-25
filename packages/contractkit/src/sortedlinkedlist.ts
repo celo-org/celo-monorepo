@@ -9,13 +9,13 @@ interface ListElement {
 
 /**
  * Returns the two keys around element
- * @param newElement Element to find lesser and greater keys for
- * @param sortedElements Descending sorted list
+ * @param elem Element to find lesser and greater keys for
+ * @param sorted Descending sorted list
  */
-export function getLesserAndGreaterKeys(newElement: ListElement, sortedElements: ListElement[]) {
-  const lesserElem = sortedElements.find((elem) => elem.value < newElement.value)
+export function getLesserAndGreaterKeys(elem: ListElement, sorted: ListElement[]) {
+  const lesserElem = sorted.find((e) => e.value < elem.value && e.key !== elem.key)
   const lesserKey = lesserElem === undefined ? NULL_ADDRESS : lesserElem.key
-  const greaterElem = sortedElements.reverse().find((elem) => elem.value > newElement.value)
+  const greaterElem = sorted.reverse().find((e) => e.value > elem.value && e.key !== elem.key)
   const greaterKey = greaterElem === undefined ? NULL_ADDRESS : greaterElem.key
   return { lesserKey, greaterKey }
 }

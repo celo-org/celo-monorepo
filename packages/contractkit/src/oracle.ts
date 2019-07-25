@@ -16,7 +16,7 @@ interface FractionElements {
  * @param numerators Numerators array returned from getRates
  * @param denominators Denominators array return from getRates
  */
-function parseFractionElements(fractionElements: FractionElements) {
+function getValuesFromFractions(fractionElements: FractionElements) {
   const { 0: keys, 1: numerators, 2: denominators } = fractionElements
   return keys.map((key, i) => ({
     key: key.toLowerCase(),
@@ -43,11 +43,11 @@ export async function makeReportTx(
 
   const oracles = await getSortedOraclesContract(web3)
   const sortedFractions = await oracles.methods.getRates(tokenAddress).call()
-  const sorted = parseFractionElements(sortedFractions)
+  const sortedValues = getValuesFromFractions(sortedFractions)
 
   const { lesserKey, greaterKey } = await getLesserAndGreaterKeys(
     { key: from, value: rate },
-    sorted
+    sortedValues
   )
   return oracles.methods.report(
     tokenAddress,
