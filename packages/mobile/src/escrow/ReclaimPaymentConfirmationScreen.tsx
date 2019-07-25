@@ -112,11 +112,11 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
   render() {
     const { t, isReclaiming, appConnected } = this.props
     const payment = this.getReclaimPaymentInput()
-    const convertedAmount = divideByWei(payment.amount.toString())
-    const convertedFee = divideByWei(this.getFee().toString())
+    const convertedAmount = divideByWei(payment.amount.valueOf())
+    const convertedFee = divideByWei(this.getFee().valueOf())
 
     const currentBalance = this.props.dollarBalance
-    const userHasEnough = new BigNumber(convertedFee).isLessThanOrEqualTo(currentBalance)
+    const userHasEnough = convertedFee.isLessThanOrEqualTo(currentBalance)
 
     return (
       <View style={styles.container}>
@@ -135,9 +135,9 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
             recipientPhone={payment.recipientPhone}
             recipientContact={payment.recipientContact}
             comment={payment.message}
-            amount={new BigNumber(convertedAmount)}
+            amount={convertedAmount}
             currency={CURRENCY_ENUM.DOLLAR} // User can only request in Dollars
-            fee={new BigNumber(convertedFee)}
+            fee={convertedFee}
           />
         </ReviewFrame>
       </View>
