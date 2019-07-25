@@ -5,8 +5,7 @@ import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Modal from 'react-native-modal'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -26,6 +25,8 @@ interface State {
 }
 
 class BackupIntroduction extends React.Component<Props, State> {
+  static navigationOptions = { header: null }
+
   state = {
     selectedAnswer: null,
     visibleModal: false,
@@ -88,10 +89,7 @@ class BackupIntroduction extends React.Component<Props, State> {
         <View style={componentStyles.topBar}>
           <CancelButton onCancel={this.props.onCancel} />
         </View>
-        <KeyboardAwareScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="always"
-        >
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.center}>
             <Image source={backupIcon} style={styles.logo} />
           </View>
@@ -99,17 +97,25 @@ class BackupIntroduction extends React.Component<Props, State> {
           <Text style={[fontStyles.body, styles.body]}>{t('backupKeyImportance.0')}</Text>
           <Text style={[fontStyles.body, styles.body]}>{t('backupKeyImportance.1')}</Text>
           <Text style={[fontStyles.body, styles.body]}>{t('backupKeyImportance.2')}</Text>
+        </ScrollView>
+        <View>
           <View style={styles.modalContainer}>
             <Modal isVisible={this.state.visibleModal === true}>{this.skip()}</Modal>
           </View>
           <Button
             onPress={this.onBackup}
             text={t('getBackupKey')}
-            standard={true}
+            standard={false}
             type={BtnTypes.PRIMARY}
           />
-          <Button onPress={this.onSkip} text={t('skip')} standard={true} type={BtnTypes.TERTIARY} />
-        </KeyboardAwareScrollView>
+          <Button
+            onPress={this.onSkip}
+            style={styles.skipLink}
+            text={t('skip')}
+            standard={false}
+            type={BtnTypes.TERTIARY}
+          />
+        </View>
       </View>
     )
   }
@@ -119,7 +125,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
   scrollContainer: {
@@ -179,9 +185,8 @@ const styles = StyleSheet.create({
     color: colors.dark,
   },
   skipLink: {
-    paddingBottom: 20,
-    paddingTop: 6,
     textAlign: 'center',
+    marginVertical: 0,
   },
 })
 
