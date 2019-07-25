@@ -46,11 +46,11 @@ contract('Quorum', () => {
 
   describe('#threshold', () => {
     it('should revert at undefined participation', async () => {
-      await assertRevert(quorum.threshold(0, 0, 70, 100, 1, 2))
+      await assertRevert(quorum.thresholdAt(0, 0, 70, 100, 1, 2))
     })
 
     it('should revert at 0 participation', async () => {
-      await assertRevert(quorum.threshold(0, 100, 70, 100, 1, 2))
+      await assertRevert(quorum.thresholdAt(0, 100, 70, 100, 1, 2))
     })
 
     describe('when the quorum baseline is low', () => {
@@ -73,7 +73,7 @@ contract('Quorum', () => {
       it('should return the correct threshold at low participation', async () => {
         const totalVotes = 10
         const totalWeight = 100
-        const [tNum, tDenom] = await quorum.threshold(
+        const [tNum, tDenom] = await quorum.thresholdAt(
           totalVotes,
           totalWeight,
           baseThresholdNumerator,
@@ -89,7 +89,7 @@ contract('Quorum', () => {
       it('should return the correct threshold at medium participation', async () => {
         const totalVotes = 50
         const totalWeight = 100
-        const [tNum, tDenom] = await quorum.threshold(
+        const [tNum, tDenom] = await quorum.thresholdAt(
           totalVotes,
           totalWeight,
           baseThresholdNumerator,
@@ -105,7 +105,7 @@ contract('Quorum', () => {
       it('should return the correct threshold at high participation', async () => {
         const totalVotes = 80
         const totalWeight = 100
-        const [tNum, tDenom] = await quorum.threshold(
+        const [tNum, tDenom] = await quorum.thresholdAt(
           totalVotes,
           totalWeight,
           baseThresholdNumerator,
@@ -139,7 +139,7 @@ contract('Quorum', () => {
       it('should return the correct threshold at low participation', async () => {
         const totalVotes = 10
         const totalWeight = 100
-        const [tNum, tDenom] = await quorum.threshold(
+        const [tNum, tDenom] = await quorum.thresholdAt(
           totalVotes,
           totalWeight,
           baseThresholdNumerator,
@@ -155,7 +155,7 @@ contract('Quorum', () => {
       it('should return the correct threshold at medium participation', async () => {
         const totalVotes = 40
         const totalWeight = 100
-        const [tNum, tDenom] = await quorum.threshold(
+        const [tNum, tDenom] = await quorum.thresholdAt(
           totalVotes,
           totalWeight,
           baseThresholdNumerator,
@@ -171,7 +171,7 @@ contract('Quorum', () => {
       it('should return the correct threshold at high participation', async () => {
         const totalVotes = 100
         const totalWeight = 100
-        const [tNum, tDenom] = await quorum.threshold(
+        const [tNum, tDenom] = await quorum.thresholdAt(
           totalVotes,
           totalWeight,
           baseThresholdNumerator,

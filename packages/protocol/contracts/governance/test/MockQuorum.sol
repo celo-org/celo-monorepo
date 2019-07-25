@@ -29,7 +29,7 @@ contract MockQuorum {
     return (lastUpdateCall.totalVotes, lastUpdateCall.totalWeight);
   }
 
-  function threshold(
+  function thresholdAt(
     uint256 /* totalVotes */,
     uint256 /* totalWeight */,
     uint256 /* baseThresholdNumerator */,

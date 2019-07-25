@@ -966,7 +966,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
         proposal.transactions[i].destination,
         functionId
       );
-      (uint256 thresholdNumerator, uint256 thresholdDenominator) = quorum.threshold(
+      (uint256 thresholdNumerator, uint256 thresholdDenominator) = quorum.thresholdAt(
         totalVotes,
         totalWeight_,
         thresholdParameters.baseThreshold.numerator,

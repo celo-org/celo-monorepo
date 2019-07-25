@@ -64,7 +64,7 @@ contract Quorum is IQuorum, Ownable, Initializable {
    * @param kFactorNumerator The numerator of the sensitivity factor.
    * @param kFactorDenominator The denominator of the sensitivity factor.
    */
-  function threshold(
+  function thresholdAt(
     uint256 totalVotes,
     uint256 totalWeight,
     uint256 baseThresholdNumerator,
@@ -80,20 +80,20 @@ contract Quorum is IQuorum, Ownable, Initializable {
       && baseThresholdDenominator > 0 && kFactorDenominator > 0);
     FractionUtil.Fraction memory participation = FractionUtil.Fraction(totalVotes, totalWeight);
     FractionUtil.Fraction memory quorumRatio = participation.div(quorumBaseline);
-    FractionUtil.Fraction memory adjustedThreshold =
+    FractionUtil.Fraction memory threshold =
       FractionUtil.Fraction(baseThresholdNumerator, baseThresholdDenominator);
     FractionUtil.Fraction memory kFactor =
       FractionUtil.Fraction(kFactorNumerator, kFactorDenominator);
     if (quorumRatio.isLessThanOrEqualTo(FractionUtil.Fraction(1, 1))) {
       FractionUtil.Fraction memory adjustment = kFactor.mul(quorumRatio.inverse().sub(quorumRatio));
-      adjustedThreshold = adjustedThreshold.add(adjustment);
+      threshold = threshold.add(adjustment);
     } else {
       FractionUtil.Fraction memory adjustment = kFactor.mul(quorumRatio.sub(quorumRatio.inverse()));
       FractionUtil.Fraction memory half = FractionUtil.Fraction(1, 2);
-      adjustedThreshold = adjustedThreshold.isGreaterThan(adjustment.add(half)) ?
-        adjustedThreshold.sub(adjustment) : half;
+      threshold = threshold.isGreaterThan(adjustment.add(half)) ?
+        threshold.sub(adjustment) : half;
     }
-    return (adjustedThreshold.numerator, adjustedThreshold.denominator);
+    return (threshold.numerator, threshold.denominator);
   }
 
   /**
