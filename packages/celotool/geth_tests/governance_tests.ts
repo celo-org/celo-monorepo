@@ -6,6 +6,7 @@ import {
   initAndStartGeth,
 } from '@celo/celotool/geth_tests/src/lib/utils'
 import BigNumber from 'bignumber.js'
+import { strip0x } from '../src/lib/utils'
 const assert = require('chai').assert
 const Web3 = require('web3')
 
@@ -118,7 +119,7 @@ describe('governance tests', () => {
   const getParsedSignatureOfAddress = async (address: string, signer: string, signerWeb3: any) => {
     // @ts-ignore
     const hash = signerWeb3.utils.soliditySha3({ type: 'address', value: address })
-    const signature = (await signerWeb3.eth.sign(hash, signer)).slice(2)
+    const signature = strip0x(await signerWeb3.eth.sign(hash, signer))
     return {
       r: `0x${signature.slice(0, 64)}`,
       s: `0x${signature.slice(64, 128)}`,
