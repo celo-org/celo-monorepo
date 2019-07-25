@@ -12,8 +12,9 @@ export function validateInteger(input: string): string {
 }
 
 export function validateDecimal(input: string, lng?: string): string {
-  // Comma decimal points
-  if (lng && lng === 'es-AR') {
+  // Comma decimal points, only supports es right now!
+  if (lng && lng.startsWith('es')) {
+    // Keep only first decimal
     return input
       .replace(/[^0-9,]/g, '')
       .replace(/,/, 'b')
@@ -21,7 +22,7 @@ export function validateDecimal(input: string, lng?: string): string {
       .replace(/b/, '.')
   }
 
-  // Keep only first decimal
+  // Fall back to just period decimals
   return input
     .replace(/[^0-9.]/g, '')
     .replace(/\./, 'b')
@@ -29,8 +30,9 @@ export function validateDecimal(input: string, lng?: string): string {
     .replace(/b/, '.')
 }
 
-export function validatePhone(input: string, countryCallingCode: string): string {
+export function validatePhone(input: string, countryCallingCode?: string): string {
   input = input.replace(/[^0-9()\- ]/g, '')
+
   if (!countryCallingCode) {
     return input
   }
@@ -55,10 +57,6 @@ export function validateInput(input: string, props: BaseProps): string {
     case 'integer':
       return validateInteger(input)
     case 'phone':
-      // countryCallingCode should be defined but it can be an empty string: no falsy null check
-      if (props.countryCallingCode === undefined) {
-        throw new Error('countryCallingCode is not defined')
-      }
       return validatePhone(input, props.countryCallingCode)
     case 'custom': {
       if (props.customValidator) {

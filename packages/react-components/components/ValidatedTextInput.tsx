@@ -40,7 +40,7 @@ interface RefProps {
 
 type Props = OwnProps & ValidatorProps & RefProps & TextInputProps
 
-class ValidatedTextInput extends React.Component<Props> {
+export class ValidatedTextInput extends React.Component<Props> {
   onChangeText = (input: string): void => {
     const validated = validateInput(input, this.props)
     // Don't propagate change if new change is invalid

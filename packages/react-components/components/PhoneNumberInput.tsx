@@ -1,5 +1,5 @@
 import TextInput from '@celo/react-components/components/TextInput'
-import ValidatedTextInput from '@celo/react-components/components/ValidatedTextInput'
+import { ValidatedTextInput } from '@celo/react-components/components/ValidatedTextInput'
 import colors from '@celo/react-components/styles/colors'
 import { Countries } from '@celo/utils/src/countries'
 import { getRegionCodeFromCountryCode, parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
