@@ -272,9 +272,9 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       bytes(identifier).length > 0 &&
       bytes(name).length > 0 &&
       bytes(url).length > 0 &&
-      publicKeysData.length == (64 + 96 + 192)
+      publicKeysData.length == (64 + 48 + 192)
     );
-    bytes memory proofOfPossessionBytes = publicKeysData.slice(64, 96+192);
+    bytes memory proofOfPossessionBytes = publicKeysData.slice(64, 48+192);
     require(checkProofOfPossession(proofOfPossessionBytes));
     address account = getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
