@@ -13,8 +13,6 @@ USAGE
   $ celocli validator:affiliation
 
 OPTIONS
-  -h, --help                                         show CLI help
-  -l, --logLevel=logLevel
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Validator's address
   --set=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   set affiliation to given address
   --unset                                            clear affiliation field
@@ -34,10 +32,6 @@ List existing Validators
 USAGE
   $ celocli validator:list
 
-OPTIONS
-  -h, --help               show CLI help
-  -l, --logLevel=logLevel
-
 EXAMPLE
   list
 ```
@@ -53,8 +47,6 @@ USAGE
   $ celocli validator:register
 
 OPTIONS
-  -h, --help                                         show CLI help
-  -l, --logLevel=logLevel
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator
   --id=id                                            (required)
   --name=name                                        (required)
@@ -81,10 +73,6 @@ USAGE
 
 ARGUMENTS
   VALIDATORADDRESS  Validator's address
-
-OPTIONS
-  -h, --help               show CLI help
-  -l, --logLevel=logLevel
 
 EXAMPLE
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3

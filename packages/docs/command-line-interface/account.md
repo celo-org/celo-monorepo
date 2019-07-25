@@ -12,10 +12,6 @@ View Celo Dollar and Gold balances given account address
 USAGE
   $ celocli account:balance ACCOUNT
 
-OPTIONS
-  -h, --help               show CLI help
-  -l, --logLevel=logLevel
-
 EXAMPLE
   balance 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
@@ -29,10 +25,6 @@ Creates a new account
 ```
 USAGE
   $ celocli account:new
-
-OPTIONS
-  -h, --help               show CLI help
-  -l, --logLevel=logLevel
 
 EXAMPLE
   new
@@ -49,8 +41,6 @@ USAGE
   $ celocli account:transferdollar
 
 OPTIONS
-  -h, --help                                         show CLI help
-  -l, --logLevel=logLevel
   --amountInWei=amountInWei                          (required) Amount to transfer (in wei)
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
@@ -71,8 +61,6 @@ USAGE
   $ celocli account:transfergold
 
 OPTIONS
-  -h, --help                                         show CLI help
-  -l, --logLevel=logLevel
   --amountInWei=amountInWei                          (required) Amount to transfer (in wei)
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
@@ -93,8 +81,6 @@ USAGE
   $ celocli account:unlock
 
 OPTIONS
-  -h, --help                                            show CLI help
-  -l, --logLevel=logLevel
   --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
   --password=password                                   (required)
 

@@ -13,9 +13,7 @@ USAGE
   $ celocli exchange:list
 
 OPTIONS
-  -h, --help               show CLI help
-  -l, --logLevel=logLevel
-  --amount=amount          [default: 1000000000000000000] Amount of sellToken (in wei) to report rates for
+  --amount=amount  [default: 1000000000000000000] Amount of sellToken (in wei) to report rates for
 
 EXAMPLE
   list
@@ -36,10 +34,6 @@ ARGUMENTS
   MINBUYAMOUNT  the minimum amount of buyToken (in wei) expected
   FROM
 
-OPTIONS
-  -h, --help               show CLI help
-  -l, --logLevel=logLevel
-
 EXAMPLE
   selldollar 100 300 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
 ```
@@ -58,10 +52,6 @@ ARGUMENTS
   SELLAMOUNT    the amount of sellToken (in wei) to sell
   MINBUYAMOUNT  the minimum amount of buyToken (in wei) expected
   FROM
-
-OPTIONS
-  -h, --help               show CLI help
-  -l, --logLevel=logLevel
 
 EXAMPLE
   sellgold 100 300 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d

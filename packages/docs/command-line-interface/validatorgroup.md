@@ -12,10 +12,6 @@ List existing Validator Groups
 USAGE
   $ celocli validatorgroup:list
 
-OPTIONS
-  -h, --help               show CLI help
-  -l, --logLevel=logLevel
-
 EXAMPLE
   list
 ```
@@ -34,8 +30,6 @@ ARGUMENTS
   VALIDATORADDRESS  Validator's address
 
 OPTIONS
-  -h, --help                                         show CLI help
-  -l, --logLevel=logLevel
   --accept                                           Accept a validator whose affiliation is already set to the group
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) ValidatorGroup's address
   --remove                                           Remove a validator from the members list
@@ -56,8 +50,6 @@ USAGE
   $ celocli validatorgroup:register
 
 OPTIONS
-  -h, --help                                         show CLI help
-  -l, --logLevel=logLevel
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group
   --id=id                                            (required)
   --name=name                                        (required)
@@ -82,10 +74,6 @@ USAGE
 ARGUMENTS
   GROUPADDRESS  ValidatorGroup's address
 
-OPTIONS
-  -h, --help               show CLI help
-  -l, --logLevel=logLevel
-
 EXAMPLE
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3
 ```
@@ -101,8 +89,6 @@ USAGE
   $ celocli validatorgroup:vote
 
 OPTIONS
-  -h, --help                                         show CLI help
-  -l, --logLevel=logLevel
   --current                                          Show voter's current vote
   --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   Set vote for ValidatorGroup's address
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address

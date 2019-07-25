@@ -11,10 +11,6 @@ Output network node configuration
 ```
 USAGE
   $ celocli config:get
-
-OPTIONS
-  -h, --help               show CLI help
-  -l, --logLevel=logLevel
 ```
 
 _See code: [src/commands/config/get.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/config/get.ts)_
@@ -28,9 +24,7 @@ USAGE
   $ celocli config:set
 
 OPTIONS
-  -h, --help               show CLI help
-  -l, --logLevel=logLevel
-  --node=node              (required) [default: ws://localhost:8546] Node URL
+  --node=node  (required) [default: ws://localhost:8546] Node URL
 ```
 
 _See code: [src/commands/config/set.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/config/set.ts)_

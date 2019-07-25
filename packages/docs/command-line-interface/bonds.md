@@ -13,8 +13,6 @@ USAGE
   $ celocli bonds:deposit
 
 OPTIONS
-  -h, --help                   show CLI help
-  -l, --logLevel=logLevel
   --from=from                  (required)
   --goldAmount=goldAmount      (required) unit amount of gold token (cGLD)
 
@@ -35,10 +33,6 @@ View information about all of the account's deposits
 USAGE
   $ celocli bonds:list ACCOUNT
 
-OPTIONS
-  -h, --help               show CLI help
-  -l, --logLevel=logLevel
-
 EXAMPLE
   list 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
@@ -54,8 +48,6 @@ USAGE
   $ celocli bonds:notify
 
 OPTIONS
-  -h, --help                                         show CLI help
-  -l, --logLevel=logLevel
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
   --goldAmount=goldAmount                            (required) unit amount of gold token (cGLD)
 
@@ -77,8 +69,6 @@ USAGE
   $ celocli bonds:register
 
 OPTIONS
-  -h, --help                                         show CLI help
-  -l, --logLevel=logLevel
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
 
 EXAMPLE
@@ -97,8 +87,6 @@ USAGE
 
 OPTIONS
   -d, --delegate=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Delegate rewards to provided account
-  -h, --help                                                 show CLI help
-  -l, --logLevel=logLevel
   -r, --redeem                                               Redeem accrued rewards from bonded deposits
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d          (required) Account Address
 
@@ -118,8 +106,6 @@ USAGE
   $ celocli bonds:show ACCOUNT
 
 OPTIONS
-  -h, --help                           show CLI help
-  -l, --logLevel=logLevel
   --availabilityTime=availabilityTime  unix timestamp at which withdrawable; doubles as ID of a notified deposit
 
   --noticePeriod=noticePeriod          duration (seconds) from notice to withdrawable; doubles as ID of a bonded
@@ -144,8 +130,6 @@ ARGUMENTS
   AVAILABILITYTIME  unix timestamp at which withdrawable; doubles as ID of a notified deposit
 
 OPTIONS
-  -h, --help                                         show CLI help
-  -l, --logLevel=logLevel
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
 
 EXAMPLE
