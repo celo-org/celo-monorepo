@@ -33,6 +33,8 @@ interface State {
 }
 
 class BackupQuestion extends React.PureComponent<Props, State> {
+  static navigationOptions = { header: null }
+
   state = {
     selectedAnswer: null,
     visibleModal: false,
