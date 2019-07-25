@@ -1,8 +1,8 @@
 pragma solidity ^0.5.8;
 
-import "../common/Proxy.sol";
+import "../Proxy.sol";
 
 
 /* solhint-disable no-empty-blocks */
-contract ExchangeProxy is Proxy {
+contract GoldTokenProxy is Proxy {
 }
