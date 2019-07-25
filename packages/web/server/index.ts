@@ -1,5 +1,6 @@
 import * as bodyParser from 'body-parser'
 import * as compression from 'compression'
+import * as slashes from 'connect-slashes'
 import * as express from 'express'
 import * as expressEnforcesSsl from 'express-enforces-ssl'
 import * as helmet from 'helmet'
@@ -34,6 +35,7 @@ function wwwRedirect(req, res, nextAction) {
   server.use(wwwRedirect)
   server.enable('trust proxy')
   server.use(compression())
+  server.use(slashes(false))
 
   if (!dev) {
     server.use(expressEnforcesSsl())
