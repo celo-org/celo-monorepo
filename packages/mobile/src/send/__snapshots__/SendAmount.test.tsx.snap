@@ -239,18 +239,21 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
         />
         <TextInput
           allowFontScaling={true}
-          autoCapitalize="none"
-          autoCorrect={false}
           autoFocus={true}
+          autocorrect={false}
           keyboardType="numeric"
-          multiline={false}
+          labelStyle={
+            Object {
+              "color": "#42D689",
+            }
+          }
+          numberOfDecimals={2}
           onBlur={[Function]}
           onChangeText={[Function]}
           onFocus={[Function]}
           placeholder="amount"
           placeholderTextColor="#A3EBC6"
           rejectResponderTermination={true}
-          spellCheck={false}
           style={
             Object {
               "flex": 1,
@@ -258,7 +261,9 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
               "marginHorizontal": 8,
             }
           }
+          title="$"
           underlineColorAndroid="transparent"
+          validator="decimal"
           value=""
         />
       </View>
@@ -327,18 +332,14 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
         />
         <TextInput
           allowFontScaling={true}
-          autoCapitalize="none"
-          autoCorrect={false}
-          autoFocus={false}
           keyboardType="default"
-          multiline={false}
+          maxLength={70}
           onBlur={[Function]}
           onChangeText={[Function]}
           onFocus={[Function]}
           placeholder="groceriesRent"
           placeholderTextColor="rgba(0, 0, 0, .4)"
           rejectResponderTermination={true}
-          spellCheck={false}
           style={
             Object {
               "flex": 1,
@@ -346,6 +347,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
               "marginHorizontal": 8,
             }
           }
+          title="for"
           underlineColorAndroid="transparent"
           value=""
         />
