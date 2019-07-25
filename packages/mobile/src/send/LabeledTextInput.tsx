@@ -19,6 +19,7 @@ interface OwnProps {
   autoFocus?: boolean
   numberOfDecimals?: number
   lng?: string
+  maxLength?: number
   onChangeText(value: string): void
 }
 

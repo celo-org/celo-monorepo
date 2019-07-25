@@ -393,6 +393,7 @@ export class SendAmount extends React.PureComponent<Props, State> {
             title={t('for')}
             placeholder={t('groceriesRent')}
             value={this.state.reason}
+            maxLength={70}
             onChangeText={this.onReasonChanged}
           />
         </KeyboardAwareScrollView>
