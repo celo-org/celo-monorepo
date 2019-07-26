@@ -218,6 +218,27 @@ jobs:
           # Flaky tests - run them twice
           command: yarn --cwd packages/protocol test || yarn --cwd packages/protocol test
 
+  contractkit-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: test alphanet
+          command: |
+            # Test alphanet
+            set -euo pipefail
+            yarn --cwd=packages/contractkit build alfajores
+            yarn --cwd=packages/contractkit test
+
+      - run:
+          name: test alphanet staging
+          command: |
+            # Test alphanet
+            set -euo pipefail
+            yarn --cwd=packages/contractkit build alfajoresstaging
+            yarn --cwd=packages/contractkit test
+      
   cli-test:
     <<: *defaults
     steps:
@@ -318,6 +339,35 @@ jobs:
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
             ./ci_test_sync.sh checkout master
 
+  end-to-end-geth-integration-sync-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+      - run:
+          name: Setup Go language
+          command: |
+            set -e
+            set -v
+            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
+            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
+            ls /tmp/go/bin/go
+            /tmp/go/bin/go version
+      - run:
+          name: Run test
+          command: |
+            set -e
+            export PATH=${PATH}:/tmp/go/bin
+            go version
+            cd packages/celotool
+            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+            ./ci_test_integration_sync.sh checkout master
+
   web:
     working_directory: ~/app
     docker:
@@ -340,7 +390,16 @@ workflows:
       - build-all-packages:
            requires:
             - install_dependencies
+            - lint-checks
       - general-test:
+          requires:
+            - install_dependencies
+            - lint-checks
+      - contractkit-test:
+          requires:
+            - install_dependencies
+            - lint-checks
+      - cli-test:
           requires:
             - install_dependencies
             - lint-checks
@@ -359,12 +418,20 @@ workflows:
       - protocol-test:
           requires:
             - install_dependencies
+            - lint-checks
       - end-to-end-geth-transfer-test:
           requires:
             - install_dependencies
+            - lint-checks
       - end-to-end-geth-governance-test:
           requires:
             - install_dependencies
+            - lint-checks
       - end-to-end-geth-sync-test:
           requires:
             - install_dependencies
+            - lint-checks
+      - end-to-end-geth-integration-sync-test:
+          requires:
+            - install_dependencies
+            - lint-checks
