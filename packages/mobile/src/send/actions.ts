@@ -77,7 +77,7 @@ export const setTransactionFee = (suggestedFee: string): SetTransactionFeeAction
   suggestedFee,
 })
 
-export const StoreLatestInRecents = (key: string): StoreLatestInRecentsAction => ({
+export const storeLatestInRecents = (key: string): StoreLatestInRecentsAction => ({
   type: Actions.STORE_LATEST_IN_RECENTS,
   key,
 })

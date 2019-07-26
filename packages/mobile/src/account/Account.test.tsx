@@ -1,6 +1,6 @@
 const { mockNavigationServiceFor } = require('test/utils')
 const { navigate } = mockNavigationServiceFor('Account')
-const isPhoneNumberVerified = jest.fn(async (key) => true)
+// const isPhoneNumberVerified = jest.fn(async (key) => true)
 
 import * as React from 'react'
 import 'react-native'
@@ -11,9 +11,9 @@ import Account from 'src/account/Account'
 import { Screens } from 'src/navigator/Screens'
 import { createMockStore } from 'test/utils'
 
-jest.mock('src/identity/verification', () => ({
-  isPhoneNumberVerified,
-}))
+// jest.mock('src/identity/verification', () => ({
+//   isPhoneNumberVerified,
+// }))
 
 jest.useFakeTimers()
 

@@ -5,7 +5,6 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import { parseInputAmount } from '@celo/utils/src/parsing'
-import { RecipientKind } from '@celo/utils/src/recipient'
 import BigNumber from 'bignumber.js'
 import { debounce } from 'lodash'
 import * as React from 'react'
@@ -30,11 +29,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ERROR_BANNER_DURATION, INPUT_DEBOUNCE_TIME } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
-import {
-  getRecipientAddress,
-  getRecipientVerificationStatus,
-  VerificationStatus,
-} from 'src/identity/contactMapping'
+import { VerificationStatus } from 'src/identity/contactMapping'
 import { E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -47,7 +42,12 @@ import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import Logger from 'src/utils/Logger'
-import { Recipient } from 'src/utils/recipient'
+import {
+  getAddressFromRecipient,
+  getRecipientVerificationStatus,
+  Recipient,
+  RecipientKind,
+} from 'src/utils/recipient'
 
 const TAG: string = 'send/SendAmount'
 
@@ -209,9 +209,8 @@ export class SendAmount extends React.PureComponent<Props, State> {
   getConfirmationInput = () => {
     const amount = parseInputAmount(this.state.amount)
     const recipient = this.getRecipient()
-    const recipientAddress = recipient.address
-      ? recipient.address
-      : getRecipientAddress(recipient, this.props.e164NumberToAddress)
+    // TODO (Rossy) Remove address field from some recipient types.
+    const recipientAddress = getAddressFromRecipient(recipient, this.props.e164NumberToAddress)
 
     const confirmationInput: ConfirmationInput = {
       recipient,
@@ -362,7 +361,6 @@ export class SendAmount extends React.PureComponent<Props, State> {
             e164Number={recipient.e164PhoneNumber}
             defaultCountryCode={this.props.defaultCountryCode}
             iconSize={40}
-            recipientKind={recipient.kind}
           />
           {verificationStatus === VerificationStatus.UNKNOWN && (
             <View style={style.verificationStatusContainer}>

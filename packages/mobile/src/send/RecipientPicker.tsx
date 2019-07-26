@@ -5,7 +5,6 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { isValidAddress } from '@celo/utils/lib/src/signatureUtils'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
-import { RecipientKind } from '@celo/utils/src/recipient'
 import { TranslationFunction } from 'i18next'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
@@ -32,6 +31,7 @@ import {
   getRecipientFromAddress,
   NumberToRecipient,
   Recipient,
+  RecipientKind,
   RecipientWithAddress,
   RecipientWithMobileNumber,
 } from 'src/utils/recipient'
@@ -72,6 +72,7 @@ interface StateProps {
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
 }
+
 type RecipientProps = Props & WithNamespaces & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
@@ -121,25 +122,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
       return this.renderSendToPhoneNumber(parsedNumber.displayNumber, parsedNumber.e164Number)
     }
     if (isValidAddress(this.props.searchQuery)) {
-      const existingContact = getRecipientFromAddress(
-        this.props.searchQuery,
-        addressToE164Number,
-        recipientCache
-      )
-
-      if (existingContact) {
-        return (
-          <>
-            <RecipientItem
-              recipient={existingContact}
-              onSelectRecipient={this.props.onSelectRecipient}
-            />
-            {this.renderItemSeparator()}
-          </>
-        )
-      }
-
-      return this.renderSendToAddress(this.props.searchQuery)
+      return this.renderSendToAddress()
     }
     return this.renderNoContentEmptyView()
   }
@@ -158,12 +141,12 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     </View>
   )
 
-  renderSendToPhoneNumber = (displayKey: string, e164PhoneNumber: string) => {
+  renderSendToPhoneNumber = (displayId: string, e164PhoneNumber: string) => {
     const { t } = this.props
     const recipient: RecipientWithMobileNumber = {
       kind: RecipientKind.MobileNumber,
       displayName: t('mobileNumber'),
-      displayKey,
+      displayId,
       e164PhoneNumber,
     }
     return (
@@ -174,20 +157,40 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     )
   }
 
-  renderSendToAddress = (address: string) => {
+  renderSendToAddressOnly = (address: string) => {
     const { t } = this.props
     const recipient: RecipientWithAddress = {
       kind: RecipientKind.Address,
       displayName: t('walletAddress'),
-      displayKey: address.substring(2, 17) + '...',
+      displayId: address.substring(2, 17) + '...',
       address,
     }
+
     return (
       <>
         <RecipientItem recipient={recipient} onSelectRecipient={this.props.onSelectRecipient} />
         {this.renderItemSeparator()}
       </>
     )
+  }
+
+  renderSendToAddress = () => {
+    const { searchQuery, addressToE164Number, recipientCache, onSelectRecipient } = this.props
+    const existingContact = getRecipientFromAddress(
+      searchQuery,
+      addressToE164Number,
+      recipientCache
+    )
+    if (existingContact) {
+      return (
+        <>
+          <RecipientItem recipient={existingContact} onSelectRecipient={onSelectRecipient} />
+          {this.renderItemSeparator()}
+        </>
+      )
+    } else {
+      return this.renderSendToAddressOnly(searchQuery)
+    }
   }
 
   render() {

@@ -1,5 +1,4 @@
-import { RecipientKind } from '@celo/utils/src/recipient'
-import { contactsToRecipients } from 'src/utils/recipient'
+import { contactsToRecipients, RecipientKind } from 'src/utils/recipient'
 import { mockAccount, mockContactList, mockDisplayNumber, mockE164Number } from 'test/values'
 
 describe('contactsToRecipients', () => {
@@ -20,7 +19,7 @@ describe('contactsToRecipients', () => {
     expect(recipientsWithE164Numbers[1]).toMatchObject({
       kind: RecipientKind.Contact,
       displayName: 'Alice The Person',
-      displayKey: '(209) 555-9790',
+      displayId: '(209) 555-9790',
       e164PhoneNumber: '+12095559790',
       phoneNumberLabel: 'mobile',
       contactId: '1',
@@ -28,7 +27,7 @@ describe('contactsToRecipients', () => {
     expect(recipientsWithE164Numbers[0]).toMatchObject({
       kind: RecipientKind.Contact,
       displayName: 'Bob Bobson',
-      displayKey: mockDisplayNumber,
+      displayId: mockDisplayNumber,
       e164PhoneNumber: mockE164Number,
       phoneNumberLabel: 'home',
       contactId: '2',
@@ -37,7 +36,7 @@ describe('contactsToRecipients', () => {
     expect(recipientsWithoutE164Numbers[0]).toMatchObject({
       kind: RecipientKind.Contact,
       displayName: 'Bob Bobson',
-      displayKey: '100200',
+      displayId: '100200',
       phoneNumberLabel: 'mobile',
       contactId: '2',
     })

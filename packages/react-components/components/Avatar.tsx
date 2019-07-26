@@ -12,14 +12,13 @@ interface Props {
   name?: string
   address?: string
   e164Number?: string
-  recipientKind?: string
   defaultCountryCode: string
   iconSize: number
 }
 
 export class Avatar extends React.PureComponent<Props> {
   render() {
-    const { contact, address, defaultCountryCode, iconSize, name, recipientKind } = this.props
+    const { contact, address, defaultCountryCode, iconSize, name } = this.props
     let { e164Number } = this.props
     let userName = contact ? contact.displayName : name ? name : address
     if (!e164Number && contact) {
@@ -40,7 +39,6 @@ export class Avatar extends React.PureComponent<Props> {
       <View style={style.container}>
         <ContactCircle
           style={style.contactCircle}
-          recipientKind={recipientKind}
           name={userName}
           address={address}
           size={iconSize}

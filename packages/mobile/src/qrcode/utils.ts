@@ -1,4 +1,3 @@
-import { RecipientKind } from '@celo/utils/src/recipient'
 import { isValidAddress } from '@celo/utils/src/signatureUtils'
 import { isEmpty } from 'lodash'
 import * as RNFS from 'react-native-fs'
@@ -10,9 +9,14 @@ import { ERROR_BANNER_DURATION } from 'src/config'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { QrCode, StoreLatestInRecents, SVG } from 'src/send/actions'
+import { QrCode, storeLatestInRecents, SVG } from 'src/send/actions'
 import Logger from 'src/utils/Logger'
-import { getRecipientFromAddress, NumberToRecipient, Recipient } from 'src/utils/recipient'
+import {
+  getRecipientFromAddress,
+  NumberToRecipient,
+  Recipient,
+  RecipientKind,
+} from 'src/utils/recipient'
 
 const TAG = 'QR/utils'
 
@@ -81,7 +85,7 @@ export function* handleBarcode(
     ? {
         ...data,
         kind: RecipientKind.QrCode,
-        displayKey: data.e164PhoneNumber,
+        displayId: data.e164PhoneNumber,
         phoneNumberLabel: 'QR Code',
         thumbnailPath: cachedRecipient.thumbnailPath,
         contactId: cachedRecipient.contactId,
@@ -89,11 +93,11 @@ export function* handleBarcode(
     : {
         ...data,
         kind: RecipientKind.QrCode,
-        displayKey: data.e164PhoneNumber,
+        displayId: data.e164PhoneNumber,
       }
 
   if (data.e164PhoneNumber !== '') {
-    yield put(StoreLatestInRecents(data.e164PhoneNumber))
+    yield put(storeLatestInRecents(data.e164PhoneNumber))
     // TODO: refactor recent contacts list and RecipientPicker UI to support accounts without phone numbers
   }
 

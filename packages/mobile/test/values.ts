@@ -1,5 +1,4 @@
 /* Shared mock values to facilitate testing */
-import { RecipientKind } from '@celo/utils/src/recipient'
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
 import { NotificationTypes, PaymentRequest, PaymentRequestStatuses } from 'src/account/types'
@@ -7,7 +6,7 @@ import { EscrowedPayment } from 'src/escrow/actions'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { AttestationCode } from 'src/identity/verification'
-import { RecipientWithContact, RecipientWithMobileNumber } from 'src/utils/recipient'
+import { RecipientKind, RecipientWithContact, RecipientWithMobileNumber } from 'src/utils/recipient'
 
 export const mockName = 'John Doe'
 export const mockAccount = '0x0000000000000000000000000000000000007E57'
@@ -38,7 +37,7 @@ export const mockRecipient: RecipientWithContact = {
   kind: RecipientKind.Contact,
   address: mockAccount,
   displayName: mockName,
-  displayKey: '14155550000',
+  displayId: '14155550000',
   e164PhoneNumber: mockE164Number,
   contactId: 'contactId',
   phoneNumberLabel: 'phoneNumLabel',
@@ -48,7 +47,7 @@ export const mockRecipientWithPhoneNumber: RecipientWithMobileNumber = {
   kind: RecipientKind.MobileNumber,
   address: mockAccount,
   displayName: mockName,
-  displayKey: '14155550000',
+  displayId: '14155550000',
   e164PhoneNumber: mockE164Number,
 }
 

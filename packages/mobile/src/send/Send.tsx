@@ -1,7 +1,6 @@
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
-import { RecipientKind } from '@celo/utils/src/recipient'
 import { throttle } from 'lodash'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
@@ -20,7 +19,7 @@ import { E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import { StoreLatestInRecents } from 'src/send/actions'
+import { storeLatestInRecents } from 'src/send/actions'
 import RecipientPicker from 'src/send/RecipientPicker'
 import {
   buildRecentRecipients,
@@ -28,6 +27,7 @@ import {
   filterRecipients,
   NumberToRecipient,
   Recipient,
+  RecipientKind,
   RecipientWithQrCode,
 } from 'src/utils/recipient'
 
@@ -51,7 +51,7 @@ interface StateProps {
 interface DispatchProps {
   showError: typeof showError
   hideAlert: typeof hideAlert
-  StoreLatestInRecents: typeof StoreLatestInRecents
+  storeLatestInRecents: typeof storeLatestInRecents
 }
 
 type Props = StateProps & DispatchProps & WithNamespaces & NavigationInjectedProps
@@ -77,7 +77,7 @@ const defaultRecipientAddress = `0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10`
 export const CeloDefaultRecipient: RecipientWithQrCode = {
   address: defaultRecipientAddress,
   displayName: 'Celo Default Recipient',
-  displayKey: defaultRecipientPhoneNumber,
+  displayId: defaultRecipientPhoneNumber,
   kind: RecipientKind.QrCode,
   e164PhoneNumber: defaultRecipientPhoneNumber,
 }
@@ -185,11 +185,11 @@ class Send extends React.Component<Props, State> {
     }
 
     if (recipient.e164PhoneNumber && recipient.e164PhoneNumber !== defaultRecipientPhoneNumber) {
-      this.props.StoreLatestInRecents(recipient.e164PhoneNumber)
+      this.props.storeLatestInRecents(recipient.e164PhoneNumber)
     }
 
     if (recipient.address && recipient.address !== defaultRecipientAddress) {
-      this.props.StoreLatestInRecents(recipient.address)
+      this.props.storeLatestInRecents(recipient.address)
     }
     navigate(Screens.SendAmount, { recipient })
   }
@@ -255,7 +255,7 @@ export default componentWithAnalytics(
     {
       showError,
       hideAlert,
-      StoreLatestInRecents,
+      storeLatestInRecents,
     }
   )(withNamespaces(Namespaces.sendFlow7)(withNavigation(Send)))
 )

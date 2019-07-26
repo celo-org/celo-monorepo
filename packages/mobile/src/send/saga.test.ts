@@ -1,4 +1,3 @@
-import { RecipientKind } from '@celo/utils/src/recipient'
 import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
@@ -10,6 +9,7 @@ import { BarcodeTypes } from 'src/qrcode/utils'
 import { Actions, QrCode } from 'src/send/actions'
 import { recipientCacheSelector } from 'src/send/reducers'
 import { watchQrCodeDetections } from 'src/send/saga'
+import { RecipientKind } from 'src/utils/recipient'
 import { mockAccount, mockE164Number, mockName, mockQrCodeData } from 'test/values'
 
 jest.mock('src/utils/time', () => ({
@@ -48,7 +48,7 @@ describe(watchQrCodeDetections, () => {
       recipient: {
         address: mockAccount,
         displayName: mockName,
-        displayKey: mockE164Number,
+        displayId: mockE164Number,
         e164PhoneNumber: mockE164Number,
         kind: RecipientKind.QrCode,
       },
@@ -66,7 +66,7 @@ describe(watchQrCodeDetections, () => {
       recipient: {
         address: mockAccount,
         displayName: '',
-        displayKey: mockE164Number,
+        displayId: mockE164Number,
         e164PhoneNumber: mockE164Number,
         kind: RecipientKind.QrCode,
       },
@@ -87,7 +87,7 @@ describe(watchQrCodeDetections, () => {
       recipient: {
         address: mockAccount,
         displayName: mockName,
-        displayKey: '',
+        displayId: '',
         e164PhoneNumber: '',
         kind: RecipientKind.QrCode,
       },

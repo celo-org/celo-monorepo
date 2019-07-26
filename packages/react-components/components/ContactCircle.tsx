@@ -1,7 +1,6 @@
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { getContactNameHash } from '@celo/utils/src/contacts'
-import { RecipientKind } from '@celo/utils/src/recipient'
 import * as React from 'react'
 import { Image, StyleSheet, Text, View, ViewStyle } from 'react-native'
 import { MinimalContact } from 'react-native-contacts'
@@ -14,7 +13,7 @@ interface Props {
   size: number
   preferNameInitial?: boolean
   thumbnailPath?: string | null
-  recipientKind?: string
+  displayInitials?: string | null
 }
 
 export const contactIconColors = [colors.teal, colors.orange, colors.purple]
@@ -27,7 +26,7 @@ const getNameInitial = (name: string) => name.charAt(0).toLocaleUpperCase()
 
 export default class ContactCircle extends React.PureComponent<Props> {
   getContactCircleInner = () => {
-    const { contact, name, size, preferNameInitial, thumbnailPath, recipientKind } = this.props
+    const { contact, name, size, preferNameInitial, thumbnailPath, displayInitials } = this.props
     const resolvedThumbnail = thumbnailPath || (contact && contact.thumbnailPath)
     if (resolvedThumbnail) {
       return (
@@ -41,11 +40,8 @@ export default class ContactCircle extends React.PureComponent<Props> {
     const fontSize = size / 2.0
     const textStyle = [fontStyles.iconText, { fontSize }]
 
-    if (recipientKind && recipientKind === RecipientKind.Address) {
-      return <Text style={textStyle}>{'0x'}</Text>
-    }
-    if (recipientKind && recipientKind === RecipientKind.MobileNumber) {
-      return <Text style={textStyle}>{'#'}</Text>
+    if (displayInitials) {
+      return <Text style={textStyle}>{displayInitials}</Text>
     }
 
     const initials =
