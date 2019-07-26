@@ -6,15 +6,41 @@ description: >-
 
 # Introduction
 
-### Getting Started
+## Getting Started
 
-The Celo CLI is published as a node module on NPM. Assuming you have [npm installed](https://www.npmjs.com/get-npm), you can install the Celo CLI using the following command:
+### Docker Image
+
+A docker image that runs the Celo Blockchain client in full sync mode which includes the Celo CLI is available for version pinning.
+
+`$ docker pull us.gcr.io/celo-testnet/celocli:master`
+
+For more details on configuring this container, see the [Running a Full Node](../getting-started/running-a-full-node.md) section. You can run the container with the following command.
+
+`$ docker run --name celo_cli_container -it -p 8545:8545 us.gcr.io/celo-testnet/celocli:master -v`
+
+With additional arguments to the image, it can also be run in ultralight sync mode.
+
+`$ docker run --name celo_cli_container -p 8545:8545 --entrypoint=/celo/start_geth.sh us.gcr.io/celo-testnet/celocli:master "/usr/local/bin/geth" "alfajores" "ultralight"`
+
+An interactive shell where the Celo CLI is available can be obtained via the following command. All of the subsequent documentation should be appropriate from this shell.
+
+`$ docker exec -it celo_cli_container /bin/sh`
+
+Make sure to kill the container when you are done.
+
+`$ docker kill celo_cli_container`
+
+### NPM Package
+
+The Celo CLI is also published as a node module on NPM. Assuming you have [npm installed](https://www.npmjs.com/get-npm), you can install the Celo CLI using the following command:
 
 `$ npm install -g @celo/celocli`
 
 {% hint style="info" %}
 We are currently deploying the CLI with only Node v10.x LTS support. If you are running a different version of Node, consider using [NVM](https://github.com/nvm-sh/nvm#installation-and-update) to manage your node versions. e.g. with: `nvm install 10 && nvm use 10`
 {% endhint %}
+
+### Overview
 
 The tool is broken down into modules and commands with the following pattern:
 

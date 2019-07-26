@@ -75,7 +75,7 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
 
     this.setState({ requestState: requestStatusToState(status) })
     if (key) {
-      this.subscribe(key)
+      await this.subscribe(key)
     }
     this.resetCaptcha()
   }
@@ -85,8 +85,8 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
     return send(this.state.beneficiary, this.props.kind, this.getCaptchaToken())
   }
 
-  subscribe = (key: string) => {
-    subscribeRequest(key, this.onUpdates)
+  subscribe = async (key: string) => {
+    await subscribeRequest(key, this.onUpdates)
   }
 
   onUpdates = (record: RequestRecord) => {
