@@ -6,7 +6,7 @@ import { call, cancelled, put, spawn, take } from 'redux-saga/effects'
 import { waitForGethConnectivity } from 'src/geth/saga'
 import { setNetworkConnectivity } from 'src/networkInfo/actions'
 import Logger from 'src/utils/Logger'
-import { waitForWeb3Ready } from 'src/web3/saga'
+import { checkWeb3Sync } from 'src/web3/saga'
 
 const TAG = 'networkInfo/saga'
 
@@ -17,7 +17,7 @@ export function* waitForRehydrate() {
 
 export function* waitForNetwork() {
   yield waitForGethConnectivity()
-  yield waitForWeb3Ready()
+  yield checkWeb3Sync()
 }
 
 function createNetworkStatusChannel() {

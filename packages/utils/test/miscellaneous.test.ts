@@ -1,21 +1,30 @@
-import { reTryAsync } from '../src/miscellaneous'
+import { retryAsync } from '../src/miscellaneous'
 
 describe('utils->miscellaneous', () => {
   it('tries once if it works', async () => {
-    const myfunct = jest.fn()
-    await reTryAsync(myfunct, 2, [])
-    expect(myfunct).toHaveBeenCalledTimes(1)
+    const mockFunction = jest.fn()
+    await retryAsync(mockFunction, 2, [], 1)
+    expect(mockFunction).toHaveBeenCalledTimes(1)
   })
 
   it('retries n times', async () => {
-    const myfunct2 = jest.fn(() => {
+    const mockFunction = jest.fn(() => {
       throw 'error'
     })
 
-    expect(async () => {
-      await reTryAsync(myfunct2, 2, [])
-    }).toThrow()
+    let didThrow = false
+    try {
+      await retryAsync(mockFunction, 2, [], 1)
+    } catch (error) {
+      didThrow = true
+    }
+    expect(didThrow).toBeTruthy()
 
-    expect(myfunct2).toHaveBeenCalledTimes(3)
+    // TODO For some reason this doesn't throw
+    // expect(async () => {
+    //   await retryAsync(myfunct, 2, [])
+    // }).toThrow()
+
+    expect(mockFunction).toHaveBeenCalledTimes(3)
   })
 })

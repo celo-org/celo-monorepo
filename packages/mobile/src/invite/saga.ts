@@ -42,7 +42,6 @@ import { dynamicLink } from 'src/utils/dynamicLink'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { fetchGasPrice } from 'src/web3/gas'
-import { web3ReadySelector } from 'src/web3/reducer'
 import { createNewAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -220,7 +219,6 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
 
     // Check that the balance of the new account is not 0
     const StableToken = yield call(getStableTokenContract, web3)
-    Logger.debug(TAG + '@redeemInviteCode', 'web3 is: ' + (yield select(web3ReadySelector)))
 
     // Try to get balance once + two retries before failing
     const stableBalance = new BigNumber(

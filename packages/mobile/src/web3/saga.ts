@@ -31,7 +31,6 @@ import {
 } from 'src/web3/actions'
 import { web3 } from 'src/web3/contracts'
 import { refreshGasPrice } from 'src/web3/gas'
-import { web3ReadySelector } from 'src/web3/reducer'
 import { currentAccountSelector } from 'src/web3/selectors'
 import { Block } from 'web3/eth/types'
 
@@ -45,38 +44,21 @@ const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect 
 
 let AssignAccountLock = false
 
-export function* waitForWeb3Ready() {
-  const connected = yield select(web3ReadySelector)
-  if (connected) {
-    return
-  }
-
-  while (true) {
-    const action = yield take(Actions.SET_IS_READY)
-    if (action.payload.isReady) {
-      return
-    }
-  }
-}
-
 // checks if web3 claims it is currently syncing or not
 function* checkWeb3SyncProgressClaim() {
   // yield call(waitForGethConnectivity)
   while (true) {
     try {
-      const syncProgress = yield web3.eth.isSyncing() // return false when it's still syncing and thus not ready
+      const syncProgress = yield web3.eth.isSyncing() // returns true when it's still syncing and thus not ready
       if (typeof syncProgress === 'boolean' && !syncProgress) {
-        if (!(yield select(web3ReadySelector))) {
-          Logger.debug(TAG, 'checkWeb3SyncProgressClaim', 'sync complete')
-          yield put(setIsReady(true))
-          yield put(setSyncProgress(100))
-        }
-        return
+        Logger.debug(TAG, 'checkWeb3SyncProgressClaim', 'sync complete')
+
+        yield put(setSyncProgress(100))
+        return true
       }
       Logger.debug(TAG, 'checkWeb3SyncProgressClaim', 'sync in progress')
-      yield put(setIsReady(false))
-
       yield put(updateWeb3SyncProgress(syncProgress))
+      // not ready yet, keep looping
     } catch (error) {
       if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
         CeloAnalytics.track(CustomEventNames.blockChainCorruption, {}, true)
@@ -93,43 +75,40 @@ function* checkWeb3SyncProgressClaim() {
 }
 
 // The worker listening to sync progress requests
-export function* checkSyncProgressWorker() {
-  while (true) {
+export function* checkWeb3Sync() {
+  try {
+    yield call(waitForGethConnectivity)
     try {
-      yield call(waitForGethConnectivity)
-      try {
-        const { timeout } = yield race({
-          checkProgress: call(checkWeb3SyncProgressClaim),
-          timeout: delay(CHECK_SYNC_PROGRESS_TIMEOUT),
-        })
+      const { timeout } = yield race({
+        checkProgress: call(checkWeb3SyncProgressClaim),
+        timeout: delay(CHECK_SYNC_PROGRESS_TIMEOUT),
+      })
 
-        if (timeout) {
-          Logger.error(TAG, 'Could not complete sync progress check')
-          yield put(setIsReady(false))
-          navigate(Screens.ErrorScreen, {
-            errorMessage: 'Failing to sync, check your network connection',
-          })
-          continue
-        }
-
-        const latestBlock: Block = yield getLatestBlock()
-        if (latestBlock && latestBlock.number > 0) {
-          yield put(setLatestBlockNumber(latestBlock.number))
-        } else {
-          Logger.error(
-            TAG,
-            `web3 indicated sync complete, yet the latest block is ${JSON.stringify(latestBlock)}`
-          )
-        }
-      } catch (error) {
-        Logger.error(TAG, `checkSyncProgressWorker error: ${error}`)
+      if (timeout) {
+        Logger.error(TAG, 'Could not complete sync progress check')
+        yield put(setIsReady(false))
         navigate(Screens.ErrorScreen, {
-          errorMessage: 'Error occurred during sync, please try again later',
+          errorMessage: 'Failing to sync, check your network connection',
         })
       }
+
+      const latestBlock: Block = yield getLatestBlock()
+      if (latestBlock && latestBlock.number > 0) {
+        yield put(setLatestBlockNumber(latestBlock.number))
+      } else {
+        Logger.error(
+          TAG,
+          `web3 indicated sync complete, yet the latest block is ${JSON.stringify(latestBlock)}`
+        )
+      }
     } catch (error) {
-      Logger.error(TAG, `checkSyncProgressWorker saga error: ${error}`)
+      Logger.error(TAG, `checkSyncProgressWorker error: ${error}`)
+      navigate(Screens.ErrorScreen, {
+        errorMessage: 'Error occurred during sync, please try again later',
+      })
     }
+  } catch (error) {
+    Logger.error(TAG, `checkSyncProgressWorker saga error: ${error}`)
   }
 }
 
@@ -257,5 +236,4 @@ export function* watchRefreshGasPrice() {
 
 export function* web3Saga() {
   yield spawn(checkSyncProgressWorker)
-  yield spawn(watchRefreshGasPrice)
 }
