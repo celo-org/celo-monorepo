@@ -40,7 +40,7 @@ brew install yarn
 
 ### Install Rust
 
-We use Rust to build the [bls-zexe] repo, which Geth depends on.
+We use Rust to build the [bls-zexe](https://github.com/celo-org/bls-zexe) repo, which Geth depends on.
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
