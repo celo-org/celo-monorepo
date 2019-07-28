@@ -38,6 +38,21 @@ nvm alias default 8
 brew install yarn
 ```
 
+### Install Rust
+
+We use Rust to build the [bls-zexe] repo, which Geth depends on.
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+Re-login to the system and run:
+
+```bash
+rustup install nightly-2019-07-25
+rustup default nightly-2019-07-25
+```
+
 ### Java
 
 We need Java to be able to build and run Android to deploy the mobile app to
