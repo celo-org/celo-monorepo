@@ -26,7 +26,7 @@ import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redu
 import { e164NumberSelector } from 'src/account/reducer'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { CommonValues, CustomEventNames } from 'src/analytics/constants'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { refreshAllBalances } from 'src/home/actions'
@@ -78,8 +78,7 @@ export function* startVerification() {
   yield call(getConnectedAccount)
 
   Logger.debug(TAG, 'Starting verification')
-  CeloAnalytics.track(CustomEventNames.verification_start)
-  const startTime = Date.now()
+  CeloAnalytics.startTracking(CustomEventNames.verification)
 
   const { result, cancel, timeout } = yield race({
     result: call(doVerificationFlow),
@@ -89,20 +88,24 @@ export function* startVerification() {
 
   if (result === true) {
     Logger.debug(TAG, 'Verification completed successfully')
-    CeloAnalytics.track(CustomEventNames.verification_complete, {
-      duration: Date.now() - startTime,
+    CeloAnalytics.stopTracking(CustomEventNames.verification, {
+      result: CommonValues.success,
     })
   } else if (result === false) {
     Logger.debug(TAG, 'Verification failed')
-    CeloAnalytics.track(CustomEventNames.verification_failure, {
-      duration: Date.now() - startTime,
+    CeloAnalytics.stopTracking(CustomEventNames.verification, {
+      result: CommonValues.failure,
     })
   } else if (cancel) {
     Logger.debug(TAG, 'Verification cancelled')
-    CeloAnalytics.track(CustomEventNames.verification_cancel)
+    CeloAnalytics.stopTracking(CustomEventNames.verification, {
+      result: CommonValues.cancel,
+    })
   } else if (timeout) {
     Logger.debug(TAG, 'Verification timed out')
-    CeloAnalytics.track(CustomEventNames.verification_timeout)
+    CeloAnalytics.stopTracking(CustomEventNames.verification, {
+      result: CommonValues.timeout,
+    })
     yield put(showError(ErrorMessages.VERIFICATION_TIMEOUT, ERROR_DURATION))
     // TODO #1955: Add logic in this case to request more SMS messages
   }
@@ -121,12 +124,19 @@ export function* doVerificationFlow() {
     const attestationsContract: AttestationsType = yield call(getAttestationsContract, web3)
     const stableTokenContract: StableTokenType = yield call(getStableTokenContract, web3)
 
+    CeloAnalytics.trackSubEvent(CustomEventNames.verification, CustomEventNames.verification_setup)
+
     // Get all relevant info about the account's verification status
     const status: AttestationsStatus = yield call(
       getAttestationsStatus,
       attestationsContract,
       account,
       e164NumberHash
+    )
+
+    CeloAnalytics.trackSubEvent(
+      CustomEventNames.verification,
+      CustomEventNames.verification_get_status
     )
 
     if (status.isVerified) {
@@ -149,6 +159,11 @@ export function* doVerificationFlow() {
       account
     )
 
+    CeloAnalytics.trackSubEvent(
+      CustomEventNames.verification,
+      CustomEventNames.verification_req_attestations
+    )
+
     // Get actionable attestation details
     const attestations: ActionableAttestation[] = yield call(
       getActionableAttestations,
@@ -157,6 +172,11 @@ export function* doVerificationFlow() {
       account
     )
     const issuers = attestations.map((a) => a.issuer)
+
+    CeloAnalytics.trackSubEvent(
+      CustomEventNames.verification,
+      CustomEventNames.verification_get_attestations
+    )
 
     // Start listening for manual and/or auto message inputs
     const receiveMessageTask: Task = yield takeEvery(
@@ -167,6 +187,11 @@ export function* doVerificationFlow() {
 
     // This needs to go before revealing the attesttions because that depends on the public data key being set.
     yield call(setAccount, attestationsContract, account, dataKey)
+
+    CeloAnalytics.trackSubEvent(
+      CustomEventNames.verification,
+      CustomEventNames.verification_set_account
+    )
 
     // Request codes for the attestations needed
     yield call(
@@ -363,10 +388,6 @@ function attestationCodeReceiver(
       }
 
       yield put(inputAttestationCode({ code, issuer }))
-
-      CeloAnalytics.track(CustomEventNames.verification_code_entered, {
-        inputType: action.inputType,
-      })
     } catch (error) {
       Logger.error(TAG + '@attestationCodeReceiver', 'Error processing attestation code', error)
       yield put(showError(ErrorMessages.INVALID_ATTESTATION_CODE))
@@ -412,7 +433,17 @@ function* revealAndCompleteAttestation(
   const revealTx = yield call(makeRevealTx, attestationsContract, e164Number, issuer)
   yield call(sendTransaction, revealTx, account, TAG, `Reveal ${issuer}`)
 
+  CeloAnalytics.trackSubEvent(
+    CustomEventNames.verification,
+    CustomEventNames.verification_reveal_txs
+  )
+
   const code: AttestationCode = yield call(waitForAttestationCode, issuer)
+
+  CeloAnalytics.trackSubEvent(
+    CustomEventNames.verification,
+    CustomEventNames.verification_codes_received
+  )
 
   Logger.debug(TAG + '@revealAttestation', `Completing code for issuer: ${code.issuer}`)
 
@@ -424,6 +455,11 @@ function* revealAndCompleteAttestation(
     code.code
   )
   yield call(sendTransaction, completeTx, account, TAG, `Confirmation ${issuer}`)
+
+  CeloAnalytics.trackSubEvent(
+    CustomEventNames.verification,
+    CustomEventNames.verification_complete_txs
+  )
 
   yield put(completeAttestationCode())
   Logger.debug(TAG + '@revealAttestation', `Attestation for issuer ${issuer} completed`)
