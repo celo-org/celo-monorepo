@@ -142,7 +142,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   )
 
   renderSendToPhoneNumber = (displayId: string, e164PhoneNumber: string) => {
-    const { t } = this.props
+    const { t, onSelectRecipient } = this.props
     const recipient: RecipientWithMobileNumber = {
       kind: RecipientKind.MobileNumber,
       displayName: t('mobileNumber'),
@@ -151,24 +151,24 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     }
     return (
       <>
-        <RecipientItem recipient={recipient} onSelectRecipient={this.props.onSelectRecipient} />
+        <RecipientItem recipient={recipient} onSelectRecipient={onSelectRecipient} />
         {this.renderItemSeparator()}
       </>
     )
   }
 
-  renderSendToAddressOnly = (address: string) => {
-    const { t } = this.props
+  renderSendToAddressOnly = () => {
+    const { t, onSelectRecipient, searchQuery } = this.props
     const recipient: RecipientWithAddress = {
       kind: RecipientKind.Address,
       displayName: t('walletAddress'),
-      displayId: address.substring(2, 17) + '...',
-      address,
+      displayId: searchQuery.substring(2, 17) + '...',
+      address: searchQuery,
     }
 
     return (
       <>
-        <RecipientItem recipient={recipient} onSelectRecipient={this.props.onSelectRecipient} />
+        <RecipientItem recipient={recipient} onSelectRecipient={onSelectRecipient} />
         {this.renderItemSeparator()}
       </>
     )
@@ -189,7 +189,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
         </>
       )
     } else {
-      return this.renderSendToAddressOnly(searchQuery)
+      return this.renderSendToAddressOnly()
     }
   }
 
