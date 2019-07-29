@@ -211,6 +211,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
           ListEmptyComponent={this.renderEmptyView(addressToE164Number, recipientCache)}
           keyExtractor={this.keyExtractor}
           initialNumToRender={30}
+          keyboardShouldPersistTaps="handled"
         />
       </View>
     )
