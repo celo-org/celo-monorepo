@@ -237,35 +237,56 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             ]
           }
         />
-        <TextInput
-          allowFontScaling={true}
-          autoFocus={true}
-          autocorrect={false}
-          keyboardType="numeric"
-          labelStyle={
-            Object {
-              "color": "#42D689",
-            }
-          }
-          numberOfDecimals={2}
-          onBlur={[Function]}
-          onChangeText={[Function]}
-          onFocus={[Function]}
-          placeholder="amount"
-          placeholderTextColor="#A3EBC6"
-          rejectResponderTermination={true}
+        <View
           style={
-            Object {
-              "flex": 1,
-              "height": 54,
-              "marginHorizontal": 8,
-            }
+            Array [
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "flexDirection": "row",
+                "justifyContent": "center",
+              },
+              Object {
+                "flex": 1,
+                "height": 54,
+                "marginHorizontal": 8,
+              },
+            ]
           }
-          title="$"
-          underlineColorAndroid="transparent"
-          validator="decimal"
-          value=""
-        />
+        >
+          <TextInput
+            allowFontScaling={true}
+            autoCorrect={true}
+            autoFocus={true}
+            keyboardType="numeric"
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            placeholder="amount"
+            placeholderTextColor="#A3EBC6"
+            rejectResponderTermination={true}
+            secureTextEntry={false}
+            style={
+              Array [
+                Object {
+                  "fontFamily": "Hind-Regular",
+                },
+                Object {
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 3,
+                  "padding": 8,
+                },
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "flex": 1,
+                },
+              ]
+            }
+            textContentType="none"
+            underlineColorAndroid="transparent"
+            value=""
+          />
+        </View>
       </View>
       <View
         style={
@@ -330,27 +351,56 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             ]
           }
         />
-        <TextInput
-          allowFontScaling={true}
-          keyboardType="default"
-          maxLength={70}
-          onBlur={[Function]}
-          onChangeText={[Function]}
-          onFocus={[Function]}
-          placeholder="groceriesRent"
-          placeholderTextColor="rgba(0, 0, 0, .4)"
-          rejectResponderTermination={true}
+        <View
           style={
-            Object {
-              "flex": 1,
-              "height": 54,
-              "marginHorizontal": 8,
-            }
+            Array [
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "flexDirection": "row",
+                "justifyContent": "center",
+              },
+              Object {
+                "flex": 1,
+                "height": 54,
+                "marginHorizontal": 8,
+              },
+            ]
           }
-          title="for"
-          underlineColorAndroid="transparent"
-          value=""
-        />
+        >
+          <TextInput
+            allowFontScaling={true}
+            autoCorrect={true}
+            autoFocus={false}
+            keyboardType="default"
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            placeholder="groceriesRent"
+            placeholderTextColor="rgba(0, 0, 0, .4)"
+            rejectResponderTermination={true}
+            secureTextEntry={false}
+            style={
+              Array [
+                Object {
+                  "fontFamily": "Hind-Regular",
+                },
+                Object {
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 3,
+                  "padding": 8,
+                },
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "flex": 1,
+                },
+              ]
+            }
+            textContentType="none"
+            underlineColorAndroid="transparent"
+            value=""
+          />
+        </View>
       </View>
     </View>
   </RCTScrollView>
