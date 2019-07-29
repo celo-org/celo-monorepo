@@ -56,7 +56,9 @@ export default class ValidatedTextInput extends React.Component<Props> {
       return undefined
     }
 
-    const decimalPos = this.props.value.indexOf('.')
+    const { value, lng } = this.props
+
+    const decimalPos = lng && lng.startsWith('es') ? value.indexOf(',') : value.indexOf('.')
     if (decimalPos === -1) {
       return undefined
     }
