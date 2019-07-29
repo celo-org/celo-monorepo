@@ -53,7 +53,7 @@ export const NUM_ATTESTATIONS_REQUIRED = 3
 export const VERIFICATION_TIMEOUT = 5 * 60 * 1000 // 5 minutes
 export const ERROR_DURATION = 5000 // 5 seconds
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
-
+export const REQUEST_TX_GAS = 5708274
 export enum CodeInputType {
   AUTOMATIC = 'automatic',
   MANUAL = 'manual',
@@ -305,7 +305,7 @@ export async function requestNeededAttestations(
 
   await approveTransactionHashPromise
   await Promise.all([
-    sendTransaction(requestTx, account, TAG, 'Request Attestations', 5708274),
+    sendTransaction(requestTx, account, TAG, 'Request Attestations', REQUEST_TX_GAS),
     approveConfirmationPromise,
   ])
 }
