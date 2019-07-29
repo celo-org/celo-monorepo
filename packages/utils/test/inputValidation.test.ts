@@ -19,22 +19,16 @@ describe('inputValidation', () => {
     })
   }
 
-  validateFunction(
-    'validateInteger',
-    'Removes invalid characters',
-    ['bu123n', '123', '-123', '1b2u3n', '1.2.3.'],
-    'integer',
-    '123'
-  )
+  const numbers = ['bu1.23n', '1.2.3', '1.23', '1.2.-_[`/,zx3.....', '1.b.23']
 
-  const decimals = ['bu1.23n', '1.2.3', '1.23', '1.2.-_[`/,zx3.....', '1.b.23']
+  validateFunction('validateInteger', 'Removes invalid characters', numbers, 'integer', '123')
 
-  validateFunction('validateDecimal', 'Removes invalid characters', decimals, 'decimal', '1.23')
+  validateFunction('validateDecimal', 'Removes invalid characters', numbers, 'decimal', '1.23')
 
   validateFunction(
     'validateDecimal',
     'Supports commas',
-    decimals.map((val) => val.replace('.', ',')),
+    numbers.map((val) => val.replace('.', ',')),
     'decimal',
     '1,23',
     { lng: 'es-AR' }
