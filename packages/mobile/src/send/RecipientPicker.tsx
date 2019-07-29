@@ -157,25 +157,8 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     )
   }
 
-  renderSendToAddressOnly = () => {
-    const { t, onSelectRecipient, searchQuery } = this.props
-    const recipient: RecipientWithAddress = {
-      kind: RecipientKind.Address,
-      displayName: t('walletAddress'),
-      displayId: searchQuery.substring(2, 17) + '...',
-      address: searchQuery,
-    }
-
-    return (
-      <>
-        <RecipientItem recipient={recipient} onSelectRecipient={onSelectRecipient} />
-        {this.renderItemSeparator()}
-      </>
-    )
-  }
-
   renderSendToAddress = () => {
-    const { searchQuery, addressToE164Number, recipientCache, onSelectRecipient } = this.props
+    const { t, searchQuery, addressToE164Number, recipientCache, onSelectRecipient } = this.props
     const existingContact = getRecipientFromAddress(
       searchQuery,
       addressToE164Number,
@@ -189,7 +172,19 @@ export class RecipientPicker extends React.Component<RecipientProps> {
         </>
       )
     } else {
-      return this.renderSendToAddressOnly()
+      const recipient: RecipientWithAddress = {
+        kind: RecipientKind.Address,
+        displayName: t('walletAddress'),
+        displayId: searchQuery.substring(2, 17) + '...',
+        address: searchQuery,
+      }
+
+      return (
+        <>
+          <RecipientItem recipient={recipient} onSelectRecipient={onSelectRecipient} />
+          {this.renderItemSeparator()}
+        </>
+      )
     }
   }
 
