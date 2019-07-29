@@ -82,7 +82,7 @@ lerna-debug.log
 .env.mnemonic.appintegration
 .env.mnemonic.integration
 .env.mnemonic.integrationtesting
+.env.mnemonic.pilotstaging
 
 # LicenseDisclaimer
 **/LicenseDisclaimer.txt
-
