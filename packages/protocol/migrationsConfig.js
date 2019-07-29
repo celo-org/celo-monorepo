@@ -80,6 +80,7 @@ const linkedLibraries = {
     'BondedDeposits',
     'StableToken',
     'Validators',
+    'Governance',
   ],
   LinkedList: ['AddressLinkedList', 'SortedLinkedList'],
   SortedLinkedList: ['AddressSortedLinkedList', 'IntegerSortedLinkedList'],

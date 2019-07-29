@@ -16,6 +16,7 @@ export const concreteContracts = [
   // governance
   'BondedDeposits',
   'BondedDepositsProxy',
+  'Governance',
 
   // identity
   'Attestations',
