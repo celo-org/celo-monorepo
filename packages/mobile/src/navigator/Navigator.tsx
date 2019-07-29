@@ -34,7 +34,6 @@ import Send from 'src/send/Send'
 import SendAmount from 'src/send/SendAmount'
 import SendConfirmation from 'src/send/SendConfirmation'
 import SetClock from 'src/set-clock/SetClock'
-import Sync from 'src/sync/Sync'
 import TabNavigator from 'src/tab/TabNavigator'
 import TransactionReviewScreen from 'src/transactions/TransactionReviewScreen'
 import VerifyEducation from 'src/verify/Education'
@@ -68,7 +67,6 @@ const NuxStack = createStackNavigator(
     [Screens.VerifyInput]: { screen: VerifyInput },
     [Screens.VerifyVerifying]: { screen: VerifyVerifying },
     [Screens.VerifyVerified]: { screen: VerifyVerified },
-    [Screens.Sync]: { screen: Sync },
     [Screens.Pincode]: { screen: Pincode },
     [Screens.ImportWallet]: { screen: ImportWallet },
     [Screens.Language]: { screen: Language },

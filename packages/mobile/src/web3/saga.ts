@@ -22,7 +22,6 @@ import {
   Actions,
   getLatestBlock,
   setAccount,
-  setIsReady,
   setLatestBlockNumber,
   setPrivateCommentKey,
   setSyncProgress,
@@ -46,7 +45,6 @@ let AssignAccountLock = false
 
 // checks if web3 claims it is currently syncing or not
 function* checkWeb3SyncProgressClaim() {
-  // yield call(waitForGethConnectivity)
   while (true) {
     try {
       const syncProgress = yield web3.eth.isSyncing() // returns true when it's still syncing and thus not ready
@@ -86,7 +84,6 @@ export function* checkWeb3Sync() {
 
       if (timeout) {
         Logger.error(TAG, 'Could not complete sync progress check')
-        yield put(setIsReady(false))
         navigate(Screens.ErrorScreen, {
           errorMessage: 'Failing to sync, check your network connection',
         })
