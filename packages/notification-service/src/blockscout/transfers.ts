@@ -69,8 +69,10 @@ function filterAndJoinTransfers(
   return filteredGold.concat(filterdStable)
 }
 
-function notifyForNewTransfers(transfers: Transfer[], lastBlockNotified: number) {
-  for (const t of transfers) {
+function notifyForNewTransfers(transfers: Transfer[], lastBlockNotified: number): Promise<void[]> {
+  const results = new Array<Promise<void>>(transfers.length)
+  for (let i = 0; i < transfers.length; i++) {
+    const t = transfers[i]
     // Skip transactions for which we've already sent notifications
     if (!t || t.blockNumber <= lastBlockNotified) {
       continue
@@ -82,13 +84,15 @@ function notifyForNewTransfers(transfers: Transfer[], lastBlockNotified: number)
       blockNumber: String(t.blockNumber),
       timestamp: String(t.timestamp),
     }
-    sendPaymentNotification(
+    const result: Promise<void> = sendPaymentNotification(
       t.recipient,
       convertWeiValue(t.value),
       t.currency,
       removeEmptyValuesFromObject(notificationData)
     )
+    results[i] = result
   }
+  return Promise.all(results)
 }
 
 function convertWeiValue(value: string) {
@@ -98,7 +102,7 @@ function convertWeiValue(value: string) {
     .valueOf()
 }
 
-export async function handleTransferNotifications() {
+export async function handleTransferNotifications(): Promise<void> {
   const lastBlockNotified = getLastBlockNotified()
   if (lastBlockNotified < 0) {
     // Firebase not yet ready
@@ -117,6 +121,6 @@ export async function handleTransferNotifications() {
 
   const allTransfers = filterAndJoinTransfers(goldTransfers, stableTransfers)
 
-  notifyForNewTransfers(allTransfers, lastBlockNotified)
-  setLastBlockNotified(Math.max(goldTransfersLatestBlock, stableTransfersLatestBlock))
+  await notifyForNewTransfers(allTransfers, lastBlockNotified)
+  return setLastBlockNotified(Math.max(goldTransfersLatestBlock, stableTransfersLatestBlock))
 }

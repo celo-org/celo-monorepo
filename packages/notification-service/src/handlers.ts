@@ -18,8 +18,8 @@ export async function handlePaymentRequests() {
     if (request.notified) {
       continue
     }
-    setPaymentRequestNotified(uid)
-    requestedPaymentNotification(
+    await setPaymentRequestNotified(uid)
+    await requestedPaymentNotification(
       request.requesteeAddress,
       request.amount,
       request.currency,

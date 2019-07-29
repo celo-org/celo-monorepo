@@ -109,6 +109,7 @@ exports[`Invite renders correctly 1`] = `
       horizontal={false}
       initialNumToRender={30}
       keyExtractor={[Function]}
+      keyboardShouldPersistTaps="handled"
       maxToRenderPerBatch={10}
       onContentSizeChange={[Function]}
       onEndReachedThreshold={2}
