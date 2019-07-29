@@ -5,7 +5,7 @@ import { FetchMock } from 'jest-fetch-mock'
 import { Linking } from 'react-native'
 import SmsAndroid from 'react-native-sms-android'
 import { expectSaga } from 'redux-saga-test-plan'
-import { select } from 'redux-saga/effects'
+import { call, select } from 'redux-saga/effects'
 import { setName } from 'src/account'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -18,6 +18,7 @@ import {
   storeInviteeData,
 } from 'src/invite/actions'
 import { watchRedeemInvite, watchSendInvite } from 'src/invite/saga'
+import { waitForNetwork } from 'src/networkInfo/saga'
 import { transactionConfirmed } from 'src/transactions/actions'
 import { currentAccountSelector } from 'src/web3/selectors'
 import { createMockContract, createMockStore } from 'test/utils'
@@ -109,6 +110,7 @@ describe(watchRedeemInvite, () => {
       .mockReturnValueOnce(10) // new account
 
     await expectSaga(watchRedeemInvite)
+      .provide([[call(waitForNetwork), true]])
       .withState(state)
       .dispatch(redeemInvite(KEY, NAME))
       .put(setName(NAME))
@@ -122,6 +124,7 @@ describe(watchRedeemInvite, () => {
       .mockReturnValueOnce(0) // new account
 
     await expectSaga(watchRedeemInvite)
+      .provide([[call(waitForNetwork), true]])
       .withState(state)
       .dispatch(redeemInvite(KEY, NAME))
       .put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ERROR_BANNER_DURATION))
@@ -134,6 +137,7 @@ describe(watchRedeemInvite, () => {
       .mockReturnValueOnce(0) // current account
 
     await expectSaga(watchRedeemInvite)
+      .provide([[call(waitForNetwork), true]])
       .withState(state)
       .dispatch(redeemInvite(KEY, NAME))
       .put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ERROR_BANNER_DURATION))
@@ -144,8 +148,8 @@ describe(watchRedeemInvite, () => {
     balance.mockReturnValueOnce(0) // temp account
 
     await expectSaga(watchRedeemInvite)
+      .provide([[select(currentAccountSelector), null], [call(waitForNetwork), true]])
       .withState(state)
-      .provide([[select(currentAccountSelector), null]])
       .dispatch(redeemInvite(KEY, NAME))
       .put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ERROR_BANNER_DURATION))
       .run()
@@ -157,6 +161,7 @@ describe(watchRedeemInvite, () => {
       .mockReturnValueOnce(10) // current account
 
     await expectSaga(watchRedeemInvite)
+      .provide([[call(waitForNetwork), true]])
       .withState(state)
       .dispatch(redeemInvite(KEY, NAME))
       .put(setName(NAME))
