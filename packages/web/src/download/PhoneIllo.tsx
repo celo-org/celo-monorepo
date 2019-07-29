@@ -6,7 +6,7 @@ import Svg from 'svgs'
 
 export default React.memo(function PhoneIllo() {
   return (
-    <Svg width={'100%'} height={'100%'} viewBox="0 0 269 666" fill="none">
+    <Svg width={'100%'} height={'100%'} viewBox="0 0 269 666" fill={colors.dark}>
       <Path
         d="M242.076 664.653L19.3108 626.069C8.78103 624.25 1.12622 615.556 1.12622 605.426V51.1616C1.12622 40.6981 9.27489 31.82 20.2456 30.3848L242.993 1.01364C256.328 -0.738619 268.233 9.05734 268.233 21.7904V644.009C268.233 657.109 255.693 667.006 242.076 664.653Z"
         stroke={colors.secondary}

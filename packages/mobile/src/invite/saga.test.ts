@@ -3,7 +3,7 @@ const { navigateReset } = mockNavigationServiceFor('invite/saga')
 
 import { FetchMock } from 'jest-fetch-mock'
 import { Linking } from 'react-native'
-import SmsAndroid from 'react-native-sms-android'
+import SendIntentAndroid from 'react-native-send-intent'
 import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
 import { setName } from 'src/account'
@@ -57,6 +57,8 @@ jest.mock('src/transactions/send', () => ({
   sendTransaction: async () => true,
 }))
 
+SendIntentAndroid.sendSms = jest.fn()
+
 const state = createMockStore({ web3: { account: mockAccount } }).getState()
 
 describe(watchSendInvite, () => {
@@ -78,7 +80,7 @@ describe(watchSendInvite, () => {
       .put(storeInviteeData(KEY, mockE164Number))
       .run()
 
-    expect(SmsAndroid.sms).toHaveBeenCalled()
+    expect(SendIntentAndroid.sendSms).toHaveBeenCalled()
   })
 
   it('sends a WhatsApp invite as expected', async () => {

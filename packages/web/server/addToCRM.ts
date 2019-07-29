@@ -125,16 +125,18 @@ const CUSTOM_FIELD_IDS = {
   source: 1,
 }
 async function setCustomFields(contactID: ActiveCampaignID, fields) {
-  Object.keys(fields).map((key) => {
-    const value = fields[key]
-    if (value) {
-      createContactFieldValue({
-        contact: contactID,
-        field: CUSTOM_FIELD_IDS[key],
-        value,
-      })
-    }
-  })
+  await Promise.all(
+    Object.keys(fields).map(async (key) => {
+      const value = fields[key]
+      if (value) {
+        await createContactFieldValue({
+          contact: contactID,
+          field: CUSTOM_FIELD_IDS[key],
+          value,
+        })
+      }
+    })
+  )
 }
 
 const NEWSLETTER_LIST = 1
@@ -153,9 +155,10 @@ export default async function addToCRM({
     const contact = await upsertContact(preparedContact)
     const contactID = Number(contact.contact.id)
 
-    addToList({ contact: contactID, list, status: ListStatus.subscribe })
-
-    setCustomFields(contactID, { interest, company, role, source: 'website' })
+    await Promise.all([
+      addToList({ contact: contactID, list, status: ListStatus.subscribe }),
+      setCustomFields(contactID, { interest, company, role, source: 'website' }),
+    ])
 
     return contact
   } catch (e) {

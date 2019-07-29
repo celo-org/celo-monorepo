@@ -4,9 +4,9 @@ import {
   getHooks,
   importGenesis,
   initAndStartGeth,
-  sleep,
 } from '@celo/celotool/geth_tests/src/lib/utils'
 import BigNumber from 'bignumber.js'
+import { strip0x } from '../src/lib/utils'
 const assert = require('chai').assert
 const Web3 = require('web3')
 
@@ -118,7 +118,7 @@ describe('governance tests', () => {
   const getParsedSignatureOfAddress = async (address: string, signer: string, signerWeb3: any) => {
     // @ts-ignore
     const hash = signerWeb3.utils.soliditySha3({ type: 'address', value: address })
-    const signature = (await signerWeb3.eth.sign(hash, signer)).slice(2)
+    const signature = strip0x(await signerWeb3.eth.sign(hash, signer))
     return {
       r: `0x${signature.slice(0, 64)}`,
       s: `0x${signature.slice(64, 128)}`,
@@ -140,17 +140,17 @@ describe('governance tests', () => {
     return await tx.send({ from: account, ...txOptions, gasPrice, gas })
   }
 
-  const redeemRewards = async (account: string, txOptions: any = {}) => {
-    await unlockAccount(account, web3)
-    const tx = bondedDeposits.methods.redeemRewards()
-    let gas = txOptions.gas
-    // We overestimate to account for variations in the fraction reduction necessary to redeem
-    // rewards.
-    if (!gas) {
-      gas = 2 * (await tx.estimateGas({ ...txOptions }))
-    }
-    return await tx.send({ from: account, ...txOptions, gasPrice, gas })
-  }
+  // const redeemRewards = async (account: string, txOptions: any = {}) => {
+  //   await unlockAccount(account, web3)
+  //   const tx = bondedDeposits.methods.redeemRewards()
+  //   let gas = txOptions.gas
+  //   // We overestimate to account for variations in the fraction reduction necessary to redeem
+  //   // rewards.
+  //   if (!gas) {
+  //     gas = 2 * (await tx.estimateGas({ ...txOptions }))
+  //   }
+  //   return await tx.send({ from: account, ...txOptions, gasPrice, gas })
+  // }
 
   describe('when a bonded deposit account with weight exists', () => {
     const account = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
@@ -173,12 +173,12 @@ describe('governance tests', () => {
       await delegateRewards(account, delegate)
     })
 
-    it('should be able to redeem block rewards', async function(this: any) {
-      this.timeout(0) // Disable test timeout
-      await sleep(1)
-      await redeemRewards(account)
-      assert.isAtLeast(await web3.eth.getBalance(delegate), 1)
-    })
+    // it('should be able to redeem block rewards', async function(this: any) {
+    //   this.timeout(0) // Disable test timeout
+    //   await sleep(1)
+    //   await redeemRewards(account)
+    //   assert.isAtLeast(await web3.eth.getBalance(delegate), 1)
+    // })
   })
 
   describe('when adding any block', () => {
