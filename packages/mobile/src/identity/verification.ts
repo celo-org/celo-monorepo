@@ -146,7 +146,6 @@ export function* doVerificationFlow() {
     }
 
     // Mark codes completed in previous attempts
-    // yield call(setCompletedCodes, NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining)
     yield put(completeAttestationCode(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining))
 
     // Request any additional attestations needed to be verified
@@ -289,18 +288,6 @@ async function getAttestationsStatus(
     numAttestationsRequestsNeeded,
   }
 }
-
-// function* setCompletedCodes(numCodesCompleted: number) {
-//   yield all([
-//     put(completeAttestationCode(numCodesCompleted)),
-//     put(
-//       inputAttestationCode({
-//         code: ATTESTATION_CODE_PLACEHOLDER,
-//         issuer: ATTESTATION_ISSUER_PLACEHOLDER,
-//       })
-//     ),
-//   ])
-// }
 
 export async function requestNeededAttestations(
   attestationsContract: AttestationsType,

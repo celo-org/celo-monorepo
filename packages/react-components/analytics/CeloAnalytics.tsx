@@ -90,12 +90,14 @@ class CeloAnalytics {
       this.Logger.info(TAG, `Analytics is disabled, not tracking event ${eventName}`)
       return
     }
+
+    this.Logger.info(TAG, `Tracking event ${eventName}`, JSON.stringify(eventProperties))
+
     if (!SEGMENT_API_KEY) {
       return
     }
 
     try {
-      this.Logger.info(TAG, `Tracking event ${eventName}`, JSON.stringify(eventProperties))
       const props = this.getProps(eventProperties)
       if (attachDeviceInfo) {
         _.set(props, 'device', getDeviceInfo())

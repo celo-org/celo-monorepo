@@ -142,7 +142,7 @@ export class Verifying extends React.Component<Props, State> {
     if (this.isVerificationComplete()) {
       return this.finishVerification()
     }
-    if (this.isCodeNoLongerSubmitting(prevProps) && !this.state.isCodeSubmitting) {
+    if (this.isCodeNoLongerSubmitting(prevProps) && this.state.isCodeSubmitting) {
       this.setState({ isCodeSubmitting: false })
     }
   }
