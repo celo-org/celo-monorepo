@@ -221,7 +221,8 @@ export async function sendTransactionAsync<T>(
   tx: TransactionObject<T>,
   account: string,
   gasCurrencyContract: StableToken | GoldToken,
-  logger: TxLogger = emptyTxLogger
+  logger: TxLogger = emptyTxLogger,
+  staticGas?: number | undefined
 ): Promise<TxPromises> {
   // @ts-ignore
   const resolvers: TxPromiseResolvers = {}
@@ -257,19 +258,24 @@ export async function sendTransactionAsync<T>(
       gasCurrency: gasCurrencyContract._address,
       gasPrice: '0',
     }
-    const estimatedGas = Math.round((await tx.estimateGas(txParams)) * gasInflateFactor)
-    logger(EstimatedGas(estimatedGas))
 
-    await tx
-      .send({
-        from: account,
-        // @ts-ignore
-        gasCurrency: gasCurrencyContract._address,
-        gas: estimatedGas,
-        // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
-        // the suggested price in the selected gasCurrency.
-        gasPrice: '0',
-      })
+    let estimatedGas
+    if (staticGas === undefined) {
+      estimatedGas = Math.round((await tx.estimateGas(txParams)) * gasInflateFactor)
+      logger(EstimatedGas(estimatedGas))
+    } else {
+      estimatedGas = staticGas
+    }
+
+    tx.send({
+      from: account,
+      // @ts-ignore
+      gasCurrency: gasCurrencyContract._address,
+      gas: estimatedGas,
+      // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
+      // the suggested price in the selected gasCurrency.
+      gasPrice: '0',
+    })
       .on('receipt', (r: TransactionReceipt) => {
         logger(ReceiptReceived(r))
         if (resolvers.receipt) {

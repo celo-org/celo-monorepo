@@ -41,7 +41,7 @@ import {
 import { attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { RootState } from 'src/redux/reducers'
-import { sendTransaction } from 'src/transactions/send'
+import { sendTransaction, sendTransactionPromises } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -164,7 +164,7 @@ export function* doVerificationFlow() {
     const autoRetrievalTask: Task = yield fork(startAutoSmsRetrieval)
 
     // This needs to go before revealing the attesttions because that depends on the public data key being set.
-    yield call(setAccount, attestationsContract, account, dataKey)
+    yield fork(setAccount, attestationsContract, account, dataKey)
 
     // Request codes for the attestations needed
     yield call(
@@ -286,20 +286,28 @@ export async function requestNeededAttestations(
     numAttestationsRequestsNeeded
   )
 
-  await sendTransaction(approveTx, account, TAG, 'Approve Attestations')
-
   Logger.debug(
     `${TAG}@requestNeededAttestations`,
     `Requesting ${numAttestationsRequestsNeeded} new attestations`
   )
 
-  const requestTx = makeRequestTx(
+  const requestTx = await makeRequestTx(
     attestationsContract,
     e164NumberHash,
     numAttestationsRequestsNeeded,
     stableTokenContract
   )
-  await sendTransaction(requestTx, account, TAG, 'Request Attestations')
+
+  const {
+    confirmation: approveConfirmationPromise,
+    transactionHash: approveTransactionHashPromise,
+  } = await sendTransactionPromises(approveTx, account, TAG, 'Approve Attestations')
+
+  await approveTransactionHashPromise
+  await Promise.all([
+    sendTransaction(requestTx, account, TAG, 'Request Attestations', 5708274),
+    approveConfirmationPromise,
+  ])
 }
 
 function attestationCodeReceiver(
