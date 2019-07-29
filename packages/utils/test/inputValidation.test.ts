@@ -4,10 +4,10 @@ describe('inputValidation', () => {
   function validateFunction(
     desc: string,
     itStr: string,
-    props: BaseProps,
     inputs: string[],
     validator: 'phone' | 'integer' | 'decimal',
-    expected: string
+    expected: string,
+    props?: BaseProps
   ) {
     describe(desc, () => {
       inputs.forEach((input) =>
@@ -22,7 +22,6 @@ describe('inputValidation', () => {
   validateFunction(
     'validateInteger',
     'Removes invalid characters',
-    {},
     ['bu123n', '123', '-123', '1b2u3n', '1.2.3.'],
     'integer',
     '123'
@@ -30,21 +29,20 @@ describe('inputValidation', () => {
 
   const decimals = ['bu1.23n', '1.2.3', '1.23', '1.2.-_[`/,zx3.....', '1.b.23']
 
-  validateFunction('validateDecimal', 'Removes invalid characters', {}, decimals, 'decimal', '1.23')
+  validateFunction('validateDecimal', 'Removes invalid characters', decimals, 'decimal', '1.23')
 
   validateFunction(
     'validateDecimal',
     'Supports commas',
-    { lng: 'es-AR' },
     decimals.map((val) => val.replace('.', ',')),
     'decimal',
-    '1,23'
+    '1,23',
+    { lng: 'es-AR' }
   )
 
   validateFunction(
     'validatePhone',
     'Removes invalid characters and formats numbers',
-    {},
     [
       '4023939889',
       '(402)3939889',
