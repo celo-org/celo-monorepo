@@ -83,8 +83,8 @@ class RequestConfirmation extends React.Component<Props> {
     })
 
     const { t } = this.props
-    if (!recipient || !recipient.e164PhoneNumber) {
-      throw new Error("Can't request from recipient without valid e164 number")
+    if (!recipient || (!recipient.e164PhoneNumber && !recipient.address)) {
+      throw new Error("Can't request from recipient without valid e164 number or a wallet address")
     }
 
     const address = this.props.account
