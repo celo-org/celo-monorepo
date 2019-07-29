@@ -3,6 +3,7 @@ import * as React from 'react'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
+import { FeeType } from 'src/fees/actions'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import SendAmount, { SendAmount as SendAmountClass } from 'src/send/SendAmount'
 import { createMockStore, getMockI18nProps } from 'test/utils'
@@ -17,7 +18,11 @@ const numeral = require('numeral')
 
 const storeData = {
   stableToken: { balance: BALANCE_VALID },
-  send: { suggestedFee: '1' },
+  fees: {
+    send: {
+      feeInWei: '1',
+    },
+  },
 }
 
 const TEXT_PLACEHOLDER = 'groceriesRent'
@@ -68,6 +73,7 @@ describe('SendAmount', () => {
             suggestedFeeDollars={new BigNumber(1)}
             e164NumberToAddress={{ [mockE164Number2]: mockAccount2 }}
             defaultCountryCode={'+1'}
+            feeType={FeeType.SEND}
           />
         </Provider>
       )

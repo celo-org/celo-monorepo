@@ -27,6 +27,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import { FeeType } from 'src/fees/actions'
 import EstimateFee from 'src/fees/EstimateFee'
+import { getFeeEstimateDollars } from 'src/fees/selectors'
 import { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import {
@@ -39,7 +40,6 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import LabeledTextInput from 'src/send/LabeledTextInput'
-import { getSuggestedFeeDollars } from 'src/send/selectors'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
@@ -54,13 +54,20 @@ interface State {
   characterLimitExeeded: boolean
 }
 
-type Props = StateProps & DispatchProps & NavigationInjectedProps & WithNamespaces
+type Navigation = NavigationInjectedProps['navigation']
+
+interface OwnProps {
+  navigation: Navigation
+}
+
+type Props = StateProps & DispatchProps & OwnProps & WithNamespaces
 
 interface StateProps {
   dollarBalance: BigNumber | null
-  suggestedFeeDollars: BigNumber
+  suggestedFeeDollars: BigNumber | null
   defaultCountryCode: string
   e164NumberToAddress: E164NumberToAddressType
+  feeType: FeeType | undefined
 }
 
 interface DispatchProps {
@@ -71,12 +78,49 @@ interface DispatchProps {
   fetchPhoneAddresses: typeof fetchPhoneAddresses
 }
 
-const mapStateToProps = (state: RootState): StateProps => ({
-  dollarBalance: state.stableToken.balance ? new BigNumber(state.stableToken.balance) : null,
-  suggestedFeeDollars: getSuggestedFeeDollars(state),
-  defaultCountryCode: state.account.defaultCountryCode,
-  e164NumberToAddress: state.identity.e164NumberToAddress,
-})
+function getRecipient(navigation: Navigation): Recipient {
+  const recipient = navigation.getParam('recipient')
+  if (!recipient) {
+    throw new Error('Recipient expected')
+  }
+  return recipient
+}
+
+function getVerificationStatus(
+  navigation: Navigation,
+  e164NumberToAddress: E164NumberToAddressType
+) {
+  return getRecipientVerificationStatus(getRecipient(navigation), e164NumberToAddress)
+}
+
+function getFeeType(
+  navigation: Navigation,
+  e164NumberToAddress: E164NumberToAddressType
+): FeeType | undefined {
+  const verificationStatus = getVerificationStatus(navigation, e164NumberToAddress)
+
+  switch (verificationStatus) {
+    case VerificationStatus.UNKNOWN:
+      return undefined
+    case VerificationStatus.UNVERIFIED:
+      return FeeType.INVITE
+    case VerificationStatus.VERIFIED:
+      return FeeType.SEND
+  }
+}
+
+const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
+  const { navigation } = ownProps
+  const { e164NumberToAddress } = state.identity
+  const feeType = getFeeType(navigation, e164NumberToAddress)
+  return {
+    dollarBalance: state.stableToken.balance ? new BigNumber(state.stableToken.balance) : null,
+    suggestedFeeDollars: feeType ? getFeeEstimateDollars(state, feeType) : null,
+    defaultCountryCode: state.account.defaultCountryCode,
+    e164NumberToAddress,
+    feeType,
+  }
+}
 
 export class SendAmount extends React.PureComponent<Props, State> {
   static navigationOptions = ({ navigation }: NavigationScreenProps) => ({
@@ -116,7 +160,9 @@ export class SendAmount extends React.PureComponent<Props, State> {
 
   getAmountIsValid = () => {
     const bigNumberAmount: BigNumber = parseInputAmount(this.state.amount)
-    const amountWithFees: BigNumber = bigNumberAmount.plus(this.props.suggestedFeeDollars)
+    const amountWithFees: BigNumber = bigNumberAmount.plus(
+      this.props.suggestedFeeDollars || new BigNumber(NaN)
+    )
     const currentBalance = this.props.dollarBalance
       ? new BigNumber(this.props.dollarBalance)
       : new BigNumber(0)
@@ -127,18 +173,11 @@ export class SendAmount extends React.PureComponent<Props, State> {
   }
 
   getRecipient = (): Recipient => {
-    const recipient = this.props.navigation.getParam('recipient')
-    if (!recipient) {
-      throw new Error('Recipient expected')
-    }
-    return recipient
+    return getRecipient(this.props.navigation)
   }
 
-  getVerificationStatus = (e164NumberToAddress?: E164NumberToAddressType) => {
-    return getRecipientVerificationStatus(
-      this.getRecipient(),
-      e164NumberToAddress || this.props.e164NumberToAddress
-    )
+  getVerificationStatus = () => {
+    return getVerificationStatus(this.props.navigation, this.props.e164NumberToAddress)
   }
 
   onAmountChanged = (amount: string) => {
@@ -164,12 +203,17 @@ export class SendAmount extends React.PureComponent<Props, State> {
     const recipient = this.getRecipient()
     const recipientAddress = getRecipientAddress(recipient, this.props.e164NumberToAddress)
 
+    const { suggestedFeeDollars } = this.props
+    if (!suggestedFeeDollars) {
+      return null
+    }
+
     const confirmationInput: ConfirmationInput = {
       recipient,
       amount,
       reason: this.state.reason,
       recipientAddress,
-      fee: this.props.suggestedFeeDollars,
+      fee: suggestedFeeDollars,
     }
     return confirmationInput
   }
@@ -193,6 +237,10 @@ export class SendAmount extends React.PureComponent<Props, State> {
     }
 
     const confirmationInput = this.getConfirmationInput()
+    if (!confirmationInput) {
+      return
+    }
+
     if (verificationStatus === VerificationStatus.VERIFIED) {
       CeloAnalytics.track(CustomEventNames.transaction_details, {
         recipientAddress: confirmationInput.recipientAddress,
@@ -206,6 +254,10 @@ export class SendAmount extends React.PureComponent<Props, State> {
   onRequest = () => {
     CeloAnalytics.track(CustomEventNames.request_payment_continue)
     const confirmationInput = this.getConfirmationInput()
+    if (!confirmationInput) {
+      return
+    }
+
     CeloAnalytics.track(CustomEventNames.send_invite_details, {
       requesteeAddress: confirmationInput.recipientAddress,
     })
@@ -295,20 +347,14 @@ export class SendAmount extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { t } = this.props
+    const { t, feeType } = this.props
     const recipient = this.getRecipient()
     const { amountIsValid, userHasEnough } = this.getAmountIsValid()
     const verificationStatus = this.getVerificationStatus()
 
     return (
       <View style={style.body}>
-        {verificationStatus !== VerificationStatus.UNKNOWN && (
-          <EstimateFee
-            feeType={
-              verificationStatus === VerificationStatus.VERIFIED ? FeeType.SEND : FeeType.INVITE
-            }
-          />
-        )}
+        {feeType && <EstimateFee feeType={feeType} />}
         <KeyboardAwareScrollView
           keyboardShouldPersistTaps="always"
           contentContainerStyle={style.scrollViewContentContainer}
@@ -435,7 +481,7 @@ const style = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
+  connect<StateProps, DispatchProps, OwnProps, RootState>(
     mapStateToProps,
     {
       fetchDollarBalance,

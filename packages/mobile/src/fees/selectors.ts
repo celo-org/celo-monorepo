@@ -27,12 +27,12 @@ export const getEscrowFeeEstimateDollars = feeEstimateSelectorFactory(getEscrowF
 export const getFeeEstimateDollars = (state: RootState, feeType: FeeType) => {
   switch (feeType) {
     case FeeType.INVITE:
-      return getInviteFeeEstimate(state)
+      return getInviteFeeEstimateDollars(state)
     case FeeType.SEND:
-      return getSendFeeEstimate(state)
+      return getSendFeeEstimateDollars(state)
     case FeeType.EXCHANGE:
-      return getExchangeFeeEstimate(state)
+      return getExchangeFeeEstimateDollars(state)
     case FeeType.ESCROW:
-      return getEscrowFeeEstimate(state)
+      return getEscrowFeeEstimateDollars(state)
   }
 }
