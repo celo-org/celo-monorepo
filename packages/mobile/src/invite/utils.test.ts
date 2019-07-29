@@ -3,7 +3,10 @@ import { createInviteCode, extractValidInviteCode, isValidPrivateKey } from 'src
 export const VALID_INVITE =
   'Something something pFCr5NAAf/vUcWypJiQFnF6DHI+6vCGxMhhShki07ow= another thing else'
 export const VALID_INVITE_KEY = '0xa450abe4d0007ffbd4716ca92624059c5e831c8fbabc21b13218528648b4ee8c'
-
+export const PARTIAL_INVITE =
+  'Hi! I would like to invite you to join the Celo payments network. Your invite code is: ndoILWBXFR1+C59M3QKcEA7rWP7+2u5XQKC1gTemXBo= You can install the C'
+export const PARTIAL_INVITE_KEY =
+  '0x9dda082d6057151d7e0b9f4cdd029c100eeb58fefedaee5740a0b58137a65c1a'
 describe(extractValidInviteCode, () => {
   it('extracts invite code correctly', () => {
     expect(extractValidInviteCode('nothing')).toBeNull()

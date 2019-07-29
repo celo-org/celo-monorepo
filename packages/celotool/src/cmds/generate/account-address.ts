@@ -1,5 +1,5 @@
 /* tslint:disable no-console */
-import { generateAccountAddressFromPrivateKey } from 'src/lib/generate_utils'
+import { privateKeyToAddress } from 'src/lib/generate_utils'
 import * as yargs from 'yargs'
 
 interface AccountAddressArgv {
@@ -19,5 +19,5 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: AccountAddressArgv) => {
-  console.log(generateAccountAddressFromPrivateKey(argv.privateKey))
+  console.log(privateKeyToAddress(argv.privateKey))
 }

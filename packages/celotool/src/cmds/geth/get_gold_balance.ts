@@ -2,6 +2,7 @@ import { GethArgv } from '@celo/celotool/src/cmds/geth'
 import {
   addCeloEnvMiddleware,
   addCeloGethMiddleware,
+  ensure0x,
   execCmdWithExitOnFailure,
 } from '@celo/celotool/src/lib/utils'
 import * as yargs from 'yargs'
@@ -37,9 +38,7 @@ export const handler = async (argv: GetGoldBalanceArgv) => {
     // This return is required to prevent false lint errors in the code following this line
     return
   }
-  if (!account.startsWith('0x')) {
-    account = '0x' + account
-  }
+  account = ensure0x(account)
   if (account.length !== 42) {
     invalidArgumentExit(account, 'Account must be 40 hex-chars')
   }
