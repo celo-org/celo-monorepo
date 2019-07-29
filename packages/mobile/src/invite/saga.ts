@@ -201,7 +201,6 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
   const { inviteCode, name } = action
 
   yield call(waitForNetwork)
-  // yield call(waitForGethConnectivity)
   try {
     // Add temp wallet so we can send money from it
     let tempAccount
