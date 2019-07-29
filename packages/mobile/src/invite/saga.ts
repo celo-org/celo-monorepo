@@ -3,7 +3,7 @@ import {
   getAttestationsContract,
   getStableTokenContract,
 } from '@celo/contractkit'
-import { reTryAsync } from '@celo/utils/src/miscellaneous'
+import { retryAsync } from '@celo/utils/src/miscellaneous'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { Linking } from 'react-native'
@@ -222,7 +222,7 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
 
     // Try to get balance once + two retries before failing
     const stableBalance = new BigNumber(
-      yield call(reTryAsync, StableToken.methods.balanceOf(tempAccount).call, 2, [])
+      yield call(retryAsync, StableToken.methods.balanceOf(tempAccount).call, 2, [])
     )
 
     Logger.debug(TAG + '@redeemInviteCode', 'Temporary account balance: ' + stableBalance)

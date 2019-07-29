@@ -12,18 +12,12 @@ describe('utils->miscellaneous', () => {
       throw 'error'
     })
 
-    let didThrow = false
     try {
       await retryAsync(mockFunction, 2, [], 1)
+      expect(false).toBeTruthy()
     } catch (error) {
-      didThrow = true
+      // should never happen
     }
-    expect(didThrow).toBeTruthy()
-
-    // TODO For some reason this doesn't throw
-    // expect(async () => {
-    //   await retryAsync(myfunct, 2, [])
-    // }).toThrow()
 
     expect(mockFunction).toHaveBeenCalledTimes(3)
   })

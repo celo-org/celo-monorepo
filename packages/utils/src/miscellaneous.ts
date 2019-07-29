@@ -15,7 +15,7 @@ export const retryAsync = async (
     } catch (error) {
       await new Promise((resolve) => setTimeout(resolve, delay))
       saveError = error
-      console.error(`${TAG}/@reTryAsync, Failed to execute function on try #${i}`, error)
+      console.info(`${TAG}/@reTryAsync, Failed to execute function on try #${i}`, error)
     }
   }
 

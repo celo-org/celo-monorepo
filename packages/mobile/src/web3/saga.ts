@@ -235,5 +235,5 @@ export function* watchRefreshGasPrice() {
 // }
 
 export function* web3Saga() {
-  yield spawn(checkSyncProgressWorker)
+  yield spawn(watchRefreshGasPrice)
 }
