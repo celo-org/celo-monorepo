@@ -31,6 +31,7 @@ files=(
   ".env.mnemonic.appintegration"
   ".env.mnemonic.integration"
   ".env.mnemonic.integrationtesting"
+  ".env.mnemonic.pilotstaging"
 )
 
 # this is to allow the script to be called from anywhere
