@@ -6,7 +6,7 @@ import {
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { Linking } from 'react-native'
-import SmsAndroid from 'react-native-sms-android'
+import SendIntentAndroid from 'react-native-send-intent'
 import VersionCheck from 'react-native-version-check'
 import { call, delay, put, select, spawn, takeLeading } from 'redux-saga/effects'
 import { setName } from 'src/account'
@@ -94,13 +94,12 @@ export async function generateLink(inviteCode: string, recipientName: string) {
 
 async function sendSms(toPhone: string, msg: string) {
   return new Promise((resolve, reject) => {
-    SmsAndroid.sms(toPhone, msg, 'sendIndirect', (err: Error) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve()
-      }
-    })
+    try {
+      SendIntentAndroid.sendSms(toPhone, msg)
+      resolve()
+    } catch (e) {
+      reject(e)
+    }
   })
 }
 
