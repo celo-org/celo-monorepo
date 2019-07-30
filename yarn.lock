@@ -9067,6 +9067,11 @@ connect-query@^1.0.0:
   dependencies:
     qs "~6.4.0"
 
+connect-slashes@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/connect-slashes/-/connect-slashes-1.4.0.tgz#fe884e9d130e9bd0a40d8ee502c1dfa269f94373"
+  integrity sha512-BJRbgSczzlsRwyF64DxGNIizBTxUf7f/tAsDzq2Nq8eLrm2160vVfm/4vQcjrT4qVFu6qDCqPK+vDaEWJsnSzA==
+
 connect@^3.6.2, connect@^3.6.5:
   version "3.6.6"
   resolved "https://registry.yarnpkg.com/connect/-/connect-3.6.6.tgz#09eff6c55af7236e137135a72574858b6786f524"
@@ -22863,9 +22868,9 @@ react-native-secure-randombytes@^2.2.3:
   dependencies:
     buffer "^4.9.1"
 
-"react-native-send-intent@git+ssh://git@github.com/celo-org/react-native-send-intent#8039938":
+"react-native-send-intent@git+https://github.com/celo-org/react-native-send-intent#8039938":
   version "1.0.30"
-  resolved "git+ssh://git@github.com/celo-org/react-native-send-intent#80399380eef368b9a8ab1ee1db07e193e6f89826"
+  resolved "git+https://github.com/celo-org/react-native-send-intent#80399380eef368b9a8ab1ee1db07e193e6f89826"
 
 react-native-sentry@^0.38.3:
   version "0.38.3"
@@ -22884,11 +22889,6 @@ react-native-share@^1.1.3:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-1.1.3.tgz#513ea61075e2bb945d33cfda120e12592916299e"
   integrity sha512-vKAJqgkEt7HjsF0HUwgom+E0FbmFNVZNncHwby1+O8/mXlKugh+Ym6rvv+A2ASHmD5TXKohJMYT2+jYofzPORA==
-
-react-native-sms-android@^0.4.1:
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/react-native-sms-android/-/react-native-sms-android-0.4.1.tgz#e87bd98e1cd93485bab270bb489f2180960c24a6"
-  integrity sha1-6HvZjhzZNIW6snC7SJ8hgJYMJKY=
 
 react-native-splash-screen@^3.1.1:
   version "3.1.1"

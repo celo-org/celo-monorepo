@@ -101,7 +101,75 @@ exports[`Invite renders correctly 1`] = `
       />
     </View>
     <RCTScrollView
-      ListEmptyComponent={[Function]}
+      ListEmptyComponent={
+        <View
+          style={
+            Object {
+              "justifyContent": "center",
+              "paddingHorizontal": 50,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "justifyContent": "center",
+                "paddingVertical": 20,
+                "textAlign": "center",
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 24,
+                }
+              }
+            >
+              noResultsFor
+            </Text>
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 24,
+                  },
+                  Object {
+                    "color": "#2E3338",
+                  },
+                ]
+              }
+            >
+               ""
+            </Text>
+          </View>
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                },
+                Object {
+                  "justifyContent": "center",
+                  "textAlign": "center",
+                },
+              ]
+            }
+          >
+            searchForSomeone
+          </Text>
+        </View>
+      }
       data={Array []}
       disableVirtualization={false}
       getItem={[Function]}
@@ -109,6 +177,7 @@ exports[`Invite renders correctly 1`] = `
       horizontal={false}
       initialNumToRender={30}
       keyExtractor={[Function]}
+      keyboardShouldPersistTaps="handled"
       maxToRenderPerBatch={10}
       onContentSizeChange={[Function]}
       onEndReachedThreshold={2}
@@ -128,6 +197,7 @@ exports[`Invite renders correctly 1`] = `
     >
       <View>
         <View
+          onLayout={[Function]}
           style={
             Object {
               "justifyContent": "center",
