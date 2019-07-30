@@ -4,6 +4,7 @@ import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
+import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import { parseInputAmount } from '@celo/utils/src/parsing'
 import BigNumber from 'bignumber.js'
 import { debounce } from 'lodash'
@@ -378,7 +379,7 @@ export class SendAmount extends React.PureComponent<Props, State> {
             onChangeText={this.onAmountChanged}
             autoFocus={true}
             numberOfDecimals={this.state.numberOfDecimals}
-            validator="decimal"
+            validator={ValidatorKind.Decimal}
             lng={this.props.lng}
           />
           <LabeledTextInput

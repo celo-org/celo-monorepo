@@ -1,7 +1,14 @@
 import { getDisplayPhoneNumber } from './phoneNumbers'
 
+export enum ValidatorKind {
+  Custom = 'custom',
+  Decimal = 'decimal',
+  Integer = 'integer',
+  Phone = 'phone',
+}
+
 export interface BaseProps {
-  validator?: 'phone' | 'integer' | 'decimal' | 'custom'
+  validator?: ValidatorKind
   customValidator?: (input: string) => string
   countryCallingCode?: string
   lng?: string

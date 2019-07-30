@@ -1,42 +1,37 @@
-import { BaseProps, validateInput } from '../src/inputValidation'
+import { BaseProps, validateInput, ValidatorKind } from '../src/inputValidation'
 
 describe('inputValidation', () => {
   function validateFunction(
-    desc: string,
     itStr: string,
     inputs: string[],
-    validator: 'phone' | 'integer' | 'decimal',
+    validator: ValidatorKind,
     expected: string,
     props?: BaseProps
   ) {
-    describe(desc, () => {
-      inputs.forEach((input) =>
-        it(`${itStr}: ${input}`, () => {
-          const result = validateInput(input, { validator, countryCallingCode: '1', ...props })
-          expect(result).toEqual(expected)
-        })
-      )
-    })
+    it(itStr, () =>
+      inputs.forEach((input) => {
+        const result = validateInput(input, { validator, countryCallingCode: '1', ...props })
+        expect(result).toEqual(expected)
+      })
+    )
   }
 
   const numbers = ['bu1.23n', '1.2.3', '1.23', '1.2.-_[`/,zx3.....', '1.b.23']
 
-  validateFunction('validateInteger', 'Removes invalid characters', numbers, 'integer', '123')
+  validateFunction('validates integers', numbers, ValidatorKind.Integer, '123')
 
-  validateFunction('validateDecimal', 'Removes invalid characters', numbers, 'decimal', '1.23')
+  validateFunction('validates decimals', numbers, ValidatorKind.Decimal, '1.23')
 
   validateFunction(
-    'validateDecimal',
-    'Supports commas',
+    'allows comma decimals',
     numbers.map((val) => val.replace('.', ',')),
-    'decimal',
+    ValidatorKind.Decimal,
     '1,23',
     { lng: 'es-AR' }
   )
 
   validateFunction(
-    'validatePhone',
-    'Removes invalid characters and formats numbers',
+    'validates phone numbers',
     [
       '4023939889',
       '(402)3939889',
@@ -46,7 +41,7 @@ describe('inputValidation', () => {
       '(4023) 9-39-88-9',
       '4-0-2-3-9-3-9-8-8-9', // phone-kebab
     ],
-    'phone',
+    ValidatorKind.Phone,
     '(402) 393-9889'
   )
 })

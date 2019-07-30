@@ -1,5 +1,5 @@
 import TextInput from '@celo/react-components/components/TextInput'
-import { validateInput } from '@celo/utils/src/inputValidation'
+import { validateInput, ValidatorKind } from '@celo/utils/src/inputValidation'
 import * as React from 'react'
 import { TextInputProps } from 'react-native'
 
@@ -13,21 +13,21 @@ interface OwnProps {
 
 // Required props when validator type is phone
 interface PhoneValidatorProps {
-  validator: 'phone'
+  validator: ValidatorKind.Phone
   countryCallingCode: string
   // Following props unused w/ 'phone' validator but required to be defined
   customValidator?: CustomValidatorProps['customValidator']
 }
 
 interface NumberValidatorProps {
-  validator?: 'integer' | 'decimal'
+  validator?: ValidatorKind.Integer | ValidatorKind.Decimal
   // Following props unused w/ number validators but required to be defined
   countryCallingCode?: string
   customValidator?: CustomValidatorProps['customValidator']
 }
 
 interface CustomValidatorProps {
-  validator: 'custom'
+  validator: ValidatorKind.Custom
   customValidator: (input: string) => string
   // Following props unused w/ 'custom' but required to be defined
   countryCallingCode?: string
