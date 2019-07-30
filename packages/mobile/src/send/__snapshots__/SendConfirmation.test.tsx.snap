@@ -361,6 +361,23 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                   </Text>
                 </Text>
               </View>
+              <View
+                style={
+                  Object {
+                    "alignItems": "stretch",
+                    "justifyContent": "center",
+                    "marginBottom": 10,
+                    "marginTop": 10,
+                  }
+                }
+              >
+                <ActivityIndicator
+                  animating={true}
+                  color="#42D689"
+                  hidesWhenStopped={true}
+                  size="small"
+                />
+              </View>
             </View>
           </View>
           <Modal
@@ -2298,6 +2315,23 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                     200.00
                   </Text>
                 </Text>
+              </View>
+              <View
+                style={
+                  Object {
+                    "alignItems": "stretch",
+                    "justifyContent": "center",
+                    "marginBottom": 10,
+                    "marginTop": 10,
+                  }
+                }
+              >
+                <ActivityIndicator
+                  animating={true}
+                  color="#42D689"
+                  hidesWhenStopped={true}
+                  size="small"
+                />
               </View>
             </View>
           </View>

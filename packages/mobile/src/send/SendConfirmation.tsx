@@ -228,6 +228,7 @@ class SendConfirmation extends React.Component<Props, State> {
             value={amount}
             currency={CURRENCY_ENUM.DOLLAR} // User can only send in Dollars
             fee={fee}
+            isLoadingFee={asyncFee.loading}
             type={isPaymentRequest && TransactionTypes.PAY_REQUEST}
             dollarBalance={this.props.dollarBalance}
           />

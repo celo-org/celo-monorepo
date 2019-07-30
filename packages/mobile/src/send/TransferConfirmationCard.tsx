@@ -5,7 +5,7 @@ import { componentStyles } from '@celo/react-components/styles/styles'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -62,6 +62,7 @@ export interface OwnProps {
   value: BigNumber
   currency: CURRENCY_ENUM
   fee?: BigNumber
+  isLoadingFee?: boolean
   type: TransactionTypes
   e164PhoneNumber?: string
   dollarBalance?: BigNumber
@@ -134,6 +135,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
     type: TransactionTypes,
     total: BigNumber,
     fee: BigNumber | undefined,
+    isLoadingFee: boolean | undefined,
     currency: CURRENCY_ENUM,
     comment?: string,
     address?: string
@@ -194,20 +196,26 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
               </Text>
             </View>
           )}
-          {!!fee && (
+          {isLoadingFee && (
             <View style={style.feeContainer}>
-              {this.props.type === TransactionTypes.PAY_REQUEST && (
-                <LineItemRow currencySymbol={'$'} amount={total} title={t('dollarsSent')} />
-              )}
-              <LineItemRow
-                currencySymbol={currencyStyle.symbol}
-                amount={fee}
-                title={address ? t('securityFee') : t('inviteAndSecurityFee')}
-                titleIcon={<FeeIcon />}
-              />
-              <LineItemRow currencySymbol={'$'} amount={amountWithFees} title={t('total')} />
+              <ActivityIndicator size="small" color={colors.celoGreen} />
             </View>
           )}
+          {!isLoadingFee &&
+            !!fee && (
+              <View style={style.feeContainer}>
+                {this.props.type === TransactionTypes.PAY_REQUEST && (
+                  <LineItemRow currencySymbol={'$'} amount={total} title={t('dollarsSent')} />
+                )}
+                <LineItemRow
+                  currencySymbol={currencyStyle.symbol}
+                  amount={fee}
+                  title={address ? t('securityFee') : t('inviteAndSecurityFee')}
+                  titleIcon={<FeeIcon />}
+                />
+                <LineItemRow currencySymbol={'$'} amount={amountWithFees} title={t('total')} />
+              </View>
+            )}
         </View>
       )
     }
@@ -221,6 +229,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
       currency,
       comment,
       fee,
+      isLoadingFee,
       type,
       e164PhoneNumber,
       defaultCountryCode,
@@ -230,7 +239,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
       <View style={[componentStyles.roundedBorder, style.container]}>
         {this.renderTopSection(type, recipient, address, e164PhoneNumber, defaultCountryCode)}
         {this.renderAmountSection(type, currency)}
-        {this.renderBottomSection(type, value, fee, currency, comment, address)}
+        {this.renderBottomSection(type, value, fee, isLoadingFee, currency, comment, address)}
       </View>
     )
   }
