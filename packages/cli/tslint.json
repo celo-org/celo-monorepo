@@ -13,6 +13,7 @@
     "no-duplicate-variable": false,
     "no-sparse-arrays": false,
     "interface-over-type-literal": false,
-    "no-global-arrow-functions": false
+    "no-global-arrow-functions": false,
+    "no-floating-promises": true
   }
 }

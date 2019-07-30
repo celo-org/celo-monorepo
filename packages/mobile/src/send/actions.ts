@@ -21,7 +21,7 @@ export type SVG = typeof Svg
 
 export enum Actions {
   SET_TRANSACTION_FEE = 'SEND/SET_TRANSACTION_FEE',
-  STORE_PHONE_NUMBER_IN_RECENTS = 'SEND/STORE_PHONE_NUMBER_IN_RECENTS',
+  STORE_LATEST_IN_RECENTS = 'SEND/STORE_LATEST_IN_RECENTS',
   BARCODE_DETECTED = 'SEND/BARCODE_DETECTED',
   QRCODE_SHARE = 'SEND/QRCODE_SHARE',
   SET_RECIPIENT_CACHE = 'SEND/SET_RECIPIENT_CACHE',
@@ -36,9 +36,9 @@ export interface SetTransactionFeeAction {
   suggestedFee: string
 }
 
-export interface StorePhoneNumberInRecentsAction {
-  type: Actions.STORE_PHONE_NUMBER_IN_RECENTS
-  phoneNumber: string
+export interface StoreLatestInRecentsAction {
+  type: Actions.STORE_LATEST_IN_RECENTS
+  key: string
 }
 
 export interface SetRecipientCacheAction {
@@ -66,7 +66,7 @@ export interface SendPaymentOrInviteFailureAction {
 
 export type ActionTypes =
   | SetTransactionFeeAction
-  | StorePhoneNumberInRecentsAction
+  | StoreLatestInRecentsAction
   | SetRecipientCacheAction
   | SendPaymentOrInviteAction
   | SendPaymentOrInviteSuccessAction
@@ -77,11 +77,9 @@ export const setTransactionFee = (suggestedFee: string): SetTransactionFeeAction
   suggestedFee,
 })
 
-export const storePhoneNumberInRecents = (
-  phoneNumber: string
-): StorePhoneNumberInRecentsAction => ({
-  type: Actions.STORE_PHONE_NUMBER_IN_RECENTS,
-  phoneNumber,
+export const storeLatestInRecents = (key: string): StoreLatestInRecentsAction => ({
+  type: Actions.STORE_LATEST_IN_RECENTS,
+  key,
 })
 
 export const handleBarcodeDetected = (data: QrCode) => ({

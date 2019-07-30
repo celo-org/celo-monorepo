@@ -2,7 +2,7 @@
 import {
   AccountType,
   generatePrivateKey,
-  generatePublicKeyFromPrivateKey,
+  privateKeyToPublicKey,
 } from '@celo/celotool/src/lib/generate_utils'
 import { retrieveIPAddress } from '@celo/celotool/src/lib/helm_deploy'
 import { envVar, execCmd, execCmdWithExitOnFailure, fetchEnv } from '@celo/celotool/src/lib/utils'
@@ -85,7 +85,7 @@ export const getBootnodeEnode = async (namespace: string) => {
     AccountType.LOAD_TESTING_ACCOUNT,
     0
   )
-  const nodeId = generatePublicKeyFromPrivateKey(privateKey)
+  const nodeId = privateKeyToPublicKey(privateKey)
   return [getEnodeAddress(nodeId, ip, DISCOVERY_PORT)]
 }
 
@@ -98,7 +98,7 @@ const getEnodesWithIpAddresses = async (namespace: string, getExternalIP: boolea
   const enodes = Promise.all(
     txNodesRange.map(async (index) => {
       const privateKey = generatePrivateKey(fetchEnv(envVar.MNEMONIC), AccountType.TX_NODE, index)
-      const nodeId = generatePublicKeyFromPrivateKey(privateKey)
+      const nodeId = privateKeyToPublicKey(privateKey)
       let address: string
       if (getExternalIP) {
         address = txAddresses[index]
@@ -337,8 +337,8 @@ const transferAndTrace = async (
     logMessage.gasCurrency = gasCurrencySymbol
   }
 
-  const transferToken = new Promise((resolve) => {
-    transferERC20Token(
+  const transferToken = new Promise(async (resolve) => {
+    await transferERC20Token(
       web3,
       token,
       from,
@@ -497,8 +497,8 @@ export const simulateClient = async (
 
       const sendTransactionTime = Date.now()
 
-      const transferToken = new Promise((resolve: (data: any) => void) => {
-        transferERC20Token(
+      const transferToken = new Promise(async (resolve: (data: any) => void) => {
+        await transferERC20Token(
           web3,
           token,
           senderAddress,
@@ -553,7 +553,7 @@ export const simulateClient = async (
       })
 
       if (getRandomInt(0, 99) < blockscoutProbability) {
-        measureBlockscout(
+        await measureBlockscout(
           blockscoutUrl,
           receipt.transactionHash,
           senderAddress,
