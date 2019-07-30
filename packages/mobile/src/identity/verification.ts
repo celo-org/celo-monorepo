@@ -53,7 +53,12 @@ export const NUM_ATTESTATIONS_REQUIRED = 3
 export const VERIFICATION_TIMEOUT = 5 * 60 * 1000 // 5 minutes
 export const ERROR_DURATION = 5000 // 5 seconds
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
-export const REQUEST_TX_GAS = 5708274
+// Gas estimation for concurrent pending transactions is currently not support for
+// light clients, so we have to statically specify the gas here. Furthermore, the
+// current request function does a whole validator election which is why it is very
+// expensive. When https://github.com/celo-org/celo-monorepo-old/issues/3818 gets
+// merged we should significantly reduce this number
+export const REQUEST_TX_GAS = 7000000
 export enum CodeInputType {
   AUTOMATIC = 'automatic',
   MANUAL = 'manual',
@@ -163,18 +168,18 @@ export function* doVerificationFlow() {
     )
     const autoRetrievalTask: Task = yield fork(startAutoSmsRetrieval)
 
-    // This needs to go before revealing the attesttions because that depends on the public data key being set.
-    yield fork(setAccount, attestationsContract, account, dataKey)
-
-    // Request codes for the attestations needed
-    yield call(
-      revealNeededAttestations,
-      attestationsContract,
-      account,
-      e164Number,
-      e164NumberHash,
-      attestations
-    )
+    yield all([
+      call(setAccount, attestationsContract, account, dataKey),
+      // Request codes for the attestations needed
+      call(
+        revealNeededAttestations,
+        attestationsContract,
+        account,
+        e164Number,
+        e164NumberHash,
+        attestations
+      ),
+    ])
 
     receiveMessageTask.cancel()
     autoRetrievalTask.cancel()
@@ -291,7 +296,7 @@ export async function requestNeededAttestations(
     `Requesting ${numAttestationsRequestsNeeded} new attestations`
   )
 
-  const requestTx = await makeRequestTx(
+  const requestTx = makeRequestTx(
     attestationsContract,
     e164NumberHash,
     numAttestationsRequestsNeeded,
