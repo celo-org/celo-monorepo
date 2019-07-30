@@ -21,7 +21,7 @@
     "node": ">=8.0.0"
   },
   "scripts": {
-    "setup:environment": "yarn --cwd=packages/$CELO_ROOT/celo-monorepo/packages/contractkit build",
+    "setup:environment": "yarn --cwd=packages/contractkit build-sdk",
     "build": "rm -rf lib && yarn run prepack",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "lint-checks": "yarn run lint",
