@@ -2,6 +2,8 @@ export const concreteContracts = [
   'Migrations',
 
   // common
+  'GasPriceMinimum',
+  'GasPriceMinimumProxy',
   'GasCurrencyWhitelist',
   'GasCurrencyWhitelistProxy',
   'Initializable',
@@ -12,11 +14,13 @@ export const concreteContracts = [
   'RegistryProxy',
   'UsingRegistry',
   'Validators',
+  'ValidatorsProxy',
 
   // governance
   'BondedDeposits',
   'BondedDepositsProxy',
   'Governance',
+  'GovernanceProxy',
 
   // identity
   'Attestations',
@@ -24,6 +28,7 @@ export const concreteContracts = [
   'Escrow',
   'EscrowProxy',
   'Random',
+  'RandomProxy',
 
   // stability
   'Exchange',

@@ -1,43 +1,40 @@
 pragma solidity ^0.5.8;
 
+import "fixidity/contracts/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./Initializable.sol";
 import "./UsingRegistry.sol";
 import "../stability/interfaces/ISortedOracles.sol";
-import "../stability/FractionUtil.sol";
 
 /**
  * @title Stores and provides gas price minimum for various currencies.
  */
 contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
+  using FixidityLib for int256;
   using SafeMath for uint256;
-  using FractionUtil for FractionUtil.Fraction;
 
   event TargetDensitySet(
-    uint256 numerator,
-    uint256 denominator
+    int256 targetDensity
   );
 
   event AdjustmentSpeedSet(
-    uint256 numerator,
-    uint256 denominator
+    int256 adjustmentSpeed
   );
 
   event InfrastructureFractionSet(
-    uint256 numerator,
-    uint256 denominator
+    int256 infrastructureFraction
   );
 
   uint256 public gasPriceMinimum;
 
   // Block congestion level targeted by the gas price minimum calculation.
-  FractionUtil.Fraction public targetDensity;
+  int256 public targetDensity;
 
   // Speed of gas price minimum adjustment due to congestion.
-  FractionUtil.Fraction public adjustmentSpeed;
+  int256 public adjustmentSpeed;
 
   // Fraction of the gas price minimum allocated to the infrastructure fund.
-  FractionUtil.Fraction public infrastructureFraction;
+  int256 public infrastructureFraction;
 
   modifier onlyVm() {
     assert(msg.sender == address(0x0));
@@ -47,12 +44,9 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
   function initialize(
     address _registryAddress,
     uint256 initialGas,
-    uint256 targetDensityNumerator,
-    uint256 targetDensityDenominator,
-    uint256 adjustmentSpeedNumerator,
-    uint256 adjustmentSpeedDenominator,
-    uint256 infrastructureFractionNumerator,
-    uint256 infrastructureFractionDenominator
+    int256 _targetDensity,
+    int256 _adjustmentSpeed,
+    int256 _infrastructureFraction
   )
     external
     initializer
@@ -60,38 +54,38 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
     gasPriceMinimum = initialGas;
-    setTargetDensity(targetDensityNumerator, targetDensityDenominator);
-    setAdjustmentSpeed(adjustmentSpeedNumerator, adjustmentSpeedDenominator);
-    setInfrastructureFraction(infrastructureFractionNumerator, infrastructureFractionDenominator);
+    setTargetDensity(_targetDensity);
+    setAdjustmentSpeed(_adjustmentSpeed);
+    setInfrastructureFraction(_infrastructureFraction);
   }
 
   /**
    * @notice Set a multiplier that impacts how quickly gas price minimum is adjusted.
    * @dev Value is expected to be < 1.
    */
-  function setAdjustmentSpeed(uint256 numerator, uint256 denominator) public onlyOwner {
-    require(denominator > 0 && numerator < denominator);
-    adjustmentSpeed = FractionUtil.Fraction(numerator, denominator);
-    emit AdjustmentSpeedSet(numerator, denominator);
+  function setAdjustmentSpeed(int256 _adjustmentSpeed) public onlyOwner {
+    require(_adjustmentSpeed < FixidityLib.fixed1());
+    adjustmentSpeed = _adjustmentSpeed;
+    emit AdjustmentSpeedSet(_adjustmentSpeed);
   }
 
   /**
    * @notice Set the block density targeted by the gas price minimum algorithm.
    */
-  function setTargetDensity(uint256 numerator, uint256 denominator) public onlyOwner {
-    require(denominator > 0 && numerator < denominator);
-    targetDensity = FractionUtil.Fraction(numerator, denominator);
-    emit TargetDensitySet(numerator, denominator);
+  function setTargetDensity(int256 _targetDensity) public onlyOwner {
+    require(_targetDensity < FixidityLib.fixed1());
+    targetDensity = _targetDensity;
+    emit TargetDensitySet(_targetDensity);
   }
 
   /**
    * @notice Set the fraction of the gas price minimum which is sent to
    * the infrastructure fund.
    */
-  function setInfrastructureFraction(uint256 numerator, uint256 denominator) public onlyOwner {
-    require(denominator > 0 && numerator < denominator);
-    infrastructureFraction = FractionUtil.Fraction(numerator, denominator);
-    emit InfrastructureFractionSet(numerator, denominator);
+  function setInfrastructureFraction(int256 _infrastructureFraction) public onlyOwner {
+    require(_infrastructureFraction < FixidityLib.fixed1());
+    infrastructureFraction = _infrastructureFraction;
+    emit InfrastructureFractionSet(_infrastructureFraction);
   }
 
   /**
@@ -153,14 +147,18 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
     view
     returns (uint256)
   {
-    FractionUtil.Fraction memory one = FractionUtil.Fraction(1, 1);
-    FractionUtil.Fraction memory blockDensity = FractionUtil.Fraction(
-      blockGasTotal,
-      blockGasLimit
+    int256 blockDensity = FixidityLib.newFixed(int256(blockGasTotal)).divide(
+      FixidityLib.newFixed(int256(blockGasLimit))
     );
-    FractionUtil.Fraction memory adjustment = one.add(adjustmentSpeed.mul(blockDensity)).sub(
-      adjustmentSpeed.mul(targetDensity)
+    int256 adjustment = FixidityLib.fixed1().add(
+      adjustmentSpeed.multiply(blockDensity.subtract(targetDensity))
     );
-    return adjustment.mul(gasPriceMinimum).add(1);
+
+    return uint256(
+      adjustment
+        .multiply(FixidityLib.newFixed(int256(gasPriceMinimum)))
+        .add(FixidityLib.fixed1())
+        .fromFixed()
+    );
   }
 }

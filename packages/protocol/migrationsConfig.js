@@ -32,18 +32,9 @@ const defaultConfig = {
   },
   gasPriceMinimum: {
     initialMinimum: 10000,
-    targetDensity: {
-      numerator: 1,
-      denominator: 2,
-    },
-    adjustmentSpeed: {
-      numerator: 1,
-      denominator: 2,
-    },
-    infrastructureFraction: {
-      numerator: 1,
-      denominator: 2,
-    },
+    targetDensity: 1 / 2,
+    adjustmentSpeed: 1 / 2,
+    infrastructureFraction: 1 / 2,
   },
   registryProxyPredeployedAddress: '0x000000000000000000000000000000000000ce10',
   reserve: {
@@ -81,6 +72,7 @@ const linkedLibraries = {
     'StableToken',
     'Validators',
     'Governance',
+    'GasPriceMinimum',
   ],
   LinkedList: ['AddressLinkedList', 'SortedLinkedList'],
   SortedLinkedList: ['AddressSortedLinkedList', 'IntegerSortedLinkedList'],

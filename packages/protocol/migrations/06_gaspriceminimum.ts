@@ -5,6 +5,7 @@ import {
   getDeployedProxiedContract,
   setInRegistry,
 } from '@celo/protocol/lib/web3-utils'
+import { toFixed } from '@celo/protocol/lib/fixidity'
 import { config } from '@celo/protocol/migrationsConfig'
 import { GasPriceMinimumInstance, RegistryInstance } from 'types'
 
@@ -13,15 +14,14 @@ const initializeArgs = async (): Promise<any[]> => {
     'Registry',
     artifacts
   )
+  // @ts-ignore
+  registry.numberFormat = 'BigNumber'
   return [
     registry.address,
     config.gasPriceMinimum.initialMinimum,
-    config.gasPriceMinimum.targetDensity.numerator,
-    config.gasPriceMinimum.targetDensity.denominator,
-    config.gasPriceMinimum.adjustmentSpeed.numerator,
-    config.gasPriceMinimum.adjustmentSpeed.denominator,
-    config.gasPriceMinimum.infrastructureFraction.numerator,
-    config.gasPriceMinimum.infrastructureFraction.denominator,
+    toFixed(config.gasPriceMinimum.targetDensity).toString(),
+    toFixed(config.gasPriceMinimum.adjustmentSpeed).toString(),
+    toFixed(config.gasPriceMinimum.infrastructureFraction).toString(),
   ]
 }
 
