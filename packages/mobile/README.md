@@ -1,4 +1,8 @@
-# Mobile
+# Mobile (Celo Wallet)
+
+## Architecture
+
+The app uses [React Native][react native] and a geth [light node][light node].
 
 ## Setup
 
@@ -75,10 +79,6 @@ renders when no state has changed. Reducing renders can be done via pure
 components in react or overloading the should component update method
 [example here][rn optimize example].
 
-## Architecture
-
-The app uses [React Native][react native] and a geth [light node][light node].
-
 ## Connecting to networks
 
 By default, we have the `alfajores` network set up. If you have other testnets
@@ -121,10 +121,6 @@ Next, the VM snapshot settings should be modified:
 
 For information on how to run and extend the e2e tests, refer to the
 [e2e readme][e2e readme].
-
-## Deployment
-
-The app is set up to automatically deploy to Google Play beta using fastlane.
 
 ## Generating GraphQL Types
 

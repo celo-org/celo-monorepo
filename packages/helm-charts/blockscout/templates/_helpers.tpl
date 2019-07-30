@@ -31,7 +31,7 @@ volumes:
 - name: NETWORK
   value: Celo
 - name: SUBNETWORK
-  value: Alfajores
+  value: {{ .Values.blockscout.subnetwork }}
 - name: COIN
   value: cGLD
 - name: ECTO_USE_SSL

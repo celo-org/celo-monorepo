@@ -1,5 +1,6 @@
 import { Actions, ActionTypes } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { RootState } from 'src/redux/reducers'
 
 export interface State {
   type: 'message' | 'error'
@@ -25,4 +26,8 @@ export const reducer = (state: State | null = initialState, action: ActionTypes)
     default:
       return state
   }
+}
+
+export const errorSelector = (state: RootState) => {
+  return state.alert ? state.alert.underlyingError || null : null
 }

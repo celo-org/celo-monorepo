@@ -2,8 +2,8 @@
 import {
   coerceMnemonicAccountType,
   generatePrivateKey,
-  generatePublicKeyFromPrivateKey,
   MNEMONIC_ACCOUNT_TYPE_CHOICES,
+  privateKeyToPublicKey,
 } from 'src/lib/generate_utils'
 import * as yargs from 'yargs'
 
@@ -47,7 +47,7 @@ export const builder = (argv: yargs.Argv) => {
  */
 export const handler = async (argv: Bip32Argv) => {
   console.log(
-    generatePublicKeyFromPrivateKey(
+    privateKeyToPublicKey(
       generatePrivateKey(argv.mnemonic, coerceMnemonicAccountType(argv.accountType), argv.index)
     )
   )
