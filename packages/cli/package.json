@@ -21,7 +21,7 @@
     "node": ">=8.0.0"
   },
   "scripts": {
-    "build-sdk": "yarn --cwd=packages/contractkit build-sdk",
+    "build:sdk": "yarn --cwd=packages/contractkit build-sdk",
     "build": "rm -rf lib && tsc -b",
     "docs": "yarn oclif-dev readme --multi --dir=../docs/command-line-interface && yarn prettier ../docs/command-line-interface/*.md --write",
     "lint": "tslint -c tslint.json --project tsconfig.json",
