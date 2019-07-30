@@ -165,6 +165,12 @@ jobs:
           at: ~/app
 
       - run:
+          name: Ensure translations are not missing
+          command: |
+            set -euo pipefail
+            diff <(cat packages/mobile/locales/en-US/*.json | jq keys | sort) <(cat packages/mobile/locales/es-AR/*.json | jq keys | sort)
+
+      - run:
           name: jest tests
           command: |
             mkdir -p test-results/jest
