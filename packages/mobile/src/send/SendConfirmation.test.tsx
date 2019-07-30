@@ -10,10 +10,6 @@ jest.mock('src/send/saga', () => ({
   getSendFee: jest.fn(async () => new BigNumber(10000000000000000)),
 }))
 
-// const SendConfirmation = require('src/send/SendConfirmation').default
-
-// const { getSendFee } = require('src/send/saga')
-
 const store = createMockStore({
   stableToken: {
     balance: '200',
