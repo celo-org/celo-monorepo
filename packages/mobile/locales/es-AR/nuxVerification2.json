@@ -54,5 +54,6 @@
   "errorRequestCode": "Error al solicitar los códigos.",
   "errorRedeemingCode": "Error al canjear el código.",
   "pleaseRetry": "Por favor reinicie la verificación.",
-  "retryVerification": "Reintentar la verificación"
+  "retryVerification": "Reintentar la verificación",
+  "codeAccepted": "Aceptado"
 }

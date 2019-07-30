@@ -3,7 +3,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
-import { getRecipientThumbnail, Recipient } from 'src/utils/recipient'
+import { getRecipientThumbnail, Recipient, RecipientKind } from 'src/utils/recipient'
 
 interface Props {
   recipient: Recipient
@@ -13,6 +13,16 @@ interface Props {
 class RecipientItem extends React.PureComponent<Props> {
   onPress = () => {
     this.props.onSelectRecipient(this.props.recipient)
+  }
+
+  displayInitials = (recipientKind: RecipientKind) => {
+    if (recipientKind && recipientKind === RecipientKind.Address) {
+      return '0x'
+    }
+    if (recipientKind && recipientKind === RecipientKind.MobileNumber) {
+      return '#'
+    }
+    return null
   }
 
   render() {
@@ -27,6 +37,7 @@ class RecipientItem extends React.PureComponent<Props> {
             thumbnailPath={getRecipientThumbnail(recipient)}
             address={recipient.address}
             size={40}
+            displayInitials={this.displayInitials(recipient.kind)}
           />
           <View style={style.nameContainer}>
             <Text
@@ -38,7 +49,7 @@ class RecipientItem extends React.PureComponent<Props> {
             </Text>
           </View>
           <Text style={[fontStyles.bodySmallSemiBold, fontStyles.light, style.phone]}>
-            {recipient.displayPhoneNumber}
+            {recipient.displayId}
           </Text>
         </View>
       </TouchableHighlight>
