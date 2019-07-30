@@ -21,7 +21,7 @@
     "node": ">=8.0.0"
   },
   "scripts": {
-    "setup:environment": "./import_contract_types_from_sdk.sh",
+    "setup:environment": "yarn --cwd=packages/$CELO_ROOT/celo-monorepo/packages/contractkit build",
     "build": "rm -rf lib && yarn run prepack",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "lint-checks": "yarn run lint",
@@ -32,6 +32,7 @@
     "version": "oclif-dev readme && git add README.md"
   },
   "dependencies": {
+    "@celo/contractkit": "^0.0.1",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
