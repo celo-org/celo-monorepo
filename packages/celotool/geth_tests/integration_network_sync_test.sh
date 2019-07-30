@@ -19,7 +19,8 @@ GENESIS_FILE_PATH="/tmp/genesis_ibft.json"
 GETH_BINARY="${GETH_DIR}/build/bin/geth --datadir ${DATA_DIR}"
 CELOTOOLJS="${CELO_MONOREPO_DIR}/packages/celotool/bin/celotooljs.sh"
 
-${CELOTOOLJS} generate genesis-file --celo-env ${NETWORK_NAME} > ${GENESIS_FILE_PATH}
+curl "https://www.googleapis.com/storage/v1/b/genesis_blocks/o/${NETWORK_NAME}?alt=media" --output ${GENESIS_FILE_PATH}
+
 ${CELOTOOLJS} geth build --geth-dir ${GETH_DIR}
 
 rm -rf ${DATA_DIR}
