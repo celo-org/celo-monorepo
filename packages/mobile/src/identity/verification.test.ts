@@ -10,7 +10,7 @@ import { call, delay, select } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/reducer'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
+import { CommonValues, CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { cancelVerification, completeAttestationCode, endVerification } from 'src/identity/actions'
@@ -28,7 +28,13 @@ import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { privateCommentKeySelector } from 'src/web3/selectors'
 import { createMockContract } from 'test/utils'
-import { mockAccount, mockE164Number, mockPrivateDEK, mockPublicDEK } from 'test/values'
+import {
+  mockAccount,
+  mockAccount2,
+  mockE164Number,
+  mockPrivateDEK,
+  mockPublicDEK,
+} from 'test/values'
 
 const MockedAnalytics = CeloAnalytics as any
 
@@ -84,7 +90,7 @@ const stubUserUnverified = {
     attestationCode2.issuer,
   ],
   getAttestationState: [AttestationState.Incomplete, Date.now()],
-  getWalletAddress: null,
+  getWalletAddress: mockAccount2,
   getDataEncryptionKey: mockPublicDEK,
   setAccount: null,
   validateAttestationCode: true,
@@ -103,24 +109,33 @@ const stableTokenStub = {
 
 describe('Start Verification Saga', () => {
   beforeEach(() => {
-    MockedAnalytics.track = jest.fn()
+    MockedAnalytics.startTracking.mockReset()
+    MockedAnalytics.stopTracking.mockReset()
   })
   it('tracks success', async () => {
     await expectSaga(startVerification)
       .provide([[call(getConnectedAccount), null], [call(doVerificationFlow), true]])
       .run()
-    expect(MockedAnalytics.track.mock.calls.length).toBe(2)
-    expect(MockedAnalytics.track.mock.calls[0][0]).toBe(CustomEventNames.verification_start)
-    expect(MockedAnalytics.track.mock.calls[1][0]).toBe(CustomEventNames.verification_complete)
+    expect(MockedAnalytics.startTracking.mock.calls.length).toBe(1)
+    expect(MockedAnalytics.startTracking.mock.calls[0][0]).toBe(CustomEventNames.verification)
+    expect(MockedAnalytics.stopTracking.mock.calls.length).toBe(1)
+    expect(MockedAnalytics.stopTracking.mock.calls[0]).toEqual([
+      CustomEventNames.verification,
+      { result: CommonValues.success },
+    ])
   })
 
   it('tracks failure', async () => {
     await expectSaga(startVerification)
       .provide([[call(getConnectedAccount), null], [call(doVerificationFlow), false]])
       .run()
-    expect(MockedAnalytics.track.mock.calls.length).toBe(2)
-    expect(MockedAnalytics.track.mock.calls[0][0]).toBe(CustomEventNames.verification_start)
-    expect(MockedAnalytics.track.mock.calls[1][0]).toBe(CustomEventNames.verification_failure)
+    expect(MockedAnalytics.startTracking.mock.calls.length).toBe(1)
+    expect(MockedAnalytics.startTracking.mock.calls[0][0]).toBe(CustomEventNames.verification)
+    expect(MockedAnalytics.stopTracking.mock.calls.length).toBe(1)
+    expect(MockedAnalytics.stopTracking.mock.calls[0]).toEqual([
+      CustomEventNames.verification,
+      { result: CommonValues.failure },
+    ])
   })
 
   it('times out when verification takes too long', async () => {
@@ -131,10 +146,15 @@ describe('Start Verification Saga', () => {
         [delay(VERIFICATION_TIMEOUT), 1000],
       ])
       .run(2000)
-    expect(MockedAnalytics.track.mock.calls.length).toBe(3)
-    expect(MockedAnalytics.track.mock.calls[0][0]).toBe(CustomEventNames.verification_start)
-    expect(MockedAnalytics.track.mock.calls[1][0]).toBe(CustomEventNames.verification_timeout)
-    expect(MockedAnalytics.track.mock.calls[2][0]).toBe(DefaultEventNames.errorDisplayed)
+    expect(MockedAnalytics.startTracking.mock.calls.length).toBe(1)
+    expect(MockedAnalytics.startTracking.mock.calls[0][0]).toBe(CustomEventNames.verification)
+    expect(MockedAnalytics.stopTracking.mock.calls.length).toBe(1)
+    expect(MockedAnalytics.stopTracking.mock.calls[0]).toEqual([
+      CustomEventNames.verification,
+      { result: CommonValues.timeout },
+    ])
+    expect(MockedAnalytics.track.mock.calls.length).toBe(1)
+    expect(MockedAnalytics.track.mock.calls[0][0]).toBe(DefaultEventNames.errorDisplayed)
   })
 
   it('stops when the user cancels', async () => {
@@ -142,9 +162,13 @@ describe('Start Verification Saga', () => {
       .provide([[call(getConnectedAccount), null], [call(doVerificationFlow), sleep(1500)]])
       .dispatch(cancelVerification())
       .run(2000)
-    expect(MockedAnalytics.track.mock.calls.length).toBe(2)
-    expect(MockedAnalytics.track.mock.calls[0][0]).toBe(CustomEventNames.verification_start)
-    expect(MockedAnalytics.track.mock.calls[1][0]).toBe(CustomEventNames.verification_cancel)
+    expect(MockedAnalytics.startTracking.mock.calls.length).toBe(1)
+    expect(MockedAnalytics.startTracking.mock.calls[0][0]).toBe(CustomEventNames.verification)
+    expect(MockedAnalytics.stopTracking.mock.calls.length).toBe(1)
+    expect(MockedAnalytics.stopTracking.mock.calls[0]).toEqual([
+      CustomEventNames.verification,
+      { result: CommonValues.cancel },
+    ])
   })
 })
 
