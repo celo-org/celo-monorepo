@@ -1,4 +1,4 @@
-import { cancelled, spawn, takeEvery, takeLeading } from 'redux-saga/effects'
+import { cancelled, spawn, takeEvery, takeLatest } from 'redux-saga/effects'
 import { Actions } from 'src/identity/actions'
 import { doImportContacts, fetchPhoneAddresses } from 'src/identity/contactMapping'
 import { revokeVerification, startVerification } from 'src/identity/verification'
@@ -7,7 +7,7 @@ import Logger from 'src/utils/Logger'
 const TAG = 'identity/saga'
 
 function* watchVerification() {
-  yield takeLeading(Actions.START_VERIFICATION, startVerification)
+  yield takeLatest(Actions.START_VERIFICATION, startVerification)
   yield takeEvery(Actions.REVOKE_VERIFICATION, revokeVerification)
 }
 
