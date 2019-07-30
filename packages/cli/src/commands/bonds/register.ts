@@ -1,5 +1,6 @@
+import { BondedDeposits } from '@celo/contractkit'
+
 import { BaseCommand } from '../../base'
-import { BondedDeposits } from '../../generated/contracts'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
