@@ -15,8 +15,7 @@ import { getWordlist } from 'src/backup/utils'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData } from 'src/geth/geth'
 import { waitForGethConnectivity } from 'src/geth/saga'
-import { navigate, navigateToError } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigateToError } from 'src/navigator/NavigationService'
 import Logger from 'src/utils/Logger'
 import {
   Actions,
@@ -84,9 +83,7 @@ export function* checkWeb3Sync() {
 
       if (timeout) {
         Logger.error(TAG, 'Could not complete sync progress check')
-        navigate(Screens.ErrorScreen, {
-          errorMessage: 'Failing to sync, check your network connection',
-        })
+        navigateToError('web3FailedToSync')
       }
 
       const latestBlock: Block = yield getLatestBlock()
@@ -100,9 +97,7 @@ export function* checkWeb3Sync() {
       }
     } catch (error) {
       Logger.error(TAG, `checkSyncProgressWorker error: ${error}`)
-      navigate(Screens.ErrorScreen, {
-        errorMessage: 'Error occurred during sync, please try again later',
-      })
+      navigateToError('errorDuringSync')
     }
   } catch (error) {
     Logger.error(TAG, `checkSyncProgressWorker saga error: ${error}`)
@@ -226,10 +221,6 @@ export function* getConnectedUnlockedAccount() {
 export function* watchRefreshGasPrice() {
   yield takeLatest(Actions.SET_GAS_PRICE, refreshGasPrice)
 }
-
-// export function* watchRequestSyncProgress() {
-//   yield takeLatest(Actions.REQUEST_SYNC_PROGRESS, checkSyncProgressWorker)
-// }
 
 export function* web3Saga() {
   yield spawn(watchRefreshGasPrice)

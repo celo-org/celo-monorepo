@@ -82,5 +82,7 @@
     "Código QR no se pudo leer. Motivo: no se encontró la dirección de la billetera.",
   "qrFailedInvalidAddress":
     "Código QR no se pudo leer. Razón: la dirección de la cartera no es válida.",
-  "corruptedChainDeleted": "Se ha borrado información corrupta, por favor reinicie la applicación"
+  "corruptedChainDeleted": "Se ha borrado información corrupta, por favor reinicie la applicación",
+  "web3FailedToSync": "Fallo la sincronización, por favor verifique su conexión",
+  "errorDuringSync": "Ocurrió un error duranet la sincronización, por favor intente más tarde"
 }
