@@ -222,7 +222,7 @@ export async function sendTransactionAsync<T>(
   account: string,
   gasCurrencyContract: StableToken | GoldToken,
   logger: TxLogger = emptyTxLogger,
-  staticGas?: number | undefined
+  estimatedGas?: number | undefined
 ): Promise<TxPromises> {
   // @ts-ignore
   const resolvers: TxPromiseResolvers = {}
@@ -259,12 +259,9 @@ export async function sendTransactionAsync<T>(
       gasPrice: '0',
     }
 
-    let estimatedGas
-    if (staticGas === undefined) {
+    if (estimatedGas === undefined) {
       estimatedGas = Math.round((await tx.estimateGas(txParams)) * gasInflateFactor)
       logger(EstimatedGas(estimatedGas))
-    } else {
-      estimatedGas = staticGas
     }
 
     tx.send({
