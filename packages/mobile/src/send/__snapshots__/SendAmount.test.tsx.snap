@@ -256,34 +256,32 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
         >
           <TextInput
             allowFontScaling={true}
-            autoCorrect={true}
             autoFocus={true}
+            autocorrect={false}
+            forwardedRef={null}
             keyboardType="numeric"
+            labelStyle={
+              Object {
+                "color": "#42D689",
+              }
+            }
+            numberOfDecimals={2}
             onBlur={[Function]}
             onChangeText={[Function]}
             onFocus={[Function]}
             placeholder="amount"
             placeholderTextColor="#A3EBC6"
             rejectResponderTermination={true}
-            secureTextEntry={false}
             style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-Regular",
-                },
-                Object {
-                  "borderColor": "#D1D5D8",
-                  "borderRadius": 3,
-                  "padding": 8,
-                },
-                Object {
-                  "backgroundColor": "#FFFFFF",
-                  "flex": 1,
-                },
-              ]
+              Object {
+                "flex": 1,
+                "height": 54,
+                "marginHorizontal": 8,
+              }
             }
-            textContentType="none"
+            title="$"
             underlineColorAndroid="transparent"
+            validator="decimal"
             value=""
           />
         </View>
@@ -370,33 +368,23 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
         >
           <TextInput
             allowFontScaling={true}
-            autoCorrect={true}
-            autoFocus={false}
+            forwardedRef={null}
             keyboardType="default"
+            maxLength={70}
             onBlur={[Function]}
             onChangeText={[Function]}
             onFocus={[Function]}
             placeholder="groceriesRent"
             placeholderTextColor="rgba(0, 0, 0, .4)"
             rejectResponderTermination={true}
-            secureTextEntry={false}
             style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-Regular",
-                },
-                Object {
-                  "borderColor": "#D1D5D8",
-                  "borderRadius": 3,
-                  "padding": 8,
-                },
-                Object {
-                  "backgroundColor": "#FFFFFF",
-                  "flex": 1,
-                },
-              ]
+              Object {
+                "flex": 1,
+                "height": 54,
+                "marginHorizontal": 8,
+              }
             }
-            textContentType="none"
+            title="for"
             underlineColorAndroid="transparent"
             value=""
           />

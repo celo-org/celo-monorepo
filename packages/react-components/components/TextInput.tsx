@@ -2,28 +2,23 @@ import CircleButton from '@celo/react-components/components/CircleButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { StyleSheet, TextInput as RNTextInput, TextInputProperties, View } from 'react-native'
+import {
+  NativeSyntheticEvent,
+  StyleSheet,
+  TextInput as RNTextInput,
+  TextInputFocusEventData,
+  TextInputProps,
+  View,
+} from 'react-native'
 
-interface Props {
+interface OwnProps {
   onChangeText: (pin1: string) => void
-  onEndEditing?: () => void
-  onSubmitEditing?: () => void
-  onFocus?: () => void
-  value?: string
-  style?: object
-  isSensitiveInput?: boolean
-  keyboardType?: TextInputProperties['keyboardType']
-  textContentType?: any
-  placeholder?: string
-  autoFocus?: boolean
-  autoCorrect?: boolean
   testID?: string
-  placeholderTextColor?: string
-  enablesReturnKeyAutomatically?: boolean
   showClearButton?: boolean
-  underlineColorAndroid?: string
   forwardedRef?: React.RefObject<RNTextInput>
 }
+
+type Props = OwnProps & TextInputProps
 
 interface State {
   isFocused: boolean
@@ -37,11 +32,11 @@ export class CTextInput extends React.Component<Props, State> {
     }
   }
 
-  handleInputFocus = () => {
+  handleInputFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     const { onFocus } = this.props
     this.setState({ isFocused: true })
     if (onFocus) {
-      onFocus()
+      onFocus(e)
     }
   }
 
@@ -56,22 +51,10 @@ export class CTextInput extends React.Component<Props, State> {
   render() {
     const {
       style: propsStyle,
-      onChangeText,
-      onSubmitEditing,
-      onEndEditing,
-      placeholderTextColor,
-      enablesReturnKeyAutomatically,
-      testID,
       value = '',
-      isSensitiveInput = false,
-      autoCorrect = true,
-      keyboardType = 'default',
-      textContentType = 'none',
-      underlineColorAndroid = 'transparent',
-      placeholder = '',
-      autoFocus = false,
       showClearButton = true,
       forwardedRef,
+      ...props
     } = this.props
 
     const { isFocused = false } = this.state
@@ -81,23 +64,10 @@ export class CTextInput extends React.Component<Props, State> {
         <RNTextInput
           ref={forwardedRef}
           style={[fontStyles.regular, style.borderedText, style.numberInput]}
-          onChangeText={onChangeText}
-          onEndEditing={onEndEditing}
+          value={value}
+          {...props}
           onFocus={this.handleInputFocus}
           onBlur={this.handleInputBlur}
-          value={value}
-          underlineColorAndroid={underlineColorAndroid}
-          placeholder={placeholder}
-          keyboardType={keyboardType}
-          secureTextEntry={isSensitiveInput}
-          // @ts-ignore until we upgrade '@types/react-native'
-          textContentType={textContentType}
-          autoCorrect={autoCorrect}
-          onSubmitEditing={onSubmitEditing}
-          autoFocus={autoFocus}
-          placeholderTextColor={placeholderTextColor}
-          enablesReturnKeyAutomatically={enablesReturnKeyAutomatically}
-          testID={testID}
         />
         {isFocused &&
           !!value &&
