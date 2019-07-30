@@ -1,5 +1,6 @@
 pragma solidity ^0.5.8;
 
+import "fixidity/contracts/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/IExchange.sol";
@@ -17,6 +18,7 @@ import "../common/interfaces/IERC20Token.sol";
  * using a Constant Product Market Maker Model
  */
 contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
+  using FixidityLib for int256;
   using SafeMath for uint256;
   using FractionUtil for FractionUtil.Fraction;
 
@@ -35,10 +37,10 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     uint256 minimumReports
   );
 
-  FractionUtil.Fraction public spread;
+  int256 public spread;
   // Fraction of the Reserve that is committed to the gold bucket when updating
   // buckets.
-  FractionUtil.Fraction public reserveFraction;
+  int256 public reserveFraction;
 
   address public stable;
 
@@ -64,11 +66,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
    * @dev Initializes the exchange, setting initial bucket sizes
    * @param registryAddress Address of the Registry contract
    * @param stableToken Address of the stable token
-   * @param spreadNumerator Numerator of the spread charged on exchanges
-   * @param spreadDenominator Denominator of the spread charged on exchanges
-   * @param reserveFractionNumerator Numerator of the reserve fraction to commit
-   * to the gold bucket
-   * @param reserveFractionDenominator Denominator of the reserve fraction to commit
+   * @param _spread Spread charged on exchanges
+   * @param _reserveFraction Fraction to commit
    * to the gold bucket
    * @param _updateFrequency The time period that needs to elapse between bucket
    * updates
@@ -79,10 +78,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
   function initialize(
     address registryAddress,
     address stableToken,
-    uint256 spreadNumerator,
-    uint256 spreadDenominator,
-    uint256 reserveFractionNumerator,
-    uint256 reserveFractionDenominator,
+    int256 _spread,
+    int256 _reserveFraction,
     uint256 _updateFrequency,
     uint256 _minimumReports
   )
@@ -92,11 +89,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     stable = stableToken;
-    spread = FractionUtil.Fraction(spreadNumerator, spreadDenominator);
-    reserveFraction = FractionUtil.Fraction(
-      reserveFractionNumerator,
-      reserveFractionDenominator
-    );
+    spread = _spread;
+    reserveFraction = _reserveFraction;
     updateFrequency = _updateFrequency;
     minimumReports = _minimumReports;
     _updateBucketsIfNecessary();
@@ -168,11 +162,13 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     uint256 buyTokenBucket;
     (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);
 
-    uint256 x = spread.denominator.sub(spread.numerator).mul(sellAmount);
-    uint256 numerator = x.mul(buyTokenBucket);
-    uint256 denominator = sellTokenBucket.mul(spread.denominator).add(x);
+    int256 reducedSellAmount = FixidityLib.fixed1()
+      .subtract(spread)
+      .multiply(FixidityLib.newFixed(int256(sellAmount)));
+    int256 numerator = reducedSellAmount.multiply(FixidityLib.newFixed(int256(buyTokenBucket)));
+    int256 denominator = FixidityLib.newFixed(int256(sellTokenBucket)).add(reducedSellAmount);
 
-    return numerator.div(denominator);
+    return uint256(numerator.divide(denominator).fromFixed());
   }
 
   /**
@@ -194,12 +190,11 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     uint256 buyTokenBucket;
     (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);
 
-    uint256 numerator = spread.denominator.mul(buyAmount).mul(sellTokenBucket);
-    uint256 denominator = spread.denominator.sub(spread.numerator).mul(
-      buyTokenBucket.sub(buyAmount)
-    );
+    int256 numerator = FixidityLib.newFixed(int256(buyAmount.mul(sellTokenBucket)));
+    int256 denominator = FixidityLib.newFixed(int256(buyTokenBucket.sub(buyAmount)))
+      .multiply(FixidityLib.fixed1().subtract(spread));
 
-    return numerator.div(denominator);
+    return uint256(numerator.divide(denominator).fromFixed());
   }
 
   /**
@@ -273,17 +268,20 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     uint256 buyTokenBucket;
     (buyTokenBucket, sellTokenBucket) = _getBuyAndSellBuckets(sellGold);
 
-    uint256 x = spread.denominator.sub(spread.numerator).mul(sellAmount);
-    uint256 numerator = x.mul(buyTokenBucket);
-    uint256 denominator = sellTokenBucket.mul(spread.denominator).add(x);
+    int256 reducedSellAmount = FixidityLib.fixed1()
+      .subtract(spread)
+      .multiply(FixidityLib.newFixed(int256(sellAmount)));
+    int256 numerator = reducedSellAmount.multiply(FixidityLib.newFixed(int256(buyTokenBucket)));
+    int256 denominator = FixidityLib.newFixed(int256(sellTokenBucket)).add(reducedSellAmount);
 
-    return numerator.div(denominator);
+    return uint256(numerator.divide(denominator).fromFixed());
   }
 
   function getUpdatedBuckets() private view returns (uint256, uint256) {
-    uint256 updatedGoldBucket = reserveFraction.mul(
-        gold().balanceOf(registry.getAddressForOrDie(RESERVE_REGISTRY_ID))
-      );
+    uint256 reserveGoldBalance = gold().balanceOf(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
+    uint256 updatedGoldBucket = uint256(reserveFraction.multiply(
+        FixidityLib.newFixed(int256(reserveGoldBalance))
+    ).fromFixed());
     uint256 updatedStableBucket = getOracleExchangeRate().mul(updatedGoldBucket);
 
     return (updatedGoldBucket, updatedStableBucket);

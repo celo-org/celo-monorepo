@@ -14,10 +14,8 @@ const defaultConfig = {
     maxNoticePeriod: 60 * 60 * 24 * 365 * 3, // 3 years
   },
   exchange: {
-    spreadNumerator: 5,
-    spreadDenominator: 1000,
-    reserveFractionNumerator: 1,
-    reserveFractionDenominator: 1,
+    spread: 5 / 1000,
+    reserveFraction: 1,
     updateFrequency: 3600,
     minimumReports: 1,
   },
@@ -73,6 +71,7 @@ const linkedLibraries = {
     'Validators',
     'Governance',
     'GasPriceMinimum',
+    'Exchange',
   ],
   LinkedList: ['AddressLinkedList', 'SortedLinkedList'],
   SortedLinkedList: ['AddressSortedLinkedList', 'IntegerSortedLinkedList'],

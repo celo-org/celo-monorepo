@@ -6,6 +6,7 @@ import {
   getDeployedProxiedContract,
   setInRegistry,
 } from '@celo/protocol/lib/web3-utils'
+import { toFixed } from '@celo/protocol/lib/fixidity'
 import { config } from '@celo/protocol/migrationsConfig'
 import { ExchangeInstance, RegistryInstance, ReserveInstance, StableTokenInstance } from 'types'
 
@@ -21,10 +22,8 @@ const initializeArgs = async (): Promise<any[]> => {
   return [
     registry.address,
     stableToken.address,
-    config.exchange.spreadNumerator,
-    config.exchange.spreadDenominator,
-    config.exchange.reserveFractionNumerator,
-    config.exchange.reserveFractionDenominator,
+    toFixed(config.exchange.spread).toString(),
+    toFixed(config.exchange.reserveFraction).toString(),
     config.exchange.updateFrequency,
     config.exchange.minimumReports,
   ]

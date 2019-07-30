@@ -6,10 +6,8 @@ interface IExchange {
   function initialize(
     address,
     address,
-    uint256,
-    uint256,
-    uint256,
-    uint256,
+    int256,
+    int256,
     uint256,
     uint256
   ) external;
