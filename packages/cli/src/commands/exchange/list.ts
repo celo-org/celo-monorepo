@@ -1,7 +1,9 @@
-import { flags } from '@oclif/command'
 import { cli } from 'cli-ux'
+
+import { Exchange } from '@celo/contractkit'
+import { flags } from '@oclif/command'
+
 import { BaseCommand } from '../../base'
-import { Exchange } from '../../generated/contracts'
 
 export default class List extends BaseCommand {
   static description = 'List information about tokens on the exchange (all amounts in wei)'

@@ -25,8 +25,10 @@ import Logger from 'src/utils/Logger'
 import { contactsToRecipients, NumberToRecipient } from 'src/utils/recipient'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
+
 const TAG = 'identity/contactMapping'
-const MAPPING_CHUNK_SIZE = 50
+const MAPPING_CHUNK_SIZE = 25
+const NUM_PARALLEL_REQUESTS = 3
 
 export function* doImportContacts() {
   try {
@@ -112,13 +114,26 @@ function* lookupNewRecipients(
   Logger.debug(TAG, `Total new recipients found: ${newE164Numbers.length}`)
 
   const attestationsContract: AttestationsType = yield call(getAttestationsContract, web3)
-  yield all(
-    chunk(newE164Numbers, MAPPING_CHUNK_SIZE).map((numbersChunk) =>
-      call(fetchAndStoreAddressMappings, attestationsContract, numbersChunk)
-    )
+
+  // If chunk sizes are too large, or number of parallel lookups too high
+  // we see errors from web3. So we break things down and limit parallelization
+  // This is still not perfect, errors due still occur randomly for some chunks
+  const numberChunks = chunk(newE164Numbers, MAPPING_CHUNK_SIZE)
+  const requestChunks = chunk(numberChunks, NUM_PARALLEL_REQUESTS)
+  Logger.debug(
+    TAG,
+    `Lookup up: ${numberChunks.length} number chunks across ${requestChunks.length} request rounds`
   )
+  for (const requestChunk of requestChunks) {
+    yield all(
+      requestChunk.map((numberChunk) =>
+        call(fetchAndStoreAddressMappings, attestationsContract, numberChunk)
+      )
+    )
+  }
 
   // Now that mappings are updated, update the recipient objects
+  // TODO(Rossy) Consider revisiting the use of addresses in recip objects (to avoid confusion with the maps)
   const updatedE164NumberToAddress: E164NumberToAddressType = yield select(
     e164NumberToAddressSelector
   )
@@ -165,6 +180,8 @@ export function* fetchAndStoreAddressMappings(
     if (!addresses || addresses.length !== e164Numbers.length) {
       throw new Error('Address lookup length did not match numbers list length')
     }
+
+    Logger.debug(TAG, `Retrieved ${addresses.length} addresses`)
 
     const e164NumberToAddressUpdates: E164NumberToAddressType = {}
     const addressToE164NumberUpdates: AddressToE164NumberType = {}
