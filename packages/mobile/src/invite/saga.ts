@@ -191,6 +191,7 @@ export function* sendInviteSaga(action: SendInviteAction) {
 function* redeemSuccess(name: string, account: string) {
   Logger.showMessage(i18n.t('inviteFlow11:redeemSuccess'))
   web3.eth.defaultAccount = account
+  // TODO(Rossy) Decouple setting of name from redeem complete, they are on diff screens now
   yield put(setName(name))
   yield put(redeemComplete(true))
 }

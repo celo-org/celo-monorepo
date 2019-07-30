@@ -28,12 +28,14 @@ import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
 import TransactionsList from 'src/home/TransactionsList'
 import { Namespaces } from 'src/i18n'
+import { importContacts } from 'src/identity/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { initializeSentryUserContext } from 'src/sentry/Sentry'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { resetStandbyTransactions } from 'src/transactions/actions'
+import { NumberToRecipient } from 'src/utils/recipient'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const SCREEN_WIDTH = variables.width
@@ -43,6 +45,7 @@ interface StateProps {
   address?: string | null
   activeNotificationCount: number
   callToActNotification: boolean
+  recipientCache: NumberToRecipient
 }
 
 interface DispatchProps {
@@ -53,6 +56,7 @@ interface DispatchProps {
   setLoading: typeof setLoading
   showMessage: typeof showMessage
   hideAlert: typeof hideAlert
+  importContacts: typeof importContacts
 }
 
 type Props = StateProps & DispatchProps & WithNamespaces
@@ -62,6 +66,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   address: currentAccountSelector(state),
   activeNotificationCount: getActiveNotificationCount(state),
   callToActNotification: callToActNotificationSelector(state),
+  recipientCache: state.send.recipientCache,
 })
 
 const Header = () => {
@@ -138,6 +143,7 @@ export class WalletHome extends React.PureComponent<Props> {
     this.props.resetStandbyTransactions()
     this.props.initializeSentryUserContext()
     this.showTestnetBanner()
+    this.importContactsIfNeeded()
   }
 
   renderSection = ({ section: { title, bubbleText } }: { section: SectionListData<any> }) => (
@@ -151,6 +157,14 @@ export class WalletHome extends React.PureComponent<Props> {
   showTestnetBanner = () => {
     const { t } = this.props
     this.props.showMessage(t('testnetAlert.1'), null, t('dismiss'), t('testnetAlert.0'))
+  }
+
+  importContactsIfNeeded = () => {
+    // If we haven't already imported the contacts and populated the recip cache
+    if (!Object.keys(this.props.recipientCache).length) {
+      // Add a slight delay so contact importing doesn't make wallet home feel slugglish at first
+      setTimeout(() => this.props.importContacts(), 2000)
+    }
   }
 
   render() {
@@ -262,6 +276,7 @@ export default componentWithAnalytics(
       setLoading,
       showMessage,
       hideAlert,
+      importContacts,
     }
   )(withNamespaces(Namespaces.walletFlow5)(WalletHome))
 )

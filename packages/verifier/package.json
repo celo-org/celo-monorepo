@@ -18,7 +18,7 @@
     "test": "export TZ=UTC && jest --ci --silent --coverage --runInBand",
     "test:verbose": "export TZ=UTC && jest --ci --verbose --runInBand",
     "test:watch": "export TZ=UTC && node node_modules/jest/bin/jest.js --watch",
-    "deploy:update-version": "./scripts/update-version.sh"
+    "pre-deploy": "./scripts/pre-deploy.sh"
   },
   "rnpm": {
     "assets": [
