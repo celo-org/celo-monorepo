@@ -30,15 +30,19 @@ export enum CustomEventNames {
   send_invite_details = 'send_invite_details',
   send_invite = 'send_invite',
   edit_send_invite = 'edit_send_invite',
-  verification_commit = 'verification_commit',
-  verification_start = 'verification_start',
-  verification_cancel = 'verification_cancel',
-  verification_timeout = 'verification_timeout',
+
+  // Verification event and sub-events
+  verification = 'verification',
+  verification_setup = 'verification_setup',
+  verification_get_status = 'verification_get_status',
+  verification_req_attestations = 'verification_req_attestations',
+  verification_get_attestations = 'verification_get_attestations',
+  verification_set_account = 'verification_set_account',
+  verification_reveal_txs = 'verification_reveal_txs',
+  verification_codes_received = 'verification_codes_received',
+  verification_complete_txs = 'verification_complete_txs',
   verification_manual_selected = 'verification_manual_selected',
-  verification_code_entered = 'verification_code_entered',
-  verification_code_confirmed = 'verification_code_confirmed',
-  verification_complete = 'verification_complete',
-  verification_failure = 'verification_failure',
+
   photos_education = 'photos_education',
   get_backup_key = 'earn_celo_gold',
   earn_celo_gold = 'earn_celo_gold',
@@ -137,6 +141,13 @@ export enum CustomEventNames {
 
   // QR Code
   qrcode_main_screen_visit = 'qrcode_main_screen_visit',
+}
+
+export enum CommonValues {
+  success = 'success',
+  failure = 'failure',
+  cancel = 'cancel',
+  timeout = 'timeout',
 }
 
 // TODO(nitya): separate this out by event name
