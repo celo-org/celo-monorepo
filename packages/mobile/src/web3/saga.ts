@@ -16,7 +16,6 @@ import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData } from 'src/geth/geth'
 import { waitForGethConnectivity } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
-import { waitForNetwork } from 'src/networkInfo/saga'
 import Logger from 'src/utils/Logger'
 import {
   Actions,
@@ -203,9 +202,7 @@ export function* getAccount() {
 
 // Wait for geth to be connected and account ready
 export function* getConnectedAccount() {
-  yield call(waitForNetwork)
-  // yield checkWeb3Sync()
-  // yield waitForGethConnectivity()
+  yield waitForGethConnectivity()
   const account: string = yield getAccount()
   return account
 }

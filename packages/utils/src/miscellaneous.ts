@@ -2,6 +2,8 @@ const TAG = 'utils/src/miscellaneous'
 
 type InFunction = (...params: any) => Promise<any>
 
+// Retries an async function when it raises an exeption
+// if all the tries fail it raises the last thrown exeption
 export const retryAsync = async (
   inFunction: InFunction,
   tries: number,
