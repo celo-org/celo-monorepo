@@ -36,7 +36,6 @@ export enum envVar {
   GETHTX3_NODE_ID = 'GETHTX3_NODE_ID',
   GETHTX4_NODE_ID = 'GETHTX4_NODE_ID',
   GOOGLE_APPLICATION_CREDENTIALS = 'GOOGLE_APPLICATION_CREDENTIALS',
-  INTERNAL_BOOTNODE = 'INTERNAL_BOOTNODE',
   KUBERNETES_CLUSTER_NAME = 'KUBERNETES_CLUSTER_NAME',
   KUBERNETES_CLUSTER_ZONE = 'KUBERNETES_CLUSTER_ZONE',
   MNEMONIC = 'MNEMONIC',
@@ -62,13 +61,17 @@ export enum EnvTypes {
   PRODUCTION = 'production',
 }
 
-export function execCmd(cmd: string, options: any = {}): Promise<[string, string]> {
+export function execCmd(
+  cmd: string,
+  execOptions: any = {},
+  rejectWithOutput = false
+): Promise<[string, string]> {
   return new Promise((resolve, reject) => {
     if (process.env.CELOTOOL_VERBOSE === 'true') {
       console.debug('$ ' + cmd)
     }
 
-    exec(cmd, { maxBuffer: 1024 * 1000, ...options }, (err, stdout, stderr) => {
+    exec(cmd, { maxBuffer: 1024 * 1000, ...execOptions }, (err, stdout, stderr) => {
       if (process.env.CELOTOOL_VERBOSE === 'true') {
         console.debug(stdout.toString())
       }
@@ -76,7 +79,11 @@ export function execCmd(cmd: string, options: any = {}): Promise<[string, string
         console.error(stderr.toString())
       }
       if (err) {
-        reject(err)
+        if (rejectWithOutput) {
+          reject([err, stdout.toString(), stderr.toString()])
+        } else {
+          reject(err)
+        }
       } else {
         resolve([stdout.toString(), stderr.toString()])
       }
@@ -300,3 +307,6 @@ export function addCeloGethMiddleware(argv: yargs.Argv) {
 export const validateAccountAddress = (address: string) => {
   return address !== null && address.toLowerCase().startsWith('0x') && address.length === 42 // 0x followed by 40 hex-chars
 }
+
+export const ensure0x = (hexstr: string) => (hexstr.startsWith('0x') ? hexstr : '0x' + hexstr)
+export const strip0x = (hexstr: string) => (hexstr.startsWith('0x') ? hexstr.slice(2) : hexstr)
