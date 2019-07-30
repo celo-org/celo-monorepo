@@ -24,6 +24,7 @@ module.exports = {
     extraNodeModules: {
       ...nodeLibs,
       'crypto-js': path.resolve(cwd, 'node_modules/crypto-js'),
+      'isomorphic-fetch': require.resolve('cross-fetch'),
       net: require.resolve('react-native-tcp'),
       'react-native': path.resolve(cwd, 'node_modules/react-native'),
       'react-native-fs': path.resolve(cwd, 'node_modules/react-native-fs'),
