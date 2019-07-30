@@ -73,6 +73,7 @@ describe(watchSendInvite, () => {
 
   it('sends an SMS invite as expected', async () => {
     await expectSaga(watchSendInvite)
+      .provide([[call(waitForNetwork), true]])
       .withState(state)
       .dispatch(sendInvite(mockName, mockE164Number, InviteBy.SMS))
       .dispatch(transactionConfirmed('a sha3 hash'))
@@ -84,6 +85,7 @@ describe(watchSendInvite, () => {
 
   it('sends a WhatsApp invite as expected', async () => {
     await expectSaga(watchSendInvite)
+      .provide([[call(waitForNetwork), true]])
       .withState(state)
       .dispatch(sendInvite(mockName, mockE164Number, InviteBy.WhatsApp))
       .put(storeInviteeData(KEY, mockE164Number))
