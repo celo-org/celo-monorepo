@@ -13,18 +13,24 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
+import { FeeType } from 'src/fees/actions'
+import CalculateFee, {
+  CalculateFeeChildren,
+  PropsWithoutChildren as CalculateFeeProps,
+} from 'src/fees/CalculateFee'
+import { getFeeDollars } from 'src/fees/selectors'
 import i18n from 'src/i18n'
 import { InviteBy } from 'src/invite/actions'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import { sendPaymentOrInvite } from 'src/send/actions'
-import { getSuggestedFeeDollars } from 'src/send/selectors'
 import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { TransactionTypes } from 'src/transactions/reducer'
 import { Recipient } from 'src/utils/recipient'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 const numeral = require('numeral')
 
@@ -36,10 +42,10 @@ export interface ConfirmationInput {
   fee: BigNumber
 }
 interface StateProps {
+  account: string | null
   isSending: boolean
   defaultCountryCode: string
   dollarBalance: BigNumber
-  suggestedFeeDollars: BigNumber
   appConnected: boolean
 }
 
@@ -55,10 +61,10 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
+    account: currentAccountSelector(state),
     isSending: state.send.isSending,
     defaultCountryCode: state.account.defaultCountryCode,
     dollarBalance: new BigNumber(state.stableToken.balance || 0),
-    suggestedFeeDollars: getSuggestedFeeDollars(state),
     appConnected: isAppConnected(state),
   }
 }
@@ -176,15 +182,14 @@ class SendConfirmation extends React.Component<Props, State> {
     this.sendOrInvite(InviteBy.SMS)
   }
 
-  render() {
+  renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
     const { t, appConnected, isSending } = this.props
-    const { amount, reason, recipient, recipientAddress, fee } = this.getConfirmationInput()
+    const { amount, reason, recipient, recipientAddress } = this.getConfirmationInput()
 
     const currentBalance = this.props.dollarBalance
-    const amountWithFees = new BigNumber(numeral(amount).value()).plus(
-      this.props.suggestedFeeDollars
-    )
-    const userHasEnough = amountWithFees.isLessThanOrEqualTo(currentBalance)
+    const fee = asyncFee.result && getFeeDollars(asyncFee.result)
+    const amountWithFee = new BigNumber(numeral(amount).value()).plus(fee || 0)
+    const userHasEnough = !asyncFee.loading && amountWithFee.isLessThanOrEqualTo(currentBalance)
     const { isPaymentRequest } = this.getNavParams()
     let primaryBtnInfo = {
       action: this.onSendButtonClick,
@@ -204,6 +209,7 @@ class SendConfirmation extends React.Component<Props, State> {
         disabled: isSending,
       }
     }
+
     return (
       <View style={styles.container}>
         <DisconnectBanner />
@@ -247,6 +253,21 @@ class SendConfirmation extends React.Component<Props, State> {
         </ReviewFrame>
       </View>
     )
+  }
+
+  render() {
+    const { account } = this.props
+    if (!account) {
+      throw Error('Account is required')
+    }
+
+    const { amount, reason, recipientAddress } = this.getConfirmationInput()
+
+    const feeProps: CalculateFeeProps = recipientAddress
+      ? { feeType: FeeType.SEND, account, recipientAddress, amount, comment: reason }
+      : { feeType: FeeType.INVITE }
+
+    return <CalculateFee {...feeProps}>{this.renderWithAsyncFee}</CalculateFee>
   }
 }
 

@@ -56,7 +56,7 @@ const INVITE_SEND_AMOUNT = '0.18'
 export async function getInvitationVerificationFee() {
   // TODO(cmcewen): don't use this
   if (!USE_REAL_FEE) {
-    return web3.utils.toWei(INVITE_FEE)
+    return new BigNumber(web3.utils.toWei(INVITE_FEE))
   }
   const attestationsContract = await getAttestationsContract(web3)
   const stableTokenContract = await getStableTokenContract(web3)

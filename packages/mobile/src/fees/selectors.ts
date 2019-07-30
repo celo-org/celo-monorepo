@@ -9,13 +9,20 @@ const getSendFeeEstimate = (state: RootState) => state.fees.send.feeInWei
 const getExchangeFeeEstimate = (state: RootState) => state.fees.exchange.feeInWei
 const getEscrowFeeEstimate = (state: RootState) => state.fees.escrow.feeInWei
 
+export function getFeeDollars(feeInWei: BigNumber | string) {
+  const adjustedFee = divideByWei(
+    feeInWei instanceof BigNumber ? feeInWei.toString() : feeInWei,
+    18
+  )
+  return new BigNumber(adjustedFee)
+}
+
 const feeEstimateSelectorFactory = (feeSelector: (state: RootState) => string | null) => {
   return createSelector(feeSelector, (feeInWei) => {
     if (!feeInWei) {
       return null
     }
-    const adjustedFee = divideByWei(feeInWei, 18)
-    return new BigNumber(adjustedFee)
+    return getFeeDollars(feeInWei)
   })
 }
 
