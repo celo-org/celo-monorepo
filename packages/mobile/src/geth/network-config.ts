@@ -18,4 +18,8 @@ export default {
     nodeDir: `.${Testnets.alfajores}`,
     syncMode: SYNC_MODE_ULTRALIGHT,
   },
+  [Testnets.pilotstaging]: {
+    nodeDir: `.${Testnets.pilotstaging}`,
+    syncMode: SYNC_MODE_ULTRALIGHT,
+  },
 }

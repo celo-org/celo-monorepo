@@ -5,6 +5,7 @@ export enum Testnets {
   appintegration = 'appintegration',
   alfajoresstaging = 'alfajoresstaging',
   alfajores = 'alfajores',
+  pilotstaging = 'pilotstaging',
 }
 
 export const DEFAULT_TESTNET: Testnets = Config.DEFAULT_TESTNET
