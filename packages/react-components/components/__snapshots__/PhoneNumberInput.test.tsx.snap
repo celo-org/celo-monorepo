@@ -89,29 +89,58 @@ exports[`PhoneNumberInput renders correctly with minimum props 1`] = `
         }
       }
     />
-    <TextInput
-      allowFontScaling={true}
-      countryCallingCode="1"
-      keyboardType="phone-pad"
-      onChangeText={[Function]}
-      placeholderTextColor="#D1D5D8"
-      rejectResponderTermination={true}
+    <View
       style={
         Array [
           Object {
-            "height": 50,
-          },
-          Object {
+            "alignItems": "center",
             "flex": 1,
-            "marginLeft": 9,
+            "flexDirection": "row",
+            "justifyContent": "center",
           },
+          Array [
+            Object {
+              "height": 50,
+            },
+            Object {
+              "flex": 1,
+              "marginLeft": 9,
+            },
+          ],
         ]
       }
-      testID="PhoneNumberField"
-      underlineColorAndroid="transparent"
-      validator="phone"
-      value=""
-    />
+    >
+      <TextInput
+        allowFontScaling={true}
+        countryCallingCode="1"
+        keyboardType="phone-pad"
+        onBlur={[Function]}
+        onChangeText={[Function]}
+        onFocus={[Function]}
+        placeholderTextColor="#D1D5D8"
+        rejectResponderTermination={true}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "padding": 8,
+            },
+            Object {
+              "backgroundColor": "#FFFFFF",
+              "flex": 1,
+            },
+          ]
+        }
+        testID="PhoneNumberField"
+        underlineColorAndroid="transparent"
+        validator="phone"
+        value=""
+      />
+    </View>
   </View>
 </View>
 `;

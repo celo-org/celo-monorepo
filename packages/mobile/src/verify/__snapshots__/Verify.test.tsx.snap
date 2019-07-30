@@ -2380,7 +2380,6 @@ exports[`renders the Input step correctly 1`] = `
                 autoCorrect={false}
                 data={Array []}
                 defaultValue=""
-                forwardedRef={[Function]}
                 inputContainerStyle={
                   Array [
                     Object {
@@ -2440,11 +2439,17 @@ exports[`renders the Input step correctly 1`] = `
                 style={
                   Array [
                     Object {
-                      "backgroundColor": "white",
-                      "height": 40,
-                      "paddingLeft": 3,
+                      "fontFamily": "Hind-Regular",
                     },
-                    undefined,
+                    Object {
+                      "borderColor": "#D1D5D8",
+                      "borderRadius": 3,
+                      "padding": 8,
+                    },
+                    Object {
+                      "backgroundColor": "#FFFFFF",
+                      "flex": 1,
+                    },
                   ]
                 }
                 testID="CountryNameField"
@@ -2526,7 +2531,6 @@ exports[`renders the Input step correctly 1`] = `
             <TextInput
               allowFontScaling={true}
               countryCallingCode=""
-              forwardedRef={null}
               keyboardType="phone-pad"
               onBlur={[Function]}
               onChangeText={[Function]}
@@ -2537,11 +2541,16 @@ exports[`renders the Input step correctly 1`] = `
               style={
                 Array [
                   Object {
-                    "height": 50,
+                    "fontFamily": "Hind-Regular",
                   },
                   Object {
+                    "borderColor": "#D1D5D8",
+                    "borderRadius": 3,
+                    "padding": 8,
+                  },
+                  Object {
+                    "backgroundColor": "#FFFFFF",
                     "flex": 1,
-                    "marginLeft": 9,
                   },
                 ]
               }

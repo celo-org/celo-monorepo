@@ -258,7 +258,6 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             allowFontScaling={true}
             autoFocus={true}
             autocorrect={false}
-            forwardedRef={null}
             keyboardType="numeric"
             labelStyle={
               Object {
@@ -273,11 +272,20 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             placeholderTextColor="#A3EBC6"
             rejectResponderTermination={true}
             style={
-              Object {
-                "flex": 1,
-                "height": 54,
-                "marginHorizontal": 8,
-              }
+              Array [
+                Object {
+                  "fontFamily": "Hind-Regular",
+                },
+                Object {
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 3,
+                  "padding": 8,
+                },
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "flex": 1,
+                },
+              ]
             }
             title="$"
             underlineColorAndroid="transparent"
@@ -368,7 +376,6 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
         >
           <TextInput
             allowFontScaling={true}
-            forwardedRef={null}
             keyboardType="default"
             maxLength={70}
             onBlur={[Function]}
@@ -378,11 +385,20 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             placeholderTextColor="rgba(0, 0, 0, .4)"
             rejectResponderTermination={true}
             style={
-              Object {
-                "flex": 1,
-                "height": 54,
-                "marginHorizontal": 8,
-              }
+              Array [
+                Object {
+                  "fontFamily": "Hind-Regular",
+                },
+                Object {
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 3,
+                  "padding": 8,
+                },
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "flex": 1,
+                },
+              ]
             }
             title="for"
             underlineColorAndroid="transparent"

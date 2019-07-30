@@ -42,7 +42,6 @@ exports[`renders the EditProfile Component 1`] = `
         allowFontScaling={true}
         autoCorrect={false}
         autoFocus={true}
-        forwardedRef={null}
         onBlur={[Function]}
         onChangeText={[Function]}
         onEndEditing={[Function]}
@@ -53,17 +52,16 @@ exports[`renders the EditProfile Component 1`] = `
         style={
           Array [
             Object {
-              "borderColor": "#EEEEEE",
-              "borderRadius": 3,
-              "borderWidth": 1,
-              "fontSize": 16,
-              "height": 54,
-              "margin": 20,
-              "padding": 5,
-              "width": 710,
+              "fontFamily": "Hind-Regular",
             },
             Object {
-              "fontFamily": "Hind-Regular",
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "padding": 8,
+            },
+            Object {
+              "backgroundColor": "#FFFFFF",
+              "flex": 1,
             },
           ]
         }

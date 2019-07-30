@@ -94,7 +94,6 @@ exports[`Invite renders correctly 1`] = `
       >
         <TextInput
           allowFontScaling={true}
-          forwardedRef={null}
           keyboardType="default"
           onBlur={[Function]}
           onChangeText={[Function]}
@@ -103,11 +102,20 @@ exports[`Invite renders correctly 1`] = `
           placeholderTextColor="rgba(0, 0, 0, .4)"
           rejectResponderTermination={true}
           style={
-            Object {
-              "flex": 1,
-              "height": 54,
-              "marginHorizontal": 8,
-            }
+            Array [
+              Object {
+                "fontFamily": "Hind-Regular",
+              },
+              Object {
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "padding": 8,
+              },
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "flex": 1,
+              },
+            ]
           }
           underlineColorAndroid="transparent"
           value=""
