@@ -1,3 +1,5 @@
+import { stripHexLeader } from './commentEncryption'
+
 const ethjsutil = require('ethereumjs-util')
 
 export function signMessage(messageHash: string, privateKey: string, address: string) {
@@ -73,6 +75,12 @@ export function isValidAddress(address: string) {
     !ethjsutil.isZeroAddress(address) &&
     ethjsutil.isValidAddress(address)
   )
+}
+
+export function compareAddresses(address1: string, address2: string) {
+  address1 = stripHexLeader(address1.toLowerCase())
+  address2 = stripHexLeader(address2.toLowerCase())
+  return address1 === address2
 }
 
 export const SignatureUtils = {
