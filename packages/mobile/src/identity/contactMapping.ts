@@ -22,15 +22,9 @@ import {
 import { setRecipientCache } from 'src/send/actions'
 import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
-import {
-  contactsToRecipients,
-  NumberToRecipient,
-  Recipient,
-  RecipientKind,
-} from 'src/utils/recipient'
+import { contactsToRecipients, NumberToRecipient } from 'src/utils/recipient'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
-
 const TAG = 'identity/contactMapping'
 const MAPPING_CHUNK_SIZE = 25
 const NUM_PARALLEL_REQUESTS = 3
@@ -235,21 +229,6 @@ export enum VerificationStatus {
   UNKNOWN = 2,
 }
 
-export function getRecipientAddress(
-  recipient: Recipient,
-  e164NumberToAddress: E164NumberToAddressType
-): string | null | undefined {
-  if (recipient.kind === RecipientKind.QrCode && recipient.address) {
-    return recipient.address
-  }
-
-  if (!recipient.e164PhoneNumber) {
-    throw new Error('Missing recipient e164Number')
-  }
-
-  return getPhoneNumberAddress(recipient.e164PhoneNumber, e164NumberToAddress)
-}
-
 export function getPhoneNumberAddress(
   e164Number: string,
   e164NumberToAddress: E164NumberToAddressType
@@ -259,21 +238,6 @@ export function getPhoneNumberAddress(
   }
 
   return e164NumberToAddress[e164Number]
-}
-
-export function getRecipientVerificationStatus(
-  recipient: Recipient,
-  e164NumberToAddress: E164NumberToAddressType
-): VerificationStatus {
-  if (recipient.kind === RecipientKind.QrCode && recipient.address) {
-    return VerificationStatus.VERIFIED
-  }
-
-  if (!recipient.e164PhoneNumber) {
-    throw new Error('No recipient e164Number found')
-  }
-
-  return getPhoneNumberVerificationStatus(recipient.e164PhoneNumber, e164NumberToAddress)
 }
 
 export function getPhoneNumberVerificationStatus(
