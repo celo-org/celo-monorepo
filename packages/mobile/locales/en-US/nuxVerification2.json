@@ -53,5 +53,6 @@
   "errorRequestCode": "Failed to request codes.",
   "errorRedeemingCode": "Failed to redeem code.",
   "pleaseRetry": "Please retry verification.",
-  "retryVerification": "Retry Verification"
+  "retryVerification": "Retry Verification",
+  "codeAccepted": "Accepted"
 }

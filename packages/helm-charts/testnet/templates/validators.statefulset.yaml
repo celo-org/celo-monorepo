@@ -60,7 +60,11 @@ spec:
             celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $RID > /root/.celo/pkey
             echo 'Generating address'
             celotooljs.sh generate account-address --private-key `cat /root/.celo/pkey` > /root/.celo/address
-            echo $IP_ADDRESSES | cut -d '/' -f $((RID + 1)) > /root/.celo/ipAddress
+            if [ -z $IP_ADDRESSES ]; then
+              echo $POD_IP > /root/.celo/ipAddress
+            else
+              echo $IP_ADDRESSES | cut -d '/' -f $((RID + 1)) > /root/.celo/ipAddress
+            fi
             echo -n "Generating IP address for validator: "
             cat /root/.celo/ipAddress
             celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType load_testing --index 0 > /root/.celo/bootnodeEnodeAddress
@@ -71,6 +75,11 @@ spec:
             echo -n "Generating Bootnode enode for the validator: "
             cat /root/.celo/bootnodeEnode
         env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
         - name: REPLICA_NAME
           valueFrom:
             fieldRef:
@@ -113,8 +122,6 @@ spec:
           ACCOUNT_ADDRESS=`cat /root/.celo/address`
           RID=`cat /root/.celo/replica_id`
           FAULTY_NODE_FLAGS=`if [ "$RID" -lt "$FAULTY_NODES" ]; then echo -n "--istanbul.faultymode $FAULTY_NODE_TYPE"; fi`
-          NAT_FLAG=""
-          [[ "$STATIC_IPS_FOR_GETH_NODES" == "true" ]] && NAT_FLAG="--nat=extip:`cat /root/.celo/ipAddress`"
           geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
             --password=/root/.celo/account/accountSecret \
@@ -142,7 +149,7 @@ spec:
             ${FAULTY_NODE_FLAGS} \
             --istanbul.blockperiod={{ .Values.geth.blocktime }} \
             --maxpeers={{ mul 2 (add .Values.geth.validators .Values.geth.tx_nodes) }} \
-            ${NAT_FLAG}
+            --nat=extip:`cat /root/.celo/ipAddress`
         env:
         - name: POD_IP
           valueFrom:
@@ -168,7 +175,7 @@ spec:
         - name: FAULTY_NODE_TYPE
           value: {{ .Values.geth.faultyValidatorType | quote }}
         - name: STATIC_IPS_FOR_GETH_NODES
-          value: "{{ default "false" .Values.geth.static_ips }}"
+          value: "{{ default false .Values.geth.static_ips }}"
         ports:
         - name: discovery-udp
           containerPort: 30303
