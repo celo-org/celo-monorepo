@@ -25,19 +25,17 @@ interface OwnProps {
   comment: string
   id: string
   updatePaymentRequestStatus: typeof updatePaymentRequestStatus
-  fee: BigNumber
 }
 
 type Props = OwnProps & WithNamespaces
 
 export class PaymentRequestNotification extends React.Component<Props> {
   onPay = () => {
-    const { amount, comment: reason, fee, requester: recipient } = this.props
+    const { amount, comment: reason, requester: recipient } = this.props
     navigate(Screens.SendConfirmation, {
       confirmationInput: {
         reason,
         recipient,
-        fee,
         amount: new BigNumber(amount),
         recipientAddress: recipient.address,
       },
