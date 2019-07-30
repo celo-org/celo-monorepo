@@ -9,6 +9,7 @@ import { Linking, ScrollView, StyleSheet, Text, TextInput as RNTextInput, View }
 import { connect } from 'react-redux'
 import { setName, setPhoneNumber } from 'src/account/actions'
 import { hideAlert, showError } from 'src/alert/actions'
+import { errorSelector } from 'src/alert/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackButton from 'src/components/BackButton'
@@ -62,7 +63,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
-    error: (state.alert && state.alert.underlyingError) || null,
+    error: errorSelector(state),
     language: state.app.language || 'en-us',
     cachedName: state.account.name,
     cachedNumber: state.account.e164PhoneNumber,
