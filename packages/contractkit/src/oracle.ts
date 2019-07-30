@@ -34,7 +34,7 @@ function getValuesFromFractions(fractionElements: FractionElements) {
  */
 export async function makeReportTx(
   web3: Web3,
-  from: string,
+  oracleAddress: string,
   tokenAddress: string,
   numerator: BigNumber,
   denominator: BigNumber
@@ -46,7 +46,7 @@ export async function makeReportTx(
   const sortedValues = getValuesFromFractions(sortedFractions)
 
   const { lesserKey, greaterKey } = await getLesserAndGreaterKeys(
-    { key: from, value: rate },
+    { key: oracleAddress, value: rate },
     sortedValues
   )
   return oracles.methods.report(
