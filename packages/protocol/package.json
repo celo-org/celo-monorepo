@@ -60,7 +60,7 @@
     "truffle": "5.0.19",
     "truffle-artifactor": "^4.0.4",
     "truffle-resolver": "^4.0.4",
-    "truffle-security": "^1.3.7",
+    "truffle-security": "^1.4.4",
     "twilio": "^3.23.2",
     "typechain": "git+https://github.com/celo-org/TypeChain.git#ce6a33b",
     "weak-map": "^1.0.5",
