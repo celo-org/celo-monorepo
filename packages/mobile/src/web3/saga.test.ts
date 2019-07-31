@@ -11,10 +11,10 @@ import {
   updateWeb3SyncProgress,
 } from 'src/web3/actions'
 import {
-  checkWeb3Sync,
-  CHECK_SYNC_PROGRESS_TIMEOUT,
-  createNewAccount,
+  _CHECK_SYNC_PROGRESS_TIMEOUT,
   _checkWeb3SyncProgressClaim,
+  checkWeb3Sync,
+  createNewAccount,
 } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 import { createMockStore } from 'test/utils'
@@ -87,7 +87,7 @@ describe(checkWeb3Sync, () => {
       .provide([
         [call(waitForGethConnectivity), true],
         [call(_checkWeb3SyncProgressClaim), call(sleep, 100)], // sleep so timeout always wins the race
-        [delay(CHECK_SYNC_PROGRESS_TIMEOUT), true],
+        [delay(_CHECK_SYNC_PROGRESS_TIMEOUT), true],
         [call(getLatestBlock), { number: LAST_BLOCK_NUMBER }],
       ])
       .run()

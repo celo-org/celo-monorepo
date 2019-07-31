@@ -37,7 +37,7 @@ const MNEMONIC_BIT_LENGTH = (ETH_PRIVATE_KEY_LENGTH * 8) / 2
 
 const TAG = 'web3/saga'
 // The timeout for web3 to complete syncing and the latestBlock to be > 0
-export const CHECK_SYNC_PROGRESS_TIMEOUT = 60000
+const CHECK_SYNC_PROGRESS_TIMEOUT = 60000
 const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect to node on IPC."
 
 let AssignAccountLock = false
@@ -229,3 +229,4 @@ export function* web3Saga() {
 
 // exported for testing
 export const _checkWeb3SyncProgressClaim = checkWeb3SyncProgressClaim
+export const _CHECK_SYNC_PROGRESS_TIMEOUT = CHECK_SYNC_PROGRESS_TIMEOUT // Camell case because
