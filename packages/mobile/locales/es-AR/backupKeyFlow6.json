@@ -20,7 +20,6 @@
   "setBackupKey": "Crear clave de respaldo",
   "skip": "Saltar paso",
   "areYouSure": "¿Está seguro?",
-  "needBackupKey": "Sin una clave de respaldo, puede perder el acceso a la billetera para siempre.",
   "shareBackupKey": "Compartir clave de respaldo",
   "backupRecovery":
     "Comparta la clave de respaldo con una sola persona en la que confíe plenamente.",
