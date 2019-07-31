@@ -53,10 +53,11 @@ export const sendTransactionPromises = async (
   tx: TransactionObject<any>,
   account: string,
   tag: string,
-  txId: string
+  txId: string,
+  staticGas?: number | undefined
 ) => {
   const stableToken = await getStableTokenContract(web3)
-  return sendTransactionAsync(tx, account, stableToken, getLogger(tag, txId))
+  return sendTransactionAsync(tx, account, stableToken, getLogger(tag, txId), staticGas)
 }
 
 // Send a transaction and await for its confirmation
@@ -65,7 +66,8 @@ export const sendTransaction = async (
   tx: TransactionObject<any>,
   account: string,
   tag: string,
-  txId: string
+  txId: string,
+  staticGas?: number | undefined
 ) => {
-  return sendTransactionPromises(tx, account, tag, txId).then(awaitConfirmation)
+  return sendTransactionPromises(tx, account, tag, txId, staticGas).then(awaitConfirmation)
 }
