@@ -52,7 +52,7 @@
     "mathjs": "^5.0.4",
     "mocha": "^5.1.1",
     "node-fetch": "^2.3.0",
-    "openzeppelin-solidity": "^2.2.0",
+    "openzeppelin-solidity": "^2.3.0",
     "prompts": "^2.0.1",
     "solhint": "^2.0.0",
     "solidity-bytes-utils": "^0.0.7",
