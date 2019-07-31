@@ -33,15 +33,17 @@ export class CTextInput extends React.Component<Props, State> {
   }
 
   handleInputFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-    const { onFocus } = this.props
     this.setState({ isFocused: true })
-    if (onFocus) {
-      onFocus(e)
+    if (this.props.onFocus) {
+      this.props.onFocus(e)
     }
   }
 
-  handleInputBlur = () => {
+  handleInputBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     this.setState({ isFocused: false })
+    if (this.props.onBlur) {
+      this.props.onBlur(e)
+    }
   }
 
   onClear = () => {
