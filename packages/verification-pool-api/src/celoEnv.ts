@@ -1,1 +1,1 @@
-export const CELO_ENV = 'pilotstaging'
+export const CELO_ENV = 'pilot'

@@ -31,6 +31,7 @@ files=(
   ".env.mnemonic.appintegration"
   ".env.mnemonic.integration"
   ".env.mnemonic.integrationtesting"
+  ".env.mnemonic.pilot"
   ".env.mnemonic.pilotstaging"
 )
 
