@@ -19,22 +19,18 @@ export function validateInteger(input: string): string {
 }
 
 export function validateDecimal(input: string, lng?: string): string {
-  // Comma decimal points, only supports es right now!
-  if (lng && lng.startsWith('es')) {
-    // Keep only first decimal
-    return input
-      .replace(/[^0-9,]/g, '')
-      .replace(/,/, 'b')
-      .replace(/,/g, '')
-      .replace(/b/, ',')
-  }
+  // Comma decimal points -- only supports es right now
+  const decimalChar = lng && lng.startsWith('es') ? ',' : '.'
+  const regex = decimalChar === ',' ? /[^0-9,]/g : /[^0-9.]/g
 
-  // Fall back to just period decimals
-  return input
-    .replace(/[^0-9.]/g, '')
-    .replace(/\./, 'b')
-    .replace(/\./g, '')
-    .replace(/b/, '.')
+  const cleanedArray = input.replace(regex, '').split(decimalChar)
+
+  if (cleanedArray.length <= 1) {
+    // Empty string or no decimals
+    return cleanedArray.join('')
+  } else {
+    return cleanedArray.shift() + decimalChar + cleanedArray.join('')
+  }
 }
 
 export function validatePhone(input: string, countryCallingCode?: string): string {
