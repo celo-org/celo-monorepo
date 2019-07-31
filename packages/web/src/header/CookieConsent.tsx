@@ -3,7 +3,8 @@ import { StyleSheet, Text, View } from 'react-native'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Link from 'src/shared/Link'
 import Responsive from 'src/shared/Responsive'
-import { Colors, CONSENT_HEIGHT, Fonts, TextStyles } from 'src/shared/Styles'
+import { CONSENT_HEIGHT } from 'src/shared/Styles'
+import { colors, fonts } from 'src/styles'
 import { agree, disagree, hasUserGivenCookiesAgreement } from '../analytics/analytics'
 
 const isInEU = require('@segment/in-eu')
@@ -39,14 +40,14 @@ export class CookieConsent extends React.Component<I18nProps, State> {
 
     return (
       <View style={styles.container}>
-        <Text style={[styles.infoMessageText, styles.infoMessageTextFirstBlock]}>
+        <Text style={[fonts.p, styles.infoMessageText, styles.infoMessageTextFirstBlock]}>
           <Text style={styles.infoMessageTextPrefix}>{t('weUseCookies')} </Text>
           {t('weUseCookiesReasons')}
         </Text>
-        <Text style={styles.infoMessageText}>
+        <Text style={[fonts.p, styles.infoMessageText]}>
           {t('cookiesPrivacyInfo')}{' '}
           <Link href="/privacy">
-            <Text style={styles.link}>{t('cookiesPrivacyPolicy')}</Text>
+            <Text style={[fonts.p, styles.link]}>{t('cookiesPrivacyPolicy')}</Text>
           </Link>
         </Text>
 
@@ -57,7 +58,7 @@ export class CookieConsent extends React.Component<I18nProps, State> {
               large={[styles.button, styles.disagreeButton]}
             >
               <View style={[styles.buttonMedium, styles.disagreeButton]} onClick={disagree}>
-                <Text style={[TextStyles.button, styles.buttonText]}>
+                <Text style={[fonts.navigation, styles.buttonText]}>
                   {t('cookiesDisagree')
                     .toString()
                     .toUpperCase()}
@@ -69,7 +70,7 @@ export class CookieConsent extends React.Component<I18nProps, State> {
               large={[styles.button, styles.agreeButton]}
             >
               <View style={[styles.buttonMedium, styles.agreeButton]} onClick={onClickAgree}>
-                <Text style={[TextStyles.button, styles.buttonText]}>
+                <Text style={[fonts.navigation, styles.buttonText]}>
                   {t('cookiesAgree')
                     .toString()
                     .toUpperCase()}
@@ -98,10 +99,7 @@ const styles = StyleSheet.create({
   },
   infoMessageText: {
     textAlign: 'center',
-    color: Colors.WHITE,
-    fontFamily: Fonts.PRIMARY,
-    fontSize: 16,
-    fontWeight: '300',
+    color: colors.white,
   },
   infoMessageTextPrefix: {
     textAlign: 'center',
@@ -147,15 +145,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 2,
     marginLeft: 10,
-    borderColor: Colors.WHITE,
+    borderColor: colors.white,
   },
   buttonText: {
     textAlign: 'center',
-    color: Colors.WHITE,
-    fontSize: 13,
+    color: colors.white,
+    textRendering: 'geometricPrecision',
   },
   link: {
-    color: Colors.WHITE,
+    color: colors.white,
     cursor: 'pointer',
     textDecorationLine: 'underline',
   },

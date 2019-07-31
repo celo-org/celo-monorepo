@@ -1,7 +1,9 @@
 import * as React from 'react'
 
 import Fade from 'react-reveal/Fade'
-import Articles, { Props as ArticleProps } from 'src/community/Articles'
+import Articles from 'src/community/Articles'
+
+import { Articles as ArticleProps } from 'fullstack/ArticleProps'
 
 import { H2 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
