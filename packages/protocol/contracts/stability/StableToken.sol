@@ -295,7 +295,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
 
     balances[to] = balances[to].add(units);
     balances[from] = balances[from].sub(units);
-    allowed[from][msg.sender] = allowed[from][msg.sender].sub(units);
+    allowed[from][msg.sender] = allowed[from][msg.sender].sub(value);
     emit Transfer(from, to, value);
     return true;
   }
