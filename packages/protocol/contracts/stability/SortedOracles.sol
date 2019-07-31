@@ -184,7 +184,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    */
   function medianRate(address token) external view returns (uint128, uint128) {
     SortedFractionMedianList.Element memory median = getMedianElement(rates[token]);
-    return (uint128(median.value.fromFixed()), uint128(FixidityLib.fixed1()));
+    return (uint128(median.value), uint128(FixidityLib.fixed1()));
   }
 
   /**
