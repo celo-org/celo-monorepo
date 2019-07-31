@@ -73,7 +73,8 @@ describe(checkWeb3Sync, () => {
       .withState(state)
       .provide([
         [call(waitForGethConnectivity), true],
-        [call(_checkWeb3SyncProgressClaim), true],
+        // needs this async function to win the race with a delay
+        [call(_checkWeb3SyncProgressClaim), call(async () => true)],
         [call(getLatestBlock), { number: LAST_BLOCK_NUMBER }],
       ])
       .put(setLatestBlockNumber(LAST_BLOCK_NUMBER))
