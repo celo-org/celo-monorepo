@@ -1,5 +1,6 @@
+import { GoldToken } from '@celo/contractkit'
+
 import { BaseCommand } from '../../base'
-import { GoldToken } from '../../generated/contracts'
 import { doSwap, swapArguments } from '../../utils/exchange'
 
 export default class SellGold extends BaseCommand {

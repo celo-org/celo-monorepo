@@ -1,31 +1,32 @@
+import { EventProps } from 'fullstack/EventProps'
 import * as React from 'react'
 import { View } from 'react-native'
-import OpenGraph from 'src/header/OpenGraph'
-
 import Events from 'src/community/connect/Events'
-import {
-  EventProps,
-  intializeTableTop,
-  normalizeEvents,
-  splitEvents,
-} from 'src/community/EventHelpers'
+import { getEvents } from 'src/community/connect/EventsData'
+import OpenGraph from 'src/header/OpenGraph'
+import { NameSpaces } from 'src/i18n'
 import { standardStyles } from 'src/styles'
+
 const preview = require('src/community/connect/preview.jpg')
 
-interface Props {
+interface State {
   pastEvents: EventProps[]
+  loading: boolean
 }
 
-export default class PastEventsPage extends React.PureComponent<Props> {
-  static async getInitialProps() {
-    let data
-    try {
-      data = await intializeTableTop()
-    } catch {
-      data = []
-    }
-    const { pastEvents } = splitEvents(normalizeEvents(data))
-    return { pastEvents, namespacesRequired: ['common', 'community'] }
+export default class PastEventsPage extends React.PureComponent<{}, State> {
+  static getInitialProps() {
+    return { namespacesRequired: [NameSpaces.common, NameSpaces.community] }
+  }
+
+  state = {
+    loading: true,
+    pastEvents: [],
+  }
+
+  async componentDidMount() {
+    const { pastEvents } = await getEvents()
+    this.setState({ pastEvents, loading: false })
   }
 
   render() {
@@ -39,7 +40,7 @@ export default class PastEventsPage extends React.PureComponent<Props> {
           }
           image={preview}
         />
-        <Events pastEvents={this.props.pastEvents} />
+        <Events pastEvents={this.state.pastEvents} loading={this.state.loading} />
       </View>
     )
   }

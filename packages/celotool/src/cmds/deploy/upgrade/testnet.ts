@@ -19,7 +19,7 @@ export const builder = {}
 export const handler = async (argv: TestnetArgv) => {
   await switchToClusterFromEnv()
 
-  upgradeStaticIPs(argv.celoEnv)
+  await upgradeStaticIPs(argv.celoEnv)
 
   if (argv.reset) {
     await resetAndUpgradeHelmChart(argv.celoEnv)
