@@ -11,12 +11,13 @@
   "scripts": {
     "build": "tsc",
     "gcp-build": "npm run build",
-    "test": "",
+    "test": "jest",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "lint-checks": "yarn run lint && yarn build --noEmit",
     "start": "node ./dist/index.js",
     "start:local": "npm run build; cp config/config.local.env .env; node --inspect ./dist/index.js",
-    "deploy": "./deploy.sh"
+    "deploy": "./deploy.sh",
+    "test:watch": "export TZ=UTC && jest --watch"
   },
   "dependencies": {
     "async-polling": "^0.2.1",
@@ -37,8 +38,11 @@
     "@types/dotenv": "^4.0.3",
     "@types/express": "^4.16.1",
     "@types/i18next": "^11.9.3",
+    "@types/jest": "^24.0.16",
     "@types/node-fetch": "^2.1.2",
     "@types/utf8": "^2.1.6",
-    "@types/web3": "^1.0.18"
+    "@types/web3": "^1.0.18",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2"
   }
 }

@@ -9,7 +9,8 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "target": "es6"
+    "target": "es6",
+    "lib": ["es7", "esnext"]
   },
   "include": ["src/**/*"]
 }

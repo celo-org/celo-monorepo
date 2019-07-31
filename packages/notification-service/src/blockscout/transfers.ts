@@ -48,7 +48,7 @@ async function getLatestTokenTransfers(
   return { transfers, latestBlock }
 }
 
-function filterAndJoinTransfers(
+export function filterAndJoinTransfers(
   goldTransfers: Map<string, Transfer> | null,
   stableTransfers: Map<string, Transfer> | null
 ): Transfer[] {
