@@ -5,6 +5,7 @@ export enum Testnets {
   appintegration = 'appintegration',
   alfajoresstaging = 'alfajoresstaging',
   alfajores = 'alfajores',
+  pilot = 'pilot',
   pilotstaging = 'pilotstaging',
 }
 

@@ -801,6 +801,6 @@ export default async function getInstance(web3: Web3) {
     "type": "function"
   }
 ],
-   "0xd9266a37C197B5D171636Baaa22b4fa265FE1139"
+   "0x99f0290B03D01a033Ca57b05FbDF1063B7645ebe"
   )
 }
