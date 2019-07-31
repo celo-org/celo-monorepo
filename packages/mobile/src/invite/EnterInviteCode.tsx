@@ -20,6 +20,7 @@ import {
 import SendIntentAndroid from 'react-native-send-intent'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
+import { errorSelector } from 'src/alert/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
@@ -46,7 +47,6 @@ interface StateProps {
 interface State {
   inviteCode: string
   isSubmitting: boolean
-  messageAppOpened: boolean
   appState: AppStateStatus
   validCodeInClipboard: boolean
 }
@@ -65,7 +65,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
-    error: (state.alert && state.alert.underlyingError) || null,
+    error: errorSelector(state),
     name: state.account.name,
     redeemComplete: state.invite.redeemComplete,
   }
@@ -105,13 +105,13 @@ export class EnterInviteCode extends React.Component<Props, State> {
   state: State = {
     inviteCode: '',
     isSubmitting: false,
-    messageAppOpened: false,
     appState: AppState.currentState,
     validCodeInClipboard: false,
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     AppState.addEventListener('change', this.handleValidCodeInClipboard)
+    this.checkIfValidCodeInClipboard()
   }
 
   componentWillUnmount() {
@@ -119,18 +119,19 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   openMessage = () => {
-    this.setState({
-      messageAppOpened: true,
-    })
     SendIntentAndroid.openSMSApp()
+  }
+
+  checkIfValidCodeInClipboard = async () => {
+    const message = await Clipboard.getString()
+    const validCode = extractValidInviteCode(message)
+
+    this.setState({ validCodeInClipboard: validCode !== null })
   }
 
   handleValidCodeInClipboard = async (nextAppState: AppStateStatus) => {
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-      const message = await Clipboard.getString()
-      const validCode = extractValidInviteCode(message)
-
-      this.setState({ validCodeInClipboard: validCode !== null })
+      this.checkIfValidCodeInClipboard()
     }
     this.setState({ appState: nextAppState })
   }
@@ -186,7 +187,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
             <Text style={fontStyles.bodySmallBold}>{t('inviteCodeText.inviteAccepted')}</Text>
           ) : (
             !this.state.isSubmitting &&
-            (!(this.state.messageAppOpened && this.state.validCodeInClipboard) ? (
+            (!this.state.validCodeInClipboard ? (
               <View>
                 <Text style={[styles.body, styles.hint]}>
                   <Text style={fontStyles.bodySmallSemiBold}>

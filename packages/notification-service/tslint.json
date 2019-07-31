@@ -1,3 +1,6 @@
 {
-  "extends": ["@celo/typescript/tslint.json"]
+  "extends": ["@celo/typescript/tslint.json"],
+  "rules": {
+    "no-floating-promises": true
+  }
 }

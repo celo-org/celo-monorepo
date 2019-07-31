@@ -40,6 +40,9 @@ export function getGasFeeRecipient(networkName: string) {
   switch (networkName) {
     case 'alfajoresstaging':
       return '0xFe6B1360Fb2D31B4574d05c1d8Af29053fE28F1A'
+    case 'alfajores':
+      // Seems to work
+      return '0xFe6B1360Fb2D31B4574d05c1d8Af29053fE28F1A'
   }
   throw new Error(`getGasFeeRecipient/Unexpected network ${networkName}`)
 }
@@ -47,17 +50,21 @@ export function getGasFeeRecipient(networkName: string) {
 // Mnemonic taken from .env.mnemonic.<NETWORK_NAME> file in celo-monorepo
 function getMnemonic(networkName: string): string {
   const mnemonicFile = `${__dirname}/../../../.env.mnemonic.${networkName}`
-  const mnemonicFileContent = fs
-    .readFileSync(mnemonicFile)
-    .toString()
-    .toString()
-  // TODO(ashishb): This is hacky, we should eventually move to `properties-reader` or a similar package.
-  const mnemonic = mnemonicFileContent
-    .split('=')[1]
-    .replace('"', '')
-    .replace('"', '')
-    .trim()
-  return mnemonic
+  Logger.debug('getMnemonic', `Reading mnemonic from ${mnemonicFile}`)
+  const mnemonicFileContent = fs.readFileSync(mnemonicFile).toString()
+  const lines = mnemonicFileContent.split('\n')
+  for (const line of lines) {
+    if (line.startsWith('MNEMONIC')) {
+      // TODO(ashishb): This is hacky, we should eventually move to `properties-reader` or a similar package.
+      const mnemonic = line
+        .split('=')[1]
+        .replace('"', '')
+        .replace('"', '')
+        .trim()
+      return mnemonic
+    }
+  }
+  throw new Error(`Mnemonic not found in ${mnemonicFile}`)
 }
 
 // Alternative way to generate this:
