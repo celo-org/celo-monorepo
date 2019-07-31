@@ -66,7 +66,7 @@ module.exports = deployProxyAndImplementation<StableTokenInstance>(
     await sortedOracles.addOracle(stableToken.address, minerAddress)
     await sortedOracles.report(
       stableToken.address,
-      config.stableToken.goldPrice,
+      toFixed(config.stableToken.goldPrice),
       NULL_ADDRESS,
       NULL_ADDRESS
     )
