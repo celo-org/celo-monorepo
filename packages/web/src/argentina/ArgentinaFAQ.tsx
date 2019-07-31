@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import Link from 'src/shared/Link'
 import Responsive from 'src/shared/Responsive'
 import { TextStyles } from 'src/shared/Styles'
-import { ResponsiveH1 } from 'src/shared/Text'
+import { H1 as ResponsiveH1 } from 'src/fonts/Fonts'
 
 export default class Argentina extends React.Component {
   render() {

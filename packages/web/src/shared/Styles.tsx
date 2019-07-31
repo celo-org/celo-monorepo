@@ -55,23 +55,6 @@ export const TextStyles = StyleSheet.create({
     color: Colors.DARK_GRAY,
     textRendering: 'geometricPrecision',
   },
-  p: {
-    marginTop: 4,
-    marginBottom: 4,
-  },
-  ul: {
-    marginTop: 4,
-    marginBottom: 4,
-  },
-  li: {
-    marginTop: 4,
-    marginBottom: 4,
-    flexDirection: 'row',
-    flex: 1,
-  },
-  liText: {
-    marginLeft: 15,
-  },
   table: {
     marginTop: 4,
     marginBottom: 4,
@@ -131,9 +114,5 @@ export const TextStyles = StyleSheet.create({
     lineHeight: 24,
     textRendering: 'geometricPrecision',
     letterSpacing: 1,
-  },
-  bold: {
-    fontWeight: '600',
-    fontFamily: Fonts.PRIMARY,
   },
 })
