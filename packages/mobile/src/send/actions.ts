@@ -11,7 +11,6 @@ export interface QrCode {
 export type SVG = typeof Svg
 
 export enum Actions {
-  SET_TRANSACTION_FEE = 'SEND/SET_TRANSACTION_FEE',
   STORE_LATEST_IN_RECENTS = 'SEND/STORE_LATEST_IN_RECENTS',
   BARCODE_DETECTED = 'SEND/BARCODE_DETECTED',
   QRCODE_SHARE = 'SEND/QRCODE_SHARE',
@@ -20,11 +19,6 @@ export enum Actions {
   SEND_PAYMENT_OR_INVITE = 'SEND/SEND_PAYMENT_OR_INVITE',
   SEND_PAYMENT_OR_INVITE_SUCCESS = 'SEND/SEND_PAYMENT_OR_INVITE_SUCCESS',
   SEND_PAYMENT_OR_INVITE_FAILURE = 'SEND/SEND_PAYMENT_OR_INVITE_FAILURE',
-}
-
-export interface SetTransactionFeeAction {
-  type: Actions.SET_TRANSACTION_FEE
-  suggestedFee: string
 }
 
 export interface StoreLatestInRecentsAction {
@@ -56,17 +50,11 @@ export interface SendPaymentOrInviteFailureAction {
 }
 
 export type ActionTypes =
-  | SetTransactionFeeAction
   | StoreLatestInRecentsAction
   | SetRecipientCacheAction
   | SendPaymentOrInviteAction
   | SendPaymentOrInviteSuccessAction
   | SendPaymentOrInviteFailureAction
-
-export const setTransactionFee = (suggestedFee: string): SetTransactionFeeAction => ({
-  type: Actions.SET_TRANSACTION_FEE,
-  suggestedFee,
-})
 
 export const storeLatestInRecents = (key: string): StoreLatestInRecentsAction => ({
   type: Actions.STORE_LATEST_IN_RECENTS,
