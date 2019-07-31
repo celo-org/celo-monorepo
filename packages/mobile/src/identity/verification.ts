@@ -190,6 +190,7 @@ export function* doVerificationFlow() {
     const autoRetrievalTask: Task = yield fork(startAutoSmsRetrieval)
 
     yield all([
+      // Set acccount and data encryption key in contract
       call(setAccount, attestationsContract, account, dataKey),
       // Request codes for the attestations needed
       call(
@@ -494,7 +495,6 @@ async function setAccount(
       CustomEventNames.verification,
       CustomEventNames.verification_set_account
     )
-    return
   }
 }
 
