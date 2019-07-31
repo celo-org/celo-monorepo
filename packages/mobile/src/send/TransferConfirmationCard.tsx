@@ -22,22 +22,30 @@ const iconSize = 40
 
 interface LineItemProps {
   currencySymbol: string
-  amount: BigNumber
+  amount?: BigNumber
   title: string
   titleIcon?: React.ReactNode
+  isLoading?: boolean
 }
 
-function LineItemRow({ currencySymbol, amount, title, titleIcon }: LineItemProps) {
+function LineItemRow({ currencySymbol, amount, title, titleIcon, isLoading }: LineItemProps) {
   return (
     <View style={style.lineItemRow}>
       <View style={style.feeDescription}>
         <Text style={style.feeText}>{title}</Text>
         {titleIcon}
       </View>
-      <Text style={style.feeText}>
-        {currencySymbol}
-        {getMoneyDisplayValue(amount, 4)}
-      </Text>
+      {amount && (
+        <Text style={style.feeText}>
+          {currencySymbol}
+          {getMoneyDisplayValue(amount, 4)}
+        </Text>
+      )}
+      {isLoading && (
+        <View style={style.loadingContainer}>
+          <ActivityIndicator size="small" color={colors.celoGreen} />
+        </View>
+      )}
     </View>
   )
 }
@@ -196,26 +204,21 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
               </Text>
             </View>
           )}
-          {isLoadingFee && (
+          {(isLoadingFee || fee) && (
             <View style={style.feeContainer}>
-              <ActivityIndicator size="small" color={colors.celoGreen} />
+              {this.props.type === TransactionTypes.PAY_REQUEST && (
+                <LineItemRow currencySymbol={'$'} amount={total} title={t('dollarsSent')} />
+              )}
+              <LineItemRow
+                currencySymbol={currencyStyle.symbol}
+                amount={fee}
+                title={address ? t('securityFee') : t('inviteAndSecurityFee')}
+                titleIcon={<FeeIcon />}
+                isLoading={isLoadingFee}
+              />
+              <LineItemRow currencySymbol={'$'} amount={amountWithFees} title={t('total')} />
             </View>
           )}
-          {!isLoadingFee &&
-            !!fee && (
-              <View style={style.feeContainer}>
-                {this.props.type === TransactionTypes.PAY_REQUEST && (
-                  <LineItemRow currencySymbol={'$'} amount={total} title={t('dollarsSent')} />
-                )}
-                <LineItemRow
-                  currencySymbol={currencyStyle.symbol}
-                  amount={fee}
-                  title={address ? t('securityFee') : t('inviteAndSecurityFee')}
-                  titleIcon={<FeeIcon />}
-                />
-                <LineItemRow currencySymbol={'$'} amount={amountWithFees} title={t('total')} />
-              </View>
-            )}
         </View>
       )
     }
@@ -315,6 +318,9 @@ const style = StyleSheet.create({
   feeText: {
     ...fontStyles.subSmall,
     color: colors.dark,
+  },
+  loadingContainer: {
+    transform: [{ scale: 0.8 }],
   },
   avatar: {
     marginTop: 5,

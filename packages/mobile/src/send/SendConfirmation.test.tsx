@@ -37,10 +37,11 @@ describe('SendConfirmation', () => {
 
     // Initial render
     expect(toJSON()).toMatchSnapshot()
-    expect(queryByText('securityFee')).toBeNull()
+    expect(queryByText('securityFee')).not.toBeNull()
+    expect(queryByText('0.0100')).toBeNull()
 
     // Wait for fee to be calculated and displayed
-    await waitForElement(() => getByText('securityFee'))
+    await waitForElement(() => getByText('0.0100'))
 
     expect(toJSON()).toMatchSnapshot()
   })
@@ -62,10 +63,11 @@ describe('SendConfirmation', () => {
 
     // Initial render
     expect(toJSON()).toMatchSnapshot()
-    expect(queryByText('securityFee')).toBeNull()
+    expect(queryByText('securityFee')).not.toBeNull()
+    expect(queryByText('0.0100')).toBeNull()
 
     // Wait for fee to be calculated and displayed
-    await waitForElement(() => getByText('securityFee'))
+    await waitForElement(() => getByText('0.0100'))
 
     expect(toJSON()).toMatchSnapshot()
   })
