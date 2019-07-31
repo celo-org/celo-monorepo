@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import { TextInput } from 'src/forms/FormComponents'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import Form, { emailIsValid } from 'src/shared/Form'
+import Form, { emailIsValid } from 'src/forms/Form'
 import Responsive from 'src/shared/Responsive'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 

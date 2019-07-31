@@ -11,7 +11,7 @@ import {
 } from 'src/fauceting/utils'
 import { TextInput } from 'src/forms/FormComponents'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
-import { postForm } from 'src/shared/Form'
+import { postForm } from 'src/forms/Form'
 import { colors, standardStyles } from 'src/styles'
 import { RequestRecord, RequestType, subscribeRequest } from '../../server/FirebaseClient'
 

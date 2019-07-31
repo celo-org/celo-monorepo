@@ -10,7 +10,7 @@ import Octocat from 'src/icons/Octocat'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
 import menuItems, { CeloLinks } from 'src/shared/menu-items'
-import { TweetLogo as TwitterLogo } from 'src/shared/TwitterLogo'
+import { TweetLogo as TwitterLogo } from 'src/icons/TwitterLogo'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 const newsImg = require('src/dev/devNews.png')
