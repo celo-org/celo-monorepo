@@ -40,6 +40,7 @@ const MockedAnalytics = CeloAnalytics as any
 
 jest.mock('src/transactions/send', () => ({
   sendTransaction: jest.fn(),
+  sendTransactionPromises: jest.fn(() => ({ confirmation: true, transactionHash: true })),
 }))
 
 jest.mock('@celo/react-native-sms-retriever', () => ({

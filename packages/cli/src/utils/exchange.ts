@@ -1,6 +1,7 @@
 import Web3 from 'web3'
-import { Exchange } from '../generated/contracts'
-import { IERC20Token } from '../generated/types/IERC20Token'
+
+import { CeloTokenType, Exchange } from '@celo/contractkit'
+
 import { displaySendTx } from './cli'
 
 export const swapArguments = [
@@ -30,7 +31,7 @@ interface SwapArgs {
 export const doSwap = async (
   web3: Web3,
   args: SwapArgs,
-  sellToken: IERC20Token,
+  sellToken: CeloTokenType,
   sellGold: boolean
 ) => {
   const exchange = await Exchange(web3, args.from)
