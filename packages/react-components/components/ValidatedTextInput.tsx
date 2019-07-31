@@ -1,13 +1,14 @@
 import TextInput from '@celo/react-components/components/TextInput'
 import { validateInput, ValidatorKind } from '@celo/utils/src/inputValidation'
 import * as React from 'react'
-import { TextInputProps } from 'react-native'
+import { TextInput as RNTextInput, TextInputProps } from 'react-native'
 
 interface OwnProps {
   value: string
   numberOfDecimals?: number
   placeholder?: string
   lng?: string
+  nativeInput?: boolean
   onChangeText: (input: string) => void
 }
 
@@ -70,7 +71,15 @@ export default class ValidatedTextInput extends React.Component<Props> {
   }
 
   render() {
-    return (
+    const { nativeInput = false } = this.props
+    return nativeInput ? (
+      <RNTextInput
+        maxLength={this.getMaxLength()}
+        {...this.props}
+        value={this.props.value}
+        onChangeText={this.onChangeText}
+      />
+    ) : (
       <TextInput
         maxLength={this.getMaxLength()}
         {...this.props}
