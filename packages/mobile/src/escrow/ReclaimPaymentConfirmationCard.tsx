@@ -6,7 +6,7 @@ import { getContactPhoneNumber } from '@celo/utils/src/contacts'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { MinimalContact } from 'react-native-contacts'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
@@ -19,11 +19,12 @@ import { getCurrencyColor, getMoneyDisplayValue } from 'src/utils/formatting'
 
 interface LineItemProps {
   currencySymbol: string
-  amount: BigNumber
+  amount?: BigNumber
   title: string
   titleIcon?: React.ReactNode
   negative?: boolean
   boldedStyle?: boolean
+  isLoading?: boolean
 }
 
 function LineItemRow({
@@ -33,6 +34,7 @@ function LineItemRow({
   titleIcon,
   negative,
   boldedStyle,
+  isLoading,
 }: LineItemProps) {
   const fontStyle = boldedStyle ? fontStyles.bodyBold : fontStyles.body
   const totalStyle = boldedStyle ? style.totalGreen : style.total
@@ -42,11 +44,18 @@ function LineItemRow({
         <Text style={[fontStyle, style.totalTitle]}>{title}</Text>
         {titleIcon}
       </View>
-      <Text style={[fontStyle, totalStyle]}>
-        {negative && '-'}
-        {currencySymbol}
-        {getMoneyDisplayValue(amount)}
-      </Text>
+      {amount && (
+        <Text style={[fontStyle, totalStyle]}>
+          {negative && '-'}
+          {currencySymbol}
+          {getMoneyDisplayValue(amount)}
+        </Text>
+      )}
+      {isLoading && (
+        <View style={style.loadingContainer}>
+          <ActivityIndicator size="small" color={colors.celoGreen} />
+        </View>
+      )}
     </View>
   )
 }
@@ -56,6 +65,7 @@ export interface OwnProps {
   amount: BigNumber
   comment?: string
   fee?: BigNumber
+  isLoadingFee?: boolean
   currency: CURRENCY_ENUM
 }
 
@@ -72,13 +82,14 @@ const mapStateToProps = (state: RootState): StateProps => {
 type Props = OwnProps & StateProps & WithNamespaces
 
 class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
-  renderFeeAndTotal = (total: BigNumber, currencySymbol: string, fee?: BigNumber) => {
-    if (!fee) {
-      return
-    }
-
+  renderFeeAndTotal = (
+    total: BigNumber,
+    currencySymbol: string,
+    fee: BigNumber | undefined,
+    isLoadingFee: boolean | undefined
+  ) => {
     const { t } = this.props
-    const amountWithFees = total.minus(this.props.fee || 0)
+    const amountWithFees = total.minus(fee || 0)
 
     return (
       <View style={style.feeContainer}>
@@ -89,6 +100,7 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
           title={t('securityFee')}
           titleIcon={<FeeIcon />}
           negative={true}
+          isLoading={isLoadingFee}
         />
         <LineItemRow
           currencySymbol={'$'}
@@ -101,7 +113,15 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
   }
 
   render() {
-    const { recipient, amount, comment, fee, currency, defaultCountryCode } = this.props
+    const {
+      recipient,
+      amount,
+      comment,
+      fee,
+      isLoadingFee,
+      currency,
+      defaultCountryCode,
+    } = this.props
     const currencySymbol = CURRENCIES[currency].symbol
     const currencyColor = getCurrencyColor(currency)
     return (
@@ -137,7 +157,7 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
           )}
           {!!comment && <Text style={[fontStyles.bodySecondary, style.comment]}>{comment}</Text>}
         </View>
-        {this.renderFeeAndTotal(amount, currencySymbol, fee)}
+        {this.renderFeeAndTotal(amount, currencySymbol, fee, isLoadingFee)}
       </View>
     )
   }
@@ -199,6 +219,9 @@ const style = StyleSheet.create({
     fontSize: 30,
     lineHeight: 40,
     height: 35,
+  },
+  loadingContainer: {
+    transform: [{ scale: 0.8 }],
   },
   contactName: {
     paddingTop: 6,

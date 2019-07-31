@@ -7,7 +7,7 @@ export enum FeeType {
   INVITE = 'invite',
   SEND = 'send',
   EXCHANGE = 'exchange',
-  ESCROW = 'escrow',
+  RECLAIM_ESCROW = 'reclaim-escrow',
 }
 
 export interface UpdateDefaultFeeAction {

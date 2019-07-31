@@ -30,7 +30,7 @@ export function* updateDefaultFeeSaga({ feeType }: UpdateDefaultFeeAction) {
     case FeeType.EXCHANGE:
       // TODO
       break
-    case FeeType.ESCROW:
+    case FeeType.RECLAIM_ESCROW:
       // TODO
       break
   }

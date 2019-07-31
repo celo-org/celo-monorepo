@@ -7,7 +7,7 @@ import { divideByWei } from 'src/utils/formatting'
 const getInviteFeeEstimate = (state: RootState) => state.fees.invite.feeInWei
 const getSendFeeEstimate = (state: RootState) => state.fees.send.feeInWei
 const getExchangeFeeEstimate = (state: RootState) => state.fees.exchange.feeInWei
-const getEscrowFeeEstimate = (state: RootState) => state.fees.escrow.feeInWei
+const getReclaimEscrowFeeEstimate = (state: RootState) => state.fees.reclaimEscrow.feeInWei
 
 export function getFeeDollars(feeInWei: BigNumber | string) {
   const adjustedFee = divideByWei(
@@ -29,7 +29,9 @@ const feeEstimateSelectorFactory = (feeSelector: (state: RootState) => string | 
 export const getInviteFeeEstimateDollars = feeEstimateSelectorFactory(getInviteFeeEstimate)
 export const getSendFeeEstimateDollars = feeEstimateSelectorFactory(getSendFeeEstimate)
 export const getExchangeFeeEstimateDollars = feeEstimateSelectorFactory(getExchangeFeeEstimate)
-export const getEscrowFeeEstimateDollars = feeEstimateSelectorFactory(getEscrowFeeEstimate)
+export const getReclaimEscrowFeeEstimateDollars = feeEstimateSelectorFactory(
+  getReclaimEscrowFeeEstimate
+)
 
 export const getFeeEstimateDollars = (state: RootState, feeType: FeeType) => {
   switch (feeType) {
@@ -39,7 +41,7 @@ export const getFeeEstimateDollars = (state: RootState, feeType: FeeType) => {
       return getSendFeeEstimateDollars(state)
     case FeeType.EXCHANGE:
       return getExchangeFeeEstimateDollars(state)
-    case FeeType.ESCROW:
-      return getEscrowFeeEstimateDollars(state)
+    case FeeType.RECLAIM_ESCROW:
+      return getReclaimEscrowFeeEstimateDollars(state)
   }
 }

@@ -38,6 +38,7 @@ export async function getSendFee(account: string, contractGetter: any, params: B
   // create mock transaction and get gas
   const tx = await createTransaction(contractGetter, params)
   const txParams: any = { from: account, gasCurrency: contractGetter(web3)._address }
+  Logger.debug(`${TAG}/getSendFee`, `txParams:`, txParams)
   const gas: BigNumber = new BigNumber(await tx.estimateGas(txParams))
   const gasPrice: BigNumber = new BigNumber(await fetchGasPrice())
   Logger.debug(`${TAG}/getSendFee`, `estimated gas: ${gas}`)

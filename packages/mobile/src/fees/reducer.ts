@@ -36,12 +36,12 @@ export interface State {
   invite: FeeEstimateState
   send: FeeEstimateState
   exchange: FeeEstimateState
-  escrow: FeeEstimateState
+  reclaimEscrow: FeeEstimateState
 }
 
 export const reducer = combineReducers({
   invite: createEstimateReducer(FeeType.INVITE),
   send: createEstimateReducer(FeeType.SEND),
   exchange: createEstimateReducer(FeeType.EXCHANGE),
-  escrow: createEstimateReducer(FeeType.ESCROW),
+  reclaimEscrow: createEstimateReducer(FeeType.RECLAIM_ESCROW),
 })

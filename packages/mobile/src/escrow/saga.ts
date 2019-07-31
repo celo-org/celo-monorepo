@@ -26,6 +26,7 @@ import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
+import { fetchGasPrice } from 'src/web3/gas'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 
 const TAG = 'escrow/saga'
@@ -123,14 +124,35 @@ function* withdrawFromEscrow(action: EndVerificationAction) {
   }
 }
 
+async function createReclaimTransaction(paymentID: string) {
+  const escrow = await getEscrowContract(web3)
+  return escrow.methods.revoke(paymentID)
+}
+
+export async function getReclaimEscrowFee(account: string, paymentID: string) {
+  // create mock transaction and get gas
+  const tx = await createReclaimTransaction(paymentID)
+  // TODO(jeanregisser): looks like this ts error about _addresss is legit and shouldn't be ignored
+  // this was copied from getSendFee where no error was reported since there it was of type any
+  // @ts-ignore
+  const txParams: any = { from: account, gasCurrency: getEscrowContract(web3)._address }
+  Logger.debug(`${TAG}/getReclaimEscrowFee`, `txParams:`, txParams)
+  const gas: BigNumber = new BigNumber(await tx.estimateGas(txParams))
+  const gasPrice: BigNumber = new BigNumber(await fetchGasPrice())
+  Logger.debug(`${TAG}/getReclaimEscrowFee`, `estimated gas: ${gas}`)
+  Logger.debug(`${TAG}/getReclaimEscrowFee`, `gas price: ${gasPrice}`)
+  const feeInWei: BigNumber = gas.multipliedBy(gasPrice)
+  Logger.debug(`${TAG}/getReclaimEscrowFee`, `New fee is: ${feeInWei}`)
+  return feeInWei
+}
+
 function* reclaimFromEscrow(action: ReclaimPaymentAction) {
   try {
     const { paymentID } = action
-    const escrow = yield call(getEscrowContract, web3)
     const account = yield call(getConnectedUnlockedAccount)
 
     Logger.debug(TAG + '@reclaimFromEscrow', 'Reclaiming escrowed payment')
-    const reclaimTx = escrow.methods.revoke(paymentID)
+    const reclaimTx = yield call(createReclaimTransaction, paymentID)
     const txID = generateStandbyTransactionId(account)
     yield call(sendTransaction, reclaimTx, account, TAG, txID)
 

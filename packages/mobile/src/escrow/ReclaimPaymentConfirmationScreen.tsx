@@ -2,7 +2,6 @@ import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
-import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
@@ -16,11 +15,13 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import { EscrowedPayment, reclaimPayment } from 'src/escrow/actions'
 import ReclaimPaymentConfirmationCard from 'src/escrow/ReclaimPaymentConfirmationCard'
+import { FeeType } from 'src/fees/actions'
+import CalculateFee, { CalculateFeeChildren } from 'src/fees/CalculateFee'
+import { getFeeDollars } from 'src/fees/selectors'
 import { Namespaces } from 'src/i18n'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import { getSuggestedFeeDollars } from 'src/send/selectors'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -30,7 +31,6 @@ const TAG = 'escrow/ReclaimPaymentConfirmationScreen'
 interface StateProps {
   e164PhoneNumber: string
   account: string | null
-  fee: BigNumber
 }
 
 interface DispatchProps {
@@ -47,7 +47,6 @@ const mapStateToProps = (state: RootState): StateProps => {
   return {
     e164PhoneNumber: state.account.e164PhoneNumber,
     account: currentAccountSelector(state),
-    fee: getSuggestedFeeDollars(state),
   }
 }
 
@@ -94,9 +93,10 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
     return <ReviewHeader title={title} />
   }
 
-  render() {
-    const { t, fee } = this.props
+  renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
+    const { t } = this.props
     const payment = this.getReclaimPaymentInput()
+    const fee = asyncFee.result && getFeeDollars(asyncFee.result)
 
     return (
       <View style={styles.container}>
@@ -116,9 +116,29 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
             amount={payment.amount}
             currency={CURRENCY_ENUM.DOLLAR} // User can only request in Dollars
             fee={fee}
+            isLoadingFee={asyncFee.loading}
           />
         </ReviewFrame>
       </View>
+    )
+  }
+
+  render() {
+    const { account } = this.props
+    if (!account) {
+      throw Error('Account is required')
+    }
+
+    const payment = this.getReclaimPaymentInput()
+
+    return (
+      <CalculateFee
+        feeType={FeeType.RECLAIM_ESCROW}
+        account={account}
+        paymentID={payment.paymentID}
+      >
+        {this.renderWithAsyncFee}
+      </CalculateFee>
     )
   }
 }
