@@ -2,7 +2,7 @@ import { GethArgv } from '@celo/celotool/src/cmds/geth'
 import { spawnSync } from 'child_process'
 import fs from 'fs'
 import path from 'path'
-import { addCeloGethMiddleware, validateAccountAddress } from 'src/lib/utils'
+import { addCeloGethMiddleware, ensure0x, validateAccountAddress } from 'src/lib/utils'
 import * as yargs from 'yargs'
 
 const STATIC_NODES_FILE_NAME = 'static-nodes.json'
@@ -75,12 +75,10 @@ export const builder = (argv: yargs.Argv) => {
       description: 'Verbosity level',
       default: 5,
     })
-    .coerce('miner-address', (minerAddress: string) => {
-      if (minerAddress !== null && !minerAddress.startsWith('0x')) {
-        return '0x' + minerAddress
-      }
-      return minerAddress
-    })
+    .coerce(
+      'miner-address',
+      (minerAddress: string) => (minerAddress === null ? null : ensure0x(minerAddress))
+    )
 }
 
 export const handler = async (argv: RunArgv) => {

@@ -1,5 +1,6 @@
 import * as bodyParser from 'body-parser'
 import * as compression from 'compression'
+import * as slashes from 'connect-slashes'
 import * as express from 'express'
 import * as expressEnforcesSsl from 'express-enforces-ssl'
 import * as helmet from 'helmet'
@@ -7,9 +8,9 @@ import * as next from 'next'
 import nextI18NextMiddleware from 'next-i18next/middleware'
 import addToCRM from '../server/addToCRM'
 import nextI18next from '../src/i18n'
-import captchaVerify from './captchaVerify'
+import { faucetOrInviteController } from './controllers'
 import { submitFellowApp } from './FellowshipApp'
-import { RequestStatus, startFundRequest, startInviteRequest } from './FirebaseClient'
+import { RequestType } from './FirebaseClient'
 import mailer from './mailer'
 
 const port = parseInt(process.env.PORT, 10) || 3000
@@ -36,6 +37,7 @@ function wwwRedirect(req, res, nextAction) {
   server.use(wwwRedirect)
   server.enable('trust proxy')
   server.use(compression())
+  server.use(slashes(false))
 
   if (!dev) {
     server.use(expressEnforcesSsl())
@@ -68,10 +70,10 @@ function wwwRedirect(req, res, nextAction) {
   server.use(bodyParser.json())
   server.use(nextI18NextMiddleware(nextI18next))
 
-  server.post('/fellowship', (req, res) => {
+  server.post('/fellowship', async (req, res) => {
     const { ideas, email, name, bio, deliverables, resume } = req.body
 
-    submitFellowApp({
+    await submitFellowApp({
       name,
       email,
       ideas,
@@ -84,35 +86,21 @@ function wwwRedirect(req, res, nextAction) {
   })
 
   server.post('/faucet', async (req, res) => {
-    const { captchaToken, beneficiary } = req.body
-    const captchaResponse = await captchaVerify(captchaToken)
-    if (captchaResponse.success) {
-      const funding = await startFundRequest(beneficiary)
-      res.status(200).json(funding)
-    } else {
-      res.status(401).json({ status: RequestStatus.Failed })
-    }
+    await faucetOrInviteController(req, res, RequestType.Faucet)
   })
 
   server.post('/invite', async (req, res) => {
-    const { captchaToken, beneficiary } = req.body
-    const captchaResponse = await captchaVerify(captchaToken)
-    if (captchaResponse.success) {
-      const funding = await startInviteRequest(beneficiary)
-      res.status(200).json(funding)
-    } else {
-      res.status(401).json({ status: RequestStatus.Failed })
-    }
+    await faucetOrInviteController(req, res, RequestType.Invite)
   })
 
   server.post('/contacts', async (req, res) => {
-    addToCRM(req.body)
+    await addToCRM(req.body)
     res.status(204).send('ok')
   })
 
   server.post('/partnerships-email', async (req, res) => {
     const { email } = req.body
-    mailer({
+    await mailer({
       toName: 'Team Celo',
       toEmail: 'partnerships@celo.org',
       fromEmail: 'partnerships@celo.org',
