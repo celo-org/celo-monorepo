@@ -22,25 +22,6 @@ export default {
 }
 
 export const TextStyles = StyleSheet.create({
-  smallerSectionHeader: {
-    fontSize: 18,
-    fontFamily: Fonts.PRIMARY,
-    color: Colors.DARK_GRAY,
-    textRendering: 'geometricPrecision',
-  },
-  sectionHeader: {
-    fontSize: 24,
-    fontFamily: Fonts.PRIMARY,
-    color: Colors.DARK_GRAY,
-    textRendering: 'geometricPrecision',
-  },
-  main: {
-    fontSize: 18,
-    lineHeight: 34,
-    fontFamily: Fonts.PRIMARY,
-    color: Colors.DARK_GRAY,
-    textRendering: 'geometricPrecision',
-  },
   mediumMain: {
     fontSize: 24,
     lineHeight: 32,
@@ -86,15 +67,6 @@ export const TextStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '300',
     lineHeight: 20,
-    textRendering: 'geometricPrecision',
-  },
-  largeAllCaps: {
-    fontFamily: Fonts.PRIMARY,
-    color: Colors.DARK_GRAY,
-    fontSize: 20,
-    letterSpacing: 1.5,
-    fontWeight: '600',
-    lineHeight: 32,
     textRendering: 'geometricPrecision',
   },
   largeHeader: {

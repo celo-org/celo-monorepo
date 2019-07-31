@@ -4,7 +4,6 @@ import backerList from 'src/about/backers/backers'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Responsive from 'src/shared/Responsive'
-import { TextStyles } from 'src/shared/Styles'
 export const BACKER_ID = 'backers'
 import { H1, H4 } from 'src/fonts/Fonts'
 import Button, { BTN } from 'src/shared/Button.3'
@@ -41,9 +40,7 @@ export class Backers extends React.Component<I18nProps> {
                         style={styles.photo}
                       />
                     ) : (
-                      <Responsive medium={[TextStyles.mediumMain, styles.centerText]}>
-                        <Text style={[TextStyles.small, styles.centerText]}>{backer.name}</Text>
-                      </Responsive>
+                      <Text style={[fonts.h4, textStyles.center]}>{backer.name}</Text>
                     )}
                   </View>
                 </Responsive>
