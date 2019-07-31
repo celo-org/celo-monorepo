@@ -58,7 +58,7 @@
     "solidity-bytes-utils": "^0.0.7",
     "solidity-coverage": "rotcivegaf/solidity-coverage#5875f5b7",
     "truffle": "5.0.19",
-    "truffle-artifactor": "^3.0.7",
+    "truffle-artifactor": "^4.0.4",
     "truffle-resolver": "^4.0.4",
     "truffle-security": "^1.3.7",
     "twilio": "^3.23.2",
