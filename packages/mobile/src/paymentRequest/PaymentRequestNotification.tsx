@@ -79,7 +79,7 @@ export class PaymentRequestNotification extends React.Component<Props> {
   }
 
   isDisplayingNumber = () => {
-    return this.props.requester.displayPhoneNumber !== this.props.requester.displayName
+    return this.props.requester.displayId !== this.props.requester.displayName
   }
 
   render() {
@@ -103,7 +103,7 @@ export class PaymentRequestNotification extends React.Component<Props> {
           <View style={styles.body}>
             {this.isDisplayingNumber() && (
               <Text style={[fontStyles.subSmall, styles.phoneNumber]}>
-                {this.props.requester.displayPhoneNumber}
+                {this.props.requester.displayId}
               </Text>
             )}
             <Text style={[fontStyles.subSmall, styles.comment]}>{this.props.comment}</Text>

@@ -30,11 +30,7 @@ import EstimateFee from 'src/fees/EstimateFee'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
 import { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
-import {
-  getRecipientAddress,
-  getRecipientVerificationStatus,
-  VerificationStatus,
-} from 'src/identity/contactMapping'
+import { VerificationStatus } from 'src/identity/contactMapping'
 import { E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -43,7 +39,12 @@ import LabeledTextInput from 'src/send/LabeledTextInput'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
-import { Recipient, RecipientKind } from 'src/utils/recipient'
+import {
+  getAddressFromRecipient,
+  getRecipientVerificationStatus,
+  Recipient,
+  RecipientKind,
+} from 'src/utils/recipient'
 
 const MAX_COMMENT_LENGTH = 70
 
@@ -201,7 +202,8 @@ export class SendAmount extends React.PureComponent<Props, State> {
   getConfirmationInput = () => {
     const amount = parseInputAmount(this.state.amount)
     const recipient = this.getRecipient()
-    const recipientAddress = getRecipientAddress(recipient, this.props.e164NumberToAddress)
+    // TODO (Rossy) Remove address field from some recipient types.
+    const recipientAddress = getAddressFromRecipient(recipient, this.props.e164NumberToAddress)
 
     const { suggestedFeeDollars } = this.props
     if (!suggestedFeeDollars) {
@@ -317,8 +319,8 @@ export class SendAmount extends React.PureComponent<Props, State> {
 
   fetchLatestPhoneAddress = () => {
     const recipient = this.getRecipient()
-    if (recipient.kind === RecipientKind.QrCode) {
-      // Skip for QR codes
+    if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
+      // Skip for QR codes or Addresses
       return
     }
     if (!recipient.e164PhoneNumber) {
