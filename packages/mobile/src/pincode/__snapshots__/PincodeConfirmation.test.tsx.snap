@@ -147,6 +147,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
           allowFontScaling={true}
           autoFocus={true}
           keyboardType="numeric"
+          nativeInput={true}
           onChangeText={[Function]}
           onSubmitEditing={[Function]}
           placeholder="createPin.yourPin"
@@ -167,6 +168,7 @@ exports[`PincodeConfirmation renders correctly 1`] = `
           }
           textContentType="password"
           underlineColorAndroid="transparent"
+          validator="integer"
           value=""
         />
       </View>

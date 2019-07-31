@@ -364,15 +364,14 @@ exports[`Pincode renders correctly for pin enter 1`] = `
       >
         createPin.title
       </Text>
-      <TextInput
-        allowFontScaling={true}
+      <ValidatedTextInput
         autoFocus={true}
         keyboardType="numeric"
         maxLength={6}
+        nativeInput={true}
         onChangeText={[Function]}
         onSubmitEditing={[Function]}
         placeholder="createPin.yourPin"
-        rejectResponderTermination={true}
         secureTextEntry={true}
         style={
           Object {
@@ -388,7 +387,7 @@ exports[`Pincode renders correctly for pin enter 1`] = `
           }
         }
         textContentType="password"
-        underlineColorAndroid="transparent"
+        validator="integer"
         value=""
       />
     </View>
@@ -491,15 +490,14 @@ exports[`Pincode renders correctly for pin re-enter 1`] = `
       >
         verifyPin.title
       </Text>
-      <TextInput
-        allowFontScaling={true}
+      <ValidatedTextInput
         autoFocus={true}
         keyboardType="numeric"
         maxLength={6}
+        nativeInput={true}
         onChangeText={[Function]}
         onSubmitEditing={[Function]}
         placeholder="createPin.yourPin"
-        rejectResponderTermination={true}
         secureTextEntry={true}
         style={
           Object {
@@ -515,7 +513,7 @@ exports[`Pincode renders correctly for pin re-enter 1`] = `
           }
         }
         textContentType="password"
-        underlineColorAndroid="transparent"
+        validator="integer"
         value=""
       />
     </View>
