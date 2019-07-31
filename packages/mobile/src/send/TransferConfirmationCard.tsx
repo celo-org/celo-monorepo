@@ -150,7 +150,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
   ) => {
     const { t } = this.props
     const currencyStyle = getCurrencyStyles(currency, type)
-    const amountWithFees = total.plus(this.props.fee || 0)
+    const amountWithFees = total.plus(fee || 0)
 
     if (type === TransactionTypes.VERIFICATION_FEE) {
       return <Text style={style.pSmall}>{t('receiveFlow8:verificationMessage')}</Text>

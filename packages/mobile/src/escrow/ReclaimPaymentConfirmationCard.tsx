@@ -134,7 +134,7 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
             {currencySymbol}
           </Text>
           <Text style={[fontStyles.body, style.amount, { color: currencyColor }]}>
-            {getMoneyDisplayValue(amount.minus(this.props.fee || 0))}
+            {getMoneyDisplayValue(amount.minus(fee || 0))}
           </Text>
         </View>
         <View style={style.horizontalLine} />
