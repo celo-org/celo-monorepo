@@ -37,12 +37,13 @@ const MNEMONIC_BIT_LENGTH = (ETH_PRIVATE_KEY_LENGTH * 8) / 2
 
 const TAG = 'web3/saga'
 // The timeout for web3 to complete syncing and the latestBlock to be > 0
-const CHECK_SYNC_PROGRESS_TIMEOUT = 60000
+export const CHECK_SYNC_PROGRESS_TIMEOUT = 60000
 const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect to node on IPC."
 
 let AssignAccountLock = false
 
 // checks if web3 claims it is currently syncing or not
+// exported for testing
 function* checkWeb3SyncProgressClaim() {
   while (true) {
     try {
@@ -86,7 +87,7 @@ export function* checkWeb3Sync() {
         navigateToError('web3FailedToSync')
       }
 
-      const latestBlock: Block = yield getLatestBlock()
+      const latestBlock: Block = yield call(getLatestBlock)
       if (latestBlock && latestBlock.number > 0) {
         yield put(setLatestBlockNumber(latestBlock.number))
       } else {
@@ -96,11 +97,11 @@ export function* checkWeb3Sync() {
         )
       }
     } catch (error) {
-      Logger.error(TAG, `checkSyncProgressWorker error: ${error}`)
+      Logger.error(TAG, 'checkWeb3Sync', error)
       navigateToError('errorDuringSync')
     }
   } catch (error) {
-    Logger.error(TAG, `checkSyncProgressWorker saga error: ${error}`)
+    Logger.error(TAG, 'checkWeb3Sync saga error', error)
   }
 }
 
@@ -225,3 +226,6 @@ export function* watchRefreshGasPrice() {
 export function* web3Saga() {
   yield spawn(watchRefreshGasPrice)
 }
+
+// exported for testing
+export const _checkWeb3SyncProgressClaim = checkWeb3SyncProgressClaim
