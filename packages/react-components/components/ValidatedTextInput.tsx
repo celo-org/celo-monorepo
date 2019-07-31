@@ -1,3 +1,10 @@
+/**
+ * TextInput with input validation, interchangeable with `./TextInput.tsx` and
+ * React Native's TextInput if input validation is required.  Set the
+ * `nativeInput` prop to `true` for RN TextInput replacement without visual
+ * changes.
+ */
+
 import TextInput from '@celo/react-components/components/TextInput'
 import { validateInput, ValidatorKind } from '@celo/utils/src/inputValidation'
 import * as React from 'react'

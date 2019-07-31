@@ -1,3 +1,9 @@
+/**
+ * TextInput with label, such as an input for SendAmount with a dollar sign on
+ * the left of the input.  Uses ValidatedTextInput to validate various kinds of
+ * input.
+ */
+
 import ValidatedTextInput, {
   ValidatorProps,
 } from '@celo/react-components/components/ValidatedTextInput'
