@@ -9,12 +9,14 @@ metadata:
     heritage: {{ .Release.Service }}
     component: bootnode
 spec:
+  {{ if $.Values.geth.static_ips }}
+  type: LoadBalancer
+  loadBalancerIP: {{ .Values.geth.bootnodeIpAddress }}
+  {{ end }}
   selector:
     app: {{ template "ethereum.name" . }}
     release: {{ .Release.Name }}
     component: bootnode
-  type: LoadBalancer
-  loadBalancerIP: {{ .Values.geth.bootnodeIpAddress }}
   ports:
   - name: discovery
     port: 30301

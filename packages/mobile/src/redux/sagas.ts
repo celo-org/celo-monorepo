@@ -8,7 +8,7 @@ import { firebaseSaga } from 'src/firebase/saga'
 import { gethSaga } from 'src/geth/saga'
 import { goldTokenSaga } from 'src/goldToken/saga'
 import { homeSaga } from 'src/home/saga'
-import { abeSaga } from 'src/identity/saga'
+import { identitySaga } from 'src/identity/saga'
 import { importSaga } from 'src/import/saga'
 import { inviteSaga } from 'src/invite/saga'
 import { networkInfoSaga } from 'src/networkInfo/saga'
@@ -27,6 +27,7 @@ const loggerBlacklist = [
   'WEB3/SET_COMMENT_KEY',
   'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
   'IDENTITY/FETCH_PHONE_ADDRESSES',
+  'INVITE/REDEEM_INVITE',
 ]
 
 function* loggerSaga() {
@@ -54,7 +55,7 @@ export function* rootSaga() {
   yield spawn(networkInfoSaga)
   yield spawn(gethSaga)
   yield spawn(web3Saga)
-  yield spawn(abeSaga)
+  yield spawn(identitySaga)
   yield spawn(goldTokenSaga)
   yield spawn(stableTokenSaga)
   yield spawn(sendSaga)

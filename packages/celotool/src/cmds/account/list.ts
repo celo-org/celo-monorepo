@@ -113,7 +113,7 @@ async function getNonverificationTransactions(transactionUrl: string) {
       const resp = await fetch(transactionUrl)
       jsonResp = await resp.json()
     } catch (e) {
-      sleep(Math.random() * 5000)
+      await sleep(Math.random() * 5000)
     }
   }
 

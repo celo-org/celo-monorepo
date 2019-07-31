@@ -33,6 +33,7 @@
   "backToWallet": "Volver a el Monedero",
   "exchangeForGold": "Cambiar a Oro",
   "restoreCeloWallet": "Restaurar el Monedero Celo",
+  "cantSelectInvalidPhone": "No se puede seleccionar el contacto: número de teléfono no válido",
   "invalidKey": "Clave de respaldo inválida ",
   "invalidPhone": "Número de teléfono inválido",
   "invalidAmount": "Monto invalido",

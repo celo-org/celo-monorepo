@@ -6,6 +6,7 @@ exports[`PhoneNumberInput when defaultCountry renders defaults 1`] = `
     Array [
       undefined,
       Object {
+        "backgroundColor": "#FFFFFF",
         "position": "relative",
       },
     ]
@@ -18,6 +19,9 @@ exports[`PhoneNumberInput when defaultCountry renders defaults 1`] = `
           "borderColor": "#D1D5D8",
           "borderRadius": 3,
           "borderWidth": 1,
+        },
+        Object {
+          "height": 50,
         },
         Object {
           "alignItems": "center",
@@ -96,11 +100,15 @@ exports[`PhoneNumberInput when defaultCountry renders defaults 1`] = `
             "flexDirection": "row",
             "justifyContent": "center",
           },
-          Object {
-            "backgroundColor": "#FFFFFF",
-            "flex": 1,
-            "marginLeft": 2,
-          },
+          Array [
+            Object {
+              "height": 50,
+            },
+            Object {
+              "flex": 1,
+              "marginLeft": 9,
+            },
+          ],
         ]
       }
     >
@@ -113,6 +121,7 @@ exports[`PhoneNumberInput when defaultCountry renders defaults 1`] = `
         onChangeText={[Function]}
         onFocus={[Function]}
         placeholder=""
+        placeholderTextColor="#D1D5D8"
         rejectResponderTermination={true}
         secureTextEntry={false}
         style={
@@ -147,6 +156,7 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
     Array [
       undefined,
       Object {
+        "backgroundColor": "#FFFFFF",
         "position": "relative",
       },
     ]
@@ -177,6 +187,10 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
               "borderWidth": 1,
             },
             Object {
+              "height": 50,
+            },
+            Object {
+              "marginTop": 1,
               "padding": 3,
             },
           ],
@@ -212,6 +226,7 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
           onChangeText={[Function]}
           onFocus={[Function]}
           placeholder=""
+          placeholderTextColor="#D1D5D8"
           rejectResponderTermination={true}
           secureTextEntry={false}
           style={
@@ -295,11 +310,15 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
             "flexDirection": "row",
             "justifyContent": "center",
           },
-          Object {
-            "backgroundColor": "#FFFFFF",
-            "flex": 1,
-            "marginLeft": 2,
-          },
+          Array [
+            Object {
+              "height": 50,
+            },
+            Object {
+              "flex": 1,
+              "marginLeft": 9,
+            },
+          ],
         ]
       }
     >
@@ -312,6 +331,7 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
         onChangeText={[Function]}
         onFocus={[Function]}
         placeholder=""
+        placeholderTextColor="#D1D5D8"
         rejectResponderTermination={true}
         secureTextEntry={false}
         style={

@@ -13,6 +13,7 @@ interface Props {
   size: number
   preferNameInitial?: boolean
   thumbnailPath?: string | null
+  displayInitials?: string | null
 }
 
 export const contactIconColors = [colors.teal, colors.orange, colors.purple]
@@ -25,7 +26,7 @@ const getNameInitial = (name: string) => name.charAt(0).toLocaleUpperCase()
 
 export default class ContactCircle extends React.PureComponent<Props> {
   getContactCircleInner = () => {
-    const { contact, name, size, preferNameInitial, thumbnailPath } = this.props
+    const { contact, name, size, preferNameInitial, thumbnailPath, displayInitials } = this.props
     const resolvedThumbnail = thumbnailPath || (contact && contact.thumbnailPath)
     if (resolvedThumbnail) {
       return (
@@ -38,6 +39,11 @@ export default class ContactCircle extends React.PureComponent<Props> {
     }
     const fontSize = size / 2.0
     const textStyle = [fontStyles.iconText, { fontSize }]
+
+    if (displayInitials) {
+      return <Text style={textStyle}>{displayInitials}</Text>
+    }
+
     const initials =
       (preferNameInitial && name && getNameInitial(name)) ||
       (contact && getContactInitial(contact)) ||

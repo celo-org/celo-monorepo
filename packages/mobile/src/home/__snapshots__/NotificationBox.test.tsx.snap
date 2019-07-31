@@ -141,9 +141,9 @@ exports[`NotificationBox Backup too late test 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#81868B",
+                            "color": "#2E3338",
                             "fontFamily": "Hind-Regular",
-                            "fontSize": 13,
+                            "fontSize": 14,
                             "lineHeight": 18,
                           },
                           Object {
@@ -292,9 +292,9 @@ exports[`NotificationBox Backup too late test 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#81868B",
+                            "color": "#2E3338",
                             "fontFamily": "Hind-Regular",
-                            "fontSize": 13,
+                            "fontSize": 14,
                             "lineHeight": 18,
                           },
                           Object {
@@ -331,9 +331,9 @@ exports[`NotificationBox Backup too late test 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#81868B",
+                            "color": "#2E3338",
                             "fontFamily": "Hind-Regular",
-                            "fontSize": 13,
+                            "fontSize": 14,
                             "lineHeight": 18,
                           },
                           Object {
@@ -539,9 +539,9 @@ exports[`NotificationBox Educations not completed yet 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#81868B",
+                            "color": "#2E3338",
                             "fontFamily": "Hind-Regular",
-                            "fontSize": 13,
+                            "fontSize": 14,
                             "lineHeight": 18,
                           },
                           Object {
@@ -578,9 +578,9 @@ exports[`NotificationBox Educations not completed yet 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#81868B",
+                            "color": "#2E3338",
                             "fontFamily": "Hind-Regular",
-                            "fontSize": 13,
+                            "fontSize": 14,
                             "lineHeight": 18,
                           },
                           Object {
@@ -791,9 +791,9 @@ exports[`NotificationBox Payment Requests exist 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#81868B",
+                            "color": "#2E3338",
                             "fontFamily": "Hind-Regular",
-                            "fontSize": 13,
+                            "fontSize": 14,
                             "lineHeight": 18,
                           },
                           Object {
@@ -963,9 +963,9 @@ exports[`NotificationBox Simple test 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#81868B",
+                            "color": "#2E3338",
                             "fontFamily": "Hind-Regular",
-                            "fontSize": 13,
+                            "fontSize": 14,
                             "lineHeight": 18,
                           },
                           Object {
@@ -1114,9 +1114,9 @@ exports[`NotificationBox Simple test 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#81868B",
+                            "color": "#2E3338",
                             "fontFamily": "Hind-Regular",
-                            "fontSize": 13,
+                            "fontSize": 14,
                             "lineHeight": 18,
                           },
                           Object {
@@ -1153,9 +1153,9 @@ exports[`NotificationBox Simple test 1`] = `
                       style={
                         Array [
                           Object {
-                            "color": "#81868B",
+                            "color": "#2E3338",
                             "fontFamily": "Hind-Regular",
-                            "fontSize": 13,
+                            "fontSize": 14,
                             "lineHeight": 18,
                           },
                           Object {

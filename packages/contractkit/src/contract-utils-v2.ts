@@ -1,12 +1,12 @@
-import { Exchange } from '@celo/contractkit/types/Exchange'
-import { GasPriceMinimum as GasPriceMinimumType } from '@celo/contractkit/types/GasPriceMinimum'
-import { GoldToken as GoldTokenType } from '@celo/contractkit/types/GoldToken'
-import { StableToken as StableTokenType } from '@celo/contractkit/types/StableToken'
 import { CURRENCY_ENUM as Tokens } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
 import { TransactionReceipt } from 'web3/types'
+import { Exchange } from '../types/Exchange'
+import { GasPriceMinimum as GasPriceMinimumType } from '../types/GasPriceMinimum'
+import { GoldToken as GoldTokenType } from '../types/GoldToken'
+import { StableToken as StableTokenType } from '../types/StableToken'
 import {
   getExchangeContract,
   getGasPriceMinimumContract,

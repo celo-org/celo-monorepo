@@ -297,7 +297,7 @@ exports[`Verifying process renders the fully verified state correctly 1`] = `
           ]
         }
       >
-        ab8049b95ac02e989aae8b61fddc10fe9b3ac3c6aebcd3e68be495570b2d3da15aabc691ab88de69648f988fab653ac943f67404e532cfd1013627f56365f36501
+        q4BJuVrALpiaroth/dwQ/ps6w8auvNPmi+SVVwstPaFaq8aRq4jeaWSPmI+rZTrJQ/Z0BOUyz9EBNif1Y2XzZQE=
       </Text>
       <Text
         ellipsizeMode="tail"
@@ -319,7 +319,7 @@ exports[`Verifying process renders the fully verified state correctly 1`] = `
           ]
         }
       >
-        ab8049b95ac02e989aae8b61fddc10fe9b3ac3c6aebcd3e68be495570b2d3da15aabc691ab88de69648f988fab653ac943f67404e532cfd1013627f56365f36501
+        q4BJuVrALpiaroth/dwQ/ps6w8auvNPmi+SVVwstPaFaq8aRq4jeaWSPmI+rZTrJQ/Z0BOUyz9EBNif1Y2XzZQE=
       </Text>
       <Text
         ellipsizeMode="tail"
@@ -341,7 +341,7 @@ exports[`Verifying process renders the fully verified state correctly 1`] = `
           ]
         }
       >
-        ab8049b95ac02e989aae8b61fddc10fe9b3ac3c6aebcd3e68be495570b2d3da15aabc691ab88de69648f988fab653ac943f67404e532cfd1013627f56365f36501
+        q4BJuVrALpiaroth/dwQ/ps6w8auvNPmi+SVVwstPaFaq8aRq4jeaWSPmI+rZTrJQ/Z0BOUyz9EBNif1Y2XzZQE=
       </Text>
       <Text
         ellipsizeMode="tail"
@@ -1291,7 +1291,7 @@ exports[`Verifying process renders the partially verified state correctly 1`] = 
           ]
         }
       >
-        ab8049b95ac02e989aae8b61fddc10fe9b3ac3c6aebcd3e68be495570b2d3da15aabc691ab88de69648f988fab653ac943f67404e532cfd1013627f56365f36501
+        q4BJuVrALpiaroth/dwQ/ps6w8auvNPmi+SVVwstPaFaq8aRq4jeaWSPmI+rZTrJQ/Z0BOUyz9EBNif1Y2XzZQE=
       </Text>
       <Text
         ellipsizeMode="tail"
@@ -1725,7 +1725,7 @@ exports[`Verifying process renders the verification error state correctly 1`] = 
           ]
         }
       >
-        ab8049b95ac02e989aae8b61fddc10fe9b3ac3c6aebcd3e68be495570b2d3da15aabc691ab88de69648f988fab653ac943f67404e532cfd1013627f56365f36501
+        q4BJuVrALpiaroth/dwQ/ps6w8auvNPmi+SVVwstPaFaq8aRq4jeaWSPmI+rZTrJQ/Z0BOUyz9EBNif1Y2XzZQE=
       </Text>
       <Text
         ellipsizeMode="tail"
@@ -1742,7 +1742,7 @@ exports[`Verifying process renders the verification error state correctly 1`] = 
           }
         }
       >
-        ab8049b95ac02e989aae8b61fddc10fe9b3ac3c6aebcd3e68be495570b2d3da15aabc691ab88de69648f988fab653ac943f67404e532cfd1013627f56365f36501
+        q4BJuVrALpiaroth/dwQ/ps6w8auvNPmi+SVVwstPaFaq8aRq4jeaWSPmI+rZTrJQ/Z0BOUyz9EBNif1Y2XzZQE=
       </Text>
       <Text
         ellipsizeMode="tail"
@@ -2313,6 +2313,7 @@ exports[`renders the Input step correctly 1`] = `
               "marginTop": 10,
             },
             Object {
+              "backgroundColor": "#FFFFFF",
               "position": "relative",
             },
           ]
@@ -2343,6 +2344,10 @@ exports[`renders the Input step correctly 1`] = `
                     "borderWidth": 1,
                   },
                   Object {
+                    "height": 50,
+                  },
+                  Object {
+                    "marginTop": 1,
                     "padding": 3,
                   },
                 ],
@@ -2378,6 +2383,7 @@ exports[`renders the Input step correctly 1`] = `
                 onChangeText={[Function]}
                 onFocus={[Function]}
                 placeholder="country"
+                placeholderTextColor="#D1D5D8"
                 rejectResponderTermination={true}
                 secureTextEntry={false}
                 style={
@@ -2461,11 +2467,15 @@ exports[`renders the Input step correctly 1`] = `
                   "flexDirection": "row",
                   "justifyContent": "center",
                 },
-                Object {
-                  "backgroundColor": "#FFFFFF",
-                  "flex": 1,
-                  "marginLeft": 2,
-                },
+                Array [
+                  Object {
+                    "height": 50,
+                  },
+                  Object {
+                    "flex": 1,
+                    "marginLeft": 9,
+                  },
+                ],
               ]
             }
           >
@@ -2478,6 +2488,7 @@ exports[`renders the Input step correctly 1`] = `
               onChangeText={[Function]}
               onFocus={[Function]}
               placeholder="phoneNumber"
+              placeholderTextColor="#D1D5D8"
               rejectResponderTermination={true}
               secureTextEntry={false}
               style={

@@ -23,6 +23,7 @@ import io.sentry.RNSentryPackage;
 import com.bitgo.randombytes.RandomBytesPackage;
 import com.corbt.keepawake.KCKeepAwakePackage;
 import com.facebook.react.ReactApplication;
+import com.burnweb.rnsendintent.RNSendIntentPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
@@ -40,7 +41,6 @@ import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import com.peel.react.TcpSocketsModule;
 import com.reactcommunity.rnlanguages.RNLanguagesPackage;
 import com.reactnativegeth.RNGethPackage;
-import com.rhaker.reactnativesmsandroid.RNSmsAndroidPackage;
 import com.rnfs.RNFSPackage;
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
 import com.tradle.react.UdpSocketsModule;
@@ -80,6 +80,7 @@ public class MainApplication extends MultiDexApplication implements ShareApplica
 
       ReactPackage basePackages[] = new ReactPackage[] {
               new MainReactPackage(),
+              new RNSendIntentPackage(),
               new RNCWebViewPackage(),
               new NetInfoPackage(),
               new RNGestureHandlerPackage(),
@@ -101,7 +102,6 @@ public class MainApplication extends MultiDexApplication implements ShareApplica
               new TcpSocketsModule(),
               new RNSentryPackage(),
               new RandomBytesPackage(),
-              new RNSmsAndroidPackage(),
               new SvgPackage(),
               new ReactNativeContacts(),
               new KCKeepAwakePackage(),

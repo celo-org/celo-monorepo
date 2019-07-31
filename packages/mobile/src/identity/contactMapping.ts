@@ -9,34 +9,30 @@ import { setUserContactDetails } from 'src/account'
 import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/reducer'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { FetchPhoneAddressesAction, updateE164PhoneNumberAddresses } from 'src/identity/actions'
+import {
+  endImportContacts,
+  FetchPhoneAddressesAction,
+  updateE164PhoneNumberAddresses,
+} from 'src/identity/actions'
 import {
   AddressToE164NumberType,
   e164NumberToAddressSelector,
   E164NumberToAddressType,
 } from 'src/identity/reducer'
-import { waitForUserVerified } from 'src/identity/verification'
 import { setRecipientCache } from 'src/send/actions'
 import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
-import {
-  contactsToRecipients,
-  NumberToRecipient,
-  Recipient,
-  RecipientKind,
-} from 'src/utils/recipient'
+import { contactsToRecipients, NumberToRecipient } from 'src/utils/recipient'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
 
 const TAG = 'identity/contactMapping'
-const MAPPING_CHUNK_SIZE = 50
+const MAPPING_CHUNK_SIZE = 25
+const NUM_PARALLEL_REQUESTS = 3
 
 export function* doImportContacts() {
   try {
     yield call(getConnectedAccount)
-
-    // TODO(Rossy): After new Invite screen is in place, change this to wait for phone number inputted
-    yield call(waitForUserVerified)
 
     Logger.debug(TAG, 'Importing user contacts')
 
@@ -62,9 +58,11 @@ export function* doImportContacts() {
     yield call(lookupNewRecipients, e164NumberToAddress, e164NumberToRecipients, otherRecipients)
 
     Logger.debug(TAG, 'Done importing user contacts')
+    yield put(endImportContacts(true))
   } catch (error) {
     Logger.error(TAG, 'Error importing user contacts', error)
     yield put(showError(ErrorMessages.IMPORT_CONTACTS_FAILED))
+    yield put(endImportContacts(false))
   }
 }
 
@@ -116,13 +114,26 @@ function* lookupNewRecipients(
   Logger.debug(TAG, `Total new recipients found: ${newE164Numbers.length}`)
 
   const attestationsContract: AttestationsType = yield call(getAttestationsContract, web3)
-  yield all(
-    chunk(newE164Numbers, MAPPING_CHUNK_SIZE).map((numbersChunk) =>
-      call(fetchAndStoreAddressMappings, attestationsContract, numbersChunk)
-    )
+
+  // If chunk sizes are too large, or number of parallel lookups too high
+  // we see errors from web3. So we break things down and limit parallelization
+  // This is still not perfect, errors due still occur randomly for some chunks
+  const numberChunks = chunk(newE164Numbers, MAPPING_CHUNK_SIZE)
+  const requestChunks = chunk(numberChunks, NUM_PARALLEL_REQUESTS)
+  Logger.debug(
+    TAG,
+    `Lookup up: ${numberChunks.length} number chunks across ${requestChunks.length} request rounds`
   )
+  for (const requestChunk of requestChunks) {
+    yield all(
+      requestChunk.map((numberChunk) =>
+        call(fetchAndStoreAddressMappings, attestationsContract, numberChunk)
+      )
+    )
+  }
 
   // Now that mappings are updated, update the recipient objects
+  // TODO(Rossy) Consider revisiting the use of addresses in recip objects (to avoid confusion with the maps)
   const updatedE164NumberToAddress: E164NumberToAddressType = yield select(
     e164NumberToAddressSelector
   )
@@ -170,6 +181,8 @@ export function* fetchAndStoreAddressMappings(
       throw new Error('Address lookup length did not match numbers list length')
     }
 
+    Logger.debug(TAG, `Retrieved ${addresses.length} addresses`)
+
     const e164NumberToAddressUpdates: E164NumberToAddressType = {}
     const addressToE164NumberUpdates: AddressToE164NumberType = {}
 
@@ -213,21 +226,6 @@ export enum VerificationStatus {
   UNKNOWN = 2,
 }
 
-export function getRecipientAddress(
-  recipient: Recipient,
-  e164NumberToAddress: E164NumberToAddressType
-): string | null | undefined {
-  if (recipient.kind === RecipientKind.QrCode && recipient.address) {
-    return recipient.address
-  }
-
-  if (!recipient.e164PhoneNumber) {
-    throw new Error('Missing recipient e164Number')
-  }
-
-  return getPhoneNumberAddress(recipient.e164PhoneNumber, e164NumberToAddress)
-}
-
 export function getPhoneNumberAddress(
   e164Number: string,
   e164NumberToAddress: E164NumberToAddressType
@@ -237,21 +235,6 @@ export function getPhoneNumberAddress(
   }
 
   return e164NumberToAddress[e164Number]
-}
-
-export function getRecipientVerificationStatus(
-  recipient: Recipient,
-  e164NumberToAddress: E164NumberToAddressType
-): VerificationStatus {
-  if (recipient.kind === RecipientKind.QrCode && recipient.address) {
-    return VerificationStatus.VERIFIED
-  }
-
-  if (!recipient.e164PhoneNumber) {
-    throw new Error('No recipient e164Number found')
-  }
-
-  return getPhoneNumberVerificationStatus(recipient.e164PhoneNumber, e164NumberToAddress)
 }
 
 export function getPhoneNumberVerificationStatus(

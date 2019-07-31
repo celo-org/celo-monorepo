@@ -9,6 +9,7 @@ import { validateMnemonic } from 'react-native-bip39'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
+import { errorSelector } from 'src/alert/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -50,9 +51,8 @@ interface StateProps {
 type Props = StateProps & DispatchProps & WithNamespaces
 
 const mapStateToProps = (state: RootState): StateProps => {
-  const { alert } = state
   return {
-    error: (alert && alert.underlyingError) || null,
+    error: errorSelector(state),
   }
 }
 
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   scrollContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
   },
   h1: {
     textAlign: 'center',

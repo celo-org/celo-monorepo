@@ -1,18 +1,24 @@
 import { applyMiddleware, compose, createStore } from 'redux'
-import { persistReducer, persistStore } from 'redux-persist'
+import { createMigrate, persistReducer, persistStore } from 'redux-persist'
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2'
 import storage from 'redux-persist/lib/storage'
 import createSagaMiddleware from 'redux-saga'
 import thunk from 'redux-thunk'
+import { migrations } from 'src/redux/migrations'
 import rootReducer from 'src/redux/reducers'
 import { rootSaga } from 'src/redux/sagas'
 
-const persistConfig = {
+const persistConfig: any = {
   key: 'root',
-  version: -1, // default is -1, increment as we make migrations
+  version: 0, // default is -1, increment as we make migrations
   storage,
   blacklist: ['home', 'geth', 'exchange', 'networkInfo', 'alert'],
   stateReconciler: autoMergeLevel2,
+  migrate: createMigrate(migrations, { debug: true }),
+}
+
+if (__DEV__) {
+  persistConfig.timeout = 10000
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

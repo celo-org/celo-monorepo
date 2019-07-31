@@ -3,14 +3,20 @@ const { navigateReset } = mockNavigationServiceFor('invite/saga')
 
 import { FetchMock } from 'jest-fetch-mock'
 import { Linking } from 'react-native'
-import SmsAndroid from 'react-native-sms-android'
+import SendIntentAndroid from 'react-native-send-intent'
 import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
 import { setName } from 'src/account'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ERROR_BANNER_DURATION } from 'src/config'
-import { InviteBy, redeemInvite, sendInvite, storeInviteeData } from 'src/invite/actions'
+import {
+  InviteBy,
+  redeemComplete,
+  redeemInvite,
+  sendInvite,
+  storeInviteeData,
+} from 'src/invite/actions'
 import { watchRedeemInvite, watchSendInvite } from 'src/invite/saga'
 import { transactionConfirmed } from 'src/transactions/actions'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -42,9 +48,16 @@ jest.mock('src/account/actions', () => ({
   getPincode: async () => 'pin',
 }))
 
+jest.mock('src/invite/actions', () => ({
+  ...jest.requireActual('src/invite/actions'),
+  redeemComplete: () => jest.fn(),
+}))
+
 jest.mock('src/transactions/send', () => ({
   sendTransaction: async () => true,
 }))
+
+SendIntentAndroid.sendSms = jest.fn()
 
 const state = createMockStore({ web3: { account: mockAccount } }).getState()
 
@@ -67,7 +80,7 @@ describe(watchSendInvite, () => {
       .put(storeInviteeData(KEY, mockE164Number))
       .run()
 
-    expect(SmsAndroid.sms).toHaveBeenCalled()
+    expect(SendIntentAndroid.sendSms).toHaveBeenCalled()
   })
 
   it('sends a WhatsApp invite as expected', async () => {
@@ -101,9 +114,8 @@ describe(watchRedeemInvite, () => {
       .withState(state)
       .dispatch(redeemInvite(KEY, NAME))
       .put(setName(NAME))
+      .dispatch(redeemComplete(true))
       .run()
-
-    expect(navigateReset).toHaveBeenCalled()
   })
 
   it('fails with a valid private key but unsuccessful transfer', async () => {
@@ -150,8 +162,7 @@ describe(watchRedeemInvite, () => {
       .withState(state)
       .dispatch(redeemInvite(KEY, NAME))
       .put(setName(NAME))
+      .dispatch(redeemComplete(true))
       .run()
-
-    expect(navigateReset).toHaveBeenCalled()
   })
 })
