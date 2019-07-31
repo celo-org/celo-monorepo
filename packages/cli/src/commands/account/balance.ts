@@ -1,5 +1,6 @@
+import { StableToken } from '@celo/contractkit'
+
 import { BaseCommand } from '../../base'
-import { StableToken } from '../../generated/contracts'
 import { printValueMap } from '../../utils/cli'
 import { Args } from '../../utils/command'
 

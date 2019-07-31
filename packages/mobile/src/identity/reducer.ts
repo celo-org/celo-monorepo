@@ -2,6 +2,9 @@ import { Actions, ActionTypes } from 'src/identity/actions'
 import { AttestationCode, NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import { RootState } from 'src/redux/reducers'
 
+export const ATTESTATION_CODE_PLACEHOLDER = 'ATTESTATION_CODE_PLACEHOLDER'
+export const ATTESTATION_ISSUER_PLACEHOLDER = 'ATTESTATION_ISSUER_PLACEHOLDER'
+
 export interface AddressToE164NumberType {
   [address: string]: string | null
 }
@@ -46,7 +49,7 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
       return action.success
         ? {
             ...state,
-            numCompleteAttestations: NUM_ATTESTATIONS_REQUIRED,
+            ...completeCodeReducer(state, NUM_ATTESTATIONS_REQUIRED),
             verificationFailed: false,
           }
         : {
@@ -62,7 +65,7 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
     case Actions.COMPLETE_ATTESTATION_CODE:
       return {
         ...state,
-        numCompleteAttestations: state.numCompleteAttestations + action.numComplete,
+        ...completeCodeReducer(state, state.numCompleteAttestations + action.numComplete),
       }
     case Actions.UPDATE_E164_PHONE_NUMBER_ADDRESSES:
       return {
@@ -91,6 +94,21 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
       }
     default:
       return state
+  }
+}
+
+const completeCodeReducer = (state: State, numCompleteAttestations: number) => {
+  const { attestationCodes } = state
+  // Ensure numCompleteAttestations many codes are filled
+  for (let i = 0; i < numCompleteAttestations; i++) {
+    attestationCodes[i] = attestationCodes[i] || {
+      code: ATTESTATION_CODE_PLACEHOLDER,
+      issuer: ATTESTATION_ISSUER_PLACEHOLDER,
+    }
+  }
+  return {
+    numCompleteAttestations,
+    attestationCodes: [...attestationCodes],
   }
 }
 
