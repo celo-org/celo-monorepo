@@ -132,11 +132,10 @@ async function createReclaimTransaction(paymentID: string) {
 export async function getReclaimEscrowFee(account: string, paymentID: string) {
   // create mock transaction and get gas
   const tx = await createReclaimTransaction(paymentID)
-  // TODO(jeanregisser): looks like this ts error about _addresss is legit and shouldn't be ignored
-  // this was copied from getSendFee where no error was reported since there it was of type any
-  // @ts-ignore
-  const txParams: any = { from: account, gasCurrency: getEscrowContract(web3)._address }
-  Logger.debug(`${TAG}/getReclaimEscrowFee`, `txParams:`, txParams)
+  const txParams = {
+    from: account,
+    gasCurrency: (await getStableTokenContract(web3))._address,
+  }
   const gas = new BigNumber(await tx.estimateGas(txParams))
   const gasPrice = new BigNumber(await fetchGasPrice())
   Logger.debug(`${TAG}/getReclaimEscrowFee`, `estimated gas: ${gas}`)
