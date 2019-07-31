@@ -1,10 +1,12 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import Link from '@celo/react-components/components/Link'
+import ValidatedTextInput from '@celo/react-components/components/ValidatedTextInput'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
+import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { pincodeSet, setPin } from 'src/account/actions'
 import { hideAlert, showError } from 'src/alert/actions'
@@ -162,8 +164,9 @@ export class Pincode extends React.Component<Props, State> {
         return (
           <View style={style.pincodeContent}>
             <Text style={[fontStyles.h1, style.h1]}>{t('createPin.title')}</Text>
-            <TextInput
+            <ValidatedTextInput
               value={this.state.pin1}
+              validator={ValidatorKind.Integer}
               onChangeText={this.onChangePin1}
               onSubmitEditing={this.onSubmitPin1}
               autoFocus={true}
@@ -173,6 +176,7 @@ export class Pincode extends React.Component<Props, State> {
               secureTextEntry={true}
               style={style.numberInput}
               textContentType="password"
+              nativeInput={true}
             />
           </View>
         )
@@ -180,8 +184,9 @@ export class Pincode extends React.Component<Props, State> {
         return (
           <View style={style.pincodeContent}>
             <Text style={[fontStyles.h1, style.h1]}>{t('verifyPin.title')}</Text>
-            <TextInput
+            <ValidatedTextInput
               value={this.state.pin2}
+              validator={ValidatorKind.Integer}
               onChangeText={this.onChangePin2}
               onSubmitEditing={this.createPin}
               autoFocus={true}
@@ -191,6 +196,7 @@ export class Pincode extends React.Component<Props, State> {
               secureTextEntry={true}
               style={style.numberInput}
               textContentType="password"
+              nativeInput={true}
             />
           </View>
         )
