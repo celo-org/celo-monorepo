@@ -46,6 +46,38 @@ contract Quorum is IQuorum, Ownable, Initializable {
   }
 
   /**
+   * @notice Computes the support ratio for a proposal following quorum adjustment.
+   * @param yes The number of yes votes on the proposal.
+   * @param no The number of no votes on the proposal.
+   * @param abstain The number of abstain votes on the proposal.
+   * @param totalWeight The total weight of the network.
+   * @return The support ratio following quorum adjustment.
+   */
+  function adjustedSupport(
+    uint256 yes,
+    uint256 no,
+    uint256 abstain,
+    uint256 totalWeight
+  )
+    external
+    view
+    returns (int256)
+  {
+    if (yes.add(no) == 0) {
+      return 0;
+    }
+    int256 totalWeightFixed = FixidityLib.newFixed(int256(totalWeight));
+    int256 yesRatio = FixidityLib.newFixed(int256(yes)).divide(totalWeightFixed);
+    int256 abstainRatio = FixidityLib.newFixed(int256(abstain)).divide(totalWeightFixed);
+    int256 participation = FixidityLib.newFixed(int256(yes.add(no).add(abstain)))
+      .divide(totalWeightFixed);
+    int256 adjustedQuorum =
+      (participation > quorumBaseline ? participation : quorumBaseline).subtract(abstainRatio);
+    int256 support = yesRatio.divide(adjustedQuorum);
+    return support;
+  }
+
+  /**
    * @notice Updates the quorum baseline using the participation ratio
    *   of the latest proposal under referendum.
    * @param participation The participation in the latest proposal.

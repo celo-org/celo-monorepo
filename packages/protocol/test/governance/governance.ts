@@ -58,7 +58,7 @@ enum VoteValue {
   Yes,
 }
 
-enum TallyResult {
+enum TallyOutcome {
   None = 0,
   Fail,
   Pass,
@@ -86,6 +86,7 @@ contract('Governance', (accounts: string[]) => {
   const referendumStageDuration = 5 * 60 // 5 minutes
   const tallyStageDuration = 5 * 60 // 5 minutes
   const executionStageDuration = 1 * 60 // 1 minute
+  const defaultThreshold = toFixed(7 / 10)
   let transactionSuccess1
   let transactionSuccess2
   let transactionFail
@@ -529,7 +530,7 @@ contract('Governance', (accounts: string[]) => {
       it('should not set the default threshold', async () => {
         await governance.setConstitution(destination, functionId, threshold)
         const actualThreshold = await governance.getConstitution(destination, differentFunctionId)
-        assert.isTrue(actualThreshold.eq(toFixed(1 / 2)))
+        assert.isTrue(actualThreshold.eq(defaultThreshold))
       })
 
       it('should emit the ConstitutionSet event', async () => {
@@ -555,8 +556,8 @@ contract('Governance', (accounts: string[]) => {
       await assertRevert(governance.setConstitution(destination, nullFunctionId, 0))
     })
 
-    it('should revert when the threshold is not greater than a majority', async () => {
-      await assertRevert(governance.setConstitution(destination, nullFunctionId, toFixed(1 / 2)))
+    it('should revert when the threshold is less than a majority', async () => {
+      await assertRevert(governance.setConstitution(destination, nullFunctionId, toFixed(49 / 100)))
     })
 
     it('should revert when the threshold is greater than 100%', async () => {
@@ -1391,26 +1392,39 @@ contract('Governance', (accounts: string[]) => {
         await timeTravel(referendumStageDuration, web3)
       })
 
-      it('should return false', async () => {
-        const success = await governance.vote.call(proposalId, index, value)
-        assert.isFalse(success)
+      describe('when the proposal has not been tallied', () => {
+        it('should revert', async () => {
+          await assertRevert(governance.vote.call(proposalId, index, value))
+        })
       })
 
-      it('should delete the proposal', async () => {
-        await governance.vote(proposalId, index, value)
-        assert.isFalse(await governance.proposalExists(proposalId))
-      })
+      describe('when the proposal has been tallied', () => {
+        beforeEach(async () => {
+          await mockQuorum.setAdjustedSupportReturn(toFixed(0))
+          await governance.tally(proposalId, index)
+        })
 
-      it('should remove the proposal ID from dequeued', async () => {
-        await governance.vote(proposalId, index, value)
-        const dequeued = await governance.getDequeue()
-        assert.notInclude(dequeued.map((x) => x.toNumber()), proposalId)
-      })
+        it('should return false', async () => {
+          const success = await governance.vote.call(proposalId, index, value)
+          assert.isFalse(success)
+        })
 
-      it('should add the index to empty indices', async () => {
-        await governance.vote(proposalId, index, value)
-        const emptyIndex = await governance.emptyIndices(0)
-        assert.equal(emptyIndex.toNumber(), index)
+        it('should delete the proposal', async () => {
+          await governance.vote(proposalId, index, value)
+          assert.isFalse(await governance.proposalExists(proposalId))
+        })
+
+        it('should remove the proposal ID from dequeued', async () => {
+          await governance.vote(proposalId, index, value)
+          const dequeued = await governance.getDequeue()
+          assert.notInclude(dequeued.map((x) => x.toNumber()), proposalId)
+        })
+
+        it('should add the index to empty indices', async () => {
+          await governance.vote(proposalId, index, value)
+          const emptyIndex = await governance.emptyIndices(0)
+          assert.equal(emptyIndex.toNumber(), index)
+        })
       })
     })
   })
@@ -1419,6 +1433,7 @@ contract('Governance', (accounts: string[]) => {
     const weight = 10
     const proposalId = 1
     const index = 0
+    const value = VoteValue.Yes
 
     beforeEach(async () => {
       await governance.propose(
@@ -1433,98 +1448,78 @@ contract('Governance', (accounts: string[]) => {
       await governance.approve(proposalId, index)
       await timeTravel(approvalStageDuration, web3)
       await mockBondedDeposits.setWeight(account, weight)
+      await governance.vote(proposalId, index, value)
+      await timeTravel(referendumStageDuration, web3)
+      await mockQuorum.setAdjustedSupportReturn(toFixed(1))
     })
 
-    describe('when the proposal is passing', () => {
-      beforeEach(async () => {
-        await governance.vote(proposalId, index, VoteValue.Yes)
-        await timeTravel(referendumStageDuration, web3)
-      })
-
-      it('should return true', async () => {
-        const passed = await governance.tally.call(proposalId, index)
-        assert.isTrue(passed)
-      })
-
-      it('should set the tally result', async () => {
-        await governance.tally(proposalId, index)
-        assert.equal(await governance.getTally(proposalId, index), TallyResult.Pass)
-      })
-
-      it('should emit the ProposalTallied event', async () => {
-        const resp = await governance.tally(proposalId, index)
-        assert.equal(resp.logs.length, 1)
-        const log = resp.logs[0]
-        assertLogMatches2(log, {
-          event: 'ProposalTallied',
-          args: {
-            proposalId: new BigNumber(proposalId),
-            passed: true,
-          },
-        })
-      })
+    it('should return true', async () => {
+      const passed = await governance.tally.call(proposalId, index)
+      assert.isTrue(passed)
     })
 
-    describe('when the proposal is failing', () => {
-      beforeEach(async () => {
-        await governance.vote(proposalId, index, VoteValue.No)
-        await timeTravel(referendumStageDuration, web3)
-      })
+    it('should set the tally result', async () => {
+      await governance.tally(proposalId, index)
+      assertEqualBN(await governance.getTally(proposalId), TallyOutcome.Pass)
+    })
 
-      it('should return false', async () => {
-        const passed = await governance.tally.call(proposalId, index)
-        assert.isFalse(passed)
-      })
-
-      it('should set the tally result', async () => {
-        await governance.tally(proposalId, index)
-        assert.equal(await governance.getTally(proposalId, index), TallyResult.Fail)
-      })
-
-      it('should emit the ProposalTallied event', async () => {
-        const resp = await governance.tally(proposalId, index)
-        assert.equal(resp.logs.length, 1)
-        const log = resp.logs[0]
-        assertLogMatches2(log, {
-          event: 'ProposalTallied',
-          args: {
-            proposalId: new BigNumber(proposalId),
-            passed: false,
-          },
-        })
+    it('should emit the ProposalTallied event', async () => {
+      const resp = await governance.tally(proposalId, index)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertLogMatches2(log, {
+        event: 'ProposalTallied',
+        args: {
+          proposalId: new BigNumber(proposalId),
+        },
       })
     })
 
     it('should update quorum with participation values', async () => {
-      await governance.vote(proposalId, index, VoteValue.Yes)
-      await timeTravel(referendumStageDuration, web3)
-
-      const expectedCount = (await mockQuorum.updateCallCount()).toNumber()
+      const expectedCount = (await mockQuorum.updateCallCount()).toNumber() + 1
       const [yes, no, abstain] = await governance.getVoteTotals(proposalId)
-      const expectedTotalVotes = yes.toNumber() + no.toNumber() + abstain.toNumber()
-      const expectedTotalWeight = (await mockBondedDeposits.totalWeight()).toNumber()
+      const totalVotes = yes.toNumber() + no.toNumber() + abstain.toNumber()
+      const totalWeight = (await mockBondedDeposits.totalWeight()).toNumber()
+      const participation = toFixed(totalVotes / totalWeight)
 
-      await governance.vote(proposalId, index, value)
+      await governance.tally(proposalId, index)
 
       const updateCount = (await mockQuorum.updateCallCount()).toNumber()
-      const [totalVotes, totalWeight] = await mockQuorum.getLastUpdateCall()
-      assert.equal(updateCount, expectedCount + 1)
-      assert.equal(totalVotes.toNumber(), expectedTotalVotes)
-      assert.equal(totalWeight.toNumber(), expectedTotalWeight)
+      const lastUpdateCall = await mockQuorum.lastUpdateCall()
+      assert.equal(updateCount, expectedCount)
+      assertEqualBN(lastUpdateCall, participation)
     })
 
     it('should revert if the proposal has already been tallied', async () => {
-      await governance.vote(proposalId, index, VoteValue.Yes)
-      await timeTravel(referendumStageDuration, web3)
       await governance.tally(proposalId, index)
       await assertRevert(governance.tally(proposalId, index))
     })
 
-    it('should revert if the proposal is past the tally stage', async () => {
-      await governance.vote(proposalId, index, VoteValue.Yes)
-      await timeTravel(referendumStageDuration, web3)
-      await timeTravel(tallyStageDuration, web3)
-      await assertRevert(governance.tally(proposalId, index))
+    describe('when the proposal is past the tally stage', () => {
+      beforeEach(async () => {
+        await timeTravel(tallyStageDuration, web3)
+      })
+      it('should return false', async () => {
+        const success = await governance.tally.call(proposalId, index)
+        assert.isFalse(success)
+      })
+
+      it('should delete the proposal', async () => {
+        await governance.tally(proposalId, index)
+        assert.isFalse(await governance.proposalExists(proposalId))
+      })
+
+      it('should remove the proposal ID from dequeued', async () => {
+        await governance.tally(proposalId, index)
+        const dequeued = await governance.getDequeue()
+        assert.notInclude(dequeued.map((x) => x.toNumber()), proposalId)
+      })
+
+      it('should add the index to empty indices', async () => {
+        await governance.tally(proposalId, index)
+        const emptyIndex = await governance.emptyIndices(0)
+        assert.equal(emptyIndex.toNumber(), index)
+      })
     })
   })
 
@@ -1551,6 +1546,7 @@ contract('Governance', (accounts: string[]) => {
           await mockBondedDeposits.setWeight(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
+          await mockQuorum.setAdjustedSupportReturn(toFixed(1))
           await governance.tally(proposalId, index)
           await timeTravel(tallyStageDuration, web3)
         })
@@ -1599,6 +1595,7 @@ contract('Governance', (accounts: string[]) => {
           await mockBondedDeposits.setWeight(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
+          await mockQuorum.setAdjustedSupportReturn(toFixed(1))
           await governance.tally(proposalId, index)
           await timeTravel(tallyStageDuration, web3)
         })
@@ -1627,6 +1624,7 @@ contract('Governance', (accounts: string[]) => {
           await mockBondedDeposits.setWeight(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
+          await mockQuorum.setAdjustedSupportReturn(toFixed(1))
           await governance.tally(proposalId, index)
           await timeTravel(tallyStageDuration, web3)
         })
@@ -1678,6 +1676,7 @@ contract('Governance', (accounts: string[]) => {
             await mockBondedDeposits.setWeight(account, weight)
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
+            await mockQuorum.setAdjustedSupportReturn(toFixed(1))
             await governance.tally(proposalId, index)
             await timeTravel(tallyStageDuration, web3)
           })
@@ -1704,6 +1703,7 @@ contract('Governance', (accounts: string[]) => {
             await mockBondedDeposits.setWeight(account, weight)
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
+            await mockQuorum.setAdjustedSupportReturn(toFixed(1))
             await governance.tally(proposalId, index)
             await timeTravel(tallyStageDuration, web3)
           })
@@ -1731,11 +1731,30 @@ contract('Governance', (accounts: string[]) => {
         await mockBondedDeposits.setWeight(account, weight)
         await governance.vote(proposalId, index, value)
         await timeTravel(referendumStageDuration, web3)
+        await mockQuorum.setAdjustedSupportReturn(toFixed(1))
         await timeTravel(tallyStageDuration, web3)
       })
 
-      it('should revert', async () => {
-        await assertRevert(governance.execute(proposalId, index))
+      it('should return false', async () => {
+        const success = await governance.execute.call(proposalId, index)
+        assert.isFalse(success)
+      })
+
+      it('should delete the proposal', async () => {
+        await governance.execute(proposalId, index)
+        assert.isFalse(await governance.proposalExists(proposalId))
+      })
+
+      it('should remove the proposal ID from dequeued', async () => {
+        await governance.execute(proposalId, index)
+        const dequeued = await governance.getDequeue()
+        assert.notInclude(dequeued.map((x) => x.toNumber()), proposalId)
+      })
+
+      it('should add the index to empty indices', async () => {
+        await governance.execute(proposalId, index)
+        const emptyIndex = await governance.emptyIndices(0)
+        assert.equal(emptyIndex.toNumber(), index)
       })
     })
 
@@ -1755,6 +1774,7 @@ contract('Governance', (accounts: string[]) => {
         await mockBondedDeposits.setWeight(account, weight)
         await governance.vote(proposalId, index, value)
         await timeTravel(referendumStageDuration, web3)
+        await mockQuorum.setAdjustedSupportReturn(toFixed(1))
         await governance.tally(proposalId, index)
         await timeTravel(tallyStageDuration, web3)
         await timeTravel(executionStageDuration, web3)
@@ -1768,6 +1788,18 @@ contract('Governance', (accounts: string[]) => {
       it('should delete the proposal', async () => {
         await governance.execute(proposalId, index)
         assert.isFalse(await governance.proposalExists(proposalId))
+      })
+
+      it('should remove the proposal ID from dequeued', async () => {
+        await governance.execute(proposalId, index)
+        const dequeued = await governance.getDequeue()
+        assert.notInclude(dequeued.map((x) => x.toNumber()), proposalId)
+      })
+
+      it('should add the index to empty indices', async () => {
+        await governance.execute(proposalId, index)
+        const emptyIndex = await governance.emptyIndices(0)
+        assert.equal(emptyIndex.toNumber(), index)
       })
     })
   })
@@ -1858,5 +1890,37 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  // TODO(brice): Rewrite isProposalPassing() tests
+  describe('#isProposalPassing()', () => {
+    const weight = 10
+    const proposalId = 1
+    const index = 0
+    const value = VoteValue.Yes
+    beforeEach(async () => {
+      await governance.propose(
+        [transactionSuccess1.value],
+        [transactionSuccess1.destination],
+        transactionSuccess1.data,
+        [transactionSuccess1.data.length],
+        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+        { value: minDeposit }
+      )
+      await timeTravel(dequeueFrequency, web3)
+      await governance.approve(proposalId, index)
+      await timeTravel(approvalStageDuration, web3)
+      await mockBondedDeposits.setWeight(account, weight)
+      await governance.vote(proposalId, index, value)
+    })
+
+    it('should return true when adjusted support is greater than threshold', async () => {
+      await mockQuorum.setAdjustedSupportReturn(toFixed(1))
+      const passing = await governance.isProposalPassing(proposalId)
+      assert.isTrue(passing)
+    })
+
+    it('should return false when adjusted support is less than or equal to threshold', async () => {
+      await mockQuorum.setAdjustedSupportReturn(toFixed(7 / 10))
+      const passing = await governance.isProposalPassing(proposalId)
+      assert.isFalse(passing)
+    })
+  })
 })

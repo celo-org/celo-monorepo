@@ -45,7 +45,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     Yes
   }
 
-  enum TallyResult {
+  enum TallyOutcome {
     None,
     Fail,
     Pass
@@ -85,7 +85,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     Transaction[] transactions;
     bool approved;
     bool passed;
-    TallyResult tally;
+    TallyOutcome tally;
   }
 
   struct ContractConstitution {
@@ -193,8 +193,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   );
 
   event ProposalTallied(
-    uint256 indexed proposalId,
-    bool passed
+    uint256 indexed proposalId
   );
 
   event ProposalExecuted(
@@ -609,7 +608,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
    *   "Pass" or "Fail". Updates quorum.
    * @param proposalId The ID of the proposal to vote on.
    * @param index The index of the proposal ID in `dequeued`.
-   * @return Whether or not the proposal passed.
+   * @return Whether or not the proposal was tallied.
    */
   function tally(uint256 proposalId, uint256 index) external returns (bool) {
     dequeueProposalsIfReady();
@@ -622,14 +621,13 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
     require(
       proposal.approved &&
-      proposal.tally == TallyResult.None &&
+      proposal.tally == TallyOutcome.None &&
       stage == ProposalStage.Tally
     );
-    bool passed = _isProposalPassing(proposal);
-    proposal.tally = passed ? TallyResult.Pass : TallyResult.Fail;
-    emit ProposalTallied(proposalId, passed);
+    proposal.tally = _isProposalPassing(proposal) ? TallyOutcome.Pass : TallyOutcome.Fail;
+    emit ProposalTallied(proposalId);
     updateQuorum(proposal);
-    return passed;
+    return true;
   }
 
   /**
@@ -650,7 +648,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
       require(
         proposal.approved &&
         stage == ProposalStage.Execution &&
-        proposal.tally == TallyResult.Pass
+        proposal.tally == TallyOutcome.Pass
       );
       for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
         bool transactionExecuted = externalCall(
@@ -697,6 +695,14 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
    */
   function getReferendumStageDuration() external view returns (uint256) {
     return stageDurations.referendum;
+  }
+
+  /**
+   * @notice Returns the number of seconds proposals stay in the tally stage.
+   * @return The number of seconds proposals stay in the tally stage.
+   */
+  function getTallyStageDuration() external view returns (uint256) {
+    return stageDurations.tally;
   }
 
   /**
@@ -771,9 +777,9 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   }
 
   /**
-   * @notice Returns the tally result of the proposal.
+   * @notice Returns the tally outcome of the proposal.
    * @param proposalId The ID of the proposal.
-   * @return The tally result of the proposal.
+   * @return The tally outcome of the proposal.
    */
   function getTally(uint256 proposalId) external view returns (uint256) {
     return uint256(proposals[proposalId].tally);
@@ -934,19 +940,15 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
    * @return Whether or not the proposal is passing.
    */
   function _isProposalPassing(Proposal storage proposal) private view returns (bool) {
-    int256 totalWeightFixed = FixidityLib.newFixed(int256(totalWeight()));
-    int256 yesRatio = FixidityLib.newFixed(int256(proposal.votes.yes)).divide(totalWeightFixed);
-    int256 abstainRatio = FixidityLib.newFixed(int256(proposal.votes.abstain)).divide(totalWeightFixed);
-    int256 participation = FixidityLib.newFixed(
-      int256(proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain))
-    ).divide(totalWeightFixed);
     IQuorum quorum = IQuorum(registry.getAddressForOrDie(QUORUM_REGISTRY_ID));
-    int256 quorumBaseline = quorum.quorumBaseline();
-    int256 adjustedTotalRatio =
-      (participation > quorumBaseline ? participation : quorumBaseline).subtract(abstainRatio);
-    int256 supportRatio = yesRatio.divide(adjustedTotalRatio);
+    int256 support = quorum.adjustedSupport(
+      proposal.votes.yes,
+      proposal.votes.no,
+      proposal.votes.abstain,
+      totalWeight()
+    );
     int256 threshold = _getProposalThreshold(proposal);
-    return supportRatio > threshold;
+    return support > threshold;
   }
 
   function getProposalThreshold(uint256 proposalId) external view returns (int256) {
@@ -1083,8 +1085,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     //   4. Past the execution stage.
     return (
       (stage > ProposalStage.Execution) ||
-      (stage > ProposalStage.Tally && proposal.tally != TallyResult.Pass) ||
-      (stage > ProposalStage.Referendum && !_isProposalPassing(proposal)) ||
+      (stage > ProposalStage.Tally && proposal.tally != TallyOutcome.Pass) ||
+      (stage > ProposalStage.Referendum && proposal.tally == TallyOutcome.Fail) ||
       (stage > ProposalStage.Approval && !proposal.approved)
     );
   }

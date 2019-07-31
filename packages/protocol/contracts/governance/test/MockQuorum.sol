@@ -6,26 +6,33 @@ pragma solidity ^0.5.8;
  */
 contract MockQuorum {
 
-  struct UpdateCall {
-    uint256 totalVotes;
-    uint256 totalWeight;
+  uint256 public updateCallCount;
+  int256 public lastUpdateCall;
+  int256 public adjustedSupportReturn;
+
+  function setAdjustedSupportReturn(int256 returnValue) external {
+    adjustedSupportReturn = returnValue;
   }
 
-  uint256 public updateCallCount;
-  UpdateCall public lastUpdateCall;
-
-  function getLastUpdateCall() external view returns (uint256, uint256) {
-    return (lastUpdateCall.totalVotes, lastUpdateCall.totalWeight);
+  function adjustedSupport(
+    uint256 /* yes */,
+    uint256 /* no */,
+    uint256 /* abstain */,
+    uint256 /* totalWeight */
+  )
+    external
+    view
+    returns (int256)
+  {
+    return adjustedSupportReturn;
   }
 
   function updateQuorumBaseline(
-    uint256 totalVotes,
-    uint256 totalWeight
+    int256 participation
   )
     external
   {
     updateCallCount++;
-    lastUpdateCall.totalVotes = totalVotes;
-    lastUpdateCall.totalWeight = totalWeight;
+    lastUpdateCall = participation;
   }
 }

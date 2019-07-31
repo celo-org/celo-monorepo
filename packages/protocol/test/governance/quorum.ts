@@ -1,5 +1,5 @@
-import { assertFractionEqual, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
-import BigNumber from 'bignumber.js'
+import { toFixed } from '@celo/protocol/lib/fixidity'
+import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
 import { QuorumContract, QuorumInstance } from 'types'
 
 const Quorum: QuorumContract = artifacts.require('Quorum')
@@ -9,143 +9,105 @@ const Quorum: QuorumContract = artifacts.require('Quorum')
 Quorum.numberFormat = 'BigNumber'
 
 contract('Quorum', () => {
-  const initialQuorumNumerator = 50
-  const initialQuorumDenominator = 100
-  const quorumFloorNumerator = 5
-  const quorumFloorDenominator = 100
+  const quorumBaseline = toFixed(50 / 100)
+  const quorumFloor = toFixed(5 / 100)
+  const updateCoefficient = toFixed(1 / 5)
   let quorum: QuorumInstance
   beforeEach(async () => {
     quorum = await Quorum.new()
-    await quorum.initialize(
-      initialQuorumNumerator,
-      initialQuorumDenominator,
-      quorumFloorNumerator,
-      quorumFloorDenominator
-    )
-    BigNumber.config({ DECIMAL_PLACES: 17, ROUNDING_MODE: BigNumber.ROUND_HALF_UP })
+    await quorum.initialize(quorumBaseline, quorumFloor, updateCoefficient)
   })
 
-  describe('#initialize', () => {
+  describe('#initialize()', () => {
     it('should have set the quorum', async () => {
-      const [qNum, qDenom] = await quorum.getQuorumBaseline()
-      assert.equal(qNum.toNumber(), initialQuorumNumerator)
-      assert.equal(qDenom.toNumber(), initialQuorumDenominator)
+      const actualQuorum = await quorum.quorumBaseline()
+      assertEqualBN(actualQuorum, quorumBaseline)
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(
-        quorum.initialize(
-          initialQuorumNumerator,
-          initialQuorumDenominator,
-          quorumFloorNumerator,
-          quorumFloorDenominator
-        )
-      )
+      await assertRevert(quorum.initialize(quorumBaseline, quorumFloor, updateCoefficient))
     })
   })
 
-  describe('#updateQuorumBaseline', () => {
-    describe('when quorum does not overflow', () => {
-      const totalVotes = 80
-      const totalWeight = 100
+  describe('#adjustedSupport()', () => {
+    const totalWeight = 100
 
-      it('should update quorum baseline to correct value', async () => {
-        await quorum.updateQuorumBaseline(totalVotes, totalWeight)
-        const [qNum, qDenom] = await quorum.getQuorumBaseline()
-        const expectedNum = 56
-        const expectedDenom = 100
-        assertFractionEqual(qNum.toNumber(), qDenom.toNumber(), expectedNum, expectedDenom)
-      })
-
-      it('should emit a QuorumUpdated event', async () => {
-        const resp = await quorum.updateQuorumBaseline(totalVotes, totalWeight)
-        const [qNum, qDenom] = await quorum.getQuorumBaseline()
-        assert.equal(resp.logs.length, 1)
-        const log = resp.logs[0]
-        assertLogMatches2(log, {
-          event: 'QuorumUpdated',
-          args: {
-            quorumNumerator: qNum,
-            quorumDenominator: qDenom,
-          },
-        })
-      })
+    it('should return support ratio when participation above quorum', async () => {
+      const yes = 15
+      const no = 10
+      const abstain = 30
+      const expected = toFixed(3 / 5)
+      const support = await quorum.adjustedSupport(yes, no, abstain, totalWeight)
+      assertEqualBN(support, expected)
     })
 
-    describe('when quorum overflows', () => {
-      const largeQuorumNumerator = web3.utils.toBN('477345987239467349857936734')
-      const largeQuorumDenominator = web3.utils.toBN('1091203940239235093109539501')
-      const totalVotes = 783479873246
-      const totalWeight = 1085729492949
-      beforeEach(async () => {
-        quorum = await Quorum.new()
-        await quorum.initialize(
-          largeQuorumNumerator,
-          largeQuorumDenominator,
-          quorumFloorNumerator,
-          quorumFloorDenominator
-        )
-      })
+    it('should return lowered support ratio when participation below quorum', async () => {
+      const yes = 15
+      const no = 10
+      const abstain = 10
+      // 20 "no" votes added
+      const expected = toFixed(3 / 8)
+      const support = await quorum.adjustedSupport(yes, no, abstain, totalWeight)
+      assertEqualBN(support, expected)
+    })
 
-      it('should update quorum baseline to approximate value', async () => {
-        await quorum.updateQuorumBaseline(totalVotes, totalWeight)
-        const [qNum, qDenom] = await quorum.getQuorumBaseline()
-        const expected = 0.49428235584815016
-        const epsilon = 1e-15
-        const difference = qNum.div(qDenom).toNumber() - expected
-        assert.isTrue(difference > -epsilon && difference < epsilon)
-        assert.isTrue(qNum.isLessThan('1e30'))
-        assert.isTrue(qDenom.isLessThan('1e30'))
-      })
+    it('should return 0 support ratio when 0 yes votes and 0 no votes are cast', async () => {
+      const yes = 0
+      const no = 0
+      const abstain = 30
+      const expected = toFixed(0)
+      const support = await quorum.adjustedSupport(yes, no, abstain, totalWeight)
+      assertEqualBN(support, expected)
+    })
+  })
 
-      it('should emit a QuorumUpdated event', async () => {
-        const resp = await quorum.updateQuorumBaseline(totalVotes, totalWeight)
-        const [qNum, qDenom] = await quorum.getQuorumBaseline()
-        assert.equal(resp.logs.length, 1)
-        const log = resp.logs[0]
-        assertLogMatches2(log, {
-          event: 'QuorumUpdated',
-          args: {
-            quorumNumerator: qNum,
-            quorumDenominator: qDenom,
-          },
-        })
+  describe('#updateQuorumBaseline()', () => {
+    const participation = toFixed(80 / 100)
+
+    it('should update quorum baseline to correct value', async () => {
+      await quorum.updateQuorumBaseline(participation)
+      const newQuorumBaseline = await quorum.quorumBaseline()
+      const expected = toFixed(56 / 100)
+      assertEqualBN(newQuorumBaseline, expected)
+    })
+
+    it('should emit a QuorumUpdated event', async () => {
+      const resp = await quorum.updateQuorumBaseline(participation)
+      const newQuorumBaseline = await quorum.quorumBaseline()
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertLogMatches2(log, {
+        event: 'QuorumUpdated',
+        args: {
+          quorum: newQuorumBaseline,
+        },
       })
     })
 
     describe('when quorum falls below floor', () => {
-      const lowQuorumNumerator = 55
-      const lowQuorumDenominator = 1000
-      const totalVotes = 5
-      const totalWeight = 1000
+      const lowQuorumBaseline = toFixed(55 / 1000)
+      const lowParticipation = toFixed(5 / 1000)
       beforeEach(async () => {
         quorum = await Quorum.new()
-        await quorum.initialize(
-          lowQuorumNumerator,
-          lowQuorumDenominator,
-          quorumFloorNumerator,
-          quorumFloorDenominator
-        )
+        await quorum.initialize(lowQuorumBaseline, quorumFloor, updateCoefficient)
       })
 
       it('should update quorum baseline to floor value', async () => {
-        await quorum.updateQuorumBaseline(totalVotes, totalWeight)
-        const [qNum, qDenom] = await quorum.getQuorumBaseline()
-        const expectedNum = 5
-        const expectedDenom = 100
-        assertFractionEqual(qNum.toNumber(), qDenom.toNumber(), expectedNum, expectedDenom)
+        await quorum.updateQuorumBaseline(lowParticipation)
+        const newQuorumBaseline = await quorum.quorumBaseline()
+        const expected = toFixed(5 / 100)
+        assertEqualBN(newQuorumBaseline, expected)
       })
 
       it('should emit a QuorumUpdated event', async () => {
-        const resp = await quorum.updateQuorumBaseline(totalVotes, totalWeight)
-        const [qNum, qDenom] = await quorum.getQuorumBaseline()
+        const resp = await quorum.updateQuorumBaseline(lowParticipation)
+        const newQuorumBaseline = await quorum.quorumBaseline()
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
         assertLogMatches2(log, {
           event: 'QuorumUpdated',
           args: {
-            quorumNumerator: qNum,
-            quorumDenominator: qDenom,
+            quorum: newQuorumBaseline,
           },
         })
       })
