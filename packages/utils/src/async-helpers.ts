@@ -1,4 +1,4 @@
-const TAG = 'utils/src/miscellaneous'
+const TAG = 'utils/src/async-helpers'
 
 type InFunction = (...params: any) => Promise<any>
 

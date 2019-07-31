@@ -3,7 +3,7 @@ import {
   getAttestationsContract,
   getStableTokenContract,
 } from '@celo/contractkit'
-import { retryAsync } from '@celo/utils/src/miscellaneous'
+import { retryAsync } from '@celo/utils/src/async-helpers'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { Linking } from 'react-native'
