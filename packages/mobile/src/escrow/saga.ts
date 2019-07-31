@@ -137,11 +137,11 @@ export async function getReclaimEscrowFee(account: string, paymentID: string) {
   // @ts-ignore
   const txParams: any = { from: account, gasCurrency: getEscrowContract(web3)._address }
   Logger.debug(`${TAG}/getReclaimEscrowFee`, `txParams:`, txParams)
-  const gas: BigNumber = new BigNumber(await tx.estimateGas(txParams))
-  const gasPrice: BigNumber = new BigNumber(await fetchGasPrice())
+  const gas = new BigNumber(await tx.estimateGas(txParams))
+  const gasPrice = new BigNumber(await fetchGasPrice())
   Logger.debug(`${TAG}/getReclaimEscrowFee`, `estimated gas: ${gas}`)
   Logger.debug(`${TAG}/getReclaimEscrowFee`, `gas price: ${gasPrice}`)
-  const feeInWei: BigNumber = gas.multipliedBy(gasPrice)
+  const feeInWei = gas.multipliedBy(gasPrice)
   Logger.debug(`${TAG}/getReclaimEscrowFee`, `New fee is: ${feeInWei}`)
   return feeInWei
 }
