@@ -26,9 +26,17 @@ interface LineItemProps {
   title: string
   titleIcon?: React.ReactNode
   isLoading?: boolean
+  hasError?: boolean
 }
 
-function LineItemRow({ currencySymbol, amount, title, titleIcon, isLoading }: LineItemProps) {
+function LineItemRow({
+  currencySymbol,
+  amount,
+  title,
+  titleIcon,
+  isLoading,
+  hasError,
+}: LineItemProps) {
   return (
     <View style={style.lineItemRow}>
       <View style={style.feeDescription}>
@@ -41,6 +49,7 @@ function LineItemRow({ currencySymbol, amount, title, titleIcon, isLoading }: Li
           {getMoneyDisplayValue(amount, 4)}
         </Text>
       )}
+      {hasError && <Text style={style.feeText}>---</Text>}
       {isLoading && (
         <View style={style.loadingContainer}>
           <ActivityIndicator size="small" color={colors.celoGreen} />
@@ -71,6 +80,7 @@ export interface OwnProps {
   currency: CURRENCY_ENUM
   fee?: BigNumber
   isLoadingFee?: boolean
+  feeError?: Error
   type: TransactionTypes
   e164PhoneNumber?: string
   dollarBalance?: BigNumber
@@ -144,6 +154,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
     total: BigNumber,
     fee: BigNumber | undefined,
     isLoadingFee: boolean | undefined,
+    feeError: Error | undefined,
     currency: CURRENCY_ENUM,
     comment?: string,
     address?: string
@@ -204,7 +215,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
               </Text>
             </View>
           )}
-          {(isLoadingFee || fee) && (
+          {(isLoadingFee || fee || feeError) && (
             <View style={style.feeContainer}>
               {this.props.type === TransactionTypes.PAY_REQUEST && (
                 <LineItemRow currencySymbol={'$'} amount={total} title={t('dollarsSent')} />
@@ -215,6 +226,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
                 title={address ? t('securityFee') : t('inviteAndSecurityFee')}
                 titleIcon={<FeeIcon />}
                 isLoading={isLoadingFee}
+                hasError={!!feeError}
               />
               <LineItemRow currencySymbol={'$'} amount={amountWithFees} title={t('total')} />
             </View>
@@ -233,6 +245,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
       comment,
       fee,
       isLoadingFee,
+      feeError,
       type,
       e164PhoneNumber,
       defaultCountryCode,
@@ -242,7 +255,16 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
       <View style={[componentStyles.roundedBorder, style.container]}>
         {this.renderTopSection(type, recipient, address, e164PhoneNumber, defaultCountryCode)}
         {this.renderAmountSection(type, currency)}
-        {this.renderBottomSection(type, value, fee, isLoadingFee, currency, comment, address)}
+        {this.renderBottomSection(
+          type,
+          value,
+          fee,
+          isLoadingFee,
+          feeError,
+          currency,
+          comment,
+          address
+        )}
       </View>
     )
   }

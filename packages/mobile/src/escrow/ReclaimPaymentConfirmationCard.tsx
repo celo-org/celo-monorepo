@@ -25,6 +25,7 @@ interface LineItemProps {
   negative?: boolean
   boldedStyle?: boolean
   isLoading?: boolean
+  hasError?: boolean
 }
 
 function LineItemRow({
@@ -35,6 +36,7 @@ function LineItemRow({
   negative,
   boldedStyle,
   isLoading,
+  hasError,
 }: LineItemProps) {
   const fontStyle = boldedStyle ? fontStyles.bodyBold : fontStyles.body
   const totalStyle = boldedStyle ? style.totalGreen : style.total
@@ -51,6 +53,7 @@ function LineItemRow({
           {getMoneyDisplayValue(amount)}
         </Text>
       )}
+      {hasError && <Text style={[fontStyle, totalStyle]}>---</Text>}
       {isLoading && (
         <View style={style.loadingContainer}>
           <ActivityIndicator size="small" color={colors.celoGreen} />
@@ -66,6 +69,7 @@ export interface OwnProps {
   comment?: string
   fee?: BigNumber
   isLoadingFee?: boolean
+  feeError?: Error
   currency: CURRENCY_ENUM
 }
 
@@ -86,7 +90,8 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
     total: BigNumber,
     currencySymbol: string,
     fee: BigNumber | undefined,
-    isLoadingFee: boolean | undefined
+    isLoadingFee: boolean | undefined,
+    feeError: Error | undefined
   ) => {
     const { t } = this.props
     const amountWithFees = total.minus(fee || 0)
@@ -101,6 +106,7 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
           titleIcon={<FeeIcon />}
           negative={true}
           isLoading={isLoadingFee}
+          hasError={!!feeError}
         />
         <LineItemRow
           currencySymbol={'$'}
@@ -119,6 +125,7 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
       comment,
       fee,
       isLoadingFee,
+      feeError,
       currency,
       defaultCountryCode,
     } = this.props
@@ -157,7 +164,7 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
           )}
           {!!comment && <Text style={[fontStyles.bodySecondary, style.comment]}>{comment}</Text>}
         </View>
-        {this.renderFeeAndTotal(amount, currencySymbol, fee, isLoadingFee)}
+        {this.renderFeeAndTotal(amount, currencySymbol, fee, isLoadingFee, feeError)}
       </View>
     )
   }

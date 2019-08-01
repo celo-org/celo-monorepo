@@ -194,14 +194,14 @@ class SendConfirmation extends React.Component<Props, State> {
     let primaryBtnInfo = {
       action: this.onSendButtonClick,
       text: t('send'),
-      disabled: isSending || !userHasEnough || !appConnected,
+      disabled: isSending || !userHasEnough || !appConnected || !!asyncFee.error,
     }
     let secondaryBtnInfo = { action: this.onPressEdit, text: t('edit'), disabled: isSending }
     if (isPaymentRequest) {
       primaryBtnInfo = {
         action: this.sendOrInvite,
         text: i18n.t('paymentRequestFlow:pay'),
-        disabled: isSending || !userHasEnough || !appConnected,
+        disabled: isSending || !userHasEnough || !appConnected || !!asyncFee.error,
       }
       secondaryBtnInfo = {
         action: this.onPressEdit,
@@ -229,6 +229,7 @@ class SendConfirmation extends React.Component<Props, State> {
             currency={CURRENCY_ENUM.DOLLAR} // User can only send in Dollars
             fee={fee}
             isLoadingFee={asyncFee.loading}
+            feeError={asyncFee.error}
             type={isPaymentRequest && TransactionTypes.PAY_REQUEST}
             dollarBalance={this.props.dollarBalance}
           />

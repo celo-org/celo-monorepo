@@ -106,7 +106,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
           confirmButton={{
             action: this.onConfirm,
             text: t('global:confirm'),
-            disabled: false,
+            disabled: asyncFee.loading || !!asyncFee.error,
           }}
           modifyButton={{ action: this.onPressEdit, text: t('cancel'), disabled: false }}
         >
@@ -117,6 +117,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
             currency={CURRENCY_ENUM.DOLLAR} // User can only request in Dollars
             fee={fee}
             isLoadingFee={asyncFee.loading}
+            feeError={asyncFee.error}
           />
         </ReviewFrame>
       </View>
