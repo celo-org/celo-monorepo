@@ -1,7 +1,10 @@
-import fecha from 'fecha'
+// App crashes when these are imports instead of requires, now that the code is serverside
+const fecha = require('fecha')
+const Tabletop = require('tabletop')
+
 import getConfig from 'next/config'
-import { abort } from 'src/utils/abortableFetch'
-import Tabletop from 'tabletop'
+import { EventProps } from '../fullstack/EventProps'
+import { abort } from '../src/utils/abortableFetch'
 
 // Intermediate step Event With all String Values
 interface IncomingEvent {
@@ -15,20 +18,6 @@ interface IncomingEvent {
   startDate: string // (MM-DD-YY)
   endDate?: string // (MM-DD-YY)
   recap?: string // text
-}
-
-// Processed Event with typed values
-export interface EventProps {
-  name: string
-  startDate: Date
-  location: string
-  link: string
-  celoHosted: boolean
-  celoSpeaking: boolean
-  celoAttending: boolean
-  endDate?: Date
-  recap?: string
-  description?: string
 }
 
 const REQUIRED_KEYS = ['link', 'celoHosted', 'name', 'description', 'location', 'startDate']
@@ -59,8 +48,13 @@ function getURL() {
   return getConfig().serverRuntimeConfig.EVENTS_SHEET_URL
 }
 
+export default async function getFormattedEvents() {
+  const eventData = await intializeTableTop()
+  return splitEvents(normalizeEvents(eventData as RawEvent[]))
+}
+
 export function intializeTableTop() {
-  const promise = new Promise((resolve) => {
+  const promise = new Promise<RawEvent[]>((resolve) => {
     const callback = (data: RawEvent[]) => {
       resolve(data)
     }
@@ -75,7 +69,7 @@ export function intializeTableTop() {
       console.error(e)
     }
   })
-  return Promise.race([promise, abort(getURL(), 3000)])
+  return Promise.race([promise, abort(getURL(), 3000).catch(() => [])])
 }
 
 function convertKeys(rawEvent: RawEvent): IncomingEvent {

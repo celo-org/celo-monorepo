@@ -20,6 +20,7 @@ import {
 import SendIntentAndroid from 'react-native-send-intent'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
+import { errorSelector } from 'src/alert/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
@@ -64,7 +65,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
-    error: (state.alert && state.alert.underlyingError) || null,
+    error: errorSelector(state),
     name: state.account.name,
     redeemComplete: state.invite.redeemComplete,
   }
