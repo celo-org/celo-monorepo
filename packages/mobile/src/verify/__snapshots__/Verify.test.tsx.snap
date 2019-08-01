@@ -1903,7 +1903,6 @@ exports[`renders the Education step correctly 1`] = `
       "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
-      "paddingHorizontal": 20,
       "paddingTop": 20,
     }
   }
@@ -2141,12 +2140,8 @@ exports[`renders the Education step correctly 1`] = `
             "borderRadius": 3,
             "flexDirection": "row",
           },
-          Object {
-            "marginVertical": 10,
-          },
-          Object {
-            "marginBottom": 10,
-          },
+          null,
+          null,
           undefined,
           Object {
             "backgroundColor": "#42D689",
@@ -2167,9 +2162,7 @@ exports[`renders the Education step correctly 1`] = `
           Object {
             "alignItems": "center",
             "backgroundColor": "#42D689",
-            "borderColor": "#42D689",
-            "borderRadius": 3,
-            "borderWidth": 2,
+            "borderWidth": 0,
             "flex": 1,
             "height": 50,
             "justifyContent": "center",
