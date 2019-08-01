@@ -1048,7 +1048,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     uint256 totalWeight_ = totalWeight();
     if (totalWeight_ > 0) {
       uint256 totalVotes = proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain);
-      int256 participation = FixidityLib.newFixed(int256(totalVotes)).divide(FixidityLib.newFixed(int256(totalWeight_)));
+      int256 participation = FixidityLib.newFixed(int256(totalVotes))
+        .divide(FixidityLib.newFixed(int256(totalWeight_)));
       IQuorum quorum = IQuorum(registry.getAddressForOrDie(QUORUM_REGISTRY_ID));
       quorum.updateQuorumBaseline(participation);
     }
