@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import fetch from 'node-fetch'
-import { BLOCKSCOUT_API, Currencies, GOLD_TOKEN_ADDRESS, STABLE_TOKEN_ADDRESS } from '../config'
+import { BLOCKSCOUT_API, GOLD_TOKEN_ADDRESS, STABLE_TOKEN_ADDRESS } from '../config'
 import { getLastBlockNotified, sendPaymentNotification, setLastBlockNotified } from '../firebase'
 import { removeEmptyValuesFromObject } from '../util/utils'
 import { Log, Response, Transfer } from './blockscout'
@@ -8,7 +8,12 @@ import { decodeLogs } from './decode'
 
 export const WEI_PER_GOLD = 1000000000000000000.0
 
-async function query(path: string) {
+export enum Currencies {
+  GOLD = 'gold',
+  DOLLAR = 'dollar',
+}
+
+export async function query(path: string) {
   try {
     console.debug('Querying Blockscout. Path:', path)
     const response = await fetch(BLOCKSCOUT_API + path)
@@ -69,7 +74,10 @@ export function filterAndJoinTransfers(
   return filteredGold.concat(filterdStable)
 }
 
-function notifyForNewTransfers(transfers: Transfer[], lastBlockNotified: number): Promise<void[]> {
+export function notifyForNewTransfers(
+  transfers: Transfer[],
+  lastBlockNotified: number
+): Promise<void[]> {
   const results = new Array<Promise<void>>(transfers.length)
   for (let i = 0; i < transfers.length; i++) {
     const t = transfers[i]
@@ -92,7 +100,10 @@ function notifyForNewTransfers(transfers: Transfer[], lastBlockNotified: number)
     )
     results[i] = result
   }
-  return Promise.all(results)
+  const filtered = results.filter((el) => {
+    return el !== undefined
+  })
+  return Promise.all(filtered)
 }
 
 function convertWeiValue(value: string) {
