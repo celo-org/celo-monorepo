@@ -1,8 +1,9 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import Link from '@celo/react-components/components/Link'
-import NumberInput from '@celo/react-components/components/NumberInput'
+import ValidatedTextInput from '@celo/react-components/components/ValidatedTextInput'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
+import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -163,15 +164,19 @@ export class Pincode extends React.Component<Props, State> {
         return (
           <View style={style.pincodeContent}>
             <Text style={[fontStyles.h1, style.h1]}>{t('createPin.title')}</Text>
-            <NumberInput
+            <ValidatedTextInput
               value={this.state.pin1}
-              onChange={this.onChangePin1}
-              onSubmit={this.onSubmitPin1}
-              isSensitiveInput={true}
-              keyboardType="numeric"
-              textContentType="password"
-              placeholder={t('createPin.yourPin')}
+              validator={ValidatorKind.Integer}
+              onChangeText={this.onChangePin1}
+              onSubmitEditing={this.onSubmitPin1}
               autoFocus={true}
+              keyboardType="numeric"
+              maxLength={6}
+              placeholder={t('createPin.yourPin')}
+              secureTextEntry={true}
+              style={style.numberInput}
+              textContentType="password"
+              nativeInput={true}
             />
           </View>
         )
@@ -179,15 +184,19 @@ export class Pincode extends React.Component<Props, State> {
         return (
           <View style={style.pincodeContent}>
             <Text style={[fontStyles.h1, style.h1]}>{t('verifyPin.title')}</Text>
-            <NumberInput
+            <ValidatedTextInput
               value={this.state.pin2}
-              onChange={this.onChangePin2}
-              onSubmit={this.createPin}
-              isSensitiveInput={true}
-              keyboardType="numeric"
-              textContentType="password"
-              placeholder={t('createPin.yourPin')}
+              validator={ValidatorKind.Integer}
+              onChangeText={this.onChangePin2}
+              onSubmitEditing={this.createPin}
               autoFocus={true}
+              keyboardType="numeric"
+              maxLength={6}
+              placeholder={t('createPin.yourPin')}
+              secureTextEntry={true}
+              style={style.numberInput}
+              textContentType="password"
+              nativeInput={true}
             />
           </View>
         )
@@ -287,6 +296,17 @@ const style = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     paddingBottom: 35,
+  },
+  numberInput: {
+    borderWidth: 1,
+    borderColor: colors.inputBorder,
+    borderRadius: 3,
+    padding: 7,
+    fontSize: 24,
+    marginHorizontal: 60,
+    marginVertical: 15,
+    textAlign: 'center',
+    backgroundColor: '#FFFFFF',
   },
   h1: {
     textAlign: 'center',
