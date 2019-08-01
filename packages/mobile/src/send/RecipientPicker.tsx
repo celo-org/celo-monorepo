@@ -199,7 +199,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
           keyboardType="default"
           placeholder={t('nameOrPhoneNumber')}
           value={this.props.searchQuery}
-          onValueChanged={this.props.onSearchQueryChanged}
+          onChangeText={this.props.onSearchQueryChanged}
         />
         {this.props.showQRCode && <QRCodeCTA t={t} />}
         <SectionList
