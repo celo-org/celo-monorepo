@@ -762,8 +762,8 @@ rule insert_preconditions_check(uint256 key, uint256 value, uint256 lesser, uint
 	uint256 actualNewValue = sinvoke getValue(ePost,key);
 	assert actualNewValue == value, "inserted a different value, expected $value but got $actualNewValue";
 	// TODO: check - Add assertion about the previous and next of the new key-- new key's lesser's next is key, new key's greater's prev is key. 
-	assert sinvoke getElementLesser(sinvoke getElementGreater(ePost,key)) == key, "New key $key lesser of its greater must be the key";
-	assert sinvoke getElementGreater(sinvoke getElementLesser(ePost,key)) == key, "New key $key greater of its lesser must be the key";
+	assert sinvoke getElementLesser(ePost,sinvoke getElementGreater(ePost,key)) == key, "New key $key lesser of its greater must be the key";
+	assert sinvoke getElementGreater(ePost,sinvoke getElementLesser(ePost,key)) == key, "New key $key greater of its lesser must be the key";
 }
 
 /*
