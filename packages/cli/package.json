@@ -21,17 +21,18 @@
     "node": ">=8.0.0"
   },
   "scripts": {
-    "setup:environment": "./import_contract_types_from_sdk.sh",
+    "setup:environment": "yarn --cwd=packages/contractkit build-sdk",
     "build": "rm -rf lib && yarn run prepack",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "lint-checks": "yarn run lint",
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "tslint -p . -t stylish",
     "prepack": "tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "export TZ=UTC && jest --ci --silent --coverage",
+    "test": "export TZ=UTC && jest --ci --silent",
     "version": "oclif-dev readme && git add README.md"
   },
   "dependencies": {
+    "@celo/contractkit": "^0.0.1",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",

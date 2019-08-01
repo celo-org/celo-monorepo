@@ -34,7 +34,7 @@ import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { fetchGasPrice } from 'src/web3/gas'
-import { getConnectedUnlockedAccount } from 'src/web3/saga'
+import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 
 const TAG = 'escrow/saga'
 
@@ -175,7 +175,7 @@ function* getEscrowedPayment(paymentID: string) {
 function* getSentPayments() {
   try {
     const escrow = yield call(getEscrowContract, web3)
-    const account = yield call(getConnectedUnlockedAccount)
+    const account = yield call(getConnectedAccount)
     const recipientsPhoneNumbers = yield select(inviteesSelector)
     const recipientPhoneNumberToContact = yield select(recipientCacheSelector)
 
@@ -213,7 +213,7 @@ export function* fetchReclaimSuggestedFee(action: FetchReclaimTransactionFeeActi
     const { paymentID } = action
     const escrow = yield call(getEscrowContract, web3)
     const stableToken = yield call(getStableTokenContract, web3)
-    const account = yield call(getConnectedUnlockedAccount)
+    const account = yield call(getConnectedAccount)
 
     Logger.debug(TAG + '@fetchReclaimSuggestedFee', 'Fetching reclaim transaction fee')
 
