@@ -3,58 +3,36 @@ import * as React from 'react'
 import LazyLoad from 'react-lazyload'
 import { StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
-import { Props as ArticleProps } from 'src/community/Articles'
-import ArticlesSection from 'src/community/connect/ArticlesSection'
 import CodeOfConduct from 'src/community/connect/CodeOfConduct'
 import CoverArea from 'src/community/connect/CoverArea'
-import Events from 'src/community/connect/Events'
 import FellowSection from 'src/community/connect/FellowSection'
 import Tenets from 'src/community/connect/Tenets'
-import {
-  EventProps,
-  intializeTableTop,
-  normalizeEvents,
-  splitEvents,
-} from 'src/community/EventHelpers'
+
 import { H2, H3 } from 'src/fonts/Fonts'
 import EmailForm, { After } from 'src/forms/EmailForm'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import { getFormattedMediumArticles } from 'src/utils/mediumAPI'
+import ArticleData from './ArticleData'
+import EventData from './EventsData'
 
 // @ts-ignore
 const Sweep = dynamic(() => import('src/community/connect/Sweep'))
 
 const preview = require('src/community/connect/preview.jpg')
 
-interface OwnProps {
-  upcomingEvents: EventProps[]
-  topEvent: EventProps | null
-}
-
-type Props = I18nProps & ArticleProps & OwnProps
+type Props = I18nProps
 
 // only send used translations to the client
 const NAME_SPACES = ['common', 'community']
 
 export class ConnectPage extends React.Component<Props> {
   // This is Next.js method that runs serverside. it is only available on page components
-  static getInitialProps = async () => {
-    let eventData, articleData
-    try {
-      ;[eventData, articleData] = await Promise.all([
-        intializeTableTop(),
-        getFormattedMediumArticles(),
-      ])
-    } catch {
-      eventData = []
-      articleData = { articles: [] }
+  static getInitialProps = () => {
+    return {
+      namespacesRequired: NAME_SPACES,
     }
-    const { upcomingEvents, topEvent } = splitEvents(normalizeEvents(eventData))
-    const { articles } = articleData
-    return { articles, upcomingEvents, topEvent, namespacesRequired: NAME_SPACES }
   }
 
   render() {
@@ -83,8 +61,8 @@ export class ConnectPage extends React.Component<Props> {
               </Fade>
             </Cell>
           </GridRow>
-          <Events upcomingEvents={this.props.upcomingEvents} topEvent={this.props.topEvent} />
-          <ArticlesSection articles={this.props.articles} />
+          <EventData />
+          <ArticleData />
           <FellowSection />
           <View style={styles.darkBackground}>
             <GridRow
