@@ -207,10 +207,6 @@ export async function importPrivateKey(gethBinaryPath: string, instance: GethIns
   )
 }
 
-export async function killPid(pid: number) {
-  await execCmd('kill', ['-9', pid.toString()])
-}
-
 export async function killGeth() {
   console.info(`Killing ALL geth instances`)
   await execCmd('pkill', ['-9', 'geth'], { silent: true })
@@ -298,6 +294,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
   }
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`)
+  instance.pid = gethProcess.pid
 
   // Give some time for geth to come up
   const isOpen = await waitForPortOpen('localhost', rpcport, 5)
@@ -307,8 +304,6 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   } else {
     console.info(`geth:${instance.name}: jsonRPC port open ${rpcport}`)
   }
-
-  return gethProcess.pid
 }
 
 export async function migrateContracts(validatorPrivateKeys: string[], to: number = 1000) {
@@ -440,14 +435,9 @@ export function getHooks(gethConfig: GethTestConfig) {
     }
   }
 
-  const restartInstance = async (instance: GethInstanceConfig) => {
-    await killInstance(instance)
-    await initAndStartGeth(gethBinaryPath, instance)
-  }
-
   const after = () => killGeth()
 
-  return { before, after, restart, restartInstance, gethBinaryPath }
+  return { before, after, restart, gethBinaryPath }
 }
 
 export async function assertRevert(promise: any, errorMessage: string = '') {
