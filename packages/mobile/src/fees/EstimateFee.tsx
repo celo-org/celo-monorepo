@@ -1,10 +1,10 @@
 import { useEffect } from 'react'
 import { connect } from 'react-redux'
-import { FeeType, updateDefaultFee as updateDefaultFeeAction } from 'src/fees/actions'
+import { estimateFee as estimateFeeAction, FeeType } from 'src/fees/actions'
 import { RootState } from 'src/redux/reducers'
 
 interface DispatchProps {
-  updateDefaultFee: typeof updateDefaultFeeAction
+  estimateFee: typeof estimateFeeAction
 }
 
 interface OwnProps {
@@ -14,13 +14,13 @@ interface OwnProps {
 type Props = DispatchProps & OwnProps
 
 const mapDispatchToProps = {
-  updateDefaultFee: updateDefaultFeeAction,
+  estimateFee: estimateFeeAction,
 }
 
-export function EstimateFee({ feeType, updateDefaultFee }: Props) {
+export function EstimateFee({ feeType, estimateFee }: Props) {
   useEffect(
     () => {
-      updateDefaultFee(feeType)
+      estimateFee(feeType)
     },
     [feeType]
   )

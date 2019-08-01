@@ -21,7 +21,7 @@ function createEstimateReducer(feeType: FeeType) {
     }
 
     switch (action.type) {
-      case Actions.DEFAULT_FEE_UPDATED:
+      case Actions.FEE_ESTIMATED:
         return {
           ...state,
           feeInWei: action.feeInWei,

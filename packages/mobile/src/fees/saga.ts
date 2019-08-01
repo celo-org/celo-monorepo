@@ -1,6 +1,6 @@
 import { getStableTokenContract } from '@celo/contractkit'
 import { call, put, spawn, takeLeading } from 'redux-saga/effects'
-import { Actions, defaultFeeUpdated, FeeType, UpdateDefaultFeeAction } from 'src/fees/actions'
+import { Actions, EstimateFeeAction, feeEstimated, FeeType } from 'src/fees/actions'
 import { getInvitationVerificationFee } from 'src/invite/saga'
 import { getSendFee } from 'src/send/saga'
 import { CeloDefaultRecipient } from 'src/send/Send'
@@ -8,8 +8,8 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'fees/saga'
 
-export function* updateDefaultFeeSaga({ feeType }: UpdateDefaultFeeAction) {
-  Logger.debug(TAG + '@updateDefaultFeeSaga', 'updating for ', feeType)
+export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
+  Logger.debug(TAG + '@estimateFeeSaga', 'updating for ', feeType)
 
   // TODO: skip fee update if it was calculated recently
 
@@ -36,15 +36,15 @@ export function* updateDefaultFeeSaga({ feeType }: UpdateDefaultFeeAction) {
   }
 
   if (feeInWei) {
-    Logger.debug(`${TAG}/updateDefaultFeeSaga`, `New fee is: ${feeInWei}`)
-    yield put(defaultFeeUpdated(feeType, feeInWei))
+    Logger.debug(`${TAG}/estimateFeeSaga`, `New fee is: ${feeInWei}`)
+    yield put(feeEstimated(feeType, feeInWei))
   }
 }
 
-export function* watchUpdateDefaultFee() {
-  yield takeLeading(Actions.UPDATE_DEFAULT_FEE, updateDefaultFeeSaga)
+export function* watchEstimateFee() {
+  yield takeLeading(Actions.ESTIMATE_FEE, estimateFeeSaga)
 }
 
 export function* feesSaga() {
-  yield spawn(watchUpdateDefaultFee)
+  yield spawn(watchEstimateFee)
 }

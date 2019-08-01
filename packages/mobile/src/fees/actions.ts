@@ -1,6 +1,6 @@
 export enum Actions {
-  UPDATE_DEFAULT_FEE = 'FEES/UPDATE_DEFAULT_FEE',
-  DEFAULT_FEE_UPDATED = 'FEES/DEFAULT_FEE_UPDATED',
+  ESTIMATE_FEE = 'FEES/ESTIMATE_FEE',
+  FEE_ESTIMATED = 'FEES/FEE_ESTIMATED',
 }
 
 export enum FeeType {
@@ -10,26 +10,26 @@ export enum FeeType {
   RECLAIM_ESCROW = 'reclaim-escrow',
 }
 
-export interface UpdateDefaultFeeAction {
-  type: Actions.UPDATE_DEFAULT_FEE
+export interface EstimateFeeAction {
+  type: Actions.ESTIMATE_FEE
   feeType: FeeType
 }
 
-export interface DefaultFeeUpdatedAction {
-  type: Actions.DEFAULT_FEE_UPDATED
+export interface FeeEstimatedAction {
+  type: Actions.FEE_ESTIMATED
   feeType: FeeType
   feeInWei: string
 }
 
-export type ActionTypes = UpdateDefaultFeeAction | DefaultFeeUpdatedAction
+export type ActionTypes = EstimateFeeAction | FeeEstimatedAction
 
-export const updateDefaultFee = (feeType: FeeType): UpdateDefaultFeeAction => ({
-  type: Actions.UPDATE_DEFAULT_FEE,
+export const estimateFee = (feeType: FeeType): EstimateFeeAction => ({
+  type: Actions.ESTIMATE_FEE,
   feeType,
 })
 
-export const defaultFeeUpdated = (feeType: FeeType, feeInWei: string): DefaultFeeUpdatedAction => ({
-  type: Actions.DEFAULT_FEE_UPDATED,
+export const feeEstimated = (feeType: FeeType, feeInWei: string): FeeEstimatedAction => ({
+  type: Actions.FEE_ESTIMATED,
   feeType,
   feeInWei,
 })

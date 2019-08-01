@@ -4,10 +4,10 @@ import { FeeType } from 'src/fees/actions'
 import { RootState } from 'src/redux/reducers'
 import { divideByWei } from 'src/utils/formatting'
 
-const getInviteFeeEstimate = (state: RootState) => state.fees.invite.feeInWei
-const getSendFeeEstimate = (state: RootState) => state.fees.send.feeInWei
-const getExchangeFeeEstimate = (state: RootState) => state.fees.exchange.feeInWei
-const getReclaimEscrowFeeEstimate = (state: RootState) => state.fees.reclaimEscrow.feeInWei
+const getInviteFeeEstimateInWei = (state: RootState) => state.fees.invite.feeInWei
+const getSendFeeEstimateInWei = (state: RootState) => state.fees.send.feeInWei
+const getExchangeFeeEstimateInWei = (state: RootState) => state.fees.exchange.feeInWei
+const getReclaimEscrowFeeEstimateInWei = (state: RootState) => state.fees.reclaimEscrow.feeInWei
 
 export function getFeeDollars(feeInWei: BigNumber | string) {
   const adjustedFee = divideByWei(
@@ -17,7 +17,7 @@ export function getFeeDollars(feeInWei: BigNumber | string) {
   return new BigNumber(adjustedFee)
 }
 
-const feeEstimateSelectorFactory = (feeSelector: (state: RootState) => string | null) => {
+const feeEstimateDollarsSelectorFactory = (feeSelector: (state: RootState) => string | null) => {
   return createSelector(feeSelector, (feeInWei) => {
     if (!feeInWei) {
       return null
@@ -26,11 +26,15 @@ const feeEstimateSelectorFactory = (feeSelector: (state: RootState) => string | 
   })
 }
 
-export const getInviteFeeEstimateDollars = feeEstimateSelectorFactory(getInviteFeeEstimate)
-export const getSendFeeEstimateDollars = feeEstimateSelectorFactory(getSendFeeEstimate)
-export const getExchangeFeeEstimateDollars = feeEstimateSelectorFactory(getExchangeFeeEstimate)
-export const getReclaimEscrowFeeEstimateDollars = feeEstimateSelectorFactory(
-  getReclaimEscrowFeeEstimate
+export const getInviteFeeEstimateDollars = feeEstimateDollarsSelectorFactory(
+  getInviteFeeEstimateInWei
+)
+export const getSendFeeEstimateDollars = feeEstimateDollarsSelectorFactory(getSendFeeEstimateInWei)
+export const getExchangeFeeEstimateDollars = feeEstimateDollarsSelectorFactory(
+  getExchangeFeeEstimateInWei
+)
+export const getReclaimEscrowFeeEstimateDollars = feeEstimateDollarsSelectorFactory(
+  getReclaimEscrowFeeEstimateInWei
 )
 
 export const getFeeEstimateDollars = (state: RootState, feeType: FeeType) => {

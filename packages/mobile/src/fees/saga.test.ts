@@ -1,19 +1,10 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import { call } from 'redux-saga/effects'
-import { defaultFeeUpdated, FeeType, updateDefaultFee } from 'src/fees/actions'
-import { watchUpdateDefaultFee } from 'src/fees/saga'
+import { estimateFee, feeEstimated, FeeType } from 'src/fees/actions'
+import { watchEstimateFee } from 'src/fees/saga'
 import { getInvitationVerificationFee } from 'src/invite/saga'
 
-// jest.mock('src/utils/time', () => ({
-//   clockInSync: () => true,
-// }))
-
-// jest.mock('src/identity/reducer', () => ({
-//   ...jest.requireActual('src/identity/reducer'),
-//   addressToE164NumberSelector: (state: any) => ({}),
-// }))
-
-describe(watchUpdateDefaultFee, () => {
+describe(watchEstimateFee, () => {
   beforeAll(() => {
     jest.useRealTimers()
   })
@@ -23,10 +14,10 @@ describe(watchUpdateDefaultFee, () => {
   })
 
   it('updates the default invite fee', async () => {
-    await expectSaga(watchUpdateDefaultFee)
-      .dispatch(updateDefaultFee(FeeType.INVITE))
+    await expectSaga(watchEstimateFee)
+      .dispatch(estimateFee(FeeType.INVITE))
       .provide([[call(getInvitationVerificationFee), '42']])
-      .put(defaultFeeUpdated(FeeType.INVITE, '42'))
+      .put(feeEstimated(FeeType.INVITE, '42'))
       .silentRun()
   })
 })
