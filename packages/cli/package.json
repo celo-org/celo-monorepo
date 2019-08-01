@@ -36,6 +36,7 @@
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
+    "ethereumjs-util": "^5.2.0",
     "bip32": "^1.0.2",
     "bip39": "^2.5.0",
     "bn.js": "^5.0.0",
