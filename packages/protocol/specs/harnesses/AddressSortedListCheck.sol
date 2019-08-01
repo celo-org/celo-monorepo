@@ -7,14 +7,18 @@ contract AddressSortedListCheck {
 	
 	SortedLinkedList.List l;
 	
+	function toBytes(address a) public pure returns (bytes32) { // not sure why won't import?
+		return bytes32(uint256(a) << 96);
+	}
+  
 	function getElementLesser(uint256 k) public view returns (uint256) {
 		require (k < 2**160);
-		return uint256(l.list.elements[bytes32(k)].previousKey);
+		return uint256(l.list.elements[toBytes(address(k))].previousKey);
 	}
 	
 	function getElementGreater(uint256 k) public view returns (uint256) {
 		require (k < 2**160);
-		return uint256(l.list.elements[bytes32(k)].nextKey);
+		return uint256(l.list.elements[toBytes(address(k))].nextKey);
 	}
 	
 	function getNumElements() public view returns (uint256) {
