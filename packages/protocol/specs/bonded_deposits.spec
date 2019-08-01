@@ -45,7 +45,7 @@ rule address_cant_be_both_account_and_delegate(method f, address x) {
 	env ePre;
 	bool _isAccount = sinvoke _exists(ePre,x); // x is an account if true
 	
-	address _aExists = sinvoke _exists(ePre,account);
+	bool _aExists = sinvoke _exists(ePre,account);
 	address _aRewardsDelegate = sinvoke _rewardsDelegate(ePre,account);
 	address _aVotingDelegate = sinvoke _votingDelegate(ePre,account);
 	address _aValidatingDelegate = sinvoke _validatingDelegate(ePre,account);
@@ -64,7 +64,7 @@ rule address_cant_be_both_account_and_delegate(method f, address x) {
 	env ePost;
 	bool isAccount_ = sinvoke _exists(ePost,x); // x is an account if true
 	
-	address aExists_ = sinvoke _exists(ePost,account);
+	bool aExists_ = sinvoke _exists(ePost,account);
 	address aRewardsDelegate_ = sinvoke _rewardsDelegate(ePost,account);
 	address aVotingDelegate_ = sinvoke _votingDelegate(ePost,account);
 	address aValidatingDelegate_ = sinvoke _validatingDelegate(ePost,account);

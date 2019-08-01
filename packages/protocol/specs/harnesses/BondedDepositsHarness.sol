@@ -54,4 +54,40 @@ contract BondedDepositsHarness is BondedDeposits {
 		  }
 	 */
 
+	function _lenNoticePeriods(address account) public view returns (uint256) {
+		return accounts[account].deposits.noticePeriods.length;
+	}
+	
+	function _lenAvailabilityTimes(address account) public view returns (uint256) { 
+		return accounts[account].deposits.availabilityTimes.length;
+	}
+	
+	function _rewardsDelegate(address account) public view returns (address) {
+		return accounts[account].rewards.delegate;
+	}
+	
+	function _rewardsLastRedeemed(address account) public view returns (uint96) {
+		return accounts[account].rewards.lastRedeemed;
+	}
+	
+	function _votingDelegate(address account) public view returns (address) {
+		return accounts[account].voting.delegate;	
+	}
+	
+	function _votingFrozen(address account) public view returns (bool) {
+		return accounts[account].voting.frozen;
+	}
+	
+	function _validatingDelegate(address account) public view returns (address) {
+		return accounts[account].validating.delegate;
+	}
+	
+	function _weight(address account) public view returns (uint256) {
+		return accounts[account].weight;
+	}
+	
+	function _exists(address account) public view returns (bool) {
+		return accounts[account].exists;
+	}
+	
 }

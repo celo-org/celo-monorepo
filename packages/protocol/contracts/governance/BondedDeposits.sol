@@ -78,7 +78,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
   // TODO(asa): Add minNoticePeriod
   uint256 public maxNoticePeriod;
   uint256 public totalWeight;
-  mapping(address => Account) private accounts;
+  mapping(address => Account) accounts; // SG: Tentatively removing "private", mechanize this
   // Maps voting, rewards, and validating delegates to the account that delegated these rights.
   mapping(address => address) public delegations;
   // Maps a block number to the cumulative reward for an account with weight 1 since genesis.
