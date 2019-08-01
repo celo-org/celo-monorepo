@@ -47,6 +47,8 @@ library LinkedList {
     if (list.numElements == 0) {
       list.tail = key;
       list.head = key;
+	  element.nextKey = 0; // SG: Edge case in checking the list invariants. Could happen if we were to delete all elements from the list and re-add one of them.
+	  element.previousKey = 0;
     } else {
       require(
         previousKey != bytes32(0) || nextKey != bytes32(0),
