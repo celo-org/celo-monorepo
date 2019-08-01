@@ -82,8 +82,6 @@ class ImportContacts extends React.Component<Props, State> {
   nextScreen = async () => {
     const { account, e164Number } = this.props
     const currentlyVerifiedAddress = await lookupAddressFromPhoneNumber(e164Number)
-    console.log('==cur ver address', currentlyVerifiedAddress)
-    console.log('==cur account', account)
     if (account && areAddressesEqual(account, currentlyVerifiedAddress)) {
       // Wallet was imported and user is already verified to their current phone number
       navigate(Stacks.AppStack)
