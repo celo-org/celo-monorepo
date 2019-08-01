@@ -4,10 +4,11 @@ import { FeeType } from 'src/fees/actions'
 import { RootState } from 'src/redux/reducers'
 import { divideByWei } from 'src/utils/formatting'
 
-const getInviteFeeEstimateInWei = (state: RootState) => state.fees.invite.feeInWei
-const getSendFeeEstimateInWei = (state: RootState) => state.fees.send.feeInWei
-const getExchangeFeeEstimateInWei = (state: RootState) => state.fees.exchange.feeInWei
-const getReclaimEscrowFeeEstimateInWei = (state: RootState) => state.fees.reclaimEscrow.feeInWei
+const getInviteFeeEstimateInWei = (state: RootState) => state.fees.estimates.invite.feeInWei
+const getSendFeeEstimateInWei = (state: RootState) => state.fees.estimates.send.feeInWei
+const getExchangeFeeEstimateInWei = (state: RootState) => state.fees.estimates.exchange.feeInWei
+const getReclaimEscrowFeeEstimateInWei = (state: RootState) =>
+  state.fees.estimates.reclaimEscrow.feeInWei
 
 export function getFeeDollars(feeInWei: BigNumber | string) {
   const adjustedFee = divideByWei(

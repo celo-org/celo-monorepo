@@ -33,15 +33,19 @@ function createEstimateReducer(feeType: FeeType) {
 }
 
 export interface State {
-  invite: FeeEstimateState
-  send: FeeEstimateState
-  exchange: FeeEstimateState
-  reclaimEscrow: FeeEstimateState
+  estimates: {
+    invite: FeeEstimateState
+    send: FeeEstimateState
+    exchange: FeeEstimateState
+    reclaimEscrow: FeeEstimateState
+  }
 }
 
-export const reducer = combineReducers({
+const estimatesReducer = combineReducers({
   invite: createEstimateReducer(FeeType.INVITE),
   send: createEstimateReducer(FeeType.SEND),
   exchange: createEstimateReducer(FeeType.EXCHANGE),
   reclaimEscrow: createEstimateReducer(FeeType.RECLAIM_ESCROW),
 })
+
+export const reducer = combineReducers({ estimates: estimatesReducer })

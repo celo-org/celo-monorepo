@@ -19,8 +19,10 @@ const numeral = require('numeral')
 const storeData = {
   stableToken: { balance: BALANCE_VALID },
   fees: {
-    send: {
-      feeInWei: '1',
+    estimates: {
+      send: {
+        feeInWei: '1',
+      },
     },
   },
 }
