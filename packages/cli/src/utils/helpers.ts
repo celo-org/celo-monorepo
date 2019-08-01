@@ -42,10 +42,7 @@ export async function getPubKeyFromAddrAndWeb3(addr: string, web3: Web3) {
   const prefixedMsg = ethjsutil.sha3(Buffer.concat([prefix, new Buffer(String(msg.length)), msg]))
   const pubKey = ethjsutil.ecrecover(prefixedMsg, rawsig.v, rawsig.r, rawsig.s)
 
-  const pubKeyStr = '0x' + pubKey.toString('hex')
-  const hash = Web3.utils.keccak256(pubKeyStr)
-  const computedAddr = '0x' + hash.slice(24 + 2)
-
+  const computedAddr = ethjsutil.pubToAddress(pubKey).toString('hex')
   assert(eqAddress(computedAddr, addr), 'computed address !== addr')
 
   return pubKey

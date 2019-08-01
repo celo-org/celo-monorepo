@@ -41,6 +41,7 @@ export default class ValidatorRegister extends BaseCommand {
 
     // register encryption key on attestations contract
     const attestations = await Attestations(this.web3, res.flags.from)
+    // TODO: Use a different key data encryption
     const pubKey = await getPubKeyFromAddrAndWeb3(res.flags.from, this.web3)
     // @ts-ignore
     const setKeyTx = attestations.methods.setAccountDataEncryptionKey(pubKey)
