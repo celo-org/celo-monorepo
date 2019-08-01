@@ -39,35 +39,38 @@ rule invariants_insert_basic(uint256 key, uint256 value, uint256 lesser, uint256
 	require !sinvoke contains(ePre,0);
 	
 // TODO: I'm getting into an instantiation loop here... will all the greater, lesser pointers
-	// /* forall key. contains(key) => (greater(key) != 0 => contains(greater(key))) && (lesser(key) != 0 => contains(lesser(key))) */
+	// /* forall key. contains(key) => (greater(key) != 0 => contains(greater(key))) && (lesser(key) != 0 => contains(lesser(key))) */ // TODO: Add this
 	/* forall key. contains(key) => (greater(key) == 0 <=> key == head) && (lesser(key) == 0 <=> key == tail) */
 	/* incomplete instantiation */
 	if (_headContained) {
-		require sinvoke getElementGreater(ePre,_head) == 0 <=> _head == _head;
-		require sinvoke getElementLesser(ePre,_head) == 0 <=> _head == _tail;
+		uint256 _headGreater = sinvoke getElementGreater(ePre,_head);
+		require (_headGreater == 0 <=> _head == _head) && (_headGreater != 0 => sinvoke contains(ePre,_headGreater));
+		uint256 _headLesser = sinvoke getElementLesser(ePre,_head);
+		require (_headLesser == 0 <=> _head == _tail) && (_headLesser != 0 => sinvoke contains(ePre,_headLesser));
 	}
 	if (_tailContained) {
-		require sinvoke getElementGreater(ePre,_tail) == 0 <=> _tail == _head;
-		require sinvoke getElementLesser(ePre,_tail) == 0 <=> _tail == _tail;
+		uint256 _tailGreater = sinvoke getElementGreater(ePre,_tail);
+		require (_tailGreater == 0 <=> _tail == _head) && (_tailGreater != 0 => sinvoke contains(ePre,_tailGreater));
+		uint256 _tailLesser = sinvoke getElementLesser(ePre,_tail);
+		require (_tailLesser == 0 <=> _tail == _tail) && (_tailLesser != 0 => sinvoke contains(ePre,_tailLesser));
 	}
 	if (_keyContained) {
-		require sinvoke getElementGreater(ePre,key) == 0 <=> key == _head;
-		require sinvoke getElementLesser(ePre,key) == 0 <=> key == _tail;
+		uint256 _keyGreater = sinvoke getElementGreater(ePre,key);
+		require(_keyGreater == 0 <=> key == _head) && (_keyGreater != 0 => sinvoke contains(ePre,_keyGreater));
+		uint256 _keyLesser = sinvoke getElementLesser(ePre,key);
+		require (_keyLesser == 0 <=> key == _tail) && (_keyLesser != 0 => sinvoke contains(ePre,_keyLesser));
 	}
 	if (_lesserContained) {
-		//require greaterOfLesser != 0 => _greaterOfLesserContained /* don't need for lesser(lesserKey) */;
-		require _greaterOfLesser == 0 <=> lesser == _head;
+		require (_greaterOfLesser == 0 <=> lesser == _head) && (_greaterOfLesser != 0 => _greaterOfLesserContained);
 		require sinvoke getElementLesser(ePre,lesser) == 0 <=> lesser == _tail;
-
 	}
 	if (_greaterContained) {
-		//require lesserOfGreater != 0 => _lesserOfGreaterContained /* don't need for lesser(lesserKey) */;
 		require sinvoke getElementGreater(ePre,greater) == 0 <=> greater == _head;
-		require _lesserOfGreater == 0 <=> greater == _tail;
+		require (_lesserOfGreater == 0 <=> greater == _tail) && (_lesserOfGreater != 0 => _lesserOfGreaterContained);
 	}
 			
 	env e;
-	invoke insert(e,key,value,lesser,greater);
+	sinvoke insert(e,key,value,lesser,greater);
 
 	env ePost;
 	/* collect post-data */
@@ -104,8 +107,8 @@ rule invariants_insert_basic(uint256 key, uint256 value, uint256 lesser, uint256
 	uint256 nextOfNewKey = sinvoke getElementGreater(ePost,key);
 	uint256 prevOfNewKey = sinvoke getElementLesser(ePost,key);
 
-	assert sinvoke contains(ePost,nextOfNewKey), "New key $key next $nextOfNewKey should be contained in the list";
-	assert sinvoke contains(ePost,prevOfNewKey), "New key $key previous $nextOfNewKey should be contained in the list";
+	assert nextOfNewKey == 0 || sinvoke contains(ePost,nextOfNewKey), "New key $key next $nextOfNewKey should be contained in the list";
+	assert prevOfNewKey == 0 || sinvoke contains(ePost,prevOfNewKey), "New key $key previous $prevOfNewKey should be contained in the list";
 }
 
 rule invariants_insert_basic_sorted(uint256 key, uint256 value, uint256 lesser, uint256 greater) {
@@ -169,31 +172,34 @@ rule invariants_insert_basic_sorted(uint256 key, uint256 value, uint256 lesser, 
 	/* forall key. contains(key) => getValues(tail) <= getValue(key) <= getValue(head) */
 	/* incomplete instantiation */
 	if (_headContained) {
-		require sinvoke getElementGreater(ePre,_head) == 0 <=> _head == _head;
-		require sinvoke getElementLesser(ePre,_head) == 0 <=> _head == _tail;
-		require _tailValue <= _headValue && _headValue <= _headValue;
+		uint256 _headGreater = sinvoke getElementGreater(ePre,_head);
+		require (_headGreater == 0 <=> _head == _head) && (_headGreater != 0 => sinvoke contains(ePre,_headGreater));
+		uint256 _headLesser = sinvoke getElementLesser(ePre,_head);
+		require (_headLesser == 0 <=> _head == _tail) && (_headLesser != 0 => sinvoke contains(ePre,_headLesser));
+		require _tailValue <= _headValue && _headValue <= _headValue;		
 	}
 	if (_tailContained) {
-		require sinvoke getElementGreater(ePre,_tail) == 0 <=> _tail == _head;
-		require sinvoke getElementLesser(ePre,_tail) == 0 <=> _tail == _tail;
-		require _tailValue <= _tailValue && _tailValue <= _headValue;
+		uint256 _tailGreater = sinvoke getElementGreater(ePre,_tail);
+		require (_tailGreater == 0 <=> _tail == _head) && (_tailGreater != 0 => sinvoke contains(ePre,_tailGreater));
+		uint256 _tailLesser = sinvoke getElementLesser(ePre,_tail);
+		require (_tailLesser == 0 <=> _tail == _tail) && (_tailLesser != 0 => sinvoke contains(ePre,_tailLesser));
+		require _tailValue <= _tailValue && _tailValue <= _headValue;		
 	}
 	if (_keyContained) {
-		require sinvoke getElementGreater(ePre,key) == 0 <=> key == _head;
-		require sinvoke getElementLesser(ePre,key) == 0 <=> key == _tail;
-		require _tailValue <= _keyValue && _keyValue <= _headValue;
+		uint256 _keyGreater = sinvoke getElementGreater(ePre,key);
+		require(_keyGreater == 0 <=> key == _head) && (_keyGreater != 0 => sinvoke contains(ePre,_keyGreater));
+		uint256 _keyLesser = sinvoke getElementLesser(ePre,key);
+		require (_keyLesser == 0 <=> key == _tail) && (_keyLesser != 0 => sinvoke contains(ePre,_keyLesser));
+		require _tailValue <= _keyValue && _keyValue <= _headValue;		
 	}
 	if (_lesserContained) {
-		//require greaterOfLesser != 0 => _greaterOfLesserContained /* don't need for lesser(lesserKey) */;
-		require _greaterOfLesser == 0 <=> lesser == _head;
+		require (_greaterOfLesser == 0 <=> lesser == _head) && (_greaterOfLesser != 0 => _greaterOfLesserContained);
 		require sinvoke getElementLesser(ePre,lesser) == 0 <=> lesser == _tail;
 		require _tailValue <= _lesserValue && _lesserValue <= _headValue;
-
 	}
 	if (_greaterContained) {
-		//require lesserOfGreater != 0 => _lesserOfGreaterContained /* don't need for lesser(lesserKey) */;
 		require sinvoke getElementGreater(ePre,greater) == 0 <=> greater == _head;
-		require _lesserOfGreater == 0 <=> greater == _tail;
+		require (_lesserOfGreater == 0 <=> greater == _tail) && (_lesserOfGreater != 0 => _lesserOfGreaterContained);
 		require _tailValue <= _greaterValue && _greaterValue <= _headValue;
 	}
 	if (_iContained) {
@@ -212,7 +218,7 @@ rule invariants_insert_basic_sorted(uint256 key, uint256 value, uint256 lesser, 
 	
 		
 	env e;
-	invoke insert(e,key,value,lesser,greater);
+	sinvoke insert(e,key,value,lesser,greater);
 
 	env ePost;
 	/* collect post-data */
@@ -278,10 +284,10 @@ rule invariants_insert_basic_sorted(uint256 key, uint256 value, uint256 lesser, 
 	uint256 prevOfNewKey = sinvoke getElementLesser(ePost,key);
 	uint256 prevOfNewKeyValue = sinvoke getValue(ePost,prevOfNewKey);
 
-	assert sinvoke contains(ePost,nextOfNewKey), "New key $key next $nextOfNewKey should be contained in the list";
-	assert sinvoke contains(ePost,prevOfNewKey), "New key $key previous $nextOfNewKey should be contained in the list";
-	assert nextOfNewKeyValue >= value, "New key $key next $nextOfNewKey value $nextOfNewKeyValue should be greater or equal to $value";
-	assert prevOfNewKeyValue <= value, "New key $key previous $prevOfNewKey value $prevOfNewKeyValue value should be lesser or equal to $value";
+	assert nextOfNewKey == 0 || sinvoke contains(ePost,nextOfNewKey), "New key $key next $nextOfNewKey should be contained in the list";
+	assert prevOfNewKey == 0 || sinvoke contains(ePost,prevOfNewKey), "New key $key previous $prevOfNewKey should be contained in the list";
+	assert nextOfNewKey == 0 || nextOfNewKeyValue >= value, "New key $key next $nextOfNewKey value $nextOfNewKeyValue should be greater or equal to $value";
+	assert prevOfNewKey == 0 || prevOfNewKeyValue <= value, "New key $key previous $prevOfNewKey value $prevOfNewKeyValue value should be lesser or equal to $value";
 }
 
 
@@ -337,29 +343,34 @@ rule max_correctness_insert(uint256 key, uint256 value, uint256 lesser, uint256 
 	/* forall key. contains(key) => getValues(tail) <= getValue(key) <= getValue(head) */
 	/* incomplete instantiation */
 	if (_headContained) {
-		require sinvoke getElementGreater(ePre,_head) == 0 <=> _head == _head;
-		require sinvoke getElementLesser(ePre,_head) == 0 <=> _head == _tail;
-		require _tailValue <= _headValue && _headValue <= _headValue;
+		uint256 _headGreater = sinvoke getElementGreater(ePre,_head);
+		require (_headGreater == 0 <=> _head == _head) && (_headGreater != 0 => sinvoke contains(ePre,_headGreater));
+		uint256 _headLesser = sinvoke getElementLesser(ePre,_head);
+		require (_headLesser == 0 <=> _head == _tail) && (_headLesser != 0 => sinvoke contains(ePre,_headLesser));
+		require _tailValue <= _headValue && _headValue <= _headValue;		
 	}
 	if (_tailContained) {
-		require sinvoke getElementGreater(ePre,_tail) == 0 <=> _tail == _head;
-		require sinvoke getElementLesser(ePre,_tail) == 0 <=> _tail == _tail;
-		require _tailValue <= _tailValue && _tailValue <= _headValue;
+		uint256 _tailGreater = sinvoke getElementGreater(ePre,_tail);
+		require (_tailGreater == 0 <=> _tail == _head) && (_tailGreater != 0 => sinvoke contains(ePre,_tailGreater));
+		uint256 _tailLesser = sinvoke getElementLesser(ePre,_tail);
+		require (_tailLesser == 0 <=> _tail == _tail) && (_tailLesser != 0 => sinvoke contains(ePre,_tailLesser));
+		require _tailValue <= _tailValue && _tailValue <= _headValue;		
 	}
 	if (_keyContained) {
-		require sinvoke getElementGreater(ePre,key) == 0 <=> key == _head;
-		require sinvoke getElementLesser(ePre,key) == 0 <=> key == _tail;
-		require _tailValue <= _keyValue && _keyValue <= _headValue;
+		uint256 _keyGreater = sinvoke getElementGreater(ePre,key);
+		require(_keyGreater == 0 <=> key == _head) && (_keyGreater != 0 => sinvoke contains(ePre,_keyGreater));
+		uint256 _keyLesser = sinvoke getElementLesser(ePre,key);
+		require (_keyLesser == 0 <=> key == _tail) && (_keyLesser != 0 => sinvoke contains(ePre,_keyLesser));
+		require _tailValue <= _keyValue && _keyValue <= _headValue;		
 	}
 	if (_lesserContained) {
-		require _greaterOfLesser == 0 <=> lesser == _head;
+		require (_greaterOfLesser == 0 <=> lesser == _head) && (_greaterOfLesser != 0 => _greaterOfLesserContained);
 		require sinvoke getElementLesser(ePre,lesser) == 0 <=> lesser == _tail;
 		require _tailValue <= _lesserValue && _lesserValue <= _headValue;
-
 	}
 	if (_greaterContained) {
 		require sinvoke getElementGreater(ePre,greater) == 0 <=> greater == _head;
-		require _lesserOfGreater == 0 <=> greater == _tail;
+		require (_lesserOfGreater == 0 <=> greater == _tail) && (_lesserOfGreater != 0 => _lesserOfGreaterContained);
 		require _tailValue <= _greaterValue && _greaterValue <= _headValue;
 	}
 	if (_iContained) {
@@ -434,29 +445,34 @@ rule min_correctness_insert(uint256 key, uint256 value, uint256 lesser, uint256 
 	/* forall key. contains(key) => getValues(tail) <= getValue(key) <= getValue(head) */
 	/* incomplete instantiation */
 	if (_headContained) {
-		require sinvoke getElementGreater(ePre,_head) == 0 <=> _head == _head;
-		require sinvoke getElementLesser(ePre,_head) == 0 <=> _head == _tail;
-		require _tailValue <= _headValue && _headValue <= _headValue;
+		uint256 _headGreater = sinvoke getElementGreater(ePre,_head);
+		require (_headGreater == 0 <=> _head == _head) && (_headGreater != 0 => sinvoke contains(ePre,_headGreater));
+		uint256 _headLesser = sinvoke getElementLesser(ePre,_head);
+		require (_headLesser == 0 <=> _head == _tail) && (_headLesser != 0 => sinvoke contains(ePre,_headLesser));
+		require _tailValue <= _headValue && _headValue <= _headValue;		
 	}
 	if (_tailContained) {
-		require sinvoke getElementGreater(ePre,_tail) == 0 <=> _tail == _head;
-		require sinvoke getElementLesser(ePre,_tail) == 0 <=> _tail == _tail;
-		require _tailValue <= _tailValue && _tailValue <= _headValue;
+		uint256 _tailGreater = sinvoke getElementGreater(ePre,_tail);
+		require (_tailGreater == 0 <=> _tail == _head) && (_tailGreater != 0 => sinvoke contains(ePre,_tailGreater));
+		uint256 _tailLesser = sinvoke getElementLesser(ePre,_tail);
+		require (_tailLesser == 0 <=> _tail == _tail) && (_tailLesser != 0 => sinvoke contains(ePre,_tailLesser));
+		require _tailValue <= _tailValue && _tailValue <= _headValue;		
 	}
 	if (_keyContained) {
-		require sinvoke getElementGreater(ePre,key) == 0 <=> key == _head;
-		require sinvoke getElementLesser(ePre,key) == 0 <=> key == _tail;
-		require _tailValue <= _keyValue && _keyValue <= _headValue;
+		uint256 _keyGreater = sinvoke getElementGreater(ePre,key);
+		require(_keyGreater == 0 <=> key == _head) && (_keyGreater != 0 => sinvoke contains(ePre,_keyGreater));
+		uint256 _keyLesser = sinvoke getElementLesser(ePre,key);
+		require (_keyLesser == 0 <=> key == _tail) && (_keyLesser != 0 => sinvoke contains(ePre,_keyLesser));
+		require _tailValue <= _keyValue && _keyValue <= _headValue;		
 	}
 	if (_lesserContained) {
-		require _greaterOfLesser == 0 <=> lesser == _head;
+		require (_greaterOfLesser == 0 <=> lesser == _head) && (_greaterOfLesser != 0 => _greaterOfLesserContained);
 		require sinvoke getElementLesser(ePre,lesser) == 0 <=> lesser == _tail;
 		require _tailValue <= _lesserValue && _lesserValue <= _headValue;
-
 	}
 	if (_greaterContained) {
 		require sinvoke getElementGreater(ePre,greater) == 0 <=> greater == _head;
-		require _lesserOfGreater == 0 <=> greater == _tail;
+		require (_lesserOfGreater == 0 <=> greater == _tail) && (_lesserOfGreater != 0 => _lesserOfGreaterContained);
 		require _tailValue <= _greaterValue && _greaterValue <= _headValue;
 	}
 	if (_iContained) {
@@ -484,7 +500,7 @@ rule min_correctness_insert(uint256 key, uint256 value, uint256 lesser, uint256 
 rule insert_succeeds_only_if_preconds_hold(uint256 key, uint256 value, uint256 lesser, uint256 greater)
 {
 
-env ePre; havoc ePre;
+	env ePre; havoc ePre;
 	env ePost; havoc ePost;
 	env eF; havoc eF;
 	
@@ -548,6 +564,60 @@ env ePre; havoc ePre;
 	}
 
 	precond = precond && (lesserCorrect || greaterCorrect);
+
+	// now assume invariants
+	/* list is empty iff num elements is 0 */
+	require _head == 0 <=> _numElements == 0;
+	/* head-tail symmetry */
+	require _head == 0 <=> _tail == 0; 
+	/* (exists key. contains(key)) => head != 0 && contains(head) && tail != 0 && contains(tail) */
+	require ((_head != 0 && _headContained) 
+			|| (_tail != 0 && _tailContained) 
+			|| (lesser != 0 && _lesserContained) 
+			|| (greater != 0 && _greaterContained)
+			|| (key != 0 && _keyContained)
+					) => (_head != 0 && _headContained && _tail != 0 && _tailContained);
+	/* !contains(0) */
+	require !sinvoke contains(ePre,0);
+
+	/* forall key. contains(key) => (greater(key) == 0 <=> key == head) && (lesser(key) == 0 <=> key == tail) */
+	/* forall key. contains(key) => getValues(tail) <= getValue(key) <= getValue(head) */
+	/* incomplete instantiation */
+	if (_headContained) {
+		uint256 _headGreater = sinvoke getElementGreater(ePre,_head);
+		require (_headGreater == 0 <=> _head == _head) && (_headGreater != 0 => sinvoke contains(ePre,_headGreater));
+		uint256 _headLesser = sinvoke getElementLesser(ePre,_head);
+		require (_headLesser == 0 <=> _head == _tail) && (_headLesser != 0 => sinvoke contains(ePre,_headLesser));
+		require _tailValue <= _headValue && _headValue <= _headValue;		
+	}
+	if (_tailContained) {
+		uint256 _tailGreater = sinvoke getElementGreater(ePre,_tail);
+		require (_tailGreater == 0 <=> _tail == _head) && (_tailGreater != 0 => sinvoke contains(ePre,_tailGreater));
+		uint256 _tailLesser = sinvoke getElementLesser(ePre,_tail);
+		require (_tailLesser == 0 <=> _tail == _tail) && (_tailLesser != 0 => sinvoke contains(ePre,_tailLesser));
+		require _tailValue <= _tailValue && _tailValue <= _headValue;		
+	}
+	if (_keyContained) {
+		uint256 _keyGreater = sinvoke getElementGreater(ePre,key);
+		require(_keyGreater == 0 <=> key == _head) && (_keyGreater != 0 => sinvoke contains(ePre,_keyGreater));
+		uint256 _keyLesser = sinvoke getElementLesser(ePre,key);
+		require (_keyLesser == 0 <=> key == _tail) && (_keyLesser != 0 => sinvoke contains(ePre,_keyLesser));
+		require _tailValue <= _keyValue && _keyValue <= _headValue;		
+	}
+	if (_lesserContained) {
+		require (_greaterOfLesser == 0 <=> lesser == _head) && (_greaterOfLesser != 0 => _greaterOfLesserContained);
+		require sinvoke getElementLesser(ePre,lesser) == 0 <=> lesser == _tail;
+		require _tailValue <= _lesserValue && _lesserValue <= _headValue;
+	}
+	if (_greaterContained) {
+		require sinvoke getElementGreater(ePre,greater) == 0 <=> greater == _head;
+		require (_lesserOfGreater == 0 <=> greater == _tail) && (_lesserOfGreater != 0 => _lesserOfGreaterContained);
+		require _tailValue <= _greaterValue && _greaterValue <= _headValue;
+	}
+		
+	/* more sortedness assumptions */
+	require _tailValue <= _lesserOfGreaterValue && _lesserOfGreaterValue <= _greaterValue
+			&& _lesserValue <= _greaterOfLesserValue && _greaterOfLesserValue <= _headValue;
 
 	invoke insert(eF, key, value, lesser, greater);
 	bool insertSucceeded = !lastReverted;
@@ -642,64 +712,48 @@ rule insert_preconditions_check(uint256 key, uint256 value, uint256 lesser, uint
 
 	/* forall key. contains(key) => (greater(key) == 0 <=> key == head) && (lesser(key) == 0 <=> key == tail) */
 	/* forall key. contains(key) => getValues(tail) <= getValue(key) <= getValue(head) */
+	// NEW forall key. contains(key) => contains(greater(key)) && contains(lesser(key))
 	/* incomplete instantiation */
 	if (_headContained) {
-		require sinvoke getElementGreater(ePre,_head) == 0 <=> _head == _head;
-		require sinvoke getElementLesser(ePre,_head) == 0 <=> _head == _tail;
-		require _tailValue <= _headValue && _headValue <= _headValue;
+		uint256 _headGreater = sinvoke getElementGreater(ePre,_head);
+		require (_headGreater == 0 <=> _head == _head) && (_headGreater != 0 => sinvoke contains(ePre,_headGreater));
+		uint256 _headLesser = sinvoke getElementLesser(ePre,_head);
+		require (_headLesser == 0 <=> _head == _tail) && (_headLesser != 0 => sinvoke contains(ePre,_headLesser));
+		require _tailValue <= _headValue && _headValue <= _headValue;		
 	}
 	if (_tailContained) {
-		require sinvoke getElementGreater(ePre,_tail) == 0 <=> _tail == _head;
-		require sinvoke getElementLesser(ePre,_tail) == 0 <=> _tail == _tail;
-		require _tailValue <= _tailValue && _tailValue <= _headValue;
+		uint256 _tailGreater = sinvoke getElementGreater(ePre,_tail);
+		require (_tailGreater == 0 <=> _tail == _head) && (_tailGreater != 0 => sinvoke contains(ePre,_tailGreater));
+		uint256 _tailLesser = sinvoke getElementLesser(ePre,_tail);
+		require (_tailLesser == 0 <=> _tail == _tail) && (_tailLesser != 0 => sinvoke contains(ePre,_tailLesser));
+		require _tailValue <= _tailValue && _tailValue <= _headValue;		
 	}
 	if (_keyContained) {
-		require sinvoke getElementGreater(ePre,key) == 0 <=> key == _head;
-		require sinvoke getElementLesser(ePre,key) == 0 <=> key == _tail;
-		require _tailValue <= _keyValue && _keyValue <= _headValue;
+		uint256 _keyGreater = sinvoke getElementGreater(ePre,key);
+		require(_keyGreater == 0 <=> key == _head) && (_keyGreater != 0 => sinvoke contains(ePre,_keyGreater));
+		uint256 _keyLesser = sinvoke getElementLesser(ePre,key);
+		require (_keyLesser == 0 <=> key == _tail) && (_keyLesser != 0 => sinvoke contains(ePre,_keyLesser));
+		require _tailValue <= _keyValue && _keyValue <= _headValue;		
 	}
 	if (_lesserContained) {
-		require _greaterOfLesser == 0 <=> lesser == _head;
+		require (_greaterOfLesser == 0 <=> lesser == _head) && (_greaterOfLesser != 0 => _greaterOfLesserContained);
 		require sinvoke getElementLesser(ePre,lesser) == 0 <=> lesser == _tail;
 		require _tailValue <= _lesserValue && _lesserValue <= _headValue;
-
 	}
 	if (_greaterContained) {
 		require sinvoke getElementGreater(ePre,greater) == 0 <=> greater == _head;
-		require _lesserOfGreater == 0 <=> greater == _tail;
+		require (_lesserOfGreater == 0 <=> greater == _tail) && (_lesserOfGreater != 0 => _lesserOfGreaterContained);
 		require _tailValue <= _greaterValue && _greaterValue <= _headValue;
 	}
+	
+	// greater of lesserOfGreater is greater, lesser of greaterOfLesser is lesser
+	require sinvoke getElementGreater(ePre,_lesserOfGreater) == greater;
+	require sinvoke getElementLesser(ePre,_greaterOfLesser) == lesser;
 		
 	/* more sortedness assumptions */
 	require _tailValue <= _lesserOfGreaterValue && _lesserOfGreaterValue <= _greaterValue
 			&& _lesserValue <= _greaterOfLesserValue && _greaterOfLesserValue <= _headValue;
-	
-	
-/*		
-	// forall key. contains(key) => (greater(key) == 0 <=> key == head) 
-	require lesserKey != 0 && sinvoke contains(ePre,lesserKey) => (sinvoke getElementGreater(ePre,lesserKey) == 0 <=> lesserKey == head);
-	// forall key. contains(key) => (lesser(key) == 0 <=> key == tail) 
-	require greaterKey != 0 && sinvoke contains(ePre,greaterKey) => (sinvoke getElementLesser(ePre,greaterKey) == 0 <=> greaterKey == tail);
-	// Instantiate the above for head, tail specifically (will simplify it) 
-	require head != 0 => (sinvoke getElementGreater(ePre,head) == 0);
-	require tail != 0 => (sinvoke getElementLesser(ePre,tail) == 0);
-
-	uint256 lessersGreater = sinvoke getElementGreater(ePre, lesserKey);
-	uint256 greatersLesser = sinvoke getElementLesser(ePre, greaterKey);
-	// forall key. contains(key) => (greater(key) != 0 => contains(greater(key))) && (lesser(key) != 0 => contains(lesser(key))) 
-	require sinvoke contains(ePre,lesserKey) => (lessersGreater != 0 => sinvoke contains(ePre,lessersGreater));
-	require sinvoke contains(ePre,greaterKey) => (greatersLesser != 0 => sinvoke contains(ePre,greatersLesser));
-	
-	// forall key. contains(key) => (greater(key) != 0 => key <= greater(key)) && (lesser(key) != 0 => key >= lesser(key)) 
-	require sinvoke contains(ePre,lesserKey) => ((lessersGreater != 0 => sinvoke getValue(ePre,lesserKey) <= sinvoke getValue(ePre,lessersGreater)) &&
-														(greatersLesser != 0 => sinvoke getValue(ePre,greaterKey) <= sinvoke getValue(ePre,greatersLesser)));
 		
-	// forall key1,key2. contains(key1) && contains(key2) => greater(key1) == key2 <=> lesser(key2) == key1 
-	// here: simplified	
-	require lesserCorrect => sinvoke getElementLesser(ePre, lessersGreater) == lesserKey;
-	require greaterCorrect => sinvoke getElementGreater(ePre, greatersLesser) == greaterKey;
-	*/
-	
 	invoke insert(eF, key, value, lesser, greater);
 	bool insertSucceeded = !lastReverted;
 	
@@ -707,6 +761,9 @@ rule insert_preconditions_check(uint256 key, uint256 value, uint256 lesser, uint
 	assert sinvoke contains(ePost,key), "new key $key must be contained";
 	uint256 actualNewValue = sinvoke getValue(ePost,key);
 	assert actualNewValue == value, "inserted a different value, expected $value but got $actualNewValue";
+	// TODO: check - Add assertion about the previous and next of the new key-- new key's lesser's next is key, new key's greater's prev is key. 
+	assert sinvoke getElementLesser(sinvoke getElementGreater(ePost,key)) == key, "New key $key lesser of its greater must be the key";
+	assert sinvoke getElementGreater(sinvoke getElementLesser(ePost,key)) == key, "New key $key greater of its lesser must be the key";
 }
 
 /*
