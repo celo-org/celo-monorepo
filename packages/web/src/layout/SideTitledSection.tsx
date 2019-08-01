@@ -8,15 +8,16 @@ interface SectionProps {
   title: string
   text?: string | React.ReactNode
   children?: React.ReactNode
+  span?: Spans
 }
 
-function SideTitledSection({ title, text, children }: SectionProps) {
+function SideTitledSection({ title, text, children, span }: SectionProps) {
   return (
     <GridRow allStyle={standardStyles.elementalMargin}>
       <Cell span={Spans.fourth}>
         <H3>{title}</H3>
       </Cell>
-      <Cell span={Spans.half}>
+      <Cell span={span || Spans.half}>
         <Text style={fonts.p}>{text}</Text>
         {children}
       </Cell>
