@@ -313,6 +313,13 @@ export async function requestNeededAttestations(
     numAttestationsRequestsNeeded
   )
 
+  const {
+    confirmation: approveConfirmationPromise,
+    transactionHash: approveTransactionHashPromise,
+  } = await sendTransactionPromises(approveTx, account, TAG, 'Approve Attestations')
+
+  await approveTransactionHashPromise
+
   Logger.debug(
     `${TAG}@requestNeededAttestations`,
     `Requesting ${numAttestationsRequestsNeeded} new attestations`
@@ -325,15 +332,9 @@ export async function requestNeededAttestations(
     stableTokenContract
   )
 
-  const {
-    confirmation: approveConfirmationPromise,
-    transactionHash: approveTransactionHashPromise,
-  } = await sendTransactionPromises(approveTx, account, TAG, 'Approve Attestations')
-
-  await approveTransactionHashPromise
   await Promise.all([
-    sendTransaction(requestTx, account, TAG, 'Request Attestations', REQUEST_TX_GAS),
     approveConfirmationPromise,
+    sendTransaction(requestTx, account, TAG, 'Request Attestations', REQUEST_TX_GAS),
   ])
 }
 
