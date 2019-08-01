@@ -34,8 +34,6 @@ describe('SendAmount', () => {
   })
 
   describe('when commenting', () => {
-    beforeEach(() => {})
-
     const store = createMockStore(storeData)
     const getWrapper = () =>
       render(
