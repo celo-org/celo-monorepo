@@ -2,7 +2,7 @@
 
 ### Function parameters
 
-_Vanilla parameters_ are prefered over Object Destructuring.
+_Vanilla parameters_ are preferred over Object Destructuring.
 
 Example of Vanilla parameters:
 
@@ -26,17 +26,17 @@ export const tokenFetchFactory = ({
 }: TokenFetchFactory)
 ```
 
-This is for simplicity, with fewer lines and some evidenece shows it's [faster](https://codeburst.io/es6s-function-destructuring-assignment-is-not-free-lunch-19caacc18137).
+This is for simplicity, with fewer lines and some evidence shows it's [faster](https://codeburst.io/es6s-function-destructuring-assignment-is-not-free-lunch-19caacc18137).
 
 ### Function definitions: Arrow functions vs Vanilla functions
 
-In the root scope, _Vanilla fuctions_ are prefered over Arrow fuctions.
+In the root scope, _Vanilla functions_ are preferred over Arrow functions.
 
 This is because it's consistent with generator functions, simpler to understand, easier to debug, supports recursion and functions are hoisted, meaning no concern about definition order.
 
 ### Class methods: anonymous functions vs native methods
 
-Anonnymus functions are the prefered way. As shown in the example:
+Anonymous functions are the preferred way. As shown in the example:
 
 ```
 class myClass {
@@ -54,11 +54,11 @@ For example instead of doing this:
 export myFunction{...}
 ```
 
-This is the prefered way:
+This is the preferred way:
 
 ```
 const myFunction{...}
 export _myFunction = myFunction
 ```
 
-In case it's necesarry, a decorator could wrap the exported function to allow it only to be accessed during testing.
+In case it's necessary, a decorator could wrap the exported function to allow it only to be accessed during testing.
