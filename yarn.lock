@@ -1541,15 +1541,10 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
-"@celo/client-integration@npm:@celo/client@55cf94c":
+"@celo/client@55cf94c":
   version "0.0.54"
   resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.54.tgz#b12e716b197d53686ac9e06566a48464cc0e2839"
   integrity sha512-+L2S/cOQlbEjnVscvwi50HE1itBaxtBA0gHjIbO/MoqBXvips2FGSHvpU9Uz/usnqLm/FN6BaKo5JUKZMR9FUg==
-
-"@celo/client@4fd835d":
-  version "0.0.28"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.28.tgz#2de197b0e75222ee64720f26fb3e57c19cf273eb"
-  integrity sha512-u0VPhyi7YLUdCqZCDSVqUQm+MU/EZJ6JiKAq/MikJyCJdQZu7QU3nU4nV1HPXAsLmLon2z38a46nAjO4318D+Q==
 
 "@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#2ebdf9f":
   version "6.4.3"
