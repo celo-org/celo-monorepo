@@ -146,6 +146,10 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     uint256 referendumStageDuration
   );
 
+  event TallyStageDurationSet(
+    uint256 tallyStageDuration
+  );
+
   event ExecutionStageDurationSet(
     uint256 executionStageDuration
   );
@@ -334,6 +338,16 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     require(referendumStageDuration > 0 && referendumStageDuration != stageDurations.referendum);
     stageDurations.referendum = referendumStageDuration;
     emit ReferendumStageDurationSet(referendumStageDuration);
+  }
+
+  /**
+   * @notice Updates the number of seconds proposals stay in the tally stage.
+   * @param tallyStageDuration The number of seconds proposals stay in the tally stage.
+   */
+  function setTallyStageDuration(uint256 tallyStageDuration) external onlyOwner {
+    require(tallyStageDuration > 0 && tallyStageDuration != stageDurations.tally);
+    stageDurations.tally = tallyStageDuration;
+    emit TallyStageDurationSet(tallyStageDuration);
   }
 
   /**
@@ -532,7 +546,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
       deleteDequeuedProposal(proposalId, index);
       return false;
     }
-    ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
+    ProposalStage stage = getDequeuedProposalStage(proposal.timestamp);
     require(msg.sender == approver && !proposal.approved && stage == ProposalStage.Approval);
     proposal.approved = true;
     emit ProposalApproved(proposalId);
@@ -564,7 +578,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
       deleteDequeuedProposal(proposalId, index);
       return false;
     }
-    ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
+    ProposalStage stage = getDequeuedProposalStage(proposal.timestamp);
     Voter storage voter = voters[account];
     uint256 weight = getAccountWeight(account);
     require(
@@ -618,7 +632,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
       deleteDequeuedProposal(proposalId, index);
       return false;
     }
-    ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
+    ProposalStage stage = getDequeuedProposalStage(proposal.timestamp);
     require(
       proposal.approved &&
       proposal.tally == TallyOutcome.None &&
@@ -644,7 +658,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     bool expired = isDequeuedProposalExpired(proposal);
     if (!expired) {
       // TODO(asa): Think through the effects of changing the passing function
-      ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
+      ProposalStage stage = getDequeuedProposalStage(proposal.timestamp);
       require(
         proposal.approved &&
         stage == ProposalStage.Execution &&
@@ -868,7 +882,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     Voter storage voter = voters[account];
     bool isVotingQueue = voter.upvotedProposal != 0 && isQueued(voter.upvotedProposal);
     Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
-    ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
+    ProposalStage stage = getDequeuedProposalStage(proposal.timestamp);
     bool isVotingReferendum = (stage == ProposalStage.Referendum);
     bool isVotingTally = (stage == ProposalStage.Tally);
     return isVotingQueue || isVotingReferendum || isVotingTally;
@@ -947,16 +961,6 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
       proposal.votes.abstain,
       totalWeight()
     );
-    int256 threshold = _getProposalThreshold(proposal);
-    return support > threshold;
-  }
-
-  function getProposalThreshold(uint256 proposalId) external view returns (int256) {
-    Proposal storage proposal = proposals[proposalId];
-    return _getProposalThreshold(proposal);
-  }
-
-  function _getProposalThreshold(Proposal storage proposal) private view returns (int256) {
     int256 proposalThreshold = HALF;
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
       bytes4 functionId = extractFunctionSignature(proposal.transactions[i].data);
@@ -968,11 +972,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
         proposalThreshold = threshold;
       }
     }
-    return proposalThreshold;
-  }
-
-  function getDequeuedProposalStage(uint256 dequeueTime) external view returns (ProposalStage) {
-    return _getDequeuedProposalStage(dequeueTime);
+    return support > proposalThreshold;
   }
 
   /**
@@ -980,7 +980,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
    * @param dequeueTime The timestamp in seconds since epoch of when the proposal was dequeued.
    * @return The stage of the dequeued proposal.
    */
-  function _getDequeuedProposalStage(uint256 dequeueTime) private view returns (ProposalStage) {
+  function getDequeuedProposalStage(uint256 dequeueTime) public view returns (ProposalStage) {
     // solhint-disable-next-line not-rely-on-time
     if (now >= stageStartTime(dequeueTime, ProposalStage.Expiration)) {
       return ProposalStage.Expiration;
@@ -1078,7 +1078,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
    * @return Whether or not the dequeued proposal has expired.
    */
   function isDequeuedProposalExpired(Proposal storage proposal) private view returns (bool) {
-    ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
+    ProposalStage stage = getDequeuedProposalStage(proposal.timestamp);
     // The proposal is considered expired under the following conditions:
     //   1. Past the approval stage and not approved.
     //   2. Past the referendum stage and not passing.

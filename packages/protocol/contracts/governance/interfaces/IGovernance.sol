@@ -9,6 +9,7 @@ interface IGovernance {
   function setDequeueFrequency(uint256) external;
   function setApprovalStageDuration(uint256) external;
   function setReferendumStageDuration(uint256) external;
+  function setTallyStageDuration(uint256) external;
   function setExecutionStageDuration(uint256) external;
   function setConstitution(address, bytes4, int256) external;
 

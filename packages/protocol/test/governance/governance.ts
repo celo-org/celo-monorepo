@@ -181,6 +181,11 @@ contract('Governance', (accounts: string[]) => {
       assert.equal(actualReferendumStageDuration.toNumber(), referendumStageDuration)
     })
 
+    it('should have set tallyStageDuration', async () => {
+      const actualTallyStageDuration = await governance.getTallyStageDuration()
+      assert.equal(actualTallyStageDuration.toNumber(), tallyStageDuration)
+    })
+
     it('should have set executionStageDuration', async () => {
       const actualExecutionStageDuration = await governance.getExecutionStageDuration()
       assert.equal(actualExecutionStageDuration.toNumber(), executionStageDuration)
@@ -433,6 +438,40 @@ contract('Governance', (accounts: string[]) => {
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(
         governance.setReferendumStageDuration(newReferendumStageDuration, { from: nonOwner })
+      )
+    })
+  })
+
+  describe('#setTallyStageDuration', () => {
+    const newTallyStageDuration = 2
+    it('should set the tally stage duration', async () => {
+      await governance.setTallyStageDuration(newTallyStageDuration)
+      assert.equal((await governance.getTallyStageDuration()).toNumber(), newTallyStageDuration)
+    })
+
+    it('should emit the TallyStageDurationSet event', async () => {
+      const resp = await governance.setTallyStageDuration(newTallyStageDuration)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertLogMatches2(log, {
+        event: 'TallyStageDurationSet',
+        args: {
+          tallyStageDuration: new BigNumber(newTallyStageDuration),
+        },
+      })
+    })
+
+    it('should revert when tally stage duration is 0', async () => {
+      await assertRevert(governance.setTallyStageDuration(0))
+    })
+
+    it('should revert when tally stage duration is unchanged', async () => {
+      await assertRevert(governance.setTallyStageDuration(tallyStageDuration))
+    })
+
+    it('should revert when called by anyone other than the owner', async () => {
+      await assertRevert(
+        governance.setTallyStageDuration(newTallyStageDuration, { from: nonOwner })
       )
     })
   })
