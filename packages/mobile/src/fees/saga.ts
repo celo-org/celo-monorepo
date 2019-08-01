@@ -9,7 +9,7 @@ import Logger from 'src/utils/Logger'
 const TAG = 'fees/saga'
 
 export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
-  Logger.debug(TAG + '@estimateFeeSaga', 'updating for ', feeType)
+  Logger.debug(TAG + '@estimateFeeSaga', `updating for ${feeType}`)
 
   // TODO: skip fee update if it was calculated recently
 
