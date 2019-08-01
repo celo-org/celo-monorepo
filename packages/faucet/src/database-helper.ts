@@ -65,7 +65,8 @@ function buildHandleFaucet(request: RequestRecord, snap: DataSnapshot, config: N
       new Web3(config.nodeUrl),
       account.pk,
       config.stableTokenAddress,
-      config.escrowAddress
+      config.escrowAddress,
+      config.goldTokenAddress
     )
     const goldTx = await celo.transferGold(request.beneficiary, config.faucetGoldAmount)
     const goldTxHash = await goldTx.getHash()
@@ -93,7 +94,8 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
       new Web3(config.nodeUrl),
       account.pk,
       config.stableTokenAddress,
-      config.escrowAddress
+      config.escrowAddress,
+      config.goldTokenAddress
     )
     const { address: tempAddress, inviteCode } = generateInviteCode()
     const goldTx = await celo.transferGold(tempAddress, config.inviteGoldAmount)
