@@ -173,11 +173,9 @@ library SortedLinkedList {
       greaterKey == bytes32(0) && isValueBetween(list, value, list.list.head, greaterKey)
     ) {
       return (list.list.head, greaterKey);
-    } else if (isValueBetween(list, value, lesserKey, list.list.elements[lesserKey].nextKey)) {
+    } else if (lesserKey != bytes32(0) && isValueBetween(list, value, lesserKey, list.list.elements[lesserKey].nextKey)) {
       return (lesserKey, list.list.elements[lesserKey].nextKey);
-    } else if (
-      isValueBetween(list, value, list.list.elements[greaterKey].previousKey, greaterKey)
-    ) {
+    } else if (greaterKey != bytes32(0) && isValueBetween(list, value, list.list.elements[greaterKey].previousKey, greaterKey)) {
       return (list.list.elements[greaterKey].previousKey, greaterKey);
     } else {
       require(false);
