@@ -1,4 +1,5 @@
 import { RESTDataSource } from 'apollo-datasource-rest'
+import BigNumber from 'bignumber.js'
 import {
   ABE_ADDRESS,
   BLOCKSCOUT_API,
@@ -29,23 +30,23 @@ const MODULE_ACTIONS = {
 }
 
 interface BlockscoutTransaction {
-  value: number
-  txreceipt_status: number
-  transactionIndex: number
+  value: string
+  txreceipt_status: string
+  transactionIndex: string
   to: string
-  timeStamp: number
-  nonce: number
-  isError: number
+  timeStamp: string
+  nonce: string
+  isError: string
   input: string
   hash: string
-  gasUsed: number
-  gasPrice: number
-  gas: number
+  gasUsed: string
+  gasPrice: string
+  gas: string
   from: string
-  cumulativeGasUsed: number
+  cumulativeGasUsed: string
   contractAddress: string
-  confirmations: number
-  blockNumber: number
+  confirmations: string
+  blockNumber: string
   blockHash: string
 }
 
@@ -66,6 +67,15 @@ export class BlockscoutAPI extends RESTDataSource {
     return result
   }
 
+  // LIMITATION:
+  // This function will only return Gold transfers that happened via the GoldToken
+  // contract. Any native transfers of Gold will be omitted because of how blockscout
+  // works. To get native transactions from blockscout, we'd need to use the param:
+  // "action: MODULE_ACTIONS.ACCOUNT.TX_LIST"
+  // However, the results returned from that API call do not have an easily-parseable
+  // representation of Token transfers, if they are included at all. Given that we
+  // expect native transfers to be exceedingly rare, the work to handle this is being
+  // skipped for now. TODO: (yerdua) [226]
   async getFeedEvents(args: EventArgs) {
     const rawTransactions = await this.getTokenTransactions(args)
     const events: EventInterface[] = []
@@ -94,12 +104,12 @@ export class BlockscoutAPI extends RESTDataSource {
 
         events.push({
           type: EventTypes.EXCHANGE,
-          timestamp: inEvent.timeStamp,
-          block: inEvent.blockNumber,
+          timestamp: new BigNumber(inEvent.timeStamp).toNumber(),
+          block: new BigNumber(inEvent.blockNumber).toNumber(),
           inSymbol: CONTRACT_SYMBOL_MAPPING[inEvent.contractAddress.toLowerCase()],
-          inValue: inEvent.value / WEI_PER_GOLD,
+          inValue: new BigNumber(inEvent.value).dividedBy(WEI_PER_GOLD).toNumber(),
           outSymbol: CONTRACT_SYMBOL_MAPPING[outEvent.contractAddress.toLowerCase()],
-          outValue: outEvent.value / WEI_PER_GOLD,
+          outValue: new BigNumber(outEvent.value).dividedBy(WEI_PER_GOLD).toNumber(),
           hash: txhash,
         })
 
@@ -116,9 +126,9 @@ export class BlockscoutAPI extends RESTDataSource {
         )
         events.push({
           type,
-          timestamp: event.timeStamp,
-          block: event.blockNumber,
-          value: event.value / WEI_PER_GOLD,
+          timestamp: new BigNumber(event.timeStamp).toNumber(),
+          block: new BigNumber(event.blockNumber).toNumber(),
+          value: new BigNumber(event.value).dividedBy(WEI_PER_GOLD).toNumber(),
           address,
           comment,
           symbol: CONTRACT_SYMBOL_MAPPING[event.contractAddress.toLowerCase()] || 'unknown',
@@ -145,9 +155,9 @@ export class BlockscoutAPI extends RESTDataSource {
       }
       rewards.push({
         type: EventTypes.VERIFICATION_REWARD,
-        timestamp: t.timeStamp,
-        block: t.blockNumber,
-        value: t.value / WEI_PER_GOLD,
+        timestamp: new BigNumber(t.timeStamp).toNumber(),
+        block: new BigNumber(t.blockNumber).toNumber(),
+        value: new BigNumber(t.value).dividedBy(WEI_PER_GOLD).toNumber(),
         address: VERIFICATION_REWARDS_ADDRESS,
         comment: t.input ? formatCommentString(t.input) : '',
         symbol: CONTRACT_SYMBOL_MAPPING[t.contractAddress],
