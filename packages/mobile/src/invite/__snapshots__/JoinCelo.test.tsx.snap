@@ -172,10 +172,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
         >
           <TextInput
             allowFontScaling={true}
-            autoCorrect={true}
-            autoFocus={false}
             enablesReturnKeyAutomatically={true}
-            keyboardType="default"
             onBlur={[Function]}
             onChangeText={[Function]}
             onFocus={[Function]}
@@ -183,7 +180,6 @@ exports[`JoinCeloScreen renders correctly 1`] = `
             placeholder="fullName"
             placeholderTextColor="#D1D5D8"
             rejectResponderTermination={true}
-            secureTextEntry={false}
             style={
               Array [
                 Object {
@@ -201,7 +197,6 @@ exports[`JoinCeloScreen renders correctly 1`] = `
               ]
             }
             testID="NameEntry"
-            textContentType="none"
             underlineColorAndroid="transparent"
             value="John Doe"
           />
@@ -274,16 +269,66 @@ exports[`JoinCeloScreen renders correctly 1`] = `
               >
                 <TextInput
                   allowFontScaling={true}
+                  autoCapitalize="none"
                   autoCorrect={false}
-                  autoFocus={false}
-                  keyboardType="default"
+                  data={Array []}
+                  defaultValue=""
+                  inputContainerStyle={
+                    Array [
+                      Object {
+                        "borderColor": "#D1D5D8",
+                        "borderRadius": 3,
+                        "borderWidth": 1,
+                      },
+                      Object {
+                        "height": 50,
+                      },
+                      Object {
+                        "marginTop": 1,
+                        "padding": 3,
+                      },
+                    ]
+                  }
+                  keyboardShouldPersistTaps="always"
+                  listContainerStyle={
+                    Object {
+                      "flex": 1,
+                      "padding": 0,
+                      "position": "relative",
+                      "top": 3,
+                    }
+                  }
+                  listStyle={
+                    Array [
+                      Object {
+                        "borderColor": "#D1D5D8",
+                        "borderRadius": 3,
+                        "borderWidth": 1,
+                      },
+                      Object {
+                        "backgroundColor": "#FFFFFF",
+                        "borderColor": "#D1D5D8",
+                        "borderRadius": 3,
+                        "borderTopWidth": 1,
+                        "borderWidth": 1,
+                        "flex": 1,
+                        "marginHorizontal": 0,
+                        "paddingHorizontal": 0,
+                        "paddingVertical": 6,
+                      },
+                    ]
+                  }
                   onBlur={[Function]}
                   onChangeText={[Function]}
                   onFocus={[Function]}
+                  onStartShouldSetResponderCapture={[Function]}
                   placeholder="chooseCountryCode"
                   placeholderTextColor="#D1D5D8"
                   rejectResponderTermination={true}
-                  secureTextEntry={false}
+                  renderItem={[Function]}
+                  renderSeparator={null}
+                  renderTextInput={[Function]}
+                  rowHasChanged={[Function]}
                   style={
                     Array [
                       Object {
@@ -301,7 +346,6 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                     ]
                   }
                   testID="CountryNameField"
-                  textContentType="none"
                   underlineColorAndroid="transparent"
                   value=""
                 />
@@ -377,8 +421,6 @@ exports[`JoinCeloScreen renders correctly 1`] = `
             >
               <TextInput
                 allowFontScaling={true}
-                autoCorrect={true}
-                autoFocus={false}
                 keyboardType="phone-pad"
                 onBlur={[Function]}
                 onChangeText={[Function]}
@@ -386,7 +428,6 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                 placeholder="phoneNumber"
                 placeholderTextColor="#D1D5D8"
                 rejectResponderTermination={true}
-                secureTextEntry={false}
                 style={
                   Array [
                     Object {
@@ -404,8 +445,8 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                   ]
                 }
                 testID="PhoneNumberField"
-                textContentType="none"
                 underlineColorAndroid="transparent"
+                validator="phone"
                 value="(415) 555-6666"
               />
             </View>
@@ -660,10 +701,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
         >
           <TextInput
             allowFontScaling={true}
-            autoCorrect={true}
-            autoFocus={false}
             enablesReturnKeyAutomatically={true}
-            keyboardType="default"
             onBlur={[Function]}
             onChangeText={[Function]}
             onFocus={[Function]}
@@ -671,7 +709,6 @@ exports[`JoinCeloScreen renders with an error 1`] = `
             placeholder="fullName"
             placeholderTextColor="#D1D5D8"
             rejectResponderTermination={true}
-            secureTextEntry={false}
             style={
               Array [
                 Object {
@@ -689,7 +726,6 @@ exports[`JoinCeloScreen renders with an error 1`] = `
               ]
             }
             testID="NameEntry"
-            textContentType="none"
             underlineColorAndroid="transparent"
             value="John Doe"
           />
@@ -762,16 +798,66 @@ exports[`JoinCeloScreen renders with an error 1`] = `
               >
                 <TextInput
                   allowFontScaling={true}
+                  autoCapitalize="none"
                   autoCorrect={false}
-                  autoFocus={false}
-                  keyboardType="default"
+                  data={Array []}
+                  defaultValue=""
+                  inputContainerStyle={
+                    Array [
+                      Object {
+                        "borderColor": "#D1D5D8",
+                        "borderRadius": 3,
+                        "borderWidth": 1,
+                      },
+                      Object {
+                        "height": 50,
+                      },
+                      Object {
+                        "marginTop": 1,
+                        "padding": 3,
+                      },
+                    ]
+                  }
+                  keyboardShouldPersistTaps="always"
+                  listContainerStyle={
+                    Object {
+                      "flex": 1,
+                      "padding": 0,
+                      "position": "relative",
+                      "top": 3,
+                    }
+                  }
+                  listStyle={
+                    Array [
+                      Object {
+                        "borderColor": "#D1D5D8",
+                        "borderRadius": 3,
+                        "borderWidth": 1,
+                      },
+                      Object {
+                        "backgroundColor": "#FFFFFF",
+                        "borderColor": "#D1D5D8",
+                        "borderRadius": 3,
+                        "borderTopWidth": 1,
+                        "borderWidth": 1,
+                        "flex": 1,
+                        "marginHorizontal": 0,
+                        "paddingHorizontal": 0,
+                        "paddingVertical": 6,
+                      },
+                    ]
+                  }
                   onBlur={[Function]}
                   onChangeText={[Function]}
                   onFocus={[Function]}
+                  onStartShouldSetResponderCapture={[Function]}
                   placeholder="chooseCountryCode"
                   placeholderTextColor="#D1D5D8"
                   rejectResponderTermination={true}
-                  secureTextEntry={false}
+                  renderItem={[Function]}
+                  renderSeparator={null}
+                  renderTextInput={[Function]}
+                  rowHasChanged={[Function]}
                   style={
                     Array [
                       Object {
@@ -789,7 +875,6 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                     ]
                   }
                   testID="CountryNameField"
-                  textContentType="none"
                   underlineColorAndroid="transparent"
                   value=""
                 />
@@ -865,8 +950,6 @@ exports[`JoinCeloScreen renders with an error 1`] = `
             >
               <TextInput
                 allowFontScaling={true}
-                autoCorrect={true}
-                autoFocus={false}
                 keyboardType="phone-pad"
                 onBlur={[Function]}
                 onChangeText={[Function]}
@@ -874,7 +957,6 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                 placeholder="phoneNumber"
                 placeholderTextColor="#D1D5D8"
                 rejectResponderTermination={true}
-                secureTextEntry={false}
                 style={
                   Array [
                     Object {
@@ -892,8 +974,8 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                   ]
                 }
                 testID="PhoneNumberField"
-                textContentType="none"
                 underlineColorAndroid="transparent"
+                validator="phone"
                 value="(415) 555-6666"
               />
             </View>
