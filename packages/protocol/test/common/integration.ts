@@ -1,4 +1,9 @@
-import { assertEqualBN, stripHexEncoding, timeTravel } from '@celo/protocol/lib/test-utils'
+import {
+  assertEqualBN,
+  isSameAddress,
+  stripHexEncoding,
+  timeTravel,
+} from '@celo/protocol/lib/test-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import BigNumber from 'bignumber.js'
@@ -17,6 +22,12 @@ enum VoteValue {
   Abstain,
   No,
   Yes,
+}
+
+enum TallyOutcome {
+  None = 0,
+  Fail,
+  Pass,
 }
 
 contract('Integration: Governance', (accounts: string[]) => {
@@ -116,9 +127,21 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
   })
 
+  describe('When tallying that proposal', async () => {
+    before(async () => {
+      await timeTravel(config.governance.referendumStageDuration, web3)
+      await governance.tally(proposalId, dequeuedIndex)
+    })
+
+    it('should set the proposal to passing', async () => {
+      const tally = await governance.getTally(proposalId)
+      assertEqualBN(tally, TallyOutcome.Pass)
+    })
+  })
+
   describe('When executing that proposal', async () => {
     before(async () => {
-      await timeTravel(config.governance.executionStageDuration, web3)
+      await timeTravel(config.governance.tallyStageDuration, web3)
       await governance.execute(proposalId, dequeuedIndex)
     })
 
@@ -139,6 +162,8 @@ contract('Integration: Exchange', (accounts: string[]) => {
   let originalStable
   let originalGold
   let originalReserve
+
+  const decimals = 18
 
   before(async () => {
     exchange = await getDeployedProxiedContract('Exchange', artifacts)
@@ -166,7 +191,13 @@ contract('Integration: Exchange', (accounts: string[]) => {
       await exchange.exchange(sellAmount, minBuyAmount, true)
       const finalGold = await goldToken.balanceOf(accounts[0])
 
-      assert.isTrue(finalGold.lt(originalGold))
+      const block = await web3.eth.getBlock('latest')
+      if (isSameAddress(block.miner, accounts[0])) {
+        const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
+        assert.isTrue(finalGold.lt(originalGold.plus(blockReward)))
+      } else {
+        assert.isTrue(finalGold.lt(originalGold))
+      }
     })
 
     it(`should increase Reserve's gold`, async () => {
