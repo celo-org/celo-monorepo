@@ -88,7 +88,7 @@ const CalculateInviteFee: FunctionComponent<DispatchProps & InviteProps> = (prop
 
 const CalculateSendFee: FunctionComponent<DispatchProps & SendProps> = (props) => {
   const asyncResult = useAsyncShowError(
-    async (account: string, recipientAddress: string, amount: BigNumber, comment: string) =>
+    (account: string, recipientAddress: string, amount: BigNumber, comment: string) =>
       getSendFee(account, getStableTokenContract, {
         recipientAddress,
         amount: amount.valueOf(),
