@@ -1,5 +1,9 @@
 steps:
 
+# Unshallow clone
+- name: gcr.io/cloud-builders/git
+  args: ['fetch', '--unshallow']
+
 # Deploy to app engine using yarn command 
 - name: "gcr.io/cloud-builders/yarn"
   args: ["deploy", "-n $_NETWORK_NAME"]
