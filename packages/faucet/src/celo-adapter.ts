@@ -18,8 +18,8 @@ export class CeloAdapter {
     private readonly web3: Web3,
     pk: string,
     private readonly stableTokenAddress: string,
-    private readonly escrowAddress: string,
-    private readonly goldTokenAddress: string
+    private readonly goldTokenAddress: string,
+    private readonly escrowAddress: string
   ) {
     this.privateKey = this.web3.utils.isHexStrict(pk) ? pk : '0x' + pk
     this.defaultAddress = getAddress(this.web3, this.privateKey)
