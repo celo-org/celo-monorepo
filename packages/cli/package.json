@@ -28,7 +28,7 @@
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "tslint -p . -t stylish",
     "prepack": "tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "export TZ=UTC && jest --ci --silent --coverage",
+    "test": "export TZ=UTC && jest --ci --silent",
     "version": "oclif-dev readme && git add README.md"
   },
   "dependencies": {
