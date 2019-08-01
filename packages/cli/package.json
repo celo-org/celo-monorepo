@@ -26,7 +26,7 @@
     "docs": "yarn oclif-dev readme --multi --dir=../docs/command-line-interface && yarn prettier ../docs/command-line-interface/*.md --write",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "lint-checks": "yarn run lint",
-    "test": "export TZ=UTC && jest --ci --silent --coverage"
+    "test": "export TZ=UTC && jest --ci --silent"
   },
   "dependencies": {
     "@celo/contractkit": "^0.0.1",

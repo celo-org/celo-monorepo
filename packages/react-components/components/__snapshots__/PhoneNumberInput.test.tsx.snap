@@ -112,16 +112,13 @@ exports[`PhoneNumberInput renders correctly with minimum props 1`] = `
     >
       <TextInput
         allowFontScaling={true}
-        autoCorrect={true}
-        autoFocus={false}
+        countryCallingCode="1"
         keyboardType="phone-pad"
         onBlur={[Function]}
         onChangeText={[Function]}
         onFocus={[Function]}
-        placeholder=""
         placeholderTextColor="#D1D5D8"
         rejectResponderTermination={true}
-        secureTextEntry={false}
         style={
           Array [
             Object {
@@ -139,8 +136,8 @@ exports[`PhoneNumberInput renders correctly with minimum props 1`] = `
           ]
         }
         testID="PhoneNumberField"
-        textContentType="none"
         underlineColorAndroid="transparent"
+        validator="phone"
         value=""
       />
     </View>
