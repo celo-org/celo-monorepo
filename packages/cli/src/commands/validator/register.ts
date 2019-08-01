@@ -1,3 +1,5 @@
+import ethjsutil from 'ethereumjs-util'
+
 import { Attestations, Validators } from '@celo/contractkit'
 import { flags } from '@oclif/command'
 
@@ -5,8 +7,6 @@ import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 import { sendTx } from '../../utils/tx'
-
-const ethjsutil = require('ethereumjs-util')
 
 export default class ValidatorRegister extends BaseCommand {
   static description = 'Register a new Validator'
@@ -40,11 +40,15 @@ export default class ValidatorRegister extends BaseCommand {
     await displaySendTx('registerValidator', tx)
 
     // register encryption key on attestations contract
-    const msg = 'msg_data'
-    const sig = this.web3.eth.sign(res.flags.from, msg)
+    const msg = new Buffer('msg_data')
+    const sig = await this.web3.eth.sign(res.flags.from, '0x' + msg.toString('hex'))
     const rawsig = ethjsutil.fromRpcSig(sig)
-    const pubKey = ethjsutil.ecrecover(ethjsutil.toBuffer(msg), rawsig.v, rawsig.r, rawsig.s)
+
+    const prefix = new Buffer('\x19Ethereum Signed Message:\n')
+    const prefixedMsg = ethjsutil.sha3(Buffer.concat([prefix, new Buffer(String(msg.length)), msg]))
+    const pubKey = ethjsutil.ecrecover(prefixedMsg, rawsig.v, rawsig.r, rawsig.s)
     const attestations = await Attestations(this.web3, res.flags.from)
+    // @ts-ignore
     const setKeyTx = attestations.methods.setAccountDataEncryptionKey(pubKey)
     await sendTx(setKeyTx)
   }
