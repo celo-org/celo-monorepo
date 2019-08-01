@@ -39,7 +39,6 @@ export interface ConfirmationInput {
   amount: BigNumber
   reason: string
   recipientAddress?: string | null
-  fee: BigNumber
 }
 interface StateProps {
   account: string | null

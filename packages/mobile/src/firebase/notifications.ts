@@ -47,20 +47,11 @@ const handlePaymentRequested = (
     recipientCache
   )
 
-  // const fee = await dispatch(
-  //   updateSuggestedFee(true, getStableTokenContract, {
-  //     recipientAddress: requesterAddress!,
-  //     amount: paymentRequest.amount,
-  //     comment: paymentRequest.comment,
-  //   })
-  // )
-
   navigateToRequestedPaymentReview({
     recipient,
     amount: new BigNumber(paymentRequest.amount),
     reason: paymentRequest.comment,
     recipientAddress: requesterAddress!,
-    fee: new BigNumber(1), // TODO: remove/refactor this
   })
 }
 

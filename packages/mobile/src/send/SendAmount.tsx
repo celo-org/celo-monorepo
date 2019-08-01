@@ -205,17 +205,11 @@ export class SendAmount extends React.PureComponent<Props, State> {
     // TODO (Rossy) Remove address field from some recipient types.
     const recipientAddress = getAddressFromRecipient(recipient, this.props.e164NumberToAddress)
 
-    const { suggestedFeeDollars } = this.props
-    if (!suggestedFeeDollars) {
-      return null
-    }
-
     const confirmationInput: ConfirmationInput = {
       recipient,
       amount,
       reason: this.state.reason,
       recipientAddress,
-      fee: suggestedFeeDollars,
     }
     return confirmationInput
   }
