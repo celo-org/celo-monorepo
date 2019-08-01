@@ -1,10 +1,10 @@
 import Head from 'next/head'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { H1 as ResponsiveH1 } from 'src/fonts/Fonts'
 import Link from 'src/shared/Link'
 import Responsive from 'src/shared/Responsive'
 import { TextStyles } from 'src/shared/Styles'
-import { H1 as ResponsiveH1 } from 'src/fonts/Fonts'
 
 export default class ArgentinaPrivacy extends React.Component {
   render() {

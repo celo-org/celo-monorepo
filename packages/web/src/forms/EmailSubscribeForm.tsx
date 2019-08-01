@@ -2,9 +2,9 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { TextInput } from 'src/forms/FormComponents'
 
+import Form from 'src/forms/Form'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Button, { BTN } from 'src/shared/Button.3'
-import Form from 'src/forms/Form'
 import { colors, fonts, standardStyles, textStyles, typeFaces } from 'src/styles'
 
 const MAX_CTA_LENGTH = 42

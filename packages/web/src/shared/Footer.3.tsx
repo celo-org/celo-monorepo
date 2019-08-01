@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { I18nProps, withNamespaces } from 'src/i18n'
+import MediumLogo from 'src/icons/MediumLogo'
+import RedditLogo from 'src/icons/RedditLogo'
+import TwiterLogo from 'src/icons/TwitterLogo'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import RingsLight from 'src/logos/RingsLight'
 import Button, { BTN } from 'src/shared/Button.3'
-import MediumLogo from 'src/icons/MediumLogo'
 import menu from 'src/shared/menu-items'
-import RedditLogo from 'src/icons/RedditLogo'
 import Responsive from 'src/shared/Responsive'
-import TwiterLogo from 'src/icons/TwitterLogo'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 const menuItems = [menu.HOME, menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.COMMUNITY]

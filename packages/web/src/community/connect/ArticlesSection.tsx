@@ -7,9 +7,9 @@ import { Articles as ArticleProps } from 'fullstack/ArticleProps'
 
 import { H2 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
+import MediumLogo from 'src/icons/MediumLogo'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
-import MediumLogo from 'src/icons/MediumLogo'
 import menuItems from 'src/shared/menu-items'
 import { colors, standardStyles } from 'src/styles'
 
