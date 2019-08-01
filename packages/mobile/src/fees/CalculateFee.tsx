@@ -119,9 +119,10 @@ const CalculateFee = (props: Props) => {
       return <CalculateSendFee {...props} />
     case FeeType.RECLAIM_ESCROW:
       return <CalculateReclaimEscrowFee {...props} />
-    case FeeType.EXCHANGE:
-      return null
   }
+
+  // @ts-ignore
+  throw new Error(`Unsupported feeType: ${props.feeType}`)
 
   return null
 }
