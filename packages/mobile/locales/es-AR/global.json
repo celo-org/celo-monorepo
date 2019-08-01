@@ -83,5 +83,5 @@
     "Código QR no se pudo leer. Motivo: no se encontró la dirección de la billetera.",
   "qrFailedInvalidAddress":
     "Código QR no se pudo leer. Razón: la dirección de la cartera no es válida.",
-  "calculateFeeFailed": "No se pudo calcular la tarifa"
+  "calculateFeeFailed": "No se pudo calcular la comisión"
 }
