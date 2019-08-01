@@ -1551,10 +1551,10 @@
   resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.28.tgz#2de197b0e75222ee64720f26fb3e57c19cf273eb"
   integrity sha512-u0VPhyi7YLUdCqZCDSVqUQm+MU/EZJ6JiKAq/MikJyCJdQZu7QU3nU4nV1HPXAsLmLon2z38a46nAjO4318D+Q==
 
-"@celo/dev-cli@^2.0.0":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@celo/dev-cli/-/dev-cli-2.0.1.tgz#f01ea9c99532561c5bdaaad28a8a921e733feda2"
-  integrity sha512-TdU6hqKxlOOeSMCs8nVlsba0WAeGuxpXdo76/CD07PhpPqTyiVqPDyKac8lN5oPIOX/Ic7t+4em4ag3wh/aghQ==
+"@celo/dev-cli@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@celo/dev-cli/-/dev-cli-2.0.3.tgz#67f61dfee373ad8b412925e386cf122aabada5f5"
+  integrity sha512-4p+Ot9FNxWDXvkV0bluXYbk3DRyj7m9qt/NmygugydioSGTDqRWqpi/Kh/QYGSz5T+hKhsQtaiU0XayzbxykVQ==
   dependencies:
     "@oclif/command" "^1.5.13"
     "@oclif/config" "^1.12.12"
