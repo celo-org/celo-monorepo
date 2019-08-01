@@ -1,9 +1,10 @@
-import Web3 from 'web3'
-import { BondedDeposits } from '../generated/contracts'
-import { Address, zip } from '../utils/helpers'
-
 import BN from 'bn.js'
+import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
+
+import { BondedDeposits } from '@celo/contractkit'
+
+import { Address, zip } from '../utils/helpers'
 
 export interface VotingDetails {
   accountAddress: Address

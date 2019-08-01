@@ -1,5 +1,6 @@
+import { StableToken } from '@celo/contractkit'
+
 import { BaseCommand } from '../../base'
-import { StableToken } from '../../generated/contracts'
 import { doSwap, swapArguments } from '../../utils/exchange'
 
 export default class SellDollar extends BaseCommand {
