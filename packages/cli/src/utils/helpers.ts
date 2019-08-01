@@ -1,6 +1,5 @@
 import BN from 'bn.js'
 import ethjsutil from 'ethereumjs-util'
-import { assertAbstractType } from 'graphql'
 import Web3 from 'web3'
 
 import assert = require('assert')

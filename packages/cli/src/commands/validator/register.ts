@@ -4,9 +4,8 @@ import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { computeAddrFromPubKey, eqAddress, getPubKeyFromAddrAndWeb3 } from '../../utils/helpers'
+import { getPubKeyFromAddrAndWeb3 } from '../../utils/helpers'
 
-import assert = require('assert')
 export default class ValidatorRegister extends BaseCommand {
   static description = 'Register a new Validator'
 
@@ -29,14 +28,16 @@ export default class ValidatorRegister extends BaseCommand {
   async run() {
     const res = this.parse(ValidatorRegister)
     const contract = await Validators(this.web3, res.flags.from)
-    const tx = contract.methods.registerValidator(
-      res.flags.id,
-      res.flags.name,
-      res.flags.url,
-      res.flags.publicKey as any,
-      res.flags.noticePeriod
+    await displaySendTx(
+      'registerValidator',
+      contract.methods.registerValidator(
+        res.flags.id,
+        res.flags.name,
+        res.flags.url,
+        res.flags.publicKey as any,
+        res.flags.noticePeriod
+      )
     )
-    await displaySendTx('registerValidator', tx)
 
     // register encryption key on attestations contract
     const attestations = await Attestations(this.web3, res.flags.from)
