@@ -1,5 +1,4 @@
 import PhoneNumberInput from '@celo/react-components/components/PhoneNumberInput'
-import TextInput from '@celo/react-components/components/TextInput'
 import { shallow } from 'enzyme'
 import * as React from 'react'
 import { Text } from 'react-native'
@@ -88,7 +87,7 @@ describe('PhoneNumberInput', () => {
     it('renders a TextInput', () => {
       expect(
         numberInput()
-          .find(TextInput)
+          .find('ValidatedTextInput')
           .props()
       ).toEqual(
         expect.objectContaining({
