@@ -72,7 +72,8 @@ async function transferFunds(args: {
   const web3 = await new Web3(args.nodeUrl)
   const pk = args.pk
   const to = args.recipientAddress
-  const celo = new CeloAdapter(web3, pk, args.stableTokenAddress, args.goldTokenAddress, '')
+  // Escrow address is an empty string, because we don't need that contract in this function
+  const celo = new CeloAdapter(web3, pk, args.stableTokenAddress, '', args.goldTokenAddress)
 
   const printBalance = async (addr: string) => {
     console.log(`Account: ${addr}`)
