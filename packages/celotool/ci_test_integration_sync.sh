@@ -41,20 +41,27 @@ test_ultralight_sync () {
     ${CELO_MONOREPO_DIR}/node_modules/.bin/mocha -r ts-node/register ${CELO_MONOREPO_DIR}/packages/celotool/geth_tests/verify_ultralight_geth_logs.ts --gethlogfile ${GETH_LOG_FILE} --epoch ${EPOCH}
 }
 
+if [[ ! -e ${CELO_MONOREPO_DIR}/.env.mnemonic ]]; then
+    echo "MNEMONOIC=anything random" > ${CELO_MONOREPO_DIR}/.env.mnemonic
+fi
+
 # Test syncing
-geth_tests/integration_network_sync_test.sh integration full
+export NETWORK_NAME="integration"
+geth_tests/integration_network_sync_test.sh ${NETWORK_NAME} full
 # This is broken, I am not sure why, therefore, commented for now.
 # geth_tests/integration_network_sync_test.sh integration fast
-geth_tests/integration_network_sync_test.sh integration light
+geth_tests/integration_network_sync_test.sh ${NETWORK_NAME} light
 # celolatest sync mode won't work once a network has crossed its first epoch.
 # Therefore, disable this.
 # geth_tests/integration_network_sync_test.sh integration celolatest
-test_ultralight_sync integration
+test_ultralight_sync ${NETWORK_NAME}
 
-geth_tests/integration_network_sync_test.sh appintegration full
+export NETWORK_NAME="alfajoresstaging"
+geth_tests/integration_network_sync_test.sh ${NETWORK_NAME} full
 # This is broken, I am not sure why, therefore, commented for now.
 # geth_tests/integration_network_sync_test.sh integration fast
-geth_tests/integration_network_sync_test.sh appintegration light
-# This works since appintegration, as of now, has an unusually large epoch (30M * 5 seconds ~ 5 years)
-geth_tests/integration_network_sync_test.sh appintegration celolatest
-test_ultralight_sync appintegration
+geth_tests/integration_network_sync_test.sh ${NETWORK_NAME} light
+# celolatest sync mode won't work once a network has crossed its first epoch.
+# Therefore, disable this.
+# geth_tests/integration_network_sync_test.sh ${NETWORK_NAME} celolatest
+test_ultralight_sync ${NETWORK_NAME}
