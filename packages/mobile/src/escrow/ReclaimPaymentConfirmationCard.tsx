@@ -168,7 +168,7 @@ const style = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 10,
+    padding: 20,
   },
 
   amountContainer: {
@@ -202,17 +202,11 @@ const style = StyleSheet.create({
   },
   totalTitle: {
     lineHeight: 28,
-    marginLeft: 10,
-    left: 1,
   },
   total: {
-    right: 1,
-    marginRight: 10,
     lineHeight: 28,
   },
   totalGreen: {
-    right: 1,
-    marginRight: 10,
     lineHeight: 28,
     color: colors.celoGreen,
   },
