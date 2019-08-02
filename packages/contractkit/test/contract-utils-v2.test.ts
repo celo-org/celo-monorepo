@@ -4,6 +4,7 @@ import sleep from 'sleep-promise'
 import { TransactionReceipt } from 'web3/types'
 import { NETWORK_NAME } from '../contracts/network-name'
 import ContractUtils from '../src/contract-utils-v2'
+import { getAttestationsContract, getRegistryContract } from '../src/contracts'
 import { Logger, LogLevel } from '../src/logger'
 import {
   getGasFeeRecipient,
@@ -16,6 +17,20 @@ import {
 
 beforeAll(() => {
   Logger.setLogLevel(LogLevel.VERBOSE)
+})
+
+describe('Contract Utils V1', () => {
+  describe('#getRegistryContract', () => {
+    it('should be able to get Registry Contract', async () => {
+      const web3 = await getWeb3ForTesting()
+      const registryContract = await getRegistryContract(web3)
+      Logger.debug('getRegistryContract', `Test ${registryContract._address}`)
+      const address1 = await registryContract.methods.getAddressFor('Attestations').call()
+      const address2 = (await getAttestationsContract(web3))._address
+      expect(address1).toEqual(address2)
+      Logger.debug('getRegistryContract', `Address of attestations contract: ${address1}`)
+    })
+  })
 })
 
 describe('Contract Utils V2', () => {

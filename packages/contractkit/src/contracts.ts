@@ -1,15 +1,19 @@
+import * as fs from 'fs'
+import * as path from 'path'
 import Web3 from 'web3'
 import Attestations from '../contracts/Attestations'
 import Escrow from '../contracts/Escrow'
 import Exchange from '../contracts/Exchange'
 import GasPriceMinimum from '../contracts/GasPriceMinimum'
 import GoldToken from '../contracts/GoldToken'
+import { NETWORK_NAME } from '../contracts/network-name'
 import StableToken from '../contracts/StableToken'
 import { Attestations as AttestationsType } from '../types/Attestations'
 import { Escrow as EscrowType } from '../types/Escrow'
 import { Exchange as ExchangeType } from '../types/Exchange'
 import { GasPriceMinimum as GasPriceMinimumType } from '../types/GasPriceMinimum'
 import { GoldToken as GoldTokenType } from '../types/GoldToken'
+import { Registry as RegistryType } from '../types/Registry'
 import { StableToken as StableTokenType } from '../types/StableToken'
 
 let attestationsContract: AttestationsType | null = null
@@ -17,7 +21,24 @@ let escrowContract: EscrowType | null = null
 let exchangeContract: ExchangeType | null = null
 let gasPriceMinimumContract: GasPriceMinimumType | null = null
 let goldTokenContract: GoldTokenType | null = null
+let registryContract: RegistryType | null = null
 let stableTokenContract: StableTokenType | null = null
+
+// Registry contract is always pre-deployed to this address
+const registryAddress = '0x000000000000000000000000000000000000ce10'
+
+export async function getRegistryContract(web3: Web3): Promise<RegistryType> {
+  if (registryContract === null) {
+    console.info(`Dir is ${__dirname}`)
+    const files = fs.readdirSync(path.join(__dirname, '..'))
+    console.info(`files are ${files}`)
+    const file = path.join(__dirname, `../.artifacts/build/${NETWORK_NAME}/contracts/Registry.json`)
+    const filedata: string = fs.readFileSync(file).toString()
+    const contractAbi = JSON.parse(filedata).abi
+    registryContract = (await new web3.eth.Contract(contractAbi, registryAddress)) as RegistryType
+  }
+  return registryContract
+}
 
 export async function getAttestationsContract(web3: Web3): Promise<AttestationsType> {
   if (attestationsContract === null) {
