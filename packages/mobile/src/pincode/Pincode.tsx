@@ -1,8 +1,8 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import Link from '@celo/react-components/components/Link'
-import NumberInput from '@celo/react-components/components/NumberInput'
+import ValidatedTextInput from '@celo/react-components/components/ValidatedTextInput'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
+import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -13,15 +13,14 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import BackButton from 'src/components/BackButton'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { ERROR_BANNER_DURATION, SUPPORTS_KEYSTORE } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import BackupIcon from 'src/icons/BackupIcon'
+import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import SystemAuth from 'src/pincode/SystemAuth'
-import DisconnectBanner from 'src/shared/DisconnectBanner'
 
 enum Steps {
   EDUCATION = 0,
@@ -52,19 +51,8 @@ const mapDispatchToProps = {
 }
 
 export class Pincode extends React.Component<Props, State> {
-  static navigationOptions = {
-    headerStyle: {
-      elevation: 0,
-    },
-    headerLeftContainerStyle: { paddingHorizontal: 20 },
-    headerLeft: <BackButton />,
-    headerRightContainerStyle: { paddingRight: 15 },
-    headerRight: (
-      <View>
-        <DisconnectBanner />
-      </View>
-    ),
-  }
+  static navigationOptions = nuxNavigationOptions
+
   state = {
     step: Steps.EDUCATION,
     pin1: '',
@@ -163,15 +151,19 @@ export class Pincode extends React.Component<Props, State> {
         return (
           <View style={style.pincodeContent}>
             <Text style={[fontStyles.h1, style.h1]}>{t('createPin.title')}</Text>
-            <NumberInput
+            <ValidatedTextInput
               value={this.state.pin1}
-              onChange={this.onChangePin1}
-              onSubmit={this.onSubmitPin1}
-              isSensitiveInput={true}
-              keyboardType="numeric"
-              textContentType="password"
-              placeholder={t('createPin.yourPin')}
+              validator={ValidatorKind.Integer}
+              onChangeText={this.onChangePin1}
+              onSubmitEditing={this.onSubmitPin1}
               autoFocus={true}
+              keyboardType="numeric"
+              maxLength={6}
+              placeholder={t('createPin.yourPin')}
+              secureTextEntry={true}
+              style={style.numberInput}
+              textContentType="password"
+              nativeInput={true}
             />
           </View>
         )
@@ -179,15 +171,19 @@ export class Pincode extends React.Component<Props, State> {
         return (
           <View style={style.pincodeContent}>
             <Text style={[fontStyles.h1, style.h1]}>{t('verifyPin.title')}</Text>
-            <NumberInput
+            <ValidatedTextInput
               value={this.state.pin2}
-              onChange={this.onChangePin2}
-              onSubmit={this.createPin}
-              isSensitiveInput={true}
-              keyboardType="numeric"
-              textContentType="password"
-              placeholder={t('createPin.yourPin')}
+              validator={ValidatorKind.Integer}
+              onChangeText={this.onChangePin2}
+              onSubmitEditing={this.createPin}
               autoFocus={true}
+              keyboardType="numeric"
+              maxLength={6}
+              placeholder={t('createPin.yourPin')}
+              secureTextEntry={true}
+              style={style.numberInput}
+              textContentType="password"
+              nativeInput={true}
             />
           </View>
         )
@@ -232,19 +228,6 @@ export class Pincode extends React.Component<Props, State> {
     }
   }
 
-  renderHeader() {
-    const { t } = this.props
-    return (
-      <View style={style.header}>
-        <View style={style.goBack}>
-          <Link onPress={this.onCancel} testID="CancelPincodeButton">
-            {t('cancel')}
-          </Link>
-        </View>
-      </View>
-    )
-  }
-
   render() {
     if (SUPPORTS_KEYSTORE) {
       return <SystemAuth />
@@ -254,7 +237,6 @@ export class Pincode extends React.Component<Props, State> {
       <View style={style.pincodeContainer}>
         <DevSkipButton nextScreen={Screens.EnterInviteCode} />
         <ScrollView>
-          {this.renderHeader()}
           <BackupIcon style={style.pincodeLogo} />
           {this.renderStep()}
         </ScrollView>
@@ -287,6 +269,17 @@ const style = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     paddingBottom: 35,
+  },
+  numberInput: {
+    borderWidth: 1,
+    borderColor: colors.inputBorder,
+    borderRadius: 3,
+    padding: 7,
+    fontSize: 24,
+    marginHorizontal: 60,
+    marginVertical: 15,
+    textAlign: 'center',
+    backgroundColor: '#FFFFFF',
   },
   h1: {
     textAlign: 'center',
