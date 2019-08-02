@@ -1,6 +1,11 @@
 [
 	{
 		"type":"spec",
+		"primary_contract":"BondedDepositsHarness",
+		"specfile":"specs/bonded_deposits.spec"
+	}
+	{
+		"type":"spec",
 		"primary_contract":"SortedListCheck",
 		"specfile":"specs/list.spec"
 	}

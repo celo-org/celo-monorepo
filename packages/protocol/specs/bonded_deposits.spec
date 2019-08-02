@@ -19,9 +19,9 @@ rule account_empty_unless_created(method f, address account) {
 	bool _empty4 = (sinvoke _validatingDelegate(ePre,account) == 0);
 	bool _empty5 = (sinvoke _weight(ePre,account) == 0);
 
-	bool _exists = sinvoke _exists(ePre,account);
+	bool _existsAccount = sinvoke _exists(ePre,account);
 	 
-	require !_exists => (_empty1 && _empty2 && _empty3 && _empty4 && _empty5);
+	require !_existsAccount => (_empty1 && _empty2 && _empty3 && _empty4 && _empty5);
 	
 	env eF; 
 	calldataarg arg; 
@@ -34,9 +34,9 @@ rule account_empty_unless_created(method f, address account) {
 	bool empty4_ = (sinvoke _validatingDelegate(ePost,account) == 0);
 	bool empty5_ = (sinvoke _weight(ePost,account) == 0);
 
-	bool exists_ = sinvoke _exists(ePost,account);
+	bool existsAccount_ = sinvoke _exists(ePost,account);
 	 
-	assert !exists_ => (empty1_ && empty2_ && empty3_ && empty4_ && empty5_), "Violated: after invoking, an account cannot be un-created yet non-empty";
+	assert !existsAccount_ => (empty1_ && empty2_ && empty3_ && empty4_ && empty5_), "Violated: after invoking, an account cannot be un-created yet non-empty";
 }
 
 rule address_cant_be_both_account_and_delegate(method f, address x) {
