@@ -1,0 +1,7 @@
+[
+	{
+		"type":"spec",
+		"primary_contract":"BondedDepositsHarness",
+		"specfile":"specs/bonded_deposits.spec"
+	}
+]

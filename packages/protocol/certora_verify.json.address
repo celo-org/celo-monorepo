@@ -1,0 +1,7 @@
+[
+	{
+		"type":"spec",
+		"primary_contract":"AddressSortedListCheck",
+		"specfile":"specs/list.spec"
+	}
+]
