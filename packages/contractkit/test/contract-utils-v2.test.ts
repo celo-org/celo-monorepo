@@ -6,7 +6,6 @@ import { NETWORK_NAME } from '../contracts/network-name'
 import ContractUtils from '../src/contract-utils-v2'
 import { Logger, LogLevel } from '../src/logger'
 import {
-  getGasFeeRecipient,
   getMiner0AccountAddress,
   getMiner0PrivateKey,
   getMiner1AccountAddress,
@@ -259,7 +258,7 @@ async function transferGold(
   const fromGoldBalanceBefore: BigNumber = await ContractUtils.getGoldBalance(web3, from)
   const fromDollarBalanceBefore: BigNumber = await ContractUtils.getDollarBalance(web3, from)
   const toGoldBalanceBefore: BigNumber = await ContractUtils.getGoldBalance(web3, to)
-  const gasFeeRecipient: string = await getGasFeeRecipient(NETWORK_NAME)
+  const gasFeeRecipient: string = await web3.eth.getCoinbase()
   try {
     // This will go through but subscribing to notifications will fail.
     // "Failed to subscribe to new newBlockHeaders to confirm the transaction receipts."
@@ -328,7 +327,7 @@ async function transferDollar(
   const fromGoldBalanceBefore: BigNumber = await ContractUtils.getGoldBalance(web3, from)
   const fromDollarBalanceBefore: BigNumber = await ContractUtils.getDollarBalance(web3, from)
   const toDollarBalanceBefore: BigNumber = await ContractUtils.getDollarBalance(web3, to)
-  const gasFeeRecipient: string = await getGasFeeRecipient(NETWORK_NAME)
+  const gasFeeRecipient: string = await web3.eth.getCoinbase()
   try {
     // This will go through but subscribing to notifications will fail.
     // "Failed to subscribe to new newBlockHeaders to confirm the transaction receipts."
