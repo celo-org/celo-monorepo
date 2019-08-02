@@ -4,7 +4,16 @@ import sleep from 'sleep-promise'
 import { TransactionReceipt } from 'web3/types'
 import { NETWORK_NAME } from '../contracts/network-name'
 import ContractUtils from '../src/contract-utils-v2'
-import { getAttestationsContract, getRegistryContract } from '../src/contracts'
+import {
+  getAddress,
+  getStableTokenContract,
+  getGoldTokenContract,
+  getRegistryContract,
+  getAttestationsContract,
+  getGasPriceMinimumContract,
+  getExchangeContract,
+  getEscrowContract,
+} from '../src/contracts'
 import { Logger, LogLevel } from '../src/logger'
 import {
   getGasFeeRecipient,
@@ -23,12 +32,50 @@ describe('Contract Utils V1', () => {
   describe('#getRegistryContract', () => {
     it('should be able to get Registry Contract', async () => {
       const web3 = await getWeb3ForTesting()
-      const registryContract = await getRegistryContract(web3)
-      Logger.debug('getRegistryContract', `Test ${registryContract._address}`)
-      const address1 = await registryContract.methods.getAddressFor('Attestations').call()
-      const address2 = (await getAttestationsContract(web3))._address
-      expect(address1).toEqual(address2)
-      Logger.debug('getRegistryContract', `Address of attestations contract: ${address1}`)
+      const contracts = [
+        'Registry',
+        'Attestations',
+        'Escrow',
+        'Exchange',
+        'GasPriceMinimum',
+        'GoldToken',
+        'StableToken',
+        'Validators',
+      ]
+      for (const contract of contracts) {
+        const address = await getAddress(web3, contract)
+        Logger.debug('getRegistryContract', `Address of ${contract} contract is ${address}`)
+      }
+      Logger.debug(
+        'getRegistryContract2',
+        `Address of Registry contract is ${(await getRegistryContract(web3))._address}`
+      )
+      Logger.debug(
+        'getRegistryContract2',
+        `Address of Attestations contract is ${(await getAttestationsContract(web3))._address}`
+      )
+      Logger.debug(
+        'getRegistryContract2',
+        `Address of Escrow contract is ${(await getEscrowContract(web3))._address}`
+      )
+      Logger.debug(
+        'getRegistryContract2',
+        `Address of Exchange contract is ${(await getExchangeContract(web3))._address}`
+      )
+      Logger.debug(
+        'getRegistryContract2',
+        `Address of GasPriceMinimum contract is ${
+          (await getGasPriceMinimumContract(web3))._address
+        }`
+      )
+      Logger.debug(
+        'getRegistryContract2',
+        `Address of StableToken contract is ${(await getStableTokenContract(web3))._address}`
+      )
+      Logger.debug(
+        'getRegistryContract2',
+        `Address of GoldToken contract is ${(await getGoldTokenContract(web3))._address}`
+      )
     })
   })
 })
