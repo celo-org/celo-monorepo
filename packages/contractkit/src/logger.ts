@@ -74,7 +74,7 @@ class LoggerClass {
   }
 
   public canLog(level: LogLevel): boolean {
-    return level > this.level
+    return level >= this.level
   }
 }
 

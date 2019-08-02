@@ -77,13 +77,19 @@ export function isValidAddress(address: string) {
   )
 }
 
-export function compareAddresses(address1: string, address2: string) {
-  address1 = stripHexLeader(address1.toLowerCase())
-  address2 = stripHexLeader(address2.toLowerCase())
+export function areAddressesEqual(address1: string | null, address2: string | null) {
+  if (address1) {
+    address1 = stripHexLeader(address1.toLowerCase())
+  }
+  if (address2) {
+    address2 = stripHexLeader(address2.toLowerCase())
+  }
   return address1 === address2
 }
 
 export const SignatureUtils = {
   signMessage,
   parseSignature,
+  isValidAddress,
+  areAddressesEqual,
 }
