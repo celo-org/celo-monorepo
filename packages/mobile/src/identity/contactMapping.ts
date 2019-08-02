@@ -226,7 +226,7 @@ export enum VerificationStatus {
   UNKNOWN = 2,
 }
 
-export function getPhoneNumberAddress(
+export function getAddressFromPhoneNumber(
   e164Number: string,
   e164NumberToAddress: E164NumberToAddressType
 ): string | null | undefined {
@@ -237,11 +237,11 @@ export function getPhoneNumberAddress(
   return e164NumberToAddress[e164Number]
 }
 
-export function getPhoneNumberVerificationStatus(
+export function getVerificationStatusFromPhoneNumber(
   e164Number: string,
   e164NumberToAddress: E164NumberToAddressType
 ): VerificationStatus {
-  const address = getPhoneNumberAddress(e164Number, e164NumberToAddress)
+  const address = getAddressFromPhoneNumber(e164Number, e164NumberToAddress)
 
   // Undefined means the mapping has no entry for that number
   // or the entry has been cleared
