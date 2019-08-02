@@ -190,17 +190,18 @@ class SendConfirmation extends React.Component<Props, State> {
     const amountWithFee = new BigNumber(numeral(amount).value()).plus(fee || 0)
     const userHasEnough = !asyncFee.loading && amountWithFee.isLessThanOrEqualTo(currentBalance)
     const { isPaymentRequest } = this.getNavParams()
+    const isPrimaryButtonDisabled = isSending || !userHasEnough || !appConnected || !!asyncFee.error
     let primaryBtnInfo = {
       action: this.onSendButtonClick,
       text: t('send'),
-      disabled: isSending || !userHasEnough || !appConnected || !!asyncFee.error,
+      disabled: isPrimaryButtonDisabled,
     }
     let secondaryBtnInfo = { action: this.onPressEdit, text: t('edit'), disabled: isSending }
     if (isPaymentRequest) {
       primaryBtnInfo = {
         action: this.sendOrInvite,
         text: i18n.t('paymentRequestFlow:pay'),
-        disabled: isSending || !userHasEnough || !appConnected || !!asyncFee.error,
+        disabled: isPrimaryButtonDisabled,
       }
       secondaryBtnInfo = {
         action: this.onPressEdit,
