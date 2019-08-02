@@ -1,0 +1,1 @@
+certoraRun.py specs/harnesses/SortedListCheck.sol specs/harnesses/IntegerSortedListCheck.sol specs/harnesses/AddressSortedListCheck.sol specs/harnesses/BondedDepositsHarness.sol --solc solc-5.10.exe --settings -assumeUnwindCond
