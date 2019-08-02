@@ -69,7 +69,7 @@ class JoinPage extends React.PureComponent<Props> {
                 </Fade>
               </View>
               <View style={[styles.cloud]}>
-                <Fade bottom={true} delay={20} distance={'20px'}>
+                <Fade ssrReveal={true} bottom={true} delay={20} distance={'20px'}>
                   <Button
                     kind={BTN.PRIMARY}
                     text={t('exploreRoles')}
