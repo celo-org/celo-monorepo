@@ -156,12 +156,14 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
     const payment = this.getReclaimPaymentInput()
 
     return (
+      // Note: intentionally passing a new child func here otherwise
+      // it doesn't re-render on state change since CalculateFee is a pure component
       <CalculateFee
         feeType={FeeType.RECLAIM_ESCROW}
         account={account}
         paymentID={payment.paymentID}
       >
-        {this.renderWithAsyncFee}
+        {(asyncFee) => this.renderWithAsyncFee(asyncFee)}
       </CalculateFee>
     )
   }

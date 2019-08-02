@@ -269,7 +269,11 @@ class SendConfirmation extends React.Component<Props, State> {
       ? { feeType: FeeType.SEND, account, recipientAddress, amount, comment: reason }
       : { feeType: FeeType.INVITE }
 
-    return <CalculateFee {...feeProps}>{this.renderWithAsyncFee}</CalculateFee>
+    return (
+      // Note: intentionally passing a new child func here otherwise
+      // it doesn't re-render on state change since CalculateFee is a pure component
+      <CalculateFee {...feeProps}>{(asyncFee) => this.renderWithAsyncFee(asyncFee)}</CalculateFee>
+    )
   }
 }
 
