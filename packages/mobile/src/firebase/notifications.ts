@@ -10,7 +10,7 @@ import { showMessage } from 'src/alert/actions'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import { resolveCurrency } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
-import { lookupPhoneNumberAddress } from 'src/identity/verification'
+import { lookupAddressFromPhoneNumber } from 'src/identity/verification'
 import { DispatchType, GetStateType } from 'src/redux/reducers'
 import {
   navigateToPaymentTransferReview,
@@ -34,7 +34,7 @@ const handlePaymentRequested = (
   const { recipientCache } = getState().send
   let requesterAddress = e164NumberToAddress[paymentRequest.requesterE164Number]
   if (!requesterAddress) {
-    const resolvedAddress = await lookupPhoneNumberAddress(paymentRequest.requesterE164Number)
+    const resolvedAddress = await lookupAddressFromPhoneNumber(paymentRequest.requesterE164Number)
     if (!resolvedAddress) {
       Logger.error(TAG, 'Unable to resolve requester address')
       return

@@ -90,12 +90,12 @@ describe('SendAmount', () => {
     })
 
     const store = createMockStore(storeData)
-    const getWrapper = () =>
+    const getWrapper = (lng?: string) =>
       render(
         <Provider store={store}>
           {/*
           // @ts-ignore */}
-          <SendAmount navigation={mockNavigation} />
+          <SendAmount navigation={mockNavigation} lng={lng} />
         </Provider>
       )
 
@@ -108,7 +108,7 @@ describe('SendAmount', () => {
 
     it('handles commas', () => {
       numeral.locale('es')
-      const wrapper = getWrapper()
+      const wrapper = getWrapper('es-AR')
       const input = wrapper.getByPlaceholder(AMOUNT_PLACEHOLDER)
       fireEvent.changeText(input, '4,0')
       expect(wrapper.queryAllByDisplayValue('4,0')).toHaveLength(1)
