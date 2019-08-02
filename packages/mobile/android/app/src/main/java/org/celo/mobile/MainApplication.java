@@ -43,7 +43,7 @@ import com.reactnativegeth.RNGethPackage;
 import com.rnfs.RNFSPackage;
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
 import com.tradle.react.UdpSocketsModule;
-import org.celo.rncdd.RNConfirmDeviceCredentialsPackage;
+import org.celo.rncdc.RNConfirmDeviceCredentialsPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.reactmodule.RNSystemClockPackage;
 import com.rnrestartandroid.RNRestartAndroidPackage;

@@ -23585,9 +23585,9 @@ react-native-config@^0.11.7:
   resolved "https://registry.yarnpkg.com/react-native-config/-/react-native-config-0.11.7.tgz#a2b323f2ecd76a4df88cbb6bc86eaa2ef9febee7"
   integrity sha512-dn5s+zhwLyE25vRT/vaEtLk/j8ZL1UZKvejORNDWakSwpOnLmFurFeaZV83IqkPlfWHXHFdsYe2IRYG1WN4WkQ==
 
-"react-native-confirm-device-credentials@git://github.com/celo-org/react-native-confirm-device-credentials#9c46ad9":
+"react-native-confirm-device-credentials@git://github.com/celo-org/react-native-confirm-device-credentials#b4184e6":
   version "1.0.0"
-  resolved "git://github.com/celo-org/react-native-confirm-device-credentials#9c46ad9b7d9e0ee2c389d4b94f78ee4fc793c62d"
+  resolved "git://github.com/celo-org/react-native-confirm-device-credentials#b4184e697413f9c93808e5670111a3739b079f51"
 
 "react-native-contacts@git://github.com/celo-org/react-native-contacts#4989b0b":
   version "4.0.2"

@@ -48,14 +48,20 @@ interface ReferrerData {
   installTimestamp: string
 }
 
+interface ReferrerDataError {
+  message: string
+}
+
 export const getInviteCodeFromReferrerData = async () => {
-  const referrerData: ReferrerData = await RNInstallReferrer.getReferrer()
+  const referrerData: ReferrerData | ReferrerDataError = await RNInstallReferrer.getReferrer()
   Logger.info(
     'invite/utils/getInviteCodeFromReferrerData',
     'Referrer Data: ' + JSON.stringify(referrerData)
   )
-  if (referrerData !== null) {
-    const params = new URLSearchParamsReal(decodeURIComponent(referrerData.installReferrer))
+  if (referrerData && referrerData.hasOwnProperty('installReferrer')) {
+    const params = new URLSearchParamsReal(
+      decodeURIComponent((referrerData as ReferrerData).installReferrer)
+    )
     const inviteCode = params.get('invite-code')
     if (inviteCode) {
       return inviteCode.replace(' ', '+')
