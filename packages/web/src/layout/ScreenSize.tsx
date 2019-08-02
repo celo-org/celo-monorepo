@@ -82,7 +82,6 @@ export function withScreenSize<T>(Component: React.ComponentType<T>) {
 // if not it will be fixed on the client after first rendeer.
 // note this is intended to be used serverside and only as a guess
 export function guessDeviceType(userAgent: string) {
-  // Doesn't work right now
   const md = new MobileDetect(userAgent)
 
   if (md.mobile()) {
