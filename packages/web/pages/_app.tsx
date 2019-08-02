@@ -6,7 +6,9 @@ import { ScreenSizeProvider } from 'src/layout/ScreenSize'
 import Footer from 'src/shared/Footer.3'
 import { scrollTo } from 'src/utils/utils'
 import { appWithTranslation } from '../src/i18n'
+import config from 'react-reveal/globals'
 
+config({ ssrReveal: true })
 class MyApp extends App {
   componentDidMount() {
     if (window.location.hash) {
