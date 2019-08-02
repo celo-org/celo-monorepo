@@ -233,9 +233,6 @@ export class SendAmount extends React.PureComponent<Props, State> {
     }
 
     const confirmationInput = this.getConfirmationInput()
-    if (!confirmationInput) {
-      return
-    }
 
     if (verificationStatus === VerificationStatus.VERIFIED) {
       CeloAnalytics.track(CustomEventNames.transaction_details, {
@@ -250,9 +247,6 @@ export class SendAmount extends React.PureComponent<Props, State> {
   onRequest = () => {
     CeloAnalytics.track(CustomEventNames.request_payment_continue)
     const confirmationInput = this.getConfirmationInput()
-    if (!confirmationInput) {
-      return
-    }
 
     CeloAnalytics.track(CustomEventNames.send_invite_details, {
       requesteeAddress: confirmationInput.recipientAddress,
