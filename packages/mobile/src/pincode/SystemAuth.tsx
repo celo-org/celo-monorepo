@@ -13,6 +13,7 @@ import BackupIcon from 'src/icons/BackupIcon'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
+
 interface StateProps {
   pincodeSet: boolean
 }
