@@ -1,6 +1,6 @@
 import colors from '@celo/react-components/styles/colors'
 import BigNumber from 'bignumber.js'
-import { CURRENCY_ENUM, WEI_PER_JEM } from 'src/geth/consts'
+import { CURRENCY_ENUM, WEI_PER_CELO } from 'src/geth/consts'
 const numeral = require('numeral')
 
 // Returns a localized string that represents the number with two decimal points. The input value is parsed without consideration for the current numeral locale, i.e. it uses `.` for the decimal separator as JS usually does
@@ -24,10 +24,7 @@ export const getExchangeDisplayValueFromBigNum = (value: BigNumber) => {
 
 export const divideByWei = (value: number | string, decimals: number = 2) => {
   const bn = new BigNumber(value)
-  return bn
-    .div(WEI_PER_JEM)
-    .decimalPlaces(decimals)
-    .valueOf()
+  return bn.div(WEI_PER_CELO).decimalPlaces(decimals)
 }
 
 export function roundedDownNumber(value: BigNumber.Value, decimals: number = 2) {

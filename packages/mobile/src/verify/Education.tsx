@@ -53,7 +53,7 @@ export class Education extends React.Component<WithNamespaces> {
           <Button
             onPress={this.onSubmit}
             text={t('continue')}
-            standard={true}
+            standard={false}
             type={BtnTypes.PRIMARY}
             testID="VerifyContinueButton"
           />
@@ -67,7 +67,6 @@ const style = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
     paddingTop: 20,
     backgroundColor: colors.background,
   },
