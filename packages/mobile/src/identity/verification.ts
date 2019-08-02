@@ -19,7 +19,7 @@ import { Attestations as AttestationsType } from '@celo/contractkit/types/Attest
 import { StableToken as StableTokenType } from '@celo/contractkit/types/StableToken'
 import { compressedPubKey } from '@celo/utils/src/commentEncryption'
 import { getPhoneHash, isE164Number } from '@celo/utils/src/phoneNumbers'
-import { compareAddresses } from '@celo/utils/src/signatureUtils'
+import { areAddressesEqual } from '@celo/utils/src/signatureUtils'
 import BigNumber from 'bignumber.js'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
@@ -487,8 +487,8 @@ async function setAccount(
   const currentWalletAddress = await getWalletAddress(attestationsContract, address)
   const currentWalletDEK = await getDataEncryptionKey(attestationsContract, address)
   if (
-    !compareAddresses(currentWalletAddress, address) ||
-    !compareAddresses(currentWalletDEK, dataKey)
+    !areAddressesEqual(currentWalletAddress, address) ||
+    !areAddressesEqual(currentWalletDEK, dataKey)
   ) {
     const setAccountTx = makeSetAccountTx(attestationsContract, address, dataKey)
     await sendTransaction(setAccountTx, address, TAG, `Set Wallet Address & DEK`)
@@ -537,7 +537,7 @@ export function* revokeVerification() {
 
 // TODO(Rossy) This is currently only used in one place, would be better
 // to have consumer use the e164NumberToAddress map instead
-export async function lookupPhoneNumberAddress(e164Number: string) {
+export async function lookupAddressFromPhoneNumber(e164Number: string) {
   Logger.debug(TAG + '@lookupPhoneNumberAddress', `Checking Phone Number Address`)
 
   try {
@@ -565,5 +565,5 @@ export async function isPhoneNumberVerified(phoneNumber: string | null | undefin
     return false
   }
 
-  return (await lookupPhoneNumberAddress(phoneNumber)) != null
+  return (await lookupAddressFromPhoneNumber(phoneNumber)) != null
 }
