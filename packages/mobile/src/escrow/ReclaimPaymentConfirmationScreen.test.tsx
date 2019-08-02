@@ -15,7 +15,6 @@ jest.mock('src/escrow/saga')
 const mockedGetReclaimEscrowFee = getReclaimEscrowFee as jest.Mock
 
 const store = createMockStore()
-// const store = createMockStore({ escrow: { suggestedFee: '.01' } })
 
 describe('ReclaimPaymentConfirmationScreen', () => {
   beforeAll(() => {

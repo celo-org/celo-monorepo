@@ -24,8 +24,6 @@ export enum Actions {
   GET_SENT_PAYMENTS = 'ESCROW/GET_SENT_PAYMENTS',
   STORE_SENT_PAYMENTS = 'ESCROW/STORE_SENT_PAYMENTS',
   RESEND_PAYMENT = 'ESCROW/RESEND_PAYMENT',
-  FETCH_RECLAIM_TRANSACTION_FEE = 'ESCROW/FETCH_RECLAIM_TRANSACTION_FEE',
-  SET_RECLAIM_TRANSACTION_FEE = 'ESCROW/SET_RECLAIM_TRANSACTION_FEE',
   RECLAIM_PAYMENT_SUCCESS = 'ESCROW/RECLAIM_PAYMENT_SUCCESS',
   RECLAIM_PAYMENT_FAILURE = 'ESCROW/RECLAIM_PAYMENT_FAILURE',
 }
@@ -56,16 +54,6 @@ export interface ResendPaymentAction {
   paymentId: string
 }
 
-export interface SetReclaimTransactionFeeAction {
-  type: Actions.SET_RECLAIM_TRANSACTION_FEE
-  suggestedFee: string
-}
-
-export interface FetchReclaimTransactionFeeAction {
-  type: Actions.FETCH_RECLAIM_TRANSACTION_FEE
-  paymentID: string
-}
-
 export interface ReclaimPaymentSuccessAction {
   type: Actions.RECLAIM_PAYMENT_SUCCESS
 }
@@ -81,8 +69,6 @@ export type ActionTypes =
   | GetSentPaymentsAction
   | StoreSentPaymentsAction
   | ResendPaymentAction
-  | SetReclaimTransactionFeeAction
-  | FetchReclaimTransactionFeeAction
   | ReclaimPaymentSuccessAction
   | ReclaimFailureAction
 
@@ -116,18 +102,6 @@ export const storeSentPayments = (sentPayments: EscrowedPayment[]): StoreSentPay
 export const resendPayment = (paymentId: string): ResendPaymentAction => ({
   type: Actions.RESEND_PAYMENT,
   paymentId,
-})
-
-export const setReclaimTransactionFee = (suggestedFee: string): SetReclaimTransactionFeeAction => ({
-  type: Actions.SET_RECLAIM_TRANSACTION_FEE,
-  suggestedFee,
-})
-
-export const fetchReclaimTransactionFee = (
-  paymentID: string
-): FetchReclaimTransactionFeeAction => ({
-  type: Actions.FETCH_RECLAIM_TRANSACTION_FEE,
-  paymentID,
 })
 
 export const reclaimPaymentSuccess = (): ReclaimPaymentSuccessAction => ({

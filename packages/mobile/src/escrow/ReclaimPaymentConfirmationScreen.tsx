@@ -16,7 +16,6 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import { EscrowedPayment, reclaimPayment } from 'src/escrow/actions'
 import ReclaimPaymentConfirmationCard from 'src/escrow/ReclaimPaymentConfirmationCard'
-import { reclaimSuggestedFeeSelector } from 'src/escrow/reducer'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, { CalculateFeeChildren } from 'src/fees/CalculateFee'
 import { getFeeDollars } from 'src/fees/selectors'
@@ -35,7 +34,6 @@ interface StateProps {
   isReclaiming: boolean
   e164PhoneNumber: string
   account: string | null
-  fee: string | null
   dollarBalance: BigNumber
   appConnected: boolean
 }
@@ -55,7 +53,6 @@ const mapStateToProps = (state: RootState): StateProps => {
     isReclaiming: state.escrow.isReclaiming,
     e164PhoneNumber: state.account.e164PhoneNumber,
     account: currentAccountSelector(state),
-    fee: reclaimSuggestedFeeSelector(state),
     dollarBalance: new BigNumber(state.stableToken.balance || 0),
     appConnected: isAppConnected(state),
   }
