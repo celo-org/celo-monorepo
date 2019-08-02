@@ -11,7 +11,9 @@ import { FeeType } from 'src/fees/actions'
 import { getInvitationVerificationFee } from 'src/invite/saga'
 import { getSendFee } from 'src/send/saga'
 
-export type CalculateFeeChildren = (asyncResult: UseAsyncReturn<BigNumber, never>) => any
+export type CalculateFeeChildren = (
+  asyncResult: UseAsyncReturn<BigNumber, never>
+) => React.ReactNode
 
 interface CommonProps {
   children: CalculateFeeChildren
@@ -83,7 +85,7 @@ function useAsyncShowError<R, Args extends any[]>(
 
 const CalculateInviteFee: FunctionComponent<DispatchProps & InviteProps> = (props) => {
   const asyncResult = useAsyncShowError(getInvitationVerificationFee, [], props.showError)
-  return props.children(asyncResult)
+  return props.children(asyncResult) as React.ReactElement
 }
 
 const CalculateSendFee: FunctionComponent<DispatchProps & SendProps> = (props) => {
@@ -97,7 +99,7 @@ const CalculateSendFee: FunctionComponent<DispatchProps & SendProps> = (props) =
     [props.account, props.recipientAddress, props.amount, props.comment],
     props.showError
   )
-  return props.children(asyncResult)
+  return props.children(asyncResult) as React.ReactElement
 }
 
 const CalculateReclaimEscrowFee: FunctionComponent<DispatchProps & ReclaimEscrowProps> = (
@@ -108,7 +110,7 @@ const CalculateReclaimEscrowFee: FunctionComponent<DispatchProps & ReclaimEscrow
     [props.account, props.paymentID],
     props.showError
   )
-  return props.children(asyncResult)
+  return props.children(asyncResult) as React.ReactElement
 }
 
 const CalculateFee = (props: Props) => {
