@@ -1,6 +1,8 @@
 import TextInput from '@celo/react-components/components/TextInput'
+import ValidatedTextInput from '@celo/react-components/components/ValidatedTextInput'
 import colors from '@celo/react-components/styles/colors'
 import { Countries } from '@celo/utils/src/countries'
+import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import { getRegionCodeFromCountryCode, parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
@@ -190,7 +192,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
         <View style={[style.phoneNumberContainer, style.borderedBox]}>
           <Text style={style.phoneCountryCode}>{countryCallingCode}</Text>
           <View style={style.line} />
-          <TextInput
+          <ValidatedTextInput
             style={[style.inputBox, style.phoneNumberInput]}
             placeholderTextColor={colors.inactive}
             onChangeText={this.onChangePhoneNumber}
@@ -200,6 +202,8 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
             placeholder={this.props.inputPhonePlaceholder}
             keyboardType="phone-pad"
             testID="PhoneNumberField"
+            validator={ValidatorKind.Phone}
+            countryCallingCode={this.state.countryCallingCode}
           />
         </View>
       </View>

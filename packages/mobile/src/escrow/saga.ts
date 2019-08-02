@@ -90,7 +90,8 @@ function* withdrawFromEscrow(action: EndVerificationAction) {
 
     Logger.debug(TAG + '@withdrawFromEscrow', 'Withdrawing escrowed payment')
     if (!isValidPrivateKey(inviteCode)) {
-      Logger.error(TAG + '@withdrawFromEscrow', 'Invalid private key: ' + inviteCode)
+      Logger.warn(TAG + '@withdrawFromEscrow', 'Invalid private key, skipping escrow withdrawal')
+      return
     }
 
     const tempWalletAddress = web3.eth.accounts.privateKeyToAccount(inviteCode).address
