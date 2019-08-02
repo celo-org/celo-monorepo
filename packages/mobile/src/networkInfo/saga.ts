@@ -15,7 +15,7 @@ export function* waitForRehydrate() {
   return
 }
 
-export function* waitForNetwork() {
+export function* waitWeb3LastBlock() {
   yield waitForGethConnectivity()
   yield checkWeb3Sync()
 }

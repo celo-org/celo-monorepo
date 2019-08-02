@@ -6,7 +6,7 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import { GAS_PRICE_STALE_AFTER } from 'src/geth/consts'
-import { waitForNetwork } from 'src/networkInfo/saga'
+import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { setGasPrice } from 'src/web3/actions'
@@ -18,7 +18,7 @@ export const gasPriceSelector = (state: RootState) => state.web3.gasPrice
 export const gasPriceLastUpdatedSelector = (state: RootState) => state.web3.gasPriceLastUpdated
 
 export function* refreshGasPrice() {
-  yield call(waitForNetwork)
+  yield call(waitWeb3LastBlock)
 
   let gasPrice = yield select(gasPriceSelector)
   const gasPriceLastUpdated = yield select(gasPriceLastUpdatedSelector)

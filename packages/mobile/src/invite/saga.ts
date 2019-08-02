@@ -32,7 +32,7 @@ import {
 import { createInviteCode } from 'src/invite/utils'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { waitForNetwork } from 'src/networkInfo/saga'
+import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { transferStableToken } from 'src/stableToken/actions'
 import { createTransaction } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
@@ -200,7 +200,7 @@ function* redeemSuccess(name: string, account: string) {
 export function* redeemInviteSaga(action: RedeemInviteAction) {
   const { inviteCode, name } = action
 
-  yield call(waitForNetwork)
+  yield call(waitWeb3LastBlock)
   try {
     // Add temp wallet so we can send money from it
     let tempAccount
