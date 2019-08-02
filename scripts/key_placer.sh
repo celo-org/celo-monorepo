@@ -28,7 +28,6 @@ files=(
   ".env.mnemonic"
   ".env.mnemonic.alfajores"
   ".env.mnemonic.alfajoresstaging"
-  ".env.mnemonic.appintegration"
   ".env.mnemonic.integration"
   ".env.mnemonic.integrationtesting"
 )

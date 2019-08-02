@@ -28,6 +28,11 @@ yargs
     description: 'Address for stable token contract',
     demand: true,
   })
+  .option('goldTokenAddress', {
+    type: 'string',
+    description: 'Address for the gold token contract',
+    demand: true,
+  })
   .option('dryrun', { type: 'boolean' })
   .usage(
     '$0 <pk> <recipientAddress>',
@@ -57,6 +62,7 @@ yargs
 async function transferFunds(args: {
   nodeUrl: string
   stableTokenAddress: string
+  goldTokenAddress: string
   pk: string
   recipientAddress: string
   dryrun?: boolean
@@ -66,7 +72,8 @@ async function transferFunds(args: {
   const web3 = await new Web3(args.nodeUrl)
   const pk = args.pk
   const to = args.recipientAddress
-  const celo = new CeloAdapter(web3, pk, args.stableTokenAddress)
+  // Escrow address is an empty string, because we don't need that contract in this function
+  const celo = new CeloAdapter(web3, pk, args.stableTokenAddress, '', args.goldTokenAddress)
 
   const printBalance = async (addr: string) => {
     console.log(`Account: ${addr}`)
@@ -104,4 +111,4 @@ async function transferFunds(args: {
   await printBalance(to)
 }
 
-// --nodeUrl http://35.247.98.50:8545 --gold 10000000000000000000 --dollar 10000000000000000000 --stableTokenAddress 0x7DFAA4B53E7d06E9e30C4426d9692453d94A8437 add67e37fdf5c26743d295b1af6d9b50f2785a6b60bc83a8f05bd1dd4b385c6c  0x22937E2c505374Ce7AaE95993fe7580c526a62b4
+// --nodeUrl http://35.247.98.50:8545 --gold 10000000000000000000 --dollar 10000000000000000000 --stableTokenAddress 0x7DFAA4B53E7d06E9e30C4426d9692453d94A8437 --goldTokenAddress 0x4813BFD311E132ade22c70dFf7e5DB045d26D070 add67e37fdf5c26743d295b1af6d9b50f2785a6b60bc83a8f05bd1dd4b385c6c  0x22937E2c505374Ce7AaE95993fe7580c526a62b4
