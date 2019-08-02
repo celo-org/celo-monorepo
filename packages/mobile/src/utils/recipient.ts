@@ -3,8 +3,8 @@ import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as fuzzysort from 'fuzzysort'
 import { MinimalContact } from 'react-native-contacts'
 import {
-  getPhoneNumberAddress,
-  getPhoneNumberVerificationStatus,
+  getAddressFromPhoneNumber,
+  getVerificationStatusFromPhoneNumber,
   VerificationStatus,
 } from 'src/identity/contactMapping'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
@@ -160,7 +160,7 @@ export function getAddressFromRecipient(
     throw new Error('Missing recipient e164Number')
   }
 
-  return getPhoneNumberAddress(recipient.e164PhoneNumber, e164NumberToAddress)
+  return getAddressFromPhoneNumber(recipient.e164PhoneNumber, e164NumberToAddress)
 }
 
 export function getRecipientFromAddress(
@@ -184,7 +184,7 @@ export function getRecipientVerificationStatus(
     throw new Error('No recipient e164Number found')
   }
 
-  return getPhoneNumberVerificationStatus(recipient.e164PhoneNumber, e164NumberToAddress)
+  return getVerificationStatusFromPhoneNumber(recipient.e164PhoneNumber, e164NumberToAddress)
 }
 
 export function getRecipientThumbnail(recipient: Recipient) {
