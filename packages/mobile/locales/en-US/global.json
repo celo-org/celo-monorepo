@@ -67,6 +67,7 @@
   "sendPaymentFailed": "Failure sending payment",
   "paymentRequestFailed": "Payment Request did not send",
   "reclaimingEscrowedPaymentFailed": "Payment could not be reclaimed.",
+  "fetchingReclaimFeeFailed": "Error fetching suggested fee.",
   "connectingToCelo": "Connecting to the Celo Network...",
   "poorConnection": {
     "0": "Bad Connection",

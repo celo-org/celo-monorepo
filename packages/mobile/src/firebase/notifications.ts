@@ -70,7 +70,7 @@ const handlePaymentReceived = (
       TransactionTypes.RECEIVED,
       new BigNumber(transferNotification.timestamp).toNumber(),
       {
-        value: new BigNumber(divideByWei(transferNotification.value)),
+        value: divideByWei(transferNotification.value),
         currency: resolveCurrency(transferNotification.currency),
         address: transferNotification.sender.toLowerCase(),
         comment: transferNotification.comment,

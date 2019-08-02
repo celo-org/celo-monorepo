@@ -206,7 +206,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                   ]
                 }
               >
-                Alice The Person
+                John Doe
               </Text>
               <View
                 style={
@@ -251,13 +251,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     }
                   }
                 >
-                  (209) 555-9790
+                  (415) 555-0000
                 </Text>
               </View>
             </View>
             <View
               style={
                 Object {
+                  "alignItems": "stretch",
+                  "justifyContent": "center",
                   "marginBottom": 10,
                   "marginTop": 10,
                 }
@@ -266,8 +268,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               <View
                 style={
                   Object {
-                    "alignItems": "stretch",
-                    "flex": 1,
                     "flexDirection": "row",
                     "justifyContent": "space-between",
                   }
@@ -326,8 +326,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               <View
                 style={
                   Object {
-                    "alignItems": "stretch",
-                    "flex": 1,
                     "flexDirection": "row",
                     "justifyContent": "space-between",
                   }
@@ -424,8 +422,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               <View
                 style={
                   Object {
-                    "alignItems": "stretch",
-                    "flex": 1,
                     "flexDirection": "row",
                     "justifyContent": "space-between",
                   }
@@ -855,7 +851,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 2`] = `
                   ]
                 }
               >
-                Alice The Person
+                John Doe
               </Text>
               <View
                 style={
@@ -900,13 +896,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 2`] = `
                     }
                   }
                 >
-                  (209) 555-9790
+                  (415) 555-0000
                 </Text>
               </View>
             </View>
             <View
               style={
                 Object {
+                  "alignItems": "stretch",
+                  "justifyContent": "center",
                   "marginBottom": 10,
                   "marginTop": 10,
                 }
@@ -915,8 +913,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 2`] = `
               <View
                 style={
                   Object {
-                    "alignItems": "stretch",
-                    "flex": 1,
                     "flexDirection": "row",
                     "justifyContent": "space-between",
                   }
@@ -975,8 +971,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 2`] = `
               <View
                 style={
                   Object {
-                    "alignItems": "stretch",
-                    "flex": 1,
                     "flexDirection": "row",
                     "justifyContent": "space-between",
                   }
@@ -1076,8 +1070,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 2`] = `
               <View
                 style={
                   Object {
-                    "alignItems": "stretch",
-                    "flex": 1,
                     "flexDirection": "row",
                     "justifyContent": "space-between",
                   }
@@ -1162,7 +1154,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 2`] = `
             },
             undefined,
             Object {
-              "backgroundColor": "#42D689",
+              "backgroundColor": "#A3EBC6",
             },
           ]
         }
@@ -1179,8 +1171,8 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 2`] = `
           style={
             Object {
               "alignItems": "center",
-              "backgroundColor": "#42D689",
-              "borderColor": "#42D689",
+              "backgroundColor": "#A3EBC6",
+              "borderColor": "#A3EBC6",
               "borderRadius": 3,
               "borderWidth": 2,
               "flex": 1,
@@ -1507,7 +1499,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   ]
                 }
               >
-                Alice The Person
+                John Doe
               </Text>
               <View
                 style={
@@ -1552,13 +1544,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     }
                   }
                 >
-                  (209) 555-9790
+                  (415) 555-0000
                 </Text>
               </View>
             </View>
             <View
               style={
                 Object {
+                  "alignItems": "stretch",
+                  "justifyContent": "center",
                   "marginBottom": 10,
                   "marginTop": 10,
                 }
@@ -1567,8 +1561,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               <View
                 style={
                   Object {
-                    "alignItems": "stretch",
-                    "flex": 1,
                     "flexDirection": "row",
                     "justifyContent": "space-between",
                   }
@@ -1627,8 +1619,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               <View
                 style={
                   Object {
-                    "alignItems": "stretch",
-                    "flex": 1,
                     "flexDirection": "row",
                     "justifyContent": "space-between",
                   }
@@ -1725,8 +1715,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               <View
                 style={
                   Object {
-                    "alignItems": "stretch",
-                    "flex": 1,
                     "flexDirection": "row",
                     "justifyContent": "space-between",
                   }
@@ -2156,7 +2144,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                   ]
                 }
               >
-                Alice The Person
+                John Doe
               </Text>
               <View
                 style={
@@ -2201,13 +2189,15 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     }
                   }
                 >
-                  (209) 555-9790
+                  (415) 555-0000
                 </Text>
               </View>
             </View>
             <View
               style={
                 Object {
+                  "alignItems": "stretch",
+                  "justifyContent": "center",
                   "marginBottom": 10,
                   "marginTop": 10,
                 }
@@ -2216,8 +2206,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               <View
                 style={
                   Object {
-                    "alignItems": "stretch",
-                    "flex": 1,
                     "flexDirection": "row",
                     "justifyContent": "space-between",
                   }
@@ -2276,8 +2264,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               <View
                 style={
                   Object {
-                    "alignItems": "stretch",
-                    "flex": 1,
                     "flexDirection": "row",
                     "justifyContent": "space-between",
                   }
@@ -2375,8 +2361,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               <View
                 style={
                   Object {
-                    "alignItems": "stretch",
-                    "flex": 1,
                     "flexDirection": "row",
                     "justifyContent": "space-between",
                   }

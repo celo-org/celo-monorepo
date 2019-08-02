@@ -2,12 +2,10 @@ import PhoneNumberWithFlag from '@celo/react-components/components/PhoneNumberWi
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
-import { getContactPhoneNumber } from '@celo/utils/src/contacts'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
-import { MinimalContact } from 'react-native-contacts'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
@@ -15,7 +13,8 @@ import { Namespaces } from 'src/i18n'
 import Logo from 'src/icons/Logo'
 import { RootState } from 'src/redux/reducers'
 import FeeIcon from 'src/send/FeeIcon'
-import { getCurrencyColor, getMoneyDisplayValue } from 'src/utils/formatting'
+import { getCurrencyColor, getMoneyDisplayValue, roundedUpNumber } from 'src/utils/formatting'
+import { RecipientWithContact } from 'src/utils/recipient'
 
 interface LineItemProps {
   currencySymbol: string
@@ -64,7 +63,8 @@ function LineItemRow({
 }
 
 export interface OwnProps {
-  recipient: MinimalContact | string
+  recipientPhone: string
+  recipientContact?: RecipientWithContact
   amount: BigNumber
   comment?: string
   fee?: BigNumber
@@ -101,7 +101,7 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
         <LineItemRow currencySymbol={'$'} amount={total} title={t('totalSent')} />
         <LineItemRow
           currencySymbol={currencySymbol}
-          amount={fee}
+          amount={fee && roundedUpNumber(fee)}
           title={t('securityFee')}
           titleIcon={<FeeIcon />}
           negative={true}
@@ -120,7 +120,8 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
 
   render() {
     const {
-      recipient,
+      recipientPhone,
+      recipientContact,
       amount,
       comment,
       fee,
@@ -146,22 +147,15 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
         </View>
         <View style={style.horizontalLine} />
         <View style={style.details}>
-          {typeof recipient !== 'string' && (
+          {recipientContact && (
             <Text style={[fontStyles.bodySmallSemiBold, style.contactName]}>
-              {recipient.displayName}
+              {recipientContact.displayName}
             </Text>
           )}
-          {typeof recipient !== 'string' ? (
-            <PhoneNumberWithFlag
-              e164PhoneNumber={getContactPhoneNumber(recipient) || ''}
-              defaultCountryCode={defaultCountryCode}
-            />
-          ) : (
-            <PhoneNumberWithFlag
-              e164PhoneNumber={recipient}
-              defaultCountryCode={defaultCountryCode}
-            />
-          )}
+          <PhoneNumberWithFlag
+            e164PhoneNumber={recipientPhone}
+            defaultCountryCode={defaultCountryCode}
+          />
           {!!comment && <Text style={[fontStyles.bodySecondary, style.comment]}>{comment}</Text>}
         </View>
         {this.renderFeeAndTotal(amount, currencySymbol, fee, isLoadingFee, feeError)}
@@ -194,6 +188,8 @@ const style = StyleSheet.create({
   feeContainer: {
     marginTop: 10,
     marginBottom: 10,
+    justifyContent: 'center',
+    alignItems: 'stretch',
   },
   feeRow: {
     alignItems: 'center',
@@ -201,9 +197,7 @@ const style = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   lineItemRow: {
-    flex: 1,
     flexDirection: 'row',
-    alignItems: 'stretch',
     justifyContent: 'space-between',
   },
   totalTitle: {

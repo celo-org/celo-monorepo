@@ -2,9 +2,10 @@ import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
+import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { showError } from 'src/alert/actions'
@@ -15,22 +16,28 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import { EscrowedPayment, reclaimPayment } from 'src/escrow/actions'
 import ReclaimPaymentConfirmationCard from 'src/escrow/ReclaimPaymentConfirmationCard'
+import { reclaimSuggestedFeeSelector } from 'src/escrow/reducer'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, { CalculateFeeChildren } from 'src/fees/CalculateFee'
 import { getFeeDollars } from 'src/fees/selectors'
 import { Namespaces } from 'src/i18n'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigateBack } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
+import { isAppConnected } from 'src/redux/selectors'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
+import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'escrow/ReclaimPaymentConfirmationScreen'
 
 interface StateProps {
+  isReclaiming: boolean
   e164PhoneNumber: string
   account: string | null
+  fee: string | null
+  dollarBalance: BigNumber
+  appConnected: boolean
 }
 
 interface DispatchProps {
@@ -45,8 +52,12 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
+    isReclaiming: state.escrow.isReclaiming,
     e164PhoneNumber: state.account.e164PhoneNumber,
     account: currentAccountSelector(state),
+    fee: reclaimSuggestedFeeSelector(state),
+    dollarBalance: new BigNumber(state.stableToken.balance || 0),
+    appConnected: isAppConnected(state),
   }
 }
 
@@ -78,8 +89,6 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
       this.props.showError(ErrorMessages.RECLAIMING_ESCROWED_PAYMENT_FAILED, ERROR_BANNER_DURATION)
       return
     }
-
-    navigate(Screens.WalletHome)
   }
 
   onPressEdit = () => {
@@ -93,27 +102,44 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
     return <ReviewHeader title={title} />
   }
 
+  renderFooter = () => {
+    return this.props.isReclaiming ? (
+      <ActivityIndicator size="large" color={colors.celoGreen} />
+    ) : null
+  }
+
   renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
-    const { t } = this.props
+    const { t, isReclaiming, appConnected } = this.props
     const payment = this.getReclaimPaymentInput()
     const fee = asyncFee.result && getFeeDollars(asyncFee.result)
+    const convertedAmount = divideByWei(payment.amount.valueOf())
+
+    const currentBalance = this.props.dollarBalance
+    const userHasEnough = fee && fee.isLessThanOrEqualTo(currentBalance)
 
     return (
       <View style={styles.container}>
         <DisconnectBanner />
         <ReviewFrame
           HeaderComponent={this.renderHeader}
+          FooterComponent={this.renderFooter}
           confirmButton={{
             action: this.onConfirm,
             text: t('global:confirm'),
-            disabled: asyncFee.loading || !!asyncFee.error,
+            disabled:
+              isReclaiming ||
+              !userHasEnough ||
+              !appConnected ||
+              asyncFee.loading ||
+              !!asyncFee.error,
           }}
-          modifyButton={{ action: this.onPressEdit, text: t('cancel'), disabled: false }}
+          modifyButton={{ action: this.onPressEdit, text: t('cancel'), disabled: isReclaiming }}
         >
           <ReclaimPaymentConfirmationCard
-            recipient={payment.recipient}
+            recipientPhone={payment.recipientPhone}
+            recipientContact={payment.recipientContact}
             comment={payment.message}
-            amount={payment.amount}
+            amount={convertedAmount}
             currency={CURRENCY_ENUM.DOLLAR} // User can only request in Dollars
             fee={fee}
             isLoadingFee={asyncFee.loading}
