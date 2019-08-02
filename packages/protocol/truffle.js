@@ -1,5 +1,14 @@
-const argv = require('minimist')(process.argv.slice(2), { string: ['truffle_override', 'network'] })
+/* tslint:disable: object-literal-sort-keys */
 require('ts-node/register')
+const ProviderEngine = require('web3-provider-engine')
+const WebsocketSubprovider = require('web3-provider-engine/subproviders/websocket.js')
+const { TruffleArtifactAdapter } = require('@0x/sol-trace')
+const { CoverageSubprovider } = require('@0x/sol-coverage')
+
+const argv = require('minimist')(process.argv.slice(2), { string: ['truffle_override', 'network'] })
+
+const SOLC_VERSION = '0.5.8'
+const ALFAJORES_NETWORKID = 44781
 
 const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
@@ -7,8 +16,6 @@ const INTEGRATION_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
 const INTEGRATION_TESTING_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
 const ALFAJORESSTAING_FROM = '0xf4314cb9046bece6aa54bb9533155434d0c76909'
 const ALFAJORES_FROM = '0x456f41406b32c45d59e539e4bba3d7898c3584da'
-
-const ALFAJORES_NETWORKID = 44781
 
 const defaultConfig = {
   host: '127.0.0.1',
@@ -21,6 +28,9 @@ const defaultConfig = {
 
 const freeGasConfig = { ...defaultConfig, ...{ gasPrice: 0 } }
 
+// Here to avoid recreating it each time
+let coverageProvider = null
+
 const networks = {
   development: {
     host: '127.0.0.1',
@@ -29,16 +39,47 @@ const networks = {
     from: DEVELOPMENT_FROM,
     gasPrice: 0,
     gas: 6500000,
-    defaultBalance: 1000000,
-    mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
   },
   coverage: {
     host: 'localhost',
     network_id: '*',
-    from: DEVELOPMENT_FROM,
-    port: 8545,
-    gas: 0xfffffffffff,
     gasPrice: 0,
+    gas: 6500000,
+    from: DEVELOPMENT_FROM,
+    provider: function() {
+      if (coverageProvider == null) {
+        console.log('building provider!')
+        const projectRoot = ''
+        const artifactAdapter = new TruffleArtifactAdapter(projectRoot, SOLC_VERSION)
+        coverageProvider = new ProviderEngine()
+
+        global.coverageSubprovider = new CoverageSubprovider(artifactAdapter, DEVELOPMENT_FROM, {
+          isVerbose: true,
+        })
+        coverageProvider.addProvider(global.coverageSubprovider)
+
+        coverageProvider.addProvider(
+          new WebsocketSubprovider({
+            rpcUrl: `http://localhost:${defaultConfig.port}`,
+            debug: false,
+          })
+        )
+
+        coverageProvider.start((err) => {
+          if (err !== undefined) {
+            // tslint:disable-next-line: no-console
+            console.error(err)
+            process.exit(1)
+          }
+        })
+        /**
+         * HACK: Truffle providers should have `send` function, while `ProviderEngine` creates providers with `sendAsync`,
+         * but it can be easily fixed by assigning `sendAsync` to `send`.
+         */
+        coverageProvider.send = coverageProvider.sendAsync.bind(coverageProvider)
+      }
+      return coverageProvider
+    },
   },
   testnet_prod: defaultConfig,
 
@@ -85,7 +126,7 @@ module.exports = {
   plugins: ['truffle-security'],
   compilers: {
     solc: {
-      version: '0.5.8',
+      version: SOLC_VERSION,
     },
   },
 

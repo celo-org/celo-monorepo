@@ -3,21 +3,20 @@ const glob = require('glob-fs')({
   gitignore: false,
 })
 const { exec } = require('./lib/test-utils')
-const network = require('./truffle.js').networks.development
 const minimist = require('minimist')
 
 const sleep = (seconds) => new Promise((resolve) => setTimeout(resolve, 1000 * seconds))
 
 async function startGanache() {
   const server = ganache.server({
-    default_balance_ether: network.defaultBalance,
-    network_id: network.network_id,
-    mnemonic: network.mnemonic,
-    gasPrice: network.gasPrice,
+    default_balance_ether: 1000000,
+    gasPrice: 0,
+    mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
+    network_id: '1101',
   })
 
   await new Promise((resolve, reject) => {
-    server.listen(network.port, (err, blockchain) => {
+    server.listen(8545, (err, blockchain) => {
       if (err) {
         reject(err)
       } else {
@@ -40,16 +39,20 @@ async function startGanache() {
 
 async function test() {
   const argv = minimist(process.argv.slice(2), {
-    boolean: ['local', 'gas'],
+    boolean: ['local', 'gas', 'coverage'],
   })
 
   try {
     const closeGanache = await startGanache()
+    // if we are running on cirlce ci (!local) we need to wait
     if (!argv.local) {
       await sleep(60)
     }
 
     let testArgs = ['run', 'truffle', 'test']
+    if (argv.coverage) {
+      testArgs = testArgs.concat(['--network', 'coverage'])
+    }
     if (argv.gas) {
       testArgs = testArgs.concat(['--color', '--gas'])
     }
@@ -61,8 +64,8 @@ async function test() {
     await exec('yarn', testArgs)
     await closeGanache()
   } catch (e) {
-    console.log(e.stdout)
-    process.stdout.write('\n')
+    console.error(e.stdout ? e.stdout : e)
+    // process.stdout.write('\n')
     process.nextTick(() => process.exit(1))
   }
 }

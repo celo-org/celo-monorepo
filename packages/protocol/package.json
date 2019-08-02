@@ -11,14 +11,14 @@
     "lint-checks": "yarn run lint:ts && yarn run lint:sol",
     "compile-typescript": "rm -f migrations/*.js* && tsc -b",
     "clean": "rm -rf ../types/typechain && rm -rf build/* && rm -rf migrations/*.js* && rm -rf test/**/*.js* && rm -f lib/*.js*",
-    "pretest": "yarn run contract-types && yarn run compile-typescript",
+    "SKIPpretest": "yarn run contract-types && yarn run compile-typescript",
     "test": "node runTests.js",
     "test:local": "yarn run test --local",
+    "test:coverage": "yarn run test --coverage",
     "gas": "yarn run test:local --gas",
     "truffle-compile": "./scripts/bash/compile.sh",
     "contract-types": "rm -rf build/tmp/contracts && yarn run truffle-compile -n tmp && yarn run typechain --target=truffle --outDir types/typechain \"./build/tmp/contracts/*.json\" ",
     "postinstall": "yarn run contract-types && rm -f node_modules/web3/index.d.ts",
-    "test-coverage": "yarn run pretest && node runCoverage.js",
     "migrate": "./scripts/bash/migrate.sh",
     "download-artifacts": "./scripts/bash/download_artifacts.sh",
     "init-network": "./scripts/bash/init_network.sh",
@@ -37,6 +37,12 @@
     "test-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'"
   },
   "dependencies": {
+    "@0x/sol-compiler": "^3.1.11",
+    "@0x/sol-coverage": "^3.0.8",
+    "@0x/sol-profiler": "^3.0.0",
+    "@0x/sol-trace": "^2.0.16",
+    "@0x/subproviders": "^5.0.0",    
+
     "apollo-client": "^2.4.13",
     "chai-subset": "^1.6.0",
     "csv-parser": "^2.0.0",
@@ -56,7 +62,6 @@
     "prompts": "^2.0.1",
     "solhint": "^2.0.0",
     "solidity-bytes-utils": "^0.0.7",
-    "solidity-coverage": "rotcivegaf/solidity-coverage#5875f5b7",
     "truffle": "5.0.19",
     "truffle-artifactor": "^3.0.7",
     "truffle-resolver": "^4.0.4",
@@ -64,13 +69,13 @@
     "twilio": "^3.23.2",
     "typechain": "git+https://github.com/celo-org/TypeChain.git#ce6a33b",
     "weak-map": "^1.0.5",
-    "web3": "1.0.0-beta.37"
+    "web3": "1.0.0-beta.37",
+    "web3-provider-engine": "^15.0.0"
   },
   "devDependencies": {
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#2ebdf9f",
     "@celo/typescript": "0.0.1",
     "@celo/utils": "0.0.1",
-    "@types/bignumber.js": "^5.0.0",
     "@types/bn.js": "^4.11.0",
     "@types/chai": "^4.1.3",
     "@types/mathjs": "^4.4.1",

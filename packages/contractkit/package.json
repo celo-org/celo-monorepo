@@ -45,7 +45,6 @@
     "bip32": "^1.0.2",
     "bip39": "^2.5.0",
     "@google-cloud/storage": "^2.3.3",
-    "@types/bignumber.js": "^5.0.0",
     "@types/bip32": "^1.0.1",
     "@types/bip39": "^2.4.2",
     "@types/jest": "^24.0.13",
