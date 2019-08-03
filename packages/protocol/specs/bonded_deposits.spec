@@ -53,6 +53,7 @@ rule address_cant_be_both_account_and_delegate(method f, address x) {
 	require _aExists; // we require account to be an account
 	
 	bool _isDelegate = _aRewardsDelegate == x || _aVotingDelegate == x || _aValidatingDelegate == x; // x is a delegate if true
+	// TODO: There is a link between delegate and delegations... isDelegate is true iff delegations[x] == account
 	
 	require !(_isDelegate && _isAccount); // x cannot be both a delegate and an account
 	
