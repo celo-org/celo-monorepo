@@ -1,5 +1,4 @@
 import { encryptComment } from 'src/identity/commentKey'
-import { createMockContract } from 'test/utils'
 import { mockComment } from 'test/values'
 
 jest.mock('src/web3/actions', () => ({
@@ -10,7 +9,6 @@ jest.mock('src/web3/actions', () => ({
 jest.mock('@celo/contractkit', () => ({
   ...jest.requireActual('@celo/contractkit'),
   sendTransaction: jest.fn(async () => null),
-  getABEContract: jest.fn(async () => createMockContract({})),
 }))
 
 describe('Encrypt Comment', () => {

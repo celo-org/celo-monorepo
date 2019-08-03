@@ -1,5 +1,4 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import Link from '@celo/react-components/components/Link'
 import ValidatedTextInput from '@celo/react-components/components/ValidatedTextInput'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
@@ -14,15 +13,14 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import BackButton from 'src/components/BackButton'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { ERROR_BANNER_DURATION, SUPPORTS_KEYSTORE } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import BackupIcon from 'src/icons/BackupIcon'
+import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import SystemAuth from 'src/pincode/SystemAuth'
-import DisconnectBanner from 'src/shared/DisconnectBanner'
 
 enum Steps {
   EDUCATION = 0,
@@ -53,19 +51,8 @@ const mapDispatchToProps = {
 }
 
 export class Pincode extends React.Component<Props, State> {
-  static navigationOptions = {
-    headerStyle: {
-      elevation: 0,
-    },
-    headerLeftContainerStyle: { paddingHorizontal: 20 },
-    headerLeft: <BackButton />,
-    headerRightContainerStyle: { paddingRight: 15 },
-    headerRight: (
-      <View>
-        <DisconnectBanner />
-      </View>
-    ),
-  }
+  static navigationOptions = nuxNavigationOptions
+
   state = {
     step: Steps.EDUCATION,
     pin1: '',
@@ -241,19 +228,6 @@ export class Pincode extends React.Component<Props, State> {
     }
   }
 
-  renderHeader() {
-    const { t } = this.props
-    return (
-      <View style={style.header}>
-        <View style={style.goBack}>
-          <Link onPress={this.onCancel} testID="CancelPincodeButton">
-            {t('cancel')}
-          </Link>
-        </View>
-      </View>
-    )
-  }
-
   render() {
     if (SUPPORTS_KEYSTORE) {
       return <SystemAuth />
@@ -263,7 +237,6 @@ export class Pincode extends React.Component<Props, State> {
       <View style={style.pincodeContainer}>
         <DevSkipButton nextScreen={Screens.EnterInviteCode} />
         <ScrollView>
-          {this.renderHeader()}
           <BackupIcon style={style.pincodeLogo} />
           {this.renderStep()}
         </ScrollView>
