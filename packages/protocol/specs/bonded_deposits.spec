@@ -53,9 +53,10 @@ rule address_cant_be_both_account_and_delegate(method f, address x) {
 	require _aExists; // we require account to be an account
 	
 	bool _isDelegate = _aRewardsDelegate == x || _aVotingDelegate == x || _aValidatingDelegate == x; // x is a delegate if true
-	// TODO: There is a link between delegate and delegations... isDelegate is true iff delegations[x] == account
+	address _delegatedBy = sinvoke delegations(ePre,x);
 	
 	require !(_isDelegate && _isAccount); // x cannot be both a delegate and an account
+	require _isDelegate <=> _delegatedBy == account; // x is a delegate of account iff x got a delegate role from account (see delegations_in_sync_and_exclusive)
 	
 	env eF; 
 	calldataarg arg; 
@@ -73,11 +74,41 @@ rule address_cant_be_both_account_and_delegate(method f, address x) {
 	require aExists_; // we require account to still be an account
 	
 	bool isDelegate_ = aRewardsDelegate_ == x || aVotingDelegate_ == x || aValidatingDelegate_ == x; // x is a delegate if true
+	address delegatedBy_ = sinvoke delegations(ePost,x);
 	
 	assert !(isDelegate_ && isAccount_),"$x cannot be both a delegate and an account";
+	assert isDelegate_ <=> delegatedBy_ == account, "Violated: $x is a delegate of $account iff $x got a delegate role from ${account}. But x has a delegate role: ${isDelegate_} while delegated by ${delegatedBy}";
 }
 
-// delegations should be in sync with accounts
+rule delegations_in_sync_and_exclusive(method f, address delegatedTo) {
+	env ePre;
+	address delegatingAccount = sinvoke delegations(ePre,delegatedTo); // an account that delegates one of the roles to delegatedTo
+
+	require sinvoke _exists(ePre,delegatingAccount); // delegatingAccount must be an account
+	
+	address _aRewardsDelegate = sinvoke _rewardsDelegate(ePre,delegatingAccount);
+	address _aVotingDelegate = sinvoke _votingDelegate(ePre,delegatingAccount);
+	address _aValidatingDelegate = sinvoke _validatingDelegate(ePre,delegatingAccount);
+
+	require _aRewardsDelegate || _aVotingDelegate || _aValidatingDelegate; // at least one of the roles must be delegated to delegatedTo
+	require _aRewardsDelegate => (!_aVotingDelegate && !_aValidatingDelegate)
+			&& _aVotingDelegate => (!_aRewardsDelegate && !_aValidatingDelegate)
+			&& _aValidatingDelegate => (!_aRewardsDelegate && !_aVotingDelegate); // at most one of the three roles is delegated to delegatedTo
+			
+	env eF;
+	calldataarg arg;	
+	invoke f(eF,arg);
+	
+	env ePost;
+	address aRewardsDelegate_ = sinvoke _rewardsDelegate(ePre,delegatingAccount);
+	address aVotingDelegate_ = sinvoke _votingDelegate(ePre,delegatingAccount);
+	address aValidatingDelegate_ = sinvoke _validatingDelegate(ePre,delegatingAccount);
+
+	assert aRewardsDelegate_ || aVotingDelegate_ || aValidatingDelegate_, "at least one of the roles must be delegated to $delegatedTo";
+	assert aRewardsDelegate_ => (!aVotingDelegate_ && !aValidatingDelegate_)
+			&& aVotingDelegate_ => (!aRewardsDelegate_ && !aValidatingDelegate_)
+			&& aValidatingDelegate_ => (!aRewardsDelegate_ && !aVotingDelegate_), "at most one of the three roles is delegated to $delegatedTo";
+} 
 
 
 // deleteElement should always be called with lastIndex == list.length-1
