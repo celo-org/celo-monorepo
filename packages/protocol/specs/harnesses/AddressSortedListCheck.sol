@@ -10,15 +10,25 @@ contract AddressSortedListCheck {
 	function toBytes(address a) public pure returns (bytes32) { // not sure why won't import?
 		return bytes32(uint256(a) << 96);
 	}
+	
+	function toAddress(bytes32 b) public pure returns (address) {
+		return address(uint256(b) >> 96);
+	}
   
 	function getElementLesser(uint256 k) public view returns (uint256) {
 		require (k < 2**160);
-		return uint256(l.list.elements[toBytes(address(k))].previousKey);
+		bytes32 int_result = l.list.elements[toBytes(address(k))].previousKey;
+		address result = toAddress(int_result);
+		require (toBytes(result) == int_result);
+		return uint256(result);
 	}
 	
 	function getElementGreater(uint256 k) public view returns (uint256) {
 		require (k < 2**160);
-		return uint256(l.list.elements[toBytes(address(k))].nextKey);
+		bytes32 int_result = l.list.elements[toBytes(address(k))].nextKey;
+		address result = toAddress(int_result);
+		require (toBytes(result) == int_result);
+		return uint256(result);
 	}
 	
 	function getNumElements() public view returns (uint256) {
@@ -26,11 +36,17 @@ contract AddressSortedListCheck {
 	}
 	
 	function getTail() public view returns (uint256) {
-		return uint256(l.list.tail);
+		bytes32 int_result = l.list.tail;
+		address result = toAddress(int_result);
+		require (toBytes(result) == int_result);
+		return uint256(result);
 	}
 	
 	function getHead() public view returns (uint256) {
-		return uint256(l.list.head);
+		bytes32 int_result = l.list.head;
+		address result = toAddress(int_result);
+		require (toBytes(result) == int_result);
+		return uint256(result);
 	}
 	
 	function insert(
