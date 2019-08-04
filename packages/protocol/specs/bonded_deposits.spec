@@ -81,6 +81,7 @@ rule address_cant_be_both_account_and_delegate(method f, address x) {
 }
 
 rule delegations_in_sync_and_exclusive(method f, address delegatedTo) {
+	// TODO: What if delegatedTo is 0?
 	env ePre;
 	address delegatingAccount = sinvoke delegations(ePre,delegatedTo); // an account that delegates one of the roles to delegatedTo
 
@@ -90,10 +91,14 @@ rule delegations_in_sync_and_exclusive(method f, address delegatedTo) {
 	address _aVotingDelegate = sinvoke _votingDelegate(ePre,delegatingAccount);
 	address _aValidatingDelegate = sinvoke _validatingDelegate(ePre,delegatingAccount);
 
-	require _aRewardsDelegate || _aVotingDelegate || _aValidatingDelegate; // at least one of the roles must be delegated to delegatedTo
-	require _aRewardsDelegate => (!_aVotingDelegate && !_aValidatingDelegate)
-			&& _aVotingDelegate => (!_aRewardsDelegate && !_aValidatingDelegate)
-			&& _aValidatingDelegate => (!_aRewardsDelegate && !_aVotingDelegate); // at most one of the three roles is delegated to delegatedTo
+	bool _aRewardsDelegateTo = _aRewardsDelegate == delegatedTo;
+	bool _aVotingDelegateTo = _aVotingDelegate == delegatedTo;
+	bool _aValidatingDelegateTo = _aValidatingDelegate == delegatedTo;
+	
+	require _aRewardsDelegateTo || _aVotingDelegateTo || _aValidatingDelegateTo; // at least one of the roles must be delegated to delegatedTo
+	require _aRewardsDelegateTo => (!_aVotingDelegateTo && !_aValidatingDelegateTo)
+			&& _aVotingDelegateTo => (!_aRewardsDelegateTo && !_aValidatingDelegateTo)
+			&& _aValidatingDelegateTo => (!_aRewardsDelegateTo && !_aVotingDelegateTo); // at most one of the three roles is delegated to delegatedTo
 			
 	env eF;
 	calldataarg arg;	
@@ -104,11 +109,61 @@ rule delegations_in_sync_and_exclusive(method f, address delegatedTo) {
 	address aVotingDelegate_ = sinvoke _votingDelegate(ePre,delegatingAccount);
 	address aValidatingDelegate_ = sinvoke _validatingDelegate(ePre,delegatingAccount);
 
-	assert aRewardsDelegate_ || aVotingDelegate_ || aValidatingDelegate_, "at least one of the roles must be delegated to $delegatedTo";
-	assert aRewardsDelegate_ => (!aVotingDelegate_ && !aValidatingDelegate_)
-			&& aVotingDelegate_ => (!aRewardsDelegate_ && !aValidatingDelegate_)
-			&& aValidatingDelegate_ => (!aRewardsDelegate_ && !aVotingDelegate_), "at most one of the three roles is delegated to $delegatedTo";
+	bool aRewardsDelegateTo_ = aRewardsDelegate_ == delegatedTo;
+	bool aVotingDelegateTo_ = aVotingDelegate_ == delegatedTo;
+	bool aValidatingDelegateTo_ = aValidatingDelegate_ == delegatedTo;
+
+	assert aRewardsDelegateTo_ || aVotingDelegateTo_ || aValidatingDelegateTo_, "at least one of the roles must be delegated to $delegatedTo";
+	assert aRewardsDelegateTo_ => (!aVotingDelegateTo_ && !aValidatingDelegateTo_)
+			&& aVotingDelegateTo_ => (!aRewardsDelegateTo_ && !aValidatingDelegateTo_)
+			&& aValidatingDelegateTo_ => (!aRewardsDelegateTo_ && !aVotingDelegateTo_), "at most one of the three roles is delegated to $delegatedTo";
 } 
 
+rule functional_get_account_from_voter_result(address account) {
+	// TODO: What if voting delegate is 0?
+	// If an account has a voting delegate, getAccountFromVoter(delegate) must return that account
+	
+	env e;
+		
+	address votingDelegate = sinvoke _votingDelegate(e, account);
+	// assume the invariant on delegations
+	require sinvoke delegations(e, votingDelegate) == account;
+	
+	env eF;
+	address gotAccountFromVoterResult = sinvoke getAccountFromVoter(eF, votingDelegate);
+	
+	assert votingDelegate != 0 => gotAccountFromVoterResult == account, "Account $account has a voting delegate $votingDelegate but getAccountFromVoter($votingDelegate) returns $gotAccountFromVoterResult instead of account";
+	
+	assert votingDelegate == 0 => gotAccountFromVoterResult == account, "Account $account does not have a voting delegate but getAccountFromVoter($votingDelegate) returns $gotAccountFromVoterResult";
+}
+
+rule functional_get_account_from_voter_success(address account, address delegate) {
+	// TODO: What if voting delegate is 0?
+	// getAccountFromVoter(address) must fail if “address” is not an account or voting delegate
+	env e;
+	
+	// get an accounts voting delegate
+	address votingDelegate = sinvoke _votingDelegate(e, account);
+	// assume the invariant on delegations
+	require sinvoke delegations(e, votingDelegate) == account;
+	
+	bool isDelegate = delegate == votingDelegate;
+	bool isAccount = sinvoke _exists(e, delegate);
+	
+	env eF;
+	require eF.msg.value == 0;
+	address gotAccountFromVoterResult = invoke getAccountFromVoter(eF, delegate);
+	bool success = !lastReverted;
+	
+	assert (!isDelegate && !isAccount) => !success, "getAccountFromVoter($delegate) must fail if $delegate is not an account (isAccount=${isAccount}) nor a voting delegate (isDelegate=${isDelegate})";
+}
+
+// TODO Repeat for validating delegate, rewards delegate:
+/*
+- If an account has a validating delegate, getAccountFromValidator(delegate) must return that account
+- getAccountFromValidator(address) must fail if “address” is not an account or validating delegate
+- If an account has a rewards delegate, getAccountFromRewardsRecipient(delegate) must return that account
+- getAccountFromRewardsRecipient(address) must fail if “address” is not an account or rewards delegate
+ */
 
 // deleteElement should always be called with lastIndex == list.length-1
