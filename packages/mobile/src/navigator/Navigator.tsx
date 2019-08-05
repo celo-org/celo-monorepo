@@ -10,6 +10,8 @@ import Licenses from 'src/account/Licenses'
 import PhotosEducation from 'src/account/PhotosEducation'
 import Profile from 'src/account/Profile'
 import AppLoading from 'src/app/AppLoading'
+import DappKitAccountScreen from 'src/app/DappKitAccountScreen'
+import DappKitTxSignScreen from 'src/app/DappKitTxSignScreen'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
 import UpgradeScreen from 'src/app/UpgradeScreen'
@@ -59,6 +61,8 @@ const commonScreens = {
   [Screens.PincodeConfirmation]: { screen: PincodeConfirmation },
   [Screens.ErrorScreen]: { screen: ErrorScreen },
   [Screens.UpgradeScreen]: { screen: UpgradeScreen },
+  [Screens.DappKitAccountAuth]: { screen: DappKitAccountScreen },
+  [Screens.DappKitSignTxScreen]: { screen: DappKitTxSignScreen },
 }
 
 const NuxStack = createStackNavigator(

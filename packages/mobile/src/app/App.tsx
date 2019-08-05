@@ -2,23 +2,26 @@ import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { withNamespaces } from 'react-i18next'
-import { DeviceEventEmitter, StatusBar, YellowBox } from 'react-native'
+import { DeviceEventEmitter, Linking, StatusBar, YellowBox } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
+import { sleep } from 'sleep-promise'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
 import { apolloClient } from 'src/apollo/index'
 import AppLoading from 'src/app/AppLoading'
 import ErrorBoundary from 'src/app/ErrorBoundary'
 import i18n from 'src/i18n'
+import { navigate } from 'src/navigator/NavigationService'
 import Navigator from 'src/navigator/NavigatorWrapper'
+import { Screens } from 'src/navigator/Screens'
 import { persistor, store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
-
 // This is currently breaking paste - looking into it
 // import { useScreens } from 'react-native-screens'
 // useScreens()
+import { parse } from 'url'
 
 Logger.debug('App/init', 'Current Language: ' + i18n.language)
 YellowBox.ignoreWarnings([
@@ -40,7 +43,7 @@ const WrappedNavigator = withNamespaces('common', {
 WrappedNavigator.displayName = 'WrappedNavigator'
 
 export class App extends React.Component {
-  componentDidMount() {
+  async componentDidMount() {
     CeloAnalytics.track(DefaultEventNames.appLoaded, this.props, true)
     const appLoadedAt: Date = new Date()
     // TODO(cmcewen) see above
@@ -54,6 +57,34 @@ export class App extends React.Component {
         appStartListener.remove()
       }
     )
+
+    Linking.addEventListener('url', this._handleOpenURL)
+    const url = await Linking.getInitialURL()
+
+    if (url) {
+      await sleep(2000)
+      this.handleDappkit(url)
+    }
+  }
+
+  componentWillUnmount() {
+    Linking.removeEventListener('url', this._handleOpenURL)
+  }
+
+  handleDappkit(url: string) {
+    const params = parse(url, true).query
+    switch (params.op) {
+      case 'account_address':
+        navigate(Screens.DappKitAccountAuth, { url })
+        break
+      case 'sign_tx':
+        navigate(Screens.DappKitSignTxScreen, { url })
+        break
+    }
+  }
+
+  _handleOpenURL = (event: any) => {
+    this.handleDappkit(event.url)
   }
 
   hideSplashScreen() {
