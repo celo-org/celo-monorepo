@@ -11,7 +11,7 @@
     "lint-checks": "yarn run lint:ts && yarn run lint:sol",
     "compile-typescript": "rm -f migrations/*.js* && tsc -b",
     "clean": "rm -rf ../types/typechain && rm -rf build/* && rm -rf migrations/*.js* && rm -rf test/**/*.js* && rm -f lib/*.js*",
-    "SKIPpretest": "yarn run contract-types && yarn run compile-typescript",
+    "pretest": "yarn run contract-types && yarn run compile-typescript",
     "test": "node runTests.js",
     "test:local": "yarn run test --local",
     "test:coverage": "yarn run test --coverage",

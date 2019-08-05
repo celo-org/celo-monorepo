@@ -39,7 +39,7 @@ async function startGanache() {
 
 async function test() {
   const argv = minimist(process.argv.slice(2), {
-    boolean: ['local', 'gas', 'coverage'],
+    boolean: ['local', 'gas', 'coverage', 'verbose-rpc'],
   })
 
   try {
@@ -50,6 +50,9 @@ async function test() {
     }
 
     let testArgs = ['run', 'truffle', 'test']
+    if (argv['verbose-rpc']) {
+      testArgs.push('--verbose-rpc')
+    }
     if (argv.coverage) {
       testArgs = testArgs.concat(['--network', 'coverage'])
     }
@@ -59,11 +62,17 @@ async function test() {
     if (argv._.length > 0) {
       const testGlob = argv._.map((testName) => `test/\*\*/${testName}.ts`).join(' ')
       const testFiles = glob.readdirSync(testGlob)
+      if (testFiles.length === 0) {
+        // tslint:disable-next-line: no-console
+        console.error(`No tests matched with ${argv._}`)
+        process.exit(1)
+      }
       testArgs = testArgs.concat(testFiles)
     }
     await exec('yarn', testArgs)
     await closeGanache()
   } catch (e) {
+    // tslint:disable-next-line: no-console
     console.error(e.stdout ? e.stdout : e)
     // process.stdout.write('\n')
     process.nextTick(() => process.exit(1))

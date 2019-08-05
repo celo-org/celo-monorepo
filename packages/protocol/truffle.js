@@ -20,7 +20,7 @@ const ALFAJORES_FROM = '0x456f41406b32c45d59e539e4bba3d7898c3584da'
 const defaultConfig = {
   host: '127.0.0.1',
   port: 8545,
-  network_id: '1101',
+  network_id: 1101,
   from: OG_FROM,
   gas: 6500000,
   gasPrice: 100000000000,
@@ -35,7 +35,7 @@ const networks = {
   development: {
     host: '127.0.0.1',
     port: 8545,
-    network_id: '1101',
+    network_id: 1101,
     from: DEVELOPMENT_FROM,
     gasPrice: 0,
     gas: 6500000,
@@ -49,12 +49,23 @@ const networks = {
     provider: function() {
       if (coverageProvider == null) {
         console.log('building provider!')
-        const projectRoot = ''
-        const artifactAdapter = new TruffleArtifactAdapter(projectRoot, SOLC_VERSION)
         coverageProvider = new ProviderEngine()
 
+        const projectRoot = ''
+        const artifactAdapter = new TruffleArtifactAdapter(projectRoot, SOLC_VERSION)
         global.coverageSubprovider = new CoverageSubprovider(artifactAdapter, DEVELOPMENT_FROM, {
           isVerbose: true,
+          ignoreFilesGlobs: [
+            // Need custom precompiles
+            'common/GoldToken.sol',
+            'identity/Attestations.sol',
+
+            // Proxies
+            '**/*Proxy.sol',
+
+            // Test contracts
+            '**/test/*.sol',
+          ],
         })
         coverageProvider.addProvider(global.coverageSubprovider)
 
