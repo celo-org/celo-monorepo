@@ -543,7 +543,13 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   )
     external
     view
-    returns (string memory identifier, string memory name, string memory url, bytes memory publicKeysData, address affiliation)
+    returns (
+      string memory identifier,
+      string memory name,
+      string memory url,
+      bytes memory publicKeysData,
+      address affiliation
+  )
   {
     require(isValidator(account));
     Validator storage validator = validators[account];
