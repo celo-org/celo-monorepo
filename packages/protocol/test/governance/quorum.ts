@@ -8,11 +8,12 @@ const Quorum: QuorumContract = artifacts.require('Quorum')
 // TODO(mcortesi): Use BN.js
 Quorum.numberFormat = 'BigNumber'
 
-contract('Quorum', () => {
+contract('Quorum', (accounts: string[]) => {
   const participationBaseline = toFixed(50 / 100)
   const participationFloor = toFixed(5 / 100)
   const updateCoefficient = toFixed(1 / 5)
   const criticalBaselineLevel = toFixed(1)
+  const nonOwner = accounts[1]
   let quorum: QuorumInstance
   beforeEach(async () => {
     quorum = await Quorum.new()
@@ -73,6 +74,12 @@ contract('Quorum', () => {
     it('should revert if new participation floor is above 1', async () => {
       await assertRevert(quorum.setParticipationFloor(toFixed(101 / 100)))
     })
+
+    it('should revert when called by anyone other than the owner', async () => {
+      await assertRevert(
+        quorum.setParticipationFloor(differentParticipationFloor, { from: nonOwner })
+      )
+    })
   })
 
   describe('#setUpdateCoefficient', () => {
@@ -91,6 +98,12 @@ contract('Quorum', () => {
     it('should revert if new update coefficient is above 1', async () => {
       await assertRevert(quorum.setUpdateCoefficient(toFixed(101 / 100)))
     })
+
+    it('should revert when called by anyone other than the owner', async () => {
+      await assertRevert(
+        quorum.setUpdateCoefficient(differentUpdateCoefficient, { from: nonOwner })
+      )
+    })
   })
 
   describe('#setCriticalBaselineLevel', () => {
@@ -108,6 +121,12 @@ contract('Quorum', () => {
 
     it('should revert if new critical baseline level is above 1', async () => {
       await assertRevert(quorum.setCriticalBaselineLevel(toFixed(101 / 100)))
+    })
+
+    it('should revert when called by anyone other than the owner', async () => {
+      await assertRevert(
+        quorum.setCriticalBaselineLevel(differentCriticalBaselineLevel, { from: nonOwner })
+      )
     })
   })
 
@@ -165,6 +184,10 @@ contract('Quorum', () => {
           participationBaseline: newParticipationBaseline,
         },
       })
+    })
+
+    it('should revert when called by anyone other than the owner', async () => {
+      await assertRevert(quorum.updateParticipationBaseline(participation, { from: nonOwner }))
     })
 
     describe('when participation baseline falls below floor', () => {
