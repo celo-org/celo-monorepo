@@ -392,11 +392,15 @@ jobs:
             tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
             ls /tmp/go/bin/go
             /tmp/go/bin/go version
+            curl https://sh.rustup.rs -sSf | sh -s -- -y
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+            rustup install nightly-2019-07-25
+            rustup default nightly-2019-07-25
       - run:
           name: Run test
           command: |
             set -e
-            export PATH=${PATH}:/tmp/go/bin
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
