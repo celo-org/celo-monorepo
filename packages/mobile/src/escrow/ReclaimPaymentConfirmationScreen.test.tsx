@@ -7,7 +7,7 @@ import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { createMockNavigationProp, createMockStore } from 'test/utils'
 import { mockAccount, mockAccount2, mockContactWithPhone } from 'test/values'
 
-const store = createMockStore()
+const store = createMockStore({ escrow: { suggestedFee: '.01' } })
 
 describe('ReclaimPaymentConfirmationScreen', () => {
   it('renders correctly', () => {
