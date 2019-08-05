@@ -84,7 +84,6 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     VoteTotals votes;
     Transaction[] transactions;
     bool approved;
-    bool passed;
     TallyOutcome tally;
   }
 
@@ -197,7 +196,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   );
 
   event ProposalTallied(
-    uint256 indexed proposalId
+    uint256 indexed proposalId,
+    bool passed
   );
 
   event ProposalExecuted(
@@ -361,12 +361,13 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   }
 
   /**
-   * @notice Updates the yes:yes+no threshold curve for a specific class of proposals to pass.
+   * @notice Updates the ratio of yes:yes+no votes needed to exceed for a specific class
+   *   of proposals to pass.
    * @param destination The destination of proposals for which this threshold should apply.
    * @param functionId The function ID of proposals for which this threshold should apply. Zero
    *   will set the default.
    * @param threshold The threshold.
-   * @dev If no constitution is explicitly set the default is a simple majority, i.e. 1:2.
+   * @dev If no constitution is explicitly set the default is a 70% supermajority.
    */
   function setConstitution(
     address destination,
@@ -638,9 +639,10 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
       proposal.tally == TallyOutcome.None &&
       stage == ProposalStage.Tally
     );
-    proposal.tally = _isProposalPassing(proposal) ? TallyOutcome.Pass : TallyOutcome.Fail;
-    emit ProposalTallied(proposalId);
-    updateQuorum(proposal);
+    bool passed = _isProposalPassing(proposal);
+    proposal.tally = passed ? TallyOutcome.Pass : TallyOutcome.Fail;
+    emit ProposalTallied(proposalId, passed);
+    updateParticipationBaseline(proposal);
     return true;
   }
 
@@ -939,7 +941,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   }
 
   /**
-   * @notice Returns whether or not a particular proposal is passing according to the constitution.
+   * @notice Returns whether or not a particular proposal is passing according to the constitution
+   *   and the participation levels.
    * @param proposalId The ID of the proposal.
    * @return Whether or not the proposal is passing.
    */
@@ -949,7 +952,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   }
 
   /**
-   * @notice Returns whether or not a particular proposal is passing according to the constitution.
+   * @notice Returns whether or not a particular proposal is passing according to the constitution
+   *   and the participation levels.
    * @param proposal The proposal struct.
    * @return Whether or not the proposal is passing.
    */
@@ -1016,8 +1020,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
         .add(stageDurations.tally);
     } else if (stage == ProposalStage.Expiration) {
       return dequeueTime.add(stageDurations.approval).add(stageDurations.referendum)
-        .add(stageDurations.tally)
-        .add(stageDurations.execution);
+        .add(stageDurations.tally).add(stageDurations.execution);
     } else {
       require(false);
     }
@@ -1044,14 +1047,14 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
    *   and the total network weight.
    * @param proposal The proposal struct.
    */
-  function updateQuorum(Proposal storage proposal) private {
+  function updateParticipationBaseline(Proposal storage proposal) private {
     uint256 totalWeight_ = totalWeight();
     if (totalWeight_ > 0) {
       uint256 totalVotes = proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain);
       int256 participation = FixidityLib.newFixed(int256(totalVotes))
         .divide(FixidityLib.newFixed(int256(totalWeight_)));
       IQuorum quorum = IQuorum(registry.getAddressForOrDie(QUORUM_REGISTRY_ID));
-      quorum.updateQuorumBaseline(participation);
+      quorum.updateParticipationBaseline(participation);
     }
   }
 
@@ -1081,7 +1084,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     ProposalStage stage = getDequeuedProposalStage(proposal.timestamp);
     // The proposal is considered expired under the following conditions:
     //   1. Past the approval stage and not approved.
-    //   2. Past the referendum stage and not passing.
+    //   2. Past the referendum stage and failed.
     //   3. Past the tally stage and not passed.
     //   4. Past the execution stage.
     return (

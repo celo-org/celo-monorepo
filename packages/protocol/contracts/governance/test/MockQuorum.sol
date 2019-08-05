@@ -27,11 +27,7 @@ contract MockQuorum {
     return adjustedSupportReturn;
   }
 
-  function updateQuorumBaseline(
-    int256 participation
-  )
-    external
-  {
+  function updateParticipationBaseline(int256 participation) external {
     updateCallCount++;
     lastUpdateCall = participation;
   }

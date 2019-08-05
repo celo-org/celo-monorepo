@@ -39,9 +39,10 @@ const defaultConfig = {
     infrastructureFraction: 1 / 2,
   },
   quorum: {
-    quorumBaseline: 8 / 10,
-    quorumFloor: 5 / 100,
+    participationBaseline: 8 / 10,
+    participationFloor: 5 / 100,
     updateCoefficient: 1 / 5,
+    criticalBaselineLevel: 1,
   },
   registry: {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',

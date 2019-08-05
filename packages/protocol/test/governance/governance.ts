@@ -1510,6 +1510,7 @@ contract('Governance', (accounts: string[]) => {
         event: 'ProposalTallied',
         args: {
           proposalId: new BigNumber(proposalId),
+          passed: true,
         },
       })
     })

@@ -12,9 +12,10 @@ import { QuorumInstance, RegistryInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
   return [
-    toFixed(config.quorum.quorumBaseline).toString(),
-    toFixed(config.quorum.quorumFloor).toString(),
+    toFixed(config.quorum.participationBaseline).toString(),
+    toFixed(config.quorum.participationFloor).toString(),
     toFixed(config.quorum.updateCoefficient).toString(),
+    toFixed(config.quorum.criticalBaselineLevel).toString(),
   ]
 }
 
