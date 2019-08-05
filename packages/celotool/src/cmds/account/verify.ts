@@ -74,7 +74,6 @@ async function verifyCmd(argv: VerifyArgv) {
 
   let attestationsToComplete = await getActionableAttestations(attestations, phoneHash, account)
 
-  console.log(attestationsToComplete)
   // Request more attestations
   if (argv.num > attestationsToComplete.length) {
     console.info(`Requesting ${argv.num - attestationsToComplete.length} attestations`)
