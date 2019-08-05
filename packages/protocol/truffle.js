@@ -15,7 +15,7 @@ const defaultConfig = {
   port: 8545,
   network_id: '1101',
   from: OG_FROM,
-  gas: 6500000,
+  gas: 6700000,
   gasPrice: 100000000000,
 }
 
@@ -28,7 +28,7 @@ const networks = {
     network_id: '1101',
     from: DEVELOPMENT_FROM,
     gasPrice: 0,
-    gas: 6500000,
+    gas: 6700000,
     defaultBalance: 1000000,
     mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
   },
