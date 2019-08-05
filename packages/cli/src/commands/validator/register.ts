@@ -1,8 +1,10 @@
+import { Attestations, Validators } from '@celo/contractkit'
 import { flags } from '@oclif/command'
+
 import { BaseCommand } from '../../base'
-import { Validators } from '../../generated/contracts'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { getPubKeyFromAddrAndWeb3 } from '../../utils/helpers'
 
 export default class ValidatorRegister extends BaseCommand {
   static description = 'Register a new Validator'
@@ -36,5 +38,13 @@ export default class ValidatorRegister extends BaseCommand {
         res.flags.noticePeriod
       )
     )
+
+    // register encryption key on attestations contract
+    const attestations = await Attestations(this.web3, res.flags.from)
+    // TODO: Use a different key data encryption
+    const pubKey = await getPubKeyFromAddrAndWeb3(res.flags.from, this.web3)
+    // @ts-ignore
+    const setKeyTx = attestations.methods.setAccountDataEncryptionKey(pubKey)
+    await displaySendTx('Set encryption key', setKeyTx)
   }
 }

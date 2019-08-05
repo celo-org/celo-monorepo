@@ -65,7 +65,7 @@ export default class Form extends React.Component<Props, State> {
     const form = event.target.form || findFormInParentTree(event.target)
     // note this has a side effect of showing native html validations to form submitter
     if (form.reportValidity()) {
-      this.postForm()
+      await this.postForm()
     }
   }
 
@@ -88,6 +88,7 @@ export default class Form extends React.Component<Props, State> {
   // this will become onSubmit when submit is removed
   altSubmit = () => {
     if (this.validates()) {
+      // tslint:disable
       this.postForm()
       return true
     }

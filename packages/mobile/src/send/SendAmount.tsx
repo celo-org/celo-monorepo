@@ -1,19 +1,17 @@
-import { getStableTokenContract } from '@celo/contractkit'
 import { Avatar } from '@celo/react-components/components/Avatar'
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
+import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import { parseInputAmount } from '@celo/utils/src/parsing'
 import BigNumber from 'bignumber.js'
-import { debounce } from 'lodash'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import {
   ActivityIndicator,
   StyleSheet,
   Text,
-  TextInput,
   TextStyle,
   TouchableWithoutFeedback,
   View,
@@ -26,29 +24,27 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION, INPUT_DEBOUNCE_TIME } from 'src/config'
+import { ERROR_BANNER_DURATION } from 'src/config'
+import { FeeType } from 'src/fees/actions'
+import EstimateFee from 'src/fees/EstimateFee'
+import { getFeeEstimateDollars } from 'src/fees/selectors'
 import { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
-import {
-  getRecipientAddress,
-  getRecipientVerificationStatus,
-  VerificationStatus,
-} from 'src/identity/contactMapping'
+import { VerificationStatus } from 'src/identity/contactMapping'
 import { E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import { updateSuggestedFee } from 'src/send/actions'
 import LabeledTextInput from 'src/send/LabeledTextInput'
-import { getSuggestedFeeDollars } from 'src/send/selectors'
-import { CeloDefaultRecipient } from 'src/send/Send'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
-import Logger from 'src/utils/Logger'
-import { Recipient, RecipientKind } from 'src/utils/recipient'
-
-const TAG: string = 'send/SendAmount'
+import {
+  getAddressFromRecipient,
+  getRecipientVerificationStatus,
+  Recipient,
+  RecipientKind,
+} from 'src/utils/recipient'
 
 const MAX_COMMENT_LENGTH = 70
 
@@ -56,16 +52,23 @@ interface State {
   amount: string
   reason: string
   numberOfDecimals: number
-  characterLimitExeeded: boolean
+  characterLimitExceeded: boolean
 }
 
-type Props = StateProps & DispatchProps & NavigationInjectedProps & WithNamespaces
+type Navigation = NavigationInjectedProps['navigation']
+
+interface OwnProps {
+  navigation: Navigation
+}
+
+type Props = StateProps & DispatchProps & OwnProps & WithNamespaces
 
 interface StateProps {
   dollarBalance: BigNumber | null
-  suggestedFeeDollars: BigNumber
+  suggestedFeeDollars: BigNumber | null
   defaultCountryCode: string
   e164NumberToAddress: E164NumberToAddressType
+  feeType: FeeType | undefined
 }
 
 interface DispatchProps {
@@ -73,16 +76,52 @@ interface DispatchProps {
   showMessage: typeof showMessage
   showError: typeof showError
   hideAlert: typeof hideAlert
-  updateSuggestedFee: typeof updateSuggestedFee
   fetchPhoneAddresses: typeof fetchPhoneAddresses
 }
 
-const mapStateToProps = (state: RootState): StateProps => ({
-  dollarBalance: state.stableToken.balance ? new BigNumber(state.stableToken.balance) : null,
-  suggestedFeeDollars: getSuggestedFeeDollars(state),
-  defaultCountryCode: state.account.defaultCountryCode,
-  e164NumberToAddress: state.identity.e164NumberToAddress,
-})
+function getRecipient(navigation: Navigation): Recipient {
+  const recipient = navigation.getParam('recipient')
+  if (!recipient) {
+    throw new Error('Recipient expected')
+  }
+  return recipient
+}
+
+function getVerificationStatus(
+  navigation: Navigation,
+  e164NumberToAddress: E164NumberToAddressType
+) {
+  return getRecipientVerificationStatus(getRecipient(navigation), e164NumberToAddress)
+}
+
+function getFeeType(
+  navigation: Navigation,
+  e164NumberToAddress: E164NumberToAddressType
+): FeeType | undefined {
+  const verificationStatus = getVerificationStatus(navigation, e164NumberToAddress)
+
+  switch (verificationStatus) {
+    case VerificationStatus.UNKNOWN:
+      return undefined
+    case VerificationStatus.UNVERIFIED:
+      return FeeType.INVITE
+    case VerificationStatus.VERIFIED:
+      return FeeType.SEND
+  }
+}
+
+const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
+  const { navigation } = ownProps
+  const { e164NumberToAddress } = state.identity
+  const feeType = getFeeType(navigation, e164NumberToAddress)
+  return {
+    dollarBalance: state.stableToken.balance ? new BigNumber(state.stableToken.balance) : null,
+    suggestedFeeDollars: feeType ? getFeeEstimateDollars(state, feeType) : null,
+    defaultCountryCode: state.account.defaultCountryCode,
+    e164NumberToAddress,
+    feeType,
+  }
+}
 
 export class SendAmount extends React.PureComponent<Props, State> {
   static navigationOptions = ({ navigation }: NavigationScreenProps) => ({
@@ -95,18 +134,10 @@ export class SendAmount extends React.PureComponent<Props, State> {
     amount: '',
     reason: '',
     numberOfDecimals: 2,
-    characterLimitExeeded: false,
+    characterLimitExceeded: false,
   }
 
-  amountInput: React.RefObject<TextInput>
   timeout: number | null = null
-  calculateFeeDebounced: (() => void)
-
-  constructor(props: Props) {
-    super(props)
-    this.amountInput = React.createRef<TextInput>()
-    this.calculateFeeDebounced = debounce(this.calculateFee, INPUT_DEBOUNCE_TIME)
-  }
 
   componentDidMount() {
     this.props.navigation.setParams({ title: this.props.t('send_or_request') })
@@ -114,53 +145,19 @@ export class SendAmount extends React.PureComponent<Props, State> {
     this.fetchLatestPhoneAddress()
   }
 
-  componentDidUpdate(prevProps: Props) {
-    if (
-      this.getVerificationStatus(prevProps.e164NumberToAddress) === VerificationStatus.UNKNOWN &&
-      this.getVerificationStatus() !== VerificationStatus.UNKNOWN
-    ) {
-      this.calculateFeeDebounced()
-    }
-  }
-
-  calculateFee = () => {
-    if (this.amountGreatherThanBalance()) {
-      // No need to update fee as the user doesn't have enough anyways
-      return
-    }
-
-    const verificationStatus = this.getVerificationStatus()
-    if (verificationStatus === VerificationStatus.UNKNOWN) {
-      // Wait for verification status before calculating fee
-      return
-    }
-
-    Logger.debug(TAG, 'Updating fee')
-    const params = {
-      // Just use a default here since it doesn't matter for fee estimation
-      recipientAddress: CeloDefaultRecipient.address!,
-      amount: parseInputAmount(this.state.amount).toString(),
-      comment: this.state.reason,
-    }
-
-    this.props.updateSuggestedFee(
-      verificationStatus === VerificationStatus.VERIFIED,
-      getStableTokenContract,
-      params
-    )
-  }
-
   componentWillUnmount() {
     this.props.hideAlert()
   }
 
-  amountGreatherThanBalance = () => {
+  amountGreaterThanBalance = () => {
     return parseInputAmount(this.state.amount).isGreaterThan(this.props.dollarBalance || 0)
   }
 
   getAmountIsValid = () => {
     const bigNumberAmount: BigNumber = parseInputAmount(this.state.amount)
-    const amountWithFees: BigNumber = bigNumberAmount.plus(this.props.suggestedFeeDollars)
+    const amountWithFees: BigNumber = bigNumberAmount.plus(
+      this.props.suggestedFeeDollars || new BigNumber(NaN)
+    )
     const currentBalance = this.props.dollarBalance
       ? new BigNumber(this.props.dollarBalance)
       : new BigNumber(0)
@@ -171,51 +168,40 @@ export class SendAmount extends React.PureComponent<Props, State> {
   }
 
   getRecipient = (): Recipient => {
-    const recipient = this.props.navigation.getParam('recipient')
-    if (!recipient) {
-      throw new Error('Recipient expected')
-    }
-    return recipient
+    return getRecipient(this.props.navigation)
   }
 
-  getVerificationStatus = (e164NumberToAddress?: E164NumberToAddressType) => {
-    return getRecipientVerificationStatus(
-      this.getRecipient(),
-      e164NumberToAddress || this.props.e164NumberToAddress
-    )
+  getVerificationStatus = () => {
+    return getVerificationStatus(this.props.navigation, this.props.e164NumberToAddress)
   }
 
   onAmountChanged = (amount: string) => {
+    this.props.hideAlert()
     this.setState({ amount })
-    this.calculateFeeDebounced()
   }
 
   onReasonChanged = (reason: string) => {
-    let characterLimitExeeded
-    if (reason.length > MAX_COMMENT_LENGTH) {
+    const characterLimitExceeded = reason.length > MAX_COMMENT_LENGTH
+    if (characterLimitExceeded) {
       this.props.showMessage(this.props.t('characterLimitExceeded', { max: MAX_COMMENT_LENGTH }))
-
-      characterLimitExeeded = true
     } else {
       this.props.hideAlert()
-      characterLimitExeeded = false
     }
 
-    this.setState({ reason, characterLimitExeeded })
-    this.calculateFeeDebounced()
+    this.setState({ reason, characterLimitExceeded })
   }
 
   getConfirmationInput = () => {
     const amount = parseInputAmount(this.state.amount)
     const recipient = this.getRecipient()
-    const recipientAddress = getRecipientAddress(recipient, this.props.e164NumberToAddress)
+    // TODO (Rossy) Remove address field from some recipient types.
+    const recipientAddress = getAddressFromRecipient(recipient, this.props.e164NumberToAddress)
 
     const confirmationInput: ConfirmationInput = {
       recipient,
       amount,
       reason: this.state.reason,
       recipientAddress,
-      fee: this.props.suggestedFeeDollars,
     }
     return confirmationInput
   }
@@ -239,6 +225,7 @@ export class SendAmount extends React.PureComponent<Props, State> {
     }
 
     const confirmationInput = this.getConfirmationInput()
+
     if (verificationStatus === VerificationStatus.VERIFIED) {
       CeloAnalytics.track(CustomEventNames.transaction_details, {
         recipientAddress: confirmationInput.recipientAddress,
@@ -252,6 +239,7 @@ export class SendAmount extends React.PureComponent<Props, State> {
   onRequest = () => {
     CeloAnalytics.track(CustomEventNames.request_payment_continue)
     const confirmationInput = this.getConfirmationInput()
+
     CeloAnalytics.track(CustomEventNames.send_invite_details, {
       requesteeAddress: confirmationInput.recipientAddress,
     })
@@ -260,15 +248,15 @@ export class SendAmount extends React.PureComponent<Props, State> {
 
   renderButtons = (amountIsValid: boolean, userHasEnough: boolean) => {
     const { t } = this.props
-    const { characterLimitExeeded } = this.state
+    const { characterLimitExceeded } = this.state
     const verificationStatus = this.getVerificationStatus()
 
     const requestDisabled =
-      !amountIsValid || verificationStatus !== VerificationStatus.VERIFIED || characterLimitExeeded
+      !amountIsValid || verificationStatus !== VerificationStatus.VERIFIED || characterLimitExceeded
     const sendDisabled =
       !amountIsValid ||
       !userHasEnough ||
-      characterLimitExeeded ||
+      characterLimitExceeded ||
       verificationStatus === VerificationStatus.UNKNOWN
 
     const separatorContainerStyle =
@@ -311,8 +299,8 @@ export class SendAmount extends React.PureComponent<Props, State> {
 
   fetchLatestPhoneAddress = () => {
     const recipient = this.getRecipient()
-    if (recipient.kind === RecipientKind.QrCode) {
-      // Skip for QR codes
+    if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
+      // Skip for QR codes or Addresses
       return
     }
     if (!recipient.e164PhoneNumber) {
@@ -321,14 +309,13 @@ export class SendAmount extends React.PureComponent<Props, State> {
     this.props.fetchPhoneAddresses([recipient.e164PhoneNumber])
   }
 
-  focusAmountField = () => {
-    if (this.amountInput.current) {
-      this.amountInput.current.focus()
-    }
-  }
-
   renderBottomContainer = (amountIsValid: boolean, userHasEnough: boolean) => {
-    const onPress = () => this.focusAmountField()
+    const onPress = () => {
+      if (!amountIsValid) {
+        this.props.showError(ErrorMessages.INVALID_AMOUNT, ERROR_BANNER_DURATION)
+        return
+      }
+    }
 
     if (!amountIsValid) {
       return (
@@ -341,13 +328,14 @@ export class SendAmount extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { t } = this.props
+    const { t, feeType } = this.props
     const recipient = this.getRecipient()
     const { amountIsValid, userHasEnough } = this.getAmountIsValid()
     const verificationStatus = this.getVerificationStatus()
 
     return (
       <View style={style.body}>
+        {feeType && <EstimateFee feeType={feeType} />}
         <KeyboardAwareScrollView
           keyboardShouldPersistTaps="always"
           contentContainerStyle={style.scrollViewContentContainer}
@@ -372,23 +360,26 @@ export class SendAmount extends React.PureComponent<Props, State> {
             </Text>
           )}
           <LabeledTextInput
-            ref={this.amountInput}
             keyboardType="numeric"
             title={'$'}
             placeholder={t('amount')}
             labelStyle={style.amountLabel as TextStyle}
-            placeholderColor={colors.celoGreenInactive}
+            placeholderTextColor={colors.celoGreenInactive}
+            autocorrect={false}
             value={this.state.amount}
-            onValueChanged={this.onAmountChanged}
+            onChangeText={this.onAmountChanged}
             autoFocus={true}
             numberOfDecimals={this.state.numberOfDecimals}
+            validator={ValidatorKind.Decimal}
+            lng={this.props.lng}
           />
           <LabeledTextInput
             keyboardType="default"
             title={t('for')}
             placeholder={t('groceriesRent')}
             value={this.state.reason}
-            onValueChanged={this.onReasonChanged}
+            maxLength={70}
+            onChangeText={this.onReasonChanged}
           />
         </KeyboardAwareScrollView>
         {this.renderBottomContainer(amountIsValid, userHasEnough)}
@@ -474,13 +465,12 @@ const style = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
+  connect<StateProps, DispatchProps, OwnProps, RootState>(
     mapStateToProps,
     {
       fetchDollarBalance,
       showError,
       hideAlert,
-      updateSuggestedFee,
       showMessage,
       fetchPhoneAddresses,
     }

@@ -13,6 +13,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { NavigationScreenProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
+import { errorSelector } from 'src/alert/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
@@ -62,7 +63,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRatePair: state.exchange.exchangeRatePair,
   goldBalance: state.goldToken.balance,
   dollarBalance: state.stableToken.balance,
-  error: (state.alert && state.alert.underlyingError) || null,
+  error: errorSelector(state),
 })
 
 export class ExchangeTradeScreen extends React.Component<Props, State> {

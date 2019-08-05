@@ -2,5 +2,5 @@
 <!-- See https://developer.android.com/guide/topics/data/autobackup on how to modify this file -->
 <full-backup-content>
     <include domain="file" path=".integration/GethDroid"/>
-    <include domain="file" path=".appintegration/GethDroid"/>
+    <include domain="file" path=".alfajoresstaging/GethDroid"/>
 </full-backup-content>
