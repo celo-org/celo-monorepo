@@ -56,10 +56,6 @@ export default class MyDocument extends Document {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <link rel="stylesheet" href={'/static/normalize.css'} />
 
-          <link
-            href="https://fonts.googleapis.com/css?family=Hind+Siliguri:300,400,600"
-            rel="stylesheet"
-          />
           <link rel="preconnect" href="https://use.typekit.net" />
           <link rel="stylesheet" href="https://use.typekit.net/dki6jkb.css" />
 

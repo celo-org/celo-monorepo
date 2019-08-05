@@ -1,7 +1,7 @@
-import * as parser from 'fast-xml-parser'
+import { parse, validate } from 'fast-xml-parser'
+import { Articles } from 'fullstack/ArticleProps'
 import * as htmlToFormattedText from 'html-to-formatted-text'
-import { Props as ArticleProps } from 'src/community/Articles'
-import abortableFetch from 'src/utils/abortableFetch'
+import abortableFetch from '../src/utils/abortableFetch'
 interface JSONRSS {
   rss: {
     channel: {
@@ -62,9 +62,9 @@ function transform(items: JSONRSSItem[]) {
   })
 }
 
-function parse(xmlData: string): JSONRSSItem[] {
-  if (parser.validate(xmlData) === true) {
-    const jsonRSS: JSONRSS = parser.parse(xmlData, {})
+function parseXML(xmlData: string): JSONRSSItem[] {
+  if (validate(xmlData) === true) {
+    const jsonRSS: JSONRSS = parse(xmlData, {})
     return jsonRSS.rss.channel.item
   } else {
     return []
@@ -76,12 +76,10 @@ async function fetchMediumArticles(): Promise<string> {
   return response.text()
 }
 
-type MediumArticles = ArticleProps
-
-export async function getFormattedMediumArticles(): Promise<MediumArticles> {
+export async function getFormattedMediumArticles(): Promise<Articles> {
   try {
     const xmlString = await fetchMediumArticles()
-    const articles = transform(parse(xmlString))
+    const articles = transform(parseXML(xmlString))
     return { articles }
   } catch {
     return { articles: [] }

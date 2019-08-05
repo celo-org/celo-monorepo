@@ -26,10 +26,6 @@ export async function getAttestationsContract(web3: Web3): Promise<AttestationsT
   return attestationsContract
 }
 
-export async function getABEContract() {
-  return null
-}
-
 export async function getExchangeContract(web3: Web3): Promise<ExchangeType> {
   if (exchangeContract === null) {
     try {
