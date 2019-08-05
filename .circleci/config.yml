@@ -404,7 +404,7 @@ jobs:
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_integration_sync.sh checkout kobigurk/bls
+            ./ci_test_integration_sync.sh checkout master
 
   web:
     working_directory: ~/app
