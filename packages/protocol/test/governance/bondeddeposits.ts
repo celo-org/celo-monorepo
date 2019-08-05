@@ -1,28 +1,7 @@
-import {
-  goldTokenRegistryId,
-  governanceRegistryId,
-  validatorsRegistryId,
-} from '@celo/protocol/lib/registry-utils'
-import {
-  assertEqualBN,
-  assertLogMatches,
-  assertRevert,
-  timeTravel,
-  NULL_ADDRESS,
-} from '@celo/protocol/lib/test-utils'
-import BigNumber from 'bignumber.js'
-import {
-  BondedDepositsContract,
-  BondedDepositsInstance,
-  MockGoldTokenContract,
-  MockGoldTokenInstance,
-  MockGovernanceContract,
-  MockGovernanceInstance,
-  MockValidatorsContract,
-  MockValidatorsInstance,
-  RegistryContract,
-  RegistryInstance,
-} from 'types'
+import { goldTokenRegistryId, governanceRegistryId, validatorsRegistryId } from '@celo/protocol/lib/registry-utils';
+import { assertEqualBN, assertLogMatches, assertRevert, NULL_ADDRESS, timeTravel } from '@celo/protocol/lib/test-utils';
+import BigNumber from 'bignumber.js';
+import { BondedDepositsContract, BondedDepositsInstance, MockGoldTokenContract, MockGoldTokenInstance, MockGovernanceContract, MockGovernanceInstance, MockValidatorsContract, MockValidatorsInstance, RegistryContract, RegistryInstance } from 'types';
 
 const BondedDeposits: BondedDepositsContract = artifacts.require('BondedDeposits')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -34,11 +13,15 @@ const MockValidators: MockValidatorsContract = artifacts.require('MockValidators
 // TODO(mcortesi): Use BN
 BondedDeposits.numberFormat = 'BigNumber'
 
+const HOUR = 60 * 60
+const DAY = 24 * HOUR
+const YEAR = 365 * DAY
+
 // TODO(asa): Test reward redemption
 contract('BondedDeposits', (accounts: string[]) => {
   let account = accounts[0]
   const nonOwner = accounts[1]
-  const maxNoticePeriod = 60 * 60 * 24 * 365 * 2 // 2 years
+  const maxNoticePeriod = 2 * YEAR
   let mockGoldToken: MockGoldTokenInstance
   let mockGovernance: MockGovernanceInstance
   let mockValidators: MockValidatorsInstance
@@ -388,7 +371,7 @@ contract('BondedDeposits', (accounts: string[]) => {
   })
 
   describe('#deposit()', () => {
-    const noticePeriod = 60 * 60 * 24 // 1 day
+    const noticePeriod = 1 * DAY + 1 * HOUR
     const value = 1000
     const expectedWeight = 1033
 
@@ -538,7 +521,8 @@ contract('BondedDeposits', (accounts: string[]) => {
     let availabilityTime: BigNumber
 
     beforeEach(async () => {
-      const noticePeriod = 60 * 60 * 24 // 1 day
+      // The extra hour, saves for from race condition between notify() and rebond()
+      const noticePeriod = 1 * DAY + 1 * HOUR
       // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
       await bondedDeposits.deposit(noticePeriod, { value })
       await bondedDeposits.notify(value, noticePeriod)
@@ -623,7 +607,7 @@ contract('BondedDeposits', (accounts: string[]) => {
   })
 
   describe('#withdraw()', () => {
-    const noticePeriod = 60 * 60 * 24 // 1 day
+    const noticePeriod = 1 * DAY
     const value = 1000
     let availabilityTime: BigNumber
 
@@ -693,7 +677,7 @@ contract('BondedDeposits', (accounts: string[]) => {
   })
 
   describe('#increaseNoticePeriod()', () => {
-    const noticePeriod = 60 * 60 * 24 // 1 day
+    const noticePeriod = 1 * DAY
     const value = 1000
     const increase = noticePeriod
     const expectedWeight = 1047
@@ -930,7 +914,7 @@ contract('BondedDeposits', (accounts: string[]) => {
 
   describe('#getDepositWeight()', () => {
     const value = new BigNumber(521000)
-    const oneDay = new BigNumber(60 * 60 * 24)
+    const oneDay = new BigNumber(DAY)
     it('should return the deposit value when notice period is zero', async () => {
       const noticePeriod = new BigNumber(0)
       assertEqualBN(await bondedDeposits.getDepositWeight(value, noticePeriod), value)
