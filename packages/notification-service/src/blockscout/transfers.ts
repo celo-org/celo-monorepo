@@ -106,7 +106,7 @@ export function notifyForNewTransfers(
   return Promise.all(filtered)
 }
 
-function convertWeiValue(value: string) {
+export function convertWeiValue(value: string) {
   return new BigNumber(value)
     .div(WEI_PER_GOLD)
     .decimalPlaces(4)

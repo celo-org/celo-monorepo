@@ -1,5 +1,6 @@
 import { Log, Response, Transfer } from '../src/blockscout/blockscout'
 import {
+  convertWeiValue,
   filterAndJoinTransfers,
   handleTransferNotifications,
   notifyForNewTransfers,
@@ -122,16 +123,37 @@ describe('Transfers', () => {
     const lastBlockNotified = 122
     const returned = await notifyForNewTransfers(transfers, lastBlockNotified)
 
-    expect(sendPaymentNotificationMock).toHaveBeenCalled()
+    expect(sendPaymentNotificationMock).toHaveBeenCalledWith(
+      TRANSFER1.recipient,
+      convertWeiValue(TRANSFER1.value),
+      TRANSFER1.currency,
+      {
+        ...TRANSFER1,
+        blockNumber: String(TRANSFER1.blockNumber),
+        timestamp: String(TRANSFER1.timestamp),
+      }
+    )
+
+    expect(sendPaymentNotificationMock).toHaveBeenCalledWith(
+      TRANSFER2.recipient,
+      convertWeiValue(TRANSFER2.value),
+      TRANSFER2.currency,
+      {
+        ...TRANSFER2,
+        blockNumber: String(TRANSFER2.blockNumber),
+        timestamp: String(TRANSFER2.timestamp),
+      }
+    )
     expect(returned.length).toEqual(transfers.length)
   })
 
   it('should skip for transfers older than last block notified', async () => {
+    jest.clearAllMocks()
     const transfers = [TRANSFER1, TRANSFER2]
     const lastBlockNotified = 130
     const returned = await notifyForNewTransfers(transfers, lastBlockNotified)
 
-    expect(sendPaymentNotificationMock).toHaveBeenCalled()
+    expect(sendPaymentNotificationMock).not.toHaveBeenCalled()
     expect(returned.length).toEqual(0)
   })
 
