@@ -118,6 +118,7 @@ export interface ActionableAttestation {
   issuer: string
   attestationState: AttestationState
   time: number
+  publicKey: string
 }
 export async function getActionableAttestations(
   attestations: Attestations,
@@ -130,7 +131,7 @@ export async function getActionableAttestations(
   )
   const attestationStates = await getAttestationState(attestations, phoneHash, account)
   const now = Math.floor(new Date().getTime() / 1000)
-  return attestationStates
+  const revealableAttestations = attestationStates
     .map(([issuer, issuerState]) => ({
       issuer,
       attestationState: parseInt(issuerState[0], 10),
@@ -140,6 +141,20 @@ export async function getActionableAttestations(
       (attestation) =>
         attestation.attestationState === AttestationState.Incomplete &&
         now < attestation.time + attestationExpirySeconds
+    )
+
+  const publicKeys = await Promise.all(
+    revealableAttestations.map((attestation) =>
+      attestations.methods.getDataEncryptionKey(attestation.issuer).call()
+    )
+  )
+
+  return zip(revealableAttestations, publicKeys)
+    .map(([attestation, publicKey]) => ({ ...attestation, publicKey }))
+    .filter(
+      // @ts-ignore
+      (attestation: ActionableAttestation) =>
+        attestation.publicKey !== null && attestation.publicKey !== '0x0'
     )
 }
 
