@@ -8,7 +8,11 @@ import {
   Actions,
   EscrowedPayment,
   EXPIRY_SECONDS,
+  FetchReclaimTransactionFeeAction,
   ReclaimPaymentAction,
+  reclaimPaymentFailure,
+  reclaimPaymentSuccess,
+  setReclaimTransactionFee,
   storeSentPayments,
   TransferPaymentAction,
 } from 'src/escrow/actions'
@@ -19,13 +23,17 @@ import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import { inviteesSelector } from 'src/invite/reducer'
 import { TEMP_PW } from 'src/invite/saga'
 import { isValidPrivateKey } from 'src/invite/utils'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
+import { recipientCacheSelector } from 'src/send/reducers'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
+import { fetchGasPrice } from 'src/web3/gas'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 
 const TAG = 'escrow/saga'
@@ -82,7 +90,8 @@ function* withdrawFromEscrow(action: EndVerificationAction) {
 
     Logger.debug(TAG + '@withdrawFromEscrow', 'Withdrawing escrowed payment')
     if (!isValidPrivateKey(inviteCode)) {
-      Logger.error(TAG + '@withdrawFromEscrow', 'Invalid private key: ' + inviteCode)
+      Logger.warn(TAG + '@withdrawFromEscrow', 'Invalid private key, skipping escrow withdrawal')
+      return
     }
 
     const tempWalletAddress = web3.eth.accounts.privateKeyToAccount(inviteCode).address
@@ -136,11 +145,17 @@ function* reclaimFromEscrow(action: ReclaimPaymentAction) {
 
     yield call(fetchDollarBalance)
     yield call(getSentPayments)
+
+    yield call(navigate, Screens.WalletHome)
+    yield put(reclaimPaymentSuccess())
   } catch (e) {
     Logger.error(TAG + '@reclaimFromEscrow', 'Error reclaiming payment from escrow', e)
     if (e.message === ErrorMessages.INCORRECT_PIN) {
       yield put(showError(ErrorMessages.INCORRECT_PIN, ERROR_BANNER_DURATION))
+    } else {
+      yield put(showError(ErrorMessages.RECLAIMING_ESCROWED_PAYMENT_FAILED, ERROR_BANNER_DURATION))
     }
+    yield put(reclaimPaymentFailure(e))
     throw e
   }
 }
@@ -163,6 +178,7 @@ function* getSentPayments() {
     const escrow = yield call(getEscrowContract, web3)
     const account = yield call(getConnectedAccount)
     const recipientsPhoneNumbers = yield select(inviteesSelector)
+    const recipientPhoneNumberToContact = yield select(recipientCacheSelector)
 
     Logger.debug(TAG + '@getSentPayments', 'Fetching valid sent escrowed payments')
     const sentPaymentIDs: string[] = yield escrow.methods.getSentPaymentIds(account).call()
@@ -173,9 +189,11 @@ function* getSentPayments() {
     const sentPaymentsNotifications: EscrowedPayment[] = []
     for (let i = 0; i < sentPayments.length; i++) {
       const payment = sentPayments[i]
+      const recipientPhoneNumber = recipientsPhoneNumbers[sentPaymentIDs[i].toLowerCase()]
       const transformedPayment: EscrowedPayment = {
         senderAddress: payment[1],
-        recipient: recipientsPhoneNumbers[sentPaymentIDs[i]],
+        recipientPhone: recipientPhoneNumber,
+        recipientContact: recipientPhoneNumberToContact[recipientPhoneNumber] || undefined,
         paymentID: sentPaymentIDs[i],
         currency: SHORT_CURRENCIES.DOLLAR, // Only dollars can be escrowed
         amount: payment[3],
@@ -191,6 +209,29 @@ function* getSentPayments() {
   }
 }
 
+export function* fetchReclaimSuggestedFee(action: FetchReclaimTransactionFeeAction) {
+  try {
+    const { paymentID } = action
+    const escrow = yield call(getEscrowContract, web3)
+    const stableToken = yield call(getStableTokenContract, web3)
+    const account = yield call(getConnectedAccount)
+
+    Logger.debug(TAG + '@fetchReclaimSuggestedFee', 'Fetching reclaim transaction fee')
+
+    const mockReclaimTx = escrow.methods.revoke(paymentID)
+    const mockTxParams: any = { from: account, gasCurrency: stableToken._address }
+    const gas = new BigNumber(yield mockReclaimTx.estimateGas(mockTxParams))
+    const gasPrice = new BigNumber(yield call(fetchGasPrice))
+    const suggestedFeeInWei = gas.multipliedBy(gasPrice)
+
+    yield put(setReclaimTransactionFee(suggestedFeeInWei.toString()))
+
+    Logger.debug(TAG + '@fetchReclaimSuggestedFee', `New reclaim tx fee is: ${suggestedFeeInWei}`)
+  } catch (e) {
+    yield put(showError(ErrorMessages.FETCH_RECLAIM_FEE_FAILED, ERROR_BANNER_DURATION))
+  }
+}
+
 export function* watchTransferPayment() {
   yield takeLeading(Actions.TRANSFER_PAYMENT, transferStableTokenToEscrow)
 }
@@ -203,8 +244,12 @@ export function* watchGetSentPayments() {
   yield takeLeading(Actions.GET_SENT_PAYMENTS, getSentPayments)
 }
 
-function* watchVerificationEnd() {
+export function* watchVerificationEnd() {
   yield takeLeading(IdentityActions.END_VERIFICATION, withdrawFromEscrow)
+}
+
+export function* watchFetchReclaimFee() {
+  yield takeLeading(Actions.FETCH_RECLAIM_TRANSACTION_FEE, fetchReclaimSuggestedFee)
 }
 
 export function* escrowSaga() {
@@ -212,4 +257,5 @@ export function* escrowSaga() {
   yield spawn(watchReclaimPayment)
   yield spawn(watchGetSentPayments)
   yield spawn(watchVerificationEnd)
+  yield spawn(watchFetchReclaimFee)
 }

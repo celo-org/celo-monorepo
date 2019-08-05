@@ -5,8 +5,8 @@ import { injectDebugProvider } from './utils/eth-debug-provider'
 
 export abstract class BaseCommand extends Command {
   static flags = {
-    logLevel: flags.string({ char: 'l' }),
-    help: flags.help({ char: 'h' }),
+    logLevel: flags.string({ char: 'l', hidden: true }),
+    help: flags.help({ char: 'h', hidden: true }),
   }
 
   private _web3: Web3 | null = null

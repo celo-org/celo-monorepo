@@ -33,6 +33,7 @@
   "backToWallet": "Volver a la Billetera",
   "exchangeForGold": "Cambiar a Oro",
   "restoreCeloWallet": "Restaurar la billetera de Celo",
+  "cantSelectInvalidPhone": "No se puede seleccionar el contacto: número de teléfono no válido",
   "invalidKey": "Clave de respaldo inválida ",
   "invalidPhone": "Número de teléfono inválido",
   "invalidAmount": "Monto invalido",
@@ -67,6 +68,7 @@
   "sendPaymentFailed": "Falla en el envío de pago",
   "paymentRequestFailed": "No se pudo enviar la solicitud de pago",
   "reclaimingEscrowedPaymentFailed": "El pago no pudo ser reclamado.",
+  "fetchingReclaimFeeFailed": "Error al obtener la tarifa sugerida.",
   "connectingToCelo": "Conectando a la red de Celo...",
   "poorConnection": {
     "0": "Mala Conexión",

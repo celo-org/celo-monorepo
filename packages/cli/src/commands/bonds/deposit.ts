@@ -1,7 +1,9 @@
-import { flags } from '@oclif/command'
 import Web3 from 'web3'
+
+import { BondedDeposits } from '@celo/contractkit'
+import { flags } from '@oclif/command'
+
 import { BaseCommand } from '../../base'
-import { BondedDeposits } from '../../generated/contracts'
 import { BondArgs } from '../../utils/bonds'
 import { displaySendTx, failWith } from '../../utils/cli'
 import { Flags } from '../../utils/command'

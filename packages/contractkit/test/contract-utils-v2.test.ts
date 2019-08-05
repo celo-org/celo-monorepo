@@ -6,7 +6,6 @@ import { NETWORK_NAME } from '../contracts/network-name'
 import ContractUtils from '../src/contract-utils-v2'
 import { Logger, LogLevel } from '../src/logger'
 import {
-  getGasFeeRecipient,
   getMiner0AccountAddress,
   getMiner0PrivateKey,
   getMiner1AccountAddress,
@@ -56,13 +55,6 @@ describe('Contract Utils V2', () => {
   })
   describe('#transferTests', () => {
     it('sendCeloGoldWithGasInCeloDollar', async () => {
-      // Skipped for now, till we redeploy `appintegration` to contain the new Geth which supports the new
-      // signin mechanism.
-      // https://github.com/celo-org/celo-monorepo/issues/3899
-      // @ts-ignore
-      if (NETWORK_NAME === 'appintegration') {
-        return
-      }
       jest.setTimeout(30 * 1000)
       const web3Miner0 = await getWeb3WithSigningAbilityForTesting(
         getMiner0PrivateKey(NETWORK_NAME)
@@ -90,13 +82,6 @@ describe('Contract Utils V2', () => {
     // Figure out why this is failing.
     // Reverse the transfer to minimize the impact of the test.
     it('sendCeloGoldWithGasInCeloGold', async () => {
-      // Skipped for now, till we redeploy `appintegration` to contain the new Geth which supports the new
-      // signin mechanism.
-      // https://github.com/celo-org/celo-monorepo/issues/3899
-      // @ts-ignore
-      if (NETWORK_NAME === 'appintegration') {
-        return
-      }
       jest.setTimeout(30 * 1000)
       const web3Miner0 = await getWeb3WithSigningAbilityForTesting(
         getMiner0PrivateKey(NETWORK_NAME)
@@ -121,13 +106,6 @@ describe('Contract Utils V2', () => {
       )
     })
     it('sendCeloDollarWithGasInCeloDollar', async () => {
-      // Skipped for now, till we redeploy `appintegration` to contain the new Geth which supports the new
-      // signin mechanism.
-      // https://github.com/celo-org/celo-monorepo/issues/3899
-      // @ts-ignore
-      if (NETWORK_NAME === 'appintegration') {
-        return
-      }
       jest.setTimeout(30 * 1000)
       const web3Miner0 = await getWeb3WithSigningAbilityForTesting(
         getMiner0PrivateKey(NETWORK_NAME)
@@ -152,13 +130,6 @@ describe('Contract Utils V2', () => {
       )
     })
     it('sendCeloDollarWithGasInCeloGold', async () => {
-      // Skipped for now, till we redeploy `appintegration` to contain the new Geth which supports the new
-      // signin mechanism.
-      // https://github.com/celo-org/celo-monorepo/issues/3899
-      // @ts-ignore
-      if (NETWORK_NAME === 'appintegration') {
-        return
-      }
       jest.setTimeout(30 * 1000)
       const web3Miner0 = await getWeb3WithSigningAbilityForTesting(
         getMiner0PrivateKey(NETWORK_NAME)
@@ -183,11 +154,6 @@ describe('Contract Utils V2', () => {
 
   describe('#getGasPrice', () => {
     it('should return a nonzero gas price', async () => {
-      // Skipped for now, till we redeploy `appintegration` to contain the new GasPriceMinimum contract.
-      // @ts-ignore
-      if (NETWORK_NAME === 'appintegration') {
-        return
-      }
       const web3 = await getWeb3ForTesting()
       const gasPrice = await ContractUtils.getGasPrice(web3)
       console.debug(`Gas Price: ${gasPrice}`)
@@ -229,22 +195,12 @@ describe('Contract Utils V2', () => {
       expect(rate.isGreaterThan(0)).toBe(true) // Rate in dollars should be positive
     })
     it('should return a gas price when specifying Gold as the currency', async () => {
-      // Skipped for now, till we redeploy `appintegration` to contain the new GasPriceMinimum contract.
-      // @ts-ignore
-      if (NETWORK_NAME === 'appintegration') {
-        return
-      }
       const web3 = await getWeb3ForTesting()
       const rate = await ContractUtils.getExchangeRate(web3, Tokens.DOLLAR)
       console.info(`rate in gold: ${rate}`)
       expect(rate.isGreaterThan(0)).toBe(true) // Rate in gold should be positive
     })
     it('should return a gas price when specifying Celo Dollars as the currency', async () => {
-      // Skipped for now, till we redeploy `appintegration` to contain the new GasPriceMinimum contract.
-      // @ts-ignore
-      if (NETWORK_NAME === 'appintegration') {
-        return
-      }
       const web3 = await getWeb3ForTesting()
       const rateInDollars = await ContractUtils.getExchangeRate(web3, Tokens.DOLLAR)
       const rateInGold = await ContractUtils.getExchangeRate(web3, Tokens.GOLD)
@@ -302,7 +258,7 @@ async function transferGold(
   const fromGoldBalanceBefore: BigNumber = await ContractUtils.getGoldBalance(web3, from)
   const fromDollarBalanceBefore: BigNumber = await ContractUtils.getDollarBalance(web3, from)
   const toGoldBalanceBefore: BigNumber = await ContractUtils.getGoldBalance(web3, to)
-  const gasFeeRecipient: string = await getGasFeeRecipient(NETWORK_NAME)
+  const gasFeeRecipient: string = await web3.eth.getCoinbase()
   try {
     // This will go through but subscribing to notifications will fail.
     // "Failed to subscribe to new newBlockHeaders to confirm the transaction receipts."
@@ -371,7 +327,7 @@ async function transferDollar(
   const fromGoldBalanceBefore: BigNumber = await ContractUtils.getGoldBalance(web3, from)
   const fromDollarBalanceBefore: BigNumber = await ContractUtils.getDollarBalance(web3, from)
   const toDollarBalanceBefore: BigNumber = await ContractUtils.getDollarBalance(web3, to)
-  const gasFeeRecipient: string = await getGasFeeRecipient(NETWORK_NAME)
+  const gasFeeRecipient: string = await web3.eth.getCoinbase()
   try {
     // This will go through but subscribing to notifications will fail.
     // "Failed to subscribe to new newBlockHeaders to confirm the transaction receipts."
