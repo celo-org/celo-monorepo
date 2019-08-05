@@ -8,7 +8,6 @@ import { setAccountCreationTime } from 'src/account/actions'
 import { pincodeSelector } from 'src/account/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { setInviteCodeEntered } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
@@ -25,9 +24,7 @@ import {
   setIsReady,
   setLatestBlockNumber,
   setPrivateCommentKey,
-  setSyncProgress,
   unlockAccount,
-  updateWeb3SyncProgress,
 } from 'src/web3/actions'
 import { web3 } from 'src/web3/contracts'
 import { refreshGasPrice } from 'src/web3/gas'
@@ -58,12 +55,9 @@ function* checkWeb3SyncProgressClaim() {
         // For some weird reason, checkSyncProgressWorker is flaky and does not work for the long running
         // sync tasks.
         Logger.debug(TAG, 'sync complete')
-        yield put(setSyncProgress(100))
         yield put(setIsReady(true))
         return true
       }
-
-      yield put(updateWeb3SyncProgress(syncProgress))
     } catch (error) {
       if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
         CeloAnalytics.track(CustomEventNames.blockChainCorruption, {}, true)
@@ -134,7 +128,6 @@ function* checkSyncProgressWorker() {
         }
 
         Logger.debug(TAG, 'Sync Progress Completed')
-        yield put(setSyncProgress(100))
         yield put(setIsReady(true))
       } catch (error) {
         Logger.error(TAG, `checkSyncProgressWorker error: ${error}`)
@@ -205,8 +198,6 @@ export function* assignAccountFromPrivateKey(key: string) {
     )
 
     yield put(setAccount(account))
-    // TODO(cmcewen): remove invite code entered
-    yield put(setInviteCodeEntered(true))
     yield put(setAccountCreationTime())
     yield call(assignDataKeyFromPrivateKey, key)
 

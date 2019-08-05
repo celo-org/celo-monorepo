@@ -1,14 +1,8 @@
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
-import { Actions, ActionTypes, UpdateWeb3SyncProgressAction } from 'src/web3/actions'
+import { Actions, ActionTypes } from 'src/web3/actions'
 
 export interface State {
   isReady: boolean
-  syncProgress: number
-  syncProgressData: {
-    currentBlock: number
-    startBlock: number
-    highestBlock: number
-  }
   latestBlockNumber: number
   account: string | null
   commentKey: string | null
@@ -18,25 +12,10 @@ export interface State {
 
 const initialState: State = {
   isReady: false,
-  syncProgress: 0,
-  syncProgressData: {
-    currentBlock: 0,
-    highestBlock: 0,
-    startBlock: 0,
-  },
   latestBlockNumber: 0,
   account: null,
   commentKey: null,
   gasPriceLastUpdated: 0,
-}
-
-function calculateSyncProgress(action: UpdateWeb3SyncProgressAction) {
-  if (action.payload.currentBlock === 0) {
-    return 0
-  }
-  const numerator = action.payload.currentBlock - action.payload.startingBlock
-  const denominator = action.payload.highestBlock - action.payload.startingBlock
-  return (100 * numerator) / denominator
 }
 
 export const reducer = (
@@ -50,12 +29,6 @@ export const reducer = (
         ...state,
         ...getRehydratePayload(action, 'web3'),
         isReady: false,
-        syncProgress: 0,
-        syncProgressData: {
-          currentBlock: 0,
-          highestBlock: 0,
-          startBlock: 0,
-        },
         latestBlockNumber: 0,
       }
     }
@@ -69,11 +42,6 @@ export const reducer = (
         ...state,
         commentKey: action.commentKey,
       }
-    case Actions.SET_PROGRESS:
-      return {
-        ...state,
-        syncProgress: action.payload.syncProgress,
-      }
     case Actions.SET_IS_READY:
       return {
         ...state,
@@ -83,11 +51,6 @@ export const reducer = (
       return {
         ...state,
         latestBlockNumber: action.latestBlockNumber,
-      }
-    case Actions.UPDATE_WEB3_SYNC_PROGRESS:
-      return {
-        ...state,
-        syncProgress: calculateSyncProgress(action),
       }
     case Actions.SET_GAS_PRICE:
       return {

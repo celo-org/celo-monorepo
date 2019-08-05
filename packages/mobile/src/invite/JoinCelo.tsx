@@ -122,10 +122,6 @@ export class JoinCelo extends React.Component<Props, State> {
     })
   }
 
-  setName = (value: string) => {
-    this.setState({ name: value })
-  }
-
   onChangeNameInput = (value: string) => {
     this.setState({
       name: value,
@@ -204,7 +200,7 @@ export class JoinCelo extends React.Component<Props, State> {
           </Text>
           <TextInput
             onFocus={this.scrollToEnd}
-            onChangeText={this.setName}
+            onChangeText={this.onChangeNameInput}
             value={name}
             style={styles.box}
             placeholderTextColor={colors.inactive}
