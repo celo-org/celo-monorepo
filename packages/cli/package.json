@@ -29,7 +29,7 @@
     "test": "export TZ=UTC && jest --ci --silent"
   },
   "dependencies": {
-    "@celo/contractkit": "^0.0.1",
+    "@celo/contractkit": "^0.0.4",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
