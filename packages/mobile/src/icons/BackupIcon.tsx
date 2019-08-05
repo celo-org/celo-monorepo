@@ -7,7 +7,7 @@ interface Props {
   style?: any
 }
 
-export default class VerifyAddressBook extends React.PureComponent<Props> {
+export default class BackupIcon extends React.PureComponent<Props> {
   static defaultProps = {
     height: 70,
     width: 80,

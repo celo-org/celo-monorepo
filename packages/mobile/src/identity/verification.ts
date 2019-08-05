@@ -17,15 +17,16 @@ import {
 } from '@celo/contractkit'
 import { Attestations as AttestationsType } from '@celo/contractkit/types/Attestations'
 import { StableToken as StableTokenType } from '@celo/contractkit/types/StableToken'
-import { compressedPubKey, stripHexLeader } from '@celo/utils/src/commentEncryption'
+import { compressedPubKey } from '@celo/utils/src/commentEncryption'
 import { getPhoneHash, isE164Number } from '@celo/utils/src/phoneNumbers'
+import { areAddressesEqual } from '@celo/utils/src/signatureUtils'
 import BigNumber from 'bignumber.js'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/reducer'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
+import { CommonValues, CustomEventNames } from 'src/analytics/constants'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { refreshAllBalances } from 'src/home/actions'
@@ -41,7 +42,7 @@ import {
 import { attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { RootState } from 'src/redux/reducers'
-import { sendTransaction } from 'src/transactions/send'
+import { sendTransaction, sendTransactionPromises } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -53,7 +54,12 @@ export const NUM_ATTESTATIONS_REQUIRED = 3
 export const VERIFICATION_TIMEOUT = 5 * 60 * 1000 // 5 minutes
 export const ERROR_DURATION = 5000 // 5 seconds
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
-
+// Gas estimation for concurrent pending transactions is currently not support for
+// light clients, so we have to statically specify the gas here. Furthermore, the
+// current request function does a whole validator election which is why it is very
+// expensive. When https://github.com/celo-org/celo-monorepo-old/issues/3818 gets
+// merged we should significantly reduce this number
+export const REQUEST_TX_GAS = 7000000
 export enum CodeInputType {
   AUTOMATIC = 'automatic',
   MANUAL = 'manual',
@@ -77,8 +83,7 @@ export function* startVerification() {
   yield call(getConnectedAccount)
 
   Logger.debug(TAG, 'Starting verification')
-  CeloAnalytics.track(CustomEventNames.verification_start)
-  const startTime = Date.now()
+  CeloAnalytics.startTracking(CustomEventNames.verification)
 
   const { result, cancel, timeout } = yield race({
     result: call(doVerificationFlow),
@@ -88,20 +93,24 @@ export function* startVerification() {
 
   if (result === true) {
     Logger.debug(TAG, 'Verification completed successfully')
-    CeloAnalytics.track(CustomEventNames.verification_complete, {
-      duration: Date.now() - startTime,
+    CeloAnalytics.stopTracking(CustomEventNames.verification, {
+      result: CommonValues.success,
     })
   } else if (result === false) {
     Logger.debug(TAG, 'Verification failed')
-    CeloAnalytics.track(CustomEventNames.verification_failure, {
-      duration: Date.now() - startTime,
+    CeloAnalytics.stopTracking(CustomEventNames.verification, {
+      result: CommonValues.failure,
     })
   } else if (cancel) {
     Logger.debug(TAG, 'Verification cancelled')
-    CeloAnalytics.track(CustomEventNames.verification_cancel)
+    CeloAnalytics.stopTracking(CustomEventNames.verification, {
+      result: CommonValues.cancel,
+    })
   } else if (timeout) {
     Logger.debug(TAG, 'Verification timed out')
-    CeloAnalytics.track(CustomEventNames.verification_timeout)
+    CeloAnalytics.stopTracking(CustomEventNames.verification, {
+      result: CommonValues.timeout,
+    })
     yield put(showError(ErrorMessages.VERIFICATION_TIMEOUT, ERROR_DURATION))
     // TODO #1955: Add logic in this case to request more SMS messages
   }
@@ -120,12 +129,19 @@ export function* doVerificationFlow() {
     const attestationsContract: AttestationsType = yield call(getAttestationsContract, web3)
     const stableTokenContract: StableTokenType = yield call(getStableTokenContract, web3)
 
+    CeloAnalytics.trackSubEvent(CustomEventNames.verification, CustomEventNames.verification_setup)
+
     // Get all relevant info about the account's verification status
     const status: AttestationsStatus = yield call(
       getAttestationsStatus,
       attestationsContract,
       account,
       e164NumberHash
+    )
+
+    CeloAnalytics.trackSubEvent(
+      CustomEventNames.verification,
+      CustomEventNames.verification_get_status
     )
 
     if (status.isVerified) {
@@ -147,6 +163,11 @@ export function* doVerificationFlow() {
       account
     )
 
+    CeloAnalytics.trackSubEvent(
+      CustomEventNames.verification,
+      CustomEventNames.verification_req_attestations
+    )
+
     // Get actionable attestation details
     const attestations: ActionableAttestation[] = yield call(
       getActionableAttestations,
@@ -156,6 +177,11 @@ export function* doVerificationFlow() {
     )
     const issuers = attestations.map((a) => a.issuer)
 
+    CeloAnalytics.trackSubEvent(
+      CustomEventNames.verification,
+      CustomEventNames.verification_get_attestations
+    )
+
     // Start listening for manual and/or auto message inputs
     const receiveMessageTask: Task = yield takeEvery(
       Actions.RECEIVE_ATTESTATION_MESSAGE,
@@ -163,18 +189,19 @@ export function* doVerificationFlow() {
     )
     const autoRetrievalTask: Task = yield fork(startAutoSmsRetrieval)
 
-    // This needs to go before revealing the attesttions because that depends on the public data key being set.
-    yield call(setAccount, attestationsContract, account, dataKey)
-
-    // Request codes for the attestations needed
-    yield call(
-      revealNeededAttestations,
-      attestationsContract,
-      account,
-      e164Number,
-      e164NumberHash,
-      attestations
-    )
+    yield all([
+      // Set acccount and data encryption key in contract
+      call(setAccount, attestationsContract, account, dataKey),
+      // Request codes for the attestations needed
+      call(
+        revealNeededAttestations,
+        attestationsContract,
+        account,
+        e164Number,
+        e164NumberHash,
+        attestations
+      ),
+    ])
 
     receiveMessageTask.cancel()
     autoRetrievalTask.cancel()
@@ -286,8 +313,6 @@ export async function requestNeededAttestations(
     numAttestationsRequestsNeeded
   )
 
-  await sendTransaction(approveTx, account, TAG, 'Approve Attestations')
-
   Logger.debug(
     `${TAG}@requestNeededAttestations`,
     `Requesting ${numAttestationsRequestsNeeded} new attestations`
@@ -299,7 +324,17 @@ export async function requestNeededAttestations(
     numAttestationsRequestsNeeded,
     stableTokenContract
   )
-  await sendTransaction(requestTx, account, TAG, 'Request Attestations')
+
+  const {
+    confirmation: approveConfirmationPromise,
+    transactionHash: approveTransactionHashPromise,
+  } = await sendTransactionPromises(approveTx, account, TAG, 'Approve Attestations')
+
+  await approveTransactionHashPromise
+  await Promise.all([
+    sendTransaction(requestTx, account, TAG, 'Request Attestations', REQUEST_TX_GAS),
+    approveConfirmationPromise,
+  ])
 }
 
 function attestationCodeReceiver(
@@ -329,7 +364,7 @@ function attestationCodeReceiver(
       if (existingCode) {
         Logger.warn(TAG + '@attestationCodeReceiver', 'Code already exists store, skipping.')
         if (action.inputType === CodeInputType.MANUAL) {
-          yield put(showError(ErrorMessages.REPEAT_VERIFICATION_CODE, ERROR_DURATION))
+          yield put(showError(ErrorMessages.REPEAT_ATTESTATION_CODE, ERROR_DURATION))
         }
         return
       }
@@ -349,10 +384,6 @@ function attestationCodeReceiver(
       }
 
       yield put(inputAttestationCode({ code, issuer }))
-
-      CeloAnalytics.track(CustomEventNames.verification_code_entered, {
-        inputType: action.inputType,
-      })
     } catch (error) {
       Logger.error(TAG + '@attestationCodeReceiver', 'Error processing attestation code', error)
       yield put(showError(ErrorMessages.INVALID_ATTESTATION_CODE))
@@ -398,7 +429,17 @@ function* revealAndCompleteAttestation(
   const revealTx = yield call(makeRevealTx, attestationsContract, e164Number, issuer)
   yield call(sendTransaction, revealTx, account, TAG, `Reveal ${issuer}`)
 
+  CeloAnalytics.trackSubEvent(
+    CustomEventNames.verification,
+    CustomEventNames.verification_reveal_txs
+  )
+
   const code: AttestationCode = yield call(waitForAttestationCode, issuer)
+
+  CeloAnalytics.trackSubEvent(
+    CustomEventNames.verification,
+    CustomEventNames.verification_codes_received
+  )
 
   Logger.debug(TAG + '@revealAttestation', `Completing code for issuer: ${code.issuer}`)
 
@@ -410,6 +451,11 @@ function* revealAndCompleteAttestation(
     code.code
   )
   yield call(sendTransaction, completeTx, account, TAG, `Confirmation ${issuer}`)
+
+  CeloAnalytics.trackSubEvent(
+    CustomEventNames.verification,
+    CustomEventNames.verification_complete_txs
+  )
 
   yield put(completeAttestationCode())
   Logger.debug(TAG + '@revealAttestation', `Attestation for issuer ${issuer} completed`)
@@ -439,9 +485,16 @@ async function setAccount(
   Logger.debug(TAG, 'Setting wallet address and public data encryption key')
   const currentWalletAddress = await getWalletAddress(attestationsContract, address)
   const currentWalletDEK = await getDataEncryptionKey(attestationsContract, address)
-  if (currentWalletAddress !== address || stripHexLeader(currentWalletDEK) !== dataKey) {
+  if (
+    !areAddressesEqual(currentWalletAddress, address) ||
+    !areAddressesEqual(currentWalletDEK, dataKey)
+  ) {
     const setAccountTx = makeSetAccountTx(attestationsContract, address, dataKey)
-    return sendTransaction(setAccountTx, address, TAG, `Set Wallet Address & DEK`)
+    await sendTransaction(setAccountTx, address, TAG, `Set Wallet Address & DEK`)
+    CeloAnalytics.trackSubEvent(
+      CustomEventNames.verification,
+      CustomEventNames.verification_set_account
+    )
   }
 }
 
@@ -483,7 +536,7 @@ export function* revokeVerification() {
 
 // TODO(Rossy) This is currently only used in one place, would be better
 // to have consumer use the e164NumberToAddress map instead
-export async function lookupPhoneNumberAddress(e164Number: string) {
+export async function lookupAddressFromPhoneNumber(e164Number: string) {
   Logger.debug(TAG + '@lookupPhoneNumberAddress', `Checking Phone Number Address`)
 
   try {
@@ -511,5 +564,5 @@ export async function isPhoneNumberVerified(phoneNumber: string | null | undefin
     return false
   }
 
-  return (await lookupPhoneNumberAddress(phoneNumber)) != null
+  return (await lookupAddressFromPhoneNumber(phoneNumber)) != null
 }

@@ -3,6 +3,7 @@ import ForwardChevron from '@celo/react-components/icons/ForwardChevron'
 import QRCode from '@celo/react-components/icons/QRCode'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
+import { isValidAddress } from '@celo/utils/lib/src/signatureUtils'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import { TranslationFunction } from 'i18next'
 import * as React from 'react'
@@ -16,13 +17,24 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
+import { Namespaces } from 'src/i18n'
+import { AddressToE164NumberType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { RootState } from 'src/redux/reducers'
 import LabeledTextInput from 'src/send/LabeledTextInput'
 import RecipientItem from 'src/send/RecipientItem'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { Recipient, RecipientKind, RecipientWithMobileNumber } from 'src/utils/recipient'
+import {
+  getRecipientFromAddress,
+  NumberToRecipient,
+  Recipient,
+  RecipientKind,
+  RecipientWithAddress,
+  RecipientWithMobileNumber,
+} from 'src/utils/recipient'
 import { assertUnreachable } from 'src/utils/typescript'
 
 const goToQrCodeScreen = () => {
@@ -56,7 +68,17 @@ interface Props {
   onSearchQueryChanged(searchQuery: string): void
 }
 
-type RecipientProps = Props & WithNamespaces
+interface StateProps {
+  addressToE164Number: AddressToE164NumberType
+  recipientCache: NumberToRecipient
+}
+
+type RecipientProps = Props & WithNamespaces & StateProps
+
+const mapStateToProps = (state: RootState): StateProps => ({
+  addressToE164Number: state.identity.addressToE164Number,
+  recipientCache: state.send.recipientCache,
+})
 
 export class RecipientPicker extends React.Component<RecipientProps> {
   renderItem = ({ item, index }: ListRenderItemInfo<Recipient>) => (
@@ -75,6 +97,8 @@ export class RecipientPicker extends React.Component<RecipientProps> {
         return item.e164PhoneNumber + index
       case RecipientKind.QrCode:
         return item.address + index
+      case RecipientKind.Address:
+        return item.address + index
       default:
         throw assertUnreachable(item)
     }
@@ -89,10 +113,16 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     </>
   )
 
-  renderEmptyView = () => {
+  renderEmptyView = (
+    addressToE164Number: AddressToE164NumberType,
+    recipientCache: NumberToRecipient
+  ) => {
     const parsedNumber = parsePhoneNumber(this.props.searchQuery, this.props.defaultCountryCode)
     if (parsedNumber) {
       return this.renderSendToPhoneNumber(parsedNumber.displayNumber, parsedNumber.e164Number)
+    }
+    if (isValidAddress(this.props.searchQuery)) {
+      return this.renderSendToAddress()
     }
     return this.renderNoContentEmptyView()
   }
@@ -111,24 +141,55 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     </View>
   )
 
-  renderSendToPhoneNumber = (displayPhoneNumber: string, e164PhoneNumber: string) => {
-    const { t } = this.props
+  renderSendToPhoneNumber = (displayId: string, e164PhoneNumber: string) => {
+    const { t, onSelectRecipient } = this.props
     const recipient: RecipientWithMobileNumber = {
       kind: RecipientKind.MobileNumber,
       displayName: t('mobileNumber'),
-      displayPhoneNumber,
+      displayId,
       e164PhoneNumber,
     }
     return (
       <>
-        <RecipientItem recipient={recipient} onSelectRecipient={this.props.onSelectRecipient} />
+        <RecipientItem recipient={recipient} onSelectRecipient={onSelectRecipient} />
         {this.renderItemSeparator()}
       </>
     )
   }
 
+  renderSendToAddress = () => {
+    const { t, searchQuery, addressToE164Number, recipientCache, onSelectRecipient } = this.props
+    const existingContact = getRecipientFromAddress(
+      searchQuery,
+      addressToE164Number,
+      recipientCache
+    )
+    if (existingContact) {
+      return (
+        <>
+          <RecipientItem recipient={existingContact} onSelectRecipient={onSelectRecipient} />
+          {this.renderItemSeparator()}
+        </>
+      )
+    } else {
+      const recipient: RecipientWithAddress = {
+        kind: RecipientKind.Address,
+        displayName: t('walletAddress'),
+        displayId: searchQuery.substring(2, 17) + '...',
+        address: searchQuery,
+      }
+
+      return (
+        <>
+          <RecipientItem recipient={recipient} onSelectRecipient={onSelectRecipient} />
+          {this.renderItemSeparator()}
+        </>
+      )
+    }
+  }
+
   render() {
-    const { sections, t } = this.props
+    const { sections, t, addressToE164Number, recipientCache } = this.props
     const showFooter = sections.length > 0
 
     return (
@@ -138,7 +199,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
           keyboardType="default"
           placeholder={t('nameOrPhoneNumber')}
           value={this.props.searchQuery}
-          onValueChanged={this.props.onSearchQueryChanged}
+          onChangeText={this.props.onSearchQueryChanged}
         />
         {this.props.showQRCode && <QRCodeCTA t={t} />}
         <SectionList
@@ -147,9 +208,10 @@ export class RecipientPicker extends React.Component<RecipientProps> {
           sections={sections}
           ItemSeparatorComponent={this.renderItemSeparator}
           ListFooterComponent={showFooter ? this.renderFooter : undefined}
-          ListEmptyComponent={this.renderEmptyView}
+          ListEmptyComponent={this.renderEmptyView(addressToE164Number, recipientCache)}
           keyExtractor={this.keyExtractor}
           initialNumToRender={30}
+          keyboardShouldPersistTaps="handled"
         />
       </View>
     )
@@ -222,4 +284,9 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withNamespaces('sendFlow7')(RecipientPicker))
+export default componentWithAnalytics(
+  connect(
+    mapStateToProps,
+    {}
+  )(withNamespaces(Namespaces.sendFlow7)(RecipientPicker))
+)

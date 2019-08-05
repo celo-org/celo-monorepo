@@ -21,7 +21,7 @@
   "celoWallet": "Celo Wallet",
   "blockScout": "BlockScout",
   "interestedInNode": "Interested in running your own node? ",
-  "faucetError": "Unable to faucet - please try again",
+  "faucetError": "Unable to faucet - check your address and please try again",
   "faucetCompleted": "Faucet Completed",
   "invalidAddress": "Enter an Address",
   "interestedInNodeText": "Follow our step-by-step guide.",
@@ -31,5 +31,13 @@
   "hittingIssuesText": "",
   "askQustionsOnForum": "Get Help from the Celo Community.",
   "findAnswers": "Find answers and ask questions in the Forum",
-  "testnetForum": "Alfajores Testnet Forum"
+  "testnetForum": "Alfajores Testnet Forum",
+  "testnetAddress": "Testnet Address",
+  "getStarted": "Get Started",
+  "done": "Done",
+  "inviteError": "Unable to complete - double check your number",
+  "invalidNumber": "Must be a valid E.164 number",
+  "cUSDsent": "cUSD Sent",
+  "cGLDsent": "cGLD Sent",
+  "walletBuilt": "Wallet Built"
 }
