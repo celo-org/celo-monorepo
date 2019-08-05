@@ -78,6 +78,7 @@ const linkedLibraries = {
   AddressSortedLinkedList: ['Validators'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
   SortedFractionMedianList: ['SortedOracles', 'SortedFractionMedianListTest'],
+  Signatures: ['BondedDeposits', 'Escrow'],
 }
 
 const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}

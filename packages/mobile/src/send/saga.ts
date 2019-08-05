@@ -1,3 +1,4 @@
+import { getGoldTokenContract, getStableTokenContract } from '@celo/contractkit'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
@@ -25,11 +26,31 @@ import {
 } from 'src/send/actions'
 import { recipientCacheSelector } from 'src/send/reducers'
 import { transferStableToken } from 'src/stableToken/actions'
+import { BasicTokenTransfer, createTransaction } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
+import { web3 } from 'src/web3/contracts'
+import { fetchGasPrice } from 'src/web3/gas'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'send/saga'
+
+export async function getSendFee(
+  account: string,
+  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract,
+  params: BasicTokenTransfer
+) {
+  // create mock transaction and get gas
+  const tx = await createTransaction(contractGetter, params)
+  const txParams = { from: account, gasCurrency: (await contractGetter(web3))._address }
+  const gas = new BigNumber(await tx.estimateGas(txParams))
+  const gasPrice = new BigNumber(await fetchGasPrice())
+  Logger.debug(`${TAG}/getSendFee`, `estimated gas: ${gas}`)
+  Logger.debug(`${TAG}/getSendFee`, `gas price: ${gasPrice}`)
+  const feeInWei = gas.multipliedBy(gasPrice)
+  Logger.debug(`${TAG}/getSendFee`, `New fee is: ${feeInWei}`)
+  return feeInWei
+}
 
 export function* watchQrCodeDetections() {
   while (true) {

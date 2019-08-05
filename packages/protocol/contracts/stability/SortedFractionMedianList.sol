@@ -4,7 +4,7 @@ pragma solidity ^0.5.8;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../common/Initializable.sol";
-import "./FractionUtil.sol";
+import "../common/FractionUtil.sol";
 
 
 // TODO(asa): Inherit from SortedLinkedList or AddressSortedLinkedList

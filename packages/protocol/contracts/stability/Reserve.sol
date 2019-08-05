@@ -3,7 +3,7 @@ pragma solidity ^0.5.8;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-import "./FractionUtil.sol";
+import "../common/FractionUtil.sol";
 import "./interfaces/IReserve.sol";
 import "./interfaces/ISortedOracles.sol";
 import "./interfaces/IStableToken.sol";
