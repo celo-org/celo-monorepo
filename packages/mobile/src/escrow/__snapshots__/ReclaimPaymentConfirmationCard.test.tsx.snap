@@ -12,7 +12,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
       Object {
         "flex": 1,
         "justifyContent": "center",
-        "padding": 10,
+        "padding": 20,
       },
     ]
   }
@@ -214,9 +214,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
                 "lineHeight": 24,
               },
               Object {
-                "left": 1,
                 "lineHeight": 28,
-                "marginLeft": 10,
               },
             ]
           }
@@ -235,8 +233,6 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             },
             Object {
               "lineHeight": 28,
-              "marginRight": 10,
-              "right": 1,
             },
           ]
         }
@@ -272,9 +268,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
                 "lineHeight": 24,
               },
               Object {
-                "left": 1,
                 "lineHeight": 28,
-                "marginLeft": 10,
               },
             ]
           }
@@ -333,8 +327,6 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             },
             Object {
               "lineHeight": 28,
-              "marginRight": 10,
-              "right": 1,
             },
           ]
         }
@@ -371,9 +363,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
                 "lineHeight": 24,
               },
               Object {
-                "left": 1,
                 "lineHeight": 28,
-                "marginLeft": 10,
               },
             ]
           }
@@ -393,8 +383,6 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             Object {
               "color": "#42D689",
               "lineHeight": 28,
-              "marginRight": 10,
-              "right": 1,
             },
           ]
         }
