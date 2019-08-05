@@ -1,5 +1,4 @@
 # Exclude compiled .js files
-*.js
 *.js.map
 dist/
 
