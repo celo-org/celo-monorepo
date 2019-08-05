@@ -1,7 +1,28 @@
-import { goldTokenRegistryId, governanceRegistryId, validatorsRegistryId } from '@celo/protocol/lib/registry-utils';
-import { assertEqualBN, assertLogMatches, assertRevert, NULL_ADDRESS, timeTravel } from '@celo/protocol/lib/test-utils';
-import BigNumber from 'bignumber.js';
-import { BondedDepositsContract, BondedDepositsInstance, MockGoldTokenContract, MockGoldTokenInstance, MockGovernanceContract, MockGovernanceInstance, MockValidatorsContract, MockValidatorsInstance, RegistryContract, RegistryInstance } from 'types';
+import {
+  goldTokenRegistryId,
+  governanceRegistryId,
+  validatorsRegistryId,
+} from '@celo/protocol/lib/registry-utils'
+import {
+  assertEqualBN,
+  assertLogMatches,
+  assertRevert,
+  NULL_ADDRESS,
+  timeTravel,
+} from '@celo/protocol/lib/test-utils'
+import BigNumber from 'bignumber.js'
+import {
+  BondedDepositsContract,
+  BondedDepositsInstance,
+  MockGoldTokenContract,
+  MockGoldTokenInstance,
+  MockGovernanceContract,
+  MockGovernanceInstance,
+  MockValidatorsContract,
+  MockValidatorsInstance,
+  RegistryContract,
+  RegistryInstance,
+} from 'types'
 
 const BondedDeposits: BondedDepositsContract = artifacts.require('BondedDeposits')
 const Registry: RegistryContract = artifacts.require('Registry')
