@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "esModuleInterop": true,
     "module": "commonjs",
@@ -12,5 +14,5 @@
     "target": "es6",
     "lib": ["es7", "esnext"]
   },
-  "include": ["src/**/*"]
+  "exclude": ["node_modules", "vendor", ".bundle"]
 }
