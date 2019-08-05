@@ -44,11 +44,6 @@ const networks = {
   },
   testnet_prod: defaultConfig,
 
-  appintegration: {
-    ...defaultConfig,
-    from: INTEGRATION_FROM,
-  },
-
   // New testnets
   integration: {
     ...defaultConfig,

@@ -6,6 +6,7 @@ import { reducer as alert, State as AlertState } from 'src/alert/reducer'
 import { appReducer as app, State as AppState } from 'src/app/reducers'
 import { escrowReducer as escrow, State as EscrowState } from 'src/escrow/reducer'
 import { reducer as exchange, State as ExchangeState } from 'src/exchange/reducer'
+import { reducer as fees, State as FeesState } from 'src/fees/reducer'
 import { gethReducer as geth, State as GethState } from 'src/geth/reducer'
 import { reducer as goldToken, State as GoldTokenState } from 'src/goldToken/reducer'
 import { homeReducer as home, State as HomeState } from 'src/home/reducers'
@@ -33,6 +34,7 @@ export default combineReducers({
   invite,
   geth,
   escrow,
+  fees,
 }) as () => RootState
 
 export interface RootState {
@@ -52,6 +54,7 @@ export interface RootState {
   invite: InviteState
   geth: GethState
   escrow: EscrowState
+  fees: FeesState
 }
 
 export interface PersistedRootState {
