@@ -123,10 +123,7 @@ const CalculateFee = (props: Props) => {
       return <CalculateReclaimEscrowFee {...props} />
   }
 
-  // @ts-ignore
   throw new Error(`Unsupported feeType: ${props.feeType}`)
-
-  return null
 }
 
 export default connect<{}, DispatchProps, OwnProps, {}>(
