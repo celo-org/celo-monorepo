@@ -1,8 +1,8 @@
+import { EventProps } from 'fullstack/EventProps'
 import * as React from 'react'
 import { SectionList, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import EventRow from 'src/community/connect/EventRow'
-import { EventProps } from 'src/community/EventHelpers'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
@@ -14,6 +14,7 @@ interface OwnProps {
   upcomingEvents?: EventProps[]
   pastEvents?: EventProps[]
   topEvent?: EventProps | null
+  loading?: boolean
 }
 
 type Props = I18nProps & OwnProps
@@ -60,6 +61,10 @@ class Events extends React.PureComponent<Props, State> {
   }
 
   renderNotFound = () => {
+    if (this.props.loading) {
+      return null
+    }
+
     return (
       <NoneFound
         onPress={this.filterNone}

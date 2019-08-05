@@ -389,6 +389,8 @@ contract('Escrow', (accounts: string[]) => {
 
       it('should allow sender to redeem payment after payment has expired', async () => {
         await timeTravel(oneDayInSecs, web3)
+        const escrowedPaymentBefore = await getEscrowedPayment(uniquePaymentIDRevoke, escrow)
+
         await escrow.revoke(uniquePaymentIDRevoke, { from: sender })
 
         const sentPaymentsAfterRevoke = await escrow.getSentPaymentIds(sender)
@@ -404,6 +406,14 @@ contract('Escrow', (accounts: string[]) => {
           receivedPaymentsAfterRevoke,
           uniquePaymentIDRevoke,
           "Should have deleted this escrowed payment from receiver's receivedPaymentIds list after revoke"
+        )
+
+        const escrowedPaymentAfter = await getEscrowedPayment(uniquePaymentIDRevoke, escrow)
+
+        assert.notEqual(
+          escrowedPaymentBefore,
+          escrowedPaymentAfter,
+          'Should have zeroed this escrowed payments values after revoke'
         )
       })
 

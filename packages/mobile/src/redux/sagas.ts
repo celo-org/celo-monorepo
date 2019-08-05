@@ -4,11 +4,12 @@ import { devModeSelector } from 'src/account/reducer'
 import { appSaga, waitForRehydrate } from 'src/app/saga'
 import { escrowSaga } from 'src/escrow/saga'
 import { exchangeSaga } from 'src/exchange/saga'
+import { feesSaga } from 'src/fees/saga'
 import { firebaseSaga } from 'src/firebase/saga'
 import { gethSaga } from 'src/geth/saga'
 import { goldTokenSaga } from 'src/goldToken/saga'
 import { homeSaga } from 'src/home/saga'
-import { abeSaga } from 'src/identity/saga'
+import { identitySaga } from 'src/identity/saga'
 import { importSaga } from 'src/import/saga'
 import { inviteSaga } from 'src/invite/saga'
 import { networkInfoSaga } from 'src/networkInfo/saga'
@@ -55,7 +56,7 @@ export function* rootSaga() {
   yield spawn(networkInfoSaga)
   yield spawn(gethSaga)
   yield spawn(web3Saga)
-  yield spawn(abeSaga)
+  yield spawn(identitySaga)
   yield spawn(goldTokenSaga)
   yield spawn(stableTokenSaga)
   yield spawn(sendSaga)
@@ -65,4 +66,5 @@ export function* rootSaga() {
   yield spawn(firebaseSaga)
   yield spawn(inviteSaga)
   yield spawn(importSaga)
+  yield spawn(feesSaga)
 }

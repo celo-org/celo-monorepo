@@ -11,29 +11,9 @@ interface Props {
   accessibilityRole?: 'button' | 'label' | 'link' | 'heading' | 'listitem'
 }
 
-export const ResponsiveText = (props: Props) => {
-  const { style, children } = props
-
-  return (
-    <Responsive medium={[TextStyles.main, style]}>
-      <Text {...props} style={[TextStyles.smallMain, style]}>
-        {children}
-      </Text>
-    </Responsive>
-  )
-}
-
 export const ResponsiveH1 = ({ style, children }: Props) => {
   return (
     <Responsive medium={[TextStyles.largeHeader, style]}>
-      <Text style={[TextStyles.mediumMain, style]}>{children}</Text>
-    </Responsive>
-  )
-}
-
-export const ResponsiveH2 = ({ style, children }: Props) => {
-  return (
-    <Responsive medium={[TextStyles.mediumHeader, style]}>
       <Text style={[TextStyles.mediumMain, style]}>{children}</Text>
     </Responsive>
   )
@@ -43,13 +23,6 @@ export const ResponsiveH3 = ({ style, children }: Props) => {
   return (
     <Responsive medium={[TextStyles.sectionHeader, style]}>
       <Text style={[TextStyles.mediumMain, style]}>{children}</Text>
-    </Responsive>
-  )
-}
-export const ResponsiveH4 = ({ style, children }: Props) => {
-  return (
-    <Responsive medium={[TextStyles.smallerSectionHeader, style]}>
-      <Text style={[TextStyles.smallMain, style]}>{children}</Text>
     </Responsive>
   )
 }

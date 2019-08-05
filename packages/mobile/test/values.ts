@@ -37,7 +37,7 @@ export const mockRecipient: RecipientWithContact = {
   kind: RecipientKind.Contact,
   address: mockAccount,
   displayName: mockName,
-  displayPhoneNumber: '14155550000',
+  displayId: '14155550000',
   e164PhoneNumber: mockE164Number,
   contactId: 'contactId',
   phoneNumberLabel: 'phoneNumLabel',
@@ -47,7 +47,7 @@ export const mockRecipientWithPhoneNumber: RecipientWithMobileNumber = {
   kind: RecipientKind.MobileNumber,
   address: mockAccount,
   displayName: mockName,
-  displayPhoneNumber: '14155550000',
+  displayId: '14155550000',
   e164PhoneNumber: mockE164Number,
 }
 
@@ -111,7 +111,8 @@ export const mockContactList = [mockContactWithPhone2, mockContactWithPhone]
 
 export const mockEscrowedPayment: EscrowedPayment = {
   senderAddress: mockAccount2,
-  recipient: mockContactWithPhone,
+  recipientPhone: mockE164Number,
+  recipientContact: mockRecipient,
   paymentID: mockAccount,
   currency: SHORT_CURRENCIES.DOLLAR,
   amount: new BigNumber(10),

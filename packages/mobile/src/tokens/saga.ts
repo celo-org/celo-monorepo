@@ -60,7 +60,7 @@ export type TokenTransferAction = { type: string } & TokenTransfer
 
 interface TokenTransferFactory {
   actionName: string
-  contractGetter: (web3: any) => any
+  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract
   tag: string
   currency: CURRENCY_ENUM
   fetchAction: () => any

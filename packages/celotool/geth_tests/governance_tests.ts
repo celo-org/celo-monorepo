@@ -53,6 +53,10 @@ const bondedDepositsAbi = [
     constant: false,
     inputs: [
       {
+        name: 'role',
+        type: 'uint8',
+      },
+      {
         name: 'delegate',
         type: 'address',
       },
@@ -69,7 +73,7 @@ const bondedDepositsAbi = [
         type: 'bytes32',
       },
     ],
-    name: 'delegateRewards',
+    name: 'delegateRole',
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
@@ -130,7 +134,8 @@ describe('governance tests', () => {
     await unlockAccount(delegate, delegateWeb3)
     const { r, s, v } = await getParsedSignatureOfAddress(account, delegate, delegateWeb3)
     await unlockAccount(account, web3)
-    const tx = bondedDeposits.methods.delegateRewards(delegate, v, r, s)
+    const rewardRole = 2
+    const tx = bondedDeposits.methods.delegateRole(rewardRole, delegate, v, r, s)
     let gas = txOptions.gas
     // We overestimate to account for variations in the fraction reduction necessary to redeem
     // rewards.

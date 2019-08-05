@@ -10,6 +10,7 @@ import { Clipboard, ScrollView, StyleSheet, Text, View } from 'react-native'
 import KeepAwake from 'react-native-keep-awake'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
+import { errorSelector } from 'src/alert/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
@@ -18,13 +19,14 @@ import CancelButton from 'src/components/CancelButton'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import GethAwareButton from 'src/geth/GethAwareButton'
-import { Namespaces } from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
 import NuxLogo from 'src/icons/NuxLogo'
 import {
   cancelVerification,
   receiveAttestationMessage,
   startVerification,
 } from 'src/identity/actions'
+import { ATTESTATION_CODE_PLACEHOLDER } from 'src/identity/reducer'
 import {
   AttestationCode,
   CodeInputType,
@@ -40,8 +42,12 @@ import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'verify/verifying'
 
-function verificationCodeText(attestationCode: AttestationCode, isComplete: boolean) {
-  const text = getRecodedVerificationText(attestationCode) || '---'
+function verificationCodeText(
+  attestationCode: AttestationCode,
+  isComplete: boolean,
+  t: i18n.TranslationFunction
+) {
+  const text = getRecodedVerificationText(attestationCode, t)
   return (
     <Text
       style={isComplete ? [style.textCode, style.textGreen] : style.textCode}
@@ -53,13 +59,17 @@ function verificationCodeText(attestationCode: AttestationCode, isComplete: bool
   )
 }
 
-function getRecodedVerificationText(attestationCode: AttestationCode) {
+function getRecodedVerificationText(attestationCode: AttestationCode, t: i18n.TranslationFunction) {
   try {
-    if (attestationCode && attestationCode.code) {
-      return Buffer.from(stripHexLeader(attestationCode.code), 'hex').toString('base64')
-    } else {
-      return null
+    if (!attestationCode || !attestationCode.code) {
+      return '---'
     }
+
+    if (attestationCode.code === ATTESTATION_CODE_PLACEHOLDER) {
+      return t('codeAccepted')
+    }
+
+    return Buffer.from(stripHexLeader(attestationCode.code), 'hex').toString('base64')
   } catch (error) {
     Logger.warn(TAG, 'Could not recode verification code to base64')
     return null
@@ -73,6 +83,7 @@ interface StateProps {
   attestationCodes: AttestationCode[]
   numCompleteAttestations: number
   verificationFailed: boolean
+  underlyingError: ErrorMessages | null | undefined
 }
 
 interface DispatchProps {
@@ -87,6 +98,7 @@ type Props = StateProps & DispatchProps & WithNamespaces
 
 interface State {
   useManualEntry: boolean
+  isCodeSubmitting: boolean
 }
 
 const mapDispatchToProps = {
@@ -105,6 +117,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     numCompleteAttestations: state.identity.numCompleteAttestations,
     verificationFailed: state.identity.verificationFailed,
     account: currentAccountSelector(state),
+    underlyingError: errorSelector(state),
   }
 }
 
@@ -118,15 +131,19 @@ export class Verifying extends React.Component<Props, State> {
 
   state = {
     useManualEntry: false,
+    isCodeSubmitting: false,
   }
 
   componentDidMount() {
     this.startVerification()
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps: Props) {
     if (this.isVerificationComplete()) {
-      this.finishVerification()
+      return this.finishVerification()
+    }
+    if (this.isCodeNoLongerSubmitting(prevProps) && this.state.isCodeSubmitting) {
+      this.setState({ isCodeSubmitting: false })
     }
   }
 
@@ -142,19 +159,36 @@ export class Verifying extends React.Component<Props, State> {
       this.props.hideAlert()
       const message = await Clipboard.getString()
       if (!message) {
-        this.props.showError(ErrorMessages.EMPTY_VERIFICATION_CODE, ERROR_BANNER_DURATION)
+        this.props.showError(ErrorMessages.EMPTY_ATTESTATION_CODE, ERROR_BANNER_DURATION)
         return
       }
       Logger.debug(TAG + '@onPasteVerificationCode', 'Submitting code manually')
+      this.setState({ isCodeSubmitting: true })
       this.props.receiveVerificationMessage(message, CodeInputType.MANUAL)
     } catch (error) {
       Logger.error(TAG, 'Error during manual code input', error)
       this.props.showError(ErrorMessages.INVALID_ATTESTATION_CODE, ERROR_BANNER_DURATION)
+      this.setState({ isCodeSubmitting: false })
     }
   }
 
   isVerificationComplete = () => {
     return this.props.numCompleteAttestations >= NUM_ATTESTATIONS_REQUIRED
+  }
+
+  isCodeNoLongerSubmitting = (prevProps: Props) => {
+    // New code was received and processed
+    if (prevProps.attestationCodes.length < this.props.attestationCodes.length) {
+      return true
+    }
+    // Code was rejected
+    if (
+      this.props.underlyingError === ErrorMessages.INVALID_ATTESTATION_CODE ||
+      this.props.underlyingError === ErrorMessages.REPEAT_ATTESTATION_CODE
+    ) {
+      return true
+    }
+    return false
   }
 
   startVerification = async () => {
@@ -165,11 +199,7 @@ export class Verifying extends React.Component<Props, State> {
   finishVerification = () => {
     Logger.debug(TAG + '@finishVerification', 'Verification finished, navigating to next screen.')
     this.props.hideAlert()
-
-    // Add short delay to show the checkmarks once ver. is done
-    setTimeout(() => {
-      navigate(Screens.VerifyVerified)
-    }, 1000)
+    navigate(Screens.VerifyVerified)
   }
 
   onCancelVerification = () => {
@@ -198,7 +228,7 @@ export class Verifying extends React.Component<Props, State> {
   }
 
   render() {
-    const { useManualEntry } = this.state
+    const { useManualEntry, isCodeSubmitting } = this.state
     const {
       attestationCodes,
       numCompleteAttestations,
@@ -225,9 +255,9 @@ export class Verifying extends React.Component<Props, State> {
             <Text style={style.textLight}>{t('verifying')}</Text>
             {e164Number}
           </Text>
-          {verificationCodeText(attestationCodes[0], numCompleteAttestations > 0)}
-          {verificationCodeText(attestationCodes[1], numCompleteAttestations > 1)}
-          {verificationCodeText(attestationCodes[2], numCompleteAttestations > 2)}
+          {verificationCodeText(attestationCodes[0], numCompleteAttestations > 0, t)}
+          {verificationCodeText(attestationCodes[1], numCompleteAttestations > 1, t)}
+          {verificationCodeText(attestationCodes[2], numCompleteAttestations > 2, t)}
           <Text
             style={[style.textStatus, verificationFailed ? style.textRed : null]}
             numberOfLines={1}
@@ -273,7 +303,7 @@ export class Verifying extends React.Component<Props, State> {
                   </Text>
                   <GethAwareButton
                     onPress={this.onPasteVerificationCode}
-                    disabled={numCodesReceived === NUM_ATTESTATIONS_REQUIRED}
+                    disabled={isCodeSubmitting || numCodesReceived === NUM_ATTESTATIONS_REQUIRED}
                     text={t('pasteCode', {
                       codeNumber: Math.min(numCodesReceived + 1, NUM_ATTESTATIONS_REQUIRED),
                     })}

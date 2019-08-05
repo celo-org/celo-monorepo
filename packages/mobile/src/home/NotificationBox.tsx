@@ -69,9 +69,7 @@ export class NotificationBox extends React.Component<Props, State> {
   escrowedPaymentReminderNotification = (): Array<React.ReactElement<any>> => {
     const activeSentPayments = this.filterValidPayments()
     const activeSentPaymentNotifications: Array<React.ReactElement<any>> = activeSentPayments.map(
-      (payment, i) => (
-        <EscrowedPaymentReminderNotification key={payment.paymentID} payment={payment} />
-      )
+      (payment) => <EscrowedPaymentReminderNotification key={payment.paymentID} payment={payment} />
     )
     return activeSentPaymentNotifications
   }
@@ -81,7 +79,7 @@ export class NotificationBox extends React.Component<Props, State> {
     const validSentPayments: EscrowedPayment[] = []
     sentPayments.forEach((payment) => {
       const paymentExpiryTime = +payment.timestamp + +payment.expirySeconds
-      const currUnixTime = Date.now()
+      const currUnixTime = Date.now() / 1000
       if (currUnixTime >= paymentExpiryTime) {
         validSentPayments.push(payment)
       }
@@ -227,7 +225,11 @@ export class NotificationBox extends React.Component<Props, State> {
   }
 
   render() {
-    const notifications = [...this.paymentRequestsNotification(), ...this.generalNotifications()]
+    const notifications = [
+      ...this.paymentRequestsNotification(),
+      ...this.escrowedPaymentReminderNotification(),
+      ...this.generalNotifications(),
+    ]
 
     if (!notifications || !notifications.length) {
       // No notifications, no slider

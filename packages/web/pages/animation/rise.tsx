@@ -2,7 +2,7 @@ import * as React from 'react'
 import OpenGraph from 'src/header/OpenGraph'
 import previewImage from 'src/join/preview.png'
 import Rise from 'src/join/Rise'
-import LogoCombinedColor from 'src/shared/LogoCombinedColor'
+import LogoCombinedColor from 'src/logos/LogoLightBg'
 
 export default class RiseDemo extends React.PureComponent {
   static getInitialProps = () => {
