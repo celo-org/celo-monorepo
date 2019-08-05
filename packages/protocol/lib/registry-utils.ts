@@ -1,4 +1,4 @@
-export const attestationsRegistryId = 'Attestations'
+export const attestationsRegistryId: string = 'Attestations'
 export const bondedDepositsRegistryId: string = 'BondedDeposits'
 export const exchangeRegistryId: string = 'Exchange'
 export const gasCurrencyWhitelistRegistryId: string = 'GasCurrencyWhitelist'
@@ -9,10 +9,8 @@ export const randomRegistryId = 'Random'
 export const reserveRegistryId: string = 'Reserve'
 export const sortedOraclesRegistryId: string = 'SortedOracles'
 export const validatorsRegistryId: string = 'Validators'
-
-// These do not actually appear in the registry, but they are here temporarily for usesRegistry
-const escrowRegistryId = 'Escrow'
-const stableTokenRegistryId = 'StableToken'
+export const escrowRegistryId: string = 'Escrow'
+export const stableTokenRegistryId: string = 'StableToken'
 
 // TODO(amy): Pull this list from the build artifacts instead
 export const usesRegistry = [escrowRegistryId, reserveRegistryId, stableTokenRegistryId]
@@ -25,6 +23,7 @@ export const hasEntryInRegistry: string[] = [
   gasCurrencyWhitelistRegistryId,
   gasPriceMinimumRegistryId,
   sortedOraclesRegistryId,
+  stableTokenRegistryId,
   randomRegistryId,
   reserveRegistryId,
 ]
@@ -33,6 +32,7 @@ export default {
   attestationsRegistryId,
   exchangeRegistryId,
   goldTokenRegistryId,
+  stableTokenRegistryId,
   sortedOraclesRegistryId,
   randomRegistryId,
   reserveRegistryId,
