@@ -77,7 +77,7 @@ rule address_cant_be_both_account_and_delegate(method f, address x) {
 	address delegatedBy_ = sinvoke delegations(ePost,x);
 	
 	assert !(isDelegate_ && isAccount_),"$x cannot be both a delegate and an account";
-	assert isDelegate_ <=> delegatedBy_ == account, "Violated: $x is a delegate of $account iff $x got a delegate role from ${account}. But x has a delegate role: ${isDelegate_} while delegated by ${delegatedBy}";
+	assert isDelegate_ <=> delegatedBy_ == account, "Violated: $x is a delegate of $account iff $x got a delegate role from ${account}. But x has a delegate role: ${isDelegate_} while delegated by ${delegatedBy_}";
 }
 
 rule delegations_in_sync_and_exclusive(method f, address delegatedTo) {
@@ -166,4 +166,136 @@ rule functional_get_account_from_voter_success(address account, address delegate
 - getAccountFromRewardsRecipient(address) must fail if “address” is not an account or rewards delegate
  */
 
-// deleteElement should always be called with lastIndex == list.length-1
+rule modifying_deposits(address a, uint256 someNoticePeriod, uint256 someAvailabilityTime, method f) {
+	// just mapping out functions that affect an account's deposits
+	env _e;
+	uint256 _lenNoticePeriodsValue = sinvoke _lenNoticePeriods(_e,a);
+	uint256 _lenAvailabilityTimesValue = sinvoke _lenAvailabilityTimes(_e,a);
+	uint256 _someBondedValue; uint256 _someBondedIndex;
+	_someBondedValue, _someBondedIndex = sinvoke getBondedDeposit(_e,a,someNoticePeriod);
+	uint256 _someNotifiedValue; uint256 _someNotifiedIndex;
+	_someNotifiedValue, _someNotifiedIndex = sinvoke getNotifiedDeposit(_e,a,someAvailabilityTime);
+	
+	env eF;
+	calldataarg arg;
+	invoke f(eF,arg);
+	
+	env e_;
+	uint256 lenNoticePeriodsValue_ = sinvoke _lenNoticePeriods(e_,a);
+	uint256 lenAvailabilityTimesValue_ = sinvoke _lenAvailabilityTimes(e_,a);
+	uint256 someBondedValue_; uint256 someBondedIndex_;
+	someBondedValue_, someBondedIndex_ = sinvoke getBondedDeposit(e_,a,someNoticePeriod);
+	uint256 someNotifiedValue_; uint256 someNotifiedIndex_;
+	someNotifiedValue_, someNotifiedIndex_ = sinvoke getNotifiedDeposit(e_,a,someAvailabilityTime);
+	
+	assert _lenNoticePeriods == lenNoticePeriodsValue_, "Method changed length of notice periods";
+	assert _lenAvailabilityTimesValue == lenAvailabilityTimesValue_, "Method changed length of availability times";
+	assert _someBondedValue == someBondedValue_, "Method changed a bonded value";
+	assert _someBondedIndex == someBondedIndex_, "Method changed a bonded index";
+	assert _someNotifiedValue == someNotifiedValue_, "Method changed a notified value";
+	assert _someNotifiedIndex == someNotifiedIndex_, "Method changed a notified index";
+}
+
+rule valid_notice_period_for_deposit(address a, uint256 someNoticePeriod, method f) {
+	// An account should not be able to deposit with a notice period > the current max notice period
+	env _e;
+	uint256 _maxNoticePeriodValue = sinvoke maxNoticePeriod(_e);
+	
+	uint256 _someBondedValue; uint256 _someBondedIndex;
+	_someBondedValue, _someBondedIndex = sinvoke getBondedDeposit(_e,a,someNoticePeriod);
+	require someNoticePeriod > _maxNoticePeriodValue => (_someBondedValue == 0 && _someBondedIndex == 0);
+	
+	env eF;
+	calldataarg arg;
+	invoke f(eF,arg);
+	
+	env e_;
+	uint256 maxNoticePeriodValue_ = sinvoke maxNoticePeriod(e_);
+	
+	uint256 someBondedValue_; uint256 someBondedIndex_;
+	someBondedValue_, someBondedIndex_ = sinvoke getBondedDeposit(e_,a,someNoticePeriod);
+	
+	assert someNoticePeriod > maxNoticePeriodValue_ => (someBondedValue_ == 0 && someBondedIndex_ == 0);
+}
+
+rule cant_notify_an_unbonded_deposit(address a, uint256 someNoticePeriod, method f) {
+	// availability time for someNoticePeriod will be eF.block.timestamp+someNoticePeriod;
+	env _e;
+	env eF;
+	env e_;
+	
+	uint256 matchingAvailabilityTime = eF.block.timestamp+someNoticePeriod; // availability time is notify time + notice period set beforehand
+	
+	uint256 _someBondedValue; uint256 _someBondedIndex;
+	_someBondedValue, _someBondedIndex = sinvoke getBondedDeposit(_e,a,someNoticePeriod);
+	uint256 _someNotifiedValue; uint256 _someNotifiedIndex;
+	_someNotifiedValue, _someNotifiedIndex = sinvoke getNotifiedDeposit(_e,a,matchingAvailabilityTime);
+	
+	// not notified before:
+	require _someNotifiedValue == 0 && _someNotifiedIndex == 0;
+	
+	calldataarg arg;
+	invoke f(eF,arg);
+	
+	uint256 someBondedValue_; uint256 someBondedIndex_;
+	someBondedValue_, someBondedIndex_ = sinvoke getBondedDeposit(e_,a,someNoticePeriod);
+	uint256 someNotifiedValue_; uint256 someNotifiedIndex_;
+	someNotifiedValue_, someNotifiedIndex_ = sinvoke getNotifiedDeposit(e_,a,matchingAvailabilityTime);
+	
+	// if now we notified, necessarily, it was bonded BEFORE
+	assert (someNotifiedValue_ != 0 || someNotifiedIndex_ != 0) => (_someBondedValue != 0 || _someBondedIndex != 0), "Violated: An account should never be able to notify a deposit which hadnt previously been deposited";
+}
+
+rule modifying_weight(address a, uint256 someNoticePeriod, uint256 someAvailabilityTime, method f) {
+	// just mapping out functions that affect an account's weight
+	env _e;
+	uint256 _accountWeight = sinvoke _weight(_e,a);
+	
+	env eF;
+	calldataarg arg;
+	invoke f(eF,arg);
+	
+	env e_;
+	uint256 accountWeight_ = sinvoke _weight(e_,a);
+	
+	assert _accountWeight == accountWeight_, "Method changed weight of account";
+}
+
+rule atomic_deposit_notification(uint256 someNoticePeriod, uint256 notifyValue) {
+	// Notifying a deposit should always reduce the balance of a bonded deposit by the same amount that it increments the balance of a notified deposit
+	env _e;
+	env eF;
+	env e_;
+	
+	address a = eF.msg.sender; // our account will execute notify()
+	uint256 matchingAvailabilityTime = eF.block.timestamp+someNoticePeriod; // availability time is notify time + notice period set beforehand
+	
+	uint256 _someBondedValue; uint256 _someBondedIndex;
+	_someBondedValue, _someBondedIndex = sinvoke getBondedDeposit(_e,a,someNoticePeriod);
+	uint256 _someNotifiedValue; uint256 _someNotifiedIndex;
+	_someNotifiedValue, _someNotifiedIndex = sinvoke getNotifiedDeposit(_e,a,matchingAvailabilityTime);
+	
+	invoke notify(eF, notifyValue, someNoticePeriod);
+	
+	uint256 someBondedValue_; uint256 someBondedIndex_;
+	someBondedValue_, someBondedIndex_ = sinvoke getBondedDeposit(e_,a,someNoticePeriod);
+	uint256 someNotifiedValue_; uint256 someNotifiedIndex_;
+	someNotifiedValue_, someNotifiedIndex_ = sinvoke getNotifiedDeposit(e_,a,matchingAvailabilityTime);
+	
+	// some notified value should increase, some bonded value should decrease
+	assert someNotifiedValue_ - _someNotifiedValue == _someBondedValue - someBondedValue_, "Violated: Difference between new and old bonded value should be the same as difference of old and new notified value";
+	
+	assert someNotifiedValue_ - _someNotifiedValue == notifyValue
+			&& _someBondedValue - someBondedValue_ == notifyValue, "Violated: When notify succeeds, difference between old and new bonded value is the notify value $notifyValue";
+}
+
+rule cant_rebond_non_notified(uint256 rebondValue, uint256 depositAvailabilityTime) {
+	// An account should never be able to rebond a non-notified deposit
+	env _e;
+	env eF;
+	
+	invoke rebond(eF, rebondValue, depositAvailabilityTime);
+	assert false, "placeholder";
+}
+
+// TODO: deleteElement should always be called with lastIndex == list.length-1 - check using assertion in the code and assert mode?
