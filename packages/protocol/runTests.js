@@ -7,6 +7,9 @@ const minimist = require('minimist')
 
 const sleep = (seconds) => new Promise((resolve) => setTimeout(resolve, 1000 * seconds))
 
+// As documented https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
+const isCI = process.env.CI === 'true'
+
 async function startGanache() {
   const server = ganache.server({
     default_balance_ether: 1000000,
@@ -39,13 +42,14 @@ async function startGanache() {
 
 async function test() {
   const argv = minimist(process.argv.slice(2), {
-    boolean: ['local', 'gas', 'coverage', 'verbose-rpc'],
+    boolean: ['gas', 'coverage', 'verbose-rpc'],
   })
 
   try {
     const closeGanache = await startGanache()
-    // if we are running on cirlce ci (!local) we need to wait
-    if (!argv.local) {
+    if (isCI) {
+      // if we are running on circle ci we need to wait for ganache to be up
+      // TODO(mcortesi): improvement: check for open port instead of a fix wait time.
       await sleep(60)
     }
 

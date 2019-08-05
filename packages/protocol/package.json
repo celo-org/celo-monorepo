@@ -13,7 +13,6 @@
     "clean": "rm -rf ../types/typechain && rm -rf build/* && rm -rf migrations/*.js* && rm -rf test/**/*.js* && rm -f lib/*.js*",
     "pretest": "yarn run contract-types && yarn run compile-typescript",
     "test": "node runTests.js",
-    "test:local": "yarn run test --local",
     "test:coverage": "yarn run test --coverage",
     "gas": "yarn run test:local --gas",
     "truffle-compile": "./scripts/bash/compile.sh",
