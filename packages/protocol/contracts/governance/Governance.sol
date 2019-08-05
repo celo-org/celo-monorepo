@@ -9,7 +9,7 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "./IntegerSortedLinkedList.sol";
 import "./UsingBondedDeposits.sol";
 import "./interfaces/IGovernance.sol";
-import "../stability/FractionUtil.sol";
+import "../common/FractionUtil.sol";
 import "../common/Initializable.sol";
 
 
