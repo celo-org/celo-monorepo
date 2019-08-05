@@ -23376,6 +23376,11 @@ react-apollo@^2.4.1:
     lodash.isequal "^4.5.0"
     prop-types "^15.6.0"
 
+react-async-hook@^3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/react-async-hook/-/react-async-hook-3.4.0.tgz#0ed584a1edd85ea632eeb18ad4185cf5aea05fdd"
+  integrity sha512-LAX8FH/sem4FtTXK66CGXIT51UVT8HdvUxs0PpSYX++sNA6PLwMXaslYrGd844FXgJF+VEoASPftp5q0P+PutA==
+
 react-async-script@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/react-async-script/-/react-async-script-1.1.1.tgz#f481c6c5f094bf4b94a9d52da0d0dda2e1a74bdf"

@@ -70,7 +70,6 @@ export {
   TxPromises,
 } from './src/contract-utils'
 export {
-  getABEContract,
   getAttestationsContract,
   getEscrowContract,
   getExchangeContract,
