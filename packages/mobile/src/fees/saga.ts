@@ -1,5 +1,6 @@
 import { getStableTokenContract } from '@celo/contractkit'
 import { call, put, spawn, takeLeading } from 'redux-saga/effects'
+import { getReclaimEscrowFee } from 'src/escrow/saga'
 import { Actions, EstimateFeeAction, feeEstimated, FeeType } from 'src/fees/actions'
 import { getInvitationVerificationFee } from 'src/invite/saga'
 import { getSendFee } from 'src/send/saga'
@@ -31,7 +32,12 @@ export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
       // TODO
       break
     case FeeType.RECLAIM_ESCROW:
-      // TODO
+      // Just use default values here since it doesn't matter for fee estimation
+      feeInWei = yield call(
+        getReclaimEscrowFee,
+        CeloDefaultRecipient.address,
+        CeloDefaultRecipient.address
+      )
       break
   }
 
