@@ -1,4 +1,6 @@
 # Exclude compiled .js files
+*.js
+!jest.config.js
 *.js.map
 dist/
 
