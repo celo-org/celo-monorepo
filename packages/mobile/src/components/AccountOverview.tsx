@@ -13,14 +13,12 @@ import Styles from 'src/components/Styles'
 import { isE2EEnv } from 'src/config'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM as Tokens } from 'src/geth/consts'
-import { refreshAllBalances } from 'src/home/actions'
+import { startBalanceAutorefresh, stopBalanceAutorefresh } from 'src/home/actions'
 import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import { shouldUpdateBalance } from 'src/redux/selectors'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
-import Logger from 'src/utils/Logger'
 
 interface StateProps {
   exchangeRatePair: ExchangeRatePair | null
@@ -28,7 +26,6 @@ interface StateProps {
   stableEducationCompleted: boolean
   goldBalance: string | null
   dollarBalance: string | null
-  balanceOutOfSync: boolean
 }
 
 interface OwnProps {
@@ -36,7 +33,8 @@ interface OwnProps {
 }
 
 interface DispatchProps {
-  refreshAllBalances: typeof refreshAllBalances
+  startBalanceAutorefresh: typeof startBalanceAutorefresh
+  stopBalanceAutorefresh: typeof stopBalanceAutorefresh
 }
 
 type Props = StateProps & DispatchProps & WithNamespaces & OwnProps
@@ -48,7 +46,6 @@ const mapStateToProps = (state: RootState): StateProps => {
     stableEducationCompleted: state.stableToken.educationCompleted,
     goldBalance: state.goldToken.balance,
     dollarBalance: state.stableToken.balance,
-    balanceOutOfSync: shouldUpdateBalance(state),
   }
 }
 
@@ -70,15 +67,16 @@ export class AccountOverview extends React.Component<Props> {
     return fontSize
   }
 
-  componentWillUpdate() {
-    Logger.debug('MyTAg', `checking refreshed balance ${this.props.balanceOutOfSync}`)
-    if (!this.props.balanceOutOfSync) {
-      this.props.refreshAllBalances()
-    }
+  componentDidMount() {
+    this.props.startBalanceAutorefresh()
+  }
+
+  componentWillUnmount() {
+    this.props.stopBalanceAutorefresh()
   }
 
   render() {
-    const { t, testID, goldBalance, dollarBalance, balanceOutOfSync } = this.props
+    const { t, testID, goldBalance, dollarBalance } = this.props
 
     return (
       <View testID={testID}>
@@ -97,7 +95,7 @@ export class AccountOverview extends React.Component<Props> {
                   amount={dollarBalance}
                   size={this.getFontSize(dollarBalance, !this.props.stableEducationCompleted)}
                   type={Tokens.DOLLAR}
-                  balanceOutOfSync={balanceOutOfSync}
+                  balanceOutOfSync={false}
                 />
                 {!this.props.stableEducationCompleted && (
                   <PulsingDot
@@ -123,7 +121,7 @@ export class AccountOverview extends React.Component<Props> {
                   amount={goldBalance}
                   size={this.getFontSize(goldBalance, !this.props.goldEducationCompleted)}
                   type={Tokens.GOLD}
-                  balanceOutOfSync={balanceOutOfSync}
+                  balanceOutOfSync={false}
                 />
                 {!this.props.goldEducationCompleted && (
                   <PulsingDot
@@ -199,6 +197,6 @@ const style = StyleSheet.create({
 export default componentWithAnalytics(
   connect<StateProps, DispatchProps, OwnProps, RootState>(
     mapStateToProps,
-    { refreshAllBalances }
+    { startBalanceAutorefresh, stopBalanceAutorefresh }
   )(withNamespaces(Namespaces.walletFlow5)(AccountOverview))
 )
