@@ -1,5 +1,5 @@
 provider "google" {
-  credentials = file("/Users/trevor/.gcloud/service-accounts/celo-testnet-69a4cd9692dd.json")
+  credentials = file("~/.gcloud/service-accounts/celo-testnet-69a4cd9692dd.json")
   project     = "celo-testnet"
   region      = "us-west1"
   zone        = "us-west1-a"
@@ -63,6 +63,10 @@ module "bootnode" {
   source = "./modules/bootnode"
   # variables
   celo_env = var.celo_env
+  celotool_docker_image_repository = var.celotool_docker_image_repository
+  celotool_docker_image_tag = var.celotool_docker_image_tag
+  geth_bootnode_docker_image_repository = var.geth_bootnode_docker_image_repository
+  geth_bootnode_docker_image_tag = var.geth_bootnode_docker_image_tag
   mnemonic = var.mnemonic
   network_name = google_compute_network.network.name
 }

@@ -1,10 +1,6 @@
 import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
-// import {
-//   uploadGenesisBlockToGoogleStorage,
-//   uploadStaticNodesToGoogleStorage,
-// } from 'src/lib/testnet-utils'
+import { uploadGenesisBlockToGoogleStorage } from 'src/lib/testnet-utils'
 import { confirmAction, envVar, fetchEnv } from 'src/lib/utils'
-// import yargs from 'yargs'
 
 import {
   applyTerraformModule,
@@ -41,6 +37,5 @@ export const handler = async (argv: VMTestnetInitialArgv) => {
   console.info('Applying...')
   await applyTerraformModule(terraformModule)
 
-  // await uploadGenesisBlockToGoogleStorage(argv.celoEnv)
-  // await uploadStaticNodesToGoogleStorage(argv.celoEnv)
+  await uploadGenesisBlockToGoogleStorage(argv.celoEnv)
 }
