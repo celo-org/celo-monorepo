@@ -266,7 +266,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       bytes(identifier).length > 0 &&
       bytes(name).length > 0 &&
       bytes(url).length > 0 &&
-      publicKeysData.length == (64 + 48 + 96) // secp256k1 public key + BLS public key + BLS proof of possession
+      // secp256k1 public key + BLS public key + BLS proof of possession
+      publicKeysData.length == (64 + 48 + 96)
     );
     bytes memory proofOfPossessionBytes = publicKeysData.slice(64, 48 + 96);
     require(checkProofOfPossession(proofOfPossessionBytes));
@@ -550,7 +551,13 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   )
     external
     view
-    returns (string memory identifier, string memory name, string memory url, bytes memory publicKeysData, address affiliation)
+    returns (
+      string memory identifier,
+      string memory name,
+      string memory url,
+      bytes memory publicKeysData,
+      address affiliation
+    )
   {
     require(isValidator(account));
     Validator storage validator = validators[account];
