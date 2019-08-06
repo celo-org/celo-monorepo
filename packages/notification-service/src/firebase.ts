@@ -1,11 +1,7 @@
 import * as admin from 'firebase-admin'
 import i18next from 'i18next'
-import {
-  Currencies,
-  NOTIFICATIONS_DISABLED,
-  NOTIFICATIONS_TTL_MS,
-  NotificationTypes,
-} from './config'
+import { Currencies } from './blockscout/transfers'
+import { NOTIFICATIONS_DISABLED, NOTIFICATIONS_TTL_MS, NotificationTypes } from './config'
 
 let database: admin.database.Database
 let registrationsRef: admin.database.Reference
