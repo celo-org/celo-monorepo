@@ -78,7 +78,6 @@ async function test() {
   } catch (e) {
     // tslint:disable-next-line: no-console
     console.error(e.stdout ? e.stdout : e)
-    // process.stdout.write('\n')
     process.nextTick(() => process.exit(1))
   }
 }

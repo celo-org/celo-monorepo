@@ -419,7 +419,8 @@ contract('BondedDeposits', (accounts: string[]) => {
     let availabilityTime: BigNumber
 
     beforeEach(async () => {
-      // The extra hour, saves for from race condition between notify() and rebond()
+      // Deposit weight is calculated based on the notice period in days, rounded down to the nearest day.
+      // We add an extra hour to the initial notice period ensure that when we rebond the notice period is between 1 and 2 days.
       const noticePeriod = 1 * DAY + 1 * HOUR
       // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
       await bondedDeposits.deposit(noticePeriod, { value })
