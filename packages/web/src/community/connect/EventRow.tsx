@@ -7,7 +7,7 @@ import OvalCoin from 'src/shared/OvalCoin'
 import { printDuration } from 'src/shared/PlaceDate'
 import { colors, fonts, standardStyles } from 'src/styles'
 
-import { EventProps } from 'src/community/EventHelpers'
+import { EventProps } from 'fullstack/EventProps'
 import Chevron from 'src/icons/chevron'
 
 interface Section {

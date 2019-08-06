@@ -80,5 +80,6 @@
   "thisVersionIsInsecure": "This version is insecure",
   "update": "Update",
   "qrFailedNoAddress": "QR code read failed. Reason: wallet address not found.",
-  "qrFailedInvalidAddress": "QR code read failed. Reason: wallet address invalid."
+  "qrFailedInvalidAddress": "QR code read failed. Reason: wallet address invalid.",
+  "calculateFeeFailed": "Could not calculate fee"
 }

@@ -1,5 +1,6 @@
+import { StableToken } from '@celo/contractkit'
+
 import { BaseCommand } from '../../base'
-import { StableToken } from '../../generated/contracts'
 import { doSwap, swapArguments } from '../../utils/exchange'
 
 export default class SellDollar extends BaseCommand {
@@ -14,6 +15,6 @@ export default class SellDollar extends BaseCommand {
 
     const stableToken = await StableToken(this.web3, args.from)
 
-    doSwap(this.web3, args, stableToken, false)
+    await doSwap(this.web3, args, stableToken, false)
   }
 }

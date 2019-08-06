@@ -8,6 +8,7 @@ import {
   sleep,
 } from '@celo/celotool/geth_tests/src/lib/utils'
 import BigNumber from 'bignumber.js'
+import { strip0x } from '../src/lib/utils'
 const assert = require('chai').assert
 const Web3 = require('web3')
 
@@ -54,6 +55,10 @@ const bondedDepositsAbi = [
     constant: false,
     inputs: [
       {
+        name: 'role',
+        type: 'uint8',
+      },
+      {
         name: 'delegate',
         type: 'address',
       },
@@ -70,7 +75,7 @@ const bondedDepositsAbi = [
         type: 'bytes32',
       },
     ],
-    name: 'delegateRewards',
+    name: 'delegateRole',
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
@@ -208,7 +213,7 @@ describe('governance tests', () => {
   const getParsedSignatureOfAddress = async (address: string, signer: string, signerWeb3: any) => {
     // @ts-ignore
     const hash = signerWeb3.utils.soliditySha3({ type: 'address', value: address })
-    const signature = (await signerWeb3.eth.sign(hash, signer)).slice(2)
+    const signature = strip0x(await signerWeb3.eth.sign(hash, signer))
     return {
       r: `0x${signature.slice(0, 64)}`,
       s: `0x${signature.slice(64, 128)}`,
@@ -264,7 +269,8 @@ describe('governance tests', () => {
     await unlockAccount(delegate, delegateWeb3)
     const { r, s, v } = await getParsedSignatureOfAddress(account, delegate, delegateWeb3)
     await unlockAccount(account, web3)
-    const tx = bondedDeposits.methods.delegateRewards(delegate, v, r, s)
+    const rewardRole = 2
+    const tx = bondedDeposits.methods.delegateRole(rewardRole, delegate, v, r, s)
     let gas = txOptions.gas
     // We overestimate to account for variations in the fraction reduction necessary to redeem
     // rewards.
