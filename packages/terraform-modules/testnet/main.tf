@@ -1,6 +1,6 @@
 provider "google" {
-  credentials = file("~/.gcloud/service-accounts/celo-testnet-69a4cd9692dd.json")
-  project     = "celo-testnet"
+  credentials = file(var.gcloud_credentials_path)
+  project     = var.gcloud_project
   region      = "us-west1"
   zone        = "us-west1-a"
 }
@@ -63,11 +63,11 @@ module "bootnode" {
   source = "./modules/bootnode"
   # variables
   celo_env = var.celo_env
-  celotool_docker_image_repository = var.celotool_docker_image_repository
-  celotool_docker_image_tag = var.celotool_docker_image_tag
+  gcloud_secrets_base_path = var.gcloud_secrets_base_path
+  gcloud_secrets_bucket = var.gcloud_secrets_bucket
+  gcloud_vm_service_account_email = var.gcloud_vm_service_account_email
   geth_bootnode_docker_image_repository = var.geth_bootnode_docker_image_repository
   geth_bootnode_docker_image_tag = var.geth_bootnode_docker_image_tag
-  mnemonic = var.mnemonic
   network_name = google_compute_network.network.name
 }
 
@@ -77,16 +77,15 @@ module "validator" {
   block_time = var.block_time
   bootnode_ip_address = module.bootnode.ip_address
   celo_env = var.celo_env
-  celotool_docker_image_repository = var.celotool_docker_image_repository
-  celotool_docker_image_tag = var.celotool_docker_image_tag
   ethstats_host = var.ethstats_host
   ethstats_websocket_secret = var.ethstats_websocket_secret
+  gcloud_secrets_base_path = var.gcloud_secrets_base_path
+  gcloud_secrets_bucket = var.gcloud_secrets_bucket
+  gcloud_vm_service_account_email = var.gcloud_vm_service_account_email
   genesis_content_base64 = var.genesis_content_base64
-  geth_account_secret = var.validator_geth_account_secret
   geth_node_docker_image_repository = var.geth_node_docker_image_repository
   geth_node_docker_image_tag = var.geth_node_docker_image_tag
   geth_verbosity = var.geth_verbosity
-  mnemonic = var.mnemonic
   network_id = var.network_id
   network_name = google_compute_network.network.name
   validator_count = var.validator_count
