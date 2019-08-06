@@ -24,12 +24,6 @@ enum VoteValue {
   Yes,
 }
 
-enum TallyOutcome {
-  None = 0,
-  Fail,
-  Pass,
-}
-
 contract('Integration: Governance', (accounts: string[]) => {
   const proposalId = 1
   const dequeuedIndex = 0
@@ -127,21 +121,9 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
   })
 
-  describe('When tallying that proposal', async () => {
-    before(async () => {
-      await timeTravel(config.governance.referendumStageDuration, web3)
-      await governance.tally(proposalId, dequeuedIndex)
-    })
-
-    it('should set the proposal to passing', async () => {
-      const tally = await governance.getTally(proposalId)
-      assertEqualBN(tally, TallyOutcome.Pass)
-    })
-  })
-
   describe('When executing that proposal', async () => {
     before(async () => {
-      await timeTravel(config.governance.tallyStageDuration, web3)
+      await timeTravel(config.governance.referendumStageDuration, web3)
       await governance.execute(proposalId, dequeuedIndex)
     })
 

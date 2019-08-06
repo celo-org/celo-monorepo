@@ -58,12 +58,6 @@ enum VoteValue {
   Yes,
 }
 
-enum TallyOutcome {
-  None = 0,
-  Fail,
-  Pass,
-}
-
 // TODO(asa): Test dequeueProposalsIfReady
 // TODO(asa): Dequeue explicitly to make the gas cost of operations more clear
 contract('Governance', (accounts: string[]) => {
@@ -84,7 +78,6 @@ contract('Governance', (accounts: string[]) => {
   const dequeueFrequency = 10 * 60 // 10 minutes
   const approvalStageDuration = 1 * 60 // 1 minute
   const referendumStageDuration = 5 * 60 // 5 minutes
-  const tallyStageDuration = 5 * 60 // 5 minutes
   const executionStageDuration = 1 * 60 // 1 minute
   const defaultThreshold = toFixed(7 / 10)
   let transactionSuccess1
@@ -105,7 +98,6 @@ contract('Governance', (accounts: string[]) => {
       dequeueFrequency,
       approvalStageDuration,
       referendumStageDuration,
-      tallyStageDuration,
       executionStageDuration
     )
     await registry.setAddressFor(bondedDepositsRegistryId, mockBondedDeposits.address)
@@ -181,11 +173,6 @@ contract('Governance', (accounts: string[]) => {
       assert.equal(actualReferendumStageDuration.toNumber(), referendumStageDuration)
     })
 
-    it('should have set tallyStageDuration', async () => {
-      const actualTallyStageDuration = await governance.getTallyStageDuration()
-      assert.equal(actualTallyStageDuration.toNumber(), tallyStageDuration)
-    })
-
     it('should have set executionStageDuration', async () => {
       const actualExecutionStageDuration = await governance.getExecutionStageDuration()
       assert.equal(actualExecutionStageDuration.toNumber(), executionStageDuration)
@@ -203,7 +190,6 @@ contract('Governance', (accounts: string[]) => {
           dequeueFrequency,
           approvalStageDuration,
           referendumStageDuration,
-          tallyStageDuration,
           executionStageDuration
         )
       )
@@ -438,40 +424,6 @@ contract('Governance', (accounts: string[]) => {
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(
         governance.setReferendumStageDuration(newReferendumStageDuration, { from: nonOwner })
-      )
-    })
-  })
-
-  describe('#setTallyStageDuration', () => {
-    const newTallyStageDuration = 2
-    it('should set the tally stage duration', async () => {
-      await governance.setTallyStageDuration(newTallyStageDuration)
-      assert.equal((await governance.getTallyStageDuration()).toNumber(), newTallyStageDuration)
-    })
-
-    it('should emit the TallyStageDurationSet event', async () => {
-      const resp = await governance.setTallyStageDuration(newTallyStageDuration)
-      assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertLogMatches2(log, {
-        event: 'TallyStageDurationSet',
-        args: {
-          tallyStageDuration: new BigNumber(newTallyStageDuration),
-        },
-      })
-    })
-
-    it('should revert when tally stage duration is 0', async () => {
-      await assertRevert(governance.setTallyStageDuration(0))
-    })
-
-    it('should revert when tally stage duration is unchanged', async () => {
-      await assertRevert(governance.setTallyStageDuration(tallyStageDuration))
-    })
-
-    it('should revert when called by anyone other than the owner', async () => {
-      await assertRevert(
-        governance.setTallyStageDuration(newTallyStageDuration, { from: nonOwner })
       )
     })
   })
@@ -1431,18 +1383,17 @@ contract('Governance', (accounts: string[]) => {
         await timeTravel(referendumStageDuration, web3)
       })
 
-      describe('when the proposal has not been tallied', () => {
+      describe('when the proposal is passing', () => {
+        beforeEach(async () => {
+          await mockQuorum.setAdjustedSupportReturn(toFixed(1))
+        })
+
         it('should revert', async () => {
           await assertRevert(governance.vote.call(proposalId, index, value))
         })
       })
 
-      describe('when the proposal has been tallied', () => {
-        beforeEach(async () => {
-          await mockQuorum.setAdjustedSupportReturn(toFixed(0))
-          await governance.tally(proposalId, index)
-        })
-
+      describe('when the proposal is failing', () => {
         it('should return false', async () => {
           const success = await governance.vote.call(proposalId, index, value)
           assert.isFalse(success)
@@ -1464,101 +1415,6 @@ contract('Governance', (accounts: string[]) => {
           const emptyIndex = await governance.emptyIndices(0)
           assert.equal(emptyIndex.toNumber(), index)
         })
-      })
-    })
-  })
-
-  describe('#tally()', () => {
-    const weight = 10
-    const proposalId = 1
-    const index = 0
-    const value = VoteValue.Yes
-
-    beforeEach(async () => {
-      await governance.propose(
-        [transactionSuccess1.value],
-        [transactionSuccess1.destination],
-        transactionSuccess1.data,
-        [transactionSuccess1.data.length],
-        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-        { value: minDeposit }
-      )
-      await timeTravel(dequeueFrequency, web3)
-      await governance.approve(proposalId, index)
-      await timeTravel(approvalStageDuration, web3)
-      await mockBondedDeposits.setWeight(account, weight)
-      await governance.vote(proposalId, index, value)
-      await timeTravel(referendumStageDuration, web3)
-      await mockQuorum.setAdjustedSupportReturn(toFixed(1))
-    })
-
-    it('should return true', async () => {
-      const passed = await governance.tally.call(proposalId, index)
-      assert.isTrue(passed)
-    })
-
-    it('should set the tally result', async () => {
-      await governance.tally(proposalId, index)
-      assertEqualBN(await governance.getTally(proposalId), TallyOutcome.Pass)
-    })
-
-    it('should emit the ProposalTallied event', async () => {
-      const resp = await governance.tally(proposalId, index)
-      assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertLogMatches2(log, {
-        event: 'ProposalTallied',
-        args: {
-          proposalId: new BigNumber(proposalId),
-          passed: true,
-        },
-      })
-    })
-
-    it('should update quorum with participation values', async () => {
-      const expectedCount = (await mockQuorum.updateCallCount()).toNumber() + 1
-      const [yes, no, abstain] = await governance.getVoteTotals(proposalId)
-      const totalVotes = yes.toNumber() + no.toNumber() + abstain.toNumber()
-      const totalWeight = (await mockBondedDeposits.totalWeight()).toNumber()
-      const participation = toFixed(totalVotes / totalWeight)
-
-      await governance.tally(proposalId, index)
-
-      const updateCount = (await mockQuorum.updateCallCount()).toNumber()
-      const lastUpdateCall = await mockQuorum.lastUpdateCall()
-      assert.equal(updateCount, expectedCount)
-      assertEqualBN(lastUpdateCall, participation)
-    })
-
-    it('should revert if the proposal has already been tallied', async () => {
-      await governance.tally(proposalId, index)
-      await assertRevert(governance.tally(proposalId, index))
-    })
-
-    describe('when the proposal is past the tally stage', () => {
-      beforeEach(async () => {
-        await timeTravel(tallyStageDuration, web3)
-      })
-      it('should return false', async () => {
-        const success = await governance.tally.call(proposalId, index)
-        assert.isFalse(success)
-      })
-
-      it('should delete the proposal', async () => {
-        await governance.tally(proposalId, index)
-        assert.isFalse(await governance.proposalExists(proposalId))
-      })
-
-      it('should remove the proposal ID from dequeued', async () => {
-        await governance.tally(proposalId, index)
-        const dequeued = await governance.getDequeue()
-        assert.notInclude(dequeued.map((x) => x.toNumber()), proposalId)
-      })
-
-      it('should add the index to empty indices', async () => {
-        await governance.tally(proposalId, index)
-        const emptyIndex = await governance.emptyIndices(0)
-        assert.equal(emptyIndex.toNumber(), index)
       })
     })
   })
@@ -1587,8 +1443,6 @@ contract('Governance', (accounts: string[]) => {
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
           await mockQuorum.setAdjustedSupportReturn(toFixed(1))
-          await governance.tally(proposalId, index)
-          await timeTravel(tallyStageDuration, web3)
         })
 
         it('should return true', async () => {
@@ -1636,8 +1490,6 @@ contract('Governance', (accounts: string[]) => {
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
           await mockQuorum.setAdjustedSupportReturn(toFixed(1))
-          await governance.tally(proposalId, index)
-          await timeTravel(tallyStageDuration, web3)
         })
 
         it('should revert', async () => {
@@ -1665,8 +1517,6 @@ contract('Governance', (accounts: string[]) => {
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
           await mockQuorum.setAdjustedSupportReturn(toFixed(1))
-          await governance.tally(proposalId, index)
-          await timeTravel(tallyStageDuration, web3)
         })
 
         it('should return true', async () => {
@@ -1717,8 +1567,6 @@ contract('Governance', (accounts: string[]) => {
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
             await mockQuorum.setAdjustedSupportReturn(toFixed(1))
-            await governance.tally(proposalId, index)
-            await timeTravel(tallyStageDuration, web3)
           })
 
           it('should revert', async () => {
@@ -1744,57 +1592,12 @@ contract('Governance', (accounts: string[]) => {
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
             await mockQuorum.setAdjustedSupportReturn(toFixed(1))
-            await governance.tally(proposalId, index)
-            await timeTravel(tallyStageDuration, web3)
           })
 
           it('should revert', async () => {
             await assertRevert(governance.execute(proposalId, index))
           })
         })
-      })
-    })
-
-    describe('when the proposal was not tallied', () => {
-      beforeEach(async () => {
-        await governance.propose(
-          [transactionSuccess1.value],
-          [transactionSuccess1.destination],
-          transactionSuccess1.data,
-          [transactionSuccess1.data.length],
-          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-          { value: minDeposit }
-        )
-        await timeTravel(dequeueFrequency, web3)
-        await governance.approve(proposalId, index)
-        await timeTravel(approvalStageDuration, web3)
-        await mockBondedDeposits.setWeight(account, weight)
-        await governance.vote(proposalId, index, value)
-        await timeTravel(referendumStageDuration, web3)
-        await mockQuorum.setAdjustedSupportReturn(toFixed(1))
-        await timeTravel(tallyStageDuration, web3)
-      })
-
-      it('should return false', async () => {
-        const success = await governance.execute.call(proposalId, index)
-        assert.isFalse(success)
-      })
-
-      it('should delete the proposal', async () => {
-        await governance.execute(proposalId, index)
-        assert.isFalse(await governance.proposalExists(proposalId))
-      })
-
-      it('should remove the proposal ID from dequeued', async () => {
-        await governance.execute(proposalId, index)
-        const dequeued = await governance.getDequeue()
-        assert.notInclude(dequeued.map((x) => x.toNumber()), proposalId)
-      })
-
-      it('should add the index to empty indices', async () => {
-        await governance.execute(proposalId, index)
-        const emptyIndex = await governance.emptyIndices(0)
-        assert.equal(emptyIndex.toNumber(), index)
       })
     })
 
@@ -1815,8 +1618,6 @@ contract('Governance', (accounts: string[]) => {
         await governance.vote(proposalId, index, value)
         await timeTravel(referendumStageDuration, web3)
         await mockQuorum.setAdjustedSupportReturn(toFixed(1))
-        await governance.tally(proposalId, index)
-        await timeTravel(tallyStageDuration, web3)
         await timeTravel(executionStageDuration, web3)
       })
 
@@ -1917,10 +1718,9 @@ contract('Governance', (accounts: string[]) => {
         assert.isTrue(await governance.isVoting(account))
       })
 
-      describe('when that proposal is no longer in the referendum and tally stage', () => {
+      describe('when that proposal is no longer in the referendum stage', () => {
         beforeEach(async () => {
           await timeTravel(referendumStageDuration, web3)
-          await timeTravel(tallyStageDuration, web3)
         })
 
         it('should return false', async () => {

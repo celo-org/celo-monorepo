@@ -9,7 +9,6 @@ interface IGovernance {
   function setDequeueFrequency(uint256) external;
   function setApprovalStageDuration(uint256) external;
   function setReferendumStageDuration(uint256) external;
-  function setTallyStageDuration(uint256) external;
   function setExecutionStageDuration(uint256) external;
   function setConstitution(address, bytes4, int256) external;
 
@@ -23,13 +22,11 @@ interface IGovernance {
   function upvote(uint256, uint256, uint256) external returns (bool);
   function revokeUpvote(uint256, uint256) external returns (bool);
   function approve(uint256, uint256) external returns (bool);
-  function tally(uint256, uint256) external returns (bool);
   function execute(uint256, uint256) external returns (bool);
   function withdraw() external returns (bool);
   function dequeueProposalsIfReady() external;
   function getApprovalStageDuration() external view returns (uint256);
   function getReferendumStageDuration() external view returns (uint256);
-  function getTallyStageDuration() external view returns (uint256);
   function getExecutionStageDuration() external view returns (uint256);
   function getConstitution(address, bytes4) external view returns (int256);
   function proposalExists(uint256) external view returns (bool);

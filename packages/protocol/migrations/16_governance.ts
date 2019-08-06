@@ -27,7 +27,6 @@ const initializeArgs = async (networkName: string): Promise<any[]> => {
     config.governance.dequeueFrequency,
     config.governance.approvalStageDuration,
     config.governance.referendumStageDuration,
-    config.governance.tallyStageDuration,
     config.governance.executionStageDuration,
   ]
 }
