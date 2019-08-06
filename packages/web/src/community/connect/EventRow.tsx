@@ -4,7 +4,7 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN } from 'src/shared/Button.3'
 import OvalCoin from 'src/shared/OvalCoin'
-import { printDuration, parseDate } from 'src/shared/PlaceDate'
+import { parseDate, printDuration } from 'src/shared/PlaceDate'
 import { colors, fonts, standardStyles } from 'src/styles'
 
 import { EventProps } from 'fullstack/EventProps'
