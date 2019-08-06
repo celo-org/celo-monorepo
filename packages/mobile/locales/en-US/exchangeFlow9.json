@@ -1,7 +1,5 @@
 {
   "learnMore": "Learn More",
-  "celoDollars": "Celo Dollars",
-  "celoGold": "Celo Gold",
   "whatIsGold": "Gold is where you can choose to store Celo dollars you have",
   "manageCelo": "Manage Celo Dollars",
   "activity": "Activity",
@@ -16,7 +14,7 @@
   "reviewExchange": "Review Exchange",
   "fee": "Fee",
   "edit": "Edit",
-  "notEnoughDollars": "Not enough Celo Dollars to make exchange",
+  "notEnoughDollars": "Not enough Celo {{capitalizedStableCurrency}} to make exchange",
   "notEnoughGold": "Not enough Celo Gold to make exchange",
   "pending": "Pending",
   "loadingExchangeRate": "Loading Exchange Rate...",

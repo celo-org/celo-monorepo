@@ -23,7 +23,7 @@ import { ERROR_BANNER_DURATION } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import ExchangeRate from 'src/exchange/ExchangeRate'
 import { ExchangeRatePair } from 'src/exchange/reducer'
-import { CURRENCY_ENUM as Token } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM as Token, STABLE_CURRENCY } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -186,8 +186,8 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   render() {
     const { t } = this.props
 
-    const dollarText = t('celoDollars') + ' (cUSD)'
-    const goldText = t('celoGold') + ' (cGLD)'
+    const dollarText = t('global:celoDollars') + ' (cUSD)'
+    const goldText = t('global:celoGold') + ' (cGLD)'
 
     const makerTokenText = this.isDollar() ? dollarText : goldText
     const takerTokenText = this.isDollar() ? goldText : dollarText
@@ -204,7 +204,12 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
     const borderStyle = { borderColor: this.hasError() ? colors.errorRed : colors.dark }
 
-    const takerDisplay = `${this.isDollar() ? '' : '$'}${getMoneyDisplayValue(takerTokenAmount)}`
+    const makerSymbol = CURRENCIES[this.state.makerToken].symbol
+    const takerSymbol = this.isDollar()
+      ? CURRENCIES[Token.GOLD].symbol
+      : CURRENCIES[STABLE_CURRENCY].symbol
+
+    const takerDisplay = +getMoneyDisplayValue(takerTokenAmount)
     return (
       <View style={styles.background}>
         <View>

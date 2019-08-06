@@ -55,7 +55,7 @@ export class DollarEducation extends React.Component<Props> {
         stepInfo={stepInfo}
         onFinish={this.goToSend}
         onFinishAlternate={this.goToWallet}
-        buttonText={'sendCeloDollars'}
+        buttonText={'global:sendCeloDollars'}
         linkText={'backToWallet'}
       />
     )

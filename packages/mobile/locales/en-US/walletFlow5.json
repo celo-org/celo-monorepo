@@ -1,6 +1,4 @@
 {
-  "celoDollars": "Celo Dollars",
-  "celoGold": "Celo Gold",
   "getStarted": "Get Started",
   "paymentRequest": "Payment Request",
   "paymentRequestWithCount_plural": "{{count}} Payment Requests",
