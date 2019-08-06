@@ -514,12 +514,13 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     Proposal storage proposal = proposals[proposalId];
     require(_proposalExists(proposal) && dequeued[index] == proposalId);
     if (isDequeuedProposalExpired(proposal)) {
-      deleteDequeuedProposal(proposalId, index);
+      deleteDequeuedProposal(proposal, proposalId, index);
       return false;
     }
     ProposalStage stage = getDequeuedProposalStage(proposal.timestamp);
     require(msg.sender == approver && !proposal.approved && stage == ProposalStage.Approval);
     proposal.approved = true;
+    proposal.totalWeight = totalWeight();
     emit ProposalApproved(proposalId);
     return true;
   }
@@ -546,7 +547,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     Proposal storage proposal = proposals[proposalId];
     require(_proposalExists(proposal) && dequeued[index] == proposalId);
     if (isDequeuedProposalExpired(proposal)) {
-      deleteDequeuedProposal(proposalId, index);
+      deleteDequeuedProposal(proposal, proposalId, index);
       return false;
     }
     ProposalStage stage = getDequeuedProposalStage(proposal.timestamp);
@@ -624,7 +625,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
       );
     }
     // proposal must have executed fully or expired if this point reached
-    deleteDequeuedProposal(proposalId, index);
+    deleteDequeuedProposal(proposal, proposalId, index);
     return !expired;
   }
 
@@ -810,7 +811,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     Voter storage voter = voters[account];
     bool isVotingQueue = voter.upvotedProposal != 0 && isQueued(voter.upvotedProposal);
     Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
-    bool isVotingReferendum = (getDequeuedProposalStage(proposal.timestamp) == ProposalStage.Referendum);
+    bool isVotingReferendum =
+      (getDequeuedProposalStage(proposal.timestamp) == ProposalStage.Referendum);
     return isVotingQueue || isVotingReferendum;
   }
 
@@ -946,15 +948,18 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
 
   /**
    * @notice Deletes a dequeued proposal.
+   * @param proposal The proposal struct.
    * @param proposalId The ID of the proposal to delete.
    * @param index The index of the proposal ID in `dequeued`.
    */
   function deleteDequeuedProposal(
+    Proposal storage proposal,
     uint256 proposalId,
     uint256 index
   )
     private
   {
+    updateParticipationBaseline(proposal);
     dequeued[index] = 0;
     emptyIndices.push(index);
     delete proposals[proposalId];
@@ -966,7 +971,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
    * @param proposal The proposal struct.
    */
   function updateParticipationBaseline(Proposal storage proposal) private {
-    if (proposal.totalWeight > 0) {
+    if (proposal.approved && proposal.totalWeight > 0) {
       uint256 totalVotes = proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain);
       int256 participation = FixidityLib.newFixed(int256(totalVotes))
         .divide(FixidityLib.newFixed(int256(proposal.totalWeight)));

@@ -822,7 +822,6 @@ contract('Governance', (accounts: string[]) => {
     const weight = new BigNumber(10)
     const proposalId = new BigNumber(1)
     beforeEach(async () => {
-      await mockBondedDeposits.setWeight(account, weight)
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
@@ -831,6 +830,7 @@ contract('Governance', (accounts: string[]) => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: minDeposit }
       )
+      await mockBondedDeposits.setWeight(account, weight)
     })
 
     it('should increase the number of upvotes for the proposal', async () => {
@@ -1237,7 +1237,7 @@ contract('Governance', (accounts: string[]) => {
         assert.equal(emptyIndex.toNumber(), index)
       })
 
-      it('should not update quorum', async () => {
+      it('should not update participation baseline', async () => {
         const expectedCount = (await mockQuorum.updateCallCount()).toNumber()
         await governance.approve(proposalId, index)
         const updateCount = (await mockQuorum.updateCallCount()).toNumber()
@@ -1260,10 +1260,10 @@ contract('Governance', (accounts: string[]) => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: minDeposit }
       )
+      await mockBondedDeposits.setWeight(account, weight)
       await timeTravel(dequeueFrequency, web3)
       await governance.approve(proposalId, index)
       await timeTravel(approvalStageDuration, web3)
-      await mockBondedDeposits.setWeight(account, weight)
     })
 
     it('should return true', async () => {
@@ -1415,6 +1415,21 @@ contract('Governance', (accounts: string[]) => {
           const emptyIndex = await governance.emptyIndices(0)
           assert.equal(emptyIndex.toNumber(), index)
         })
+
+        it('should update participation baseline', async () => {
+          const expectedCount = (await mockQuorum.updateCallCount()).toNumber() + 1
+          const [yes, no, abstain] = await governance.getVoteTotals(proposalId)
+          const totalVotes = yes.toNumber() + no.toNumber() + abstain.toNumber()
+          const totalWeight = (await mockBondedDeposits.totalWeight()).toNumber()
+          const participation = toFixed(totalVotes / totalWeight)
+
+          await governance.vote(proposalId, index, value)
+
+          const updateCount = (await mockQuorum.updateCallCount()).toNumber()
+          const lastUpdateCall = await mockQuorum.lastUpdateCall()
+          assert.equal(updateCount, expectedCount)
+          assertEqualBN(lastUpdateCall, participation)
+        })
       })
     })
   })
@@ -1436,10 +1451,10 @@ contract('Governance', (accounts: string[]) => {
             // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
             { value: minDeposit }
           )
+          await mockBondedDeposits.setWeight(account, weight)
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
           await timeTravel(approvalStageDuration, web3)
-          await mockBondedDeposits.setWeight(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
           await mockQuorum.setAdjustedSupportReturn(toFixed(1))
@@ -1471,6 +1486,21 @@ contract('Governance', (accounts: string[]) => {
             },
           })
         })
+
+        it('should update participation baseline', async () => {
+          const expectedCount = (await mockQuorum.updateCallCount()).toNumber() + 1
+          const [yes, no, abstain] = await governance.getVoteTotals(proposalId)
+          const totalVotes = yes.toNumber() + no.toNumber() + abstain.toNumber()
+          const totalWeight = (await mockBondedDeposits.totalWeight()).toNumber()
+          const participation = toFixed(totalVotes / totalWeight)
+
+          await governance.execute(proposalId, index)
+
+          const updateCount = (await mockQuorum.updateCallCount()).toNumber()
+          const lastUpdateCall = await mockQuorum.lastUpdateCall()
+          assert.equal(updateCount, expectedCount)
+          assertEqualBN(lastUpdateCall, participation)
+        })
       })
 
       describe('when the proposal cannot execute successfully', () => {
@@ -1483,10 +1513,10 @@ contract('Governance', (accounts: string[]) => {
             // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
             { value: minDeposit }
           )
+          await mockBondedDeposits.setWeight(account, weight)
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
           await timeTravel(approvalStageDuration, web3)
-          await mockBondedDeposits.setWeight(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
           await mockQuorum.setAdjustedSupportReturn(toFixed(1))
@@ -1510,10 +1540,10 @@ contract('Governance', (accounts: string[]) => {
             // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
             { value: minDeposit }
           )
+          await mockBondedDeposits.setWeight(account, weight)
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
           await timeTravel(approvalStageDuration, web3)
-          await mockBondedDeposits.setWeight(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
           await mockQuorum.setAdjustedSupportReturn(toFixed(1))
@@ -1546,6 +1576,21 @@ contract('Governance', (accounts: string[]) => {
             },
           })
         })
+
+        it('should update participation baseline', async () => {
+          const expectedCount = (await mockQuorum.updateCallCount()).toNumber() + 1
+          const [yes, no, abstain] = await governance.getVoteTotals(proposalId)
+          const totalVotes = yes.toNumber() + no.toNumber() + abstain.toNumber()
+          const totalWeight = (await mockBondedDeposits.totalWeight()).toNumber()
+          const participation = toFixed(totalVotes / totalWeight)
+
+          await governance.execute(proposalId, index)
+
+          const updateCount = (await mockQuorum.updateCallCount()).toNumber()
+          const lastUpdateCall = await mockQuorum.lastUpdateCall()
+          assert.equal(updateCount, expectedCount)
+          assertEqualBN(lastUpdateCall, participation)
+        })
       })
 
       describe('when the proposal cannot execute successfully', () => {
@@ -1560,10 +1605,10 @@ contract('Governance', (accounts: string[]) => {
               // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
               { value: minDeposit }
             )
+            await mockBondedDeposits.setWeight(account, weight)
             await timeTravel(dequeueFrequency, web3)
             await governance.approve(proposalId, index)
             await timeTravel(approvalStageDuration, web3)
-            await mockBondedDeposits.setWeight(account, weight)
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
             await mockQuorum.setAdjustedSupportReturn(toFixed(1))
@@ -1574,7 +1619,7 @@ contract('Governance', (accounts: string[]) => {
           })
         })
 
-        describe('when a subsequent transaction cannot execute', () => {
+        describe('when the second transaction cannot execute', () => {
           beforeEach(async () => {
             await governance.propose(
               [transactionFail.value, transactionSuccess1.value],
@@ -1585,10 +1630,10 @@ contract('Governance', (accounts: string[]) => {
               // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
               { value: minDeposit }
             )
+            await mockBondedDeposits.setWeight(account, weight)
             await timeTravel(dequeueFrequency, web3)
             await governance.approve(proposalId, index)
             await timeTravel(approvalStageDuration, web3)
-            await mockBondedDeposits.setWeight(account, weight)
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
             await mockQuorum.setAdjustedSupportReturn(toFixed(1))
@@ -1611,10 +1656,10 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
+        await mockBondedDeposits.setWeight(account, weight)
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
         await timeTravel(approvalStageDuration, web3)
-        await mockBondedDeposits.setWeight(account, weight)
         await governance.vote(proposalId, index, value)
         await timeTravel(referendumStageDuration, web3)
         await mockQuorum.setAdjustedSupportReturn(toFixed(1))
@@ -1641,6 +1686,21 @@ contract('Governance', (accounts: string[]) => {
         await governance.execute(proposalId, index)
         const emptyIndex = await governance.emptyIndices(0)
         assert.equal(emptyIndex.toNumber(), index)
+      })
+
+      it('should update participation baseline', async () => {
+        const expectedCount = (await mockQuorum.updateCallCount()).toNumber() + 1
+        const [yes, no, abstain] = await governance.getVoteTotals(proposalId)
+        const totalVotes = yes.toNumber() + no.toNumber() + abstain.toNumber()
+        const totalWeight = (await mockBondedDeposits.totalWeight()).toNumber()
+        const participation = toFixed(totalVotes / totalWeight)
+
+        await governance.execute(proposalId, index)
+
+        const updateCount = (await mockQuorum.updateCallCount()).toNumber()
+        const lastUpdateCall = await mockQuorum.lastUpdateCall()
+        assert.equal(updateCount, expectedCount)
+        assertEqualBN(lastUpdateCall, participation)
       })
     })
   })
@@ -1707,10 +1767,10 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
+        await mockBondedDeposits.setWeight(account, weight)
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
         await timeTravel(approvalStageDuration, web3)
-        await mockBondedDeposits.setWeight(account, weight)
         await governance.vote(proposalId, index, value)
       })
 
@@ -1744,10 +1804,10 @@ contract('Governance', (accounts: string[]) => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         { value: minDeposit }
       )
+      await mockBondedDeposits.setWeight(account, weight)
       await timeTravel(dequeueFrequency, web3)
       await governance.approve(proposalId, index)
       await timeTravel(approvalStageDuration, web3)
-      await mockBondedDeposits.setWeight(account, weight)
       await governance.vote(proposalId, index, value)
     })
 
