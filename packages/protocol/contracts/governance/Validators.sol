@@ -297,7 +297,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   ) private {
     bytes memory publicKey = publicKeysData.slice(0, 64);
     bytes memory BLSPublicKey = publicKeysData.slice(64, 48);
-    bytes memory ProofOfPossession = publicKeysData.slice(64, 48);
+    bytes memory ProofOfPossession = publicKeysData.slice(64+48, 96);
 
     Validator memory validator = Validator(identifier, name, url, publicKey, BLSPublicKey, ProofOfPossession, address(0));
     validators[account] = validator;
