@@ -399,6 +399,24 @@ jobs:
       - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run: cd packages/web && ./circle_deploy.sh
 
+  test-npm-package-install:
+    working_directory: ~/app
+    docker:
+      - image: celohq/node8:gcloud
+    steps:
+      - run:
+          name: Installing npm package - @celo/typescript
+          command: yarn add @celo/typescript
+      - run:
+          name: Installing npm package - @celo/utils
+          command: yarn add @celo/utils
+      - run:
+          name: Installing npm package - @celo/contractkit
+          command: yarn add @celo/contractkit
+      - run:
+          name: Installing npm package - @celo/celocli
+          command: yarn add @celo/celocli
+
 workflows:
   version: 2
   celo-monorepo-build:
@@ -455,3 +473,15 @@ workflows:
           requires:
             - install_dependencies
             - lint-checks
+  nightly:
+    triggers:
+      - schedule:
+          # 7 PM in UTC = noon in PDT.
+          # Best for test to fail during SF afternoon, so that, someone can fix it during the day time.
+          cron: "0 19 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - test-npm-package-install
