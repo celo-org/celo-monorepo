@@ -250,11 +250,9 @@ export async function getEnode(port: number, ws: boolean = false) {
 
 export async function startGeth(gethBinaryPath: string, instance: GethInstanceConfig) {
   const datadir = getDatadir(instance)
-  const wsport = instance.wsport
-  const { syncmode, port, rpcport, wsport, validating: mine } = instance
+  const { syncmode, port, rpcport, wsport, validating } = instance
   const privateKey = instance.privateKey || ''
   const lightserv = instance.lightserv || false
-  const unlock = instance.validating
   const etherbase = instance.etherbase || ''
   const gethArgs = [
     '--datadir',
@@ -295,10 +293,6 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     )
   }
 
-  if (unlock) {
-    gethArgs.push('--password=/dev/null', `--unlock=0`)
-  }
-
   if (etherbase) {
     gethArgs.push('--etherbase', etherbase)
   }
@@ -308,18 +302,22 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   }
 
   if (validating) {
+    gethArgs.push('--password=/dev/null', `--unlock=0`)
     gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
   }
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`)
   instance.pid = gethProcess.pid
 
   // Give some time for geth to come up
-  const isOpen = await waitForPortOpen('localhost', rpcport, 5)
-  if (!isOpen) {
-    console.error(`geth:${instance.name}: jsonRPC didn't open after 5 seconds`)
-    process.exit(1)
-  } else {
-    console.info(`geth:${instance.name}: jsonRPC port open ${rpcport}`)
+  const waitForPort = wsport ? wsport : rpcport
+  if (waitForPort) {
+    const isOpen = await waitForPortOpen('localhost', waitForPort, 5)
+    if (!isOpen) {
+      console.error(`geth:${instance.name}: jsonRPC didn't open after 5 seconds`)
+      process.exit(1)
+    } else {
+      console.info(`geth:${instance.name}: jsonRPC port open ${waitForPort}`)
+    }
   }
 }
 
