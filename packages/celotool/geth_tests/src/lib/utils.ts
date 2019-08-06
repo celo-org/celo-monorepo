@@ -1,4 +1,3 @@
-const assert = require('chai').assert
 import {
   add0x,
   AccountType,
@@ -7,27 +6,32 @@ import {
   getPrivateKeysFor,
   getValidators,
   privateKeyToPublicKey,
+  privateKeyToStrippedAddress,
   Validator,
 } from '@celo/celotool/src/lib/generate_utils'
 import { getEnodeAddress } from '@celo/celotool/src/lib/geth'
+import { ensure0x } from '@celo/celotool/src/lib/utils'
+import { assert } from 'chai'
 import { spawn, SpawnOptions } from 'child_process'
 import fs from 'fs'
 import { join as joinPath, resolve as resolvePath } from 'path'
 import { Admin } from 'web3-eth-admin'
 
-interface GethInstanceConfig {
+export interface GethInstanceConfig {
   name: string
   validating: boolean
   syncmode: string
   port: number
-  rpcport: number
+  rpcport?: number
+  wsport?: number
   lightserv?: boolean
   privateKey?: string
   etherbase?: string
   peers?: string[]
+  pid?: number
 }
 
-interface GethTestConfig {
+export interface GethTestConfig {
   migrate?: boolean
   migrateTo?: number
   instances: GethInstanceConfig[]
@@ -171,7 +175,7 @@ async function setupTestDir(testDir: string) {
   await execCmd('mkdir', [testDir])
 }
 
-export async function writeGenesis(validators: Validator[], path: string) {
+function writeGenesis(validators: Validator[], path: string) {
   const blockTime = 0
   const epochLength = 10
   const genesis = generateGenesis(
@@ -207,16 +211,18 @@ export async function importPrivateKey(gethBinaryPath: string, instance: GethIns
   )
 }
 
-export async function killPid(pid: number) {
-  await execCmd('kill', ['-9', pid.toString()])
-}
-
 export async function killGeth() {
   console.info(`Killing ALL geth instances`)
   await execCmd('pkill', ['-9', 'geth'], { silent: true })
 }
 
-function addStaticPeers(datadir: string, enodes: string[]) {
+export async function killInstance(instance: GethInstanceConfig) {
+  if (instance.pid) {
+    await execCmd('kill', ['-9', instance.pid.toString()])
+  }
+}
+
+export async function addStaticPeers(datadir: string, enodes: string[]) {
   fs.writeFileSync(`${datadir}/static-nodes.json`, JSON.stringify(enodes))
 }
 
@@ -239,28 +245,23 @@ export function sleep(seconds: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, seconds * 1000))
 }
 
-export async function getEnode(rpcPort: number) {
-  const admin = new Admin(`http://localhost:${rpcPort}`)
+export async function getEnode(port: number, ws: boolean = false) {
+  let p = ws ? 'ws' : 'http'
+  const admin = new Admin(`${p}://localhost:${port}`)
   return (await admin.getNodeInfo()).enode
 }
 
 export async function startGeth(gethBinaryPath: string, instance: GethInstanceConfig) {
   const datadir = getDatadir(instance)
-  const { syncmode, port, rpcport, validating: mine } = instance
+  const { syncmode, port, rpcport, wsport, validating } = instance
   const privateKey = instance.privateKey || ''
   const lightserv = instance.lightserv || false
-  const unlock = instance.validating
   const etherbase = instance.etherbase || ''
   const gethArgs = [
     '--datadir',
     datadir,
-    '--rpc',
-    '--rpcport',
-    rpcport.toString(),
     '--syncmode',
     syncmode,
-    '--wsorigins=*',
-    '--rpcapi=eth,net,web3,debug,admin,personal',
     '--debug',
     '--port',
     port.toString(),
@@ -276,8 +277,23 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     'extip:127.0.0.1',
   ]
 
-  if (unlock) {
-    gethArgs.push('--password=/dev/null', `--unlock=0`)
+  if (rpcport) {
+    gethArgs.push(
+      '--rpc',
+      '--rpcport',
+      rpcport.toString(),
+      '--rpcapi=eth,net,web3,debug,admin,personal'
+    )
+  }
+
+  if (wsport) {
+    gethArgs.push(
+      '--wsorigins=*',
+      '--ws',
+      '--wsport',
+      wsport.toString(),
+      '--wsapi=eth,net,web3,debug,admin,personal'
+    )
   }
 
   if (etherbase) {
@@ -288,40 +304,39 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     gethArgs.push('--lightserv=90')
   }
 
-  if (mine) {
+  if (validating) {
+    gethArgs.push('--password=/dev/null', `--unlock=0`)
     gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
   }
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`)
+  instance.pid = gethProcess.pid
 
   // Give some time for geth to come up
-  const isOpen = await waitForPortOpen('localhost', rpcport, 5)
-  if (!isOpen) {
-    console.error(`geth:${instance.name}: jsonRPC didn't open after 5 seconds`)
-    process.exit(1)
-  } else {
-    console.info(`geth:${instance.name}: jsonRPC port open ${rpcport}`)
+  const waitForPort = wsport ? wsport : rpcport
+  if (waitForPort) {
+    const isOpen = await waitForPortOpen('localhost', waitForPort, 5)
+    if (!isOpen) {
+      console.error(`geth:${instance.name}: jsonRPC didn't open after 5 seconds`)
+      process.exit(1)
+    } else {
+      console.info(`geth:${instance.name}: jsonRPC port open ${waitForPort}`)
+    }
   }
-
-  return gethProcess.pid
 }
 
-export async function migrateContracts(
-  validatorPrivateKeys: string[],
-  to: number = 1000,
-  gethRepoPath: string
-) {
-  let args = [
+export async function migrateContracts(validatorPrivateKeys: string[], to: number = 1000) {
+  const args = [
     '--cwd',
     `${monorepoRoot}/packages/protocol`,
     'init-network',
     '-n',
     'testing',
     '-k',
-    validatorPrivateKeys.map(add0x).join(','),
+    validatorPrivateKeys.map(ensure0x).join(','),
+    '-m',
+    '{ "validators": { "minElectableValidators": "1" } }',
     '-t',
     to.toString(),
-    '-l',
-    gethRepoPath,
   ]
   await execCmdWithExitOnFailure('yarn', args)
 }
@@ -414,7 +429,7 @@ export function getHooks(gethConfig: GethTestConfig) {
       await initAndStartGeth(gethBinaryPath, instance)
     }
     if (gethConfig.migrate || gethConfig.migrateTo) {
-      await migrateContracts(validatorPrivateKeys, gethConfig.migrateTo, gethRepoPath)
+      await migrateContracts(validatorPrivateKeys, gethConfig.migrateTo)
     }
     await killGeth()
     await sleep(2)
