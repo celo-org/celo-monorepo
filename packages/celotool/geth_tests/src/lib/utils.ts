@@ -1,12 +1,10 @@
 import {
-  add0x,
   AccountType,
   ConsensusType,
   generateGenesis,
   getPrivateKeysFor,
   getValidators,
   privateKeyToPublicKey,
-  privateKeyToStrippedAddress,
   Validator,
 } from '@celo/celotool/src/lib/generate_utils'
 import { getEnodeAddress } from '@celo/celotool/src/lib/geth'
