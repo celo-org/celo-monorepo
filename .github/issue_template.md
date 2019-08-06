@@ -1,7 +1,9 @@
-### Expected Behavior
+Expected Behavior
+-----------------
 
 Please describe the behavior you are expecting
 
-### Current Behavior
+Current Behavior
+-----------------
 
 What is the current behavior?
