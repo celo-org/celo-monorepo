@@ -283,7 +283,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
 
     balances[to] = balances[to].add(units);
     balances[from] = balances[from].sub(units);
-    allowed[from][msg.sender] = allowed[from][msg.sender].sub(units);
+    allowed[from][msg.sender] = allowed[from][msg.sender].sub(value);
     emit Transfer(from, to, value);
     return true;
   }
@@ -441,7 +441,6 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
 
     int256 currentInflationFactor =
       FixidityLib.newFixed(int256(numerator)).divide(FixidityLib.newFixed(int256(denominator)));
-
     uint256 lastUpdated = inflationState.factorLastUpdated.add(
       inflationState.updatePeriod.mul(timesToApplyInflation)
     );

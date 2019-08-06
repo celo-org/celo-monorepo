@@ -1,9 +1,8 @@
 import BaseNotification from '@celo/react-components/components/BaseNotification'
-import { getContactPhoneNumber } from '@celo/utils/src/contacts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Image, StyleSheet, View } from 'react-native'
-import SmsAndroid from 'react-native-sms-android'
+import SendIntentAndroid from 'react-native-send-intent'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
@@ -24,10 +23,7 @@ type Props = OwnProps & WithNamespaces
 export class EscrowedPaymentReminderNotification extends React.PureComponent<Props> {
   getCTA = () => {
     const { payment } = this.props
-    const recipientPhoneNumber =
-      typeof payment.recipient === 'string'
-        ? payment.recipient
-        : getContactPhoneNumber(payment.recipient)
+    const recipientPhoneNumber = payment.recipientPhone
     return [
       {
         text: this.props.t('sendMessage'),
@@ -35,18 +31,17 @@ export class EscrowedPaymentReminderNotification extends React.PureComponent<Pro
           // TODO: move out of TSX file; business logic should be in .ts files
           CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_send_message)
           // TODO: open up whatsapp/text message slider with pre populated message
-          SmsAndroid.sms(recipientPhoneNumber, '', 'sendIndirect', (err: Error) => {
-            if (err) {
-              Logger.showError(this.props.t('SMSError'))
-              Logger.error(
-                'EscrowedPaymentReminderNotification/',
-                this.props.t('SMSErrorDetails', {
-                  recipientNumber: recipientPhoneNumber,
-                  errMsg: err,
-                })
-              )
-            }
-          })
+          try {
+            SendIntentAndroid.sendSms(recipientPhoneNumber, '')
+          } catch {
+            Logger.showError(this.props.t('SMSError'))
+            Logger.error(
+              'EscrowedPaymentReminderNotification/',
+              this.props.t('SMSErrorDetails', {
+                recipientNumber: recipientPhoneNumber,
+              })
+            )
+          }
         },
       },
       {
@@ -62,8 +57,9 @@ export class EscrowedPaymentReminderNotification extends React.PureComponent<Pro
 
   getTitle() {
     const { t, payment } = this.props
-    const displayName =
-      typeof payment.recipient === 'string' ? payment.recipient : payment.recipient.displayName
+    const displayName = payment.recipientContact
+      ? payment.recipientContact.displayName
+      : payment.recipientPhone
     return t('escrowedPaymentReminder', { mobile: displayName })
   }
 

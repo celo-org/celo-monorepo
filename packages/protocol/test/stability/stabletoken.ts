@@ -5,7 +5,7 @@ import {
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { fixed1, toFixed } from '@celo/protocol/lib/fixidity'
+import { fixed1, toFixed, fromFixed } from '@celo/protocol/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import * as _ from 'lodash'
 import { RegistryInstance, StableTokenInstance } from 'types'
@@ -373,17 +373,18 @@ contract('StableToken', (accounts: string[]) => {
       const sender = accounts[0]
       const receiver = accounts[1]
       const inflationRate = toFixed(201 / 200)
+      const amount = new BigNumber(10000000000000000000)
 
       beforeEach(async () => {
         await stableToken.setMinter(sender)
-        await stableToken.mint(sender, 1000)
+        await stableToken.mint(sender, amount.times(2))
         await stableToken.setInflationParameters(inflationRate, SECONDS_IN_A_WEEK)
         await timeTravel(SECONDS_IN_A_WEEK, web3)
       })
 
-      async function assertInflationUpdatedEvent(log, requestBlockTime) {
+      async function assertInflationUpdatedEvent(log, requestBlockTime, inflationPeriods = 1) {
         assertLogMatches(log, 'InflationFactorUpdated', {
-          factor: inflationRate,
+          factor: toFixed(fromFixed(inflationRate).pow(inflationPeriods)),
           lastUpdated: requestBlockTime,
         })
       }
@@ -394,7 +395,7 @@ contract('StableToken', (accounts: string[]) => {
       })
 
       it('approve', async () => {
-        const res = await stableToken.approve(receiver, 1)
+        const res = await stableToken.approve(receiver, amount)
         await assertInflationUpdatedEvent(res.logs[0], initializationTime + SECONDS_IN_A_WEEK)
       })
 
@@ -404,22 +405,24 @@ contract('StableToken', (accounts: string[]) => {
       })
 
       it('transferWithComment', async () => {
-        const res = await stableToken.transferWithComment(receiver, 1, 'hi')
+        const res = await stableToken.transferWithComment(receiver, amount, 'hi')
         await assertInflationUpdatedEvent(res.logs[0], initializationTime + SECONDS_IN_A_WEEK)
       })
 
       it('burn', async () => {
-        const res = await stableToken.mint(sender, 1)
+        const res = await stableToken.mint(sender, amount)
         await assertInflationUpdatedEvent(res.logs[0], initializationTime + SECONDS_IN_A_WEEK)
       })
 
       it('transferFrom', async () => {
-        // force inflation factor to be updated, don't change value
-        await stableToken.approve(receiver, 1)
-        await stableToken.setInflationParameters(fixed1, SECONDS_IN_A_WEEK)
+        await stableToken.approve(receiver, amount)
         await timeTravel(SECONDS_IN_A_WEEK, web3)
-        const res = await stableToken.transferFrom(sender, receiver, 1, { from: receiver })
-        await assertInflationUpdatedEvent(res.logs[0], initializationTime + SECONDS_IN_A_WEEK * 2)
+        const res = await stableToken.transferFrom(sender, receiver, amount, { from: receiver })
+        await assertInflationUpdatedEvent(
+          res.logs[0],
+          initializationTime + SECONDS_IN_A_WEEK * 2,
+          2
+        )
       })
 
       it('transfer', async () => {

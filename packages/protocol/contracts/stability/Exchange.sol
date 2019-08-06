@@ -7,7 +7,7 @@ import "./interfaces/IExchange.sol";
 import "./interfaces/ISortedOracles.sol";
 import "./interfaces/IReserve.sol";
 import "./interfaces/IStableToken.sol";
-import "./FractionUtil.sol";
+import "../common/FractionUtil.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/IERC20Token.sol";

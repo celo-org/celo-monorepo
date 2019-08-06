@@ -9,7 +9,7 @@
   "verifyNumber": "Verify your phone number so other Celo users can find you and send you value",
   "syncNetwork": "Syncing with Network",
   "welcomeCelo": "Welcome to Celo Wallet",
-  "chooseCountryCode": "Choose Country Code",
+  "chooseCountryCode": "Country Code",
   "joinText": {
     "0":
       "Welcome to Celo Wallet, a digital wallet that allows you to easily send, receive, and save value.",
@@ -92,7 +92,7 @@
     "1":
       "Importing your contacts allows you to easily send and request payments from your community and see who is already using Celo.",
     "enable": "Enable Contact Access",
-    "loading": "Importing your contacts..."
+    "loading": "Finding friends on Celo..."
   },
   "skip": "Skip"
 }

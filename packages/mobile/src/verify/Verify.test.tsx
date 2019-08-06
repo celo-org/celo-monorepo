@@ -9,7 +9,7 @@ import Verifying from 'src/verify/Verifying'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 import { mockAttestationMessage } from 'test/values'
 
-const store = createMockStore()
+const store = createMockStore({})
 
 it('renders the Education step correctly', () => {
   const tree = renderer.create(

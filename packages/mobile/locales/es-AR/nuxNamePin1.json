@@ -10,7 +10,7 @@
     "Verifique su número de teléfono para conectarse con otros usuarios y recibir dinero",
   "syncNetwork": "Sincronizando con la red",
   "welcomeCelo": "Le damos la bienvenida a Celo",
-  "chooseCountryCode": "Elegir código de país",
+  "chooseCountryCode": "Código de país",
   "joinText": {
     "0":
       "Bienvenido a Celo Wallet, una billetera digital que le permite enviar, recibir y guardar valor fácilmente.",
@@ -93,7 +93,7 @@
     "1":
       "Importar tus contactos te permite enviar y solicitar pagos fácilmente a tu comunidad y ver quién ya está usando Celo",
     "enable": "Habilitar acceso a contactos",
-    "loading": "Importar tus contactos..."
+    "loading": "Encontrar amigos en Celo..."
   },
   "skip": "Saltar"
 }

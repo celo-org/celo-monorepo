@@ -14,6 +14,10 @@ jest.mock('src/geth/GethAwareButton', () => {
   return Button
 })
 
+jest.mock('src/identity/verification', () => {
+  return { isPhoneVerified: jest.fn(() => true) }
+})
+
 describe('InviteReview', () => {
   it('renders correctly', () => {
     const tree = renderer.create(

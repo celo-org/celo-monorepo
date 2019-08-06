@@ -3,18 +3,12 @@ import * as React from 'react'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import sleep from 'sleep-promise'
-import { INPUT_DEBOUNCE_TIME } from 'src/config'
+import { FeeType } from 'src/fees/actions'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import SendAmount, { SendAmount as SendAmountClass } from 'src/send/SendAmount'
 import { createMockStore, getMockI18nProps } from 'test/utils'
-import {
-  mockAccount,
-  mockAccount2,
-  mockE164Number,
-  mockE164Number2,
-  mockNavigation,
-} from 'test/values'
+import { mockAccount2, mockE164Number2, mockNavigation } from 'test/values'
+
 const AMOUNT_ZERO = '0.00'
 const AMOUNT_VALID = '4.93'
 const AMOUNT_TOO_MUCH = '106.98'
@@ -24,18 +18,17 @@ const numeral = require('numeral')
 
 const storeData = {
   stableToken: { balance: BALANCE_VALID },
-  send: { suggestedFee: '1' },
+  fees: {
+    estimates: {
+      send: {
+        feeInWei: '1',
+      },
+    },
+  },
 }
 
 const TEXT_PLACEHOLDER = 'groceriesRent'
 const AMOUNT_PLACEHOLDER = 'amount'
-
-jest.mock('src/send/actions', () => ({
-  ...jest.requireActual('src/send/actions'),
-  updateSuggestedFee: jest.fn(() => ({ type: 'b' })),
-}))
-
-const { updateSuggestedFee } = require('src/send/actions')
 
 describe('SendAmount', () => {
   beforeAll(() => {
@@ -43,10 +36,6 @@ describe('SendAmount', () => {
   })
 
   describe('when commenting', () => {
-    beforeEach(() => {
-      updateSuggestedFee.mockClear()
-    })
-
     const store = createMockStore(storeData)
     const getWrapper = () =>
       render(
@@ -56,37 +45,6 @@ describe('SendAmount', () => {
           <SendAmount navigation={mockNavigation} />
         </Provider>
       )
-
-    it('calculateFee debouncing works', async () => {
-      const wrapper = render(
-        <Provider store={createMockStore()}>
-          <SendAmountClass
-            navigation={mockNavigation}
-            {...getMockI18nProps()}
-            fetchDollarBalance={jest.fn()}
-            showMessage={jest.fn()}
-            showError={jest.fn()}
-            hideAlert={jest.fn()}
-            updateSuggestedFee={updateSuggestedFee}
-            fetchPhoneAddresses={fetchPhoneAddresses}
-            dollarBalance={new BigNumber(1)}
-            suggestedFeeDollars={new BigNumber(1)}
-            e164NumberToAddress={{ [mockE164Number]: mockAccount }}
-            defaultCountryCode={'+1'}
-          />
-        </Provider>
-      )
-      const input = wrapper.getByPlaceholder(TEXT_PLACEHOLDER)
-      const comment1 = 'first'
-      const comment2 = 'second'
-      fireEvent.changeText(input, comment1)
-      fireEvent.changeText(input, comment2)
-      fireEvent.changeText(input, comment1)
-      await sleep(INPUT_DEBOUNCE_TIME)
-
-      // Called once for debounce
-      expect(updateSuggestedFee).toHaveBeenCalledTimes(1)
-    })
 
     it('updates the comment/reason', () => {
       const wrapper = getWrapper()
@@ -110,12 +68,12 @@ describe('SendAmount', () => {
             showMessage={showMessage}
             showError={jest.fn()}
             hideAlert={jest.fn()}
-            updateSuggestedFee={jest.fn()}
             fetchPhoneAddresses={fetchPhoneAddresses}
             dollarBalance={new BigNumber(1)}
             suggestedFeeDollars={new BigNumber(1)}
             e164NumberToAddress={{ [mockE164Number2]: mockAccount2 }}
             defaultCountryCode={'+1'}
+            feeType={FeeType.SEND}
           />
         </Provider>
       )
@@ -132,12 +90,12 @@ describe('SendAmount', () => {
     })
 
     const store = createMockStore(storeData)
-    const getWrapper = () =>
+    const getWrapper = (lng?: string) =>
       render(
         <Provider store={store}>
           {/*
           // @ts-ignore */}
-          <SendAmount navigation={mockNavigation} />
+          <SendAmount navigation={mockNavigation} lng={lng} />
         </Provider>
       )
 
@@ -150,7 +108,7 @@ describe('SendAmount', () => {
 
     it('handles commas', () => {
       numeral.locale('es')
-      const wrapper = getWrapper()
+      const wrapper = getWrapper('es-AR')
       const input = wrapper.getByPlaceholder(AMOUNT_PLACEHOLDER)
       fireEvent.changeText(input, '4,0')
       expect(wrapper.queryAllByDisplayValue('4,0')).toHaveLength(1)

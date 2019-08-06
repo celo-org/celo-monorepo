@@ -13,6 +13,9 @@ const defaultConfig = {
   bondedDeposits: {
     maxNoticePeriod: 60 * 60 * 24 * 365 * 3, // 3 years
   },
+  oracles: {
+    reportExpiry: 60 * 60, // 1 hour
+  },
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1,
@@ -79,6 +82,7 @@ const linkedLibraries = {
   AddressSortedLinkedList: ['Validators'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
   SortedFractionMedianList: ['SortedOracles', 'SortedFractionMedianListTest'],
+  Signatures: ['BondedDeposits', 'Escrow'],
 }
 
 const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
