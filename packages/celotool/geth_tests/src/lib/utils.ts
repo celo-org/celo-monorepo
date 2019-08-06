@@ -14,7 +14,7 @@ import fs from 'fs'
 import { join as joinPath, resolve as resolvePath } from 'path'
 import { Admin } from 'web3-eth-admin'
 
-interface GethInstanceConfig {
+export interface GethInstanceConfig {
   name: string
   validating: boolean
   syncmode: string
@@ -25,9 +25,10 @@ interface GethInstanceConfig {
   privateKey?: string
   etherbase?: string
   peers?: string[]
+  pid?: number
 }
 
-interface GethTestConfig {
+export interface GethTestConfig {
   migrate?: boolean
   migrateTo?: number
   instances: GethInstanceConfig[]
@@ -207,16 +208,18 @@ export async function importPrivateKey(gethBinaryPath: string, instance: GethIns
   )
 }
 
-export async function killPid(pid: number) {
-  await execCmd('kill', ['-9', pid.toString()])
-}
-
 export async function killGeth() {
   console.info(`Killing ALL geth instances`)
   await execCmd('pkill', ['-9', 'geth'], { silent: true })
 }
 
-function addStaticPeers(datadir: string, enodes: string[]) {
+export async function killInstance(instance: GethInstanceConfig) {
+  if (instance.pid) {
+    await execCmd('kill', ['-9', instance.pid.toString()])
+  }
+}
+
+export async function addStaticPeers(datadir: string, enodes: string[]) {
   fs.writeFileSync(`${datadir}/static-nodes.json`, JSON.stringify(enodes))
 }
 
@@ -308,6 +311,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
   }
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`)
+  instance.pid = gethProcess.pid
 
   // Give some time for geth to come up
   const isOpen = await waitForPortOpen('localhost', rpcport, 5)
@@ -317,8 +321,6 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   } else {
     console.info(`geth:${instance.name}: jsonRPC port open ${rpcport}`)
   }
-
-  return gethProcess.pid
 }
 
 export async function migrateContracts(validatorPrivateKeys: string[], to: number = 1000) {
