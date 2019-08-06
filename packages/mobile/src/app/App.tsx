@@ -1,4 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
+import { DappKitRequestTypes, parseDappKitRequestDeeplink } from '@celo/utils/src/dappkit'
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { withNamespaces } from 'react-i18next'
@@ -6,7 +7,7 @@ import { DeviceEventEmitter, Linking, StatusBar, YellowBox } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
-import { sleep } from 'sleep-promise'
+import sleep from 'sleep-promise'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
 import { apolloClient } from 'src/apollo/index'
@@ -18,10 +19,6 @@ import Navigator from 'src/navigator/NavigatorWrapper'
 import { Screens } from 'src/navigator/Screens'
 import { persistor, store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
-// This is currently breaking paste - looking into it
-// import { useScreens } from 'react-native-screens'
-// useScreens()
-import { parse } from 'url'
 
 Logger.debug('App/init', 'Current Language: ' + i18n.language)
 YellowBox.ignoreWarnings([
@@ -72,13 +69,13 @@ export class App extends React.Component {
   }
 
   handleDappkit(url: string) {
-    const params = parse(url, true).query
-    switch (params.op) {
-      case 'account_address':
-        navigate(Screens.DappKitAccountAuth, { url })
+    const dappKitRequest = parseDappKitRequestDeeplink(url)
+    switch (dappKitRequest.type) {
+      case DappKitRequestTypes.ACCOUNT_ADDRESS:
+        navigate(Screens.DappKitAccountAuth, { dappKitRequest })
         break
-      case 'sign_tx':
-        navigate(Screens.DappKitSignTxScreen, { url })
+      case DappKitRequestTypes.SIGN_TX:
+        navigate(Screens.DappKitSignTxScreen, { dappKitRequest })
         break
     }
   }

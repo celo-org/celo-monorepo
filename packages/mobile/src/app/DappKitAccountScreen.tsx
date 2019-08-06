@@ -1,5 +1,10 @@
 import FullscreenCTA from '@celo/react-components/components/FullscreenCTA'
 import { componentStyles } from '@celo/react-components/styles/styles'
+import {
+  AccountAuthRequest,
+  AccountAuthResponseSuccess,
+  produceResponseDeeplink,
+} from '@celo/utils/src/dappkit'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Linking, Text, View } from 'react-native'
@@ -8,7 +13,6 @@ import { connect } from 'react-redux'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import { parse } from 'url'
 
 interface OwnProps {
   account: string
@@ -34,18 +38,16 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
       return
     }
 
-    const deeplink: string = this.props.navigation.getParam('url', '')
+    const request: AccountAuthRequest = this.props.navigation.getParam('dappKitRequest', null)
 
-    console.log(deeplink)
-
-    const callback: string = parse(deeplink, true).query.callback
-    if (!callback) {
+    if (request === null) {
       return
     }
 
     navigate(Screens.WalletHome)
-    console.log(callback)
-    Linking.openURL(callback + '?account=' + this.props.account)
+    Linking.openURL(
+      produceResponseDeeplink(request, AccountAuthResponseSuccess(this.props.account))
+    )
   }
 
   render() {

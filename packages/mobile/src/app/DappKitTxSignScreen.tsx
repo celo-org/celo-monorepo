@@ -1,5 +1,6 @@
 import FullscreenCTA from '@celo/react-components/components/FullscreenCTA'
 import { componentStyles } from '@celo/react-components/styles/styles'
+import { SignTxRequest } from '@celo/utils/src/dappkit'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Text, View } from 'react-native'
@@ -7,7 +8,6 @@ import { NavigationParams, NavigationScreenProp } from 'react-navigation'
 import { connect } from 'react-redux'
 import { requestTxSignature, RequestTxSignatureAction } from 'src/dappkit/dappkit'
 import { RootState } from 'src/redux/reducers'
-import { parse } from 'url'
 
 interface OwnProps {
   requestTxSignature: (
@@ -40,25 +40,14 @@ class DappKitSignTxScreen extends React.Component<Props> {
       return
     }
 
-    const deeplink: string = this.props.navigation.getParam('url', '')
+    const request: SignTxRequest = this.props.navigation.getParam('dappKitRequest', null)
 
-    console.log(deeplink)
-
-    const query = parse(deeplink, true).query
-
-    if (!query.callback) {
+    if (request === null) {
       return
     }
 
     // @ts-ignore
-    this.props.requestTxSignature(
-      query.txData,
-      parseInt(query.estimatedGas, 10),
-      query.from,
-      query.to,
-      parseInt(query.nonce, 10),
-      query.callback
-    )
+    this.props.requestTxSignature(request)
   }
 
   render() {
