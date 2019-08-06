@@ -3,6 +3,7 @@ pragma solidity ^0.5.8;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
+import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./AddressLinkedList.sol";
 import "./AddressSortedLinkedList.sol";
@@ -10,7 +11,6 @@ import "./UsingBondedDeposits.sol";
 import "./interfaces/IValidators.sol";
 import "../common/Initializable.sol";
 import "../common/FractionUtil.sol";
-import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 
 /**
@@ -550,7 +550,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   )
     external
     view
-    returns (string memory identifier, string memory name, string memory url, bytes memory publicKey, bytes memory BLSPublicKey, bytes memory BLSProofOfPossession, address affiliation)
+    returns (string memory identifier, string memory name, string memory url, bytes memory publicKeysData, address affiliation)
   {
     require(isValidator(account));
     Validator storage validator = validators[account];
@@ -558,9 +558,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       validator.identifier,
       validator.name,
       validator.url,
-      validator.publicKey,
-      validator.BLSPublicKey,
-      validator.BLSProofOfPossession,
+      validator.publicKeysData,
       validator.affiliation
     );
   }
