@@ -67,6 +67,8 @@
   "importContactsFailed": "Error al importar contactos",
   "sendPaymentFailed": "Falla en el envío de pago",
   "paymentRequestFailed": "No se pudo enviar la solicitud de pago",
+  "escrowTransferFailed": "Transferencia a la custodia falló",
+  "escrowWithdrawalFailed": "Retirada de la custodia fallida",
   "reclaimingEscrowedPaymentFailed": "El pago no pudo ser reclamado.",
   "connectingToCelo": "Conectando a la red de Celo...",
   "poorConnection": {

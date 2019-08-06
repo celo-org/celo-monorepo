@@ -112,6 +112,7 @@ export function* startVerification() {
       result: CommonValues.timeout,
     })
     yield put(showError(ErrorMessages.VERIFICATION_TIMEOUT, ERROR_DURATION))
+    yield put(endVerification(false))
     // TODO #1955: Add logic in this case to request more SMS messages
   }
   Logger.debug(TAG, 'Done verification')
