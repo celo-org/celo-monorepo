@@ -14,7 +14,7 @@
   "country": "País",
   "phoneNumber": "Número de teléfono",
   "invalidPhone": "Número de teléfono inválido",
-  "allowSmsPermissions": "Permitir que la billetera de Celo envíe y vea mensajes SMS",
+  "allowSmsPermissions": "Permitir que la billetera de Celo envíe y vea mensajes de texto (SMS)",
   "dontAsk": "No volver a preguntar",
   "deny": "Denegar",
   "allow": "Permitir",
@@ -45,7 +45,7 @@
   "congratsVerified": "¡Felicitaciones se ha verificado su usuario!",
   "copyPaste": "Copiar y Pegar ",
   "entireSmsMessage": "Mensaje completo desde tu SMS",
-  "pasteCode": "Paste Verification Code {{codeNumber}}",
+  "pasteCode": "Pegar código de verificación {{codeNumber}}",
   "startingVerification": "Verificando tu número de teléfono",
   "nextCode": "Recibiendo el Siguiente Código",
   "verificationComplete": "Verificación completa",
@@ -54,5 +54,6 @@
   "errorRequestCode": "Error al solicitar los códigos.",
   "errorRedeemingCode": "Error al canjear el código.",
   "pleaseRetry": "Por favor reinicie la verificación.",
-  "retryVerification": "Reintentar la verificación"
+  "retryVerification": "Reintentar la verificación",
+  "codeAccepted": "Aceptado"
 }

@@ -6,6 +6,7 @@ exports[`PhoneNumberInput when defaultCountry renders defaults 1`] = `
     Array [
       undefined,
       Object {
+        "backgroundColor": "#FFFFFF",
         "position": "relative",
       },
     ]
@@ -18,6 +19,9 @@ exports[`PhoneNumberInput when defaultCountry renders defaults 1`] = `
           "borderColor": "#D1D5D8",
           "borderRadius": 3,
           "borderWidth": 1,
+        },
+        Object {
+          "height": 50,
         },
         Object {
           "alignItems": "center",
@@ -96,25 +100,27 @@ exports[`PhoneNumberInput when defaultCountry renders defaults 1`] = `
             "flexDirection": "row",
             "justifyContent": "center",
           },
-          Object {
-            "backgroundColor": "#FFFFFF",
-            "flex": 1,
-            "marginLeft": 2,
-          },
+          Array [
+            Object {
+              "height": 50,
+            },
+            Object {
+              "flex": 1,
+              "marginLeft": 9,
+            },
+          ],
         ]
       }
     >
       <TextInput
         allowFontScaling={true}
-        autoCorrect={true}
-        autoFocus={false}
+        countryCallingCode="+54"
         keyboardType="phone-pad"
         onBlur={[Function]}
         onChangeText={[Function]}
         onFocus={[Function]}
-        placeholder=""
+        placeholderTextColor="#D1D5D8"
         rejectResponderTermination={true}
-        secureTextEntry={false}
         style={
           Array [
             Object {
@@ -132,8 +138,8 @@ exports[`PhoneNumberInput when defaultCountry renders defaults 1`] = `
           ]
         }
         testID="PhoneNumberField"
-        textContentType="none"
         underlineColorAndroid="transparent"
+        validator="phone"
         value=""
       />
     </View>
@@ -147,6 +153,7 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
     Array [
       undefined,
       Object {
+        "backgroundColor": "#FFFFFF",
         "position": "relative",
       },
     ]
@@ -177,6 +184,10 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
               "borderWidth": 1,
             },
             Object {
+              "height": 50,
+            },
+            Object {
+              "marginTop": 1,
               "padding": 3,
             },
           ],
@@ -205,15 +216,65 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
       >
         <TextInput
           allowFontScaling={true}
+          autoCapitalize="none"
           autoCorrect={false}
-          autoFocus={false}
-          keyboardType="default"
+          data={Array []}
+          defaultValue=""
+          inputContainerStyle={
+            Array [
+              Object {
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "borderWidth": 1,
+              },
+              Object {
+                "height": 50,
+              },
+              Object {
+                "marginTop": 1,
+                "padding": 3,
+              },
+            ]
+          }
+          keyboardShouldPersistTaps="always"
+          listContainerStyle={
+            Object {
+              "flex": 1,
+              "padding": 0,
+              "position": "relative",
+              "top": 3,
+            }
+          }
+          listStyle={
+            Array [
+              Object {
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "borderWidth": 1,
+              },
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "borderTopWidth": 1,
+                "borderWidth": 1,
+                "flex": 1,
+                "marginHorizontal": 0,
+                "paddingHorizontal": 0,
+                "paddingVertical": 6,
+              },
+            ]
+          }
           onBlur={[Function]}
           onChangeText={[Function]}
           onFocus={[Function]}
-          placeholder=""
+          onStartShouldSetResponderCapture={[Function]}
+          placeholderTextColor="#D1D5D8"
           rejectResponderTermination={true}
-          secureTextEntry={false}
+          renderItem={[Function]}
+          renderSeparator={null}
+          renderTextInput={[Function]}
+          rowHasChanged={[Function]}
           style={
             Array [
               Object {
@@ -231,7 +292,6 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
             ]
           }
           testID="CountryNameField"
-          textContentType="none"
           underlineColorAndroid="transparent"
           value=""
         />
@@ -295,25 +355,27 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
             "flexDirection": "row",
             "justifyContent": "center",
           },
-          Object {
-            "backgroundColor": "#FFFFFF",
-            "flex": 1,
-            "marginLeft": 2,
-          },
+          Array [
+            Object {
+              "height": 50,
+            },
+            Object {
+              "flex": 1,
+              "marginLeft": 9,
+            },
+          ],
         ]
       }
     >
       <TextInput
         allowFontScaling={true}
-        autoCorrect={true}
-        autoFocus={false}
+        countryCallingCode=""
         keyboardType="phone-pad"
         onBlur={[Function]}
         onChangeText={[Function]}
         onFocus={[Function]}
-        placeholder=""
+        placeholderTextColor="#D1D5D8"
         rejectResponderTermination={true}
-        secureTextEntry={false}
         style={
           Array [
             Object {
@@ -331,8 +393,8 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
           ]
         }
         testID="PhoneNumberField"
-        textContentType="none"
         underlineColorAndroid="transparent"
+        validator="phone"
         value=""
       />
     </View>

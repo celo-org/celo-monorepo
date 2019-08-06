@@ -1,5 +1,3 @@
-import { GoldToken } from '@celo/contractkit/types/GoldToken'
-import { StableToken } from '@celo/contractkit/types/StableToken'
 import BigNumber from 'bignumber.js'
 import { values } from 'lodash'
 import Web3 from 'web3'
@@ -7,6 +5,8 @@ import Contract from 'web3/eth/contract'
 import { TransactionObject } from 'web3/eth/types'
 import { TransactionReceipt } from 'web3/types'
 import * as ContractList from '../contracts/index'
+import { GoldToken } from '../types/GoldToken'
+import { StableToken } from '../types/StableToken'
 import { Logger } from './logger'
 
 const gasInflateFactor = 1.3
@@ -221,7 +221,8 @@ export async function sendTransactionAsync<T>(
   tx: TransactionObject<T>,
   account: string,
   gasCurrencyContract: StableToken | GoldToken,
-  logger: TxLogger = emptyTxLogger
+  logger: TxLogger = emptyTxLogger,
+  estimatedGas?: number | undefined
 ): Promise<TxPromises> {
   // @ts-ignore
   const resolvers: TxPromiseResolvers = {}
@@ -257,19 +258,21 @@ export async function sendTransactionAsync<T>(
       gasCurrency: gasCurrencyContract._address,
       gasPrice: '0',
     }
-    const estimatedGas = Math.round((await tx.estimateGas(txParams)) * gasInflateFactor)
-    logger(EstimatedGas(estimatedGas))
 
-    await tx
-      .send({
-        from: account,
-        // @ts-ignore
-        gasCurrency: gasCurrencyContract._address,
-        gas: estimatedGas,
-        // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
-        // the suggested price in the selected gasCurrency.
-        gasPrice: '0',
-      })
+    if (estimatedGas === undefined) {
+      estimatedGas = Math.round((await tx.estimateGas(txParams)) * gasInflateFactor)
+      logger(EstimatedGas(estimatedGas))
+    }
+
+    tx.send({
+      from: account,
+      // @ts-ignore
+      gasCurrency: gasCurrencyContract._address,
+      gas: estimatedGas,
+      // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
+      // the suggested price in the selected gasCurrency.
+      gasPrice: '0',
+    })
       .on('receipt', (r: TransactionReceipt) => {
         logger(ReceiptReceived(r))
         if (resolvers.receipt) {

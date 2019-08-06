@@ -65,7 +65,8 @@ function buildHandleFaucet(request: RequestRecord, snap: DataSnapshot, config: N
       new Web3(config.nodeUrl),
       account.pk,
       config.stableTokenAddress,
-      config.escrowAddress
+      config.escrowAddress,
+      config.goldTokenAddress
     )
     const goldTx = await celo.transferGold(request.beneficiary, config.faucetGoldAmount)
     const goldTxHash = await goldTx.getHash()
@@ -93,7 +94,8 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
       new Web3(config.nodeUrl),
       account.pk,
       config.stableTokenAddress,
-      config.escrowAddress
+      config.escrowAddress,
+      config.goldTokenAddress
     )
     const { address: tempAddress, inviteCode } = generateInviteCode()
     const goldTx = await celo.transferGold(tempAddress, config.inviteGoldAmount)
@@ -122,7 +124,7 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
     await escrowTx.waitReceipt()
 
     if (config.twilioClient) {
-      const messageText = `Hello! Thanks you for joining the Celo payments network. Your invite code is: ${inviteCode}`
+      const messageText = `Hello! Thank you for joining the Celo network. Your invite code is: ${inviteCode} Download the app at https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores`
       await config.twilioClient.messages.create({
         body: messageText,
         from: config.twilioPhoneNumber,

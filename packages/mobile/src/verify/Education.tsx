@@ -14,8 +14,15 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 export class Education extends React.Component<WithNamespaces> {
+  static navigationOptions = {
+    headerStyle: {
+      elevation: 0,
+    },
+    header: null,
+  }
+
   onSubmit = () => {
-    navigate(Screens.VerifyInput)
+    navigate(Screens.VerifyVerifying)
   }
 
   render() {
@@ -46,7 +53,7 @@ export class Education extends React.Component<WithNamespaces> {
           <Button
             onPress={this.onSubmit}
             text={t('continue')}
-            standard={true}
+            standard={false}
             type={BtnTypes.PRIMARY}
             testID="VerifyContinueButton"
           />
@@ -60,7 +67,6 @@ const style = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
     paddingTop: 20,
     backgroundColor: colors.background,
   },

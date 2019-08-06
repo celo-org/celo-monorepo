@@ -1,4 +1,6 @@
 rootProject.name = 'celo'
+include ':react-native-send-intent'
+project(':react-native-send-intent').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-send-intent/android')
 include ':react-native-webview'
 project(':react-native-webview').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-webview/android')
 include ':instabug-reactnative'
@@ -39,8 +41,6 @@ include ':react-native-sentry'
 project(':react-native-sentry').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-sentry/android')
 include ':react-native-secure-randombytes'
 project(':react-native-secure-randombytes').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-secure-randombytes/android')
-include ':react-native-sms-android'
-project(':react-native-sms-android').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-sms-android/android')
 include ':react-native-svg'
 project(':react-native-svg').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-svg/android')
 include ':react-native-contacts'

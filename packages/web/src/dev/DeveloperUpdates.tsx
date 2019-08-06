@@ -21,6 +21,7 @@ export default withNamespaces('dev')(
   memo(function DeveloperUpdates({ t }: I18nProps) {
     return (
       <>
+        <span id={'signup'} />
         <Title title={t('updates.title')} />
         <GridRow
           desktopStyle={standardStyles.blockMarginBottom}

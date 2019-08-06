@@ -249,9 +249,9 @@ exports[`renders for error 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 13,
+                      "fontSize": 14,
                       "lineHeight": 18,
                     },
                     Object {
@@ -398,9 +398,9 @@ exports[`renders for error 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 13,
+                      "fontSize": 14,
                       "lineHeight": 18,
                     },
                     Object {
@@ -727,9 +727,9 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 13,
+                      "fontSize": 14,
                       "lineHeight": 18,
                     },
                     Object {
@@ -908,9 +908,9 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 13,
+                      "fontSize": 14,
                       "lineHeight": 18,
                     },
                     Object {
@@ -1130,9 +1130,9 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 13,
+                      "fontSize": 14,
                       "lineHeight": 18,
                     },
                     Object {
@@ -1429,9 +1429,9 @@ exports[`renders for loading 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 13,
+                      "fontSize": 14,
                       "lineHeight": 18,
                     },
                     Object {
@@ -1610,9 +1610,9 @@ exports[`renders for loading 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 13,
+                      "fontSize": 14,
                       "lineHeight": 18,
                     },
                     Object {
@@ -1929,9 +1929,9 @@ exports[`renders for no transactions 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 13,
+                      "fontSize": 14,
                       "lineHeight": 18,
                     },
                     Object {
@@ -2110,9 +2110,9 @@ exports[`renders for no transactions 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 13,
+                      "fontSize": 14,
                       "lineHeight": 18,
                     },
                     Object {
@@ -2429,9 +2429,9 @@ exports[`renders for standbyTransactions 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 13,
+                      "fontSize": 14,
                       "lineHeight": 18,
                     },
                     Object {
@@ -2610,9 +2610,9 @@ exports[`renders for standbyTransactions 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 13,
+                      "fontSize": 14,
                       "lineHeight": 18,
                     },
                     Object {

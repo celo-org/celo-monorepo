@@ -21,7 +21,11 @@ import Logger from 'src/utils/Logger'
 // useScreens()
 
 Logger.debug('App/init', 'Current Language: ' + i18n.language)
-YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Setting a timer'])
+YellowBox.ignoreWarnings([
+  'Warning: isMounted(...) is deprecated',
+  'Setting a timer',
+  'Remote debugger', // To avoid "Remote debugger in background tab" warning
+])
 
 // TODO(cmcewen) Figure out why this is crashing and fix
 // configureBackgroundSync(store)

@@ -9,7 +9,7 @@ import { ERROR_BANNER_DURATION } from 'src/config'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { QrCode, storePhoneNumberInRecents, SVG } from 'src/send/actions'
+import { QrCode, storeLatestInRecents, SVG } from 'src/send/actions'
 import Logger from 'src/utils/Logger'
 import {
   getRecipientFromAddress,
@@ -85,7 +85,7 @@ export function* handleBarcode(
     ? {
         ...data,
         kind: RecipientKind.QrCode,
-        displayPhoneNumber: data.e164PhoneNumber,
+        displayId: data.e164PhoneNumber,
         phoneNumberLabel: 'QR Code',
         thumbnailPath: cachedRecipient.thumbnailPath,
         contactId: cachedRecipient.contactId,
@@ -93,11 +93,11 @@ export function* handleBarcode(
     : {
         ...data,
         kind: RecipientKind.QrCode,
-        displayPhoneNumber: data.e164PhoneNumber,
+        displayId: data.e164PhoneNumber,
       }
 
   if (data.e164PhoneNumber !== '') {
-    yield put(storePhoneNumberInRecents(data.e164PhoneNumber))
+    yield put(storeLatestInRecents(data.e164PhoneNumber))
     // TODO: refactor recent contacts list and RecipientPicker UI to support accounts without phone numbers
   }
 

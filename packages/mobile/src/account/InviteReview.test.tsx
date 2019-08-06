@@ -14,6 +14,10 @@ jest.mock('src/geth/GethAwareButton', () => {
   return Button
 })
 
+jest.mock('src/identity/verification', () => {
+  return { isPhoneVerified: jest.fn(() => true) }
+})
+
 describe('InviteReview', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
@@ -55,7 +59,7 @@ describe('InviteReview', () => {
     })
     it('sends Invite', async () => {
       fireEvent.press(inviteReview.getByTestId('inviteWhatsApp'))
-      expect(sendInvite).toHaveBeenCalledWith(' John Doe', '+14155550000', 'WhatsApp')
+      expect(sendInvite).toHaveBeenCalledWith('John Doe', '+14155550000', 'WhatsApp')
     })
   })
 })

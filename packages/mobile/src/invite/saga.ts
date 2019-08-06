@@ -6,7 +6,7 @@ import {
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { Linking } from 'react-native'
-import SmsAndroid from 'react-native-sms-android'
+import SendIntentAndroid from 'react-native-send-intent'
 import VersionCheck from 'react-native-version-check'
 import { call, delay, put, select, spawn, takeLeading } from 'redux-saga/effects'
 import { setName } from 'src/account'
@@ -21,6 +21,7 @@ import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import {
   Actions,
   InviteBy,
+  redeemComplete,
   RedeemInviteAction,
   SendInviteAction,
   sendInviteFailure,
@@ -29,7 +30,7 @@ import {
   storeInviteeData,
 } from 'src/invite/actions'
 import { createInviteCode } from 'src/invite/utils'
-import { navigate, navigateReset } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { transferStableToken } from 'src/stableToken/actions'
 import { createTransaction } from 'src/tokens/saga'
@@ -55,7 +56,7 @@ const INVITE_SEND_AMOUNT = '0.18'
 export async function getInvitationVerificationFee() {
   // TODO(cmcewen): don't use this
   if (!USE_REAL_FEE) {
-    return web3.utils.toWei(INVITE_FEE)
+    return new BigNumber(web3.utils.toWei(INVITE_FEE))
   }
   const attestationsContract = await getAttestationsContract(web3)
   const stableTokenContract = await getStableTokenContract(web3)
@@ -93,13 +94,12 @@ export async function generateLink(inviteCode: string, recipientName: string) {
 
 async function sendSms(toPhone: string, msg: string) {
   return new Promise((resolve, reject) => {
-    SmsAndroid.sms(toPhone, msg, 'sendIndirect', (err: Error) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve()
-      }
-    })
+    try {
+      SendIntentAndroid.sendSms(toPhone, msg)
+      resolve()
+    } catch (e) {
+      reject(e)
+    }
   })
 }
 
@@ -115,6 +115,10 @@ export function* sendInvite(
     const temporaryWalletAccount = web3.eth.accounts.create()
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
+
+    // TODO: Improve this by not checking specifically for this
+    // display name. Requires improvements in recipient handling
+    recipientName = recipientName === i18n.t('sendFlow7:mobileNumber') ? '' : ' ' + recipientName
     const msg = yield call(generateLink, inviteCode, recipientName)
 
     // Store the Temp Address locally so we know which transactions were invites
@@ -187,8 +191,9 @@ export function* sendInviteSaga(action: SendInviteAction) {
 function* redeemSuccess(name: string, account: string) {
   Logger.showMessage(i18n.t('inviteFlow11:redeemSuccess'))
   web3.eth.defaultAccount = account
+  // TODO(Rossy) Decouple setting of name from redeem complete, they are on diff screens now
   yield put(setName(name))
-  navigateReset(Screens.VerifyEducation)
+  yield put(redeemComplete(true))
 }
 
 export function* redeemInviteSaga(action: RedeemInviteAction) {
@@ -208,7 +213,7 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
         throw e
       }
     }
-    Logger.debug(TAG + '@redeemInviteCode', 'Added temp account to wallet: ' + tempAccount)
+    Logger.debug(TAG + '@redeemInviteCode', 'Added temp account to wallet', tempAccount)
 
     // Check that the balance of the new account is not 0
     const StableToken = yield call(getStableTokenContract, web3)

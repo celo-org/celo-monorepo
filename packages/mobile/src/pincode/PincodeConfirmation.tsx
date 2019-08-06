@@ -1,8 +1,9 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import Link from '@celo/react-components/components/Link'
-import NumberInput from '@celo/react-components/components/NumberInput'
+import ValidatedTextInput from '@celo/react-components/components/ValidatedTextInput'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
+import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -49,7 +50,7 @@ class PincodeConfirmation extends React.Component<Props, State> {
     const { t } = this.props
     return (
       <View style={style.pincodeContainer}>
-        <DevSkipButton nextScreen={Screens.RedeemInvite} />
+        <DevSkipButton nextScreen={Screens.JoinCelo} />
         <ScrollView>
           <View style={style.header}>
             <View style={style.goBack}>
@@ -61,15 +62,18 @@ class PincodeConfirmation extends React.Component<Props, State> {
           </View>
           <View style={style.pincodeContent}>
             <Text style={[fontStyles.h1, style.h1]}>{t('confirmPin.title')}</Text>
-            <NumberInput
+            <ValidatedTextInput
               value={this.state.pin}
-              onChange={this.onChangePin}
-              onSubmit={this.confirmPin}
-              isSensitiveInput={true}
-              keyboardType="numeric"
-              textContentType="password"
-              placeholder={t('createPin.yourPin')}
+              validator={ValidatorKind.Integer}
+              onChangeText={this.onChangePin}
+              onSubmitEditing={this.confirmPin}
               autoFocus={true}
+              keyboardType="numeric"
+              placeholder={t('createPin.yourPin')}
+              secureTextEntry={true}
+              style={style.numberInput}
+              textContentType="password"
+              nativeInput={true}
             />
           </View>
         </ScrollView>
@@ -104,6 +108,17 @@ const style = StyleSheet.create({
   },
   pincodeFooter: {
     alignItems: 'center',
+  },
+  numberInput: {
+    borderWidth: 1,
+    borderColor: colors.inputBorder,
+    borderRadius: 3,
+    padding: 7,
+    fontSize: 24,
+    marginHorizontal: 60,
+    marginVertical: 15,
+    textAlign: 'center',
+    backgroundColor: '#FFFFFF',
   },
   h1: {
     textAlign: 'center',

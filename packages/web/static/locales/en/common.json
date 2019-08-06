@@ -24,5 +24,6 @@
   "cookiesDisagree": "disagree",
   "trueGold": ["真金不怕火煉", "True gold fears no fire"],
   "copyRight": "Designed & Built by C Labs, © Celo 2019",
-  "blueBanner": "Join us for our special global announcement"
+  "blueBanner":
+    "Introducing Alfajores: Celo’s code is open source and the network is live for testing"
 }

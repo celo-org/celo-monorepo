@@ -1,4 +1,4 @@
-{{ if not (eq (.Values.geth.validators | toString) "og") }}
+{{ if and (not (eq (.Values.geth.validators | toString) "og")) .Values.geth.static_ips }}
 {{ range $index, $e := until (.Values.geth.validators | int) }}
 
 kind: Service
@@ -18,9 +18,7 @@ spec:
     component: validators
     statefulset.kubernetes.io/pod-name: {{ template "ethereum.fullname" $ }}-validators-{{ $index | toString }}
   type: LoadBalancer
-  {{ if ($.Values.geth.static_ips) }}
   loadBalancerIP: {{ index $.Values.geth (print "validators_" $index "IpAddress") }}
-  {{ end }}
   ports:
   - name: discovery
     port: 30303
@@ -43,9 +41,7 @@ spec:
     component: validators
     statefulset.kubernetes.io/pod-name: {{ template "ethereum.fullname" $ }}-validators-{{ $index | toString }}
   type: LoadBalancer
-  {{ if ($.Values.geth.static_ips) }}
   loadBalancerIP: {{ index $.Values.geth (print "validators_" $index "IpAddress") }}
-  {{ end }}
   ports:
   - name: discovery
     port: 30303

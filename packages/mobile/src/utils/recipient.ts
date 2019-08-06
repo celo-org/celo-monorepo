@@ -1,6 +1,12 @@
+import { isValidAddress } from '@celo/utils/lib/src/signatureUtils'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as fuzzysort from 'fuzzysort'
 import { MinimalContact } from 'react-native-contacts'
+import {
+  getAddressFromPhoneNumber,
+  getVerificationStatusFromPhoneNumber,
+  VerificationStatus,
+} from 'src/identity/contactMapping'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import Logger from 'src/utils/Logger'
 
@@ -10,15 +16,20 @@ export enum RecipientKind {
   MobileNumber = 'mobileNumber',
   Contact = 'contact',
   QrCode = 'QrCode',
+  Address = 'address',
 }
 
-export type Recipient = RecipientWithMobileNumber | RecipientWithContact | RecipientWithQrCode
+export type Recipient =
+  | RecipientWithMobileNumber
+  | RecipientWithContact
+  | RecipientWithQrCode
+  | RecipientWithAddress
 
 interface IRecipient {
   kind: RecipientKind
   address?: string
   displayName: string
-  displayPhoneNumber: string
+  displayId?: string
   e164PhoneNumber?: string
 }
 
@@ -42,13 +53,14 @@ export interface RecipientWithQrCode extends IRecipient {
   thumbnailPath?: string
 }
 
+export interface RecipientWithAddress extends IRecipient {
+  kind: RecipientKind.Address
+  address: string
+}
+
 export interface NumberToRecipient {
   [number: string]: RecipientWithContact
 }
-
-// TODO(Rossy): Add support for sending to addresses: https://github.com/celo-org/celo-monorepo/issues/3883
-// export interface AddressOnlyRecipient extends IRecipient {
-// }
 
 export function phoneNumberToRecipient(
   e164Number: string,
@@ -60,7 +72,7 @@ export function phoneNumberToRecipient(
     ? {
         kind: RecipientKind.Contact,
         e164PhoneNumber: e164Number,
-        displayPhoneNumber: e164Number,
+        displayId: e164Number,
         address: address || undefined,
         phoneNumberLabel: recipient.phoneNumberLabel,
         displayName: recipient.displayName,
@@ -70,7 +82,7 @@ export function phoneNumberToRecipient(
     : {
         kind: RecipientKind.MobileNumber,
         e164PhoneNumber: e164Number,
-        displayPhoneNumber: e164Number,
+        displayId: e164Number,
         address: address || undefined,
         displayName: e164Number,
       }
@@ -109,7 +121,7 @@ export function contactsToRecipients(
           e164NumberToRecipients[parsedNumber.e164Number] = {
             kind: RecipientKind.Contact,
             displayName: contact.displayName,
-            displayPhoneNumber: parsedNumber.displayNumber,
+            displayId: parsedNumber.displayNumber,
             e164PhoneNumber: parsedNumber.e164Number,
             phoneNumberLabel: phoneNumber.label,
             address: e164NumberToAddress[parsedNumber.e164Number] || undefined,
@@ -120,7 +132,7 @@ export function contactsToRecipients(
           otherRecipients[phoneNumber.number] = {
             kind: RecipientKind.Contact,
             displayName: contact.displayName,
-            displayPhoneNumber: phoneNumber.number,
+            displayId: phoneNumber.number,
             phoneNumberLabel: phoneNumber.label,
             contactId: contact.recordID,
             thumbnailPath: contact.thumbnailPath,
@@ -136,6 +148,21 @@ export function contactsToRecipients(
   }
 }
 
+export function getAddressFromRecipient(
+  recipient: Recipient,
+  e164NumberToAddress: E164NumberToAddressType
+): string | null | undefined {
+  if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
+    return recipient.address
+  }
+
+  if (!recipient.e164PhoneNumber) {
+    throw new Error('Missing recipient e164Number')
+  }
+
+  return getAddressFromPhoneNumber(recipient.e164PhoneNumber, e164NumberToAddress)
+}
+
 export function getRecipientFromAddress(
   address: string,
   addressToE164Number: AddressToE164NumberType,
@@ -143,6 +170,21 @@ export function getRecipientFromAddress(
 ) {
   const e164PhoneNumber = addressToE164Number[address]
   return e164PhoneNumber ? recipientCache[e164PhoneNumber] : undefined
+}
+
+export function getRecipientVerificationStatus(
+  recipient: Recipient,
+  e164NumberToAddress: E164NumberToAddressType
+): VerificationStatus {
+  if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
+    return VerificationStatus.VERIFIED
+  }
+
+  if (!recipient.e164PhoneNumber) {
+    throw new Error('No recipient e164Number found')
+  }
+
+  return getVerificationStatusFromPhoneNumber(recipient.e164PhoneNumber, e164NumberToAddress)
 }
 
 export function getRecipientThumbnail(recipient: Recipient) {
@@ -230,22 +272,37 @@ export const filterRecipientFactory = (recipients: Recipient[], shouldSort?: boo
 
 export const buildRecentRecipients = (
   allRecipients: RecipientWithContact[],
-  recentPhoneNumbers: string[],
-  defaultDisplayName: string
+  recentKeys: string[],
+  defaultDisplayNameNumber: string,
+  defaultDisplayNameAddress: string
 ): Recipient[] =>
-  recentPhoneNumbers
-    .map((recentNumber) => {
+  recentKeys
+    .map((recentKey) => {
       const recipientsWithContacts: Recipient[] = allRecipients.filter(
-        (recipient) => recipient.e164PhoneNumber === recentNumber
+        (recipient) =>
+          recipient.e164PhoneNumber === recentKey ||
+          (recipient.address && recipient.address === recentKey)
       )
       if (recipientsWithContacts.length > 0) {
         return recipientsWithContacts
       }
+
+      if (isValidAddress(recentKey)) {
+        const recipientWithAddress: RecipientWithAddress = {
+          kind: RecipientKind.Address,
+          displayName: defaultDisplayNameAddress,
+          displayId: recentKey.substring(0, 17) + '...',
+          address: recentKey,
+        }
+
+        return [recipientWithAddress]
+      }
+
       const recipientWithNumber: Recipient = {
         kind: RecipientKind.MobileNumber,
-        displayName: defaultDisplayName,
-        displayPhoneNumber: recentNumber,
-        e164PhoneNumber: recentNumber,
+        displayName: defaultDisplayNameNumber,
+        displayId: recentKey,
+        e164PhoneNumber: recentKey,
       }
       return [recipientWithNumber]
     })

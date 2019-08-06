@@ -2,6 +2,7 @@ import { getKubernetesClusterRegion, switchToClusterFromEnv } from '@celo/celoto
 import { ensureAuthenticatedGcloudAccount } from '@celo/celotool/src/lib/gcloud_utils'
 import { generateGenesisFromEnv } from '@celo/celotool/src/lib/generate_utils'
 import { OG_ACCOUNTS } from '@celo/celotool/src/lib/genesis_constants'
+import { getStatefulSetReplicas, scaleStatefulSet } from '@celo/celotool/src/lib/kubernetes'
 import {
   EnvTypes,
   envVar,
@@ -56,7 +57,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
   await ensureAuthenticatedGcloudAccount()
   console.info('Creating Cloud SQL database, this might take a minute or two ...')
 
-  failIfSecretMissing(CLOUDSQL_SECRET_NAME, 'default')
+  await failIfSecretMissing(CLOUDSQL_SECRET_NAME, 'default')
 
   try {
     await execCmd(`gcloud sql instances describe ${instanceName}`)
@@ -119,7 +120,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
   await execCmdWithExitOnFailure(`gcloud sql databases create blockscout -i ${instanceName}`)
 
   console.info('Copying blockscout service account secret to namespace')
-  copySecret(CLOUDSQL_SECRET_NAME, 'default', celoEnv)
+  await copySecret(CLOUDSQL_SECRET_NAME, 'default', celoEnv)
 
   const [blockscoutDBConnectionName] = await execCmdWithExitOnFailure(
     `gcloud sql instances describe ${instanceName} --format="value(connectionName)"`
@@ -304,6 +305,7 @@ export async function resetCloudSQLInstance(instanceName: string) {
 }
 
 async function registerIPAddress(name: string) {
+  console.info(`Registering IP address ${name}`)
   try {
     await execCmd(
       `gcloud compute addresses create ${name} --region ${getKubernetesClusterRegion()}`
@@ -317,6 +319,7 @@ async function registerIPAddress(name: string) {
 }
 
 async function deleteIPAddress(name: string) {
+  console.info(`Deleting IP address ${name}`)
   try {
     await execCmd(
       `gcloud compute addresses delete ${name} --region ${getKubernetesClusterRegion()} -q`
@@ -342,7 +345,7 @@ export async function createStaticIPs(celoEnv: string) {
   const numTxNodes = parseInt(fetchEnv(envVar.TX_NODES), 10)
   await Promise.all(range(numTxNodes).map((i) => registerIPAddress(`${celoEnv}-tx-nodes-${i}`)))
 
-  if (fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) === 'true') {
+  if (useStaticIPsForGethNodes()) {
     await registerIPAddress(`${celoEnv}-bootnode`)
 
     const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
@@ -354,8 +357,48 @@ export async function createStaticIPs(celoEnv: string) {
   return
 }
 
+export async function upgradeStaticIPs(celoEnv: string) {
+  const prevTxNodeCount = await getStatefulSetReplicas(celoEnv, `${celoEnv}-tx-nodes`)
+  const newTxNodeCount = parseInt(fetchEnv(envVar.TX_NODES), 10)
+  await upgradeNodeTypeStaticIPs(celoEnv, 'tx-nodes', prevTxNodeCount, newTxNodeCount)
+
+  if (useStaticIPsForGethNodes()) {
+    const prevValidatorNodeCount = await getStatefulSetReplicas(celoEnv, `${celoEnv}-validators`)
+    const newValidatorNodeCount = parseInt(fetchEnv(envVar.VALIDATORS), 10)
+    await upgradeNodeTypeStaticIPs(
+      celoEnv,
+      'validators',
+      prevValidatorNodeCount,
+      newValidatorNodeCount
+    )
+  }
+}
+
+async function upgradeNodeTypeStaticIPs(
+  celoEnv: string,
+  nodeType: string,
+  previousNodeCount: number,
+  newNodeCount: number
+) {
+  if (previousNodeCount < newNodeCount) {
+    console.info(`Scaling up ${nodeType} node count from ${previousNodeCount} to ${newNodeCount}`)
+    await Promise.all(
+      range(previousNodeCount, newNodeCount).map((i) =>
+        registerIPAddress(`${celoEnv}-${nodeType}-${i}`)
+      )
+    )
+  } else if (previousNodeCount > newNodeCount) {
+    console.info(`Scaling down ${nodeType} node count from ${previousNodeCount} to ${newNodeCount}`)
+    await Promise.all(
+      range(newNodeCount, previousNodeCount).map((i) =>
+        deleteIPAddress(`${celoEnv}-${nodeType}-${i}`)
+      )
+    )
+  }
+}
+
 export async function pollForBootnodeLoadBalancer(celoEnv: string) {
-  if (fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) !== 'true') {
+  if (!useStaticIPsForGethNodes()) {
     return
   }
   console.info(`Poll for bootnode load balancer`)
@@ -403,26 +446,19 @@ export async function deleteStaticIPs(celoEnv: string) {
   return
 }
 
-async function deletePersistentVolumeClaim(celoEnv: string, name: string) {
+export async function deletePersistentVolumeClaims(celoEnv: string) {
+  console.info(`Deleting persistent volume claims for ${celoEnv}`)
   try {
-    await execCmd(`kubectl delete pvc ${name} --namespace ${celoEnv}`)
+    const [output] = await execCmd(
+      `kubectl delete pvc --selector='component=validators' --namespace ${celoEnv}`
+    )
+    console.info(output)
   } catch (error) {
     console.error(error)
     if (!error.toString().includes('not found')) {
       process.exit(1)
     }
   }
-}
-
-export async function deletePersistentVolumeClaims(celoEnv: string) {
-  console.info(`Deleting persistent volume claims for ${celoEnv}`)
-  const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
-  await Promise.all(
-    range(numValdiators).map((i) =>
-      deletePersistentVolumeClaim(celoEnv, `data-${celoEnv}-validators-${i}`)
-    )
-  )
-  return
 }
 
 async function helmIPParameters(celoEnv: string) {
@@ -445,7 +481,7 @@ async function helmIPParameters(celoEnv: string) {
   const listOfAddresses = txAddresses.join('/')
   ipAddressParameters.push(`--set geth.tx_node_ip_addresses=${listOfAddresses}`)
 
-  if (fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) === 'true') {
+  if (useStaticIPsForGethNodes()) {
     ipAddressParameters.push(
       `--set geth.bootnodeIpAddress=${await retrieveIPAddress(`${celoEnv}-bootnode`)}`
     )
@@ -576,8 +612,8 @@ export async function removeGenericHelmChart(releaseName: string) {
 }
 
 export async function installHelmChart(celoEnv: string) {
-  failIfSecretMissing(BACKUP_GCS_SECRET_NAME, 'default')
-  copySecret(BACKUP_GCS_SECRET_NAME, 'default', celoEnv)
+  await failIfSecretMissing(BACKUP_GCS_SECRET_NAME, 'default')
+  await copySecret(BACKUP_GCS_SECRET_NAME, 'default', celoEnv)
   return installGenericHelmChart(
     celoEnv,
     celoEnv,
@@ -600,6 +636,29 @@ export async function upgradeHelmChart(celoEnv: string) {
   console.info(`Helm release ${celoEnv} upgrade successful`)
 }
 
+export async function resetAndUpgradeHelmChart(celoEnv: string) {
+  const txNodesSetName = `${celoEnv}-tx-nodes`
+  const validatorsSetName = `${celoEnv}-validators`
+
+  // scale down nodes
+  await scaleStatefulSet(celoEnv, txNodesSetName, 0)
+  await scaleStatefulSet(celoEnv, validatorsSetName, 0)
+
+  await deletePersistentVolumeClaims(celoEnv)
+  await sleep(5000)
+
+  await upgradeHelmChart(celoEnv)
+
+  const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
+  const numTxNodes = parseInt(fetchEnv(envVar.TX_NODES), 10)
+
+  // Note(trevor): helm upgrade only compares the current chart to the
+  // previously deployed chart when deciding what needs changing, so we need
+  // to manually scale up to account for when a node count is the same
+  await scaleStatefulSet(celoEnv, txNodesSetName, numTxNodes)
+  await scaleStatefulSet(celoEnv, validatorsSetName, numValdiators)
+}
+
 export async function removeHelmRelease(celoEnv: string) {
   return removeGenericHelmChart(celoEnv)
 }
@@ -612,4 +671,8 @@ export async function deleteFromCluster(celoEnv: string) {
   await removeHelmRelease(celoEnv)
   console.info(`Deleting namespace ${celoEnv}`)
   await execCmdWithExitOnFailure(`kubectl delete namespace ${celoEnv}`)
+}
+
+function useStaticIPsForGethNodes() {
+  return fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) === 'true'
 }
