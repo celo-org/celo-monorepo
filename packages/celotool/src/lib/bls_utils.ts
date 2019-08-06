@@ -1,3 +1,4 @@
+// this is an implementation of a subset of BLS12-377
 const keccak256 = require('keccak256')
 const ecurve = require('ecurve')
 const BigInteger = require('bigi')

@@ -3,7 +3,7 @@ pragma solidity ^0.5.8;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
-import "bytes/BytesLib.sol";
+import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./AddressLinkedList.sol";
 import "./AddressSortedLinkedList.sol";
@@ -37,7 +37,9 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     string identifier;
     string name;
     string url;
-    bytes publicKeysData;
+    bytes publicKey;
+    bytes BLSPublicKey;
+    bytes BLSProofOfPossession;
     address affiliation;
   }
 
@@ -272,18 +274,33 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       bytes(identifier).length > 0 &&
       bytes(name).length > 0 &&
       bytes(url).length > 0 &&
-      publicKeysData.length == (64 + 48 + 96)
+      publicKeysData.length == (64 + 48 + 96) // secp256k1 public key + BLS public key + BLS proof of possession
     );
     bytes memory proofOfPossessionBytes = publicKeysData.slice(64, 48 + 96);
     require(checkProofOfPossession(proofOfPossessionBytes));
     address account = getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     require(meetsRegistrationRequirements(account, noticePeriod));
-    Validator memory validator = Validator(identifier, name, url, publicKeysData, address(0));
-    validators[account] = validator;
+
+    storeValidator(account, identifier, name, url, publicKeysData);
     _validators.push(account);
     emit ValidatorRegistered(account, identifier, name, url, publicKeysData);
     return true;
+  }
+
+  function storeValidator(
+    address account,
+    string memory identifier,
+    string memory name,
+    string memory url,
+    bytes memory publicKeysData
+  ) private {
+    bytes memory publicKey = publicKeysData.slice(0, 64);
+    bytes memory BLSPublicKey = publicKeysData.slice(64, 48);
+    bytes memory ProofOfPossession = publicKeysData.slice(64, 48);
+
+    Validator memory validator = Validator(identifier, name, url, publicKey, BLSPublicKey, ProofOfPossession, address(0));
+    validators[account] = validator;
   }
 
   /**
@@ -543,13 +560,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   )
     external
     view
-    returns (
-      string memory identifier,
-      string memory name,
-      string memory url,
-      bytes memory publicKeysData,
-      address affiliation
-  )
+    returns (string memory identifier, string memory name, string memory url, bytes memory publicKey, bytes memory BLSPublicKey, bytes memory BLSProofOfPossession, address affiliation)
   {
     require(isValidator(account));
     Validator storage validator = validators[account];
@@ -557,7 +568,9 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       validator.identifier,
       validator.name,
       validator.url,
-      validator.publicKeysData,
+      validator.publicKey,
+      validator.BLSPublicKey,
+      validator.BLSProofOfPossession,
       validator.affiliation
     );
   }
