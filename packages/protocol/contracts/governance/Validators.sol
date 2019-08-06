@@ -3,7 +3,6 @@ pragma solidity ^0.5.8;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
-import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./AddressLinkedList.sol";
 import "./AddressSortedLinkedList.sol";
@@ -11,6 +10,7 @@ import "./UsingBondedDeposits.sol";
 import "./interfaces/IValidators.sol";
 import "../common/Initializable.sol";
 import "../common/FractionUtil.sol";
+import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 
 /**
@@ -37,9 +37,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     string identifier;
     string name;
     string url;
-    bytes publicKey;
-    bytes BLSPublicKey;
-    bytes BLSProofOfPossession;
+    bytes publicKeysData;
     address affiliation;
   }
 
@@ -236,12 +234,6 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     return true;
   }
 
-  function checkProofOfPossession(bytes memory proofOfPossessionBytes) private returns (bool) {
-    bool success;
-    (success, ) = PROOF_OF_POSSESSION.call.value(0).gas(gasleft())(proofOfPossessionBytes);
-    return success;
-  }
-
   /**
    * @notice Registers a validator unaffiliated with any validator group.
    * @param identifier An identifier for this validator.
@@ -278,29 +270,27 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     );
     bytes memory proofOfPossessionBytes = publicKeysData.slice(64, 48 + 96);
     require(checkProofOfPossession(proofOfPossessionBytes));
+
     address account = getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     require(meetsRegistrationRequirements(account, noticePeriod));
 
-    storeValidator(account, identifier, name, url, publicKeysData);
+    Validator memory validator = Validator(identifier, name, url, publicKeysData, address(0));
+    validators[account] = validator;
     _validators.push(account);
     emit ValidatorRegistered(account, identifier, name, url, publicKeysData);
     return true;
   }
 
-  function storeValidator(
-    address account,
-    string memory identifier,
-    string memory name,
-    string memory url,
-    bytes memory publicKeysData
-  ) private {
-    bytes memory publicKey = publicKeysData.slice(0, 64);
-    bytes memory BLSPublicKey = publicKeysData.slice(64, 48);
-    bytes memory ProofOfPossession = publicKeysData.slice(64+48, 96);
-
-    Validator memory validator = Validator(identifier, name, url, publicKey, BLSPublicKey, ProofOfPossession, address(0));
-    validators[account] = validator;
+  /**
+   * @notice Checks a BLS proof of possession.
+   * @param proofOfPossessionBytes The public key and signature of the proof of possession.
+   * @return True upon success.
+   */
+  function checkProofOfPossession(bytes memory proofOfPossessionBytes) private returns (bool) {
+    bool success;
+    (success, ) = PROOF_OF_POSSESSION.call.value(0).gas(gasleft())(proofOfPossessionBytes);
+    return success;
   }
 
   /**
