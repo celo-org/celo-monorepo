@@ -9,16 +9,23 @@ provider "google" {
 terraform {
   backend "gcs" {
     bucket = "celo_tf_state"
-    prefix = "trevor-testing/state"
+  }
+}
+
+data "terraform_remote_state" "state" {
+  backend = "gcs"
+  config = {
+    bucket = "celo_tf_state"
+    prefix = "${var.celo_env}/state"
   }
 }
 
 resource "google_compute_network" "network" {
-  name = "trevor-tf-test"
+  name = "${var.celo_env}-network"
 }
 
 resource "google_compute_firewall" "ssh_firewall" {
-  name = "trevor-tf-test-ssh-firewall"
+  name = "${var.celo_env}-ssh-firewall"
   network = google_compute_network.network.name
 
   allow {
@@ -28,7 +35,7 @@ resource "google_compute_firewall" "ssh_firewall" {
 }
 
 resource "google_compute_firewall" "geth_firewall" {
-  name = "trevor-tf-test-geth-firewall"
+  name = "${var.celo_env}-geth-firewall"
   network = google_compute_network.network.name
 
   allow {
@@ -43,7 +50,7 @@ resource "google_compute_firewall" "geth_firewall" {
 }
 
 resource "google_compute_firewall" "bootnode_firewall" {
-  name = "trevor-tf-test-bootnode-firewall"
+  name = "${var.celo_env}-bootnode-firewall"
   network = google_compute_network.network.name
 
   allow {
@@ -55,6 +62,7 @@ resource "google_compute_firewall" "bootnode_firewall" {
 module "bootnode" {
   source = "./modules/bootnode"
   # variables
+  celo_env = var.celo_env
   mnemonic = var.mnemonic
   network_name = google_compute_network.network.name
 }
@@ -64,6 +72,7 @@ module "validator" {
   # variables
   block_time = var.block_time
   bootnode_ip_address = module.bootnode.ip_address
+  celo_env = var.celo_env
   celotool_docker_image_repository = var.celotool_docker_image_repository
   celotool_docker_image_tag = var.celotool_docker_image_tag
   genesis_content_base64 = var.genesis_content_base64

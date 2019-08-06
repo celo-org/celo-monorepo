@@ -1,12 +1,12 @@
 resource "google_compute_address" "validator" {
-  name = "trevor-tf-test-validator-address-${count.index}"
+  name = "${var.celo_env}-validator-address-${count.index}"
   address_type = "EXTERNAL"
 
   count = var.validator_count
 }
 
 resource "google_compute_instance" "validator" {
-  name = "trevor-tf-test-validator-${count.index}"
+  name = "${var.celo_env}-validator-${count.index}"
   machine_type  = "n1-standard-1"
 
   count = var.validator_count
