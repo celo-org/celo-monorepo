@@ -19,7 +19,8 @@ export interface GethInstanceConfig {
   validating: boolean
   syncmode: string
   port: number
-  rpcport: number
+  rpcport?: number
+  wsport?: number
   lightserv?: boolean
   privateKey?: string
   etherbase?: string
@@ -241,28 +242,23 @@ export function sleep(seconds: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, seconds * 1000))
 }
 
-export async function getEnode(rpcPort: number) {
-  const admin = new Admin(`http://localhost:${rpcPort}`)
+export async function getEnode(port: number, ws: boolean = false) {
+  let p = ws ? 'ws' : 'http'
+  const admin = new Admin(`${p}://localhost:${port}`)
   return (await admin.getNodeInfo()).enode
 }
 
 export async function startGeth(gethBinaryPath: string, instance: GethInstanceConfig) {
   const datadir = getDatadir(instance)
-  const { syncmode, port, rpcport, validating: mine } = instance
+  const { syncmode, port, rpcport, wsport, validating } = instance
   const privateKey = instance.privateKey || ''
   const lightserv = instance.lightserv || false
-  const unlock = instance.validating
   const etherbase = instance.etherbase || ''
   const gethArgs = [
     '--datadir',
     datadir,
-    '--rpc',
-    '--rpcport',
-    rpcport.toString(),
     '--syncmode',
     syncmode,
-    '--wsorigins=*',
-    '--rpcapi=eth,net,web3,debug,admin,personal',
     '--debug',
     '--port',
     port.toString(),
@@ -278,8 +274,23 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     'extip:127.0.0.1',
   ]
 
-  if (unlock) {
-    gethArgs.push('--password=/dev/null', `--unlock=0`)
+  if (rpcport) {
+    gethArgs.push(
+      '--rpc',
+      '--rpcport',
+      rpcport.toString(),
+      '--rpcapi=eth,net,web3,debug,admin,personal'
+    )
+  }
+
+  if (wsport) {
+    gethArgs.push(
+      '--wsorigins=*',
+      '--ws',
+      '--wsport',
+      wsport.toString(),
+      '--wsapi=eth,net,web3,debug,admin,personal'
+    )
   }
 
   if (etherbase) {
@@ -290,19 +301,23 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     gethArgs.push('--lightserv=90')
   }
 
-  if (mine) {
+  if (validating) {
+    gethArgs.push('--password=/dev/null', `--unlock=0`)
     gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
   }
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`)
   instance.pid = gethProcess.pid
 
   // Give some time for geth to come up
-  const isOpen = await waitForPortOpen('localhost', rpcport, 5)
-  if (!isOpen) {
-    console.error(`geth:${instance.name}: jsonRPC didn't open after 5 seconds`)
-    process.exit(1)
-  } else {
-    console.info(`geth:${instance.name}: jsonRPC port open ${rpcport}`)
+  const waitForPort = wsport ? wsport : rpcport
+  if (waitForPort) {
+    const isOpen = await waitForPortOpen('localhost', waitForPort, 5)
+    if (!isOpen) {
+      console.error(`geth:${instance.name}: jsonRPC didn't open after 5 seconds`)
+      process.exit(1)
+    } else {
+      console.info(`geth:${instance.name}: jsonRPC port open ${waitForPort}`)
+    }
   }
 }
 
@@ -315,6 +330,8 @@ export async function migrateContracts(validatorPrivateKeys: string[], to: numbe
     'testing',
     '-k',
     validatorPrivateKeys.map(ensure0x).join(','),
+    '-m',
+    '{ "validators": { "minElectableValidators": "1" } }',
     '-t',
     to.toString(),
   ]
