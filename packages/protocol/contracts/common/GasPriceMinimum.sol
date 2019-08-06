@@ -37,6 +37,10 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
   // Fraction of the gas price minimum allocated to the infrastructure fund.
   int256 public infrastructureFraction;
 
+  function infrastructureFraction_() external view returns (uint256, uint256) {
+    return (uint256(infrastructureFraction), uint256(FixidityLib.fixed1()));
+  }
+
   modifier onlyVm() {
     assert(msg.sender == address(0x0));
     _;

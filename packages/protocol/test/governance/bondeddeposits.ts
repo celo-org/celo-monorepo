@@ -449,16 +449,16 @@ contract('BondedDeposits', (accounts: string[]) => {
       assert.equal(index.toNumber(), 0)
     })
 
-    it('should update the account weight', async () => {
-      await bondedDeposits.rebond(value, availabilityTime)
-      const weight = await bondedDeposits.getAccountWeight(account)
-      assert.equal(weight.toNumber(), expectedWeight)
-    })
-
     it('should update the total weight', async () => {
       await bondedDeposits.rebond(value, availabilityTime)
       const totalWeight = await bondedDeposits.totalWeight()
       assert.equal(totalWeight.toNumber(), expectedWeight)
+    })
+
+    it('should update the account weight', async () => {
+      await bondedDeposits.rebond(value, availabilityTime)
+      const weight = await bondedDeposits.getAccountWeight(account)
+      assert.equal(weight.toNumber(), expectedWeight)
     })
 
     it('should emit a DepositRebonded event', async () => {
