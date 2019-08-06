@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+#####
+# This file creates apk that will be used for the tests
+#####
 
 # set the IS_E2E_ENV value in .env during build only if it does not exist already
 grep -qF -- "IS_E2E=1" .env || echo "IS_E2E=1" >> .env

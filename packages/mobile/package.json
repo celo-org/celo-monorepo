@@ -22,15 +22,15 @@
     "dev:send-text": "adb shell input text",
     "dev:reload": "adb shell input text \"RR\"",
     "dev:send-debug-invite-code": "adb shell am broadcast -a com.android.vending.INSTALL_REFERRER -n org.celo.mobile.debug/com.androidbroadcastreceiverforreferrer.ReferrerBroadcastReceiver --es referrer \"invite-code%3D123\"",
-    "dev:emulator": "emulator -avd Nexus_5X_API_28 &",
+    "dev:emulator": "$ANDROID_SDK_ROOT/emulator/emulator -avd `$ANDROID_SDK_ROOT/emulator/emulator -list-avds | grep 'x86' | head -n 1` &",
     "dev:remote": "remotedev --hostname=localhost --port=8000",
     "test": "export TZ=UTC && jest --silent",
     "test:ci": "yarn test --coverage --runInBand",
     "test:watch": "yarn test --watch",
     "test:verbose": "export TZ=UTC && jest --verbose",
-    "test:build-e2e": "./scripts/build_e2e.sh",
-    "test:run-e2e": "./scripts/run_e2e.sh",
-    "test:detox": "CELO_TEST_CONFIG=e2e detox test -c android.emu.debug -a e2e/tmp/ --take-screenshots=failing --record-logs=failing --detectOpenHandles",
+    "test:build-e2e": "bash ./scripts/build_e2e.sh",
+    "test:run-e2e": "bash ./scripts/run_e2e.sh",
+    "test:detox": "CELO_TEST_CONFIG=e2e detox test -c android.emu.debug -a e2e/tmp/ --take-screenshots=failing --record-logs=failing --detectOpenHandles -l verbose",
     "test:unlock": "./scripts/unlock.sh",
     "pre-deploy": "./scripts/pre-deploy.sh",
     "prepare": "patch-package",
@@ -192,13 +192,15 @@
         "binaryPath": "android/app/build/outputs/apk/debug/app-debug.apk",
         "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
         "type": "android.emulator",
-        "name": "Nexus_5X_API_28"
+        "name": "Nexus_5X_API_28_x86",
+        "__comment": "Nexus_5X_API_28_x86 is currently harcoded but it should be the result from $ANDROID_SDK_ROOT/emulator/emulator -list-avds | grep 'x86' | head -n 1`"
       },
       "android.emu.release": {
         "binaryPath": "android/app/build/outputs/apk/release/app-release.apk",
         "build": "cd android && ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release && cd ..",
         "type": "android.emulator",
-        "name": "Nexus_5X_API_28"
+        "name": "Nexus_5X_API_28_x86",
+        "__comment": "Nexus_5X_API_28_x86 is currently harcoded but it should be the result from $ANDROID_SDK_ROOT/emulator/emulator -list-avds | grep 'x86' | head -n 1`"
       }
     }
   }
