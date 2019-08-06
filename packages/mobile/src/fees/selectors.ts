@@ -19,12 +19,15 @@ export function getFeeDollars(feeInWei: BigNumber | string) {
 }
 
 const feeEstimateDollarsSelectorFactory = (feeSelector: (state: RootState) => string | null) => {
-  return createSelector(feeSelector, (feeInWei) => {
-    if (!feeInWei) {
-      return null
+  return createSelector(
+    feeSelector,
+    (feeInWei) => {
+      if (!feeInWei) {
+        return null
+      }
+      return getFeeDollars(feeInWei)
     }
-    return getFeeDollars(feeInWei)
-  })
+  )
 }
 
 export const getInviteFeeEstimateDollars = feeEstimateDollarsSelectorFactory(

@@ -8,15 +8,11 @@ beforeAll(() => {
 
 describe('Gold token', () => {
   describe('#getGoldTokenAddress', () => {
-    it(
-      'is able to fetch the address',
-      async () => {
-        const web3 = await getWeb3ForTesting()
-        const address: string = await getGoldTokenAddress(web3)
-        Logger.debug('GetGoldTokenAddress Test', `Gold token address is ${address}`)
-        expect(address).not.toBe('0')
-      },
-      0
-    )
+    it('is able to fetch the address', async () => {
+      const web3 = await getWeb3ForTesting()
+      const address: string = await getGoldTokenAddress(web3)
+      Logger.debug('GetGoldTokenAddress Test', `Gold token address is ${address}`)
+      expect(address).not.toBe('0')
+    }, 0)
   })
 })

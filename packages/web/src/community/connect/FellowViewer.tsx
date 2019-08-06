@@ -86,7 +86,9 @@ class FellowViewer extends React.PureComponent<ScreenProps> {
             renderCenterRightControls={null}
             renderBottomCenterControls={PagingDots}
           >
-            {fellows.map((fellow) => <Fellow key={fellow.name} {...fellow} />)}
+            {fellows.map((fellow) => (
+              <Fellow key={fellow.name} {...fellow} />
+            ))}
           </Carousel>
         </Fade>
       </View>

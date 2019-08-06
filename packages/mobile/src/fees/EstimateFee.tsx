@@ -18,12 +18,9 @@ const mapDispatchToProps = {
 }
 
 export function EstimateFee({ feeType, estimateFee }: Props) {
-  useEffect(
-    () => {
-      estimateFee(feeType)
-    },
-    [feeType]
-  )
+  useEffect(() => {
+    estimateFee(feeType)
+  }, [feeType])
 
   return null
 }

@@ -213,50 +213,46 @@ export class Header extends React.Component<Props, State> {
                 </View>
               </View>
             </Link>
-            {this.state.showDesktopMenu &&
-              !this.state.menuFaded && (
-                <Animated.View style={[styles.links, { opacity: this.state.menuFade }]}>
-                  {menuItems.map((item, index) => (
-                    <View key={index} style={styles.linkWrapper}>
-                      <Button
-                        kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
-                        href={item.link}
-                        text={t(item.name)}
-                      />
-                      {this.props.router.pathname === item.link && (
-                        <View style={styles.activeTab}>
-                          <OvalCoin color={colors.primary} size={10} />
-                        </View>
-                      )}
-                    </View>
-                  ))}
+            {this.state.showDesktopMenu && !this.state.menuFaded && (
+              <Animated.View style={[styles.links, { opacity: this.state.menuFade }]}>
+                {menuItems.map((item, index) => (
+                  <View key={index} style={styles.linkWrapper}>
+                    <Button
+                      kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
+                      href={item.link}
+                      text={t(item.name)}
+                    />
+                    {this.props.router.pathname === item.link && (
+                      <View style={styles.activeTab}>
+                        <OvalCoin color={colors.primary} size={10} />
+                      </View>
+                    )}
+                  </View>
+                ))}
+                <View style={[styles.linkWrapper]}>
+                  <Button
+                    kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
+                    href={'https://medium.com/CeloHQ'}
+                    text={t('blog')}
+                    target={'_new_tab'}
+                    iconRight={<MediumLogo height={20} color={foreground} wrapWithLink={false} />}
+                  />
+                </View>
+                {isAlfajores() && (
                   <View style={[styles.linkWrapper]}>
                     <Button
                       kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
-                      href={'https://medium.com/CeloHQ'}
-                      text={t('blog')}
+                      href={CeloLinks.gitHub}
+                      text={t('github')}
                       target={'_new_tab'}
-                      iconRight={<MediumLogo height={20} color={foreground} wrapWithLink={false} />}
+                      iconRight={
+                        <Octocat size={18} color={this.isDarkMode() ? colors.white : colors.dark} />
+                      }
                     />
                   </View>
-                  {isAlfajores() && (
-                    <View style={[styles.linkWrapper]}>
-                      <Button
-                        kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
-                        href={CeloLinks.gitHub}
-                        text={t('github')}
-                        target={'_new_tab'}
-                        iconRight={
-                          <Octocat
-                            size={18}
-                            color={this.isDarkMode() ? colors.white : colors.dark}
-                          />
-                        }
-                      />
-                    </View>
-                  )}
-                </Animated.View>
-              )}
+                )}
+              </Animated.View>
+            )}
           </View>
         </Responsive>
         <Animated.View
@@ -271,21 +267,20 @@ export class Header extends React.Component<Props, State> {
           </View>
         </Animated.View>
 
-        {!this.state.showDesktopMenu &&
-          !this.state.menuFaded && (
-            <Animated.View style={[styles.hamburger]}>
-              <div
-                className={`${cssStyles.hamburger} ${cssStyles['hamburger--squeeze']} ${
-                  this.state.mobileMenuActive ? cssStyles['is-active'] : ''
-                }`}
-                onClick={this.clickHamburger}
-              >
-                <div className={cssStyles['hamburger-box']}>
-                  <div className={cssStyles['hamburger-inner']} />
-                </div>
+        {!this.state.showDesktopMenu && !this.state.menuFaded && (
+          <Animated.View style={[styles.hamburger]}>
+            <div
+              className={`${cssStyles.hamburger} ${cssStyles['hamburger--squeeze']} ${
+                this.state.mobileMenuActive ? cssStyles['is-active'] : ''
+              }`}
+              onClick={this.clickHamburger}
+            >
+              <div className={cssStyles['hamburger-box']}>
+                <div className={cssStyles['hamburger-inner']} />
               </div>
-            </Animated.View>
-          )}
+            </div>
+          </Animated.View>
+        )}
       </View>
     )
   }

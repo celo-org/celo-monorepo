@@ -58,16 +58,16 @@ export class ExchangeFeedItem extends React.PureComponent<Props> {
       color: isPending
         ? colors.gray
         : inCurrency === CURRENCY_ENUM.DOLLAR
-          ? colors.celoGreen
-          : colors.celoGold,
+        ? colors.celoGreen
+        : colors.celoGold,
     }
 
     const outStyle = {
       color: isPending
         ? colors.gray
         : outCurrency === CURRENCY_ENUM.DOLLAR
-          ? colors.celoGreen
-          : colors.celoGold,
+        ? colors.celoGreen
+        : colors.celoGold,
     }
 
     const opacityStyle = { opacity: isPending ? 0.3 : 1 }

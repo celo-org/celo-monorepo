@@ -70,15 +70,12 @@ function useAsyncShowError<R, Args extends any[]>(
 ): UseAsyncReturn<R, Args> {
   const asyncResult = useAsync(asyncFunction, params)
 
-  useEffect(
-    () => {
-      // Generic error banner
-      if (asyncResult.error) {
-        showErrorFunction(ErrorMessages.CALCULATE_FEE_FAILED, ERROR_BANNER_DURATION)
-      }
-    },
-    [asyncResult.error]
-  )
+  useEffect(() => {
+    // Generic error banner
+    if (asyncResult.error) {
+      showErrorFunction(ErrorMessages.CALCULATE_FEE_FAILED, ERROR_BANNER_DURATION)
+    }
+  }, [asyncResult.error])
 
   return asyncResult
 }
