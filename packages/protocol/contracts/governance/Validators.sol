@@ -4,12 +4,12 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 
-import "./AddressLinkedList.sol";
-import "./AddressSortedLinkedList.sol";
 import "./UsingBondedDeposits.sol";
 import "./interfaces/IValidators.sol";
 import "../common/Initializable.sol";
 import "../common/FractionUtil.sol";
+import "../common/linkedlists/AddressLinkedList.sol";
+import "../common/linkedlists/AddressSortedLinkedList.sol";
 
 
 /**

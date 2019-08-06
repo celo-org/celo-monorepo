@@ -116,6 +116,7 @@ library SortedFractionMedianList {
   function remove(List storage list, address key) public {
     Element storage element = list.elements[key];
     require(key != address(0) && contains(list, key));
+
     MedianAction action = MedianAction.None;
     if (list.numElements == 1) {
       list.medianKey = address(0);
