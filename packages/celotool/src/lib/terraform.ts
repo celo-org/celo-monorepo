@@ -10,6 +10,7 @@ const terraformModulesPath = path.join(__dirname, '../../../terraform-modules')
 // and the values correspond to the names of the appropriate env variables
 const terraformEnvVars: { [varName: string]: string } = {
   block_time: envVar.BLOCK_TIME,
+  celo_env: envVar.CELOTOOL_CELOENV,
   celotool_docker_image_repository: envVar.CELOTOOL_DOCKER_IMAGE_REPOSITORY,
   celotool_docker_image_tag: envVar.CELOTOOL_DOCKER_IMAGE_TAG,
   geth_verbosity: envVar.GETH_VERBOSITY,

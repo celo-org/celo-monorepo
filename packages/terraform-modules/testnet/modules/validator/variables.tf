@@ -8,6 +8,11 @@ variable bootnode_ip_address {
   description = "The external IP address of the bootnode"
 }
 
+variable celo_env {
+  type = string
+  description = "Name of the testnet Celo environment"
+}
+
 variable celotool_docker_image_repository {
   type = string
   description = "Repository of the celotool docker image"

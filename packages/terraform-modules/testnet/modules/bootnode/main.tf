@@ -1,13 +1,11 @@
 resource "google_compute_address" "bootnode" {
-  name = "trevor-tf-test-bootnode-address"
+  name = "${var.celo_env}-bootnode-address"
   address_type = "EXTERNAL"
 }
 
 resource "google_compute_instance" "bootnode" {
-  name          = "trevor-tf-test-bootnode"
+  name          = "${var.celo_env}-bootnode"
   machine_type  = "n1-standard-1"
-
-  tags = ["tag1", "tag2"]
 
   boot_disk {
     initialize_params {
@@ -24,10 +22,6 @@ resource "google_compute_instance" "bootnode" {
     access_config {
       nat_ip = google_compute_address.bootnode.address
     }
-  }
-
-  metadata = {
-    foo = "bar"
   }
 
   metadata_startup_script = templatefile(
