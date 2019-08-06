@@ -182,7 +182,7 @@ jobs:
           name: Ensure translations are not missing
           command: |
             set -euo pipefail
-            diff <(cat packages/mobile/locales/en-US/*.json | jq keys | sort) <(cat packages/mobile/locales/es-AR/*.json | jq keys | sort)
+            diff <(cat packages/mobile/locales/es-AR/*.json | jq -r '[paths | join(".")][]' | sort) <(cat packages/mobile/locales/en-US/*.json | jq -r '[paths | join(".")][]' | sort)
 
       - run:
           name: jest tests
