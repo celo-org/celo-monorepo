@@ -99,7 +99,6 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
     const key = accounts[9]
     const numerator = 2
     const newNumerator = 3
-    const newDenominator = 3
     beforeEach(async () => {
       await addressSortedLinkedListWithMedianTest.insert(key, numerator, NULL_ADDRESS, NULL_ADDRESS)
     })
@@ -108,7 +107,6 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
       await addressSortedLinkedListWithMedianTest.update(
         key,
         newNumerator,
-        newDenominator,
         NULL_ADDRESS,
         NULL_ADDRESS
       )
@@ -125,7 +123,6 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
         addressSortedLinkedListWithMedianTest.update(
           accounts[8],
           newNumerator,
-          newDenominator,
           NULL_ADDRESS,
           NULL_ADDRESS
         )
@@ -134,25 +131,13 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
 
     it('should revert if lesser is equal to key', async () => {
       await assertRevert(
-        addressSortedLinkedListWithMedianTest.update(
-          key,
-          newNumerator,
-          newDenominator,
-          key,
-          NULL_ADDRESS
-        )
+        addressSortedLinkedListWithMedianTest.update(key, newNumerator, key, NULL_ADDRESS)
       )
     })
 
     it('should revert if greater is equal to key', async () => {
       await assertRevert(
-        addressSortedLinkedListWithMedianTest.update(
-          key,
-          newNumerator,
-          newDenominator,
-          NULL_ADDRESS,
-          key
-        )
+        addressSortedLinkedListWithMedianTest.update(key, newNumerator, NULL_ADDRESS, key)
       )
     })
   })
@@ -288,7 +273,7 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
     }
 
     const assertSortedFractionListInvariants = async (
-      elementsPromise: Promise<[string[], BigNumber[], BigNumber[], BigNumber[]]>,
+      elementsPromise: Promise<[string[], BigNumber[], BigNumber[]]>,
       numElementsPromise: Promise<BigNumber>,
       medianPromise: Promise<string>,
       expectedKeys: Set<string>

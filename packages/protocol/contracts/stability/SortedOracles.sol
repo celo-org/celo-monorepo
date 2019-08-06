@@ -154,8 +154,8 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     uint256 originalMedian = rates[token].getMedianValue();
     uint256 value = numerator.mul(DENOMINATOR).div(denominator);
     if (rates[token].contains(msg.sender)) {
-      rates[token].insert(msg.sender, value, lesserKey, greaterKey);
-      timestamps[token].insert(
+      rates[token].update(msg.sender, value, lesserKey, greaterKey);
+      timestamps[token].update(
         msg.sender,
         // solhint-disable-next-line not-rely-on-time
         now,
@@ -163,8 +163,8 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
         address(0)
       );
     } else {
-      rates[token].update(msg.sender, value, lesserKey, greaterKey);
-      timestamps[token].update(
+      rates[token].insert(msg.sender, value, lesserKey, greaterKey);
+      timestamps[token].insert(
         msg.sender,
         // solhint-disable-next-line not-rely-on-time
         now,
