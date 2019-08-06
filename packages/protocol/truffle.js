@@ -7,6 +7,8 @@ const INTEGRATION_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
 const INTEGRATION_TESTING_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
 const ALFAJORESSTAING_FROM = '0xf4314cb9046bece6aa54bb9533155434d0c76909'
 const ALFAJORES_FROM = '0x456f41406b32c45d59e539e4bba3d7898c3584da'
+const PILOT_FROM = '0x9cBDb5EB1B2e2DA87BADd3acf3d5fcFc4A849bee'
+const PILOTSTAGING_FROM = '0x4ff03277E36B5C89295b1d37805A198D83175d13'
 
 const ALFAJORES_NETWORKID = 44781
 
@@ -68,6 +70,15 @@ const networks = {
     ...defaultConfig,
     network_id: ALFAJORES_NETWORKID,
     from: ALFAJORES_FROM,
+  },
+
+  pilot: {
+    ...defaultConfig,
+    from: PILOT_FROM,
+  },
+  pilotstaging: {
+    ...defaultConfig,
+    from: PILOTSTAGING_FROM,
   },
 }
 // If an override was provided, apply it.
