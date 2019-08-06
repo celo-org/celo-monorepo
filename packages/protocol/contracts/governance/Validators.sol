@@ -9,7 +9,7 @@ import "./AddressSortedLinkedList.sol";
 import "./UsingBondedDeposits.sol";
 import "./interfaces/IValidators.sol";
 import "../common/Initializable.sol";
-import "../stability/FractionUtil.sol";
+import "../common/FractionUtil.sol";
 
 
 /**

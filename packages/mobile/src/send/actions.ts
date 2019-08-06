@@ -1,16 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { InviteBy } from 'src/invite/actions'
-import { getInvitationVerificationFee } from 'src/invite/saga'
-import { DispatchType, GetStateType } from 'src/redux/reducers'
-import { BasicTokenTransfer, createTransaction } from 'src/tokens/saga'
-import Logger from 'src/utils/Logger'
 import { NumberToRecipient, Recipient } from 'src/utils/recipient'
-import { web3 } from 'src/web3/contracts'
-import { fetchGasPrice } from 'src/web3/gas'
-import { currentAccountSelector } from 'src/web3/selectors'
 import { Svg } from 'svgs'
-
-const TAG = 'send/actions'
 
 export interface QrCode {
   type: string
@@ -20,7 +11,6 @@ export interface QrCode {
 export type SVG = typeof Svg
 
 export enum Actions {
-  SET_TRANSACTION_FEE = 'SEND/SET_TRANSACTION_FEE',
   STORE_LATEST_IN_RECENTS = 'SEND/STORE_LATEST_IN_RECENTS',
   BARCODE_DETECTED = 'SEND/BARCODE_DETECTED',
   QRCODE_SHARE = 'SEND/QRCODE_SHARE',
@@ -29,11 +19,6 @@ export enum Actions {
   SEND_PAYMENT_OR_INVITE = 'SEND/SEND_PAYMENT_OR_INVITE',
   SEND_PAYMENT_OR_INVITE_SUCCESS = 'SEND/SEND_PAYMENT_OR_INVITE_SUCCESS',
   SEND_PAYMENT_OR_INVITE_FAILURE = 'SEND/SEND_PAYMENT_OR_INVITE_FAILURE',
-}
-
-export interface SetTransactionFeeAction {
-  type: Actions.SET_TRANSACTION_FEE
-  suggestedFee: string
 }
 
 export interface StoreLatestInRecentsAction {
@@ -65,17 +50,11 @@ export interface SendPaymentOrInviteFailureAction {
 }
 
 export type ActionTypes =
-  | SetTransactionFeeAction
   | StoreLatestInRecentsAction
   | SetRecipientCacheAction
   | SendPaymentOrInviteAction
   | SendPaymentOrInviteSuccessAction
   | SendPaymentOrInviteFailureAction
-
-export const setTransactionFee = (suggestedFee: string): SetTransactionFeeAction => ({
-  type: Actions.SET_TRANSACTION_FEE,
-  suggestedFee,
-})
 
 export const storeLatestInRecents = (key: string): StoreLatestInRecentsAction => ({
   type: Actions.STORE_LATEST_IN_RECENTS,
@@ -96,43 +75,6 @@ export const setRecipientCache = (recipients: NumberToRecipient): SetRecipientCa
   type: Actions.SET_RECIPIENT_CACHE,
   recipients,
 })
-
-export const updateSuggestedFee = (
-  contactIsVerified: boolean,
-  contractGetter: any,
-  params: BasicTokenTransfer
-) => async (dispatch: DispatchType, getState: GetStateType) => {
-  try {
-    if (contactIsVerified) {
-      // create mock transaction and get gas
-
-      const tx = await createTransaction(contractGetter, params)
-      const account = currentAccountSelector(getState())
-
-      const txParams: any = { from: account, gasCurrency: contractGetter(web3)._address }
-      const gas: BigNumber = new BigNumber(await tx.estimateGas(txParams))
-      const gasPrice: BigNumber = new BigNumber(await fetchGasPrice())
-
-      Logger.debug(`${TAG}/updateSuggestedFee`, `estimated gas: ${gas}`)
-      Logger.debug(`${TAG}/updateSuggestedFee`, `gas price: ${gasPrice}`)
-
-      const suggestedFeeInWei: BigNumber = gas.multipliedBy(gasPrice)
-
-      dispatch(setTransactionFee(suggestedFeeInWei.toString()))
-      Logger.debug(`${TAG}/updateSuggestedFee`, `New fee is: ${suggestedFeeInWei}`)
-      return suggestedFeeInWei
-    } else {
-      // invitation
-      // TODO add verification fee + transfer costs + Escrow
-      const verificationFee = await getInvitationVerificationFee()
-      dispatch(setTransactionFee(String(verificationFee.valueOf())))
-      return verificationFee
-    }
-  } catch (error) {
-    Logger.error(`${TAG}/updateSuggestedFee`, 'Could not update suggested fee', error)
-    throw error
-  }
-}
 
 export const sendPaymentOrInvite = (
   amount: BigNumber,

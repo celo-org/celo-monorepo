@@ -53,6 +53,10 @@ const bondedDepositsAbi = [
     constant: false,
     inputs: [
       {
+        name: 'role',
+        type: 'uint8',
+      },
+      {
         name: 'delegate',
         type: 'address',
       },
@@ -69,7 +73,7 @@ const bondedDepositsAbi = [
         type: 'bytes32',
       },
     ],
-    name: 'delegateRewards',
+    name: 'delegateRole',
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
@@ -89,7 +93,6 @@ describe('governance tests', () => {
   let web3: any
   let bondedDeposits: any
   let gasPrice: number
-  let goldTokenAddress: string
   let goldToken: any
 
   before(async function(this: any) {
@@ -105,7 +108,7 @@ describe('governance tests', () => {
     const bondedDepositsAddress = await getContractAddress('BondedDepositsProxy')
     const checksumAddress = web3.utils.toChecksumAddress(bondedDepositsAddress)
     bondedDeposits = new web3.eth.Contract(bondedDepositsAbi, checksumAddress)
-    goldTokenAddress = await getContractAddress('GoldTokenProxy')
+    const goldTokenAddress = await getContractAddress('GoldTokenProxy')
     const goldChecksumAddress = web3.utils.toChecksumAddress(goldTokenAddress)
     goldToken = new web3.eth.Contract(erc20Abi, goldChecksumAddress)
     gasPrice = parseInt(await web3.eth.getGasPrice(), 10)
@@ -131,7 +134,8 @@ describe('governance tests', () => {
     await unlockAccount(delegate, delegateWeb3)
     const { r, s, v } = await getParsedSignatureOfAddress(account, delegate, delegateWeb3)
     await unlockAccount(account, web3)
-    const tx = bondedDeposits.methods.delegateRewards(delegate, v, r, s)
+    const rewardRole = 2
+    const tx = bondedDeposits.methods.delegateRole(rewardRole, delegate, v, r, s)
     let gas = txOptions.gas
     // We overestimate to account for variations in the fraction reduction necessary to redeem
     // rewards.

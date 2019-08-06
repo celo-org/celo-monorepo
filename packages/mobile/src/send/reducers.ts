@@ -9,14 +9,12 @@ const RECENT_PHONE_NUMBERS_TO_STORE = 8
 
 export interface State {
   isSending: boolean
-  suggestedFee: string
   recentPhoneNumbers: string[]
   recipientCache: NumberToRecipient
 }
 
 const initialState = {
   isSending: false,
-  suggestedFee: '',
   recentPhoneNumbers: [],
   recipientCache: {},
 }
@@ -32,7 +30,6 @@ export const sendReducer = (
         ...state,
         ...getRehydratePayload(action, 'send'),
         isSending: false,
-        suggestedFee: '',
         recipientCache: {},
       }
     }
@@ -46,11 +43,6 @@ export const sendReducer = (
       return {
         ...state,
         isSending: false,
-      }
-    case Actions.SET_TRANSACTION_FEE:
-      return {
-        ...state,
-        suggestedFee: action.suggestedFee,
       }
     case Actions.STORE_LATEST_IN_RECENTS:
       const recentPhoneNumbers = insertAtBeginning(
