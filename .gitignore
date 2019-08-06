@@ -76,12 +76,8 @@ lerna-debug.log
 **/types/typechain/
 
 # keys
-.env.mnemonic
-.env.mnemonic.alfajores
-.env.mnemonic.alfajoresstaging
-.env.mnemonic.appintegration
-.env.mnemonic.integration
-.env.mnemonic.integrationtesting
+.env.mnemonic*
+!.env.mnemonic*.enc
 
 # LicenseDisclaimer
 **/LicenseDisclaimer.txt
