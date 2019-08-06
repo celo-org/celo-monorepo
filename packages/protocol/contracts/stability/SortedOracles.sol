@@ -137,7 +137,6 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @notice Updates an oracle value and the median.
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @param numerator The amount of tokens equal to `denominator` Celo Gold.
-   * @param denominator The amount of Celo Gold equal to `numerator` tokens.
    * @param lesserKey The element which should be just left of the new oracle value.
    * @param greaterKey The element which should be just right of the new oracle value.
    * @dev Note that only one of `lesserKey` or `greaterKey` needs to be correct to reduce friction.
@@ -145,6 +144,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   function report(
     address token,
     uint256 numerator,
+    uint256 denominator,
     address lesserKey,
     address greaterKey
   )
@@ -152,22 +152,23 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     onlyOracle(token)
   {
     uint256 originalMedian = rates[token].getMedianValue();
+    uint256 value = numerator.mul(DENOMINATOR).div(denominator);
     if (rates[token].contains(msg.sender)) {
-      rates[token].insert(msg.sender, numerator, lesserKey, greaterKey);
+      rates[token].insert(msg.sender, value, lesserKey, greaterKey);
       timestamps[token].insert(
         msg.sender,
         // solhint-disable-next-line not-rely-on-time
         now,
-        getLesserTimestampKey(token, msg.sender),
+        timestamps[token].getHead(),
         address(0)
       );
     } else {
-      rates[token].update(msg.sender, numerator, lesserKey, greaterKey);
+      rates[token].update(msg.sender, value, lesserKey, greaterKey);
       timestamps[token].update(
         msg.sender,
         // solhint-disable-next-line not-rely-on-time
         now,
-        getLesserTimestampKey(token, msg.sender),
+        timestamps[token].getHead(),
         address(0)
       );
     }
@@ -209,11 +210,9 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     returns (
         address[] memory,
         uint256[] memory,
-        uint256[] memory,
         SortedLinkedListWithMedian.MedianRelation[] memory
     )
   {
-    // TODO(asa): Fix this
     return rates[token].getElements();
   }
 
@@ -248,11 +247,9 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     returns (
         address[] memory,
         uint256[] memory,
-        uint256[] memory,
         SortedLinkedListWithMedian.MedianRelation[] memory
     )
   {
-    // TODO(asa): Fix this.
     return timestamps[token].getElements();
   }
 
@@ -279,21 +276,6 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     uint256 newMedian = rates[token].getMedianValue();
     if (newMedian != originalMedian) {
       emit MedianUpdated(token, newMedian, DENOMINATOR);
-    }
-  }
-
-  /**
-   * @notice Returns the key for the lesser element in the timestamp list.
-   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
-   * @param oracle The address of the oracle to sort into the timestamp list.
-   * @return The key of the lesser element in the list.
-   */
-  function getLesserTimestampKey(address token, address oracle) private view returns(address) {
-    address head = timestamps[token].getHead();
-    if (head == oracle) {
-      return timestamps[token].elements[head].lesserKey;
-    } else {
-      return head;
     }
   }
 }

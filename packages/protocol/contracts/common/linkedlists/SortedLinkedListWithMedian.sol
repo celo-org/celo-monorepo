@@ -12,7 +12,6 @@ library SortedLinkedListWithMedian {
 
   using SafeMath for uint256;
   using SortedLinkedList for SortedLinkedList.List;
-  using SortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
 
   enum MedianAction {
     None,
@@ -181,7 +180,7 @@ library SortedLinkedListWithMedian {
    * @return The median value.
    */
   function getMedianValue(List storage list) public view returns (uint256) {
-    return list.getValue(list.median);
+    return getValue(list, list.median);
   }
 
   /**
@@ -190,6 +189,14 @@ library SortedLinkedListWithMedian {
    */
   function getHead(List storage list) external view returns (bytes32) {
     return list.list.list.head;
+  }
+
+  /**
+   * @notice Returns the key of the median element in the list.
+   * @return The key of the median element in the list.
+   */
+  function getMedian(List storage list) external view returns (bytes32) {
+    return list.median;
   }
 
   /**
@@ -217,14 +224,16 @@ library SortedLinkedListWithMedian {
   )
     public
     view
-    returns (bytes32[] memory, uint256[] memory)
+    returns (bytes32[] memory, uint256[] memory, MedianRelation[] memory)
   {
     bytes32[] memory keys = getKeys(list);
     uint256[] memory values = new uint256[](keys.length);
+    MedianRelation[] memory relations = new MedianRelation[](keys.length);
     for (uint256 i = 0; i < keys.length; i = i.add(1)) {
       values[i] = list.list.values[keys[i]];
+      relations[i] = list.relation[keys[i]];
     }
-    return (keys, values);
+    return (keys, values, relations);
   }
 
   /**

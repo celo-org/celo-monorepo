@@ -102,6 +102,14 @@ library AddressSortedLinkedListWithMedian {
   }
 
   /**
+   * @notice Returns the key of the median element in the list.
+   * @return The key of the median element in the list.
+   */
+  function getMedian(SortedLinkedListWithMedian.List storage list) external view returns (address) {
+    return toAddress(list.getMedian());
+  }
+
+  /**
    * @notice Returns the key of the last element in the list.
    * @return The key of the last element in the list.
    */
@@ -126,15 +134,17 @@ library AddressSortedLinkedListWithMedian {
   )
     public
     view
-    returns (address[] memory, uint256[] memory)
+    returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
   {
     bytes32[] memory byteKeys = list.getKeys();
     address[] memory keys = new address[](byteKeys.length);
     uint256[] memory values = new uint256[](byteKeys.length);
+    SortedLinkedListWithMedian.MedianRelation[] memory relations = new SortedLinkedListWithMedian.MedianRelation[](keys.length);
     for (uint256 i = 0; i < byteKeys.length; i++) {
       keys[i] = toAddress(byteKeys[i]);
       values[i] = list.getValue(byteKeys[i]);
+      relations[i] = list.relation[byteKeys[i]];
     }
-    return (keys, values);
+    return (keys, values, relations);
   }
 }
