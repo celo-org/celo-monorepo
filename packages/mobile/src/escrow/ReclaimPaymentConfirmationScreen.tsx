@@ -16,7 +16,9 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import { EscrowedPayment, reclaimPayment } from 'src/escrow/actions'
 import ReclaimPaymentConfirmationCard from 'src/escrow/ReclaimPaymentConfirmationCard'
-import { reclaimSuggestedFeeSelector } from 'src/escrow/reducer'
+import { FeeType } from 'src/fees/actions'
+import CalculateFee, { CalculateFeeChildren } from 'src/fees/CalculateFee'
+import { getFeeDollars } from 'src/fees/selectors'
 import { Namespaces } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
@@ -32,7 +34,6 @@ interface StateProps {
   isReclaiming: boolean
   e164PhoneNumber: string
   account: string | null
-  fee: string | null
   dollarBalance: BigNumber
   appConnected: boolean
 }
@@ -52,7 +53,6 @@ const mapStateToProps = (state: RootState): StateProps => {
     isReclaiming: state.escrow.isReclaiming,
     e164PhoneNumber: state.account.e164PhoneNumber,
     account: currentAccountSelector(state),
-    fee: reclaimSuggestedFeeSelector(state),
     dollarBalance: new BigNumber(state.stableToken.balance || 0),
     appConnected: isAppConnected(state),
   }
@@ -69,10 +69,6 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
       throw new Error('Reclaim payment input missing')
     }
     return reclaimPaymentInput
-  }
-
-  getFee = () => {
-    return this.props.fee || ''
   }
 
   onConfirm = async () => {
@@ -109,14 +105,14 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
     ) : null
   }
 
-  render() {
+  renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
     const { t, isReclaiming, appConnected } = this.props
     const payment = this.getReclaimPaymentInput()
+    const fee = asyncFee.result && getFeeDollars(asyncFee.result)
     const convertedAmount = divideByWei(payment.amount.valueOf())
-    const convertedFee = divideByWei(this.getFee().valueOf())
 
     const currentBalance = this.props.dollarBalance
-    const userHasEnough = convertedFee.isLessThanOrEqualTo(currentBalance)
+    const userHasEnough = fee && fee.isLessThanOrEqualTo(currentBalance)
 
     return (
       <View style={styles.container}>
@@ -127,7 +123,12 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
           confirmButton={{
             action: this.onConfirm,
             text: t('global:confirm'),
-            disabled: isReclaiming || !userHasEnough || !appConnected,
+            disabled:
+              isReclaiming ||
+              !userHasEnough ||
+              !appConnected ||
+              asyncFee.loading ||
+              !!asyncFee.error,
           }}
           modifyButton={{ action: this.onPressEdit, text: t('cancel'), disabled: isReclaiming }}
         >
@@ -137,10 +138,33 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
             comment={payment.message}
             amount={convertedAmount}
             currency={CURRENCY_ENUM.DOLLAR} // User can only request in Dollars
-            fee={convertedFee}
+            fee={fee}
+            isLoadingFee={asyncFee.loading}
+            feeError={asyncFee.error}
           />
         </ReviewFrame>
       </View>
+    )
+  }
+
+  render() {
+    const { account } = this.props
+    if (!account) {
+      throw Error('Account is required')
+    }
+
+    const payment = this.getReclaimPaymentInput()
+
+    return (
+      // Note: intentionally passing a new child func here otherwise
+      // it doesn't re-render on state change since CalculateFee is a pure component
+      <CalculateFee
+        feeType={FeeType.RECLAIM_ESCROW}
+        account={account}
+        paymentID={payment.paymentID}
+      >
+        {(asyncFee) => this.renderWithAsyncFee(asyncFee)}
+      </CalculateFee>
     )
   }
 }
