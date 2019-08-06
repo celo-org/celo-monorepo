@@ -10,12 +10,15 @@ interface Props {
 
 export default function LogView({ title, logs, style, onPress }: Props) {
   const scrollViewRef = useRef<ScrollView>(null)
-  const onContentSizeChange = useCallback((/* contentWidth, contentHeight */) => {
-    const scrollView = scrollViewRef.current
-    if (scrollView) {
-      scrollView.scrollToEnd({ animated: true })
-    }
-  }, [])
+  const onContentSizeChange = useCallback(
+    (/* contentWidth, contentHeight */) => {
+      const scrollView = scrollViewRef.current
+      if (scrollView) {
+        scrollView.scrollToEnd({ animated: true })
+      }
+    },
+    []
+  )
 
   return (
     <View style={[styles.container, style]}>

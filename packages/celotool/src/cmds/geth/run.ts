@@ -75,8 +75,9 @@ export const builder = (argv: yargs.Argv) => {
       description: 'Verbosity level',
       default: 5,
     })
-    .coerce('miner-address', (minerAddress: string) =>
-      minerAddress === null ? null : ensure0x(minerAddress)
+    .coerce(
+      'miner-address',
+      (minerAddress: string) => (minerAddress === null ? null : ensure0x(minerAddress))
     )
 }
 

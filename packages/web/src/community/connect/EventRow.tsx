@@ -65,17 +65,17 @@ class EventRow extends React.PureComponent<Props> {
                       <OvalCoin size={COIN_SIZE} color={color} mixBlendMode={'multiply'} />
                     </View>
 
-                    {isMobile && index === filteredCoins.length - 1 && (
-                      <View style={[styles.chevron, { transform }]}>
-                        <Chevron color={colors.dark} opacity={1} size={9} />
-                      </View>
-                    )}
+                    {isMobile &&
+                      index === filteredCoins.length - 1 && (
+                        <View style={[styles.chevron, { transform }]}>
+                          <Chevron color={colors.dark} opacity={1} size={9} />
+                        </View>
+                      )}
                   </React.Fragment>
                 )
               })}
-              {isMobile && filteredCoins.length === 0 && (
-                <Chevron color={colors.dark} opacity={1} size={9} />
-              )}
+              {isMobile &&
+                filteredCoins.length === 0 && <Chevron color={colors.dark} opacity={1} size={9} />}
             </TouchableOpacity>
           </a>
           {isHighlightEvent && (

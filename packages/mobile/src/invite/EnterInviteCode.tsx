@@ -208,15 +208,18 @@ export class EnterInviteCode extends React.Component<Props, State> {
               </View>
             ))
           )}
-          {this.state.isSubmitting && !this.props.redeemComplete && (
-            <View>
-              <Text style={[styles.body, styles.hint]}>
-                <Text style={fontStyles.bodySmallSemiBold}>{t('inviteCodeText.validating.0')}</Text>
-                {t('inviteCodeText.validating.1')}
-              </Text>
-              <ActivityIndicator size="large" color={colors.celoGreen} style={styles.activity} />
-            </View>
-          )}
+          {this.state.isSubmitting &&
+            !this.props.redeemComplete && (
+              <View>
+                <Text style={[styles.body, styles.hint]}>
+                  <Text style={fontStyles.bodySmallSemiBold}>
+                    {t('inviteCodeText.validating.0')}
+                  </Text>
+                  {t('inviteCodeText.validating.1')}
+                </Text>
+                <ActivityIndicator size="large" color={colors.celoGreen} style={styles.activity} />
+              </View>
+            )}
         </ScrollView>
 
         <View>

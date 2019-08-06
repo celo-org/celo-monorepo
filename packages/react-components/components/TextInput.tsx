@@ -75,16 +75,18 @@ export class CTextInput extends React.Component<Props, State> {
           onFocus={this.handleInputFocus}
           onBlur={this.handleInputBlur}
         />
-        {isFocused && !!value && showClearButton && (
-          <CircleButton
-            style={style.iconStyle}
-            onPress={this.onClear}
-            solid={true}
-            size={20}
-            activeColor={colors.gray}
-            inactiveColor={colors.darkLightest}
-          />
-        )}
+        {isFocused &&
+          !!value &&
+          showClearButton && (
+            <CircleButton
+              style={style.iconStyle}
+              onPress={this.onClear}
+              solid={true}
+              size={20}
+              activeColor={colors.gray}
+              inactiveColor={colors.darkLightest}
+            />
+          )}
       </View>
     )
   }
