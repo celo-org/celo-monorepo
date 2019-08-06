@@ -163,7 +163,6 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   }
 
   renderRequestContactPermission = () => {
-    console.warn('requesting contacts')
     return (
       <>
         {!this.props.hasAcceptedContactPermission && (

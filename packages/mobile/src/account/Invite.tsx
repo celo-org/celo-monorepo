@@ -3,7 +3,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { PermissionsAndroid, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { NavigationInjectedProps, NavigationScreenProps, withNavigation } from 'react-navigation'
 import { connect } from 'react-redux'
 import { defaultCountryCodeSelector } from 'src/account/reducer'
@@ -22,6 +22,7 @@ import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import RecipientPicker from 'src/send/RecipientPicker'
 import { recipientCacheSelector } from 'src/send/reducers'
+import { requestContactsPermission } from 'src/utils/androidPermissions'
 import { filterRecipients, NumberToRecipient, Recipient } from 'src/utils/recipient'
 
 interface State {
@@ -76,11 +77,8 @@ class Invite extends React.Component<Props, State> {
   async componentDidMount() {
     this.props.navigation.setParams({ title: this.props.t('invite') })
 
-    PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_CONTACTS).then(
-      (hasPermissions) => {
-        this.setState({ hasGivenPermission: hasPermissions })
-      }
-    )
+    const result = await requestContactsPermission()
+    this.setState({ hasGivenPermission: result })
   }
 
   updateToField = (value: string) => {
