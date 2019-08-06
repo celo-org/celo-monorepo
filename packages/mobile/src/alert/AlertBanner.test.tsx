@@ -1,7 +1,34 @@
 import * as React from 'react'
 import 'react-native'
-import * as renderer from 'react-test-renderer'
+import { render } from 'react-native-testing-library'
 import { AlertBanner } from 'src/alert/AlertBanner'
+
+/*
+import SmartTopAlert, { NotificationTypes } from '@celo/react-components/components/SmartTopAlert'
+import * as React from 'react'
+import { render } from 'react-native-testing-library'
+
+describe('SmartTopAlert', () => {
+  beforeAll(() => {
+    jest.useRealTimers()
+  })
+
+  it('renders correctly', async () => {
+    const { toJSON } = render(
+      <SmartTopAlert
+        dismissAfter={5}
+        title={'Smart Top Alert'}
+        text="dont get funny"
+        onPress={jest.fn()}
+        type={NotificationTypes.MESSAGE}
+      />
+    )
+
+    expect(toJSON()).toMatchSnapshot()
+  })
+})
+
+*/
 
 describe('AlertBanner', () => {
   const baseProps = {
@@ -10,7 +37,7 @@ describe('AlertBanner', () => {
 
   describe('when message passed in', () => {
     it('renders message', () => {
-      const tree = renderer.create(
+      const { toJSON } = render(
         <AlertBanner
           {...baseProps}
           alert={{
@@ -20,13 +47,13 @@ describe('AlertBanner', () => {
           }}
         />
       )
-      expect(tree).toMatchSnapshot()
+      expect(toJSON()).toMatchSnapshot()
     })
   })
 
   describe('when message and title passed in', () => {
     it('renders title with message', () => {
-      const tree = renderer.create(
+      const { toJSON } = render(
         <AlertBanner
           {...baseProps}
           alert={{
@@ -37,13 +64,13 @@ describe('AlertBanner', () => {
           }}
         />
       )
-      expect(tree).toMatchSnapshot()
+      expect(toJSON()).toMatchSnapshot()
     })
   })
 
   describe('when error message passed in', () => {
     it('renders error message', () => {
-      const tree = renderer.create(
+      const { toJSON } = render(
         <AlertBanner
           {...baseProps}
           alert={{
@@ -53,7 +80,7 @@ describe('AlertBanner', () => {
           }}
         />
       )
-      expect(tree).toMatchSnapshot()
+      expect(toJSON()).toMatchSnapshot()
     })
   })
 })
