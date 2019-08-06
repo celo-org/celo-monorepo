@@ -11,7 +11,6 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import {
   ListRenderItemInfo,
-  PermissionsAndroid,
   SectionList,
   SectionListData,
   StyleSheet,
@@ -29,6 +28,7 @@ import { RootState } from 'src/redux/reducers'
 import LabeledTextInput from 'src/send/LabeledTextInput'
 import RecipientItem from 'src/send/RecipientItem'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
+import { requestContactsPermission } from 'src/utils/androidPermissions'
 import {
   getRecipientFromAddress,
   NumberToRecipient,
@@ -179,9 +179,9 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   }
 
   requestContactsPermission = async () => {
-    const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS)
+    const granted = await requestContactsPermission()
 
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+    if (granted) {
       this.props.onPermissionsAccepted()
     }
   }
