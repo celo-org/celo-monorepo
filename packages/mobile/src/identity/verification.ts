@@ -153,33 +153,14 @@ export function* doVerificationFlow() {
     // Mark codes completed in previous attempts
     yield put(completeAttestationCode(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining))
 
-    // The set of attestations we can reveal right now
-    let attestations: ActionableAttestation[] = yield call(
-      getActionableAttestations,
+    const attestations: ActionableAttestation[] = yield call(
+      getAllActionableAttestations,
       attestationsContract,
+      stableTokenContract,
       e164NumberHash,
-      account
+      account,
+      status.numAttestationsRemaining
     )
-
-    while (attestations.length < status.numAttestationsRemaining) {
-      // Request any additional attestations beyond the original set
-      yield call(
-        requestNeededAttestations,
-        attestationsContract,
-        stableTokenContract,
-        status.numAttestationsRemaining - attestations.length,
-        e164NumberHash,
-        account
-      )
-
-      // Check if we have a sufficient set now by fetching the new total set
-      attestations = yield call(
-        getActionableAttestations,
-        attestationsContract,
-        e164NumberHash,
-        account
-      )
-    }
 
     CeloAnalytics.trackSubEvent(
       CustomEventNames.verification,
@@ -246,6 +227,38 @@ function* getE164NumberHash() {
 interface AttestationsStatus {
   isVerified: boolean // user has sufficiently many attestations?
   numAttestationsRemaining: number // number of attestations still needed
+}
+
+// Requests if necessary additional attestations and returns all revealable attetations
+async function getAllActionableAttestations(
+  attestationsContract: AttestationsType,
+  stableTokenContract: StableTokenType,
+  e164NumberHash: string,
+  account: string,
+  attestationsRemaining: number
+) {
+  // The set of attestations we can reveal right now
+  let attestations: ActionableAttestation[] = await getActionableAttestations(
+    attestationsContract,
+    e164NumberHash,
+    account
+  )
+
+  while (attestations.length < attestationsRemaining) {
+    // Request any additional attestations beyond the original set
+    await requestNeededAttestations(
+      attestationsContract,
+      stableTokenContract,
+      attestationsRemaining - attestations.length,
+      e164NumberHash,
+      account
+    )
+
+    // Check if we have a sufficient set now by fetching the new total set
+    attestations = await getActionableAttestations(attestationsContract, e164NumberHash, account)
+  }
+
+  return attestations
 }
 
 async function getAttestationsStatus(
