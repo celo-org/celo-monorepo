@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Image, StyleSheet, View, ImageRequireSource } from 'react-native'
+import { Image, ImageRequireSource, StyleSheet, View } from 'react-native'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
