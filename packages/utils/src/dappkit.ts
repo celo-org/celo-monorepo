@@ -12,14 +12,20 @@ export enum DappKitResponseStatus {
   UNAUTHORIZED = '401',
 }
 
-export interface AccountAuthRequest {
-  type: DappKitRequestTypes.ACCOUNT_ADDRESS
+export interface DappKitRequestBase {
+  type: DappKitRequestTypes
   callback: string
+  requestId: string
 }
 
-export const AccountAuthRequest = (callback: string): AccountAuthRequest => ({
+export interface AccountAuthRequest extends DappKitRequestBase {
+  type: DappKitRequestTypes.ACCOUNT_ADDRESS
+}
+
+export const AccountAuthRequest = (callback: string, requestId: string): AccountAuthRequest => ({
   type: DappKitRequestTypes.ACCOUNT_ADDRESS,
   callback,
+  requestId,
 })
 
 export interface AccountAuthResponseSuccess {
@@ -63,34 +69,25 @@ export type SignTxResponse = SignTxResponseSuccess | SignTxResponseFailure
 export type DappKitResponse = AccountAuthResponse | SignTxResponse
 
 export function produceResponseDeeplink(request: DappKitRequest, response: DappKitResponse) {
-  return request.callback + '?' + serializeResponseParams(response)
-}
-
-export function serializeResponseParams(response: DappKitResponse) {
+  let params: any = { type: response.type, status: response.status, requestId: request.requestId }
   switch (response.type) {
     case DappKitRequestTypes.ACCOUNT_ADDRESS:
       if (response.status === DappKitResponseStatus.SUCCESS) {
-        return stringify({
-          account: response.address,
-          status: response.status,
-          type: response.type,
-        })
-      } else {
-        return stringify({ status: response.status, type: response.type })
+        params.account = response.address
       }
       break
     case DappKitRequestTypes.SIGN_TX:
       if (response.status === DappKitResponseStatus.SUCCESS) {
-        return stringify({ rawTx: response.rawTx, status: response.status, type: response.type })
-      } else {
-        return stringify({ status: response.status, type: response.type })
+        params.rawTx = response.rawTx
       }
     default:
       break
   }
+
+  return request.callback + '?' + stringify(params)
 }
 
-export interface SignTxRequest {
+export interface SignTxRequest extends DappKitRequestBase {
   type: DappKitRequestTypes.SIGN_TX
   txData: string
   estimatedGas: number
@@ -98,7 +95,6 @@ export interface SignTxRequest {
   to: string
   nonce: number
   gasCurrencyAddress: string
-  callback: string
 }
 
 export type DappKitRequest = AccountAuthRequest | SignTxRequest
@@ -125,11 +121,8 @@ export function parseDappKitRequestDeeplink(url: string): DappKitRequest {
   }
   switch (rawParams.query.type) {
     case DappKitRequestTypes.ACCOUNT_ADDRESS:
-      return {
-        type: DappKitRequestTypes.ACCOUNT_ADDRESS,
-        // @ts-ignore
-        callback: rawParams.query.callback,
-      }
+      // @ts-ignore
+      return AccountAuthRequest(rawParams.query.callback, rawParams.query.requestId)
       break
     case DappKitRequestTypes.SIGN_TX:
       // @ts-ignore
@@ -149,6 +142,8 @@ export function parseDappKitRequestDeeplink(url: string): DappKitRequest {
         gasCurrencyAddress: rawParams.query.gasCurrency,
         // @ts-ignore
         callback: rawParams.query.callback,
+        // @ts-ignore
+        requestId: rawParams.query.requestId,
       }
     default:
       throw new Error('Invalid Deeplink: does not match defined requests')
