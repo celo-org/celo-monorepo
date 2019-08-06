@@ -86,3 +86,4 @@ lerna-debug.log
 # LicenseDisclaimer
 **/LicenseDisclaimer.txt
 
+.terraform/
