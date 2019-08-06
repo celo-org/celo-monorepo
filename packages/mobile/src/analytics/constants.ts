@@ -45,6 +45,10 @@ export enum CustomEventNames {
   verification_complete_attestation = 'verification_complete_attestation',
   verification_completed_attestation = 'verification_completed_attestation',
   verification_manual_selected = 'verification_manual_selected',
+  verification_failed = 'verification_failed',
+  verification_cancelled = 'verification_cancelled',
+  verification_success = 'verification_success',
+  verification_timed_out = 'verification_timed_out',
 
   photos_education = 'photos_education',
   get_backup_key = 'earn_celo_gold',
