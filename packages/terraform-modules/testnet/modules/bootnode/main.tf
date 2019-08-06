@@ -26,6 +26,10 @@ resource "google_compute_instance" "bootnode" {
 
   metadata_startup_script = templatefile(
     format("%s/startup.sh", path.module), {
+      celotool_docker_image_repository: var.celotool_docker_image_repository,
+      celotool_docker_image_tag: var.celotool_docker_image_tag,
+      geth_bootnode_docker_image_repository: var.geth_bootnode_docker_image_repository,
+      geth_bootnode_docker_image_tag: var.geth_bootnode_docker_image_tag,
       ip_address: google_compute_address.bootnode.address,
       mnemonic: var.mnemonic
     }

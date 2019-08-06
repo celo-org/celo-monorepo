@@ -58,18 +58,18 @@ echo "Starting geth...."
 
 # We need to override the entrypoint in the geth image (which is originally `geth`)
 docker run --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
-  set -euo pipefail ;\
-  mkdir -p /root/.celo/account /var/geth ;\
-  echo -n ${genesis_content_base64} | base64 -d > /var/geth/genesis.json ;\
-  echo -n ${rid} > /root/.celo/replica_id ;\
-  echo -n ${ip_address} > /root/.celo/ipAddress ;\
-  echo -n $PRIVATE_KEY > /root/.celo/pkey ;\
-  echo -n $ACCOUNT_ADDRESS > /root/.celo/address ;\
-  echo -n $BOOTNODE_ENODE_ADDRESS > /root/.celo/bootnodeEnodeAddress ;\
-  echo -n $BOOTNODE_ENODE > /root/.celo/bootnodeEnode ;\
-  echo -n ${geth_account_secret} > /root/.celo/account/accountSecret ;\
-  geth init /var/geth/genesis.json ;\
-  geth account import --password /root/.celo/account/accountSecret /root/.celo/pkey ;\
+  set -euo pipefail && \
+  mkdir -p /root/.celo/account /var/geth && \
+  echo -n ${genesis_content_base64} | base64 -d > /var/geth/genesis.json && \
+  echo -n ${rid} > /root/.celo/replica_id && \
+  echo -n ${ip_address} > /root/.celo/ipAddress && \
+  echo -n $PRIVATE_KEY > /root/.celo/pkey && \
+  echo -n $ACCOUNT_ADDRESS > /root/.celo/address && \
+  echo -n $BOOTNODE_ENODE_ADDRESS > /root/.celo/bootnodeEnodeAddress && \
+  echo -n $BOOTNODE_ENODE > /root/.celo/bootnodeEnode && \
+  echo -n ${geth_account_secret} > /root/.celo/account/accountSecret && \
+  geth init /var/geth/genesis.json && \
+  geth account import --password /root/.celo/account/accountSecret /root/.celo/pkey && \
   geth \
     --bootnodes=enode://$BOOTNODE_ENODE \
     --password=/root/.celo/account/accountSecret \
