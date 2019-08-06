@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
+import { CURRENCIES, CURRENCY_ENUM as Tokens } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import CeloAccountIcon from 'src/icons/CeloAccountIcon'
 import { getCentAwareMoneyDisplay } from 'src/utils/formatting'
@@ -17,13 +18,14 @@ interface Props {
 
 class PaymentRequestBalance extends React.PureComponent<Props & WithNamespaces> {
   render() {
+    const dollarSymbol = CURRENCIES[Tokens.DOLLAR].symbol
     return (
       <View style={styles.balanceContainer}>
         <CeloAccountIcon />
         <View style={styles.balance}>
           <Text style={fontStyles.bodySmallSemiBold}>{this.props.t('celoDollarBalance')}</Text>
           <Text style={[fontStyles.bodySmallSemiBold, componentStyles.colorGreen]}>
-            ${getCentAwareMoneyDisplay(this.props.dollarBalance || 0)}
+            {dollarSymbol + getCentAwareMoneyDisplay(this.props.dollarBalance || 0)}
           </Text>
         </View>
       </View>

@@ -8,7 +8,7 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM, STABLE_CURRENCY } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { faucetIcon } from 'src/images/Images'
 import { RootState } from 'src/redux/reducers'
@@ -218,7 +218,11 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
           {(isLoadingFee || fee || feeError) && (
             <View style={style.feeContainer}>
               {this.props.type === TransactionTypes.PAY_REQUEST && (
-                <LineItemRow currencySymbol={'$'} amount={total} title={t('dollarsSent')} />
+                <LineItemRow
+                  currencySymbol={CURRENCIES[STABLE_CURRENCY].symbol}
+                  amount={total}
+                  title={t('dollarsSent')}
+                />
               )}
               <LineItemRow
                 currencySymbol={currencyStyle.symbol}
@@ -228,7 +232,11 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
                 isLoading={isLoadingFee}
                 hasError={!!feeError}
               />
-              <LineItemRow currencySymbol={'$'} amount={amountWithFees} title={t('total')} />
+              <LineItemRow
+                currencySymbol={CURRENCIES[STABLE_CURRENCY].symbol}
+                amount={amountWithFees}
+                title={t('total')}
+              />
             </View>
           )}
         </View>
