@@ -322,11 +322,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   }
 }
 
-export async function migrateContracts(
-  validatorPrivateKeys: string[],
-  to: number = 1000,
-  gethRepoPath: string
-) {
+export async function migrateContracts(validatorPrivateKeys: string[], to: number = 1000) {
   const args = [
     '--cwd',
     `${monorepoRoot}/packages/protocol`,
@@ -339,8 +335,6 @@ export async function migrateContracts(
     '{ "validators": { "minElectableValidators": "1" } }',
     '-t',
     to.toString(),
-    '-l',
-    gethRepoPath,
   ]
   await execCmdWithExitOnFailure('yarn', args)
 }
@@ -433,7 +427,7 @@ export function getHooks(gethConfig: GethTestConfig) {
       await initAndStartGeth(gethBinaryPath, instance)
     }
     if (gethConfig.migrate || gethConfig.migrateTo) {
-      await migrateContracts(validatorPrivateKeys, gethConfig.migrateTo, gethRepoPath)
+      await migrateContracts(validatorPrivateKeys, gethConfig.migrateTo)
     }
     await killGeth()
     await sleep(2)
