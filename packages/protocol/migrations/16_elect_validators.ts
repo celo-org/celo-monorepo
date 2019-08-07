@@ -123,15 +123,6 @@ async function registerValidator(
     .toString('hex')
     .trim()
   const publicKeysData = publicKey + BLSPublicKey + BLSPoP
-  /*
-  console.log('---------------')
-  console.info(validatorPrivateKey)
-  console.info(publicKey)
-  console.info(BLSPublicKey)
-  console.info(BLSPoP)
-  console.info(publicKeysData)
-  console.log('---------------')
-  */
 
   // @ts-ignore
   const registerTx = validators.contract.methods.registerValidator(
