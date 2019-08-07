@@ -4,7 +4,7 @@ import { componentStyles } from '@celo/react-components/styles/styles'
 import { throttle } from 'lodash'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { ActivityIndicator, PermissionsAndroid, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { NavigationInjectedProps, NavigationScreenProps, withNavigation } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
@@ -22,6 +22,7 @@ import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { storeLatestInRecents } from 'src/send/actions'
 import RecipientPicker from 'src/send/RecipientPicker'
+import { checkContactsPermission } from 'src/utils/androidPermissions'
 import {
   buildRecentRecipients,
   filterRecipientFactory,
@@ -31,6 +32,11 @@ import {
   RecipientKind,
   RecipientWithQrCode,
 } from 'src/utils/recipient'
+
+interface Section {
+  key: string
+  data: Recipient[]
+}
 
 interface State {
   loading: boolean
@@ -67,6 +73,13 @@ const mapStateToProps = (state: RootState): StateProps => ({
   e164PhoneNumberAddressMapping: state.identity.e164NumberToAddress,
   recipientCache: state.send.recipientCache,
 })
+
+const mapDispatchToProps = {
+  showError,
+  hideAlert,
+  storeLatestInRecents,
+  importContacts,
+}
 
 // TODO(Rossy) move this into redux as I've done for the full cache (don't forget to blacklist it when you do)
 let recentCache: Recipient[] | null = null
@@ -203,23 +216,41 @@ class Send extends React.Component<Props, State> {
 
   onPermissionsAccepted = async () => {
     this.props.importContacts()
-    this.setState({ hasGivenPermission: true })
+
+    const { recipientCache } = this.props
+
+    if (recipientCache) {
+      const recipients = Object.values(recipientCache)
+      this.setState(
+        {
+          searchQuery: '',
+          recentRecipients: [],
+          hasGivenPermission: true,
+          allRecipients: recipients,
+        },
+        this.updateFilters
+      )
+    }
+  }
+
+  buildSections = (): Section[] => {
+    const { t, recipientCache } = this.props
+    const allRecipients = Object.values(recipientCache)
+
+    const queryRecipients = filterRecipients(allRecipients, this.state.searchQuery)
+
+    const { recentFiltered } = this.state
+    const sections = [
+      { key: t('recent'), data: recentFiltered },
+      { key: t('contacts'), data: Object.values(queryRecipients) },
+    ].filter((section) => section.data.length > 0)
+
+    return sections
   }
 
   render() {
     const { t, defaultCountryCode } = this.props
-    const { loading, searchQuery, recentFiltered, allFiltered } = this.state
-
-    const sections = [
-      {
-        key: t('recent'),
-        data: recentFiltered,
-      },
-      {
-        key: t('contacts'),
-        data: allFiltered,
-      },
-    ].filter((section) => section.data.length > 0) // Only show section if there's results
+    const { loading, searchQuery } = this.state
 
     return (
       <View style={style.body}>
@@ -230,7 +261,7 @@ class Send extends React.Component<Props, State> {
           </View>
         ) : (
           <RecipientPicker
-            sections={sections}
+            sections={this.buildSections()}
             searchQuery={searchQuery}
             defaultCountryCode={defaultCountryCode}
             hasAcceptedContactPermission={this.state.hasGivenPermission}
@@ -264,13 +295,8 @@ const style = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect(
+  connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
-    {
-      showError,
-      hideAlert,
-      storeLatestInRecents,
-      importContacts,
-    }
+    mapDispatchToProps
   )(withNamespaces(Namespaces.sendFlow7)(withNavigation(Send)))
 )
