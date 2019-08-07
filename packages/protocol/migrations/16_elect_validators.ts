@@ -1,8 +1,5 @@
 /* tslint:disable:no-console */
-import {
-  BLSPrivateKeyToProcessedPrivateKey,
-  BLSPrivateKeyToPublic,
-} from '@celo/celotool/src/lib/bls_utils'
+import { BLSPrivateKeyToPublic } from '@celo/celotool/src/lib/bls_utils'
 import { NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
 import {
   add0x,
@@ -14,6 +11,7 @@ import {
 import { config } from '@celo/protocol/migrationsConfig'
 import { BigNumber } from 'bignumber.js'
 import { exec } from 'child_process'
+import * as crypto from 'crypto'
 import * as minimist from 'minimist'
 import { BondedDepositsInstance, ValidatorsInstance } from 'types'
 const Web3 = require('web3')
@@ -22,8 +20,6 @@ const argv = minimist(process.argv, {
   string: ['keys'],
   default: { keys: '' },
 })
-
-const gethRepoPath = argv.localgeth || '/tmp/geth'
 
 function serializeKeystore(keystore: any) {
   return Buffer.from(JSON.stringify(keystore)).toString('base64')
