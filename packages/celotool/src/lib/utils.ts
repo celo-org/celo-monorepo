@@ -11,10 +11,6 @@ export interface CeloEnvArgv extends yargs.Argv {
   celoEnv: string
 }
 
-export interface CeloGethDirEnvArgv extends CeloEnvArgv {
-  gethDir: string
-}
-
 export enum envVar {
   BLOCK_TIME = 'BLOCK_TIME',
   CELOTOOL_CONFIRMED = 'CELOTOOL_CONFIRMED',
@@ -292,21 +288,18 @@ export function addCeloEnvMiddleware(argv: yargs.Argv) {
   )
 }
 
-export function addCeloGethDirMiddleware(argv: yargs.Argv) {
-  return argv.option('geth-dir', {
-    type: 'string',
-    alias: 'd',
-    description: 'path to geth repository',
-    demand: 'Please, specify the path to geth directory, where the binary could be found',
-  })
-}
-
 export function addCeloGethMiddleware(argv: yargs.Argv) {
-  return addCeloGethDirMiddleware(argv).option('data-dir', {
-    type: 'string',
-    description: 'path to datadir',
-    demand: 'Please, specify geth datadir',
-  })
+  return argv
+    .option('geth-dir', {
+      type: 'string',
+      description: 'path to geth repository',
+      demand: 'Please, specify the path to geth directory, where the binary could be found',
+    })
+    .option('data-dir', {
+      type: 'string',
+      description: 'path to datadir',
+      demand: 'Please, specify geth datadir',
+    })
 }
 
 // Some tools require hex address to be preceeded by 0x, some don't.
