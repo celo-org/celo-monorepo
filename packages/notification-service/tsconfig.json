@@ -14,5 +14,6 @@
     "target": "es6",
     "lib": ["es7", "esnext"]
   },
-  "exclude": ["node_modules", "vendor", ".bundle", "dist", "test"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "vendor", ".bundle"]
 }
