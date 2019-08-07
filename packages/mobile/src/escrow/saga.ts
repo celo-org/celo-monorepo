@@ -29,14 +29,12 @@ import { isValidPrivateKey } from 'src/invite/utils'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import { recipientCacheSelector } from 'src/send/reducers'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { addStandbyTransaction, generateStandbyTransactionId } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
-import { NumberToRecipient } from 'src/utils/recipient'
 import { web3 } from 'src/web3/contracts'
 import { fetchGasPrice } from 'src/web3/gas'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -60,7 +58,7 @@ function* transferStableTokenToEscrow(action: TransferPaymentAction) {
     Logger.debug(TAG + '@transferToEscrow', 'Transfering to escrow')
 
     const transferTxId = generateStandbyTransactionId(escrow._address)
-    yield call(registerStandbyTransaction, transferTxId, convertedAmount, escrow._address)
+    yield call(registerStandbyTransaction, transferTxId, amount.toString(), escrow._address)
 
     const transferTx = escrow.methods.transfer(
       phoneHash,
@@ -227,7 +225,7 @@ function* doFetchSentPayments() {
 
     const sentPaymentIDs: string[] = yield escrow.methods.getSentPaymentIds(account).call() // Note: payment ids are currently temp wallet addresses
 
-    const newPaymentIds = sentPaymentIDs.filter((id) => !existingPaymentsIds.has(id))
+    const newPaymentIds = sentPaymentIDs.filter((id) => !existingPaymentsIds.has(id.toLowerCase()))
     if (!newPaymentIds.length) {
       Logger.debug(TAG + '@doFetchSentPayments', 'No new payments found')
       return
@@ -238,7 +236,6 @@ function* doFetchSentPayments() {
     )
 
     const tempAddresstoRecipientPhoneNumber: Invitees = yield select(inviteesSelector)
-    const phoneNumberToRecipientContact: NumberToRecipient = yield select(recipientCacheSelector)
     const sentPaymentsNotifications: EscrowedPayment[] = []
     for (let i = 0; i < sentPayments.length; i++) {
       const id = sentPaymentIDs[i].toLowerCase()
@@ -248,7 +245,6 @@ function* doFetchSentPayments() {
         paymentID: id,
         senderAddress: payment[1],
         recipientPhone: recipientPhoneNumber,
-        recipientContact: phoneNumberToRecipientContact[recipientPhoneNumber] || undefined,
         currency: SHORT_CURRENCIES.DOLLAR, // Only dollars can be escrowed
         amount: payment[3],
         timestamp: payment[6],
