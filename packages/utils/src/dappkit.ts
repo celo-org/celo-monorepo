@@ -97,27 +97,54 @@ export interface SignTxRequest extends DappKitRequestBase {
   gasCurrencyAddress: string
 }
 
+export const SignTxRequest = (
+  txData: string,
+  estimatedGas: number,
+  from: string,
+  to: string,
+  nonce: number,
+  gasCurrencyAddress: string,
+  callback: string,
+  requestId: string
+): SignTxRequest => ({
+  type: DappKitRequestTypes.SIGN_TX,
+  txData,
+  estimatedGas,
+  from,
+  to,
+  nonce,
+  gasCurrencyAddress,
+  callback,
+  requestId,
+})
+
 export type DappKitRequest = AccountAuthRequest | SignTxRequest
 
 export function serializeDappKitRequestDeeplink(request: DappKitRequest) {
-  return DAPPKIT_BASE_HOST + serializeRequestParams(request)
-}
-
-export function serializeRequestParams(request: DappKitRequest) {
+  let params: any = { type: request.type, requestId: request.requestId, callback: request.callback }
   switch (request.type) {
-    case DappKitRequestTypes.ACCOUNT_ADDRESS:
-      return stringify({ type: request.type, callback: request.callback })
-      break
+    case DappKitRequestTypes.SIGN_TX:
+      params = {
+        ...params,
+        txData: request.txData,
+        estimatedGas: request.estimatedGas,
+        from: request.from,
+        to: request.to,
+        nonce: request.nonce,
+        gasCurrencyAddress: request.gasCurrencyAddress,
+      }
     default:
       break
   }
+
+  return DAPPKIT_BASE_HOST + '?' + stringify(params)
 }
 
 export function parseDappKitRequestDeeplink(url: string): DappKitRequest {
   const rawParams = parse(url, true)
 
   if (rawParams.query.type === undefined) {
-    throw new Error('Invalid Deeplink: does not contain type' + 'url')
+    throw new Error('Invalid Deeplink: does not contain type' + url)
   }
   switch (rawParams.query.type) {
     case DappKitRequestTypes.ACCOUNT_ADDRESS:
