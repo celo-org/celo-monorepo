@@ -216,21 +216,14 @@ class Send extends React.Component<Props, State> {
 
   onPermissionsAccepted = async () => {
     this.props.importContacts()
-
-    const { recipientCache } = this.props
-
-    if (recipientCache) {
-      const recipients = Object.values(recipientCache)
-      this.setState(
-        {
-          searchQuery: '',
-          recentRecipients: [],
-          hasGivenPermission: true,
-          allRecipients: recipients,
-        },
-        this.updateFilters
-      )
-    }
+    this.setState(
+      {
+        searchQuery: '',
+        recentRecipients: [],
+        hasGivenPermission: true,
+      },
+      this.updateFilters
+    )
   }
 
   buildSections = (): Section[] => {
