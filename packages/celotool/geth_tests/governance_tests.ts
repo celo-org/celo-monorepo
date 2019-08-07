@@ -340,7 +340,7 @@ describe('governance tests', () => {
 
       const subscription = groupWeb3.eth.subscribe('newBlockHeaders').on('data', changeValidatorSet)
       // Wait for a few epochs while changing the validator set.
-      const numTries = 0
+      let numTries = 0
       while (expectedEpochMembership.size < 3 && numTries < 10) {
         numTries++
         await sleep(epoch)
