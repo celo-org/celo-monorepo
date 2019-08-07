@@ -28,6 +28,8 @@ files=(
   ".env.mnemonic.alfajoresstaging"
   ".env.mnemonic.integration"
   ".env.mnemonic.integrationtesting"
+  ".env.mnemonic.pilot"
+  ".env.mnemonic.pilotstaging"
 )
 
 # this is to allow the script to be called from anywhere
