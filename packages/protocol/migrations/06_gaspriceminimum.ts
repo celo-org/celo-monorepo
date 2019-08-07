@@ -1,11 +1,11 @@
 /* tslint:disable:no-console */
+import { toFixed } from '@celo/protocol/lib/fixidity'
 import { gasPriceMinimumRegistryId } from '@celo/protocol/lib/registry-utils'
 import {
   deployProxyAndImplementation,
   getDeployedProxiedContract,
   setInRegistry,
 } from '@celo/protocol/lib/web3-utils'
-import { toFixed } from '@celo/protocol/lib/fixidity'
 import { config } from '@celo/protocol/migrationsConfig'
 import { GasPriceMinimumInstance, RegistryInstance } from 'types'
 
