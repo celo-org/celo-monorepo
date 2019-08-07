@@ -28,11 +28,12 @@ ${GETH_BINARY} init ${GENESIS_FILE_PATH} 1>/dev/null 2>/dev/null
 curl "https://www.googleapis.com/storage/v1/b/static_nodes/o/${NETWORK_NAME}?alt=media" --output ${DATA_DIR}/static-nodes.json
 
 echo "Running geth in the background..."
+LOG_FILE="/tmp/geth_stdout"
 # Run geth in the background
 ${CELOTOOLJS} geth run \
     --geth-dir ${GETH_DIR} \
     --data-dir ${DATA_DIR} \
-    --sync-mode ${SYNCMODE} 1>/tmp/geth_stdout 2>/tmp/geth_stderr &
+    --sync-mode ${SYNCMODE} 1>${LOG_FILE} 2>/tmp/geth_stderr &
 # let it sync
 sleep 20
 latestBlock=$(${GETH_BINARY} attach -exec eth.blockNumber)
@@ -41,6 +42,10 @@ echo "Latest block number is ${latestBlock}"
 pkill -9 geth
 
 if [ "$latestBlock" -eq "0" ]; then
-    echo "Sync is not working with network '${NETWORK_NAME}' in mode '${SYNCMODE}', see logs in /tmp/geth_stdout"
+    echo "Sync is not working with network '${NETWORK_NAME}' in mode '${SYNCMODE}', see logs in ${LOG_FILE}"
+    if test ${CI}; then
+        echo "Running on CI, dumping logs from ${LOG_FILE}..."
+        cat ${LOG_FILE}
+    fi
     exit 1
 fi
