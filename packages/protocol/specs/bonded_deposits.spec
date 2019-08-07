@@ -57,6 +57,11 @@ rule address_cant_be_both_account_and_delegate(method f, address x) {
 	
 	require !(_isDelegate && _isAccount); // x cannot be both a delegate and an account
 	require _isDelegate <=> _delegatedBy == account; // x is a delegate of account iff x got a delegate role from account (see delegations_in_sync_and_exclusive)
+	// we require but do not check, the invariant that if x is a delegate, it is exclusive for one role
+	require _isDelegate => (_aRewardsDelegate == x => (_aVotingDelegate != x && _aValidatingDelegate != x)); 
+	require _isDelegate => (_aVotingDelegate == x => (_aRewardsDelegate != x && _aValidatingDelegate != x)); 
+	require _isDelegate => (_aValidatingDelegate == x => (_aVotingDelegate != x && _aRewardsDelegate != x)); 
+	
 	
 	env eF; 
 	calldataarg arg; 
@@ -83,13 +88,13 @@ rule address_cant_be_both_account_and_delegate(method f, address x) {
 rule delegations_in_sync_and_exclusive(method f, address delegatedTo) {
 	// TODO: What if delegatedTo is 0?
 	env ePre;
-	address delegatingAccount = sinvoke delegations(ePre,delegatedTo); // an account that delegates one of the roles to delegatedTo
+	address _delegatingAccount = sinvoke delegations(ePre,delegatedTo); // an account that delegates one of the roles to delegatedTo
 
-	require sinvoke _exists(ePre,delegatingAccount); // delegatingAccount must be an account
+	require sinvoke _exists(ePre,_delegatingAccount); // _delegatingAccount must be an account
 	
-	address _aRewardsDelegate = sinvoke _rewardsDelegate(ePre,delegatingAccount);
-	address _aVotingDelegate = sinvoke _votingDelegate(ePre,delegatingAccount);
-	address _aValidatingDelegate = sinvoke _validatingDelegate(ePre,delegatingAccount);
+	address _aRewardsDelegate = sinvoke _rewardsDelegate(ePre,_delegatingAccount);
+	address _aVotingDelegate = sinvoke _votingDelegate(ePre,_delegatingAccount);
+	address _aValidatingDelegate = sinvoke _validatingDelegate(ePre,_delegatingAccount);
 
 	bool _aRewardsDelegateTo = _aRewardsDelegate == delegatedTo;
 	bool _aVotingDelegateTo = _aVotingDelegate == delegatedTo;
@@ -105,19 +110,46 @@ rule delegations_in_sync_and_exclusive(method f, address delegatedTo) {
 	invoke f(eF,arg);
 	
 	env ePost;
-	address aRewardsDelegate_ = sinvoke _rewardsDelegate(ePre,delegatingAccount);
-	address aVotingDelegate_ = sinvoke _votingDelegate(ePre,delegatingAccount);
-	address aValidatingDelegate_ = sinvoke _validatingDelegate(ePre,delegatingAccount);
-
+	address aRewardsDelegate_ = sinvoke _rewardsDelegate(ePre,_delegatingAccount);
+	address aVotingDelegate_ = sinvoke _votingDelegate(ePre,_delegatingAccount);
+	address aValidatingDelegate_ = sinvoke _validatingDelegate(ePre,_delegatingAccount);
+		
 	bool aRewardsDelegateTo_ = aRewardsDelegate_ == delegatedTo;
 	bool aVotingDelegateTo_ = aVotingDelegate_ == delegatedTo;
 	bool aValidatingDelegateTo_ = aValidatingDelegate_ == delegatedTo;
-
-	assert aRewardsDelegateTo_ || aVotingDelegateTo_ || aValidatingDelegateTo_, "at least one of the roles must be delegated to $delegatedTo";
-	assert aRewardsDelegateTo_ => (!aVotingDelegateTo_ && !aValidatingDelegateTo_)
-			&& aVotingDelegateTo_ => (!aRewardsDelegateTo_ && !aValidatingDelegateTo_)
-			&& aValidatingDelegateTo_ => (!aRewardsDelegateTo_ && !aVotingDelegateTo_), "at most one of the three roles is delegated to $delegatedTo";
+	
+	address delegatingAccount_ = sinvoke delegations(ePre,delegatedTo); // an account that delegates one of the roles to delegatedTo
+	
+	if (delegatingAccount_ == _delegatingAccount) { // if delegatedTo was not removed
+		assert aRewardsDelegateTo_ || aVotingDelegateTo_ || aValidatingDelegateTo_, "at least one of the roles must be delegated to $delegatedTo";
+		assert aRewardsDelegateTo_ => (!aVotingDelegateTo_ && !aValidatingDelegateTo_)
+				&& aVotingDelegateTo_ => (!aRewardsDelegateTo_ && !aValidatingDelegateTo_)
+				&& aValidatingDelegateTo_ => (!aRewardsDelegateTo_ && !aVotingDelegateTo_), "at most one of the three roles is delegated to $delegatedTo";
+	}
+	// otherwise, delegatedTo was removed as a delegation
+	assert delegatingAccount_ != _delegatingAccount => 
+			(!aRewardsDelegateTo_ && !aVotingDelegateTo_ && !aValidatingDelegateTo_),
+				"Delegated $delegatedTo before executing $f was removed as a delegate of $_delegatingAccount, therefore it cannot have a delegate role, although at least one of the roles stayed: rewards: ${aRewardsDelegateTo_}, voting: ${aVotingDelegateTo_}, validating: ${aValidatingDelegateTo_}";
+	
 } 
+
+rule delegations_can_be_removed_but_not_moved(method f, address delegatedTo)
+{
+	// delegations cannot change from non-zero to non-zero
+	env ePre;
+	address _delegatingAccount = sinvoke delegations(ePre,delegatedTo); // an account that delegates one of the roles to delegatedTo
+
+	env eF;
+	calldataarg arg;	
+	invoke f(eF,arg);
+	
+	env ePost;
+	address delegatingAccount_ = sinvoke delegations(ePre,delegatedTo); // an account that delegates one of the roles to delegatedTo
+	
+	assert _delegatingAccount == delegatingAccount_ || _delegatingAccount == 0 || delegatingAccount_ == 0,
+		"Account delegating to $delegatedTo cannot change from one non-zero value to another non-zero value";
+}
+
 
 rule functional_get_account_from_voter_result(address account) {
 	// TODO: What if voting delegate is 0?
@@ -188,7 +220,7 @@ rule modifying_deposits(address a, uint256 someNoticePeriod, uint256 someAvailab
 	uint256 someNotifiedValue_; uint256 someNotifiedIndex_;
 	someNotifiedValue_, someNotifiedIndex_ = sinvoke getNotifiedDeposit(e_,a,someAvailabilityTime);
 	
-	assert _lenNoticePeriods == lenNoticePeriodsValue_, "Method changed length of notice periods";
+	assert _lenNoticePeriodsValue == lenNoticePeriodsValue_, "Method changed length of notice periods";
 	assert _lenAvailabilityTimesValue == lenAvailabilityTimesValue_, "Method changed length of availability times";
 	assert _someBondedValue == someBondedValue_, "Method changed a bonded value";
 	assert _someBondedIndex == someBondedIndex_, "Method changed a bonded index";
@@ -237,8 +269,8 @@ rule cant_notify_an_unbonded_deposit(address a, uint256 someNoticePeriod, method
 	calldataarg arg;
 	invoke f(eF,arg);
 	
-	uint256 someBondedValue_; uint256 someBondedIndex_;
-	someBondedValue_, someBondedIndex_ = sinvoke getBondedDeposit(e_,a,someNoticePeriod);
+	/*uint256 someBondedValue_; uint256 someBondedIndex_;
+	someBondedValue_, someBondedIndex_ = sinvoke getBondedDeposit(e_,a,someNoticePeriod);*/
 	uint256 someNotifiedValue_; uint256 someNotifiedIndex_;
 	someNotifiedValue_, someNotifiedIndex_ = sinvoke getNotifiedDeposit(e_,a,matchingAvailabilityTime);
 	
@@ -299,3 +331,68 @@ rule cant_rebond_non_notified(uint256 rebondValue, uint256 depositAvailabilityTi
 }
 
 // TODO: deleteElement should always be called with lastIndex == list.length-1 - check using assertion in the code and assert mode?
+
+rule withdrawing_removes_notified_deposit(uint256 someNoticePeriod) {
+	// Withdrawing should remove the notified deposit
+	env _e;
+	env eF;
+	env e_;
+	
+	address a = eF.msg.sender; // our account will execute withdraw()
+	uint256 matchingAvailabilityTime = eF.block.timestamp+someNoticePeriod; // availability time is notify time + notice period set beforehand
+	
+	/*uint256 _someBondedValue; uint256 _someBondedIndex;
+	_someBondedValue, _someBondedIndex = sinvoke getBondedDeposit(_e,a,someNoticePeriod);
+	uint256 _someNotifiedValue; uint256 _someNotifiedIndex;
+	_someNotifiedValue, _someNotifiedIndex = sinvoke getNotifiedDeposit(_e,a,matchingAvailabilityTime);
+	*/
+	
+	invoke withdraw(eF, matchingAvailabilityTime);
+	bool withdrawSucceeded = !lastReverted;
+	
+	/*uint256 someBondedValue_; uint256 someBondedIndex_;
+	someBondedValue_, someBondedIndex_ = sinvoke getBondedDeposit(e_,a,someNoticePeriod);*/
+	uint256 someNotifiedValue_; uint256 someNotifiedIndex_;
+	someNotifiedValue_, someNotifiedIndex_ = sinvoke getNotifiedDeposit(e_,a,matchingAvailabilityTime);
+	
+	assert withdrawSucceeded => (someNotifiedValue_ == 0 && someNotifiedIndex_ == 0), "Violated: withdraw succeeded but for deposit $someNoticePeriod with availability time $matchingAvailabilityTime we still have value: ${someNotifiedValue_} and index ${someBondedIndex_}";
+	
+	// TODO: What about bonded deposit?
+}
+
+
+
+// initialization rules
+rule only_initializer_changes_initialized_field(method f) {
+	env _e;
+	env eF;
+	env e_;
+	
+	bool _isInitialized = sinvoke initialized(_e);
+	
+	require f != initialize;
+	calldataarg arg;
+	invoke f(eF,arg);
+	
+	bool isInitialized_ = sinvoke initialized(e_);
+	
+	assert _isInitialized == isInitialized_, "Method $f is not expected to change initialization field from ${_isInitialized} to ${isInitialized_}";
+}
+
+rule check_initializer {
+	env _e;
+	env eF;
+	env e_;
+	
+	bool _isInitialized = sinvoke initialized(_e);
+	
+	calldataarg arg;
+	invoke initialize(eF,arg);
+	bool successInit = !lastReverted;
+	
+	bool isInitialized_ = sinvoke initialized(e_);
+	
+	assert _isInitialized => !successInit, "initialize() must revert if already initialized";
+	assert successInit => isInitialized_, "When initialize() succeeds, must set initialization field to true";
+}
+
