@@ -81,6 +81,10 @@ export async function makeRevealTx(
 ) {
   const publicKey = await attestations.methods.getDataEncryptionKey(issuer).call()
 
+  if (!publicKey) {
+    throw new Error('Issuer data encryption key is null')
+  }
+
   const encryptedPhone: any =
     '0x' +
     ECIES.Encrypt(
