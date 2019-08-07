@@ -244,9 +244,9 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param publicKeysData Comprised of three tightly-packed elements:
    *    - publicKey - The public key that the validator is using for consensus, should match
    *      msg.sender. 64 bytes.
-   *    - BLSPublicKey - The BLS public key that the validator is using for consensus, should pass
+   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
    *      proof of possession. 48 bytes.
-   *    - BLSPoP - The BLS public key proof of possession. 96 bytes.
+   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient weight.
