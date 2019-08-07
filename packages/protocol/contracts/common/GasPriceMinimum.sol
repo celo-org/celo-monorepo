@@ -4,7 +4,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./Initializable.sol";
 import "./UsingRegistry.sol";
 import "../stability/interfaces/ISortedOracles.sol";
-import "../stability/FractionUtil.sol";
+import "../common/FractionUtil.sol";
 
 /**
  * @title Stores and provides gas price minimum for various currencies.

@@ -3,11 +3,10 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Image, StyleSheet, View } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
-import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
-import { EscrowedPayment, fetchReclaimTransactionFee } from 'src/escrow/actions'
+import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentLineItem from 'src/escrow/EscrowedPaymentLineItem'
 import { Namespaces } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
@@ -19,15 +18,7 @@ interface OwnProps {
   payment: EscrowedPayment
 }
 
-interface DispatchProps {
-  fetchReclaimTransactionFee: typeof fetchReclaimTransactionFee
-}
-
-type Props = OwnProps & DispatchProps & WithNamespaces
-
-const mapDispatchToProps = {
-  fetchReclaimTransactionFee,
-}
+type Props = OwnProps & WithNamespaces
 
 export class EscrowedPaymentReminderNotification extends React.PureComponent<Props> {
   getCTA = () => {
@@ -58,7 +49,6 @@ export class EscrowedPaymentReminderNotification extends React.PureComponent<Pro
         onPress: () => {
           const reclaimPaymentInput = payment
           CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_notification)
-          this.props.fetchReclaimTransactionFee(payment.paymentID)
           navigate(Screens.ReclaimPaymentConfirmationScreen, { reclaimPaymentInput })
         },
       },
@@ -108,8 +98,5 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<{}, DispatchProps>(
-    null,
-    mapDispatchToProps
-  )(withNamespaces(Namespaces.walletFlow5)(EscrowedPaymentReminderNotification))
+  withNamespaces(Namespaces.walletFlow5)(EscrowedPaymentReminderNotification)
 )

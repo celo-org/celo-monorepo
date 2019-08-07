@@ -26,7 +26,6 @@ export enum ErrorMessages {
   SEND_PAYMENT_FAILED = 'sendPaymentFailed',
   PAYMENT_REQUEST_FAILED = 'paymentRequestFailed',
   RECLAIMING_ESCROWED_PAYMENT_FAILED = 'reclaimingEscrowedPaymentFailed',
-  FETCH_RECLAIM_FEE_FAILED = 'fetchingReclaimFeeFailed',
   EXCHANGE_RATE_FAILED = 'exchangeFlow9:errorRefreshingRate',
   EXCHANGE_RATE_CHANGE = 'exchangeFlow9:exchangeRateChange',
   REDEEM_INVITE_FAILED = 'inviteFlow11:redeemFailed',
@@ -37,4 +36,5 @@ export enum ErrorMessages {
   QR_FAILED_NO_ADDRESS = 'qrFailedNoAddress',
   QR_FAILED_INVALID_ADDRESS = 'qrFailedInvalidAddress',
   CORRUPTED_CHAIN_DELETED = 'corruptedChainDeleted',
+  CALCULATE_FEE_FAILED = 'calculateFeeFailed',
 }

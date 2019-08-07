@@ -68,7 +68,6 @@
   "sendPaymentFailed": "Falla en el envío de pago",
   "paymentRequestFailed": "No se pudo enviar la solicitud de pago",
   "reclaimingEscrowedPaymentFailed": "El pago no pudo ser reclamado.",
-  "fetchingReclaimFeeFailed": "Error al obtener la tarifa sugerida.",
   "connectingToCelo": "Conectando a la red de Celo...",
   "poorConnection": {
     "0": "Mala Conexión",
@@ -86,5 +85,6 @@
     "Código QR no se pudo leer. Razón: la dirección de la cartera no es válida.",
   "corruptedChainDeleted": "Se ha borrado información corrupta, por favor reinicie la applicación",
   "web3FailedToSync": "Fallo la sincronización, por favor verifique su conexión",
-  "errorDuringSync": "Ocurrió un error duranet la sincronización, por favor intente más tarde"
+  "errorDuringSync": "Ocurrió un error duranet la sincronización, por favor intente más tarde",
+  "calculateFeeFailed": "No se pudo calcular la comisión"
 }

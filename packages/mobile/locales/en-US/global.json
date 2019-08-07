@@ -67,7 +67,6 @@
   "sendPaymentFailed": "Failure sending payment",
   "paymentRequestFailed": "Payment Request did not send",
   "reclaimingEscrowedPaymentFailed": "Payment could not be reclaimed.",
-  "fetchingReclaimFeeFailed": "Error fetching suggested fee.",
   "connectingToCelo": "Connecting to the Celo Network...",
   "poorConnection": {
     "0": "Bad Connection",
@@ -84,5 +83,6 @@
   "qrFailedInvalidAddress": "QR code read failed. Reason: wallet address invalid.",
   "corruptedChainDeleted": "Corrupted chain data has been deleted, please restart the app",
   "web3FailedToSync": "Failing to sync, check your network connection",
-  "errorDuringSync": "Error occurred during sync, please try again later"
+  "errorDuringSync": "Error occurred during sync, please try again later",
+  "calculateFeeFailed": "Could not calculate fee"
 }
