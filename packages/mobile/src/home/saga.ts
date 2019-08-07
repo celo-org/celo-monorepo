@@ -11,7 +11,7 @@ import {
 } from 'redux-saga/effects'
 import { getSentPayments } from 'src/escrow/actions'
 import { fetchGoldBalance } from 'src/goldToken/actions'
-import { Actions, setLoading } from 'src/home/actions'
+import { Actions, refreshAllBalances, setLoading } from 'src/home/actions'
 import { withTimeout } from 'src/redux/sagas-helpers'
 import { shouldUpdateBalance } from 'src/redux/selectors'
 import { fetchDollarBalance } from 'src/stableToken/actions'
@@ -52,7 +52,7 @@ function* autoRefreshSaga() {
   while (true) {
     yield delay(10 * 1000) // sleep 10 seconds
     if (yield select(shouldUpdateBalance)) {
-      refreshBalances()
+      put(refreshAllBalances())
     }
   }
 }
