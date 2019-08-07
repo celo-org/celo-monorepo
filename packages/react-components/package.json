@@ -15,7 +15,7 @@
     "test:watch": "export TZ=UTC && jest --watch"
   },
   "dependencies": {
-    "@celo/utils": "0.0.1",
+    "@celo/utils": "^0.0.5",
     "lodash": "^4.17.14",
     "react-native-platform-touchable": "^1.1.1",
     "svgs": "^3.2.1"
