@@ -4,7 +4,7 @@ import { componentStyles } from '@celo/react-components/styles/styles'
 import { throttle } from 'lodash'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, PermissionsAndroid, StyleSheet, Text, View } from 'react-native'
 import { NavigationInjectedProps, NavigationScreenProps, withNavigation } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
@@ -15,6 +15,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import CancelButton from 'src/components/CancelButton'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import { Namespaces } from 'src/i18n'
+import { importContacts } from 'src/identity/actions'
 import { E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -38,6 +39,7 @@ interface State {
   recentRecipients: Recipient[]
   allFiltered: Recipient[]
   recentFiltered: Recipient[]
+  hasGivenPermission: boolean
 }
 
 interface StateProps {
@@ -52,6 +54,7 @@ interface DispatchProps {
   showError: typeof showError
   hideAlert: typeof hideAlert
   storeLatestInRecents: typeof storeLatestInRecents
+  importContacts: typeof importContacts
 }
 
 type Props = StateProps & DispatchProps & WithNamespaces & NavigationInjectedProps
@@ -106,6 +109,7 @@ class Send extends React.Component<Props, State> {
       recentRecipients: [],
       allFiltered: [],
       recentFiltered: [],
+      hasGivenPermission: true,
     }
 
     this.allRecipientsFilter = filterRecipientFactory(this.state.allRecipients)
@@ -163,6 +167,15 @@ class Send extends React.Component<Props, State> {
         },
         this.updateFilters
       )
+
+      // Just checks to see if the permissions have already been given, without asking again.
+      PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_CONTACTS).then(
+        (hasPermissions) => {
+          this.setState({
+            hasGivenPermission: hasPermissions,
+          })
+        }
+      )
     }
   }
 
@@ -194,6 +207,11 @@ class Send extends React.Component<Props, State> {
     navigate(Screens.SendAmount, { recipient })
   }
 
+  onPermissionsAccepted = async () => {
+    this.props.importContacts()
+    this.setState({ hasGivenPermission: true })
+  }
+
   render() {
     const { t, defaultCountryCode } = this.props
     const { loading, searchQuery, recentFiltered, allFiltered } = this.state
@@ -221,9 +239,11 @@ class Send extends React.Component<Props, State> {
             sections={sections}
             searchQuery={searchQuery}
             defaultCountryCode={defaultCountryCode}
+            hasAcceptedContactPermission={this.state.hasGivenPermission}
             onSelectRecipient={this.onSelectRecipient}
             onSearchQueryChanged={this.onSearchQueryChanged}
             showQRCode={true}
+            onPermissionsAccepted={this.onPermissionsAccepted}
           />
         )}
       </View>
@@ -256,6 +276,7 @@ export default componentWithAnalytics(
       showError,
       hideAlert,
       storeLatestInRecents,
+      importContacts,
     }
   )(withNamespaces(Namespaces.sendFlow7)(withNavigation(Send)))
 )
