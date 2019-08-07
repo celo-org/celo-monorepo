@@ -15,6 +15,8 @@ export enum Actions {
   ADD_NOTIFICATION = 'HOME/ADD_NOTIFICATION',
   SET_NOTIFICATION = 'HOME/SET_NOTIFICATION',
   REFRESH_BALANCES = 'HOME/REFRESH_BALANCES',
+  START_BALANCE_AUTOREFRESH = 'HOME/START_BALANCE_AUTOREFRESH',
+  STOP_BALANCE_AUTOREFRESH = 'HOME/STOP_BALANCE_AUTOREFRESH',
 }
 
 export const setLoading = (loading: boolean) => ({
@@ -41,4 +43,12 @@ export const setNotification = (notification: Notification, index: number) => ({
 
 export const refreshAllBalances = () => ({
   type: Actions.REFRESH_BALANCES,
+})
+
+export const startBalanceAutorefresh = () => ({
+  type: Actions.START_BALANCE_AUTOREFRESH,
+})
+
+export const stopBalanceAutorefresh = () => ({
+  type: Actions.STOP_BALANCE_AUTOREFRESH,
 })
