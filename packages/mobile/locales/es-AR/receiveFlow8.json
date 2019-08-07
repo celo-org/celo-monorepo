@@ -1,7 +1,7 @@
 {
   "receivedPayment": "Pago recibido",
   "from": "de",
-  "celoWallet": "Billetera de Celo",
+  "celoWallet": "Monedero de Celo",
   "at": "a las",
   "receivedDollars": "Celo Dólares Recibidos",
   "verificationMessage": "La tasa de verificación fue pagada. ¡Bienvenido a Celo!",

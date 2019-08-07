@@ -11,6 +11,7 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { BigNumber } from 'bignumber.js'
 import * as minimist from 'minimist'
 import { BondedDepositsInstance, ValidatorsInstance } from 'types'
+const Web3 = require('web3')
 
 const argv = minimist(process.argv, {
   string: ['keys'],
@@ -50,7 +51,10 @@ async function registerValidatorGroup(
   // can be recovered.
   const account = web3.eth.accounts.create()
 
-  const encryptedPrivateKey = web3.eth.accounts.encrypt(account.privateKey, privateKey)
+  // We do not use web3 provided by Truffle since the eth.accounts.encrypt behaves differently
+  // in the version we use elsewhere.
+  const encryptionWeb3 = new Web3('http://localhost:8545')
+  const encryptedPrivateKey = encryptionWeb3.eth.accounts.encrypt(account.privateKey, privateKey)
   const encodedKey = serializeKeystore(encryptedPrivateKey)
 
   await web3.eth.sendTransaction({

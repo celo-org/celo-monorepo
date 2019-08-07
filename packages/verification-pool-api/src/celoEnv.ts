@@ -1,1 +1,1 @@
-export const CELO_ENV = 'alfajores'
+export const CELO_ENV = 'pilot'
