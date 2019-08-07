@@ -8,9 +8,9 @@
   "types": "./lib/index.d.ts",
   "scripts": {
     "pretest": "tsc",
-    "postinstall": "yarn run build || exit 1 && yarn run prettify || true",
     "prettify": "yarn run prettier --config ../../.prettierrc.js --write '{contracts,types,lib}/**/*.+(ts|tsx|js|jsx)'",
     "build": "tsc",
+    "postbuild": "yarn run prettify",
     "test": "npm run pretest && jest --ci --silent --coverage --runInBand",
     "test:verbose": "npm run pretest && jest --ci --verbose --runInBand"
   },
