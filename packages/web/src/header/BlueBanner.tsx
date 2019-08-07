@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron from 'src/icons/chevron'
 import { colors, fonts, textStyles } from 'src/styles'
 
@@ -66,8 +65,12 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces('common')(({ t }: I18nProps) => (
-  <BlueBanner link="https://medium.com/celohq/introducing-alfajores-1b162ebcb44d">
-    {t('blueBanner')}
-  </BlueBanner>
-))
+export default function() {
+  return <BlueBanner link={LINK}>{TEXT}</BlueBanner>
+}
+
+// MAX width 75 characters
+export const TEXT =
+  'Introducing Alfajores: Celo’s code is open source and the network is live for testing'
+
+const LINK = 'https://medium.com/celohq/introducing-alfajores-1b162ebcb44d'
