@@ -50,19 +50,21 @@ function SmartTopAlert(props: Props) {
   )
 
   function hide() {
-    if (containerRef.current) {
-      containerRef.current.measure((l, t, w, height) => {
-        Animated.timing(yOffset.current, {
-          toValue: -height,
-          duration: 150,
-          useNativeDriver: true,
-        }).start(({ finished }) => {
-          if (finished) {
-            setVisibleAlertState(null)
-          }
-        })
-      })
+    if (!containerRef.current) {
+      return
     }
+
+    containerRef.current.measure((l, t, w, height) => {
+      Animated.timing(yOffset.current, {
+        toValue: -height,
+        duration: 150,
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished) {
+          setVisibleAlertState(null)
+        }
+      })
+    })
   }
 
   useEffect(
@@ -83,25 +85,29 @@ function SmartTopAlert(props: Props) {
       let rafHandle: number
       let timeoutHandle: number
 
-      if (visibleAlertState) {
-        rafHandle = requestAnimationFrame(() => {
-          if (containerRef.current) {
-            containerRef.current.measure((l, t, w, height) => {
-              Animated.timing(yOffset.current, {
-                // @ts-ignore, react-native type defs are missing this one!
-                fromValue: -height,
-                toValue: 0,
-                duration: 200,
-                useNativeDriver: true,
-              }).start()
+      if (!visibleAlertState) {
+        return
+      }
 
-              if (visibleAlertState.dismissAfter) {
-                timeoutHandle = window.setTimeout(hide, visibleAlertState.dismissAfter)
-              }
-            })
+      rafHandle = requestAnimationFrame(() => {
+        if (!containerRef.current) {
+          return
+        }
+
+        containerRef.current.measure((l, t, w, height) => {
+          Animated.timing(yOffset.current, {
+            // @ts-ignore, react-native type defs are missing this one!
+            fromValue: -height,
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+          }).start()
+
+          if (visibleAlertState.dismissAfter) {
+            timeoutHandle = window.setTimeout(hide, visibleAlertState.dismissAfter)
           }
         })
-      }
+      })
 
       return () => {
         if (rafHandle) {
