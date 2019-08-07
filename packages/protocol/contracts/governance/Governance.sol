@@ -59,9 +59,9 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
 
   // TODO(asa): Reduce storage usage here.
   struct VoteTotals {
+    uint256 yes;
     uint256 abstain;
     uint256 no;
-    uint256 yes;
   }
 
   struct Transaction {

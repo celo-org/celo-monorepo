@@ -37,7 +37,7 @@ contract Quorum is IQuorum, Ownable, Initializable {
   );
 
   /**
-   * @notice Initializes participation baseline.
+   * @notice Initializes quorum variables.
    * @param _participationBaseline The initial value of the participation baseline.
    * @param _participationFloor The participation floor.
    * @param _updateCoefficient The weight of the new participation
@@ -127,7 +127,7 @@ contract Quorum is IQuorum, Ownable, Initializable {
     view
     returns (int256)
   {
-    if (yes.add(no) == 0) {
+    if (yes == 0) {
       return 0;
     }
     int256 totalWeightFixed = FixidityLib.newFixed(int256(totalWeight));
