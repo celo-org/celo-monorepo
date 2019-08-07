@@ -2,6 +2,7 @@ import {
   getAttestationFee,
   getAttestationsContract,
   getStableTokenContract,
+  parseFromContractDecimals,
 } from '@celo/contractkit'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
@@ -49,7 +50,6 @@ export const TEMP_PW = 'ce10'
 
 const USE_REAL_FEE = false
 const INVITE_FEE = '0.2'
-const INVITE_SEND_AMOUNT = '0.18'
 
 // TODO(Rossy) Cache this so we don't recalculate it every time we invite someone
 // Especially relevant when inviting many friends
@@ -250,11 +250,13 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
     yield call(web3.eth.personal.unlockAccount, tempAccount, TEMP_PW, 600)
 
     // TODO(cmcewen): calculate the proper amount when gas estimation is working
+    const stableBalanceConverted = yield parseFromContractDecimals(stableBalance, StableToken)
 
     const tx = yield call(createTransaction, getStableTokenContract, {
       recipientAddress: newAccount,
       comment: SENTINEL_INVITE_COMMENT,
-      amount: INVITE_SEND_AMOUNT,
+      // TODO: appropriately withdraw the balance instead of using gas fees will be less than 1 cent
+      amount: stableBalanceConverted.minus('0.01').toString(),
     })
 
     yield call(sendTransaction, tx, tempAccount, TAG, 'Transfer from temp wallet')
