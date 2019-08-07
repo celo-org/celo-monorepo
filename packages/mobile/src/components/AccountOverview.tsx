@@ -95,7 +95,6 @@ export class AccountOverview extends React.Component<Props> {
                   amount={dollarBalance}
                   size={this.getFontSize(dollarBalance, !this.props.stableEducationCompleted)}
                   type={Tokens.DOLLAR}
-                  balanceOutOfSync={false}
                 />
                 {!this.props.stableEducationCompleted && (
                   <PulsingDot
@@ -121,7 +120,6 @@ export class AccountOverview extends React.Component<Props> {
                   amount={goldBalance}
                   size={this.getFontSize(goldBalance, !this.props.goldEducationCompleted)}
                   type={Tokens.GOLD}
-                  balanceOutOfSync={false}
                 />
                 {!this.props.goldEducationCompleted && (
                   <PulsingDot
