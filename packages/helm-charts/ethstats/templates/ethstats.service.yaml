@@ -1,16 +1,16 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{ template "ethereum.fullname" . }}-ethstats
+  name: {{ .Release.Name }}-ethstats
   labels:
-    app: {{ template "ethereum.name" . }}
-    chart: {{ template "ethereum.chart" . }}
+    app: ethstats
+    chart: ethstats
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     component: ethstats
 spec:
   selector:
-    app: {{ template "ethereum.name" . }}
+    app: ethstats
     release: {{ .Release.Name }}
     component: ethstats
   type: {{ .Values.ethstats.service.type }}

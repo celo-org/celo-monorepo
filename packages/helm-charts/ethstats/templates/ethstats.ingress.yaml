@@ -1,10 +1,10 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ template "ethereum.fullname" . }}-ethstats-ingress
+  name: {{ .Release.Name }}-ethstats-ingress
   labels:
-    app: {{ template "ethereum.name" . }}
-    chart: {{ template "ethereum.chart" . }}
+    app: ethstats
+    chart: ethstats
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     component: ethstats
@@ -14,12 +14,12 @@ spec:
   tls:
   - hosts:
     - {{ .Release.Name }}-ethstats.{{ .Values.domain.name }}.org
-    secretName: {{ template "ethereum.fullname" . }}-ethstats-tls
+    secretName: {{ .Release.Name }}-ethstats-tls
   rules:
   - host: {{ .Release.Name }}-ethstats.{{ .Values.domain.name }}.org
     http:
       paths:
       - path: /
         backend:
-          serviceName: {{ template "ethereum.fullname" . }}-ethstats
+          serviceName: {{ .Release.Name }}-ethstats
           servicePort: 80

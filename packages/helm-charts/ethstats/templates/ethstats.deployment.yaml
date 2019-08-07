@@ -1,10 +1,10 @@
-apiVersion: apps/v1beta2 
+apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ template "ethereum.fullname" . }}-ethstats
+  name: {{ .Release.Name }}-ethstats
   labels:
-    app: {{ template "ethereum.name" . }}
-    chart: {{ template "ethereum.chart" . }}
+    app: ethstats
+    chart: ethstats
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
     component: ethstats
@@ -12,13 +12,13 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ template "ethereum.name" . }}
+      app: ethstats
       release: {{ .Release.Name }}
       component: ethstats
   template:
     metadata:
       labels:
-        app: {{ template "ethereum.name" . }}
+        app: ethstats
         release: {{ .Release.Name }}
         component: ethstats
     spec:
@@ -37,7 +37,7 @@ spec:
         - name: WS_SECRET
           valueFrom:
             secretKeyRef:
-              name: {{ template "ethereum.fullname" . }}-ethstats
+              name: {{ .Release.Name }}-ethstats
               key: WS_SECRET
     {{- with .Values.nodeSelector }}
       nodeSelector:
