@@ -142,7 +142,6 @@ export class RecipientPicker extends React.Component<RecipientProps> {
       <Text style={[fontStyles.bodySmall, style.emptyViewBodySmall]}>
         {this.props.t('searchForSomeone')}
       </Text>
-      {this.renderRequestContactPermission()}
     </View>
   )
 
@@ -242,6 +241,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
           initialNumToRender={30}
           keyboardShouldPersistTaps="handled"
         />
+        {this.renderRequestContactPermission()}
       </View>
     )
   }

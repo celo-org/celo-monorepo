@@ -141,7 +141,7 @@ class Send extends React.Component<Props, State> {
     // end alfajores-net code
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const { t, recentPhoneNumbers, recipientCache } = this.props
     this.props.navigation.setParams({ title: t('send_or_request') })
     const recipients = Object.values(recipientCache)
@@ -168,14 +168,8 @@ class Send extends React.Component<Props, State> {
         this.updateFilters
       )
 
-      // Just checks to see if the permissions have already been given, without asking again.
-      PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_CONTACTS).then(
-        (hasPermissions) => {
-          this.setState({
-            hasGivenPermission: hasPermissions,
-          })
-        }
-      )
+      const hasGivenPermission = await checkContactsPermission()
+      this.setState({ hasGivenPermission })
     }
   }
 
