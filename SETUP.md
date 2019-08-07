@@ -49,8 +49,8 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 Re-login to the system and run:
 
 ```bash
-rustup install nightly-2019-07-25
-rustup default nightly-2019-07-25
+rustup install 1.36.0
+rustup default 1.36.0
 ```
 
 ### Java

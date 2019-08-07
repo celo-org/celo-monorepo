@@ -291,8 +291,8 @@ jobs:
             /tmp/go/bin/go version
             curl https://sh.rustup.rs -sSf | sh -s -- -y
             export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            rustup install nightly-2019-07-25
-            rustup default nightly-2019-07-25
+            rustup install 1.36.0
+            rustup default 1.36.0
       - run:
           name: Run test
           no_output_timeout: 20m
@@ -325,8 +325,8 @@ jobs:
             /tmp/go/bin/go version
             curl https://sh.rustup.rs -sSf | sh -s -- -y
             export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            rustup install nightly-2019-07-25
-            rustup default nightly-2019-07-25
+            rustup install 1.36.0
+            rustup default 1.36.0
 
       - run:
           name: Run test
@@ -360,8 +360,8 @@ jobs:
             /tmp/go/bin/go version
             curl https://sh.rustup.rs -sSf | sh -s -- -y
             export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            rustup install nightly-2019-07-25
-            rustup default nightly-2019-07-25
+            rustup install 1.36.0
+            rustup default 1.36.0
 
       - run:
           name: Run test
@@ -394,8 +394,8 @@ jobs:
             /tmp/go/bin/go version
             curl https://sh.rustup.rs -sSf | sh -s -- -y
             export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            rustup install nightly-2019-07-25
-            rustup default nightly-2019-07-25
+            rustup install 1.36.0
+            rustup default 1.36.0
       - run:
           name: Run test
           command: |
