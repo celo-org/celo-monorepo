@@ -213,7 +213,6 @@ async function getEscrowedPayment(escrow: Escrow, paymentID: string) {
   }
 }
 
-// TODO(Rossy) optimize this with caching?
 function* doFetchSentPayments() {
   Logger.debug(TAG + '@doFetchSentPayments', 'Fetching valid sent escrowed payments')
 
