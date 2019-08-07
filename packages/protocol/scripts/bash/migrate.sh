@@ -11,13 +11,12 @@ TRUFFLE_OVERRIDE=""
 MIGRATION_OVERRIDE=""
 NETWORK=""
 RESET=""
-LOCALGETH=""
 # https://github.com/trufflesuite/truffle-migrate/blob/develop/index.js#L161
 # Default to larger than the number of contracts we will ever have
 TO=100000
 VALIDATOR_PUBLIC_KEYS=""
 
-while getopts 'n:rt:c:k:m:l:' flag; do
+while getopts 'n:rt:c:k:m:' flag; do
   case "${flag}" in
     n) NETWORK="$OPTARG" ;;
     r) RESET="--reset" ;;
@@ -25,7 +24,6 @@ while getopts 'n:rt:c:k:m:l:' flag; do
     k) VALIDATOR_PUBLIC_KEYS="$OPTARG" ;;
     c) TRUFFLE_OVERRIDE="$OPTARG" ;;
     m) MIGRATION_OVERRIDE="$OPTARG" ;;
-    l) LOCALGETH="$OPTARG" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -37,13 +35,11 @@ if ! nc -z 127.0.0.1 8545 ; then
   exit 1
 fi
 
-pushd $LOCALGETH && make bls-zexe && popd && \
 yarn run contract-types && \
 yarn run compile-typescript && \
 echo "Migrating contracts up to migration number ${TO}" && \
 yarn run truffle migrate --compile-all --network $NETWORK --build_directory $PWD/build/$NETWORK $RESET \
   --to ${TO} \
   --keys $VALIDATOR_PUBLIC_KEYS \
-  --localgeth $LOCALGETH \
   --truffle_override "$TRUFFLE_OVERRIDE" \
   --migration_override "$MIGRATION_OVERRIDE"
