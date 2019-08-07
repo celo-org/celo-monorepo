@@ -302,7 +302,7 @@ jobs:
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_transfers.sh checkout 33e2a1111485ab00202406add78c513ce12fb42b
+            ./ci_test_transfers.sh checkout kobigurk/bls
 
   end-to-end-geth-governance-test:
     <<: *defaults
@@ -337,7 +337,7 @@ jobs:
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_governance.sh checkout 33e2a1111485ab00202406add78c513ce12fb42b
+            ./ci_test_governance.sh checkout kobigurk/bls
 
   end-to-end-geth-sync-test:
     <<: *defaults
@@ -371,7 +371,7 @@ jobs:
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_sync.sh checkout 33e2a1111485ab00202406add78c513ce12fb42b
+            ./ci_test_sync.sh checkout kobigurk/bls
 
   end-to-end-geth-integration-sync-test:
     <<: *defaults
