@@ -23,8 +23,6 @@ rule modifying_stageDuration(method f) {
 /*
 
 A user should never be able to upvote more than one proposal in the queue
---> What we will check: 
-	impossibility of: increase of p's yes votes for user u whose upvoted proposal is p 
 	
 */
 rule no_double_upvote(uint256 p, address u) {
@@ -46,6 +44,10 @@ rule no_double_upvote(uint256 p, address u) {
 
 
 /* That's for referendum...
+A user should never be able to upvote more than one proposal in the queue
+--> What we will check: 
+	impossibility of: increase of p's yes votes for user u whose upvoted proposal is p 
+	
 rule no_double_upvote(uint256 p, address u) {
 
 	env _e;

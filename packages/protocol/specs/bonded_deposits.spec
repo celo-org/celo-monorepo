@@ -41,6 +41,7 @@ rule account_empty_unless_created(method f, address account) {
 
 rule address_cant_be_both_account_and_delegate(method f, address x) {
 	address account; // an account that may point to x being a delegate
+	require account != 0; // account 0 is not real, should never be real
 	
 	env ePre;
 	bool _isAccount = sinvoke _exists(ePre,x); // x is an account if true
@@ -62,8 +63,16 @@ rule address_cant_be_both_account_and_delegate(method f, address x) {
 	require _isDelegate => (_aVotingDelegate == x => (_aRewardsDelegate != x && _aValidatingDelegate != x)); 
 	require _isDelegate => (_aValidatingDelegate == x => (_aVotingDelegate != x && _aRewardsDelegate != x)); 
 	
-	
 	env eF; 
+	/* Missing: forall a1,a2. delegations(x)==a1 => x does not have a delegate role for a2 
+		We instantitate this invariant for eF.msg.sender
+	*/
+	require sinvoke _rewardsDelegate(ePre,eF.msg.sender) != x 
+			&& sinvoke _votingDelegate(ePre,eF.msg.sender) != x 
+			&& sinvoke _validatingDelegate(ePre,eF.msg.sender) != x;
+	// TODO: Prove the above invariant
+	// TODO: Consider adding the requirement delegations[account.validating.delegate] == msg.sender to all delegate* functions
+	
 	calldataarg arg; 
 	invoke f(eF,arg);
 
@@ -85,12 +94,29 @@ rule address_cant_be_both_account_and_delegate(method f, address x) {
 	assert isDelegate_ <=> delegatedBy_ == account, "Violated: $x is a delegate of $account iff $x got a delegate role from ${account}. But x has a delegate role: ${isDelegate_} while delegated by ${delegatedBy_}";
 }
 
+rule address_zero_cannot_become_an_account(method f) {
+	env ePre;
+	address account = 0;
+	
+	bool _isAccount = sinvoke _exists(ePre,account);
+	
+	env eF;
+	calldataarg arg; 
+	invoke f(eF,arg);
+	
+	env ePost;
+	bool isAccount_ = sinvoke _exists(ePost,account);
+	
+	assert !_isAccount => !isAccount_, "For address 0, even though it did not exist before executing ${f}, it exists now";	
+}
+
 rule delegations_in_sync_and_exclusive(method f, address delegatedTo) {
 	// TODO: What if delegatedTo is 0?
 	env ePre;
 	address _delegatingAccount = sinvoke delegations(ePre,delegatedTo); // an account that delegates one of the roles to delegatedTo
 
 	require sinvoke _exists(ePre,_delegatingAccount); // _delegatingAccount must be an account
+	require !sinvoke _exists(ePre,delegtedTo); // applying address_cant_be_both_account_and_delegate - delegatedTo is a delegate, thus not an account
 	
 	address _aRewardsDelegate = sinvoke _rewardsDelegate(ePre,_delegatingAccount);
 	address _aVotingDelegate = sinvoke _votingDelegate(ePre,_delegatingAccount);
@@ -129,7 +155,7 @@ rule delegations_in_sync_and_exclusive(method f, address delegatedTo) {
 	// otherwise, delegatedTo was removed as a delegation
 	assert delegatingAccount_ != _delegatingAccount => 
 			(!aRewardsDelegateTo_ && !aVotingDelegateTo_ && !aValidatingDelegateTo_),
-				"Delegated $delegatedTo before executing $f was removed as a delegate of $_delegatingAccount, therefore it cannot have a delegate role, although at least one of the roles stayed: rewards: ${aRewardsDelegateTo_}, voting: ${aVotingDelegateTo_}, validating: ${aValidatingDelegateTo_}";
+				"Delegated $delegatedTo before executing $f was removed as a delegate of ${_delegatingAccount}, therefore it cannot have a delegate role, although at least one of the roles stayed: rewards: ${aRewardsDelegateTo_}, voting: ${aVotingDelegateTo_}, validating: ${aValidatingDelegateTo_}";
 	
 } 
 
@@ -152,8 +178,8 @@ rule delegations_can_be_removed_but_not_moved(method f, address delegatedTo)
 
 
 rule functional_get_account_from_voter_result(address account) {
-	// TODO: What if voting delegate is 0?
 	// If an account has a voting delegate, getAccountFromVoter(delegate) must return that account
+	require account != 0; // account 0 is not real, should never be real
 	
 	env e;
 		
@@ -170,7 +196,6 @@ rule functional_get_account_from_voter_result(address account) {
 }
 
 rule functional_get_account_from_voter_success(address account, address delegate) {
-	// TODO: What if voting delegate is 0?
 	// getAccountFromVoter(address) must fail if “address” is not an account or voting delegate
 	env e;
 	
@@ -396,3 +421,5 @@ rule check_initializer {
 	assert successInit => isInitialized_, "When initialize() succeeds, must set initialization field to true";
 }
 
+
+// all these invariants should be asserted to hold in construction
