@@ -50,7 +50,6 @@ export const TEMP_PW = 'ce10'
 
 const USE_REAL_FEE = false
 const INVITE_FEE = '0.2'
-const INVITE_SEND_AMOUNT = '0.3'
 
 // TODO(Rossy) Cache this so we don't recalculate it every time we invite someone
 // Especially relevant when inviting many friends

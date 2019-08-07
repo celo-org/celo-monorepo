@@ -154,7 +154,7 @@ export function* doVerificationFlow() {
     yield put(completeAttestationCode(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining))
 
     const attestations: ActionableAttestation[] = yield call(
-      getAllActionableAttestations,
+      requestAndRetrieveAttestations,
       attestationsContract,
       stableTokenContract,
       e164NumberHash,
@@ -230,7 +230,7 @@ interface AttestationsStatus {
 }
 
 // Requests if necessary additional attestations and returns all revealable attetations
-async function getAllActionableAttestations(
+export async function requestAndRetrieveAttestations(
   attestationsContract: AttestationsType,
   stableTokenContract: StableTokenType,
   e164NumberHash: string,
@@ -246,7 +246,7 @@ async function getAllActionableAttestations(
 
   while (attestations.length < attestationsRemaining) {
     // Request any additional attestations beyond the original set
-    await requestNeededAttestations(
+    await requestAttestations(
       attestationsContract,
       stableTokenContract,
       attestationsRemaining - attestations.length,
@@ -297,7 +297,7 @@ async function getAttestationsStatus(
   }
 }
 
-export async function requestNeededAttestations(
+async function requestAttestations(
   attestationsContract: AttestationsType,
   stableTokenContract: StableTokenType,
   numAttestationsRequestsNeeded: number,
