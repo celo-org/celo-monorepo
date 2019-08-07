@@ -1,16 +1,14 @@
-import { addCeloEnvMiddleware, addCeloGethDirMiddleware, CeloGethDirEnvArgv } from 'src/lib/utils'
+import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/utils'
 import * as yargs from 'yargs'
 
 export const command = 'deploy <deployMethod> <deployPackage>'
 
 export const describe = 'commands for deployment of various packages in the monorepo'
 
-export type DeployArgv = CeloGethDirEnvArgv
+export type DeployArgv = CeloEnvArgv
 
 export const builder = (argv: yargs.Argv) => {
-  return addCeloGethDirMiddleware(addCeloEnvMiddleware(argv)).commandDir('deploy', {
-    extensions: ['ts'],
-  })
+  return addCeloEnvMiddleware(argv).commandDir('deploy', { extensions: ['ts'] })
 }
 export const handler = () => {
   // empty

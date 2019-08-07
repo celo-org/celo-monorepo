@@ -24,7 +24,6 @@ const argv = minimist(process.argv, {
 })
 
 const gethRepoPath = argv.localgeth || '/tmp/geth'
-const blsPoPBinaryPath = `${gethRepoPath}/vendor/github.com/celo-org/bls-zexe/bls/target/release/examples/pop`
 
 function serializeKeystore(keystore: any) {
   return Buffer.from(JSON.stringify(keystore)).toString('base64')
@@ -114,15 +113,13 @@ async function registerValidator(
   const address = generateAccountAddressFromPrivateKey(validatorPrivateKey.slice(2))
   const publicKey = generatePublicKeyFromPrivateKey(validatorPrivateKey.slice(2))
   const BLSPublicKey = BLSPrivateKeyToPublic(validatorPrivateKey.slice(2))
+  const BLSPoP = crypto
+    .randomBytes(96)
+    .toString('hex')
+    .trim() // PoP is not verified until we have a TypeScript version
+  const publicKeysData = publicKey + BLSPublicKey + BLSPoP
 
   await makeMinimumDeposit(bondedDeposits, validatorPrivateKey)
-  const BLSPoP = (await execCmdWithOutput(blsPoPBinaryPath, [
-    '-k',
-    BLSPrivateKeyToProcessedPrivateKey(validatorPrivateKey.slice(2)).toString('hex'),
-  ]))
-    .toString('hex')
-    .trim()
-  const publicKeysData = publicKey + BLSPublicKey + BLSPoP
 
   // @ts-ignore
   const registerTx = validators.contract.methods.registerValidator(
