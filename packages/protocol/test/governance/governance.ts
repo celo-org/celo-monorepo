@@ -547,8 +547,8 @@ contract('Governance', (accounts: string[]) => {
       await assertRevert(governance.setConstitution(destination, nullFunctionId, 0))
     })
 
-    it('should revert when the threshold is less than a majority', async () => {
-      await assertRevert(governance.setConstitution(destination, nullFunctionId, toFixed(49 / 100)))
+    it('should revert when the threshold is equal to a majority', async () => {
+      await assertRevert(governance.setConstitution(destination, nullFunctionId, toFixed(1 / 2)))
     })
 
     it('should revert when the threshold is greater than 100%', async () => {
@@ -1811,14 +1811,14 @@ contract('Governance', (accounts: string[]) => {
       await governance.vote(proposalId, index, value)
     })
 
-    it('should return true when adjusted support is greater than threshold', async () => {
-      await mockQuorum.setAdjustedSupportReturn(toFixed(1))
+    it('should return true when adjusted support is greater than or equal to threshold', async () => {
+      await mockQuorum.setAdjustedSupportReturn(toFixed(7 / 10))
       const passing = await governance.isProposalPassing(proposalId)
       assert.isTrue(passing)
     })
 
-    it('should return false when adjusted support is less than or equal to threshold', async () => {
-      await mockQuorum.setAdjustedSupportReturn(toFixed(7 / 10))
+    it('should return false when adjusted support is less than threshold', async () => {
+      await mockQuorum.setAdjustedSupportReturn(toFixed(6 / 10))
       const passing = await governance.isProposalPassing(proposalId)
       assert.isFalse(passing)
     })

@@ -228,29 +228,4 @@ library FractionUtil {
   {
     return isLessThanOrEqualTo(x, z) && isLessThanOrEqualTo(z, y);
   }
-
-  /**
-   * @dev Returns a fraction approximately equal to x whose numerator
-   *   and denominator have base-10 representations at most maxDigits long.
-   * @param x A Fraction struct.
-   * @param maxDigits The maximum numerator and denominator base-10 length.
-   * @return An approximation to x.
-   */
-  function round(
-    Fraction memory x,
-    uint256 maxDigits
-  )
-    internal
-    pure
-    returns (Fraction memory)
-  {
-    uint256 limit = 10**maxDigits;
-    uint256 num = x.numerator;
-    uint256 denom = x.denominator;
-    while ((num > limit || denom > limit) && denom >= 10) {
-      num = num.div(10);
-      denom = denom.div(10);
-    }
-    return Fraction(num, denom);
-  }
 }

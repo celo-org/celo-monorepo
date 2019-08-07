@@ -331,8 +331,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   }
 
   /**
-   * @notice Updates the ratio of yes:yes+no votes needed to exceed for a specific class
-   *   of proposals to pass.
+   * @notice Updates the ratio of yes:yes+no votes needed for a specific class of proposals to pass.
    * @param destination The destination of proposals for which this threshold should apply.
    * @param functionId The function ID of proposals for which this threshold should apply. Zero
    *   will set the default.
@@ -350,7 +349,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     // TODO(asa): https://github.com/celo-org/celo-monorepo/pull/3414#discussion_r283588332
     require(destination != address(0));
     // Threshold has to be greater than majority and not greater than unaninimty
-    require(threshold >= HALF && threshold <= FixidityLib.fixed1());
+    require(threshold > HALF && threshold <= FixidityLib.fixed1());
     if (functionId == 0) {
       constitution[destination].defaultThreshold = threshold;
     } else {
@@ -902,7 +901,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
         proposalThreshold = threshold;
       }
     }
-    return support > proposalThreshold;
+    return support >= proposalThreshold;
   }
 
   /**
