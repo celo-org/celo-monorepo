@@ -43,7 +43,6 @@ const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect 
 let AssignAccountLock = false
 
 // checks if web3 claims it is currently syncing or not
-// exported for testing
 function* checkWeb3SyncProgressClaim() {
   while (true) {
     try {
@@ -204,6 +203,7 @@ export function* getAccount() {
 // Wait for geth to be connected and account ready
 export function* getConnectedAccount() {
   yield waitForGethConnectivity()
+  yield checkWeb3Sync()
   const account: string = yield getAccount()
   return account
 }
@@ -229,4 +229,4 @@ export function* web3Saga() {
 
 // exported for testing
 export const _checkWeb3SyncProgressClaim = checkWeb3SyncProgressClaim
-export const _CHECK_SYNC_PROGRESS_TIMEOUT = CHECK_SYNC_PROGRESS_TIMEOUT // Camell case because
+export const _CHECK_SYNC_PROGRESS_TIMEOUT = CHECK_SYNC_PROGRESS_TIMEOUT
