@@ -2056,10 +2056,10 @@
   version "1.0.3"
   resolved "git+https://github.com/celo-org/react-native-sms-retriever#d3a2fdb148e3427c9a8c1c87acb61e79e2afcfee"
 
-"@celo/utils@0.0.1-dappkit3":
-  version "0.0.1-dappkit3"
-  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.0.1-dappkit3.tgz#07b3c7efc0acb5c2de5fde24c3f5b0e4ab087e78"
-  integrity sha512-SxoMUrEmtA1TzS7FTvWdX/+OGyfemX9EVLF5C/VVYMZeUe2vA6krTKJzstm8d/U/bPv5D7kuS/06XByRGTZ08A==
+"@celo/utils@0.0.1-dappkit6":
+  version "0.0.1-dappkit6"
+  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.0.1-dappkit6.tgz#80b0e90d84481b58c725518e4c8280e311e2d3ae"
+  integrity sha512-R6kz5e3ye0gaGk19Y/qv6ji6udh/fO3WMxuVtVomlfQ7WDg4pdc3BUQn+rQFXW7HsLt5qcQyQMU3j/2SMqYsIQ==
   dependencies:
     "@umpirsky/country-list" "https://github.com/umpirsky/country-list#05fda51"
     bignumber.js "^7.2.0"
