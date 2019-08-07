@@ -48,7 +48,7 @@ export const handler = async (argv: InitialArgv) => {
     await execCmd(
       `yarn --cwd ../protocol run init-network -n ${
         argv.celoEnv
-      } -c '{ "from" : "${minerForEnv()}" }' -k ${getValidatorKeys()}`
+      } -c '{ "from" : "${minerForEnv()}" }' -k ${getValidatorKeys()} -l ${argv.gethDir}`
     )
   }
 

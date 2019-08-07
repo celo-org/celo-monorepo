@@ -15,7 +15,7 @@ export const handler = async (argv: UpgradeArgv) => {
 
   console.info(`Upgrading smart contracts on ${argv.celoEnv}`)
   const cb = async () => {
-    await execCmd(`yarn --cwd ../protocol run migrate -n ${argv.celoEnv}`)
+    await execCmd(`yarn --cwd ../protocol run migrate -n ${argv.celoEnv} -l ${argv.gethDir}`)
   }
 
   try {

@@ -37,6 +37,7 @@ if ! nc -z 127.0.0.1 8545 ; then
   exit 1
 fi
 
+pushd $LOCALGETH && make bls-zexe && popd && \
 yarn run contract-types && \
 yarn run compile-typescript && \
 echo "Migrating contracts up to migration number ${TO}" && \
