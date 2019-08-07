@@ -23604,6 +23604,11 @@ react-native-confirm-device-credentials@^1.0.0:
   version "4.0.2"
   resolved "git://github.com/celo-org/react-native-contacts#4989b0b4df8bf84acf1979643af243b51453a504"
 
+"react-native-contacts@https://github.com/celo-org/react-native-contacts#4989b0b":
+  version "4.0.2"
+  uid "4989b0b4df8bf84acf1979643af243b51453a504"
+  resolved "https://github.com/celo-org/react-native-contacts#4989b0b4df8bf84acf1979643af243b51453a504"
+
 react-native-crypto@^2.0.1:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/react-native-crypto/-/react-native-crypto-2.1.2.tgz#cfe68cad51cd1f73a4202b7ac164f96c1144cb2a"
