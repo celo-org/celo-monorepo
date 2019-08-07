@@ -1,4 +1,4 @@
-import { BLSPrivateKeyToPublic } from '@celo/celotool/src/lib/bls_utils'
+import { blsPrivateKeyToPublic } from '@celo/celotool/src/lib/bls_utils'
 import {
   CONTRACT_ADDRESSES,
   CONTRACT_OWNER_STORAGE_LOCATION,
@@ -39,7 +39,7 @@ export enum ConsensusType {
 
 export interface Validator {
   address: string
-  BLSPublicKey: string
+  blsPublicKey: string
 }
 
 export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
@@ -102,7 +102,7 @@ export const getValidators = (mnemonic: string, n: number) => {
     .map((key) => {
       return {
         address: privateKeyToAddress(key).slice(2),
-        BLSPublicKey: BLSPrivateKeyToPublic(key),
+        blsPublicKey: blsPrivateKeyToPublic(key),
       }
     })
 }
@@ -114,7 +114,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
       ? OG_ACCOUNTS.map((account) => {
           return {
             address: account.address,
-            BLSPublicKey: BLSPrivateKeyToPublic(account.privateKey),
+            blsPublicKey: blsPrivateKeyToPublic(account.privateKey),
           }
         })
       : getValidators(fetchEnv(envVar.MNEMONIC), parseInt(validatorEnv, 10))
@@ -165,7 +165,7 @@ const generateIstanbulExtraData = (validators: Validator[]) => {
       // @ts-ignore
       .encode([
         validators.map((validator) => Buffer.from(validator.address, 'hex')),
-        validators.map((validator) => Buffer.from(validator.BLSPublicKey, 'hex')),
+        validators.map((validator) => Buffer.from(validator.blsPublicKey, 'hex')),
         new Buffer(0),
         Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
         new Buffer(0),

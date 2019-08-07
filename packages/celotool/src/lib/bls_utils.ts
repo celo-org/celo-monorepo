@@ -25,7 +25,7 @@ const g = Point.fromAffine(curve, Gx, Gy)
 
 const MODULUSMASK = 31
 
-export const BLSPrivateKeyToProcessedPrivateKey = (privateKeyHex: string) => {
+export const blsPrivateKeyToProcessedPrivateKey = (privateKeyHex: string) => {
   for (let i = 0; i < 256; i++) {
     const originalPrivateKeyBytes = Buffer.from(privateKeyHex, 'hex')
 
@@ -54,8 +54,8 @@ export const BLSPrivateKeyToProcessedPrivateKey = (privateKeyHex: string) => {
   throw new Error("couldn't derive BLS key from ECDSA key")
 }
 
-export const BLSPrivateKeyToPublic = (privateKeyHex: string) => {
-  const privateKeyBytes = BLSPrivateKeyToProcessedPrivateKey(privateKeyHex)
+export const blsPrivateKeyToPublic = (privateKeyHex: string) => {
+  const privateKeyBytes = blsPrivateKeyToProcessedPrivateKey(privateKeyHex)
   const privateKey = BigInteger.fromBuffer(reverse(privateKeyBytes))
 
   const publicKey = g.multiply(privateKey)

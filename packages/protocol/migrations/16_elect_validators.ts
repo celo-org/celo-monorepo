@@ -25,23 +25,6 @@ function serializeKeystore(keystore: any) {
   return Buffer.from(JSON.stringify(keystore)).toString('base64')
 }
 
-export function execCmdWithOutput(cmd: string, args: string[], options: any = {}): Promise<Buffer> {
-  return new Promise(async (resolve, reject) => {
-    const cmdline = [cmd].concat(args).join(' ')
-    console.debug('$ ' + cmdline)
-    exec(cmdline, { ...options }, (err, stdout, _) => {
-      try {
-        if (err) {
-          throw new Error(`error executing: ${err.message}`)
-        }
-        resolve(stdout)
-      } catch (error) {
-        reject(error)
-      }
-    })
-  })
-}
-
 async function makeMinimumDeposit(bondedDeposits: BondedDepositsInstance, privateKey: string) {
   // @ts-ignore
   const createAccountTx = bondedDeposits.contract.methods.createAccount()
@@ -109,10 +92,11 @@ async function registerValidator(
   const address = generateAccountAddressFromPrivateKey(validatorPrivateKey.slice(2))
   const publicKey = generatePublicKeyFromPrivateKey(validatorPrivateKey.slice(2))
   const BLSPublicKey = BLSPrivateKeyToPublic(validatorPrivateKey.slice(2))
+  // TODO(Kobi): Replace with a real PoP when we have a TypeScript version.
   const BLSPoP = crypto
     .randomBytes(96)
     .toString('hex')
-    .trim() // PoP is not verified until we have a TypeScript version
+    .trim()
   const publicKeysData = publicKey + BLSPublicKey + BLSPoP
 
   await makeMinimumDeposit(bondedDeposits, validatorPrivateKey)

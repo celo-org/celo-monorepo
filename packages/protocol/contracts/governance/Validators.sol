@@ -243,10 +243,10 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    *   validator registration.
    * @param publicKeysData Comprised of three tightly-packed elements:
    *    - publicKey - The public key that the validator is using for consensus, should match
-   *      msg.sender.
+   *      msg.sender. 64 bytes.
    *    - BLSPublicKey - The BLS public key that the validator is using for consensus, should pass
-   *      proof of possession.
-   *    - BLSPoP - The BLS public key proof of possession.
+   *      proof of possession. 48 bytes.
+   *    - BLSPoP - The BLS public key proof of possession. 96 bytes.
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient weight.
@@ -270,8 +270,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       publicKeysData.length == (64 + 48 + 96)
     );
     bytes memory proofOfPossessionBytes = publicKeysData.slice(64, 48 + 96);
-    // Disabled until we have a TypeScript version
-    //require(checkProofOfPossession(proofOfPossessionBytes));
+    // TODO(Kobi): Should call checkProofOfPossession once the input is generated correctly.
 
     address account = getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
