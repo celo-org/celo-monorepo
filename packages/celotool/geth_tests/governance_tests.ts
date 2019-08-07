@@ -324,7 +324,6 @@ describe('governance tests', () => {
 
       const changeValidatorSet = async (header: any) => {
         // At the start of epoch N, swap members so the validator set is different for epoch N + 1.
-        console.log(header.number, expectedEpochMembership.size, epoch)
         if (header.number % epoch == 0) {
           const members = await getValidatorGroupMembers()
           const direction = members.includes(membersToSwap[0])
@@ -341,7 +340,7 @@ describe('governance tests', () => {
 
       const subscription = groupWeb3.eth.subscribe('newBlockHeaders').on('data', changeValidatorSet)
       // Wait for a few epochs while changing the validator set.
-      await sleep(3 * epoch)
+      await sleep(epoch * 3)
       subscription.unsubscribe()
       // Wait for the current epoch to complete.
       await sleep(epoch)
