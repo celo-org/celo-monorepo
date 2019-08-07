@@ -1,4 +1,4 @@
-import { retryAsync } from '../src/miscellaneous'
+import { retryAsync } from '../src/async-helpers'
 
 describe('utils->miscellaneous', () => {
   it('tries once if it works', async () => {
