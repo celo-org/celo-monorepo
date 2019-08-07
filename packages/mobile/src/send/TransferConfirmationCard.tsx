@@ -5,7 +5,7 @@ import { componentStyles } from '@celo/react-components/styles/styles'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -22,22 +22,39 @@ const iconSize = 40
 
 interface LineItemProps {
   currencySymbol: string
-  amount: BigNumber
+  amount?: BigNumber
   title: string
   titleIcon?: React.ReactNode
+  isLoading?: boolean
+  hasError?: boolean
 }
 
-function LineItemRow({ currencySymbol, amount, title, titleIcon }: LineItemProps) {
+function LineItemRow({
+  currencySymbol,
+  amount,
+  title,
+  titleIcon,
+  isLoading,
+  hasError,
+}: LineItemProps) {
   return (
     <View style={style.lineItemRow}>
       <View style={style.feeDescription}>
         <Text style={style.feeText}>{title}</Text>
         {titleIcon}
       </View>
-      <Text style={style.feeText}>
-        {currencySymbol}
-        {getMoneyDisplayValue(amount, 4)}
-      </Text>
+      {amount && (
+        <Text style={style.feeText}>
+          {currencySymbol}
+          {getMoneyDisplayValue(amount, 4)}
+        </Text>
+      )}
+      {hasError && <Text style={style.feeText}>---</Text>}
+      {isLoading && (
+        <View style={style.loadingContainer}>
+          <ActivityIndicator size="small" color={colors.celoGreen} />
+        </View>
+      )}
     </View>
   )
 }
@@ -62,6 +79,8 @@ export interface OwnProps {
   value: BigNumber
   currency: CURRENCY_ENUM
   fee?: BigNumber
+  isLoadingFee?: boolean
+  feeError?: Error
   type: TransactionTypes
   e164PhoneNumber?: string
   dollarBalance?: BigNumber
@@ -134,13 +153,15 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
     type: TransactionTypes,
     total: BigNumber,
     fee: BigNumber | undefined,
+    isLoadingFee: boolean | undefined,
+    feeError: Error | undefined,
     currency: CURRENCY_ENUM,
     comment?: string,
     address?: string
   ) => {
     const { t } = this.props
     const currencyStyle = getCurrencyStyles(currency, type)
-    const amountWithFees = total.plus(this.props.fee || 0)
+    const amountWithFees = total.plus(fee || 0)
 
     if (type === TransactionTypes.VERIFICATION_FEE) {
       return <Text style={style.pSmall}>{t('receiveFlow8:verificationMessage')}</Text>
@@ -194,7 +215,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
               </Text>
             </View>
           )}
-          {!!fee && (
+          {(isLoadingFee || fee || feeError) && (
             <View style={style.feeContainer}>
               {this.props.type === TransactionTypes.PAY_REQUEST && (
                 <LineItemRow currencySymbol={'$'} amount={total} title={t('dollarsSent')} />
@@ -204,6 +225,8 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
                 amount={fee}
                 title={address ? t('securityFee') : t('inviteAndSecurityFee')}
                 titleIcon={<FeeIcon />}
+                isLoading={isLoadingFee}
+                hasError={!!feeError}
               />
               <LineItemRow currencySymbol={'$'} amount={amountWithFees} title={t('total')} />
             </View>
@@ -221,6 +244,8 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
       currency,
       comment,
       fee,
+      isLoadingFee,
+      feeError,
       type,
       e164PhoneNumber,
       defaultCountryCode,
@@ -230,7 +255,16 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
       <View style={[componentStyles.roundedBorder, style.container]}>
         {this.renderTopSection(type, recipient, address, e164PhoneNumber, defaultCountryCode)}
         {this.renderAmountSection(type, currency)}
-        {this.renderBottomSection(type, value, fee, currency, comment, address)}
+        {this.renderBottomSection(
+          type,
+          value,
+          fee,
+          isLoadingFee,
+          feeError,
+          currency,
+          comment,
+          address
+        )}
       </View>
     )
   }
@@ -306,6 +340,9 @@ const style = StyleSheet.create({
   feeText: {
     ...fontStyles.subSmall,
     color: colors.dark,
+  },
+  loadingContainer: {
+    transform: [{ scale: 0.8 }],
   },
   avatar: {
     marginTop: 5,

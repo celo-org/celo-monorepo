@@ -5,9 +5,9 @@ set -euo pipefail
 # verifies that the sync works.
 
 # For testing a particular commit hash of Geth repo (usually, on Circle CI)
-# Usage: ci_test.sh checkout <commit_hash_of_geth_repo_to_test>
+# Usage: ci_test_sync_with_network.sh checkout <commit_hash_of_geth_repo_to_test>
 # For testing the local Geth dir (usually, for manual testing)
-# Usage: ci_test.sh local <location_of_local_geth_dir>
+# Usage: ci_test_sync_with_network.sh local <location_of_local_geth_dir>
 
 if [ "${1}" == "checkout" ]; then
     export GETH_DIR="/tmp/geth"
@@ -34,34 +34,31 @@ test_ultralight_sync () {
     NETWORK_NAME=$1
     echo "Testing ultralight sync with '${NETWORK_NAME}' network"
     # Run the sync in ultralight mode
-    geth_tests/integration_network_sync_test.sh ${NETWORK_NAME} ultralight
+    geth_tests/network_sync_test.sh ${NETWORK_NAME} ultralight
     # Get the epoch size by sourcing this file
     source ${CELO_MONOREPO_DIR}/.env.${NETWORK_NAME}
     # Verify what happened by reading the logs.
     ${CELO_MONOREPO_DIR}/node_modules/.bin/mocha -r ts-node/register ${CELO_MONOREPO_DIR}/packages/celotool/geth_tests/verify_ultralight_geth_logs.ts --gethlogfile ${GETH_LOG_FILE} --epoch ${EPOCH}
 }
 
+# Some code in celotool requires this file to contain the MNEMONOIC.
+# The value of MNEMONOIC does not matter.
 if [[ ! -e ${CELO_MONOREPO_DIR}/.env.mnemonic ]]; then
     echo "MNEMONOIC=anything random" > ${CELO_MONOREPO_DIR}/.env.mnemonic
 fi
 
 # Test syncing
 export NETWORK_NAME="integration"
-geth_tests/integration_network_sync_test.sh ${NETWORK_NAME} full
+# Add an extra echo at the end to dump a new line, this makes the results a bit more readable.
+geth_tests/network_sync_test.sh ${NETWORK_NAME} full && echo
 # This is broken, I am not sure why, therefore, commented for now.
-# geth_tests/integration_network_sync_test.sh integration fast
-geth_tests/integration_network_sync_test.sh ${NETWORK_NAME} light
-# celolatest sync mode won't work once a network has crossed its first epoch.
-# Therefore, disable this.
-# geth_tests/integration_network_sync_test.sh integration celolatest
-test_ultralight_sync ${NETWORK_NAME}
+# geth_tests/network_sync_test.sh ${NETWORK_NAME} fast && echo
+geth_tests/network_sync_test.sh ${NETWORK_NAME} light && echo
+test_ultralight_sync ${NETWORK_NAME} && echo
 
 export NETWORK_NAME="alfajoresstaging"
-geth_tests/integration_network_sync_test.sh ${NETWORK_NAME} full
+geth_tests/network_sync_test.sh ${NETWORK_NAME} full && echo
 # This is broken, I am not sure why, therefore, commented for now.
-# geth_tests/integration_network_sync_test.sh integration fast
-geth_tests/integration_network_sync_test.sh ${NETWORK_NAME} light
-# celolatest sync mode won't work once a network has crossed its first epoch.
-# Therefore, disable this.
-# geth_tests/integration_network_sync_test.sh ${NETWORK_NAME} celolatest
-test_ultralight_sync ${NETWORK_NAME}
+# geth_tests/network_sync_test.sh ${NETWORK_NAME} fast && echo
+geth_tests/network_sync_test.sh ${NETWORK_NAME} light && echo
+test_ultralight_sync ${NETWORK_NAME} && echo

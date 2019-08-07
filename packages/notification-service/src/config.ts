@@ -36,11 +36,6 @@ export const DEFAULT_LOCALE = process.env.DEFAULT_LOCALE
 export const POLLING_INTERVAL = Number(process.env.POLLING_INTERVAL) || 1000
 export const NOTIFICATIONS_TTL_MS = Number(process.env.NOTIFICATION_TTL_MS) || 3600 * 1000 * 24 * 7 // 1 week in milliseconds
 
-export enum Currencies {
-  GOLD = 'gold',
-  DOLLAR = 'dollar',
-}
-
 export enum NotificationTypes {
   PAYMENT_RECEIVED = 'PAYMENT_RECEIVED',
   PAYMENT_REQUESTED = 'PAYMENT_REQUESTED',
