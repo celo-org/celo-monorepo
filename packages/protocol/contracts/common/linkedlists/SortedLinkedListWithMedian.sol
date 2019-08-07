@@ -51,26 +51,25 @@ library SortedLinkedListWithMedian {
     list.list.insert(key, value, lesserKey, greaterKey);
     LinkedList.Element storage element = list.list.list.elements[key];
 
-
     MedianAction action = MedianAction.None;
     if (list.list.list.numElements == 1) {
       list.median = key;
       list.relation[key] = MedianRelation.Equal;
     } else if (list.list.list.numElements % 2 == 1) {
-      // When we have an even number of elements, we always choose the higher of the two medians.
-      // Thus, if the element we're inserting is less than the median we need to slide the median
-      // left by one.
-      if (lesserKey == bytes32(0) || list.relation[element.previousKey] == MedianRelation.Lesser) {
+      // When we have an odd number of elements, and the element that we inserted is less than
+      // the previous median, we need to slide the median down one element, since we had previously
+      // selected the greater of the two middle elements.
+      if (element.previousKey == bytes32(0) || list.relation[element.previousKey] == MedianRelation.Lesser) {
         action = MedianAction.Lesser;
         list.relation[key] = MedianRelation.Lesser;
       } else {
         list.relation[key] = MedianRelation.Greater;
       }
     } else {
-      // When we have an even number of elements, we always choose the higher of the two medians.
-      // Thus, if the element we're adding is greaterKey than the median, we need to slide the
-      // median right by one.
-      if (greaterKey == bytes32(0) || list.relation[element.nextKey] == MedianRelation.Greater) {
+      // When we have an even number of elements, and the element that we inserted is greater than
+      // the previous median, we need to slide the median up one element, since we always select
+      // the greater of the two middle elements.
+      if (element.nextKey == bytes32(0) || list.relation[element.nextKey] == MedianRelation.Greater) {
         action = MedianAction.Greater;
         list.relation[key] = MedianRelation.Greater;
       } else {
@@ -85,12 +84,10 @@ library SortedLinkedListWithMedian {
    * @param key The key of the element to remove.
    */
   function remove(List storage list, bytes32 key) public {
-    list.list.remove(key);
-
     MedianAction action = MedianAction.None;
     if (list.list.list.numElements == 0) {
       list.median = bytes32(0);
-    } else if (list.list.list.numElements % 2 == 1) {
+    } else if (list.list.list.numElements % 2 == 0) {
       // When we have an even number of elements, we always choose the higher of the two medians.
       // Thus, if the element we're removing is greaterKey than or equal to the median we need to
       // slide the median left by one.
@@ -105,8 +102,10 @@ library SortedLinkedListWithMedian {
         action = MedianAction.Greater;
       }
     }
-
+    // TODO(asa): What happens when this causes us to update the median to the key that we're removing?
     updateMedian(list, action);
+
+    list.list.remove(key);
   }
 
   /**
@@ -248,6 +247,8 @@ library SortedLinkedListWithMedian {
    * @notice Moves the median pointer right or left of its current value.
    * @param action Which direction to move the median pointer.
    */
+  // When we remove or update the median, we lose our ability to slide the median left or right...
+  // We could save the original left or right pointers, but then if we update those, we can't use them...
   function updateMedian(List storage list, MedianAction action) private {
     LinkedList.Element storage previousMedian = list.list.list.elements[list.median];
     if (action == MedianAction.Lesser) {
