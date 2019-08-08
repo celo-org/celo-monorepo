@@ -78,9 +78,9 @@ function getEnvVarOptions() {
   return nameValuePairs.join(' ')
 }
 
-function execTerraformCmd(command: string, path: string, ...options: string[]) {
+function execTerraformCmd(command: string, workspacePath: string, ...options: string[]) {
   const optionsStr = options ? options.join(' ') : ''
-  const cmd = `terraform ${command} -input=false ${optionsStr} ${path}`
+  const cmd = `terraform ${command} -input=false ${optionsStr} ${workspacePath}`
   // use the middle two default arguments
-  return execCmd(cmd, ...[, ,], true)
+  return execCmd(cmd, {}, false, true)
 }

@@ -12,7 +12,7 @@ export const command = 'vm-testnet'
 
 export const describe = 'deploy a testnet on a VM'
 
-export const builder = () => {}
+export const builder = {}
 
 type VMTestnetInitialArgv = InitialArgv
 
