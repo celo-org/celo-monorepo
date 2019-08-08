@@ -1,28 +1,35 @@
 FROM node:8
-
-RUN apt-get update
-RUN apt-get install lsb-release -y
+WORKDIR /celo-monorepo
 
 # Needed for gsutil
-RUN export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
+RUN apt-get update && \
+    apt-get install -y lsb-release && \
+    export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
     echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    apt-get update -y && apt-get install google-cloud-sdk -y
+    apt-get update -y && \
+    apt-get install -y google-cloud-sdk && \
+    rm -rf /var/lib/apt/lists/*
+
 
 # ensure yarn.lock is evaluated by kaniko cache diff
+COPY lerna.json package.json yarn.lock ./
+COPY scripts/ scripts/
+COPY packages/utils/package.json packages/utils/
+COPY packages/typescript/package.json packages/typescript/
+COPY packages/contractkit/package.json packages/contractkit/
+COPY packages/verification-pool-api/package.json packages/verification-pool-api/
+COPY packages/celotool/package.json packages/celotool/
 
-COPY lerna.json /celo-monorepo/lerna.json
-COPY scripts /celo-monorepo/scripts
-COPY package.json /celo-monorepo/package.json
-COPY yarn.lock /celo-monorepo/yarn.lock
-COPY .prettierrc.js /celo-monorepo/.prettierrc.js
-COPY packages/utils /celo-monorepo/packages/utils
-COPY packages/typescript /celo-monorepo/packages/typescript
-COPY packages/contractkit /celo-monorepo/packages/contractkit
-COPY packages/celotool /celo-monorepo/packages/celotool
+RUN yarn install --frozen-lockfile && yarn cache clean
 
-WORKDIR /celo-monorepo
-RUN yarn install
+COPY packages/utils packages/utils/
+COPY packages/typescript packages/typescript/
+COPY packages/contractkit packages/contractkit/
+COPY packages/verification-pool-api packages/verification-pool-api/
+COPY packages/celotool packages/celotool/
+
+# RUN yarn build
 
 ENV PATH="/celo-monorepo/packages/celotool/bin:${PATH}"
 
