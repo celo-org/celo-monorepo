@@ -56,7 +56,7 @@
     "openzeppelin-solidity": "^2.2.0",
     "prompts": "^2.0.1",
     "solhint": "^2.0.0",
-    "solidity-bytes-utils": "^0.0.7",
+    "solidity-bytes-utils": "0.0.7",
     "solidity-coverage": "rotcivegaf/solidity-coverage#5875f5b7",
     "truffle": "5.0.19",
     "truffle-artifactor": "^3.0.7",
