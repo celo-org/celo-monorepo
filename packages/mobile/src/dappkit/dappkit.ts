@@ -11,7 +11,7 @@ import { getConnectedUnlockedAccount } from 'src/web3/saga'
 export enum actions {
   REQUEST_TX_SIGNATURE = 'DAPPKIT/REQUEST_TX_SIGNATURE',
 }
-export type RequestTxSignatureAction = {
+export interface RequestTxSignatureAction {
   type: actions.REQUEST_TX_SIGNATURE
   request: SignTxRequest
 }
