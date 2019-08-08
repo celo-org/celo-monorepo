@@ -142,6 +142,10 @@ yarn
 > github.com host key. Clone a repo or add the github host key to
 > `~/.ssh/known_hosts` and then try again.
 
+> When removing a dependency via `yarn remove some-package`, be sure to also run `yarn postinstall` so
+> you aren't left with freshly unpackaged modules. This is because we use `patch-package`
+> and the `postinstall` step which uses it is not automatically run after using `yarn remove`.
+
 ## Using an Android test device locally
 
 First, follow [these instructions to enable Developer Options][android dev options]
