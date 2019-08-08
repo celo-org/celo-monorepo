@@ -1,7 +1,6 @@
 import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
 import { createClusterIfNotExists, switchToClusterFromEnv } from '@celo/celotool/src/lib/cluster'
 import { installHelmChart } from '@celo/celotool/src/lib/ethstats'
-import { fetchEnvOrFallback } from '@celo/celotool/src/lib/utils'
 
 export const command = 'ethstats'
 

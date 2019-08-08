@@ -1,7 +1,7 @@
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-ethstats
+  name: {{ .Release.Name }}
   labels:
     app: ethstats
     chart: ethstats
@@ -37,7 +37,7 @@ spec:
         - name: WS_SECRET
           valueFrom:
             secretKeyRef:
-              name: {{ .Release.Name }}-ethstats
+              name: {{ .Release.Name }}
               key: WS_SECRET
     {{- with .Values.nodeSelector }}
       nodeSelector:

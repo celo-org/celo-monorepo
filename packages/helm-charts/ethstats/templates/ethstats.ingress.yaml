@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ .Release.Name }}-ethstats-ingress
+  name: {{ .Release.Name }}-ingress
   labels:
     app: ethstats
     chart: ethstats
@@ -13,13 +13,13 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Release.Name }}-ethstats.{{ .Values.domain.name }}.org
-    secretName: {{ .Release.Name }}-ethstats-tls
+    - {{ .Release.Name }}.{{ .Values.domain.name }}.org
+    secretName: {{ .Release.Name }}-tls
   rules:
-  - host: {{ .Release.Name }}-ethstats.{{ .Values.domain.name }}.org
+  - host: {{ .Release.Name }}.{{ .Values.domain.name }}.org
     http:
       paths:
       - path: /
         backend:
-          serviceName: {{ .Release.Name }}-ethstats
+          serviceName: {{ .Release.Name }}
           servicePort: 80
