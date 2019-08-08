@@ -44,7 +44,7 @@ async function getGasCurrencyContract(
     case GasCurrency.cGLD:
       return GoldToken(web3)
     default:
-      return GoldToken(web3)
+      return StableToken(web3)
   }
 }
 

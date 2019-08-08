@@ -10,6 +10,7 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Linking, Text, View } from 'react-native'
 import { NavigationParams, NavigationScreenProp } from 'react-navigation'
 import { connect } from 'react-redux'
+import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -22,6 +23,10 @@ interface OwnProps {
 
 type Props = OwnProps & WithNamespaces
 
+const mapStateToProps = (state: RootState) => ({
+  account: state.web3.account,
+})
+
 class DappKitAccountAuthScreen extends React.Component<Props> {
   static navigationOptions = { header: null }
 
@@ -29,7 +34,7 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
     return (
       this.props.errorMessage ||
       (this.props.navigation && this.props.navigation.getParam('errorMessage')) ||
-      'Yes!'
+      ''
     )
   }
 
@@ -70,8 +75,4 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
   }
 }
 
-const mapStateToProps = (state: RootState) => ({
-  account: state.web3.account,
-})
-
-export default withNamespaces('global')(connect(mapStateToProps)(DappKitAccountAuthScreen))
+export default withNamespaces(Namespaces.global)(connect(mapStateToProps)(DappKitAccountAuthScreen))

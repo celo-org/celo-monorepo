@@ -7,6 +7,7 @@ import { Text, View } from 'react-native'
 import { NavigationParams, NavigationScreenProp } from 'react-navigation'
 import { connect } from 'react-redux'
 import { requestTxSignature, RequestTxSignatureAction } from 'src/dappkit/dappkit'
+import { Namespaces } from 'src/i18n'
 import { RootState } from 'src/redux/reducers'
 
 interface OwnProps {
@@ -24,6 +25,12 @@ interface OwnProps {
 
 type Props = OwnProps & WithNamespaces
 
+const mapStateToProps = (state: RootState) => ({})
+
+const mapDispatchToProps = {
+  requestTxSignature,
+}
+
 class DappKitSignTxScreen extends React.Component<Props> {
   static navigationOptions = { header: null }
 
@@ -31,7 +38,7 @@ class DappKitSignTxScreen extends React.Component<Props> {
     return (
       this.props.errorMessage ||
       (this.props.navigation && this.props.navigation.getParam('errorMessage')) ||
-      'Yes!'
+      ''
     )
   }
 
@@ -70,13 +77,7 @@ class DappKitSignTxScreen extends React.Component<Props> {
   }
 }
 
-const mapStateToProps = (state: RootState) => ({})
-
-const mapDispatchToProps = {
-  requestTxSignature,
-}
-
-export default withNamespaces('global')(
+export default withNamespaces(Namespaces.global)(
   connect(
     mapStateToProps,
     mapDispatchToProps

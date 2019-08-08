@@ -55,7 +55,7 @@ export class App extends React.Component {
       }
     )
 
-    Linking.addEventListener('url', this._handleOpenURL)
+    Linking.addEventListener('url', this.handleOpenURL)
     const url = await Linking.getInitialURL()
 
     if (url) {
@@ -65,7 +65,7 @@ export class App extends React.Component {
   }
 
   componentWillUnmount() {
-    Linking.removeEventListener('url', this._handleOpenURL)
+    Linking.removeEventListener('url', this.handleOpenURL)
   }
 
   handleDappkit(url: string) {
@@ -80,7 +80,7 @@ export class App extends React.Component {
     }
   }
 
-  _handleOpenURL = (event: any) => {
+  handleOpenURL = (event: any) => {
     this.handleDappkit(event.url)
   }
 

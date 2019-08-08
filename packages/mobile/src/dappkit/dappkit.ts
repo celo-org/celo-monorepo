@@ -7,6 +7,7 @@ import { Linking } from 'react-native'
 import { call, takeLeading } from 'redux-saga/effects'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
+
 export enum actions {
   REQUEST_TX_SIGNATURE = 'DAPPKIT/REQUEST_TX_SIGNATURE',
 }
@@ -38,6 +39,6 @@ function* produceTxSignatureSaga(action: RequestTxSignatureAction) {
   Linking.openURL(produceResponseDeeplink(action.request, SignTxResponseSuccess(signedTx.raw)))
 }
 
-export function* saga() {
+export function* dappKitSaga() {
   yield takeLeading(actions.REQUEST_TX_SIGNATURE, produceTxSignatureSaga)
 }
