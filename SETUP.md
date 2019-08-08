@@ -38,9 +38,9 @@ nvm alias default 8
 brew install yarn
 ```
 
-### Install Rust
+### Optional: Install Rust
 
-We use Rust to build the [bls-zexe](https://github.com/celo-org/bls-zexe) repo, which Geth depends on.
+We use Rust to build the [bls-zexe](https://github.com/celo-org/bls-zexe) repo, which Geth depends on. If you only use the monorepo, you probably don't need this.
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
