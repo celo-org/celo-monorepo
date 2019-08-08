@@ -1,7 +1,8 @@
 import * as React from 'react'
 import 'react-native'
-import * as renderer from 'react-test-renderer'
+import { render } from 'react-native-testing-library'
 import { MessageBanner } from 'src/components/MessageBanner'
+
 describe('Message Banner', () => {
   const baseProps = {
     clearMessage: jest.fn(),
@@ -9,18 +10,18 @@ describe('Message Banner', () => {
   }
   describe('when message passed in', () => {
     it('renders message', () => {
-      const tree = renderer.create(
+      const { toJSON } = render(
         <MessageBanner {...baseProps} message={'This is your shadow speaking'} />
       )
-      expect(tree).toMatchSnapshot()
+      expect(toJSON()).toMatchSnapshot()
     })
   })
   describe('when message and title passed in', () => {
     it('renders title with message', () => {
-      const tree = renderer.create(
+      const { toJSON } = render(
         <MessageBanner {...baseProps} message="I am the concensus" title="Declaration" />
       )
-      expect(tree).toMatchSnapshot()
+      expect(toJSON()).toMatchSnapshot()
     })
   })
 })
