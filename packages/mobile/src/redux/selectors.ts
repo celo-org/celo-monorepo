@@ -41,5 +41,5 @@ export const areAllBalancesFresh = (state: RootState) =>
 
 // isAppConnected is used to either show the "disconnected banner" or "Refresh balance"
 // but not both at the same time
-export const showRefreshBalanceMessage = (state: RootState) =>
+export const shouldUpdateBalance = (state: RootState) =>
   areAllBalancesFresh(state) && isAppConnected(state)
