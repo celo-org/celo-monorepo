@@ -22,7 +22,7 @@ general:
     - 'protocol/coverage'
 
 jobs:
-  install_dependencies:
+  install-and-build:
     <<: *defaults
     steps:
       # The standard Circle CI checkout steps makes a shallow clone with the depth of 1
@@ -75,6 +75,10 @@ jobs:
 
       - run: npm rebuild scrypt
 
+      - run:
+          name: Build packages
+          command: yarn build
+
       - save_cache:
           key: yarn-v2-{{ checksum "yarn.lock" }}-{{ arch }}
           paths:
@@ -93,23 +97,6 @@ jobs:
 
       - run: yarn run lint:ci
 
-  build-all-packages:
-     <<: *defaults
-     steps:
-       - attach_workspace:
-          at: ~/app
-       - run:
-           name: Build Packages
-           command: yarn build
-       - run:
-          name: Fail if someone forgot to commit CLI docs
-          command: |
-            yarn --cwd=packages/cli docs
-            if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
-              git --no-pager diff packages/docs/command-line-interface
-              echo "There are git differences after generating CLI docs"
-              exit 1
-            fi
   general-test:
     <<: *defaults
     steps:
@@ -236,6 +223,15 @@ jobs:
           command: |
             set -euo pipefail
             yarn --cwd=packages/cli test
+      - run:
+          name: Fail if someone forgot to commit CLI docs
+          command: |
+            yarn --cwd=packages/cli docs
+            if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
+              git --no-pager diff packages/docs/command-line-interface
+              echo "There are git differences after generating CLI docs"
+              exit 1
+            fi            
 
   end-to-end-geth-transfer-test:
     <<: *defaults
@@ -419,58 +415,47 @@ workflows:
   version: 2
   celo-monorepo-build:
     jobs:
-      - install_dependencies
+      - install-and-build
       - lint:
           requires:
-            - install_dependencies
-      - build-all-packages:
-           requires:
-            - install_dependencies
-            - lint
+            - install-and-build
       - general-test:
           requires:
-            - install_dependencies
             - lint
       - contractkit-test:
           requires:
-            - install_dependencies
             - lint
       - cli-test:
           requires:
-            - install_dependencies
             - lint
       - mobile-test:
           requires:
-            - install_dependencies
             - lint
       - mobile-test-build-app:
           requires:
-            - install_dependencies
-            - lint
+            - mobile-test
       - verification-pool-api:
           requires:
-            - install_dependencies
             - lint
       - protocol-test:
           requires:
-            - install_dependencies
             - lint
       - end-to-end-geth-transfer-test:
           requires:
-            - install_dependencies
-            - lint
+            - protocol-test
+            - contractkit-test
       - end-to-end-geth-governance-test:
           requires:
-            - install_dependencies
-            - lint
+            - protocol-test
+            - contractkit-test
       - end-to-end-geth-sync-test:
           requires:
-            - install_dependencies
-            - lint
+            - protocol-test
+            - contractkit-test
       - end-to-end-geth-integration-sync-test:
           requires:
-            - install_dependencies
-            - lint
+            - protocol-test
+            - contractkit-test
   nightly:
     triggers:
       - schedule:
