@@ -143,7 +143,7 @@ export function* sendInvite(
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
       try {
         const phoneHash = getPhoneHash(e164Number)
-        yield put(transferEscrowedPayment(phoneHash, amount, txId, temporaryAddress))
+        yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress))
       } catch (e) {
         Logger.error(TAG, 'Error sending payment to unverified user: ', e)
         yield put(showError(ErrorMessages.TRANSACTION_FAILED, ERROR_BANNER_DURATION))

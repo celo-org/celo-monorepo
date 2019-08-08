@@ -60,5 +60,6 @@
   "reclaimPayment": "Reclamar el Pago",
   "totalSent": "Total Enviado",
   "totalRefunded": "Total Reembolsado",
-  "loadingVerificationStatus": "Comprobando la verificación del destinatario..."
+  "loadingVerificationStatus": "Comprobando la verificación del destinatario...",
+  "askForContactsPermissionAction": "Recuperar mis contactos"
 }
