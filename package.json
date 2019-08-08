@@ -7,8 +7,8 @@
   "scripts": {
     "install-pkg": "yarn install --link-duplicates",
     "precommit": "pretty-quick --staged",
-    "lint:ci": "yarn run prettify:diff && yarn run lint",
-    "lint": "yarn run lerna run lint",
+    "lint:ci": "yarn prettify:diff && yarn lint",
+    "lint": "yarn lerna run lint",
     "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx)'",
     "prettify:diff": "yarn run prettier --config .prettierrc.js --list-different '**/*.+(ts|tsx|js|jsx)'",
     "reset": "yarn reset-modules && yarn reset-cache",
