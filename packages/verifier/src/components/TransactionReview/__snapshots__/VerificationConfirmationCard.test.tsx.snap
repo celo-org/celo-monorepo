@@ -91,7 +91,10 @@ exports[`renders correctly 1`] = `
     >
       Foo Bar
     </Text>
-    &lt;View&gt;PhoneNumberWithFlag&lt;/View&gt;
+    <PhoneNumberWithFlag
+      defaultCountryCode="+1"
+      e164PhoneNumber="+11111111111"
+    />
   </View>
   <View
     style={
