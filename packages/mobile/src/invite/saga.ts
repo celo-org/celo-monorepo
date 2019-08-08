@@ -4,6 +4,7 @@ import {
   getStableTokenContract,
   parseFromContractDecimals,
 } from '@celo/contractkit'
+import { retryAsync } from '@celo/utils/src/async-helpers'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { Linking } from 'react-native'
@@ -16,7 +17,6 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { CURRENCY_ENUM, INVITE_REDEMPTION_GAS } from 'src/geth/consts'
-import { waitForGethConnectivity } from 'src/geth/saga'
 import i18n from 'src/i18n'
 import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import {
@@ -33,6 +33,7 @@ import {
 import { createInviteCode } from 'src/invite/utils'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { transferStableToken } from 'src/stableToken/actions'
 import { createTransaction } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
@@ -199,7 +200,7 @@ function* redeemSuccess(name: string, account: string) {
 export function* redeemInviteSaga(action: RedeemInviteAction) {
   const { inviteCode, name } = action
 
-  yield call(waitForGethConnectivity)
+  yield call(waitWeb3LastBlock)
   try {
     // Add temp wallet so we can send money from it
     let tempAccount
@@ -217,7 +218,12 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
 
     // Check that the balance of the new account is not 0
     const StableToken = yield call(getStableTokenContract, web3)
-    const stableBalance = new BigNumber(yield call(StableToken.methods.balanceOf(tempAccount).call))
+
+    // Try to get balance once + two retries before failing
+    const stableBalance = new BigNumber(
+      yield call(retryAsync, StableToken.methods.balanceOf(tempAccount).call, 2, [])
+    )
+
     Logger.debug(TAG + '@redeemInviteCode', 'Temporary account balance: ' + stableBalance)
 
     if (stableBalance.isLessThan(1)) {
