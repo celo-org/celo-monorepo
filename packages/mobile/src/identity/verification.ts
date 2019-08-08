@@ -141,14 +141,13 @@ export function* doVerificationFlow() {
     // Mark codes completed in previous attempts
     yield put(completeAttestationCode(NUM_ATTESTATIONS_REQUIRED - status.numAttestationsRemaining))
 
-    // Request any additional attestations needed to be verified
-    yield call(
-      requestNeededAttestations,
+    const attestations: ActionableAttestation[] = yield call(
+      requestAndRetrieveAttestations,
       attestationsContract,
       stableTokenContract,
-      status.numAttestationsRequestsNeeded,
       e164NumberHash,
-      account
+      account,
+      status.numAttestationsRemaining
     )
 
     // Get actionable attestation details
@@ -158,6 +157,7 @@ export function* doVerificationFlow() {
       e164NumberHash,
       account
     )
+
     const issuers = attestations.map((a) => a.issuer)
 
     // Start listening for manual and/or auto message inputs
@@ -213,7 +213,38 @@ function* getE164NumberHash() {
 interface AttestationsStatus {
   isVerified: boolean // user has sufficiently many attestations?
   numAttestationsRemaining: number // number of attestations still needed
-  numAttestationsRequestsNeeded: number // number of new request txs needed
+}
+
+// Requests if necessary additional attestations and returns all revealable attetations
+export async function requestAndRetrieveAttestations(
+  attestationsContract: AttestationsType,
+  stableTokenContract: StableTokenType,
+  e164NumberHash: string,
+  account: string,
+  attestationsRemaining: number
+) {
+  // The set of attestations we can reveal right now
+  let attestations: ActionableAttestation[] = await getActionableAttestations(
+    attestationsContract,
+    e164NumberHash,
+    account
+  )
+
+  while (attestations.length < attestationsRemaining) {
+    // Request any additional attestations beyond the original set
+    await requestAttestations(
+      attestationsContract,
+      stableTokenContract,
+      attestationsRemaining - attestations.length,
+      e164NumberHash,
+      account
+    )
+
+    // Check if we have a sufficient set now by fetching the new total set
+    attestations = await getActionableAttestations(attestationsContract, e164NumberHash, account)
+  }
+
+  return attestations
 }
 
 async function getAttestationsStatus(
@@ -232,8 +263,7 @@ async function getAttestationsStatus(
   const numAttestationRequests = new BigNumber(attestationStats[1]).toNumber()
   // Number of attestations remaining to be verified
   const numAttestationsRemaining = NUM_ATTESTATIONS_REQUIRED - numAttestationsCompleted
-  // Number of attestation requests that were not completed (some may be expired)
-  const numIncompleteAttestationRequests = numAttestationRequests - numAttestationsCompleted
+
   Logger.debug(
     TAG + '@getAttestationsStatus',
     `${numAttestationsRemaining} verifications remaining. Total of ${numAttestationRequests} requested.`
@@ -244,31 +274,16 @@ async function getAttestationsStatus(
     return {
       isVerified: true,
       numAttestationsRemaining,
-      numAttestationsRequestsNeeded: 0,
     }
   }
-
-  // Number of incomplete attestations that are still valid (not expired)
-  const numValidIncompleteAttestations =
-    numIncompleteAttestationRequests > 0
-      ? (await getActionableAttestations(attestationsContract, e164NumberHash, account)).length
-      : 0
-
-  // Number of new attestion requests that will be made to satisfy verificaiton requirements
-  const numAttestationsRequestsNeeded = numAttestationsRemaining - numValidIncompleteAttestations
-  Logger.debug(
-    TAG + '@getAttestationsStatus',
-    `${numAttestationsRequestsNeeded} new attestation requests needed to fulfill ${numAttestationsRemaining} required attestations`
-  )
 
   return {
     isVerified: false,
     numAttestationsRemaining,
-    numAttestationsRequestsNeeded,
   }
 }
 
-export async function requestNeededAttestations(
+async function requestAttestations(
   attestationsContract: AttestationsType,
   stableTokenContract: StableTokenType,
   numAttestationsRequestsNeeded: number,
@@ -291,6 +306,13 @@ export async function requestNeededAttestations(
     numAttestationsRequestsNeeded
   )
 
+  const {
+    confirmation: approveConfirmationPromise,
+    transactionHash: approveTransactionHashPromise,
+  } = await sendTransactionPromises(approveTx, account, TAG, 'Approve Attestations')
+
+  await approveTransactionHashPromise
+
   Logger.debug(
     `${TAG}@requestNeededAttestations`,
     `Requesting ${numAttestationsRequestsNeeded} new attestations`
@@ -303,15 +325,9 @@ export async function requestNeededAttestations(
     stableTokenContract
   )
 
-  const {
-    confirmation: approveConfirmationPromise,
-    transactionHash: approveTransactionHashPromise,
-  } = await sendTransactionPromises(approveTx, account, TAG, 'Approve Attestations')
-
-  await approveTransactionHashPromise
   await Promise.all([
-    sendTransaction(requestTx, account, TAG, 'Request Attestations', REQUEST_TX_GAS),
     approveConfirmationPromise,
+    sendTransaction(requestTx, account, TAG, 'Request Attestations', REQUEST_TX_GAS),
   ])
 
   CeloAnalytics.track(CustomEventNames.verification_requested_attestations)

@@ -19,7 +19,7 @@ import {
   AttestationCode,
   doVerificationFlow,
   ERROR_DURATION,
-  requestNeededAttestations,
+  requestAndRetrieveAttestations,
   startVerification,
   VERIFICATION_TIMEOUT,
 } from 'src/identity/verification'
@@ -211,7 +211,7 @@ describe('Do Verification Saga', () => {
         [call(getAttestationsContract, web3), attestationContract],
         [call(getStableTokenContract, web3), createMockContract({})],
         [select(e164NumberSelector), mockE164Number],
-        [matchers.call.fn(requestNeededAttestations), throwError(new Error('fake error'))],
+        [matchers.call.fn(requestAndRetrieveAttestations), throwError(new Error('fake error'))],
       ])
       .put(showError(ErrorMessages.VERIFICATION_FAILURE, ERROR_DURATION))
       .put(endVerification(false))
