@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "@celo/contractkit": "0.0.3",
-    "@celo/utils": "0.0.1-dappkit6",
+    "@celo/utils": "0.0.1",
     "expo": "^34.0.1"
   },
   "devDependencies": {
