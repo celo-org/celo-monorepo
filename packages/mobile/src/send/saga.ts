@@ -1,6 +1,5 @@
 import { getGoldTokenContract, getStableTokenContract } from '@celo/contractkit'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
-import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
@@ -8,7 +7,6 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ERROR_BANNER_DURATION } from 'src/config'
-import { transferEscrowedPayment } from 'src/escrow/actions'
 import { features } from 'src/flags'
 import { transferGoldToken } from 'src/goldToken/actions'
 import { encryptComment } from 'src/identity/commentKey'
@@ -72,20 +70,6 @@ export function* watchQrCodeShare() {
       yield call(shareSVGImage, action.qrCodeSvg)
     } catch (error) {
       Logger.error(TAG, 'Error handling the barcode', error)
-    }
-  }
-}
-
-export function* watchSendToUnverified() {
-  while (true) {
-    const action = yield take(Actions.SEND_TO_UNVERIFIED)
-    try {
-      const phoneHash = getPhoneHash(action.recipientE164Number)
-      yield put(
-        transferEscrowedPayment(phoneHash, action.amount, phoneHash, action.tempWalletAddress)
-      )
-    } catch (error) {
-      Logger.error(TAG, 'Error sending payment to unverified user.', error)
     }
   }
 }
@@ -187,6 +171,5 @@ export function* watchSendPaymentOrInvite() {
 export function* sendSaga() {
   yield spawn(watchQrCodeDetections)
   yield spawn(watchQrCodeShare)
-  yield spawn(watchSendToUnverified)
   yield spawn(watchSendPaymentOrInvite)
 }
