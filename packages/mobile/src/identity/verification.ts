@@ -150,14 +150,6 @@ export function* doVerificationFlow() {
       status.numAttestationsRemaining
     )
 
-    // Get actionable attestation details
-    const attestations: ActionableAttestation[] = yield call(
-      getActionableAttestations,
-      attestationsContract,
-      e164NumberHash,
-      account
-    )
-
     const issuers = attestations.map((a) => a.issuer)
 
     // Start listening for manual and/or auto message inputs
