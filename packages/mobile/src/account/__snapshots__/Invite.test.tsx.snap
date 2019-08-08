@@ -152,24 +152,7 @@ exports[`Invite renders correctly 1`] = `
                 }
               }
             >
-              noResultsFor
-            </Text>
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 24,
-                  },
-                  Object {
-                    "color": "#2E3338",
-                  },
-                ]
-              }
-            >
-               ""
+              noContacts
             </Text>
           </View>
           <Text
@@ -247,24 +230,7 @@ exports[`Invite renders correctly 1`] = `
                 }
               }
             >
-              noResultsFor
-            </Text>
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 24,
-                  },
-                  Object {
-                    "color": "#2E3338",
-                  },
-                ]
-              }
-            >
-               ""
+              noContacts
             </Text>
           </View>
           <Text
