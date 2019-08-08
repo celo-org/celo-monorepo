@@ -7,10 +7,12 @@
 
 SECRET_PIN="123456"
 
-if !( adb devices | grep "emu" ); then
+while ! (adb devices | grep "emu")
+do
   echo "Error: The emulator is not running or not connected to adb. "
-  exit 1
-fi
+  sleep 1 
+done
+
 
 # sleep until Android is done booting
 adb wait-for-device shell \
@@ -18,6 +20,7 @@ adb wait-for-device shell \
 
 echo "Device is done booting"
 
+sleep 1
 # Sequence to unlock the app lock screen in any state
 adb shell input keyevent 26		# Power
 adb shell input keyevent 26		# Power
