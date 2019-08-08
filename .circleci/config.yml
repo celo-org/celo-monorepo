@@ -111,7 +111,7 @@ jobs:
             yarn --cwd=packages/cli build-sdk alfajores
             yarn --cwd=packages/cli build
             yarn --cwd=packages/cli docs
-      
+
        - run:
           name: Fail if someone forgot to commit CLI docs
           command: |
@@ -258,7 +258,7 @@ jobs:
             set -euo pipefail
             yarn --cwd=packages/contractkit build alfajoresstaging
             yarn --cwd=packages/contractkit test
-      
+
   cli-test:
     <<: *defaults
     steps:
@@ -290,15 +290,24 @@ jobs:
             ls /tmp/go/bin/go
             /tmp/go/bin/go version
       - run:
+          name: Setup Rust language
+          command: |
+            set -e
+            set -v
+            curl https://sh.rustup.rs -sSf | sh -s -- -y
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+            rustup install 1.36.0
+            rustup default 1.36.0
+      - run:
           name: Run test
           no_output_timeout: 20m
           command: |
             set -e
-            export PATH=${PATH}:/tmp/go/bin
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_transfers.sh checkout master
+            ./ci_test_transfers.sh checkout kobigurk/bls
 
   end-to-end-geth-governance-test:
     <<: *defaults
@@ -320,15 +329,24 @@ jobs:
             ls /tmp/go/bin/go
             /tmp/go/bin/go version
       - run:
+          name: Setup Rust language
+          command: |
+            set -e
+            set -v
+            curl https://sh.rustup.rs -sSf | sh -s -- -y
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+            rustup install 1.36.0
+            rustup default 1.36.0
+      - run:
           name: Run test
           no_output_timeout: 20m
           command: |
             set -e
-            export PATH=${PATH}:/tmp/go/bin
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_governance.sh checkout master
+            ./ci_test_governance.sh checkout kobigurk/bls
 
   end-to-end-geth-sync-test:
     <<: *defaults
@@ -350,14 +368,23 @@ jobs:
             ls /tmp/go/bin/go
             /tmp/go/bin/go version
       - run:
+          name: Setup Rust language
+          command: |
+            set -e
+            set -v
+            curl https://sh.rustup.rs -sSf | sh -s -- -y
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+            rustup install 1.36.0
+            rustup default 1.36.0
+      - run:
           name: Run test
           command: |
             set -e
-            export PATH=${PATH}:/tmp/go/bin
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_sync.sh checkout master
+            ./ci_test_sync.sh checkout kobigurk/bls
 
   end-to-end-geth-integration-sync-test:
     <<: *defaults
@@ -378,15 +405,19 @@ jobs:
             tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
             ls /tmp/go/bin/go
             /tmp/go/bin/go version
+            curl https://sh.rustup.rs -sSf | sh -s -- -y
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+            rustup install 1.36.0
+            rustup default 1.36.0
       - run:
           name: Run test
           command: |
             set -e
-            export PATH=${PATH}:/tmp/go/bin
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_integration_sync.sh checkout master
+            ./ci_test_sync_with_network.sh checkout master
 
   web:
     working_directory: ~/app

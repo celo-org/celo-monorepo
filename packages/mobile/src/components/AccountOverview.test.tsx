@@ -17,8 +17,8 @@ it('renders correctly when ready', () => {
       goldEducationCompleted={true}
       stableEducationCompleted={true}
       testID={'SnapshotAccountOverview'}
-      balanceOutOfSync={false}
-      refreshAllBalances={jest.fn()}
+      startBalanceAutorefresh={jest.fn()}
+      stopBalanceAutorefresh={jest.fn()}
       {...getMockI18nProps()}
     />
   )
@@ -34,8 +34,8 @@ it('renders correctly when not ready', () => {
       goldEducationCompleted={true}
       stableEducationCompleted={true}
       testID={'SnapshotAccountOverview'}
-      balanceOutOfSync={false}
-      refreshAllBalances={jest.fn()}
+      startBalanceAutorefresh={jest.fn()}
+      stopBalanceAutorefresh={jest.fn()}
       {...getMockI18nProps()}
     />
   )
@@ -51,8 +51,8 @@ it('renders correctly when transaction pending', () => {
       goldEducationCompleted={true}
       stableEducationCompleted={true}
       testID={'SnapshotAccountOverview'}
-      balanceOutOfSync={false}
-      refreshAllBalances={jest.fn()}
+      startBalanceAutorefresh={jest.fn()}
+      stopBalanceAutorefresh={jest.fn()}
       {...getMockI18nProps()}
     />
   )
@@ -68,8 +68,8 @@ it("renders correctly when Gold education NUX flow hasn't been completed", () =>
       goldEducationCompleted={false}
       stableEducationCompleted={true}
       testID={'SnapshotAccountOverview'}
-      balanceOutOfSync={false}
-      refreshAllBalances={jest.fn()}
+      startBalanceAutorefresh={jest.fn()}
+      stopBalanceAutorefresh={jest.fn()}
       {...getMockI18nProps()}
     />
   )
@@ -85,25 +85,8 @@ it("renders correctly when Dollar education NUX flow hasn't been completed", () 
       goldEducationCompleted={true}
       stableEducationCompleted={false}
       testID={'SnapshotAccountOverview'}
-      balanceOutOfSync={false}
-      refreshAllBalances={jest.fn()}
-      {...getMockI18nProps()}
-    />
-  )
-  expect(tree).toMatchSnapshot()
-})
-
-it('renders correctly when balance is out of sync', () => {
-  const tree = renderer.create(
-    <AccountOverview
-      dollarBalance={SAMPLE_BALANCE}
-      goldBalance={SAMPLE_BALANCE}
-      exchangeRatePair={exchangeRatePair}
-      goldEducationCompleted={true}
-      stableEducationCompleted={true}
-      balanceOutOfSync={true}
-      refreshAllBalances={jest.fn()}
-      testID={'SnapshotAccountOverview'}
+      startBalanceAutorefresh={jest.fn()}
+      stopBalanceAutorefresh={jest.fn()}
       {...getMockI18nProps()}
     />
   )
