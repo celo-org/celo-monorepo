@@ -11,14 +11,7 @@ import { Namespaces } from 'src/i18n'
 import { RootState } from 'src/redux/reducers'
 
 interface OwnProps {
-  requestTxSignature: (
-    txData: string,
-    estimatedGas: number,
-    from: string,
-    to: string,
-    nonce: number,
-    callback: string
-  ) => RequestTxSignatureAction
+  requestTxSignature: (request: SignTxRequest) => RequestTxSignatureAction
   errorMessage?: string
   navigation?: NavigationScreenProp<NavigationParams>
 }
@@ -58,8 +51,6 @@ class DappKitSignTxScreen extends React.Component<Props> {
   }
 
   render() {
-    const { t } = this.props
-    const errorMessage = this.getErrorMessage()
     return (
       <FullscreenCTA
         CTAText={'Authorize'}

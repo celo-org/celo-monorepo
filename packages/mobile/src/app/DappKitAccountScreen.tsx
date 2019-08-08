@@ -56,8 +56,6 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
   }
 
   render() {
-    const { t } = this.props
-    const errorMessage = this.getErrorMessage()
     return (
       <FullscreenCTA
         CTAText={'Authorize'}
