@@ -103,6 +103,7 @@ export function* startVerification() {
     CeloAnalytics.track(CustomEventNames.verification_timed_out)
     Logger.debug(TAG, 'Verification timed out')
     yield put(showError(ErrorMessages.VERIFICATION_TIMEOUT, ERROR_DURATION))
+    yield put(endVerification(false))
     // TODO #1955: Add logic in this case to request more SMS messages
   }
   Logger.debug(TAG, 'Done verification')

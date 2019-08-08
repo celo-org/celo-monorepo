@@ -22,6 +22,11 @@ exports[`renders correctly 1`] = `
       >
         <Image
           resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../assets/celo-logo.png",
+            }
+          }
           style={
             Object {
               "height": 40,
