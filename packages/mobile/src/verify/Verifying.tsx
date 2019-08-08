@@ -204,6 +204,7 @@ export class Verifying extends React.Component<Props, State> {
 
   onCancelVerification = () => {
     this.props.cancelVerification()
+    this.props.hideAlert()
     navigate(Screens.VerifyEducation)
   }
 
