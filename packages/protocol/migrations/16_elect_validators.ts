@@ -1,4 +1,5 @@
 /* tslint:disable:no-console */
+import { blsPrivateKeyToPublic } from '@celo/celotool/src/lib/bls_utils'
 import { NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
 import {
   add0x,
@@ -9,6 +10,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { BigNumber } from 'bignumber.js'
+import * as crypto from 'crypto'
 import * as minimist from 'minimist'
 import { BondedDepositsInstance, ValidatorsInstance } from 'types'
 const Web3 = require('web3')
@@ -87,7 +89,14 @@ async function registerValidator(
   groupAddress: string
 ) {
   const address = generateAccountAddressFromPrivateKey(validatorPrivateKey.slice(2))
-  const publicKey = add0x(generatePublicKeyFromPrivateKey(validatorPrivateKey.slice(2)))
+  const publicKey = generatePublicKeyFromPrivateKey(validatorPrivateKey.slice(2))
+  const blsPublicKey = blsPrivateKeyToPublic(validatorPrivateKey.slice(2))
+  // TODO(Kobi): Replace with a real PoP when we have a TypeScript version.
+  const blsPoP = crypto
+    .randomBytes(96)
+    .toString('hex')
+    .trim()
+  const publicKeysData = publicKey + blsPublicKey + blsPoP
 
   await makeMinimumDeposit(bondedDeposits, validatorPrivateKey)
 
@@ -96,7 +105,7 @@ async function registerValidator(
     address,
     address,
     config.validators.groupUrl,
-    publicKey,
+    add0x(publicKeysData),
     config.validators.minBondedDepositNoticePeriod
   )
 
