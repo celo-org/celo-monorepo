@@ -157,6 +157,7 @@ const styles = StyleSheet.create({
   },
   circleContainerMedium: {
     width: '80vw',
+    maxWidth: '60vh',
   },
   circleContainerLarge: {
     width: '73vh',
