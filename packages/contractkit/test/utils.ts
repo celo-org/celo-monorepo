@@ -29,24 +29,6 @@ export function generateAccountAddressFromPrivateKey(privateKey: string): string
   return new Web3.modules.Eth().accounts.privateKeyToAccount(privateKey).address
 }
 
-// Etherbases for alfajoresstaging
-// 0xFe6B1360Fb2D31B4574d05c1d8Af29053fE28F1A
-// 0x504186950242779043cdA208D18445BCd2aDBFBe
-// 0x1AC48f235c205f79ce1cFf12463Ca04E8e0cA2a1
-// 0x56499c06F4525dEB200F9308a6c3CdbF9b1Efd08
-// 0x6781433a8e0f06a98a58dFF519b3D79Aa8111742
-// 0xd1cF006E962Ce60ec996945e07154f06F526EFD9
-export function getGasFeeRecipient(networkName: string) {
-  switch (networkName) {
-    case 'alfajoresstaging':
-      return '0xFe6B1360Fb2D31B4574d05c1d8Af29053fE28F1A'
-    case 'alfajores':
-      // Seems to work
-      return '0xFe6B1360Fb2D31B4574d05c1d8Af29053fE28F1A'
-  }
-  throw new Error(`getGasFeeRecipient/Unexpected network ${networkName}`)
-}
-
 // Mnemonic taken from .env.mnemonic.<NETWORK_NAME> file in celo-monorepo
 function getMnemonic(networkName: string): string {
   const mnemonicFile = `${__dirname}/../../../.env.mnemonic.${networkName}`

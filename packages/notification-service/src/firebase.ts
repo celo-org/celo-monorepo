@@ -1,11 +1,7 @@
 import * as admin from 'firebase-admin'
 import i18next from 'i18next'
-import {
-  Currencies,
-  NOTIFICATIONS_DISABLED,
-  NOTIFICATIONS_TTL_MS,
-  NotificationTypes,
-} from './config'
+import { Currencies } from './blockscout/transfers'
+import { NOTIFICATIONS_DISABLED, NOTIFICATIONS_TTL_MS, NotificationTypes } from './config'
 
 let database: admin.database.Database
 let registrationsRef: admin.database.Reference
@@ -13,10 +9,13 @@ let lastBlockRef: admin.database.Reference
 let pendingRequestsRef: admin.database.Reference
 
 export interface Registrations {
-  [address: string]: {
-    fcmToken: string
-    language?: string
-  }
+  [address: string]:
+    | {
+        fcmToken: string
+        language?: string
+      }
+    | undefined
+    | null
 }
 
 export enum PaymentRequestStatuses {
@@ -103,15 +102,17 @@ export function initializeDb() {
 }
 
 export function getTokenFromAddress(address: string) {
-  if (address in registrations) {
-    return registrations[address].fcmToken
+  const registration = registrations[address]
+  if (registration) {
+    return registration.fcmToken
   } else {
     return null
   }
 }
 
 export function getTranslatorForAddress(address: string) {
-  const language = registrations[address].language
+  const registration = registrations[address]
+  const language = registration && registration.language
   // Language is set and i18next has the proper config
   if (language) {
     console.info(`Language resolved as ${language} for user address ${address}`)

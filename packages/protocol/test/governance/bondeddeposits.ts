@@ -56,6 +56,16 @@ contract('BondedDeposits', (accounts: string[]) => {
     }
   }
 
+  enum roles {
+    validating,
+    voting,
+    rewards,
+  }
+  const forEachRole = (tests: (arg0: roles) => void) =>
+    Object.keys(roles)
+      .slice(3)
+      .map((role) => describe(`when dealing with ${role} role`, () => tests(roles[role])))
+
   beforeEach(async () => {
     bondedDeposits = await BondedDeposits.new()
     mockGoldToken = await MockGoldToken.new()
@@ -123,7 +133,7 @@ contract('BondedDeposits', (accounts: string[]) => {
     })
   })
 
-  describe('#delegateRewards()', () => {
+  describe('#delegateRole()', () => {
     const delegate = accounts[1]
     let sig
 
@@ -131,212 +141,79 @@ contract('BondedDeposits', (accounts: string[]) => {
       sig = await getParsedSignatureOfAddress(account, delegate)
     })
 
-    it('should set the rewards delegate', async () => {
-      await bondedDeposits.delegateRewards(delegate, sig.v, sig.r, sig.s)
-      assert.equal(await bondedDeposits.delegations(delegate), account)
-      assert.equal(await bondedDeposits.getRewardsRecipientFromAccount(account), delegate)
-      assert.equal(await bondedDeposits.getAccountFromRewardsRecipient(delegate), account)
-    })
-
-    it('should emit a VotingDelegated event', async () => {
-      const resp = await bondedDeposits.delegateRewards(delegate, sig.v, sig.r, sig.s)
-      assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertLogMatches(log, 'RewardsDelegated', {
-        account,
-        delegate,
-      })
-    })
-
-    it('should revert if the delegate is an account', async () => {
-      await bondedDeposits.createAccount({ from: delegate })
-      await assertRevert(bondedDeposits.delegateRewards(delegate, sig.v, sig.r, sig.s))
-    })
-
-    it('should revert if the address is already being delegated to', async () => {
-      const otherAccount = accounts[2]
-      const otherSig = await getParsedSignatureOfAddress(otherAccount, delegate)
-      await bondedDeposits.createAccount({ from: otherAccount })
-      await bondedDeposits.delegateRewards(delegate, otherSig.v, otherSig.r, otherSig.s, {
-        from: otherAccount,
-      })
-      await assertRevert(bondedDeposits.delegateRewards(delegate, sig.v, sig.r, sig.s))
-    })
-
-    it('should revert if the signature is incorrect', async () => {
-      const nonDelegate = accounts[3]
-      const incorrectSig = await getParsedSignatureOfAddress(account, nonDelegate)
-      await assertRevert(
-        bondedDeposits.delegateRewards(delegate, incorrectSig.v, incorrectSig.r, incorrectSig.s)
-      )
-    })
-
-    describe('when a previous delegation has been made', async () => {
-      const newDelegate = accounts[2]
-      let newSig
-      beforeEach(async () => {
-        await bondedDeposits.delegateRewards(delegate, sig.v, sig.r, sig.s)
-        newSig = await getParsedSignatureOfAddress(account, newDelegate)
+    forEachRole((role) => {
+      it('should set the role delegate', async () => {
+        await bondedDeposits.delegateRole(role, delegate, sig.v, sig.r, sig.s)
+        assert.equal(await bondedDeposits.delegations(delegate), account)
+        assert.equal(await bondedDeposits.getDelegateFromAccountAndRole(account, role), delegate)
+        assert.equal(await bondedDeposits.getAccountFromDelegateAndRole(delegate, role), account)
       })
 
-      it('should set the new delegate', async () => {
-        await bondedDeposits.delegateRewards(newDelegate, newSig.v, newSig.r, newSig.s)
-        assert.equal(await bondedDeposits.delegations(newDelegate), account)
-        assert.equal(await bondedDeposits.getRewardsRecipientFromAccount(account), newDelegate)
-        assert.equal(await bondedDeposits.getAccountFromRewardsRecipient(newDelegate), account)
+      it('should emit a RoleDelegated event', async () => {
+        const resp = await bondedDeposits.delegateRole(role, delegate, sig.v, sig.r, sig.s)
+        assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        assertLogMatches(log, 'RoleDelegated', {
+          role,
+          account,
+          delegate,
+        })
       })
 
-      it('should reset the previous delegate', async () => {
-        await bondedDeposits.delegateRewards(newDelegate, newSig.v, newSig.r, newSig.s)
-        assert.equal(await bondedDeposits.delegations(delegate), NULL_ADDRESS)
-      })
-    })
-  })
-
-  describe('#delegateValidating()', () => {
-    const delegate = accounts[1]
-    let sig
-
-    beforeEach(async () => {
-      sig = await getParsedSignatureOfAddress(account, delegate)
-    })
-
-    it('should set the validating delegate', async () => {
-      await bondedDeposits.delegateValidating(delegate, sig.v, sig.r, sig.s)
-      assert.equal(await bondedDeposits.delegations(delegate), account)
-      assert.equal(await bondedDeposits.getValidatorFromAccount(account), delegate)
-      assert.equal(await bondedDeposits.getAccountFromValidator(delegate), account)
-    })
-
-    it('should emit a ValidatingDelegated event', async () => {
-      const resp = await bondedDeposits.delegateValidating(delegate, sig.v, sig.r, sig.s)
-      assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertLogMatches(log, 'ValidatingDelegated', {
-        account,
-        delegate,
-      })
-    })
-
-    it('should revert if the delegate is an account', async () => {
-      await bondedDeposits.createAccount({ from: delegate })
-      await assertRevert(bondedDeposits.delegateValidating(delegate, sig.v, sig.r, sig.s))
-    })
-
-    it('should revert if the address is already being delegated to', async () => {
-      const otherAccount = accounts[2]
-      const otherSig = await getParsedSignatureOfAddress(otherAccount, delegate)
-      await bondedDeposits.createAccount({ from: otherAccount })
-      await bondedDeposits.delegateValidating(delegate, otherSig.v, otherSig.r, otherSig.s, {
-        from: otherAccount,
-      })
-      await assertRevert(bondedDeposits.delegateValidating(delegate, sig.v, sig.r, sig.s))
-    })
-
-    it('should revert if the caller is validating', async () => {
-      await mockValidators.setValidating(account)
-      await assertRevert(bondedDeposits.delegateValidating(delegate, sig.v, sig.r, sig.s))
-    })
-
-    it('should revert if the signature is incorrect', async () => {
-      const nonDelegate = accounts[3]
-      const incorrectSig = await getParsedSignatureOfAddress(account, nonDelegate)
-      await assertRevert(
-        bondedDeposits.delegateValidating(delegate, incorrectSig.v, incorrectSig.r, incorrectSig.s)
-      )
-    })
-
-    describe('when a previous delegation has been made', async () => {
-      const newDelegate = accounts[2]
-      let newSig
-      beforeEach(async () => {
-        await bondedDeposits.delegateValidating(delegate, sig.v, sig.r, sig.s)
-        newSig = await getParsedSignatureOfAddress(account, newDelegate)
+      it('should revert if the delegate is an account', async () => {
+        await bondedDeposits.createAccount({ from: delegate })
+        await assertRevert(bondedDeposits.delegateRole(role, delegate, sig.v, sig.r, sig.s))
       })
 
-      it('should set the new delegate', async () => {
-        await bondedDeposits.delegateValidating(newDelegate, newSig.v, newSig.r, newSig.s)
-        assert.equal(await bondedDeposits.delegations(newDelegate), account)
-        assert.equal(await bondedDeposits.getValidatorFromAccount(account), newDelegate)
-        assert.equal(await bondedDeposits.getAccountFromValidator(newDelegate), account)
+      it('should revert if the address is already being delegated to', async () => {
+        const otherAccount = accounts[2]
+        const otherSig = await getParsedSignatureOfAddress(otherAccount, delegate)
+        await bondedDeposits.createAccount({ from: otherAccount })
+        await bondedDeposits.delegateRole(role, delegate, otherSig.v, otherSig.r, otherSig.s, {
+          from: otherAccount,
+        })
+        await assertRevert(bondedDeposits.delegateRole(role, delegate, sig.v, sig.r, sig.s))
       })
 
-      it('should reset the previous delegate', async () => {
-        await bondedDeposits.delegateValidating(newDelegate, newSig.v, newSig.r, newSig.s)
-        assert.equal(await bondedDeposits.delegations(delegate), NULL_ADDRESS)
-      })
-    })
-  })
-
-  describe('#delegateVoting()', () => {
-    const delegate = accounts[1]
-    let sig
-
-    beforeEach(async () => {
-      sig = await getParsedSignatureOfAddress(account, delegate)
-    })
-
-    it('should set the voting delegate', async () => {
-      await bondedDeposits.delegateVoting(delegate, sig.v, sig.r, sig.s)
-      assert.equal(await bondedDeposits.delegations(delegate), account)
-      assert.equal(await bondedDeposits.getVoterFromAccount(account), delegate)
-      assert.equal(await bondedDeposits.getAccountFromVoter(delegate), account)
-    })
-
-    it('should emit a VotingDelegated event', async () => {
-      const resp = await bondedDeposits.delegateVoting(delegate, sig.v, sig.r, sig.s)
-      assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertLogMatches(log, 'VotingDelegated', {
-        account,
-        delegate,
-      })
-    })
-
-    it('should revert if the delegate is an account', async () => {
-      await bondedDeposits.createAccount({ from: delegate })
-      await assertRevert(bondedDeposits.delegateVoting(delegate, sig.v, sig.r, sig.s))
-    })
-
-    it('should revert if the address is already being delegated to', async () => {
-      const otherAccount = accounts[2]
-      const otherSig = await getParsedSignatureOfAddress(otherAccount, delegate)
-      await bondedDeposits.createAccount({ from: otherAccount })
-      await bondedDeposits.delegateVoting(delegate, otherSig.v, otherSig.r, otherSig.s, {
-        from: otherAccount,
-      })
-      await assertRevert(bondedDeposits.delegateVoting(delegate, sig.v, sig.r, sig.s))
-    })
-
-    it('should revert if the caller is voting', async () => {
-      await mockGovernance.setVoting(account)
-      await assertRevert(bondedDeposits.delegateVoting(delegate, sig.v, sig.r, sig.s))
-    })
-
-    it('should revert if the signature is incorrect', async () => {
-      const nonDelegate = accounts[3]
-      sig = await getParsedSignatureOfAddress(account, nonDelegate)
-      await assertRevert(bondedDeposits.delegateVoting(delegate, sig.v, sig.r, sig.s))
-    })
-
-    describe('when a previous delegation has been made', async () => {
-      const newDelegate = accounts[2]
-      let newSig
-      beforeEach(async () => {
-        await bondedDeposits.delegateVoting(delegate, sig.v, sig.r, sig.s)
-        newSig = await getParsedSignatureOfAddress(account, newDelegate)
+      it('should revert if the signature is incorrect', async () => {
+        const nonDelegate = accounts[3]
+        const incorrectSig = await getParsedSignatureOfAddress(account, nonDelegate)
+        await assertRevert(
+          bondedDeposits.delegateRole(
+            role,
+            delegate,
+            incorrectSig.v,
+            incorrectSig.r,
+            incorrectSig.s
+          )
+        )
       })
 
-      it('should set the new delegate', async () => {
-        await bondedDeposits.delegateVoting(newDelegate, newSig.v, newSig.r, newSig.s)
-        assert.equal(await bondedDeposits.delegations(newDelegate), account)
-        assert.equal(await bondedDeposits.getVoterFromAccount(account), newDelegate)
-        assert.equal(await bondedDeposits.getAccountFromVoter(newDelegate), account)
-      })
+      describe('when a previous delegation has been made', async () => {
+        const newDelegate = accounts[2]
+        let newSig
+        beforeEach(async () => {
+          await bondedDeposits.delegateRole(role, delegate, sig.v, sig.r, sig.s)
+          newSig = await getParsedSignatureOfAddress(account, newDelegate)
+        })
 
-      it('should reset the previous delegate', async () => {
-        await bondedDeposits.delegateVoting(newDelegate, newSig.v, newSig.r, newSig.s)
-        assert.equal(await bondedDeposits.delegations(delegate), NULL_ADDRESS)
+        it('should set the new delegate', async () => {
+          await bondedDeposits.delegateRole(role, newDelegate, newSig.v, newSig.r, newSig.s)
+          assert.equal(await bondedDeposits.delegations(newDelegate), account)
+          assert.equal(
+            await bondedDeposits.getDelegateFromAccountAndRole(account, role),
+            newDelegate
+          )
+          assert.equal(
+            await bondedDeposits.getAccountFromDelegateAndRole(newDelegate, role),
+            account
+          )
+        })
+
+        it('should reset the previous delegate', async () => {
+          await bondedDeposits.delegateRole(role, newDelegate, newSig.v, newSig.r, newSig.s)
+          assert.equal(await bondedDeposits.delegations(delegate), NULL_ADDRESS)
+        })
       })
     })
   })
@@ -758,119 +635,73 @@ contract('BondedDeposits', (accounts: string[]) => {
     })
   })
 
-  describe('#getAccountFromVoter()', () => {
-    describe('when the account is not delegating', () => {
-      it('should return the account when passed the account', async () => {
-        assert.equal(await bondedDeposits.getAccountFromVoter(account), account)
+  describe('#getAccountFromDelegateAndRole()', () => {
+    forEachRole((role) => {
+      describe('when the account is not delegating', () => {
+        it('should return the account when passed the account', async () => {
+          assert.equal(await bondedDeposits.getAccountFromDelegateAndRole(account, role), account)
+        })
+
+        it('should revert when passed a delegate that is not the role delegate', async () => {
+          const delegate = accounts[2]
+          const diffRole = (role + 1) % 3
+          const sig = await getParsedSignatureOfAddress(account, delegate)
+          await bondedDeposits.delegateRole(role, delegate, sig.v, sig.r, sig.s)
+          await assertRevert(bondedDeposits.getAccountFromDelegateAndRole(delegate, diffRole))
+        })
       })
 
-      it('should revert when passed a delegate that is not the voting delegate for the account', async () => {
-        const rewardsDelegate = accounts[2]
-        const sig = await getParsedSignatureOfAddress(account, rewardsDelegate)
-        await bondedDeposits.delegateRewards(rewardsDelegate, sig.v, sig.r, sig.s)
-        await assertRevert(bondedDeposits.getAccountFromVoter(rewardsDelegate))
-      })
-    })
+      describe('when the account is delegating', () => {
+        const delegate = accounts[1]
 
-    describe('when the account is delegating', () => {
-      const delegate = accounts[1]
+        beforeEach(async () => {
+          const sig = await getParsedSignatureOfAddress(account, delegate)
+          await bondedDeposits.delegateRole(role, delegate, sig.v, sig.r, sig.s)
+        })
 
-      beforeEach(async () => {
-        const sig = await getParsedSignatureOfAddress(account, delegate)
-        await bondedDeposits.delegateVoting(delegate, sig.v, sig.r, sig.s)
-      })
+        it('should return the account when passed the delegate', async () => {
+          assert.equal(await bondedDeposits.getAccountFromDelegateAndRole(delegate, role), account)
+        })
 
-      it('should return the account when passed the delegate', async () => {
-        assert.equal(await bondedDeposits.getAccountFromVoter(delegate), account)
-      })
+        it('should return the account when passed the account', async () => {
+          assert.equal(await bondedDeposits.getAccountFromDelegateAndRole(account, role), account)
+        })
 
-      it('should return the account when passed the account', async () => {
-        assert.equal(await bondedDeposits.getAccountFromVoter(account), account)
-      })
-
-      it('should revert when passed a delegate that is not the voting delegate for the account', async () => {
-        const rewardsDelegate = accounts[2]
-        const sig = await getParsedSignatureOfAddress(account, rewardsDelegate)
-        await bondedDeposits.delegateRewards(rewardsDelegate, sig.v, sig.r, sig.s)
-        await assertRevert(bondedDeposits.getAccountFromVoter(rewardsDelegate))
-      })
-    })
-  })
-
-  describe('#getAccountFromValidator()', () => {
-    describe('when the account is not delegating', () => {
-      it('should return the account when passed the account', async () => {
-        assert.equal(await bondedDeposits.getAccountFromValidator(account), account)
-      })
-
-      it('should revert when passed a delegate that is not the validating delegate for the account', async () => {
-        const rewardsDelegate = accounts[2]
-        const sig = await getParsedSignatureOfAddress(account, rewardsDelegate)
-        await bondedDeposits.delegateRewards(rewardsDelegate, sig.v, sig.r, sig.s)
-        await assertRevert(bondedDeposits.getAccountFromValidator(rewardsDelegate))
-      })
-    })
-
-    describe('when the account is delegating', () => {
-      const delegate = accounts[1]
-
-      beforeEach(async () => {
-        const sig = await getParsedSignatureOfAddress(account, delegate)
-        await bondedDeposits.delegateValidating(delegate, sig.v, sig.r, sig.s)
-      })
-
-      it('should return the account when passed the delegate', async () => {
-        assert.equal(await bondedDeposits.getAccountFromValidator(delegate), account)
-      })
-
-      it('should return the account when passed the account', async () => {
-        assert.equal(await bondedDeposits.getAccountFromValidator(account), account)
-      })
-
-      it('should revert when passed a delegate that is not the voting delegate for the account', async () => {
-        const rewardsDelegate = accounts[2]
-        const sig = await getParsedSignatureOfAddress(account, rewardsDelegate)
-        await bondedDeposits.delegateRewards(rewardsDelegate, sig.v, sig.r, sig.s)
-        await assertRevert(bondedDeposits.getAccountFromValidator(rewardsDelegate))
+        it('should revert when passed a delegate that is not the role delegate', async () => {
+          const delegate = accounts[2]
+          const diffRole = (role + 1) % 3
+          const sig = await getParsedSignatureOfAddress(account, delegate)
+          await bondedDeposits.delegateRole(role, delegate, sig.v, sig.r, sig.s)
+          await assertRevert(bondedDeposits.getAccountFromDelegateAndRole(delegate, diffRole))
+        })
       })
     })
   })
 
-  describe('#getAccountFromRewardsRecipient()', () => {
-    describe('when the account is not delegating', () => {
-      it('should return the account when passed the account', async () => {
-        assert.equal(await bondedDeposits.getAccountFromRewardsRecipient(account), account)
+  describe('#getDelegateFromAccountAndRole()', () => {
+    forEachRole((role) => {
+      describe('when the account is not delegating', () => {
+        it('should return the account when passed the account', async () => {
+          assert.equal(await bondedDeposits.getDelegateFromAccountAndRole(account, role), account)
+        })
       })
 
-      it('should revert when passed a delegate that is not the rewards delegate for the account', async () => {
-        const votingDelegate = accounts[2]
-        const sig = await getParsedSignatureOfAddress(account, votingDelegate)
-        await bondedDeposits.delegateVoting(votingDelegate, sig.v, sig.r, sig.s)
-        await assertRevert(bondedDeposits.getAccountFromRewardsRecipient(votingDelegate))
-      })
-    })
+      describe('when the account is delegating', () => {
+        const delegate = accounts[1]
 
-    describe('when the account is delegating', () => {
-      const delegate = accounts[1]
+        beforeEach(async () => {
+          const sig = await getParsedSignatureOfAddress(account, delegate)
+          await bondedDeposits.delegateRole(role, delegate, sig.v, sig.r, sig.s)
+        })
 
-      beforeEach(async () => {
-        const sig = await getParsedSignatureOfAddress(account, delegate)
-        await bondedDeposits.delegateRewards(delegate, sig.v, sig.r, sig.s)
-      })
+        it('should return the account when passed undelegated role', async () => {
+          const role2 = (role + 1) % 3
+          assert.equal(await bondedDeposits.getDelegateFromAccountAndRole(account, role2), account)
+        })
 
-      it('should return the account when passed the delegate', async () => {
-        assert.equal(await bondedDeposits.getAccountFromRewardsRecipient(delegate), account)
-      })
-
-      it('should return the account when passed the account', async () => {
-        assert.equal(await bondedDeposits.getAccountFromRewardsRecipient(account), account)
-      })
-
-      it('should revert when passed a delegate that is not the rewards delegate for the account', async () => {
-        const votingDelegate = accounts[2]
-        const sig = await getParsedSignatureOfAddress(account, votingDelegate)
-        await bondedDeposits.delegateVoting(votingDelegate, sig.v, sig.r, sig.s)
-        await assertRevert(bondedDeposits.getAccountFromRewardsRecipient(votingDelegate))
+        it('should return the delegate when passed the delegated role', async () => {
+          assert.equal(await bondedDeposits.getDelegateFromAccountAndRole(account, role), delegate)
+        })
       })
     })
   })
@@ -903,7 +734,7 @@ contract('BondedDeposits', (accounts: string[]) => {
 
       beforeEach(async () => {
         const sig = await getParsedSignatureOfAddress(account, delegate)
-        await bondedDeposits.delegateVoting(delegate, sig.v, sig.r, sig.s)
+        await bondedDeposits.delegateRole(roles.voting, delegate, sig.v, sig.r, sig.s)
       })
 
       it('should return false if the delegate is not voting in governance or validator elections', async () => {

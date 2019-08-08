@@ -1,4 +1,3 @@
-import { getStableTokenContract } from '@celo/contractkit'
 import BigNumber from 'bignumber.js'
 import { Notification } from 'react-native-firebase/notifications'
 import {
@@ -11,9 +10,8 @@ import { showMessage } from 'src/alert/actions'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import { resolveCurrency } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
-import { lookupPhoneNumberAddress } from 'src/identity/verification'
+import { lookupAddressFromPhoneNumber } from 'src/identity/verification'
 import { DispatchType, GetStateType } from 'src/redux/reducers'
-import { updateSuggestedFee } from 'src/send/actions'
 import {
   navigateToPaymentTransferReview,
   navigateToRequestedPaymentReview,
@@ -36,7 +34,7 @@ const handlePaymentRequested = (
   const { recipientCache } = getState().send
   let requesterAddress = e164NumberToAddress[paymentRequest.requesterE164Number]
   if (!requesterAddress) {
-    const resolvedAddress = await lookupPhoneNumberAddress(paymentRequest.requesterE164Number)
+    const resolvedAddress = await lookupAddressFromPhoneNumber(paymentRequest.requesterE164Number)
     if (!resolvedAddress) {
       Logger.error(TAG, 'Unable to resolve requester address')
       return
@@ -49,20 +47,11 @@ const handlePaymentRequested = (
     recipientCache
   )
 
-  const fee = await dispatch(
-    updateSuggestedFee(true, getStableTokenContract, {
-      recipientAddress: requesterAddress!,
-      amount: paymentRequest.amount,
-      comment: paymentRequest.comment,
-    })
-  )
-
   navigateToRequestedPaymentReview({
     recipient,
     amount: new BigNumber(paymentRequest.amount),
     reason: paymentRequest.comment,
     recipientAddress: requesterAddress!,
-    fee,
   })
 }
 
@@ -81,7 +70,7 @@ const handlePaymentReceived = (
       TransactionTypes.RECEIVED,
       new BigNumber(transferNotification.timestamp).toNumber(),
       {
-        value: new BigNumber(divideByWei(transferNotification.value)),
+        value: divideByWei(transferNotification.value),
         currency: resolveCurrency(transferNotification.currency),
         address: transferNotification.sender.toLowerCase(),
         comment: transferNotification.comment,

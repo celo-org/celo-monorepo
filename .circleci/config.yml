@@ -108,8 +108,18 @@ jobs:
        - run:
           name: Build CLI
           command: |
-            yarn --cwd=packages/cli setup:environment alfajores
+            yarn --cwd=packages/cli build-sdk alfajores
             yarn --cwd=packages/cli build
+            yarn --cwd=packages/cli docs
+      
+       - run:
+          name: Fail if someone forgot to commit CLI docs
+          command: |
+            if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
+              git --no-pager diff packages/docs/command-line-interface
+              echo "There are git differences after generating CLI docs"
+              exit 1
+            fi
 
        - run:
           name: Build mobile
@@ -128,6 +138,10 @@ jobs:
           command: |
               set -e
               yarn --cwd=packages/web build
+
+       - run:
+          name: Build Docs
+          command: yarn --cwd=packages/docs build
 
   general-test:
     <<: *defaults
@@ -175,7 +189,7 @@ jobs:
           command: |
             mkdir -p test-results/jest
             # Tests fail with https://stackoverflow.com/questions/38558989/node-js-heap-out-of-memory without this
-            NODE_OPTIONS="--max-old-space-size=4096" yarn --cwd packages/mobile test
+            NODE_OPTIONS="--max-old-space-size=4096" yarn --cwd packages/mobile test:ci
           environment:
             JEST_JUNIT_OUTPUT: test-results/jest/junit.xml
 
@@ -372,7 +386,7 @@ jobs:
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_integration_sync.sh checkout master
+            ./ci_test_sync_with_network.sh checkout master
 
   web:
     working_directory: ~/app
@@ -384,6 +398,24 @@ jobs:
 
       - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run: cd packages/web && ./circle_deploy.sh
+
+  test-npm-package-install:
+    working_directory: ~/app
+    docker:
+      - image: celohq/node8:gcloud
+    steps:
+      - run:
+          name: Installing npm package - @celo/typescript
+          command: yarn add @celo/typescript
+      - run:
+          name: Installing npm package - @celo/utils
+          command: yarn add @celo/utils
+      - run:
+          name: Installing npm package - @celo/contractkit
+          command: yarn add @celo/contractkit
+      - run:
+          name: Installing npm package - @celo/celocli
+          command: yarn add @celo/celocli
 
 workflows:
   version: 2
@@ -441,3 +473,15 @@ workflows:
           requires:
             - install_dependencies
             - lint-checks
+  nightly:
+    triggers:
+      - schedule:
+          # 7 PM in UTC = noon in PDT.
+          # Best for test to fail during SF afternoon, so that, someone can fix it during the day time.
+          cron: "0 19 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - test-npm-package-install

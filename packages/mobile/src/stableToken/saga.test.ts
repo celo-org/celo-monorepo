@@ -1,5 +1,8 @@
+import { getErc20Balance, getStableTokenContract } from '@celo/contractkit'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { expectSaga } from 'redux-saga-test-plan'
+import { call } from 'redux-saga/effects'
+import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { fetchDollarBalance, setBalance, transferStableToken } from 'src/stableToken/actions'
 import { stableTokenFetch, stableTokenTransfer } from 'src/stableToken/saga'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
@@ -26,7 +29,6 @@ jest.mock('src/web3/actions', () => ({
   unlockAccount: jest.fn(async () => true),
 }))
 
-import { getErc20Balance, getStableTokenContract } from '@celo/contractkit'
 const { unlockAccount } = require('src/web3/actions')
 
 const state = createMockStore().getState()
@@ -43,6 +45,7 @@ describe('stableToken saga', () => {
 
   it('should fetch the balance and put the new balance', async () => {
     await expectSaga(stableTokenFetch)
+      .provide([[call(waitWeb3LastBlock), true]])
       .withState(state)
       .dispatch(fetchDollarBalance())
       .put(setBalance(BALANCE))
@@ -52,6 +55,7 @@ describe('stableToken saga', () => {
 
   it('should add a standby transaction and dispatch a sendAndMonitorTransaction', async () => {
     await expectSaga(stableTokenTransfer)
+      .provide([[call(waitWeb3LastBlock), true]])
       .withState(state)
       .dispatch(TRANSFER_ACTION)
       .put(
@@ -71,6 +75,7 @@ describe('stableToken saga', () => {
 
   it('should add a standby transaction', async () => {
     await expectSaga(stableTokenTransfer)
+      .provide([[call(waitWeb3LastBlock), true]])
       .withState(state)
       .dispatch(TRANSFER_ACTION)
       .put(
@@ -91,6 +96,7 @@ describe('stableToken saga', () => {
   // TODO(cmcewen): Figure out how to mock this so we can get actual contract calls
   it('should call the contract getter', async () => {
     await expectSaga(stableTokenTransfer)
+      .provide([[call(waitWeb3LastBlock), true]])
       .withState(state)
       .dispatch(TRANSFER_ACTION)
       .run()
@@ -101,6 +107,7 @@ describe('stableToken saga', () => {
     unlockAccount.mockImplementationOnce(async () => false)
 
     await expectSaga(stableTokenTransfer)
+      .provide([[call(waitWeb3LastBlock), true]])
       .withState(state)
       .dispatch(TRANSFER_ACTION)
       .put(removeStandbyTransaction(TX_ID))

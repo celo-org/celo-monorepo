@@ -147,7 +147,7 @@ export default class Rise extends React.PureComponent<Props, State> {
   }
 }
 
-function jitter({ x, y }) {
+function jitter({ x, y }: Coord) {
   return {
     x: randomIntegerInRange(x, x + JITTER),
     y: randomIntegerInRange(y - JITTER + 1, y + JITTER + 1),
@@ -160,13 +160,13 @@ class RisingCoin extends React.PureComponent<RisingCoinProps, StateVectors> {
     super(props)
     this.state = spawn(props)
   }
-  getTransformStart = ({ x, y }) => {
+  getTransformStart = ({ x, y }: Coord) => {
     return [{ translateX: x }, { translateY: y }, { translateZ: 0 }]
   }
-  getTransformEnd = ({ x, y }) => {
+  getTransformEnd = ({ x, y }: Coord) => {
     return [{ translateX: x + this.state.vx }, { translateY: y - this.state.vy }, { translateZ: 0 }]
   }
-  getTransformMidpoint = ({ x, y }, percent) => {
+  getTransformMidpoint = ({ x, y }, percent: number) => {
     return [
       { translateX: x + this.state.vx * percent },
       { translateY: y - this.state.vy * percent },
@@ -279,7 +279,7 @@ class RisingCoin extends React.PureComponent<RisingCoinProps, StateVectors> {
     }
   }
 
-  getHollowCoinStyle(color) {
+  getHollowCoinStyle(color: colors) {
     return {
       opacity: 1,
       strokeWidth: '8px',
@@ -321,7 +321,7 @@ class RisingCoin extends React.PureComponent<RisingCoinProps, StateVectors> {
         ]}
       >
         <OvalCoin
-          style={this.getHollowCoinStyle(this.props.color)}
+          style={this.props.willFall && this.getHollowCoinStyle(this.props.color)}
           color={this.props.color}
           size={this.state.radius}
           viewBox="-10 -10 90 115"

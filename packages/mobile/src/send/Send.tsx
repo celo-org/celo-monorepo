@@ -15,12 +15,14 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import CancelButton from 'src/components/CancelButton'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import { Namespaces } from 'src/i18n'
+import { importContacts } from 'src/identity/actions'
 import { E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { storeLatestInRecents } from 'src/send/actions'
 import RecipientPicker from 'src/send/RecipientPicker'
+import { checkContactsPermission } from 'src/utils/androidPermissions'
 import {
   buildRecentRecipients,
   filterRecipientFactory,
@@ -31,6 +33,11 @@ import {
   RecipientWithQrCode,
 } from 'src/utils/recipient'
 
+interface Section {
+  key: string
+  data: Recipient[]
+}
+
 interface State {
   loading: boolean
   searchQuery: string
@@ -38,6 +45,7 @@ interface State {
   recentRecipients: Recipient[]
   allFiltered: Recipient[]
   recentFiltered: Recipient[]
+  hasGivenPermission: boolean
 }
 
 interface StateProps {
@@ -52,6 +60,7 @@ interface DispatchProps {
   showError: typeof showError
   hideAlert: typeof hideAlert
   storeLatestInRecents: typeof storeLatestInRecents
+  importContacts: typeof importContacts
 }
 
 type Props = StateProps & DispatchProps & WithNamespaces & NavigationInjectedProps
@@ -64,6 +73,13 @@ const mapStateToProps = (state: RootState): StateProps => ({
   e164PhoneNumberAddressMapping: state.identity.e164NumberToAddress,
   recipientCache: state.send.recipientCache,
 })
+
+const mapDispatchToProps = {
+  showError,
+  hideAlert,
+  storeLatestInRecents,
+  importContacts,
+}
 
 // TODO(Rossy) move this into redux as I've done for the full cache (don't forget to blacklist it when you do)
 let recentCache: Recipient[] | null = null
@@ -106,6 +122,7 @@ class Send extends React.Component<Props, State> {
       recentRecipients: [],
       allFiltered: [],
       recentFiltered: [],
+      hasGivenPermission: true,
     }
 
     this.allRecipientsFilter = filterRecipientFactory(this.state.allRecipients)
@@ -137,7 +154,7 @@ class Send extends React.Component<Props, State> {
     // end alfajores-net code
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const { t, recentPhoneNumbers, recipientCache } = this.props
     this.props.navigation.setParams({ title: t('send_or_request') })
     const recipients = Object.values(recipientCache)
@@ -163,6 +180,9 @@ class Send extends React.Component<Props, State> {
         },
         this.updateFilters
       )
+
+      const hasGivenPermission = await checkContactsPermission()
+      this.setState({ hasGivenPermission })
     }
   }
 
@@ -194,20 +214,36 @@ class Send extends React.Component<Props, State> {
     navigate(Screens.SendAmount, { recipient })
   }
 
+  onPermissionsAccepted = async () => {
+    this.props.importContacts()
+    this.setState(
+      {
+        searchQuery: '',
+        recentRecipients: [],
+        hasGivenPermission: true,
+      },
+      this.updateFilters
+    )
+  }
+
+  buildSections = (): Section[] => {
+    const { t, recipientCache } = this.props
+    const allRecipients = Object.values(recipientCache)
+
+    const queryRecipients = filterRecipients(allRecipients, this.state.searchQuery)
+
+    const { recentFiltered } = this.state
+    const sections = [
+      { key: t('recent'), data: recentFiltered },
+      { key: t('contacts'), data: Object.values(queryRecipients) },
+    ].filter((section) => section.data.length > 0)
+
+    return sections
+  }
+
   render() {
     const { t, defaultCountryCode } = this.props
-    const { loading, searchQuery, recentFiltered, allFiltered } = this.state
-
-    const sections = [
-      {
-        key: t('recent'),
-        data: recentFiltered,
-      },
-      {
-        key: t('contacts'),
-        data: allFiltered,
-      },
-    ].filter((section) => section.data.length > 0) // Only show section if there's results
+    const { loading, searchQuery } = this.state
 
     return (
       <View style={style.body}>
@@ -218,12 +254,14 @@ class Send extends React.Component<Props, State> {
           </View>
         ) : (
           <RecipientPicker
-            sections={sections}
+            sections={this.buildSections()}
             searchQuery={searchQuery}
             defaultCountryCode={defaultCountryCode}
+            hasAcceptedContactPermission={this.state.hasGivenPermission}
             onSelectRecipient={this.onSelectRecipient}
             onSearchQueryChanged={this.onSearchQueryChanged}
             showQRCode={true}
+            onPermissionsAccepted={this.onPermissionsAccepted}
           />
         )}
       </View>
@@ -250,12 +288,8 @@ const style = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect(
+  connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
-    {
-      showError,
-      hideAlert,
-      storeLatestInRecents,
-    }
+    mapDispatchToProps
   )(withNamespaces(Namespaces.sendFlow7)(withNavigation(Send)))
 )

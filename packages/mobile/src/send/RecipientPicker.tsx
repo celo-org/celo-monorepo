@@ -1,3 +1,4 @@
+import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import SectionHead from '@celo/react-components/components/SectionHead'
 import ForwardChevron from '@celo/react-components/icons/ForwardChevron'
 import QRCode from '@celo/react-components/icons/QRCode'
@@ -27,6 +28,7 @@ import { RootState } from 'src/redux/reducers'
 import LabeledTextInput from 'src/send/LabeledTextInput'
 import RecipientItem from 'src/send/RecipientItem'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
+import { requestContactsPermission } from 'src/utils/androidPermissions'
 import {
   getRecipientFromAddress,
   NumberToRecipient,
@@ -64,8 +66,10 @@ interface Props {
   searchQuery: string
   sections: Section[]
   defaultCountryCode: string
+  hasAcceptedContactPermission: boolean
   onSelectRecipient(recipient: Recipient): void
   onSearchQueryChanged(searchQuery: string): void
+  onPermissionsAccepted(): void
 }
 
 interface StateProps {
@@ -157,6 +161,30 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     )
   }
 
+  renderRequestContactPermission = () => {
+    return (
+      <>
+        {!this.props.hasAcceptedContactPermission && (
+          <Button
+            text={this.props.t('askForContactsPermissionAction')}
+            style={style.button}
+            onPress={this.requestContactsPermission}
+            standard={true}
+            type={BtnTypes.SECONDARY}
+          />
+        )}
+      </>
+    )
+  }
+
+  requestContactsPermission = async () => {
+    const granted = await requestContactsPermission()
+
+    if (granted) {
+      this.props.onPermissionsAccepted()
+    }
+  }
+
   renderSendToAddress = () => {
     const { t, searchQuery, addressToE164Number, recipientCache, onSelectRecipient } = this.props
     const existingContact = getRecipientFromAddress(
@@ -199,7 +227,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
           keyboardType="default"
           placeholder={t('nameOrPhoneNumber')}
           value={this.props.searchQuery}
-          onValueChanged={this.props.onSearchQueryChanged}
+          onChangeText={this.props.onSearchQueryChanged}
         />
         {this.props.showQRCode && <QRCodeCTA t={t} />}
         <SectionList
@@ -213,6 +241,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
           initialNumToRender={30}
           keyboardShouldPersistTaps="handled"
         />
+        {this.renderRequestContactPermission()}
       </View>
     )
   }
@@ -222,6 +251,12 @@ const style = StyleSheet.create({
   body: {
     flex: 1,
   },
+  button: {
+    marginTop: 30,
+    paddingHorizontal: 20,
+    paddingVertical: 5,
+  },
+
   label: {
     alignSelf: 'center',
     color: colors.dark,

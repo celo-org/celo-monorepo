@@ -285,4 +285,5 @@ const styles = StyleSheet.create({
   },
 })
 
+// @ts-ignore
 export default withNamespaces(Namespaces.walletFlow5)(TransferFeedItem)
