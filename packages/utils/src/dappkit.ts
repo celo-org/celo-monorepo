@@ -140,6 +140,8 @@ export function serializeDappKitRequestDeeplink(request: DappKitRequest) {
   return DAPPKIT_BASE_HOST + '?' + stringify(params)
 }
 
+// TODO: parsing query params yields broad types
+// once interface stabilizes, properly type the parsing
 export function parseDappKitRequestDeeplink(url: string): DappKitRequest {
   const rawParams = parse(url, true)
 
