@@ -21,7 +21,7 @@ export const EXPIRY_SECONDS = 432000 // 5 days in seconds
 export enum Actions {
   TRANSFER_PAYMENT = 'ESCROW/TRANSFER_PAYMENT',
   RECLAIM_PAYMENT = 'ESCROW/RECLAIM_PAYMENT',
-  GET_SENT_PAYMENTS = 'ESCROW/GET_SENT_PAYMENTS',
+  FETCH_SENT_PAYMENTS = 'ESCROW/FETCH_SENT_PAYMENTS',
   STORE_SENT_PAYMENTS = 'ESCROW/STORE_SENT_PAYMENTS',
   RESEND_PAYMENT = 'ESCROW/RESEND_PAYMENT',
   RECLAIM_PAYMENT_SUCCESS = 'ESCROW/RECLAIM_PAYMENT_SUCCESS',
@@ -32,7 +32,6 @@ export interface TransferPaymentAction {
   type: Actions.TRANSFER_PAYMENT
   phoneHash: string
   amount: BigNumber
-  txId: string
   tempWalletAddress: string
 }
 export interface ReclaimPaymentAction {
@@ -40,8 +39,8 @@ export interface ReclaimPaymentAction {
   paymentID: string
 }
 
-export interface GetSentPaymentsAction {
-  type: Actions.GET_SENT_PAYMENTS
+export interface FetchSentPaymentsAction {
+  type: Actions.FETCH_SENT_PAYMENTS
 }
 
 export interface StoreSentPaymentsAction {
@@ -66,7 +65,7 @@ export interface ReclaimFailureAction {
 export type ActionTypes =
   | TransferPaymentAction
   | ReclaimPaymentAction
-  | GetSentPaymentsAction
+  | FetchSentPaymentsAction
   | StoreSentPaymentsAction
   | ResendPaymentAction
   | ReclaimPaymentSuccessAction
@@ -75,13 +74,11 @@ export type ActionTypes =
 export const transferEscrowedPayment = (
   phoneHash: string,
   amount: BigNumber,
-  txId: string,
   tempWalletAddress: string
 ): TransferPaymentAction => ({
   type: Actions.TRANSFER_PAYMENT,
   phoneHash,
   amount,
-  txId,
   tempWalletAddress,
 })
 
@@ -90,8 +87,8 @@ export const reclaimPayment = (paymentID: string): ReclaimPaymentAction => ({
   paymentID,
 })
 
-export const getSentPayments = (): GetSentPaymentsAction => ({
-  type: Actions.GET_SENT_PAYMENTS,
+export const fetchSentPayments = (): FetchSentPaymentsAction => ({
+  type: Actions.FETCH_SENT_PAYMENTS,
 })
 
 export const storeSentPayments = (sentPayments: EscrowedPayment[]): StoreSentPaymentsAction => ({
