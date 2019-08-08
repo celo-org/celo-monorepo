@@ -36,7 +36,7 @@ jobs:
           name: Checkout (with last 100 commits)
           command: |
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            git clone --depth 100 --no-single-branch --branch ${CIRCLE_BRANCH} https://github.com/celo-org/celo-monorepo.git ~/app
+            git clone --depth 100 --no-single-branch --branch ${CIRCLE_BRANCH} git@github.com:celo-org/celo-monorepo.git ~/app
             cd ~/app
             set -v
             # To get the "master" branch mapping
