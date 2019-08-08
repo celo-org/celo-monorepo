@@ -52,19 +52,22 @@ jobs:
           at: ~/app
 
       - restore_cache:
-          key: yarn-v2-{{ checksum "yarn.lock" }}-{{ arch }}
+          keys: 
+            - yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-v2-{{ arch }}-{{ .Branch }}-
+            - yarn-v2-{{ arch }}-
+            - yarn-v2-
 
       - run:
           name: Delete @celo dir from node_modules (if its there)
           command: rm -rf ~/app/node_modules/@celo
 
       - run:
-          name: yarn
+          name: Install dependencies
           command: |
             # Deals with yarn install flakiness which can come due to yarnpkg.com being
             # unreliable. For example, https://circleci.com/gh/celo-org/celo-monorepo/82685
             yarn install || yarn install
-
       - run:
           name: Fail if someone forgot to commit "yarn.lock"
           command: |
@@ -72,22 +75,26 @@ jobs:
               echo "There are git differences after running yarn install"
               exit 1
             fi
-
       - run: npm rebuild scrypt
-
-      - run:
-          name: Build packages
-          command: yarn build
 
       - save_cache:
           key: yarn-v2-{{ checksum "yarn.lock" }}-{{ arch }}
           paths:
             - node_modules
             - packages/*/node_modules
+      
+      - run:
+          name: Build packages
+          command: |
+            # build protocol first to avoid out of memory in circle ci
+            yarn build --scope @celo/protocol
+            yarn build --ignore @celo/protocol
+
 
       - persist_to_workspace:
           root: .
-          paths: .
+          paths: 
+            - .
 
   lint:
     <<: *defaults
