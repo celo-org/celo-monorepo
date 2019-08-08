@@ -6,13 +6,14 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./SortedFractionMedianList.sol";
 import "./interfaces/ISortedOracles.sol";
 import "../common/Initializable.sol";
+import "../common/UsingFixidity.sol";
 
 
 // TODO: don't treat timestamps as Fixidity values
 /**
  * @title Maintains a sorted list of oracle exchange rates between Celo Gold and other currencies.
  */
-contract SortedOracles is ISortedOracles, Ownable, Initializable {
+contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingFixidity {
   using FixidityLib for int256;
   using SafeMath for uint256;
   using SafeMath for uint128;
@@ -159,7 +160,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     timestamps[token].insertOrUpdate(
       msg.sender,
       // solhint-disable-next-line not-rely-on-time
-      FixidityLib.newFixed(uint128(now)),
+      toFixed(now),
       getLesserTimestampKey(token, msg.sender),
       address(0)
     );
@@ -184,7 +185,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    */
   function medianRate(address token) external view returns (uint128, uint128) {
     SortedFractionMedianList.Element memory median = getMedianElement(rates[token]);
-    return (uint128(median.value), uint128(FixidityLib.fixed1()));
+    return (uint128(median.value), uint128(FIXED1));
   }
 
   /**

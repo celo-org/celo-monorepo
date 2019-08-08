@@ -11,12 +11,13 @@ import "./AddressSortedLinkedList.sol";
 import "./UsingBondedDeposits.sol";
 import "./interfaces/IValidators.sol";
 import "../common/Initializable.sol";
+import "../common/UsingFixidity.sol";
 
 
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
  */
-contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, UsingBondedDeposits {
+contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, UsingBondedDeposits, UsingFixidity {
 
   using AddressLinkedList for LinkedList.List;
   using AddressSortedLinkedList for SortedLinkedList.List;
@@ -821,8 +822,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     ValidatorGroup storage group = groups[groupAddress];
     // Only consider groups with members left to be elected.
     if (group.members.numElements > numMembersElected) {
-      int256 n = FixidityLib.newFixed(int256(votes.getValue(groupAddress))).divide(
-        FixidityLib.newFixed(int256(numMembersElected.add(1)))
+      int256 n = toFixed(votes.getValue(groupAddress)).divide(
+        toFixed(numMembersElected.add(1))
       );
       if (n > maxN) {
         return (n, true);

@@ -9,6 +9,7 @@ import "./interfaces/IReserve.sol";
 import "./interfaces/IStableToken.sol";
 import "../common/FractionUtil.sol";
 import "../common/Initializable.sol";
+import "../common/UsingFixidity.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/IERC20Token.sol";
 
@@ -17,7 +18,7 @@ import "../common/interfaces/IERC20Token.sol";
  * @title Contract that allows to exchange StableToken for GoldToken and vice versa
  * using a Constant Product Market Maker Model
  */
-contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
+contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, UsingFixidity {
   using FixidityLib for int256;
   using SafeMath for uint256;
   using FractionUtil for FractionUtil.Fraction;
@@ -163,8 +164,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);
 
     int256 reducedSellAmount = getReducedSellAmount(sellAmount);
-    int256 numerator = reducedSellAmount.multiply(int256(buyTokenBucket).newFixed());
-    int256 denominator = int256(sellTokenBucket).newFixed().add(reducedSellAmount);
+    int256 numerator = reducedSellAmount.multiply(toFixed(buyTokenBucket));
+    int256 denominator = toFixed(sellTokenBucket).add(reducedSellAmount);
 
     return uint256(numerator.divide(denominator).fromFixed());
   }
@@ -188,9 +189,9 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     uint256 buyTokenBucket;
     (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);
 
-    int256 numerator = int256(buyAmount.mul(sellTokenBucket)).newFixed();
-    int256 denominator = int256(buyTokenBucket.sub(buyAmount)).newFixed()
-      .multiply(FixidityLib.fixed1().subtract(spread));
+    int256 numerator = toFixed(buyAmount.mul(sellTokenBucket));
+    int256 denominator = toFixed(buyTokenBucket.sub(buyAmount))
+      .multiply(FIXED1.subtract(spread));
 
     return uint256(numerator.divide(denominator).fromFixed());
   }
@@ -267,8 +268,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     (buyTokenBucket, sellTokenBucket) = _getBuyAndSellBuckets(sellGold);
 
     int256 reducedSellAmount = getReducedSellAmount(sellAmount);
-    int256 numerator = reducedSellAmount.multiply(int256(buyTokenBucket).newFixed());
-    int256 denominator = int256(sellTokenBucket).newFixed().add(reducedSellAmount);
+    int256 numerator = reducedSellAmount.multiply(toFixed(buyTokenBucket));
+    int256 denominator = toFixed(sellTokenBucket).add(reducedSellAmount);
 
     return uint256(numerator.divide(denominator).fromFixed());
   }
@@ -282,7 +283,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
 
   function getUpdatedGoldBucket() private view returns (uint256) {
     uint256 reserveGoldBalance = gold().balanceOf(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
-    return uint256(reserveFraction.multiply(int256(reserveGoldBalance).newFixed()).fromFixed());
+    return uint256(reserveFraction.multiply(toFixed(reserveGoldBalance)).fromFixed());
   }
 
   /**
@@ -304,9 +305,9 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
    * @return The reduced sell amount, computed as (1 - spread) * sellAmount
    */
   function getReducedSellAmount(uint256 sellAmount) private view returns (int256) {
-    return FixidityLib.fixed1()
+    return FIXED1
       .subtract(spread)
-      .multiply(int256(sellAmount).newFixed());
+      .multiply(toFixed(sellAmount));
   }
 
   /*

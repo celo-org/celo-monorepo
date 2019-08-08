@@ -9,6 +9,7 @@ import "./interfaces/IStableToken.sol";
 import "../common/interfaces/IERC20Token.sol";
 import "../common/interfaces/ICeloToken.sol";
 import "../common/Initializable.sol";
+import "../common/UsingFixidity.sol";
 import "../common/UsingRegistry.sol";
 
 
@@ -16,7 +17,8 @@ import "../common/UsingRegistry.sol";
  * @title An ERC20 compliant token with adjustable supply.
  */
 // solhint-disable-next-line max-line-length
-contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initializable, UsingRegistry {
+contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
+Initializable, UsingRegistry, UsingFixidity {
   using FixidityLib for int256;
   using SafeMath for uint256;
 
@@ -138,7 +140,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
     decimals_ = _decimals;
 
     inflationState.rate = inflationRate;
-    inflationState.factor = FixidityLib.fixed1();
+    inflationState.factor = FIXED1;
     inflationState.updatePeriod = inflationFactorUpdatePeriod;
     // solhint-disable-next-line not-rely-on-time
     inflationState.factorLastUpdated = now;
@@ -380,7 +382,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
 
     (updatedInflationFactor, ) = getUpdatedInflationFactor();
 
-    return uint256(FixidityLib.newFixed(int256(units)).divide(updatedInflationFactor).fromFixed());
+    return uint256(toFixed(units).divide(updatedInflationFactor).fromFixed());
   }
 
   /**
@@ -397,7 +399,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
     pure
     returns (uint256)
   {
-    return uint256(inflationFactor.multiply(FixidityLib.newFixed(int256(value))).fromFixed());
+    return uint256(inflationFactor.multiply(toFixed(value)).fromFixed());
   }
 
   /**
@@ -426,9 +428,9 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
 
     (numerator, denominator) = fractionMulExp(
       uint256(inflationState.factor),
-      uint256(FixidityLib.fixed1()),
+      uint256(FIXED1),
       uint256(inflationState.rate),
-      uint256(FixidityLib.fixed1()),
+      uint256(FIXED1),
       timesToApplyInflation,
       decimals_
     );
@@ -440,7 +442,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
     }
 
     int256 currentInflationFactor =
-      FixidityLib.newFixed(int256(numerator)).divide(FixidityLib.newFixed(int256(denominator)));
+      toFixed(numerator).divide(toFixed(denominator));
     uint256 lastUpdated = inflationState.factorLastUpdated.add(
       inflationState.updatePeriod.mul(timesToApplyInflation)
     );

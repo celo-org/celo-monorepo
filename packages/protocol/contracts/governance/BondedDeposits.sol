@@ -11,11 +11,12 @@ import "./interfaces/IValidators.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
+import "../common/UsingFixidity.sol";
 import "../common/interfaces/IERC20Token.sol";
 import "../common/Signatures.sol";
 import "../common/FractionUtil.sol";
 
-contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, UsingRegistry {
+contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, UsingRegistry, UsingFixidity {
 
   using FixidityLib for int256;
   using FractionUtil for FractionUtil.Fraction;
@@ -580,7 +581,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     );
     require(rewardWeight != 0, "Rewards weight does not exist");
     uint256 value =
-      uint256(rewardWeight.multiply(FixidityLib.newFixed(int256(account.weight))).fromFixed());
+      uint256(rewardWeight.multiply(toFixed(account.weight)).fromFixed());
     account.rewardsLastRedeemed = uint96(rewardBlockNumber);
     if (value > 0) {
       address recipient = getDelegateFromAccountAndRole(_account, DelegateRole.Rewards);

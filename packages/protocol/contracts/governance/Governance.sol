@@ -11,20 +11,18 @@ import "./IntegerSortedLinkedList.sol";
 import "./UsingBondedDeposits.sol";
 import "./interfaces/IGovernance.sol";
 import "../common/Initializable.sol";
+import "../common/UsingFixidity.sol";
 
 
 // TODO(asa): Hardcode minimum times for queueExpiry, etc.
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
  */
-contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits, ReentrancyGuard {
+contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits, ReentrancyGuard, UsingFixidity {
   using FixidityLib for int256;
   using SafeMath for uint256;
   using IntegerSortedLinkedList for SortedLinkedList.List;
   using BytesLib for bytes;
-
-  // FixidityLib.fixed1().divide(FixidityLib.newFixed(2))
-  int256 constant public HALF = 500000000000000000000000;
 
   // TODO(asa): Consider a delay stage.
   enum ProposalStage {
@@ -347,7 +345,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     // TODO(asa): https://github.com/celo-org/celo-monorepo/pull/3414#discussion_r283588332
     require(destination != address(0));
     // Threshold has to be greater than majority and not greater than unaninimty
-    require(threshold > HALF && threshold <= FixidityLib.fixed1());
+    require(threshold > FIXED_HALF && threshold <= FIXED1);
     if (functionId == 0) {
       constitution[destination].defaultThreshold = threshold;
     } else {
@@ -875,8 +873,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     if (yesNoVotes == 0) {
       return false;
     }
-    int256 yesRatio = FixidityLib.newFixed(int256(proposal.votes.yes)).divide(
-      FixidityLib.newFixed(int256(yesNoVotes))
+    int256 yesRatio = toFixed(proposal.votes.yes).divide(
+      toFixed(yesNoVotes)
     );
 
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
@@ -1010,7 +1008,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     returns (int256)
   {
     // Default to a simple majority.
-    int256 threshold = HALF;
+    int256 threshold = FIXED_HALF;
     if (constitution[destination].functionThresholds[functionId] != 0) {
       threshold = constitution[destination].functionThresholds[functionId];
     } else if (constitution[destination].defaultThreshold != 0) {
