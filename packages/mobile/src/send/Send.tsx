@@ -140,15 +140,14 @@ class Send extends React.Component<Props, State> {
   }
 
   updateFilters() {
-    this.setState(
-      {
-        recentRecipients: [CeloDefaultRecipient, ...this.state.recentRecipients],
-      },
-      () => {
-        this.recentRecipientsFilter = filterRecipientFactory(this.state.recentRecipients, false)
-        this.onSearchQueryChanged('')
-      }
-    )
+    const recentRecipients = this.props.devModeActive
+      ? [CeloDefaultRecipient, ...this.state.recentRecipients]
+      : this.state.recentRecipients
+
+    this.setState({ recentRecipients }, () => {
+      this.recentRecipientsFilter = filterRecipientFactory(this.state.recentRecipients, false)
+      this.onSearchQueryChanged('')
+    })
 
     this.allRecipientsFilter = filterRecipientFactory(this.state.allRecipients, true)
     // end alfajores-net code
