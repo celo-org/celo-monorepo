@@ -16,7 +16,7 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import ArticleData from './ArticleData'
 import EventData from './EventsData'
-
+import EcoFund from 'src/community/EcoFund'
 // @ts-ignore
 const Sweep = dynamic(() => import('src/community/connect/Sweep'))
 
@@ -50,6 +50,7 @@ export class ConnectPage extends React.Component<Props> {
         <View>
           <CoverArea />
           <Tenets />
+          <EcoFund />
           <CodeOfConduct />
           <GridRow
             desktopStyle={standardStyles.sectionMarginTop}
