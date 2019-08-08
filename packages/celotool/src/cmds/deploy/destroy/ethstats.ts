@@ -6,13 +6,9 @@ export const command = 'ethstats'
 
 export const describe = 'destroy the ethstats package'
 
-type EthstatsArgv = DestroyArgv & {
-  reset: boolean
-}
-
 export const builder = {}
 
-export const handler = async (argv: EthstatsArgv) => {
+export const handler = async (argv: DestroyArgv) => {
   await createClusterIfNotExists()
   await switchToClusterFromEnv()
 
