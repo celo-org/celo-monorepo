@@ -7,13 +7,12 @@
   "author": "Celo",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "yarn run clean && bin/build-sdk.js",
-    "compile-typescript": "tsc",
+    "build:env": "bin/build-sdk.js",
+    "build:ts": "tsc -p .",
     "clean": "rm -rf lib .artifacts contracts types lib",
     "lint": "tslint -c tslint.json --project tsconfig.json",
-    "lint-checks": "yarn run lint && yarn run build alfajores",
-    "postinstall": "yarn run build alfajores",
-    "prettify": "yarn run prettier --config ../../.prettierrc.js --write '{contracts,types}/**/*.+(ts|tsx|js|jsx)'",
+    "prebuild": "yarn clean",
+    "build": "yarn run build:env alfajores",
     "test": "export TZ=UTC && jest --ci --silent --coverage --runInBand test/attestations.test.ts test/erc20-utils.test.ts test/google-storage-utils.test.ts test/start_geth.sh test/transaction-utils.test.ts",
     "test:verbose": "export TZ=UTC && jest --ci --verbose --runInBand  test/attestations.test.ts test/erc20-utils.test.ts test/google-storage-utils.test.ts test/start_geth.sh test/transaction-utils.test.ts",
     "test-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'"

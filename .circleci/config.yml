@@ -85,64 +85,31 @@ jobs:
           root: .
           paths: .
 
-  lint-checks:
+  lint:
     <<: *defaults
     steps:
       - attach_workspace:
           at: ~/app
 
-      - run: yarn run ci-lint
+      - run: yarn run lint:ci
 
   build-all-packages:
      <<: *defaults
      steps:
        - attach_workspace:
           at: ~/app
-
        - run:
-           name: Build SDK
-           command: |
-              set -e
-              yarn --cwd=packages/contractkit build alfajores
-
-       - run:
-          name: Build CLI
-          command: |
-            yarn --cwd=packages/cli build-sdk alfajores
-            yarn --cwd=packages/cli build
-            yarn --cwd=packages/cli docs
-
+           name: Build Packages
+           command: yarn build
        - run:
           name: Fail if someone forgot to commit CLI docs
           command: |
+            yarn --cwd=packages/cli docs
             if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
               git --no-pager diff packages/docs/command-line-interface
               echo "There are git differences after generating CLI docs"
               exit 1
             fi
-
-       - run:
-          name: Build mobile
-          command: yarn --cwd=packages/mobile build
-
-       - run:
-          name: Build Verification Pool
-          command: yarn --cwd=packages/verification-pool-api compile-typescript
-
-       - run:
-          name: Build Verifier
-          command: yarn --cwd=packages/verifier build:typescript
-
-       - run:
-          name: Build Web
-          command: |
-              set -e
-              yarn --cwd=packages/web build
-
-       - run:
-          name: Build Docs
-          command: yarn --cwd=packages/docs build
-
   general-test:
     <<: *defaults
     steps:
@@ -453,57 +420,57 @@ workflows:
   celo-monorepo-build:
     jobs:
       - install_dependencies
-      - lint-checks:
+      - lint:
           requires:
             - install_dependencies
       - build-all-packages:
            requires:
             - install_dependencies
-            - lint-checks
+            - lint
       - general-test:
           requires:
             - install_dependencies
-            - lint-checks
+            - lint
       - contractkit-test:
           requires:
             - install_dependencies
-            - lint-checks
+            - lint
       - cli-test:
           requires:
             - install_dependencies
-            - lint-checks
+            - lint
       - mobile-test:
           requires:
             - install_dependencies
-            - lint-checks
+            - lint
       - mobile-test-build-app:
           requires:
             - install_dependencies
-            - lint-checks
+            - lint
       - verification-pool-api:
           requires:
             - install_dependencies
-            - lint-checks
+            - lint
       - protocol-test:
           requires:
             - install_dependencies
-            - lint-checks
+            - lint
       - end-to-end-geth-transfer-test:
           requires:
             - install_dependencies
-            - lint-checks
+            - lint
       - end-to-end-geth-governance-test:
           requires:
             - install_dependencies
-            - lint-checks
+            - lint
       - end-to-end-geth-sync-test:
           requires:
             - install_dependencies
-            - lint-checks
+            - lint
       - end-to-end-geth-integration-sync-test:
           requires:
             - install_dependencies
-            - lint-checks
+            - lint
   nightly:
     triggers:
       - schedule:

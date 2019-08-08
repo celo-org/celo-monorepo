@@ -7,8 +7,8 @@
   "scripts": {
     "install-pkg": "yarn install --link-duplicates",
     "precommit": "pretty-quick --staged",
-    "ci-lint": "yarn run prettify:diff && yarn run lint-checks",
-    "lint-checks": "yarn run lerna run lint-checks",
+    "lint:ci": "yarn run prettify:diff && yarn run lint",
+    "lint": "yarn run lerna run lint",
     "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx)'",
     "prettify:diff": "yarn run prettier --config .prettierrc.js --list-different '**/*.+(ts|tsx|js|jsx)'",
     "reset": "yarn reset-modules && yarn reset-cache",
@@ -17,6 +17,7 @@
     "reset-rn": "watchman watch-del-all; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/haste-map-*; rm -rf $TMPDIR/metro-symbolicate*",
     "reset-yarn": "yarn cache clean",
     "test": "yarn run lerna run test",
+    "build": "yarn run lerna run build",
     "report-coverage": "yarn run lerna run test-coverage",
     "test:watch": "node node_modules/jest/bin/jest.js --watch",
     "postinstall": "yarn run lerna --concurrency 1 run postinstall && patch-package && sh scripts/custom_patch_packages.sh && yarn keys:decrypt",

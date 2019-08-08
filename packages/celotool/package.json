@@ -43,7 +43,7 @@
     "cli": "TS_NODE_FILES=true ts-node -r tsconfig-paths/register src/cli.ts",
     "test": "jest",
     "lint": "tslint -c tslint.json --project tsconfig.json",
-    "lint-checks": "yarn run lint && tsc --project tsconfig.json --noEmit"
+    "build": "tsc -p tsconfig.json "
   },
   "private": true
 }
