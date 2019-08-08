@@ -15,9 +15,13 @@ contract Quorum is IQuorum, Ownable, Initializable {
   using FixidityLib for int256;
   using SafeMath for uint256;
 
+  // The average network participation in governance, weighted toward recent proposals.
   int256 public participationBaseline;
+  // The lower bound on the participation baseline.
   int256 public participationFloor;
+  // The weight of the most recent proposal's participation on the baseline.
   int256 public updateCoefficient;
+  // The fraction of the baseline under which the proposal will be padded with "no" votes.
   int256 public criticalBaselineLevel;
 
   event ParticipationBaselineUpdated(
@@ -55,9 +59,13 @@ contract Quorum is IQuorum, Ownable, Initializable {
     external
     initializer
   {
-    require(_participationFloor >= 0 && _participationFloor <= FixidityLib.fixed1()
-      && _updateCoefficient >= 0 && _updateCoefficient <= FixidityLib.fixed1()
-      && _criticalBaselineLevel > 0 && _criticalBaselineLevel <= FixidityLib.fixed1()
+    require(
+      _participationFloor >= 0 &&
+      _participationFloor <= FixidityLib.fixed1() &&
+      _updateCoefficient >= 0 &&
+      _updateCoefficient <= FixidityLib.fixed1() &&
+      _criticalBaselineLevel > 0 &&
+      _criticalBaselineLevel <= FixidityLib.fixed1()
     );
     _transferOwnership(msg.sender);
     participationBaseline = _participationBaseline;
@@ -71,7 +79,8 @@ contract Quorum is IQuorum, Ownable, Initializable {
    * @param _participationFloor The value at which the baseline is floored.
    */
   function setParticipationFloor(int256 _participationFloor) external onlyOwner {
-    require(_participationFloor != participationFloor &&
+    require(
+      _participationFloor != participationFloor &&
       _participationFloor >= 0 &&
       _participationFloor <= FixidityLib.fixed1()
     );
@@ -84,7 +93,8 @@ contract Quorum is IQuorum, Ownable, Initializable {
    * @param _updateCoefficient The weight of the new participation.
    */
   function setUpdateCoefficient(int256 _updateCoefficient) external onlyOwner {
-    require(_updateCoefficient != updateCoefficient &&
+    require(
+      _updateCoefficient != updateCoefficient &&
       _updateCoefficient >= 0 &&
       _updateCoefficient <= FixidityLib.fixed1()
     );
@@ -97,7 +107,8 @@ contract Quorum is IQuorum, Ownable, Initializable {
    * @param _criticalBaselineLevel The weight of the new participation.
    */
   function setCriticalBaselineLevel(int256 _criticalBaselineLevel) external onlyOwner {
-    require(_criticalBaselineLevel != criticalBaselineLevel &&
+    require(
+      _criticalBaselineLevel != criticalBaselineLevel &&
       _criticalBaselineLevel > 0 &&
       _criticalBaselineLevel <= FixidityLib.fixed1()
     );
