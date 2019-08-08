@@ -60,7 +60,7 @@ class DappKitSignTxScreen extends React.Component<Props> {
       >
         <View>
           <Text style={componentStyles.errorMessage} numberOfLines={10} ellipsizeMode="tail">
-            {this.props.navigation.getParam('url', '')}
+            Dapp
           </Text>
         </View>
       </FullscreenCTA>
