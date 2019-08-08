@@ -9,7 +9,7 @@ import {
   take,
   takeLeading,
 } from 'redux-saga/effects'
-import { getSentPayments } from 'src/escrow/actions'
+import { fetchSentPayments } from 'src/escrow/actions'
 import { fetchGoldBalance } from 'src/goldToken/actions'
 import { Actions, refreshAllBalances, setLoading } from 'src/home/actions'
 import { withTimeout } from 'src/redux/sagas-helpers'
@@ -38,7 +38,7 @@ export function* refreshBalances() {
   yield call(getConnectedAccount)
   yield put(fetchDollarBalance())
   yield put(fetchGoldBalance())
-  yield put(getSentPayments())
+  yield put(fetchSentPayments())
 }
 
 export function* refreshBalancesWithLoadingSaga() {
