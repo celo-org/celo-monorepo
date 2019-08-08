@@ -1,4 +1,3 @@
-import { isValidAddress } from '@celo/utils/lib/src/signatureUtils'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as fuzzysort from 'fuzzysort'
 import { MinimalContact } from 'react-native-contacts'
@@ -269,41 +268,3 @@ export const filterRecipientFactory = (recipients: Recipient[], shouldSort?: boo
     return executeFuzzySearch(preparedRecipients, query, fuzzysortPreparedOptions, shouldSort)
   }
 }
-
-export const buildRecentRecipients = (
-  allRecipients: RecipientWithContact[],
-  recentKeys: string[],
-  defaultDisplayNameNumber: string,
-  defaultDisplayNameAddress: string
-): Recipient[] =>
-  recentKeys
-    .map((recentKey) => {
-      const recipientsWithContacts: Recipient[] = allRecipients.filter(
-        (recipient) =>
-          recipient.e164PhoneNumber === recentKey ||
-          (recipient.address && recipient.address === recentKey)
-      )
-      if (recipientsWithContacts.length > 0) {
-        return recipientsWithContacts
-      }
-
-      if (isValidAddress(recentKey)) {
-        const recipientWithAddress: RecipientWithAddress = {
-          kind: RecipientKind.Address,
-          displayName: defaultDisplayNameAddress,
-          displayId: recentKey.substring(0, 17) + '...',
-          address: recentKey,
-        }
-
-        return [recipientWithAddress]
-      }
-
-      const recipientWithNumber: Recipient = {
-        kind: RecipientKind.MobileNumber,
-        displayName: defaultDisplayNameNumber,
-        displayId: recentKey,
-        e164PhoneNumber: recentKey,
-      }
-      return [recipientWithNumber]
-    })
-    .reduce((a, b) => a.concat(b), []) // poor mans flatMap

@@ -19,11 +19,11 @@ import { importContacts } from 'src/identity/actions'
 import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { filterRecipients, NumberToRecipient, Recipient } from 'src/recipients/recipient'
+import RecipientPicker from 'src/recipients/RecipientPicker'
+import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
-import RecipientPicker from 'src/send/RecipientPicker'
-import { recipientCacheSelector } from 'src/send/reducers'
 import { checkContactsPermission } from 'src/utils/androidPermissions'
-import { filterRecipients, NumberToRecipient, Recipient } from 'src/utils/recipient'
 
 interface State {
   searchQuery: string
