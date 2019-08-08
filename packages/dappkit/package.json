@@ -10,7 +10,7 @@
     "expo": "^34.0.1"
   },
   "devDependencies": {
-    "typescript": "3.5.3",
+    "typescript": "3.3.3",
     "@types/web3": "^1.0.18"
   },
   "main": "./lib/index.js",
