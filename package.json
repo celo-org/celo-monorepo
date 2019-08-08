@@ -36,11 +36,8 @@
     ],
     "nohoist": [
       "@celo/verifier/react-native",
-      "@celo/verifier/react",
       "@celo/mobile/react-native",
-      "@celo/mobile/react",
       "@celo/react-components/react-native",
-      "@celo/react-components/react",
       "@celo/web/@timkendrick/monaco-editor",
       "@celo/web/@types/react-i18next",
       "@celo/web/next-i18next",
