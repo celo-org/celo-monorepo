@@ -162,11 +162,9 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     uint256 buyTokenBucket;
     (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);
 
-    int256 reducedSellAmount = FixidityLib.fixed1()
-      .subtract(spread)
-      .multiply(FixidityLib.newFixed(int256(sellAmount)));
-    int256 numerator = reducedSellAmount.multiply(FixidityLib.newFixed(int256(buyTokenBucket)));
-    int256 denominator = FixidityLib.newFixed(int256(sellTokenBucket)).add(reducedSellAmount);
+    int256 reducedSellAmount = getReducedSellAmount(sellAmount);
+    int256 numerator = reducedSellAmount.multiply(int256(buyTokenBucket).newFixed());
+    int256 denominator = int256(sellTokenBucket).newFixed().add(reducedSellAmount);
 
     return uint256(numerator.divide(denominator).fromFixed());
   }
@@ -190,8 +188,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     uint256 buyTokenBucket;
     (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);
 
-    int256 numerator = FixidityLib.newFixed(int256(buyAmount.mul(sellTokenBucket)));
-    int256 denominator = FixidityLib.newFixed(int256(buyTokenBucket.sub(buyAmount)))
+    int256 numerator = int256(buyAmount.mul(sellTokenBucket)).newFixed();
+    int256 denominator = int256(buyTokenBucket.sub(buyAmount)).newFixed()
       .multiply(FixidityLib.fixed1().subtract(spread));
 
     return uint256(numerator.divide(denominator).fromFixed());
@@ -268,23 +266,23 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     uint256 buyTokenBucket;
     (buyTokenBucket, sellTokenBucket) = _getBuyAndSellBuckets(sellGold);
 
-    int256 reducedSellAmount = FixidityLib.fixed1()
-      .subtract(spread)
-      .multiply(FixidityLib.newFixed(int256(sellAmount)));
-    int256 numerator = reducedSellAmount.multiply(FixidityLib.newFixed(int256(buyTokenBucket)));
-    int256 denominator = FixidityLib.newFixed(int256(sellTokenBucket)).add(reducedSellAmount);
+    int256 reducedSellAmount = getReducedSellAmount(sellAmount);
+    int256 numerator = reducedSellAmount.multiply(int256(buyTokenBucket).newFixed());
+    int256 denominator = int256(sellTokenBucket).newFixed().add(reducedSellAmount);
 
     return uint256(numerator.divide(denominator).fromFixed());
   }
 
   function getUpdatedBuckets() private view returns (uint256, uint256) {
-    uint256 reserveGoldBalance = gold().balanceOf(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
-    uint256 updatedGoldBucket = uint256(reserveFraction.multiply(
-        FixidityLib.newFixed(int256(reserveGoldBalance))
-    ).fromFixed());
+    uint256 updatedGoldBucket = getUpdatedGoldBucket();
     uint256 updatedStableBucket = getOracleExchangeRate().mul(updatedGoldBucket);
 
     return (updatedGoldBucket, updatedStableBucket);
+  }
+
+  function getUpdatedGoldBucket() private view returns (uint256) {
+    uint256 reserveGoldBalance = gold().balanceOf(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
+    return uint256(reserveFraction.multiply(int256(reserveGoldBalance).newFixed()).fromFixed());
   }
 
   /**
@@ -298,6 +296,17 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
 
       (goldBucket, stableBucket) = getUpdatedBuckets();
     }
+  }
+
+  /**
+   * @dev Calculates the sell amount reduced by the spread.
+   * @param sellAmount The original sell amount.
+   * @return The reduced sell amount, computed as (1 - spread) * sellAmount
+   */
+  function getReducedSellAmount(uint256 sellAmount) private view returns (int256) {
+    return FixidityLib.fixed1()
+      .subtract(spread)
+      .multiply(int256(sellAmount).newFixed());
   }
 
   /*
