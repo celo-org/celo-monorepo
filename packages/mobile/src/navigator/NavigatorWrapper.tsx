@@ -26,9 +26,11 @@ export class NavigatorWrapper extends React.Component<Props> {
   render() {
     return (
       <View style={styles.container}>
-        <AlertBanner />
-        <BackupPrompt />
         <AppContainer ref={this.setNavigator} onNavigationStateChange={navigationStateChange} />
+        <View style={styles.floating}>
+          <BackupPrompt />
+          <AlertBanner />
+        </View>
       </View>
     )
   }
@@ -40,6 +42,12 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'stretch',
     justifyContent: 'flex-start',
+  },
+  floating: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    right: 0,
   },
 })
 
