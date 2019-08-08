@@ -10,7 +10,7 @@ adb kill-server && adb start-server
 
 DEFAULT_AVD="Nexus_5X_API_28_x86"
 
-if [[ ! $(emulator -list-avds | grep ^$DEFAULT_AVD$) ]]; then
+if [[ ! $($ANDROID_SDK_ROOT/emulator/emulator -list-avds | grep ^$DEFAULT_AVD$) ]]; then
   echo "AVD $DEFAULT_AVD not installed. Pleas install it or change detox' configuration in package.json"
   echo "You can see the list of available installed devices with $ANDROID_SDK_ROOT/emulator/emulator -list-avds"
   exit 1
@@ -22,7 +22,7 @@ yarn dev:emulator
 lsof -t -i :8081 | xargs kill -9
 yarn start:bg
 
-./scripts/unlock.sh
+bash ./scripts/unlock.sh
 adb reconnect
 if [ $? -ne 0 ]
 then

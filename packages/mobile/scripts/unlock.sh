@@ -16,6 +16,8 @@ fi
 adb wait-for-device shell \
   'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
 
+echo "Device is done booting"
+
 # Sequence to unlock the app lock screen in any state
 adb shell input keyevent 26		# Power
 adb shell input keyevent 26		# Power
