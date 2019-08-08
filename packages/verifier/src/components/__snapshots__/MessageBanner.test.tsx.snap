@@ -2,25 +2,24 @@
 
 exports[`Message Banner when message and title passed in renders title with message 1`] = `
 <View
-  accessible={true}
-  isTVSelectable={true}
-  onResponderGrant={[Function]}
-  onResponderMove={[Function]}
-  onResponderRelease={[Function]}
-  onResponderTerminate={[Function]}
-  onResponderTerminationRequest={[Function]}
-  onStartShouldSetResponder={[Function]}
   style={
     Object {
-      "opacity": 1,
+      "overflow": "hidden",
     }
   }
 >
   <View
+    accessible={true}
+    isTVSelectable={true}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
     style={
       Object {
-        "backgroundColor": "#3C9BF4",
-        "height": 36,
+        "opacity": 1,
       }
     }
   >
@@ -28,16 +27,20 @@ exports[`Message Banner when message and title passed in renders title with mess
       style={
         Object {
           "alignItems": "center",
-          "flex": 1,
+          "backgroundColor": "#3C9BF4",
           "flexDirection": "row",
           "justifyContent": "center",
-          "opacity": 1,
           "paddingHorizontal": 25,
+          "paddingVertical": 10,
+          "transform": Array [
+            Object {
+              "translateY": -500,
+            },
+          ],
         }
       }
     >
       <Text
-        numberOfLines={1}
         style={
           Array [
             Object {
@@ -48,7 +51,7 @@ exports[`Message Banner when message and title passed in renders title with mess
             },
             Object {
               "color": "white",
-              "lineHeight": 20,
+              "lineHeight": undefined,
               "textAlign": "center",
             },
             false,
@@ -60,7 +63,7 @@ exports[`Message Banner when message and title passed in renders title with mess
             Array [
               Object {
                 "color": "white",
-                "lineHeight": 20,
+                "lineHeight": undefined,
                 "textAlign": "center",
               },
               Object {
@@ -82,25 +85,24 @@ exports[`Message Banner when message and title passed in renders title with mess
 
 exports[`Message Banner when message passed in renders message 1`] = `
 <View
-  accessible={true}
-  isTVSelectable={true}
-  onResponderGrant={[Function]}
-  onResponderMove={[Function]}
-  onResponderRelease={[Function]}
-  onResponderTerminate={[Function]}
-  onResponderTerminationRequest={[Function]}
-  onStartShouldSetResponder={[Function]}
   style={
     Object {
-      "opacity": 1,
+      "overflow": "hidden",
     }
   }
 >
   <View
+    accessible={true}
+    isTVSelectable={true}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
     style={
       Object {
-        "backgroundColor": "#3C9BF4",
-        "height": 36,
+        "opacity": 1,
       }
     }
   >
@@ -108,16 +110,20 @@ exports[`Message Banner when message passed in renders message 1`] = `
       style={
         Object {
           "alignItems": "center",
-          "flex": 1,
+          "backgroundColor": "#3C9BF4",
           "flexDirection": "row",
           "justifyContent": "center",
-          "opacity": 1,
           "paddingHorizontal": 25,
+          "paddingVertical": 10,
+          "transform": Array [
+            Object {
+              "translateY": -500,
+            },
+          ],
         }
       }
     >
       <Text
-        numberOfLines={1}
         style={
           Array [
             Object {
@@ -128,7 +134,7 @@ exports[`Message Banner when message passed in renders message 1`] = `
             },
             Object {
               "color": "white",
-              "lineHeight": 20,
+              "lineHeight": undefined,
               "textAlign": "center",
             },
             false,
