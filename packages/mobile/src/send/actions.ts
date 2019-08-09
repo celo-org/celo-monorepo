@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { InviteBy } from 'src/invite/actions'
-import { NumberToRecipient, Recipient } from 'src/utils/recipient'
+import { Recipient } from 'src/recipients/recipient'
 import { Svg } from 'svgs'
 
 export interface QrCode {
@@ -14,7 +14,6 @@ export enum Actions {
   STORE_LATEST_IN_RECENTS = 'SEND/STORE_LATEST_IN_RECENTS',
   BARCODE_DETECTED = 'SEND/BARCODE_DETECTED',
   QRCODE_SHARE = 'SEND/QRCODE_SHARE',
-  SET_RECIPIENT_CACHE = 'SEND/SET_RECIPIENT_CACHE',
   SEND_PAYMENT_OR_INVITE = 'SEND/SEND_PAYMENT_OR_INVITE',
   SEND_PAYMENT_OR_INVITE_SUCCESS = 'SEND/SEND_PAYMENT_OR_INVITE_SUCCESS',
   SEND_PAYMENT_OR_INVITE_FAILURE = 'SEND/SEND_PAYMENT_OR_INVITE_FAILURE',
@@ -22,12 +21,7 @@ export enum Actions {
 
 export interface StoreLatestInRecentsAction {
   type: Actions.STORE_LATEST_IN_RECENTS
-  key: string
-}
-
-export interface SetRecipientCacheAction {
-  type: Actions.SET_RECIPIENT_CACHE
-  recipients: NumberToRecipient
+  recipient: Recipient
 }
 
 export interface SendPaymentOrInviteAction {
@@ -50,14 +44,13 @@ export interface SendPaymentOrInviteFailureAction {
 
 export type ActionTypes =
   | StoreLatestInRecentsAction
-  | SetRecipientCacheAction
   | SendPaymentOrInviteAction
   | SendPaymentOrInviteSuccessAction
   | SendPaymentOrInviteFailureAction
 
-export const storeLatestInRecents = (key: string): StoreLatestInRecentsAction => ({
+export const storeLatestInRecents = (recipient: Recipient): StoreLatestInRecentsAction => ({
   type: Actions.STORE_LATEST_IN_RECENTS,
-  key,
+  recipient,
 })
 
 export const handleBarcodeDetected = (data: QrCode) => ({
@@ -68,11 +61,6 @@ export const handleBarcodeDetected = (data: QrCode) => ({
 export const shareQRCode = (qrCodeSvg: SVG) => ({
   type: Actions.QRCODE_SHARE,
   qrCodeSvg,
-})
-
-export const setRecipientCache = (recipients: NumberToRecipient): SetRecipientCacheAction => ({
-  type: Actions.SET_RECIPIENT_CACHE,
-  recipients,
 })
 
 export const sendPaymentOrInvite = (
