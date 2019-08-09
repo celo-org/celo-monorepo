@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin'
-import { Currencies } from './blockscout/transfers'
-import { _setTestRegistrations, sendPaymentNotification } from './firebase'
+import { Currencies } from '../src/blockscout/transfers'
+import { sendPaymentNotification, _setTestRegistrations } from '../src/firebase'
 
 const messagingMock = {
   send: jest.fn(),
