@@ -1,4 +1,4 @@
-import { exec } from 'child_process'
+import { exec, accept } from 'child_process'
 import { enterPin, skipTo, sleep } from './utils'
 
 const SAMPLE_BACKUP_KEY =
@@ -61,40 +61,44 @@ describe('Transfer Works', () => {
 
     await waitFor(element(by.id('InviteCodeTitle')))
       .toBeVisible()
-      .withTimeout(10000)
-
-    // await expect(element(by.id('ImportWalletButton'))).toBeVisible()
-
-    // await waitFor(element(by.id('ImportWalletButton')))
-    //   .toBeNotVisible()
-    //   .withTimeout(2000)
-
-    // await element(by.id('ImportWalletButton')).tap()
-
-    // await waitFor(element(by.id('ImportWalletLoadingCircle')))
-    //   .toBeNotVisible()
-    //   .withTimeout(20000) // have to remoeve this, for some reason it's not shown instantly
-
-    // await waitFor(element(by.id('VerifyContinueButton')))
-    //   .toBeVisible()
-    //   .withTimeout(5000)
-    // await expect(element(by.id('VerifyContinueButton'))).toBeVisible()
+      .withTimeout(1000)
   })
 
-  // it('NUX->Verify', async () => {
-  //   // TODO: uncomment when verification works again
-  //   // await expect(element(by.id('VerifyContinueButton'))).toBeVisible()
-  //   // await element(by.id('VerifyContinueButton')).tap()
-  //   // await expect(element(by.id('CountryNameField'))).toBeVisible()
-  //   // await element(by.id('CountryNameField')).replaceText(VERIFICATION_COUNTRY)
-  //   // await expect(element(by.id('PhoneNumberField'))).toBeVisible()
-  //   // await element(by.id('PhoneNumberField')).replaceText(VERIFICATION_PHONE_NUMBER)
-  //   // await expect(element(by.id('PhoneNumberField'))).toHaveText("(415) 555-5555")
-  //   // await expect(element(by.id('VerifyInputAutomaticButton'))).toBeVisible()
-  //   // await element(by.id('VerifyInputAutomaticButton')).tap()
-  //   // Wait for the three messages
-  //   await skipTo('WalletHome')
-  // })
+  it('NUX->ImportContacts', async () => {
+    // skip verification
+
+    await device.launchApp({ permissions: { contacts: 'YES' } })
+    await waitFor(element(by.id('ImportContactsPermissionTitle')))
+      .toBeVisible()
+      .withTimeout(1000)
+
+    await waitFor(element(by.id('importContactsEnable')))
+      .toBeVisible()
+      .withTimeout(1000)
+
+    await element(by.id('importContactsEnable')).tap()
+  })
+
+  it('NUX->Verify', async () => {
+    // import contacts
+
+    await waitFor(element(by.id('VerifyEducationHeader')))
+      .toBeVisible()
+      .withTimeout(100000)
+
+    await waitFor(element(by.id('VerifyContinueButton')))
+      .toBeVisible()
+      .withTimeout(10000)
+
+    await element(by.id('VerifyContinueButton')).tap()
+
+    await waitFor(element(by.id('VerifyLogo')))
+      .toBeVisible()
+      .withTimeout(1000)
+
+    // skipping for now
+    element(by.id('ButtonDevScreen')).tap()
+  })
 
   // it('NUX->Home', async () => {
   //   await expect(element(by.id('SendNavigator'))).toBeVisible()

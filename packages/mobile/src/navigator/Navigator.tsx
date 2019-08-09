@@ -37,10 +37,10 @@ import SetClock from 'src/set-clock/SetClock'
 import Sync from 'src/sync/Sync'
 import TabNavigator from 'src/tab/TabNavigator'
 import TransactionReviewScreen from 'src/transactions/TransactionReviewScreen'
-import VerifyEducation from 'src/verify/Education'
 import VerifyInput from 'src/verify/Input'
 import VerifyVerified from 'src/verify/Verified'
 import VerifyVerifying from 'src/verify/Verifying'
+import VerifyEducation from 'src/verify/VerifyPhoneEducation'
 export const navbarStyle: {
   headerMode: 'none'
 } = {

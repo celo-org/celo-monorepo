@@ -37,3 +37,9 @@ export function enterPin() {
     exec('adb shell input text 123456 && sleep 1 && adb shell input keyevent 66')
   }, 3000)
 }
+
+export function accept() {
+  setTimeout(() => {
+    exec('adb shell input keyevent 66')
+  }, 3000)
+}

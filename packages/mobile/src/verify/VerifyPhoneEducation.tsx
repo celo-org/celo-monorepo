@@ -13,7 +13,7 @@ import VerifyAddressBook from 'src/icons/VerifyAddressBook'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-export class Education extends React.Component<WithNamespaces> {
+export class VerifyPhoneEducation extends React.Component<WithNamespaces> {
   static navigationOptions = {
     headerStyle: {
       elevation: 0,
@@ -92,4 +92,4 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withNamespaces('nuxVerification2')(Education))
+export default componentWithAnalytics(withNamespaces('nuxVerification2')(VerifyPhoneEducation))
