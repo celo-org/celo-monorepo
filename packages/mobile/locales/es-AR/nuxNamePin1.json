@@ -76,6 +76,8 @@
   },
   "systemAuth": {
     "title": "Configura la seguridad Celo",
+    "secure":
+      "Agregar un PIN a tu teléfono ayuda a que tus fondos en Celo se mantengan seguros y protegidos.",
     "intro":
       "Necesitaremos que ingreses el código de bloqueo de pantalla de tu dispositivo o tu huella, si el mismo lo soporta.",
     "why":
