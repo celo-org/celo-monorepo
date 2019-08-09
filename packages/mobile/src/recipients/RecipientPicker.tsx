@@ -24,11 +24,6 @@ import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { RootState } from 'src/redux/reducers'
-import LabeledTextInput from 'src/send/LabeledTextInput'
-import RecipientItem from 'src/send/RecipientItem'
-import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { requestContactsPermission } from 'src/utils/androidPermissions'
 import {
   getRecipientFromAddress,
   NumberToRecipient,
@@ -36,7 +31,14 @@ import {
   RecipientKind,
   RecipientWithAddress,
   RecipientWithMobileNumber,
-} from 'src/utils/recipient'
+} from 'src/recipients/recipient'
+import RecipientItem from 'src/recipients/RecipientItem'
+import { recipientCacheSelector } from 'src/recipients/reducer'
+import { RootState } from 'src/redux/reducers'
+import LabeledTextInput from 'src/send/LabeledTextInput'
+import DisconnectBanner from 'src/shared/DisconnectBanner'
+import { requestContactsPermission } from 'src/utils/androidPermissions'
+import Logger from 'src/utils/Logger'
 import { assertUnreachable } from 'src/utils/typescript'
 
 const goToQrCodeScreen = () => {
@@ -81,7 +83,7 @@ type RecipientProps = Props & WithNamespaces & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   addressToE164Number: state.identity.addressToE164Number,
-  recipientCache: state.send.recipientCache,
+  recipientCache: recipientCacheSelector(state),
 })
 
 export class RecipientPicker extends React.Component<RecipientProps> {
@@ -104,6 +106,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
       case RecipientKind.Address:
         return item.address + index
       default:
+        Logger.error('RecipientPicker', 'Unsupported recipient kind', item)
         throw assertUnreachable(item)
     }
   }
