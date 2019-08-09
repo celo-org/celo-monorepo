@@ -80,7 +80,7 @@ jobs:
       - run: npm rebuild scrypt
 
       - save_cache:
-          key: yarn-v2-{{ checksum "yarn.lock" }}-{{ arch }}
+          key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
             - packages/*/node_modules
