@@ -10,7 +10,7 @@ import Title from 'src/dev/Title'
 import { Li } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, withNamespaces } from 'src/i18n'
-import menuItems, { CeloLinks } from 'src/shared/menu-items'
+import menuItems, { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { standardStyles, textStyles } from 'src/styles'
 
 class BuildPage extends React.PureComponent<I18nProps> {
@@ -33,7 +33,7 @@ class BuildPage extends React.PureComponent<I18nProps> {
         <StackExplorer />
         <View style={standardStyles.darkBackground}>
           <Features />
-          <Title invert={true} title={t('celoStack')} />
+          <Title nativeID={hashNav.build.stack} invert={true} title={t('celoStack')} />
           <StackSection
             label="1"
             id={APPLICATIONS_ID}

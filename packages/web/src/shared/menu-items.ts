@@ -74,4 +74,21 @@ export const languageOptions = {
   },
 }
 
+export const hashNav = {
+  connect: {
+    tenets: 'tenets',
+    code: 'code',
+    events: 'events',
+    blog: 'blog',
+    fellowship: 'fellowship',
+    fund: 'fund',
+    newsletter: 'newsletter',
+  },
+  build: {
+    features: 'features',
+    stack: 'stack',
+    newsletter: 'newsletter',
+  },
+}
+
 export default menuItems

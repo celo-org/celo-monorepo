@@ -8,6 +8,7 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import ResponsiveImage from 'src/shared/ResponsiveImage'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import { hashNav } from 'src/shared/menu-items'
 
 type Props = I18nProps
 
@@ -44,7 +45,7 @@ class Tenets extends React.PureComponent<Props> {
   render() {
     const { t } = this.props
     return (
-      <View style={standardStyles.sectionMarginBottom}>
+      <View nativeID={hashNav.connect.tenets} style={standardStyles.sectionMarginBottom}>
         <GridRow
           allStyle={standardStyles.centered}
           mobileStyle={standardStyles.sectionMarginMobile}

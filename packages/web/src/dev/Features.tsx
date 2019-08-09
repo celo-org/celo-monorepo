@@ -5,6 +5,7 @@ import Feature from 'src/dev/Feature'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Title from './Title'
+import { hashNav } from 'src/shared/menu-items'
 const stableImg = require('src/dev/features/stable.png')
 const pkiImg = require('src/dev/features/pki.png')
 const govImg = require('src/dev/features/gov.png')
@@ -20,7 +21,7 @@ export default withNamespaces('dev')(
   memo(function Features({ t }: Props) {
     return (
       <Fade bottom={true} distance={'40px'}>
-        <View>
+        <View nativeID={hashNav.build.features}>
           <Title invert={true} title={t('featureTitle')} />
           <GridRow mobileStyle={styles.featuresMobile}>
             <Cell span={Spans.fourth} mobileSpan={Spans.half}>

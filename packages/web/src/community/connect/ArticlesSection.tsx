@@ -1,5 +1,5 @@
 import * as React from 'react'
-
+import { View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import Articles from 'src/community/Articles'
 
@@ -12,6 +12,7 @@ import Button, { BTN } from 'src/shared/Button.3'
 import MediumLogo from 'src/shared/MediumLogo'
 import menuItems from 'src/shared/menu-items'
 import { colors, standardStyles } from 'src/styles'
+import { hashNav } from 'src/shared/menu-items'
 
 type Props = I18nProps & ArticleProps
 
@@ -19,7 +20,7 @@ class ArticlesSection extends React.PureComponent<Props> {
   render() {
     const { t, articles } = this.props
     return (
-      <>
+      <View nativeID={hashNav.connect.blog}>
         <GridRow
           desktopStyle={[standardStyles.sectionMarginTop, standardStyles.blockMarginBottom]}
           tabletStyle={[standardStyles.sectionMarginTablet, standardStyles.blockMarginBottomTablet]}
@@ -48,7 +49,7 @@ class ArticlesSection extends React.PureComponent<Props> {
             />
           </Cell>
         </GridRow>
-      </>
+      </View>
     )
   }
 }
