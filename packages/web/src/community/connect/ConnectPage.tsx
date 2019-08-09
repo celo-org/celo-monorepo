@@ -13,10 +13,10 @@ import EmailForm, { After } from 'src/forms/EmailForm'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import ArticleData from './ArticleData'
 import EventData from './EventsData'
-import { hashNav } from 'src/shared/menu-items'
 
 // @ts-ignore
 const Sweep = dynamic(() => import('src/community/connect/Sweep'))

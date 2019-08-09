@@ -8,8 +8,8 @@ import { H2 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
-import { colors, standardStyles, textStyles } from 'src/styles'
 import { hashNav } from 'src/shared/menu-items'
+import { colors, standardStyles, textStyles } from 'src/styles'
 
 class FellowSection extends React.PureComponent<I18nProps> {
   render() {

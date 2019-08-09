@@ -10,9 +10,8 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
 import MediumLogo from 'src/shared/MediumLogo'
-import menuItems from 'src/shared/menu-items'
+import menuItems, { hashNav } from 'src/shared/menu-items'
 import { colors, standardStyles } from 'src/styles'
-import { hashNav } from 'src/shared/menu-items'
 
 type Props = I18nProps & ArticleProps
 

@@ -4,8 +4,8 @@ import Fade from 'react-reveal/Fade'
 import Feature from 'src/dev/Feature'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Title from './Title'
 import { hashNav } from 'src/shared/menu-items'
+import Title from './Title'
 const stableImg = require('src/dev/features/stable.png')
 const pkiImg = require('src/dev/features/pki.png')
 const govImg = require('src/dev/features/gov.png')
