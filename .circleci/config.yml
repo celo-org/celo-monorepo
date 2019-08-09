@@ -7,6 +7,8 @@ defaults: &defaults
   working_directory: ~/app
   docker:
     - image: celohq/node8:gcloud-deps
+  environment:
+    NODE_OPTIONS: "--max-old-space-size=4096"
 
 android-defaults: &android-defaults
   <<: *defaults
