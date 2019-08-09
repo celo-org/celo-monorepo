@@ -75,6 +75,17 @@ export const languageOptions = {
 }
 
 export const hashNav = {
+  about: {
+    backers: 'backers',
+  },
+  build: {
+    features: 'features',
+    stack: 'stack',
+    newsletter: 'newsletter',
+    applications: 'applications',
+    contracts: 'contracts',
+    blockchain: 'blockchain',
+  },
   connect: {
     tenets: 'tenets',
     code: 'code',
@@ -84,10 +95,11 @@ export const hashNav = {
     fund: 'fund',
     newsletter: 'newsletter',
   },
-  build: {
-    features: 'features',
-    stack: 'stack',
-    newsletter: 'newsletter',
+  join: {
+    roles: 'roles',
+  },
+  home: {
+    partnerships: 'partnerships',
   },
 }
 
