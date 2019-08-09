@@ -317,7 +317,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                         ]
                       }
                     >
-                      +
+                      0
                     </Text>
                   </View>
                 </View>
@@ -340,7 +340,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                     }
                   }
                 >
-                  +1555-867-5309
+                  0x0000000000000000000000000000000000007E57
                 </Text>
                 <View>
                   <View
@@ -354,6 +354,21 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                     <View
                       style={Object {}}
                     >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#81868B",
+                              "fontFamily": "Hind-Regular",
+                              "fontSize": 14,
+                              "lineHeight": 20,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                            },
+                          ]
+                        }
+                      />
                       <Text
                         style={
                           Array [
@@ -582,7 +597,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                         ]
                       }
                     >
-                      +
+                      0
                     </Text>
                   </View>
                 </View>
@@ -605,7 +620,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                     }
                   }
                 >
-                  +14155550000
+                  0x0000000000000000000000000000000000007E57
                 </Text>
                 <View>
                   <View
@@ -619,6 +634,21 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                     <View
                       style={Object {}}
                     >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#81868B",
+                              "fontFamily": "Hind-Regular",
+                              "fontSize": 14,
+                              "lineHeight": 20,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                            },
+                          ]
+                        }
+                      />
                       <Text
                         style={
                           Array [
@@ -847,7 +877,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                         ]
                       }
                     >
-                      +
+                      0
                     </Text>
                   </View>
                 </View>
@@ -870,7 +900,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                     }
                   }
                 >
-                  +14155550000
+                  0x0000000000000000000000000000000000007E57
                 </Text>
                 <View>
                   <View
@@ -884,6 +914,21 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                     <View
                       style={Object {}}
                     >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#81868B",
+                              "fontFamily": "Hind-Regular",
+                              "fontSize": 14,
+                              "lineHeight": 20,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                            },
+                          ]
+                        }
+                      />
                       <Text
                         style={
                           Array [
