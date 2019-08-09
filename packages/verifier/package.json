@@ -10,7 +10,7 @@
     "dev:reload": "adb shell input text \"RR\"",
     "dev:remote": "remotedev --hostname=localhost --port=8000",
     "lint": "tslint -c tslint.json --project tsconfig.json",
-    "build": "tsc -p .",
+    "build": "tsc -p . --noEmit",
     "start": "react-native start",
     "start:android": "react-native run-android",
     "start:ios": "react-native run-ios",
