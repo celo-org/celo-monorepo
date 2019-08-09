@@ -14,8 +14,8 @@ contract BondedDepositsHarness is BondedDeposits {
 			mapping(uint256 => Deposit) bonded;
 			// Maps an availability time in seconds since epoch to a notified deposit.
 			mapping(uint256 => Deposit) notified;
-			uint256[] noticePeriods;
-			uint256[] availabilityTimes;
+			uint256[] noticePeriods; // index maps to notice period which is a key in bonded?
+			uint256[] availabilityTimes; // index maps to availability time which is a key in notified?
 		  }
 
 		  struct Rewards {

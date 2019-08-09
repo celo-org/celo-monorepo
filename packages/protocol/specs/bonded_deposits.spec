@@ -116,7 +116,7 @@ rule delegations_in_sync_and_exclusive(method f, address delegatedTo) {
 	address _delegatingAccount = sinvoke delegations(ePre,delegatedTo); // an account that delegates one of the roles to delegatedTo
 
 	require sinvoke _exists(ePre,_delegatingAccount); // _delegatingAccount must be an account
-	require !sinvoke _exists(ePre,delegtedTo); // applying address_cant_be_both_account_and_delegate - delegatedTo is a delegate, thus not an account
+	require !sinvoke _exists(ePre,delegatedTo); // applying address_cant_be_both_account_and_delegate - delegatedTo is a delegate, thus not an account
 	
 	address _aRewardsDelegate = sinvoke _rewardsDelegate(ePre,_delegatingAccount);
 	address _aVotingDelegate = sinvoke _votingDelegate(ePre,_delegatingAccount);
@@ -215,13 +215,83 @@ rule functional_get_account_from_voter_success(address account, address delegate
 	assert (!isDelegate && !isAccount) => !success, "getAccountFromVoter($delegate) must fail if $delegate is not an account (isAccount=${isAccount}) nor a voting delegate (isDelegate=${isDelegate})";
 }
 
-// TODO Repeat for validating delegate, rewards delegate:
-/*
-- If an account has a validating delegate, getAccountFromValidator(delegate) must return that account
-- getAccountFromValidator(address) must fail if “address” is not an account or validating delegate
-- If an account has a rewards delegate, getAccountFromRewardsRecipient(delegate) must return that account
-- getAccountFromRewardsRecipient(address) must fail if “address” is not an account or rewards delegate
- */
+rule functional_get_account_from_rewards_recipient_result(address account) {
+	// If an account has a reward recipient delegate, getAccountFromRewardsRecipient(delegate) must return that account
+	require account != 0; // account 0 is not real, should never be real
+	
+	env e;
+		
+	address rewardsRecipientDelegate = sinvoke _rewardsDelegate(e, account);
+	// assume the invariant on delegations
+	require sinvoke delegations(e, rewardsRecipientDelegate) == account;
+	
+	env eF;
+	address gotAccountFromRewardsRecipientResult = sinvoke getAccountFromRewardsRecipient(eF, rewardsRecipientDelegate);
+	
+	assert rewardsRecipientDelegate != 0 => gotAccountFromRewardsRecipientResult == account, "Account $account has a voting delegate $rewardsRecipientDelegate but getAccountFromVoter($rewardsRecipientDelegate) returns $gotAccountFromRewardsRecipientResult instead of account";
+	
+	assert rewardsRecipientDelegate == 0 => gotAccountFromRewardsRecipientResult == account, "Account $account does not have a voting delegate but getAccountFromVoter($rewardsRecipientDelegate) returns $gotAccountFromRewardsRecipientResult";
+}
+
+rule functional_get_account_from_rewards_recipient_success(address account, address delegate) {
+	// getAccountFromRewardsRecipient(address) must fail if “address” is not an account or rewards recipient delegate
+	env e;
+	
+	// get an accounts voting delegate
+	address rewardsRecipientDelegate = sinvoke _rewardsDelegate(e, account);
+	// assume the invariant on delegations
+	require sinvoke delegations(e, rewardsRecipientDelegate) == account;
+	
+	bool isDelegate = delegate == rewardsRecipientDelegate;
+	bool isAccount = sinvoke _exists(e, delegate);
+	
+	env eF;
+	require eF.msg.value == 0;
+	address gotAccountFromRewardsRecipientResult = invoke getAccountFromRewardsRecipient(eF, delegate);
+	bool success = !lastReverted;
+	
+	assert (!isDelegate && !isAccount) => !success, "getAccountFromRewardsRecipient($delegate) must fail if $delegate is not an account (isAccount=${isAccount}) nor a rewards recipient delegate (isDelegate=${isDelegate})";
+}
+
+
+rule functional_get_account_from_validator_result(address account) {
+	// If an account has a validator delegate, getAccountFromValidator(delegate) must return that account
+	require account != 0; // account 0 is not real, should never be real
+	
+	env e;
+		
+	address validatorDelegate = sinvoke _validatingDelegate(e, account);
+	// assume the invariant on delegations
+	require sinvoke delegations(e, validatorDelegate) == account;
+	
+	env eF;
+	address gotAccountFromValidatorResult = sinvoke getAccountFromValidator(eF, validatorDelegate);
+	
+	assert validatorDelegate != 0 => gotAccountFromValidatorResult == account, "Account $account has a validator delegate $validatorDelegate but getAccountFromVoter($validatorDelegate) returns $gotAccountFromValidatorResult instead of account";
+	
+	assert validatorDelegate == 0 => gotAccountFromValidatorResult == account, "Account $account does not have a validator delegate but getAccountFromVoter($validatorDelegate) returns $gotAccountFromValidatorResult";
+}
+
+rule functional_get_account_from_validator_success(address account, address delegate) {
+	// getAccountFromValidator(address) must fail if “address” is not an account or validator delegate
+	env e;
+	
+	// get an accounts validator delegate
+	address validatorDelegate = sinvoke _validatingDelegate(e, account);
+	// assume the invariant on delegations
+	require sinvoke delegations(e, validatorDelegate) == account;
+	
+	bool isDelegate = delegate == validatorDelegate;
+	bool isAccount = sinvoke _exists(e, delegate);
+	
+	env eF;
+	require eF.msg.value == 0;
+	address gotAccountFromValidatorResult = invoke getAccountFromValidator(eF, delegate);
+	bool success = !lastReverted;
+	
+	assert (!isDelegate && !isAccount) => !success, "getAccountFromValidator($delegate) must fail if $delegate is not an account (isAccount=${isAccount}) nor a validator delegate (isDelegate=${isDelegate})";
+}
+
 
 rule modifying_deposits(address a, uint256 someNoticePeriod, uint256 someAvailabilityTime, method f) {
 	// just mapping out functions that affect an account's deposits
@@ -297,7 +367,8 @@ rule cant_notify_an_unbonded_deposit(address a, uint256 someNoticePeriod, method
 	/*uint256 someBondedValue_; uint256 someBondedIndex_;
 	someBondedValue_, someBondedIndex_ = sinvoke getBondedDeposit(e_,a,someNoticePeriod);*/
 	uint256 someNotifiedValue_; uint256 someNotifiedIndex_;
-	someNotifiedValue_, someNotifiedIndex_ = sinvoke getNotifiedDeposit(e_,a,matchingAvailabilityTime);
+	someNotifiedValue_, someNotifiedIndex_ = sinvoke getNotifiedDeposit(e_,a,matchingAvailabilityTime); 
+	// what happens if in withdraw we delete and matchingAvailabilityTime is the last index? then its index is updated
 	
 	// if now we notified, necessarily, it was bonded BEFORE
 	assert (someNotifiedValue_ != 0 || someNotifiedIndex_ != 0) => (_someBondedValue != 0 || _someBondedIndex != 0), "Violated: An account should never be able to notify a deposit which hadnt previously been deposited";
@@ -316,6 +387,22 @@ rule modifying_weight(address a, uint256 someNoticePeriod, uint256 someAvailabil
 	uint256 accountWeight_ = sinvoke _weight(e_,a);
 	
 	assert _accountWeight == accountWeight_, "Method changed weight of account";
+}
+
+rule modifying_weight_other(address a, uint256 someNoticePeriod, uint256 someAvailabilityTime, method f) {
+	// just mapping out functions that affect an account's weight
+	env _e;
+	uint256 _accountWeight = sinvoke _weight(_e,a);
+	
+	env eF;
+	require eF.msg.sender != a;
+	calldataarg arg;
+	invoke f(eF,arg);
+	
+	env e_;
+	uint256 accountWeight_ = sinvoke _weight(e_,a);
+	
+	assert _accountWeight == accountWeight_, "Method changed weight of an account other than sender's";
 }
 
 rule atomic_deposit_notification(uint256 someNoticePeriod, uint256 notifyValue) {
@@ -351,8 +438,14 @@ rule cant_rebond_non_notified(uint256 rebondValue, uint256 depositAvailabilityTi
 	env _e;
 	env eF;
 	
+	address a = eF.msg.sender; // our account will execute rebond()
+	uint256 someNotifiedValue_; 
+	_someNotifiedValue, _ = sinvoke getNotifiedDeposit(_e,a,depositAvailabilityTime);
+	
 	invoke rebond(eF, rebondValue, depositAvailabilityTime);
-	assert false, "placeholder";
+	
+	// TODO: How exactly is a deposit non-notified? If its availabilityTime is not in the map? value < requirested value?
+	assert _someNotifiedValue < rebondValue => lastReverted, "Trying to rebond more deposits then there are notified ($rebondValue > ${_someNotifiedValue}), and did not revert rebond()";
 }
 
 // TODO: deleteElement should always be called with lastIndex == list.length-1 - check using assertion in the code and assert mode?
@@ -382,10 +475,77 @@ rule withdrawing_removes_notified_deposit(uint256 someNoticePeriod) {
 	
 	assert withdrawSucceeded => (someNotifiedValue_ == 0 && someNotifiedIndex_ == 0), "Violated: withdraw succeeded but for deposit $someNoticePeriod with availability time $matchingAvailabilityTime we still have value: ${someNotifiedValue_} and index ${someBondedIndex_}";
 	
-	// TODO: What about bonded deposit?
+	// TODO: What about bonded deposit? Already removed or added new one by that time
+}
+
+rule withdraw_precond(uint256 someAvailabilityTime) {
+	// Accounts should never be able to withdraw a deposit that hasn’t been notified or before the notice period is up
+	env _e;
+	env eF;
+	env e_;
+	
+	address a = eF.msg.sender; // our account will execute withdraw()
+	
+	
+	/*uint256 _someBondedValue; uint256 _someBondedIndex;
+	_someBondedValue, _someBondedIndex = sinvoke getBondedDeposit(_e,a,someNoticePeriod);*/
+	uint256 _someNotifiedValue;
+	_someNotifiedValue, _ = sinvoke getNotifiedDeposit(_e,a,matchingAvailabilityTime);
+	
+	invoke withdraw(eF, someAvailabilityTime);
+	bool withdrawSucceeded = !lastReverted;
+	
+	// TODO: Is it a strict, or non-strict inequality?
+	assert eF.block.timestamp < matchingAvailabilityTime => !withdrawSucceeded, "Withdraw succeeded even though time ${eF.block.timestamp} is before availability time $matchingAvailabilityTime";
+	assert _someNotifiedValue == 0 => !withdrawSucceeded, "Withdraw succeeded even though this deposit was not notified";	
+}
+
+rule increase_notice_period_precond(uint256 someNoticePeriod) {
+	// Accounts should not be able to increase the notice period of a non-bonded deposit
+	env _e;
+	env eF;
+	env e_;
+	
+	address a = eF.msg.sender; // our account will execute increaseNoticePeriod()
+	
+	uint256 _someBondedValue;
+	_someBondedValue, _ = sinvoke getBondedDeposit(_e,a,someNoticePeriod);
+	
+	uint256 value;
+	uint256 increase;
+	
+	invoke increaseNoticePeriod(eF,value,someNoticePeriod,increase);
+	bool increaseNoticePeriodSucceded = !lastReverted;
+	
+	assert _someBondedValue < value => !increaseNoticePeriodSucceded, "Increasing notice period succeeded even though it requested to increase notice period of non-bonded deposits $value where currently deposited just ${_someBondedValue}";	
+}
+
+rule notify_only_updates_the_expected_deposit_availability_time(uint256 someNoticePeriod, uint256 randomTime) {
+	// The availability time of a notified deposit should always equal the notice period of the deposit when it was bonded plus the time at which the notice was given
+	// Translation: if we run notify, we must update the correct availability time and not any other!
+	
+	env _e;
+	env eF;
+	env e_;
+	
+	address a = eF.msg.sender; // our account will execute notify()
+	uint256 matchingAvailabilityTime = eF.block.timestamp+someNoticePeriod; // availability time is notify time + notice period set beforehand
+	require randomTime != matchingAvailabilityTime; // we will be checking for some other time
+	uint256 notifyValue;
+	
+	uint256 _someNotifiedValue; uint256 _someNotifiedIndex;
+	_someNotifiedValue, _someNotifiedIndex = sinvoke getNotifiedDeposit(_e,a,randomTime);
+	
+	sinvoke notify(eF, notifyValue, someNoticePeriod);
+	
+	uint256 someNotifiedValue_; uint256 someNotifiedIndex_;
+	someNotifiedValue_, someNotifiedIndex_ = sinvoke getNotifiedDeposit(e_,a,randomTime);
+	
+	assert _someNotifiedIndex == someNotifiedIndex_ && _someNotifiedValue == someNotifiedValue_, "Invocation of notify with notice period $someNoticePeriod and matching availability time $matchingAvailabilityTime should not have updated any entry in notified deposit of $randomTime";
 }
 
 
+// TODO: Sqrt sufficiently precise for [0..1000]?
 
 // initialization rules
 rule only_initializer_changes_initialized_field(method f) {
