@@ -2,7 +2,7 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { call, put } from 'redux-saga/effects'
 import { fetchGoldBalance } from 'src/goldToken/actions'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
-import { refreshBalances, watchRefreshBalances, withLoading } from 'src/home/saga'
+import { _watchRefreshBalances, refreshBalances, withLoading } from 'src/home/saga'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { getConnectedAccount } from 'src/web3/saga'
 
@@ -17,7 +17,7 @@ describe('refreshBalances', () => {
 
 describe('watchRefreshBalances', () => {
   test('reacts on REFRESH_BALANCES', async () => {
-    const p = expectSaga(watchRefreshBalances)
+    const p = expectSaga(_watchRefreshBalances)
       .put(setLoading(true))
       .put(setLoading(false))
       .provide([[call(getConnectedAccount), true]])

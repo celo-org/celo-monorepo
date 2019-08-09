@@ -2,7 +2,9 @@ import {
   getAttestationFee,
   getAttestationsContract,
   getStableTokenContract,
+  parseFromContractDecimals,
 } from '@celo/contractkit'
+import { retryAsync } from '@celo/utils/src/async-helpers'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { Linking } from 'react-native'
@@ -15,7 +17,6 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ERROR_BANNER_DURATION } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { CURRENCY_ENUM, INVITE_REDEMPTION_GAS } from 'src/geth/consts'
-import { waitForGethConnectivity } from 'src/geth/saga'
 import i18n from 'src/i18n'
 import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import {
@@ -32,6 +33,7 @@ import {
 import { createInviteCode } from 'src/invite/utils'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { transferStableToken } from 'src/stableToken/actions'
 import { createTransaction } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
@@ -49,7 +51,6 @@ export const TEMP_PW = 'ce10'
 
 const USE_REAL_FEE = false
 const INVITE_FEE = '0.2'
-const INVITE_SEND_AMOUNT = '0.18'
 
 // TODO(Rossy) Cache this so we don't recalculate it every time we invite someone
 // Especially relevant when inviting many friends
@@ -142,7 +143,7 @@ export function* sendInvite(
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
       try {
         const phoneHash = getPhoneHash(e164Number)
-        yield put(transferEscrowedPayment(phoneHash, amount, txId, temporaryAddress))
+        yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress))
       } catch (e) {
         Logger.error(TAG, 'Error sending payment to unverified user: ', e)
         yield put(showError(ErrorMessages.TRANSACTION_FAILED, ERROR_BANNER_DURATION))
@@ -199,7 +200,7 @@ function* redeemSuccess(name: string, account: string) {
 export function* redeemInviteSaga(action: RedeemInviteAction) {
   const { inviteCode, name } = action
 
-  yield call(waitForGethConnectivity)
+  yield call(waitWeb3LastBlock)
   try {
     // Add temp wallet so we can send money from it
     let tempAccount
@@ -217,7 +218,12 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
 
     // Check that the balance of the new account is not 0
     const StableToken = yield call(getStableTokenContract, web3)
-    const stableBalance = new BigNumber(yield call(StableToken.methods.balanceOf(tempAccount).call))
+
+    // Try to get balance once + two retries before failing
+    const stableBalance = new BigNumber(
+      yield call(retryAsync, StableToken.methods.balanceOf(tempAccount).call, 2, [])
+    )
+
     Logger.debug(TAG + '@redeemInviteCode', 'Temporary account balance: ' + stableBalance)
 
     if (stableBalance.isLessThan(1)) {
@@ -250,11 +256,13 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
     yield call(web3.eth.personal.unlockAccount, tempAccount, TEMP_PW, 600)
 
     // TODO(cmcewen): calculate the proper amount when gas estimation is working
+    const stableBalanceConverted = yield parseFromContractDecimals(stableBalance, StableToken)
 
     const tx = yield call(createTransaction, getStableTokenContract, {
       recipientAddress: newAccount,
       comment: SENTINEL_INVITE_COMMENT,
-      amount: INVITE_SEND_AMOUNT,
+      // TODO: appropriately withdraw the balance instead of using gas fees will be less than 1 cent
+      amount: stableBalanceConverted.minus('0.01').toString(),
     })
 
     yield call(sendTransaction, tx, tempAccount, TAG, 'Transfer from temp wallet')
