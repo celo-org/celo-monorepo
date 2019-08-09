@@ -123,6 +123,11 @@
     "email": "Please enter a valid email address",
     "generic": "Oops I’m blank!"
   },
+  "ecoFund": {
+    "title": "Celo Ecosystem Fund",
+    "poweredBy": "Powered by Polychain Capital",
+    "description": "La La Blockchain; TODO"
+  },
   "website": "WEBSITE",
   "recap": "RECAP",
   "stayConnected": "Stay connected",

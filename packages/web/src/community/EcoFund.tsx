@@ -17,8 +17,10 @@ import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import { H2 } from 'src/fonts/Fonts'
 import { Image } from 'react-native'
 import Rings from 'src/logos/RingsLight'
+import { EcoFundFields, EcoFundKeys } from 'fullstack/EcoFundFields'
 
 const EcoFund = React.memo(function EcoFundComponent({ t }: I18nProps) {
+  const inputStyle = [standardStyles.input, fonts.p, formStyles.input]
   return (
     <GridRow
       desktopStyle={[standardStyles.sectionMarginTop, standardStyles.blockMarginBottom]}
@@ -41,10 +43,47 @@ const EcoFund = React.memo(function EcoFundComponent({ t }: I18nProps) {
         <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('ecoFund.description')}</Text>
         <Button text={t('ecoFund.Link')} kind={BTN.NAKED} size={SIZE.normal} />
       </Cell>
-      <Cell span={Spans.half}>{}</Cell>
+      <Cell span={Spans.half}>
+        <FormContainer route="/ecosystem" blankForm={blankForm()} validateWith={validateFields}>
+          {({ onAltSubmit, onInput, formState }) => (
+            <Form>
+              <TextInput
+                style={[inputStyle, formState.errors.includes('name') && formStyles.errorBorder]}
+                focusStyle={standardStyles.inputFocused}
+                placeholder={t('form.name')}
+                placeholderTextColor={colors.placeholderGray}
+                name="name"
+                value={formState.form.name}
+                onChange={onInput}
+                required={true}
+              />
+              <Button
+                text={t('submit')}
+                kind={BTN.PRIMARY}
+                onPress={onAltSubmit}
+                size={SIZE.big}
+                align={'center'}
+              />
+              {formState.isComplete && (
+                <Text style={[textStyles.center, fonts.p, standardStyles.elementalMarginTop]}>
+                  {t('form.fellowshipSubmitted')}
+                </Text>
+              )}
+            </Form>
+          )}
+        </FormContainer>
+      </Cell>
     </GridRow>
   )
 })
+
+function blankForm(): EcoFundKeys {
+  return { name: '' }
+}
+
+function validateFields(fields: EcoFundKeys) {
+  return []
+}
 
 export default withNamespaces(NameSpaces.community)(EcoFund)
 
