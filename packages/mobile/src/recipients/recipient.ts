@@ -12,10 +12,10 @@ import Logger from 'src/utils/Logger'
 const TAG = 'utils/recipient'
 
 export enum RecipientKind {
-  MobileNumber = 'mobileNumber',
-  Contact = 'contact',
+  MobileNumber = 'MobileNumber',
+  Contact = 'Contact',
   QrCode = 'QrCode',
-  Address = 'address',
+  Address = 'Address',
 }
 
 export type Recipient =
@@ -267,4 +267,30 @@ export const filterRecipientFactory = (recipients: Recipient[], shouldSort?: boo
   return (query: string) => {
     return executeFuzzySearch(preparedRecipients, query, fuzzysortPreparedOptions, shouldSort)
   }
+}
+
+// Returns true if two recipients are equivalent
+// This isn't trivial because two recipients of diff types (Qr code vs contact)
+// could potentially refer to the same recipient
+export function areRecipientsEquivalent(recipient1: Recipient, recipient2: Recipient) {
+  if (recipient1 === recipient2) {
+    return true
+  }
+
+  if (
+    recipient1.e164PhoneNumber &&
+    recipient2.e164PhoneNumber &&
+    recipient1.e164PhoneNumber === recipient2.e164PhoneNumber
+  ) {
+    return true
+  }
+
+  if (recipient1.address && recipient2.address && recipient1.address === recipient2.address) {
+    return true
+  }
+
+  // Todo(Rossy) there's still the case where one recip's e164Number gets resolved to another's address
+  // but to detect that we'll need to wire in the mappings and check there too
+
+  return false
 }
