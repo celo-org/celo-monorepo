@@ -9,7 +9,7 @@ import {
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import Logger from 'src/utils/Logger'
 
-const TAG = 'utils/recipient'
+const TAG = 'recipients/recipient'
 
 export enum RecipientKind {
   MobileNumber = 'MobileNumber',
