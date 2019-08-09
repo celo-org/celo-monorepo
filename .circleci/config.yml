@@ -88,9 +88,11 @@ jobs:
       - run:
           name: Build packages
           command: |
-            # build protocol first to avoid out of memory in circle ci
+            # separate build to avoid ENOMEN in CI :(
             yarn build --scope @celo/protocol
-            yarn build --ignore @celo/protocol
+            yarn build --scope docs
+            yarn build --scope @celo/contractkit
+            yarn build --ignore @celo/protocol --ignore docs --ignore @celo/contractkit
 
 
       - persist_to_workspace:
