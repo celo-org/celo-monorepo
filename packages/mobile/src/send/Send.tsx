@@ -19,73 +19,20 @@ import { importContacts } from 'src/identity/actions'
 import { E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { RootState } from 'src/redux/reducers'
-import { storeLatestInRecents } from 'src/send/actions'
-import RecipientPicker from 'src/send/RecipientPicker'
-import { checkContactsPermission } from 'src/utils/androidPermissions'
 import {
-  buildRecentRecipients,
   filterRecipientFactory,
   filterRecipients,
-  NumberToRecipient,
   Recipient,
   RecipientKind,
   RecipientWithQrCode,
-} from 'src/utils/recipient'
+} from 'src/recipients/recipient'
+import RecipientPicker from 'src/recipients/RecipientPicker'
+import { recipientCacheSelector } from 'src/recipients/reducer'
+import { RootState } from 'src/redux/reducers'
+import { storeLatestInRecents } from 'src/send/actions'
+import { checkContactsPermission } from 'src/utils/androidPermissions'
 
-interface Section {
-  key: string
-  data: Recipient[]
-}
-
-interface State {
-  loading: boolean
-  searchQuery: string
-  allRecipients: Recipient[]
-  recentRecipients: Recipient[]
-  allFiltered: Recipient[]
-  recentFiltered: Recipient[]
-  hasGivenPermission: boolean
-}
-
-interface StateProps {
-  recentPhoneNumbers: string[]
-  defaultCountryCode: string
-  e164PhoneNumber: string
-  devModeActive: boolean
-  e164PhoneNumberAddressMapping: E164NumberToAddressType
-  recipientCache: NumberToRecipient
-}
-interface DispatchProps {
-  showError: typeof showError
-  hideAlert: typeof hideAlert
-  storeLatestInRecents: typeof storeLatestInRecents
-  importContacts: typeof importContacts
-}
-
-type Props = StateProps & DispatchProps & WithNamespaces & NavigationInjectedProps
-
-const mapStateToProps = (state: RootState): StateProps => ({
-  recentPhoneNumbers: state.send.recentPhoneNumbers || [],
-  defaultCountryCode: state.account.defaultCountryCode,
-  e164PhoneNumber: state.account.e164PhoneNumber,
-  devModeActive: state.account.devModeActive || false,
-  e164PhoneNumberAddressMapping: state.identity.e164NumberToAddress,
-  recipientCache: state.send.recipientCache,
-})
-
-const mapDispatchToProps = {
-  showError,
-  hideAlert,
-  storeLatestInRecents,
-  importContacts,
-}
-
-// TODO(Rossy) move this into redux as I've done for the full cache (don't forget to blacklist it when you do)
-let recentCache: Recipient[] | null = null
-
-const THROTTLE_TIME = 50
-
+const SEARCH_THROTTLE_TIME = 50
 const defaultRecipientPhoneNumber = '+10000000000'
 const defaultRecipientAddress = `0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10`
 
@@ -98,7 +45,55 @@ export const CeloDefaultRecipient: RecipientWithQrCode = {
   e164PhoneNumber: defaultRecipientPhoneNumber,
 }
 
+interface Section {
+  key: string
+  data: Recipient[]
+}
+
+interface State {
+  loading: boolean
+  searchQuery: string
+  allFiltered: Recipient[]
+  recentFiltered: Recipient[]
+  hasGivenPermission: boolean
+}
+
+interface StateProps {
+  defaultCountryCode: string
+  e164PhoneNumber: string
+  devModeActive: boolean
+  e164PhoneNumberAddressMapping: E164NumberToAddressType
+  recentRecipients: Recipient[]
+  allRecipients: Recipient[]
+}
+
+interface DispatchProps {
+  showError: typeof showError
+  hideAlert: typeof hideAlert
+  storeLatestInRecents: typeof storeLatestInRecents
+  importContacts: typeof importContacts
+}
+
+type Props = StateProps & DispatchProps & WithNamespaces & NavigationInjectedProps
+
+const mapStateToProps = (state: RootState): StateProps => ({
+  defaultCountryCode: state.account.defaultCountryCode,
+  e164PhoneNumber: state.account.e164PhoneNumber,
+  devModeActive: state.account.devModeActive || false,
+  e164PhoneNumberAddressMapping: state.identity.e164NumberToAddress,
+  recentRecipients: [CeloDefaultRecipient, ...state.send.recentRecipients],
+  allRecipients: Object.values(recipientCacheSelector(state)),
+})
+
+const mapDispatchToProps = {
+  showError,
+  hideAlert,
+  storeLatestInRecents,
+  importContacts,
+}
+
 type FilterType = (searchQuery: string) => Recipient[]
+
 class Send extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationScreenProps) => ({
     headerTitle: navigation.getParam('title', ''),
@@ -118,72 +113,34 @@ class Send extends React.Component<Props, State> {
     this.state = {
       loading: true,
       searchQuery: '',
-      allRecipients: [],
-      recentRecipients: [],
       allFiltered: [],
       recentFiltered: [],
       hasGivenPermission: true,
     }
 
-    this.allRecipientsFilter = filterRecipientFactory(this.state.allRecipients)
-    this.recentRecipientsFilter = filterRecipientFactory(this.state.recentRecipients)
+    this.allRecipientsFilter = filterRecipientFactory(this.props.allRecipients)
+    this.recentRecipientsFilter = filterRecipientFactory(this.props.recentRecipients)
 
     this.throttledSearch = throttle((searchQuery: string) => {
       this.setState({
         recentFiltered: this.recentRecipientsFilter(searchQuery),
-      })
-
-      this.setState({
         allFiltered: this.allRecipientsFilter(searchQuery),
       })
-    }, THROTTLE_TIME)
-  }
-
-  updateFilters() {
-    this.setState(
-      {
-        recentRecipients: [CeloDefaultRecipient, ...this.state.recentRecipients],
-      },
-      () => {
-        this.recentRecipientsFilter = filterRecipientFactory(this.state.recentRecipients, false)
-        this.onSearchQueryChanged('')
-      }
-    )
-
-    this.allRecipientsFilter = filterRecipientFactory(this.state.allRecipients, true)
-    // end alfajores-net code
+    }, SEARCH_THROTTLE_TIME)
   }
 
   async componentDidMount() {
-    const { t, recentPhoneNumbers, recipientCache } = this.props
+    const { t, recentRecipients, allRecipients } = this.props
     this.props.navigation.setParams({ title: t('send_or_request') })
-    const recipients = Object.values(recipientCache)
 
-    if (recipientCache) {
-      if (!recentCache) {
-        // TODO do this in import contacts saga
-        recentCache = buildRecentRecipients(
-          recipients,
-          recentPhoneNumbers,
-          this.props.t('mobileNumber'),
-          this.props.t('walletAddress')
-        )
-      }
+    this.setState({
+      loading: false,
+      recentFiltered: filterRecipients(recentRecipients, this.state.searchQuery, false),
+      allFiltered: filterRecipients(allRecipients, this.state.searchQuery, true),
+    })
 
-      this.setState(
-        {
-          loading: false,
-          allRecipients: recipients,
-          recentRecipients: recentCache,
-          allFiltered: filterRecipients(recipients, this.state.searchQuery, true),
-          recentFiltered: filterRecipients(recentCache, this.state.searchQuery, false),
-        },
-        this.updateFilters
-      )
-
-      const hasGivenPermission = await checkContactsPermission()
-      this.setState({ hasGivenPermission })
-    }
+    const hasGivenPermission = await checkContactsPermission()
+    this.setState({ hasGivenPermission })
   }
 
   onSearchQueryChanged = (searchQuery: string) => {
@@ -199,43 +156,36 @@ class Send extends React.Component<Props, State> {
     CeloAnalytics.track(CustomEventNames.send_input, {
       selectedRecipientAddress: recipient.address,
     })
+
     if (!recipient.e164PhoneNumber && !recipient.address) {
       this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE, ERROR_BANNER_DURATION)
       return
     }
 
-    if (recipient.e164PhoneNumber && recipient.e164PhoneNumber !== defaultRecipientPhoneNumber) {
-      this.props.storeLatestInRecents(recipient.e164PhoneNumber)
+    if (
+      (recipient.e164PhoneNumber && recipient.e164PhoneNumber !== defaultRecipientPhoneNumber) ||
+      (recipient.address && recipient.address !== defaultRecipientAddress)
+    ) {
+      this.props.storeLatestInRecents(recipient)
     }
 
-    if (recipient.address && recipient.address !== defaultRecipientAddress) {
-      this.props.storeLatestInRecents(recipient.address)
-    }
     navigate(Screens.SendAmount, { recipient })
   }
 
   onPermissionsAccepted = async () => {
     this.props.importContacts()
-    this.setState(
-      {
-        searchQuery: '',
-        recentRecipients: [],
-        hasGivenPermission: true,
-      },
-      this.updateFilters
-    )
+    this.setState({
+      searchQuery: '',
+      hasGivenPermission: true,
+    })
   }
 
   buildSections = (): Section[] => {
-    const { t, recipientCache } = this.props
-    const allRecipients = Object.values(recipientCache)
-
-    const queryRecipients = filterRecipients(allRecipients, this.state.searchQuery)
-
-    const { recentFiltered } = this.state
+    const { t } = this.props
+    const { recentFiltered, allFiltered } = this.state
     const sections = [
       { key: t('recent'), data: recentFiltered },
-      { key: t('contacts'), data: Object.values(queryRecipients) },
+      { key: t('contacts'), data: allFiltered },
     ].filter((section) => section.data.length > 0)
 
     return sections

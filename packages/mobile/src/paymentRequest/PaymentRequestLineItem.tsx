@@ -1,7 +1,7 @@
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleSheet, Text } from 'react-native'
-import { Recipient } from 'src/utils/recipient'
+import { Recipient } from 'src/recipients/recipient'
 
 interface Props {
   requesterE164Number: string

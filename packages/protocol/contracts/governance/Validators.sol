@@ -3,6 +3,7 @@ pragma solidity ^0.5.8;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
+import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./AddressLinkedList.sol";
 import "./AddressSortedLinkedList.sol";
@@ -21,6 +22,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   using AddressSortedLinkedList for SortedLinkedList.List;
   using SafeMath for uint256;
   using FractionUtil for FractionUtil.Fraction;
+  using BytesLib for bytes;
 
   // TODO(asa): These strings should be modifiable
   struct ValidatorGroup {
@@ -35,7 +37,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     string identifier;
     string name;
     string url;
-    bytes publicKey;
+    bytes publicKeysData;
     address affiliation;
   }
 
@@ -56,6 +58,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   uint256 public minElectableValidators;
   uint256 public maxElectableValidators;
 
+  address constant PROOF_OF_POSSESSION = address(0xff - 4);
+
   event MinElectableValidatorsSet(
     uint256 minElectableValidators
   );
@@ -74,7 +78,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     string identifier,
     string name,
     string url,
-    bytes publicKey
+    bytes publicKeysData
   );
 
   event ValidatorDeregistered(
@@ -237,8 +241,12 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param url A URL for the validator.
    * @param noticePeriod The notice period of the bonded deposit that meets the requirements for
    *   validator registration.
-   * @param publicKey The public key that the validator is using for consensus, should match
-   *   msg.sender.
+   * @param publicKeysData Comprised of three tightly-packed elements:
+   *    - publicKey - The public key that the validator is using for consensus, should match
+   *      msg.sender. 64 bytes.
+   *    - blsPublicKey - The BLS public key that the validator is using for consensus, should pass
+   *      proof of possession. 48 bytes.
+   *    - blsPoP - The BLS public key proof of possession. 96 bytes.
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient weight.
@@ -247,7 +255,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     string calldata identifier,
     string calldata name,
     string calldata url,
-    bytes calldata publicKey,
+    bytes calldata publicKeysData,
     uint256 noticePeriod
   )
     external
@@ -258,19 +266,32 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       bytes(identifier).length > 0 &&
       bytes(name).length > 0 &&
       bytes(url).length > 0 &&
-      publicKey.length == 64
+      // secp256k1 public key + BLS public key + BLS proof of possession
+      publicKeysData.length == (64 + 48 + 96)
     );
+    bytes memory proofOfPossessionBytes = publicKeysData.slice(64, 48 + 96);
+    // TODO(Kobi): Should call checkProofOfPossession once the input is generated correctly.
+
     address account = getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     require(meetsRegistrationRequirements(account, noticePeriod));
-    Validator storage validator = validators[account];
-    validator.identifier = identifier;
-    validator.name = name;
-    validator.url = url;
-    validator.publicKey = publicKey;
+
+    Validator memory validator = Validator(identifier, name, url, publicKeysData, address(0));
+    validators[account] = validator;
     _validators.push(account);
-    emit ValidatorRegistered(account, identifier, name, url, publicKey);
+    emit ValidatorRegistered(account, identifier, name, url, publicKeysData);
     return true;
+  }
+
+  /**
+   * @notice Checks a BLS proof of possession.
+   * @param proofOfPossessionBytes The public key and signature of the proof of possession.
+   * @return True upon success.
+   */
+  function checkProofOfPossession(bytes memory proofOfPossessionBytes) private returns (bool) {
+    bool success;
+    (success, ) = PROOF_OF_POSSESSION.call.value(0).gas(gasleft())(proofOfPossessionBytes);
+    return success;
   }
 
   /**
@@ -530,7 +551,13 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   )
     external
     view
-    returns (string memory, string memory, string memory, bytes memory, address)
+    returns (
+      string memory identifier,
+      string memory name,
+      string memory url,
+      bytes memory publicKeysData,
+      address affiliation
+    )
   {
     require(isValidator(account));
     Validator storage validator = validators[account];
@@ -538,7 +565,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       validator.identifier,
       validator.name,
       validator.url,
-      validator.publicKey,
+      validator.publicKeysData,
       validator.affiliation
     );
   }
