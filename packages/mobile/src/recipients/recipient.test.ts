@@ -1,4 +1,4 @@
-import { contactsToRecipients, RecipientKind } from 'src/utils/recipient'
+import { contactsToRecipients, RecipientKind } from 'src/recipients/recipient'
 import { mockAccount, mockContactList, mockDisplayNumber, mockE164Number } from 'test/values'
 
 describe('contactsToRecipients', () => {
