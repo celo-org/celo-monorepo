@@ -90,4 +90,9 @@ contract BondedDepositsHarness is BondedDeposits {
 		return accounts[account].exists;
 	}
 	
+	function _isValidating(address account) public view returns (bool) {
+		IValidators validators = IValidators(registry.getAddressFor(VALIDATORS_REGISTRY_ID));
+		return validators.isValidating(account);
+	}
+	
 }

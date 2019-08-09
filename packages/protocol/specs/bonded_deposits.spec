@@ -439,7 +439,7 @@ rule cant_rebond_non_notified(uint256 rebondValue, uint256 depositAvailabilityTi
 	env eF;
 	
 	address a = eF.msg.sender; // our account will execute rebond()
-	uint256 someNotifiedValue_; 
+	uint256 _someNotifiedValue; 
 	_someNotifiedValue, _ = sinvoke getNotifiedDeposit(_e,a,depositAvailabilityTime);
 	
 	invoke rebond(eF, rebondValue, depositAvailabilityTime);
@@ -490,13 +490,13 @@ rule withdraw_precond(uint256 someAvailabilityTime) {
 	/*uint256 _someBondedValue; uint256 _someBondedIndex;
 	_someBondedValue, _someBondedIndex = sinvoke getBondedDeposit(_e,a,someNoticePeriod);*/
 	uint256 _someNotifiedValue;
-	_someNotifiedValue, _ = sinvoke getNotifiedDeposit(_e,a,matchingAvailabilityTime);
+	_someNotifiedValue, _ = sinvoke getNotifiedDeposit(_e,a,someAvailabilityTime);
 	
 	invoke withdraw(eF, someAvailabilityTime);
 	bool withdrawSucceeded = !lastReverted;
 	
 	// TODO: Is it a strict, or non-strict inequality?
-	assert eF.block.timestamp < matchingAvailabilityTime => !withdrawSucceeded, "Withdraw succeeded even though time ${eF.block.timestamp} is before availability time $matchingAvailabilityTime";
+	assert eF.block.timestamp < someAvailabilityTime => !withdrawSucceeded, "Withdraw succeeded even though time ${eF.block.timestamp} is before availability time $someAvailabilityTime";
 	assert _someNotifiedValue == 0 => !withdrawSucceeded, "Withdraw succeeded even though this deposit was not notified";	
 }
 
