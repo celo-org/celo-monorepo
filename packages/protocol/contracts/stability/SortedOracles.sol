@@ -172,7 +172,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
         address(0)
       );
     }
-    emit OracleReported(token, msg.sender, now, numerator, DENOMINATOR);
+    emit OracleReported(token, msg.sender, now, value, DENOMINATOR);
     uint256 newMedian = rates[token].getMedianValue();
     if (newMedian != originalMedian) {
       emit MedianUpdated(token, newMedian, DENOMINATOR);
@@ -184,8 +184,8 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @return The number of reported oracle rates for `token`.
    */
-  function numRates(address token) external view returns (uint256) {
-    return rates[token].list.list.numElements;
+  function numRates(address token) public view returns (uint256) {
+    return rates[token].getNumElements();
   }
 
   /**
@@ -194,7 +194,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @return The median exchange rate for `token`.
    */
   function medianRate(address token) external view returns (uint256, uint256) {
-    return (rates[token].getMedianValue(), DENOMINATOR);
+    return (rates[token].getMedianValue(), numRates(token) == 0 ? 0 : DENOMINATOR);
   }
 
   /**
@@ -275,7 +275,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     emit OracleReportRemoved(token, oracle);
     uint256 newMedian = rates[token].getMedianValue();
     if (newMedian != originalMedian) {
-      emit MedianUpdated(token, newMedian, DENOMINATOR);
+      emit MedianUpdated(token, newMedian, numRates(token) == 0 ? 0 : DENOMINATOR);
     }
   }
 }
