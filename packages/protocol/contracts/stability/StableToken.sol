@@ -1,6 +1,5 @@
 pragma solidity ^0.5.8;
 
-import "fixidity/contracts/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
@@ -19,7 +18,6 @@ import "../common/UsingRegistry.sol";
 // solhint-disable-next-line max-line-length
 contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
 Initializable, UsingRegistry, UsingFixidity {
-  using FixidityLib for int256;
   using SafeMath for uint256;
 
   event MinterSet(address indexed _minter);

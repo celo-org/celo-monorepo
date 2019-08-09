@@ -1,6 +1,5 @@
 pragma solidity ^0.5.8;
 
-import "fixidity/contracts/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
@@ -21,7 +20,6 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
   using AddressLinkedList for LinkedList.List;
   using AddressSortedLinkedList for SortedLinkedList.List;
-  using FixidityLib for int256;
   using SafeMath for uint256;
   using BytesLib for bytes;
 

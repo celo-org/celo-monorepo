@@ -1,6 +1,5 @@
 pragma solidity ^0.5.8;
 
-import "fixidity/contracts/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./Initializable.sol";
@@ -12,7 +11,6 @@ import "../stability/interfaces/ISortedOracles.sol";
  * @title Stores and provides gas price minimum for various currencies.
  */
 contract GasPriceMinimum is Ownable, Initializable, UsingRegistry, UsingFixidity {
-  using FixidityLib for int256;
   using SafeMath for uint256;
 
   event TargetDensitySet(

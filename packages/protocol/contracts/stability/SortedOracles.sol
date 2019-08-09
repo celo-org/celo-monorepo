@@ -1,6 +1,5 @@
 pragma solidity ^0.5.8;
 
-import "fixidity/contracts/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./SortedFractionMedianList.sol";
@@ -14,7 +13,6 @@ import "../common/UsingFixidity.sol";
  * @title Maintains a sorted list of oracle exchange rates between Celo Gold and other currencies.
  */
 contract SortedOracles is ISortedOracles, Ownable, Initializable, UsingFixidity {
-  using FixidityLib for int256;
   using SafeMath for uint256;
   using SafeMath for uint128;
   using SortedFractionMedianList for SortedFractionMedianList.List;

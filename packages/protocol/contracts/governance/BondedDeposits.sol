@@ -1,6 +1,5 @@
 pragma solidity ^0.5.8;
 
-import "fixidity/contracts/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -18,7 +17,6 @@ import "../common/FractionUtil.sol";
 
 contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, UsingRegistry, UsingFixidity {
 
-  using FixidityLib for int256;
   using FractionUtil for FractionUtil.Fraction;
   using SafeMath for uint256;
 

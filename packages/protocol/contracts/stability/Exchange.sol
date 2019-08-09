@@ -1,6 +1,5 @@
 pragma solidity ^0.5.8;
 
-import "fixidity/contracts/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/IExchange.sol";
@@ -19,7 +18,6 @@ import "../common/interfaces/IERC20Token.sol";
  * using a Constant Product Market Maker Model
  */
 contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, UsingFixidity {
-  using FixidityLib for int256;
   using SafeMath for uint256;
   using FractionUtil for FractionUtil.Fraction;
 
