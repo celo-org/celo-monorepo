@@ -16,13 +16,13 @@ import { sendInvite } from 'src/invite/saga'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { handleBarcode, shareSVGImage } from 'src/qrcode/utils'
+import { recipientCacheSelector } from 'src/recipients/reducer'
 import {
   Actions,
   SendPaymentOrInviteAction,
   sendPaymentOrInviteFailure,
   sendPaymentOrInviteSuccess,
 } from 'src/send/actions'
-import { recipientCacheSelector } from 'src/send/reducers'
 import { transferStableToken } from 'src/stableToken/actions'
 import { BasicTokenTransfer, createTransaction } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
@@ -52,6 +52,8 @@ export async function getSendFee(
 
 export function* watchQrCodeDetections() {
   while (true) {
+    // TODO(Rossy) this gets called taken multiple times before a user can press the send button
+    // Add de-bouncing logic
     const action = yield take(Actions.BARCODE_DETECTED)
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const recipientCache = yield select(recipientCacheSelector)

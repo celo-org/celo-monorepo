@@ -1,22 +1,18 @@
+import { areRecipientsEquivalent, Recipient } from 'src/recipients/recipient'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
-import { RootState } from 'src/redux/reducers'
 import { Actions, ActionTypes } from 'src/send/actions'
-import { insertAtBeginning } from 'src/utils/insertAtBeginning'
-import { NumberToRecipient } from 'src/utils/recipient'
 
 // Sets the limit of recent recipients we want to store
-const RECENT_PHONE_NUMBERS_TO_STORE = 8
+const RECENT_RECIPIENTS_TO_STORE = 8
 
 export interface State {
   isSending: boolean
-  recentPhoneNumbers: string[]
-  recipientCache: NumberToRecipient
+  recentRecipients: Recipient[]
 }
 
 const initialState = {
   isSending: false,
-  recentPhoneNumbers: [],
-  recipientCache: {},
+  recentRecipients: [],
 }
 
 export const sendReducer = (
@@ -45,20 +41,22 @@ export const sendReducer = (
         isSending: false,
       }
     case Actions.STORE_LATEST_IN_RECENTS:
-      const recentPhoneNumbers = insertAtBeginning(
-        action.key,
-        state.recentPhoneNumbers || []
-      ).slice(0, RECENT_PHONE_NUMBERS_TO_STORE)
-      return { ...state, recentPhoneNumbers }
+      return storeLatestRecentReducer(state, action.recipient)
 
-    case Actions.SET_RECIPIENT_CACHE:
-      return {
-        ...state,
-        recipientCache: action.recipients,
-      }
     default:
       return state
   }
 }
 
-export const recipientCacheSelector = (state: RootState) => state.send.recipientCache
+const storeLatestRecentReducer = (state: State, newRecipient: Recipient) => {
+  const recentRecipients = [
+    newRecipient,
+    ...state.recentRecipients.filter(
+      (existingRecipient) => !areRecipientsEquivalent(newRecipient, existingRecipient)
+    ),
+  ].slice(0, RECENT_RECIPIENTS_TO_STORE)
+  return {
+    ...state,
+    recentRecipients,
+  }
+}

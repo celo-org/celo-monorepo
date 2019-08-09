@@ -2,10 +2,12 @@
 import Web3 = require('web3')
 
 import { toFixed } from '@celo/protocol/lib/fixidity'
+import { stableTokenRegistryId } from '@celo/protocol/lib/registry-utils'
 import {
   convertToContractDecimalsBN,
   deployProxyAndImplementation,
   getDeployedProxiedContract,
+  setInRegistry,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import {
@@ -47,6 +49,12 @@ module.exports = deployProxyAndImplementation<StableTokenInstance>(
   'StableToken',
   initializeArgs,
   async (stableToken: StableTokenInstance, _web3: Web3, networkName: string) => {
+    const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
+      'Registry',
+      artifacts
+    )
+    await setInRegistry(stableToken, registry, stableTokenRegistryId)
+
     const minerAddress: string = truffle.networks[networkName].from
     const minerStartBalance = await convertToContractDecimalsBN(
       config.stableToken.minerDollarBalance.toString(),

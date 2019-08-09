@@ -56,9 +56,10 @@ geth_tests/network_sync_test.sh ${NETWORK_NAME} full && echo
 geth_tests/network_sync_test.sh ${NETWORK_NAME} light && echo
 test_ultralight_sync ${NETWORK_NAME} && echo
 
-export NETWORK_NAME="alfajoresstaging"
-geth_tests/network_sync_test.sh ${NETWORK_NAME} full && echo
+#TODO(Kobi): disabled until alfajoresstaging is upgraded with BLS
+#export NETWORK_NAME="alfajoresstaging"
+#geth_tests/network_sync_test.sh ${NETWORK_NAME} full && echo
 # This is broken, I am not sure why, therefore, commented for now.
 # geth_tests/network_sync_test.sh ${NETWORK_NAME} fast && echo
-geth_tests/network_sync_test.sh ${NETWORK_NAME} light && echo
-test_ultralight_sync ${NETWORK_NAME} && echo
+#geth_tests/network_sync_test.sh ${NETWORK_NAME} light && echo
+#test_ultralight_sync ${NETWORK_NAME} && echo
