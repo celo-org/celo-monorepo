@@ -105,8 +105,8 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
-
-      - run: yarn run lint:ci
+      - run: yarn run prettify:diff
+      - run: yarn run lint
 
   general-test:
     <<: *defaults

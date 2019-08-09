@@ -6,8 +6,6 @@
   "private": true,
   "scripts": {
     "install-pkg": "yarn install --link-duplicates",
-    "precommit": "pretty-quick --staged",
-    "lint:ci": "yarn prettify:diff && yarn lint",
     "lint": "yarn lerna run lint",
     "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx)'",
     "prettify:diff": "yarn run prettier --config .prettierrc.js --list-different '**/*.+(ts|tsx|js|jsx)'",
