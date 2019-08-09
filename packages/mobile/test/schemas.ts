@@ -106,6 +106,15 @@ const v0Schema = {
     ...vNeg1Schema.invite,
     redeemComplete: false,
   },
+  send: {
+    isSending: false,
+    recentPhoneNumbers: undefined,
+    recipientCache: undefined,
+    recentRecipients: [],
+  },
+  recipients: {
+    recipientCache: {},
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {

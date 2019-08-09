@@ -17,10 +17,10 @@ import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identi
 import PaymentRequestBalance from 'src/paymentRequest/PaymentRequestBalance'
 import PaymentRequestListEmpty from 'src/paymentRequest/PaymentRequestListEmpty'
 import PaymentRequestNotification from 'src/paymentRequest/PaymentRequestNotification'
+import { NumberToRecipient, phoneNumberToRecipient } from 'src/recipients/recipient'
+import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
-import { recipientCacheSelector } from 'src/send/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { NumberToRecipient, phoneNumberToRecipient } from 'src/utils/recipient'
 
 const { contentPadding } = variables
 
