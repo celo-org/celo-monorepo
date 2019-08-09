@@ -32,12 +32,6 @@ const response: Response<Log> = {
   message: '',
 }
 
-jest.mock('../src/config', () => ({
-  BLOCKSCOUT_API: '',
-  STABLE_TOKEN_ADDRESS: '',
-  GOLD_TOKEN_ADDRESS: '',
-}))
-
 jest.mock('node-fetch', () => ({
   ...jest.requireActual('node-fetch'),
   __esModule: true,
