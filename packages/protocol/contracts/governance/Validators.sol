@@ -16,7 +16,8 @@ import "../common/UsingFixidity.sol";
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
  */
-contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, UsingBondedDeposits, UsingFixidity {
+contract Validators is
+  IValidators, Ownable, ReentrancyGuard, Initializable, UsingBondedDeposits, UsingFixidity {
 
   using AddressLinkedList for LinkedList.List;
   using AddressSortedLinkedList for SortedLinkedList.List;

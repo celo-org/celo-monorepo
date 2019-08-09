@@ -15,7 +15,8 @@ import "../common/interfaces/IERC20Token.sol";
 import "../common/Signatures.sol";
 import "../common/FractionUtil.sol";
 
-contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, UsingRegistry, UsingFixidity {
+contract BondedDeposits is
+  IBondedDeposits, ReentrancyGuard, Initializable, UsingRegistry, UsingFixidity {
 
   using FractionUtil for FractionUtil.Fraction;
   using SafeMath for uint256;
