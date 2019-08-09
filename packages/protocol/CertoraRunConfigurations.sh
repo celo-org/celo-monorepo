@@ -1,6 +1,6 @@
 # Run bonded deposits simple
 cp certora_verify.json.bonded certora_verify.json
-certoraRun.py pecs/harnesses/BondedDepositsHarness.sol --solc solc-5.10.exe
+certoraRun.py specs/harnesses/BondedDepositsHarness.sol --solc solc-5.10.exe
 
 # Run bonded deposits linked
 cp certora_verify.json.bonded.linked certora_verify.json
