@@ -8,6 +8,7 @@ defaults: &defaults
   docker:
     - image: celohq/node8:gcloud-deps
   environment:
+    # To avoid ENOMEM problem when running node
     NODE_OPTIONS: "--max-old-space-size=4096"
 
 android-defaults: &android-defaults
@@ -24,7 +25,7 @@ general:
     - 'protocol/coverage'
 
 jobs:
-  install-and-build:
+  install_dependencies:
     <<: *defaults
     steps:
       # The standard Circle CI checkout steps makes a shallow clone with the depth of 1
@@ -100,7 +101,7 @@ jobs:
           paths: 
             - .
 
-  lint:
+  lint-checks:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -426,47 +427,47 @@ workflows:
   version: 2
   celo-monorepo-build:
     jobs:
-      - install-and-build
-      - lint:
+      - install_dependencies
+      - lint-checks:
           requires:
-            - install-and-build
+            - install_dependencies
       - general-test:
           requires:
-            - install-and-build
+            - install_dependencies
       - contractkit-test:
           requires:
-            - install-and-build
+            - install_dependencies
       - cli-test:
           requires:
-            - install-and-build
+            - install_dependencies
       - mobile-test:
           requires:
-            - lint
+            - lint-checks
       - mobile-test-build-app:
           requires:
             - mobile-test
       - verification-pool-api:
           requires:
-            - lint
+            - lint-checks
       - protocol-test:
           requires:
-            - lint
+            - lint-checks
             - contractkit-test
       - end-to-end-geth-transfer-test:
           requires:
-            - lint
+            - lint-checks
             - contractkit-test
       - end-to-end-geth-governance-test:
           requires:
-            - lint
+            - lint-checks
             - contractkit-test
       - end-to-end-geth-sync-test:
           requires:
-            - lint
+            - lint-checks
             - contractkit-test
       - end-to-end-geth-integration-sync-test:
           requires:
-            - lint
+            - lint-checks
             - contractkit-test
   nightly:
     triggers:
