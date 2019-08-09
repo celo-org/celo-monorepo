@@ -467,7 +467,7 @@ contract('StableToken', (accounts: string[]) => {
         await assertInflationUpdatedEvent(res.logs[0], initializationTime + SECONDS_IN_A_WEEK)
       })
 
-      it.only('transferFrom', async () => {
+      it('transferFrom', async () => {
         await stableToken.approve(receiver, amount)
         await timeTravel(SECONDS_IN_A_WEEK, web3)
         const res = await stableToken.transferFrom(sender, receiver, amount, { from: receiver })
