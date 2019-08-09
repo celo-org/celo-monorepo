@@ -3,6 +3,7 @@ import { Storage } from '@google-cloud/storage'
 import { writeFileSync } from 'fs'
 import { generateGenesisFromEnv } from 'src/lib/generate_utils'
 import { getEnodesWithExternalIPAddresses, sleep } from 'src/lib/geth'
+import { ensureAuthenticatedGcloudAccount } from '@celo/celotool/src/lib/gcloud_utils'
 
 const genesisBlocksBucketName = 'genesis_blocks'
 const staticNodesBucketName = StaticNodeUtils.getStaticNodesGoogleStorageBucketName()
@@ -57,6 +58,7 @@ async function uploadFileToGoogleStorage(
   googleStorageFileName: string,
   makeFileWorldReadable: boolean
 ) {
+  await ensureAuthenticatedGcloudAccount()
   const storage = new Storage()
   await storage.bucket(googleStorageBucketName).upload(localFilePath, {
     destination: googleStorageFileName,
