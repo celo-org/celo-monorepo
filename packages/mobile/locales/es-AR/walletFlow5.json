@@ -11,7 +11,7 @@
   "setBackupKey":
     "Configure su clave de respaldo para mejorar la seguridad y habilitar la recuperación de la cuenta",
   "activity": "Actividad",
-  "wallet": "Billetera",
+  "wallet": "Monedero",
   "send": "Envío",
   "sent": "Envió",
   "received": "Recibido",

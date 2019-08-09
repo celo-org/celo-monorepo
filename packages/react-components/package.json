@@ -15,16 +15,19 @@
     "test:watch": "export TZ=UTC && jest --watch"
   },
   "dependencies": {
-    "@celo/utils": "0.0.1",
+    "@celo/utils": "^0.0.5",
     "lodash": "^4.17.14",
+    "react-native-autocomplete-input": "^3.6.0",
     "react-native-platform-touchable": "^1.1.1",
+    "react-native-contacts": "git://github.com/celo-org/react-native-contacts#4989b0b",
     "svgs": "^3.2.1"
   },
   "devDependencies": {
     "@celo/typescript": "0.0.1",
     "@types/enzyme": "^3.9.1",
     "@types/jest": "^24.0.13",
-    "@types/react-native": "^0.57.36",
+    "@types/react": "^16.8.19",
+    "@types/react-native": "^0.57.47",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.11.2",
     "jest": "^24.8.0",
