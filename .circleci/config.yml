@@ -432,13 +432,13 @@ workflows:
             - install-and-build
       - general-test:
           requires:
-            - lint
+            - install-and-build
       - contractkit-test:
           requires:
-            - lint
+            - install-and-build
       - cli-test:
           requires:
-            - lint
+            - install-and-build
       - mobile-test:
           requires:
             - lint
@@ -451,21 +451,22 @@ workflows:
       - protocol-test:
           requires:
             - lint
+            - contractkit-test
       - end-to-end-geth-transfer-test:
           requires:
-            - protocol-test
+            - lint
             - contractkit-test
       - end-to-end-geth-governance-test:
           requires:
-            - protocol-test
+            - lint
             - contractkit-test
       - end-to-end-geth-sync-test:
           requires:
-            - protocol-test
+            - lint
             - contractkit-test
       - end-to-end-geth-integration-sync-test:
           requires:
-            - protocol-test
+            - lint
             - contractkit-test
   nightly:
     triggers:
