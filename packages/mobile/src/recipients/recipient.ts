@@ -1,4 +1,3 @@
-import { isValidAddress } from '@celo/utils/lib/src/signatureUtils'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as fuzzysort from 'fuzzysort'
 import { MinimalContact } from 'react-native-contacts'
@@ -10,13 +9,13 @@ import {
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import Logger from 'src/utils/Logger'
 
-const TAG = 'utils/recipient'
+const TAG = 'recipients/recipient'
 
 export enum RecipientKind {
-  MobileNumber = 'mobileNumber',
-  Contact = 'contact',
+  MobileNumber = 'MobileNumber',
+  Contact = 'Contact',
   QrCode = 'QrCode',
-  Address = 'address',
+  Address = 'Address',
 }
 
 export type Recipient =
@@ -270,40 +269,28 @@ export const filterRecipientFactory = (recipients: Recipient[], shouldSort?: boo
   }
 }
 
-export const buildRecentRecipients = (
-  allRecipients: RecipientWithContact[],
-  recentKeys: string[],
-  defaultDisplayNameNumber: string,
-  defaultDisplayNameAddress: string
-): Recipient[] =>
-  recentKeys
-    .map((recentKey) => {
-      const recipientsWithContacts: Recipient[] = allRecipients.filter(
-        (recipient) =>
-          recipient.e164PhoneNumber === recentKey ||
-          (recipient.address && recipient.address === recentKey)
-      )
-      if (recipientsWithContacts.length > 0) {
-        return recipientsWithContacts
-      }
+// Returns true if two recipients are equivalent
+// This isn't trivial because two recipients of diff types (Qr code vs contact)
+// could potentially refer to the same recipient
+export function areRecipientsEquivalent(recipient1: Recipient, recipient2: Recipient) {
+  if (recipient1 === recipient2) {
+    return true
+  }
 
-      if (isValidAddress(recentKey)) {
-        const recipientWithAddress: RecipientWithAddress = {
-          kind: RecipientKind.Address,
-          displayName: defaultDisplayNameAddress,
-          displayId: recentKey.substring(0, 17) + '...',
-          address: recentKey,
-        }
+  if (
+    recipient1.e164PhoneNumber &&
+    recipient2.e164PhoneNumber &&
+    recipient1.e164PhoneNumber === recipient2.e164PhoneNumber
+  ) {
+    return true
+  }
 
-        return [recipientWithAddress]
-      }
+  if (recipient1.address && recipient2.address && recipient1.address === recipient2.address) {
+    return true
+  }
 
-      const recipientWithNumber: Recipient = {
-        kind: RecipientKind.MobileNumber,
-        displayName: defaultDisplayNameNumber,
-        displayId: recentKey,
-        e164PhoneNumber: recentKey,
-      }
-      return [recipientWithNumber]
-    })
-    .reduce((a, b) => a.concat(b), []) // poor mans flatMap
+  // Todo(Rossy) there's still the case where one recip's e164Number gets resolved to another's address
+  // but to detect that we'll need to wire in the mappings and check there too
+
+  return false
+}

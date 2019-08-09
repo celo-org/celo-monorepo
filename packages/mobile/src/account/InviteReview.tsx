@@ -21,11 +21,11 @@ import WhatsAppLogo from 'src/icons/WhatsAppLogo'
 import { isPhoneNumberVerified } from 'src/identity/verification'
 import { InviteBy, sendInvite } from 'src/invite/actions'
 import { navigateBack } from 'src/navigator/NavigationService'
+import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { TransactionTypes } from 'src/transactions/reducer'
-import { Recipient } from 'src/utils/recipient'
 
 interface State {
   contactIsVerified: boolean

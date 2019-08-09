@@ -11,10 +11,10 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import Logo from 'src/icons/Logo'
+import { RecipientWithContact } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import FeeIcon from 'src/send/FeeIcon'
 import { getCurrencyColor, getMoneyDisplayValue, roundedUpNumber } from 'src/utils/formatting'
-import { RecipientWithContact } from 'src/utils/recipient'
 
 interface LineItemProps {
   currencySymbol: string

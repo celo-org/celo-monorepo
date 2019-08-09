@@ -45,6 +45,10 @@ let registrations: Registrations = {}
 let lastBlockNotified: number = -1
 let pendingRequests: PendingRequests = {}
 
+export function _setTestRegistrations(testRegistrations: Registrations) {
+  registrations = testRegistrations
+}
+
 function paymentObjectToNotification(po: PaymentRequest): { [key: string]: string } {
   return {
     amount: po.amount,
@@ -120,7 +124,7 @@ export function getTranslatorForAddress(address: string) {
   }
   // If language is not supported falls back to env.DEFAULT_LOCALE
   console.info(`Users ${address} language is not set, valid or supported`)
-  return i18next.t
+  return i18next.t.bind(i18next)
 }
 
 export function getLastBlockNotified() {
