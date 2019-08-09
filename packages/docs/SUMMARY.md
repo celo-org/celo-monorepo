@@ -54,6 +54,7 @@
 ## Command Line Interface
 
 - [Introduction](command-line-interface/introduction.md)
+- [Config](command-line-interface/config.md)
 - [Account](command-line-interface/account.md)
 - [Exchange](command-line-interface/exchange.md)
 - [Bonded Deposits](command-line-interface/bonds.md)
