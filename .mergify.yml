@@ -11,9 +11,9 @@ pull_request_rules:
       # Only enable this when the pull request is being merged into master
       - "base=master"
       # List of all the tests that should pass.
+      - "status-success=ci/circleci: install-and-build"
+      - "status-success=ci/circleci: lint"
       - "status-success=ci/circleci: general-test"
-      - "status-success=ci/circleci: install_dependencies"
-      - "status-success=ci/circleci: lint-checks"
       - "status-success=ci/circleci: mobile-test"
       - "status-success=ci/circleci: protocol-test"
       - "status-success=ci/circleci: verification-pool-api"
