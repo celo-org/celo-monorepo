@@ -3,8 +3,9 @@ import {
   ConsensusType,
   generateGenesis,
   getPrivateKeysFor,
+  getValidators,
   privateKeyToPublicKey,
-  privateKeyToStrippedAddress,
+  Validator,
 } from '@celo/celotool/src/lib/generate_utils'
 import { getEnodeAddress } from '@celo/celotool/src/lib/geth'
 import { ensure0x } from '@celo/celotool/src/lib/utils'
@@ -172,7 +173,7 @@ async function setupTestDir(testDir: string) {
   await execCmd('mkdir', [testDir])
 }
 
-function writeGenesis(validators: string[], path: string) {
+function writeGenesis(validators: Validator[], path: string) {
   const blockTime = 0
   const epochLength = 10
   const genesis = generateGenesis(
@@ -392,7 +393,7 @@ export function getHooks(gethConfig: GethTestConfig) {
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
   const numValidators = validatorInstances.length
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
-  const validators = validatorPrivateKeys.map(privateKeyToStrippedAddress)
+  const validators = getValidators(mnemonic, numValidators)
   const validatorEnodes = validatorPrivateKeys.map((x: any, i: number) =>
     getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
   )
