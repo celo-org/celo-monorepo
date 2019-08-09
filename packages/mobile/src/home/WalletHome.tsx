@@ -31,11 +31,12 @@ import { Namespaces } from 'src/i18n'
 import { importContacts } from 'src/identity/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { NumberToRecipient } from 'src/recipients/recipient'
+import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import { initializeSentryUserContext } from 'src/sentry/Sentry'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { resetStandbyTransactions } from 'src/transactions/actions'
-import { NumberToRecipient } from 'src/utils/recipient'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const SCREEN_WIDTH = variables.width
@@ -66,7 +67,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   address: currentAccountSelector(state),
   activeNotificationCount: getActiveNotificationCount(state),
   callToActNotification: callToActNotificationSelector(state),
-  recipientCache: state.send.recipientCache,
+  recipientCache: recipientCacheSelector(state),
 })
 
 const Header = () => {
