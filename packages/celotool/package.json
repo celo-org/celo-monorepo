@@ -14,6 +14,7 @@
     "@types/bip39": "^2.4.2",
     "bip32": "^1.0.2",
     "bip39": "^2.5.0",
+    "bls12377js": "https://github.com/celo-org/bls12377js#2957917b2801354a9ebd6d6e515f0b3668186c8f",
     "buffer-reverse": "^1.0.1",
     "dotenv": "6.1.0",
     "ecurve": "^1.0.6",

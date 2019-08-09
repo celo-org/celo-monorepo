@@ -1,5 +1,5 @@
 /* tslint:disable:no-console */
-import { blsPrivateKeyToPublic } from '@celo/celotool/src/lib/bls_utils'
+import { blsPrivateKeyToProcessedPrivateKey } from '@celo/celotool/src/lib/bls_utils'
 import { NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
 import {
   add0x,
@@ -10,9 +10,10 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { BigNumber } from 'bignumber.js'
-import * as crypto from 'crypto'
+import * as bls12377js from 'bls12377js'
 import * as minimist from 'minimist'
 import { BondedDepositsInstance, ValidatorsInstance } from 'types'
+
 const Web3 = require('web3')
 
 const argv = minimist(process.argv, {
@@ -88,14 +89,16 @@ async function registerValidator(
   validatorPrivateKey: string,
   groupAddress: string
 ) {
-  const address = generateAccountAddressFromPrivateKey(validatorPrivateKey.slice(2))
-  const publicKey = generatePublicKeyFromPrivateKey(validatorPrivateKey.slice(2))
-  const blsPublicKey = blsPrivateKeyToPublic(validatorPrivateKey.slice(2))
-  // TODO(Kobi): Replace with a real PoP when we have a TypeScript version.
-  const blsPoP = crypto
-    .randomBytes(96)
-    .toString('hex')
-    .trim()
+  const validatorPrivateKeyHexStripped = validatorPrivateKey.slice(2)
+  const address = generateAccountAddressFromPrivateKey(validatorPrivateKeyHexStripped)
+  const publicKey = generatePublicKeyFromPrivateKey(validatorPrivateKeyHexStripped)
+  const blsValidatorPrivateKeyBytes = blsPrivateKeyToProcessedPrivateKey(
+    validatorPrivateKeyHexStripped
+  )
+  const blsPublicKey = bls12377js.BLS.privateToPublicBytes(blsValidatorPrivateKeyBytes).toString(
+    'hex'
+  )
+  const blsPoP = bls12377js.BLS.signPoP(blsValidatorPrivateKeyBytes).toString('hex')
   const publicKeysData = publicKey + blsPublicKey + blsPoP
 
   await makeMinimumDeposit(bondedDeposits, validatorPrivateKey)
