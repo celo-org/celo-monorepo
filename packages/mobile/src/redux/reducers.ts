@@ -13,6 +13,7 @@ import { homeReducer as home, State as HomeState } from 'src/home/reducers'
 import { reducer as identity, State as IdentityState } from 'src/identity/reducer'
 import { inviteReducer as invite, State as InviteState } from 'src/invite/reducer'
 import { reducer as networkInfo, State as NetworkInfoState } from 'src/networkInfo/reducer'
+import { recipientsReducer as recipients, State as RecipientsState } from 'src/recipients/reducer'
 import { sendReducer as send, State as SendState } from 'src/send/reducers'
 import { reducer as stableToken, State as StableTokenState } from 'src/stableToken/reducer'
 import { reducer as transactions, State as TransactionsState } from 'src/transactions/reducer'
@@ -35,6 +36,7 @@ export default combineReducers({
   geth,
   escrow,
   fees,
+  recipients,
 }) as () => RootState
 
 export interface RootState {
@@ -55,6 +57,7 @@ export interface RootState {
   geth: GethState
   escrow: EscrowState
   fees: FeesState
+  recipients: RecipientsState
 }
 
 export interface PersistedRootState {

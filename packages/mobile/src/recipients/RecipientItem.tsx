@@ -3,7 +3,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
-import { getRecipientThumbnail, Recipient, RecipientKind } from 'src/utils/recipient'
+import { getRecipientThumbnail, Recipient, RecipientKind } from 'src/recipients/recipient'
 
 interface Props {
   recipient: Recipient

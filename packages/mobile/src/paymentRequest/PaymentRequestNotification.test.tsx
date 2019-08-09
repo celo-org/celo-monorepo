@@ -2,7 +2,7 @@ import * as React from 'react'
 import 'react-native'
 import * as renderer from 'react-test-renderer'
 import PaymentRequestNotification from 'src/paymentRequest/PaymentRequestNotification'
-import { RecipientKind } from 'src/utils/recipient'
+import { RecipientKind } from 'src/recipients/recipient'
 
 const commonProps = {
   id: 1,
