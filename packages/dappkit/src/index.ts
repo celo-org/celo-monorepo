@@ -1,4 +1,4 @@
-import { CeloTokenType, GoldToken, StableToken } from '@celo/contractkit'
+import { CeloTokenType, GoldToken, StableToken } from '@celo/walletkit'
 import { AccountAuthRequest, serializeDappKitRequestDeeplink, SignTxRequest } from '@celo/utils'
 import { Linking } from 'expo'
 import Web3 from 'web3'

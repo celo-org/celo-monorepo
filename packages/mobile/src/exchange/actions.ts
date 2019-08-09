@@ -3,10 +3,10 @@ import {
   getExchangeContract,
   getGoldTokenContract,
   getStableTokenContract,
-} from '@celo/contractkit'
-import { Exchange as ExchangeType } from '@celo/contractkit/types/Exchange'
-import { GoldToken as GoldTokenType } from '@celo/contractkit/types/GoldToken'
-import { StableToken as StableTokenType } from '@celo/contractkit/types/StableToken'
+} from '@celo/walletkit'
+import { Exchange as ExchangeType } from '@celo/walletkit/types/Exchange'
+import { GoldToken as GoldTokenType } from '@celo/walletkit/types/GoldToken'
+import { StableToken as StableTokenType } from '@celo/walletkit/types/StableToken'
 import BigNumber from 'bignumber.js'
 import { call, put, select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'

@@ -30,8 +30,8 @@ const KEY = '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724'
 const NAME = 'Celonius'
 
 const balance = jest.fn(() => 10)
-jest.mock('@celo/contractkit', () => ({
-  ...jest.requireActual('@celo/contractkit'),
+jest.mock('@celo/walletkit', () => ({
+  ...jest.requireActual('@celo/walletkit'),
   getAttestationsContract: async () =>
     createMockContract({ getAttestationRequestFee: Math.pow(10, 18) }),
   getStableTokenContract: jest.fn(async () =>

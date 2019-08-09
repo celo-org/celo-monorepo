@@ -1,4 +1,4 @@
-import { getErc20Balance, getGoldTokenContract, getStableTokenContract } from '@celo/contractkit'
+import { getErc20Balance, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { call, put, take, takeEvery } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'

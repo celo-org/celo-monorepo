@@ -1,4 +1,4 @@
-import { getStableTokenContract } from '@celo/contractkit'
+import { getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import React, { FunctionComponent, useEffect } from 'react'
 import { useAsync, UseAsyncReturn } from 'react-async-hook'

@@ -1,5 +1,5 @@
-import { ContractUtils } from '@celo/contractkit'
 import { CURRENCY_ENUM } from '@celo/utils'
+import { ContractUtils } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { call, put, select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'

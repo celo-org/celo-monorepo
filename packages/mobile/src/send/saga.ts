@@ -1,5 +1,5 @@
-import { getGoldTokenContract, getStableTokenContract } from '@celo/contractkit'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
+import { getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
