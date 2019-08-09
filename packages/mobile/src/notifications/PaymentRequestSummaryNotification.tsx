@@ -21,9 +21,9 @@ import { sendDollar } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import PaymentRequestLineItem from 'src/paymentRequest/PaymentRequestLineItem'
+import { NumberToRecipient, phoneNumberToRecipient } from 'src/recipients/recipient'
+import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
-import { recipientCacheSelector } from 'src/send/reducers'
-import { NumberToRecipient, phoneNumberToRecipient } from 'src/utils/recipient'
 
 interface OwnProps {
   requests: PaymentRequest[]
