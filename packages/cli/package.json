@@ -21,18 +21,15 @@
     "node": ">=8.0.0"
   },
   "scripts": {
-    "setup:environment": "yarn --cwd=packages/contractkit build-sdk",
-    "build": "rm -rf lib && yarn run prepack",
+    "build:sdk": "yarn --cwd=packages/contractkit build-sdk",
+    "build": "rm -rf lib && tsc -b",
+    "docs": "yarn oclif-dev readme --multi --dir=../docs/command-line-interface && yarn prettier ../docs/command-line-interface/*.md --write",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "lint-checks": "yarn run lint",
-    "postpack": "rm -f oclif.manifest.json",
-    "posttest": "tslint -p . -t stylish",
-    "prepack": "tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "export TZ=UTC && jest --ci --silent",
-    "version": "oclif-dev readme && git add README.md"
+    "test": "export TZ=UTC && jest --ci --silent"
   },
   "dependencies": {
-    "@celo/contractkit": "^0.0.1",
+    "@celo/contractkit": "^0.0.4",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
@@ -53,7 +50,7 @@
     "web3": "1.0.0-beta.37"
   },
   "devDependencies": {
-    "@oclif/dev-cli": "^1",
+    "@celo/dev-cli": "^2.0.3",
     "@types/bip32": "^1.0.1",
     "@types/bip39": "^2.4.2",
     "@types/elliptic": "^6.4.9",

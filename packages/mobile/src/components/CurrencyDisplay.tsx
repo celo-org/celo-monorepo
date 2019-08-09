@@ -10,21 +10,13 @@ interface Props {
   amount: string | null | number
   size: number
   type: CURRENCY_ENUM
-  balanceOutOfSync: boolean
 }
 
 const symbolRatio = 0.6
 
 export default class CurrencyDisplay extends React.PureComponent<Props> {
   color() {
-    const { balanceOutOfSync } = this.props
-    if (balanceOutOfSync) {
-      return this.props.type === CURRENCY_ENUM.DOLLAR
-        ? colors.celoGreenInactiveExtra
-        : colors.celoGoldInactive
-    } else {
-      return this.props.type === CURRENCY_ENUM.DOLLAR ? colors.celoGreen : colors.celoGold
-    }
+    return this.props.type === CURRENCY_ENUM.DOLLAR ? colors.celoGreen : colors.celoGold
   }
 
   symbolStyle(fontSize: number) {

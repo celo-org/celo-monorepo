@@ -6,7 +6,11 @@ import { EscrowedPayment } from 'src/escrow/actions'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { AttestationCode } from 'src/identity/verification'
-import { RecipientKind, RecipientWithContact, RecipientWithMobileNumber } from 'src/utils/recipient'
+import {
+  RecipientKind,
+  RecipientWithContact,
+  RecipientWithMobileNumber,
+} from 'src/recipients/recipient'
 
 export const mockName = 'John Doe'
 export const mockAccount = '0x0000000000000000000000000000000000007E57'
@@ -111,7 +115,8 @@ export const mockContactList = [mockContactWithPhone2, mockContactWithPhone]
 
 export const mockEscrowedPayment: EscrowedPayment = {
   senderAddress: mockAccount2,
-  recipient: mockContactWithPhone,
+  recipientPhone: mockE164Number,
+  recipientContact: mockRecipient,
   paymentID: mockAccount,
   currency: SHORT_CURRENCIES.DOLLAR,
   amount: new BigNumber(10),

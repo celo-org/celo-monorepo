@@ -88,8 +88,9 @@ const vNeg1Schema = {
     redeemedInviteCode: '',
   },
   escrow: {
+    isReclaiming: false,
     sentEscrowedPayments: [],
-    currentPaymentId: '',
+    suggestedFee: null,
   },
 }
 
@@ -104,6 +105,15 @@ const v0Schema = {
   invite: {
     ...vNeg1Schema.invite,
     redeemComplete: false,
+  },
+  send: {
+    isSending: false,
+    recentPhoneNumbers: undefined,
+    recipientCache: undefined,
+    recentRecipients: [],
+  },
+  recipients: {
+    recipientCache: {},
   },
 }
 
