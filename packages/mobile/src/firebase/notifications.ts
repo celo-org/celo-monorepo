@@ -7,7 +7,7 @@ import {
   TransferNotificationData,
 } from 'src/account'
 import { showMessage } from 'src/alert/actions'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { resolveCurrency } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import { lookupAddressFromPhoneNumber } from 'src/identity/verification'
@@ -86,7 +86,7 @@ export const handleNotification = (
   notificationState: NotificationReceiveState
 ) => async (dispatch: DispatchType, getState: GetStateType) => {
   if (notificationState === NotificationReceiveState.APP_ALREADY_OPEN) {
-    dispatch(showMessage(notification.title, ERROR_BANNER_DURATION))
+    dispatch(showMessage(notification.title, ALERT_BANNER_DURATION))
   }
   switch (notification.data.type) {
     case NotificationTypes.PAYMENT_REQUESTED:
