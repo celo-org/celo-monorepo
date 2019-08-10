@@ -12,10 +12,9 @@
     "test": "jest --ci --silent --coverage --runInBand",
     "test:verbose": "jest --ci --verbose --runInBand",
     "lint": "tslint -c tslint.json --project tsconfig.json",
-    "lint-checks": "yarn run lint && tsc --project tsconfig.json --noEmit",
     "start": "node ./dist/index.js",
     "start:dev": "tsc-watch --onSuccess \"node ./dist/index.js\" ",
-    "build": "tsc",
+    "build": "tsc -p .",
     "gcp-build": "npm run build",
     "deploy": "gcloud app deploy"
   },
