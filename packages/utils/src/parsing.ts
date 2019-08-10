@@ -8,7 +8,7 @@ export const stringToBoolean = (inputString: string): boolean => {
   } else if (lowercasedInput === 'false') {
     return false
   }
-  throw 'Parsing error'
+  throw new Error('Parsing error')
 }
 
 export const parseInputAmount = (inputString: string): BigNumber => {
