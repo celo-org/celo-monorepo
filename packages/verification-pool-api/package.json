@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "main": "lib/src/index.js",
   "scripts": {
-    "build": "./build.sh -e",
+    "build:for-env": "./build.sh -e",
     "get-config": "firebase functions:config:get",
     "set-config": "ts-node ./deployment/set-config.ts --celo-env",
     "set-env": "ts-node ./deployment/set-env.ts --celo-env",
@@ -16,9 +16,8 @@
     "shell": "firebase functions:shell",
     "start": "yarn run shell",
     "logs": "firebase functions:log",
-    "lint-checks": "yarn run lint && yarn run compile-typescript",
     "lint": "tslint -c tslint.json --project tsconfig.json",
-    "compile-typescript": "tsc",
+    "build": "tsc -p .",
     "test": "jest --ci --coverage --runInBand --detectOpenHandles",
     "test:verbose": "jest --ci --verbose --runInBand --detectOpenHandles"
   },

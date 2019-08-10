@@ -23,8 +23,7 @@ if ! nc -z 127.0.0.1 8545 ; then
   exit 1
 fi
 
-yarn run contract-types && \
-yarn run compile-typescript && \
+yarn run build && \
 yarn run truffle-compile -n $NETWORK && \
 yarn run truffle exec ./scripts/truffle/upgrade.js \
   --network $NETWORK --build_directory $PWD/build/$NETWORK \
