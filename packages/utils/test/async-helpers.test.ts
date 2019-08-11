@@ -9,7 +9,7 @@ describe('utils->async-helpers', () => {
 
   it('retries n times', async () => {
     const mockFunction = jest.fn(() => {
-      throw 'error'
+      throw new Error('error')
     })
 
     try {

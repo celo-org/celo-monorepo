@@ -13,7 +13,7 @@ const ec = new EC('secp256k1')
 const ECIES_SESSION_KEY_LEN = 129
 const TAG = 'CommentEncryption'
 
-export interface encryptionStatus {
+export interface EncryptionStatus {
   encrypted: boolean
   comment: string
 }
@@ -72,7 +72,7 @@ export function encryptComment(
   comment: string,
   pubKeyRecipient: Buffer,
   pubKeySelf: Buffer
-): encryptionStatus {
+): EncryptionStatus {
   try {
     // Uncompress public keys & strip out the leading 0x04
     const pubRecip = decompressPublicKey(pubKeyRecipient)
@@ -99,7 +99,7 @@ export function encryptComment(
  */
 
 export const decryptComment = memoize(
-  (comment: string, key: Buffer, sender: boolean): encryptionStatus => {
+  (comment: string, key: Buffer, sender: boolean): EncryptionStatus => {
     try {
       const buf = Buffer.from(comment, 'base64')
       const data = decryptData(buf, key, sender).toString('ucs2')
