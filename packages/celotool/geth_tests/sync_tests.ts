@@ -15,10 +15,38 @@ describe('sync tests', function(this: any) {
   const gethConfig = {
     migrate: true,
     instances: [
-      { name: 'validator0', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
-      { name: 'validator1', validating: true, syncmode: 'full', port: 30305, rpcport: 8547 },
-      { name: 'validator2', validating: true, syncmode: 'full', port: 30307, rpcport: 8549 },
-      { name: 'validator3', validating: true, syncmode: 'full', port: 30309, rpcport: 8551 },
+      {
+        name: 'validator0',
+        validating: true,
+        syncmode: 'full',
+        port: 30303,
+        proxyport: 30503,
+        rpcport: 8545,
+      },
+      {
+        name: 'validator1',
+        validating: true,
+        syncmode: 'full',
+        port: 30305,
+        proxyport: 30505,
+        rpcport: 8547,
+      },
+      {
+        name: 'validator2',
+        validating: true,
+        syncmode: 'full',
+        port: 30307,
+        proxyport: 30507,
+        rpcport: 8549,
+      },
+      {
+        name: 'validator3',
+        validating: true,
+        syncmode: 'full',
+        port: 30309,
+        proxyport: 30509,
+        rpcport: 8551,
+      },
     ],
   }
   const hooks = getHooks(gethConfig)
@@ -36,6 +64,7 @@ describe('sync tests', function(this: any) {
       syncmode: 'full',
       lightserv: true,
       port: 30311,
+      proxyport: 30511,
       rpcport: 8553,
       peers: [await getEnode(8545)],
     }
@@ -55,6 +84,7 @@ describe('sync tests', function(this: any) {
           validating: false,
           syncmode,
           port: 30313,
+          proxyport: 30513,
           rpcport: 8555,
           lightserv: syncmode !== 'light' && syncmode !== 'ultralight',
           peers: [await getEnode(8553)],

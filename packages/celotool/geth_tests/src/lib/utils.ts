@@ -20,6 +20,7 @@ export interface GethInstanceConfig {
   validating: boolean
   syncmode: string
   port: number
+  proxyport?: number
   rpcport?: number
   wsport?: number
   lightserv?: boolean
@@ -251,7 +252,7 @@ export async function getEnode(port: number, ws: boolean = false) {
 
 export async function startGeth(gethBinaryPath: string, instance: GethInstanceConfig) {
   const datadir = getDatadir(instance)
-  const { syncmode, port, rpcport, wsport, validating } = instance
+  const { syncmode, port, proxyport, rpcport, wsport, validating } = instance
   const privateKey = instance.privateKey || ''
   const lightserv = instance.lightserv || false
   const etherbase = instance.etherbase || ''
@@ -274,6 +275,10 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     '--nat',
     'extip:127.0.0.1',
   ]
+
+  if (proxyport) {
+    gethArgs.push('--proxyport', proxyport.toString())
+  }
 
   if (rpcport) {
     gethArgs.push(
