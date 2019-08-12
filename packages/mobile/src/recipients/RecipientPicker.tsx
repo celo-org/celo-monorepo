@@ -64,6 +64,7 @@ interface Section {
 }
 
 interface Props {
+  testID?: string
   showQRCode: boolean
   searchQuery: string
   sections: Section[]

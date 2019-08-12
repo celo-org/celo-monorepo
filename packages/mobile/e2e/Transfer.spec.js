@@ -79,12 +79,12 @@ describe('Transfer Works', () => {
     await element(by.id('importContactsEnable')).tap()
   })
 
-  it('NUX->Verify', async () => {
+  it('NUX->VerifyEducation', async () => {
     // import contacts
 
     await waitFor(element(by.id('VerifyEducationHeader')))
       .toBeVisible()
-      .withTimeout(100000)
+      .withTimeout(10000000)
 
     await waitFor(element(by.id('VerifyContinueButton')))
       .toBeVisible()
@@ -95,13 +95,24 @@ describe('Transfer Works', () => {
     await waitFor(element(by.id('VerifyLogo')))
       .toBeVisible()
       .withTimeout(1000)
+  })
 
+  it('NUX->Verify', async () => {
     // skipping for now
     element(by.id('ButtonDevScreen')).tap()
   })
 
-  // it('NUX->Home', async () => {
-  //   await expect(element(by.id('SendNavigator'))).toBeVisible()
-  //   await element(by.id('SendNavigator')).tap()
-  // })
+  it('Wallet Home', async () => {
+    await waitFor(element(by.id('AccountOverviewInHome/dollarBalance')))
+      .toBeVisible()
+      .withTimeout(1000)
+
+    await waitFor(element(by.id('AccountOverviewInHome/dollarBalance')))
+      .toBeVisible()
+      .withTimeout(1000)
+
+    await waitFor(element(by.id('RecipientPicker')))
+      .toBeVisible()
+      .withTimeout(1000)
+  })
 })
