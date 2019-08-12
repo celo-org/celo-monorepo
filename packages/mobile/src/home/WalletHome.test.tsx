@@ -3,6 +3,7 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { WalletHome } from 'src/home/WalletHome'
 import { createMockStore, getMockI18nProps } from 'test/utils'
+
 const TWO_DAYS_MS = 2 * 24 * 60 * 1000
 
 const storeData = {
@@ -21,7 +22,6 @@ jest.mock('src/home/TransactionsList')
 
 describe('Testnet banner', () => {
   it('Shows testnet banner for 5 seconds', async () => {
-    // const store = createMockStore(storeData)
     const store = createMockStore({
       ...storeData,
       account: {
