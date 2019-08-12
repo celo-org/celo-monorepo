@@ -17,7 +17,8 @@ import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identi
 import PaymentRequestBalance from 'src/paymentRequest/PaymentRequestBalance'
 import PaymentRequestListEmpty from 'src/paymentRequest/PaymentRequestListEmpty'
 import PaymentRequestNotification from 'src/paymentRequest/PaymentRequestNotification'
-import { NumberToRecipient, phoneNumberToRecipient } from 'src/recipients/recipient'
+import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
+import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
@@ -53,37 +54,17 @@ export class PaymentRequestListScreen extends React.Component<Props> {
     headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
   })
 
-  getRequesterRecipient = (requesterE164Number: string) => {
-    return phoneNumberToRecipient(
-      requesterE164Number,
-      this.props.e164PhoneNumberAddressMapping[requesterE164Number],
-      this.props.recipientCache
-    )
-  }
-
-  componentDidMount = () => {
-    const { paymentRequests, e164PhoneNumberAddressMapping } = this.props
-    const missingAddresses = Array.from(
-      new Set(
-        paymentRequests
-          .map((paymentRequest) => paymentRequest.requesterE164Number)
-          .filter((e164Number) => !e164PhoneNumberAddressMapping[e164Number])
-      )
-    )
-    if (missingAddresses && missingAddresses.length) {
-      // fetch missing addresses and update the mapping
-      this.props.fetchPhoneAddresses(Array.from(missingAddresses))
-    }
-  }
-
   renderRequest = (request: PaymentRequest, key: number, allRequests: PaymentRequest[]) => {
+    const { recipientCache } = this.props
+    const requester = getRecipientFromPaymentRequest(request, recipientCache)
+
     return (
       <View key={key}>
         <PaymentRequestNotification
           id={request.uid || ''}
           amount={request.amount}
           updatePaymentRequestStatus={this.props.updatePaymentRequestStatus}
-          requester={this.getRequesterRecipient(request.requesterE164Number)}
+          requester={requester}
           comment={request.comment}
         />
         {key < allRequests.length - 1 && <View style={styles.separator} />}

@@ -14,7 +14,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { writePaymentRequest } from 'src/firebase/firebase'
 import { currencyToShortMap } from 'src/geth/consts'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
@@ -111,12 +111,12 @@ class RequestConfirmation extends React.Component<Props> {
         this.props.writePaymentRequest(paymentInfo)
       } catch (error) {
         Logger.error(TAG, 'Payment request failed, show error message', error)
-        this.props.showError(ErrorMessages.PAYMENT_REQUEST_FAILED, ERROR_BANNER_DURATION)
+        this.props.showError(ErrorMessages.PAYMENT_REQUEST_FAILED, ALERT_BANNER_DURATION)
         return
       }
     } else {
       // TODO: handle unverified recepients, maybe send them a sms to download the app?
-      this.props.showError(ErrorMessages.CAN_NOT_REQUEST_FROM_UNVERIFIED, ERROR_BANNER_DURATION)
+      this.props.showError(ErrorMessages.CAN_NOT_REQUEST_FROM_UNVERIFIED, ALERT_BANNER_DURATION)
       Logger.info(
         'RequestConfirmation/onConfirm',
         'Currently requesting from unverified users is not supported'

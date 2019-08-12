@@ -14,7 +14,7 @@ import { call, delay, put, select, spawn, takeLeading } from 'redux-saga/effects
 import { setName } from 'src/account'
 import { showError, showMessage } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { CURRENCY_ENUM, INVITE_REDEMPTION_GAS } from 'src/geth/consts'
 import i18n from 'src/i18n'
@@ -146,7 +146,7 @@ export function* sendInvite(
         yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress))
       } catch (e) {
         Logger.error(TAG, 'Error sending payment to unverified user: ', e)
-        yield put(showError(ErrorMessages.TRANSACTION_FAILED, ERROR_BANNER_DURATION))
+        yield put(showError(ErrorMessages.TRANSACTION_FAILED, ALERT_BANNER_DURATION))
       }
     }
 
@@ -178,13 +178,13 @@ export function* sendInviteSaga(action: SendInviteAction) {
     yield put(
       showMessage(
         i18n.t('inviteSent', { ns: 'inviteFlow11' }) + ' ' + e164Number,
-        ERROR_BANNER_DURATION
+        ALERT_BANNER_DURATION
       )
     )
     yield call(navigate, Screens.WalletHome)
     yield put(sendInviteSuccess())
   } catch (e) {
-    yield put(showError(ErrorMessages.INVITE_FAILED, ERROR_BANNER_DURATION))
+    yield put(showError(ErrorMessages.INVITE_FAILED, ALERT_BANNER_DURATION))
     yield put(sendInviteFailure(ErrorMessages.INVITE_FAILED))
   }
 }
@@ -278,7 +278,7 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
     yield redeemSuccess(name, newAccount)
   } catch (e) {
     Logger.error(TAG, 'Redeem invite error: ', e)
-    yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ERROR_BANNER_DURATION))
+    yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ALERT_BANNER_DURATION))
   }
 }
 
