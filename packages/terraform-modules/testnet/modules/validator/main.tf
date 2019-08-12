@@ -36,6 +36,8 @@ resource "google_compute_instance" "validator" {
       celotool_docker_image_tag: var.celotool_docker_image_tag,
       ethstats_host: var.ethstats_host,
       ethstats_websocket_secret: var.ethstats_websocket_secret,
+      gcloud_secrets_base_path: var.gcloud_secrets_base_path,
+      gcloud_secrets_bucket: var.gcloud_secrets_bucket,
       genesis_content_base64: var.genesis_content_base64,
       geth_account_secret: var.geth_account_secret,
       geth_node_docker_image_repository: var.geth_node_docker_image_repository,

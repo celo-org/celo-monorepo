@@ -33,6 +33,16 @@ variable ethstats_websocket_secret {
   description = "Ethstats websocket secret to allow validators to report activity"
 }
 
+variable gcloud_secrets_base_path {
+  type = string
+  description = "Base path in the secrets bucket of a Google Cloud Storage file containing validator secrets"
+}
+
+variable gcloud_secrets_bucket {
+  type = string
+  description = "Name of the Google Cloud Storage bucket where secrets are kept"
+}
+
 variable genesis_content_base64 {
   type = string
   description = "Content of the genesis file encoded in base64"

@@ -34,10 +34,8 @@ const terraformEnvVars: { [varName: string]: string } = {
   geth_bootnode_docker_image_tag: envVar.GETH_BOOTNODE_DOCKER_IMAGE_TAG,
   geth_node_docker_image_repository: envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY,
   geth_node_docker_image_tag: envVar.GETH_NODE_DOCKER_IMAGE_TAG,
-  mnemonic: envVar.MNEMONIC,
   network_id: envVar.NETWORK_ID,
   validator_count: envVar.VALIDATORS,
-  validator_geth_account_secret: envVar.GETH_ACCOUNT_SECRET,
   verification_pool_url: envVar.VERIFICATION_POOL_URL,
 }
 
@@ -45,7 +43,7 @@ export async function deploy(celoEnv: string) {
   const envType = fetchEnv(envVar.ENV_TYPE)
   console.info(`Deploying ${celoEnv} in environment ${envType}`)
 
-  const vars: TerraformVars = getTerraformVars()
+  const vars: TerraformVars = getTerraformVars(celoEnv)
 
   console.info('Initializing...')
   await initTerraformModule(terraformModule, vars)
@@ -70,7 +68,7 @@ export async function destroy(celoEnv: string) {
   const envType = fetchEnv(envVar.ENV_TYPE)
   console.info(`Destroying ${celoEnv} in environment ${envType}`)
 
-  const vars: TerraformVars = getTerraformVars()
+  const vars: TerraformVars = getTerraformVars(celoEnv)
 
   console.info('Initializing...')
   await initTerraformModule(terraformModule, vars)
@@ -83,10 +81,12 @@ export async function destroy(celoEnv: string) {
   await destroyTerraformModule(terraformModule, vars)
 }
 
-function getTerraformVars() {
+function getTerraformVars(celoEnv: string) {
   const genesisBuffer = new Buffer(generateGenesisFromEnv())
   return {
     ...getTerraformEnvVarValues(),
+    gcloud_secrets_bucket: secretsBucketName,
+    gcloud_secrets_base_path: secretsBasePath(celoEnv),
     genesis_content_base64: genesisBuffer.toString('base64'),
   }
 }
@@ -107,7 +107,7 @@ export async function generateAndUploadSecrets(celoEnv: string) {
     const secrets = generateSecretsEnvVars(AccountType.VALIDATOR, i)
     const localTmpFilePath = `/tmp/${celoEnv}-validator-${i}-secrets`
     writeFileSync(localTmpFilePath, secrets)
-    const cloudStorageFileName = `vm/${celoEnv}/.env.validator-${i}`
+    const cloudStorageFileName = `${secretsBasePath(celoEnv)}/.env.validator-${i}`
     await uploadFileToGoogleStorage(
       localTmpFilePath,
       secretsBucketName,
@@ -136,6 +136,10 @@ export function generateSecretsEnvVars(accountType: AccountType, index: number) 
 // Formats an object into a multi-line string with each line as KEY=VALUE
 function formatEnvVars(envVars: { [key: string]: string | number | boolean }) {
   return Object.keys(envVars)
-    .map((key) => `${key}=${envVars[key]}`)
+    .map((key) => `${key}='${envVars[key]}'`)
     .join('\n')
+}
+
+function secretsBasePath(celoEnv: string) {
+  return `vm/${celoEnv}`
 }

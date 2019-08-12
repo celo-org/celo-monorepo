@@ -28,7 +28,7 @@ docker pull $CELOTOOL_DOCKER_IMAGE
 echo "Generating node key..."
 NODE_KEY=`docker run --rm $CELOTOOL_DOCKER_IMAGE \
   celotooljs.sh generate bip32 --mnemonic "${mnemonic}" \
-  --accountType load_testing --index 0`
+  --accountType bootnode --index 0`
 
 echo "Pulling bootnode..."
 docker pull $GETH_BOOTNODE_DOCKER_IMAGE
