@@ -136,21 +136,23 @@ export class RecipientPicker extends React.Component<RecipientProps> {
 
   renderNoContentEmptyView = () => (
     <View style={style.emptyView}>
-      <View style={style.emptyViewBody}>
-        {this.props.searchQuery !== '' ? (
-          <>
+      {this.props.searchQuery !== '' ? (
+        <>
+          <View style={style.emptyViewBody}>
             <Text style={fontStyles.body}>{this.props.t('noResultsFor')}</Text>
             <Text style={[fontStyles.body, style.emptyViewBodyDark]}>
               {` "${this.props.searchQuery}"`}
             </Text>
-          </>
-        ) : (
+          </View>
+          <Text style={[fontStyles.subSmall, style.footer]}>
+            {this.props.t('searchForSomeone')}
+          </Text>
+        </>
+      ) : (
+        <View style={style.emptyViewBody}>
           <Text style={fontStyles.body}>{this.props.t('noContacts')}</Text>
-        )}
-      </View>
-      <Text style={[fontStyles.bodySmall, style.emptyViewBodySmall]}>
-        {this.props.t('searchForSomeone')}
-      </Text>
+        </View>
+      )}
     </View>
   )
 
