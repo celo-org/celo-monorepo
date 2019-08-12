@@ -1,6 +1,7 @@
 import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
-import { uploadGenesisBlockToGoogleStorage } from 'src/lib/testnet-utils'
-import { confirmAction, envVar, fetchEnv } from 'src/lib/utils'
+import { uploadGenesisBlockToGoogleStorage } from '@celo/celotool/src/lib/testnet-utils'
+import { confirmAction, envVar, fetchEnv } from '@celo/celotool/src/lib/utils'
+import { generateAndUploadSecrets } from '@celo/celotool/src/lib/vm-testnet-utils'
 
 import {
   applyTerraformModule,
@@ -33,6 +34,9 @@ export const handler = async (argv: VMTestnetInitialArgv) => {
       argv.celoEnv
     } in environment ${envType}?`
   )
+
+  console.info('Generating and uploading secrets env files to Google Storage...')
+  await generateAndUploadSecrets(argv.celoEnv)
 
   console.info('Applying...')
   await applyTerraformModule(terraformModule)
