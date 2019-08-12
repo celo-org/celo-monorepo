@@ -250,9 +250,6 @@ const styles = StyleSheet.create({
   logo: {
     marginTop: 0,
   },
-  headerRight: {
-    paddingLeft: 15,
-  },
   scrollContainer: {
     paddingHorizontal: 10,
     paddingBottom: 10,
@@ -275,15 +272,6 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     flexDirection: 'row',
     flexWrap: 'wrap',
-  },
-  importWallet: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    marginVertical: 17,
-  },
-  description: {
-    padding: 30,
   },
 })
 
