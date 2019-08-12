@@ -13,7 +13,7 @@
   "chooseCountryCode": "Código de país",
   "joinText": {
     "0":
-      "Bienvenido a Celo Wallet, una billetera digital que le permite enviar, recibir y guardar valor fácilmente.",
+      "Bienvenido a Celo Wallet, un monedero digital que le permite enviar, recibir y guardar valor fácilmente.",
     "1":
       "Al unirte a esta red, nos das permiso para recopilar información anónima sobre cómo utilizas la aplicación. Además, si verificas tu número de teléfono, se almacenará una copia ofuscada en la Red de Celo. Más información en",
     "2": "celo.org/terms"
@@ -44,7 +44,7 @@
     "askForInvite": {
       "0": "¿No tiene un código? ",
       "1":
-        "Solicite una invitación a alguien con Celo Wallet o regístrese para obtener una cuenta de testnet en ",
+        "Solicite una invitación a alguien con un Monedero Celo o regístrese para obtener una cuenta de testnet en",
       "2": "celo.org/build/wallet"
     }
   },
@@ -53,16 +53,16 @@
   "InvitationCode": "Código de invitación",
   "optIn": "Inscribirse",
   "submitting": "Enviando ...",
-  "haveWallet": "¿Ya tiene una billetera de Celo? ",
+  "haveWallet": "¿Ya tiene un Monedero Celo? ",
   "importIt": "Importar",
   "cancel": "Cancelar",
   "important": "Importante",
   "createPin": {
     "title": "Crear un código PIN de 6 dígitos",
-    "intro": "Cree un PIN para proteger su billetera de Celo.",
+    "intro": "Cree un PIN para proteger su Monedero Celo.",
     "why": "En ciertos casos, necesitará este PIN para enviar Celo Dólares a sus amigos.",
     "warn":
-      "escriba su código PIN de 6 dígitos en un papel y guárdelo en algún sitio seguro. Se lo solicitaremos más tarde para acceder a su billetera.",
+      "escriba su código PIN de 6 dígitos en un papel y guárdelo en algún sitio seguro. Se lo solicitaremos más tarde para acceder a su monedero.",
     "yourPin": "Su PIN"
   },
   "enableSecurity": "Habilitar seguridad",
@@ -76,10 +76,12 @@
   },
   "systemAuth": {
     "title": "Configura la seguridad Celo",
+    "secure":
+      "Agregar un PIN a tu teléfono ayuda a que tus fondos en Celo se mantengan seguros y protegidos.",
     "intro":
       "Necesitaremos que ingreses el código de bloqueo de pantalla de tu dispositivo o tu huella, si el mismo lo soporta.",
     "why":
-      "Necesitamos este nivel de protección adicional para asegurar que el contenido de tu billetera se encuentra a salvo."
+      "Necesitamos este nivel de protección adicional para asegurar que el contenido de tu monedero se encuentra a salvo."
   },
   "goToSystemSecuritySettingsActionLabel": "Vaya a seguridad",
   "enableSystemScreenLockFailedMessage": "Error al intentar habilitar el bloqueo de pantalla",

@@ -135,7 +135,7 @@ function buildSdk() {
     writeNetworkNameToFile(network, contractsPath)
 
     console.debug('Recompiling typescript')
-    execCmd(`yarn run --cwd="${__dirname}/.." compile-typescript`)
+    execCmd(`yarn run --cwd="${__dirname}/.." build:ts`)
     console.debug('build-sdk done')
   } catch (error) {
     console.error('Error building SDK', error)

@@ -3,33 +3,33 @@
 
 steps:
   
-- name: gcr.io/kaniko-project/executor:latest
+- id: "docker:celotool"
+  name: gcr.io/kaniko-project/executor:latest
   args: [
-    "--dockerfile=dockerfiles/monorepo/Dockerfile.celotool",
+    "--dockerfile=dockerfiles/celotool/Dockerfile",
     "--cache=true",
     "--destination=gcr.io/$PROJECT_ID/celo-monorepo:celotool-$COMMIT_SHA"
   ]
-  id: Build celotool docker image
   waitFor: ['-']
 
-- name: gcr.io/kaniko-project/executor:latest
+- id: "docker:transaction-metrics-exporter"
+  name: gcr.io/kaniko-project/executor:latest
   args: [
-    "--dockerfile=dockerfiles/monorepo/Dockerfile.transaction-metrics-exporter",
+    "--dockerfile=dockerfiles/transaction-metrics-exporter/Dockerfile",
     "--cache=true",
     "--destination=gcr.io/$PROJECT_ID/celo-monorepo:transaction-metrics-exporter-$COMMIT_SHA"
   ]
-  id: Build transaction metrics exporter docker image
   waitFor: ['-']
 
-- name: gcr.io/kaniko-project/executor:latest
+- id: "docker:cli"
+  name: gcr.io/kaniko-project/executor:latest
   args: [
-    "--dockerfile=dockerfiles/cli/Dockerfile.cli",
+    "--dockerfile=dockerfiles/cli/Dockerfile",
     "--cache=true",
     "--destination=gcr.io/$PROJECT_ID/celocli:$COMMIT_SHA",
     "--build-arg",
     "celo_env=alfajores"
   ]
-  id: Build CLI docker image
   waitFor: ['-']
 
 timeout: 3000s

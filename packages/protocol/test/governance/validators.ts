@@ -28,7 +28,7 @@ const parseValidatorParams = (validatorParams: any) => {
     identifier: validatorParams[0],
     name: validatorParams[1],
     url: validatorParams[2],
-    publicKey: validatorParams[3],
+    publicKeysData: validatorParams[3],
     affiliation: validatorParams[4],
   }
 }
@@ -48,7 +48,14 @@ contract('Validators', (accounts: string[]) => {
   let mockBondedDeposits: MockBondedDepositsInstance
   // A random 64 byte hex string.
   const publicKey =
-    '0xea0733ad275e2b9e05541341a97ee82678c58932464fad26164657a111a7e37a9fa0300266fb90e2135a1f1512350cb4e985488a88809b14e3cbe415e76e82b2'
+    'ea0733ad275e2b9e05541341a97ee82678c58932464fad26164657a111a7e37a9fa0300266fb90e2135a1f1512350cb4e985488a88809b14e3cbe415e76e82b2'
+  const blsPublicKey =
+    '4d23d8cd06f30b1fa7cf368e2f5399ab04bb6846c682f493a98a607d3dfb7e53a712bb79b475c57b0ac2785460f91301'
+  const blsPoP =
+    '9d3e1d8f49f6b0d8e9a03d80ca07b1d24cf1cc0557bdcc04f5e17a46e35d02d0d411d956dbd5d2d2464eebd7b74ae30005d223780d785d2abc5644fac7ac29fb0e302bdc80c81a5d45018b68b1045068a4b3a4861c93037685fd0d252d740501'
+
+  const publicKeysData = '0x' + publicKey + blsPublicKey + blsPoP
+
   const nonOwner = accounts[1]
   const minElectableValidators = new BigNumber(4)
   const maxElectableValidators = new BigNumber(6)
@@ -81,7 +88,7 @@ contract('Validators', (accounts: string[]) => {
       name,
       url,
       // @ts-ignore bytes type
-      publicKey,
+      publicKeysData,
       registrationRequirement.noticePeriod,
       { from: validator }
     )
@@ -274,7 +281,7 @@ contract('Validators', (accounts: string[]) => {
         name,
         url,
         // @ts-ignore bytes type
-        publicKey,
+        publicKeysData,
         registrationRequirement.noticePeriod
       )
       assert.isTrue(await validators.isValidator(validator))
@@ -286,7 +293,7 @@ contract('Validators', (accounts: string[]) => {
         name,
         url,
         // @ts-ignore bytes type
-        publicKey,
+        publicKeysData,
         registrationRequirement.noticePeriod
       )
       assert.deepEqual(await validators.getRegisteredValidators(), [validator])
@@ -298,14 +305,14 @@ contract('Validators', (accounts: string[]) => {
         name,
         url,
         // @ts-ignore bytes type
-        publicKey,
+        publicKeysData,
         registrationRequirement.noticePeriod
       )
       const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
       assert.equal(parsedValidator.identifier, identifier)
       assert.equal(parsedValidator.name, name)
       assert.equal(parsedValidator.url, url)
-      assert.equal(parsedValidator.publicKey, publicKey)
+      assert.equal(parsedValidator.publicKeysData, publicKeysData)
     })
 
     it('should emit the ValidatorRegistered event', async () => {
@@ -314,7 +321,7 @@ contract('Validators', (accounts: string[]) => {
         name,
         url,
         // @ts-ignore bytes type
-        publicKey,
+        publicKeysData,
         registrationRequirement.noticePeriod
       )
       assert.equal(resp.logs.length, 1)
@@ -326,7 +333,7 @@ contract('Validators', (accounts: string[]) => {
           identifier,
           name,
           url,
-          publicKey,
+          publicKeysData,
         },
       })
     })
@@ -338,7 +345,7 @@ contract('Validators', (accounts: string[]) => {
           name,
           url,
           // @ts-ignore bytes type
-          publicKey,
+          publicKeysData,
           registrationRequirement.noticePeriod
         )
       })
@@ -350,7 +357,7 @@ contract('Validators', (accounts: string[]) => {
             name,
             url,
             // @ts-ignore bytes type
-            publicKey,
+            publicKeysData,
             registrationRequirement.noticePeriod
           )
         )
@@ -374,7 +381,7 @@ contract('Validators', (accounts: string[]) => {
             name,
             url,
             // @ts-ignore bytes type
-            publicKey,
+            publicKeysData,
             registrationRequirement.noticePeriod
           )
         )
@@ -397,7 +404,7 @@ contract('Validators', (accounts: string[]) => {
             name,
             url,
             // @ts-ignore bytes type
-            publicKey,
+            publicKeysData,
             registrationRequirement.noticePeriod
           )
         )

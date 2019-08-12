@@ -12,7 +12,7 @@
   "feeTransaction": "El envío de transacciones tiene una pequeña comisión",
   "sendCelo": "Enviar Celo Dólares a cualquier persona con un celular",
   "sendCeloDollars": "Enviar Celo Dólares",
-  "backToWallet": "Volver a la Billetera",
+  "backToWallet": "Volver a el Monedero",
   "celoLikeGold": "Celo Oro es como el oro real",
   "goldFluctuates": "Hay una cantidad limitada de Celo Oro, y su valor puede aumentar o disminuir",
   "exchange": "Cambie Oro a Dólares cuando quiera",
@@ -20,8 +20,7 @@
   "addressPhotos": "Celo usa sus contactos para mostrar fotos",
   "changePhotos": "Puede cambiar una foto si actualiza los contactos",
   "localPhotos": "Solo usted puede ver estas fotos desde su teléfono",
-  "allowContactAccess":
-    "Permita que la Billetera de Celo tenga acceso a las fotos de sus contactos",
+  "allowContactAccess": "Permita que el Monedero Celo tenga acceso a las fotos de sus contactos",
   "deny": "Denegar",
   "allow": "Permitir"
 }
