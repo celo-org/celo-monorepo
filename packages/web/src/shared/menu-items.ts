@@ -74,4 +74,33 @@ export const languageOptions = {
   },
 }
 
+export const hashNav = {
+  about: {
+    backers: 'backers',
+  },
+  build: {
+    features: 'features',
+    stack: 'stack',
+    newsletter: 'newsletter',
+    applications: 'applications',
+    contracts: 'contracts',
+    blockchain: 'blockchain',
+  },
+  connect: {
+    tenets: 'tenets',
+    code: 'code',
+    events: 'events',
+    blog: 'blog',
+    fellowship: 'fellowship',
+    fund: 'fund',
+    newsletter: 'newsletter',
+  },
+  join: {
+    roles: 'roles',
+  },
+  home: {
+    partnerships: 'partnerships',
+  },
+}
+
 export default menuItems
