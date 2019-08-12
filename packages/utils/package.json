@@ -7,15 +7,13 @@
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "scripts": {
-    "pretest": "tsc",
-    "postinstall": "yarn run build || exit 1 && yarn run prettify || true",
-    "prettify": "yarn run prettier --config ../../.prettierrc.js --write '{contracts,types,lib}/**/*.+(ts|tsx|js|jsx)'",
     "build": "tsc",
-    "test": "npm run pretest && jest --ci --silent --coverage --runInBand",
-    "test:verbose": "npm run pretest && jest --ci --verbose --runInBand"
+    "lint": "tslint --project .",
+    "test": "yarn build && jest --ci --silent --coverage --runInBand",
+    "test:verbose": "yarn build && jest --ci --verbose --runInBand"
   },
   "dependencies": {
-    "@umpirsky/country-list": "https://github.com/umpirsky/country-list#05fda51",
+    "@umpirsky/country-list": "git://github.com/umpirsky/country-list#05fda51",
     "bignumber.js": "^7.2.0",
     "bn.js": "4.11.8",
     "country-data": "^0.0.31",

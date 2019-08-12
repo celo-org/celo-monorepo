@@ -16,8 +16,8 @@ import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import NotificationAmount from 'src/paymentRequest/NotificationAmount'
+import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import Logger from 'src/utils/Logger'
-import { getRecipientThumbnail, Recipient } from 'src/utils/recipient'
 
 interface OwnProps {
   requester: Recipient

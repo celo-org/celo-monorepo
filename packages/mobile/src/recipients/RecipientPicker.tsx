@@ -1,3 +1,4 @@
+import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import SectionHead from '@celo/react-components/components/SectionHead'
 import ForwardChevron from '@celo/react-components/icons/ForwardChevron'
 import QRCode from '@celo/react-components/icons/QRCode'
@@ -23,10 +24,6 @@ import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { RootState } from 'src/redux/reducers'
-import LabeledTextInput from 'src/send/LabeledTextInput'
-import RecipientItem from 'src/send/RecipientItem'
-import DisconnectBanner from 'src/shared/DisconnectBanner'
 import {
   getRecipientFromAddress,
   NumberToRecipient,
@@ -34,7 +31,14 @@ import {
   RecipientKind,
   RecipientWithAddress,
   RecipientWithMobileNumber,
-} from 'src/utils/recipient'
+} from 'src/recipients/recipient'
+import RecipientItem from 'src/recipients/RecipientItem'
+import { recipientCacheSelector } from 'src/recipients/reducer'
+import { RootState } from 'src/redux/reducers'
+import LabeledTextInput from 'src/send/LabeledTextInput'
+import DisconnectBanner from 'src/shared/DisconnectBanner'
+import { requestContactsPermission } from 'src/utils/androidPermissions'
+import Logger from 'src/utils/Logger'
 import { assertUnreachable } from 'src/utils/typescript'
 
 const goToQrCodeScreen = () => {
@@ -64,8 +68,10 @@ interface Props {
   searchQuery: string
   sections: Section[]
   defaultCountryCode: string
+  hasAcceptedContactPermission: boolean
   onSelectRecipient(recipient: Recipient): void
   onSearchQueryChanged(searchQuery: string): void
+  onPermissionsAccepted(): void
 }
 
 interface StateProps {
@@ -77,7 +83,7 @@ type RecipientProps = Props & WithNamespaces & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   addressToE164Number: state.identity.addressToE164Number,
-  recipientCache: state.send.recipientCache,
+  recipientCache: recipientCacheSelector(state),
 })
 
 export class RecipientPicker extends React.Component<RecipientProps> {
@@ -100,6 +106,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
       case RecipientKind.Address:
         return item.address + index
       default:
+        Logger.error('RecipientPicker', 'Unsupported recipient kind', item)
         throw assertUnreachable(item)
     }
   }
@@ -155,6 +162,30 @@ export class RecipientPicker extends React.Component<RecipientProps> {
         {this.renderItemSeparator()}
       </>
     )
+  }
+
+  renderRequestContactPermission = () => {
+    return (
+      <>
+        {!this.props.hasAcceptedContactPermission && (
+          <Button
+            text={this.props.t('askForContactsPermissionAction')}
+            style={style.button}
+            onPress={this.requestContactsPermission}
+            standard={true}
+            type={BtnTypes.SECONDARY}
+          />
+        )}
+      </>
+    )
+  }
+
+  requestContactsPermission = async () => {
+    const granted = await requestContactsPermission()
+
+    if (granted) {
+      this.props.onPermissionsAccepted()
+    }
   }
 
   renderSendToAddress = () => {
@@ -213,6 +244,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
           initialNumToRender={30}
           keyboardShouldPersistTaps="handled"
         />
+        {this.renderRequestContactPermission()}
       </View>
     )
   }
@@ -222,6 +254,12 @@ const style = StyleSheet.create({
   body: {
     flex: 1,
   },
+  button: {
+    marginTop: 30,
+    paddingHorizontal: 20,
+    paddingVertical: 5,
+  },
+
   label: {
     alignSelf: 'center',
     color: colors.dark,

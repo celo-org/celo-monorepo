@@ -1,4 +1,5 @@
 import { Actions, ActionTypes, EscrowedPayment } from 'src/escrow/actions'
+import { RootState } from 'src/redux/reducers'
 
 export interface State {
   isReclaiming: boolean
@@ -32,3 +33,5 @@ export const escrowReducer = (state: State | undefined = initialState, action: A
       return state
   }
 }
+
+export const sentEscrowedPaymentsSelector = (state: RootState) => state.escrow.sentEscrowedPayments

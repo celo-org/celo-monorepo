@@ -23,6 +23,7 @@ import { hideAlert, showMessage } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { exitBackupFlow } from 'src/app/actions'
 import AccountOverview from 'src/components/AccountOverview'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
 import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
@@ -31,11 +32,12 @@ import { Namespaces } from 'src/i18n'
 import { importContacts } from 'src/identity/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { NumberToRecipient } from 'src/recipients/recipient'
+import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import { initializeSentryUserContext } from 'src/sentry/Sentry'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { resetStandbyTransactions } from 'src/transactions/actions'
-import { NumberToRecipient } from 'src/utils/recipient'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const SCREEN_WIDTH = variables.width
@@ -66,7 +68,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   address: currentAccountSelector(state),
   activeNotificationCount: getActiveNotificationCount(state),
   callToActNotification: callToActNotificationSelector(state),
-  recipientCache: state.send.recipientCache,
+  recipientCache: recipientCacheSelector(state),
 })
 
 const Header = () => {
@@ -156,7 +158,7 @@ export class WalletHome extends React.PureComponent<Props> {
 
   showTestnetBanner = () => {
     const { t } = this.props
-    this.props.showMessage(t('testnetAlert.1'), null, t('dismiss'), t('testnetAlert.0'))
+    this.props.showMessage(t('testnetAlert.1'), ALERT_BANNER_DURATION, null, t('testnetAlert.0'))
   }
 
   importContactsIfNeeded = () => {
