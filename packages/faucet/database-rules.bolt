@@ -26,7 +26,7 @@ path /{net}/requests {
 
 path /{net}/requests/{id} is Request {
   read() { true }
-  write() { isNew(this) }
+  write() { isAllowed(this) }
 }
 
 path /{net}/accounts/{account} is Account {
@@ -42,6 +42,17 @@ path /{net}/accounts/{account} is Account {
 isLoggedIn() { auth != null }
 
 isNew(ref) { prior(ref) == null }
+
+// uid of ashishb+faucet@celo.org is gYOD4GPV86OlqQh33Loc5lh0Yo02 on celo-faucet
+// This account can be seen/modified at https://console.firebase.google.com/project/celo-faucet/authentication/users
+//
+// uid of ashishb+faucet@celo.org is LLnGFlilnxbXrb5pZzvjiDeUJ6l2 on celo-faucet-staging
+// This account can be seen/modified at https://console.firebase.google.com/project/celo-faucet-staging/authentication/users
+isAllowed(ref) {
+  // TODO(ashishb): In the longer run, it would be better to choose only one uid based on whether
+  // we are on staging network or the production network.
+  return auth.uid == "gYOD4GPV86OlqQh33Loc5lh0Yo02" || auth.uid == "LLnGFlilnxbXrb5pZzvjiDeUJ6l2"
+}
 
 
 /**
