@@ -155,24 +155,6 @@ exports[`Invite renders correctly 1`] = `
               noContacts
             </Text>
           </View>
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 14,
-                  "lineHeight": 18,
-                },
-                Object {
-                  "justifyContent": "center",
-                  "textAlign": "center",
-                },
-              ]
-            }
-          >
-            searchForSomeone
-          </Text>
         </View>
       }
       data={Array []}
@@ -233,24 +215,6 @@ exports[`Invite renders correctly 1`] = `
               noContacts
             </Text>
           </View>
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 14,
-                  "lineHeight": 18,
-                },
-                Object {
-                  "justifyContent": "center",
-                  "textAlign": "center",
-                },
-              ]
-            }
-          >
-            searchForSomeone
-          </Text>
         </View>
       </View>
     </RCTScrollView>
