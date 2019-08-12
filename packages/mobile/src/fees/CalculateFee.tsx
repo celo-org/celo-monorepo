@@ -5,7 +5,7 @@ import { useAsync, UseAsyncReturn } from 'react-async-hook'
 import { connect } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { getReclaimEscrowFee } from 'src/escrow/saga'
 import { FeeType } from 'src/fees/actions'
 import { getInvitationVerificationFee } from 'src/invite/saga'
@@ -74,7 +74,7 @@ function useAsyncShowError<R, Args extends any[]>(
     () => {
       // Generic error banner
       if (asyncResult.error) {
-        showErrorFunction(ErrorMessages.CALCULATE_FEE_FAILED, ERROR_BANNER_DURATION)
+        showErrorFunction(ErrorMessages.CALCULATE_FEE_FAILED, ALERT_BANNER_DURATION)
       }
     },
     [asyncResult.error]

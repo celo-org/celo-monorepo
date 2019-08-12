@@ -1,4 +1,6 @@
 <resources>
   <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+  <item name="android:windowLightNavigationBar">true</item>
+  <item name="android:navigationBarColor">@android:color/white</item>
   </style>
 </resources>

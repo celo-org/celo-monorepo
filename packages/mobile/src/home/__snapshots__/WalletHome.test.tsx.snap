@@ -1,0 +1,736 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "position": "relative",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "height": 45,
+        "left": 0,
+        "opacity": 0,
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+        "zIndex": 1,
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "height": 45,
+            "position": "relative",
+            "width": 750,
+          },
+          Object {},
+        ]
+      }
+    >
+      <svg
+        height={47}
+        style={
+          Object {
+            "left": 0,
+            "position": "absolute",
+            "top": 1,
+          }
+        }
+        width={752}
+      >
+        <defs>
+          <linearGradient
+            id="top"
+            x1="0%"
+            x2="0%"
+            y1="100%"
+            y2="0%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </linearGradient>
+          <linearGradient
+            id="bottom"
+            x1="0%"
+            x2="0%"
+            y1="0%"
+            y2="100%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </linearGradient>
+          <linearGradient
+            id="left"
+            x1="100%"
+            x2="0%"
+            y1="0%"
+            y2="0%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </linearGradient>
+          <linearGradient
+            id="right"
+            x1="0%"
+            x2="100%"
+            y1="0%"
+            y2="0%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </linearGradient>
+          <radialGradient
+            cx="100%"
+            cy="100%"
+            fx="100%"
+            fy="100%"
+            id="border-left-top"
+            r="100%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </radialGradient>
+          <radialGradient
+            cx="100%"
+            cy="0%"
+            fx="100%"
+            fy="0%"
+            id="border-left-bottom"
+            r="100%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </radialGradient>
+          <radialGradient
+            cx="0%"
+            cy="100%"
+            fx="0%"
+            fy="100%"
+            id="border-right-top"
+            r="100%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </radialGradient>
+          <radialGradient
+            cx="0%"
+            cy="0%"
+            fx="0%"
+            fy="0%"
+            id="border-right-bottom"
+            r="100%"
+          >
+            <stop
+              offset="0"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity={0.1}
+            />
+            <stop
+              offset="1"
+              stopColor="#2e3338"
+              stopOpacity="0"
+            />
+          </radialGradient>
+        </defs>
+        <path
+          d="M 0 1,Q 0 0 1 0,v 0,q -1 0 -1 1,h 0,z"
+          fill="url(#border-left-top)"
+        />
+        <path
+          d="M 749 0,q 1 0 1 1,h 0,q 0 -1 -1 -1,v 0,z"
+          fill="url(#border-right-top)"
+        />
+        <path
+          d="M 750 44,h 0,q 0 1 -1 1,v 0,q 1 0 1 -1,z"
+          fill="url(#border-right-bottom)"
+        />
+        <path
+          d="M 0 44,q 0 1 1 1,v 0,q -1 0 -1 -1,h 0,z"
+          fill="url(#border-left-bottom)"
+        />
+        <rect
+          fill="url(#top)"
+          height={0}
+          width={748}
+          x={1}
+          y="0"
+        />
+        <rect
+          fill="url(#left)"
+          height={43}
+          width={0}
+          x="0"
+          y={1}
+        />
+        <rect
+          fill="url(#right)"
+          height={43}
+          width={0}
+          x={750}
+          y={1}
+        />
+        <rect
+          fill="url(#bottom)"
+          height={0}
+          width={748}
+          x={1}
+          y={45}
+        />
+        <path
+          d="M 1 0,h 748,q 1 0 1 1,v 43,q 0 1 -1 1,h -748,q -1 0 -1 -1,v -43,q 0 -1 1 -1"
+          fill="rgba(46,51,56,0.1)"
+        />
+      </svg>
+      <View
+        style={
+          Object {
+            "height": 45,
+            "width": 750,
+          }
+        }
+      />
+    </View>
+  </View>
+  <View
+    style={
+      Array [
+        Object {
+          "height": 45,
+        },
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#FFFFFF",
+          "flexDirection": "row",
+          "justifyContent": "center",
+          "zIndex": 2,
+        },
+      ]
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Hind-Medium",
+          "fontSize": 14,
+          "opacity": 0,
+        }
+      }
+    >
+      wallet
+    </Text>
+    <View
+      accessible={true}
+      hitSlop={
+        Object {
+          "bottom": 15,
+          "left": 15,
+          "right": 15,
+          "top": 15,
+        }
+      }
+      isTVSelectable={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "justifyContent": "flex-end",
+          "margin": 5,
+          "opacity": 1,
+          "position": "absolute",
+          "right": 10,
+          "top": 10,
+        }
+      }
+    >
+      <svg
+        height={18}
+        style={Object {}}
+        viewBox="0 0 18 18"
+        width={18}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M0.0395506 12.0537C-0.108559 11.5415 0.178104 11.0054 0.6511 10.7948C1.26743 10.5267 1.68309 9.86619 1.79776 9.20085C1.79776 9.11469 1.79298 9.03331 1.79298 8.94715C1.79298 8.91365 1.79298 8.88493 1.79298 8.85142C1.68309 8.17651 1.29132 7.47287 0.6511 7.21918C0.173327 7.00378 -0.108559 6.47247 0.0395506 5.9603C0.192438 5.496 0.283214 5.26624 0.507768 4.83066C0.765766 4.36635 1.34387 4.18925 1.8312 4.37593C2.44753 4.62004 3.18808 4.4573 3.73752 4.07916C3.77574 4.03608 3.81874 3.993 3.86174 3.94992C3.91907 3.89248 3.97163 3.83982 4.02896 3.78717C4.41596 3.23192 4.62617 2.47563 4.35384 1.84859C4.16751 1.36035 4.34429 0.781169 4.80773 0.522691C5.03228 0.407812 5.20428 0.326439 5.38106 0.25464C5.55783 0.18284 5.73461 0.115827 5.97827 0.0392413C6.48949 -0.109144 7.0246 0.178054 7.23482 0.65193C7.51193 1.28855 8.19992 1.70977 8.88791 1.81029C8.93091 1.81029 8.97391 1.81029 9.02169 1.81029C9.06947 1.81029 9.11247 1.81029 9.16025 1.81508C9.82435 1.69541 10.5123 1.31248 10.756 0.675863C10.971 0.1972 11.5013 -0.085211 12.0126 0.0631745C12.476 0.216347 12.7053 0.307293 13.1401 0.532264C13.6035 0.790742 13.7803 1.36992 13.594 1.85816C13.3455 2.48521 13.5175 3.2415 13.9093 3.79674C13.9141 3.80153 13.9141 3.80153 13.9189 3.80632C13.9141 3.79674 13.9141 3.79196 13.9093 3.78238C14.4635 4.3137 15.4143 4.69184 16.1692 4.36157C16.6565 4.17489 17.2346 4.35199 17.4926 4.8163C17.7124 5.25188 17.8079 5.47685 17.9608 5.94594C18.1089 6.45811 17.8223 6.99421 17.3493 7.20482C16.604 7.52553 16.1548 8.42063 16.174 9.21521C16.174 9.21042 16.1692 9.21042 16.1692 9.20563C16.2886 9.87097 16.6756 10.5507 17.3063 10.7996C17.7841 11.015 18.0659 11.5463 17.9178 12.0585C17.7649 12.5228 17.6742 12.7525 17.4496 13.1881C17.1916 13.6524 16.6135 13.8295 16.1262 13.6428C15.4812 13.3891 14.7024 13.5806 14.1434 13.9923C13.6513 14.5523 13.3312 15.4378 13.6465 16.151C13.8329 16.6393 13.6561 17.2184 13.1927 17.4769C12.9681 17.5918 12.7961 17.6732 12.6193 17.745C12.4425 17.8168 12.2658 17.8838 12.0221 17.9604C11.5109 18.1088 10.9758 17.8216 10.7656 17.3477C10.4885 16.7015 9.78613 16.2803 9.08858 16.1893C9.03602 16.1893 8.97869 16.1893 8.92614 16.1893C8.92136 16.1893 8.91658 16.1893 8.91658 16.1893C8.21425 16.2803 7.45937 16.6728 7.20137 17.3477C6.98638 17.8263 6.45605 18.1088 5.94483 17.9604C5.48139 17.8072 5.25206 17.7163 4.81728 17.4913C4.35384 17.2328 4.17707 16.6536 4.3634 16.1654C4.61662 15.524 4.43029 14.7438 4.0194 14.1885C3.99551 14.1646 3.97163 14.1406 3.94296 14.1167C3.90951 14.0832 3.87129 14.0449 3.83785 14.0114C3.27885 13.595 2.48575 13.3509 1.84076 13.6381C1.35343 13.8247 0.775322 13.6476 0.517324 13.1833C0.283215 12.7477 0.192438 12.5228 0.0395506 12.0537ZM10.6031 12.944C12.777 12.0441 13.809 9.54548 12.9108 7.36757C12.0126 5.18965 9.51858 4.15574 7.34471 5.05563C5.17084 5.95551 4.13885 8.45413 5.03706 10.632C5.93527 12.81 8.42925 13.8487 10.6031 12.944Z"
+          fill="#42D689"
+          style={Object {}}
+        />
+      </svg>
+    </View>
+  </View>
+  <RCTScrollView
+    ListHeaderComponent={[Function]}
+    data={
+      Array [
+        Object {
+          "data": Array [
+            Object {},
+          ],
+          "renderItem": [Function],
+          "title": "activity",
+        },
+      ]
+    }
+    disableVirtualization={false}
+    getItem={[Function]}
+    getItemCount={[Function]}
+    horizontal={false}
+    initialNumToRender={10}
+    keyExtractor={[Function]}
+    maxToRenderPerBatch={10}
+    onContentSizeChange={[Function]}
+    onEndReachedThreshold={2}
+    onLayout={[Function]}
+    onMomentumScrollEnd={[Function]}
+    onRefresh={[Function]}
+    onScroll={[Function]}
+    onScrollBeginDrag={[Function]}
+    onScrollEndDrag={[Function]}
+    refreshControl={
+      <RefreshControlMock
+        colors={
+          Array [
+            "#42D689",
+          ]
+        }
+        onRefresh={[Function]}
+        refreshing={false}
+      />
+    }
+    refreshing={false}
+    renderItem={[Function]}
+    renderSectionHeader={[Function]}
+    scrollEventThrottle={50}
+    sections={
+      Array [
+        Object {
+          "data": Array [
+            Object {},
+          ],
+          "renderItem": [Function],
+          "title": "activity",
+        },
+      ]
+    }
+    stickyHeaderIndices={
+      Array [
+        1,
+      ]
+    }
+    stickySectionHeadersEnabled={true}
+    style={
+      Object {
+        "backgroundColor": "#FFFFFF",
+        "flex": 1,
+        "position": "relative",
+      }
+    }
+    updateCellsBatchingPeriod={50}
+    windowSize={21}
+  >
+    <RCTRefreshControl />
+    <View>
+      <View
+        onLayout={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+            }
+          }
+        >
+          <View
+            accessible={true}
+            isTVSelectable={true}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "alignItems": "flex-end",
+                "flexDirection": "row",
+                "opacity": 1,
+                "overflow": "visible",
+                "padding": 10,
+              }
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  undefined,
+                ]
+              }
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "backgroundColor": "#7AD6FE",
+                      "borderRadius": 27.5,
+                      "height": 55,
+                      "width": 55,
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#FFFFFF",
+                        "fontFamily": "Hind-Medium",
+                        "fontSize": 16,
+                      },
+                      Object {
+                        "fontSize": 27.5,
+                      },
+                    ]
+                  }
+                >
+                  J
+                </Text>
+              </View>
+            </View>
+            <View
+              style={
+                Object {
+                  "bottom": 5,
+                  "position": "absolute",
+                  "right": 5,
+                  "zIndex": 10,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={21}
+                style={Object {}}
+                viewBox="0 0 21 21"
+                width={21}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  fill="white"
+                  height={21}
+                  rx="1"
+                  style={Object {}}
+                  width={21}
+                />
+                <rect
+                  height="6.6"
+                  stroke="#42D689"
+                  style={Object {}}
+                  width="6.6"
+                  x="2.5"
+                  y="11.9"
+                />
+                <rect
+                  fill="#42D689"
+                  height="3.8"
+                  style={Object {}}
+                  width="3.8"
+                  x="3.89999"
+                  y="13.3"
+                />
+                <rect
+                  height="6.6"
+                  stroke="#42D689"
+                  style={Object {}}
+                  width="6.6"
+                  x="2.5"
+                  y="2.5"
+                />
+                <rect
+                  fill="#42D689"
+                  height="3.8"
+                  style={Object {}}
+                  width="3.8"
+                  x="3.89999"
+                  y="3.90002"
+                />
+                <rect
+                  height="6.6"
+                  stroke="#42D689"
+                  style={Object {}}
+                  width="6.6"
+                  x="11.5"
+                  y="2.5"
+                />
+                <rect
+                  fill="#42D689"
+                  height="3.8"
+                  style={Object {}}
+                  width="3.8"
+                  x="12.9"
+                  y="3.90002"
+                />
+                <path
+                  d="M18.3073 13.1485C17.9542 12.4166 17.3262 11.8611 16.5418 11.584C15.7562 11.3079 14.9066 11.3434 14.1483 11.6847C13.3995 12.0226 12.8295 12.6182 12.5404 13.365C11.1683 14.1472 10.6067 15.8274 11.2927 17.2511C11.6458 17.983 12.2738 18.5385 13.0594 18.8156C13.4089 18.9382 13.7703 19 14.1317 19C14.582 19 15.0322 18.905 15.4529 18.7148C16.2017 18.3758 16.7705 17.7802 17.0596 17.0335C18.4317 16.2524 18.9933 14.5721 18.3073 13.1485ZM14.473 12.3605C14.7905 12.2173 15.1294 12.1452 15.4695 12.1452C15.742 12.1452 16.0145 12.191 16.2787 12.2838C16.8712 12.4922 17.344 12.9114 17.6106 13.4635C17.8772 14.0155 17.9056 14.6351 17.6899 15.2078C17.5916 15.4701 17.4447 15.7072 17.2622 15.9133C17.2539 15.4964 17.1567 15.083 16.9683 14.6935C16.3664 13.4451 14.9896 12.7808 13.6471 12.9836C13.8663 12.7213 14.1459 12.5071 14.473 12.3605ZM13.1779 13.8861C14.3486 13.3867 15.7254 13.8815 16.2693 15.0074C16.4991 15.4838 16.5501 16.0095 16.4221 16.5135C15.8617 16.7529 15.2396 16.7746 14.6626 16.5719C14.0701 16.3635 13.5973 15.9443 13.3307 15.3922C13.1009 14.9157 13.0499 14.3889 13.1779 13.8861ZM15.127 18.0391C14.5559 18.2968 13.9149 18.3243 13.3224 18.1158C12.73 17.9074 12.2572 17.4882 11.9906 16.9361C11.724 16.3841 11.6956 15.7644 11.9112 15.1918C12.0096 14.9295 12.1565 14.6924 12.339 14.4862C12.3473 14.9031 12.4444 15.3166 12.6328 15.706C13.1637 16.8056 14.2952 17.4527 15.4742 17.4527C15.6342 17.4527 15.7941 17.4401 15.9541 17.416C15.7325 17.6783 15.4541 17.8925 15.127 18.0391Z"
+                  fill="#42D689"
+                  style={Object {}}
+                />
+              </svg>
+            </View>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "justifyContent": "center",
+                  },
+                  Object {
+                    "height": 15,
+                    "width": 15,
+                  },
+                  Object {
+                    "bottom": 25,
+                    "position": "absolute",
+                    "right": -15,
+                    "zIndex": 20,
+                  },
+                ]
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "backgroundColor": "#3C9BF4",
+                    "borderRadius": 2.5,
+                    "height": 5,
+                    "opacity": 1,
+                    "transform": Array [
+                      Object {
+                        "scale": 1,
+                      },
+                      Object {
+                        "perspective": 1000,
+                      },
+                    ],
+                    "width": 5,
+                  }
+                }
+              />
+              <View
+                style={
+                  Object {
+                    "backgroundColor": "#3C9BF4",
+                    "borderRadius": 2.5,
+                    "height": 5,
+                    "position": "absolute",
+                    "width": 5,
+                  }
+                }
+              />
+            </View>
+          </View>
+          <Text
+            onPress={[Function]}
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                },
+                Object {
+                  "paddingTop": 10,
+                },
+              ]
+            }
+            suppressHighlighting={true}
+          >
+            John Doe
+          </Text>
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "alignSelf": "center",
+                "flexDirection": "row",
+                "justifyContent": "center",
+              }
+            }
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Light",
+                    "fontSize": 14,
+                    "textAlignVertical": "center",
+                  },
+                  Object {
+                    "alignItems": "center",
+                    "backgroundColor": "#EEEEEE",
+                    "borderRadius": 3,
+                    "justifyContent": "center",
+                    "marginRight": 5,
+                    "paddingLeft": 6,
+                    "paddingRight": 3,
+                  },
+                ]
+              }
+            >
+               +1
+            </Text>
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Light",
+                  "fontSize": 14,
+                  "textAlignVertical": "center",
+                }
+              }
+            >
+              (415) 555-6666
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        onLayout={[Function]}
+        style={null}
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "backgroundColor": "#F8F8F8",
+              "display": "flex",
+              "flexDirection": "row",
+              "height": 36,
+              "justifyContent": "space-between",
+              "paddingHorizontal": 10,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-Medium",
+                "fontSize": 12,
+              }
+            }
+          >
+            activity
+          </Text>
+        </View>
+      </View>
+      <View
+        onLayout={[Function]}
+        style={null}
+      />
+      <View
+        onLayout={[Function]}
+        style={null}
+      />
+    </View>
+  </RCTScrollView>
+</View>
+`;
