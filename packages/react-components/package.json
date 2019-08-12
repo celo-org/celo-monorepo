@@ -8,7 +8,6 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "lint-checks": "yarn run lint && yarn run build --noEmit",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "test": "export TZ=UTC && jest --ci --silent --coverage --maxWorkers=2",
     "test:verbose": "export TZ=UTC && jest --ci --verbose --runInBand",
