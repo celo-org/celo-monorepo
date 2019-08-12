@@ -11,6 +11,7 @@ import { ERROR_BANNER_DURATION } from 'src/config'
 import { resolveCurrency } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import { lookupAddressFromPhoneNumber } from 'src/identity/verification'
+import { getRecipientFromAddress, phoneNumberToRecipient } from 'src/recipients/recipient'
 import { DispatchType, GetStateType } from 'src/redux/reducers'
 import {
   navigateToPaymentTransferReview,
@@ -19,7 +20,6 @@ import {
 import { TransactionTypes } from 'src/transactions/reducer'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
-import { getRecipientFromAddress, phoneNumberToRecipient } from 'src/utils/recipient'
 
 const TAG = 'FirebaseNotifications'
 
@@ -31,7 +31,7 @@ const handlePaymentRequested = (
     return
   }
   const { e164NumberToAddress } = getState().identity
-  const { recipientCache } = getState().send
+  const { recipientCache } = getState().recipients
   let requesterAddress = e164NumberToAddress[paymentRequest.requesterE164Number]
   if (!requesterAddress) {
     const resolvedAddress = await lookupAddressFromPhoneNumber(paymentRequest.requesterE164Number)
@@ -62,7 +62,7 @@ const handlePaymentReceived = (
   dispatch(refreshAllBalances())
 
   if (notificationState !== NotificationReceiveState.APP_ALREADY_OPEN) {
-    const { recipientCache } = getState().send
+    const { recipientCache } = getState().recipients
     const { addressToE164Number } = getState().identity
     const address = transferNotification.sender.toLowerCase()
 

@@ -7,7 +7,7 @@ patch-package
      mavenCentral()
 +
 +    flatDir {
-+      dirs "../" + rootProject.ext.get("celoClientDirectory")
++      dirs rootProject.ext.get("celoClientDirectory")
 +    }
  }
  

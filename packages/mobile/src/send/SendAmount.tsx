@@ -34,17 +34,17 @@ import { VerificationStatus } from 'src/identity/contactMapping'
 import { E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { RootState } from 'src/redux/reducers'
-import LabeledTextInput from 'src/send/LabeledTextInput'
-import { ConfirmationInput } from 'src/send/SendConfirmation'
-import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { fetchDollarBalance } from 'src/stableToken/actions'
 import {
   getAddressFromRecipient,
   getRecipientVerificationStatus,
   Recipient,
   RecipientKind,
-} from 'src/utils/recipient'
+} from 'src/recipients/recipient'
+import { RootState } from 'src/redux/reducers'
+import LabeledTextInput from 'src/send/LabeledTextInput'
+import { ConfirmationInput } from 'src/send/SendConfirmation'
+import DisconnectBanner from 'src/shared/DisconnectBanner'
+import { fetchDollarBalance } from 'src/stableToken/actions'
 
 const MAX_COMMENT_LENGTH = 70
 

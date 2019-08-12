@@ -1,10 +1,14 @@
 import SmartTopAlert, { NotificationTypes } from '@celo/react-components/components/SmartTopAlert'
 import * as React from 'react'
-import * as renderer from 'react-test-renderer'
+import { render } from 'react-native-testing-library'
 
 describe('SmartTopAlert', () => {
-  it('renders correctly', () => {
-    const tree = renderer.create(
+  beforeAll(() => {
+    jest.useRealTimers()
+  })
+
+  it('renders correctly', async () => {
+    const { toJSON } = render(
       <SmartTopAlert
         dismissAfter={5}
         title={'Smart Top Alert'}
@@ -13,6 +17,7 @@ describe('SmartTopAlert', () => {
         type={NotificationTypes.MESSAGE}
       />
     )
-    expect(tree).toMatchSnapshot()
+
+    expect(toJSON()).toMatchSnapshot()
   })
 })
