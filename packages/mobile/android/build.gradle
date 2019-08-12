@@ -12,7 +12,7 @@ buildscript {
         // Must pin to 16 because 17 uses androidX
         googlePlayServicesVersion = "16.+"
         // Change this to change the geth version
-        celoClientDirectory = new File(rootProject.projectDir, '../../../node_modules/@celo/client-integration/build/bin')
+        celoClientDirectory = new File(rootProject.projectDir, '../../../node_modules/@celo/client/build/bin')
     }
     repositories {
         google()
