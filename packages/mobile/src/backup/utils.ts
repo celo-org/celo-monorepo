@@ -14,11 +14,13 @@ export function selectQuizWordOptions(correctWord: string, allWords: string[], n
   const wordOptions = []
   const correctWordPosition = Math.floor(Math.random() * numOptions)
   for (let i = 0; i < numOptions; i++) {
-    wordOptions.push(
-      i === correctWordPosition
-        ? correctWord
-        : allWords[Math.floor(Math.random() * allWords.length)]
-    )
+    if (i === correctWordPosition) {
+      wordOptions.push(correctWord)
+      continue
+    }
+    const randomWord = allWords[Math.floor(Math.random() * allWords.length)]
+    wordOptions.push(randomWord)
+    allWords = allWords.filter((w) => w !== randomWord)
   }
   return wordOptions
 }
