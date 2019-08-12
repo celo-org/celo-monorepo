@@ -222,7 +222,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @return The number of oracle report timestamps for `token`.
    */
   function numTimestamps(address token) external view returns (uint256) {
-    return timestamps[token].list.list.numElements;
+    return timestamps[token].getNumElements();
   }
 
   /**

@@ -85,7 +85,7 @@ library SortedLinkedListWithMedian {
    */
   function remove(List storage list, bytes32 key) public {
     MedianAction action = MedianAction.None;
-    if (list.list.list.numElements == 0) {
+    if (list.list.list.numElements == 1) {
       list.median = bytes32(0);
     } else if (list.list.list.numElements % 2 == 0) {
       // When we have an even number of elements, we always choose the higher of the two medians.
