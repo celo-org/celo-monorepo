@@ -317,7 +317,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                         ]
                       }
                     >
-                      0
+                      +
                     </Text>
                   </View>
                 </View>
@@ -340,7 +340,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                     }
                   }
                 >
-                  0x0000000000000000000000000000000000007E57
+                  +1555-867-5309
                 </Text>
                 <View>
                   <View
@@ -597,7 +597,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                         ]
                       }
                     >
-                      0
+                      +
                     </Text>
                   </View>
                 </View>
@@ -620,7 +620,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                     }
                   }
                 >
-                  0x0000000000000000000000000000000000007E57
+                  +14155550000
                 </Text>
                 <View>
                   <View
@@ -877,7 +877,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                         ]
                       }
                     >
-                      0
+                      +
                     </Text>
                   </View>
                 </View>
@@ -900,7 +900,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                     }
                   }
                 >
-                  0x0000000000000000000000000000000000007E57
+                  +14155550000
                 </Text>
                 <View>
                   <View
