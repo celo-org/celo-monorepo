@@ -15,7 +15,7 @@ library Proposals {
   using BytesLib for bytes;
 
   // TODO(asa): Consider a delay stage.
-  enum ProposalStage {
+  enum Stage {
     None,
     Queued,
     Approval,
@@ -92,76 +92,55 @@ library Proposals {
     uint256 dataPosition = 0;
     for (uint256 i = 0; i < transactionCount; i = i.add(1)) {
       proposal.transactions.push(
-        Proposals.Transaction(values[i], destinations[i], data.slice(dataPosition, dataLengths[i]))
+        Transaction(values[i], destinations[i], data.slice(dataPosition, dataLengths[i]))
       );
       dataPosition = dataPosition.add(dataLengths[i]);
     }
   }
 
-  /**
-   * @notice Returns an unpacked proposal struct with its transaction count.
-   * @param proposal The proposal struct.
-   * @return The unpacked proposal with its transaction count.
-   */
-  function unpack(
-    Proposal storage proposal
-  )
-    public
-    view
-    returns (address, uint256, uint256, uint256)
-  {
-    return (
-      proposal.proposer,
-      proposal.deposit,
-      proposal.timestamp,
-      proposal.transactions.length
-    );
-  }
-
-  /**
-   * @notice Returns a specified transaction in a proposal.
-   * @param proposal The proposal struct.
-   * @param index The index of the specified transaction in the proposal's transaction list.
-   * @return The specified transaction.
-   */
-  function getTransaction(
+  function vote(
     Proposal storage proposal,
-    uint256 index
+    uint256 weight,
+    VoteValue currentVote,
+    VoteValue previousVote
   )
     public
-    view
-    returns (uint256, address, bytes memory)
   {
-    require(index < proposal.transactions.length);
-    return (
-      proposal.transactions[index].value,
-      proposal.transactions[index].destination,
-      proposal.transactions[index].data
-    );
+    // Subtract previous vote.
+    if (previousVote == VoteValue.Abstain) {
+      proposal.votes.abstain = proposal.votes.abstain.sub(weight);
+    } else if (previousVote == VoteValue.Yes) {
+      proposal.votes.yes = proposal.votes.yes.sub(weight);
+    } else if (previousVote == VoteValue.No) {
+      proposal.votes.no = proposal.votes.no.sub(weight);
+    }
+
+    // Add new vote.
+    if (currentVote == VoteValue.Abstain) {
+      proposal.votes.abstain = proposal.votes.abstain.add(weight);
+    } else if (currentVote == VoteValue.Yes) {
+      proposal.votes.yes = proposal.votes.yes.add(weight);
+    } else if (currentVote == VoteValue.No) {
+      proposal.votes.no = proposal.votes.no.add(weight);
+    }
   }
 
   /**
-   * @notice Returns whether or not a proposal has been approved.
+   * @notice Executes the proposal, reverting if any transaction fails.
    * @param proposal The proposal struct.
-   * @return Whether or not the proposal has been approved.
    */
-  function isApproved(Proposal storage proposal) internal view returns (bool) {
-    return proposal.approved;
-  }
-
-  /**
-   * @notice Returns the referendum vote totals for a proposal.
-   * @param proposal The proposal struct.
-   * @return The yes, no, and abstain vote totals.
-   */
-  function getVoteTotals(
-    Proposal storage proposal
-  )
-    public
-    view
-    returns (uint256, uint256, uint256)
-  {
-    return (proposal.votes.yes, proposal.votes.no, proposal.votes.abstain);
+  function execute(Proposal storage proposal) public {
+    for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
+      // reverts proposal if any transaction fails
+      require(
+        externalCall(
+          proposal.transactions[i].destination,
+          proposal.transactions[i].value,
+          proposal.transactions[i].data.length,
+          proposal.transactions[i].data
+        )
+      );
+    }
   }
 
   /**
@@ -208,28 +187,91 @@ library Proposals {
     Proposal storage proposal,
     StageDurations storage stageDurations
   )
-    public
+    internal
     view
-    returns (ProposalStage)
+    returns (Stage)
   {
     uint256 stageStartTime = proposal.timestamp.add(stageDurations.approval).add(
       stageDurations.referendum
     ).add(stageDurations.execution);
     // solhint-disable-next-line not-rely-on-time
     if (now >= stageStartTime) {
-      return Proposals.ProposalStage.Expiration;
+      return Stage.Expiration;
     }
     stageStartTime = stageStartTime.sub(stageDurations.execution);
     // solhint-disable-next-line not-rely-on-time
     if (now >= stageStartTime) {
-      return Proposals.ProposalStage.Execution;
+      return Stage.Execution;
     }
     stageStartTime = stageStartTime.sub(stageDurations.referendum);
     // solhint-disable-next-line not-rely-on-time
     if (now >= stageStartTime) {
-      return Proposals.ProposalStage.Referendum;
+      return Stage.Referendum;
     }
-    return Proposals.ProposalStage.Approval;
+    return Stage.Approval;
+  }
+
+  /**
+   * @notice Returns a specified transaction in a proposal.
+   * @param proposal The proposal struct.
+   * @param index The index of the specified transaction in the proposal's transaction list.
+   * @return The specified transaction.
+   */
+  function getTransaction(
+    Proposal storage proposal,
+    uint256 index
+  )
+    public
+    view
+    returns (uint256, address, bytes memory)
+  {
+    require(index < proposal.transactions.length);
+    Transaction storage transaction = proposal.transactions[index];
+    return (transaction.value, transaction.destination, transaction.data);
+  }
+
+  /**
+   * @notice Returns an unpacked proposal struct with its transaction count.
+   * @param proposal The proposal struct.
+   * @return The unpacked proposal with its transaction count.
+   */
+  function unpack(
+    Proposal storage proposal
+  )
+    internal
+    view
+    returns (address, uint256, uint256, uint256)
+  {
+    return (
+      proposal.proposer,
+      proposal.deposit,
+      proposal.timestamp,
+      proposal.transactions.length
+    );
+  }
+
+  /**
+   * @notice Returns the referendum vote totals for a proposal.
+   * @param proposal The proposal struct.
+   * @return The yes, no, and abstain vote totals.
+   */
+  function getVoteTotals(
+    Proposal storage proposal
+  )
+    internal
+    view
+    returns (uint256, uint256, uint256)
+  {
+    return (proposal.votes.yes, proposal.votes.no, proposal.votes.abstain);
+  }
+
+  /**
+   * @notice Returns whether or not a proposal has been approved.
+   * @param proposal The proposal struct.
+   * @return Whether or not the proposal has been approved.
+   */
+  function isApproved(Proposal storage proposal) internal view returns (bool) {
+    return proposal.approved;
   }
 
   /**
@@ -237,53 +279,8 @@ library Proposals {
    * @param proposal The proposal struct.
    * @return Whether or not the proposal exists.
    */
-  function exists(Proposal storage proposal) public view returns (bool) {
+  function exists(Proposal storage proposal) internal view returns (bool) {
     return proposal.timestamp > 0;
-  }
-
-  function vote(
-    Proposal storage proposal,
-    uint256 weight,
-    VoteValue currentVote,
-    VoteValue previousVote
-  )
-    public
-  {
-    // Subtract previous vote.
-    if (previousVote == VoteValue.Abstain) {
-      proposal.votes.abstain = proposal.votes.abstain.sub(weight);
-    } else if (previousVote == VoteValue.Yes) {
-      proposal.votes.yes = proposal.votes.yes.sub(weight);
-    } else if (previousVote == VoteValue.No) {
-      proposal.votes.no = proposal.votes.no.sub(weight);
-    }
-
-    // Add new vote.
-    if (currentVote == VoteValue.Abstain) {
-      proposal.votes.abstain = proposal.votes.abstain.add(weight);
-    } else if (currentVote == VoteValue.Yes) {
-      proposal.votes.yes = proposal.votes.yes.add(weight);
-    } else if (currentVote == VoteValue.No) {
-      proposal.votes.no = proposal.votes.no.add(weight);
-    }
-  }
-
-  /**
-   * @notice Executes the proposal, reverting if any transaction fails.
-   * @param proposal The proposal struct.
-   */
-  function execute(Proposal storage proposal) public {
-    for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
-      // reverts proposal if any transaction fails
-      require(
-        externalCall(
-          proposal.transactions[i].destination,
-          proposal.transactions[i].value,
-          proposal.transactions[i].data.length,
-          proposal.transactions[i].data
-        )
-      );
-    }
   }
 
   // call has been separated into its own function in order to take advantage

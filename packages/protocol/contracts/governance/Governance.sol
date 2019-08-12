@@ -413,16 +413,11 @@ contract Governance is
     require(msg.value >= minDeposit);
 
     proposalCount = proposalCount.add(1);
-    proposals[proposalCount].make(values, destinations, data, dataLengths, msg.sender, msg.value);
+    Proposals.Proposal storage proposal = proposals[proposalCount];
+    proposal.make(values, destinations, data, dataLengths, msg.sender, msg.value);
     queue.push(proposalCount);
     // solhint-disable-next-line not-rely-on-time
-    emit ProposalQueued(
-      proposalCount,
-      msg.sender,
-      proposals[proposalCount].transactions.length,
-      msg.value,
-      now
-    );
+    emit ProposalQueued(proposalCount, msg.sender, proposal.transactions.length, msg.value, now);
     return proposalCount;
   }
 
@@ -534,7 +529,7 @@ contract Governance is
     dequeueProposalsIfReady();
     Proposals.Proposal storage proposal = proposals[proposalId];
     require(isDequeuedProposal(proposal, proposalId, index));
-    Proposals.ProposalStage stage = proposal.getDequeuedStage(stageDurations);
+    Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
     if (isDequeuedProposalExpired(proposal, stage)) {
       deleteDequeuedProposal(proposal, proposalId, index);
       return false;
@@ -542,7 +537,7 @@ contract Governance is
     require(
       msg.sender == approver &&
       !proposal.isApproved() &&
-      stage == Proposals.ProposalStage.Approval
+      stage == Proposals.Stage.Approval
     );
     proposal.approved = true;
     // Ensures that totalWeight is set by the end of Referendum, even if 0 votes are cast.
@@ -572,7 +567,7 @@ contract Governance is
     dequeueProposalsIfReady();
     Proposals.Proposal storage proposal = proposals[proposalId];
     require(isDequeuedProposal(proposal, proposalId, index));
-    Proposals.ProposalStage stage = proposal.getDequeuedStage(stageDurations);
+    Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
     if (isDequeuedProposalExpired(proposal, stage)) {
       deleteDequeuedProposal(proposal, proposalId, index);
       return false;
@@ -581,7 +576,7 @@ contract Governance is
     uint256 weight = getAccountWeight(account);
     require(
       proposal.isApproved() &&
-      stage == Proposals.ProposalStage.Referendum &&
+      stage == Proposals.Stage.Referendum &&
       value != Proposals.VoteValue.None &&
       weight > 0
     );
@@ -614,12 +609,12 @@ contract Governance is
     dequeueProposalsIfReady();
     Proposals.Proposal storage proposal = proposals[proposalId];
     require(isDequeuedProposal(proposal, proposalId, index));
-    Proposals.ProposalStage stage = proposal.getDequeuedStage(stageDurations);
+    Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
     bool expired = isDequeuedProposalExpired(proposal, stage);
     if (!expired) {
       // TODO(asa): Think through the effects of changing the passing function
       require(
-        stage == Proposals.ProposalStage.Execution &&
+        stage == Proposals.Stage.Execution &&
         _isProposalPassing(proposal)
       );
       proposal.execute();
@@ -785,7 +780,7 @@ contract Governance is
     bool isVotingQueue = voter.upvotedProposal != 0 && isQueued(voter.upvotedProposal);
     Proposals.Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
     bool isVotingReferendum =
-      (proposal.getDequeuedStage(stageDurations) == Proposals.ProposalStage.Referendum);
+      (proposal.getDequeuedStage(stageDurations) == Proposals.Stage.Referendum);
     return isVotingQueue || isVotingReferendum;
   }
 
@@ -885,7 +880,7 @@ contract Governance is
    */
   function isDequeuedProposalExpired(
     Proposals.Proposal storage proposal,
-    Proposals.ProposalStage stage
+    Proposals.Stage stage
   )
     private
     view
@@ -896,9 +891,9 @@ contract Governance is
     //   2. Past the referendum stage and not passing.
     //   3. Past the execution stage.
     return (
-      (stage > Proposals.ProposalStage.Execution) ||
-      (stage > Proposals.ProposalStage.Referendum && !_isProposalPassing(proposal)) ||
-      (stage > Proposals.ProposalStage.Approval && !proposal.isApproved())
+      (stage > Proposals.Stage.Execution) ||
+      (stage > Proposals.Stage.Referendum && !_isProposalPassing(proposal)) ||
+      (stage > Proposals.Stage.Approval && !proposal.isApproved())
     );
   }
 
