@@ -13,14 +13,24 @@ export async function createQuizWordList(mnemonic: string, language: string | nu
 export function selectQuizWordOptions(correctWord: string, allWords: string[], numOptions: number) {
   const wordOptions = []
   const correctWordPosition = Math.floor(Math.random() * numOptions)
+  const usedIndex: number[] = []
+  let randomWordIndex: number
+
   for (let i = 0; i < numOptions; i++) {
     if (i === correctWordPosition) {
       wordOptions.push(correctWord)
       continue
     }
-    const randomWord = allWords[Math.floor(Math.random() * allWords.length)]
-    wordOptions.push(randomWord)
-    allWords = allWords.filter((w) => w !== randomWord)
+
+    while (true) {
+      randomWordIndex = Math.floor(Math.random() * allWords.length)
+      if (!usedIndex.includes(randomWordIndex)) {
+        break
+      }
+    }
+
+    wordOptions.push(allWords[randomWordIndex])
+    usedIndex.push(randomWordIndex)
   }
   return wordOptions
 }
