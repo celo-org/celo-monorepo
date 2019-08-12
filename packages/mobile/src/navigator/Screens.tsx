@@ -6,6 +6,8 @@ export enum Stacks {
 export enum Screens {
   Account = 'Account',
   Backup = 'Backup',
+  DappKitAccountAuth = 'DappKitAccountAuth',
+  DappKitSignTxScreen = 'DappKitSignTxScreen',
   Debug = 'Debug',
   DollarEducation = 'DollarEducation',
   EditProfile = 'EditProfile',
