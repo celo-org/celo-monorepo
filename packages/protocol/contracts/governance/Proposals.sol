@@ -154,7 +154,13 @@ library Proposals {
    * @param proposal The proposal struct.
    * @return The yes, no, and abstain vote totals.
    */
-  function getVoteTotals(Proposal storage proposal) public view returns (uint256, uint256, uint256) {
+  function getVoteTotals(
+    Proposal storage proposal
+  )
+    public
+    view
+    returns (uint256, uint256, uint256)
+  {
     return (proposal.votes.yes, proposal.votes.no, proposal.votes.abstain);
   }
 
@@ -168,15 +174,26 @@ library Proposals {
    * @param criticalBaseline The minimum participation at which "no" votes are not added.
    * @return The support ratio with the quorum condition.
    */
-  function adjustedSupport(Proposal storage proposal, int256 criticalBaseline) public view returns (int256) {
+  function adjustedSupport(
+    Proposal storage proposal,
+    int256 criticalBaseline
+  )
+    public
+    view
+    returns (int256)
+  {
     if (proposal.votes.yes == 0) {
       return 0;
     }
     int256 totalWeightFixed = toFixed(proposal.totalWeight);
     int256 yesRatio = toFixed(proposal.votes.yes).divide(totalWeightFixed);
     int256 abstainRatio = toFixed(proposal.votes.abstain).divide(totalWeightFixed);
-    int256 participation = toFixed(proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain)).divide(totalWeightFixed);
-    int256 adjustedYesNoRatio = (participation > criticalBaseline ? participation : criticalBaseline).subtract(abstainRatio);
+    int256 participation = toFixed(
+      proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain)
+    ).divide(totalWeightFixed);
+    int256 adjustedYesNoRatio = (
+      participation > criticalBaseline ? participation : criticalBaseline
+    ).subtract(abstainRatio);
     int256 support = yesRatio.divide(adjustedYesNoRatio);
     return support;
   }
@@ -195,9 +212,9 @@ library Proposals {
     view
     returns (ProposalStage)
   {
-    uint256 stageStartTime = proposal.timestamp.add(stageDurations.approval).add(stageDurations.referendum).add(
-      stageDurations.execution
-    );
+    uint256 stageStartTime = proposal.timestamp.add(stageDurations.approval).add(
+      stageDurations.referendum
+    ).add(stageDurations.execution);
     // solhint-disable-next-line not-rely-on-time
     if (now >= stageStartTime) {
       return Proposals.ProposalStage.Expiration;
@@ -224,7 +241,14 @@ library Proposals {
     return proposal.timestamp > 0;
   }
 
-  function vote(Proposal storage proposal, uint256 weight, VoteValue currentVote, VoteValue previousVote) public {
+  function vote(
+    Proposal storage proposal,
+    uint256 weight,
+    VoteValue currentVote,
+    VoteValue previousVote
+  )
+    public
+  {
     // Subtract previous vote.
     if (previousVote == VoteValue.Abstain) {
       proposal.votes.abstain = proposal.votes.abstain.sub(weight);

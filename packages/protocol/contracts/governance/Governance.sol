@@ -337,8 +337,16 @@ contract Governance is
    * @notice Updates the weight of the new participation in the baseline update rule.
    * @param _participationUpdateCoefficient The weight of the new participation.
    */
-  function setParticipationUpdateCoefficient(int256 _participationUpdateCoefficient) external onlyOwner {
-    require(_participationUpdateCoefficient != participationUpdateCoefficient && isFraction(_participationUpdateCoefficient));
+  function setParticipationUpdateCoefficient(
+    int256 _participationUpdateCoefficient
+  )
+    external
+    onlyOwner
+  {
+    require(
+      _participationUpdateCoefficient != participationUpdateCoefficient &&
+      isFraction(_participationUpdateCoefficient)
+    );
     participationUpdateCoefficient = _participationUpdateCoefficient;
     emit ParticipationUpdateCoefficientSet(_participationUpdateCoefficient);
   }
@@ -408,7 +416,13 @@ contract Governance is
     proposals[proposalCount].make(values, destinations, data, dataLengths, msg.sender, msg.value);
     queue.push(proposalCount);
     // solhint-disable-next-line not-rely-on-time
-    emit ProposalQueued(proposalCount, msg.sender, proposals[proposalCount].transactions.length, msg.value, now);
+    emit ProposalQueued(
+      proposalCount,
+      msg.sender,
+      proposals[proposalCount].transactions.length,
+      msg.value,
+      now
+    );
     return proposalCount;
   }
 
@@ -525,7 +539,11 @@ contract Governance is
       deleteDequeuedProposal(proposal, proposalId, index);
       return false;
     }
-    require(msg.sender == approver && !proposal.isApproved() && stage == Proposals.ProposalStage.Approval);
+    require(
+      msg.sender == approver &&
+      !proposal.isApproved() &&
+      stage == Proposals.ProposalStage.Approval
+    );
     proposal.approved = true;
     // Ensures that totalWeight is set by the end of Referendum, even if 0 votes are cast.
     proposal.totalWeight = totalWeight();
@@ -832,7 +850,9 @@ contract Governance is
   }
 
   function _isProposalPassing(Proposals.Proposal storage proposal) private view returns (bool) {
-    int256 support = proposal.adjustedSupport(participationBaseline.multiply(criticalBaselineLevel));
+    int256 support = proposal.adjustedSupport(
+      participationBaseline.multiply(criticalBaselineLevel)
+    );
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
       bytes4 functionId = extractFunctionSignature(proposal.transactions[i].data);
       int256 threshold = getConstitution(
@@ -846,7 +866,15 @@ contract Governance is
     return true;
   }
 
-  function isDequeuedProposal(Proposals.Proposal storage proposal, uint256 proposalId, uint256 index) private view returns (bool) {
+  function isDequeuedProposal(
+    Proposals.Proposal storage proposal,
+    uint256 proposalId,
+    uint256 index
+  )
+    private
+    view
+    returns (bool)
+  {
     return proposal.exists() && dequeued[index] == proposalId;
   }
 
@@ -855,7 +883,14 @@ contract Governance is
    * @param proposal The proposal struct.
    * @return Whether or not the dequeued proposal has expired.
    */
-  function isDequeuedProposalExpired(Proposals.Proposal storage proposal, Proposals.ProposalStage stage) private view returns (bool) {
+  function isDequeuedProposalExpired(
+    Proposals.Proposal storage proposal,
+    Proposals.ProposalStage stage
+  )
+    private
+    view
+    returns (bool)
+  {
     // The proposal is considered expired under the following conditions:
     //   1. Past the approval stage and not approved.
     //   2. Past the referendum stage and not passing.
