@@ -861,6 +861,12 @@ contract Governance is
     return true;
   }
 
+  /**
+   * @notice Returns whether a proposal is dequeued at the given index.
+   * @param proposal The proposal struct.
+   * @param proposalId The proposal ID.
+   * @param index The index of the proposal ID in `dequeued`.
+   */
   function isDequeuedProposal(
     Proposals.Proposal storage proposal,
     uint256 proposalId,
@@ -976,6 +982,10 @@ contract Governance is
     return threshold;
   }
 
+  /**
+   * @notice Returns whether a Fixed value is between 0 and 1.
+   * @param x The Fixed value.
+   */
   function isFraction(int256 x) private pure returns (bool) {
     return x >= 0 && x <= FIXED1;
   }
