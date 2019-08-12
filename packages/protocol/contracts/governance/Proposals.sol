@@ -98,6 +98,13 @@ library Proposals {
     }
   }
 
+  /**
+   * @notice Adds or changes a vote on a proposal.
+   * @param proposalId The ID of the proposal to vote on.
+   * @param weight The weight of the vote.
+   * @param currentVote The vote to be set.
+   * @param previousVote The vote to be removed, or None for a new vote.
+   */
   function vote(
     Proposal storage proposal,
     uint256 weight,
@@ -324,6 +331,10 @@ library Proposals {
     return result;
   }
 
+  /**
+   * @notice Converts a uint256 to Fixed form. Mirrors toFixed() in UsingFixidity.
+   * @param n The value to be converted.
+   */
   function toFixed(uint256 n) private pure returns (int256) {
     return int256(n).newFixed();
   }
