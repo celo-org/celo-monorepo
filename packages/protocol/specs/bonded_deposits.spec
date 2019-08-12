@@ -402,7 +402,7 @@ rule modifying_weight_other(address a, uint256 someNoticePeriod, uint256 someAva
 	env e_;
 	uint256 accountWeight_ = sinvoke _weight(e_,a);
 	
-	assert _accountWeight == accountWeight_, "Method changed weight of an account other than sender's";
+	assert _accountWeight == accountWeight_, "Method changed weight of an account other than sender";
 }
 
 rule atomic_deposit_notification(uint256 someNoticePeriod, uint256 notifyValue) {
