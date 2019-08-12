@@ -12,13 +12,14 @@ export function getRecipientFromPaymentRequest(
   if (cachedRecipient) {
     return {
       ...cachedRecipient,
+      kind: RecipientKind.Address,
       address: paymentRequest.requesterAddress,
     }
   } else {
     return {
       kind: RecipientKind.Address,
       address: paymentRequest.requesterAddress,
-      displayName: paymentRequest.requesterAddress,
+      displayName: paymentRequest.requesterE164Number || paymentRequest.requesterAddress,
     }
   }
 }
