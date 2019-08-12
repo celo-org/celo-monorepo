@@ -4,12 +4,12 @@ import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native
 import Fade from 'react-reveal/Fade'
 import { H2 } from 'src/fonts/Fonts'
 import Cyclone from 'src/home/Cyclone'
-import { PARTNERSHIP_ID } from 'src/home/version3/HomeEmail'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
 import Button, { BTN } from 'src/shared/Button.3'
+import { hashNav } from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import { scrollTo } from 'src/utils/utils'
@@ -39,7 +39,7 @@ const onStabilityPress = () => {
 }
 
 const onLearnMorePress = () => {
-  scrollTo(PARTNERSHIP_ID)
+  scrollTo(hashNav.home.partnerships)
 }
 
 class HomeSystems extends React.PureComponent<Props> {
