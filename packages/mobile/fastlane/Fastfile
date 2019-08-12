@@ -46,7 +46,7 @@ platform :android do
   desc 'Ship Integration to Playstore Alpha.'
   lane :integration do
     env = 'integration'
-    sdkEnv = 'alfajoresstaging'
+    sdkEnv = 'integration'
     clean
     build(environment: env, sdkEnv: sdkEnv)
     fastlane_supply(env, 'internal', env)
