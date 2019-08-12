@@ -34,6 +34,8 @@ resource "google_compute_instance" "validator" {
       bootnode_ip_address: var.bootnode_ip_address,
       celotool_docker_image_repository: var.celotool_docker_image_repository,
       celotool_docker_image_tag: var.celotool_docker_image_tag,
+      ethstats_host: var.ethstats_host,
+      ethstats_websocket_secret: var.ethstats_websocket_secret,
       genesis_content_base64: var.genesis_content_base64,
       geth_account_secret: var.geth_account_secret,
       geth_node_docker_image_repository: var.geth_node_docker_image_repository,
@@ -44,6 +46,7 @@ resource "google_compute_instance" "validator" {
       mnemonic: var.mnemonic,
       network_id: var.network_id,
       rid: count.index,
+      validator_name: "${var.celo_env}-validator-${count.index}",
       verification_pool_url: var.verification_pool_url
     }
   )

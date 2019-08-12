@@ -79,6 +79,8 @@ module "validator" {
   celo_env = var.celo_env
   celotool_docker_image_repository = var.celotool_docker_image_repository
   celotool_docker_image_tag = var.celotool_docker_image_tag
+  ethstats_host = var.ethstats_host
+  ethstats_websocket_secret = var.ethstats_websocket_secret
   genesis_content_base64 = var.genesis_content_base64
   geth_account_secret = var.validator_geth_account_secret
   geth_node_docker_image_repository = var.geth_node_docker_image_repository

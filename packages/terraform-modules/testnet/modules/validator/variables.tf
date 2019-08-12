@@ -23,6 +23,16 @@ variable celotool_docker_image_tag {
   description = "Tag of the celotool docker image"
 }
 
+variable ethstats_host {
+  type = "string"
+  description = "Ethstats url or IP address"
+}
+
+variable ethstats_websocket_secret {
+  type = string
+  description = "Ethstats websocket secret to allow validators to report activity"
+}
+
 variable genesis_content_base64 {
   type = string
   description = "Content of the genesis file encoded in base64"

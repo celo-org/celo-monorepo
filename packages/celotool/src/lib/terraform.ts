@@ -13,6 +13,7 @@ const terraformEnvVars: { [varName: string]: string } = {
   celo_env: envVar.CELOTOOL_CELOENV,
   celotool_docker_image_repository: envVar.CELOTOOL_DOCKER_IMAGE_REPOSITORY,
   celotool_docker_image_tag: envVar.CELOTOOL_DOCKER_IMAGE_TAG,
+  ethstats_websocket_secret: envVar.ETHSTATS_WEBSOCKETSECRET,
   geth_verbosity: envVar.GETH_VERBOSITY,
   geth_bootnode_docker_image_repository: envVar.GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY,
   geth_bootnode_docker_image_tag: envVar.GETH_BOOTNODE_DOCKER_IMAGE_TAG,
@@ -66,6 +67,9 @@ function getVarOptions() {
   return [
     getEnvVarOptions(),
     `-var='genesis_content_base64=${genesisBuffer.toString('base64')}'`,
+    `-var='ethstats_host=${fetchEnv(envVar.CELOTOOL_CELOENV)}-ethstats.${fetchEnv(
+      envVar.CLUSTER_DOMAIN_NAME
+    )}.org'`,
   ].join(' ')
 }
 
