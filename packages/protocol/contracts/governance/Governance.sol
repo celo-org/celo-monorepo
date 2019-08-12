@@ -189,7 +189,6 @@ contract Governance is
    * @param _criticalBaselineLevel The proportion of the baseline under which additional
    *   "no" votes will be added.
    * @dev Should be called only once.
-   * @dev Should be called only once.
    */
   function initialize(
     address registryAddress,
