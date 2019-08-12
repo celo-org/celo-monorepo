@@ -1,3 +1,4 @@
+import { ensureAuthenticatedGcloudAccount } from '@celo/celotool/src/lib/gcloud_utils'
 import { StaticNodeUtils } from '@celo/contractkit'
 import { Storage } from '@google-cloud/storage'
 import { writeFileSync } from 'fs'
@@ -57,6 +58,7 @@ async function uploadFileToGoogleStorage(
   googleStorageFileName: string,
   makeFileWorldReadable: boolean
 ) {
+  await ensureAuthenticatedGcloudAccount()
   const storage = new Storage()
   await storage.bucket(googleStorageBucketName).upload(localFilePath, {
     destination: googleStorageFileName,
