@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import {
   Actions,
   EscrowedPayment,
@@ -74,9 +74,9 @@ function* transferStableTokenToEscrow(action: TransferPaymentAction) {
   } catch (e) {
     Logger.error(TAG + '@transferToEscrow', 'Error transfering to escrow', e)
     if (e.message === ErrorMessages.INCORRECT_PIN) {
-      yield put(showError(ErrorMessages.INCORRECT_PIN, ERROR_BANNER_DURATION))
+      yield put(showError(ErrorMessages.INCORRECT_PIN, ALERT_BANNER_DURATION))
     } else {
-      yield put(showError(ErrorMessages.ESCROW_TRANSFER_FAILED, ERROR_BANNER_DURATION))
+      yield put(showError(ErrorMessages.ESCROW_TRANSFER_FAILED, ALERT_BANNER_DURATION))
     }
   }
 }
@@ -147,9 +147,9 @@ function* withdrawFromEscrow(action: EndVerificationAction) {
   } catch (e) {
     Logger.error(TAG + '@withdrawFromEscrow', 'Error withdrawing payment from escrow', e)
     if (e.message === ErrorMessages.INCORRECT_PIN) {
-      yield put(showError(ErrorMessages.INCORRECT_PIN, ERROR_BANNER_DURATION))
+      yield put(showError(ErrorMessages.INCORRECT_PIN, ALERT_BANNER_DURATION))
     } else {
-      yield put(showError(ErrorMessages.ESCROW_WITHDRAWAL_FAILED, ERROR_BANNER_DURATION))
+      yield put(showError(ErrorMessages.ESCROW_WITHDRAWAL_FAILED, ALERT_BANNER_DURATION))
     }
   }
 }
@@ -193,9 +193,9 @@ function* reclaimFromEscrow(action: ReclaimPaymentAction) {
   } catch (e) {
     Logger.error(TAG + '@reclaimFromEscrow', 'Error reclaiming payment from escrow', e)
     if (e.message === ErrorMessages.INCORRECT_PIN) {
-      yield put(showError(ErrorMessages.INCORRECT_PIN, ERROR_BANNER_DURATION))
+      yield put(showError(ErrorMessages.INCORRECT_PIN, ALERT_BANNER_DURATION))
     } else {
-      yield put(showError(ErrorMessages.RECLAIMING_ESCROWED_PAYMENT_FAILED, ERROR_BANNER_DURATION))
+      yield put(showError(ErrorMessages.RECLAIMING_ESCROWED_PAYMENT_FAILED, ALERT_BANNER_DURATION))
     }
     yield put(reclaimPaymentFailure(e))
   }

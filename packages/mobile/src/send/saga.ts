@@ -6,7 +6,7 @@ import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { features } from 'src/flags'
 import { transferGoldToken } from 'src/goldToken/actions'
 import { encryptComment } from 'src/identity/commentKey'
@@ -16,13 +16,13 @@ import { sendInvite } from 'src/invite/saga'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { handleBarcode, shareSVGImage } from 'src/qrcode/utils'
+import { recipientCacheSelector } from 'src/recipients/reducer'
 import {
   Actions,
   SendPaymentOrInviteAction,
   sendPaymentOrInviteFailure,
   sendPaymentOrInviteSuccess,
 } from 'src/send/actions'
-import { recipientCacheSelector } from 'src/send/reducers'
 import { transferStableToken } from 'src/stableToken/actions'
 import { BasicTokenTransfer, createTransaction } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
@@ -52,6 +52,8 @@ export async function getSendFee(
 
 export function* watchQrCodeDetections() {
   while (true) {
+    // TODO(Rossy) this gets called taken multiple times before a user can press the send button
+    // Add de-bouncing logic
     const action = yield take(Actions.BARCODE_DETECTED)
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const recipientCache = yield select(recipientCacheSelector)
@@ -159,7 +161,7 @@ export function* sendPaymentOrInviteSaga({
 
     yield put(sendPaymentOrInviteSuccess())
   } catch (e) {
-    yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED, ERROR_BANNER_DURATION))
+    yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED, ALERT_BANNER_DURATION))
     yield put(sendPaymentOrInviteFailure())
   }
 }

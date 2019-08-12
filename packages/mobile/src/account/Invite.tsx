@@ -13,17 +13,17 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CancelButton from 'src/components/CancelButton'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import { importContacts } from 'src/identity/actions'
 import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { filterRecipients, NumberToRecipient, Recipient } from 'src/recipients/recipient'
+import RecipientPicker from 'src/recipients/RecipientPicker'
+import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
-import RecipientPicker from 'src/send/RecipientPicker'
-import { recipientCacheSelector } from 'src/send/reducers'
 import { checkContactsPermission } from 'src/utils/androidPermissions'
-import { filterRecipients, NumberToRecipient, Recipient } from 'src/utils/recipient'
 
 interface State {
   searchQuery: string
@@ -98,7 +98,7 @@ class Invite extends React.Component<Props, State> {
       CeloAnalytics.track(CustomEventNames.friend_invited)
       navigate(Screens.InviteReview, { recipient })
     } else {
-      this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE, ERROR_BANNER_DURATION)
+      this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE, ALERT_BANNER_DURATION)
     }
   }
 

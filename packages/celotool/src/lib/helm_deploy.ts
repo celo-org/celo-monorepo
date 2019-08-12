@@ -647,9 +647,10 @@ export async function resetAndUpgradeHelmChart(celoEnv: string) {
   await scaleResource(celoEnv, 'Deployment', bootnodeName, 0)
 
   await deletePersistentVolumeClaims(celoEnv)
-  await sleep(5000)
+  await sleep(10000)
 
   await upgradeHelmChart(celoEnv)
+  await sleep(10000)
 
   const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
   const numTxNodes = parseInt(fetchEnv(envVar.TX_NODES), 10)

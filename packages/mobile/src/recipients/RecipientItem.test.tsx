@@ -1,7 +1,7 @@
 import * as React from 'react'
 import 'react-native'
 import * as renderer from 'react-test-renderer'
-import RecipientItem from 'src/send/RecipientItem'
+import RecipientItem from 'src/recipients/RecipientItem'
 import { mockRecipient } from 'test/values'
 
 describe(RecipientItem, () => {
