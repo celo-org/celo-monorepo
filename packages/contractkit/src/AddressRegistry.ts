@@ -1,4 +1,4 @@
-import { Address, CeloContract, NULL_ADDRESS } from 'src/base'
+import { Address, AllContracts, CeloContract, NULL_ADDRESS } from 'src/base'
 import { newRegistry } from 'src/generated/Registry'
 import { Registry } from 'src/generated/types/Registry'
 import { ContractKit } from 'src/kit'
@@ -27,14 +27,11 @@ export class AddressRegistry {
     return this.cache.get(contract)!
   }
 
-  // async allAddresses(): Promise<Map<CeloContract, Address>> {
-  //   const AllContracts = Object.keys(CeloContract).map((contract) => {
-  //     if (typeof contract === string) {
-  //       return CeloContract[contract]
-  //     }
-  //   }) as CeloContract[]
-  //   AllContracts.forEach(async (contract) => {
-  //     await this.addressFor(contract)
-  //   })
-  // }
+  async allAddresses(): Promise<Record<CeloContract, Address>> {
+    const res: Partial<Record<CeloContract, Address>> = {}
+    for (const contract of AllContracts) {
+      res[contract] = await this.addressFor(contract)
+    }
+    return res as Record<CeloContract, Address>
+  }
 }
