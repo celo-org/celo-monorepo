@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Invite renders correctly 1`] = `
+exports[`Invite renders correctly with no recipients 1`] = `
 <View
   style={
     Object {
@@ -152,44 +152,9 @@ exports[`Invite renders correctly 1`] = `
                 }
               }
             >
-              noResultsFor
-            </Text>
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 24,
-                  },
-                  Object {
-                    "color": "#2E3338",
-                  },
-                ]
-              }
-            >
-               ""
+              noContacts
             </Text>
           </View>
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 14,
-                  "lineHeight": 18,
-                },
-                Object {
-                  "justifyContent": "center",
-                  "textAlign": "center",
-                },
-              ]
-            }
-          >
-            searchForSomeone
-          </Text>
         </View>
       }
       data={Array []}
@@ -247,43 +212,428 @@ exports[`Invite renders correctly 1`] = `
                 }
               }
             >
-              noResultsFor
-            </Text>
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 24,
-                  },
-                  Object {
-                    "color": "#2E3338",
-                  },
-                ]
-              }
-            >
-               ""
+              noContacts
             </Text>
           </View>
+        </View>
+      </View>
+    </RCTScrollView>
+  </View>
+</View>
+`;
+
+exports[`Invite renders correctly with recipients 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "flex": 1,
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "borderColor": "#EEEEEE",
+            "borderRadius": 3,
+            "borderWidth": 1,
+            "flexDirection": "row",
+            "height": 50,
+            "marginHorizontal": 10,
+            "marginVertical": 5,
+          },
+          Object {
+            "borderColor": "#EEEEEE",
+          },
+        ]
+      }
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flexDirection": "column",
+            "justifyContent": "center",
+            "minWidth": 45,
+          }
+        }
+      >
+        <svg
+          fill="none"
+          height={18}
+          style={Object {}}
+          viewBox="0 0 18 18"
+          width={18}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            clipRule="evenodd"
+            d="M2.65971 7.31402C2.65971 9.88456 4.74354 11.9684 7.31408 11.9684C9.88462 11.9684 11.9685 9.88456 11.9685 7.31402C11.9685 4.74348 9.88462 2.65964 7.31408 2.65964C4.74354 2.65964 2.65971 4.74348 2.65971 7.31402ZM6.10352e-05 7.31402C6.10352e-05 11.3534 3.27466 14.628 7.31408 14.628C8.65119 14.628 9.9045 14.2692 10.983 13.6427L14.9508 17.6105C15.4701 18.1298 16.3121 18.1298 16.8315 17.6105C17.3508 17.0912 17.3508 16.2492 16.8315 15.7298L13.0074 11.9058C14.0211 10.6505 14.6281 9.05315 14.6281 7.31402C14.6281 3.2746 11.3535 0 7.31408 0C3.27466 0 6.10352e-05 3.2746 6.10352e-05 7.31402Z"
+            fill="#81868B"
+            fillRule="evenodd"
+            style={Object {}}
+          />
+        </svg>
+      </View>
+      <View
+        style={
+          Array [
+            Object {
+              "height": 35,
+              "width": 1,
+            },
+            Object {
+              "backgroundColor": "#EEEEEE",
+            },
+          ]
+        }
+      />
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "center",
+            },
+            Object {
+              "flex": 1,
+              "height": 54,
+              "marginHorizontal": 8,
+            },
+          ]
+        }
+      >
+        <TextInput
+          allowFontScaling={true}
+          keyboardType="default"
+          onBlur={[Function]}
+          onChangeText={[Function]}
+          onFocus={[Function]}
+          placeholder="nameOrPhoneNumber"
+          placeholderTextColor="rgba(0, 0, 0, .4)"
+          rejectResponderTermination={true}
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-Regular",
+              },
+              Object {
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "padding": 8,
+              },
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "flex": 1,
+              },
+            ]
+          }
+          underlineColorAndroid="transparent"
+          value=""
+        />
+      </View>
+    </View>
+    <RCTScrollView
+      ListEmptyComponent={
+        <View
+          style={
+            Object {
+              "justifyContent": "center",
+              "paddingHorizontal": 50,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "flexDirection": "row",
+                "justifyContent": "center",
+                "paddingVertical": 20,
+                "textAlign": "center",
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 24,
+                }
+              }
+            >
+              noContacts
+            </Text>
+          </View>
+        </View>
+      }
+      ListFooterComponent={[Function]}
+      data={
+        Array [
+          Object {
+            "data": Array [
+              Object {
+                "contactId": "contactId",
+                "displayId": "14155550000",
+                "displayName": "John Doe",
+                "e164PhoneNumber": "+14155550000",
+                "kind": "Contact",
+                "phoneNumberLabel": "phoneNumLabel",
+              },
+            ],
+            "key": "contacts",
+          },
+        ]
+      }
+      disableVirtualization={false}
+      getItem={[Function]}
+      getItemCount={[Function]}
+      horizontal={false}
+      initialNumToRender={30}
+      keyExtractor={[Function]}
+      keyboardShouldPersistTaps="handled"
+      maxToRenderPerBatch={10}
+      onContentSizeChange={[Function]}
+      onEndReachedThreshold={2}
+      onLayout={[Function]}
+      onMomentumScrollEnd={[Function]}
+      onScroll={[Function]}
+      onScrollBeginDrag={[Function]}
+      onScrollEndDrag={[Function]}
+      renderItem={[Function]}
+      renderSectionHeader={[Function]}
+      scrollEventThrottle={50}
+      sections={
+        Array [
+          Object {
+            "data": Array [
+              Object {
+                "contactId": "contactId",
+                "displayId": "14155550000",
+                "displayName": "John Doe",
+                "e164PhoneNumber": "+14155550000",
+                "kind": "Contact",
+                "phoneNumberLabel": "phoneNumLabel",
+              },
+            ],
+            "key": "contacts",
+          },
+        ]
+      }
+      stickyHeaderIndices={
+        Array [
+          0,
+        ]
+      }
+      stickySectionHeadersEnabled={true}
+      updateCellsBatchingPeriod={50}
+      windowSize={21}
+    >
+      <View>
+        <View
+          onLayout={[Function]}
+          style={null}
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#F8F8F8",
+                "display": "flex",
+                "flexDirection": "row",
+                "height": 36,
+                "justifyContent": "space-between",
+                "paddingHorizontal": 10,
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Medium",
+                  "fontSize": 12,
+                }
+              }
+            >
+              contacts
+            </Text>
+          </View>
+        </View>
+        <View
+          onLayout={[Function]}
+          style={null}
+        >
+          <View
+            accessible={true}
+            isTVSelectable={true}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={null}
+          >
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "height": 50,
+                  "justifyContent": "space-between",
+                  "paddingHorizontal": 10,
+                }
+              }
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "marginRight": 10,
+                    },
+                  ]
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "justifyContent": "center",
+                      },
+                      Object {
+                        "backgroundColor": "#7AD6FE",
+                        "borderRadius": 20,
+                        "height": 40,
+                        "width": 40,
+                      },
+                    ]
+                  }
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#FFFFFF",
+                          "fontFamily": "Hind-Medium",
+                          "fontSize": 16,
+                        },
+                        Object {
+                          "fontSize": 20,
+                        },
+                      ]
+                    }
+                  >
+                    J
+                  </Text>
+                </View>
+              </View>
+              <View
+                style={
+                  Object {
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "paddingRight": 5,
+                  }
+                }
+              >
+                <Text
+                  ellipsizeMode="tail"
+                  numberOfLines={1}
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-SemiBold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "lineHeight": 41,
+                      },
+                    ]
+                  }
+                >
+                  John Doe
+                </Text>
+              </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "fontFamily": "Hind-Light",
+                    },
+                    Object {
+                      "lineHeight": 41,
+                      "textAlign": "right",
+                    },
+                  ]
+                }
+              >
+                14155550000
+              </Text>
+            </View>
+          </View>
+        </View>
+        <View
+          onLayout={[Function]}
+          style={null}
+        />
+        <View
+          onLayout={[Function]}
+        >
+          <View
+            style={
+              Object {
+                "backgroundColor": "#EEEEEE",
+                "height": 1,
+                "marginLeft": 60,
+              }
+            }
+          />
           <Text
             style={
               Array [
                 Object {
-                  "color": "#2E3338",
+                  "color": "#81868B",
                   "fontFamily": "Hind-Regular",
                   "fontSize": 14,
-                  "lineHeight": 18,
+                  "lineHeight": 20,
                 },
                 Object {
-                  "justifyContent": "center",
+                  "paddingHorizontal": 50,
+                  "paddingVertical": 20,
                   "textAlign": "center",
                 },
               ]
             }
           >
-            searchForSomeone
+            searchFriends
           </Text>
         </View>
       </View>

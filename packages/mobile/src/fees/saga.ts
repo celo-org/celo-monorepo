@@ -1,4 +1,4 @@
-import { getStableTokenContract } from '@celo/contractkit'
+import { getStableTokenContract } from '@celo/walletkit'
 import { call, put, spawn, takeLeading } from 'redux-saga/effects'
 import { getReclaimEscrowFee } from 'src/escrow/saga'
 import { Actions, EstimateFeeAction, feeEstimated, FeeType } from 'src/fees/actions'

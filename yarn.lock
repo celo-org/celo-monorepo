@@ -23285,11 +23285,6 @@ postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.2:
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-postinstall-postinstall@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/postinstall-postinstall/-/postinstall-postinstall-1.0.0.tgz#49c8c6dcc95fe02f1ffc8edfb35b83f1e6616be5"
-  integrity sha512-wy05IaZP73c7A/VQt5ChsZkzP+XUqs3bSJf45AP1PyHTf/FGy4qNwqG05h0t42v4KIUT93gKRRuj+bQYSlz9FA==
-
 postinstall-prepare@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/postinstall-prepare/-/postinstall-prepare-1.0.1.tgz#dac9b5d91b054389141b13c0192eb68a0aa002b5"
@@ -29311,9 +29306,9 @@ type-is@~1.6.17:
     media-typer "0.3.0"
     mime-types "~2.1.24"
 
-"typechain@git+https://github.com/celo-org/TypeChain.git#ce6a33b":
+"typechain@git+https://github.com/celo-org/TypeChain.git#832e628":
   version "0.3.11"
-  resolved "git+https://github.com/celo-org/TypeChain.git#ce6a33b06af43da8c3997a9d0ed1d27683d24bd9"
+  resolved "git+https://github.com/celo-org/TypeChain.git#832e628fab8f7d9946d46047afe73958d527c262"
   dependencies:
     command-line-args "^4.0.7"
     debug "^3.0.1"

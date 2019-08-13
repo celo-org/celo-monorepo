@@ -60,8 +60,8 @@ const images = [
   {
     height: 300,
     width: 450,
-    image: require('src/home/carousel/04-jason-will-wfp@2x.jpg'),
-    caption: 'Jason and Will participating in the World Food Programme’s Innovation Accelerator',
+    image: require('src/home/carousel/04-anna-onboarding@2x.jpg'),
+    caption: 'Anna onboarding merchants in the Philippines',
   },
   {
     height: 300,

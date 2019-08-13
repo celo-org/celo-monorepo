@@ -8,6 +8,7 @@ import { H2 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
+import { hashNav } from 'src/shared/menu-items'
 import { colors, standardStyles, textStyles } from 'src/styles'
 
 class FellowSection extends React.PureComponent<I18nProps> {
@@ -15,8 +16,10 @@ class FellowSection extends React.PureComponent<I18nProps> {
     const { t } = this.props
     return (
       <>
-        <View style={[styles.darkBackground, styles.keepOnScreen]}>
-          <span id={'fellowship'} />
+        <View
+          nativeID={hashNav.connect.fellowship}
+          style={[styles.darkBackground, styles.keepOnScreen]}
+        >
           <GridRow mobileStyle={[styles.proposalArea, standardStyles.blockMarginBottomTablet]}>
             <Cell span={Spans.half} style={styles.verticalCenter}>
               <View style={styles.proposalText}>

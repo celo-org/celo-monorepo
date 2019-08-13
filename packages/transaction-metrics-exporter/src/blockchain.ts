@@ -8,7 +8,7 @@ import {
   getFunctionSignatureFromInput,
   parseFunctionCall,
   parseLog,
-} from '@celo/contractkit'
+} from '@celo/walletkit'
 import { find } from 'lodash'
 import {
   blockheaderCounter,
