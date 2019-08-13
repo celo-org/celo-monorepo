@@ -93,6 +93,6 @@ export {
 export { ContractUtils }
 export { GenesisBlockUtils }
 export { GoogleStorageUtils }
-export { Logger as ContractKitLogger, LogLevel as ContractKitLogLevel }
+export { Logger as WalletKitLogger, LogLevel as WalletKitLogLevel }
 export { StaticNodeUtils }
 export { Web3Utils }

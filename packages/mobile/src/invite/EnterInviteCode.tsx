@@ -45,7 +45,6 @@ interface StateProps {
 }
 
 interface State {
-  inviteCode: string
   isSubmitting: boolean
   appState: AppStateStatus
   validCodeInClipboard: boolean
@@ -93,7 +92,6 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   state: State = {
-    inviteCode: '',
     isSubmitting: false,
     appState: AppState.currentState,
     validCodeInClipboard: false,

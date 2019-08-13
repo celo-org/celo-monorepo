@@ -1,6 +1,6 @@
 import Web3 from 'web3'
 
-import { CeloTokenType, Exchange } from '@celo/contractkit'
+import { CeloTokenType, Exchange } from '@celo/walletkit'
 
 import { displaySendTx } from './cli'
 

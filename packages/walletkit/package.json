@@ -1,7 +1,7 @@
 {
-  "name": "@celo/contractkit",
+  "name": "@celo/walletkit",
   "version": "0.0.4",
-  "description": "Celo's ContractKit to interact with Celo network",
+  "description": "Celo's WalletKit to interact with Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "author": "Celo",
@@ -35,7 +35,7 @@
     "prettier": "1.13.5",
     "sleep-promise": "^8.0.1",
     "ts-jest": "^24.0.0",
-    "typechain": "git+https://github.com/celo-org/TypeChain.git#ce6a33b",
+    "typechain": "git+https://github.com/celo-org/TypeChain.git#832e628",
     "typescript": "^3.3.3",
     "web3": "1.0.0-beta.37",
     "web3-utils": "1.0.0-beta.37"
@@ -54,7 +54,7 @@
     "jest": "^24.8.0",
     "prettier": "1.13.5",
     "ts-jest": "^24.0.0",
-    "typechain": "git+https://github.com/celo-org/TypeChain.git#ce6a33b",
+    "typechain": "git+https://github.com/celo-org/TypeChain.git#832e628",
     "typescript": "^3.3.3"
   },
   "files": [

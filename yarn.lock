@@ -29294,9 +29294,9 @@ type-is@~1.6.17:
     media-typer "0.3.0"
     mime-types "~2.1.24"
 
-"typechain@git+https://github.com/celo-org/TypeChain.git#ce6a33b":
+"typechain@git+https://github.com/celo-org/TypeChain.git#832e628":
   version "0.3.11"
-  resolved "git+https://github.com/celo-org/TypeChain.git#ce6a33b06af43da8c3997a9d0ed1d27683d24bd9"
+  resolved "git+https://github.com/celo-org/TypeChain.git#832e628fab8f7d9946d46047afe73958d527c262"
   dependencies:
     command-line-args "^4.0.7"
     debug "^3.0.1"
