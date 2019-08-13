@@ -8,13 +8,13 @@ import { setAccountCreationTime } from 'src/account/actions'
 import { pincodeSelector } from 'src/account/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { setInviteCodeEntered } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData } from 'src/geth/geth'
 import { waitForGethConnectivity } from 'src/geth/saga'
+import { redeemComplete } from 'src/invite/actions'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import Logger from 'src/utils/Logger'
@@ -162,8 +162,7 @@ export function* assignAccountFromPrivateKey(key: string) {
     )
 
     yield put(setAccount(account))
-    // TODO(cmcewen): remove invite code entered
-    yield put(setInviteCodeEntered(true))
+    yield put(redeemComplete(true))
     yield put(setAccountCreationTime())
     yield call(assignDataKeyFromPrivateKey, key)
 
@@ -172,6 +171,7 @@ export function* assignAccountFromPrivateKey(key: string) {
     return account
   } catch (e) {
     Logger.error(TAG, `@assignAccountFromPrivateKey: ${e}`)
+    yield put(redeemComplete(false))
     return null
   }
 }

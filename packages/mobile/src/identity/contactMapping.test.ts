@@ -1,4 +1,4 @@
-import { getAttestationsContract } from '@celo/contractkit'
+import { getAttestationsContract } from '@celo/walletkit'
 import { expectSaga } from 'redux-saga-test-plan'
 import { throwError } from 'redux-saga-test-plan/providers'
 import { call, select } from 'redux-saga/effects'
