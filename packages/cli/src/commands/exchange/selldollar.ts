@@ -1,4 +1,4 @@
-import { StableToken } from '@celo/contractkit'
+import { StableToken } from '@celo/walletkit'
 
 import { BaseCommand } from '../../base'
 import { doSwap, swapArguments } from '../../utils/exchange'

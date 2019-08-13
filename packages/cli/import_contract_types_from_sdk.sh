@@ -3,11 +3,11 @@ set -euo pipefail
 
 environment="$1"
 
-yarn --cwd=../contractkit build $environment
+yarn --cwd=../walletkit build $environment
 
 rm -rf ./src/generated
 mkdir -p ./src/generated/contracts
 mkdir -p ./src/generated/types
-cp ../contractkit/contracts/*.ts ./src/generated/contracts
-cp ../contractkit/types/*.d.ts ./src/generated/types
+cp ../walletkit/contracts/*.ts ./src/generated/contracts
+cp ../walletkit/types/*.d.ts ./src/generated/types
 

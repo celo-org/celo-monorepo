@@ -18,7 +18,7 @@ COPY yarn.lock /celo-monorepo/yarn.lock
 COPY .prettierrc.js /celo-monorepo/.prettierrc.js
 COPY packages/utils /celo-monorepo/packages/utils
 COPY packages/typescript /celo-monorepo/packages/typescript
-COPY packages/contractkit /celo-monorepo/packages/contractkit
+COPY packages/walletkit /celo-monorepo/packages/walletkit
 COPY packages/celotool /celo-monorepo/packages/celotool
 COPY packages/transaction-metrics-exporter /celo-monorepo/packages/transaction-metrics-exporter
 
