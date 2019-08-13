@@ -13,7 +13,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CancelButton from 'src/components/CancelButton'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import { importContacts } from 'src/identity/actions'
 import { E164NumberToAddressType } from 'src/identity/reducer'
@@ -81,7 +81,9 @@ const mapStateToProps = (state: RootState): StateProps => ({
   e164PhoneNumber: state.account.e164PhoneNumber,
   devModeActive: state.account.devModeActive || false,
   e164PhoneNumberAddressMapping: state.identity.e164NumberToAddress,
-  recentRecipients: [CeloDefaultRecipient, ...state.send.recentRecipients],
+  recentRecipients: state.account.devModeActive
+    ? [CeloDefaultRecipient, ...state.send.recentRecipients]
+    : state.send.recentRecipients,
   allRecipients: Object.values(recipientCacheSelector(state)),
 })
 
@@ -158,7 +160,7 @@ class Send extends React.Component<Props, State> {
     })
 
     if (!recipient.e164PhoneNumber && !recipient.address) {
-      this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE, ERROR_BANNER_DURATION)
+      this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE, ALERT_BANNER_DURATION)
       return
     }
 

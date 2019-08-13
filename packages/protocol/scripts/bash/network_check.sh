@@ -22,8 +22,7 @@ done
 
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
 
-yarn run contract-types && \
-yarn run compile-typescript && \
+yarn run build && \
 yarn run truffle exec ./scripts/truffle/network_check.js \
   --network $NETWORK --build_directory $PWD/build/$NETWORK \
   --truffle_override "$TRUFFLE_OVERRIDE" \
