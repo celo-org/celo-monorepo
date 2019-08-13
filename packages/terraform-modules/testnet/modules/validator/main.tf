@@ -32,8 +32,6 @@ resource "google_compute_instance" "validator" {
     format("%s/startup.sh", path.module), {
       block_time: var.block_time,
       bootnode_ip_address: var.bootnode_ip_address,
-      celotool_docker_image_repository: var.celotool_docker_image_repository,
-      celotool_docker_image_tag: var.celotool_docker_image_tag,
       ethstats_host: var.ethstats_host,
       ethstats_websocket_secret: var.ethstats_websocket_secret,
       gcloud_secrets_base_path: var.gcloud_secrets_base_path,

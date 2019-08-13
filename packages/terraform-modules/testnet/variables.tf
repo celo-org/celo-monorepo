@@ -8,16 +8,6 @@ variable celo_env {
   description = "Name of the testnet Celo environment"
 }
 
-variable celotool_docker_image_repository {
-  type = string
-  description = "Repository of the celotool docker image"
-}
-
-variable celotool_docker_image_tag {
-  type = string
-  description = "Tag of the celotool docker image"
-}
-
 variable ethstats_host {
   type = "string"
   description = "Ethstats url or IP address"

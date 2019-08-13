@@ -3,6 +3,16 @@ variable celo_env {
   description = "Name of the testnet Celo environment"
 }
 
+variable gcloud_secrets_base_path {
+  type = string
+  description = "Base path in the secrets bucket of a Google Cloud Storage file containing validator secrets"
+}
+
+variable gcloud_secrets_bucket {
+  type = string
+  description = "Name of the Google Cloud Storage bucket where secrets are kept"
+}
+
 variable geth_bootnode_docker_image_repository {
   type = string
   description = "Repository of the geth bootnode docker image"

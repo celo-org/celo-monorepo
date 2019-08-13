@@ -17,18 +17,14 @@ gcloud auth configure-docker
 
 BOOTNODE_VERBOSITY=1
 
-CELOTOOL_DOCKER_IMAGE=${celotool_docker_image_repository}:${celotool_docker_image_tag}
 GETH_BOOTNODE_DOCKER_IMAGE=${geth_bootnode_docker_image_repository}:${geth_bootnode_docker_image_tag}
 
-# Get the node key from the celotool docker container
-
-echo "Pulling celotool..."
-docker pull $CELOTOOL_DOCKER_IMAGE
-
-echo "Generating node key..."
-NODE_KEY=`docker run --rm $CELOTOOL_DOCKER_IMAGE \
-  celotooljs.sh generate bip32 --mnemonic "this is a fake mnemonic" \
-  --accountType bootnode --index 0`
+# download & apply secrets pulled from Cloud Storage as environment vars
+echo "Downloading secrets from Google Cloud Storage..."
+SECRETS_ENV_PATH=/var/.env.celo.secrets
+gsutil cp gs://${gcloud_secrets_bucket}/${gcloud_secrets_base_path}/.env.bootnode $SECRETS_ENV_PATH
+# Apply the .env file
+. $SECRETS_ENV_PATH
 
 echo "Pulling bootnode..."
 docker pull $GETH_BOOTNODE_DOCKER_IMAGE

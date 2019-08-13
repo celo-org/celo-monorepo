@@ -18,7 +18,7 @@ GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_i
 echo "Downloading secrets from Google Cloud Storage..."
 SECRETS_ENV_PATH=/var/.env.celo.secrets
 gsutil cp gs://${gcloud_secrets_bucket}/${gcloud_secrets_base_path}/.env.validator-${rid} $SECRETS_ENV_PATH
-# Applies the .env file
+# Apply the .env file
 . $SECRETS_ENV_PATH
 
 echo "Address: $ACCOUNT_ADDRESS"
@@ -27,10 +27,10 @@ echo "Bootnode enode address: $BOOTNODE_ENODE_ADDRESS"
 BOOTNODE_ENODE=$BOOTNODE_ENODE_ADDRESS@${bootnode_ip_address}:30301
 echo "Bootnode enode: $BOOTNODE_ENODE"
 
+echo "Pulling geth..."
 docker pull $GETH_NODE_DOCKER_IMAGE
 
-echo "Starting geth...."
-
+echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`)
 docker run --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
   set -euo pipefail && \

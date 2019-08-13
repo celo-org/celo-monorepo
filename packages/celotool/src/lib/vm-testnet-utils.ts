@@ -27,8 +27,6 @@ const terraformModule = 'testnet'
 const terraformEnvVars: { [varName: string]: string } = {
   block_time: envVar.BLOCK_TIME,
   celo_env: envVar.CELOTOOL_CELOENV,
-  celotool_docker_image_repository: envVar.CELOTOOL_DOCKER_IMAGE_REPOSITORY,
-  celotool_docker_image_tag: envVar.CELOTOOL_DOCKER_IMAGE_TAG,
   geth_verbosity: envVar.GETH_VERBOSITY,
   geth_bootnode_docker_image_repository: envVar.GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY,
   geth_bootnode_docker_image_tag: envVar.GETH_BOOTNODE_DOCKER_IMAGE_TAG,
@@ -102,22 +100,32 @@ function getTerraformEnvVarValues() {
 // TODO(trevor): update this to include tx-nodes when they are added to
 // the terraform module
 export async function generateAndUploadSecrets(celoEnv: string) {
+  // Bootnode
+  const bootnodeSecrets = generateBootnodeSecretEnvVars()
+  await uploadSecrets(celoEnv, bootnodeSecrets, 'bootnode')
+  // Validators
   const validatorCount = parseInt(fetchEnv(envVar.VALIDATORS), 10)
   for (let i = 0; i < validatorCount; i++) {
-    const secrets = generateSecretsEnvVars(AccountType.VALIDATOR, i)
-    const localTmpFilePath = `/tmp/${celoEnv}-validator-${i}-secrets`
-    writeFileSync(localTmpFilePath, secrets)
-    const cloudStorageFileName = `${secretsBasePath(celoEnv)}/.env.validator-${i}`
-    await uploadFileToGoogleStorage(
-      localTmpFilePath,
-      secretsBucketName,
-      cloudStorageFileName,
-      false
-    )
+    const secrets = generateValidatorSecretEnvVars(AccountType.VALIDATOR, i)
+    await uploadSecrets(celoEnv, secrets, `validator-${i}`)
   }
 }
 
-export function generateSecretsEnvVars(accountType: AccountType, index: number) {
+function uploadSecrets(celoEnv: string, secrets: string, resourceName: string) {
+  const localTmpFilePath = `/tmp/${celoEnv}-${resourceName}-secrets`
+  writeFileSync(localTmpFilePath, secrets)
+  const cloudStorageFileName = `${secretsBasePath(celoEnv)}/.env.${resourceName}`
+  return uploadFileToGoogleStorage(localTmpFilePath, secretsBucketName, cloudStorageFileName, false)
+}
+
+function generateBootnodeSecretEnvVars() {
+  const mnemonic = fetchEnv(envVar.MNEMONIC)
+  return formatEnvVars({
+    NODE_KEY: generatePrivateKey(mnemonic, AccountType.BOOTNODE, 0),
+  })
+}
+
+function generateValidatorSecretEnvVars(accountType: AccountType, index: number) {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const privateKey = generatePrivateKey(mnemonic, accountType, index)
   const secrets = {
