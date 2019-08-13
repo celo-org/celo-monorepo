@@ -3,13 +3,11 @@ import getConfig from 'next/config'
 
 let airTableSingleton
 
-export default function getAirtable(appName: string) {
+export default function airtableInit(baseID: string) {
   const { serverRuntimeConfig } = getConfig()
 
   if (!airTableSingleton) {
-    airTableSingleton = new AirtableAPI({ apiKey: serverRuntimeConfig.AIRTABLE_API_KEY }).base(
-      serverRuntimeConfig.AIRTABLE_APP_ID
-    )
+    airTableSingleton = new AirtableAPI({ apiKey: serverRuntimeConfig.AIRTABLE_API_KEY })
   }
-  return airTableSingleton(appName)
+  return airTableSingleton.base(baseID)
 }

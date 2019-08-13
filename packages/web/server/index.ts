@@ -12,7 +12,7 @@ import { faucetOrInviteController } from './controllers'
 import { submitFellowApp } from './FellowshipApp'
 import { RequestType } from './FirebaseClient'
 import mailer from './mailer'
-
+import ecoFundSubmission from 'server/EcoFundApp'
 const port = parseInt(process.env.PORT, 10) || 3000
 const dev = process.env.NEXT_DEV === 'true'
 const app = next({ dev })
@@ -83,6 +83,14 @@ function wwwRedirect(req, res, nextAction) {
     })
 
     res.status(204).send('ok')
+  })
+
+  server.post('/ecosystem/:table', async (req, res) => {
+    try {
+      const status = await ecoFundSubmission(req.body, req.params.table)
+    } catch (e) {
+      res.status(500).json(JSON.stringify(e))
+    }
   })
 
   server.post('/faucet', async (req, res) => {

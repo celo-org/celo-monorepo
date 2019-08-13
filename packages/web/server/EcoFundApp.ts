@@ -1,38 +1,55 @@
-const AirtableAPI = require('airtable')
 import getConfig from 'next/config'
-import { EcoFundKeys, EcuFundFields } from '../fullstack/EcoFundFields'
+import airtableInit from 'server/airtable'
+import {
+  Application,
+  ApplicationFields,
+  Recommendation,
+  RecommendationFields,
+} from '../fullstack/EcoFundFields'
 
-const APP_NAME = 'Fellowship Application'
+enum Tables {
+  Applicants = 'Applicants',
+  Recommendations = 'Recommendations',
+}
 
-let airTableSingleton
+export default function submit(fields: Recommendation | Application, table: Tables) {
+  switch (table) {
+    case Tables.Applicants:
+      return apply(fields as Application)
+    case Tables.Recommendations:
+      return recommend(fields as Recommendation)
+    default:
+      return Promise.reject(`Invalid Table ${table}`)
+  }
+}
 
-function getAirtable() {
+function getAirtable(tableName: Tables) {
   const { serverRuntimeConfig } = getConfig()
-
-  if (!airTableSingleton) {
-    airTableSingleton = new AirtableAPI({ apiKey: serverRuntimeConfig.AIRTABLE_API_KEY }).base(
-      serverRuntimeConfig.AIRTABLE_APP_ID
-    )(APP_NAME)
-  }
-
-  return airTableSingleton
+  return airtableInit(serverRuntimeConfig.AIRTABLE_ECOFUND_ID)(tableName)
 }
 
-export async function submitFellowApp(fields: FellowApp) {
-  try {
-    await getAirtable().create(migrate(fields))
-  } catch {
-    return []
-  }
+export async function recommend(fields: Recommendation) {
+  return getAirtable(Tables.Recommendations).create(migrateRecomentation(fields))
 }
 
-function migrate(fields: EcoFundKeys) {
+export async function apply(fields: Application) {
+  return getAirtable(Tables.Recommendations).create(migrationApplication(fields))
+}
+
+function migrateRecomentation(fields: Recommendation) {
   return {
-    [EcuFundFields.name]: fields.name,
-    [EcuFundFields.email]: fields.email,
-    [EcuFundFields.ideas]: fields.ideas,
-    [EcuFundFields.deliverables]: fields.deliverables,
-    [EcuFundFields.bio]: fields.bio,
-    [EcuFundFields.resume]: fields.resume,
+    [RecommendationFields.orgName]: fields.orgName,
+  }
+}
+
+function migrationApplication(fields: Application) {
+  return {
+    [ApplicationFields.about]: fields.about,
+    [ApplicationFields.org]: fields.org,
+    [ApplicationFields.product]: fields.product,
+    [ApplicationFields.url]: fields.url,
+    [ApplicationFields.founderEmail]: fields.founderEmail,
+    [ApplicationFields.coFounderEmail]: fields.coFounderEmail,
+    [ApplicationFields.video]: fields.video,
   }
 }
