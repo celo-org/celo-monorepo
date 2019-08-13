@@ -35,8 +35,7 @@ if ! nc -z 127.0.0.1 8545 ; then
   exit 1
 fi
 
-yarn run contract-types && \
-yarn run compile-typescript && \
+yarn run build && \
 echo "Migrating contracts up to migration number ${TO}" && \
 yarn run truffle migrate --compile-all --network $NETWORK --build_directory $PWD/build/$NETWORK $RESET \
   --to ${TO} \

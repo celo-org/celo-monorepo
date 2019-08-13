@@ -13,6 +13,7 @@ import EmailForm, { After } from 'src/forms/EmailForm'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import ArticleData from './ArticleData'
 import EventData from './EventsData'
@@ -53,6 +54,7 @@ export class ConnectPage extends React.Component<Props> {
           <EcoFund />
           <CodeOfConduct />
           <GridRow
+            nativeID={hashNav.connect.events}
             desktopStyle={standardStyles.sectionMarginTop}
             mobileStyle={standardStyles.sectionMarginTopMobile}
           >
@@ -65,7 +67,7 @@ export class ConnectPage extends React.Component<Props> {
           <EventData />
           <ArticleData />
           <FellowSection />
-          <View style={styles.darkBackground}>
+          <View style={styles.darkBackground} nativeID={hashNav.connect.newsletter}>
             <GridRow
               desktopStyle={standardStyles.sectionMargin}
               tabletStyle={standardStyles.sectionMarginTablet}
