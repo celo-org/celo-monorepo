@@ -10,53 +10,6 @@ exports[`ImportWallet renders correctly 1`] = `
     }
   }
 >
-  <View
-    style={
-      Object {
-        "height": 45,
-      }
-    }
-  >
-    <View
-      style={
-        Object {
-          "alignItems": "flex-start",
-        }
-      }
-    >
-      <View
-        accessible={true}
-        isTVSelectable={true}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "opacity": 1,
-            "paddingHorizontal": 20,
-            "paddingVertical": 10,
-          }
-        }
-        testID="CancelButton"
-      >
-        <Text
-          style={
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 22,
-            }
-          }
-        >
-          cancel
-        </Text>
-      </View>
-    </View>
-  </View>
   <RCTScrollView
     automaticallyAdjustContentInsets={false}
     contentContainerStyle={
@@ -100,7 +53,9 @@ exports[`ImportWallet renders correctly 1`] = `
               "marginBottom": 25,
               "marginTop": 25,
             },
-            Object {},
+            Object {
+              "marginTop": 0,
+            },
           ]
         }
       >
@@ -143,8 +98,8 @@ exports[`ImportWallet renders correctly 1`] = `
             Object {
               "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
+              "fontSize": 14,
+              "lineHeight": 18,
             },
             Object {
               "paddingBottom": 15,
@@ -160,8 +115,25 @@ exports[`ImportWallet renders correctly 1`] = `
             Object {
               "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "paddingBottom": 15,
+            },
+          ]
+        }
+      >
+        backupKeyTip
+      </Text>
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
             },
             Object {
               "paddingBottom": 15,
@@ -230,27 +202,6 @@ exports[`ImportWallet renders correctly 1`] = `
           value=""
         />
       </View>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 14,
-            "lineHeight": 18,
-          }
-        }
-      >
-        <Text
-          style={
-            Object {
-              "fontFamily": "Hind-Medium",
-            }
-          }
-        >
-          tip
-        </Text>
-        backupKeyTip
-      </Text>
     </View>
   </RCTScrollView>
   <View
@@ -337,53 +288,6 @@ exports[`ImportWallet renders with an error 1`] = `
     }
   }
 >
-  <View
-    style={
-      Object {
-        "height": 45,
-      }
-    }
-  >
-    <View
-      style={
-        Object {
-          "alignItems": "flex-start",
-        }
-      }
-    >
-      <View
-        accessible={true}
-        isTVSelectable={true}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "opacity": 1,
-            "paddingHorizontal": 20,
-            "paddingVertical": 10,
-          }
-        }
-        testID="CancelButton"
-      >
-        <Text
-          style={
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 22,
-            }
-          }
-        >
-          cancel
-        </Text>
-      </View>
-    </View>
-  </View>
   <RCTScrollView
     automaticallyAdjustContentInsets={false}
     contentContainerStyle={
@@ -427,7 +331,9 @@ exports[`ImportWallet renders with an error 1`] = `
               "marginBottom": 25,
               "marginTop": 25,
             },
-            Object {},
+            Object {
+              "marginTop": 0,
+            },
           ]
         }
       >
@@ -470,8 +376,8 @@ exports[`ImportWallet renders with an error 1`] = `
             Object {
               "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
+              "fontSize": 14,
+              "lineHeight": 18,
             },
             Object {
               "paddingBottom": 15,
@@ -487,8 +393,25 @@ exports[`ImportWallet renders with an error 1`] = `
             Object {
               "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "paddingBottom": 15,
+            },
+          ]
+        }
+      >
+        backupKeyTip
+      </Text>
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
             },
             Object {
               "paddingBottom": 15,
@@ -559,27 +482,6 @@ exports[`ImportWallet renders with an error 1`] = `
           value=""
         />
       </View>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 14,
-            "lineHeight": 18,
-          }
-        }
-      >
-        <Text
-          style={
-            Object {
-              "fontFamily": "Hind-Medium",
-            }
-          }
-        >
-          tip
-        </Text>
-        backupKeyTip
-      </Text>
     </View>
   </RCTScrollView>
   <View

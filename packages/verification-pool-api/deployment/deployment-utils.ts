@@ -16,7 +16,7 @@ export function setEnv(CELO_ENV: string) {
 }
 
 export async function deploy(CELO_ENV: string) {
-  await exec('yarn', ['run', 'build', CELO_ENV])
+  await exec('yarn', ['run', 'build:for-env', CELO_ENV])
   await exec('yarn', [
     'run',
     'firebase',

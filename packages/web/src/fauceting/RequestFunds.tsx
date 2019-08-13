@@ -138,6 +138,9 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
             isInvalid && styles.error,
           ]}
           placeholder={this.getPlaceholder()}
+          // TODO: is it normal that setBeneficiary is using React.SyntheticEvent<HTMLInputElement>
+          // and not NativeSyntheticEvent<TextInputChangeEventData> ?
+          // @ts-ignore
           onChange={this.setBeneficiary}
           value={this.state.beneficiary}
         />

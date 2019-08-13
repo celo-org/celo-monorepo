@@ -24,14 +24,14 @@ import { errorSelector } from 'src/alert/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import { redeemInvite } from 'src/invite/actions'
 import { extractValidInviteCode } from 'src/invite/utils'
+import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import DisconnectBanner from 'src/shared/DisconnectBanner'
 import Logger from 'src/utils/Logger'
 
 function goToFaucet() {
@@ -78,19 +78,9 @@ const displayedErrors = [ErrorMessages.INVALID_INVITATION, ErrorMessages.REDEEM_
 const hasDisplayedError = (error: ErrorMessages | null) => {
   return error && displayedErrors.includes(error)
 }
+
 export class EnterInviteCode extends React.Component<Props, State> {
-  static navigationOptions = {
-    headerStyle: {
-      elevation: 0,
-    },
-    headerLeft: null,
-    headerRightContainerStyle: { paddingRight: 15 },
-    headerRight: (
-      <View>
-        <DisconnectBanner />
-      </View>
-    ),
-  }
+  static navigationOptions = nuxNavigationOptionsNoBackButton
 
   static getDerivedStateFromProps(props: Props, state: State): State | null {
     if (hasDisplayedError(props.error) && state.isSubmitting) {
@@ -115,7 +105,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
-    AppState.addEventListener('change', this.handleValidCodeInClipboard)
+    AppState.removeEventListener('change', this.handleValidCodeInClipboard)
   }
 
   openMessage = () => {
@@ -146,13 +136,13 @@ export class EnterInviteCode extends React.Component<Props, State> {
       Logger.debug('Extracted invite code:', validCode || '')
 
       if (!validCode) {
-        this.props.showError(ErrorMessages.INVALID_INVITATION, ERROR_BANNER_DURATION)
+        this.props.showError(ErrorMessages.INVALID_INVITATION, ALERT_BANNER_DURATION)
         return
       }
       this.props.redeemInvite(validCode, this.props.name)
     } catch {
       this.setState({ isSubmitting: false })
-      this.props.showError(ErrorMessages.REDEEM_INVITE_FAILED, ERROR_BANNER_DURATION)
+      this.props.showError(ErrorMessages.REDEEM_INVITE_FAILED, ALERT_BANNER_DURATION)
     }
   }
 

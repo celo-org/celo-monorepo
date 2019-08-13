@@ -64,7 +64,8 @@ async function web3Playground() {
     web3,
     pk,
     '0x299E74bdCD90d4E10f7957EF074ceE32d7e9089a',
-    '0x202ec0cbd312425C266dd473754Ad1719948Bd35'
+    '0x202ec0cbd312425C266dd473754Ad1719948Bd35',
+    '0x4813BFD311E132ade22c70dFf7e5DB045d26D070'
   )
 
   const printBalance = async (addr: string) => {
