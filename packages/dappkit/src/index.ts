@@ -1,32 +1,54 @@
+import {
+  AccountAuthRequest,
+  DappKitRequestMeta,
+  DappKitRequestTypes,
+  DappKitResponseStatus,
+  parseDappkitResponseDepplink,
+  serializeDappKitRequestDeeplink,
+  SignTxRequest,
+} from '@celo/utils'
 import { CeloTokenType, GoldToken, StableToken } from '@celo/walletkit'
-import { AccountAuthRequest, serializeDappKitRequestDeeplink, SignTxRequest } from '@celo/utils'
 import { Linking } from 'expo'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
 
-export { AccountAuthRequest, serializeDappKitRequestDeeplink, SignTxRequest } from '@celo/utils'
+export {
+  AccountAuthRequest,
+  DappKitRequestMeta,
+  serializeDappKitRequestDeeplink,
+  SignTxRequest,
+} from '@celo/utils/'
 
 export function listenToAccount(callback: (account: string) => void) {
   return Linking.addEventListener('url', ({ url }: { url: string }) => {
-    const { queryParams } = Linking.parse(url)
-    if (queryParams.account) {
-      callback(queryParams.account)
-    }
+    try {
+      const dappKitResponse = parseDappkitResponseDepplink(url)
+      if (
+        dappKitResponse.type === DappKitRequestTypes.ACCOUNT_ADDRESS &&
+        dappKitResponse.status === DappKitResponseStatus.SUCCESS
+      ) {
+        callback(dappKitResponse.address)
+      }
+    } catch (error) {}
   })
 }
 
 export function listenToSignedTx(callback: (signedTx: string) => void) {
   return Linking.addEventListener('url', ({ url }: { url: string }) => {
-    const { queryParams } = Linking.parse(url)
-    if (queryParams.rawTx) {
-      callback(queryParams.rawTx)
-    }
+    try {
+      const dappKitResponse = parseDappkitResponseDepplink(url)
+      if (
+        dappKitResponse.type === DappKitRequestTypes.SIGN_TX &&
+        dappKitResponse.status === DappKitResponseStatus.SUCCESS
+      ) {
+        callback(dappKitResponse.rawTx)
+      }
+    } catch (error) {}
   })
 }
 
-export function requestAccountAddress(returnPath: string) {
-  const url = Linking.makeUrl(returnPath)
-  Linking.openURL(serializeDappKitRequestDeeplink(AccountAuthRequest(url, 'test')))
+export function requestAccountAddress(meta: DappKitRequestMeta) {
+  Linking.openURL(serializeDappKitRequestDeeplink(AccountAuthRequest(meta)))
 }
 
 export enum GasCurrency {
@@ -56,14 +78,16 @@ export interface TxParams<T> {
   gasCurrency: GasCurrency
 }
 
-export async function requestTxSig<T>(web3: Web3, txParams: TxParams<T>, returnPath: string) {
+export async function requestTxSig<T>(web3: Web3, txParams: TxParams<T>, meta: DappKitRequestMeta) {
   const gasCurrencyContract = await getGasCurrencyContract(web3, txParams.gasCurrency)
-  const estimatedTxParams = { gasCurrency: gasCurrencyContract._address }
+  const estimatedTxParams = {
+    gasCurrency: gasCurrencyContract.options.address,
+  }
   // @ts-ignore
   const estimatedGas = await txParams.tx.estimateGas(estimatedTxParams)
 
   const nonce = await web3.eth.getTransactionCount(txParams.from)
-  const url = Linking.makeUrl(returnPath)
+  // const url = Linking.makeUrl(returnPath)
 
   const request = SignTxRequest(
     txParams.tx.encodeABI(),
@@ -72,8 +96,7 @@ export async function requestTxSig<T>(web3: Web3, txParams: TxParams<T>, returnP
     txParams.to,
     nonce,
     gasCurrencyContract._address,
-    url,
-    'test'
+    meta
   )
 
   Linking.openURL(serializeDappKitRequestDeeplink(request))
