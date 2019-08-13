@@ -44,7 +44,8 @@ contract Governance is
   }
 
   // All parameters are Fixidity fractions.
-  // The baseline is updated as max{floor, (1 - updateCoefficient) * baseline + updateCoefficient * participation}
+  // The baseline is updated as
+  // max{floor, (1 - updateCoefficient) * baseline + updateCoefficient * participation}
   struct QuorumParameters {
     // The average network participation in governance, weighted toward recent proposals.
     int256 participationBaseline;
