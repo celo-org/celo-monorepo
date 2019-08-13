@@ -55,7 +55,7 @@ platform :android do
   desc 'Ship Staging to Playstore Internal'
   lane :staging do
     env = 'staging'
-    sdkEnv = 'alfajores'
+    sdkEnv = 'alfajoresstaging'
     clean
     build(environment: env, sdkEnv: sdkEnv)
     fastlane_supply(env, 'internal', env)
