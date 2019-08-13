@@ -6,6 +6,7 @@ import PagingDots from 'src/carousel/PagingDots'
 import { H2, H3, H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { hashNav } from 'src/shared/menu-items'
 import ResponsiveImage from 'src/shared/ResponsiveImage'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
@@ -44,7 +45,7 @@ class Tenets extends React.PureComponent<Props> {
   render() {
     const { t } = this.props
     return (
-      <View style={standardStyles.sectionMarginBottom}>
+      <View nativeID={hashNav.connect.tenets} style={standardStyles.sectionMarginBottom}>
         <GridRow
           allStyle={standardStyles.centered}
           mobileStyle={standardStyles.sectionMarginMobile}
