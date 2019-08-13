@@ -50,6 +50,15 @@ $ export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
 $ export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
 ```
 
+In order to register the validator later on, generate a "proof of possession" - a signature proving you know your validator's BLS private key. Run this command:
+`` $ docker run -v `pwd`:/root/.celo -it us.gcr.io/celo-testnet/celo-node:alfajores account proof-of-possession $CELO_VALIDATOR_ADDRESS ``
+
+It will prompt you for the passphrase you've chosen for the validator account. Let's save the resulting proof-of-possession to an environment variable:
+
+```
+$ export CELO_VALIDATOR_POP=<YOUR-VALIDATOR-PROOF-OF-POSSESSION>
+```
+
 ### Deploy the validator node
 
 Initialize the docker container, building from an image for the network and initializing Celo with the genesis block:
@@ -109,10 +118,10 @@ Register your validator group:
 
 Register your validator:
 
-`` $ celocli validator:register --id <VALIDATOR_ID_OF_YOUR_CHOICE> --name <VALIDATOR_NAME_OF_YOUR_CHOICE> --url <VALIDATOR_URL_OF_YOUR_CHOICE> --from $CELO_VALIDATOR_ADDRESS --noticePeriod 5184000 --publicKey 0x`openssl rand -hex 64` ``
+`` $ celocli validator:register --id <VALIDATOR_ID_OF_YOUR_CHOICE> --name <VALIDATOR_NAME_OF_YOUR_CHOICE> --url <VALIDATOR_URL_OF_YOUR_CHOICE> --from $CELO_VALIDATOR_ADDRESS --noticePeriod 5184000 --publicKey 0x`openssl rand -hex 64`$CELO_VALIDATOR_POP ``
 
 {% hint style="info" %}
-**Roadmap**: Note that the “publicKey” field is currently ignored, and thus can be set to any 128 character hex value. This will change when the Celo protocol moves to BLS signatures for consensus.
+**Roadmap**: Note that the “publicKey” first part of the public key field is currently ignored, and thus can be set to any 128 character hex value. The rest is used for the BLS public key and proof-of-possession.
 {% endhint %}
 
 Affiliate your validator with your validator group. Note that you will not be a member of this group until the validator group accepts you:

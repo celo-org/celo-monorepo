@@ -30,6 +30,10 @@ export default function Initializer(CeloAnalytics: CeloAnalyticsType, Logger: Re
       }
 
       trackEvent(event: any, props: any, attachDeviceInfo = false) {
+        if (!CeloAnalytics) {
+          return
+        }
+
         try {
           CeloAnalytics.track(event, props, attachDeviceInfo)
         } catch {

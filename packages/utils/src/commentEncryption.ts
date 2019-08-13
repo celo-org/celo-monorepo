@@ -1,19 +1,19 @@
 import { randomBytes } from 'crypto'
 import { ec as EC } from 'elliptic'
+import { memoize } from 'lodash'
 import {
   AES128DecryptAndHMAC,
   AES128EncryptAndHMAC,
   Decrypt as ECIESDecrypt,
   Encrypt as ECIESEncrypt,
 } from './ecies'
-import { memoize } from 'lodash'
 const hkdf = require('futoin-hkdf')
 const ec = new EC('secp256k1')
 
 const ECIES_SESSION_KEY_LEN = 129
 const TAG = 'CommentEncryption'
 
-export interface encryptionStatus {
+export interface EncryptionStatus {
   encrypted: boolean
   comment: string
 }
@@ -47,7 +47,7 @@ export function encryptData(data: Buffer, pubKeyRecipient: Buffer, pubKeySelf: B
 export function decryptData(data: Buffer, key: Buffer, sender: boolean): Buffer {
   // Deal with presumably enencrypted comments
   if (data.length < ECIES_SESSION_KEY_LEN * 2 + 48) {
-    throw new Error(`${TAG}/Buffer length too short for decryption`)
+    throw new Error('Buffer length too short')
   }
   const sessionKeyEncrypted = sender
     ? data.slice(ECIES_SESSION_KEY_LEN, ECIES_SESSION_KEY_LEN * 2)
@@ -72,7 +72,7 @@ export function encryptComment(
   comment: string,
   pubKeyRecipient: Buffer,
   pubKeySelf: Buffer
-): encryptionStatus {
+): EncryptionStatus {
   try {
     // Uncompress public keys & strip out the leading 0x04
     const pubRecip = decompressPublicKey(pubKeyRecipient)
@@ -99,13 +99,13 @@ export function encryptComment(
  */
 
 export const decryptComment = memoize(
-  (comment: string, key: Buffer, sender: boolean): encryptionStatus => {
+  (comment: string, key: Buffer, sender: boolean): EncryptionStatus => {
     try {
       const buf = Buffer.from(comment, 'base64')
       const data = decryptData(buf, key, sender).toString('ucs2')
       return { encrypted: true, comment: data }
     } catch (error) {
-      console.info(`${TAG}/Error decrypting: ${error}`)
+      console.info(`${TAG}/Could not decrypt: ${error.message}`)
       return { encrypted: false, comment }
     }
   }

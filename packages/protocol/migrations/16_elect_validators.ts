@@ -1,4 +1,5 @@
 /* tslint:disable:no-console */
+import { blsPrivateKeyToPublic } from '@celo/celotool/src/lib/bls_utils'
 import { NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
 import {
   add0x,
@@ -9,8 +10,10 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { BigNumber } from 'bignumber.js'
+import * as crypto from 'crypto'
 import * as minimist from 'minimist'
 import { BondedDepositsInstance, ValidatorsInstance } from 'types'
+const Web3 = require('web3')
 
 const argv = minimist(process.argv, {
   string: ['keys'],
@@ -50,7 +53,10 @@ async function registerValidatorGroup(
   // can be recovered.
   const account = web3.eth.accounts.create()
 
-  const encryptedPrivateKey = web3.eth.accounts.encrypt(account.privateKey, privateKey)
+  // We do not use web3 provided by Truffle since the eth.accounts.encrypt behaves differently
+  // in the version we use elsewhere.
+  const encryptionWeb3 = new Web3('http://localhost:8545')
+  const encryptedPrivateKey = encryptionWeb3.eth.accounts.encrypt(account.privateKey, privateKey)
   const encodedKey = serializeKeystore(encryptedPrivateKey)
 
   await web3.eth.sendTransaction({
@@ -83,7 +89,14 @@ async function registerValidator(
   groupAddress: string
 ) {
   const address = generateAccountAddressFromPrivateKey(validatorPrivateKey.slice(2))
-  const publicKey = add0x(generatePublicKeyFromPrivateKey(validatorPrivateKey.slice(2)))
+  const publicKey = generatePublicKeyFromPrivateKey(validatorPrivateKey.slice(2))
+  const blsPublicKey = blsPrivateKeyToPublic(validatorPrivateKey.slice(2))
+  // TODO(Kobi): Replace with a real PoP when we have a TypeScript version.
+  const blsPoP = crypto
+    .randomBytes(96)
+    .toString('hex')
+    .trim()
+  const publicKeysData = publicKey + blsPublicKey + blsPoP
 
   await makeMinimumDeposit(bondedDeposits, validatorPrivateKey)
 
@@ -92,7 +105,7 @@ async function registerValidator(
     address,
     address,
     config.validators.groupUrl,
-    publicKey,
+    add0x(publicKeysData),
     config.validators.minBondedDepositNoticePeriod
   )
 

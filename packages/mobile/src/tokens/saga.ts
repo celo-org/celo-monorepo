@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { call, put, take, takeEvery } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
@@ -60,7 +60,7 @@ export type TokenTransferAction = { type: string } & TokenTransfer
 
 interface TokenTransferFactory {
   actionName: string
-  contractGetter: (web3: any) => any
+  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract
   tag: string
   currency: CURRENCY_ENUM
   fetchAction: () => any
@@ -130,9 +130,9 @@ export const tokenTransferFactory = ({
         Logger.error(tag, 'Error transfering token', error)
         yield put(removeStandbyTransaction(txId))
         if (error.message === ErrorMessages.INCORRECT_PIN) {
-          yield put(showError(ErrorMessages.INCORRECT_PIN, ERROR_BANNER_DURATION))
+          yield put(showError(ErrorMessages.INCORRECT_PIN, ALERT_BANNER_DURATION))
         } else {
-          yield put(showError(ErrorMessages.TRANSACTION_FAILED, ERROR_BANNER_DURATION))
+          yield put(showError(ErrorMessages.TRANSACTION_FAILED, ALERT_BANNER_DURATION))
         }
       }
     }
