@@ -59,6 +59,6 @@
   "reclaimPayment": "Reclaim Payment",
   "totalSent": "Total Sent",
   "totalRefunded": "Total Refunded",
-  "loadingVerificationStatus": "Checking recipient verfication...",
+  "loadingVerificationStatus": "Checking recipient verification...",
   "askForContactsPermissionAction": "Get my Contacts"
 }
