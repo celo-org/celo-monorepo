@@ -1,0 +1,30 @@
+{
+  "name": "@celo/contractkit",
+  "version": "0.0.4",
+  "description": "Celo's ContractKit to interact with Celo network",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "tsc -b .",
+    "clean": "tsc -b . --clean && rm -rf src/generated",
+    "build:gen": "yarn --cwd ../protocol build",
+    "prepublishOnly": "yarn build:gen && yarn build",
+    "lint": "tslint -c tslint.json --project ."
+  },
+  "dependencies": {
+    "@celo/utils": "^0.0.5",
+    "bignumber.js": "^7.2.0",
+    "web3": "1.0.0-beta.37",
+    "web3-utils": "1.0.0-beta.37"
+  },
+  "devDependencies": {
+    "@celo/protocol": "1.0.0",
+    "@types/jest": "^24.0.13",
+    "@types/web3": "^1.0.18"
+  },
+  "files": [
+    "lib/**/*"
+  ]
+}

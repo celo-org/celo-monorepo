@@ -51,6 +51,7 @@
     "pretty-quick": "^1.11.1",
     "solc": "0.5.8",
     "tslint": "^5.12.1",
+    "typescript": "^3.3.3",
     "typescript-tslint-plugin": "^0.5.0"
   },
   "dependencies": {
