@@ -72,7 +72,14 @@ library AddressSortedLinkedListWithMedian {
    * @param key The element key.
    * @return Whether or not the key is in the sorted list.
    */
-  function contains(SortedLinkedListWithMedian.List storage list, address key) public view returns (bool) {
+  function contains(
+    SortedLinkedListWithMedian.List storage list,
+    address key
+  )
+    public
+    view
+    returns (bool)
+  {
     return list.contains(toBytes(key));
   }
 
@@ -81,7 +88,14 @@ library AddressSortedLinkedListWithMedian {
    * @param key The element key.
    * @return The element value.
    */
-  function getValue(SortedLinkedListWithMedian.List storage list, address key) public view returns (uint256) {
+  function getValue(
+    SortedLinkedListWithMedian.List storage list,
+    address key
+  )
+    public
+    view
+    returns (uint256)
+  {
     return list.getValue(toBytes(key));
   }
 
@@ -89,7 +103,13 @@ library AddressSortedLinkedListWithMedian {
    * @notice Returns the median value of the sorted list.
    * @return The median value.
    */
-  function getMedianValue(SortedLinkedListWithMedian.List storage list) public view returns (uint256) {
+  function getMedianValue(
+    SortedLinkedListWithMedian.List storage list
+  )
+    public
+    view
+    returns (uint256)
+  {
     return list.getValue(list.median);
   }
 
@@ -121,7 +141,13 @@ library AddressSortedLinkedListWithMedian {
    * @notice Returns the number of elements in the list.
    * @return The number of elements in the list.
    */
-  function getNumElements(SortedLinkedListWithMedian.List storage list) external view returns (uint256) {
+  function getNumElements(
+    SortedLinkedListWithMedian.List storage list
+  )
+    external
+    view
+    returns (uint256)
+  {
     return list.getNumElements();
   }
 
@@ -139,7 +165,8 @@ library AddressSortedLinkedListWithMedian {
     bytes32[] memory byteKeys = list.getKeys();
     address[] memory keys = new address[](byteKeys.length);
     uint256[] memory values = new uint256[](byteKeys.length);
-    SortedLinkedListWithMedian.MedianRelation[] memory relations = new SortedLinkedListWithMedian.MedianRelation[](keys.length);
+    SortedLinkedListWithMedian.MedianRelation[] memory relations =
+      new SortedLinkedListWithMedian.MedianRelation[](keys.length);
     for (uint256 i = 0; i < byteKeys.length; i++) {
       keys[i] = toAddress(byteKeys[i]);
       values[i] = list.getValue(byteKeys[i]);
