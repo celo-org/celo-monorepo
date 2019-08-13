@@ -22,12 +22,6 @@ jest.mock('react-native-bip39', () => {
 })
 
 describe('backup/utils', () => {
-  beforeAll(() => {
-    const mockMath = Object.create(global.Math)
-    mockMath.random = () => 0.5
-    global.Math = mockMath
-  })
-
   describe('createQuizWordList', () => {
     it('creates list correctly without dupes', async () => {
       const wordList = await createQuizWordList(mockMnemonic, 'en')
@@ -39,10 +33,20 @@ describe('backup/utils', () => {
   })
   describe('selectQuizWordOptions', () => {
     it('selects words correctly', async () => {
+      global.Math.random = () => 0.5
+
       const wordList = await createQuizWordList(mockMnemonic, 'en')
       const wordOptions = selectQuizWordOptions('crawl', wordList, 4)
       expect(wordOptions.length).toBe(4)
       expect(wordOptions[2]).toBe('crawl')
+    })
+
+    it('does not have duplicates in word options', () => {
+      global.Math = Math
+      const wordList = ['a', 'b', 'c']
+      const wordOptions = selectQuizWordOptions('d', wordList, 4)
+      expect(wordOptions.length).toBe(4)
+      expect(wordOptions).toEqual(expect.arrayContaining(['a', 'b', 'c', 'd']))
     })
   })
 })
