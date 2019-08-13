@@ -48,11 +48,6 @@ variable genesis_content_base64 {
   description = "Content of the genesis file encoded in base64"
 }
 
-variable geth_account_secret {
-  type = string
-  description = "Geth account secret"
-}
-
 variable geth_node_docker_image_repository {
   type = string
   description = "Repository of the geth docker image"
@@ -66,11 +61,6 @@ variable geth_node_docker_image_tag {
 variable geth_verbosity {
   type = number
   description = "Verbosity of the validator nodes"
-}
-
-variable mnemonic {
-  type = string
-  description = "Mnemonic for the validators"
 }
 
 variable network_id {

@@ -68,11 +68,6 @@ variable geth_verbosity {
   description = "Verbosity of all geth nodes"
 }
 
-variable mnemonic {
-  type = string
-  description = "Mnemonic for the nodes"
-}
-
 variable network_id {
   type = number
   description = "The network ID number"
@@ -81,11 +76,6 @@ variable network_id {
 variable validator_count {
   type = number
   description = "Number of validators to create"
-}
-
-variable validator_geth_account_secret {
-  type = string
-  description = "Geth account secret for validators"
 }
 
 variable verification_pool_url {

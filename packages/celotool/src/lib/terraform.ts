@@ -1,8 +1,6 @@
+import { execCmd } from '@celo/celotool/src/lib/utils'
 import fs from 'fs'
 import path from 'path'
-
-import { generateGenesisFromEnv } from '@celo/celotool/src/lib/generate_utils'
-import { envVar, execCmd, fetchEnv } from '@celo/celotool/src/lib/utils'
 
 const terraformModulesPath = path.join(__dirname, '../../../terraform-modules')
 
