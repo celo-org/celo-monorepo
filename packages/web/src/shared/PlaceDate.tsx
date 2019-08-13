@@ -13,6 +13,13 @@ export function printDuration(date: Date, endDate: Date | null): string {
   }
 }
 
+export function parseDate(date: string | undefined) {
+  if (date) {
+    return fecha.parse(date, 'MM-DD-YY')
+  }
+  return null
+}
+
 export default function PlaceDate({
   location = '',
   startDate,

@@ -37,14 +37,22 @@ export const mockCountryCode = '+1'
 
 export const mockQrCodeData = `{"address":"${mockAccount}","e164PhoneNumber":"${mockE164Number}","displayName":"${mockName}"}`
 
-export const mockRecipient: RecipientWithContact = {
+export const mockInvitableRecipient: RecipientWithContact = {
   kind: RecipientKind.Contact,
-  address: mockAccount,
   displayName: mockName,
   displayId: '14155550000',
   e164PhoneNumber: mockE164Number,
   contactId: 'contactId',
   phoneNumberLabel: 'phoneNumLabel',
+}
+
+export const mockRecipient: RecipientWithContact = {
+  ...mockInvitableRecipient,
+  address: mockAccount,
+}
+
+export const mockE164NumberToInvitableRecipient = {
+  [mockE164Number]: mockInvitableRecipient,
 }
 
 export const mockRecipientWithPhoneNumber: RecipientWithMobileNumber = {

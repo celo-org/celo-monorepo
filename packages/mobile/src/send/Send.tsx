@@ -81,7 +81,9 @@ const mapStateToProps = (state: RootState): StateProps => ({
   e164PhoneNumber: state.account.e164PhoneNumber,
   devModeActive: state.account.devModeActive || false,
   e164PhoneNumberAddressMapping: state.identity.e164NumberToAddress,
-  recentRecipients: [CeloDefaultRecipient, ...state.send.recentRecipients],
+  recentRecipients: state.account.devModeActive
+    ? [CeloDefaultRecipient, ...state.send.recentRecipients]
+    : state.send.recentRecipients,
   allRecipients: Object.values(recipientCacheSelector(state)),
 })
 
