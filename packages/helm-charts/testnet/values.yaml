@@ -13,13 +13,6 @@ bootnode:
     repository: gcr.io/celo-testnet/geth-all
     tag: fc254b550a4993956ac7aa3fcd8dd4db63b8c9d2
 
-ethstats:
-  image:
-    repository: ethereumex/eth-stats-dashboard
-    tag: v0.0.1
-  service:
-    type: NodePort
-
 geth:
   image:
     repository: gcr.io/celo-testnet/geth
