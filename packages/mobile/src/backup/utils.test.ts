@@ -32,7 +32,7 @@ describe('backup/utils', () => {
     })
   })
   describe('selectQuizWordOptions', () => {
-    it.skip('selects words correctly', async () => {
+    it('selects words correctly', async () => {
       global.Math.random = () => 0.5
 
       const wordList = await createQuizWordList(mockMnemonic, 'en')
