@@ -20,6 +20,3 @@ export {
   resolveCurrency,
   SHORT_CURRENCIES,
 } from '@celo/utils/src/currencies'
-
-import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
-export const STABLE_CURRENCY = CURRENCY_ENUM.DOLLAR

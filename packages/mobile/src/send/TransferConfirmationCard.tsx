@@ -8,7 +8,7 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { CURRENCIES, CURRENCY_ENUM, STABLE_CURRENCY } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { faucetIcon } from 'src/images/Images'
 import { Recipient } from 'src/recipients/recipient'
@@ -219,7 +219,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
             <View style={style.feeContainer}>
               {this.props.type === TransactionTypes.PAY_REQUEST && (
                 <LineItemRow
-                  currencySymbol={CURRENCIES[STABLE_CURRENCY].symbol}
+                  currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
                   amount={total}
                   title={t('dollarsSent')}
                 />
@@ -233,7 +233,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
                 hasError={!!feeError}
               />
               <LineItemRow
-                currencySymbol={CURRENCIES[STABLE_CURRENCY].symbol}
+                currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
                 amount={amountWithFees}
                 title={t('total')}
               />
