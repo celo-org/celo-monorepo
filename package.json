@@ -55,7 +55,8 @@
     "typescript-tslint-plugin": "^0.5.0"
   },
   "dependencies": {
-    "codecov": "^3.1.0"
+    "codecov": "^3.1.0",
+    "detox": "14.0.2"
   },
   "resolutions": {
     "node-gyp": "5.0.1",

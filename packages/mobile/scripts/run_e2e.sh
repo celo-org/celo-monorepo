@@ -32,7 +32,7 @@ fi
 echo "Waiting for emulator to unlock..."
 # TODO: improve this to actually poll if the screen is unlocked
 # https://stackoverflow.com/questions/35275828/is-there-a-way-to-check-if-android-device-screen-is-locked-via-adb
-sleep 10
+sleep 3
 echo "Emulator unlocked!"
 
 yarn test:detox
@@ -47,13 +47,15 @@ fi
 
 if [ $STATUS -ne 0 ]; then
    # TODO: upload e2e_run.log and attach the link
-   #http POST $SLACK_HOOK_URL < e2e/test_fail.json
    echo "Test failed"
 else
-   #http POST $SLACK_HOOK_URL < e2e/test_pass.json
    echo "Test passed"
 fi
 
 react-native-kill-packager
+
+echo "closing emulator"
+
+kill -s 9 `ps -a | grep "Nexus_5X_API_28_x86" | grep -v "grep"  | awk '{print $1}'`
 
 exit $STATUS

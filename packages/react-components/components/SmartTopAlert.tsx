@@ -128,8 +128,10 @@ function SmartTopAlert(props: Props) {
   const { type, title, text, buttonMessage, onPress } = visibleAlertState
   const isError = type === NotificationTypes.ERROR
 
+  const testID = isError ? 'errorBanner' : 'infoBanner'
+
   return (
-    <View style={styles.overflowContainer}>
+    <View style={styles.overflowContainer} testID={testID}>
       <TouchableOpacity onPress={onPress}>
         <Animated.View
           ref={animatedRef}
