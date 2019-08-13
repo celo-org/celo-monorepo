@@ -7,6 +7,9 @@ defaults: &defaults
   working_directory: ~/app
   docker:
     - image: celohq/node8:gcloud-deps
+  environment:
+    # To avoid ENOMEM problem when running node
+    NODE_OPTIONS: "--max-old-space-size=4096"
 
 android-defaults: &android-defaults
   <<: *defaults
@@ -52,19 +55,22 @@ jobs:
           at: ~/app
 
       - restore_cache:
-          key: yarn-v2-{{ checksum "yarn.lock" }}-{{ arch }}
+          keys: 
+            - yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-v2-{{ arch }}-{{ .Branch }}-
+            - yarn-v2-{{ arch }}-
+            - yarn-v2-
 
       - run:
           name: Delete @celo dir from node_modules (if its there)
           command: rm -rf ~/app/node_modules/@celo
 
       - run:
-          name: yarn
+          name: Install dependencies
           command: |
             # Deals with yarn install flakiness which can come due to yarnpkg.com being
             # unreliable. For example, https://circleci.com/gh/celo-org/celo-monorepo/82685
             yarn install || yarn install
-
       - run:
           name: Fail if someone forgot to commit "yarn.lock"
           command: |
@@ -72,76 +78,36 @@ jobs:
               echo "There are git differences after running yarn install"
               exit 1
             fi
-
       - run: npm rebuild scrypt
 
       - save_cache:
-          key: yarn-v2-{{ checksum "yarn.lock" }}-{{ arch }}
+          key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
             - packages/*/node_modules
+      
+      - run:
+          name: Build packages
+          command: |
+            # separate build to avoid ENOMEN in CI :(
+            yarn build --scope @celo/protocol
+            yarn build --scope docs
+            yarn build --scope @celo/walletkit
+            yarn build --ignore @celo/protocol --ignore docs --ignore @celo/walletkit
+
 
       - persist_to_workspace:
           root: .
-          paths: .
+          paths: 
+            - .
 
   lint-checks:
     <<: *defaults
     steps:
       - attach_workspace:
           at: ~/app
-
-      - run: yarn run ci-lint
-
-  build-all-packages:
-     <<: *defaults
-     steps:
-       - attach_workspace:
-          at: ~/app
-
-       - run:
-           name: Build SDK
-           command: |
-              set -e
-              yarn --cwd=packages/contractkit build alfajores
-
-       - run:
-          name: Build CLI
-          command: |
-            yarn --cwd=packages/cli build-sdk alfajores
-            yarn --cwd=packages/cli build
-            yarn --cwd=packages/cli docs
-      
-       - run:
-          name: Fail if someone forgot to commit CLI docs
-          command: |
-            if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
-              git --no-pager diff packages/docs/command-line-interface
-              echo "There are git differences after generating CLI docs"
-              exit 1
-            fi
-
-       - run:
-          name: Build mobile
-          command: yarn --cwd=packages/mobile build
-
-       - run:
-          name: Build Verification Pool
-          command: yarn --cwd=packages/verification-pool-api compile-typescript
-
-       - run:
-          name: Build Verifier
-          command: yarn --cwd=packages/verifier build:typescript
-
-       - run:
-          name: Build Web
-          command: |
-              set -e
-              yarn --cwd=packages/web build
-
-       - run:
-          name: Build Docs
-          command: yarn --cwd=packages/docs build
+      - run: yarn run prettify:diff
+      - run: yarn run lint
 
   general-test:
     <<: *defaults
@@ -153,7 +119,7 @@ jobs:
           name: jest tests
           command: |
             mkdir -p test-results/jest
-            yarn run lerna --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/contractkit --ignore @celo/celocli run test
+            yarn run lerna --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/walletkit --ignore @celo/celocli run test
 
   mobile-test-build-app:
     working_directory: ~/app
@@ -181,8 +147,8 @@ jobs:
       - run:
           name: Ensure translations are not missing
           command: |
-            set -euo pipefail
-            diff <(cat packages/mobile/locales/en-US/*.json | jq keys | sort) <(cat packages/mobile/locales/es-AR/*.json | jq keys | sort)
+            cd packages/mobile
+            ./scripts/verify_locales.sh
 
       - run:
           name: jest tests
@@ -238,7 +204,7 @@ jobs:
           # Flaky tests - run them twice
           command: yarn --cwd packages/protocol test || yarn --cwd packages/protocol test
 
-  contractkit-test:
+  walletkit-test:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -248,17 +214,17 @@ jobs:
           command: |
             # Test alphanet
             set -euo pipefail
-            yarn --cwd=packages/contractkit build alfajores
-            yarn --cwd=packages/contractkit test
+            yarn --cwd=packages/walletkit build alfajores
+            yarn --cwd=packages/walletkit test
 
       - run:
           name: test alphanet staging
           command: |
             # Test alphanet
             set -euo pipefail
-            yarn --cwd=packages/contractkit build alfajoresstaging
-            yarn --cwd=packages/contractkit test
-      
+            yarn --cwd=packages/walletkit build alfajoresstaging
+            yarn --cwd=packages/walletkit test
+
   cli-test:
     <<: *defaults
     steps:
@@ -269,6 +235,15 @@ jobs:
           command: |
             set -euo pipefail
             yarn --cwd=packages/cli test
+      - run:
+          name: Fail if someone forgot to commit CLI docs
+          command: |
+            yarn --cwd=packages/cli docs
+            if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
+              git --no-pager diff packages/docs/command-line-interface
+              echo "There are git differences after generating CLI docs"
+              exit 1
+            fi            
 
   end-to-end-geth-transfer-test:
     <<: *defaults
@@ -290,11 +265,20 @@ jobs:
             ls /tmp/go/bin/go
             /tmp/go/bin/go version
       - run:
+          name: Setup Rust language
+          command: |
+            set -e
+            set -v
+            curl https://sh.rustup.rs -sSf | sh -s -- -y
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+            rustup install 1.36.0
+            rustup default 1.36.0
+      - run:
           name: Run test
           no_output_timeout: 20m
           command: |
             set -e
-            export PATH=${PATH}:/tmp/go/bin
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
@@ -320,11 +304,20 @@ jobs:
             ls /tmp/go/bin/go
             /tmp/go/bin/go version
       - run:
+          name: Setup Rust language
+          command: |
+            set -e
+            set -v
+            curl https://sh.rustup.rs -sSf | sh -s -- -y
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+            rustup install 1.36.0
+            rustup default 1.36.0
+      - run:
           name: Run test
           no_output_timeout: 20m
           command: |
             set -e
-            export PATH=${PATH}:/tmp/go/bin
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
@@ -350,10 +343,19 @@ jobs:
             ls /tmp/go/bin/go
             /tmp/go/bin/go version
       - run:
+          name: Setup Rust language
+          command: |
+            set -e
+            set -v
+            curl https://sh.rustup.rs -sSf | sh -s -- -y
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+            rustup install 1.36.0
+            rustup default 1.36.0
+      - run:
           name: Run test
           command: |
             set -e
-            export PATH=${PATH}:/tmp/go/bin
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
@@ -378,15 +380,19 @@ jobs:
             tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
             ls /tmp/go/bin/go
             /tmp/go/bin/go version
+            curl https://sh.rustup.rs -sSf | sh -s -- -y
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+            rustup install 1.36.0
+            rustup default 1.36.0
       - run:
           name: Run test
           command: |
             set -e
-            export PATH=${PATH}:/tmp/go/bin
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_integration_sync.sh checkout master
+            ./ci_test_sync_with_network.sh checkout master
 
   web:
     working_directory: ~/app
@@ -411,8 +417,8 @@ jobs:
           name: Installing npm package - @celo/utils
           command: yarn add @celo/utils
       - run:
-          name: Installing npm package - @celo/contractkit
-          command: yarn add @celo/contractkit
+          name: Installing npm package - @celo/walletkit
+          command: yarn add @celo/walletkit
       - run:
           name: Installing npm package - @celo/celocli
           command: yarn add @celo/celocli
@@ -425,54 +431,44 @@ workflows:
       - lint-checks:
           requires:
             - install_dependencies
-      - build-all-packages:
-           requires:
-            - install_dependencies
-            - lint-checks
       - general-test:
           requires:
             - install_dependencies
-            - lint-checks
-      - contractkit-test:
+      - walletkit-test:
           requires:
             - install_dependencies
-            - lint-checks
       - cli-test:
           requires:
             - install_dependencies
-            - lint-checks
       - mobile-test:
           requires:
-            - install_dependencies
             - lint-checks
       - mobile-test-build-app:
           requires:
-            - install_dependencies
-            - lint-checks
+            - mobile-test
       - verification-pool-api:
           requires:
-            - install_dependencies
             - lint-checks
       - protocol-test:
           requires:
-            - install_dependencies
             - lint-checks
+            - walletkit-test
       - end-to-end-geth-transfer-test:
           requires:
-            - install_dependencies
             - lint-checks
+            - walletkit-test
       - end-to-end-geth-governance-test:
           requires:
-            - install_dependencies
             - lint-checks
+            - walletkit-test
       - end-to-end-geth-sync-test:
           requires:
-            - install_dependencies
             - lint-checks
+            - walletkit-test
       - end-to-end-geth-integration-sync-test:
           requires:
-            - install_dependencies
             - lint-checks
+            - walletkit-test
   nightly:
     triggers:
       - schedule:

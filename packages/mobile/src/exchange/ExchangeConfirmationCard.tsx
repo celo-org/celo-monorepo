@@ -75,7 +75,6 @@ class ExchangeConfirmationCard extends React.PureComponent<Props> {
             amount={leftCurrencyAmount.toString()}
             size={36}
             type={this.props.token}
-            balanceOutOfSync={false}
           />
           <View style={styles.arrow}>
             <RoundedArrow />
@@ -85,7 +84,6 @@ class ExchangeConfirmationCard extends React.PureComponent<Props> {
             amount={rightCurrencyAmount.toString()}
             size={36}
             type={this.takerToken()}
-            balanceOutOfSync={false}
           />
         </View>
 

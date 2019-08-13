@@ -19,7 +19,7 @@ import { CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CancelButton from 'src/components/CancelButton'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import ExchangeRate from 'src/exchange/ExchangeRate'
 import { ExchangeRatePair } from 'src/exchange/reducer'
@@ -104,7 +104,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     if (this.getMakerBalance().isLessThan(amount)) {
       this.props.showError(
         this.isDollar() ? ErrorMessages.NSF_DOLLARS : ErrorMessages.NSF_GOLD,
-        ERROR_BANNER_DURATION
+        ALERT_BANNER_DURATION
       )
     } else {
       this.props.hideAlert()

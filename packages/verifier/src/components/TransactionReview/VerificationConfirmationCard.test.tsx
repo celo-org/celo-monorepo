@@ -14,9 +14,7 @@ const tProps = {
   t: i18n.t,
 }
 
-jest.mock('@celo/react-components/components/PhoneNumberWithFlag', () => ({
-  default: () => '<View>PhoneNumberWithFlag</View>',
-}))
+jest.mock('@celo/react-components/components/PhoneNumberWithFlag', () => 'PhoneNumberWithFlag')
 
 it('renders correctly', () => {
   const store = mockStore({

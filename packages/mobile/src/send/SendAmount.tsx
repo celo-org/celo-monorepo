@@ -24,7 +24,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { FeeType } from 'src/fees/actions'
 import EstimateFee from 'src/fees/EstimateFee'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
@@ -35,17 +35,17 @@ import { VerificationStatus } from 'src/identity/contactMapping'
 import { E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { RootState } from 'src/redux/reducers'
-import LabeledTextInput from 'src/send/LabeledTextInput'
-import { ConfirmationInput } from 'src/send/SendConfirmation'
-import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { fetchDollarBalance } from 'src/stableToken/actions'
 import {
   getAddressFromRecipient,
   getRecipientVerificationStatus,
   Recipient,
   RecipientKind,
-} from 'src/utils/recipient'
+} from 'src/recipients/recipient'
+import { RootState } from 'src/redux/reducers'
+import LabeledTextInput from 'src/send/LabeledTextInput'
+import { ConfirmationInput } from 'src/send/SendConfirmation'
+import DisconnectBanner from 'src/shared/DisconnectBanner'
+import { fetchDollarBalance } from 'src/stableToken/actions'
 
 const MAX_COMMENT_LENGTH = 70
 
@@ -216,12 +216,12 @@ export class SendAmount extends React.PureComponent<Props, State> {
     // TODO(Rossy) this almost never shows because numeral is swalling the errors
     // and returning 0 for invalid numbers
     if (!amountIsValid) {
-      this.props.showError(ErrorMessages.INVALID_AMOUNT, ERROR_BANNER_DURATION)
+      this.props.showError(ErrorMessages.INVALID_AMOUNT, ALERT_BANNER_DURATION)
       return
     }
 
     if (!userHasEnough) {
-      this.props.showError(ErrorMessages.NSF_TO_SEND, ERROR_BANNER_DURATION)
+      this.props.showError(ErrorMessages.NSF_TO_SEND, ALERT_BANNER_DURATION)
       return
     }
 
@@ -313,7 +313,7 @@ export class SendAmount extends React.PureComponent<Props, State> {
   renderBottomContainer = (amountIsValid: boolean, userHasEnough: boolean) => {
     const onPress = () => {
       if (!amountIsValid) {
-        this.props.showError(ErrorMessages.INVALID_AMOUNT, ERROR_BANNER_DURATION)
+        this.props.showError(ErrorMessages.INVALID_AMOUNT, ALERT_BANNER_DURATION)
         return
       }
     }

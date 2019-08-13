@@ -1,13 +1,13 @@
 // Processed Event with typed values
 export interface EventProps {
   name: string
-  startDate: Date
+  startDate: string
   location: string
   link: string
   celoHosted: boolean
   celoSpeaking: boolean
   celoAttending: boolean
-  endDate?: Date
+  endDate?: string
   recap?: string
   description?: string
 }
