@@ -18,7 +18,7 @@ contract ProposalsTest {
     proposal.votes.abstain = abstain;
   }
 
-  function adjustedSupport(int256 criticalBaseline) external view returns (int256) {
-    return proposal.adjustedSupport(criticalBaseline);
+  function getSupportWithQuorumPadding(int256 criticalBaseline) external view returns (int256) {
+    return proposal.getSupportWithQuorumPadding(criticalBaseline);
   }
 }

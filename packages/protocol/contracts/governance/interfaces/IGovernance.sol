@@ -29,6 +29,7 @@ interface IGovernance {
   function withdraw() external returns (bool);
   function dequeueProposalsIfReady() external;
   function getStageDurations() external view returns (uint256, uint256, uint256);
+  function getQuorumParameters() external view returns (int256, int256, int256, int256);
   function getConstitution(address, bytes4) external view returns (int256);
   function proposalExists(uint256) external view returns (bool);
   function getProposal(uint256) external view returns (address, uint256, uint256, uint256);

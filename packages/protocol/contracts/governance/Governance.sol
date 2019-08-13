@@ -43,6 +43,19 @@ contract Governance is
     mapping(bytes4 => int256) functionThresholds;
   }
 
+  // All parameters are Fixidity fractions.
+  // The baseline is updated as max{floor, (1 - updateCoefficient) * baseline + updateCoefficient * participation}
+  struct QuorumParameters {
+    // The average network participation in governance, weighted toward recent proposals.
+    int256 participationBaseline;
+    // The lower bound on the participation baseline.
+    int256 participationFloor;
+    // The weight of the most recent proposal's participation on the baseline.
+    int256 participationUpdateCoefficient;
+    // The fraction of the baseline under which the proposal will be padded with "no" votes.
+    int256 criticalBaselineLevel;
+  }
+
   Proposals.StageDurations public stageDurations;
   uint256 public queueExpiry;
   uint256 public dequeueFrequency;
@@ -58,14 +71,7 @@ contract Governance is
   SortedLinkedList.List private queue;
   uint256[] public dequeued;
   uint256[] public emptyIndices;
-  // The average network participation in governance, weighted toward recent proposals.
-  int256 public participationBaseline;
-  // The lower bound on the participation baseline.
-  int256 public participationFloor;
-  // The weight of the most recent proposal's participation on the baseline.
-  int256 public participationUpdateCoefficient;
-  // The fraction of the baseline under which the proposal will be padded with "no" votes.
-  int256 public criticalBaselineLevel;
+  QuorumParameters public quorumParameters;
 
   event ApproverSet(
     address approver
@@ -232,10 +238,10 @@ contract Governance is
     stageDurations.approval = approvalStageDuration;
     stageDurations.referendum = referendumStageDuration;
     stageDurations.execution = executionStageDuration;
-    participationBaseline = _participationBaseline;
-    participationFloor = _participationFloor;
-    participationUpdateCoefficient = _participationUpdateCoefficient;
-    criticalBaselineLevel = _criticalBaselineLevel;
+    quorumParameters.participationBaseline = _participationBaseline;
+    quorumParameters.participationFloor = _participationFloor;
+    quorumParameters.participationUpdateCoefficient = _participationUpdateCoefficient;
+    quorumParameters.criticalBaselineLevel = _criticalBaselineLevel;
     // solhint-disable-next-line not-rely-on-time
     lastDequeue = now;
   }
@@ -327,8 +333,11 @@ contract Governance is
    * @param _participationFloor The value at which the baseline is floored.
    */
   function setParticipationFloor(int256 _participationFloor) external onlyOwner {
-    require(_participationFloor != participationFloor && isFraction(_participationFloor));
-    participationFloor = _participationFloor;
+    require(
+      _participationFloor != quorumParameters.participationFloor &&
+      isFraction(_participationFloor)
+    );
+    quorumParameters.participationFloor = _participationFloor;
     emit ParticipationFloorSet(_participationFloor);
   }
 
@@ -343,10 +352,10 @@ contract Governance is
     onlyOwner
   {
     require(
-      _participationUpdateCoefficient != participationUpdateCoefficient &&
+      _participationUpdateCoefficient != quorumParameters.participationUpdateCoefficient &&
       isFraction(_participationUpdateCoefficient)
     );
-    participationUpdateCoefficient = _participationUpdateCoefficient;
+    quorumParameters.participationUpdateCoefficient = _participationUpdateCoefficient;
     emit ParticipationUpdateCoefficientSet(_participationUpdateCoefficient);
   }
 
@@ -355,8 +364,11 @@ contract Governance is
    * @param _criticalBaselineLevel The weight of the new participation.
    */
   function setCriticalBaselineLevel(int256 _criticalBaselineLevel) external onlyOwner {
-    require(_criticalBaselineLevel != criticalBaselineLevel && isFraction(_criticalBaselineLevel));
-    criticalBaselineLevel = _criticalBaselineLevel;
+    require(
+      _criticalBaselineLevel != quorumParameters.criticalBaselineLevel &&
+      isFraction(_criticalBaselineLevel)
+    );
+    quorumParameters.criticalBaselineLevel = _criticalBaselineLevel;
     emit CriticalBaselineLevelSet(_criticalBaselineLevel);
   }
 
@@ -539,7 +551,7 @@ contract Governance is
       stage == Proposals.Stage.Approval
     );
     proposal.approved = true;
-    // Ensures that totalWeight is set by the end of Referendum, even if 0 votes are cast.
+    // Ensures that totalWeight is set by the end of the Referendum stage, even if 0 votes are cast.
     proposal.totalWeight = totalWeight();
     emit ProposalApproved(proposalId);
     return true;
@@ -621,7 +633,7 @@ contract Governance is
         proposalId
       );
     }
-    // proposal must have executed fully or expired if this point reached
+    // Proposal must have executed fully or expired if this point is reached.
     deleteDequeuedProposal(proposal, proposalId, index);
     return !expired;
   }
@@ -644,6 +656,19 @@ contract Governance is
    */
   function getStageDurations() external view returns (uint256, uint256, uint256) {
     return (stageDurations.approval, stageDurations.referendum, stageDurations.execution);
+  }
+
+  /**
+   * @notice Returns the number of seconds proposals stay in each stage.
+   * @return The number of seconds proposals stay in each stage.
+   */
+  function getQuorumParameters() external view returns (int256, int256, int256, int256) {
+    return (
+      quorumParameters.participationBaseline,
+      quorumParameters.participationFloor,
+      quorumParameters.participationUpdateCoefficient,
+      quorumParameters.criticalBaselineLevel
+    );
   }
 
   /**
@@ -844,8 +869,8 @@ contract Governance is
   }
 
   function _isProposalPassing(Proposals.Proposal storage proposal) private view returns (bool) {
-    int256 support = proposal.adjustedSupport(
-      participationBaseline.multiply(criticalBaselineLevel)
+    int256 support = proposal.getSupportWithQuorumPadding(
+      quorumParameters.participationBaseline.multiply(quorumParameters.criticalBaselineLevel)
     );
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
       bytes4 functionId = extractFunctionSignature(proposal.transactions[i].data);
@@ -863,7 +888,7 @@ contract Governance is
   /**
    * @notice Returns whether a proposal is dequeued at the given index.
    * @param proposal The proposal struct.
-   * @param proposalId The proposal ID.
+   * @param proposalId The ID of the proposal.
    * @param index The index of the proposal ID in `dequeued`.
    */
   function isDequeuedProposal(
@@ -924,20 +949,20 @@ contract Governance is
   }
 
   /**
-   * @notice Updates the participation baseline using the total number of votes on the proposal
-   *   and the total weight across all accounts.
+   * @notice Updates the participation baseline based on the proportion of BondedDeposit weight
+   *   that participated in the proposal's Referendum stage.
    * @param proposal The proposal struct.
    */
   function updateParticipationBaseline(Proposals.Proposal storage proposal) private {
     uint256 totalVotes = proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain);
     int256 participation = toFixed(totalVotes).divide(toFixed(proposal.totalWeight));
-    participationBaseline =
-      participationBaseline.multiply(FIXED1.subtract(participationUpdateCoefficient))
-      .add(participation.multiply(participationUpdateCoefficient));
-    if (participationBaseline < participationFloor) {
-      participationBaseline = participationFloor;
+    quorumParameters.participationBaseline = quorumParameters.participationBaseline.multiply(
+      FIXED1.subtract(quorumParameters.participationUpdateCoefficient)
+    ).add(participation.multiply(quorumParameters.participationUpdateCoefficient));
+    if (quorumParameters.participationBaseline < quorumParameters.participationFloor) {
+      quorumParameters.participationBaseline = quorumParameters.participationFloor;
     }
-    emit ParticipationBaselineUpdated(participationBaseline);
+    emit ParticipationBaselineUpdated(quorumParameters.participationBaseline);
   }
 
   /**

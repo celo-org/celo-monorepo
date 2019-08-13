@@ -12,7 +12,7 @@ ProposalsTest.numberFormat = 'BigNumber'
 contract('ProposalsTest', () => {
   let proposalsTest: ProposalsTestInstance
 
-  describe('#adjustedSupport()', () => {
+  describe('#getSupportWithQuorumPadding()', () => {
     const totalWeight = 100
     const criticalBaseline = new BigNumber(5).div(new BigNumber(10))
 
@@ -27,7 +27,7 @@ contract('ProposalsTest', () => {
       const abstain = 30
       const expected = toFixed(yes / (yes + no))
       await proposalsTest.setVotes(yes, no, abstain)
-      const support = await proposalsTest.adjustedSupport(toFixed(criticalBaseline))
+      const support = await proposalsTest.getSupportWithQuorumPadding(toFixed(criticalBaseline))
       assertEqualBN(support, expected)
     })
 
@@ -39,7 +39,7 @@ contract('ProposalsTest', () => {
       const addedNo = 50 - yes - no - abstain
       const expected = toFixed(yes / (yes + no + addedNo))
       await proposalsTest.setVotes(yes, no, abstain)
-      const support = await proposalsTest.adjustedSupport(toFixed(criticalBaseline))
+      const support = await proposalsTest.getSupportWithQuorumPadding(toFixed(criticalBaseline))
       assertEqualBN(support, expected)
     })
 
@@ -49,7 +49,7 @@ contract('ProposalsTest', () => {
       const abstain = 30
       const expected = toFixed(0)
       await proposalsTest.setVotes(yes, no, abstain)
-      const support = await proposalsTest.adjustedSupport(toFixed(criticalBaseline))
+      const support = await proposalsTest.getSupportWithQuorumPadding(toFixed(criticalBaseline))
       assertEqualBN(support, expected)
     })
   })

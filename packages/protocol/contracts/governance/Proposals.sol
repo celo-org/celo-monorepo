@@ -6,7 +6,7 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 
 /**
- * @title Maintains a governance proposal.
+ * @title A library operating on Celo Governance proposals.
  */
 library Proposals {
 
@@ -40,8 +40,8 @@ library Proposals {
   // TODO(asa): Reduce storage usage here.
   struct VoteTotals {
     uint256 yes;
-    uint256 abstain;
     uint256 no;
+    uint256 abstain;
   }
 
   struct Transaction {
@@ -67,8 +67,8 @@ library Proposals {
    * @param destinations The destination addresses of the proposed transactions.
    * @param data The concatenated data to be included in the proposed transactions.
    * @param dataLengths The lengths of each transaction's data.
-   * @param msgSender The proposal sender.
-   * @param msgValue The proposal deposit.
+   * @param proposer The proposer.
+   * @param deposit The proposal deposit.
    */
   function make(
     Proposal storage proposal,
@@ -76,16 +76,16 @@ library Proposals {
     address[] memory destinations,
     bytes memory data,
     uint256[] memory dataLengths,
-    address msgSender,
-    uint256 msgValue
+    address proposer,
+    uint256 deposit
   )
     public
   {
     require(values.length == destinations.length && destinations.length == dataLengths.length);
     uint256 transactionCount = values.length;
 
-    proposal.proposer = msgSender;
-    proposal.deposit = msgValue;
+    proposal.proposer = proposer;
+    proposal.deposit = deposit;
     // solhint-disable-next-line not-rely-on-time
     proposal.timestamp = now;
 
@@ -100,7 +100,7 @@ library Proposals {
 
   /**
    * @notice Adds or changes a vote on a proposal.
-   * @param proposalId The ID of the proposal to vote on.
+   * @param proposal The proposal struct.
    * @param weight The weight of the vote.
    * @param currentVote The vote to be set.
    * @param previousVote The vote to be removed, or None for a new vote.
@@ -133,12 +133,12 @@ library Proposals {
   }
 
   /**
-   * @notice Executes the proposal, reverting if any transaction fails.
+   * @notice Executes the proposal.
    * @param proposal The proposal struct.
+   * @dev Reverts if any transaction fails.
    */
   function execute(Proposal storage proposal) public {
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
-      // reverts proposal if any transaction fails
       require(
         externalCall(
           proposal.transactions[i].destination,
@@ -160,7 +160,7 @@ library Proposals {
    * @param criticalBaseline The minimum participation at which "no" votes are not added.
    * @return The support ratio with the quorum condition.
    */
-  function adjustedSupport(
+  function getSupportWithQuorumPadding(
     Proposal storage proposal,
     int256 criticalBaseline
   )
@@ -189,6 +189,7 @@ library Proposals {
    * @param proposal The proposal struct.
    * @param stageDurations The durations of the dequeued proposal stages.
    * @return The stage of the dequeued proposal.
+   * @dev Must be called on a dequeued proposal.
    */
   function getDequeuedStage(
     Proposal storage proposal,
