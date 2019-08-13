@@ -511,13 +511,13 @@ describe('transfer tests', function(this: any) {
         })
 
         describe('when paying for gas in Celo Dollars', () => {
-          const intrinsicGas = 291000
+          const intrinsicGas = 192000
           describe('when there is no demurrage', () => {
             describe('when setting a gas amount greater than the amount of gas necessary', () => {
               before(async function(this: any) {
                 await restartGeth(syncMode)
 
-                const expectedGasUsed = 293511
+                const expectedGasUsed = 194511
                 ;[txSuccess, newBalances, expectedFees] = await runTestTransaction(
                   transferCeloGold(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
                     gasCurrency: stableTokenAddress,
@@ -582,7 +582,7 @@ describe('transfer tests', function(this: any) {
 
                 await setInflationParams(2, 1, timeSinceLastUpdated.toNumber())
 
-                const expectedGasUsed = 293511
+                const expectedGasUsed = 194511
                 ;[txSuccess, newBalances, expectedFees] = await runTestTransaction(
                   transferCeloGold(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
                     gasCurrency: stableTokenAddress,
@@ -747,7 +747,7 @@ describe('transfer tests', function(this: any) {
           before(async function(this: any) {
             await restartGeth(syncMode)
 
-            const expectedGasUsed = 331014
+            const expectedGasUsed = 232063
             ;[txSuccess, newBalances, expectedFees] = await runTestTransaction(
               transferCeloDollars(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
                 gasCurrency: stableTokenAddress,
@@ -764,7 +764,7 @@ describe('transfer tests', function(this: any) {
           before(async function(this: any) {
             await restartGeth(syncMode)
 
-            const expectedGasUsed = 61014
+            const expectedGasUsed = 61063
             ;[txSuccess, newBalances, expectedFees] = await runTestTransaction(
               transferCeloDollars(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
                 gasFeeRecipient: feeRecipientAddress,
