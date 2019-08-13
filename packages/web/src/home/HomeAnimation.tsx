@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { StyleSheet } from 'react-native'
 import { createElement } from 'react-native-web'
+import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Responsive from 'src/shared/Responsive'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
-
 const Video = React.forwardRef((props, ref) => createElement('video', { ...props, ref }))
 const Source = (props) => createElement('source', props)
 
@@ -12,7 +12,7 @@ interface Props {
   onFinished: () => void
 }
 
-export default class HomeAnimation extends React.Component<Props> {
+class HomeAnimation extends React.Component<Props & ScreenProps> {
   video: any
   started = false
 
@@ -46,6 +46,14 @@ export default class HomeAnimation extends React.Component<Props> {
     }, 200)
   }
 
+  source = () => {
+    if (this.props.screen === ScreenSizes.MOBILE) {
+      return '//storage.googleapis.com/celo-website/celo-animation-mobile.mp4'
+    }
+
+    return '//storage.googleapis.com/celo-website/celo-animation.mp4'
+  }
+
   render() {
     return (
       <Responsive large={styles.video}>
@@ -58,12 +66,14 @@ export default class HomeAnimation extends React.Component<Props> {
           muted={true}
           playsInline={true}
         >
-          <Source src="//storage.googleapis.com/celo-website/celo-animation.mp4" type="video/mp4" />
+          <Source src={this.source()} type="video/mp4" />
         </Video>
       </Responsive>
     )
   }
 }
+
+export default withScreenSize(HomeAnimation)
 
 const styles = StyleSheet.create({
   video: {

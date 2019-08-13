@@ -3,6 +3,7 @@ import { StyleSheet, View, ViewStyle } from 'react-native'
 import Responsive from 'src/shared/Responsive'
 
 interface GridProps {
+  nativeID?: string
   mobileStyle?: ViewStyle | ViewStyle[]
   tabletStyle?: ViewStyle | ViewStyle[]
   desktopStyle?: ViewStyle | ViewStyle[]
@@ -26,7 +27,9 @@ export function GridRow(props: GridProps) {
       large={[props.allStyle, styles.desktop, props.desktopStyle]}
       medium={[props.allStyle, styles.tablet, props.desktopStyle, props.tabletStyle]}
     >
-      <View style={[props.allStyle, styles.mobile, props.mobileStyle]}>{props.children}</View>
+      <View nativeID={props.nativeID} style={[props.allStyle, styles.mobile, props.mobileStyle]}>
+        {props.children}
+      </View>
     </Responsive>
   )
 }
