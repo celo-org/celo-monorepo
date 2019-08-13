@@ -9,7 +9,7 @@ import { call, select } from 'redux-saga/effects'
 import { setName } from 'src/account'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import {
   InviteBy,
   redeemComplete,
@@ -131,7 +131,7 @@ describe(watchRedeemInvite, () => {
       .provide([[call(waitWeb3LastBlock), true]])
       .withState(state)
       .dispatch(redeemInvite(KEY, NAME))
-      .put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ERROR_BANNER_DURATION))
+      .put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ALERT_BANNER_DURATION))
       .run()
   })
 
@@ -144,7 +144,7 @@ describe(watchRedeemInvite, () => {
       .provide([[call(waitWeb3LastBlock), true]])
       .withState(state)
       .dispatch(redeemInvite(KEY, NAME))
-      .put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ERROR_BANNER_DURATION))
+      .put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ALERT_BANNER_DURATION))
       .run()
   })
 
@@ -155,7 +155,7 @@ describe(watchRedeemInvite, () => {
       .provide([[select(currentAccountSelector), null], [call(waitWeb3LastBlock), true]])
       .withState(state)
       .dispatch(redeemInvite(KEY, NAME))
-      .put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ERROR_BANNER_DURATION))
+      .put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ALERT_BANNER_DURATION))
       .run()
   })
 

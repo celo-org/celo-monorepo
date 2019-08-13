@@ -7,11 +7,11 @@ import {
   TransferNotificationData,
 } from 'src/account'
 import { showMessage } from 'src/alert/actions'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { resolveCurrency } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
-import { lookupAddressFromPhoneNumber } from 'src/identity/verification'
-import { getRecipientFromAddress, phoneNumberToRecipient } from 'src/recipients/recipient'
+import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
+import { getRecipientFromAddress } from 'src/recipients/recipient'
 import { DispatchType, GetStateType } from 'src/redux/reducers'
 import {
   navigateToPaymentTransferReview,
@@ -30,28 +30,20 @@ const handlePaymentRequested = (
   if (notificationState === NotificationReceiveState.APP_ALREADY_OPEN) {
     return
   }
-  const { e164NumberToAddress } = getState().identity
-  const { recipientCache } = getState().recipients
-  let requesterAddress = e164NumberToAddress[paymentRequest.requesterE164Number]
-  if (!requesterAddress) {
-    const resolvedAddress = await lookupAddressFromPhoneNumber(paymentRequest.requesterE164Number)
-    if (!resolvedAddress) {
-      Logger.error(TAG, 'Unable to resolve requester address')
-      return
-    }
-    requesterAddress = resolvedAddress
+
+  if (!paymentRequest.requesterAddress) {
+    Logger.error(TAG, 'Payment request must specify a requester address')
+    return
   }
-  const recipient = phoneNumberToRecipient(
-    paymentRequest.requesterE164Number,
-    requesterAddress,
-    recipientCache
-  )
+
+  const { recipientCache } = getState().recipients
+  const targetRecipient = getRecipientFromPaymentRequest(paymentRequest, recipientCache)
 
   navigateToRequestedPaymentReview({
-    recipient,
+    recipient: targetRecipient,
     amount: new BigNumber(paymentRequest.amount),
     reason: paymentRequest.comment,
-    recipientAddress: requesterAddress!,
+    recipientAddress: targetRecipient.address,
   })
 }
 
@@ -86,7 +78,7 @@ export const handleNotification = (
   notificationState: NotificationReceiveState
 ) => async (dispatch: DispatchType, getState: GetStateType) => {
   if (notificationState === NotificationReceiveState.APP_ALREADY_OPEN) {
-    dispatch(showMessage(notification.title, ERROR_BANNER_DURATION))
+    dispatch(showMessage(notification.title, ALERT_BANNER_DURATION))
   }
   switch (notification.data.type) {
     case NotificationTypes.PAYMENT_REQUESTED:
