@@ -3,7 +3,6 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
-import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, View } from 'react-native'
@@ -18,18 +17,17 @@ import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identi
 import PaymentRequestBalance from 'src/paymentRequest/PaymentRequestBalance'
 import PaymentRequestListEmpty from 'src/paymentRequest/PaymentRequestListEmpty'
 import PaymentRequestNotification from 'src/paymentRequest/PaymentRequestNotification'
+import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
+import { NumberToRecipient } from 'src/recipients/recipient'
+import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
-import { recipientCacheSelector } from 'src/send/reducers'
-import { getSuggestedFeeDollars } from 'src/send/selectors'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { NumberToRecipient, phoneNumberToRecipient } from 'src/utils/recipient'
 
 const { contentPadding } = variables
 
 interface StateProps {
   dollarBalance: string | null
   paymentRequests: PaymentRequest[]
-  fee: BigNumber
   e164PhoneNumberAddressMapping: E164NumberToAddressType
   recipientCache: NumberToRecipient
 }
@@ -42,7 +40,6 @@ interface DispatchProps {
 const mapStateToProps = (state: RootState): StateProps => ({
   dollarBalance: state.stableToken.balance,
   paymentRequests: getPaymentRequests(state),
-  fee: getSuggestedFeeDollars(state),
   e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
   recipientCache: recipientCacheSelector(state),
 })
@@ -57,39 +54,18 @@ export class PaymentRequestListScreen extends React.Component<Props> {
     headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
   })
 
-  getRequesterRecipient = (requesterE164Number: string) => {
-    return phoneNumberToRecipient(
-      requesterE164Number,
-      this.props.e164PhoneNumberAddressMapping[requesterE164Number],
-      this.props.recipientCache
-    )
-  }
-
-  componentDidMount = () => {
-    const { paymentRequests, e164PhoneNumberAddressMapping } = this.props
-    const missingAddresses = Array.from(
-      new Set(
-        paymentRequests
-          .map((paymentRequest) => paymentRequest.requesterE164Number)
-          .filter((e164Number) => !e164PhoneNumberAddressMapping[e164Number])
-      )
-    )
-    if (missingAddresses && missingAddresses.length) {
-      // fetch missing addresses and update the mapping
-      this.props.fetchPhoneAddresses(Array.from(missingAddresses))
-    }
-  }
-
   renderRequest = (request: PaymentRequest, key: number, allRequests: PaymentRequest[]) => {
+    const { recipientCache } = this.props
+    const requester = getRecipientFromPaymentRequest(request, recipientCache)
+
     return (
       <View key={key}>
         <PaymentRequestNotification
           id={request.uid || ''}
           amount={request.amount}
           updatePaymentRequestStatus={this.props.updatePaymentRequestStatus}
-          requester={this.getRequesterRecipient(request.requesterE164Number)}
+          requester={requester}
           comment={request.comment}
-          fee={this.props.fee}
         />
         {key < allRequests.length - 1 && <View style={styles.separator} />}
       </View>

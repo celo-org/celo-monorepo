@@ -3,14 +3,21 @@ import { ConnectionInfo } from 'react-native'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { eventChannel } from 'redux-saga'
 import { call, cancelled, put, spawn, take } from 'redux-saga/effects'
+import { waitForGethConnectivity } from 'src/geth/saga'
 import { setNetworkConnectivity } from 'src/networkInfo/actions'
 import Logger from 'src/utils/Logger'
+import { checkWeb3Sync } from 'src/web3/saga'
 
 const TAG = 'networkInfo/saga'
 
 export function* waitForRehydrate() {
   yield take(REHYDRATE)
   return
+}
+
+export function* waitWeb3LastBlock() {
+  yield waitForGethConnectivity()
+  yield checkWeb3Sync()
 }
 
 function createNetworkStatusChannel() {
