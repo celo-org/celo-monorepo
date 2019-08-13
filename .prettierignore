@@ -9,10 +9,10 @@ packages/blockchain-api/dist
 
 packages/cli/lib
 
-packages/contractkit/lib/
-packages/contractkit/.artifacts/
-packages/contractkit/contracts/
-packages/contractkit/types/
+packages/walletkit/lib/
+packages/walletkit/.artifacts/
+packages/walletkit/contracts/
+packages/walletkit/types/
 packages/dappkit/lib/
 packages/docs/_book
 packages/faucet/dist/

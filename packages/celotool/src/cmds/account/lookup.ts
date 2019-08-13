@@ -1,9 +1,9 @@
 /* tslint:disable no-console */
 import { AccountArgv } from '@celo/celotool/src/cmds/account'
 import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
-// @ts-ignore
-import { Attestations, lookupPhoneNumbers } from '@celo/contractkit'
 import { PhoneNumberUtils } from '@celo/utils'
+// @ts-ignore
+import { Attestations, lookupPhoneNumbers } from '@celo/walletkit'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { Argv } from 'yargs'
 
