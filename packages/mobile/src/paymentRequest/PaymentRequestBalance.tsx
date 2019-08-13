@@ -18,14 +18,14 @@ interface Props {
 
 class PaymentRequestBalance extends React.PureComponent<Props & WithNamespaces> {
   render() {
-    const dollarSymbol = CURRENCIES[Tokens.DOLLAR].symbol
     return (
       <View style={styles.balanceContainer}>
         <CeloAccountIcon />
         <View style={styles.balance}>
           <Text style={fontStyles.bodySmallSemiBold}>{this.props.t('celoDollarBalance')}</Text>
           <Text style={[fontStyles.bodySmallSemiBold, componentStyles.colorGreen]}>
-            {dollarSymbol + getCentAwareMoneyDisplay(this.props.dollarBalance || 0)}
+            {CURRENCIES[Tokens.DOLLAR].symbol +
+              getCentAwareMoneyDisplay(this.props.dollarBalance || 0)}
           </Text>
         </View>
       </View>
