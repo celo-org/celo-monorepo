@@ -6,7 +6,6 @@ const numeral = require('numeral')
 require('numeral/locales/es')
 
 export enum Actions {
-  SET_INVITE_CODE_ENTERED = 'APP/SET_INVITE_CODE_ENTERED',
   SET_LOGGED_IN = 'APP/SET_LOGGED_IN',
   SET_NUMBER_VERIFIED = 'APP/SET_NUMBER_VERIFIED',
   SET_LANGUAGE = 'APP/SET_LANGUAGE',
@@ -15,11 +14,6 @@ export enum Actions {
   EXIT_BACKUP_FLOW = 'APP/EXIT_BACKUP_FLOW',
   SET_FEED_CACHE = 'APP/SET_FEED_CACHE',
   SET_ANALYTICS_ENABLED = 'APP/SET_ANALYTICS_ENABLED',
-}
-
-interface SetInviteCodeEntered {
-  type: Actions.SET_INVITE_CODE_ENTERED
-  inviteCodeEntered: boolean
 }
 
 interface SetLoggedIn {
@@ -55,7 +49,6 @@ interface SetAnalyticsEnabled {
 }
 
 export type ActionTypes =
-  | SetInviteCodeEntered
   | SetLoggedIn
   | SetNumberVerifiedAction
   | ResetAppOpenedState
@@ -63,11 +56,6 @@ export type ActionTypes =
   | EnterBackupFlow
   | ExitBackupFlow
   | SetAnalyticsEnabled
-
-export const setInviteCodeEntered = (inviteCodeEntered: boolean) => ({
-  type: Actions.SET_INVITE_CODE_ENTERED,
-  inviteCodeEntered,
-})
 
 export const setLoggedIn = (loggedIn: boolean) => ({
   type: Actions.SET_LOGGED_IN,

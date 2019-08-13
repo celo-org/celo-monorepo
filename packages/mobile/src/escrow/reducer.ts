@@ -4,13 +4,11 @@ import { RootState } from 'src/redux/reducers'
 export interface State {
   isReclaiming: boolean
   sentEscrowedPayments: EscrowedPayment[]
-  suggestedFee: string | null
 }
 
 export const initialState = {
   isReclaiming: false,
   sentEscrowedPayments: [],
-  suggestedFee: null,
 }
 
 export const escrowReducer = (state: State | undefined = initialState, action: ActionTypes) => {
@@ -19,11 +17,6 @@ export const escrowReducer = (state: State | undefined = initialState, action: A
       return {
         ...state,
         sentEscrowedPayments: action.sentPayments,
-      }
-    case Actions.SET_RECLAIM_TRANSACTION_FEE:
-      return {
-        ...state,
-        suggestedFee: action.suggestedFee,
       }
     case Actions.RECLAIM_PAYMENT:
       return {
@@ -41,4 +34,4 @@ export const escrowReducer = (state: State | undefined = initialState, action: A
   }
 }
 
-export const reclaimSuggestedFeeSelector = (state: RootState) => state.escrow.suggestedFee
+export const sentEscrowedPaymentsSelector = (state: RootState) => state.escrow.sentEscrowedPayments

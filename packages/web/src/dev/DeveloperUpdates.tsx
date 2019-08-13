@@ -10,7 +10,7 @@ import Octocat from 'src/icons/Octocat'
 import { TweetLogo as TwitterLogo } from 'src/icons/TwitterLogo'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
-import menuItems, { CeloLinks } from 'src/shared/menu-items'
+import menuItems, { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 const newsImg = require('src/dev/devNews.png')
@@ -24,6 +24,7 @@ export default withNamespaces('dev')(
         <span id={'signup'} />
         <Title title={t('updates.title')} />
         <GridRow
+          nativeID={hashNav.build.newsletter}
           desktopStyle={standardStyles.blockMarginBottom}
           tabletStyle={standardStyles.blockMarginBottomTablet}
           mobileStyle={standardStyles.blockMarginBottomMobile}

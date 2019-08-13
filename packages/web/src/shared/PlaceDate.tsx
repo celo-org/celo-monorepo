@@ -10,3 +10,10 @@ export function printDuration(date: Date, endDate: Date | null): string {
     return ''
   }
 }
+
+export function parseDate(date: string | undefined) {
+  if (date) {
+    return fecha.parse(date, 'MM-DD-YY')
+  }
+  return null
+}
