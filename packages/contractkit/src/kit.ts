@@ -3,6 +3,7 @@ import { Address, CeloToken } from 'src/base'
 import { ContractCache } from 'src/contract-cache'
 import { sendTransaction, TxOptions } from 'src/utils/send-tx'
 import { toTxResult } from 'src/utils/tx-result'
+import { WrapperCache } from 'src/wrapper-cache'
 import Web3 from 'web3'
 import { TransactionObject, Tx } from 'web3/eth/types'
 
@@ -17,6 +18,7 @@ export function newKitFromWeb3(web3: Web3) {
 export class ContractKit {
   readonly registry: AddressRegistry
   readonly contracts: ContractCache
+  readonly wrappers: WrapperCache
 
   defaultOptions: TxOptions
   constructor(readonly web3: Web3) {
@@ -26,10 +28,19 @@ export class ContractKit {
 
     this.registry = new AddressRegistry(this)
     this.contracts = new ContractCache(this)
+    this.wrappers = new WrapperCache(this)
   }
 
   async setGasCurrency(token: CeloToken) {
     this.defaultOptions.gasCurrency = await this.registry.addressFor(token)
+  }
+
+  set defaultAccount(address: Address) {
+    this.web3.eth.defaultAccount = address
+  }
+
+  get defaultAccount() {
+    return this.web3.eth.defaultAccount
   }
 
   setGasCurrencyAddress(address: Address) {
