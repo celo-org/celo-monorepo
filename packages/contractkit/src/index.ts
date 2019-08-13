@@ -1,5 +1,6 @@
 import Web3 from 'web3'
 
+export { Address, CeloContract } from './base'
 export { newAttestations } from './generated/Attestations'
 export { newBondedDeposits } from './generated/BondedDeposits'
 export { newEscrow } from './generated/Escrow'
@@ -15,6 +16,7 @@ export { newReserve } from './generated/Reserve'
 export { newSortedOracles } from './generated/SortedOracles'
 export { newStableToken } from './generated/StableToken'
 export { newValidators } from './generated/Validators'
+export * from './kit'
 
 export function newWeb3(url: string) {
   return new Web3(url)
