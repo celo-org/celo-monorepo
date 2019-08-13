@@ -15,7 +15,7 @@ Celo’s purpose is to empower anyone with a smartphone anywhere in the world to
 
 The project aims to be a decentralized platform that is not controlled by any single entity, but instead developed, upgraded and operated by a broad community of individuals, organizations and partners.
 
-Uniquely, Celo is oriented around providing the simplest possible experience for end users, who may have no familiarity with cryptocurrencies, and may be using low cost devices with limited connectivity. To achieve this, the project takes a full-stack approach, comprising both a protocol and applications that use that protocol.
+Uniquely, Celo is oriented around providing the simplest possible experience for end users, who may have no familiarity with cryptocurrencies, and may be using low cost devices with limited connectivity. To achieve this, the project takes a full-stack approach, comprising of both a protocol and applications that use that protocol.
 
 The Celo protocol is an open, distributed cryptographic protocol that allows applications to make transactions with and perform computation on a family of cryptocurrencies, including ones pegged to ‘fiat’ currencies like the US Dollar. The [Celo Wallet](http://celo.org/build/wallet) app, the first of an ecosystem of applications, allows end users to manage accounts and make payments securely and simply by taking advantage of the innovations in the Celo protocol.
 
@@ -25,7 +25,7 @@ Highlights include:
 
   Celo includes native support for multiple ERC20-like stable currencies pegged to ‘fiat’ currencies like the US dollar, to facilitate the use of Celo as a means of payment.
 
-- **Accounts linked to Phone Numbers**
+- **Accounts Linked to Phone Numbers**
 
   Celo maintains a secure decentralized mapping of phone numbers that allow wallet users to send and receive payments with their existing contacts simply and with confidence that the payment will reach the intended recipient.
 
