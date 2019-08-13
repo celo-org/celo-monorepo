@@ -1,13 +1,10 @@
+import { Address, CeloContract, NULL_ADDRESS } from 'src/base'
 import { newRegistry } from 'src/generated/Registry'
 import { Registry } from 'src/generated/types/Registry'
-import { Address, CeloContract } from './base'
-import { ContractKit } from './kit'
+import { ContractKit } from 'src/kit'
 
 // Registry contract is always predeployed to this address
 const REGISTRY_CONTRACT_ADDRESS = '0x000000000000000000000000000000000000ce10'
-
-// This is what's returned from the registry when a contract isn't found
-const ADDRESS_NOT_FOUND = '0x0000000000000000000000000000000000000000'
 
 export class AddressRegistry {
   private readonly registry: Registry
@@ -22,7 +19,7 @@ export class AddressRegistry {
     if (!this.cache.has(contract)) {
       const address = await this.registry.methods.getAddressFor(contract).call()
 
-      if (!address || address === ADDRESS_NOT_FOUND) {
+      if (!address || address === NULL_ADDRESS) {
         throw new Error(`Failed to get address for ${contract} from the Registry`)
       }
       this.cache.set(contract, address)
