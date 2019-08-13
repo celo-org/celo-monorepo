@@ -152,10 +152,9 @@ library Proposals {
 
   /**
    * @notice Computes the support ratio for a proposal with the quorum condition:
-   *   If the total participation (yes + no + abstain) is less than the critical
-   *   baseline, "no" votes are added to increase particiption to this level. The abstaining votes
-   *   are removed, leaving the "yes" and (potentially increased) "no" votes. The ratio of "yes"
-   *   votes to this value is returned.
+   *   If the total participation (yes + no + abstain) / total is less than the critical
+   *   baseline, "no" votes are added to increase particiption to this level. The ratio of
+   *   yes / (yes + no) is returned.
    * @param proposal The proposal struct.
    * @param criticalBaseline The minimum participation at which "no" votes are not added.
    * @return The support ratio with the quorum condition.
@@ -168,20 +167,17 @@ library Proposals {
     view
     returns (int256)
   {
-    if (proposal.votes.yes == 0) {
+    uint256 yesVotes = proposal.votes.yes;
+    if (yesVotes == 0) {
       return 0;
     }
-    int256 totalWeightFixed = toFixed(proposal.totalWeight);
-    int256 yesRatio = toFixed(proposal.votes.yes).divide(totalWeightFixed);
-    int256 abstainRatio = toFixed(proposal.votes.abstain).divide(totalWeightFixed);
-    int256 participation = toFixed(
-      proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain)
-    ).divide(totalWeightFixed);
-    int256 adjustedYesNoRatio = (
-      participation > criticalBaseline ? participation : criticalBaseline
-    ).subtract(abstainRatio);
-    int256 support = yesRatio.divide(adjustedYesNoRatio);
-    return support;
+    uint256 noVotes = proposal.votes.no;
+    uint256 totalVotes = yesVotes.add(noVotes).add(proposal.votes.abstain);
+    uint256 requiredVotes = fromFixed(criticalBaseline.multiply(toFixed(proposal.totalWeight)));
+    if (requiredVotes > totalVotes) {
+      noVotes = noVotes.add(requiredVotes.sub(totalVotes));
+    }
+    return toFixed(yesVotes).divide(toFixed(yesVotes.add(noVotes)));
   }
 
   /**
@@ -338,5 +334,13 @@ library Proposals {
    */
   function toFixed(uint256 n) private pure returns (int256) {
     return int256(n).newFixed();
+  }
+
+  /**
+   * @notice Converts a int256 in Fixed form to a uint256, truncating the decimal.
+   * @param n The value to be converted.
+   */
+  function fromFixed(int256 n) private pure returns (uint256) {
+    return uint256(n.fromFixed());
   }
 }

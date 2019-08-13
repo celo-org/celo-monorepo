@@ -80,7 +80,7 @@ contract('Governance', (accounts: string[]) => {
   const participationFloor = new BigNumber(5).div(new BigNumber(100))
   const participationUpdateCoefficient = new BigNumber(1).div(new BigNumber(5))
   const criticalBaselineLevel = 1
-  const defaultThreshold = new BigNumber(7).div(new BigNumber(10))
+  const defaultThreshold = new BigNumber(50).div(new BigNumber(100))
   const weight = 100
   const participation = 1
   const expectedParticipationBaseline = participationUpdateCoefficient
@@ -685,14 +685,12 @@ contract('Governance', (accounts: string[]) => {
       await assertRevert(governance.setConstitution(destination, nullFunctionId, 0))
     })
 
-    it('should revert when the threshold is equal to a majority', async () => {
-      await assertRevert(governance.setConstitution(destination, nullFunctionId, toFixed(1 / 2)))
+    it('should revert when the threshold is less than a majority', async () => {
+      await assertRevert(governance.setConstitution(destination, nullFunctionId, toFixed(49 / 100)))
     })
 
-    it('should revert when the threshold is greater than 100%', async () => {
-      await assertRevert(
-        governance.setConstitution(destination, nullFunctionId, toFixed(101 / 100))
-      )
+    it('should revert when the threshold is at least 100%', async () => {
+      await assertRevert(governance.setConstitution(destination, nullFunctionId, toFixed(1)))
     })
 
     it('should revert when called by anyone other than the owner', async () => {
@@ -1918,10 +1916,10 @@ contract('Governance', (accounts: string[]) => {
       await timeTravel(approvalStageDuration, web3)
     })
 
-    describe('when the adjusted support is greater than or equal to threshold', () => {
+    describe('when the adjusted support is greater than threshold', () => {
       beforeEach(async () => {
-        await mockBondedDeposits.setWeight(account, (weight * 70) / 100)
-        await mockBondedDeposits.setWeight(otherAccount, (weight * 30) / 100)
+        await mockBondedDeposits.setWeight(account, (weight * 51) / 100)
+        await mockBondedDeposits.setWeight(otherAccount, (weight * 49) / 100)
         await governance.vote(proposalId, index, VoteValue.Yes)
         await governance.vote(proposalId, index, VoteValue.No, { from: otherAccount })
       })
@@ -1932,10 +1930,10 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe('when the adjusted support is less than threshold', () => {
+    describe('when the adjusted support is less than or equal to threshold', () => {
       beforeEach(async () => {
-        await mockBondedDeposits.setWeight(account, (weight * 69) / 100)
-        await mockBondedDeposits.setWeight(otherAccount, (weight * 31) / 100)
+        await mockBondedDeposits.setWeight(account, (weight * 50) / 100)
+        await mockBondedDeposits.setWeight(otherAccount, (weight * 50) / 100)
         await governance.vote(proposalId, index, VoteValue.Yes)
         await governance.vote(proposalId, index, VoteValue.No, { from: otherAccount })
       })

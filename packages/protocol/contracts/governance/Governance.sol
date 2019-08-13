@@ -379,7 +379,7 @@ contract Governance is
    * @param functionId The function ID of proposals for which this threshold should apply. Zero
    *   will set the default.
    * @param threshold The threshold.
-   * @dev If no constitution is explicitly set the default is a 70% supermajority.
+   * @dev If no constitution is explicitly set the default is a simple majority.
    */
   function setConstitution(
     address destination,
@@ -391,8 +391,8 @@ contract Governance is
   {
     // TODO(asa): https://github.com/celo-org/celo-monorepo/pull/3414#discussion_r283588332
     require(destination != address(0));
-    // Threshold has to be greater than majority and not greater than unaninimty
-    require(threshold > FIXED_HALF && threshold <= FIXED1);
+    // Threshold has to be greater than or equal to a majority and less than unaninimty
+    require(threshold >= FIXED_HALF && threshold < FIXED1);
     if (functionId == 0) {
       constitution[destination].defaultThreshold = threshold;
     } else {
@@ -879,7 +879,7 @@ contract Governance is
         proposal.transactions[i].destination,
         functionId
       );
-      if (support < threshold) {
+      if (support <= threshold) {
         return false;
       }
     }
@@ -997,8 +997,8 @@ contract Governance is
     view
     returns (int256)
   {
-    // Default to a 70% supermajority.
-    int256 threshold = toFixed(7).divide(toFixed(10));
+    // Default to a simple majority.
+    int256 threshold = FIXED_HALF;
     if (constitution[destination].functionThresholds[functionId] != 0) {
       threshold = constitution[destination].functionThresholds[functionId];
     } else if (constitution[destination].defaultThreshold != 0) {
