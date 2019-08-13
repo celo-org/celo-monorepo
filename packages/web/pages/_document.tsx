@@ -2,7 +2,7 @@ import Document, { Head, Main, NextScript } from 'next/document'
 import * as React from 'react'
 import { AppRegistry, I18nManager } from 'react-native-web'
 import analytics from 'src/analytics/analytics'
-import { guessDeviceType } from 'src/layout/ScreenSize'
+import { setDimensionsForScreen } from 'src/layout/ScreenSize'
 import { isLocaleRTL } from '../server/i18nSetup'
 // @ts-ignore
 const a = analytics
@@ -21,7 +21,7 @@ export default class MyDocument extends Document {
   static async getInitialProps(context: NextInitalProps) {
     const locale = context.req.locale
     const userAgent = context.req.headers['user-agent']
-    guessDeviceType(userAgent)
+    setDimensionsForScreen(userAgent)
 
     AppRegistry.registerComponent('Main', () => Main)
 
