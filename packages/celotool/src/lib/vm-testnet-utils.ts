@@ -27,6 +27,8 @@ const terraformModule = 'testnet'
 const terraformEnvVars: { [varName: string]: string } = {
   block_time: envVar.BLOCK_TIME,
   celo_env: envVar.CELOTOOL_CELOENV,
+  gcloud_credentials_path: envVar.GOOGLE_APPLICATION_CREDENTIALS,
+  gcloud_project: envVar.TESTNET_PROJECT_NAME,
   geth_verbosity: envVar.GETH_VERBOSITY,
   geth_bootnode_docker_image_repository: envVar.GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY,
   geth_bootnode_docker_image_tag: envVar.GETH_BOOTNODE_DOCKER_IMAGE_TAG,

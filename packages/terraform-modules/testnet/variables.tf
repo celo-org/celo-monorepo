@@ -18,6 +18,16 @@ variable ethstats_websocket_secret {
   description = "Ethstats websocket secret to allow nodes to report activity"
 }
 
+variable gcloud_credentials_path {
+  type = string
+  description = "Path to the file containing the Google Cloud credentials to use"
+}
+
+variable gcloud_project {
+  type = string
+  description = "Name of the Google Cloud project to use"
+}
+
 variable gcloud_secrets_base_path {
   type = string
   description = "Base path in the secrets bucket of a Google Cloud Storage file containing node secrets"
