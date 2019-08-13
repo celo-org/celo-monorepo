@@ -1,3 +1,4 @@
+import { sampleSize } from 'lodash'
 import { generateMnemonic, wordlists } from 'react-native-bip39'
 
 export async function createQuizWordList(mnemonic: string, language: string | null) {
@@ -13,8 +14,8 @@ export async function createQuizWordList(mnemonic: string, language: string | nu
 export function selectQuizWordOptions(correctWord: string, allWords: string[], numOptions: number) {
   const wordOptions = []
   const correctWordPosition = Math.floor(Math.random() * numOptions)
-  const usedIndex: number[] = []
-  let randomWordIndex: number
+  const randomWordIndexList = sampleSize([...Array(allWords.length).keys()], numOptions - 1)
+  let randomWordIndex: number = 0
 
   for (let i = 0; i < numOptions; i++) {
     if (i === correctWordPosition) {
@@ -22,15 +23,8 @@ export function selectQuizWordOptions(correctWord: string, allWords: string[], n
       continue
     }
 
-    while (true) {
-      randomWordIndex = Math.floor(Math.random() * allWords.length)
-      if (!usedIndex.includes(randomWordIndex)) {
-        break
-      }
-    }
-
-    wordOptions.push(allWords[randomWordIndex])
-    usedIndex.push(randomWordIndex)
+    wordOptions.push(allWords[randomWordIndexList[randomWordIndex]])
+    randomWordIndex += 1
   }
   return wordOptions
 }
