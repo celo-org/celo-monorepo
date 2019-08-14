@@ -53,6 +53,15 @@ rustup install 1.36.0
 rustup default 1.36.0
 ```
 
+If you're building Geth for Android, you require an NDK that has a cross-compilation toolchain. You can get it by appropriately defining the relevant environment variables, e.g.:
+
+```bash
+export NDK_VERSION=android-ndk-r19c
+export ANDROID_NDK=ndk_bundle/android-ndk-r19c
+```
+
+and running `make ndk_bundle`. This will download the NDK for your platform.
+
 ### Java
 
 We need Java to be able to build and run Android to deploy the mobile app to

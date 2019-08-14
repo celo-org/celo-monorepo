@@ -73,6 +73,14 @@ variable geth_verbosity {
   description = "Verbosity of all geth nodes"
 }
 
+<<<<<<< HEAD
+=======
+variable mnemonic {
+  type = string
+  description = "Mnemonic for the nodes"
+}
+
+>>>>>>> e7510c6eecd12e034893dfd7bb7323042f6d2f08
 variable network_id {
   type = number
   description = "The network ID number"
@@ -83,6 +91,14 @@ variable validator_count {
   description = "Number of validators to create"
 }
 
+<<<<<<< HEAD
+=======
+variable validator_geth_account_secret {
+  type = string
+  description = "Geth account secret for validators"
+}
+
+>>>>>>> e7510c6eecd12e034893dfd7bb7323042f6d2f08
 variable verification_pool_url {
   type = string
   description = "URL of the verification pool"
