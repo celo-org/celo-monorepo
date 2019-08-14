@@ -26,7 +26,7 @@ const WrapperFactories = {
 
 type CFType = typeof WrapperFactories
 
-type WrapperCacheMap = {
+interface WrapperCacheMap {
   // [CeloContract.Attestations]?: AttestationsWrapper,
   [CeloContract.BondedDeposits]?: BondedDepositsWrapper
   // [CeloContract.Escrow]?: EscrowWrapper,

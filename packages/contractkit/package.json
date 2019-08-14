@@ -11,7 +11,7 @@
     "clean": "tsc -b . --clean && rm -rf src/generated",
     "build:gen": "yarn --cwd ../protocol build",
     "prepublishOnly": "yarn build:gen && yarn build",
-    "lint": "tslint -c tslint.json --project ."
+    "lint": "tslint -c tslint.json --project . && tslint -c tslint.json --project test"
   },
   "dependencies": {
     "@celo/utils": "^0.0.5",

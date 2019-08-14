@@ -1,11 +1,10 @@
+import { zip } from '@celo/utils/lib/src/collections'
 import BN from 'bn.js'
 import { Address } from 'src/base'
 import { BondedDeposits } from 'src/generated/types/BondedDeposits'
 import { BaseWrapper } from 'src/wrappers/BaseWrapper'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
-
-import { zip } from '@celo/utils/lib/src/collections'
 
 export interface VotingDetails {
   accountAddress: Address
@@ -40,8 +39,8 @@ export class BondedDepositsWrapper extends BaseWrapper<BondedDeposits> {
   }
 
   // async getVotingDetails(_accountOrVoterAddress: Address): Promise<VotingDetails> {
-    //   throw new Error('Requires FIX on Incompatible Contract')
-    // }
+  //   throw new Error('Requires FIX on Incompatible Contract')
+  // }
   async getVotingDetails(accountOrVoterAddress: Address): Promise<VotingDetails> {
     const accountAddress = await this.contract.methods
       .getAccountFromDelegateAndRole(accountOrVoterAddress, roles.voting)
@@ -67,6 +66,7 @@ export class BondedDepositsWrapper extends BaseWrapper<BondedDeposits> {
     const accountTimes = await timesFunc(account).call()
     const accountValues = await Promise.all(accountTimes.map((time) => valueFunc(account, time)))
     return zip(
+      // tslint:disable-next-line: no-object-literal-type-assertion
       (time, value) => ({ time, value } as Deposit),
       accountTimes.map((time) => Web3.utils.toBN(time)),
       accountValues
