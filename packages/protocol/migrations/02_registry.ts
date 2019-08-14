@@ -9,7 +9,7 @@ const initializeArgs = async (): Promise<any[]> => {
 module.exports = deployImplementationAndRepointProxy<RegistryInstance>(
   web3,
   artifacts,
-  config.registryProxyPredeployedAddress,
+  config.registry.predeployedProxyAddress,
   'Registry',
   initializeArgs
 )

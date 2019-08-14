@@ -9,6 +9,7 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import Arrow from 'src/icons/Arrow'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
+import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 type Props = ScreenProps & I18nProps
@@ -18,27 +19,15 @@ class CoverArea extends React.PureComponent<Props> {
     const isDesktop = screen === ScreenSizes.DESKTOP
     return (
       <View style={styles.darkBackground}>
-        <View style={[standardStyles.centered, styles.fullScreen]}>
+        <View
+          style={[standardStyles.centered, isDesktop ? styles.fullScreen : styles.economizeScreen]}
+        >
           <View style={[standardStyles.centered, styles.aboveFold]}>
             <View style={circleContainerStyle(screen)}>
               <FadeIn duration={0} unmountIfInvisible={true}>
                 {(load) => <FullCircle init={load} />}
               </FadeIn>
-              <View
-                style={[
-                  standardStyles.centered,
-                  isDesktop ? styles.fourWords : styles.fourWordsMobile,
-                ]}
-              >
-                <Text style={fonts.specialOneOff}>
-                  <Text style={styles.greenColor}>Developers. </Text>
-                  <Text style={styles.purpleColor}>Designers. </Text>
-                </Text>
-                <Text style={fonts.specialOneOff}>
-                  <Text style={styles.redColor}>Dreamers. </Text>
-                  <Text style={styles.blueColor}>Doers. </Text>
-                </Text>
-              </View>
+              {isDesktop && <FourWords screen={screen} />}
             </View>
           </View>
           <View
@@ -55,6 +44,11 @@ class CoverArea extends React.PureComponent<Props> {
           mobileStyle={standardStyles.sectionMarginBottomMobile}
         >
           <Cell span={Spans.half}>
+            {!isDesktop && (
+              <Fade bottom={true} distance={'40px'}>
+                <FourWords screen={screen} />
+              </Fade>
+            )}
             <Fade bottom={true} distance={'80px'}>
               <View style={[standardStyles.centered, isDesktop && styles.ctArea]}>
                 <H1
@@ -95,10 +89,40 @@ function circleContainerStyle(screen: ScreenSizes) {
   }
 }
 
+function fourWordsStyle(screen: ScreenSizes) {
+  switch (screen) {
+    case ScreenSizes.DESKTOP:
+      return styles.fourWords
+    case ScreenSizes.TABLET:
+      return styles.fourWordsMobile
+    default:
+      return styles.fourWordsMobile
+  }
+}
+
+function FourWords({ screen }: { screen: ScreenSizes }) {
+  return (
+    <View style={[standardStyles.centered, fourWordsStyle(screen)]}>
+      <Text style={[fonts.specialOneOff, textStyles.center]}>
+        <Text style={styles.greenColor}>Developers. </Text>
+        <Text style={styles.purpleColor}>Designers. </Text>
+      </Text>
+      <Text style={[fonts.specialOneOff, textStyles.center]}>
+        <Text style={styles.redColor}>Dreamers. </Text>
+        <Text style={styles.blueColor}>Doers. </Text>
+      </Text>
+    </View>
+  )
+}
+
 const styles = StyleSheet.create({
   fullScreen: {
     width: '100vw',
     height: '100vh',
+    maxHeight: '100vw', // so large tablets dont make the circle area oddly tall
+  },
+  economizeScreen: {
+    marginTop: HEADER_HEIGHT,
   },
   aboveFold: { justifyContent: 'space-around', width: '100%', padding: 20 },
   darkBackground: {
@@ -126,14 +150,14 @@ const styles = StyleSheet.create({
   },
   fourWordsMobile: {
     width: '100%',
-    marginTop: 50,
+    marginBottom: 50,
   },
   circleContainer: {
     width: '100%',
   },
   circleContainerMedium: {
     width: '80vw',
-    maxHeight: '70vh',
+    maxWidth: '60vh',
   },
   circleContainerLarge: {
     width: '73vh',

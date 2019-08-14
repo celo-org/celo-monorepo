@@ -2,13 +2,14 @@ import { envVar, execCmdWithExitOnFailure, fetchEnv } from '@celo/celotool/src/l
 
 const NUMBER_OF_TX_NODES = 4
 
-export async function scaleStatefulSet(
+export async function scaleResource(
   celoEnv: string,
+  type: string,
   resourceName: string,
   replicaCount: number
 ) {
   await execCmdWithExitOnFailure(
-    `kubectl scale statefulset ${resourceName} --replicas=${replicaCount} --namespace ${celoEnv}`
+    `kubectl scale ${type} ${resourceName} --replicas=${replicaCount} --namespace ${celoEnv}`
   )
 }
 

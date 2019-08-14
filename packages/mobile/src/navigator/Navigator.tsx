@@ -14,6 +14,8 @@ import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
 import UpgradeScreen from 'src/app/UpgradeScreen'
 import Backup from 'src/backup/Backup'
+import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
+import DappKitTxSignScreen from 'src/dappkit/DappKitTxSignScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
@@ -34,7 +36,6 @@ import Send from 'src/send/Send'
 import SendAmount from 'src/send/SendAmount'
 import SendConfirmation from 'src/send/SendConfirmation'
 import SetClock from 'src/set-clock/SetClock'
-import Sync from 'src/sync/Sync'
 import TabNavigator from 'src/tab/TabNavigator'
 import TransactionReviewScreen from 'src/transactions/TransactionReviewScreen'
 import VerifyEducation from 'src/verify/Education'
@@ -59,6 +60,8 @@ const commonScreens = {
   [Screens.PincodeConfirmation]: { screen: PincodeConfirmation },
   [Screens.ErrorScreen]: { screen: ErrorScreen },
   [Screens.UpgradeScreen]: { screen: UpgradeScreen },
+  [Screens.DappKitAccountAuth]: { screen: DappKitAccountScreen },
+  [Screens.DappKitSignTxScreen]: { screen: DappKitTxSignScreen },
 }
 
 const NuxStack = createStackNavigator(
@@ -68,7 +71,6 @@ const NuxStack = createStackNavigator(
     [Screens.VerifyInput]: { screen: VerifyInput },
     [Screens.VerifyVerifying]: { screen: VerifyVerifying },
     [Screens.VerifyVerified]: { screen: VerifyVerified },
-    [Screens.Sync]: { screen: Sync },
     [Screens.Pincode]: { screen: Pincode },
     [Screens.ImportWallet]: { screen: ImportWallet },
     [Screens.Language]: { screen: Language },

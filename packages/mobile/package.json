@@ -9,11 +9,10 @@
     "start:bg": "react-native start &",
     "start:android": "react-native run-android",
     "start:ios": "react-native run-ios",
-    "lint-checks": "yarn run lint && yarn run build:typescript",
     "lint": "tslint -c tslint.json --project tsconfig.json",
-    "build": "yarn run build:typescript && yarn run build:metro",
-    "build:sdk": "build-sdk",
-    "build:typescript": "tsc --noEmit",
+    "build": "yarn run build:ts && yarn run build:metro",
+    "build:sdk": "yarn --cwd ../walletkit build:for-env",
+    "build:ts": "tsc --noEmit",
     "build:metro": "echo 'NOT WORKING RIGHT NOW'",
     "build:gen-graphql-types": "gql-gen --schema http://localhost:8080/graphql --template graphql-codegen-typescript-template --out ./typings/ 'src/**/*.tsx'",
     "dev": "react-native run-android --appIdSuffix \"debug\"",
@@ -36,7 +35,8 @@
     "prepare": "patch-package",
     "postinstall": "sh scripts/fix_rn_version.sh; patch-package",
     "update-disclaimer": "yarn licenses generate-disclaimer > LicenseDisclaimer.txt && mkdir -p android/app/src/main/assets/custom && cp LicenseDisclaimer.txt android/app/src/main/assets/custom/LicenseDisclaimer.txt",
-    "test-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'"
+    "test-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'",
+    "verify-locales": "./scripts/verify_locales.sh"
   },
   "rnpm": {
     "assets": [
@@ -44,11 +44,10 @@
     ]
   },
   "dependencies": {
-    "@celo/client": "4fd835d",
-    "@celo/client-integration": "npm:@celo/client@55cf94c",
-    "@celo/contractkit": "0.0.1",
+    "@celo/client": "55cf94c",
+    "@celo/walletkit": "^0.0.4",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#d3a2fdb",
-    "@celo/utils": "0.0.1",
+    "@celo/utils": "^0.0.5",
     "@react-native-community/netinfo": "^2.0.4",
     "@segment/analytics-react-native": "^0.1.0-beta.0",
     "@segment/analytics-react-native-firebase": "^0.1.0-beta.0",
@@ -77,6 +76,7 @@
     "numeral": "^2.0.6",
     "react": "16.8.3",
     "react-apollo": "^2.4.1",
+    "react-async-hook": "^3.4.0",
     "react-i18next": "^8.3.8",
     "react-native": "0.59.10",
     "react-native-android-broadcast-receiver-for-referrer": "^1.0.7",

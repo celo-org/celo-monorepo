@@ -4,13 +4,12 @@ import Cover from 'src/dev/Cover'
 import DeveloperUpdates from 'src/dev/DeveloperUpdates'
 import Features from 'src/dev/Features'
 import StackExplorer from 'src/dev/FullStack'
-import { APPLICATIONS_ID, PROOF_ID, PROTOCOL_ID } from 'src/dev/sectionIDs'
 import StackSection from 'src/dev/StackSection'
 import Title from 'src/dev/Title'
 import { Li } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, withNamespaces } from 'src/i18n'
-import menuItems, { CeloLinks } from 'src/shared/menu-items'
+import menuItems, { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { standardStyles, textStyles } from 'src/styles'
 
 class BuildPage extends React.PureComponent<I18nProps> {
@@ -33,10 +32,10 @@ class BuildPage extends React.PureComponent<I18nProps> {
         <StackExplorer />
         <View style={standardStyles.darkBackground}>
           <Features />
-          <Title invert={true} title={t('celoStack')} />
+          <Title nativeID={hashNav.build.stack} invert={true} title={t('celoStack')} />
           <StackSection
             label="1"
-            id={APPLICATIONS_ID}
+            id={hashNav.build.applications}
             title={t('mobile.title')}
             text={t('mobile.text')}
             buttonOne={{ title: t('installWallet'), href: CeloLinks.walletApp }}
@@ -49,7 +48,7 @@ class BuildPage extends React.PureComponent<I18nProps> {
           </StackSection>
           <StackSection
             label="2"
-            id={PROTOCOL_ID}
+            id={hashNav.build.contracts}
             title={t('protocol.title')}
             text={t('protocol.text')}
             buttonOne={{ title: t('readMore'), href: CeloLinks.docsOverview }}
@@ -61,7 +60,7 @@ class BuildPage extends React.PureComponent<I18nProps> {
           </StackSection>
           <StackSection
             label="3"
-            id={PROOF_ID}
+            id={hashNav.build.blockchain}
             title={t('proof.title')}
             text={t('proof.text')}
             buttonOne={{ title: t('readMore'), href: CeloLinks.docsOverview }}

@@ -1,7 +1,7 @@
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
 
-import { Validators } from '@celo/contractkit'
+import { Validators } from '@celo/walletkit'
 
 import { Address, compareBN, eqAddress, NULL_ADDRESS, zip } from '../utils/helpers'
 import { BondedDepositAdapter } from './bonded-deposit'

@@ -1,4 +1,4 @@
-import { GenesisBlockUtils, StaticNodeUtils } from '@celo/contractkit'
+import { GenesisBlockUtils, StaticNodeUtils } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'

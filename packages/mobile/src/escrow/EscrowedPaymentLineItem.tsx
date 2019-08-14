@@ -1,21 +1,23 @@
 import fontStyles from '@celo/react-components/styles/fonts'
-import { getContactPhoneNumber } from '@celo/utils/src/contacts'
 import * as React from 'react'
 import { StyleSheet, Text } from 'react-native'
 import { EscrowedPayment } from 'src/escrow/actions'
+import { divideByWei, getMoneyDisplayValue } from 'src/utils/formatting'
 
 interface Props {
   payment: EscrowedPayment
 }
 
 export default function EscrowedPaymentLineItem(props: Props) {
-  const { message, recipient } = props.payment
-  const recipientPhoneNumber =
-    typeof recipient === 'string' ? recipient : getContactPhoneNumber(recipient)
+  const { amount, message, recipientPhone } = props.payment
   return (
     <Text numberOfLines={1} ellipsizeMode="middle" style={styles.oneLine}>
       <Text style={[fontStyles.subSmall]}>
-        {recipientPhoneNumber} - {message}
+        {recipientPhone} - {message}
+      </Text>
+      <Text style={[fontStyles.subSmall, fontStyles.semiBold]}>
+        {' '}
+        ${getMoneyDisplayValue(divideByWei(amount.toString()))}
       </Text>
     </Text>
   )

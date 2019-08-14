@@ -21,11 +21,6 @@ export async function requestContactsPermission() {
   )
 }
 
-// We don't ask for this permission anymore. Eventually, this method will go away.
-export async function requestReadSmsPermission() {
-  return false
-}
-
 export async function requestCameraPermission() {
   return requestPermission(PermissionsAndroid.PERMISSIONS.CAMERA)
 }
