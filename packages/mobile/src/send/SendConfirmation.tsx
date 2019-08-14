@@ -230,7 +230,7 @@ class SendConfirmation extends React.Component<Props, State> {
             fee={fee}
             isLoadingFee={asyncFee.loading}
             feeError={asyncFee.error}
-            type={isPaymentRequest ? TransactionTypes.PAY_REQUEST : TransactionTypes.SENT}
+            type={isPaymentRequest && TransactionTypes.PAY_REQUEST}
             dollarBalance={this.props.dollarBalance}
           />
           <Modal
