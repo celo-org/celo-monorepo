@@ -45,16 +45,16 @@ contract Governance is
 
   // All parameters are Fixidity fractions.
   // The baseline is updated as
-  // max{floor, (1 - updateCoefficient) * baseline + updateCoefficient * participation}
-  struct QuorumParameters {
+  // max{floor, (1 - baselineUpdateFactor) * baseline + baselineUpdateFactor * participation}
+  struct ParticipationParameters {
     // The average network participation in governance, weighted toward recent proposals.
-    int256 participationBaseline;
+    int256 baseline;
     // The lower bound on the participation baseline.
-    int256 participationFloor;
+    int256 floor;
     // The weight of the most recent proposal's participation on the baseline.
-    int256 participationUpdateCoefficient;
-    // The fraction of the baseline under which the proposal will be padded with "no" votes.
-    int256 criticalBaselineLevel;
+    int256 baselineUpdateFactor;
+    // The proportion of the baseline that constitutes quorum.
+    int256 baselineQuorumFactor;
   }
 
   Proposals.StageDurations public stageDurations;
@@ -72,7 +72,7 @@ contract Governance is
   SortedLinkedList.List private queue;
   uint256[] public dequeued;
   uint256[] public emptyIndices;
-  QuorumParameters public quorumParameters;
+  ParticipationParameters public participationParameters;
 
   event ApproverSet(
     address approver
@@ -164,12 +164,12 @@ contract Governance is
     int256 participationFloor
   );
 
-  event ParticipationUpdateCoefficientSet(
-    int256 participationUpdateCoefficient
+  event BaselineUpdateFactorSet(
+    int256 baselineUpdateFactor
   );
 
-  event CriticalBaselineLevelSet(
-    int256 criticalBaselineLevel
+  event BaselineQuorumFactorSet(
+    int256 baselineQuorumFactor
   );
 
   function() external payable {} // solhint-disable no-empty-blocks
@@ -189,12 +189,10 @@ contract Governance is
    *   after the approval stage ends.
    * @param executionStageDuration The number of seconds users have to execute a passed proposal
    *   after the referendum stage ends.
-   * @param _participationBaseline The initial value of the participation baseline.
-   * @param _participationFloor The participation floor.
-   * @param _participationUpdateCoefficient The weight of the new participation
-   *   in the baseline update rule.
-   * @param _criticalBaselineLevel The proportion of the baseline under which additional
-   *   "no" votes will be added.
+   * @param participationBaseline The initial value of the participation baseline.
+   * @param participationFloor The participation floor.
+   * @param baselineUpdateFactor The weight of the new participation in the baseline update rule.
+   * @param baselineQuorumFactor The proportion of the baseline that constitutes quorum.
    * @dev Should be called only once.
    */
   function initialize(
@@ -207,10 +205,10 @@ contract Governance is
     uint256 approvalStageDuration,
     uint256 referendumStageDuration,
     uint256 executionStageDuration,
-    int256 _participationBaseline,
-    int256 _participationFloor,
-    int256 _participationUpdateCoefficient,
-    int256 _criticalBaselineLevel
+    int256 participationBaseline,
+    int256 participationFloor,
+    int256 baselineUpdateFactor,
+    int256 baselineQuorumFactor
   )
     external
     initializer
@@ -224,10 +222,10 @@ contract Governance is
       approvalStageDuration != 0 &&
       referendumStageDuration != 0 &&
       executionStageDuration != 0 &&
-      isFraction(_participationBaseline) &&
-      isFraction(_participationFloor) &&
-      isFraction(_participationUpdateCoefficient) &&
-      isFraction(_criticalBaselineLevel)
+      isFraction(participationBaseline) &&
+      isFraction(participationFloor) &&
+      isFraction(baselineUpdateFactor) &&
+      isFraction(baselineQuorumFactor)
     );
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -239,10 +237,10 @@ contract Governance is
     stageDurations.approval = approvalStageDuration;
     stageDurations.referendum = referendumStageDuration;
     stageDurations.execution = executionStageDuration;
-    quorumParameters.participationBaseline = _participationBaseline;
-    quorumParameters.participationFloor = _participationFloor;
-    quorumParameters.participationUpdateCoefficient = _participationUpdateCoefficient;
-    quorumParameters.criticalBaselineLevel = _criticalBaselineLevel;
+    participationParameters.baseline = participationBaseline;
+    participationParameters.floor = participationFloor;
+    participationParameters.baselineUpdateFactor = baselineUpdateFactor;
+    participationParameters.baselineQuorumFactor = baselineQuorumFactor;
     // solhint-disable-next-line not-rely-on-time
     lastDequeue = now;
   }
@@ -331,46 +329,38 @@ contract Governance is
 
   /**
    * @notice Updates the floor of the participation baseline.
-   * @param _participationFloor The value at which the baseline is floored.
+   * @param participationFloor The value at which the baseline is floored.
    */
-  function setParticipationFloor(int256 _participationFloor) external onlyOwner {
-    require(
-      _participationFloor != quorumParameters.participationFloor &&
-      isFraction(_participationFloor)
-    );
-    quorumParameters.participationFloor = _participationFloor;
-    emit ParticipationFloorSet(_participationFloor);
+  function setParticipationFloor(int256 participationFloor) external onlyOwner {
+    require(participationFloor != participationParameters.floor && isFraction(participationFloor));
+    participationParameters.floor = participationFloor;
+    emit ParticipationFloorSet(participationFloor);
   }
 
   /**
    * @notice Updates the weight of the new participation in the baseline update rule.
-   * @param _participationUpdateCoefficient The weight of the new participation.
+   * @param baselineUpdateFactor The new baseline update factor.
    */
-  function setParticipationUpdateCoefficient(
-    int256 _participationUpdateCoefficient
-  )
-    external
-    onlyOwner
-  {
+  function setBaselineUpdateFactor(int256 baselineUpdateFactor) external onlyOwner {
     require(
-      _participationUpdateCoefficient != quorumParameters.participationUpdateCoefficient &&
-      isFraction(_participationUpdateCoefficient)
+      baselineUpdateFactor != participationParameters.baselineUpdateFactor &&
+      isFraction(baselineUpdateFactor)
     );
-    quorumParameters.participationUpdateCoefficient = _participationUpdateCoefficient;
-    emit ParticipationUpdateCoefficientSet(_participationUpdateCoefficient);
+    participationParameters.baselineUpdateFactor = baselineUpdateFactor;
+    emit BaselineUpdateFactorSet(baselineUpdateFactor);
   }
 
   /**
-   * @notice Updates the proportion to compute the critical baseline.
-   * @param _criticalBaselineLevel The weight of the new participation.
+   * @notice Updates the proportion of the baseline that constitutes quorum.
+   * @param baselineQuorumFactor The new baseline quorum factor.
    */
-  function setCriticalBaselineLevel(int256 _criticalBaselineLevel) external onlyOwner {
+  function setBaselineQuorumFactor(int256 baselineQuorumFactor) external onlyOwner {
     require(
-      _criticalBaselineLevel != quorumParameters.criticalBaselineLevel &&
-      isFraction(_criticalBaselineLevel)
+      baselineQuorumFactor != participationParameters.baselineQuorumFactor &&
+      isFraction(baselineQuorumFactor)
     );
-    quorumParameters.criticalBaselineLevel = _criticalBaselineLevel;
-    emit CriticalBaselineLevelSet(_criticalBaselineLevel);
+    participationParameters.baselineQuorumFactor = baselineQuorumFactor;
+    emit BaselineQuorumFactorSet(baselineQuorumFactor);
   }
 
   /**
@@ -472,12 +462,7 @@ contract Governance is
       weight > 0
     );
     uint256 upvotes = queue.getValue(proposalId).add(uint256(weight));
-    queue.update(
-      proposalId,
-      upvotes,
-      lesser,
-      greater
-    );
+    queue.update(proposalId, upvotes, lesser, greater);
     voter.upvotedProposal = proposalId;
     emit ProposalUpvoted(proposalId, account, weight);
     return true;
@@ -516,12 +501,7 @@ contract Governance is
       } else {
         uint256 weight = getAccountWeight(account);
         require(weight > 0);
-        queue.update(
-          proposalId,
-          queue.getValue(proposalId).sub(weight),
-          lesser,
-          greater
-        );
+        queue.update(proposalId, queue.getValue(proposalId).sub(weight), lesser, greater);
         emit ProposalUpvoteRevoked(proposalId, account, weight);
       }
     }
@@ -546,14 +526,10 @@ contract Governance is
       deleteDequeuedProposal(proposal, proposalId, index);
       return false;
     }
-    require(
-      msg.sender == approver &&
-      !proposal.isApproved() &&
-      stage == Proposals.Stage.Approval
-    );
+    require(msg.sender == approver && !proposal.isApproved() && stage == Proposals.Stage.Approval);
     proposal.approved = true;
-    // Ensures that totalWeight is set by the end of the Referendum stage, even if 0 votes are cast.
-    proposal.totalWeight = totalWeight();
+    // Ensures networkWeight is set by the end of the Referendum stage, even if 0 votes are cast.
+    proposal.networkWeight = totalWeight();
     emit ProposalApproved(proposalId);
     return true;
   }
@@ -595,10 +571,10 @@ contract Governance is
     VoteRecord storage voteRecord = voter.referendumVotes[index];
     proposal.vote(
       weight,
-      value,
-      (voteRecord.proposalId == proposalId) ? voteRecord.value : Proposals.VoteValue.None
+      (voteRecord.proposalId == proposalId) ? voteRecord.value : Proposals.VoteValue.None,
+      value
     );
-    proposal.totalWeight = totalWeight();
+    proposal.networkWeight = totalWeight();
     voteRecord.proposalId = proposalId;
     voteRecord.value = value;
     if (proposal.timestamp > voter.mostRecentReferendumProposal) {
@@ -616,7 +592,6 @@ contract Governance is
    * @return Whether or not the proposal was executed successfully.
    * @dev Does not remove the proposal if the execution fails.
    */
-  // TODO(brice): Can execute() be reentrant? Can a proposal execute itself?
   function execute(uint256 proposalId, uint256 index) external nonReentrant returns (bool) {
     dequeueProposalsIfReady();
     Proposals.Proposal storage proposal = proposals[proposalId];
@@ -625,14 +600,9 @@ contract Governance is
     bool expired = isDequeuedProposalExpired(proposal, stage);
     if (!expired) {
       // TODO(asa): Think through the effects of changing the passing function
-      require(
-        stage == Proposals.Stage.Execution &&
-        _isProposalPassing(proposal)
-      );
+      require(stage == Proposals.Stage.Execution && _isProposalPassing(proposal));
       proposal.execute();
-      emit ProposalExecuted(
-        proposalId
-      );
+      emit ProposalExecuted(proposalId);
     }
     // Proposal must have executed fully or expired if this point is reached.
     deleteDequeuedProposal(proposal, proposalId, index);
@@ -660,15 +630,15 @@ contract Governance is
   }
 
   /**
-   * @notice Returns the number of seconds proposals stay in each stage.
-   * @return The number of seconds proposals stay in each stage.
+   * @notice Returns the participation parameters.
+   * @return The participation parameters.
    */
-  function getQuorumParameters() external view returns (int256, int256, int256, int256) {
+  function getParticipationParameters() external view returns (int256, int256, int256, int256) {
     return (
-      quorumParameters.participationBaseline,
-      quorumParameters.participationFloor,
-      quorumParameters.participationUpdateCoefficient,
-      quorumParameters.criticalBaselineLevel
+      participationParameters.baseline,
+      participationParameters.floor,
+      participationParameters.baselineUpdateFactor,
+      participationParameters.baselineQuorumFactor
     );
   }
 
@@ -804,8 +774,9 @@ contract Governance is
     Voter storage voter = voters[account];
     bool isVotingQueue = voter.upvotedProposal != 0 && isQueued(voter.upvotedProposal);
     Proposals.Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
-    bool isVotingReferendum =
-      (proposal.getDequeuedStage(stageDurations) == Proposals.Stage.Referendum);
+    bool isVotingReferendum = (
+      proposal.getDequeuedStage(stageDurations) == Proposals.Stage.Referendum
+    );
     return isVotingQueue || isVotingReferendum;
   }
 
@@ -869,16 +840,19 @@ contract Governance is
     return _isProposalPassing(proposals[proposalId]);
   }
 
+  /**
+   * @notice Returns whether or not a particular proposal is passing according to the constitution
+   *   and the participation levels.
+   * @param proposal The proposal struct.
+   * @return Whether or not the proposal is passing.
+   */
   function _isProposalPassing(Proposals.Proposal storage proposal) private view returns (bool) {
     int256 support = proposal.getSupportWithQuorumPadding(
-      quorumParameters.participationBaseline.multiply(quorumParameters.criticalBaselineLevel)
+      participationParameters.baseline.multiply(participationParameters.baselineQuorumFactor)
     );
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
       bytes4 functionId = extractFunctionSignature(proposal.transactions[i].data);
-      int256 threshold = getConstitution(
-        proposal.transactions[i].destination,
-        functionId
-      );
+      int256 threshold = getConstitution(proposal.transactions[i].destination, functionId);
       if (support <= threshold) {
         return false;
       }
@@ -941,7 +915,7 @@ contract Governance is
   )
     private
   {
-    if (proposal.isApproved() && proposal.totalWeight > 0) {
+    if (proposal.isApproved() && proposal.networkWeight > 0) {
       updateParticipationBaseline(proposal);
     }
     dequeued[index] = 0;
@@ -955,15 +929,17 @@ contract Governance is
    * @param proposal The proposal struct.
    */
   function updateParticipationBaseline(Proposals.Proposal storage proposal) private {
-    uint256 totalVotes = proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain);
-    int256 participation = toFixed(totalVotes).divide(toFixed(proposal.totalWeight));
-    quorumParameters.participationBaseline = quorumParameters.participationBaseline.multiply(
-      FIXED1.subtract(quorumParameters.participationUpdateCoefficient)
-    ).add(participation.multiply(quorumParameters.participationUpdateCoefficient));
-    if (quorumParameters.participationBaseline < quorumParameters.participationFloor) {
-      quorumParameters.participationBaseline = quorumParameters.participationFloor;
+    int256 participationComponent = proposal.getParticipation().multiply(
+      participationParameters.baselineUpdateFactor
+    );
+    int256 baselineComponent = participationParameters.baseline.multiply(
+      FIXED1.subtract(participationParameters.baselineUpdateFactor)
+    );
+    participationParameters.baseline = participationComponent.add(baselineComponent);
+    if (participationParameters.baseline < participationParameters.floor) {
+      participationParameters.baseline = participationParameters.floor;
     }
-    emit ParticipationBaselineUpdated(quorumParameters.participationBaseline);
+    emit ParticipationBaselineUpdated(participationParameters.baseline);
   }
 
   /**
@@ -987,7 +963,7 @@ contract Governance is
    * @param destination The destination address to get the constitution for.
    * @param functionId The function ID to get the constitution for, zero for the destination
    *   default.
-   * @return The ratio of yes:no votes needed in order to pass the proposal.
+   * @return The ratio of yes:no votes needed to exceed in order to pass the proposal.
    */
   function getConstitution(
     address destination,

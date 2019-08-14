@@ -11,8 +11,8 @@ interface IGovernance {
   function setReferendumStageDuration(uint256) external;
   function setExecutionStageDuration(uint256) external;
   function setParticipationFloor(int256) external;
-  function setParticipationUpdateCoefficient(int256) external;
-  function setCriticalBaselineLevel(int256) external;
+  function setBaselineUpdateFactor(int256) external;
+  function setBaselineQuorumFactor(int256) external;
   function setConstitution(address, bytes4, int256) external;
 
   function propose(
@@ -29,7 +29,7 @@ interface IGovernance {
   function withdraw() external returns (bool);
   function dequeueProposalsIfReady() external;
   function getStageDurations() external view returns (uint256, uint256, uint256);
-  function getQuorumParameters() external view returns (int256, int256, int256, int256);
+  function getParticipationParameters() external view returns (int256, int256, int256, int256);
   function getConstitution(address, bytes4) external view returns (int256);
   function proposalExists(uint256) external view returns (bool);
   function getProposal(uint256) external view returns (address, uint256, uint256, uint256);

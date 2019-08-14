@@ -13,12 +13,12 @@ contract('ProposalsTest', () => {
   let proposalsTest: ProposalsTestInstance
 
   describe('#getSupportWithQuorumPadding()', () => {
-    const totalWeight = 100
-    const criticalBaseline = new BigNumber(5).div(new BigNumber(10))
+    const networkWeight = 100
+    const quorum = new BigNumber(5).div(new BigNumber(10))
 
     beforeEach(async () => {
       proposalsTest = await ProposalsTest.new()
-      await proposalsTest.setTotalWeight(totalWeight)
+      await proposalsTest.setNetworkWeight(networkWeight)
     })
 
     it('should return support ratio when participation above critical baseline', async () => {
@@ -27,7 +27,7 @@ contract('ProposalsTest', () => {
       const abstain = 30
       const expected = toFixed(yes / (yes + no))
       await proposalsTest.setVotes(yes, no, abstain)
-      const support = await proposalsTest.getSupportWithQuorumPadding(toFixed(criticalBaseline))
+      const support = await proposalsTest.getSupportWithQuorumPadding(toFixed(quorum))
       assertEqualBN(support, expected)
     })
 
@@ -35,11 +35,11 @@ contract('ProposalsTest', () => {
       const yes = 15
       const no = 10
       const abstain = 10
-      // 15 "no" votes added to reach quorum of 50 votes (50% baseline * 100 total weight)
+      // 15 "no" votes added to reach quorum of 50 votes (50% baseline * 100 network weight)
       const addedNo = 50 - yes - no - abstain
       const expected = toFixed(yes / (yes + no + addedNo))
       await proposalsTest.setVotes(yes, no, abstain)
-      const support = await proposalsTest.getSupportWithQuorumPadding(toFixed(criticalBaseline))
+      const support = await proposalsTest.getSupportWithQuorumPadding(toFixed(quorum))
       assertEqualBN(support, expected)
     })
 
@@ -49,7 +49,7 @@ contract('ProposalsTest', () => {
       const abstain = 30
       const expected = toFixed(0)
       await proposalsTest.setVotes(yes, no, abstain)
-      const support = await proposalsTest.getSupportWithQuorumPadding(toFixed(criticalBaseline))
+      const support = await proposalsTest.getSupportWithQuorumPadding(toFixed(quorum))
       assertEqualBN(support, expected)
     })
   })

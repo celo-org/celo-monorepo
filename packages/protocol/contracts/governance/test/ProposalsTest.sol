@@ -8,8 +8,8 @@ contract ProposalsTest {
 
   Proposals.Proposal private proposal;
 
-  function setTotalWeight(uint256 totalWeight) external {
-    proposal.totalWeight = totalWeight;
+  function setNetworkWeight(uint256 networkWeight) external {
+    proposal.networkWeight = networkWeight;
   }
 
   function setVotes(uint256 yes, uint256 no, uint256 abstain) external {

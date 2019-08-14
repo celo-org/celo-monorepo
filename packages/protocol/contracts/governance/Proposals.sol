@@ -14,7 +14,6 @@ library Proposals {
   using SafeMath for uint256;
   using BytesLib for bytes;
 
-  // TODO(asa): Consider a delay stage.
   enum Stage {
     None,
     Queued,
@@ -57,7 +56,7 @@ library Proposals {
     VoteTotals votes;
     Transaction[] transactions;
     bool approved;
-    uint256 totalWeight;
+    uint256 networkWeight;
   }
 
   /**
@@ -102,14 +101,14 @@ library Proposals {
    * @notice Adds or changes a vote on a proposal.
    * @param proposal The proposal struct.
    * @param weight The weight of the vote.
-   * @param currentVote The vote to be set.
    * @param previousVote The vote to be removed, or None for a new vote.
+   * @param currentVote The vote to be set.
    */
   function vote(
     Proposal storage proposal,
     uint256 weight,
-    VoteValue currentVote,
-    VoteValue previousVote
+    VoteValue previousVote,
+    VoteValue currentVote
   )
     public
   {
@@ -152,16 +151,16 @@ library Proposals {
 
   /**
    * @notice Computes the support ratio for a proposal with the quorum condition:
-   *   If the total participation (yes + no + abstain) / total is less than the critical
-   *   baseline, "no" votes are added to increase particiption to this level. The ratio of
-   *   yes / (yes + no) is returned.
+   *   If the total number of votes (yes + no + abstain) is less than the required number of votes,
+   *   "no" votes are added to increase particiption to this level. The ratio of yes / (yes + no)
+   *   votes is returned.
    * @param proposal The proposal struct.
-   * @param criticalBaseline The minimum participation at which "no" votes are not added.
+   * @param quorum The minimum participation at which "no" votes are not added.
    * @return The support ratio with the quorum condition.
    */
   function getSupportWithQuorumPadding(
     Proposal storage proposal,
-    int256 criticalBaseline
+    int256 quorum
   )
     public
     view
@@ -173,7 +172,7 @@ library Proposals {
     }
     uint256 noVotes = proposal.votes.no;
     uint256 totalVotes = yesVotes.add(noVotes).add(proposal.votes.abstain);
-    uint256 requiredVotes = fromFixed(criticalBaseline.multiply(toFixed(proposal.totalWeight)));
+    uint256 requiredVotes = fromFixed(quorum.multiply(toFixed(proposal.networkWeight)));
     if (requiredVotes > totalVotes) {
       noVotes = noVotes.add(requiredVotes.sub(totalVotes));
     }
@@ -213,6 +212,17 @@ library Proposals {
       return Stage.Referendum;
     }
     return Stage.Approval;
+  }
+
+  /**
+   * @notice Returns the number of votes cast on the proposal over the total number
+   *   of votes in the network as a fraction.
+   * @param proposal The proposal struct.
+   * @return The participation of the proposal.
+   */
+  function getParticipation(Proposal storage proposal) public view returns (int256) {
+    uint256 totalVotes = proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain);
+    return toFixed(totalVotes).divide(toFixed(proposal.networkWeight));
   }
 
   /**
