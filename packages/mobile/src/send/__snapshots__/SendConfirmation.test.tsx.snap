@@ -4515,7 +4515,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                   ]
                 }
               >
-                
+                $
               </Text>
               <Text
                 ellipsizeMode="tail"
@@ -6552,7 +6552,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   ]
                 }
               >
-                
+                $
               </Text>
               <Text
                 ellipsizeMode="tail"
@@ -7573,7 +7573,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   ]
                 }
               >
-                
+                $
               </Text>
               <Text
                 ellipsizeMode="tail"
