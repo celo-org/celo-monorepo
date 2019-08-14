@@ -42,6 +42,7 @@ export const appReducer = (state: State | undefined = initialState, action: Acti
         ...state,
         loggedIn: false,
         numberVerified: false,
+        language: null,
       }
     case Actions.ENTER_BACKUP_FLOW:
       return {
