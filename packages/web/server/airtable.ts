@@ -1,4 +1,4 @@
-const AirtableAPI = require('airtable')
+import * as AirtableAPI from 'airtable'
 import getConfig from 'next/config'
 
 let airTableSingleton

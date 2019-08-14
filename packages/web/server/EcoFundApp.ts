@@ -1,16 +1,12 @@
 import getConfig from 'next/config'
-import airtableInit from 'server/airtable'
 import {
   Application,
-  ApplicationFields,
+  // ApplicationFields,
   Recommendation,
   RecommendationFields,
+  Tables,
 } from '../fullstack/EcoFundFields'
-
-enum Tables {
-  Applicants = 'Applicants',
-  Recommendations = 'Recommendations',
-}
+import airtableInit from '../server/airtable'
 
 export default function submit(fields: Recommendation | Application, table: Tables) {
   switch (table) {
@@ -19,7 +15,7 @@ export default function submit(fields: Recommendation | Application, table: Tabl
     case Tables.Recommendations:
       return recommend(fields as Recommendation)
     default:
-      return Promise.reject(`Invalid Table ${table}`)
+      return Promise.reject({ message: `Invalid Table ${table}` })
   }
 }
 
@@ -33,7 +29,7 @@ export async function recommend(fields: Recommendation) {
 }
 
 export async function apply(fields: Application) {
-  return getAirtable(Tables.Recommendations).create(migrationApplication(fields))
+  return getAirtable(Tables.Applicants).create(fields)
 }
 
 function migrateRecomentation(fields: Recommendation) {
@@ -42,14 +38,14 @@ function migrateRecomentation(fields: Recommendation) {
   }
 }
 
-function migrationApplication(fields: Application) {
-  return {
-    [ApplicationFields.about]: fields.about,
-    [ApplicationFields.org]: fields.org,
-    [ApplicationFields.product]: fields.product,
-    [ApplicationFields.url]: fields.url,
-    [ApplicationFields.founderEmail]: fields.founderEmail,
-    [ApplicationFields.coFounderEmail]: fields.coFounderEmail,
-    [ApplicationFields.video]: fields.video,
-  }
-}
+// function migrationApplication(fields: Application) {
+//   return {
+//     [ApplicationFields.about]: fields.about,
+//     [ApplicationFields.org]: fields.org,
+//     [ApplicationFields.product]: fields.product,
+//     [ApplicationFields.url]: fields.url,
+//     [ApplicationFields.founderEmail]: fields.founderEmail,
+//     [ApplicationFields.coFounderEmail]: fields.coFounderEmail,
+//     [ApplicationFields.video]: fields.video,
+//   }
+// }

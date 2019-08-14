@@ -1,6 +1,6 @@
 import getConfig from 'next/config'
-import airtableInit from 'server/airtable'
 import { FellowApp, FellowKeys } from '../fullstack/Fellowship'
+import airtableInit from '../server/airtable'
 const TABLE_NAME = 'Fellowship Application'
 
 function getAirtable() {
@@ -9,11 +9,7 @@ function getAirtable() {
 }
 
 export async function submitFellowApp(fields: FellowApp) {
-  try {
-    await getAirtable().create(migrate(fields))
-  } catch {
-    return []
-  }
+  return getAirtable().create(migrate(fields))
 }
 
 function migrate(fields: FellowApp) {

@@ -6,7 +6,7 @@ export enum ApplicationFields {
   product = 'What does your organization make?',
   founderEmail = 'Email of the founder who is filling out this application',
   coFounderEmail = "Cofounders' email (if relevant)",
-  video = 'Optional: please enter the URL of a simple 1 minute unlisted (not private) YouTube, Vimeo, or Youku video introducing the founder(s).',
+  video = 'Optional: URL of a simple 1 minute unlisted (not private) YouTube, Vimeo, or Youku video introducing the founder(s).',
 }
 
 export interface Application {
@@ -19,19 +19,22 @@ export interface Application {
   video: string | undefined
 }
 
-// https://airtable.com/apppO5poOzAE5YYJN/api/docs#javascript/table:recommendations
+export const ApplicationKeys = Object.keys(ApplicationFields)
+
+// https://airtable.com/apppO5poOzAE5YYJN/api/docs#javascript/table:Recommendationss
 export enum RecommendationFields {
-  orgName = '',
   email = 'Your Email Address',
+  org = 'Organization you are Recommending',
   founderEmail = 'One founder’s name',
   founderName = "One founder's name",
   why = 'Why do you recommend this applicant?',
 }
 
-export interface Recommendation {
-  orgName: string
-  email: string
-  founderEmail: string
-  founderName: string
-  why: string
+export type Recommendation = Record<keyof RecommendationFields, string>
+
+export const RecommendationKeys = Object.keys(RecommendationFields)
+
+export enum Tables {
+  Applicants = 'Applicants',
+  Recommendations = 'Recommendations',
 }
