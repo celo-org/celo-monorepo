@@ -17,6 +17,7 @@ import { RootState } from 'src/redux/reducers'
 
 interface OwnProps {
   account: string
+  phoneNumber: string
   errorMessage?: string
   navigation?: NavigationScreenProp<NavigationParams>
 }
@@ -25,6 +26,7 @@ type Props = OwnProps & WithNamespaces
 
 const mapStateToProps = (state: RootState) => ({
   account: state.web3.account,
+  phoneNumber: state.account.e164PhoneNumber,
 })
 
 class DappKitAccountAuthScreen extends React.Component<Props> {
@@ -51,7 +53,10 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
 
     navigate(Screens.WalletHome)
     Linking.openURL(
-      produceResponseDeeplink(request, AccountAuthResponseSuccess(this.props.account))
+      produceResponseDeeplink(
+        request,
+        AccountAuthResponseSuccess(this.props.account, this.props.phoneNumber)
+      )
     )
   }
 
