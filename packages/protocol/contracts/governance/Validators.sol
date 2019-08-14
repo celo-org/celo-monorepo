@@ -269,7 +269,12 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       // secp256k1 public key + BLS public key + BLS proof of possession
       publicKeysData.length == (64 + 48 + 96)
     );
-    bytes memory proofOfPossessionBytes = publicKeysData.slice(64, 48 + 96);
+
+    // NOTE(trevor): commented proofOfPossessionBytes out to avoid a stack too deep
+    // error upon compilation. When we do call checkProofOfPossession, this
+    // error can be avoided by not creating the local variable proofOfPossessionBytes.
+
+    // bytes memory proofOfPossessionBytes = publicKeysData.slice(64, 48 + 96);
     // TODO(Kobi): Should call checkProofOfPossession once the input is generated correctly.
 
     address account = getAccountFromValidator(msg.sender);

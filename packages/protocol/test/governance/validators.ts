@@ -346,7 +346,7 @@ contract('Validators', (accounts: string[]) => {
           url,
           // @ts-ignore bytes type
           publicKeysData,
-          registrationRequirement.noticePeriod
+          [registrationRequirement.noticePeriod]
         )
       })
 
