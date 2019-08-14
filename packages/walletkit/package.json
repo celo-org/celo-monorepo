@@ -1,7 +1,7 @@
 {
-  "name": "@celo/contractkit",
+  "name": "@celo/walletkit",
   "version": "0.0.4",
-  "description": "Celo's ContractKit to interact with Celo network",
+  "description": "Celo's WalletKit to interact with Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "author": "Celo",

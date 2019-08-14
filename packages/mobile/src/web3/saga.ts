@@ -8,13 +8,13 @@ import { setAccountCreationTime } from 'src/account/actions'
 import { pincodeSelector } from 'src/account/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { setInviteCodeEntered } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData } from 'src/geth/geth'
 import { waitForGethConnectivity } from 'src/geth/saga'
+import { redeemComplete } from 'src/invite/actions'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import Logger from 'src/utils/Logger'
@@ -40,8 +40,6 @@ const TAG = 'web3/saga'
 // The timeout for web3 to complete syncing and the latestBlock to be > 0
 const CHECK_SYNC_PROGRESS_TIMEOUT = 60000
 const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect to node on IPC."
-
-let AssignAccountLock = false
 
 // checks if web3 claims it is currently syncing or not
 function* checkWeb3SyncProgressClaim() {
@@ -135,26 +133,33 @@ export function* createNewAccount() {
 
 export function* assignAccountFromPrivateKey(key: string) {
   const currentAccount = yield select(currentAccountSelector)
-  if (AssignAccountLock || currentAccount) {
-    Logger.debug(TAG + '@assignAccountFromPrivateKey', 'Account already exists is being created')
-    return
-  }
 
   try {
-    AssignAccountLock = true
-
     const pincodeSet = yield select(pincodeSelector)
     if (!pincodeSet) {
       Logger.debug(TAG + '@assignAccountFromPrivateKey', 'PIN does not seem to be set')
       throw Error('Cannot create account without having the pin set')
     }
+
     const password = yield call(getPincode)
     if (!password) {
       Logger.debug(TAG + '@assignAccountFromPrivateKey', 'Got falsy pin')
       throw Error('Cannot create account without having the pin set')
     }
-    // @ts-ignore
-    const account = yield call(web3.eth.personal.importRawKey, String(key), password)
+
+    let account: string
+    try {
+      // @ts-ignore
+      account = yield call(web3.eth.personal.importRawKey, String(key), password)
+    } catch (e) {
+      if (e.toString().includes('account already exists')) {
+        account = currentAccount
+        Logger.debug(TAG + '@assignAccountFromPrivateKey', 'Importing same account as current one')
+      } else {
+        throw e
+      }
+    }
+
     yield call(web3.eth.personal.unlockAccount, account, password, UNLOCK_DURATION)
     Logger.debug(
       TAG + '@assignAccountFromPrivateKey',
@@ -162,16 +167,15 @@ export function* assignAccountFromPrivateKey(key: string) {
     )
 
     yield put(setAccount(account))
-    // TODO(cmcewen): remove invite code entered
-    yield put(setInviteCodeEntered(true))
+    yield put(redeemComplete(true))
     yield put(setAccountCreationTime())
     yield call(assignDataKeyFromPrivateKey, key)
 
     web3.eth.defaultAccount = account
-    AssignAccountLock = false
     return account
   } catch (e) {
     Logger.error(TAG, `@assignAccountFromPrivateKey: ${e}`)
+    yield put(redeemComplete(false))
     return null
   }
 }
