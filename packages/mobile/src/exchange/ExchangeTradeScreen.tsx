@@ -93,7 +93,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   setExchangeAmount = (amount: string) => {
     // remove $ we inserted for display purposes
-    const currencySymbol = new RegExp(CURRENCIES[Token.DOLLAR].symbol, 'g')
+    const currencySymbol = new RegExp('\\' + CURRENCIES[Token.DOLLAR].symbol, 'g')
     amount = amount.replace(currencySymbol, '')
 
     this.setState({ makerTokenAmount: amount }, () => {
