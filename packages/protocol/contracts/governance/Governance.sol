@@ -569,7 +569,7 @@ contract Governance is
       weight > 0
     );
     VoteRecord storage voteRecord = voter.referendumVotes[index];
-    proposal.vote(
+    proposal.updateVote(
       weight,
       (voteRecord.proposalId == proposalId) ? voteRecord.value : Proposals.VoteValue.None,
       value
@@ -984,7 +984,7 @@ contract Governance is
   }
 
   /**
-   * @notice Returns whether a Fixed value is between 0 and 1.
+   * @notice Returns whether a Fixed value is between 0 and 1, inclusive.
    * @param x The Fixed value.
    */
   function isFraction(int256 x) private pure returns (bool) {

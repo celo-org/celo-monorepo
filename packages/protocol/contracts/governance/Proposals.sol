@@ -104,7 +104,7 @@ library Proposals {
    * @param previousVote The vote to be removed, or None for a new vote.
    * @param currentVote The vote to be set.
    */
-  function vote(
+  function updateVote(
     Proposal storage proposal,
     uint256 weight,
     VoteValue previousVote,
