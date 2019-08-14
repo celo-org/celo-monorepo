@@ -1,6 +1,6 @@
 pragma solidity ^0.5.8;
 
-import "../IntegerSortedLinkedList.sol";
+import "../linkedlists/IntegerSortedLinkedList.sol";
 
 
 contract IntegerSortedLinkedListTest {

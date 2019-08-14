@@ -286,6 +286,8 @@ jobs:
 
   end-to-end-geth-governance-test:
     <<: *defaults
+    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
+    resource_class: medium+
     steps:
       - attach_workspace:
           at: ~/app

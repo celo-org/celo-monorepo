@@ -28,7 +28,7 @@ import { ALERT_BANNER_DURATION } from 'src/config'
 import { FeeType } from 'src/fees/actions'
 import EstimateFee from 'src/fees/EstimateFee'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
-import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM as Tokens } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/contactMapping'
@@ -362,7 +362,7 @@ export class SendAmount extends React.PureComponent<Props, State> {
           )}
           <LabeledTextInput
             keyboardType="numeric"
-            title={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+            title={CURRENCIES[Tokens.DOLLAR].symbol}
             placeholder={t('amount')}
             labelStyle={style.amountLabel as TextStyle}
             placeholderTextColor={colors.celoGreenInactive}
