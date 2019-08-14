@@ -6,3 +6,5 @@ export const getPaymentRequests = (state: RootState) => {
     (p) => p.status === PaymentRequestStatuses.REQUESTED
   )
 }
+
+export const currentPhoneNumber = (state: RootState) => state.account.e164PhoneNumber
