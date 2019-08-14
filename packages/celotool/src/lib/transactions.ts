@@ -1,10 +1,10 @@
-import { StableToken } from '@celo/contractkit'
-import { StableToken as StableTokenType } from '@celo/contractkit/lib/types/StableToken'
+import { StableToken } from '@celo/walletkit'
+import { StableToken as StableTokenType } from '@celo/walletkit/lib/types/StableToken'
 import {
   awaitConfirmation,
   emptyTxLogger,
   sendTransactionAsync,
-} from '@celo/contractkit/src/contract-utils'
+} from '@celo/walletkit/src/contract-utils'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
 

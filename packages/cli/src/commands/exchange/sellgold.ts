@@ -1,4 +1,4 @@
-import { GoldToken } from '@celo/contractkit'
+import { GoldToken } from '@celo/walletkit'
 
 import { BaseCommand } from '../../base'
 import { doSwap, swapArguments } from '../../utils/exchange'
