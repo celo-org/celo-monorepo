@@ -1,5 +1,5 @@
-import * as firebasePackage from 'firebase'
 import * as firebase from 'firebase/app'
+import 'firebase/auth'
 import 'firebase/database'
 import getConfig from 'next/config'
 
@@ -8,11 +8,14 @@ async function getFirebase() {
     const { publicRuntimeConfig } = getConfig()
     // These variables are defined in `env-config.js` file in the parent directory.
     firebase.initializeApp(publicRuntimeConfig.FIREBASE_CONFIG)
-    const loginUsername = publicRuntimeConfig.LOGIN_USERNAME
-    const loginPassword = publicRuntimeConfig.LOGIN_PASSWORD
+    const loginUsername = publicRuntimeConfig.FIREBASE_LOGIN_USERNAME
+    const loginPassword = publicRuntimeConfig.FIREBASE_LOGIN_PASSWORD
+    if (loginUsername === null || loginUsername.length === 0) {
+      throw new Error('Login username is empty')
+    }
     try {
       // Source: https://firebase.google.com/docs/auth
-      await firebasePackage.auth().signInWithEmailAndPassword(loginUsername, loginPassword)
+      await firebase.auth().signInWithEmailAndPassword(loginUsername, loginPassword)
     } catch (e) {
       console.error(`Fail to login into Firebase: ${e}`)
       throw e
