@@ -14,17 +14,24 @@ import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
+import Logger from 'src/utils/Logger'
+import { currentAccountSelector } from 'src/web3/selectors'
+
+const TAG = 'dappkit/DappKitAccountScreen'
 
 interface OwnProps {
-  account: string
   errorMessage?: string
   navigation?: NavigationScreenProp<NavigationParams>
 }
 
-type Props = OwnProps & WithNamespaces
+interface StateProps {
+  account: string | null
+}
 
-const mapStateToProps = (state: RootState) => ({
-  account: state.web3.account,
+type Props = OwnProps & StateProps & WithNamespaces
+
+const mapStateToProps = (state: RootState): StateProps => ({
+  account: currentAccountSelector(state),
 })
 
 class DappKitAccountAuthScreen extends React.Component<Props> {
@@ -39,20 +46,27 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
   }
 
   linkBack = () => {
-    if (!this.props.navigation) {
+    const { account, navigation } = this.props
+
+    if (!navigation) {
+      Logger.error(TAG, 'Missing navigation props')
       return
     }
 
-    const request: AccountAuthRequest = this.props.navigation.getParam('dappKitRequest', null)
+    const request: AccountAuthRequest = navigation.getParam('dappKitRequest', null)
 
-    if (request === null) {
+    if (!request) {
+      Logger.error(TAG, 'No request found in navigation props')
+      return
+    }
+
+    if (!account) {
+      Logger.error(TAG, 'No account set up for this wallet')
       return
     }
 
     navigate(Screens.WalletHome)
-    Linking.openURL(
-      produceResponseDeeplink(request, AccountAuthResponseSuccess(this.props.account))
-    )
+    Linking.openURL(produceResponseDeeplink(request, AccountAuthResponseSuccess(account)))
   }
 
   render() {
@@ -73,4 +87,6 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
   }
 }
 
-export default withNamespaces(Namespaces.global)(connect(mapStateToProps)(DappKitAccountAuthScreen))
+export default withNamespaces(Namespaces.global)(
+  connect<StateProps, null, {}, RootState>(mapStateToProps)(DappKitAccountAuthScreen)
+)
