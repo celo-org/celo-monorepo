@@ -80,7 +80,7 @@ export type SignTxResponse = SignTxResponseSuccess | SignTxResponseFailure
 export type DappKitResponse = AccountAuthResponse | SignTxResponse
 
 export function produceResponseDeeplink(request: DappKitRequest, response: DappKitResponse) {
-  let params: any = { type: response.type, status: response.status, requestId: request.requestId }
+  const params: any = { type: response.type, status: response.status, requestId: request.requestId }
   switch (response.type) {
     case DappKitRequestTypes.ACCOUNT_ADDRESS:
       if (response.status === DappKitResponseStatus.SUCCESS) {
