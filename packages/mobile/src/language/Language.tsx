@@ -17,7 +17,6 @@ interface State {
 }
 
 interface StateProps {
-  isWeb3Ready: boolean
   pincodeSet: boolean
 }
 
@@ -29,7 +28,6 @@ type Props = DispatchProps & NavigationScreenProps & WithNamespaces & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
-    isWeb3Ready: state.web3.isReady,
     pincodeSet: state.account.pincodeSet,
   }
 }

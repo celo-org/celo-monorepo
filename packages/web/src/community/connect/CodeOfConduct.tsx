@@ -8,6 +8,7 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import { hashNav } from 'src/shared/menu-items'
 import { G, Path } from 'src/shared/svg'
 
 import { colors, standardStyles, textStyles } from 'src/styles'
@@ -17,7 +18,7 @@ type Props = I18nProps & ScreenProps
 
 const CodeofConduct: React.FunctionComponent<Props> = function CodeOfConduct({ t, screen }) {
   return (
-    <View style={styles.darkBackground}>
+    <View nativeID={hashNav.connect.code} style={styles.darkBackground}>
       <GridRow
         allStyle={standardStyles.centered}
         desktopStyle={standardStyles.sectionMargin}

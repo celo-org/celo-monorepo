@@ -5,7 +5,7 @@ interface Props {
   height?: number
 }
 
-export default class LogoLightBg extends React.Component<Props> {
+export default class LogoDarkBg extends React.Component<Props> {
   static defaultProps = {
     height: 25,
   }

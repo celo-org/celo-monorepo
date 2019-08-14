@@ -9,7 +9,7 @@ const root = path.resolve(cwd, '../..')
 const escapedRoot = escapeStringRegexp(root)
 const rnRegex = new RegExp(`${escapedRoot}\/node_modules\/(react-native)\/.*`)
 const celoRegex = new RegExp(
-  `${escapedRoot}\/packages\/(?!mobile|utils|contractkit|react-components).*`
+  `${escapedRoot}\/packages\/(?!mobile|utils|walletkit|react-components).*`
 )
 const nestedRnRegex = new RegExp(`.*\/node_modules\/.*\/node_modules\/(react-native)\/.*`)
 const componentsRnRegex = new RegExp(`.*react-components\/node_modules\/(react-native)\/.*`)
@@ -24,6 +24,7 @@ module.exports = {
     extraNodeModules: {
       ...nodeLibs,
       'crypto-js': path.resolve(cwd, 'node_modules/crypto-js'),
+      'isomorphic-fetch': require.resolve('cross-fetch'),
       net: require.resolve('react-native-tcp'),
       'react-native': path.resolve(cwd, 'node_modules/react-native'),
       'react-native-fs': path.resolve(cwd, 'node_modules/react-native-fs'),

@@ -2,28 +2,29 @@ import PhoneNumberWithFlag from '@celo/react-components/components/PhoneNumberWi
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
-import { getContactPhoneNumber } from '@celo/utils/src/contacts'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
-import { MinimalContact } from 'react-native-contacts'
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import Logo from 'src/icons/Logo'
+import { RecipientWithContact } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import FeeIcon from 'src/send/FeeIcon'
-import { getCurrencyColor, getMoneyDisplayValue } from 'src/utils/formatting'
+import { getCurrencyColor, getMoneyDisplayValue, roundedUpNumber } from 'src/utils/formatting'
 
 interface LineItemProps {
   currencySymbol: string
-  amount: BigNumber
+  amount?: BigNumber
   title: string
   titleIcon?: React.ReactNode
   negative?: boolean
   boldedStyle?: boolean
+  isLoading?: boolean
+  hasError?: boolean
 }
 
 function LineItemRow({
@@ -33,6 +34,8 @@ function LineItemRow({
   titleIcon,
   negative,
   boldedStyle,
+  isLoading,
+  hasError,
 }: LineItemProps) {
   const fontStyle = boldedStyle ? fontStyles.bodyBold : fontStyles.body
   const totalStyle = boldedStyle ? style.totalGreen : style.total
@@ -42,20 +45,31 @@ function LineItemRow({
         <Text style={[fontStyle, style.totalTitle]}>{title}</Text>
         {titleIcon}
       </View>
-      <Text style={[fontStyle, totalStyle]}>
-        {negative && '-'}
-        {currencySymbol}
-        {getMoneyDisplayValue(amount)}
-      </Text>
+      {amount && (
+        <Text style={[fontStyle, totalStyle]}>
+          {negative && '-'}
+          {currencySymbol}
+          {getMoneyDisplayValue(amount)}
+        </Text>
+      )}
+      {hasError && <Text style={[fontStyle, totalStyle]}>---</Text>}
+      {isLoading && (
+        <View style={style.loadingContainer}>
+          <ActivityIndicator size="small" color={colors.celoGreen} />
+        </View>
+      )}
     </View>
   )
 }
 
 export interface OwnProps {
-  recipient: MinimalContact | string
+  recipientPhone: string
+  recipientContact?: RecipientWithContact
   amount: BigNumber
   comment?: string
   fee?: BigNumber
+  isLoadingFee?: boolean
+  feeError?: Error
   currency: CURRENCY_ENUM
 }
 
@@ -72,23 +86,27 @@ const mapStateToProps = (state: RootState): StateProps => {
 type Props = OwnProps & StateProps & WithNamespaces
 
 class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
-  renderFeeAndTotal = (total: BigNumber, currencySymbol: string, fee?: BigNumber) => {
-    if (!fee) {
-      return
-    }
-
+  renderFeeAndTotal = (
+    total: BigNumber,
+    currencySymbol: string,
+    fee: BigNumber | undefined,
+    isLoadingFee: boolean | undefined,
+    feeError: Error | undefined
+  ) => {
     const { t } = this.props
-    const amountWithFees = total.minus(this.props.fee || 0)
+    const amountWithFees = total.minus(fee || 0)
 
     return (
       <View style={style.feeContainer}>
         <LineItemRow currencySymbol={'$'} amount={total} title={t('totalSent')} />
         <LineItemRow
           currencySymbol={currencySymbol}
-          amount={fee}
+          amount={fee && roundedUpNumber(fee)}
           title={t('securityFee')}
           titleIcon={<FeeIcon />}
           negative={true}
+          isLoading={isLoadingFee}
+          hasError={!!feeError}
         />
         <LineItemRow
           currencySymbol={'$'}
@@ -101,7 +119,17 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
   }
 
   render() {
-    const { recipient, amount, comment, fee, currency, defaultCountryCode } = this.props
+    const {
+      recipientPhone,
+      recipientContact,
+      amount,
+      comment,
+      fee,
+      isLoadingFee,
+      feeError,
+      currency,
+      defaultCountryCode,
+    } = this.props
     const currencySymbol = CURRENCIES[currency].symbol
     const currencyColor = getCurrencyColor(currency)
     return (
@@ -114,30 +142,23 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
             {currencySymbol}
           </Text>
           <Text style={[fontStyles.body, style.amount, { color: currencyColor }]}>
-            {getMoneyDisplayValue(amount.minus(this.props.fee || 0))}
+            {getMoneyDisplayValue(amount.minus(fee || 0))}
           </Text>
         </View>
         <View style={style.horizontalLine} />
         <View style={style.details}>
-          {typeof recipient !== 'string' && (
+          {recipientContact && (
             <Text style={[fontStyles.bodySmallSemiBold, style.contactName]}>
-              {recipient.displayName}
+              {recipientContact.displayName}
             </Text>
           )}
-          {typeof recipient !== 'string' ? (
-            <PhoneNumberWithFlag
-              e164PhoneNumber={getContactPhoneNumber(recipient) || ''}
-              defaultCountryCode={defaultCountryCode}
-            />
-          ) : (
-            <PhoneNumberWithFlag
-              e164PhoneNumber={recipient}
-              defaultCountryCode={defaultCountryCode}
-            />
-          )}
+          <PhoneNumberWithFlag
+            e164PhoneNumber={recipientPhone}
+            defaultCountryCode={defaultCountryCode}
+          />
           {!!comment && <Text style={[fontStyles.bodySecondary, style.comment]}>{comment}</Text>}
         </View>
-        {this.renderFeeAndTotal(amount, currencySymbol, fee)}
+        {this.renderFeeAndTotal(amount, currencySymbol, fee, isLoadingFee, feeError)}
       </View>
     )
   }
@@ -147,7 +168,7 @@ const style = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 10,
+    padding: 20,
   },
 
   amountContainer: {
@@ -167,6 +188,8 @@ const style = StyleSheet.create({
   feeContainer: {
     marginTop: 10,
     marginBottom: 10,
+    justifyContent: 'center',
+    alignItems: 'stretch',
   },
   feeRow: {
     alignItems: 'center',
@@ -174,24 +197,16 @@ const style = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   lineItemRow: {
-    flex: 1,
     flexDirection: 'row',
-    alignItems: 'stretch',
     justifyContent: 'space-between',
   },
   totalTitle: {
     lineHeight: 28,
-    marginLeft: 10,
-    left: 1,
   },
   total: {
-    right: 1,
-    marginRight: 10,
     lineHeight: 28,
   },
   totalGreen: {
-    right: 1,
-    marginRight: 10,
     lineHeight: 28,
     color: colors.celoGreen,
   },
@@ -199,6 +214,9 @@ const style = StyleSheet.create({
     fontSize: 30,
     lineHeight: 40,
     height: 35,
+  },
+  loadingContainer: {
+    transform: [{ scale: 0.8 }],
   },
   contactName: {
     paddingTop: 6,

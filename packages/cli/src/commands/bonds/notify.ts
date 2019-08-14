@@ -1,6 +1,7 @@
+import { BondedDeposits } from '@celo/walletkit'
 import { flags } from '@oclif/command'
+
 import { BaseCommand } from '../../base'
-import { BondedDeposits } from '../../generated/contracts'
 import { BondArgs } from '../../utils/bonds'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'

@@ -1,5 +1,6 @@
 import { AccountArgv } from '@celo/celotool/src/cmds/account'
 import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
+import { PhoneNumberUtils } from '@celo/utils'
 import {
   ActionableAttestation,
   // @ts-ignore
@@ -15,11 +16,10 @@ import {
   makeSetWalletAddressTx,
   StableToken,
   validateAttestationCode,
-} from '@celo/contractkit'
+} from '@celo/walletkit'
 // @ts-ignore
-import { Attestations as AttestationsType } from '@celo/contractkit/lib/types/Attestations'
-import { StableToken as StableTokenType } from '@celo/contractkit/lib/types/StableToken'
-import { PhoneNumberUtils } from '@celo/utils'
+import { Attestations as AttestationsType } from '@celo/walletkit/lib/types/Attestations'
+import { StableToken as StableTokenType } from '@celo/walletkit/lib/types/StableToken'
 import prompts from 'prompts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { sendTransaction } from 'src/lib/transactions'
@@ -70,13 +70,19 @@ async function verifyCmd(argv: VerifyArgv) {
   const attestations = await Attestations(web3)
   const stableToken = await StableToken(web3)
   const phoneHash = PhoneNumberUtils.getPhoneHash(argv.phone)
-
   await printCurrentCompletedAttestations(attestations, argv.phone, account)
 
+  let attestationsToComplete = await getActionableAttestations(attestations, phoneHash, account)
+
   // Request more attestations
-  if (argv.num > 0) {
-    console.info(`Requesting ${argv.num} attestations`)
-    await requestMoreAttestations(attestations, stableToken, phoneHash, argv.num)
+  if (argv.num > attestationsToComplete.length) {
+    console.info(`Requesting ${argv.num - attestationsToComplete.length} attestations`)
+    await requestMoreAttestations(
+      attestations,
+      stableToken,
+      phoneHash,
+      argv.num - attestationsToComplete.length
+    )
   }
 
   // Set the wallet address if not already appropriate
@@ -87,8 +93,8 @@ async function verifyCmd(argv: VerifyArgv) {
     await sendTransaction(setWalletAddressTx)
   }
 
+  attestationsToComplete = await getActionableAttestations(attestations, phoneHash, account)
   // Find attestations we can reveal/verify
-  const attestationsToComplete = await getActionableAttestations(attestations, phoneHash, account)
   console.info(`Revealing ${attestationsToComplete.length} attestations`)
   await revealAttestations(attestationsToComplete, attestations, argv.phone)
 

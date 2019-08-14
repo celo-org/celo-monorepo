@@ -1,8 +1,9 @@
 import {
   getEnode,
   getHooks,
+  GethInstanceConfig,
   initAndStartGeth,
-  killPid,
+  killInstance,
   sleep,
 } from '@celo/celotool/geth_tests/src/lib/utils'
 import { assert } from 'chai'
@@ -47,9 +48,9 @@ describe('sync tests', function(this: any) {
   const syncModes = ['full', 'fast', 'light', 'ultralight']
   for (const syncmode of syncModes) {
     describe(`when syncing with a ${syncmode} node`, () => {
-      let gethPid: number | null = null
+      let syncInstance: GethInstanceConfig
       beforeEach(async () => {
-        const syncInstance = {
+        syncInstance = {
           name: syncmode,
           validating: false,
           syncmode,
@@ -58,14 +59,11 @@ describe('sync tests', function(this: any) {
           lightserv: syncmode !== 'light' && syncmode !== 'ultralight',
           peers: [await getEnode(8553)],
         }
-        gethPid = await initAndStartGeth(hooks.gethBinaryPath, syncInstance)
+        await initAndStartGeth(hooks.gethBinaryPath, syncInstance)
       })
 
       afterEach(() => {
-        if (gethPid) {
-          killPid(gethPid)
-          gethPid = null
-        }
+        killInstance(syncInstance)
       })
 
       it('should sync the latest block', async () => {
@@ -84,4 +82,28 @@ describe('sync tests', function(this: any) {
       })
     })
   }
+  describe(`when a validator's data directory is deleted`, () => {
+    let web3: any
+    beforeEach(async function(this: any) {
+      this.timeout(0) // Disable test timeout
+      web3 = new Web3('http://localhost:8545')
+      await hooks.restart()
+    })
+
+    it('should continue to block produce', async function(this: any) {
+      this.timeout(0)
+      const instance: GethInstanceConfig = gethConfig.instances[0]
+      await killInstance(instance)
+      await initAndStartGeth(hooks.gethBinaryPath, instance)
+      await sleep(60) // wait for round change / resync
+      const address = (await web3.eth.getAccounts())[0]
+      const currentBlock = await web3.eth.getBlock('latest')
+      for (let i = 0; i < gethConfig.instances.length; i++) {
+        if ((await web3.eth.getBlock(currentBlock.number - i)).miner == address) {
+          return // A block proposed by validator who lost randomness was found, hence randomness was recovered
+        }
+      }
+      assert.fail('Reset validator did not propose any new blocks')
+    })
+  })
 })
