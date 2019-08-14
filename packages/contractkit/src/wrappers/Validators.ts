@@ -81,7 +81,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       throw new Error(`missing from at new ValdidatorUtils()`)
     }
 
-    const bondedDeposits = await this.kit.wrappers.getBondedDeposits()
+    const bondedDeposits = await this.kit.contracts.getBondedDeposits()
     const votingDetails = await bondedDeposits.getVotingDetails(this.kit.defaultAccount)
     const votedGroup = await this.getVoteFrom(votingDetails.accountAddress)
 
@@ -102,7 +102,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       throw new Error(`missing from at new ValdidatorUtils()`)
     }
 
-    const bondedDeposits = await this.kit.wrappers.getBondedDeposits()
+    const bondedDeposits = await this.kit.contracts.getBondedDeposits()
     const votingDetails = await bondedDeposits.getVotingDetails(this.kit.defaultAccount)
 
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(

@@ -1,86 +1,91 @@
 import { CeloContract } from 'src/base'
-import { newAttestations } from 'src/generated/Attestations'
-import { newBondedDeposits } from 'src/generated/BondedDeposits'
-import { newEscrow } from 'src/generated/Escrow'
-import { newExchange } from 'src/generated/Exchange'
-import { newGasCurrencyWhitelist } from 'src/generated/GasCurrencyWhitelist'
-import { newGasPriceMinimum } from 'src/generated/GasPriceMinimum'
-import { newGoldToken } from 'src/generated/GoldToken'
-import { newGovernance } from 'src/generated/Governance'
-import { newMultiSig } from 'src/generated/MultiSig'
-import { newRandom } from 'src/generated/Random'
-import { newRegistry } from 'src/generated/Registry'
-import { newReserve } from 'src/generated/Reserve'
-import { newSortedOracles } from 'src/generated/SortedOracles'
-import { newStableToken } from 'src/generated/StableToken'
-import { newValidators } from 'src/generated/Validators'
 import { ContractKit } from 'src/kit'
+import { BondedDepositsWrapper } from 'src/wrappers/BondedDeposits'
+import { ExchangeWrapper } from 'src/wrappers/Exchange'
+import { GoldTokenWrapper } from 'src/wrappers/GoldTokenWrapper'
+import { StableTokenWrapper } from 'src/wrappers/StableTokenWrapper'
+import { ValidatorsWrapper } from 'src/wrappers/Validators'
 
-const ContractFactories = {
-  [CeloContract.Attestations]: newAttestations,
-  [CeloContract.BondedDeposits]: newBondedDeposits,
-  [CeloContract.Escrow]: newEscrow,
-  [CeloContract.Exchange]: newExchange,
-  [CeloContract.GasCurrencyWhitelist]: newGasCurrencyWhitelist,
-  [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
-  [CeloContract.GoldToken]: newGoldToken,
-  [CeloContract.Governance]: newGovernance,
-  [CeloContract.MultiSig]: newMultiSig,
-  [CeloContract.Random]: newRandom,
-  [CeloContract.Registry]: newRegistry,
-  [CeloContract.Reserve]: newReserve,
-  [CeloContract.SortedOracles]: newSortedOracles,
-  [CeloContract.StableToken]: newStableToken,
-  [CeloContract.Validators]: newValidators,
+const WrapperFactories = {
+  // [CeloContract.Attestations]: AttestationsWrapper,
+  [CeloContract.BondedDeposits]: BondedDepositsWrapper,
+  // [CeloContract.Escrow]: EscrowWrapper,
+  [CeloContract.Exchange]: ExchangeWrapper,
+  // [CeloContract.GasCurrencyWhitelist]: GasCurrencyWhitelistWrapper,
+  // [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
+  [CeloContract.GoldToken]: GoldTokenWrapper,
+  // [CeloContract.Governance]: GovernanceWrapper,
+  // [CeloContract.MultiSig]: MultiSigWrapper,
+  // [CeloContract.Random]: RandomWrapper,
+  // [CeloContract.Registry]: RegistryWrapper,
+  // [CeloContract.Reserve]: ReserveWrapper,
+  // [CeloContract.SortedOracles]: SortedOraclesWrapper,
+  [CeloContract.StableToken]: StableTokenWrapper,
+  [CeloContract.Validators]: ValidatorsWrapper,
 }
 
-type CFType = typeof ContractFactories
-type ContractCacheMap = { [K in keyof CFType]?: ReturnType<CFType[K]> }
+type CFType = typeof WrapperFactories
 
-export class ContractCache {
-  private cacheMap: ContractCacheMap = {}
+type WrapperCacheMap = {
+  // [CeloContract.Attestations]?: AttestationsWrapper,
+  [CeloContract.BondedDeposits]?: BondedDepositsWrapper
+  // [CeloContract.Escrow]?: EscrowWrapper,
+  [CeloContract.Exchange]?: ExchangeWrapper
+  // [CeloContract.GasCurrencyWhitelist]?: GasCurrencyWhitelistWrapper,
+  // [CeloContract.GasPriceMinimum]?: GasPriceMinimumWrapper,
+  [CeloContract.GoldToken]?: GoldTokenWrapper
+  // [CeloContract.Governance]?: GovernanceWrapper,
+  // [CeloContract.MultiSig]?: MultiSigWrapper,
+  // [CeloContract.Random]?: RandomWrapper,
+  // [CeloContract.Registry]?: RegistryWrapper,
+  // [CeloContract.Reserve]?: ReserveWrapper,
+  // [CeloContract.SortedOracles]?: SortedOraclesWrapper,
+  [CeloContract.StableToken]?: StableTokenWrapper
+  [CeloContract.Validators]?: ValidatorsWrapper
+}
+
+export class WrapperCache {
+  // private wrapperCache: Map<CeloContract, any> = new Map()
+  private wrapperCache: WrapperCacheMap = {}
 
   constructor(readonly kit: ContractKit) {}
 
-  getAttestations() {
-    return this.getContract(CeloContract.Attestations)
-  }
+  // getAttestations() {
+  //   return this.getWrapper(CeloContract.Attestations, newAttestations)
+  // }
   getBondedDeposits() {
     return this.getContract(CeloContract.BondedDeposits)
   }
-  getEscrow() {
-    return this.getContract(CeloContract.Escrow)
-  }
+  // getEscrow() {
+  //   return this.getWrapper(CeloContract.Escrow, newEscrow)
+  // }
   getExchange() {
     return this.getContract(CeloContract.Exchange)
   }
-  getGasCurrencyWhitelist() {
-    return this.getContract(CeloContract.GasCurrencyWhitelist)
-  }
-  getGasPriceMinimum() {
-    return this.getContract(CeloContract.GasPriceMinimum)
-  }
+  // getGasCurrencyWhitelist() {
+  //   return this.getWrapper(CeloContract.GasCurrencyWhitelist, newGasCurrencyWhitelist)
+  // }
+  // getGasPriceMinimum() {
+  //   return this.getWrapper(CeloContract.GasPriceMinimum, newGasPriceMinimum)
+  // }
   getGoldToken() {
     return this.getContract(CeloContract.GoldToken)
   }
-  getGovernance() {
-    return this.getContract(CeloContract.Governance)
-  }
-  getMultiSig() {
-    return this.getContract(CeloContract.MultiSig)
-  }
-  getRandom() {
-    return this.getContract(CeloContract.Random)
-  }
-  getRegistry() {
-    return this.getContract(CeloContract.Registry)
-  }
-  getReserve() {
-    return this.getContract(CeloContract.Reserve)
-  }
-  getSortedOracles() {
-    return this.getContract(CeloContract.SortedOracles)
-  }
+  // getGovernance() {
+  //   return this.getWrapper(CeloContract.Governance, newGovernance)
+  // }
+  // getMultiSig() {
+  //   return this.getWrapper(CeloContract.MultiSig, newMultiSig)
+  // }
+  // getRegistry() {
+  //   return this.getWrapper(CeloContract.Registry, newRegistry)
+  // }
+  // getReserve() {
+  //   return this.getWrapper(CeloContract.Reserve, newReserve)
+  // }
+  // getSortedOracles() {
+  //   return this.getWrapper(CeloContract.SortedOracles, newSortedOracles)
+  // }
   getStableToken() {
     return this.getContract(CeloContract.StableToken)
   }
@@ -88,15 +93,12 @@ export class ContractCache {
     return this.getContract(CeloContract.Validators)
   }
 
-  async getContract<C extends CeloContract>(contract: C) {
-    if (this.cacheMap[contract] == null) {
-      const createFn = ContractFactories[contract] as CFType[C]
-      this.cacheMap[contract] = createFn(
-        this.kit.web3,
-        await this.kit.registry.addressFor(contract)
-      ) as NonNullable<ContractCacheMap[C]>
+  public async getContract<C extends keyof CFType>(contract: C) {
+    if (this.wrapperCache[contract] == null) {
+      const instance = await this.kit._web3Contracts.getContract(contract)
+      const Klass: CFType[C] = WrapperFactories[contract]
+      this.wrapperCache[contract] = new Klass(this.kit, instance as any) as any
     }
-    // we know it's defined (thus the !)
-    return this.cacheMap[contract]!
+    return this.wrapperCache[contract]!
   }
 }
