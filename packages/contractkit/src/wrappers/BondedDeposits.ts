@@ -1,10 +1,11 @@
-import { zip } from '@celo/utils/lib/src/collections'
 import BN from 'bn.js'
 import { Address } from 'src/base'
 import { BondedDeposits } from 'src/generated/types/BondedDeposits'
 import { BaseWrapper } from 'src/wrappers/BaseWrapper'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
+
+import { zip } from '@celo/utils/lib/src/collections'
 
 export interface VotingDetails {
   accountAddress: Address
@@ -26,27 +27,32 @@ export interface Deposits {
   }
 }
 
+enum roles {
+  validating,
+  voting,
+  rewards,
+}
+
 export class BondedDepositsWrapper extends BaseWrapper<BondedDeposits> {
   async getAccountWeight(account: Address): Promise<BN> {
     const accountWeight = await this.contract.methods.getAccountWeight(account).call()
     return Web3.utils.toBN(accountWeight)
   }
 
-  async getVotingDetails(_accountOrVoterAddress: Address): Promise<VotingDetails> {
-    throw new Error('Requires FIX on Incompatible Contract')
-  }
-  // FIXME this.contract.methods.getAccountFromVoter does not exist
-  // async getVotingDetails(accountOrVoterAddress: Address): Promise<VotingDetails> {
-  //   const accountAddress = await this.contract.methods
-  //     .getAccountFromVoter(accountOrVoterAddress)
-  //     .call()
+  // async getVotingDetails(_accountOrVoterAddress: Address): Promise<VotingDetails> {
+    //   throw new Error('Requires FIX on Incompatible Contract')
+    // }
+  async getVotingDetails(accountOrVoterAddress: Address): Promise<VotingDetails> {
+    const accountAddress = await this.contract.methods
+      .getAccountFromDelegateAndRole(accountOrVoterAddress, roles.voting)
+      .call()
 
-  //   return {
-  //     accountAddress,
-  //     voterAddress: accountOrVoterAddress,
-  //     weight: await this.getAccountWeight(accountAddress),
-  //   }
-  // }
+    return {
+      accountAddress,
+      voterAddress: accountOrVoterAddress,
+      weight: await this.getAccountWeight(accountAddress),
+    }
+  }
 
   async getBondedDepositValue(account: string, noticePeriod: string) {
     const deposit = await this.contract.methods.getBondedDeposit(account, noticePeriod).call()
@@ -109,11 +115,11 @@ export class BondedDepositsWrapper extends BaseWrapper<BondedDeposits> {
   }
 
   // FIXME this.contract.methods.delegateRewards does not exist
-  // async delegateRewardsTx(account: string, delegate: string) {
-  //   const sig = await this.getParsedSignatureOfAddress(account, delegate)
+  async delegateRewardsTx(account: string, delegate: string) {
+    const sig = await this.getParsedSignatureOfAddress(account, delegate)
 
-  //   return this.contract.methods.delegateRewards(delegate, sig.v, sig.r, sig.s)
-  // }
+    return this.contract.methods.delegateRole(roles.rewards, delegate, sig.v, sig.r, sig.s)
+  }
 
   async getParsedSignatureOfAddress(address: string, signer: string) {
     const hash = Web3.utils.soliditySha3({ type: 'address', value: address })
