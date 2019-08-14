@@ -3,6 +3,7 @@
   "compilerOptions": {
     "esModuleInterop": true,
     "baseUrl": ".",
+    "declaration": true,
     "jsx": "preserve",
     "lib": ["dom", "es2015", "es2016"],
     "module": "commonjs",

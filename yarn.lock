@@ -2010,10 +2010,34 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo/client@55cf94c":
-  version "0.0.54"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.54.tgz#b12e716b197d53686ac9e06566a48464cc0e2839"
-  integrity sha512-+L2S/cOQlbEjnVscvwi50HE1itBaxtBA0gHjIbO/MoqBXvips2FGSHvpU9Uz/usnqLm/FN6BaKo5JUKZMR9FUg==
+"@celo/client@f7095b7":
+  version "0.0.98"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.98.tgz#0c15460fe6508be6c7f400183500cd705c8827ab"
+  integrity sha512-r43CBGZx6BMD3TAcFGVEuG/r0Hsvbuc8wg9d564Sh5YsUgWoPtyDCEgsOfCwaEdF9MoaiavFxl/sGUeN7RL/5g==
+
+"@celo/contractkit@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.0.4.tgz#dc3a481f14e87e99e92824ec52c5bac255e102b5"
+  integrity sha512-FQDN/GG5/zwu3lCDBONm2N7Fml/ou3xQHFrE3kTlGCG+wyHLjpZD+8Vq2G1FarYKe91Agylx9De0KCnMc8j8zA==
+  dependencies:
+    "@0x/subproviders" "^4.1.0"
+    "@celo/utils" "0.0.5"
+    "@google-cloud/storage" "^2.3.3"
+    "@types/jest" "^24.0.13"
+    babel-jest "^24.8.0"
+    bignumber.js "^7.2.0"
+    chalk "^2.4.2"
+    cross-fetch "^3.0.2"
+    eth-lib "^0.2.8"
+    jest "^24.8.0"
+    lodash "^4.17.14"
+    prettier "1.13.5"
+    sleep-promise "^8.0.1"
+    ts-jest "^24.0.0"
+    typechain "git+https://github.com/celo-org/TypeChain.git#ce6a33b"
+    typescript "^3.3.3"
+    web3 "1.0.0-beta.37"
+    web3-utils "1.0.0-beta.37"
 
 "@celo/dev-cli@^2.0.3":
   version "2.0.3"
@@ -29297,6 +29321,15 @@ type-is@~1.6.17:
 "typechain@git+https://github.com/celo-org/TypeChain.git#832e628":
   version "0.3.11"
   resolved "git+https://github.com/celo-org/TypeChain.git#832e628fab8f7d9946d46047afe73958d527c262"
+  dependencies:
+    command-line-args "^4.0.7"
+    debug "^3.0.1"
+    fs-extra "^7.0.0"
+    ts-generator "^0.0.8"
+
+"typechain@git+https://github.com/celo-org/TypeChain.git#ce6a33b":
+  version "0.3.11"
+  resolved "git+https://github.com/celo-org/TypeChain.git#ce6a33b06af43da8c3997a9d0ed1d27683d24bd9"
   dependencies:
     command-line-args "^4.0.7"
     debug "^3.0.1"
