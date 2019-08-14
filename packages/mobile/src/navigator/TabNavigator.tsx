@@ -18,21 +18,6 @@ import { RootState } from 'src/redux/reducers'
 import { getTabBarActiveNotification } from 'src/redux/selectors'
 import Send from 'src/send/Send'
 
-// // These stsacks must be defined in this file due to a bug with react navigation
-// // https://github.com/react-navigation/react-navigation/issues/3326
-// const HomeStack = createStackNavigator(
-//   {
-//     [Screens.WalletHome]: WalletHome,
-//     ...commonScreens,
-//   },
-//   {
-//     defaultNavigationOptions: {
-//       header: null,
-//     },
-//     initialRouteName: Screens.WalletHome,
-//   }
-// )
-
 interface LabelProps {
   tintColor: string
 }
@@ -117,9 +102,6 @@ export const TabNavigator = createBottomTabNavigator(
         tabBarLabel: ({ tintColor }: LabelProps) => {
           return <MenuText testID="SendNavigator" transKey="payments" tintColor={tintColor} />
         },
-        // tabBarOnPress: () => {
-        //   navigate(Stacks.SendStack)
-        // },
       },
     },
     [Screens.ExchangeHomeScreen]: {
@@ -130,9 +112,6 @@ export const TabNavigator = createBottomTabNavigator(
         tabBarLabel: ({ tintColor }: LabelProps) => {
           return <MenuText testID="ExchangeNavigator" transKey="exchange" tintColor={tintColor} />
         },
-        // tabBarOnPress: () => {
-        //   navigate(Screens.ExchangeHomeScreen)
-        // },
       },
     },
   },
