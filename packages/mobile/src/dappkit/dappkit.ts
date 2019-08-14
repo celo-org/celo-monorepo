@@ -5,8 +5,11 @@ import {
 } from '@celo/utils/src/dappkit'
 import { Linking } from 'react-native'
 import { call, takeLeading } from 'redux-saga/effects'
+import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
+
+const TAG = 'dappkit/dappkit'
 
 export enum actions {
   REQUEST_TX_SIGNATURE = 'DAPPKIT/REQUEST_TX_SIGNATURE',
@@ -24,7 +27,10 @@ export const requestTxSignature = (request: SignTxRequest): RequestTxSignatureAc
 export type Actions = RequestTxSignatureAction
 
 function* produceTxSignatureSaga(action: RequestTxSignatureAction) {
+  Logger.debug(TAG, 'Producing tx signature')
+
   yield call(getConnectedUnlockedAccount)
+
   const signedTx = yield web3.eth.signTransaction({
     from: action.request.from,
     to: action.request.to,
@@ -36,6 +42,7 @@ function* produceTxSignatureSaga(action: RequestTxSignatureAction) {
     gasCurrency: action.request.gasCurrency,
   })
 
+  Logger.debug(TAG, 'Tx signed, opening URL')
   Linking.openURL(produceResponseDeeplink(action.request, SignTxResponseSuccess(signedTx.raw)))
 }
 
