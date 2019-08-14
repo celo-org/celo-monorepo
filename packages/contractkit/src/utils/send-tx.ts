@@ -14,16 +14,8 @@ export interface TxOptions {
 }
 
 /**
- * sendTransactionAsync mainly abstracts the sending of a transaction in a promise like
- * interface. Use the higher-order sendTransactionFactory as a consumer to configure
- * logging and promise resolution
- * TODO: Should probably renamed to sendTransaction once we remove the current
- *       sendTransaction
- * @param tx The transaction object itself
- * @param account The address from which the transaction should be sent
- * @param gasCurrencyContract The contract instance of the Token in which to pay gas for
- * @param logger An object whose log level functions can be passed a function to pass
- *               a transaction ID
+ * sendTransaction mainly abstracts the sending of a transaction in a promise like
+ * interface.
  */
 export async function sendTransaction<T>(
   tx: TransactionObject<T>,
