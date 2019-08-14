@@ -1,5 +1,6 @@
 import { AccountArgv } from '@celo/celotool/src/cmds/account'
 import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
+import { PhoneNumberUtils } from '@celo/utils'
 import {
   ActionableAttestation,
   // @ts-ignore
@@ -15,11 +16,10 @@ import {
   makeSetWalletAddressTx,
   StableToken,
   validateAttestationCode,
-} from '@celo/contractkit'
+} from '@celo/walletkit'
 // @ts-ignore
-import { Attestations as AttestationsType } from '@celo/contractkit/lib/types/Attestations'
-import { StableToken as StableTokenType } from '@celo/contractkit/lib/types/StableToken'
-import { PhoneNumberUtils } from '@celo/utils'
+import { Attestations as AttestationsType } from '@celo/walletkit/lib/types/Attestations'
+import { StableToken as StableTokenType } from '@celo/walletkit/lib/types/StableToken'
 import prompts from 'prompts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { sendTransaction } from 'src/lib/transactions'

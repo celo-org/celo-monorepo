@@ -12,9 +12,9 @@ import {
   sendTransaction,
   StableToken,
   unlockAccount,
-} from '@celo/contractkit'
-import { GoldToken as GoldTokenType } from '@celo/contractkit/types/GoldToken'
-import { StableToken as StableTokenType } from '@celo/contractkit/types/StableToken'
+} from '@celo/walletkit'
+import { GoldToken as GoldTokenType } from '@celo/walletkit/types/GoldToken'
+import { StableToken as StableTokenType } from '@celo/walletkit/types/StableToken'
 import BigNumber from 'bignumber.js'
 import fs from 'fs'
 import { range } from 'lodash'
