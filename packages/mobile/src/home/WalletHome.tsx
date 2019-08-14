@@ -32,6 +32,7 @@ import { Namespaces } from 'src/i18n'
 import { importContacts } from 'src/identity/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { withDispatchAfterNavigate } from 'src/navigator/WithDispatchAfterNavigate'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -109,7 +110,7 @@ const SHADOW_STYLE = {
   x: 0,
   y: 1,
 }
-export class WalletHome extends React.PureComponent<Props> {
+export class WalletHome extends React.Component<Props> {
   animatedValue: Animated.Value
   headerOpacity: Animated.AnimatedInterpolation
   shadowOpacity: Animated.AnimatedInterpolation
@@ -267,18 +268,21 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    {
-      refreshAllBalances,
-      resetStandbyTransactions,
-      initializeSentryUserContext,
-      exitBackupFlow,
-      setLoading,
-      showMessage,
-      hideAlert,
-      importContacts,
-    }
-  )(withNamespaces(Namespaces.walletFlow5)(WalletHome))
+export default withDispatchAfterNavigate(
+  null,
+  componentWithAnalytics(
+    connect<StateProps, DispatchProps, {}, RootState>(
+      mapStateToProps,
+      {
+        refreshAllBalances,
+        resetStandbyTransactions,
+        initializeSentryUserContext,
+        exitBackupFlow,
+        setLoading,
+        showMessage,
+        hideAlert,
+        importContacts,
+      }
+    )(withNamespaces(Namespaces.walletFlow5)(WalletHome))
+  )
 )

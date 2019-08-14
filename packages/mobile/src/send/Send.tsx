@@ -12,7 +12,6 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import CancelButton from 'src/components/CancelButton'
 import { ALERT_BANNER_DURATION } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import { importContacts } from 'src/identity/actions'
@@ -102,7 +101,7 @@ class Send extends React.Component<Props, State> {
     headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
     // This helps vertically center the title
     headerRight: <View />,
-    headerLeft: <CancelButton eventName={CustomEventNames.send_select_cancel} />,
+    headerLeft: <View />,
   })
 
   throttledSearch: (searchQuery: string) => void

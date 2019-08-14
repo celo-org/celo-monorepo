@@ -3,7 +3,6 @@ import { call, delay, select } from 'redux-saga/effects'
 import { pincodeSelector } from 'src/account/reducer'
 import { waitForGethConnectivity } from 'src/geth/saga'
 import { navigateToError } from 'src/navigator/NavigationService'
-import { sleep } from 'src/test/utils'
 import {
   getLatestBlock,
   setLatestBlockNumber,
@@ -11,13 +10,13 @@ import {
   updateWeb3SyncProgress,
 } from 'src/web3/actions'
 import {
-  _CHECK_SYNC_PROGRESS_TIMEOUT,
-  _checkWeb3SyncProgressClaim,
   checkWeb3Sync,
   createNewAccount,
+  _checkWeb3SyncProgressClaim,
+  _CHECK_SYNC_PROGRESS_TIMEOUT,
 } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
-import { createMockStore } from 'test/utils'
+import { createMockStore, sleep } from 'test/utils'
 import { mockAccount } from 'test/values'
 
 const LAST_BLOCK_NUMBER = 1000

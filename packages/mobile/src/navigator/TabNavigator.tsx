@@ -4,21 +4,81 @@ import { fontFamily } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import { createBottomTabNavigator } from 'react-navigation'
+import { createBottomTabNavigator, createStackNavigator } from 'react-navigation'
 import { connect } from 'react-redux'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
+import ExchangeReview from 'src/exchange/ExchangeReview'
+import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
 import WalletHome from 'src/home/WalletHome'
 import { Namespaces } from 'src/i18n'
 import ExchangeIcon from 'src/icons/Exchange'
 import PaymentsIcon from 'src/icons/PaymentsIcon'
 import WalletIcon from 'src/icons/Wallet'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { commonScreens } from 'src/navigator/Navigator'
+import { Screens, Stacks } from 'src/navigator/Screens'
+import TabBar from 'src/navigator/TabBar'
+import QRCode from 'src/qrcode/QRCode'
+import QRScanner from 'src/qrcode/QRScanner'
 import { RootState } from 'src/redux/reducers'
 import { getTabBarActiveNotification } from 'src/redux/selectors'
-import TabBar from 'src/tab/TabBar'
+import FeeEducation from 'src/send/FeeEducation'
+import RequestConfirmation from 'src/send/RequestConfirmation'
+import Send from 'src/send/Send'
+import SendAmount from 'src/send/SendAmount'
+import SendConfirmation from 'src/send/SendConfirmation'
 
-const SendStack = () => <View />
+// These stacks need to be defined in this file due to a bug
+// with react navigation.
+const HomeStack = createStackNavigator(
+  {
+    [Screens.WalletHome]: WalletHome,
+    ...commonScreens,
+  },
+  {
+    defaultNavigationOptions: {
+      header: null,
+    },
+    initialRouteName: Screens.WalletHome,
+  }
+)
+
+const SendStack = createStackNavigator(
+  {
+    [Screens.Send]: { screen: Send },
+    [Screens.QRCode]: { screen: QRCode },
+    [Screens.QRScanner]: { screen: QRScanner },
+    [Screens.SendAmount]: { screen: SendAmount },
+    [Screens.SendConfirmation]: { screen: SendConfirmation },
+    [Screens.FeeEducation]: { screen: FeeEducation },
+    [Screens.RequestConfirmation]: { screen: RequestConfirmation },
+    ...commonScreens,
+  },
+  {
+    defaultNavigationOptions: {
+      headerStyle: {
+        elevation: 0,
+      },
+    },
+    initialRouteName: Screens.Send,
+  }
+)
+
+const ExchangeStack = createStackNavigator(
+  {
+    [Screens.ExchangeHomeScreen]: { screen: ExchangeHomeScreen },
+    [Screens.ExchangeTradeScreen]: { screen: ExchangeTradeScreen },
+    [Screens.ExchangeReview]: { screen: ExchangeReview },
+    ...commonScreens,
+  },
+  {
+    defaultNavigationOptions: {
+      headerStyle: {
+        elevation: 0,
+      },
+    },
+    initialRouteName: Screens.ExchangeHomeScreen,
+  }
+)
 
 interface LabelProps {
   tintColor: string
@@ -86,8 +146,8 @@ const SmartWalletIcon = connect<StateProps, {}, {}, RootState>(mapStateToProps)(
 
 export const TabNavigator = createBottomTabNavigator(
   {
-    [Screens.WalletHome]: {
-      screen: WalletHome,
+    [Stacks.HomeStack]: {
+      screen: HomeStack,
       navigationOptions: {
         tabBarButtonComponent: TabBarButtonComponent,
         tabBarIcon: (props: any) => <SmartWalletIcon {...props} />,
@@ -96,7 +156,7 @@ export const TabNavigator = createBottomTabNavigator(
         },
       },
     },
-    Send: {
+    [Stacks.SendStack]: {
       screen: SendStack,
       navigationOptions: {
         tabBarButtonComponent: TabBarButtonComponent,
@@ -104,27 +164,27 @@ export const TabNavigator = createBottomTabNavigator(
         tabBarLabel: ({ tintColor }: LabelProps) => {
           return <MenuText testID="SendNavigator" transKey="payments" tintColor={tintColor} />
         },
-        tabBarOnPress: () => {
-          navigate(Screens.SendStack)
-        },
+        // tabBarOnPress: () => {
+        //   navigate(Screens.SendStack)
+        // },
       },
     },
-    [Screens.ExchangeHomeScreen]: {
-      screen: ExchangeHomeScreen,
+    [Stacks.ExchangeStack]: {
+      screen: ExchangeStack,
       navigationOptions: {
         tabBarButtonComponent: TabBarButtonComponent,
         tabBarIcon: (props: any) => <ExchangeIcon color={props.tintColor} />,
         tabBarLabel: ({ tintColor }: LabelProps) => {
           return <MenuText testID="ExchangeNavigator" transKey="exchange" tintColor={tintColor} />
         },
-        tabBarOnPress: () => {
-          navigate(Screens.ExchangeHomeScreen)
-        },
+        // tabBarOnPress: () => {
+        //   navigate(Screens.ExchangeHomeScreen)
+        // },
       },
     },
   },
   {
-    initialRouteName: Screens.WalletHome,
+    initialRouteName: Stacks.HomeStack,
     tabBarComponent: TabBar as any,
     tabBarOptions: {
       activeTintColor: colors.celoGreen,
