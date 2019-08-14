@@ -1,5 +1,5 @@
 import debugFactory from 'debug'
-import { Future } from 'src/utils/future'
+import { ExternalPromise } from 'src/utils/external-promise'
 import PromiEvent from 'web3/promiEvent'
 import { TransactionReceipt } from 'web3/types'
 
@@ -10,9 +10,9 @@ export function toTxResult(pe: PromiEvent<any>) {
 }
 
 export class TransactionResult {
-  private hashFuture = new Future<string>()
-  private receiptFuture = new Future<TransactionReceipt>()
-  private confirmationsFuture = new Future<boolean>()
+  private hashFuture = new ExternalPromise<string>()
+  private receiptFuture = new ExternalPromise<TransactionReceipt>()
+  private confirmationsFuture = new ExternalPromise<boolean>()
 
   constructor(pe: PromiEvent<any>) {
     pe.on('transactionHash', (hash: string) => {
@@ -46,14 +46,14 @@ export class TransactionResult {
   }
 
   getHash() {
-    return this.hashFuture.wait()
+    return this.hashFuture
   }
 
   waitReceipt() {
-    return this.receiptFuture.wait()
+    return this.receiptFuture
   }
 
   waitConfirmation() {
-    return this.confirmationsFuture.wait()
+    return this.confirmationsFuture
   }
 }
