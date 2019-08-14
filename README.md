@@ -1,4 +1,4 @@
-# Celo Monorepo
+# *Celo Monorepo*
 
 [![CircleCI](https://circleci.com/gh/celo-org/celo-monorepo/tree/master.svg?style=svg)](https://circleci.com/gh/celo-org/celo-monorepo/tree/master)
 
