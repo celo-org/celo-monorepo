@@ -37,31 +37,6 @@ export class Countries {
     this.assignCountries()
   }
 
-  private assignCountries() {
-    // add other languages to country data
-    this.localizedCountries = countryData.callingCountries.all.map(
-      (country: countryData.Country) => {
-        // this is assuming these two are the only cases, in i18n.ts seems like there
-        // are fallback languages 'es-US' and 'es-LA' that are not covered
-        const names: CountryNames = {
-          'en-us': country.name,
-          'es-ar': esData[country.alpha2],
-        }
-
-        const localizedCountry = {
-          names,
-          displayName: names[this.language],
-          ...country,
-        }
-
-        // use ISO 3166-1 alpha2 code as country id
-        this.countryMap.set(country.alpha2.toUpperCase(), localizedCountry)
-
-        return localizedCountry
-      }
-    )
-  }
-
   getCountry(countryName?: string | null): LocalizedCountry {
     if (!countryName) {
       return EMPTY_COUNTRY
@@ -128,5 +103,30 @@ export class Countries {
             c.countryCallingCodes[0].startsWith('+' + query))
       )
       .map((c: LocalizedCountry) => c.alpha2)
+  }
+
+  private assignCountries() {
+    // add other languages to country data
+    this.localizedCountries = countryData.callingCountries.all.map(
+      (country: countryData.Country) => {
+        // this is assuming these two are the only cases, in i18n.ts seems like there
+        // are fallback languages 'es-US' and 'es-LA' that are not covered
+        const names: CountryNames = {
+          'en-us': country.name,
+          'es-ar': esData[country.alpha2],
+        }
+
+        const localizedCountry = {
+          names,
+          displayName: names[this.language],
+          ...country,
+        }
+
+        // use ISO 3166-1 alpha2 code as country id
+        this.countryMap.set(country.alpha2.toUpperCase(), localizedCountry)
+
+        return localizedCountry
+      }
+    )
   }
 }

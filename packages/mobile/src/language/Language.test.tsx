@@ -11,7 +11,6 @@ it('renders correctly', () => {
       setLanguage={jest.fn()}
       navigation={navigation}
       {...getMockI18nProps()}
-      isWeb3Ready={false}
       pincodeSet={false}
     />
   )

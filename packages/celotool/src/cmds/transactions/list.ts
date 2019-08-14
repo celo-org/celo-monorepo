@@ -5,7 +5,7 @@ import {
   getContracts,
   parseFunctionCall,
   parseLog,
-} from '@celo/contractkit'
+} from '@celo/walletkit'
 import moment from 'moment'
 import fetch from 'node-fetch'
 import { CONTRACTS_TO_COPY, copyContractArtifacts, downloadArtifacts } from 'src/lib/artifacts'

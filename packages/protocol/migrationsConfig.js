@@ -43,7 +43,9 @@ const defaultConfig = {
       denominator: 2,
     },
   },
-  registryProxyPredeployedAddress: '0x000000000000000000000000000000000000ce10',
+  registry: {
+    predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
+  },
   reserve: {
     goldBalance: 100000,
     tobinTaxStalenessThreshold: 3600, // 1 hour
@@ -60,7 +62,7 @@ const defaultConfig = {
     inflationPeriod: 7 * 24 * 60 * 60, // 1 week
   },
   validators: {
-    minElectableValidators: '10', // 1 is only used for tests
+    minElectableValidators: '10',
     maxElectableValidators: '100',
     minBondedDepositValue: '1000000000000000000', // 1 gold
     minBondedDepositNoticePeriod: 60 * 24 * 60 * 60, // 60 days
@@ -73,16 +75,24 @@ const defaultConfig = {
 
 const linkedLibraries = {
   LinkedList: ['AddressLinkedList', 'SortedLinkedList'],
-  SortedLinkedList: ['AddressSortedLinkedList', 'IntegerSortedLinkedList'],
+  SortedLinkedList: [
+    'AddressSortedLinkedList',
+    'IntegerSortedLinkedList',
+    'SortedLinkedListWithMedian',
+  ],
+  SortedLinkedListWithMedian: ['AddressSortedLinkedListWithMedian'],
   AddressLinkedList: ['Validators'],
   AddressSortedLinkedList: ['Validators'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
-  SortedFractionMedianList: ['SortedOracles', 'SortedFractionMedianListTest'],
+  AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
   Signatures: ['BondedDeposits', 'Escrow'],
 }
 
 const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
-config = { ...defaultConfig, ...migrationOverride }
+config = {}
+for (const key in defaultConfig) {
+  config[key] = { ...defaultConfig[key], ...migrationOverride[key] }
+}
 
 module.exports = {
   config,

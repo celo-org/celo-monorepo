@@ -4,10 +4,25 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import Invite from 'src/account/Invite'
 import { createMockStore } from 'test/utils'
-import { mockNavigation } from 'test/values'
+import { mockE164NumberToInvitableRecipient, mockNavigation } from 'test/values'
 
 describe('Invite', () => {
-  it('renders correctly', () => {
+  it('renders correctly with recipients', () => {
+    const tree = renderer.create(
+      <Provider
+        store={createMockStore({
+          recipients: { recipientCache: mockE164NumberToInvitableRecipient },
+        })}
+      >
+        {/*
+          // @ts-ignore */}
+        <Invite navigation={mockNavigation} />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+
+  it('renders correctly with no recipients', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         {/*

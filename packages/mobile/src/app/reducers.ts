@@ -2,7 +2,6 @@ import { Actions, ActionTypes } from 'src/app/actions'
 import { RootState } from 'src/redux/reducers'
 
 export interface State {
-  inviteCodeEntered: boolean
   loggedIn: boolean
   numberVerified: boolean
   language: string | null
@@ -11,7 +10,6 @@ export interface State {
 }
 
 const initialState = {
-  inviteCodeEntered: false,
   loading: false,
   loggedIn: false,
   numberVerified: false,
@@ -24,11 +22,6 @@ export const currentLanguageSelector = (state: RootState) => state.app.language
 
 export const appReducer = (state: State | undefined = initialState, action: ActionTypes): State => {
   switch (action.type) {
-    case Actions.SET_INVITE_CODE_ENTERED:
-      return {
-        ...state,
-        inviteCodeEntered: action.inviteCodeEntered,
-      }
     case Actions.SET_LOGGED_IN:
       return {
         ...state,
@@ -47,9 +40,9 @@ export const appReducer = (state: State | undefined = initialState, action: Acti
     case Actions.RESET_APP_OPENED_STATE:
       return {
         ...state,
-        inviteCodeEntered: false,
         loggedIn: false,
         numberVerified: false,
+        language: null,
       }
     case Actions.ENTER_BACKUP_FLOW:
       return {
