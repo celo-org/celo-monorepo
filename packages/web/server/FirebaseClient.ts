@@ -10,11 +10,14 @@ async function getFirebase() {
     firebase.initializeApp(publicRuntimeConfig.FIREBASE_CONFIG)
     const loginUsername = publicRuntimeConfig.LOGIN_USERNAME
     const loginPassword = publicRuntimeConfig.LOGIN_PASSWORD
+    if (loginUsername === null || loginUsername.length() === 0) {
+      throw new Error('Login username is empty')
+    }
     try {
       // Source: https://firebase.google.com/docs/auth
       await firebasePackage.auth().signInWithEmailAndPassword(loginUsername, loginPassword)
     } catch (e) {
-      console.error(`Fail to login into Firebase: ${e}`)
+      console.error(`Fail to login into Firebase with usern: ${e}`)
       throw e
     }
   }
