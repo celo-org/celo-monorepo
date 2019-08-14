@@ -6,7 +6,6 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
-import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { RootState } from 'src/redux/reducers'
 
 export interface OwnProps {
@@ -46,7 +45,7 @@ export class VerificationConfirmationCard extends React.Component<Props> {
           iconSize={55}
         />
         <View style={style.amountContainer}>
-          <Text style={style.currencySymbol}>{CURRENCIES[CURRENCY_ENUM.Dollar].symbol}</Text>
+          <Text style={style.currencySymbol}>$</Text>
           <Text style={[fontStyles.body, style.amount]}>{value}</Text>
         </View>
         {phoneNumbers.map((number) => (
