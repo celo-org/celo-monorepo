@@ -68,7 +68,7 @@
     "web3": "1.0.0-beta.37"
   },
   "devDependencies": {
-    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#2ebdf9f",
+    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#1ebae73",
     "@celo/typescript": "0.0.1",
     "@celo/utils": "^0.0.5",
     "@types/bignumber.js": "^5.0.0",
