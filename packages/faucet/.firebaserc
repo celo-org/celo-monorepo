@@ -9,6 +9,13 @@
           "celo-faucet"
         ]
       }
+    },
+    "celo-faucet-staging": {
+      "database": {
+        "faucet": [
+          "celo-faucet-staging"
+        ]
+      }
     }
   }
 }
