@@ -6,11 +6,11 @@ import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
-import "./IntegerSortedLinkedList.sol";
 import "./UsingBondedDeposits.sol";
 import "./interfaces/IGovernance.sol";
 import "../common/Initializable.sol";
 import "../common/UsingFixidity.sol";
+import "../common/linkedlists/IntegerSortedLinkedList.sol";
 
 
 // TODO(asa): Hardcode minimum times for queueExpiry, etc.

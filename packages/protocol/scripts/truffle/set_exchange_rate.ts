@@ -1,5 +1,4 @@
 /* tslint:disable:no-console */
-import { toFixed } from '@celo/protocol/lib/fixidity'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { BigNumber } from 'bignumber.js'
 import { SortedOraclesInstance, StableTokenInstance } from 'types'
@@ -134,12 +133,7 @@ module.exports = async (callback: (error?: any) => number) => {
       elements
     )
     // Report it
-    await oracles.report(
-      stableToken.address,
-      toFixed(numerator / denominator),
-      lesserKey,
-      greaterKey
-    )
+    await oracles.report(stableToken.address, numerator, denominator, lesserKey, greaterKey)
     callback()
   } catch (error) {
     callback(error)

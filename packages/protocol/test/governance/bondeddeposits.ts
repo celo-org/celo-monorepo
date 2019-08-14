@@ -415,7 +415,9 @@ contract('BondedDeposits', (accounts: string[]) => {
     let availabilityTime: BigNumber
 
     beforeEach(async () => {
-      const noticePeriod = 60 * 60 * 24 // 1 day
+      // Set an initial notice period of just over one day, so that when we rebond, we're
+      // guaranteed that the new notice period is at least one day.
+      const noticePeriod = 60 * 60 * 24 + 10
       // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
       await bondedDeposits.deposit(noticePeriod, { value })
       await bondedDeposits.notify(value, noticePeriod)

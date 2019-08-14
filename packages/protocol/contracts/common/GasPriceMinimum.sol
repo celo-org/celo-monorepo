@@ -108,8 +108,8 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry, UsingFixidity
       ISortedOracles sortedOracles = ISortedOracles(
         registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
       );
-      uint128 rateNumerator;
-      uint128 rateDenominator;
+      uint256 rateNumerator;
+      uint256 rateDenominator;
       (rateNumerator, rateDenominator) = sortedOracles.medianRate(tokenAddress);
       return (gasPriceMinimum.mul(rateNumerator).div(rateDenominator));
     }

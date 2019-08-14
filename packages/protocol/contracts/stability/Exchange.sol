@@ -326,8 +326,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, UsingFixi
   }
 
   function getOracleExchangeRate() private view returns (FractionUtil.Fraction memory) {
-    uint128 rateNumerator;
-    uint128 rateDenominator;
+    uint256 rateNumerator;
+    uint256 rateDenominator;
     (rateNumerator, rateDenominator) =
       ISortedOracles(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)).medianRate(stable);
     return FractionUtil.Fraction(rateNumerator, rateDenominator);

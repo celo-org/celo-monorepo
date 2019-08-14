@@ -70,7 +70,6 @@ const defaultConfig = {
 const linkedLibraries = {
   FixidityLib: [
     'SortedOracles',
-    'SortedFractionMedianList',
     'BondedDeposits',
     'StableToken',
     'Validators',
@@ -79,11 +78,16 @@ const linkedLibraries = {
     'Exchange',
   ],
   LinkedList: ['AddressLinkedList', 'SortedLinkedList'],
-  SortedLinkedList: ['AddressSortedLinkedList', 'IntegerSortedLinkedList'],
+  SortedLinkedList: [
+    'AddressSortedLinkedList',
+    'IntegerSortedLinkedList',
+    'SortedLinkedListWithMedian',
+  ],
+  SortedLinkedListWithMedian: ['AddressSortedLinkedListWithMedian'],
   AddressLinkedList: ['Validators'],
   AddressSortedLinkedList: ['Validators'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
-  SortedFractionMedianList: ['SortedOracles', 'SortedFractionMedianListTest'],
+  AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
   Signatures: ['BondedDeposits', 'Escrow'],
 }
 
