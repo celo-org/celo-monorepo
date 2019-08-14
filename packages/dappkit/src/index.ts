@@ -6,6 +6,7 @@ import {
   parseDappkitResponseDepplink,
   serializeDappKitRequestDeeplink,
   SignTxRequest,
+  TxToSignParam,
 } from '@celo/utils'
 import { CeloTokenType, GoldToken, StableToken } from '@celo/walletkit'
 import { Linking } from 'expo'
@@ -33,7 +34,7 @@ export function listenToAccount(callback: (account: string) => void) {
   })
 }
 
-export function listenToSignedTx(callback: (signedTx: string) => void) {
+export function listenToSignedTxs(callback: (signedTxs: string[]) => void) {
   return Linking.addEventListener('url', ({ url }: { url: string }) => {
     try {
       const dappKitResponse = parseDappkitResponseDepplink(url)
@@ -41,7 +42,7 @@ export function listenToSignedTx(callback: (signedTx: string) => void) {
         dappKitResponse.type === DappKitRequestTypes.SIGN_TX &&
         dappKitResponse.status === DappKitResponseStatus.SUCCESS
       ) {
-        callback(dappKitResponse.rawTx)
+        callback(dappKitResponse.rawTxs)
       }
     } catch (error) {}
   })
@@ -78,26 +79,34 @@ export interface TxParams<T> {
   gasCurrency: GasCurrency
 }
 
-export async function requestTxSig<T>(web3: Web3, txParams: TxParams<T>, meta: DappKitRequestMeta) {
-  const gasCurrencyContract = await getGasCurrencyContract(web3, txParams.gasCurrency)
-  const estimatedTxParams = {
-    gasCurrency: gasCurrencyContract.options.address,
-  }
-  // @ts-ignore
-  const estimatedGas = await txParams.tx.estimateGas(estimatedTxParams)
+export async function requestTxSig<T>(
+  web3: Web3,
+  txParams: TxParams<T>[],
+  meta: DappKitRequestMeta
+) {
+  const txs: TxToSignParam[] = await Promise.all(
+    txParams.map(async (txParam) => {
+      const gasCurrencyContract = await getGasCurrencyContract(web3, txParam.gasCurrency)
+      const estimatedTxParams = {
+        gasCurrency: gasCurrencyContract.options.address,
+      }
+      // @ts-ignore
+      const estimatedGas = await txParam.tx.estimateGas(estimatedTxParams)
 
-  const nonce = await web3.eth.getTransactionCount(txParams.from)
+      const nonce = await web3.eth.getTransactionCount(txParam.from)
+      return {
+        txData: txParam.tx.encodeABI(),
+        estimatedGas,
+        nonce,
+        gasCurrencyAddress: gasCurrencyContract._address,
+        ...txParam,
+      }
+    })
+  )
+
   // const url = Linking.makeUrl(returnPath)
 
-  const request = SignTxRequest(
-    txParams.tx.encodeABI(),
-    estimatedGas,
-    txParams.from,
-    txParams.to,
-    nonce,
-    gasCurrencyContract._address,
-    meta
-  )
+  const request = SignTxRequest(txs, meta)
 
   Linking.openURL(serializeDappKitRequestDeeplink(request))
 }

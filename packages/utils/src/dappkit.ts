@@ -61,13 +61,13 @@ export type AccountAuthResponse = AccountAuthResponseSuccess | AccountAuthRespon
 export interface SignTxResponseSuccess {
   type: DappKitRequestTypes.SIGN_TX
   status: DappKitResponseStatus.SUCCESS
-  rawTx: string
+  rawTxs: string[]
 }
 
-export const SignTxResponseSuccess = (rawTx: string): SignTxResponseSuccess => ({
+export const SignTxResponseSuccess = (rawTxs: string[]): SignTxResponseSuccess => ({
   type: DappKitRequestTypes.SIGN_TX,
   status: DappKitResponseStatus.SUCCESS,
-  rawTx,
+  rawTxs,
 })
 
 export interface SignTxResponseFailure {
@@ -90,7 +90,7 @@ export function produceResponseDeeplink(request: DappKitRequest, response: DappK
       break
     case DappKitRequestTypes.SIGN_TX:
       if (response.status === DappKitResponseStatus.SUCCESS) {
-        params.rawTx = response.rawTx
+        params.rawTxs = response.rawTxs
       }
     default:
       break
@@ -99,8 +99,7 @@ export function produceResponseDeeplink(request: DappKitRequest, response: DappK
   return request.callback + '?' + stringify(params)
 }
 
-export interface SignTxRequest extends DappKitRequestBase {
-  type: DappKitRequestTypes.SIGN_TX
+export interface TxToSignParam {
   txData: string
   estimatedGas: number
   from: string
@@ -109,22 +108,21 @@ export interface SignTxRequest extends DappKitRequestBase {
   gasCurrencyAddress: string
 }
 
-export const SignTxRequest = (
-  txData: string,
-  estimatedGas: number,
-  from: string,
-  to: string,
-  nonce: number,
-  gasCurrencyAddress: string,
-  meta: DappKitRequestMeta
-): SignTxRequest => ({
+export interface SignTxRequest extends DappKitRequestBase {
+  type: DappKitRequestTypes.SIGN_TX
+  txs: TxToSignParam[]
+}
+
+export const SignTxRequest = (txs: TxToSignParam[], meta: DappKitRequestMeta): SignTxRequest => ({
   type: DappKitRequestTypes.SIGN_TX,
-  txData,
-  estimatedGas,
-  from,
-  to,
-  nonce,
-  gasCurrencyAddress,
+  txs: txs.map((tx) => ({
+    txData: tx.txData,
+    estimatedGas: tx.estimatedGas,
+    from: tx.from,
+    to: tx.to,
+    nonce: tx.nonce,
+    gasCurrencyAddress: tx.gasCurrencyAddress,
+  })),
   ...meta,
 })
 
@@ -141,12 +139,7 @@ export function serializeDappKitRequestDeeplink(request: DappKitRequest) {
     case DappKitRequestTypes.SIGN_TX:
       params = {
         ...params,
-        txData: request.txData,
-        estimatedGas: request.estimatedGas,
-        from: request.from,
-        to: request.to,
-        nonce: request.nonce,
-        gasCurrencyAddress: request.gasCurrencyAddress,
+        txs: Buffer.from(JSON.stringify(request.txs), 'utf8').toString('base64'),
       }
     default:
       break
@@ -181,11 +174,15 @@ export function parseDappkitResponseDepplink(url: string): DappKitResponse {
       }
     case DappKitRequestTypes.SIGN_TX:
       if (rawParams.query.status === DappKitResponseStatus.SUCCESS) {
+        let rawTxs = rawParams.query.rawTxs
+        if (typeof rawTxs === 'string') {
+          rawTxs = [rawTxs]
+        }
         // @ts-ignore
         return {
           type: DappKitRequestTypes.SIGN_TX,
           status: DappKitResponseStatus.SUCCESS,
-          rawTx: rawParams.query.rawTx,
+          rawTxs,
         }
       } else {
         return {
@@ -227,17 +224,7 @@ export function parseDappKitRequestDeeplink(url: string): DappKitRequest {
       return {
         type: DappKitRequestTypes.SIGN_TX,
         // @ts-ignore
-        txData: rawParams.query.txData,
-        // @ts-ignore
-        estimatedGas: parseInt(rawParams.query.estimatedGas, 10),
-        // @ts-ignore
-        from: rawParams.query.from,
-        // @ts-ignore
-        to: rawParams.query.to,
-        // @ts-ignore
-        nonce: parseInt(rawParams.query.nonce, 10),
-        // @ts-ignore
-        gasCurrencyAddress: rawParams.query.gasCurrency,
+        txs: JSON.parse(Buffer.from(rawParams.query.txs, 'base64').toString('utf8')),
         ...requestMeta,
       }
     default:
