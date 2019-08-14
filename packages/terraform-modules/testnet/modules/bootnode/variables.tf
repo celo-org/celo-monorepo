@@ -13,6 +13,11 @@ variable gcloud_secrets_bucket {
   description = "Name of the Google Cloud Storage bucket where secrets are kept"
 }
 
+variable gcloud_vm_service_account_email {
+  type = string
+  description = "The email of the service account to associate virtual machines with"
+}
+
 variable geth_bootnode_docker_image_repository {
   type = string
   description = "Repository of the geth bootnode docker image"

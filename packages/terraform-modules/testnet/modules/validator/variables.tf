@@ -33,6 +33,11 @@ variable gcloud_secrets_bucket {
   description = "Name of the Google Cloud Storage bucket where secrets are kept"
 }
 
+variable gcloud_vm_service_account_email {
+  type = string
+  description = "The email of the service account to associate virtual machines with"
+}
+
 variable genesis_content_base64 {
   type = string
   description = "Content of the genesis file encoded in base64"

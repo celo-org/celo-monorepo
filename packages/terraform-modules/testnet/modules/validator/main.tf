@@ -41,7 +41,8 @@ resource "google_compute_instance" "validator" {
       geth_node_docker_image_tag: var.geth_node_docker_image_tag,
       geth_verbosity: var.geth_verbosity,
       ip_address: google_compute_address.validator[count.index].address,
-      max_peers: var.validator_count * 2,
+      # max_peers: var.validator_count * 2,
+      max_peers: 25,
       network_id: var.network_id,
       rid: count.index,
       validator_name: "${var.celo_env}-validator-${count.index}",
@@ -50,6 +51,7 @@ resource "google_compute_instance" "validator" {
   )
 
   service_account {
-    scopes = ["userinfo-email", "compute-ro", "storage-ro"]
+    email = var.gcloud_vm_service_account_email
+    scopes = ["storage-ro"]
   }
 }

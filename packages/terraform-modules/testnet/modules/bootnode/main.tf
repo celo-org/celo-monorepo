@@ -35,6 +35,7 @@ resource "google_compute_instance" "bootnode" {
   )
 
   service_account {
-    scopes = ["userinfo-email", "compute-ro", "storage-ro"]
+    email = var.gcloud_vm_service_account_email
+    scopes = ["storage-ro"]
   }
 }

@@ -87,6 +87,8 @@ function getTerraformVars(celoEnv: string) {
     ...getTerraformEnvVarValues(),
     gcloud_secrets_bucket: secretsBucketName,
     gcloud_secrets_base_path: secretsBasePath(celoEnv),
+    // only able to view objects (for accessing secrets)
+    gcloud_vm_service_account_email: 'terraform-testnet@celo-testnet.iam.gserviceaccount.com',
     genesis_content_base64: genesisBuffer.toString('base64'),
   }
 }
