@@ -10,7 +10,7 @@ async function getFirebase() {
     firebase.initializeApp(publicRuntimeConfig.FIREBASE_CONFIG)
     const loginUsername = publicRuntimeConfig.LOGIN_USERNAME
     const loginPassword = publicRuntimeConfig.LOGIN_PASSWORD
-    if (loginUsername === null || loginUsername.length() === 0) {
+    if (loginUsername === null || loginUsername.length === 0) {
       throw new Error('Login username is empty')
     }
     try {
