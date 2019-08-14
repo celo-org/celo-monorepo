@@ -18,11 +18,6 @@ variable ethstats_host {
   description = "Ethstats url or IP address"
 }
 
-variable ethstats_websocket_secret {
-  type = string
-  description = "Ethstats websocket secret to allow validators to report activity"
-}
-
 variable gcloud_secrets_base_path {
   type = string
   description = "Base path in the secrets bucket of a Google Cloud Storage file containing validator secrets"

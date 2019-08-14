@@ -33,7 +33,6 @@ resource "google_compute_instance" "validator" {
       block_time: var.block_time,
       bootnode_ip_address: var.bootnode_ip_address,
       ethstats_host: var.ethstats_host,
-      ethstats_websocket_secret: var.ethstats_websocket_secret,
       gcloud_secrets_base_path: var.gcloud_secrets_base_path,
       gcloud_secrets_bucket: var.gcloud_secrets_bucket,
       genesis_content_base64: var.genesis_content_base64,

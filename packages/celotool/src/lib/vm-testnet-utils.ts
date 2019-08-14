@@ -85,6 +85,7 @@ function getTerraformVars(celoEnv: string) {
   const genesisBuffer = new Buffer(generateGenesisFromEnv())
   return {
     ...getTerraformEnvVarValues(),
+    ethstats_host: `${celoEnv}-ethstats.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org`,
     gcloud_secrets_bucket: secretsBucketName,
     gcloud_secrets_base_path: secretsBasePath(celoEnv),
     // only able to view objects (for accessing secrets)

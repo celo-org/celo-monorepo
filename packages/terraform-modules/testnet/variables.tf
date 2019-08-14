@@ -13,11 +13,6 @@ variable ethstats_host {
   description = "Ethstats url or IP address"
 }
 
-variable ethstats_websocket_secret {
-  type = string
-  description = "Ethstats websocket secret to allow nodes to report activity"
-}
-
 variable gcloud_credentials_path {
   type = string
   description = "Path to the file containing the Google Cloud credentials to use"

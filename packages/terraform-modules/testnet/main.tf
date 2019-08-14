@@ -78,7 +78,6 @@ module "validator" {
   bootnode_ip_address = module.bootnode.ip_address
   celo_env = var.celo_env
   ethstats_host = var.ethstats_host
-  ethstats_websocket_secret = var.ethstats_websocket_secret
   gcloud_secrets_base_path = var.gcloud_secrets_base_path
   gcloud_secrets_bucket = var.gcloud_secrets_bucket
   gcloud_vm_service_account_email = var.gcloud_vm_service_account_email
