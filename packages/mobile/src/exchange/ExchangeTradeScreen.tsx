@@ -13,12 +13,13 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { NavigationScreenProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
+import { errorSelector } from 'src/alert/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CancelButton from 'src/components/CancelButton'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import ExchangeRate from 'src/exchange/ExchangeRate'
 import { ExchangeRatePair } from 'src/exchange/reducer'
@@ -62,7 +63,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRatePair: state.exchange.exchangeRatePair,
   goldBalance: state.goldToken.balance,
   dollarBalance: state.stableToken.balance,
-  error: (state.alert && state.alert.underlyingError) || null,
+  error: errorSelector(state),
 })
 
 export class ExchangeTradeScreen extends React.Component<Props, State> {
@@ -103,7 +104,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     if (this.getMakerBalance().isLessThan(amount)) {
       this.props.showError(
         this.isDollar() ? ErrorMessages.NSF_DOLLARS : ErrorMessages.NSF_GOLD,
-        ERROR_BANNER_DURATION
+        ALERT_BANNER_DURATION
       )
     } else {
       this.props.hideAlert()

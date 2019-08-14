@@ -30,15 +30,26 @@ export enum CustomEventNames {
   send_invite_details = 'send_invite_details',
   send_invite = 'send_invite',
   edit_send_invite = 'edit_send_invite',
-  verification_commit = 'verification_commit',
-  verification_start = 'verification_start',
-  verification_cancel = 'verification_cancel',
-  verification_timeout = 'verification_timeout',
+
+  // Verification event and sub-events
+  verification = 'verification',
+  verification_setup = 'verification_setup',
+  verification_get_status = 'verification_get_status',
+  verification_request_attestations = 'verification_request_attestations',
+  verification_requested_attestations = 'verification_requested_attestations',
+  verification_get_attestations = 'verification_get_attestations',
+  verification_set_account = 'verification_set_account',
+  verification_reveal_attestation = 'verification_reveal_attestation',
+  verification_revealed_attestation = 'verification_revealed_attestation',
+  verification_codes_received = 'verification_codes_received',
+  verification_complete_attestation = 'verification_complete_attestation',
+  verification_completed_attestation = 'verification_completed_attestation',
   verification_manual_selected = 'verification_manual_selected',
-  verification_code_entered = 'verification_code_entered',
-  verification_code_confirmed = 'verification_code_confirmed',
-  verification_complete = 'verification_complete',
-  verification_failure = 'verification_failure',
+  verification_failed = 'verification_failed',
+  verification_cancelled = 'verification_cancelled',
+  verification_success = 'verification_success',
+  verification_timed_out = 'verification_timed_out',
+
   photos_education = 'photos_education',
   get_backup_key = 'earn_celo_gold',
   earn_celo_gold = 'earn_celo_gold',
@@ -137,6 +148,13 @@ export enum CustomEventNames {
 
   // QR Code
   qrcode_main_screen_visit = 'qrcode_main_screen_visit',
+}
+
+export enum CommonValues {
+  success = 'success',
+  failure = 'failure',
+  cancel = 'cancel',
+  timeout = 'timeout',
 }
 
 // TODO(nitya): separate this out by event name

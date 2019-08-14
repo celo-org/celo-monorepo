@@ -1,5 +1,6 @@
+import { GoldToken } from '@celo/walletkit'
+
 import { BaseCommand } from '../../base'
-import { GoldToken } from '../../generated/contracts'
 import { doSwap, swapArguments } from '../../utils/exchange'
 
 export default class SellGold extends BaseCommand {
@@ -14,6 +15,6 @@ export default class SellGold extends BaseCommand {
 
     const goldToken = await GoldToken(this.web3, args.from)
 
-    doSwap(this.web3, args, goldToken, true)
+    await doSwap(this.web3, args, goldToken, true)
   }
 }

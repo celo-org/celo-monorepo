@@ -16,8 +16,8 @@ import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import NotificationAmount from 'src/paymentRequest/NotificationAmount'
+import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import Logger from 'src/utils/Logger'
-import { getRecipientThumbnail, Recipient } from 'src/utils/recipient'
 
 interface OwnProps {
   requester: Recipient
@@ -25,19 +25,17 @@ interface OwnProps {
   comment: string
   id: string
   updatePaymentRequestStatus: typeof updatePaymentRequestStatus
-  fee: BigNumber
 }
 
 type Props = OwnProps & WithNamespaces
 
 export class PaymentRequestNotification extends React.Component<Props> {
   onPay = () => {
-    const { amount, comment: reason, fee, requester: recipient } = this.props
+    const { amount, comment: reason, requester: recipient } = this.props
     navigate(Screens.SendConfirmation, {
       confirmationInput: {
         reason,
         recipient,
-        fee,
         amount: new BigNumber(amount),
         recipientAddress: recipient.address,
       },
@@ -81,7 +79,7 @@ export class PaymentRequestNotification extends React.Component<Props> {
   }
 
   isDisplayingNumber = () => {
-    return this.props.requester.displayPhoneNumber !== this.props.requester.displayName
+    return this.props.requester.displayId !== this.props.requester.displayName
   }
 
   render() {
@@ -105,7 +103,7 @@ export class PaymentRequestNotification extends React.Component<Props> {
           <View style={styles.body}>
             {this.isDisplayingNumber() && (
               <Text style={[fontStyles.subSmall, styles.phoneNumber]}>
-                {this.props.requester.displayPhoneNumber}
+                {this.props.requester.displayId}
               </Text>
             )}
             <Text style={[fontStyles.subSmall, styles.comment]}>{this.props.comment}</Text>

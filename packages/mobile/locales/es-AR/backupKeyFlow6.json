@@ -11,16 +11,15 @@
   "cancel": "Cancelar",
   "backupKeyImportance": {
     "0":
-      "Si pierde su teléfono o elimina la aplicación de Celo, perderá todo el oro y los dólares de su billetera.",
+      "Si pierde su teléfono o elimina la aplicación de Celo, perderá todo el oro y los dólares de su monedero.",
     "1":
-      "Puede hacer un respaldo de la billetera si escribe una clave de respaldo en un papel y la guarda en algún sitio seguro. Así, podrá restaurar la billetera en el futuro de ser necesario.",
+      "Puede hacer un respaldo del monedero si escribe una clave de respaldo en un papel y la guarda en algún sitio seguro. Así, podrá restaurar el monedero en el futuro de ser necesario.",
     "2":
       "No haga una captura de pantalla ni la guarde en las notas de su teléfono. Asegúrese de escribir la clave de respaldo a mano y mantenerla segura."
   },
   "setBackupKey": "Crear clave de respaldo",
   "skip": "Saltar paso",
   "areYouSure": "¿Está seguro?",
-  "needBackupKey": "Sin una clave de respaldo, puede perder el acceso a la billetera para siempre.",
   "shareBackupKey": "Compartir clave de respaldo",
   "backupRecovery":
     "Comparta la clave de respaldo con una sola persona en la que confíe plenamente.",
@@ -33,7 +32,7 @@
   "securityTips": "Consejos de seguridad",
   "backupKeySummary": {
     "0": "Escriba esta frase en un papel y guárdela en algún sitio seguro.",
-    "1": "No le muestre la frase a nadie. Si alguien la sabe, podrá acceder a su billetera."
+    "1": "No le muestre la frase a nadie. Si alguien la sabe, podrá acceder a su monedero."
   },
   "learnYourKey": "Escriba o memorice su clave de respaldo.",
   "keyWillBeVerified":
@@ -76,10 +75,10 @@
   "seeBackupKey": "Ver clave de respaldo",
   "backupKeySet": "Clave de respaldo creada",
   "dontLoseIt":
-    "No pierda esta clave. Es de suma importancia que la mantenga en un lugar seguro, ya que es la única forma de desbloquear su billetera si pierde su celular.",
+    "No pierda esta clave. Es de suma importancia que la mantenga en un lugar seguro, ya que es la única forma de desbloquear su monedero si pierde su celular.",
   "done": "Listo",
   "whatsappMessage":
-    "Importante: por favor mantenga esto privado. \n\nTe estoy enviando la frase de respaldo a mi Billetera de Celo: ",
+    "Importante: por favor mantenga esto privado. \n\nTe estoy enviando la frase de respaldo a mi Monedero Celo: ",
   "backupPrompt":
     "Para la seguridad de sus fondos, su cuenta está congelada hasta que obtenga su clave de respaldo",
   "copyToClipboard": "Copiar al portapapeles",

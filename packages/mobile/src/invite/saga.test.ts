@@ -3,13 +3,13 @@ const { navigateReset } = mockNavigationServiceFor('invite/saga')
 
 import { FetchMock } from 'jest-fetch-mock'
 import { Linking } from 'react-native'
-import SmsAndroid from 'react-native-sms-android'
+import SendIntentAndroid from 'react-native-send-intent'
 import { expectSaga } from 'redux-saga-test-plan'
-import { select } from 'redux-saga/effects'
+import { call, select } from 'redux-saga/effects'
 import { setName } from 'src/account'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import {
   InviteBy,
   redeemComplete,
@@ -18,6 +18,7 @@ import {
   storeInviteeData,
 } from 'src/invite/actions'
 import { watchRedeemInvite, watchSendInvite } from 'src/invite/saga'
+import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { transactionConfirmed } from 'src/transactions/actions'
 import { currentAccountSelector } from 'src/web3/selectors'
 import { createMockContract, createMockStore } from 'test/utils'
@@ -29,8 +30,8 @@ const KEY = '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724'
 const NAME = 'Celonius'
 
 const balance = jest.fn(() => 10)
-jest.mock('@celo/contractkit', () => ({
-  ...jest.requireActual('@celo/contractkit'),
+jest.mock('@celo/walletkit', () => ({
+  ...jest.requireActual('@celo/walletkit'),
   getAttestationsContract: async () =>
     createMockContract({ getAttestationRequestFee: Math.pow(10, 18) }),
   getStableTokenContract: jest.fn(async () =>
@@ -57,6 +58,8 @@ jest.mock('src/transactions/send', () => ({
   sendTransaction: async () => true,
 }))
 
+SendIntentAndroid.sendSms = jest.fn()
+
 const state = createMockStore({ web3: { account: mockAccount } }).getState()
 
 describe(watchSendInvite, () => {
@@ -72,17 +75,19 @@ describe(watchSendInvite, () => {
 
   it('sends an SMS invite as expected', async () => {
     await expectSaga(watchSendInvite)
+      .provide([[call(waitWeb3LastBlock), true]])
       .withState(state)
       .dispatch(sendInvite(mockName, mockE164Number, InviteBy.SMS))
       .dispatch(transactionConfirmed('a sha3 hash'))
       .put(storeInviteeData(KEY, mockE164Number))
       .run()
 
-    expect(SmsAndroid.sms).toHaveBeenCalled()
+    expect(SendIntentAndroid.sendSms).toHaveBeenCalled()
   })
 
   it('sends a WhatsApp invite as expected', async () => {
     await expectSaga(watchSendInvite)
+      .provide([[call(waitWeb3LastBlock), true]])
       .withState(state)
       .dispatch(sendInvite(mockName, mockE164Number, InviteBy.WhatsApp))
       .put(storeInviteeData(KEY, mockE164Number))
@@ -109,6 +114,7 @@ describe(watchRedeemInvite, () => {
       .mockReturnValueOnce(10) // new account
 
     await expectSaga(watchRedeemInvite)
+      .provide([[call(waitWeb3LastBlock), true]])
       .withState(state)
       .dispatch(redeemInvite(KEY, NAME))
       .put(setName(NAME))
@@ -122,9 +128,10 @@ describe(watchRedeemInvite, () => {
       .mockReturnValueOnce(0) // new account
 
     await expectSaga(watchRedeemInvite)
+      .provide([[call(waitWeb3LastBlock), true]])
       .withState(state)
       .dispatch(redeemInvite(KEY, NAME))
-      .put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ERROR_BANNER_DURATION))
+      .put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ALERT_BANNER_DURATION))
       .run()
   })
 
@@ -134,9 +141,10 @@ describe(watchRedeemInvite, () => {
       .mockReturnValueOnce(0) // current account
 
     await expectSaga(watchRedeemInvite)
+      .provide([[call(waitWeb3LastBlock), true]])
       .withState(state)
       .dispatch(redeemInvite(KEY, NAME))
-      .put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ERROR_BANNER_DURATION))
+      .put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ALERT_BANNER_DURATION))
       .run()
   })
 
@@ -144,10 +152,10 @@ describe(watchRedeemInvite, () => {
     balance.mockReturnValueOnce(0) // temp account
 
     await expectSaga(watchRedeemInvite)
+      .provide([[select(currentAccountSelector), null], [call(waitWeb3LastBlock), true]])
       .withState(state)
-      .provide([[select(currentAccountSelector), null]])
       .dispatch(redeemInvite(KEY, NAME))
-      .put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ERROR_BANNER_DURATION))
+      .put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ALERT_BANNER_DURATION))
       .run()
   })
 
@@ -157,6 +165,7 @@ describe(watchRedeemInvite, () => {
       .mockReturnValueOnce(10) // current account
 
     await expectSaga(watchRedeemInvite)
+      .provide([[call(waitWeb3LastBlock), true]])
       .withState(state)
       .dispatch(redeemInvite(KEY, NAME))
       .put(setName(NAME))

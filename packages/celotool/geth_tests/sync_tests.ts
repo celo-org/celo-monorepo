@@ -1,13 +1,17 @@
-const assert = require('chai').assert
-const Web3 = require('web3')
 import {
-  getHooks,
   getEnode,
+  getHooks,
+  GethInstanceConfig,
   initAndStartGeth,
+  killInstance,
   sleep,
 } from '@celo/celotool/geth_tests/src/lib/utils'
+import { assert } from 'chai'
+import Web3 from 'web3'
 
-describe('sync tests', () => {
+describe('sync tests', function(this: any) {
+  this.timeout(0)
+
   const gethConfig = {
     migrate: true,
     instances: [
@@ -19,8 +23,7 @@ describe('sync tests', () => {
   }
   const hooks = getHooks(gethConfig)
 
-  before(async function(this: any) {
-    this.timeout(0)
+  before(async () => {
     // Start validator nodes and migrate contracts.
     await hooks.before()
     // Restart validator nodes.
@@ -42,46 +45,65 @@ describe('sync tests', () => {
 
   after(hooks.after)
 
-  const beforeEachHook = async (test: any, syncmode: string) => {
-    test.timeout(0)
-    const syncInstance = {
-      name: syncmode,
-      validating: false,
-      syncmode: syncmode,
-      port: 30313,
-      rpcport: 8555,
-      lightserv: syncmode == 'light' || syncmode == 'ultralight' ? false : true,
-      peers: [await getEnode(8553)],
-    }
-    await initAndStartGeth(hooks.gethBinaryPath, syncInstance)
-  }
-
-  const syncTest = async (test: any) => {
-    test.timeout(0)
-    const validatingWeb3 = new Web3(`http://localhost:8545`)
-    const validatingFirstBlock = await validatingWeb3.eth.getBlock('latest')
-    await sleep(20)
-    const validatingLatestBlock = await validatingWeb3.eth.getBlock('latest')
-    await sleep(3)
-    const syncWeb3 = new Web3(`http://localhost:8555`)
-    const syncLatestBlock = await syncWeb3.eth.getBlock('latest')
-    assert.isAbove(validatingLatestBlock.number, 1)
-    // Assert that the validator is still producing blocks.
-    assert.isAbove(validatingLatestBlock.number, validatingFirstBlock.number)
-    // Assert that the syncing node has synced with the validator.
-    assert.isAtLeast(syncLatestBlock.number, validatingLatestBlock.number)
-  }
-
   const syncModes = ['full', 'fast', 'light', 'ultralight']
-  for (const syncMode of syncModes) {
-    describe(`when syncing with a ${syncMode} node`, () => {
-      beforeEach(async function(this: any) {
-        await beforeEachHook(this, syncMode)
+  for (const syncmode of syncModes) {
+    describe(`when syncing with a ${syncmode} node`, () => {
+      let syncInstance: GethInstanceConfig
+      beforeEach(async () => {
+        syncInstance = {
+          name: syncmode,
+          validating: false,
+          syncmode,
+          port: 30313,
+          rpcport: 8555,
+          lightserv: syncmode !== 'light' && syncmode !== 'ultralight',
+          peers: [await getEnode(8553)],
+        }
+        await initAndStartGeth(hooks.gethBinaryPath, syncInstance)
       })
 
-      it('should sync the latest block', async function(this: any) {
-        await syncTest(this)
+      afterEach(() => {
+        killInstance(syncInstance)
+      })
+
+      it('should sync the latest block', async () => {
+        const validatingWeb3 = new Web3(`http://localhost:8545`)
+        const validatingFirstBlock = await validatingWeb3.eth.getBlock('latest')
+        await sleep(20)
+        const validatingLatestBlock = await validatingWeb3.eth.getBlock('latest')
+        await sleep(3)
+        const syncWeb3 = new Web3(`http://localhost:8555`)
+        const syncLatestBlock = await syncWeb3.eth.getBlock('latest')
+        assert.isAbove(validatingLatestBlock.number, 1)
+        // Assert that the validator is still producing blocks.
+        assert.isAbove(validatingLatestBlock.number, validatingFirstBlock.number)
+        // Assert that the syncing node has synced with the validator.
+        assert.isAtLeast(syncLatestBlock.number, validatingLatestBlock.number)
       })
     })
   }
+  describe(`when a validator's data directory is deleted`, () => {
+    let web3: any
+    beforeEach(async function(this: any) {
+      this.timeout(0) // Disable test timeout
+      web3 = new Web3('http://localhost:8545')
+      await hooks.restart()
+    })
+
+    it('should continue to block produce', async function(this: any) {
+      this.timeout(0)
+      const instance: GethInstanceConfig = gethConfig.instances[0]
+      await killInstance(instance)
+      await initAndStartGeth(hooks.gethBinaryPath, instance)
+      await sleep(60) // wait for round change / resync
+      const address = (await web3.eth.getAccounts())[0]
+      const currentBlock = await web3.eth.getBlock('latest')
+      for (let i = 0; i < gethConfig.instances.length; i++) {
+        if ((await web3.eth.getBlock(currentBlock.number - i)).miner == address) {
+          return // A block proposed by validator who lost randomness was found, hence randomness was recovered
+        }
+      }
+      assert.fail('Reset validator did not propose any new blocks')
+    })
+  })
 })

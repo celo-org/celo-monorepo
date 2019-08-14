@@ -2,7 +2,7 @@ import { getKubernetesClusterRegion, switchToClusterFromEnv } from '@celo/celoto
 import { ensureAuthenticatedGcloudAccount } from '@celo/celotool/src/lib/gcloud_utils'
 import { generateGenesisFromEnv } from '@celo/celotool/src/lib/generate_utils'
 import { OG_ACCOUNTS } from '@celo/celotool/src/lib/genesis_constants'
-import { getStatefulSetReplicas, scaleStatefulSet } from '@celo/celotool/src/lib/kubernetes'
+import { getStatefulSetReplicas, scaleResource } from '@celo/celotool/src/lib/kubernetes'
 import {
   EnvTypes,
   envVar,
@@ -57,7 +57,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
   await ensureAuthenticatedGcloudAccount()
   console.info('Creating Cloud SQL database, this might take a minute or two ...')
 
-  failIfSecretMissing(CLOUDSQL_SECRET_NAME, 'default')
+  await failIfSecretMissing(CLOUDSQL_SECRET_NAME, 'default')
 
   try {
     await execCmd(`gcloud sql instances describe ${instanceName}`)
@@ -120,7 +120,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
   await execCmdWithExitOnFailure(`gcloud sql databases create blockscout -i ${instanceName}`)
 
   console.info('Copying blockscout service account secret to namespace')
-  copySecret(CLOUDSQL_SECRET_NAME, 'default', celoEnv)
+  await copySecret(CLOUDSQL_SECRET_NAME, 'default', celoEnv)
 
   const [blockscoutDBConnectionName] = await execCmdWithExitOnFailure(
     `gcloud sql instances describe ${instanceName} --format="value(connectionName)"`
@@ -360,12 +360,17 @@ export async function createStaticIPs(celoEnv: string) {
 export async function upgradeStaticIPs(celoEnv: string) {
   const prevTxNodeCount = await getStatefulSetReplicas(celoEnv, `${celoEnv}-tx-nodes`)
   const newTxNodeCount = parseInt(fetchEnv(envVar.TX_NODES), 10)
-  upgradeNodeTypeStaticIPs(celoEnv, 'tx-nodes', prevTxNodeCount, newTxNodeCount)
+  await upgradeNodeTypeStaticIPs(celoEnv, 'tx-nodes', prevTxNodeCount, newTxNodeCount)
 
   if (useStaticIPsForGethNodes()) {
     const prevValidatorNodeCount = await getStatefulSetReplicas(celoEnv, `${celoEnv}-validators`)
     const newValidatorNodeCount = parseInt(fetchEnv(envVar.VALIDATORS), 10)
-    upgradeNodeTypeStaticIPs(celoEnv, 'validators', prevValidatorNodeCount, newValidatorNodeCount)
+    await upgradeNodeTypeStaticIPs(
+      celoEnv,
+      'validators',
+      prevValidatorNodeCount,
+      newValidatorNodeCount
+    )
   }
 }
 
@@ -530,7 +535,6 @@ async function helmParameters(celoEnv: string) {
     `--set geth.backup.enabled=${fetchEnv(envVar.GETH_NODES_BACKUP_CRONJOB_ENABLED)}`,
     `--set bootnode.image.repository=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY')}`,
     `--set bootnode.image.tag=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_TAG')}`,
-    `--set bootnode.internal=${fetchEnvOrFallback(envVar.INTERNAL_BOOTNODE, 'true')}`,
     `--set cluster.zone=${fetchEnv('KUBERNETES_CLUSTER_ZONE')}`,
     `--set cluster.name=${fetchEnv('KUBERNETES_CLUSTER_NAME')}`,
     `--set bucket=${bucketName}`,
@@ -608,8 +612,8 @@ export async function removeGenericHelmChart(releaseName: string) {
 }
 
 export async function installHelmChart(celoEnv: string) {
-  failIfSecretMissing(BACKUP_GCS_SECRET_NAME, 'default')
-  copySecret(BACKUP_GCS_SECRET_NAME, 'default', celoEnv)
+  await failIfSecretMissing(BACKUP_GCS_SECRET_NAME, 'default')
+  await copySecret(BACKUP_GCS_SECRET_NAME, 'default', celoEnv)
   return installGenericHelmChart(
     celoEnv,
     celoEnv,
@@ -635,15 +639,18 @@ export async function upgradeHelmChart(celoEnv: string) {
 export async function resetAndUpgradeHelmChart(celoEnv: string) {
   const txNodesSetName = `${celoEnv}-tx-nodes`
   const validatorsSetName = `${celoEnv}-validators`
+  const bootnodeName = `${celoEnv}-bootnode`
 
   // scale down nodes
-  await scaleStatefulSet(celoEnv, txNodesSetName, 0)
-  await scaleStatefulSet(celoEnv, validatorsSetName, 0)
+  await scaleResource(celoEnv, 'StatefulSet', txNodesSetName, 0)
+  await scaleResource(celoEnv, 'StatefulSet', validatorsSetName, 0)
+  await scaleResource(celoEnv, 'Deployment', bootnodeName, 0)
 
   await deletePersistentVolumeClaims(celoEnv)
-  await sleep(5000)
+  await sleep(10000)
 
   await upgradeHelmChart(celoEnv)
+  await sleep(10000)
 
   const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
   const numTxNodes = parseInt(fetchEnv(envVar.TX_NODES), 10)
@@ -651,8 +658,9 @@ export async function resetAndUpgradeHelmChart(celoEnv: string) {
   // Note(trevor): helm upgrade only compares the current chart to the
   // previously deployed chart when deciding what needs changing, so we need
   // to manually scale up to account for when a node count is the same
-  await scaleStatefulSet(celoEnv, txNodesSetName, numTxNodes)
-  await scaleStatefulSet(celoEnv, validatorsSetName, numValdiators)
+  await scaleResource(celoEnv, 'StatefulSet', txNodesSetName, numTxNodes)
+  await scaleResource(celoEnv, 'StatefulSet', validatorsSetName, numValdiators)
+  await scaleResource(celoEnv, 'Deployment', bootnodeName, 1)
 }
 
 export async function removeHelmRelease(celoEnv: string) {

@@ -7,7 +7,7 @@ import {
 } from 'google-libphonenumber'
 import * as Web3Utils from 'web3-utils'
 
-interface ParsedPhoneNumber {
+export interface ParsedPhoneNumber {
   e164Number: string
   displayNumber: string
   countryCode?: number

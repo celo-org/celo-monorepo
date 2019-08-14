@@ -6,16 +6,20 @@ export default {
     nodeDir: `.${Testnets.integration}`,
     syncMode: SYNC_MODE_ULTRALIGHT,
   },
-  [Testnets.appintegration]: {
-    nodeDir: `.${Testnets.appintegration}`,
-    syncMode: SYNC_MODE_ULTRALIGHT,
-  },
   [Testnets.alfajoresstaging]: {
     nodeDir: `.${Testnets.alfajoresstaging}`,
     syncMode: SYNC_MODE_ULTRALIGHT,
   },
   [Testnets.alfajores]: {
     nodeDir: `.${Testnets.alfajores}`,
+    syncMode: SYNC_MODE_ULTRALIGHT,
+  },
+  [Testnets.pilot]: {
+    nodeDir: `.${Testnets.pilot}`,
+    syncMode: SYNC_MODE_ULTRALIGHT,
+  },
+  [Testnets.pilotstaging]: {
+    nodeDir: `.${Testnets.pilotstaging}`,
     syncMode: SYNC_MODE_ULTRALIGHT,
   },
 }

@@ -1,21 +1,22 @@
+import { retryAsync } from '@celo/utils/src/async-helpers'
+import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import {
   getAttestationFee,
   getAttestationsContract,
   getStableTokenContract,
-} from '@celo/contractkit'
-import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
+  parseFromContractDecimals,
+} from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { Linking } from 'react-native'
-import SmsAndroid from 'react-native-sms-android'
+import SendIntentAndroid from 'react-native-send-intent'
 import VersionCheck from 'react-native-version-check'
 import { call, delay, put, select, spawn, takeLeading } from 'redux-saga/effects'
 import { setName } from 'src/account'
 import { showError, showMessage } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { CURRENCY_ENUM, INVITE_REDEMPTION_GAS } from 'src/geth/consts'
-import { waitForGethConnectivity } from 'src/geth/saga'
 import i18n from 'src/i18n'
 import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import {
@@ -32,6 +33,7 @@ import {
 import { createInviteCode } from 'src/invite/utils'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { transferStableToken } from 'src/stableToken/actions'
 import { createTransaction } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
@@ -49,14 +51,13 @@ export const TEMP_PW = 'ce10'
 
 const USE_REAL_FEE = false
 const INVITE_FEE = '0.2'
-const INVITE_SEND_AMOUNT = '0.18'
 
 // TODO(Rossy) Cache this so we don't recalculate it every time we invite someone
 // Especially relevant when inviting many friends
 export async function getInvitationVerificationFee() {
   // TODO(cmcewen): don't use this
   if (!USE_REAL_FEE) {
-    return web3.utils.toWei(INVITE_FEE)
+    return new BigNumber(web3.utils.toWei(INVITE_FEE))
   }
   const attestationsContract = await getAttestationsContract(web3)
   const stableTokenContract = await getStableTokenContract(web3)
@@ -94,13 +95,12 @@ export async function generateLink(inviteCode: string, recipientName: string) {
 
 async function sendSms(toPhone: string, msg: string) {
   return new Promise((resolve, reject) => {
-    SmsAndroid.sms(toPhone, msg, 'sendIndirect', (err: Error) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve()
-      }
-    })
+    try {
+      SendIntentAndroid.sendSms(toPhone, msg)
+      resolve()
+    } catch (e) {
+      reject(e)
+    }
   })
 }
 
@@ -143,10 +143,10 @@ export function* sendInvite(
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
       try {
         const phoneHash = getPhoneHash(e164Number)
-        yield put(transferEscrowedPayment(phoneHash, amount, txId, temporaryAddress))
+        yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress))
       } catch (e) {
         Logger.error(TAG, 'Error sending payment to unverified user: ', e)
-        yield put(showError(ErrorMessages.TRANSACTION_FAILED, ERROR_BANNER_DURATION))
+        yield put(showError(ErrorMessages.TRANSACTION_FAILED, ALERT_BANNER_DURATION))
       }
     }
 
@@ -178,13 +178,13 @@ export function* sendInviteSaga(action: SendInviteAction) {
     yield put(
       showMessage(
         i18n.t('inviteSent', { ns: 'inviteFlow11' }) + ' ' + e164Number,
-        ERROR_BANNER_DURATION
+        ALERT_BANNER_DURATION
       )
     )
     yield call(navigate, Screens.WalletHome)
     yield put(sendInviteSuccess())
   } catch (e) {
-    yield put(showError(ErrorMessages.INVITE_FAILED, ERROR_BANNER_DURATION))
+    yield put(showError(ErrorMessages.INVITE_FAILED, ALERT_BANNER_DURATION))
     yield put(sendInviteFailure(ErrorMessages.INVITE_FAILED))
   }
 }
@@ -192,6 +192,7 @@ export function* sendInviteSaga(action: SendInviteAction) {
 function* redeemSuccess(name: string, account: string) {
   Logger.showMessage(i18n.t('inviteFlow11:redeemSuccess'))
   web3.eth.defaultAccount = account
+  // TODO(Rossy) Decouple setting of name from redeem complete, they are on diff screens now
   yield put(setName(name))
   yield put(redeemComplete(true))
 }
@@ -199,7 +200,7 @@ function* redeemSuccess(name: string, account: string) {
 export function* redeemInviteSaga(action: RedeemInviteAction) {
   const { inviteCode, name } = action
 
-  yield call(waitForGethConnectivity)
+  yield call(waitWeb3LastBlock)
   try {
     // Add temp wallet so we can send money from it
     let tempAccount
@@ -217,7 +218,12 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
 
     // Check that the balance of the new account is not 0
     const StableToken = yield call(getStableTokenContract, web3)
-    const stableBalance = new BigNumber(yield call(StableToken.methods.balanceOf(tempAccount).call))
+
+    // Try to get balance once + two retries before failing
+    const stableBalance = new BigNumber(
+      yield call(retryAsync, StableToken.methods.balanceOf(tempAccount).call, 2, [])
+    )
+
     Logger.debug(TAG + '@redeemInviteCode', 'Temporary account balance: ' + stableBalance)
 
     if (stableBalance.isLessThan(1)) {
@@ -250,11 +256,13 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
     yield call(web3.eth.personal.unlockAccount, tempAccount, TEMP_PW, 600)
 
     // TODO(cmcewen): calculate the proper amount when gas estimation is working
+    const stableBalanceConverted = yield parseFromContractDecimals(stableBalance, StableToken)
 
     const tx = yield call(createTransaction, getStableTokenContract, {
       recipientAddress: newAccount,
       comment: SENTINEL_INVITE_COMMENT,
-      amount: INVITE_SEND_AMOUNT,
+      // TODO: appropriately withdraw the balance instead of using gas fees will be less than 1 cent
+      amount: stableBalanceConverted.minus('0.01').toString(),
     })
 
     yield call(sendTransaction, tx, tempAccount, TAG, 'Transfer from temp wallet')
@@ -270,7 +278,7 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
     yield redeemSuccess(name, newAccount)
   } catch (e) {
     Logger.error(TAG, 'Redeem invite error: ', e)
-    yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ERROR_BANNER_DURATION))
+    yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ALERT_BANNER_DURATION))
   }
 }
 

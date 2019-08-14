@@ -2,14 +2,14 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { Screens } from 'src/navigator/Screens'
 import { BarcodeTypes } from 'src/qrcode/utils'
+import { RecipientKind } from 'src/recipients/recipient'
+import { recipientCacheSelector } from 'src/recipients/reducer'
 import { Actions, QrCode } from 'src/send/actions'
-import { recipientCacheSelector } from 'src/send/reducers'
 import { watchQrCodeDetections } from 'src/send/saga'
-import { RecipientKind } from 'src/utils/recipient'
 import { mockAccount, mockE164Number, mockName, mockQrCodeData } from 'test/values'
 
 jest.mock('src/utils/time', () => ({
@@ -48,7 +48,7 @@ describe(watchQrCodeDetections, () => {
       recipient: {
         address: mockAccount,
         displayName: mockName,
-        displayPhoneNumber: mockE164Number,
+        displayId: mockE164Number,
         e164PhoneNumber: mockE164Number,
         kind: RecipientKind.QrCode,
       },
@@ -66,7 +66,7 @@ describe(watchQrCodeDetections, () => {
       recipient: {
         address: mockAccount,
         displayName: '',
-        displayPhoneNumber: mockE164Number,
+        displayId: mockE164Number,
         e164PhoneNumber: mockE164Number,
         kind: RecipientKind.QrCode,
       },
@@ -87,7 +87,7 @@ describe(watchQrCodeDetections, () => {
       recipient: {
         address: mockAccount,
         displayName: mockName,
-        displayPhoneNumber: '',
+        displayId: '',
         e164PhoneNumber: '',
         kind: RecipientKind.QrCode,
       },
@@ -101,7 +101,7 @@ describe(watchQrCodeDetections, () => {
     await expectSaga(watchQrCodeDetections)
       .provide([[select(addressToE164NumberSelector), {}], [select(recipientCacheSelector), {}]])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
-      .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS, ERROR_BANNER_DURATION))
+      .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS, ALERT_BANNER_DURATION))
       .silentRun()
     expect(navigate).not.toHaveBeenCalled()
   })
@@ -113,7 +113,7 @@ describe(watchQrCodeDetections, () => {
     await expectSaga(watchQrCodeDetections)
       .provide([[select(addressToE164NumberSelector), {}], [select(recipientCacheSelector), {}]])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
-      .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS, ERROR_BANNER_DURATION))
+      .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS, ALERT_BANNER_DURATION))
       .silentRun()
     expect(navigate).not.toHaveBeenCalled()
   })
@@ -126,7 +126,7 @@ describe(watchQrCodeDetections, () => {
     await expectSaga(watchQrCodeDetections)
       .provide([[select(addressToE164NumberSelector), {}], [select(recipientCacheSelector), {}]])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
-      .put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS, ERROR_BANNER_DURATION))
+      .put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS, ALERT_BANNER_DURATION))
       .silentRun()
     expect(navigate).not.toHaveBeenCalled()
   })

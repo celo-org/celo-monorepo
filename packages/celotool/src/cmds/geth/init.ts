@@ -73,7 +73,7 @@ export const handler = async (argv: InitArgv) => {
 
   if (argv.fetchStaticNodesFromNetwork) {
     await switchToClusterFromEnv(false)
-    getEnodesAddresses(namespace).then((enodes) => {
+    await getEnodesAddresses(namespace).then((enodes) => {
       writeStaticNodes(enodes, datadir, STATIC_NODES_FILE_NAME)
       console.info(`Geth has been initialized successfully! 😎`)
     })

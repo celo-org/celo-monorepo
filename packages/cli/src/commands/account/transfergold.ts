@@ -1,7 +1,9 @@
-import { flags } from '@oclif/command'
 import Web3 from 'web3'
+
+import { GoldToken } from '@celo/walletkit'
+import { flags } from '@oclif/command'
+
 import { BaseCommand } from '../../base'
-import { GoldToken } from '../../generated/contracts'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 

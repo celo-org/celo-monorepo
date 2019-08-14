@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import fetch from 'node-fetch'
-import { BLOCKSCOUT_API, Currencies, GOLD_TOKEN_ADDRESS, STABLE_TOKEN_ADDRESS } from '../config'
+import { BLOCKSCOUT_API, GOLD_TOKEN_ADDRESS, STABLE_TOKEN_ADDRESS } from '../config'
 import { getLastBlockNotified, sendPaymentNotification, setLastBlockNotified } from '../firebase'
 import { removeEmptyValuesFromObject } from '../util/utils'
 import { Log, Response, Transfer } from './blockscout'
@@ -8,7 +8,12 @@ import { decodeLogs } from './decode'
 
 export const WEI_PER_GOLD = 1000000000000000000.0
 
-async function query(path: string) {
+export enum Currencies {
+  GOLD = 'gold',
+  DOLLAR = 'dollar',
+}
+
+export async function query(path: string) {
   try {
     console.debug('Querying Blockscout. Path:', path)
     const response = await fetch(BLOCKSCOUT_API + path)
@@ -48,7 +53,7 @@ async function getLatestTokenTransfers(
   return { transfers, latestBlock }
 }
 
-function filterAndJoinTransfers(
+export function filterAndJoinTransfers(
   goldTransfers: Map<string, Transfer> | null,
   stableTransfers: Map<string, Transfer> | null
 ): Transfer[] {
@@ -69,8 +74,13 @@ function filterAndJoinTransfers(
   return filteredGold.concat(filterdStable)
 }
 
-function notifyForNewTransfers(transfers: Transfer[], lastBlockNotified: number) {
-  for (const t of transfers) {
+export function notifyForNewTransfers(
+  transfers: Transfer[],
+  lastBlockNotified: number
+): Promise<void[]> {
+  const results = new Array<Promise<void>>(transfers.length)
+  for (let i = 0; i < transfers.length; i++) {
+    const t = transfers[i]
     // Skip transactions for which we've already sent notifications
     if (!t || t.blockNumber <= lastBlockNotified) {
       continue
@@ -82,23 +92,28 @@ function notifyForNewTransfers(transfers: Transfer[], lastBlockNotified: number)
       blockNumber: String(t.blockNumber),
       timestamp: String(t.timestamp),
     }
-    sendPaymentNotification(
+    const result: Promise<void> = sendPaymentNotification(
       t.recipient,
       convertWeiValue(t.value),
       t.currency,
       removeEmptyValuesFromObject(notificationData)
     )
+    results[i] = result
   }
+  const filtered = results.filter((el) => {
+    return el !== undefined
+  })
+  return Promise.all(filtered)
 }
 
-function convertWeiValue(value: string) {
+export function convertWeiValue(value: string) {
   return new BigNumber(value)
     .div(WEI_PER_GOLD)
     .decimalPlaces(4)
     .valueOf()
 }
 
-export async function handleTransferNotifications() {
+export async function handleTransferNotifications(): Promise<void> {
   const lastBlockNotified = getLastBlockNotified()
   if (lastBlockNotified < 0) {
     // Firebase not yet ready
@@ -117,6 +132,6 @@ export async function handleTransferNotifications() {
 
   const allTransfers = filterAndJoinTransfers(goldTransfers, stableTransfers)
 
-  notifyForNewTransfers(allTransfers, lastBlockNotified)
-  setLastBlockNotified(Math.max(goldTransfersLatestBlock, stableTransfersLatestBlock))
+  await notifyForNewTransfers(allTransfers, lastBlockNotified)
+  return setLastBlockNotified(Math.max(goldTransfersLatestBlock, stableTransfersLatestBlock))
 }

@@ -1,14 +1,16 @@
 import * as React from 'react'
-
+import { View } from 'react-native'
 import Fade from 'react-reveal/Fade'
-import Articles, { Props as ArticleProps } from 'src/community/Articles'
+import Articles from 'src/community/Articles'
+
+import { Articles as ArticleProps } from 'fullstack/ArticleProps'
 
 import { H2 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
 import MediumLogo from 'src/shared/MediumLogo'
-import menuItems from 'src/shared/menu-items'
+import menuItems, { hashNav } from 'src/shared/menu-items'
 import { colors, standardStyles } from 'src/styles'
 
 type Props = I18nProps & ArticleProps
@@ -17,7 +19,7 @@ class ArticlesSection extends React.PureComponent<Props> {
   render() {
     const { t, articles } = this.props
     return (
-      <>
+      <View nativeID={hashNav.connect.blog}>
         <GridRow
           desktopStyle={[standardStyles.sectionMarginTop, standardStyles.blockMarginBottom]}
           tabletStyle={[standardStyles.sectionMarginTablet, standardStyles.blockMarginBottomTablet]}
@@ -46,7 +48,7 @@ class ArticlesSection extends React.PureComponent<Props> {
             />
           </Cell>
         </GridRow>
-      </>
+      </View>
     )
   }
 }

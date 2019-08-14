@@ -6,7 +6,7 @@ import "./interfaces/IExchange.sol";
 import "./interfaces/ISortedOracles.sol";
 import "./interfaces/IReserve.sol";
 import "./interfaces/IStableToken.sol";
-import "./FractionUtil.sol";
+import "../common/FractionUtil.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/IERC20Token.sol";
@@ -320,8 +320,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
   }
 
   function getOracleExchangeRate() private view returns (FractionUtil.Fraction memory) {
-    uint128 rateNumerator;
-    uint128 rateDenominator;
+    uint256 rateNumerator;
+    uint256 rateDenominator;
     (rateNumerator, rateDenominator) =
       ISortedOracles(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)).medianRate(stable);
     return FractionUtil.Fraction(rateNumerator, rateDenominator);
