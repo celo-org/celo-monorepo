@@ -1,18 +1,14 @@
 import FullscreenCTA from '@celo/react-components/components/FullscreenCTA'
 import { componentStyles } from '@celo/react-components/styles/styles'
-import {
-  AccountAuthRequest,
-  AccountAuthResponseSuccess,
-  produceResponseDeeplink,
-} from '@celo/utils/src/dappkit'
+import { AccountAuthRequest } from '@celo/utils/src/dappkit'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { Linking, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import { NavigationParams, NavigationScreenProp } from 'react-navigation'
 import { connect } from 'react-redux'
+import { approveAccountAuth } from 'src/dappkit/dappkit'
 import { Namespaces } from 'src/i18n'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigateHome } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -65,8 +61,7 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
       return
     }
 
-    navigate(Screens.WalletHome)
-    Linking.openURL(produceResponseDeeplink(request, AccountAuthResponseSuccess(account)))
+    navigateHome({ dispatchAfterNavigate: approveAccountAuth(request) })
   }
 
   render() {
