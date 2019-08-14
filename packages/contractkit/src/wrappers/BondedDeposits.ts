@@ -1,7 +1,8 @@
 import { zip } from '@celo/utils/lib/src/collections'
 import BN from 'bn.js'
 import { Address } from 'src/base'
-import { ContractKit } from 'src/kit'
+import { BondedDeposits } from 'src/generated/types/BondedDeposits'
+import { BaseWrapper } from 'src/wrappers/BaseWrapper'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
 
@@ -25,34 +26,30 @@ export interface Deposits {
   }
 }
 
-export class BondedDepositsWrapper {
-  constructor(private kit: ContractKit) {}
-
-  contract() {
-    return this.kit.contracts.getBondedDeposits()
-  }
-
+export class BondedDepositsWrapper extends BaseWrapper<BondedDeposits> {
   async getAccountWeight(account: Address): Promise<BN> {
-    const contract = await this.contract()
-    const accountWeight = await contract.methods.getAccountWeight(account).call()
+    const accountWeight = await this.contract.methods.getAccountWeight(account).call()
     return Web3.utils.toBN(accountWeight)
   }
 
-  async getVotingDetails(accountOrVoterAddress: Address): Promise<VotingDetails> {
-    const contract = await this.contract()
-
-    const accountAddress = await contract.methods.getAccountFromVoter(accountOrVoterAddress).call()
-
-    return {
-      accountAddress,
-      voterAddress: accountOrVoterAddress,
-      weight: await this.getAccountWeight(accountAddress),
-    }
+  async getVotingDetails(_accountOrVoterAddress: Address): Promise<VotingDetails> {
+    throw new Error('Requires FIX on Incompatible Contract')
   }
+  // FIXME this.contract.methods.getAccountFromVoter does not exist
+  // async getVotingDetails(accountOrVoterAddress: Address): Promise<VotingDetails> {
+  //   const accountAddress = await this.contract.methods
+  //     .getAccountFromVoter(accountOrVoterAddress)
+  //     .call()
+
+  //   return {
+  //     accountAddress,
+  //     voterAddress: accountOrVoterAddress,
+  //     weight: await this.getAccountWeight(accountAddress),
+  //   }
+  // }
 
   async getBondedDepositValue(account: string, noticePeriod: string) {
-    const contract = await this.contract()
-    const deposit = await contract.methods.getBondedDeposit(account, noticePeriod).call()
+    const deposit = await this.contract.methods.getBondedDeposit(account, noticePeriod).call()
     return this.getValueFromDeposit(deposit)
   }
 
@@ -71,25 +68,22 @@ export class BondedDepositsWrapper {
   }
 
   async getBondedDeposits(account: string): Promise<Deposit[]> {
-    const contract = await this.contract()
     return this.zipAccountTimesAndValuesToDeposits(
       account,
-      contract.methods.getNoticePeriods,
+      this.contract.methods.getNoticePeriods,
       this.getBondedDepositValue.bind(this)
     )
   }
 
   async getNotifiedDepositValue(account: string, availTime: string) {
-    const contract = await this.contract()
-    const deposit = await contract.methods.getNotifiedDeposit(account, availTime).call()
+    const deposit = await this.contract.methods.getNotifiedDeposit(account, availTime).call()
     return this.getValueFromDeposit(deposit)
   }
 
   async getNotifiedDeposits(account: string): Promise<Deposit[]> {
-    const contract = await this.contract()
     return this.zipAccountTimesAndValuesToDeposits(
       account,
-      contract.methods.getAvailabilityTimes,
+      this.contract.methods.getAvailabilityTimes,
       this.getNotifiedDepositValue.bind(this)
     )
   }
@@ -114,12 +108,12 @@ export class BondedDepositsWrapper {
     }
   }
 
-  async delegateRewardsTx(account: string, delegate: string) {
-    const contract = await this.contract()
-    const sig = await this.getParsedSignatureOfAddress(account, delegate)
+  // FIXME this.contract.methods.delegateRewards does not exist
+  // async delegateRewardsTx(account: string, delegate: string) {
+  //   const sig = await this.getParsedSignatureOfAddress(account, delegate)
 
-    return contract.methods.delegateRewards(delegate, sig.v, sig.r, sig.s)
-  }
+  //   return this.contract.methods.delegateRewards(delegate, sig.v, sig.r, sig.s)
+  // }
 
   async getParsedSignatureOfAddress(address: string, signer: string) {
     const hash = Web3.utils.soliditySha3({ type: 'address', value: address })

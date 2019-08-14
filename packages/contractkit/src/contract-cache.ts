@@ -1,4 +1,4 @@
-import { Address, CeloContract } from 'src/base'
+import { CeloContract } from 'src/base'
 import { newAttestations } from 'src/generated/Attestations'
 import { newBondedDeposits } from 'src/generated/BondedDeposits'
 import { newEscrow } from 'src/generated/Escrow'
@@ -15,67 +15,88 @@ import { newSortedOracles } from 'src/generated/SortedOracles'
 import { newStableToken } from 'src/generated/StableToken'
 import { newValidators } from 'src/generated/Validators'
 import { ContractKit } from 'src/kit'
-import Web3 from 'web3'
+
+const ContractFactories = {
+  [CeloContract.Attestations]: newAttestations,
+  [CeloContract.BondedDeposits]: newBondedDeposits,
+  [CeloContract.Escrow]: newEscrow,
+  [CeloContract.Exchange]: newExchange,
+  [CeloContract.GasCurrencyWhitelist]: newGasCurrencyWhitelist,
+  [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
+  [CeloContract.GoldToken]: newGoldToken,
+  [CeloContract.Governance]: newGovernance,
+  [CeloContract.MultiSig]: newMultiSig,
+  [CeloContract.Random]: newRandom,
+  [CeloContract.Registry]: newRegistry,
+  [CeloContract.Reserve]: newReserve,
+  [CeloContract.SortedOracles]: newSortedOracles,
+  [CeloContract.StableToken]: newStableToken,
+  [CeloContract.Validators]: newValidators,
+}
+
+type CFType = typeof ContractFactories
+type ContractCacheMap = { [K in keyof CFType]?: ReturnType<CFType[K]> }
 
 export class ContractCache {
-  private contractCache: Map<CeloContract, any> = new Map()
+  private cacheMap: ContractCacheMap = {}
 
   constructor(readonly kit: ContractKit) {}
 
   getAttestations() {
-    return this.getContract(CeloContract.Attestations, newAttestations)
+    return this.getContract(CeloContract.Attestations)
   }
   getBondedDeposits() {
-    return this.getContract(CeloContract.BondedDeposits, newBondedDeposits)
+    return this.getContract(CeloContract.BondedDeposits)
   }
   getEscrow() {
-    return this.getContract(CeloContract.Escrow, newEscrow)
+    return this.getContract(CeloContract.Escrow)
   }
   getExchange() {
-    return this.getContract(CeloContract.Exchange, newExchange)
+    return this.getContract(CeloContract.Exchange)
   }
   getGasCurrencyWhitelist() {
-    return this.getContract(CeloContract.GasCurrencyWhitelist, newGasCurrencyWhitelist)
+    return this.getContract(CeloContract.GasCurrencyWhitelist)
   }
   getGasPriceMinimum() {
-    return this.getContract(CeloContract.GasPriceMinimum, newGasPriceMinimum)
+    return this.getContract(CeloContract.GasPriceMinimum)
   }
   getGoldToken() {
-    return this.getContract(CeloContract.GoldToken, newGoldToken)
+    return this.getContract(CeloContract.GoldToken)
   }
   getGovernance() {
-    return this.getContract(CeloContract.Governance, newGovernance)
+    return this.getContract(CeloContract.Governance)
   }
   getMultiSig() {
-    return this.getContract(CeloContract.MultiSig, newMultiSig)
+    return this.getContract(CeloContract.MultiSig)
   }
   getRandom() {
-    return this.getContract(CeloContract.Random, newRandom)
+    return this.getContract(CeloContract.Random)
   }
   getRegistry() {
-    return this.getContract(CeloContract.Registry, newRegistry)
+    return this.getContract(CeloContract.Registry)
   }
   getReserve() {
-    return this.getContract(CeloContract.Reserve, newReserve)
+    return this.getContract(CeloContract.Reserve)
   }
   getSortedOracles() {
-    return this.getContract(CeloContract.SortedOracles, newSortedOracles)
+    return this.getContract(CeloContract.SortedOracles)
   }
   getStableToken() {
-    return this.getContract(CeloContract.StableToken, newStableToken)
+    return this.getContract(CeloContract.StableToken)
   }
   getValidators() {
-    return this.getContract(CeloContract.Validators, newValidators)
+    return this.getContract(CeloContract.Validators)
   }
 
-  private async getContract<T>(
-    contract: CeloContract,
-    createFn: (web3: Web3, addr: Address) => T
-  ): Promise<T> {
-    if (!this.contractCache.has(contract)) {
-      const contractInstance = createFn(this.kit.web3, await this.kit.registry.addressFor(contract))
-      this.contractCache.set(contract, contractInstance)
+  async getContract<C extends CeloContract>(contract: C) {
+    if (this.cacheMap[contract] == null) {
+      const createFn = ContractFactories[contract] as CFType[C]
+      this.cacheMap[contract] = createFn(
+        this.kit.web3,
+        await this.kit.registry.addressFor(contract)
+      ) as NonNullable<ContractCacheMap[C]>
     }
-    return this.contractCache.get(contract)
+    // we know it's defined (thus the !)
+    return this.cacheMap[contract]!
   }
 }

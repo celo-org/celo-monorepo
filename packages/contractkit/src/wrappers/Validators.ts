@@ -2,7 +2,8 @@ import { eqAddress } from '@celo/utils/lib/src/address'
 import { compareBN } from '@celo/utils/lib/src/bn'
 import { zip } from '@celo/utils/lib/src/collections'
 import { Address, NULL_ADDRESS } from 'src/base'
-import { ContractKit } from 'src/kit'
+import { Validators } from 'src/generated/types/Validators'
+import { BaseWrapper } from 'src/wrappers/BaseWrapper'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
 
@@ -30,23 +31,15 @@ export interface ValidatorGroupVote {
   votes: BN
 }
 
-export class ValidatorsWrapper {
-  constructor(private kit: ContractKit) {}
-
-  contract() {
-    return this.kit.contracts.getValidators()
-  }
-
+export class ValidatorsWrapper extends BaseWrapper<Validators> {
   async getRegisteredValidators(): Promise<Validator[]> {
-    const contract = await this.contract()
-    const vgAddresses = await contract.methods.getRegisteredValidators().call()
+    const vgAddresses = await this.contract.methods.getRegisteredValidators().call()
 
     return Promise.all(vgAddresses.map((addr) => this.getValidator(addr)))
   }
 
   async getValidator(address: Address): Promise<Validator> {
-    const contract = await this.contract()
-    const res = await contract.methods.getValidator(address).call()
+    const res = await this.contract.methods.getValidator(address).call()
     return {
       address,
       id: res[0],
@@ -58,21 +51,18 @@ export class ValidatorsWrapper {
   }
 
   async getRegisteredValidatorGroups(): Promise<ValidatorGroup[]> {
-    const contract = await this.contract()
-    const vgAddresses = await contract.methods.getRegisteredValidatorGroups().call()
+    const vgAddresses = await this.contract.methods.getRegisteredValidatorGroups().call()
     return Promise.all(vgAddresses.map((addr) => this.getValidatorGroup(addr)))
   }
 
   async getValidatorGroup(address: Address): Promise<ValidatorGroup> {
-    const contract = await this.contract()
-    const res = await contract.methods.getValidatorGroup(address).call()
+    const res = await this.contract.methods.getValidatorGroup(address).call()
     return { address, id: res[0], name: res[1], url: res[2], members: res[3] }
   }
 
   async getValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
-    const contract = await this.contract()
-    const vgAddresses = await contract.methods.getRegisteredValidatorGroups().call()
-    const res = await contract.methods.getValidatorGroupVotes().call()
+    const vgAddresses = await this.contract.methods.getRegisteredValidatorGroups().call()
+    const res = await this.contract.methods.getValidatorGroupVotes().call()
     const r = zip((a, b) => ({ address: a, votes: Web3.utils.toBN(b) }), res[0], res[1])
     for (const vgAddress of vgAddresses) {
       if (!res[0].includes(vgAddress)) {
@@ -83,8 +73,7 @@ export class ValidatorsWrapper {
   }
 
   async getVoteFrom(validatorAddress: Address): Promise<Address | null> {
-    const contract = await this.contract()
-    return contract.methods.voters(validatorAddress).call()
+    return this.contract.methods.voters(validatorAddress).call()
   }
 
   async revokeVote(): Promise<TransactionObject<boolean>> {
@@ -92,9 +81,8 @@ export class ValidatorsWrapper {
       throw new Error(`missing from at new ValdidatorUtils()`)
     }
 
-    const votingDetails = await this.kit.wrappers
-      .getBondedDeposits()
-      .getVotingDetails(this.kit.defaultAccount)
+    const bondedDeposits = await this.kit.wrappers.getBondedDeposits()
+    const votingDetails = await bondedDeposits.getVotingDetails(this.kit.defaultAccount)
     const votedGroup = await this.getVoteFrom(votingDetails.accountAddress)
 
     if (votedGroup == null) {
@@ -106,8 +94,7 @@ export class ValidatorsWrapper {
       votingDetails.weight.neg()
     )
 
-    const contract = await this.contract()
-    return contract.methods.revokeVote(lesser, greater)
+    return this.contract.methods.revokeVote(lesser, greater)
   }
 
   async vote(validatorGroup: Address): Promise<TransactionObject<boolean>> {
@@ -115,17 +102,15 @@ export class ValidatorsWrapper {
       throw new Error(`missing from at new ValdidatorUtils()`)
     }
 
-    const votingDetails = await this.kit.wrappers
-      .getBondedDeposits()
-      .getVotingDetails(this.kit.defaultAccount)
+    const bondedDeposits = await this.kit.wrappers.getBondedDeposits()
+    const votingDetails = await bondedDeposits.getVotingDetails(this.kit.defaultAccount)
 
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(
       validatorGroup,
       votingDetails.weight
     )
 
-    const contract = await this.contract()
-    return contract.methods.vote(validatorGroup, lesser, greater)
+    return this.contract.methods.vote(validatorGroup, lesser, greater)
   }
 
   private async findLesserAndGreaterAfterVote(
