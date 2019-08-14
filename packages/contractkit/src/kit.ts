@@ -1,4 +1,4 @@
-import { AddressRegistry } from 'src/AddressRegistry'
+import { AddressRegistry } from 'src/address-registry'
 import { Address, CeloToken } from 'src/base'
 import { ContractCache } from 'src/contract-cache'
 import { sendTransaction, TxOptions } from 'src/utils/send-tx'
