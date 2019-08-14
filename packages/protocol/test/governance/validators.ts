@@ -89,7 +89,7 @@ contract('Validators', (accounts: string[]) => {
       url,
       // @ts-ignore bytes type
       publicKeysData,
-      registrationRequirement.noticePeriod,
+      [registrationRequirement.noticePeriod],
       { from: validator }
     )
   }
@@ -104,7 +104,7 @@ contract('Validators', (accounts: string[]) => {
       identifier,
       name,
       url,
-      registrationRequirement.noticePeriod,
+      [registrationRequirement.noticePeriod],
       { from: group }
     )
   }
@@ -282,7 +282,7 @@ contract('Validators', (accounts: string[]) => {
         url,
         // @ts-ignore bytes type
         publicKeysData,
-        registrationRequirement.noticePeriod
+        [registrationRequirement.noticePeriod]
       )
       assert.isTrue(await validators.isValidator(validator))
     })
@@ -294,7 +294,7 @@ contract('Validators', (accounts: string[]) => {
         url,
         // @ts-ignore bytes type
         publicKeysData,
-        registrationRequirement.noticePeriod
+        [registrationRequirement.noticePeriod]
       )
       assert.deepEqual(await validators.getRegisteredValidators(), [validator])
     })
@@ -306,7 +306,7 @@ contract('Validators', (accounts: string[]) => {
         url,
         // @ts-ignore bytes type
         publicKeysData,
-        registrationRequirement.noticePeriod
+        [registrationRequirement.noticePeriod]
       )
       const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
       assert.equal(parsedValidator.identifier, identifier)
@@ -322,7 +322,7 @@ contract('Validators', (accounts: string[]) => {
         url,
         // @ts-ignore bytes type
         publicKeysData,
-        registrationRequirement.noticePeriod
+        [registrationRequirement.noticePeriod]
       )
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
@@ -358,7 +358,7 @@ contract('Validators', (accounts: string[]) => {
             url,
             // @ts-ignore bytes type
             publicKeysData,
-            registrationRequirement.noticePeriod
+            [registrationRequirement.noticePeriod]
           )
         )
       })
@@ -366,12 +366,9 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the account is already a registered validator group', () => {
       beforeEach(async () => {
-        await validators.registerValidatorGroup(
-          identifier,
-          name,
-          url,
-          registrationRequirement.noticePeriod
-        )
+        await validators.registerValidatorGroup(identifier, name, url, [
+          registrationRequirement.noticePeriod,
+        ])
       })
 
       it('should revert', async () => {
@@ -382,7 +379,7 @@ contract('Validators', (accounts: string[]) => {
             url,
             // @ts-ignore bytes type
             publicKeysData,
-            registrationRequirement.noticePeriod
+            [registrationRequirement.noticePeriod]
           )
         )
       })
@@ -405,7 +402,7 @@ contract('Validators', (accounts: string[]) => {
             url,
             // @ts-ignore bytes type
             publicKeysData,
-            registrationRequirement.noticePeriod
+            [registrationRequirement.noticePeriod]
           )
         )
       })
@@ -758,32 +755,23 @@ contract('Validators', (accounts: string[]) => {
     })
 
     it('should mark the account as a validator group', async () => {
-      await validators.registerValidatorGroup(
-        identifier,
-        name,
-        url,
-        registrationRequirement.noticePeriod
-      )
+      await validators.registerValidatorGroup(identifier, name, url, [
+        registrationRequirement.noticePeriod,
+      ])
       assert.isTrue(await validators.isValidatorGroup(group))
     })
 
     it('should add the account to the list of validator groups', async () => {
-      await validators.registerValidatorGroup(
-        identifier,
-        name,
-        url,
-        registrationRequirement.noticePeriod
-      )
+      await validators.registerValidatorGroup(identifier, name, url, [
+        registrationRequirement.noticePeriod,
+      ])
       assert.deepEqual(await validators.getRegisteredValidatorGroups(), [group])
     })
 
     it('should set the validator group identifier, name, and url', async () => {
-      await validators.registerValidatorGroup(
-        identifier,
-        name,
-        url,
-        registrationRequirement.noticePeriod
-      )
+      await validators.registerValidatorGroup(identifier, name, url, [
+        registrationRequirement.noticePeriod,
+      ])
       const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
       assert.equal(parsedGroup.identifier, identifier)
       assert.equal(parsedGroup.name, name)
@@ -791,12 +779,9 @@ contract('Validators', (accounts: string[]) => {
     })
 
     it('should emit the ValidatorGroupRegistered event', async () => {
-      const resp = await validators.registerValidatorGroup(
-        identifier,
-        name,
-        url,
-        registrationRequirement.noticePeriod
-      )
+      const resp = await validators.registerValidatorGroup(identifier, name, url, [
+        registrationRequirement.noticePeriod,
+      ])
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertContainSubset(log, {
@@ -817,34 +802,25 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(
-          validators.registerValidatorGroup(
-            identifier,
-            name,
-            url,
-            registrationRequirement.noticePeriod
-          )
+          validators.registerValidatorGroup(identifier, name, url, [
+            registrationRequirement.noticePeriod,
+          ])
         )
       })
     })
 
     describe('when the account is already a registered validator group', () => {
       beforeEach(async () => {
-        await validators.registerValidatorGroup(
-          identifier,
-          name,
-          url,
-          registrationRequirement.noticePeriod
-        )
+        await validators.registerValidatorGroup(identifier, name, url, [
+          registrationRequirement.noticePeriod,
+        ])
       })
 
       it('should revert', async () => {
         await assertRevert(
-          validators.registerValidatorGroup(
-            identifier,
-            name,
-            url,
-            registrationRequirement.noticePeriod
-          )
+          validators.registerValidatorGroup(identifier, name, url, [
+            registrationRequirement.noticePeriod,
+          ])
         )
       })
     })
@@ -860,12 +836,9 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(
-          validators.registerValidatorGroup(
-            identifier,
-            name,
-            url,
-            registrationRequirement.noticePeriod
-          )
+          validators.registerValidatorGroup(identifier, name, url, [
+            registrationRequirement.noticePeriod,
+          ])
         )
       })
     })
