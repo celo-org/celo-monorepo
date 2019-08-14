@@ -494,7 +494,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
    * @param account The address of the account to get the key for
    * @return dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
    */
-  function getDataEncryptionKey(address account) public view returns (bytes memory) {
+  function getDataEncryptionKey(address account) external view returns (bytes memory) {
     return accounts[account].dataEncryptionKey;
   }
 
@@ -512,7 +512,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
    * @param account The address of the account to get the wallet address for
    * @return Wallet address
    */
-  function getWalletAddress(address account) public view returns (address) {
+  function getWalletAddress(address account) external view returns (address) {
     return accounts[account].walletAddress;
   }
 
@@ -556,7 +556,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
   function lookupAccountsForIdentifier(
     bytes32 identifier
   )
-    public
+    external
     view
     returns (address[] memory)
   {

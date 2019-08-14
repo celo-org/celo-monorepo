@@ -5,11 +5,11 @@ contract GetSetV1 {
   uint256 public x;
   string public y;
 
-  function get() public view returns (uint256, string memory) {
+  function get() external view returns (uint256, string memory) {
     return (x, y);
   }
 
-  function set(uint256 _x, string memory _y) public {
+  function set(uint256 _x, string memory _y) external {
     x = _x;
     y = _y;
   }

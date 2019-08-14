@@ -223,7 +223,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
   function mint(
     address to,
     uint256 value
-  ) 
+  )
     external
     onlyMinter
     updateInflationFactor
@@ -542,7 +542,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
    * @param from The account to debit balance from
    * @param value The value of balance to debit
    */
-  function debitFrom(address from, uint256 value) public onlyVm updateInflationFactor {
+  function debitFrom(address from, uint256 value) external onlyVm updateInflationFactor {
     uint256 units = _valueToUnits(inflationState.factor, value);
     totalSupply_ = totalSupply_.sub(units);
     balances[from] = balances[from].sub(units);
@@ -555,7 +555,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
    * @dev We can assume that the inflation factor is up to date as `debitFrom`
    * will have been called in the same transaction
    */
-  function creditTo(address to, uint256 value) public onlyVm {
+  function creditTo(address to, uint256 value) external onlyVm {
     uint256 units = _valueToUnits(inflationState.factor, value);
     totalSupply_ = totalSupply_.add(units);
     balances[to] = balances[to].add(units);

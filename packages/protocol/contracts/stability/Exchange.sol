@@ -236,7 +236,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     * @notice Allows owner to set the minimum number of reports required
     * @param newMininumReports The new update minimum number of reports required
     */
-  function setMinimumReports(uint256 newMininumReports) public onlyOwner {
+  function setMinimumReports(uint256 newMininumReports) external onlyOwner {
     minimumReports = newMininumReports;
     emit MinimumReportsSet(newMininumReports);
   }
