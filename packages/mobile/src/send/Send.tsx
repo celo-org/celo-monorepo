@@ -1,11 +1,10 @@
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import { throttle } from 'lodash'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
-import { NavigationInjectedProps, NavigationScreenProps, withNavigation } from 'react-navigation'
+import { NavigationInjectedProps, withNavigation } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -96,14 +95,6 @@ const mapDispatchToProps = {
 type FilterType = (searchQuery: string) => Recipient[]
 
 class Send extends React.Component<Props, State> {
-  static navigationOptions = ({ navigation }: NavigationScreenProps) => ({
-    headerTitle: navigation.getParam('title', ''),
-    headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
-    // This helps vertically center the title
-    headerRight: <View />,
-    headerLeft: <View />,
-  })
-
   throttledSearch: (searchQuery: string) => void
   allRecipientsFilter: FilterType
   recentRecipientsFilter: FilterType
@@ -131,8 +122,7 @@ class Send extends React.Component<Props, State> {
   }
 
   async componentDidMount() {
-    const { t, recentRecipients, allRecipients } = this.props
-    this.props.navigation.setParams({ title: t('send_or_request') })
+    const { recentRecipients, allRecipients } = this.props
 
     this.setState({
       loading: false,
@@ -198,6 +188,7 @@ class Send extends React.Component<Props, State> {
 
     return (
       <View style={style.body}>
+        <Text style={[fontStyles.headerTitle, style.header]}>{t('send_or_request')}</Text>
         {loading ? (
           <View style={style.container}>
             <ActivityIndicator style={style.icon} size="large" color={colors.celoGreen} />
@@ -224,6 +215,10 @@ const style = StyleSheet.create({
   body: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  header: {
+    textAlign: 'center',
+    marginVertical: 10,
   },
   container: {
     flex: 1,

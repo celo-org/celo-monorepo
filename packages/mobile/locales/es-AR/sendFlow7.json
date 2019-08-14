@@ -47,6 +47,7 @@
   "inviteSent": "Código de invitación enviado!",
   "inviteFailed": "Falló el envío de la invitación",
   "loadingContacts": "Encontrando tus contactos",
+  "QRCode": "QR código",
   "saveCodeImage": "Guardar imagen de código",
   "scanCode": "Escanear código",
   "writeStorageNeededForQrDownload":

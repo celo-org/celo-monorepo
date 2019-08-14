@@ -10,7 +10,7 @@ export function withDispatchAfterNavigate<P extends {}>(
     class WithDispatchAfterNavigateWrapper extends React.Component<WrappedComponentProps> {
       componentDidUpdate(prevProps: WrappedComponentProps) {
         if (prevProps.isFocused !== this.props.isFocused) {
-          console.log('ITS FOCUSED!')
+          // console.log('ITS FOCUSED!')
         }
       }
 

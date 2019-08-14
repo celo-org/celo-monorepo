@@ -22,9 +22,7 @@ interface State {
 }
 
 class BackupComplete extends React.Component<Props, State> {
-  static navigationOptions = {
-    header: null,
-  }
+  static navigationOptions = { header: null }
 
   state = {
     selectedAnswer: null,

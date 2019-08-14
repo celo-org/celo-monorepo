@@ -10,10 +10,10 @@ import {
   updateWeb3SyncProgress,
 } from 'src/web3/actions'
 import {
+  _CHECK_SYNC_PROGRESS_TIMEOUT,
+  _checkWeb3SyncProgressClaim,
   checkWeb3Sync,
   createNewAccount,
-  _checkWeb3SyncProgressClaim,
-  _CHECK_SYNC_PROGRESS_TIMEOUT,
 } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 import { createMockStore, sleep } from 'test/utils'
