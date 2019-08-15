@@ -109,7 +109,7 @@ const SHADOW_STYLE = {
   x: 0,
   y: 1,
 }
-export class WalletHome extends React.PureComponent<Props> {
+export class WalletHome extends React.Component<Props> {
   animatedValue: Animated.Value
   headerOpacity: Animated.AnimatedInterpolation
   shadowOpacity: Animated.AnimatedInterpolation
