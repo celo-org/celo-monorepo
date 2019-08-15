@@ -20,7 +20,7 @@ import {
   RecommendationKeys,
   Tables,
 } from '../../fullstack/EcoFundFields'
-import menuItems, { CeloLinks } from 'src/shared/menu-items'
+import menuItems from 'src/shared/menu-items'
 
 interface State {
   table: Tables
@@ -40,12 +40,6 @@ class EcoFund extends React.PureComponent<I18nProps, State> {
 
   render() {
     const { t } = this.props
-    const inputStyle = [
-      standardStyles.input,
-      fonts.p,
-      formStyles.input,
-      standardStyles.elementalMarginBottom,
-    ]
     return (
       <GridRow
         desktopStyle={[standardStyles.sectionMarginTop, standardStyles.blockMarginBottom]}
@@ -117,21 +111,13 @@ class EcoFund extends React.PureComponent<I18nProps, State> {
                 {({ onAltSubmit, onInput, formState }) => (
                   <Form>
                     {ApplicationKeys.map((key) => (
-                      <TextInput
-                        multiline={key === 'about' || key === 'product'}
-                        numberOfLines={3}
-                        key={`${Tables.Applicants}-${key}`}
-                        style={[
-                          inputStyle,
-                          formState.errors.includes(key) && formStyles.errorBorder,
-                        ]}
-                        focusStyle={standardStyles.inputFocused}
-                        placeholder={ApplicationFields[key]}
-                        placeholderTextColor={colors.placeholderGray}
-                        name={key}
+                      <LabeledInput
+                        label={ApplicationFields[key]}
                         value={formState.form[key]}
-                        onChange={onInput}
-                        required={true}
+                        name={key}
+                        multiline={key === 'about' || key === 'product'}
+                        onInput={onInput}
+                        hasError={formState.errors.includes(key)}
                       />
                     ))}
                     <Button
@@ -141,16 +127,11 @@ class EcoFund extends React.PureComponent<I18nProps, State> {
                       size={SIZE.big}
                       align={'flex-start'}
                     />
-                    <View style={standardStyles.elementalMarginTop}>
-                      {formState.isComplete && (
-                        <Text
-                          style={[textStyles.center, fonts.p, standardStyles.elementalMarginTop]}
-                        >
-                          {t('form.fellowshipSubmitted')}
-                        </Text>
-                      )}
-                      <ErrorMessage allErrors={formState.errors} field={'unknownError'} t={t} />
-                    </View>
+                    <AfterMessage
+                      errors={formState.errors}
+                      isComplete={formState.isComplete}
+                      t={t}
+                    />
                   </Form>
                 )}
               </FormContainer>
@@ -170,21 +151,13 @@ class EcoFund extends React.PureComponent<I18nProps, State> {
                 {({ onAltSubmit, onInput, formState }) => (
                   <Form>
                     {RecommendationKeys.map((key) => (
-                      <TextInput
-                        multiline={key === 'why'}
-                        numberOfLines={5}
-                        key={`${Tables.Recommendations}-${key}`}
-                        style={[
-                          inputStyle,
-                          formState.errors.includes(key) && formStyles.errorBorder,
-                        ]}
-                        focusStyle={standardStyles.inputFocused}
-                        placeholder={RecommendationFields[key]}
-                        placeholderTextColor={colors.placeholderGray}
-                        name={key}
+                      <LabeledInput
+                        label={RecommendationFields[key]}
                         value={formState.form[key]}
-                        onChange={onInput}
-                        required={true}
+                        name={key}
+                        multiline={key === 'why'}
+                        onInput={onInput}
+                        hasError={formState.errors.includes(key)}
                       />
                     ))}
                     <Button
@@ -194,16 +167,11 @@ class EcoFund extends React.PureComponent<I18nProps, State> {
                       size={SIZE.big}
                       align={'flex-start'}
                     />
-                    <View style={standardStyles.elementalMarginTop}>
-                      {formState.isComplete && (
-                        <Text
-                          style={[textStyles.center, fonts.p, standardStyles.elementalMarginTop]}
-                        >
-                          {t('form.fellowshipSubmitted')}
-                        </Text>
-                      )}
-                      <ErrorMessage allErrors={formState.errors} field={'unknownError'} t={t} />
-                    </View>
+                    <AfterMessage
+                      errors={formState.errors}
+                      isComplete={formState.isComplete}
+                      t={t}
+                    />
                   </Form>
                 )}
               </FormContainer>
@@ -289,3 +257,50 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 })
+
+function AfterMessage({
+  isComplete,
+  t,
+  errors,
+}: {
+  isComplete: boolean
+  errors: string[]
+  t: I18nProps['t']
+}) {
+  return (
+    <View style={standardStyles.elementalMarginTop}>
+      {isComplete && (
+        <Text style={[textStyles.center, fonts.p, standardStyles.elementalMarginTop]}>
+          {t('form.fellowshipSubmitted')}
+        </Text>
+      )}
+      <ErrorMessage allErrors={errors} field={'unknownError'} t={t} />
+    </View>
+  )
+}
+
+function LabeledInput({ name, multiline, hasError, value, onInput, label }) {
+  return (
+    <>
+      <Text accessibilityRole={'label'} style={fonts.a}>
+        {label}
+      </Text>
+      <TextInput
+        multiline={multiline}
+        numberOfLines={3}
+        key={`${Tables.Applicants}-${name}`}
+        style={[
+          standardStyles.input,
+          fonts.p,
+          formStyles.input,
+          standardStyles.elementalMarginBottom,
+          hasError && formStyles.errorBorder,
+        ]}
+        focusStyle={standardStyles.inputFocused}
+        name={name}
+        value={value}
+        onChange={onInput}
+      />
+    </>
+  )
+}

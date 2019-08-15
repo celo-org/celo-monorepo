@@ -7,6 +7,7 @@ import CodeOfConduct from 'src/community/connect/CodeOfConduct'
 import CoverArea from 'src/community/connect/CoverArea'
 import FellowSection from 'src/community/connect/FellowSection'
 import Tenets from 'src/community/connect/Tenets'
+import Contribute from 'src/community/connect/Contribute'
 
 import EcoFund from 'src/community/EcoFund'
 import { H2, H3 } from 'src/fonts/Fonts'
@@ -51,7 +52,7 @@ export class ConnectPage extends React.Component<Props> {
         <View>
           <CoverArea />
           <Tenets />
-          <EcoFund />
+
           <CodeOfConduct />
           <GridRow
             nativeID={hashNav.connect.events}
@@ -66,6 +67,8 @@ export class ConnectPage extends React.Component<Props> {
           </GridRow>
           <EventData />
           <ArticleData />
+          <Contribute />
+          <EcoFund />
           <FellowSection />
           <View style={styles.darkBackground} nativeID={hashNav.connect.newsletter}>
             <GridRow

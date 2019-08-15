@@ -80,6 +80,11 @@
       "Let’s chat about building a new monetary system that creates the conditions for prosperity for all. We are open to working with bright and innovative people all over the world for short, fixed-term projects.",
     "callForProp": "Read More in our Call for Proposals"
   },
+  "contribute": {
+    "title":
+      "Have an idea for the Celo ecosystem? Propose a project as a Fellow or apply to the Celo Ecosystem Fund.",
+    "button": "Call for Proposals"
+  },
   "submit": "Submit",
   "events": {
     "pastEvents": "Past Events",
@@ -96,8 +101,6 @@
     "title": "Community voices"
   },
   "fellows": {
-    "title": "Have an idea for the Celo ecosystem? Propose a project as a Fellow.",
-    "button": "Call for Proposals",
     "formTitle": "Start your fellowship application"
   },
   "form": {
@@ -133,7 +136,7 @@
     "limitedPartners": "Limited Partners",
     "link": "Learn about building on Celo",
     "applyForFunding": "Apply for Funding",
-    "recommendProject": "Recommend Project "
+    "recommendProject": "Recommend a Project "
   },
   "apply": "Apply",
   "recommend": "Recommend",
