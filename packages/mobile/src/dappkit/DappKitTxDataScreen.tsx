@@ -16,12 +16,12 @@ class DappKitSignTxScreen extends React.Component<Props> {
   static navigationOptions = headerWithBackButton
 
   render() {
-    const { t } = this.props
+    const { t, data } = this.props
     return (
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <Text style={styles.header}>{t('data')}</Text>
-          <Text style={styles.bodyText}>{this.props.data}</Text>
+          <Text style={styles.bodyText}>{data}</Text>
         </ScrollView>
       </View>
     )
@@ -37,19 +37,17 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
     backgroundColor: colors.background,
-    alignItems: 'center',
     marginHorizontal: '5%',
   },
   header: {
     ...fontStyles.h1,
-    alignItems: 'center',
-    paddingBottom: 30,
+    textAlign: 'center',
+    paddingBottom: 15,
   },
   bodyText: {
     ...fontStyles.paragraph,
     fontSize: 15,
     color: colors.darkSecondary,
-    textAlign: 'center',
   },
 })
 

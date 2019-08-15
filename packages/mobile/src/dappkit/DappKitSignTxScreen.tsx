@@ -10,7 +10,7 @@ import { connect } from 'react-redux'
 import { requestTxSignature } from 'src/dappkit/dappkit'
 import { Namespaces } from 'src/i18n'
 import DappkitExchangeIcon from 'src/icons/DappkitExchange'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { navigate, navigateBack, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
 
@@ -63,11 +63,11 @@ class DappKitSignTxScreen extends React.Component<Props, State> {
   }
 
   linkBack = () => {
-    this.props.requestTxSignature(this.state.request)
+    navigateHome({ dispatchAfterNavigate: requestTxSignature(this.state.request) })
   }
 
   showDetails = () => {
-    navigate(Screens.DappKitTxDataScreen, { dappKitData: this.state.request.txData })
+    navigate(Screens.DappKitTxDataScreen, { dappKitData: this.state.request.txs[0].txData })
   }
 
   cancel = () => {
