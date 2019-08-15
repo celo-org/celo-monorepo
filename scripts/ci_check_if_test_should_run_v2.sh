@@ -14,5 +14,6 @@ if [ $CHANGED = false ] ; then
   echo "No changes in ${1} - skipping  testing"
   # https://discuss.circleci.com/t/ability-to-return-successfully-from-a-job-before-completing-all-the-next-steps/12969/6
   circleci step halt
+  exit 0
 fi
 echo "Something $CHANGED, tests should not be skipped"
