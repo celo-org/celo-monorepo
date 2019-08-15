@@ -1,7 +1,7 @@
 import debugFactory from 'debug'
-import { Address } from 'src/base'
-import { toTxResult, TransactionResult } from 'src/utils/tx-result'
 import { TransactionObject } from 'web3/eth/types'
+import { Address } from '../base'
+import { toTxResult, TransactionResult } from './tx-result'
 
 const debug = debugFactory('contractkit:sendtx')
 

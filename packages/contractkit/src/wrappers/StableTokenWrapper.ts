@@ -1,5 +1,5 @@
-import { StableToken } from 'src/generated/types/StableToken'
-import { BaseWrapper } from 'src/wrappers/BaseWrapper'
+import { StableToken } from '../generated/types/StableToken'
+import { BaseWrapper } from './BaseWrapper'
 
 export class StableTokenWrapper extends BaseWrapper<StableToken> {
   allowance = this.proxyCall(this.contract.methods.allowance)

@@ -1,11 +1,11 @@
-import { AddressRegistry } from 'src/address-registry'
-import { Address, CeloToken } from 'src/base'
-import { WrapperCache } from 'src/contract-cache'
-import { sendTransaction, TxOptions } from 'src/utils/send-tx'
-import { toTxResult } from 'src/utils/tx-result'
-import { Web3ContractCache } from 'src/web3-contract-cache'
 import Web3 from 'web3'
 import { TransactionObject, Tx } from 'web3/eth/types'
+import { AddressRegistry } from './address-registry'
+import { Address, CeloToken } from './base'
+import { WrapperCache } from './contract-cache'
+import { sendTransaction, TxOptions } from './utils/send-tx'
+import { toTxResult } from './utils/tx-result'
+import { Web3ContractCache } from './web3-contract-cache'
 
 export function newKit(url: string) {
   return newKitFromWeb3(new Web3(url))

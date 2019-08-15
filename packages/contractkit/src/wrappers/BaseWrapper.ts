@@ -1,7 +1,7 @@
-import { ContractKit } from 'src/kit'
-import { TxOptions } from 'src/utils/send-tx'
-import { TransactionResult } from 'src/utils/tx-result'
 import { TransactionObject } from 'web3/eth/types'
+import { ContractKit } from '../kit'
+import { TxOptions } from '../utils/send-tx'
+import { TransactionResult } from '../utils/tx-result'
 
 type Method<I extends any[], O> = (...args: I) => TransactionObject<O>
 

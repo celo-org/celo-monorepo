@@ -1,7 +1,7 @@
 import debugFactory from 'debug'
-import { ExternalPromise } from 'src/utils/external-promise'
 import PromiEvent from 'web3/promiEvent'
 import { TransactionReceipt } from 'web3/types'
+import { ExternalPromise } from './external-promise'
 
 const debug = debugFactory('contractkit:txresult')
 

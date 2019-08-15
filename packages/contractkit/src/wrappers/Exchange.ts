@@ -1,5 +1,5 @@
-import { Exchange } from 'src/generated/types/Exchange'
-import { BaseWrapper } from 'src/wrappers/BaseWrapper'
+import { Exchange } from '../generated/types/Exchange'
+import { BaseWrapper } from './BaseWrapper'
 
 export class ExchangeWrapper extends BaseWrapper<Exchange> {
   getBuyTokenAmount = this.proxyCall(this.contract.methods.getBuyTokenAmount)

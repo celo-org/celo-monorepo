@@ -1,10 +1,10 @@
 import { zip } from '@celo/utils/lib/src/collections'
 import BN from 'bn.js'
-import { Address } from 'src/base'
-import { BondedDeposits } from 'src/generated/types/BondedDeposits'
-import { BaseWrapper } from 'src/wrappers/BaseWrapper'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
+import { Address } from '../base'
+import { BondedDeposits } from '../generated/types/BondedDeposits'
+import { BaseWrapper } from '../wrappers/BaseWrapper'
 
 export interface VotingDetails {
   accountAddress: Address

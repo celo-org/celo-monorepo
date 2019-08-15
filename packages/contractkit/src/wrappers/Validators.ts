@@ -1,11 +1,11 @@
 import { eqAddress } from '@celo/utils/lib/src/address'
 import { compareBN } from '@celo/utils/lib/src/bn'
 import { zip } from '@celo/utils/lib/src/collections'
-import { Address, NULL_ADDRESS } from 'src/base'
-import { Validators } from 'src/generated/types/Validators'
-import { BaseWrapper } from 'src/wrappers/BaseWrapper'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
+import { Address, NULL_ADDRESS } from '../base'
+import { Validators } from '../generated/types/Validators'
+import { BaseWrapper } from './BaseWrapper'
 
 import BN = require('bn.js')
 

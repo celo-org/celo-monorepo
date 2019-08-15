@@ -1,7 +1,7 @@
-import { Address, AllContracts, CeloContract, NULL_ADDRESS } from 'src/base'
-import { newRegistry } from 'src/generated/Registry'
-import { Registry } from 'src/generated/types/Registry'
-import { ContractKit } from 'src/kit'
+import { Address, AllContracts, CeloContract, NULL_ADDRESS } from './base'
+import { newRegistry } from './generated/Registry'
+import { Registry } from './generated/types/Registry'
+import { ContractKit } from './kit'
 
 // Registry contract is always predeployed to this address
 const REGISTRY_CONTRACT_ADDRESS = '0x000000000000000000000000000000000000ce10'

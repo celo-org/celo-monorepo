@@ -1,10 +1,10 @@
-import { CeloContract } from 'src/base'
-import { ContractKit } from 'src/kit'
-import { BondedDepositsWrapper } from 'src/wrappers/BondedDeposits'
-import { ExchangeWrapper } from 'src/wrappers/Exchange'
-import { GoldTokenWrapper } from 'src/wrappers/GoldTokenWrapper'
-import { StableTokenWrapper } from 'src/wrappers/StableTokenWrapper'
-import { ValidatorsWrapper } from 'src/wrappers/Validators'
+import { CeloContract } from './base'
+import { ContractKit } from './kit'
+import { BondedDepositsWrapper } from './wrappers/BondedDeposits'
+import { ExchangeWrapper } from './wrappers/Exchange'
+import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
+import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
+import { ValidatorsWrapper } from './wrappers/Validators'
 
 const WrapperFactories = {
   // [CeloContract.Attestations]: AttestationsWrapper,

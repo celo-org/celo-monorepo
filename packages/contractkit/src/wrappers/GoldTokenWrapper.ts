@@ -1,5 +1,5 @@
-import { GoldToken } from 'src/generated/types/GoldToken'
-import { BaseWrapper } from 'src/wrappers/BaseWrapper'
+import { GoldToken } from '../generated/types/GoldToken'
+import { BaseWrapper } from './BaseWrapper'
 
 export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
   allowance = this.proxyCall(this.contract.methods.allowance)
