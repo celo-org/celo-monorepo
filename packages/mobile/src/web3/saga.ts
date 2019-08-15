@@ -14,7 +14,6 @@ import { getWordlist } from 'src/backup/utils'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData } from 'src/geth/geth'
 import { waitForGethConnectivity } from 'src/geth/saga'
-import { redeemComplete } from 'src/invite/actions'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import Logger from 'src/utils/Logger'
@@ -167,7 +166,6 @@ export function* assignAccountFromPrivateKey(key: string) {
     )
 
     yield put(setAccount(account))
-    yield put(redeemComplete(true))
     yield put(setAccountCreationTime())
     yield call(assignDataKeyFromPrivateKey, key)
 
@@ -175,7 +173,6 @@ export function* assignAccountFromPrivateKey(key: string) {
     return account
   } catch (e) {
     Logger.error(TAG, `@assignAccountFromPrivateKey: ${e}`)
-    yield put(redeemComplete(false))
     return null
   }
 }
