@@ -30,20 +30,24 @@ function* produceTxSignatureSaga(action: RequestTxSignatureAction) {
   Logger.debug(TAG, 'Producing tx signature')
 
   yield call(getConnectedUnlockedAccount)
+  const rawTxs = yield Promise.all(
+    action.request.txs.map(async (tx) => {
+      const signedTx = await web3.eth.signTransaction({
+        from: tx.from,
+        to: tx.to,
+        gasPrice: '0',
+        gas: tx.estimatedGas,
+        data: tx.txData,
+        nonce: tx.nonce,
+        // @ts-ignore
+        gasCurrency: action.request.gasCurrency,
+      })
+      return signedTx.raw
+    })
+  )
 
-  const signedTx = yield web3.eth.signTransaction({
-    from: action.request.from,
-    to: action.request.to,
-    gasPrice: '0',
-    gas: action.request.estimatedGas,
-    data: action.request.txData,
-    nonce: action.request.nonce,
-    // @ts-ignore
-    gasCurrency: action.request.gasCurrency,
-  })
-
-  Logger.debug(TAG, 'Tx signed, opening URL')
-  Linking.openURL(produceResponseDeeplink(action.request, SignTxResponseSuccess(signedTx.raw)))
+  Logger.debug(TAG, 'Txs signed, opening URL')
+  Linking.openURL(produceResponseDeeplink(action.request, SignTxResponseSuccess(rawTxs)))
 }
 
 export function* dappKitSaga() {

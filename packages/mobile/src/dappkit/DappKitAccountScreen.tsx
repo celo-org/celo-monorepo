@@ -10,6 +10,7 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Linking, Text, View } from 'react-native'
 import { NavigationParams, NavigationScreenProp } from 'react-navigation'
 import { connect } from 'react-redux'
+import { currentPhoneNumber } from 'src/account/selectors'
 import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -26,12 +27,14 @@ interface OwnProps {
 
 interface StateProps {
   account: string | null
+  phoneNumber: string | null
 }
 
 type Props = OwnProps & StateProps & WithNamespaces
 
 const mapStateToProps = (state: RootState): StateProps => ({
   account: currentAccountSelector(state),
+  phoneNumber: currentPhoneNumber(state),
 })
 
 class DappKitAccountAuthScreen extends React.Component<Props> {
@@ -46,7 +49,7 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
   }
 
   linkBack = () => {
-    const { account, navigation } = this.props
+    const { account, navigation, phoneNumber } = this.props
 
     if (!navigation) {
       Logger.error(TAG, 'Missing navigation props')
@@ -65,8 +68,15 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
       return
     }
 
+    if (!phoneNumber) {
+      Logger.error(TAG, 'No phone number set up for this wallet')
+      return
+    }
+
     navigate(Screens.WalletHome)
-    Linking.openURL(produceResponseDeeplink(request, AccountAuthResponseSuccess(account)))
+    Linking.openURL(
+      produceResponseDeeplink(request, AccountAuthResponseSuccess(account, phoneNumber))
+    )
   }
 
   render() {
