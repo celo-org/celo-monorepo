@@ -170,8 +170,10 @@ export class TransferFeedItem extends React.PureComponent<Props> {
       comment = null
     } else if (type === TransactionTypes.FAUCET) {
       contactImage = <Image source={faucetIcon} style={styles.image} />
-      const testnetName = DEFAULT_TESTNET.charAt(0).toUpperCase() + DEFAULT_TESTNET.slice(1)
-      fullName = `Celo ${testnetName} Faucet`
+      const testnetName = DEFAULT_TESTNET
+        ? DEFAULT_TESTNET.charAt(0).toUpperCase() + DEFAULT_TESTNET.slice(1)
+        : ''
+      fullName = testnetName ? `Celo ${testnetName} Faucet` : 'Celo Faucet'
       comment = null
     } else if (type === TransactionTypes.INVITE_SENT) {
       contactImage = <Image source={inviteVerifyFee} style={styles.image} />
