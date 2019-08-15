@@ -2,6 +2,7 @@ import {
   AccountAuthRequest,
   DappKitRequestMeta,
   DappKitRequestTypes,
+  DappKitResponse,
   DappKitResponseStatus,
   parseDappkitResponseDepplink,
   serializeDappKitRequestDeeplink,
@@ -31,6 +32,24 @@ export function listenToAccount(callback: (account: string) => void) {
         callback(dappKitResponse.address)
       }
     } catch (error) {}
+  })
+}
+
+export function waitForSignedTxs(): Promise<DappKitResponse> {
+  return new Promise((resolve, reject) => {
+    Linking.addEventListener('url', ({ url }: { url: string }) => {
+      try {
+        const dappKitResponse = parseDappkitResponseDepplink(url)
+        if (
+          dappKitResponse.type === DappKitRequestTypes.SIGN_TX &&
+          dappKitResponse.status === DappKitResponseStatus.SUCCESS
+        ) {
+          resolve(dappKitResponse)
+        }
+      } catch (error) {
+        reject(error)
+      }
+    })
   })
 }
 
@@ -72,11 +91,11 @@ async function getGasCurrencyContract(
 }
 
 export interface TxParams<T> {
-  txId: string
   tx: TransactionObject<T>
   from: string
   to: string
   gasCurrency: GasCurrency
+  estimatedGas?: number
 }
 
 export async function requestTxSig<T>(
@@ -84,20 +103,25 @@ export async function requestTxSig<T>(
   txParams: TxParams<T>[],
   meta: DappKitRequestMeta
 ) {
+  // TODO: For multi-tx payloads, we for now just assume the same from address for all txs. We should apply a better heuristic
+  const baseNonce = await web3.eth.getTransactionCount(txParams[0].from)
   const txs: TxToSignParam[] = await Promise.all(
-    txParams.map(async (txParam) => {
+    txParams.map(async (txParam, index) => {
       const gasCurrencyContract = await getGasCurrencyContract(web3, txParam.gasCurrency)
       const estimatedTxParams = {
         gasCurrency: gasCurrencyContract.options.address,
       }
-      // @ts-ignore
-      const estimatedGas = await txParam.tx.estimateGas(estimatedTxParams)
+      const estimatedGas =
+        txParam.estimatedGas === undefined
+          ? //
+            // @ts-ignore
+            await txParam.tx.estimateGas(estimatedTxParams)
+          : txParam.estimatedGas
 
-      const nonce = await web3.eth.getTransactionCount(txParam.from)
       return {
         txData: txParam.tx.encodeABI(),
         estimatedGas,
-        nonce,
+        nonce: baseNonce + index,
         gasCurrencyAddress: gasCurrencyContract._address,
         ...txParam,
       }
