@@ -40,22 +40,22 @@ platform :android do
     ENV["GRADLE_OPTS"] = '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx256m -XX:+HeapDumpOnOutOfMemoryError"'
     gradle(task: 'bundle' + environment + 'JsAndAssets', project_dir: 'android/')
     ENV["GRADLE_OPTS"] = '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx3500m -XX:+HeapDumpOnOutOfMemoryError"'
-    gradle(task: 'assemble', build_type: environment, project_dir: 'android/', flags: '-x bundle' + environment + 'JsAndAssets')
+    gradle(task: 'bundle', build_type: environment, project_dir: 'android/', flags: '-x bundle' + environment + 'JsAndAssets')
   end
 
-  desc 'Ship Integration to Playstore Alpha.'
+  desc 'Ship Integration to Playstore Internal'
   lane :integration do
     env = 'integration'
-    sdkEnv = 'alfajoresstaging'
+    sdkEnv = 'integration'
     clean
     build(environment: env, sdkEnv: sdkEnv)
     fastlane_supply(env, 'internal', env)
   end
 
-  desc 'Ship Staging to Playstore Alpha.'
+  desc 'Ship Staging to Playstore Internal'
   lane :staging do
     env = 'staging'
-    sdkEnv = 'alfajores'
+    sdkEnv = 'alfajoresstaging'
     clean
     build(environment: env, sdkEnv: sdkEnv)
     fastlane_supply(env, 'internal', env)

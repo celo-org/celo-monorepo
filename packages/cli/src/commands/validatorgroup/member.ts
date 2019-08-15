@@ -1,4 +1,4 @@
-import { Validators } from '@celo/contractkit'
+import { Validators } from '@celo/walletkit'
 import { flags } from '@oclif/command'
 import { IArg } from '@oclif/parser/lib/args'
 

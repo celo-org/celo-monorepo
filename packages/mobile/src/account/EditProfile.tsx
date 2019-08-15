@@ -9,8 +9,8 @@ import { connect } from 'react-redux'
 import { setName } from 'src/account/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import CancelButton from 'src/components/CancelButton'
 import { Namespaces } from 'src/i18n'
+import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -32,9 +32,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 export class EditProfile extends React.Component<Props> {
-  static navigationOptions = {
-    headerLeft: <CancelButton eventName={CustomEventNames.edit_name_cancel} />,
-  }
+  static navigationOptions = headerWithCancelButton
 
   state = {
     name: this.props.name,

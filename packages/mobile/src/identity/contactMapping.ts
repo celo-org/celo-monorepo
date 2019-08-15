@@ -1,6 +1,6 @@
-import { getAttestationsContract, lookupPhoneNumbers } from '@celo/contractkit'
-import { Attestations as AttestationsType } from '@celo/contractkit/types/Attestations'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
+import { getAttestationsContract, lookupPhoneNumbers } from '@celo/walletkit'
+import { Attestations as AttestationsType } from '@celo/walletkit/types/Attestations'
 import BigNumber from 'bignumber.js'
 import { chunk } from 'lodash'
 import { MinimalContact } from 'react-native-contacts'

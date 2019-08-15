@@ -5,24 +5,19 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Text, View } from 'react-native'
 import { NavigationParams, NavigationScreenProp } from 'react-navigation'
-import { connect } from 'react-redux'
-import { requestTxSignature, RequestTxSignatureAction } from 'src/dappkit/dappkit'
+import { requestTxSignature } from 'src/dappkit/dappkit'
 import { Namespaces } from 'src/i18n'
-import { RootState } from 'src/redux/reducers'
+import { navigateHome } from 'src/navigator/NavigationService'
+import Logger from 'src/utils/Logger'
+
+const TAG = 'dappkit/DappKitSignTxScreen'
 
 interface OwnProps {
-  requestTxSignature: (request: SignTxRequest) => RequestTxSignatureAction
   errorMessage?: string
   navigation?: NavigationScreenProp<NavigationParams>
 }
 
 type Props = OwnProps & WithNamespaces
-
-const mapStateToProps = (state: RootState) => ({})
-
-const mapDispatchToProps = {
-  requestTxSignature,
-}
 
 class DappKitSignTxScreen extends React.Component<Props> {
   static navigationOptions = { header: null }
@@ -37,17 +32,18 @@ class DappKitSignTxScreen extends React.Component<Props> {
 
   linkBack = () => {
     if (!this.props.navigation) {
+      Logger.error(TAG, 'Missing navigation props')
       return
     }
 
     const request: SignTxRequest = this.props.navigation.getParam('dappKitRequest', null)
 
-    if (request === null) {
+    if (!request) {
+      Logger.error(TAG, 'No request found in navigation props')
       return
     }
 
-    // @ts-ignore
-    this.props.requestTxSignature(request)
+    navigateHome({ dispatchAfterNavigate: requestTxSignature(request) })
   }
 
   render() {
@@ -68,9 +64,4 @@ class DappKitSignTxScreen extends React.Component<Props> {
   }
 }
 
-export default withNamespaces(Namespaces.global)(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(DappKitSignTxScreen)
-)
+export default withNamespaces(Namespaces.global)(DappKitSignTxScreen)
