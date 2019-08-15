@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "@celo/walletkit": "0.0.4",
-    "@celo/utils": "0.0.5",
+    "@celo/utils": "0.0.6-beta",
     "expo": "^34.0.1"
   },
   "devDependencies": {
