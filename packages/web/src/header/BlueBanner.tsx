@@ -65,12 +65,11 @@ const styles = StyleSheet.create({
   },
 })
 
+// MAX width 75 characters
+export const TEXT = 'Introducing the Celo SDK: build mobile-first DeFi apps'
+
+const LINK = 'https://medium.com/@celo.org/e6f85f2fe18c'
+
 export default function() {
   return <BlueBanner link={LINK}>{TEXT}</BlueBanner>
 }
-
-// MAX width 75 characters
-export const TEXT =
-  'Introducing Alfajores: Celo’s code is open source and the network is live for testing'
-
-const LINK = 'https://medium.com/celohq/introducing-alfajores-1b162ebcb44d'
