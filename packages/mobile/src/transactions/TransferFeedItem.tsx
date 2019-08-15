@@ -6,7 +6,6 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { decryptComment as decryptCommentRaw } from '@celo/utils/src/commentEncryption'
 import BigNumber from 'bignumber.js'
 import * as _ from 'lodash'
-import { startCase } from 'lodash'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
@@ -171,7 +170,7 @@ export class TransferFeedItem extends React.PureComponent<Props> {
       comment = null
     } else if (type === TransactionTypes.FAUCET) {
       contactImage = <Image source={faucetIcon} style={styles.image} />
-      fullName = DEFAULT_TESTNET ? `Celo ${startCase(DEFAULT_TESTNET)} Faucet` : 'Celo Faucet'
+      fullName = DEFAULT_TESTNET ? `Celo ${_.startCase(DEFAULT_TESTNET)} Faucet` : 'Celo Faucet'
       comment = null
     } else if (type === TransactionTypes.INVITE_SENT) {
       contactImage = <Image source={inviteVerifyFee} style={styles.image} />
