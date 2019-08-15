@@ -50,7 +50,7 @@ export class BondedDepositsWrapper extends BaseWrapper<BondedDeposits> {
     }
   }
 
-  async getBondedDepositValue(account: string, noticePeriod: string) {
+  async getBondedDepositValue(account: string, noticePeriod: string): Promise<BN> {
     const deposit = await this.contract.methods.getBondedDeposit(account, noticePeriod).call()
     return this.getValueFromDeposit(deposit)
   }
@@ -63,7 +63,7 @@ export class BondedDepositsWrapper extends BaseWrapper<BondedDeposits> {
     )
   }
 
-  async getNotifiedDepositValue(account: string, availTime: string) {
+  async getNotifiedDepositValue(account: string, availTime: string): Promise<BN> {
     const deposit = await this.contract.methods.getNotifiedDeposit(account, availTime).call()
     return this.getValueFromDeposit(deposit)
   }
@@ -93,7 +93,7 @@ export class BondedDepositsWrapper extends BaseWrapper<BondedDeposits> {
   }
 
   // FIXME this.contract.methods.delegateRewards does not exist
-  async delegateRewardsTx(account: string, delegate: string) {
+  async delegateRewardsTx(account: string, delegate: string): Promise<TransactionObject<void>> {
     const sig = await this.getParsedSignatureOfAddress(account, delegate)
 
     return this.contract.methods.delegateRole(Roles.rewards, delegate, sig.v, sig.r, sig.s)

@@ -4,7 +4,7 @@ import { AddressRegistry } from './address-registry'
 import { Address, CeloContract, CeloToken } from './base'
 import { WrapperCache } from './contract-cache'
 import { sendTransaction, TxOptions } from './utils/send-tx'
-import { toTxResult } from './utils/tx-result'
+import { toTxResult, TransactionResult } from './utils/tx-result'
 import { Web3ContractCache } from './web3-contract-cache'
 
 export function newKit(url: string) {
@@ -40,7 +40,7 @@ export class ContractKit {
     this.web3.eth.defaultAccount = address
   }
 
-  get defaultAccount() {
+  get defaultAccount(): Address {
     return this.web3.eth.defaultAccount
   }
 
@@ -48,20 +48,24 @@ export class ContractKit {
     this.defaultOptions.gasCurrency = address
   }
 
-  sendTransaction(tx: Tx) {
+  sendTransaction(tx: Tx): TransactionResult {
     const promiEvent = this.web3.eth.sendTransaction({
       from: this.defaultOptions.from,
+      // TODO this won't work for locally signed TX
       gasPrice: '0',
       // @ts-ignore
       gasCurrency: this.defaultOptions.gasCurrency,
-      // @ts-ignore
-      gasFeeRecipient: this.defaultOptions.gasFeeRecipient,
+      // TODO needed for locally signed tx, ignored by now (celo-blockchain with set it)
+      // gasFeeRecipient: this.defaultOptions.gasFeeRecipient,
       ...tx,
     })
     return toTxResult(promiEvent)
   }
 
-  sendTransactionObject(txObj: TransactionObject<any>, options?: TxOptions) {
+  sendTransactionObject(
+    txObj: TransactionObject<any>,
+    options?: TxOptions
+  ): Promise<TransactionResult> {
     return sendTransaction(txObj, {
       ...this.defaultOptions,
       ...options,

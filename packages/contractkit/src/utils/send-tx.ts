@@ -39,11 +39,12 @@ export async function sendTransaction<T>(
     from: txOptions.from,
     // @ts-ignore
     gasCurrency: txOptions.gasCurrency,
-    // @ts-ignore
-    gasFeeRecipient: txOptions.gasFeeRecipient,
+    // TODO needed for locally signed tx, ignored by now (celo-blockchain with set it)
+    // gasFeeRecipient: txOptions.gasFeeRecipient,
     gas,
     // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
     // the suggested price in the selected gasCurrency.
+    // TODO this won't work for locally signed TX
     gasPrice: '0',
   })
   return toTxResult(promiEvent)
