@@ -1,15 +1,14 @@
 import SettingsSwitchItem from '@celo/react-components/components/SettingsSwitchItem'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text } from 'react-native'
 import { connect } from 'react-redux'
 import { setAnalyticsEnabled } from 'src/app/actions'
-import CancelButton from 'src/components/CancelButton'
 import i18n, { Namespaces } from 'src/i18n'
+import { headerWithCancelButton } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
@@ -28,13 +27,11 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-export class Analytics extends React.PureComponent<Props> {
-  static navigationOptions = {
-    headerLeft: <CancelButton />,
-    title: i18n.t('accountScreen10:analytics'),
-    headerRight: <View />,
-    headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
-  }
+export class Analytics extends React.Component<Props> {
+  static navigationOptions = () => ({
+    ...headerWithCancelButton,
+    headerTitle: i18n.t('accountScreen10:analytics'),
+  })
 
   render() {
     const { analyticsEnabled, t } = this.props
