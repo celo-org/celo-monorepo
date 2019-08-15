@@ -9,7 +9,7 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
 import Button, { BTN } from 'src/shared/Button.3'
-import { hashNav } from 'src/shared/menu-items'
+import menuItems, { hashNav } from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import { scrollTo } from 'src/utils/utils'
@@ -95,7 +95,7 @@ class HomeSystems extends React.PureComponent<Props> {
                 </Text>
                 <Text style={[fonts.p, styles.foreground]}>{t('buildOnCeloCopy')}</Text>
                 <View style={standardStyles.elementalMargin}>
-                  <Button text={t('learnMore')} kind={BTN.NAKED} onPress={onLearnMorePress} />
+                  <Button text={t('learnMore')} kind={BTN.NAKED} href={menuItems.BUILD.link} />
                 </View>
               </Cell>
               <Cell span={Spans.fourth}>
