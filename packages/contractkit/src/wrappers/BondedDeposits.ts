@@ -58,21 +58,6 @@ export class BondedDepositsWrapper extends BaseWrapper<BondedDeposits> {
     return this.getValueFromDeposit(deposit)
   }
 
-  async zipAccountTimesAndValuesToDeposits(
-    account: string,
-    timesFunc: (account: string) => TransactionObject<string[]>,
-    valueFunc: (account: string, time: string) => Promise<BN>
-  ) {
-    const accountTimes = await timesFunc(account).call()
-    const accountValues = await Promise.all(accountTimes.map((time) => valueFunc(account, time)))
-    return zip(
-      // tslint:disable-next-line: no-object-literal-type-assertion
-      (time, value) => ({ time, value } as Deposit),
-      accountTimes.map((time) => Web3.utils.toBN(time)),
-      accountValues
-    )
-  }
-
   async getBondedDeposits(account: string): Promise<Deposit[]> {
     return this.zipAccountTimesAndValuesToDeposits(
       account,
@@ -129,5 +114,20 @@ export class BondedDepositsWrapper extends BaseWrapper<BondedDeposits> {
       s: `0x${signature.slice(64, 128)}`,
       v: Web3.utils.hexToNumber(signature.slice(128, 130)) + 27,
     }
+  }
+
+  private async zipAccountTimesAndValuesToDeposits(
+    account: string,
+    timesFunc: (account: string) => TransactionObject<string[]>,
+    valueFunc: (account: string, time: string) => Promise<BN>
+  ) {
+    const accountTimes = await timesFunc(account).call()
+    const accountValues = await Promise.all(accountTimes.map((time) => valueFunc(account, time)))
+    return zip(
+      // tslint:disable-next-line: no-object-literal-type-assertion
+      (time, value) => ({ time, value } as Deposit),
+      accountTimes.map((time) => Web3.utils.toBN(time)),
+      accountValues
+    )
   }
 }
