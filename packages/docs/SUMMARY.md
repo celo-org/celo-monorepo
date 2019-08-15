@@ -51,6 +51,16 @@
     - [Payments and Exchanging](celo-codebase/wallet/how-the-wallet-works/sending-and-requesting-payments.md)
     - [Ultralight Node Sync](celo-codebase/wallet/how-the-wallet-works/ultralight-node-sync.md)
 
+## Celo SDK
+- [Introduction](developer-resources/introduction.md)
+- [DAppKit](developer-resources/dappkit/README.md)
+  - [Getting Started](developer-resources/dappkit/setup.md)
+  - [Examples](developer-resources/dappkit/examples.md)
+- [DAppKit](developer-resources/contractkit/README.md)
+  - [Getting Started](developer-resources/contractkit/setup.md)
+  - [Examples](developer-resources/contractkit/examples.md)
+- [Celo DApp Gallery](developer-resources/celo-dapp-gallery.md)
+
 ## Command Line Interface
 
 - [Introduction](command-line-interface/introduction.md)
