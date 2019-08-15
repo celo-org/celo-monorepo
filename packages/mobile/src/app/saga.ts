@@ -1,7 +1,9 @@
+import { Linking } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { all, call, put, select, spawn, take } from 'redux-saga/effects'
 import { setLanguage } from 'src/app/actions'
+import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { getVersionInfo } from 'src/firebase/firebase'
 import { waitForFirebaseAuth } from 'src/firebase/saga'
 import { NavActions, navigate } from 'src/navigator/NavigationService'
@@ -55,7 +57,11 @@ export function* checkAppDeprecation() {
 
 export function* navigateToProperScreen() {
   yield all([take(REHYDRATE), take(NavActions.SET_NAVIGATOR)])
+
+  const deepLink = yield call(Linking.getInitialURL)
+  const inSync = yield call(clockInSync)
   const mappedState = yield select(mapStateToProps)
+
   if (!mappedState) {
     navigate(Stacks.NuxStack)
     return
@@ -75,7 +81,10 @@ export function* navigateToProperScreen() {
     yield put(setLanguage(language))
   }
 
-  const inSync = yield call(clockInSync)
+  if (deepLink) {
+    handleDeepLink(deepLink)
+    return
+  }
 
   if (!language) {
     navigate(Stacks.NuxStack)
@@ -96,6 +105,12 @@ export function* navigateToProperScreen() {
   } else {
     navigate(Stacks.AppStack)
   }
+}
+
+export function handleDeepLink(deepLink: string) {
+  Logger.debug(TAG, 'Handling deep link', deepLink)
+  handleDappkitDeepLink(deepLink)
+  // Other deep link handlers can go here later
 }
 
 export function* appSaga() {

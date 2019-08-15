@@ -1,4 +1,4 @@
-import { sanitizeBase64 } from '@celo/contractkit'
+import { sanitizeBase64 } from '@celo/walletkit'
 
 export const createInviteCode = (privateKey: string) => {
   // TODO(Rossy) we need some scheme to encrypt this PK

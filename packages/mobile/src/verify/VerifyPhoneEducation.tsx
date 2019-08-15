@@ -1,25 +1,21 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
-import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import componentWithAnalytics from 'src/analytics/wrapper'
-import DevSkipButton from 'src/components/DevSkipButton'
-import FindUser from 'src/icons/FindUser'
-import NuxLogo from 'src/icons/NuxLogo'
-import ThreeChecks from 'src/icons/ThreeChecks'
-import VerifyAddressBook from 'src/icons/VerifyAddressBook'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
-import DisconnectBanner from 'src/shared/DisconnectBanner'
+import Button, { BtnTypes } from '@celo/react-components/components/Button';
+import colors from '@celo/react-components/styles/colors';
+import { fontStyles } from '@celo/react-components/styles/fonts';
+import * as React from 'react';
+import { withNamespaces, WithNamespaces } from 'react-i18next';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import componentWithAnalytics from 'src/analytics/wrapper';
+import DevSkipButton from 'src/components/DevSkipButton';
+import FindUser from 'src/icons/FindUser';
+import NuxLogo from 'src/icons/NuxLogo';
+import ThreeChecks from 'src/icons/ThreeChecks';
+import VerifyAddressBook from 'src/icons/VerifyAddressBook';
+import { navigate } from 'src/navigator/NavigationService';
+import { Screens } from 'src/navigator/Screens';
+import DisconnectBanner from 'src/shared/DisconnectBanner';
+
 export class VerifyPhoneEducation extends React.Component<WithNamespaces> {
-  static navigationOptions = {
-    headerStyle: {
-      elevation: 0,
-    },
-    header: null,
-  }
+  static navigationOptions = { header: null }
 
   onSubmit = () => {
     navigate(Screens.VerifyVerifying)

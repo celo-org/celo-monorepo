@@ -1,3 +1,6 @@
+import { compressedPubKey } from '@celo/utils/src/commentEncryption'
+import { getPhoneHash, isE164Number } from '@celo/utils/src/phoneNumbers'
+import { areAddressesEqual } from '@celo/utils/src/signatureUtils'
 import {
   ActionableAttestation,
   extractAttestationCodeFromMessage,
@@ -14,12 +17,9 @@ import {
   makeRevealTx,
   makeSetAccountTx,
   validateAttestationCode,
-} from '@celo/contractkit'
-import { Attestations as AttestationsType } from '@celo/contractkit/types/Attestations'
-import { StableToken as StableTokenType } from '@celo/contractkit/types/StableToken'
-import { compressedPubKey } from '@celo/utils/src/commentEncryption'
-import { getPhoneHash, isE164Number } from '@celo/utils/src/phoneNumbers'
-import { areAddressesEqual } from '@celo/utils/src/signatureUtils'
+} from '@celo/walletkit'
+import { Attestations as AttestationsType } from '@celo/walletkit/types/Attestations'
+import { StableToken as StableTokenType } from '@celo/walletkit/types/StableToken'
 import BigNumber from 'bignumber.js'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'

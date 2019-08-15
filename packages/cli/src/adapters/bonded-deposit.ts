@@ -2,7 +2,7 @@ import BN from 'bn.js'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
 
-import { BondedDeposits } from '@celo/contractkit'
+import { BondedDeposits } from '@celo/walletkit'
 
 import { Address, zip } from '../utils/helpers'
 

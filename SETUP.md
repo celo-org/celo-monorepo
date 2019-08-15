@@ -53,6 +53,15 @@ rustup install 1.36.0
 rustup default 1.36.0
 ```
 
+If you're building Geth for Android, you require an NDK that has a cross-compilation toolchain. You can get it by appropriately defining the relevant environment variables, e.g.:
+
+```bash
+export NDK_VERSION=android-ndk-r19c
+export ANDROID_NDK=ndk_bundle/android-ndk-r19c
+```
+
+and running `make ndk_bundle`. This will download the NDK for your platform.
+
 ### Java
 
 We need Java to be able to build and run Android to deploy the mobile app to
@@ -156,6 +165,10 @@ yarn
 > you haven’t used git with ssh at least once previously to confirm the
 > github.com host key. Clone a repo or add the github host key to
 > `~/.ssh/known_hosts` and then try again.
+
+> When removing a dependency via `yarn remove some-package`, be sure to also run `yarn postinstall` so
+> you aren't left with freshly unpackaged modules. This is because we use `patch-package`
+> and the `postinstall` step which uses it is not automatically run after using `yarn remove`.
 
 ## Using an Android test device locally
 

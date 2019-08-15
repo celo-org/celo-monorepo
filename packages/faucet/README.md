@@ -132,3 +132,13 @@ And then run:
 ```bash
 celotooljs account faucet -e alfajores --account 0xCEa3eF8e187490A9d85A1849D98412E5D27D1Bb3
 ```
+
+### How to deploy to staging
+
+1.  `yarn firebase login`
+2.  `yarn deploy:staging`
+3.  Deployment can be seen at [https://console.firebase.google.com/project/celo-faucet-staging/overview](https://console.firebase.google.com/project/celo-faucet-staging/overview)
+4.  You can simulate the access at [https://console.firebase.google.com/project/celo-faucet-staging/database/celo-faucet-staging/rules](https://console.firebase.google.com/project/celo-faucet-staging/database/celo-faucet-staging/rules)
+
+`packages/web $ yarn run dev`
+Go to [http://localhost:3000/build/wallet](http://localhost:3000/build/wallet) and perform submit, verify that no failure appears in the logs.

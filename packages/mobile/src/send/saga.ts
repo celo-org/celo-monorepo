@@ -1,12 +1,12 @@
-import { getGoldTokenContract, getStableTokenContract } from '@celo/contractkit'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
+import { getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { features } from 'src/flags'
 import { transferGoldToken } from 'src/goldToken/actions'
 import { encryptComment } from 'src/identity/commentKey'
@@ -161,7 +161,7 @@ export function* sendPaymentOrInviteSaga({
 
     yield put(sendPaymentOrInviteSuccess())
   } catch (e) {
-    yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED, ERROR_BANNER_DURATION))
+    yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED, ALERT_BANNER_DURATION))
     yield put(sendPaymentOrInviteFailure())
   }
 }

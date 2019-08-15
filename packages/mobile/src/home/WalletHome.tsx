@@ -23,6 +23,7 @@ import { hideAlert, showMessage } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { exitBackupFlow } from 'src/app/actions'
 import AccountOverview from 'src/components/AccountOverview'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
 import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
@@ -31,6 +32,7 @@ import { Namespaces } from 'src/i18n'
 import { importContacts } from 'src/identity/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { withDispatchAfterNavigate } from 'src/navigator/WithDispatchAfterNavigate'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -108,7 +110,7 @@ const SHADOW_STYLE = {
   x: 0,
   y: 1,
 }
-export class WalletHome extends React.PureComponent<Props> {
+export class WalletHome extends React.Component<Props> {
   animatedValue: Animated.Value
   headerOpacity: Animated.AnimatedInterpolation
   shadowOpacity: Animated.AnimatedInterpolation
@@ -157,7 +159,7 @@ export class WalletHome extends React.PureComponent<Props> {
 
   showTestnetBanner = () => {
     const { t } = this.props
-    this.props.showMessage(t('testnetAlert.1'), null, t('dismiss'), t('testnetAlert.0'))
+    this.props.showMessage(t('testnetAlert.1'), ALERT_BANNER_DURATION, null, t('testnetAlert.0'))
   }
 
   importContactsIfNeeded = () => {
@@ -266,18 +268,20 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    {
-      refreshAllBalances,
-      resetStandbyTransactions,
-      initializeSentryUserContext,
-      exitBackupFlow,
-      setLoading,
-      showMessage,
-      hideAlert,
-      importContacts,
-    }
-  )(withNamespaces(Namespaces.walletFlow5)(WalletHome))
+export default withDispatchAfterNavigate(
+  componentWithAnalytics(
+    connect<StateProps, DispatchProps, {}, RootState>(
+      mapStateToProps,
+      {
+        refreshAllBalances,
+        resetStandbyTransactions,
+        initializeSentryUserContext,
+        exitBackupFlow,
+        setLoading,
+        showMessage,
+        hideAlert,
+        importContacts,
+      }
+    )(withNamespaces(Namespaces.walletFlow5)(WalletHome))
+  )
 )

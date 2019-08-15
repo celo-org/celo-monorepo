@@ -27,7 +27,7 @@ export const FAQ_LINK = 'https://celo.org/faq'
 export const CELO_SUPPORT_EMAIL_ADDRESS = 'support@celo.org'
 
 export const BALANCE_OUT_OF_SYNC_THRESHOLD = 5 * 60 // 5 minutes
-export const ERROR_BANNER_DURATION = 5000
+export const ALERT_BANNER_DURATION = 5000
 export const INPUT_DEBOUNCE_TIME = 1000 // milliseconds
 
 export const SUPPORTS_KEYSTORE = Platform.Version >= 23
