@@ -1,19 +1,15 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import PhoneNumberWithFlag from '@celo/react-components/components/PhoneNumberWithFlag'
-import PulsingDot from '@celo/react-components/components/PulsingDot'
 import QRCode from '@celo/react-components/icons/QRCode'
-import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { connect } from 'react-redux'
 import { devModeTriggerClicked } from 'src/account/actions'
-import { CTA_CIRCLE_SIZE } from 'src/account/Education'
 import { getUserContactDetails, UserContactDetails } from 'src/account/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
-import { isE2EEnv } from 'src/config'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -61,7 +57,7 @@ export class AccountInfo extends React.Component<Props> {
   }
 
   render() {
-    const { name, e164Number, photosNUXClicked, userContact, defaultCountryCode } = this.props
+    const { name, e164Number, userContact, defaultCountryCode } = this.props
 
     return (
       <View style={style.accountProfile}>
@@ -75,14 +71,6 @@ export class AccountInfo extends React.Component<Props> {
           <View style={style.qrcode}>
             <QRCode />
           </View>
-          {!photosNUXClicked && (
-            <PulsingDot
-              color={colors.messageBlue}
-              circleStartSize={CTA_CIRCLE_SIZE}
-              style={style.dot}
-              animated={!isE2EEnv}
-            />
-          )}
         </TouchableOpacity>
         {!!name && (
           <Text

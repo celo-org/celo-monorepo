@@ -12,6 +12,7 @@ type Props = WithNamespaces
 
 class FeeEducation extends React.PureComponent<Props> {
   static navigationOptions = { header: null }
+
   render() {
     const { t } = this.props
     return (

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import captchaVerify from './captchaVerify'
-import { RequestStatus, RequestType, sendRequest } from './FirebaseClient'
+import { RequestStatus, RequestType } from './FirebaseClient'
+import { sendRequest } from './FirebaseServerSide'
 
 export async function faucetOrInviteController(req: Request, res: Response, type: RequestType) {
   const { captchaToken, beneficiary } = req.body
