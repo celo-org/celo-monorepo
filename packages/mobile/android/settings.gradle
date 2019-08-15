@@ -65,4 +65,6 @@ include ':react-native-sms-retriever'
 project(':react-native-sms-retriever').projectDir = new File(rootProject.projectDir, '../../../node_modules/@celo/react-native-sms-retriever/android')
 include ':react-native-share'
 project(':react-native-share').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-share/android')
+include ':react-native-fbsdk'
+project(':react-native-fbsdk').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-fbsdk/android')
 include ':app'
