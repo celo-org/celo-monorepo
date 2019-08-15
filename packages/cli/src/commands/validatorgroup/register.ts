@@ -14,9 +14,10 @@ export default class ValidatorGroupRegister extends BaseCommand {
     id: flags.string({ required: true }),
     name: flags.string({ required: true }),
     url: flags.string({ required: true }),
-    noticePeriod: flags.string({
+    noticePeriods: flags.string({
       required: true,
-      description: 'Notice Period for the Bonded deposit to use',
+      description: 'Notice Periods for the Bonded deposit to use',
+      multiple: true,
     }),
   }
 
@@ -34,7 +35,7 @@ export default class ValidatorGroupRegister extends BaseCommand {
         res.flags.id,
         res.flags.name,
         res.flags.url,
-        res.flags.noticePeriod
+        res.flags.noticePeriods
       )
     )
   }
