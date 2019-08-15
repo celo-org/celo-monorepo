@@ -6,6 +6,7 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Text, View } from 'react-native'
 import { NavigationParams, NavigationScreenProp } from 'react-navigation'
 import { connect } from 'react-redux'
+import { e164NumberSelector } from 'src/account/reducer'
 import { approveAccountAuth } from 'src/dappkit/dappkit'
 import { Namespaces } from 'src/i18n'
 import { navigateHome } from 'src/navigator/NavigationService'
@@ -22,12 +23,14 @@ interface OwnProps {
 
 interface StateProps {
   account: string | null
+  phoneNumber: string | null
 }
 
 type Props = OwnProps & StateProps & WithNamespaces
 
 const mapStateToProps = (state: RootState): StateProps => ({
   account: currentAccountSelector(state),
+  phoneNumber: e164NumberSelector(state),
 })
 
 class DappKitAccountAuthScreen extends React.Component<Props> {
@@ -42,7 +45,7 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
   }
 
   linkBack = () => {
-    const { account, navigation } = this.props
+    const { account, navigation, phoneNumber } = this.props
 
     if (!navigation) {
       Logger.error(TAG, 'Missing navigation props')
@@ -55,9 +58,12 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
       Logger.error(TAG, 'No request found in navigation props')
       return
     }
-
     if (!account) {
       Logger.error(TAG, 'No account set up for this wallet')
+      return
+    }
+    if (!phoneNumber) {
+      Logger.error(TAG, 'No phone number set up for this wallet')
       return
     }
 
