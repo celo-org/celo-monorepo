@@ -87,6 +87,7 @@ that you want to use with the app, update `.env.ENV-NAME` and `packages/mobile/.
 ```bash
 yarn run build-sdk TESTNET
 ```
+
 before rebuilding the app. Note that this will assume the testnets have a corresponding `/blockchain-api` and `/notification-service` set up.
 
 ## Testing
