@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@0x/subproviders": "^4.1.0",
-    "@celo/utils": "^0.0.6-beta",
+    "@celo/utils": "^0.0.6-beta2",
     "@google-cloud/storage": "^2.3.3",
     "@types/jest": "^24.0.13",
     "babel-jest": "^24.8.0",
