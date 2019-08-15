@@ -6,6 +6,8 @@
   "types": "./lib/index.d.ts",
   "author": "Celo",
   "license": "Apache-2.0",
+  "homepage": "https://github.com/celo-org/celo-monorepo/tree/master/packages/contractkit",
+  "keywords": ["celo", "blockchain", "contractkit", "defi"],
   "scripts": {
     "build": "tsc -b .",
     "clean": "tsc -b . --clean && rm -rf src/generated",
