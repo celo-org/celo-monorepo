@@ -47,6 +47,7 @@
   "inviteSent": "Invite code sent!",
   "inviteFailed": "Failure sending invite",
   "loadingContacts": "Finding your contacts",
+  "QRCode": "QR Code",
   "saveCodeImage": "Save Code Image",
   "scanCode": "Scan Code",
   "writeStorageNeededForQrDownload":
@@ -59,6 +60,6 @@
   "reclaimPayment": "Reclaim Payment",
   "totalSent": "Total Sent",
   "totalRefunded": "Total Refunded",
-  "loadingVerificationStatus": "Checking recipient verfication...",
+  "loadingVerificationStatus": "Checking recipient verification...",
   "askForContactsPermissionAction": "Get my Contacts"
 }

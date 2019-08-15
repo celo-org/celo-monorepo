@@ -13,6 +13,7 @@ export interface CeloEnvArgv extends yargs.Argv {
 
 export enum envVar {
   BLOCK_TIME = 'BLOCK_TIME',
+  CELOTOOL_CELOENV = 'CELOTOOL_CELOENV',
   CELOTOOL_CONFIRMED = 'CELOTOOL_CONFIRMED',
   CELOTOOL_DOCKER_IMAGE_REPOSITORY = 'CELOTOOL_DOCKER_IMAGE_REPOSITORY',
   CELOTOOL_DOCKER_IMAGE_TAG = 'CELOTOOL_DOCKER_IMAGE_TAG',
@@ -28,9 +29,14 @@ export enum envVar {
   CLUSTER_DOMAIN_NAME = 'CLUSTER_DOMAIN_NAME',
   ENV_TYPE = 'ENV_TYPE',
   EPOCH = 'EPOCH',
+  ETHSTATS_WEBSOCKETSECRET = 'ETHSTATS_WEBSOCKETSECRET',
+  GETH_ACCOUNT_SECRET = 'GETH_ACCOUNT_SECRET',
+  GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY = 'GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY',
+  GETH_BOOTNODE_DOCKER_IMAGE_TAG = 'GETH_BOOTNODE_DOCKER_IMAGE_TAG',
   GETH_NODES_BACKUP_CRONJOB_ENABLED = 'GETH_NODES_BACKUP_CRONJOB_ENABLED',
   GETH_NODE_DOCKER_IMAGE_REPOSITORY = 'GETH_NODE_DOCKER_IMAGE_REPOSITORY',
   GETH_NODE_DOCKER_IMAGE_TAG = 'GETH_NODE_DOCKER_IMAGE_TAG',
+  GETH_VERBOSITY = 'GETH_VERBOSITY',
   GETHTX1_NODE_ID = 'GETHTX1_NODE_ID',
   GETHTX2_NODE_ID = 'GETHTX2_NODE_ID',
   GETHTX3_NODE_ID = 'GETHTX3_NODE_ID',
@@ -52,6 +58,7 @@ export enum envVar {
   TRANSACTION_METRICS_EXPORTER_DOCKER_IMAGE_TAG = 'TRANSACTION_METRICS_EXPORTER_DOCKER_IMAGE_TAG',
   TX_NODES = 'TX_NODES',
   VALIDATORS = 'VALIDATORS',
+  VERIFICATION_POOL_URL = 'VERIFICATION_POOL_URL',
 }
 
 export enum EnvTypes {
@@ -64,30 +71,40 @@ export enum EnvTypes {
 export function execCmd(
   cmd: string,
   execOptions: any = {},
-  rejectWithOutput = false
+  rejectWithOutput = false,
+  pipeOutput = false
 ): Promise<[string, string]> {
   return new Promise((resolve, reject) => {
     if (process.env.CELOTOOL_VERBOSE === 'true') {
       console.debug('$ ' + cmd)
     }
 
-    exec(cmd, { maxBuffer: 1024 * 1000, ...execOptions }, (err, stdout, stderr) => {
-      if (process.env.CELOTOOL_VERBOSE === 'true') {
-        console.debug(stdout.toString())
-      }
-      if (err || process.env.CELOTOOL_VERBOSE === 'true') {
-        console.error(stderr.toString())
-      }
-      if (err) {
-        if (rejectWithOutput) {
-          reject([err, stdout.toString(), stderr.toString()])
-        } else {
-          reject(err)
+    const execProcess = exec(
+      cmd,
+      { maxBuffer: 1024 * 1000, ...execOptions },
+      (err, stdout, stderr) => {
+        if (process.env.CELOTOOL_VERBOSE === 'true') {
+          console.debug(stdout.toString())
         }
-      } else {
-        resolve([stdout.toString(), stderr.toString()])
+        if (err || process.env.CELOTOOL_VERBOSE === 'true') {
+          console.error(stderr.toString())
+        }
+        if (err) {
+          if (rejectWithOutput) {
+            reject([err, stdout.toString(), stderr.toString()])
+          } else {
+            reject(err)
+          }
+        } else {
+          resolve([stdout.toString(), stderr.toString()])
+        }
       }
-    })
+    )
+
+    if (pipeOutput) {
+      execProcess.stdout.pipe(process.stdout)
+      execProcess.stderr.pipe(process.stderr)
+    }
   })
 }
 
@@ -258,19 +275,22 @@ export async function doCheckOrPromptIfStagingOrProduction() {
     process.env.CELOTOOL_CONFIRMED !== 'true' &&
     isValidStagingOrProductionEnv(process.env.CELOTOOL_CELOENV!)
   ) {
-    const response = await prompts({
-      type: 'confirm',
-      name: 'confirmation',
-      message:
-        'You are about to apply a possibly irreversable action on a staging/production environment. Are you sure? (y/n)',
-    })
+    await confirmAction(
+      'You are about to apply a possibly irreversable action on a staging/production environment. Are you sure?'
+    )
+    process.env.CELOTOOL_CONFIRMED = 'true'
+  }
+}
 
-    if (response.confirmation) {
-      process.env.CELOTOOL_CONFIRMED = 'true'
-    } else {
-      console.info('Aborting due to user response')
-      process.exit(0)
-    }
+export async function confirmAction(message: string) {
+  const response = await prompts({
+    type: 'confirm',
+    name: 'confirmation',
+    message: `${message} (y/n)`,
+  })
+  if (!response.confirmation) {
+    console.info('Aborting due to user response')
+    process.exit(0)
   }
 }
 

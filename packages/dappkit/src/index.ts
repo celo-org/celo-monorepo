@@ -1,32 +1,55 @@
-import { CeloTokenType, GoldToken, StableToken } from '@celo/contractkit'
-import { AccountAuthRequest, serializeDappKitRequestDeeplink, SignTxRequest } from '@celo/utils'
+import {
+  AccountAuthRequest,
+  DappKitRequestMeta,
+  DappKitRequestTypes,
+  DappKitResponseStatus,
+  parseDappkitResponseDepplink,
+  serializeDappKitRequestDeeplink,
+  SignTxRequest,
+  TxToSignParam,
+} from '@celo/utils'
+import { CeloTokenType, GoldToken, StableToken } from '@celo/walletkit'
 import { Linking } from 'expo'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
 
-export { AccountAuthRequest, serializeDappKitRequestDeeplink, SignTxRequest } from '@celo/utils'
+export {
+  AccountAuthRequest,
+  DappKitRequestMeta,
+  serializeDappKitRequestDeeplink,
+  SignTxRequest,
+} from '@celo/utils/'
 
 export function listenToAccount(callback: (account: string) => void) {
   return Linking.addEventListener('url', ({ url }: { url: string }) => {
-    const { queryParams } = Linking.parse(url)
-    if (queryParams.account) {
-      callback(queryParams.account)
-    }
+    try {
+      const dappKitResponse = parseDappkitResponseDepplink(url)
+      if (
+        dappKitResponse.type === DappKitRequestTypes.ACCOUNT_ADDRESS &&
+        dappKitResponse.status === DappKitResponseStatus.SUCCESS
+      ) {
+        callback(dappKitResponse.address)
+      }
+    } catch (error) {}
   })
 }
 
-export function listenToSignedTx(callback: (signedTx: string) => void) {
+export function listenToSignedTxs(callback: (signedTxs: string[]) => void) {
   return Linking.addEventListener('url', ({ url }: { url: string }) => {
-    const { queryParams } = Linking.parse(url)
-    if (queryParams.rawTx) {
-      callback(queryParams.rawTx)
-    }
+    try {
+      const dappKitResponse = parseDappkitResponseDepplink(url)
+      if (
+        dappKitResponse.type === DappKitRequestTypes.SIGN_TX &&
+        dappKitResponse.status === DappKitResponseStatus.SUCCESS
+      ) {
+        callback(dappKitResponse.rawTxs)
+      }
+    } catch (error) {}
   })
 }
 
-export function requestAccountAddress(returnPath: string) {
-  const url = Linking.makeUrl(returnPath)
-  Linking.openURL(serializeDappKitRequestDeeplink(AccountAuthRequest(url, 'test')))
+export function requestAccountAddress(meta: DappKitRequestMeta) {
+  Linking.openURL(serializeDappKitRequestDeeplink(AccountAuthRequest(meta)))
 }
 
 export enum GasCurrency {
@@ -56,25 +79,34 @@ export interface TxParams<T> {
   gasCurrency: GasCurrency
 }
 
-export async function requestTxSig<T>(web3: Web3, txParams: TxParams<T>, returnPath: string) {
-  const gasCurrencyContract = await getGasCurrencyContract(web3, txParams.gasCurrency)
-  const estimatedTxParams = { gasCurrency: gasCurrencyContract._address }
-  // @ts-ignore
-  const estimatedGas = await txParams.tx.estimateGas(estimatedTxParams)
+export async function requestTxSig<T>(
+  web3: Web3,
+  txParams: TxParams<T>[],
+  meta: DappKitRequestMeta
+) {
+  const txs: TxToSignParam[] = await Promise.all(
+    txParams.map(async (txParam) => {
+      const gasCurrencyContract = await getGasCurrencyContract(web3, txParam.gasCurrency)
+      const estimatedTxParams = {
+        gasCurrency: gasCurrencyContract.options.address,
+      }
+      // @ts-ignore
+      const estimatedGas = await txParam.tx.estimateGas(estimatedTxParams)
 
-  const nonce = await web3.eth.getTransactionCount(txParams.from)
-  const url = Linking.makeUrl(returnPath)
-
-  const request = SignTxRequest(
-    txParams.tx.encodeABI(),
-    estimatedGas,
-    txParams.from,
-    txParams.to,
-    nonce,
-    gasCurrencyContract._address,
-    url,
-    'test'
+      const nonce = await web3.eth.getTransactionCount(txParam.from)
+      return {
+        txData: txParam.tx.encodeABI(),
+        estimatedGas,
+        nonce,
+        gasCurrencyAddress: gasCurrencyContract._address,
+        ...txParam,
+      }
+    })
   )
+
+  // const url = Linking.makeUrl(returnPath)
+
+  const request = SignTxRequest(txs, meta)
 
   Linking.openURL(serializeDappKitRequestDeeplink(request))
 }

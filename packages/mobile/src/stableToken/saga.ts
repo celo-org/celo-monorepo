@@ -1,4 +1,4 @@
-import { getStableTokenContract } from '@celo/contractkit'
+import { getStableTokenContract } from '@celo/walletkit'
 import { spawn } from 'redux-saga/effects'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Actions, fetchDollarBalance, setBalance } from 'src/stableToken/actions'
