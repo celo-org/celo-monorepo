@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     height: '100%',
-    maxWidth: 300,
+    maxWidth: 270,
     minWidth: 160,
     marginTop: 30,
     marginHorizontal: 20,
