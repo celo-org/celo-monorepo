@@ -1,12 +1,12 @@
-import { ContractUtils } from '@celo/contractkit'
 import { CURRENCY_ENUM } from '@celo/utils'
+import { ContractUtils } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { call, put, select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { GAS_PRICE_STALE_AFTER } from 'src/geth/consts'
-import { waitForGethConnectivity } from 'src/geth/saga'
+import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { setGasPrice } from 'src/web3/actions'
@@ -18,7 +18,7 @@ export const gasPriceSelector = (state: RootState) => state.web3.gasPrice
 export const gasPriceLastUpdatedSelector = (state: RootState) => state.web3.gasPriceLastUpdated
 
 export function* refreshGasPrice() {
-  yield call(waitForGethConnectivity)
+  yield call(waitWeb3LastBlock)
 
   let gasPrice = yield select(gasPriceSelector)
   const gasPriceLastUpdated = yield select(gasPriceLastUpdatedSelector)
@@ -30,7 +30,7 @@ export function* refreshGasPrice() {
     }
   } catch (error) {
     Logger.error(`${TAG}}/refreshGasPrice`, 'Could not fetch and update gas price.', error)
-    yield put(showError(ErrorMessages.GAS_PRICE_UPDATE_FAILED, ERROR_BANNER_DURATION))
+    yield put(showError(ErrorMessages.GAS_PRICE_UPDATE_FAILED, ALERT_BANNER_DURATION))
   }
 }
 

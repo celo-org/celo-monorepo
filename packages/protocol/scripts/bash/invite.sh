@@ -26,8 +26,7 @@ if ! nc -z 127.0.0.1 8545 ; then
   exit 1
 fi
 
-yarn run contract-types && \
-yarn run compile-typescript && \
+yarn run build && \
 gcloud config set project celo-testnet
 gcloud kms decrypt --ciphertext-file=twilio-config.enc --plaintext-file=twilio-config.js \
   --key=github-key --keyring=celo-keyring --location=global && \

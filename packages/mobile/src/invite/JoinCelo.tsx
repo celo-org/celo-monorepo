@@ -12,15 +12,14 @@ import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import BackButton from 'src/components/BackButton'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces } from 'src/i18n'
 import NuxLogo from 'src/icons/NuxLogo'
 import { redeemComplete } from 'src/invite/actions'
+import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import DisconnectBanner from 'src/shared/DisconnectBanner'
 
 function goToCeloSite() {
   Linking.openURL('https://celo.org/terms')
@@ -78,19 +77,7 @@ const hasDisplayedError = (error: ErrorMessages | null) => {
   return error && displayedErrors.includes(error)
 }
 export class JoinCelo extends React.Component<Props, State> {
-  static navigationOptions = {
-    headerStyle: {
-      elevation: 0,
-    },
-    headerLeftContainerStyle: { paddingHorizontal: 20 },
-    headerLeft: <BackButton />,
-    headerRightContainerStyle: { paddingRight: 15 },
-    headerRight: (
-      <View>
-        <DisconnectBanner />
-      </View>
-    ),
-  }
+  static navigationOptions = nuxNavigationOptions
 
   static getDerivedStateFromProps(props: Props, state: State): State | null {
     if (hasDisplayedError(props.error) && state.isSubmitting) {
@@ -133,10 +120,6 @@ export class JoinCelo extends React.Component<Props, State> {
     this.setState({
       isValidNumber,
     })
-  }
-
-  setName = (value: string) => {
-    this.setState({ name: value })
   }
 
   onChangeNameInput = (value: string) => {
@@ -203,49 +186,47 @@ export class JoinCelo extends React.Component<Props, State> {
           keyboardShouldPersistTaps="always"
           ref={this.scrollView}
         >
-          <View>
-            <NuxLogo style={styles.logo} />
-            <Text style={[fontStyles.h1, styles.center]} testID="InviteWallTitle">
-              {' '}
-              {t('welcomeCelo')}
+          <NuxLogo style={styles.logo} />
+          <Text style={[fontStyles.h1, styles.center]} testID="InviteWallTitle">
+            {' '}
+            {t('welcomeCelo')}
+          </Text>
+          <Text style={[fontStyles.bodySmall, styles.body]}>{t('joinText.0')}</Text>
+          <Text style={[fontStyles.bodySmall, styles.body]}>
+            {t('joinText.1')}
+            <Text onPress={goToCeloSite} style={fontStyles.link}>
+              {t('joinText.2')}
             </Text>
-            <Text style={[fontStyles.bodySmall, styles.body]}>{t('joinText.0')}</Text>
-            <Text style={[fontStyles.bodySmall, styles.body]}>
-              {t('joinText.1')}
-              <Text onPress={goToCeloSite} style={fontStyles.link}>
-                {t('joinText.2')}
-              </Text>
-            </Text>
-            <TextInput
-              onFocus={this.scrollToEnd}
-              onChangeText={this.setName}
-              value={name}
-              style={styles.box}
-              placeholderTextColor={colors.inactive}
-              underlineColorAndroid="transparent"
-              enablesReturnKeyAutomatically={true}
-              onSubmitEditing={this.focusOnCode}
-              placeholder={t('fullName')}
-              testID={'NameEntry'}
-            />
-            <PhoneNumberInput
-              setE164Number={this.setE164Number}
-              setCountryCode={this.setCountryCode}
-              setIsValidNumber={this.setIsValidNumber}
-              onInputFocus={this.scrollToEnd}
-              onInputChange={this.onChangePhoneInput}
-              inputCountryPlaceholder={t('chooseCountryCode')}
-              inputPhonePlaceholder={t('phoneNumber')}
-              callingCode={true}
-              lng={language}
-              defaultCountryCode={
-                this.props.cachedCountryCode !== '' ? this.props.cachedCountryCode : undefined
-              }
-              defaultPhoneNumber={
-                this.props.cachedNumber !== '' ? this.props.cachedNumber : undefined
-              }
-            />
-          </View>
+          </Text>
+          <TextInput
+            onFocus={this.scrollToEnd}
+            onChangeText={this.onChangeNameInput}
+            value={name}
+            style={styles.box}
+            placeholderTextColor={colors.inactive}
+            underlineColorAndroid="transparent"
+            enablesReturnKeyAutomatically={true}
+            onSubmitEditing={this.focusOnCode}
+            placeholder={t('fullName')}
+            testID={'NameEntry'}
+          />
+          <PhoneNumberInput
+            setE164Number={this.setE164Number}
+            setCountryCode={this.setCountryCode}
+            setIsValidNumber={this.setIsValidNumber}
+            onInputFocus={this.scrollToEnd}
+            onInputChange={this.onChangePhoneInput}
+            inputCountryPlaceholder={t('chooseCountryCode')}
+            inputPhonePlaceholder={t('phoneNumber')}
+            callingCode={true}
+            lng={language}
+            defaultCountryCode={
+              this.props.cachedCountryCode !== '' ? this.props.cachedCountryCode : undefined
+            }
+            defaultPhoneNumber={
+              this.props.cachedNumber !== '' ? this.props.cachedNumber : undefined
+            }
+          />
         </ScrollView>
         <Button
           standard={false}
@@ -269,9 +250,6 @@ const styles = StyleSheet.create({
   logo: {
     marginTop: 0,
   },
-  headerRight: {
-    paddingLeft: 15,
-  },
   scrollContainer: {
     paddingHorizontal: 10,
     paddingBottom: 10,
@@ -294,15 +272,6 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     flexDirection: 'row',
     flexWrap: 'wrap',
-  },
-  importWallet: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    marginVertical: 17,
-  },
-  description: {
-    padding: 30,
   },
 })
 

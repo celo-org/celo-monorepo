@@ -1,31 +1,39 @@
+/**
+ * TextInput with label, such as an input for SendAmount with a dollar sign on
+ * the left of the input.  Uses ValidatedTextInput to validate various kinds of
+ * input.
+ */
+
+import ValidatedTextInput, {
+  ValidatorProps,
+} from '@celo/react-components/components/ValidatedTextInput'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
-import { parseInputAmount } from '@celo/utils/src/parsing'
 import * as React from 'react'
-import { KeyboardType, StyleSheet, Text, TextInput, TextStyle, View } from 'react-native'
+import { KeyboardType, StyleSheet, Text, TextStyle, View } from 'react-native'
 import Search from 'src/icons/Search'
 
-interface Props {
+interface OwnProps {
+  autocorrect?: boolean
   keyboardType: KeyboardType
   title?: string
   placeholder: string
   value: string
   labelStyle?: TextStyle
-  placeholderColor?: string
+  placeholderTextColor?: string
   autoFocus?: boolean
   numberOfDecimals?: number
-  onValueChanged(value: string): void
+  lng?: string
+  maxLength?: number
+  onChangeText(value: string): void
 }
 
-type PropsWithRef = {
-  innerRef: React.RefObject<TextInput>
-} & Props
-
+type Props = OwnProps & ValidatorProps
 interface State {
   active: boolean
 }
-export class LabeledTextInput extends React.Component<PropsWithRef, State> {
+export default class LabeledTextInput extends React.Component<Props, State> {
   state = {
     active: false,
   }
@@ -36,14 +44,6 @@ export class LabeledTextInput extends React.Component<PropsWithRef, State> {
 
   onBlur = () => {
     this.setState({ active: false })
-
-    let value = this.props.value
-    if (this.props.keyboardType === 'numeric' && this.props.numberOfDecimals) {
-      value = parseInputAmount(value)
-        .toFixed(this.props.numberOfDecimals)
-        .toString()
-    }
-    this.props.onValueChanged(value)
   }
 
   render() {
@@ -70,20 +70,10 @@ export class LabeledTextInput extends React.Component<PropsWithRef, State> {
             { backgroundColor: this.state.active ? colors.darkSecondary : colors.darkLightest },
           ]}
         />
-        <TextInput
-          ref={this.props.innerRef}
+        <ValidatedTextInput
+          placeholderTextColor={colors.gray}
+          {...this.props}
           style={style.textInput}
-          keyboardType={props.keyboardType}
-          autoCapitalize="none"
-          autoCorrect={false}
-          placeholder={props.placeholder}
-          underlineColorAndroid="transparent"
-          placeholderTextColor={props.placeholderColor || colors.gray}
-          multiline={false}
-          spellCheck={false}
-          value={props.value}
-          onChangeText={props.onValueChanged}
-          autoFocus={props.autoFocus || false}
           onFocus={this.onFocus}
           onBlur={this.onBlur}
         />
@@ -114,7 +104,3 @@ const style = StyleSheet.create({
     marginHorizontal: 8,
   },
 })
-
-export default React.forwardRef((props: Props, ref: React.Ref<TextInput>) => (
-  <LabeledTextInput innerRef={ref as React.RefObject<TextInput>} {...props} />
-))

@@ -2,7 +2,7 @@ import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { withNamespaces } from 'react-i18next'
-import { DeviceEventEmitter, StatusBar, YellowBox } from 'react-native'
+import { DeviceEventEmitter, Linking, StatusBar, YellowBox } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
@@ -11,14 +11,11 @@ import { DefaultEventNames } from 'src/analytics/constants'
 import { apolloClient } from 'src/apollo/index'
 import AppLoading from 'src/app/AppLoading'
 import ErrorBoundary from 'src/app/ErrorBoundary'
+import { handleDeepLink } from 'src/app/saga'
 import i18n from 'src/i18n'
 import Navigator from 'src/navigator/NavigatorWrapper'
 import { persistor, store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
-
-// This is currently breaking paste - looking into it
-// import { useScreens } from 'react-native-screens'
-// useScreens()
 
 Logger.debug('App/init', 'Current Language: ' + i18n.language)
 YellowBox.ignoreWarnings([
@@ -40,7 +37,7 @@ const WrappedNavigator = withNamespaces('common', {
 WrappedNavigator.displayName = 'WrappedNavigator'
 
 export class App extends React.Component {
-  componentDidMount() {
+  async componentDidMount() {
     CeloAnalytics.track(DefaultEventNames.appLoaded, this.props, true)
     const appLoadedAt: Date = new Date()
     // TODO(cmcewen) see above
@@ -54,6 +51,16 @@ export class App extends React.Component {
         appStartListener.remove()
       }
     )
+
+    Linking.addEventListener('url', this.handleOpenURL)
+  }
+
+  componentWillUnmount() {
+    Linking.removeEventListener('url', this.handleOpenURL)
+  }
+
+  handleOpenURL = (event: any) => {
+    handleDeepLink(event.url)
   }
 
   hideSplashScreen() {

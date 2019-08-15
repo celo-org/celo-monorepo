@@ -6,16 +6,20 @@
   "author": "Celo",
   "license": "Apache-2.0",
   "dependencies": {
-    "@celo/contractkit": "0.0.1",
+    "@celo/walletkit": "^0.0.4",
     "@google-cloud/monitoring": "0.7.1",
     "@google-cloud/pubsub": "^0.28.1",
     "@google-cloud/storage": "^2.4.3",
     "@types/bip32": "^1.0.1",
     "@types/bip39": "^2.4.2",
+    "bignumber.js": "^7.2.0",
     "bip32": "^1.0.2",
     "bip39": "^2.5.0",
+    "buffer-reverse": "^1.0.1",
     "dotenv": "6.1.0",
+    "ecurve": "^1.0.6",
     "js-yaml": "^3.12.0",
+    "keccak256": "^1.0.0",
     "lodash": "^4.17.14",
     "moment": "^2.22.1",
     "node-fetch": "^2.2.0",
@@ -29,6 +33,7 @@
   "devDependencies": {
     "@types/dotenv": "^4.0.3",
     "@types/jest": "^24.0.13",
+    "@types/node-fetch": "^2.1.2",
     "@types/prompts": "^1.1.1",
     "@types/web3": "^1.0.18",
     "@types/yargs": "^12.0.1",
@@ -40,7 +45,7 @@
     "cli": "TS_NODE_FILES=true ts-node -r tsconfig-paths/register src/cli.ts",
     "test": "jest",
     "lint": "tslint -c tslint.json --project tsconfig.json",
-    "lint-checks": "yarn run lint && tsc --project tsconfig.json --noEmit"
+    "build": "tsc -p tsconfig.json "
   },
   "private": true
 }

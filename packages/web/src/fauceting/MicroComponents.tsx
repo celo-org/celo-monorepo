@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   statusesContainerLog: {
     position: 'absolute',
     width: '100%',
-    marignTop: 10,
+    marginTop: 10,
   },
   statusesContainerTicker: {
     alignContent: 'center',

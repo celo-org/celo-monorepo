@@ -35,7 +35,6 @@ export const inviteReducer = (
         ...state,
         isSendingInvite: true,
       }
-    case Actions.SEND_INVITE_SUCCESS:
     case Actions.SEND_INVITE_FAILURE:
       return {
         ...state,
