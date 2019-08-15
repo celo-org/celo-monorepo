@@ -62,7 +62,7 @@ A bootnode's purpose is to help nodes find other nodes in the network. This comm
 **Step 6: Start the full node**  
 This command specifies the settings needed to run the node, and gets it started.
 
-`` $ docker run -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v `pwd`:/root/.celo us.gcr.io/celo-testnet/celo-node:alfajores --verbosity 3 --networkid 44781 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS ``
+`` $ docker run -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v `pwd`:/root/.celo us.gcr.io/celo-testnet/celo-node:alfajores --verbosity 3 --networkid 44782 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --lightserv 90 --lightpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS ``
 
 You'll start seeing some output. There may be some errors or warnings that are ignorable. After a few minutes, you should see lines that look like this. This means your node has synced with the network and is receiving blocks.
 
