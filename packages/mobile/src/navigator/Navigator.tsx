@@ -15,7 +15,7 @@ import ErrorScreen from 'src/app/ErrorScreen'
 import UpgradeScreen from 'src/app/UpgradeScreen'
 import Backup from 'src/backup/Backup'
 import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
-import DappKitTxSignScreen from 'src/dappkit/DappKitTxSignScreen'
+import DappKitTxSignScreen from 'src/dappkit/DappKitSignTxScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
@@ -42,6 +42,8 @@ import VerifyEducation from 'src/verify/Education'
 import VerifyInput from 'src/verify/Input'
 import VerifyVerified from 'src/verify/Verified'
 import VerifyVerifying from 'src/verify/Verifying'
+import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
+
 export const navbarStyle: {
   headerMode: 'none'
 } = {
@@ -62,6 +64,7 @@ const commonScreens = {
   [Screens.UpgradeScreen]: { screen: UpgradeScreen },
   [Screens.DappKitAccountAuth]: { screen: DappKitAccountScreen },
   [Screens.DappKitSignTxScreen]: { screen: DappKitTxSignScreen },
+  [Screens.DappKitTxDataScreen]: { screen: DappKitTxDataScreen },
 }
 
 const NuxStack = createStackNavigator(

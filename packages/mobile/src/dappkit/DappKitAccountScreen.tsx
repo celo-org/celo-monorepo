@@ -71,20 +71,6 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
     Linking.openURL(produceResponseDeeplink(request, AccountAuthResponseSuccess(account)))
   }
 
-  prettifyAddress = (address: string | null) => {
-    if (!address) {
-      return
-    }
-
-    return '0x '.concat(
-      // @ts-ignore
-      address
-        .substring(2)
-        .match(/.{1,4}/g)
-        .join(' ')
-    )
-  }
-
   cancel = () => {
     navigateBack()
   }
@@ -99,16 +85,11 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
           </View>
           <Text style={styles.header}>{t('connectToWallet')}</Text>
 
-          <View style={styles.sectionDivider}>
-            <View style={styles.lineDivider} />
-            <View style={styles.space}>
-              <Text style={styles.connect}> {t('connect')} </Text>
-            </View>
-          </View>
+          <Text style={styles.share}>{t('shareInfo')}</Text>
 
           <View style={styles.sectionDivider}>
             <Text style={styles.sectionHeaderText}>{t('address')}</Text>
-            <Text style={styles.bodyText}>{this.prettifyAddress(account)}</Text>
+            <Text style={styles.bodyText}>{account}</Text>
           </View>
         </ScrollView>
 
@@ -147,7 +128,7 @@ const styles = StyleSheet.create({
   header: {
     ...fontStyles.h1,
     alignItems: 'center',
-    marginBottom: 30,
+    paddingBottom: 30,
   },
   footer: {
     flexDirection: 'column',
@@ -157,26 +138,24 @@ const styles = StyleSheet.create({
   logo: {
     marginBottom: 20,
   },
-  connect: {
-    ...fontStyles.sectionLabel,
-    color: colors.inactive,
+  share: {
+    ...fontStyles.bodySecondary,
+    fontSize: 13,
     alignSelf: 'center',
-    backgroundColor: colors.background,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
   },
   space: {
     paddingHorizontal: 5,
-    height: 20,
   },
   sectionDivider: {
     alignItems: 'center',
+    width: 200,
   },
   sectionHeaderText: {
     ...fontStyles.bodyBold,
     textTransform: 'uppercase',
     fontSize: 12,
     marginTop: 20,
+    marginBottom: 5,
   },
   lineDivider: {
     position: 'absolute',
@@ -187,9 +166,9 @@ const styles = StyleSheet.create({
     borderColor: colors.inactive,
   },
   bodyText: {
-    ...fontStyles.bodySmall,
+    ...fontStyles.paragraph,
+    fontSize: 15,
     color: colors.darkSecondary,
-    marginHorizontal: '5%',
     textAlign: 'center',
   },
 })

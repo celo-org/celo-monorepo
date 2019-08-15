@@ -10,10 +10,15 @@ import { connect } from 'react-redux'
 import { requestTxSignature } from 'src/dappkit/dappkit'
 import { Namespaces } from 'src/i18n'
 import DappkitExchangeIcon from 'src/icons/DappkitExchange'
-import { navigateBack } from 'src/navigator/NavigationService'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'dappkit/DappKitSignTxScreen'
+
+interface State {
+  request: SignTxRequest
+}
 
 interface OwnProps {
   errorMessage?: string
@@ -30,18 +35,10 @@ const mapDispatchToProps = {
   requestTxSignature,
 }
 
-class DappKitSignTxScreen extends React.Component<Props> {
+class DappKitSignTxScreen extends React.Component<Props, State> {
   static navigationOptions = { header: null }
 
-  getErrorMessage() {
-    return (
-      this.props.errorMessage ||
-      (this.props.navigation && this.props.navigation.getParam('errorMessage')) ||
-      ''
-    )
-  }
-
-  linkBack = () => {
+  componentDidMount() {
     if (!this.props.navigation) {
       Logger.error(TAG, 'Missing navigation props')
       return
@@ -54,11 +51,23 @@ class DappKitSignTxScreen extends React.Component<Props> {
       return
     }
 
-    this.props.requestTxSignature(request)
+    this.setState({ request })
+  }
+
+  getErrorMessage() {
+    return (
+      this.props.errorMessage ||
+      (this.props.navigation && this.props.navigation.getParam('errorMessage')) ||
+      ''
+    )
+  }
+
+  linkBack = () => {
+    this.props.requestTxSignature(this.state.request)
   }
 
   showDetails = () => {
-    this.setState({ visibleModal: true })
+    navigate(Screens.DappKitTxDataScreen, { dappKitData: this.state.request.txData })
   }
 
   cancel = () => {
@@ -75,19 +84,14 @@ class DappKitSignTxScreen extends React.Component<Props> {
           </View>
           <Text style={styles.header}>{t('connectToWallet')}</Text>
 
-          <View style={styles.sectionDivider}>
-            <View style={styles.lineDivider} />
-            <View style={styles.space}>
-              <Text style={styles.connect}> {t('connect')} </Text>
-            </View>
-          </View>
+          <Text style={styles.share}> {t('shareInfo')} </Text>
 
           <View style={styles.sectionDivider}>
             <Text style={styles.sectionHeaderText}>{t('transaction.operation')}</Text>
-            <Text style={styles.bodyText}>{t('signTX')}</Text>
+            <Text style={styles.bodyText}>{t('transaction.signTX')}</Text>
             <Text style={styles.sectionHeaderText}>{t('transaction.data')}</Text>
             <TouchableOpacity onPress={this.showDetails}>
-              <Text style={styles.bodyText}>{t('details')}</Text>
+              <Text style={[styles.bodyText, styles.underLine]}>{t('transaction.details')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -127,7 +131,7 @@ const styles = StyleSheet.create({
   header: {
     ...fontStyles.h1,
     alignItems: 'center',
-    marginBottom: 30,
+    paddingBottom: 30,
   },
   footer: {
     flexDirection: 'column',
@@ -137,13 +141,10 @@ const styles = StyleSheet.create({
   logo: {
     marginBottom: 20,
   },
-  connect: {
-    ...fontStyles.sectionLabel,
-    color: colors.inactive,
+  share: {
+    ...fontStyles.bodySecondary,
+    fontSize: 13,
     alignSelf: 'center',
-    backgroundColor: colors.background,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
   },
   space: {
     paddingHorizontal: 5,
@@ -152,24 +153,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sectionHeaderText: {
-    ...fontStyles.bodyBold,
+    ...fontStyles.sectionLabel,
+    ...fontStyles.semiBold,
+    color: colors.dark,
     textTransform: 'uppercase',
-    fontSize: 12,
     marginTop: 20,
-  },
-  lineDivider: {
-    position: 'absolute',
-    justifyContent: 'flex-start',
-    top: '50%',
-    width: '100%',
-    borderTopWidth: 1,
-    borderColor: colors.inactive,
+    marginBottom: 5,
   },
   bodyText: {
-    ...fontStyles.bodySmall,
+    ...fontStyles.paragraph,
+    fontSize: 15,
     color: colors.darkSecondary,
-    marginHorizontal: '5%',
     textAlign: 'center',
+  },
+  underLine: {
+    textDecorationLine: 'underline',
   },
 })
 
