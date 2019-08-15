@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { Image } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
+import ah from 'src/community/ah-logo.png'
+import polychain from 'src/community/polychain-logo.png'
 import { H2 } from 'src/fonts/Fonts'
 import { ErrorMessage, Form, styles as formStyles, TextInput } from 'src/forms/FormComponents'
-import { ah, polychain } from 'src/home/logos/logos'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Rings from 'src/logos/RingsLight'
@@ -13,14 +13,14 @@ import Navigation from 'src/shared/navigation'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import {
   Application,
-  ApplicationKeys,
   ApplicationFields,
+  ApplicationKeys,
   Recommendation,
-  RecommendationKeys,
   RecommendationFields,
+  RecommendationKeys,
   Tables,
 } from '../../fullstack/EcoFundFields'
-import Fade from 'react-reveal/Fade'
+import menuItems, { CeloLinks } from 'src/shared/menu-items'
 
 interface State {
   table: Tables
@@ -53,37 +53,63 @@ class EcoFund extends React.PureComponent<I18nProps, State> {
         mobileStyle={[standardStyles.sectionMarginMobile, standardStyles.blockMarginBottomMobile]}
       >
         <Cell span={Spans.half}>
-          <View style={[standardStyles.row, standardStyles.elementalMarginBottom, styles.partners]}>
-            <Image
-              resizeMode="contain"
-              accessibilityLabel="Polychain"
-              source={{ uri: polychain }}
-              style={styles.polyChain}
-            />
-            <Rings color={colors.screenGray} height={25} />
-            <Image resizeMode="contain" accessibilityLabel="a16z" source={ah} style={styles.a16z} />
-          </View>
           <H2>{t('ecoFund.title')}</H2>
-          <Text style={[fonts.p]}>{t('ecoFund.poweredBy')}</Text>
+          <Text style={[fonts.p, textStyles.italic]}>{t('ecoFund.poweredBy')}</Text>
           <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('ecoFund.description')}</Text>
-          <Button text={t('ecoFund.Link')} kind={BTN.NAKED} size={SIZE.normal} />
+          <View style={[standardStyles.row, standardStyles.elementalMargin]}>
+            <View style={styles.partners}>
+              <Text style={[fonts.h5, styles.partnerText]}>{t('ecoFund.generalPartner')}</Text>
+              <Image
+                resizeMode="contain"
+                accessibilityLabel="Polychain"
+                source={{ uri: polychain }}
+                style={styles.polyChain}
+              />
+            </View>
+            <View style={styles.partners}>
+              <Text style={[fonts.h5, styles.partnerText]}>{t('ecoFund.limitedPartners')}</Text>
+              <View style={[standardStyles.row, styles.limitedPartners]}>
+                <Rings color={colors.dark} height={40} />
+                <Image
+                  resizeMode="contain"
+                  accessibilityLabel="a16z"
+                  source={ah}
+                  style={styles.a16z}
+                />
+              </View>
+            </View>
+          </View>
+          <Button
+            style={styles.button}
+            text={t('ecoFund.link')}
+            kind={BTN.NAKED}
+            size={SIZE.normal}
+            href={menuItems.BUILD.link}
+          />
         </Cell>
         <Cell span={Spans.half}>
-          <View style={[standardStyles.row, standardStyles.centered]}>
+          <View
+            style={[
+              standardStyles.row,
+              standardStyles.centered,
+              standardStyles.elementalMarginBottom,
+            ]}
+          >
             <Navigation
               onPress={this.selectApplication}
-              text={t('applyForFunding')}
+              text={t('ecoFund.applyForFunding')}
               selected={this.state.table === Tables.Applicants}
             />
             <Navigation
               onPress={this.selectRecommendation}
-              text={t('recommendProject')}
+              text={t('ecoFund.recommendProject')}
               selected={this.state.table === Tables.Recommendations}
             />
           </View>
           <View>
-            <View style={this.state.table !== Tables.Applicants && styles.hidden}>
+            <View style={[this.state.table !== Tables.Applicants && styles.hidden]}>
               <FormContainer
+                key={Tables.Applicants}
                 route={`/ecosystem/${Tables.Applicants}`}
                 blankForm={blankApplicationForm}
                 validateWith={invalidApplicationFields}
@@ -115,17 +141,28 @@ class EcoFund extends React.PureComponent<I18nProps, State> {
                       size={SIZE.big}
                       align={'flex-start'}
                     />
-                    {formState.isComplete && (
-                      <Text style={[textStyles.center, fonts.p, standardStyles.elementalMarginTop]}>
-                        {t('form.fellowshipSubmitted')}
-                      </Text>
-                    )}
+                    <View style={standardStyles.elementalMarginTop}>
+                      {formState.isComplete && (
+                        <Text
+                          style={[textStyles.center, fonts.p, standardStyles.elementalMarginTop]}
+                        >
+                          {t('form.fellowshipSubmitted')}
+                        </Text>
+                      )}
+                      <ErrorMessage allErrors={formState.errors} field={'unknownError'} t={t} />
+                    </View>
                   </Form>
                 )}
               </FormContainer>
             </View>
-            <View style={this.state.table !== Tables.Recommendations && styles.hidden}>
+            <View
+              style={[
+                this.state.table !== Tables.Recommendations && styles.hidden,
+                styles.shorterForm,
+              ]}
+            >
               <FormContainer
+                key={Tables.Recommendations}
                 route={`/ecosystem/${Tables.Recommendations}`}
                 blankForm={blankRecForm}
                 validateWith={invalidRecFields}
@@ -157,11 +194,16 @@ class EcoFund extends React.PureComponent<I18nProps, State> {
                       size={SIZE.big}
                       align={'flex-start'}
                     />
-                    {formState.isComplete && (
-                      <Text style={[textStyles.center, fonts.p, standardStyles.elementalMarginTop]}>
-                        {t('form.fellowshipSubmitted')}
-                      </Text>
-                    )}
+                    <View style={standardStyles.elementalMarginTop}>
+                      {formState.isComplete && (
+                        <Text
+                          style={[textStyles.center, fonts.p, standardStyles.elementalMarginTop]}
+                        >
+                          {t('form.fellowshipSubmitted')}
+                        </Text>
+                      )}
+                      <ErrorMessage allErrors={formState.errors} field={'unknownError'} t={t} />
+                    </View>
                   </Form>
                 )}
               </FormContainer>
@@ -173,7 +215,7 @@ class EcoFund extends React.PureComponent<I18nProps, State> {
   }
 }
 
-const blankRecForm = {
+const blankRecForm: Recommendation = {
   org: '',
   email: '',
   founderEmail: '',
@@ -181,15 +223,15 @@ const blankRecForm = {
   why: '',
 }
 
-function invalidRecFields(fields: Recommendation) {
-  return Object.keys(fields).filter((key) => {
-    return key === 'founderEmail' || key === 'founderName'
+function invalidRecFields(fields: Record<keyof Recommendation, string>) {
+  return Object.keys(fields).filter((key: keyof Recommendation) => {
+    return key === 'founderEmail' || key === 'email'
       ? !emailIsValid(fields[key])
       : !hasField(fields[key])
   })
 }
 
-const blankApplicationForm = {
+const blankApplicationForm: Application = {
   org: '',
   url: '',
   product: '',
@@ -216,21 +258,34 @@ function invalidApplicationFields(fields: Record<keyof Application, string>) {
 export default withNamespaces(NameSpaces.community)(EcoFund)
 
 const styles = StyleSheet.create({
-  partners: {
+  limitedPartners: {
     alignItems: 'center',
   },
   polyChain: {
-    marginRight: 20,
-    width: 155,
+    marginRight: 40,
+    marginBottom: 3,
+    width: 190,
     height: 35,
   },
   a16z: {
-    width: 55,
-    height: 25,
-    marginHorizontal: 20,
+    width: 91,
+    height: 45,
+    marginHorizontal: 30,
   },
   hidden: {
-    height: 0,
-    opacity: 0,
+    // @ts-ignore
+    visibility: 'hidden',
+  },
+  shorterForm: {
+    position: 'absolute',
+  },
+  button: {
+    fontSize: 18,
+  },
+  partners: {
+    justifyContent: 'space-between',
+  },
+  partnerText: {
+    marginBottom: 5,
   },
 })

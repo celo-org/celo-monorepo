@@ -17,11 +17,15 @@ import { Cell, Spans } from 'src/layout/GridRow'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 export function ErrorMessage({ allErrors, field, t }) {
+  let key = 'generic'
+
+  if (field === 'email' || key === 'unknownError') {
+    key = field
+  }
+
   return allErrors.includes(field) ? (
     <Fade>
-      <Text style={[fonts.h5, textStyles.error]}>
-        {t(`validationErrors.${field === 'email' ? 'email' : 'generic'}`)}
-      </Text>
+      <Text style={[fonts.h5, textStyles.error]}>{t(`validationErrors.${key}`)}</Text>
     </Fade>
   ) : (
     <View style={styles.errorPlaceholder} />

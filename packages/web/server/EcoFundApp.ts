@@ -1,11 +1,5 @@
 import getConfig from 'next/config'
-import {
-  Application,
-  // ApplicationFields,
-  Recommendation,
-  RecommendationFields,
-  Tables,
-} from '../fullstack/EcoFundFields'
+import { Application, Recommendation, Tables } from '../fullstack/EcoFundFields'
 import airtableInit from '../server/airtable'
 
 export default function submit(fields: Recommendation | Application, table: Tables) {
@@ -24,28 +18,10 @@ function getAirtable(tableName: Tables) {
   return airtableInit(serverRuntimeConfig.AIRTABLE_ECOFUND_ID)(tableName)
 }
 
-export async function recommend(fields: Recommendation) {
-  return getAirtable(Tables.Recommendations).create(migrateRecomentation(fields))
+async function recommend(fields: Recommendation) {
+  return getAirtable(Tables.Recommendations).create(fields)
 }
 
-export async function apply(fields: Application) {
+async function apply(fields: Application) {
   return getAirtable(Tables.Applicants).create(fields)
 }
-
-function migrateRecomentation(fields: Recommendation) {
-  return {
-    [RecommendationFields.orgName]: fields.orgName,
-  }
-}
-
-// function migrationApplication(fields: Application) {
-//   return {
-//     [ApplicationFields.about]: fields.about,
-//     [ApplicationFields.org]: fields.org,
-//     [ApplicationFields.product]: fields.product,
-//     [ApplicationFields.url]: fields.url,
-//     [ApplicationFields.founderEmail]: fields.founderEmail,
-//     [ApplicationFields.coFounderEmail]: fields.coFounderEmail,
-//     [ApplicationFields.video]: fields.video,
-//   }
-// }

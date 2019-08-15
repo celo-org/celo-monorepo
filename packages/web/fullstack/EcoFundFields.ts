@@ -25,15 +25,22 @@ export const ApplicationKeys = Object.keys(ApplicationFields)
 export enum RecommendationFields {
   email = 'Your Email Address',
   org = 'Organization you are Recommending',
-  founderEmail = 'One founder’s name',
+  founderEmail = 'One founder’s email',
   founderName = "One founder's name",
   why = 'Why do you recommend this applicant?',
 }
 
-export type Recommendation = Record<keyof RecommendationFields, string>
+export interface Recommendation {
+  email: string
+  org: string
+  founderEmail: string
+  founderName: string
+  why: string
+}
 
 export const RecommendationKeys = Object.keys(RecommendationFields)
 
+// Must match table name on Airtable
 export enum Tables {
   Applicants = 'Applicants',
   Recommendations = 'Recommendations',

@@ -76,6 +76,7 @@ export default class Form extends React.Component<Props, State> {
       isComplete: response.ok,
       form: this.props.blankForm,
       isLoading: false,
+      errors: !response.ok ? ['unknownError'] : [],
     })
   }
 

@@ -121,12 +121,19 @@
   },
   "validationErrors": {
     "email": "Please enter a valid email address",
-    "generic": "Oops I’m blank!"
+    "generic": "Oops I’m blank!",
+    "unknownError": "Something went wrong"
   },
   "ecoFund": {
     "title": "Celo Ecosystem Fund",
-    "poweredBy": "Powered by Polychain Capital",
-    "description": "La La Blockchain; TODO"
+    "poweredBy": "By Polychain",
+    "description":
+      "The Celo Ecosystem Fund is a Polychain-led venture, supported by founding investors Andreessen Horowitz and Celo, with the goal of investing in and developing the Celo ecosystem. The fund aims to foster Celo’s mission of creating a more accessible monetary system by making strategic, seed-stage deployments into tools and services which will leverage Celo’s protocol to build new financial infrastructure in the developing world.",
+    "generalPartner": "General Partner",
+    "limitedPartners": "Limited Partners",
+    "link": "Learn about building on Celo",
+    "applyForFunding": "Apply for Funding",
+    "recommendProject": "Recommend Project "
   },
   "apply": "Apply",
   "recommend": "Recommend",

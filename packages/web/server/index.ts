@@ -91,7 +91,7 @@ function wwwRedirect(req, res, nextAction) {
   server.post('/ecosystem/:table', async (req, res) => {
     try {
       const record = await ecoFundSubmission(req.body, req.params.table)
-      res.json({ id: record.id })
+      res.status(204).json({ id: record.id })
     } catch (e) {
       res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
     }
