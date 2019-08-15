@@ -1,7 +1,7 @@
-node_modules
-coverage
-tslint.json
-tsconfig.json
-test
-src
-jest.config.json
+/node_modules
+/coverage
+/tslint.json
+/tsconfig.json
+/test
+/src
+/jest.config.json
