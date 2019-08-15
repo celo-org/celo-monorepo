@@ -55,7 +55,9 @@
     "typescript": "^3.3.3",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.0",
-    "typescript-tslint-plugin": "^0.5.0"
+    "typescript-tslint-plugin": "^0.5.0",
+    "tsconfig-paths": "^3.8.0",
+    "ts-node": "^8"
   },
   "dependencies": {
     "codecov": "^3.1.0"
