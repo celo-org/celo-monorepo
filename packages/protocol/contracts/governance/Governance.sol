@@ -43,6 +43,11 @@ contract Governance is
     mapping(bytes4 => int256) functionThresholds;
   }
 
+  struct HotfixSig {
+    address approver;
+    address auditor;
+  }
+
   // All parameters are Fixidity fractions.
   // The baseline is updated as
   // max{floor, (1 - baselineUpdateFactor) * baseline + baselineUpdateFactor * participation}
@@ -61,6 +66,7 @@ contract Governance is
   uint256 public queueExpiry;
   uint256 public dequeueFrequency;
   address public approver;
+  address public auditor;
   uint256 public lastDequeue;
   uint256 public concurrentProposals;
   uint256 public proposalCount;
@@ -69,6 +75,8 @@ contract Governance is
   mapping(address => ContractConstitution) private constitution;
   mapping(uint256 => Proposals.Proposal) private proposals;
   mapping(address => Voter) public voters;
+  mapping(bytes => HotfixSig) private hashWhitelist;
+  Proposals.Proposal private hotfix;
   SortedLinkedList.List private queue;
   uint256[] public dequeued;
   uint256[] public emptyIndices;
@@ -178,6 +186,7 @@ contract Governance is
    * @notice Initializes critical variables.
    * @param registryAddress The address of the registry contract.
    * @param _approver The address that needs to approve proposals to move to the referendum stage.
+   * @param _auditor The address that needs to audit and permit hotfixes.
    * @param _concurrentProposals The number of proposals to dequeue at once.
    * @param _minDeposit The minimum Celo Gold deposit needed to make a proposal.
    * @param _queueExpiry The number of seconds a proposal can stay in the queue before expiring.
@@ -198,6 +207,7 @@ contract Governance is
   function initialize(
     address registryAddress,
     address _approver,
+    address _auditor,
     uint256 _concurrentProposals,
     uint256 _minDeposit,
     uint256 _queueExpiry,
@@ -230,6 +240,7 @@ contract Governance is
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     approver = _approver;
+    auditor = _auditor;
     concurrentProposals = _concurrentProposals;
     minDeposit = _minDeposit;
     queueExpiry = _queueExpiry;
@@ -607,6 +618,47 @@ contract Governance is
     // Proposal must have executed fully or expired if this point is reached.
     deleteDequeuedProposal(proposal, proposalId, index);
     return !expired;
+  }
+
+  /**
+   * @notice Whitelists the hash of a proposal.
+   * @param proposalHash The hash of the proposal to be whitelisted.
+   * @dev Can only be called by the approver or auditor.
+   */
+  function whitelistHash(bytes proposalHash) external {
+    require(msg.sender == approver || msg.sender == auditor);
+    if (msg.sender == approver) {
+      hashWhitelist[proposalHash].approver = approver;
+    } else if (msg.sender == auditor) {
+      hashWhitelist[proposalHash].auditor = auditor;
+    }
+  }
+
+  /**
+   * @notice Executes a whitelisted proposal.
+   * @param values The values of Celo Gold to be sent in the proposed transactions.
+   * @param destinations The destination addresses of the proposed transactions.
+   * @param data The concatenated data to be included in the proposed transactions.
+   * @param dataLengths The lengths of each transaction's data.
+   * @dev Reverts if the proposal is not whitelisted.
+   */
+  function hotfix(
+    uint256[] calldata values,
+    address[] calldata destinations,
+    bytes calldata data,
+    uint256[] calldata dataLengths
+  )
+    external
+    nonReentrant
+  {
+    bytes hotfixHash = keccak256(abi.encodePacked(values, destinations, data, dataLengths));
+    require(
+      hashWhitelist[hotfixHash].approver == approver &&
+      hashWhitelist[hotfixHash].auditor == auditor
+    );
+    hotfix.make(values, destinations, data, dataLengths, msg.sender, 0);
+    hotfix.execute();
+    delete hotfix;
   }
 
   /**
