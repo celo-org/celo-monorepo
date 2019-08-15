@@ -12,6 +12,7 @@ import paymentRequestFlow from '@celo/mobile/locales/en-US/paymentRequestFlow.js
 import receiveFlow8 from '@celo/mobile/locales/en-US/receiveFlow8.json'
 import sendFlow7 from '@celo/mobile/locales/en-US/sendFlow7.json'
 import walletFlow5 from '@celo/mobile/locales/en-US/walletFlow5.json'
+import dappkit from '@celo/mobile/locales/en-US/dappkit.json'
 
 export default {
   accountScreen10,
@@ -28,4 +29,5 @@ export default {
   sendFlow7,
   walletFlow5,
   dev,
+  dappkit,
 }
