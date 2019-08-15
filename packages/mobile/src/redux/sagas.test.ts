@@ -1,6 +1,6 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import { withTimeout } from 'src/redux/sagas-helpers'
-import { sleep } from 'src/test/utils'
+import { sleep } from 'test/utils'
 
 describe('withTimeout Saga', () => {
   test('returns the fn results if no timeout', () =>

@@ -2010,10 +2010,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo/client@55cf94c":
-  version "0.0.54"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.54.tgz#b12e716b197d53686ac9e06566a48464cc0e2839"
-  integrity sha512-+L2S/cOQlbEjnVscvwi50HE1itBaxtBA0gHjIbO/MoqBXvips2FGSHvpU9Uz/usnqLm/FN6BaKo5JUKZMR9FUg==
+"@celo/client@f7095b7":
+  version "0.0.98"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.98.tgz#0c15460fe6508be6c7f400183500cd705c8827ab"
+  integrity sha512-r43CBGZx6BMD3TAcFGVEuG/r0Hsvbuc8wg9d564Sh5YsUgWoPtyDCEgsOfCwaEdF9MoaiavFxl/sGUeN7RL/5g==
 
 "@celo/dev-cli@^2.0.3":
   version "2.0.3"

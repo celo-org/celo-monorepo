@@ -47,6 +47,7 @@
   "inviteSent": "Invite code sent!",
   "inviteFailed": "Failure sending invite",
   "loadingContacts": "Finding your contacts",
+  "QRCode": "QR Code",
   "saveCodeImage": "Save Code Image",
   "scanCode": "Scan Code",
   "writeStorageNeededForQrDownload":

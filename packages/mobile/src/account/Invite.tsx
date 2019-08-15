@@ -1,10 +1,8 @@
 import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
-import { NavigationInjectedProps, NavigationScreenProps, withNavigation } from 'react-navigation'
+import { NavigationInjectedProps, withNavigation } from 'react-navigation'
 import { connect } from 'react-redux'
 import { defaultCountryCodeSelector } from 'src/account/reducer'
 import { hideAlert, showError } from 'src/alert/actions'
@@ -12,11 +10,11 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import CancelButton from 'src/components/CancelButton'
 import { ALERT_BANNER_DURATION } from 'src/config'
-import { Namespaces } from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
 import { importContacts } from 'src/identity/actions'
 import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
+import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { filterRecipients, NumberToRecipient, Recipient } from 'src/recipients/recipient'
@@ -62,25 +60,15 @@ const mapStateToProps = (state: RootState): StateProps => ({
 })
 
 class Invite extends React.Component<Props, State> {
-  static navigationOptions = ({ navigation }: NavigationScreenProps) => ({
-    headerStyle: {
-      elevation: 0,
-    },
-    headerTitle: navigation.getParam('title', ''),
-    headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
-    headerRight: <View />, // This helps vertically center the title
-    headerLeft: <CancelButton eventName={CustomEventNames.invite_cancel} />,
+  static navigationOptions = () => ({
+    ...headerWithCancelButton,
+    headerTitle: i18n.t('sendFlow7:invite'),
   })
 
   state: State = { searchQuery: '', hasGivenPermission: true }
 
   async componentDidMount() {
-    this.props.navigation.setParams({
-      title: this.props.t('invite'),
-    })
-
     const granted = await checkContactsPermission()
-
     this.setState({ hasGivenPermission: granted })
   }
 
