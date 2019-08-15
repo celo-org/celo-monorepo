@@ -51,7 +51,6 @@ import com.rnrestartandroid.RNRestartAndroidPackage;
 import me.furtado.smsretriever.RNSmsRetrieverPackage;
 import cl.json.RNSharePackage;
 import cl.json.ShareApplication;
-import com.facebook.reactnative.androidsdk.FBSDKPackage;
 
 import android.util.Log;
 
@@ -115,8 +114,7 @@ public class MainApplication extends MultiDexApplication implements ShareApplica
               new RNSystemClockPackage(),
               new RNRestartAndroidPackage(),
               new RNSmsRetrieverPackage(),
-              new RNSharePackage(),
-              new FBSDKPackage()
+              new RNSharePackage()
               // Disabled due to dex count
               // new RNScreensPackage(),
       };
