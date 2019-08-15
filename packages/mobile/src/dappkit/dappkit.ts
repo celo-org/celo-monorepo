@@ -1,6 +1,8 @@
 import {
   AccountAuthRequest,
   AccountAuthResponseSuccess,
+  DappKitRequestTypes,
+  parseDappKitRequestDeeplink,
   produceResponseDeeplink,
   SignTxRequest,
   SignTxResponseSuccess,
@@ -8,6 +10,8 @@ import {
 import { Linking } from 'react-native'
 import { call, select, takeLeading } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/reducer'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -77,4 +81,22 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
 export function* dappKitSaga() {
   yield takeLeading(actions.APPROVE_ACCOUNT_AUTH, respondToAccountAuth)
   yield takeLeading(actions.REQUEST_TX_SIGNATURE, produceTxSignature)
+}
+
+export function handleDappkit(deepLink: string) {
+  try {
+    const dappKitRequest = parseDappKitRequestDeeplink(deepLink)
+    switch (dappKitRequest.type) {
+      case DappKitRequestTypes.ACCOUNT_ADDRESS:
+        navigate(Screens.DappKitAccountAuth, { dappKitRequest })
+        break
+      case DappKitRequestTypes.SIGN_TX:
+        navigate(Screens.DappKitSignTxScreen, { dappKitRequest })
+        break
+      default:
+        Logger.warn(TAG, 'Unsupported dapp request type')
+    }
+  } catch (error) {
+    Logger.debug(TAG, 'Deep link not valid for dappkit. Ignoring.')
+  }
 }
