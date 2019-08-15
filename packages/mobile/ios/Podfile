@@ -1,0 +1,97 @@
+# File contents of "ios/Podfile"
+platform :ios, '9.0'
+
+pre_install do |installer|
+  # workaround for CocoaPods/CocoaPods#3289
+  Pod::Installer::Xcode::TargetValidator.send(:define_method, :verify_no_static_framework_transitive_dependencies) {}
+end
+
+target 'celo' do
+  # use_frameworks!
+  use_modular_headers!
+
+  pod 'React', :path => '../node_modules/react-native', :subspecs => [
+    'Core',
+    'CxxBridge',
+    'DevSupport',
+    # the following ones are the ones taken from "Libraries" in Xcode:
+    'RCTAnimation',
+    'RCTActionSheet',
+    'RCTBlob',
+    'RCTGeolocation',
+    'RCTImage',
+    'RCTLinkingIOS',
+    'RCTNetwork',
+    'RCTSettings',
+    'RCTText',
+    'RCTVibration',
+    'RCTWebSocket'
+  ]
+
+  # the following dependencies are dependencies of React native itself.
+  pod 'yoga', :path => '../node_modules/react-native/ReactCommon/yoga/Yoga.podspec'
+  pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec', :modular_headers => false
+  pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec', :modular_headers => false
+  pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/GLog.podspec', :modular_headers => false
+
+  # React Native Libraries
+  # pod 'RNFBApp', :path => '../node_modules/@react-native-firebase/app'
+  # pod 'RNFBAuth', :path => '../node_modules/@react-native-firebase/auth'
+  # pod 'RNFBDatabase', :path => '../node_modules/@react-native-firebase/database'
+  pod 'RNFirebase', :path => '../../../node_modules/react-native-firebase/ios'
+  pod 'RNFS', :path => '../../../node_modules/react-native-fs', :modular_headers => false
+  pod 'ReactNativeGeth', :path => '../../../node_modules/react-native-geth'
+  pod 'RNSVG', :path => '../../../node_modules/react-native-svg'
+  pod 'RNAnalytics', :path => '../../../node_modules/@segment/analytics-react-native'
+  pod 'RNAnalyticsIntegration-Firebase', :path => '../../../node_modules/@segment/analytics-react-native-firebase'
+  pod 'react-native-config', :path => '../../../node_modules/react-native-config'
+  pod 'react-native-contacts', :path => '../../../node_modules/react-native-contacts'
+  pod 'RNDeviceInfo', :path => '../../../node_modules/react-native-device-info'
+  pod 'react-native-keep-awake', :path => '../../../node_modules/react-native-keep-awake'
+  pod 'RNLanguages', :path => '../../../node_modules/react-native-languages'
+  pod 'react-native-mail', :path => '../../../node_modules/react-native-mail'
+  pod 'RNScreens', :path => '../../../node_modules/react-native-screens'
+  pod 'SentryReactNative', :path => '../../../node_modules/react-native-sentry'
+  pod 'react-native-splash-screen', :path => '../../../node_modules/react-native-splash-screen'
+  pod 'react-native-version-check', :path => '../../../node_modules/react-native-version-check'
+  pod 'RNRandomBytes', :path => '../../../node_modules/react-native-secure-randombytes'
+  pod 'react-native-udp', :path => '../../../node_modules/react-native-udp'
+  pod 'RNAnalytics', :path => '../../../node_modules/@segment/analytics-react-native'
+  pod 'react-native-netinfo', :path => '../../../node_modules/@react-native-community/netinfo'
+  pod 'RNShare', :path => '../../../node_modules/react-native-share'
+  pod 'react-native-camera', :path => '../../../node_modules/react-native-camera'
+  pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
+  pod 'Geth', :path => 'Geth.podspec'
+
+  pod 'Firebase/Core', '~> 5.20.2'
+  pod 'Segment-Firebase', '~> 2.4.0'
+
+  target 'celoTests' do
+    inherit! :search_paths
+  end
+end
+
+# The following is needed to ensure the "archive" step works in XCode.
+# It removes React from the Pods project, as it is already included in the main project.
+post_install do |installer|
+  system("mkdir -p Pods/Headers/Public/FirebaseCore && cp Pods/FirebaseCore/Firebase/Core/Public/* Pods/Headers/Public/FirebaseCore/")
+
+
+  installer.pods_project.targets.each do |target|
+    # if target.name == "React"
+    #   target.remove_from_project
+    # end
+
+    if target.name == 'react-native-config'
+      phase = target.project.new(Xcodeproj::Project::Object::PBXShellScriptBuildPhase)
+      phase.shell_script = "cd ../../"\
+                           " && RNC_ROOT=../../node_modules/react-native-config/"\
+                           " && export SYMROOT=$RNC_ROOT/ios/ReactNativeConfig"\
+                           " && export BUILD_DIR=$RNC_ROOT/ios/ReactNativeConfig"\
+                           " && ruby $RNC_ROOT/ios/ReactNativeConfig/BuildDotenvConfig.ruby"
+
+      target.build_phases << phase
+      target.build_phases.move(phase,0)
+    end
+  end
+end

@@ -1,3 +1,4 @@
+import { Platform } from 'react-native'
 import { GenesisBlockUtils, StaticNodeUtils } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import DeviceInfo from 'react-native-device-info'
@@ -45,6 +46,8 @@ enum ErrorType {
   GethAlreadyRunning,
   CorruptChainData,
 }
+
+const dir = Platform.OS === 'ios' ? 'iGeth' : 'GethDroid'
 
 async function createNewGeth(): Promise<typeof RNGeth> {
   Logger.debug('Geth@newGeth', 'Configure and create new Geth')
@@ -228,8 +231,8 @@ async function staticNodesAlreadyInitialized(nodeDir: string): Promise<boolean> 
 
 async function writeStaticNodes(nodeDir: string, enodes: string) {
   console.info(`writeStaticNodes enodes are "${enodes}"`)
-  const staticNodesFile = `${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/static-nodes.json`
-  await RNFS.mkdir(`${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/`)
+  const staticNodesFile = `${RNFS.DocumentDirectoryPath}/${nodeDir}/${dir}/static-nodes.json`
+  await RNFS.mkdir(`${RNFS.DocumentDirectoryPath}/${nodeDir}/${dir}/`)
   await RNFS.writeFile(staticNodesFile, enodes, 'utf8')
 }
 
@@ -255,7 +258,7 @@ export async function deleteChainData() {
 
 async function deleteSingleChainData(syncMode: SyncMode) {
   const { nodeDir } = currentConfig
-  const chainDataDir = `${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/${syncMode}chaindata`
+  const chainDataDir = `${RNFS.DocumentDirectoryPath}/${nodeDir}/${dir}/${syncMode}chaindata`
   Logger.debug('Geth@deleteSingleChainData', `Going to delete ${chainDataDir}`)
   return deleteFileIfExists(chainDataDir)
 }
@@ -263,7 +266,7 @@ async function deleteSingleChainData(syncMode: SyncMode) {
 async function deleteGethLockFile() {
   // Delete the .ipc file or the Geth will think that some other Geth node is using this datadir.
   const { nodeDir } = currentConfig
-  const gethLockFile = `${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/LOCK`
+  const gethLockFile = `${RNFS.DocumentDirectoryPath}/${nodeDir}/${dir}/LOCK`
   Logger.info('Geth@deleteGethLockFile', `Deleting ${gethLockFile} for nodeDir ${nodeDir}`)
   return deleteFileIfExists(gethLockFile)
 }

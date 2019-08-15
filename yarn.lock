@@ -3945,10 +3945,20 @@
   resolved "https://registry.yarnpkg.com/@segment/analytics-react-native-firebase/-/analytics-react-native-firebase-0.1.0-beta.0.tgz#b4d0a75b38f7e8a432286cdd00c6e3191383e407"
   integrity sha512-l0W8QTXYLLIRXX3DWZGKz9sjO8bsDgG9eStCjby1rpVFtvFDKjfH71NbkIp1h3FTlEoo1MVXPk/5GEB72rs2xA==
 
+"@segment/analytics-react-native-firebase@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@segment/analytics-react-native-firebase/-/analytics-react-native-firebase-1.0.1.tgz#28d3e763db61866805e3eaa2536efd4ac080c44c"
+  integrity sha512-VcbkRfciLlctzrF5NU1dH3TpbnaRspqnRdjYlHPlcYwZGlAj1Jwjx+r2GuT0aP09GH8DeR+hOS77Q0sOpigp4g==
+
 "@segment/analytics-react-native@^0.1.0-beta.0":
   version "0.1.0-beta.0"
   resolved "https://registry.yarnpkg.com/@segment/analytics-react-native/-/analytics-react-native-0.1.0-beta.0.tgz#fb1c5ff9f72d6946b263777943af7d7abb157694"
   integrity sha512-hIVs10hZn7i13BqKu/ikHhgOZUwXCFjjy61DFFsZbD7d/3Xi/X810TjQva+lBH1E27kbp+WIJ8nh+UzWlKTjPw==
+
+"@segment/analytics-react-native@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@segment/analytics-react-native/-/analytics-react-native-1.0.1.tgz#7e974ae3a4b28bd4a4d760d0ec752512912a8ce7"
+  integrity sha512-872ojMYhRZSBGHRngSpNkRCE5SkD+pD4cVB9QoLyGVssune4jeqVaPwuXji/J9wuQ/u871n7Qt1MqtD500Jv7A==
 
 "@segment/in-eu@^0.2.1":
   version "0.2.1"
@@ -24421,6 +24431,14 @@ react-native-firebase@5.3.0:
     opencollective-postinstall "^2.0.0"
     prop-types "^15.6.2"
 
+react-native-firebase@5.4.3:
+  version "5.4.3"
+  resolved "https://registry.yarnpkg.com/react-native-firebase/-/react-native-firebase-5.4.3.tgz#3c14c0f72b5593bb3aa4f91e417cbf459b60f15c"
+  integrity sha512-JnE4IK/NuST+QfgzlCKtHtjpjPcLYB2/us2YnK2jGGNeCRwARWbNUPgATLkkPAJYqRIfjxXBadqBabrVsXGCVw==
+  dependencies:
+    opencollective-postinstall "^2.0.0"
+    prop-types "^15.6.2"
+
 "react-native-flag-secure-android@git://github.com/kristiansorens/react-native-flag-secure-android#e234251":
   version "1.0.0"
   resolved "git://github.com/kristiansorens/react-native-flag-secure-android#e234251220f5d745eec8ebde3e83d4d369e81a14"
@@ -24644,10 +24662,10 @@ react-native-udp@2.1.0:
     ip-regex "^1.0.3"
     util "^0.10.3"
 
-react-native-udp@^2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/react-native-udp/-/react-native-udp-2.3.1.tgz#88eb0f548ed8c7e35065392526ecf8ce2e2be91e"
-  integrity sha1-iOsPVI7Yx+NQZTklJuz4zi4r6R4=
+react-native-udp@^2.6.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/react-native-udp/-/react-native-udp-2.6.1.tgz#ce9f2479f8af6d1bb356cfee69c89cf92fdd50be"
+  integrity sha512-KctAXtfBjRe+rGLvms92C82MsrZUwUyODwGskY6mDPigMaDTmsKdNqLCXgWh0g6ZmB2UtOzFsbPphy36NyM3KA==
   dependencies:
     base64-js "0.0.8"
     events "^1.0.2"

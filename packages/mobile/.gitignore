@@ -84,3 +84,5 @@ android/app/src/debug/google-services.json
 secrets.json
 android/sentry.properties
 ios/sentry.properties
+
+ios/Pods
