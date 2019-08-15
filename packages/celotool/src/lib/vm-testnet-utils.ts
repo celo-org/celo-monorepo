@@ -22,8 +22,8 @@ import { writeFileSync } from 'fs'
 const secretsBucketName = 'celo-testnet-secrets'
 const terraformModule = 'testnet'
 
-// NOTE(trevor): The keys correspond to the variable names that Terraform expects
-// and the values correspond to the names of the appropriate env variables
+// The keys correspond to the variable names that Terraform expects and
+// the values correspond to the names of the appropriate env variables
 const terraformEnvVars: { [varName: string]: string } = {
   block_time: envVar.BLOCK_TIME,
   celo_env: envVar.CELOTOOL_CELOENV,
