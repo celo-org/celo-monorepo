@@ -1,7 +1,7 @@
 import Web3 from 'web3'
 import { TransactionObject, Tx } from 'web3/eth/types'
 import { AddressRegistry } from './address-registry'
-import { Address, CeloToken } from './base'
+import { Address, CeloContract, CeloToken } from './base'
 import { WrapperCache } from './contract-cache'
 import { sendTransaction, TxOptions } from './utils/send-tx'
 import { toTxResult } from './utils/tx-result'
@@ -32,7 +32,8 @@ export class ContractKit {
   }
 
   async setGasCurrency(token: CeloToken) {
-    this.defaultOptions.gasCurrency = await this.registry.addressFor(token)
+    this.defaultOptions.gasCurrency =
+      token === CeloContract.GoldToken ? undefined : await this.registry.addressFor(token)
   }
 
   set defaultAccount(address: Address) {
@@ -49,11 +50,12 @@ export class ContractKit {
 
   sendTransaction(tx: Tx) {
     const promiEvent = this.web3.eth.sendTransaction({
+      from: this.defaultOptions.from,
+      gasPrice: '0',
       // @ts-ignore
       gasCurrency: this.defaultOptions.gasCurrency,
       // @ts-ignore
-      gasBeneficiary: this.defaultOptions.gasBeneficiary,
-      from: this.defaultOptions.from,
+      gasFeeRecipient: this.defaultOptions.gasFeeRecipient,
       ...tx,
     })
     return toTxResult(promiEvent)

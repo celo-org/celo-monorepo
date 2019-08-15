@@ -26,7 +26,7 @@ export interface Deposits {
   }
 }
 
-enum roles {
+enum Roles {
   validating,
   voting,
   rewards,
@@ -38,12 +38,9 @@ export class BondedDepositsWrapper extends BaseWrapper<BondedDeposits> {
     return Web3.utils.toBN(accountWeight)
   }
 
-  // async getVotingDetails(_accountOrVoterAddress: Address): Promise<VotingDetails> {
-  //   throw new Error('Requires FIX on Incompatible Contract')
-  // }
   async getVotingDetails(accountOrVoterAddress: Address): Promise<VotingDetails> {
     const accountAddress = await this.contract.methods
-      .getAccountFromDelegateAndRole(accountOrVoterAddress, roles.voting)
+      .getAccountFromDelegateAndRole(accountOrVoterAddress, Roles.voting)
       .call()
 
     return {
@@ -79,10 +76,6 @@ export class BondedDepositsWrapper extends BaseWrapper<BondedDeposits> {
     )
   }
 
-  getValueFromDeposit(deposit: { 0: string; 1: string }) {
-    return Web3.utils.toBN(deposit[0])
-  }
-
   async getDeposits(account: string): Promise<Deposits> {
     const bonded = await this.getBondedDeposits(account)
     const notified = await this.getNotifiedDeposits(account)
@@ -103,10 +96,14 @@ export class BondedDepositsWrapper extends BaseWrapper<BondedDeposits> {
   async delegateRewardsTx(account: string, delegate: string) {
     const sig = await this.getParsedSignatureOfAddress(account, delegate)
 
-    return this.contract.methods.delegateRole(roles.rewards, delegate, sig.v, sig.r, sig.s)
+    return this.contract.methods.delegateRole(Roles.rewards, delegate, sig.v, sig.r, sig.s)
   }
 
-  async getParsedSignatureOfAddress(address: string, signer: string) {
+  private getValueFromDeposit(deposit: { 0: string; 1: string }) {
+    return Web3.utils.toBN(deposit[0])
+  }
+
+  private async getParsedSignatureOfAddress(address: string, signer: string) {
     const hash = Web3.utils.soliditySha3({ type: 'address', value: address })
     const signature = (await this.kit.web3.eth.sign(hash, signer)).slice(2)
     return {

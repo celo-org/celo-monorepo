@@ -7,8 +7,8 @@ const debug = debugFactory('contractkit:sendtx')
 
 export interface TxOptions {
   gasInflationFactor?: number
-  gasBeneficiary?: Address
-  gasCurrency?: Address
+  gasFeeRecipient?: Address
+  gasCurrency?: Address | undefined
   from?: Address
   estimatedGas?: number | undefined
 }
@@ -40,7 +40,7 @@ export async function sendTransaction<T>(
     // @ts-ignore
     gasCurrency: txOptions.gasCurrency,
     // @ts-ignore
-    gasBeneficiary: txOptions.gasBeneficiary,
+    gasFeeRecipient: txOptions.gasFeeRecipient,
     gas,
     // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add
     // the suggested price in the selected gasCurrency.
