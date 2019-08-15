@@ -35,6 +35,9 @@ echo "Waiting for emulator to unlock..."
 sleep 3
 echo "Emulator unlocked!"
 
+# start logs
+pidcat -t "ReactNativeJS" |& e2e_pidcat_run.log 
+
 yarn test:detox
 STATUS=$?
 
@@ -54,8 +57,10 @@ fi
 
 react-native-kill-packager
 
-echo "closing emulator"
-
+echo "Closing emulator"
 kill -s 9 `ps -a | grep "Nexus_5X_API_28_x86" | grep -v "grep"  | awk '{print $1}'`
+
+echo "Closing pidcat"
+kill -s 9 `ps -a | grep "pidcat" | grep -v "grep"  | awk '{print $1}'`
 
 exit $STATUS

@@ -6,16 +6,26 @@ const VERIFICATION_COUNTRY = 'Germany'
 const VERIFICATION_PHONE_NUMBER = '030 901820'
 const EXAMPLE_NAME = 'Test Name'
 
-describe('Transfer Works', () => {
-  beforeEach(async function() {
-    try {
-      await waitFor(element(by.id('errorBanner')))
-        .toBeVisible()
-        .withTimeout(2000)
-      await element(by.id('errorBanner')).tap()
-    } catch (e) {
-      console.log('ErrorBanner not present')
+// clicks an element if it sees it
+async function bannerDismiss(inElement, tapElement) {
+  try {
+    await waitFor(element(inElement))
+      .toBeVisible()
+      .withTimeout(2000)
+    if (tapElement) {
+      await element(tapElement).tap()
+    } else {
+      await element(inElement).tap()
     }
+  } catch (e) {
+    // TODO take a screenshot
+  }
+}
+
+describe('Transfer Works', () => {
+  beforeEach(async () => {
+    bannerDismiss(by.id('errorBanner'))
+    bannerDismiss(by.id('SmartTopAlertButton'))
   })
 
   it('NUX->Language', async () => {
@@ -63,6 +73,8 @@ describe('Transfer Works', () => {
       .toBeVisible()
       .withTimeout(2000)
 
+    await sleep(1000)
+
     // wait for connecting banner to go away
     // TODO measure how long this take
     await waitFor(element(by.id('connectingToCelo')))
@@ -73,11 +85,14 @@ describe('Transfer Works', () => {
 
     await element(by.id('ImportWalletBackupKeyInputField')).replaceText(SAMPLE_BACKUP_KEY)
 
+    await sleep(10000)
+
     await element(by.id('ImportWalletButton')).tap()
 
-    await waitFor(element(by.id('InviteCodeTitle')))
-      .toBeVisible()
-      .withTimeout(1000)
+    await sleep(10000)
+    // await waitFor(element(by.id('InviteCodeTitle')))
+    //   .toBeVisible()
+    //   .withTimeout(1000)
   })
 
   it('NUX->ImportContacts', async () => {
@@ -119,26 +134,25 @@ describe('Transfer Works', () => {
 
   it('NUX->Verify', async () => {
     // skipping for now
-    await waitFor(element(by.id('ButtonSkipToNextScreen')))
-      .toBeVisible()
-      .withTimeout(2000)
-
-    // TODO this skip button for some reason doen't work
-    await element(by.id('ButtonSkipToNextScreen')).tap()
+    skipTo('WalletHome')
+    await sleep(10000)
   })
 
   it('Wallet Home', async () => {
-    // TODO currently not run because test before fails
     await waitFor(element(by.id('AccountOverviewInHome/dollarBalance')))
       .toBeVisible()
-      .withTimeout(1000)
+      .withTimeout(10000)
 
-    await waitFor(element(by.id('AccountOverviewInHome/dollarBalance')))
+    await waitFor(element(by.id('AccountOverviewInHome/goldBalance')))
       .toBeVisible()
-      .withTimeout(1000)
+      .withTimeout(10000)
+  })
+
+  it('Wallet Home->Send', async () => {
+    await element(by.id('SendNavigator')).tap()
 
     await waitFor(element(by.id('RecipientPicker')))
       .toBeVisible()
-      .withTimeout(1000)
+      .withTimeout(10000)
   })
 })

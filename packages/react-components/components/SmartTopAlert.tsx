@@ -154,6 +154,7 @@ function SmartTopAlert(props: Props) {
               solid={false}
               style={styles.button}
               textStyle={styles.buttonText}
+              testID={'SmartTopAlertButton'}
             />
           )}
         </Animated.View>

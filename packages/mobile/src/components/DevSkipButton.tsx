@@ -50,7 +50,7 @@ export class DevSkipButton extends React.Component<Props> {
             <TouchableOpacity
               style={[styles.devButton, styles.skipButton]}
               onPress={this.skip}
-              testID={'ButtonSkipToNextScreen'}
+              testID={`ButtonSkipTo${this.props.nextScreen}`}
             />
           </View>
         )}

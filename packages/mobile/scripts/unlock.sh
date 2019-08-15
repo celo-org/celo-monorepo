@@ -22,13 +22,13 @@ echo "Device is done booting"
 
 sleep 1
 # Sequence to unlock the app lock screen in any state
-adb shell input keyevent 26		# Power
-adb shell input keyevent 26		# Power
-sleep 1
-adb shell input keyevent 4		# Back
-sleep 1
-adb shell input keyevent 4		# Back
-sleep 1
+# adb shell input keyevent 26		# Power
+# adb shell input keyevent 26		# Power
+# sleep 1
+# adb shell input keyevent 4		# Back
+# sleep 1
+# adb shell input keyevent 4		# Back
+# sleep 1
 adb shell input keyevent 82		# Menu
 sleep 2
 adb shell input text $SECRET_PIN		# Input Pin
