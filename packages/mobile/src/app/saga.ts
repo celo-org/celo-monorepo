@@ -3,7 +3,7 @@ import DeviceInfo from 'react-native-device-info'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { all, call, put, select, spawn, take } from 'redux-saga/effects'
 import { setLanguage } from 'src/app/actions'
-import { handleDappkit } from 'src/dappkit/dappkit'
+import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { getVersionInfo } from 'src/firebase/firebase'
 import { waitForFirebaseAuth } from 'src/firebase/saga'
 import { NavActions, navigate } from 'src/navigator/NavigationService'
@@ -109,7 +109,7 @@ export function* navigateToProperScreen() {
 
 export function handleDeepLink(deepLink: string) {
   Logger.debug(TAG, 'Handling deep link', deepLink)
-  handleDappkit(deepLink)
+  handleDappkitDeepLink(deepLink)
   // Other deep link handlers can go here later
 }
 

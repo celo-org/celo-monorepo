@@ -83,7 +83,7 @@ export function* dappKitSaga() {
   yield takeLeading(actions.REQUEST_TX_SIGNATURE, produceTxSignature)
 }
 
-export function handleDappkit(deepLink: string) {
+export function handleDappkitDeepLink(deepLink: string) {
   try {
     const dappKitRequest = parseDappKitRequestDeeplink(deepLink)
     switch (dappKitRequest.type) {
