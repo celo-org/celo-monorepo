@@ -37,7 +37,9 @@ export async function sendTransaction<T>(
 
   const promiEvent = tx.send({
     from: txOptions.from,
+    // @ts-ignore
     gasCurrency: txOptions.gasCurrency,
+    // @ts-ignore
     gasBeneficiary: txOptions.gasBeneficiary,
     gas,
     // Hack to prevent web3 from adding the suggested gold gas price, allowing geth to add

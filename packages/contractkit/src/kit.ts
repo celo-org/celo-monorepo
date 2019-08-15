@@ -49,7 +49,9 @@ export class ContractKit {
 
   sendTransaction(tx: Tx) {
     const promiEvent = this.web3.eth.sendTransaction({
+      // @ts-ignore
       gasCurrency: this.defaultOptions.gasCurrency,
+      // @ts-ignore
       gasBeneficiary: this.defaultOptions.gasBeneficiary,
       from: this.defaultOptions.from,
       ...tx,

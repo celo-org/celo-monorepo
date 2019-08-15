@@ -10,7 +10,7 @@ export class AddressRegistry {
   private readonly registry: Registry
   private readonly cache: Map<CeloContract, Address> = new Map()
 
-  constructor(readonly kit: ContractKit) {
+  constructor(kit: ContractKit) {
     this.cache.set(CeloContract.Registry, REGISTRY_CONTRACT_ADDRESS)
     this.registry = newRegistry(kit.web3, REGISTRY_CONTRACT_ADDRESS)
   }
