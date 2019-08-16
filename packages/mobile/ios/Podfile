@@ -55,7 +55,7 @@ target 'celo' do
   pod 'react-native-version-check', :path => '../../../node_modules/react-native-version-check'
   pod 'RNRandomBytes', :path => '../../../node_modules/react-native-secure-randombytes'
   pod 'react-native-udp', :path => '../../../node_modules/react-native-udp'
-  pod 'RNAnalytics', :path => '../../../node_modules/@segment/analytics-react-native'
+  # pod 'RNAnalytics', :path => '../../../node_modules/@segment/analytics-react-native'
   pod 'react-native-netinfo', :path => '../../../node_modules/@react-native-community/netinfo'
   pod 'RNShare', :path => '../../../node_modules/react-native-share'
   pod 'react-native-camera', :path => '../../../node_modules/react-native-camera'
@@ -63,7 +63,8 @@ target 'celo' do
   pod 'CeloBlockchain', :path => '../../../node_modules/@celo/client/CeloBlockchain.podspec'
 
   pod 'Firebase/Core', '~> 5.20.2'
-  pod 'Segment-Firebase', '~> 2.4.0'
+  pod 'GoogleUtilities', '~> 5.3.7'
+  # pod 'Segment-Firebase', '~> 2.4.0'
 
   target 'celoTests' do
     inherit! :search_paths
@@ -73,9 +74,6 @@ end
 # The following is needed to ensure the "archive" step works in XCode.
 # It removes React from the Pods project, as it is already included in the main project.
 post_install do |installer|
-  system("mkdir -p Pods/Headers/Public/FirebaseCore && cp Pods/FirebaseCore/Firebase/Core/Public/* Pods/Headers/Public/FirebaseCore/")
-
-
   installer.pods_project.targets.each do |target|
     # if target.name == "React"
     #   target.remove_from_project

@@ -24423,13 +24423,13 @@ react-native-device-info@^2.1.0:
   resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-2.1.0.tgz#55eb82c1ba14c550cef6b71efc368d88b96b826a"
   integrity sha512-FdHFi0DtISiytXzE2KM16Qd4GPEGnbA8DjTP1vHjcUPFJCLBtm1P0/10Xn5x/kISjEvsz17grdtJxGrd83c6Pw==
 
-react-native-firebase@5.3.0:
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/react-native-firebase/-/react-native-firebase-5.3.0.tgz#3a5c31fa74c2edf9a1b82a62ae05b80dc976626e"
-  integrity sha512-bU0rDuqWTmaGThRj7dqS+fNZkqW2phq0euEqpQ4MICH40TeWZ3ek00e7yUS2142id/sAyUj184+UBWh3N0Iamg==
+react-native-firebase@5.5.4:
+  version "5.5.4"
+  resolved "https://registry.yarnpkg.com/react-native-firebase/-/react-native-firebase-5.5.4.tgz#1c71d2b21a11fdb5177f7e7c05c8bf3130fb88d7"
+  integrity sha512-D7eGeVb9M69se98Munziqmy6kQ+ymgNtHqFB6lrHRdVLnUd5v0caI6iQ/kY8zrqVUD+lU3Sui2+Lm9qHZUhbDw==
   dependencies:
     opencollective-postinstall "^2.0.0"
-    prop-types "^15.6.2"
+    prop-types "^15.7.2"
 
 "react-native-flag-secure-android@git://github.com/kristiansorens/react-native-flag-secure-android#e234251":
   version "1.0.0"
