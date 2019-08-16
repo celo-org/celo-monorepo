@@ -56,7 +56,7 @@
 - [DAppKit](developer-resources/dappkit/README.md)
   - [Getting Started](developer-resources/dappkit/setup.md)
   - [Examples](developer-resources/dappkit/examples.md)
-- [DAppKit](developer-resources/contractkit/README.md)
+- [ContractKit](developer-resources/contractkit/README.md)
   - [Getting Started](developer-resources/contractkit/setup.md)
   - [Examples](developer-resources/contractkit/examples.md)
 - [Celo DApp Gallery](developer-resources/celo-dapp-gallery.md)
