@@ -218,6 +218,9 @@ export const standardStyles = StyleSheet.create({
   row: {
     flexDirection: 'row',
   },
+  wrap: {
+    flexWrap: 'wrap',
+  },
   sectionMargin: {
     marginVertical: margins.large,
   },

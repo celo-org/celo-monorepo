@@ -121,6 +121,12 @@ export const styles = StyleSheet.create({
   input: {
     marginVertical: 0,
   },
+  label: {
+    color: colors.secondary,
+  },
+  labelBox: {
+    marginBottom: 5,
+  },
 })
 
 interface TextInputState {
@@ -157,4 +163,40 @@ export class TextInput extends React.Component<TextInputProps & TextInputAuxProp
       <RNTextInput {...props} onFocus={this.onFocus} onBlur={this.onBlur} style={currentStyle} />
     )
   }
+}
+
+interface LabelProps {
+  name: string
+  multiline?: boolean
+  hasError: boolean
+  value: string
+  label: string
+  onInput: () => void
+}
+
+export function LabeledInput({ name, multiline, hasError, value, onInput, label }: LabelProps) {
+  return (
+    <>
+      <View style={styles.labelBox}>
+        <Text accessibilityRole={'label'} style={[fonts.a, textStyles.medium, styles.label]}>
+          {label}
+        </Text>
+      </View>
+      <TextInput
+        multiline={multiline}
+        numberOfLines={3}
+        style={[
+          standardStyles.input,
+          fonts.p,
+          styles.input,
+          standardStyles.elementalMarginBottom,
+          hasError && styles.errorBorder,
+        ]}
+        focusStyle={standardStyles.inputFocused}
+        name={name}
+        value={value}
+        onChange={onInput}
+      />
+    </>
+  )
 }

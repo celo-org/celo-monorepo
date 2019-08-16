@@ -3,7 +3,7 @@ import { Image, StyleSheet, Text, View } from 'react-native'
 import ah from 'src/community/ah-logo.png'
 import polychain from 'src/community/polychain-logo.png'
 import { H2 } from 'src/fonts/Fonts'
-import { ErrorMessage, Form, styles as formStyles, TextInput } from 'src/forms/FormComponents'
+import { ErrorMessage, Form, LabeledInput } from 'src/forms/FormComponents'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Rings from 'src/logos/RingsLight'
@@ -21,12 +21,13 @@ import {
   Tables,
 } from '../../fullstack/EcoFundFields'
 import menuItems from 'src/shared/menu-items'
+import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 
 interface State {
   table: Tables
 }
 
-class EcoFund extends React.PureComponent<I18nProps, State> {
+class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
   state = {
     table: Tables.Applicants,
   }
@@ -39,18 +40,18 @@ class EcoFund extends React.PureComponent<I18nProps, State> {
   }
 
   render() {
-    const { t } = this.props
+    const { t, screen } = this.props
     return (
       <GridRow
         desktopStyle={[standardStyles.sectionMarginTop, standardStyles.blockMarginBottom]}
         tabletStyle={[standardStyles.sectionMarginTablet, standardStyles.blockMarginBottomTablet]}
         mobileStyle={[standardStyles.sectionMarginMobile, standardStyles.blockMarginBottomMobile]}
       >
-        <Cell span={Spans.half}>
+        <Cell span={Spans.half} style={screen !== ScreenSizes.MOBILE && styles.insideEdge}>
           <H2>{t('ecoFund.title')}</H2>
           <Text style={[fonts.p, textStyles.italic]}>{t('ecoFund.poweredBy')}</Text>
           <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('ecoFund.description')}</Text>
-          <View style={[standardStyles.row, standardStyles.elementalMargin]}>
+          <View style={[standardStyles.row, standardStyles.elementalMargin, standardStyles.wrap]}>
             <View style={styles.partners}>
               <Text style={[fonts.h5, styles.partnerText]}>{t('ecoFund.generalPartner')}</Text>
               <Image
@@ -100,8 +101,13 @@ class EcoFund extends React.PureComponent<I18nProps, State> {
               selected={this.state.table === Tables.Recommendations}
             />
           </View>
-          <View>
-            <View style={[this.state.table !== Tables.Applicants && styles.hidden]}>
+          <View style={standardStyles.elementalMarginTop}>
+            <View
+              style={[
+                styles.formContainer,
+                this.state.table !== Tables.Applicants && styles.hidden,
+              ]}
+            >
               <FormContainer
                 key={Tables.Applicants}
                 route={`/ecosystem/${Tables.Applicants}`}
@@ -112,6 +118,7 @@ class EcoFund extends React.PureComponent<I18nProps, State> {
                   <Form>
                     {ApplicationKeys.map((key) => (
                       <LabeledInput
+                        key={key}
                         label={ApplicationFields[key]}
                         value={formState.form[key]}
                         name={key}
@@ -138,6 +145,7 @@ class EcoFund extends React.PureComponent<I18nProps, State> {
             </View>
             <View
               style={[
+                styles.formContainer,
                 this.state.table !== Tables.Recommendations && styles.hidden,
                 styles.shorterForm,
               ]}
@@ -152,6 +160,7 @@ class EcoFund extends React.PureComponent<I18nProps, State> {
                   <Form>
                     {RecommendationKeys.map((key) => (
                       <LabeledInput
+                        key={key}
                         label={RecommendationFields[key]}
                         value={formState.form[key]}
                         name={key}
@@ -223,7 +232,7 @@ function invalidApplicationFields(fields: Record<keyof Application, string>) {
   })
 }
 
-export default withNamespaces(NameSpaces.community)(EcoFund)
+export default withScreenSize(withNamespaces(NameSpaces.community)(EcoFund))
 
 const styles = StyleSheet.create({
   limitedPartners: {
@@ -236,8 +245,8 @@ const styles = StyleSheet.create({
     height: 35,
   },
   a16z: {
-    width: 91,
-    height: 45,
+    width: 128,
+    height: 35,
     marginHorizontal: 30,
   },
   hidden: {
@@ -248,13 +257,21 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   button: {
+    marginVertical: 15,
     fontSize: 18,
   },
   partners: {
     justifyContent: 'space-between',
   },
   partnerText: {
-    marginBottom: 5,
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  insideEdge: {
+    paddingRight: 30,
+  },
+  formContainer: {
+    width: '100%',
   },
 })
 
@@ -276,31 +293,5 @@ function AfterMessage({
       )}
       <ErrorMessage allErrors={errors} field={'unknownError'} t={t} />
     </View>
-  )
-}
-
-function LabeledInput({ name, multiline, hasError, value, onInput, label }) {
-  return (
-    <>
-      <Text accessibilityRole={'label'} style={fonts.a}>
-        {label}
-      </Text>
-      <TextInput
-        multiline={multiline}
-        numberOfLines={3}
-        key={`${Tables.Applicants}-${name}`}
-        style={[
-          standardStyles.input,
-          fonts.p,
-          formStyles.input,
-          standardStyles.elementalMarginBottom,
-          hasError && formStyles.errorBorder,
-        ]}
-        focusStyle={standardStyles.inputFocused}
-        name={name}
-        value={value}
-        onChange={onInput}
-      />
-    </>
   )
 }

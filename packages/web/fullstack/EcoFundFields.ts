@@ -2,11 +2,11 @@
 export enum ApplicationFields {
   org = 'Organization Name',
   url = 'Organization URL',
-  about = 'Tell us about your organization in a sentence.',
-  product = 'What does your organization make?',
-  founderEmail = 'Email of the founder who is filling out this application',
-  coFounderEmail = "Cofounders' email (if relevant)",
-  video = 'Optional: URL of a simple 1 minute unlisted (not private) YouTube, Vimeo, or Youku video introducing the founder(s).',
+  about = 'Tell us about your organization in a sentence',
+  product = 'What does your organization do?',
+  founderEmail = 'Founder email filling out application',
+  coFounderEmail = 'Cofounder emails (if relevant)',
+  video = 'Optional: URL of a simple 1 minute unlisted YouTube, Vimeo, or Youku video introducing the founder(s)',
 }
 
 export interface Application {
