@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "@celo/walletkit": "0.0.4",
-    "@celo/utils": "0.0.5",
+    "@celo/utils": "0.0.6-beta3",
     "expo": "^34.0.1",
     "expo-contacts": "6.0.0",
     "libphonenumber-js": "^1.7.22"
