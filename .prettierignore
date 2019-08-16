@@ -9,6 +9,8 @@ packages/blockchain-api/dist
 
 packages/cli/lib
 
+packages/contractkit/lib/
+
 packages/walletkit/lib/
 packages/walletkit/.artifacts/
 packages/walletkit/contracts/
