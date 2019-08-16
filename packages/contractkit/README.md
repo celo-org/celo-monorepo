@@ -2,7 +2,7 @@
 
 Celo's ContractKit is a library to help developers and validators to interact with the celo-blockchain.
 
-Main Features:
+ContractKit supports the following functionality:
 
 - Connect to a node
 - Access web3 object to interact with node's Json RPC API
@@ -23,6 +23,8 @@ npm install @celo/contractkit
 yarn add @celo/contractkit
 ```
 
+You will need node version `8.13.0` or higher.
+
 To start working with contractkit you need a `kit` instance:
 
 ```ts
@@ -39,7 +41,7 @@ const web3 = kit.web3
 web3.eth.getBalance(someAddress)
 ```
 
-### Set Default Tx Options
+### Setting Default Tx Options
 
 `kit` allows you to set default transaction options:
 
@@ -52,7 +54,7 @@ kit.defaultAccount = myAddress
 await kit.setGasCurrency(CeloContract.StableToken)
 ```
 
-### Interact with cGold & cDollar
+### Interacting with cGold & cDollar
 
 celo-blockchain has two initial coins: cGold and cDollar (stableToken).
 Both implement the ERC20 standard, and to interact with them is as simple as:
@@ -81,7 +83,7 @@ To interact with cDollar, is the same but with a different contract:
 const stabletoken = await kit.contract.getStableToken()
 ```
 
-### Interact with Other Contracts
+### Interacting with Other Contracts
 
 Apart from GoldToken and StableToken, there are many core contracts.
 
@@ -93,7 +95,7 @@ For the moment, we have contract wrappers for:
 
 In the following weeks will add wrapper for all other contracts
 
-### Access web3 contract wrappers
+### Accessing web3 contract wrappers
 
 Some user might want to access web3 native contract wrappers.
 
@@ -105,7 +107,7 @@ const web3Exchange = await kit._web3Contracts.getExchange()
 
 We expose native wrappers for all Celo core contracts.
 
-### A note about contract Addresses
+## A Note About Contract Addresses
 
 Celo Core Contracts addresses, can be obtained by looking at the `Registry` contract.
 That's actually how `kit` obtain them.
