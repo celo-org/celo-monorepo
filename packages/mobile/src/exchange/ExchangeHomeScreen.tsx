@@ -16,7 +16,7 @@ import ExchangeRate from 'src/exchange/ExchangeRate'
 import { CURRENCY_ENUM as Token } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { Stacks } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { getRateForMakerToken } from 'src/utils/currencyExchange'
@@ -37,14 +37,10 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 function goToTrade() {
   CeloAnalytics.track(CustomEventNames.exchange_button)
-  navigate(Screens.ExchangeStack)
+  navigate(Stacks.ExchangeStack)
 }
 
 export class ExchangeHomeScreen extends React.Component<Props> {
-  static navigationOptions = {
-    title: 'Exchange Home',
-  }
-
   componentDidMount() {
     this.props.fetchExchangeRate()
   }
