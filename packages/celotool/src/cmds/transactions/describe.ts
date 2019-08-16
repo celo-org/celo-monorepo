@@ -4,8 +4,7 @@ import {
   getContracts,
   parseFunctionCall,
   parseLog,
-} from '@celo/contractkit'
-import { CONTRACTS_TO_COPY, copyContractArtifacts, downloadArtifacts } from 'src/lib/artifacts'
+} from '@celo/walletkit'
 import { getWeb3Client } from 'src/lib/blockchain'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import * as yargs from 'yargs'
@@ -26,12 +25,6 @@ export const builder = (argv: yargs.Argv) => {
 
 export const handler = async (argv: DescribeArgv) => {
   await switchToClusterFromEnv(false)
-  await downloadArtifacts(argv.celoEnv)
-  await copyContractArtifacts(
-    argv.celoEnv,
-    '../transaction-metrics-exporter/src/contracts',
-    CONTRACTS_TO_COPY
-  )
 
   const web3 = await getWeb3Client(argv.celoEnv)
 

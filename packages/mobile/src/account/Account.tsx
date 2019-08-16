@@ -14,12 +14,12 @@ import SettingsItem from 'src/account/SettingsItem'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { resetAppOpenedState, setAnalyticsEnabled, setNumberVerified } from 'src/app/actions'
-import BackButton from 'src/components/BackButton'
 import { FAQ_LINK, TOS_LINK } from 'src/config'
 import { features } from 'src/flags'
 import { Namespaces } from 'src/i18n'
 import { revokeVerification } from 'src/identity/actions'
 import { isPhoneNumberVerified } from 'src/identity/verification'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -66,13 +66,7 @@ const mapDispatchToProps = {
 }
 
 export class Account extends React.Component<Props, State> {
-  static navigationOptions = {
-    headerStyle: {
-      elevation: 0,
-    },
-    headerLeftContainerStyle: { paddingHorizontal: 20 },
-    headerLeft: <BackButton />,
-  }
+  static navigationOptions = headerWithBackButton
 
   state: State = {
     verified: undefined,

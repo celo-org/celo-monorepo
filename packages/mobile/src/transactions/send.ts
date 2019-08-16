@@ -4,7 +4,7 @@ import {
   sendTransactionAsync,
   SendTransactionLogEvent,
   SendTransactionLogEventType,
-} from '@celo/contractkit'
+} from '@celo/walletkit'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { TransactionObject } from 'web3/eth/types'

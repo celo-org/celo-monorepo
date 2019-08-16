@@ -8,21 +8,19 @@ import { setAccountCreationTime } from 'src/account/actions'
 import { pincodeSelector } from 'src/account/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { setInviteCodeEntered } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData } from 'src/geth/geth'
 import { waitForGethConnectivity } from 'src/geth/saga'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigateToError } from 'src/navigator/NavigationService'
+import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import Logger from 'src/utils/Logger'
 import {
   Actions,
   getLatestBlock,
   setAccount,
-  setIsReady,
   setLatestBlockNumber,
   setPrivateCommentKey,
   setSyncProgress,
@@ -38,40 +36,30 @@ const ETH_PRIVATE_KEY_LENGTH = 64
 const MNEMONIC_BIT_LENGTH = (ETH_PRIVATE_KEY_LENGTH * 8) / 2
 
 const TAG = 'web3/saga'
-// The timeout for web3 to complete syncing
-const CHECK_WEB3_SYNC_PROGRESS_TIMEOUT = 60000
 // The timeout for web3 to complete syncing and the latestBlock to be > 0
 const CHECK_SYNC_PROGRESS_TIMEOUT = 60000
 const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect to node on IPC."
 
-let AssignAccountLock = false
-
 // checks if web3 claims it is currently syncing or not
 function* checkWeb3SyncProgressClaim() {
-  Logger.debug(TAG, 'Checking sync progress claim')
   while (true) {
     try {
-      const syncProgress = yield web3.eth.isSyncing()
-      Logger.debug(TAG, 'Sync progress', syncProgress)
-
+      const syncProgress = yield web3.eth.isSyncing() // returns true when it's still syncing and thus not ready
       if (typeof syncProgress === 'boolean' && !syncProgress) {
-        // For some weird reason, checkSyncProgressWorker is flaky and does not work for the long running
-        // sync tasks.
-        Logger.debug(TAG, 'sync complete')
+        Logger.debug(TAG, 'checkWeb3SyncProgressClaim', 'sync complete')
+
         yield put(setSyncProgress(100))
-        yield put(setIsReady(true))
         return true
       }
-
+      Logger.debug(TAG, 'checkWeb3SyncProgressClaim', 'sync in progress')
       yield put(updateWeb3SyncProgress(syncProgress))
+      // not ready yet, keep looping
     } catch (error) {
       if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
         CeloAnalytics.track(CustomEventNames.blockChainCorruption, {}, true)
         const deleted = yield call(deleteChainData)
         if (deleted) {
-          navigate(Screens.ErrorScreen, {
-            errorMessage: 'Corrupted chain data has been deleted, please restart the app',
-          })
+          navigateToError('corruptedChainDeleted')
         }
         throw new Error('Corrupted chain data encountered')
       } else {
@@ -81,70 +69,36 @@ function* checkWeb3SyncProgressClaim() {
   }
 }
 
-// Checks both web3's claim for sync progress as well as checking the latest Block it returns
-function* checkSyncProgress() {
-  while (true) {
-    Logger.debug(TAG, 'Start checking web3 sync progress')
-
-    yield call(waitForGethConnectivity)
-    Logger.debug(TAG, 'Geth is connected')
-
-    const { web3SyncTimeout } = yield race({
-      web3SyncComplete: call(checkWeb3SyncProgressClaim),
-      web3SyncTimeout: delay(CHECK_WEB3_SYNC_PROGRESS_TIMEOUT),
-    })
-
-    if (web3SyncTimeout) {
-      Logger.error(TAG, 'checking web3 sync progress timed out')
-      continue
-    }
-
-    const latestBlock: Block = yield getLatestBlock()
-    if (latestBlock && latestBlock.number > 0) {
-      yield put(setLatestBlockNumber(latestBlock.number))
-      return
-    }
-
-    Logger.error(
-      TAG,
-      `web3 indicated sync complete, yet the latest block is ${JSON.stringify(latestBlock)}`
-    )
-  }
-}
-
 // The worker listening to sync progress requests
-function* checkSyncProgressWorker() {
-  while (true) {
+export function* checkWeb3Sync() {
+  try {
+    yield call(waitForGethConnectivity)
     try {
-      yield take(Actions.REQUEST_SYNC_PROGRESS)
-      yield call(waitForGethConnectivity)
-      try {
-        const { timeout } = yield race({
-          checkProgress: call(checkSyncProgress),
-          timeout: delay(CHECK_SYNC_PROGRESS_TIMEOUT),
-        })
+      const { timeout } = yield race({
+        checkProgress: call(checkWeb3SyncProgressClaim),
+        timeout: delay(CHECK_SYNC_PROGRESS_TIMEOUT),
+      })
 
-        if (timeout) {
-          Logger.error(TAG, 'Could not complete sync progress check')
-          yield put(setIsReady(false))
-          navigate(Screens.ErrorScreen, {
-            errorMessage: 'Failing to sync, check your network connection',
-          })
-          continue
-        }
+      if (timeout) {
+        Logger.error(TAG, 'Could not complete sync progress check')
+        navigateToError('web3FailedToSync')
+      }
 
-        Logger.debug(TAG, 'Sync Progress Completed')
-        yield put(setSyncProgress(100))
-        yield put(setIsReady(true))
-      } catch (error) {
-        Logger.error(TAG, `checkSyncProgressWorker error: ${error}`)
-        navigate(Screens.ErrorScreen, {
-          errorMessage: 'Error occurred during sync, please try again later',
-        })
+      const latestBlock: Block = yield call(getLatestBlock)
+      if (latestBlock && latestBlock.number > 0) {
+        yield put(setLatestBlockNumber(latestBlock.number))
+      } else {
+        Logger.error(
+          TAG,
+          `web3 indicated sync complete, yet the latest block is ${JSON.stringify(latestBlock)}`
+        )
       }
     } catch (error) {
-      Logger.error(TAG, `checkSyncProgressWorker saga error: ${error}`)
+      Logger.error(TAG, 'checkWeb3Sync', error)
+      navigateToError('errorDuringSync')
     }
+  } catch (error) {
+    Logger.error(TAG, 'checkWeb3Sync saga error', error)
   }
 }
 
@@ -178,26 +132,33 @@ export function* createNewAccount() {
 
 export function* assignAccountFromPrivateKey(key: string) {
   const currentAccount = yield select(currentAccountSelector)
-  if (AssignAccountLock || currentAccount) {
-    Logger.debug(TAG + '@assignAccountFromPrivateKey', 'Account already exists is being created')
-    return
-  }
 
   try {
-    AssignAccountLock = true
-
     const pincodeSet = yield select(pincodeSelector)
     if (!pincodeSet) {
       Logger.debug(TAG + '@assignAccountFromPrivateKey', 'PIN does not seem to be set')
       throw Error('Cannot create account without having the pin set')
     }
+
     const password = yield call(getPincode)
     if (!password) {
       Logger.debug(TAG + '@assignAccountFromPrivateKey', 'Got falsy pin')
       throw Error('Cannot create account without having the pin set')
     }
-    // @ts-ignore
-    const account = yield call(web3.eth.personal.importRawKey, String(key), password)
+
+    let account: string
+    try {
+      // @ts-ignore
+      account = yield call(web3.eth.personal.importRawKey, String(key), password)
+    } catch (e) {
+      if (e.toString().includes('account already exists')) {
+        account = currentAccount
+        Logger.debug(TAG + '@assignAccountFromPrivateKey', 'Importing same account as current one')
+      } else {
+        throw e
+      }
+    }
+
     yield call(web3.eth.personal.unlockAccount, account, password, UNLOCK_DURATION)
     Logger.debug(
       TAG + '@assignAccountFromPrivateKey',
@@ -205,13 +166,10 @@ export function* assignAccountFromPrivateKey(key: string) {
     )
 
     yield put(setAccount(account))
-    // TODO(cmcewen): remove invite code entered
-    yield put(setInviteCodeEntered(true))
     yield put(setAccountCreationTime())
     yield call(assignDataKeyFromPrivateKey, key)
 
     web3.eth.defaultAccount = account
-    AssignAccountLock = false
     return account
   } catch (e) {
     Logger.error(TAG, `@assignAccountFromPrivateKey: ${e}`)
@@ -246,7 +204,7 @@ export function* getAccount() {
 
 // Wait for geth to be connected and account ready
 export function* getConnectedAccount() {
-  yield waitForGethConnectivity()
+  yield call(waitWeb3LastBlock)
   const account: string = yield getAccount()
   return account
 }
@@ -267,6 +225,9 @@ export function* watchRefreshGasPrice() {
 }
 
 export function* web3Saga() {
-  yield spawn(checkSyncProgressWorker)
   yield spawn(watchRefreshGasPrice)
 }
+
+// exported for testing
+export const _checkWeb3SyncProgressClaim = checkWeb3SyncProgressClaim
+export const _CHECK_SYNC_PROGRESS_TIMEOUT = CHECK_SYNC_PROGRESS_TIMEOUT

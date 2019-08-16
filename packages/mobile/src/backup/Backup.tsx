@@ -44,6 +44,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 export class Backup extends React.Component<Props, State> {
   static navigationOptions = { header: null }
+
   state = {
     mnemonic: '',
     currentQuestion: -1,

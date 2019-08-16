@@ -1,13 +1,7 @@
-const defaultConfig = require('../../jest.config.js')
-
 module.exports = {
-  ...defaultConfig,
-  globals: {
-    navigator: true,
-    window: true,
-  },
+  preset: 'ts-jest',
+  testEnvironment: 'node',
   moduleNameMapper: {
-    '@celo/mobile': '<rootDir>',
-    '^crypto-js$': '<rootDir>/node_modules/crypto-js',
+    '^src/(.*)$': '<rootDir>/src/$1',
   },
 }
