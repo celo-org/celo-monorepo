@@ -1,8 +1,0 @@
-framework module "Geth" {
-	header "ref.h"
-    header "Geth.objc.h"
-    header "universe.objc.h"
-    header "Geth.h"
-
-    export *
-}

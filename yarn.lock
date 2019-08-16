@@ -2010,10 +2010,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo/client@f7095b7":
-  version "0.0.98"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.98.tgz#0c15460fe6508be6c7f400183500cd705c8827ab"
-  integrity sha512-r43CBGZx6BMD3TAcFGVEuG/r0Hsvbuc8wg9d564Sh5YsUgWoPtyDCEgsOfCwaEdF9MoaiavFxl/sGUeN7RL/5g==
+"@celo/client@738b8aa":
+  version "0.0.105"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.105.tgz#c9a9b8e74f3e96fcf966a085bbf8fe78d7cb172e"
+  integrity sha512-/qtDWYIYPs4motzWM9/GfaL7I2XEBJhgakHy2DtHrFcdNWtSy8B/tAJtomXkYGJy/mMYrmQbgO1aDD4SA+JgQA==
 
 "@celo/dev-cli@^2.0.3":
   version "2.0.3"
@@ -24431,14 +24431,6 @@ react-native-firebase@5.3.0:
     opencollective-postinstall "^2.0.0"
     prop-types "^15.6.2"
 
-react-native-firebase@5.4.3:
-  version "5.4.3"
-  resolved "https://registry.yarnpkg.com/react-native-firebase/-/react-native-firebase-5.4.3.tgz#3c14c0f72b5593bb3aa4f91e417cbf459b60f15c"
-  integrity sha512-JnE4IK/NuST+QfgzlCKtHtjpjPcLYB2/us2YnK2jGGNeCRwARWbNUPgATLkkPAJYqRIfjxXBadqBabrVsXGCVw==
-  dependencies:
-    opencollective-postinstall "^2.0.0"
-    prop-types "^15.6.2"
-
 "react-native-flag-secure-android@git://github.com/kristiansorens/react-native-flag-secure-android#e234251":
   version "1.0.0"
   resolved "git://github.com/kristiansorens/react-native-flag-secure-android#e234251220f5d745eec8ebde3e83d4d369e81a14"
@@ -24460,9 +24452,9 @@ react-native-gesture-handler@^1.1.0:
     invariant "^2.2.2"
     prop-types "^15.5.10"
 
-"react-native-geth@git+https://github.com/celo-org/react-native-geth#cd92070":
+"react-native-geth@git+https://github.com/celo-org/react-native-geth#653b23f":
   version "0.1.0-development"
-  resolved "git+https://github.com/celo-org/react-native-geth#cd9207002c34343aec819ab8141682a9ca447d0d"
+  resolved "git+https://github.com/celo-org/react-native-geth#653b23f79ee6ae3379b5b2135dd14c6bc4a83472"
 
 react-native-iphone-x-helper@^1.0.1:
   version "1.0.2"

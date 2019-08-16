@@ -1,6 +1,7 @@
 PODS:
-  - Analytics (3.6.10)
+  - Analytics (3.7.0)
   - boost-for-react-native (1.63.0)
+  - CeloBlockchain (0.0.1)
   - DoubleConversion (1.1.6)
   - Firebase/Core (5.20.2):
     - Firebase/CoreOnly
@@ -27,7 +28,6 @@ PODS:
     - boost-for-react-native
     - DoubleConversion
     - glog
-  - Geth (0.0.1)
   - glog (0.3.5)
   - GoogleAppMeasurement (5.8.1):
     - GoogleUtilities/AppDelegateSwizzler (~> 5.2)
@@ -148,16 +148,11 @@ PODS:
     - React/fishhook
     - React/RCTBlob
   - ReactNativeGeth (0.1.0-development):
-    - Geth
+    - CeloBlockchain
     - React
   - RNAnalytics (0.1.0-beta.0):
     - Analytics
     - React
-  - RNAnalyticsIntegration-Firebase (0.1.0-beta.0):
-    - Analytics
-    - React
-    - RNAnalytics
-    - Segment-Firebase
   - RNDeviceInfo (2.1.0):
     - React
   - RNFirebase (5.3.0):
@@ -197,10 +192,10 @@ PODS:
   - yoga (0.59.10.React)
 
 DEPENDENCIES:
+  - "CeloBlockchain (from `../../../node_modules/@celo/client/CeloBlockchain.podspec`)"
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - Firebase/Core (~> 5.20.2)
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
-  - Geth (from `Geth.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/GLog.podspec`)
   - react-native-camera (from `../../../node_modules/react-native-camera`)
   - react-native-config (from `../../../node_modules/react-native-config`)
@@ -227,7 +222,6 @@ DEPENDENCIES:
   - React/RCTWebSocket (from `../node_modules/react-native`)
   - ReactNativeGeth (from `../../../node_modules/react-native-geth`)
   - "RNAnalytics (from `../../../node_modules/@segment/analytics-react-native`)"
-  - "RNAnalyticsIntegration-Firebase (from `../../../node_modules/@segment/analytics-react-native-firebase`)"
   - RNDeviceInfo (from `../../../node_modules/react-native-device-info`)
   - RNFirebase (from `../../../node_modules/react-native-firebase/ios`)
   - RNFS (from `../../../node_modules/react-native-fs`)
@@ -257,12 +251,12 @@ SPEC REPOS:
     - Sentry
 
 EXTERNAL SOURCES:
+  CeloBlockchain:
+    :path: "../../../node_modules/@celo/client/CeloBlockchain.podspec"
   DoubleConversion:
     :podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
   Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/Folly.podspec"
-  Geth:
-    :path: Geth.podspec
   glog:
     :podspec: "../node_modules/react-native/third-party-podspecs/GLog.podspec"
   React:
@@ -289,8 +283,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-geth"
   RNAnalytics:
     :path: "../../../node_modules/@segment/analytics-react-native"
-  RNAnalyticsIntegration-Firebase:
-    :path: "../../../node_modules/@segment/analytics-react-native-firebase"
   RNDeviceInfo:
     :path: "../../../node_modules/react-native-device-info"
   RNFirebase:
@@ -315,15 +307,15 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga/Yoga.podspec"
 
 SPEC CHECKSUMS:
-  Analytics: 63744ad4afa65c3bcdcdb7a94b62515bde5b3900
+  Analytics: 77fd5fb102a4a5eedafa2c2b0245ceb7b7c15e45
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
+  CeloBlockchain: e62c7732f98b642188474ad9554a0b11364b1b9b
   DoubleConversion: bb338842f62ab1d708ceb63ec3d999f0f3d98ecd
   Firebase: 0c8cf33f266410c61ab3e2265cfa412200351d9c
   FirebaseAnalytics: ece1aa57a4f43c64d53a648b5a5e05151aae947b
   FirebaseCore: f1a9a8be1aee4bf71a2fc0f4096df6788bdfda61
   FirebaseInstanceID: a122b0c258720cf250551bb2bedf48c699f80d90
   Folly: de497beb10f102453a1afa9edbf8cf8a251890de
-  Geth: 62044a00e2008cb14cf52776f123ed6e825e92bf
   glog: aefd1eb5dda2ab95ba0938556f34b98e2da3a60d
   GoogleAppMeasurement: ffe513e90551844a739e7bcbb1d2aca1c28a4338
   GoogleUtilities: 04fce34bcd5620c1ee76fb79172105c74a4df335
@@ -339,11 +331,10 @@ SPEC CHECKSUMS:
   react-native-splash-screen: 353334c5ae82d8c74501ea7cbb916cb7cb20c8bf
   react-native-udp: 54a1aa9bf5c0824f930b1ba6dbfb3fd3e733bba9
   react-native-version-check: 901616b6d258b385628120441bd0b285b24c7be1
-  ReactNativeGeth: fde10b3e39bb7d4e1fefddf91cd27fc930cb18e5
+  ReactNativeGeth: facd6d25ceecb07e64c325e2e6e8a38f217c10ba
   RNAnalytics: 5c242b7f8117f108f5df71e96b908185db3fb4ee
-  RNAnalyticsIntegration-Firebase: cb1f36e62d1c6c2ae97923865c4da217690acf13
   RNDeviceInfo: 2b4f76adc479657bf37bfc927bbfb027b17515d4
-  RNFirebase: 6eab5439c35c57d3517f45f29c0c5c6385470f38
+  RNFirebase: badb7f503fb30a67b2c02bf2cfd9b8d11b6db344
   RNFS: 0f4d630b538e93e0e9e3519ff0b7b7b48760d8ed
   RNGestureHandler: b65d391f4f570178d657b99a16ec99d09b8656b0
   RNLanguages: 69291ca9fea686ff96c66a519f92f7e5af1d08ae
@@ -356,6 +347,6 @@ SPEC CHECKSUMS:
   SentryReactNative: 014e5b1684c30c31e6514a57e51eff26cf2b99f7
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: 5b8a8e7083380bac4df81568f2c1e3cd39f372c0
+PODFILE CHECKSUM: f6cf3930f1d89749fb0c6ecd3fb6542097e0dc6b
 
-COCOAPODS: 1.7.5
+COCOAPODS: 1.7.2
