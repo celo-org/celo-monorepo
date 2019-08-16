@@ -6,9 +6,11 @@ import { H2 } from 'src/fonts/Fonts'
 import { ErrorMessage, Form, LabeledInput } from 'src/forms/FormComponents'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Rings from 'src/logos/RingsLight'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import FormContainer, { emailIsValid, hasField } from 'src/shared/Form'
+import menuItems from 'src/shared/menu-items'
 import Navigation from 'src/shared/navigation'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import {
@@ -20,8 +22,6 @@ import {
   RecommendationKeys,
   Tables,
 } from '../../fullstack/EcoFundFields'
-import menuItems from 'src/shared/menu-items'
-import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 
 interface State {
   table: Tables

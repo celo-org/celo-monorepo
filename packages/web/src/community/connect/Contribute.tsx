@@ -1,9 +1,7 @@
 import { StyleSheet, View } from 'react-native'
-import { NameSpaces } from 'src/i18n'
-
 import QuarterCircle from 'src/community/connect/QuarterCircle'
 import { H2 } from 'src/fonts/Fonts'
-import { I18nProps, withNamespaces } from 'src/i18n'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
 import { hashNav } from 'src/shared/menu-items'
