@@ -203,7 +203,6 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     const borderStyle = { borderColor: this.hasError() ? colors.errorRed : colors.dark }
 
     const makerSymbol = CURRENCIES[this.state.makerToken].symbol
-    const takerDisplay = +getMoneyDisplayValue(takerTokenAmount)
     return (
       <View style={styles.background}>
         <View>
@@ -255,7 +254,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               <View style={[styles.outputBox, styles.ioBox]}>
                 <View style={styles.outputText}>
                   <Text numberOfLines={1} style={[styles.input, fontStyles.regular, takerStyle]}>
-                    {takerDisplay}
+                    {getMoneyDisplayValue(takerTokenAmount)}
                   </Text>
                   <Text style={[styles.input, fontStyles.regular, takerStyle, styles.superscript]}>
                     *

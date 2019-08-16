@@ -293,7 +293,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
                   ]
                 }
               >
-                0
+                0.00
               </Text>
               <Text
                 style={
