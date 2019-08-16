@@ -1,8 +1,8 @@
+import getConfig from 'next/config'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Chevron from 'src/icons/chevron'
 import { colors, fonts, textStyles } from 'src/styles'
-import getConfig from 'next/config'
 
 interface Props {
   link: string
