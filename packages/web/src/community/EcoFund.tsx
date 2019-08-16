@@ -43,9 +43,9 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
     const { t, screen } = this.props
     return (
       <GridRow
-        desktopStyle={[standardStyles.sectionMarginTop, standardStyles.blockMarginBottom]}
-        tabletStyle={[standardStyles.sectionMarginTablet, standardStyles.blockMarginBottomTablet]}
-        mobileStyle={[standardStyles.sectionMarginMobile, standardStyles.blockMarginBottomMobile]}
+        desktopStyle={[standardStyles.sectionMarginTop]}
+        tabletStyle={[standardStyles.sectionMarginTopTablet]}
+        mobileStyle={[standardStyles.sectionMarginTopMobile]}
       >
         <Cell span={Spans.half} style={screen !== ScreenSizes.MOBILE && styles.insideEdge}>
           <H2>{t('ecoFund.title')}</H2>
