@@ -67,6 +67,7 @@ class DappKitSignTxScreen extends React.Component<Props, State> {
   }
 
   showDetails = () => {
+    // TODO(sallyjyl): figure out which data to pass in for multitx
     navigate(Screens.DappKitTxDataScreen, { dappKitData: this.state.request.txs[0].txData })
   }
 
