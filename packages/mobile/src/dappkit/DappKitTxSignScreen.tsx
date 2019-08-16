@@ -5,9 +5,9 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Text, View } from 'react-native'
 import { NavigationParams, NavigationScreenProp } from 'react-navigation'
-import { connect } from 'react-redux'
 import { requestTxSignature } from 'src/dappkit/dappkit'
 import { Namespaces } from 'src/i18n'
+import { navigateHome } from 'src/navigator/NavigationService'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'dappkit/DappKitSignTxScreen'
@@ -17,15 +17,7 @@ interface OwnProps {
   navigation?: NavigationScreenProp<NavigationParams>
 }
 
-interface DispatchProps {
-  requestTxSignature: typeof requestTxSignature
-}
-
-type Props = OwnProps & DispatchProps & WithNamespaces
-
-const mapDispatchToProps = {
-  requestTxSignature,
-}
+type Props = OwnProps & WithNamespaces
 
 class DappKitSignTxScreen extends React.Component<Props> {
   static navigationOptions = { header: null }
@@ -51,7 +43,7 @@ class DappKitSignTxScreen extends React.Component<Props> {
       return
     }
 
-    this.props.requestTxSignature(request)
+    navigateHome({ dispatchAfterNavigate: requestTxSignature(request) })
   }
 
   render() {
@@ -72,9 +64,4 @@ class DappKitSignTxScreen extends React.Component<Props> {
   }
 }
 
-export default withNamespaces(Namespaces.global)(
-  connect<null, DispatchProps>(
-    null,
-    mapDispatchToProps
-  )(DappKitSignTxScreen)
-)
+export default withNamespaces(Namespaces.global)(DappKitSignTxScreen)

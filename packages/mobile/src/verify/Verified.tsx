@@ -10,9 +10,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
 
 export class Verified extends React.PureComponent<WithNamespaces> {
-  static navigationOptions = {
-    header: null,
-  }
+  static navigationOptions = { header: null }
 
   componentDidMount() {
     // And then another to show success text before leaving screen

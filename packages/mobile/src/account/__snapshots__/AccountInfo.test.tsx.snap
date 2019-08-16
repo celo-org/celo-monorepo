@@ -375,57 +375,6 @@ exports[`AccountInfo renders correctly 2`] = `
         />
       </svg>
     </View>
-    <View
-      style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "justifyContent": "center",
-          },
-          Object {
-            "height": 15,
-            "width": 15,
-          },
-          Object {
-            "bottom": 25,
-            "position": "absolute",
-            "right": -15,
-            "zIndex": 20,
-          },
-        ]
-      }
-    >
-      <View
-        style={
-          Object {
-            "backgroundColor": "#3C9BF4",
-            "borderRadius": 2.5,
-            "height": 5,
-            "opacity": 1,
-            "transform": Array [
-              Object {
-                "scale": 1,
-              },
-              Object {
-                "perspective": 1000,
-              },
-            ],
-            "width": 5,
-          }
-        }
-      />
-      <View
-        style={
-          Object {
-            "backgroundColor": "#3C9BF4",
-            "borderRadius": 2.5,
-            "height": 5,
-            "position": "absolute",
-            "width": 5,
-          }
-        }
-      />
-    </View>
   </View>
   <View
     style={
@@ -629,57 +578,6 @@ exports[`AccountInfo renders correctly 3`] = `
         />
       </svg>
     </View>
-    <View
-      style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "justifyContent": "center",
-          },
-          Object {
-            "height": 15,
-            "width": 15,
-          },
-          Object {
-            "bottom": 25,
-            "position": "absolute",
-            "right": -15,
-            "zIndex": 20,
-          },
-        ]
-      }
-    >
-      <View
-        style={
-          Object {
-            "backgroundColor": "#3C9BF4",
-            "borderRadius": 2.5,
-            "height": 5,
-            "opacity": 1,
-            "transform": Array [
-              Object {
-                "scale": 1,
-              },
-              Object {
-                "perspective": 1000,
-              },
-            ],
-            "width": 5,
-          }
-        }
-      />
-      <View
-        style={
-          Object {
-            "backgroundColor": "#3C9BF4",
-            "borderRadius": 2.5,
-            "height": 5,
-            "position": "absolute",
-            "width": 5,
-          }
-        }
-      />
-    </View>
   </View>
   <Text
     onPress={[Function]}
@@ -855,57 +753,6 @@ exports[`AccountInfo renders correctly 4`] = `
           style={Object {}}
         />
       </svg>
-    </View>
-    <View
-      style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "justifyContent": "center",
-          },
-          Object {
-            "height": 15,
-            "width": 15,
-          },
-          Object {
-            "bottom": 25,
-            "position": "absolute",
-            "right": -15,
-            "zIndex": 20,
-          },
-        ]
-      }
-    >
-      <View
-        style={
-          Object {
-            "backgroundColor": "#3C9BF4",
-            "borderRadius": 2.5,
-            "height": 5,
-            "opacity": 1,
-            "transform": Array [
-              Object {
-                "scale": 1,
-              },
-              Object {
-                "perspective": 1000,
-              },
-            ],
-            "width": 5,
-          }
-        }
-      />
-      <View
-        style={
-          Object {
-            "backgroundColor": "#3C9BF4",
-            "borderRadius": 2.5,
-            "height": 5,
-            "position": "absolute",
-            "width": 5,
-          }
-        }
-      />
     </View>
   </View>
 </View>
