@@ -47,6 +47,7 @@
   "inviteSent": "Código de invitación enviado!",
   "inviteFailed": "Falló el envío de la invitación",
   "loadingContacts": "Encontrando tus contactos",
+  "QRCode": "QR código",
   "saveCodeImage": "Guardar imagen de código",
   "scanCode": "Escanear código",
   "writeStorageNeededForQrDownload":
@@ -54,7 +55,7 @@
   "ScanCodeByPlacingItInTheBox": "Escanee el código colocándolo en la caja",
   "needCameraPermissionToScan":
     "La aplicación necesita permiso de la cámara para escanear códigos QR",
-  "backToYourQRCode": "Volver a su código QR",
+  "showYourQRCode": "Muestra su código QR",
   "toSentOrRequestPayment": "enviar o solicitar pago",
   "requestSent": "Solicitud Enviada",
   "reclaimPayment": "Reclamar el Pago",

@@ -8,12 +8,12 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { RNCamera } from 'react-native-camera'
 import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
-import BackButton from 'src/components/BackButton'
-import { Namespaces } from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { handleBarcodeDetected } from 'src/send/actions'
-import { checkCameraPermission, requestCameraPermission } from 'src/utils/androidPermissions'
+import { requestCameraPermission } from 'src/utils/androidPermissions'
 import Logger from 'src/utils/Logger'
 
 interface DispatchProps {
@@ -27,19 +27,10 @@ const goToQrCodeScreen = () => {
 }
 
 class QRScanner extends React.Component<Props> {
-  static navigationOptions = {
-    headerTitle: 'Scanner',
-    headerTitleStyle: [
-      fontStyles.headerTitle,
-      {
-        flex: 1,
-        textAlign: 'center',
-      },
-    ],
-    // This helps vertically center the title
-    headerRight: <View />,
-    headerLeft: <BackButton />,
-  }
+  static navigationOptions = () => ({
+    ...headerWithBackButton,
+    headerTitle: i18n.t('sendFlow7:scanCode'),
+  })
 
   camera: RNCamera | null = null
 
@@ -49,10 +40,7 @@ class QRScanner extends React.Component<Props> {
 
   async componentDidMount() {
     const { t } = this.props
-    let cameraPermission = await checkCameraPermission()
-    if (!cameraPermission) {
-      cameraPermission = await requestCameraPermission()
-    }
+    const cameraPermission = await requestCameraPermission()
 
     if (!cameraPermission) {
       Logger.showMessage(t('needCameraPermissionToScan'))
@@ -97,7 +85,7 @@ class QRScanner extends React.Component<Props> {
                 <QRCode />
               </View>
               <TouchableOpacity onPress={goToQrCodeScreen}>
-                <Text style={styles.footerText}> {t('backToYourQRCode')} </Text>
+                <Text style={styles.footerText}> {t('showYourQRCode')} </Text>
               </TouchableOpacity>
             </View>
           </RNCamera>
@@ -110,7 +98,6 @@ class QRScanner extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column',
   },
   preview: {
     flex: 1,
