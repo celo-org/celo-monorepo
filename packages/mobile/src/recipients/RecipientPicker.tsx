@@ -42,7 +42,7 @@ import Logger from 'src/utils/Logger'
 import { assertUnreachable } from 'src/utils/typescript'
 
 const goToQrCodeScreen = () => {
-  navigate(Screens.QRCode)
+  navigate(Screens.QRScanner)
 }
 
 const QRCodeCTA = ({ t }: { t: TranslationFunction }) => (
