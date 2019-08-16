@@ -338,7 +338,7 @@ contract('Validators', (accounts: string[]) => {
       })
     })
 
-    describe.only('when multiple deposit notice periods are provided', () => {
+    describe('when multiple deposit notice periods are provided', () => {
       it('should accept a sufficient combination of deposits as stake', async () => {
         // create registrationRequirement.value different bonded deposts each
         // with value 1 and unique noticePeriods greater than registrationRequirement.noticePeriod
@@ -361,7 +361,7 @@ contract('Validators', (accounts: string[]) => {
         assert.deepEqual(await validators.getRegisteredValidators(), [validator])
       })
 
-      it('should revert when the combined deposit value is insufficient', async () => {
+      it('should revert when the combined deposit value is insufficient with all valid notice periods', async () => {
         // create registrationRequirement.value - 1 different bonded deposts each
         // with value 1 and valid noticePeriods
         const depositCount = registrationRequirement.value.minus(1)
