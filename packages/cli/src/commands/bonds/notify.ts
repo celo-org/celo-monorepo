@@ -1,4 +1,4 @@
-import { BondedDeposits } from '@celo/contractkit'
+import { BondedDeposits } from '@celo/walletkit'
 import { flags } from '@oclif/command'
 
 import { BaseCommand } from '../../base'

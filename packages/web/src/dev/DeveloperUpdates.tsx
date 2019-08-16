@@ -9,7 +9,7 @@ import Discord from 'src/icons/Discord'
 import Octocat from 'src/icons/Octocat'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
-import menuItems, { CeloLinks } from 'src/shared/menu-items'
+import menuItems, { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { TweetLogo as TwitterLogo } from 'src/shared/TwitterLogo'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
@@ -21,8 +21,10 @@ export default withNamespaces('dev')(
   memo(function DeveloperUpdates({ t }: I18nProps) {
     return (
       <>
+        <span id={'signup'} />
         <Title title={t('updates.title')} />
         <GridRow
+          nativeID={hashNav.build.newsletter}
           desktopStyle={standardStyles.blockMarginBottom}
           tabletStyle={standardStyles.blockMarginBottomTablet}
           mobileStyle={standardStyles.blockMarginBottomMobile}

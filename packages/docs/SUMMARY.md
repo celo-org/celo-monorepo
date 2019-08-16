@@ -54,11 +54,12 @@
 ## Command Line Interface
 
 - [Introduction](command-line-interface/introduction.md)
-- [Exchange](command-line-interface/exchange.md)
-- [Bonded Deposits](command-line-interface/bonded-deposits.md)
-- [Validator Node](command-line-interface/validator-node.md)
-- [Validator Groups](command-line-interface/validator-groups.md)
+- [Config](command-line-interface/config.md)
 - [Account](command-line-interface/account.md)
+- [Exchange](command-line-interface/exchange.md)
+- [Bonded Deposits](command-line-interface/bonds.md)
+- [Validator Node](command-line-interface/validator.md)
+- [Validator Groups](command-line-interface/validatorgroup.md)
 
 ## Community
 

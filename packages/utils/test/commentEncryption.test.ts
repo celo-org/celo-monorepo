@@ -82,7 +82,7 @@ describe('Comment Encryption', () => {
     })
   })
   describe('regression test', () => {
-    const recipPriv = Buffer.from(
+    const newRecipPriv = Buffer.from(
       'd2a515a64d37407f0e0e4a6a6a69a95eeb5ef8c2524ef01a6ffc6e3b39e0661b',
       'hex'
     )
@@ -93,7 +93,7 @@ describe('Comment Encryption', () => {
     const encrypted =
       'BGacSsVDzOXrVdXBkM2yBC4F1KD94rjfClQGi7r2TPkFu+hLQIRJ73H3z5wgWVgq8vcziPR5ugWPI/6pFduezNVMAJGB9pSLfA00wvb8twy5/uBIzaAQqkfKUJ4/n10N5+F313PDq0BU1LXsPN1Oq+5SWPQc4Z4MWKs+7zkcNz//BNNZkm8lgJ4frVHExBrED62rsth87vwxpsfyxxk36zdvAHN7xfYss3bqgYVA2+E45mRZOaJxnyRHfUYKU5tA5neTertXlzpZO93l4e9SrDTUVbI/dr8QuSc2Pot7C83cCQHjeIl9eB2W5DTfTwlThg/CeWW0afaElTjuEw1XXy9eC3H9nxTXOj44SM2WUB3uDH2K2wmPJsd+RW66CDI6fD2VHMst2CA2B01hX2h+6Ml84Ria53bI6iedOpb1ejsw98a1/z2QKAlh/KfMHmseY/dQMh9kBhIuOQwavf3t4PvyMJ2QbRGwi1cuItkkyg/8eiCa8Zdjn3OozoWSQnfR'
 
-    const comment = 'regression test on encryption method 👍'
+    const newComment = 'regression test on encryption method 👍'
     // How comment was encrypted.
     // Uses elliptic package
     // console.info(
@@ -109,16 +109,16 @@ describe('Comment Encryption', () => {
         senderPriv,
         true
       )
-      assert.equal(decrypted, comment)
+      assert.equal(decrypted, newComment)
       assert(didDecrypt)
     })
     it('should not regress for recipeient', () => {
       const { comment: decrypted, encrypted: didDecrypt } = decryptComment(
         encrypted,
-        recipPriv,
+        newRecipPriv,
         false
       )
-      assert.equal(decrypted, comment)
+      assert.equal(decrypted, newComment)
       assert(didDecrypt)
     })
   })
@@ -128,7 +128,7 @@ describe('deriveCEK', () => {
   it('should produce 32 bytes', () => {
     const input = randomBytes(32)
     const derived = deriveCEK(input.toString('hex'))
-    assert(derived.length == 32)
+    assert(derived.length === 32)
   })
   it('should not regress', () => {
     // Expected verified on a different HDKF implementation for input 0xdeadbeef
@@ -149,13 +149,13 @@ describe('decompressPublicKey', () => {
     const publicKeyCompressed = Buffer.from(privateKey.getPublic(true, 'hex'), 'hex')
     const decompressed = decompressPublicKey(publicKeyCompressed)
     assert(Buffer.concat([Buffer.from('04', 'hex'), decompressed]).equals(publicKeyFull))
-    assert(decompressed.length == 64)
+    assert(decompressed.length === 64)
   })
   it('should work with long form input', () => {
     const privateKey = ec.keyFromPrivate(randomBytes(32))
     const publicKeyFull = Buffer.from(privateKey.getPublic(false, 'hex'), 'hex')
     const decompressed = decompressPublicKey(publicKeyFull)
     assert(Buffer.concat([Buffer.from('04', 'hex'), decompressed]).equals(publicKeyFull))
-    assert(decompressed.length == 64)
+    assert(decompressed.length === 64)
   })
 })

@@ -8,11 +8,13 @@ import { standardStyles, textStyles } from 'src/styles'
 interface Props {
   title: string
   invert?: boolean
+  nativeID?: string
 }
 
-const TitleComponent = React.memo(function Title({ title, invert }: Props) {
+const TitleComponent = React.memo(function Title({ title, invert, nativeID }: Props) {
   return (
     <GridRow
+      nativeID={nativeID}
       desktopStyle={[standardStyles.blockMarginBottom, standardStyles.sectionMarginTop]}
       tabletStyle={[standardStyles.blockMarginBottomTablet, standardStyles.sectionMarginTopTablet]}
       mobileStyle={[standardStyles.blockMarginBottomMobile, standardStyles.sectionMarginMobile]}

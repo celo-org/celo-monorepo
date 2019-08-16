@@ -9,7 +9,6 @@ import "../common/UsingRegistry.sol";
  * @dev Any contract calling these functions should guard against reentrancy.
  */
 contract UsingBondedDeposits is UsingRegistry {
-
   /**
    * @notice Returns whether or not an account's voting power is frozen.
    * @param account The address of the account.
@@ -27,7 +26,10 @@ contract UsingBondedDeposits is UsingRegistry {
    * @return The associated account.
    */
   function getAccountFromVoter(address accountOrDelegate) internal view returns (address) {
-    return getBondedDeposits().getAccountFromVoter(accountOrDelegate);
+    return getBondedDeposits().getAccountFromDelegateAndRole(
+      accountOrDelegate,
+      IBondedDeposits.DelegateRole.Voting
+    );
   }
 
   /**
@@ -36,7 +38,10 @@ contract UsingBondedDeposits is UsingRegistry {
    * @return The associated validator address.
    */
   function getValidatorFromAccount(address account) internal view returns (address) {
-    return getBondedDeposits().getValidatorFromAccount(account);
+    return getBondedDeposits().getDelegateFromAccountAndRole(
+      account,
+      IBondedDeposits.DelegateRole.Validating
+    );
   }
 
   /**
@@ -46,7 +51,10 @@ contract UsingBondedDeposits is UsingRegistry {
    * @return The associated account.
    */
   function getAccountFromValidator(address accountOrDelegate) internal view returns (address) {
-    return getBondedDeposits().getAccountFromValidator(accountOrDelegate);
+    return getBondedDeposits().getAccountFromDelegateAndRole(
+      accountOrDelegate,
+      IBondedDeposits.DelegateRole.Validating
+    );
   }
 
   /**
@@ -78,6 +86,6 @@ contract UsingBondedDeposits is UsingRegistry {
   }
 
   function getBondedDeposits() private view returns(IBondedDeposits) {
-    return IBondedDeposits(registry.getAddressFor(BONDED_DEPOSITS_REGISTRY_ID));
+    return IBondedDeposits(registry.getAddressForOrDie(BONDED_DEPOSITS_REGISTRY_ID));
   }
 }

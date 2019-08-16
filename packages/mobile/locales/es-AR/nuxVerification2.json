@@ -14,7 +14,7 @@
   "country": "País",
   "phoneNumber": "Número de teléfono",
   "invalidPhone": "Número de teléfono inválido",
-  "allowSmsPermissions": "Permitir que la billetera de Celo envíe y vea mensajes SMS",
+  "allowSmsPermissions": "Permitir que el Monedero Celo envíe y vea mensajes de texto (SMS)",
   "dontAsk": "No volver a preguntar",
   "deny": "Denegar",
   "allow": "Permitir",

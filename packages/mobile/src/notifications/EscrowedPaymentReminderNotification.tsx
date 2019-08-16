@@ -1,5 +1,4 @@
 import BaseNotification from '@celo/react-components/components/BaseNotification'
-import { getContactPhoneNumber } from '@celo/utils/src/contacts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Image, StyleSheet, View } from 'react-native'
@@ -24,10 +23,7 @@ type Props = OwnProps & WithNamespaces
 export class EscrowedPaymentReminderNotification extends React.PureComponent<Props> {
   getCTA = () => {
     const { payment } = this.props
-    const recipientPhoneNumber =
-      typeof payment.recipient === 'string'
-        ? payment.recipient
-        : getContactPhoneNumber(payment.recipient)
+    const recipientPhoneNumber = payment.recipientPhone
     return [
       {
         text: this.props.t('sendMessage'),
@@ -61,8 +57,9 @@ export class EscrowedPaymentReminderNotification extends React.PureComponent<Pro
 
   getTitle() {
     const { t, payment } = this.props
-    const displayName =
-      typeof payment.recipient === 'string' ? payment.recipient : payment.recipient.displayName
+    const displayName = payment.recipientContact
+      ? payment.recipientContact.displayName
+      : payment.recipientPhone
     return t('escrowedPaymentReminder', { mobile: displayName })
   }
 

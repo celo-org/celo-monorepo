@@ -6,7 +6,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { setEducationCompleted } from 'src/goldToken/actions'
 import { exchangeIcon, goldValue, shinyGold } from 'src/images/Images'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 
 interface DispatchProps {
@@ -15,17 +15,19 @@ interface DispatchProps {
 type Props = DispatchProps
 export class GoldEducation extends React.Component<Props> {
   static navigationOptions = { header: null }
+
   goToExchange = () => {
     this.props.setEducationCompleted()
     CeloAnalytics.track(CustomEventNames.exchange_gold_nux)
     navigate(Screens.ExchangeHomeScreen)
   }
 
-  goToWallet = () => {
+  goToWalletHome = () => {
     this.props.setEducationCompleted()
     CeloAnalytics.track(CustomEventNames.wallet_gold_nux)
-    navigateBack()
+    navigateHome()
   }
+
   render() {
     const stepInfo = [
       {
@@ -51,7 +53,7 @@ export class GoldEducation extends React.Component<Props> {
       <Education
         stepInfo={stepInfo}
         onFinish={this.goToExchange}
-        onFinishAlternate={this.goToWallet}
+        onFinishAlternate={this.goToWalletHome}
         buttonText={'exchangeGold'}
         linkText={'backToWallet'}
       />

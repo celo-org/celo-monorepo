@@ -1,5 +1,3 @@
-import PulsingDot from '@celo/react-components/components/PulsingDot'
-import SmallButton from '@celo/react-components/components/SmallButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles, { estimateFontSize } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
@@ -7,19 +5,16 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { connect } from 'react-redux'
-import { CTA_CIRCLE_SIZE } from 'src/account/Education'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import Styles from 'src/components/Styles'
-import { isE2EEnv } from 'src/config'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM as Tokens } from 'src/geth/consts'
-import { refreshAllBalances } from 'src/home/actions'
+import { startBalanceAutorefresh, stopBalanceAutorefresh } from 'src/home/actions'
 import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import { showRefreshBalanceMessage } from 'src/redux/selectors'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 interface StateProps {
@@ -28,7 +23,6 @@ interface StateProps {
   stableEducationCompleted: boolean
   goldBalance: string | null
   dollarBalance: string | null
-  balanceOutOfSync: boolean
 }
 
 interface OwnProps {
@@ -36,7 +30,8 @@ interface OwnProps {
 }
 
 interface DispatchProps {
-  refreshAllBalances: typeof refreshAllBalances
+  startBalanceAutorefresh: typeof startBalanceAutorefresh
+  stopBalanceAutorefresh: typeof stopBalanceAutorefresh
 }
 
 type Props = StateProps & DispatchProps & WithNamespaces & OwnProps
@@ -48,7 +43,6 @@ const mapStateToProps = (state: RootState): StateProps => {
     stableEducationCompleted: state.stableToken.educationCompleted,
     goldBalance: state.goldToken.balance,
     dollarBalance: state.stableToken.balance,
-    balanceOutOfSync: showRefreshBalanceMessage(state),
   }
 }
 
@@ -70,12 +64,16 @@ export class AccountOverview extends React.Component<Props> {
     return fontSize
   }
 
-  refreshBalances = () => {
-    this.props.refreshAllBalances()
+  componentDidMount() {
+    this.props.startBalanceAutorefresh()
+  }
+
+  componentWillUnmount() {
+    this.props.stopBalanceAutorefresh()
   }
 
   render() {
-    const { t, testID, goldBalance, dollarBalance, balanceOutOfSync } = this.props
+    const { t, testID, goldBalance, dollarBalance } = this.props
 
     return (
       <View testID={testID}>
@@ -94,16 +92,7 @@ export class AccountOverview extends React.Component<Props> {
                   amount={dollarBalance}
                   size={this.getFontSize(dollarBalance, !this.props.stableEducationCompleted)}
                   type={Tokens.DOLLAR}
-                  balanceOutOfSync={balanceOutOfSync}
                 />
-                {!this.props.stableEducationCompleted && (
-                  <PulsingDot
-                    color={colors.messageBlue}
-                    circleStartSize={CTA_CIRCLE_SIZE}
-                    style={style.dot}
-                    animated={!isE2EEnv}
-                  />
-                )}
               </TouchableOpacity>
             </View>
             <View style={style.line} />
@@ -120,30 +109,10 @@ export class AccountOverview extends React.Component<Props> {
                   amount={goldBalance}
                   size={this.getFontSize(goldBalance, !this.props.goldEducationCompleted)}
                   type={Tokens.GOLD}
-                  balanceOutOfSync={balanceOutOfSync}
                 />
-                {!this.props.goldEducationCompleted && (
-                  <PulsingDot
-                    color={colors.messageBlue}
-                    circleStartSize={CTA_CIRCLE_SIZE}
-                    style={style.dot}
-                  />
-                )}
               </TouchableOpacity>
             </View>
           </View>
-          {balanceOutOfSync && (
-            <View style={style.balanceRefreshContainer}>
-              <Text style={style.balanceRefreshText}>{t('balanceNeedUpdating')}</Text>
-              <SmallButton
-                text={t('refreshBalances')}
-                onPress={this.refreshBalances}
-                solid={false}
-                style={style.messageButton}
-                textStyle={fontStyles.messageText}
-              />
-            </View>
-          )}
         </View>
       </View>
     )
@@ -203,30 +172,11 @@ const style = StyleSheet.create({
   dot: {
     padding: 10,
   },
-  balanceRefreshContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingBottom: 13,
-    paddingHorizontal: 50,
-  },
-  balanceRefreshText: {
-    ...fontStyles.bodySmall,
-    color: colors.messageBlue,
-    paddingRight: 5,
-  },
-  messageButton: {
-    ...fontStyles.messageText,
-    borderColor: colors.messageBlue,
-    minWidth: 0,
-    paddingVertical: 2,
-    paddingHorizontal: 5,
-  },
 })
 
 export default componentWithAnalytics(
   connect<StateProps, DispatchProps, OwnProps, RootState>(
     mapStateToProps,
-    { refreshAllBalances }
+    { startBalanceAutorefresh, stopBalanceAutorefresh }
   )(withNamespaces(Namespaces.walletFlow5)(AccountOverview))
 )
