@@ -14,7 +14,8 @@
     "clean": "tsc -b . --clean && rm -rf src/generated",
     "build:gen": "yarn --cwd ../protocol build",
     "prepublishOnly": "yarn build:gen && yarn build",
-    "lint": "tslint -c tslint.json --project . && tslint -c tslint.json --project test"
+    "lint": "tslint -c tslint.json --project . && tslint -c tslint.json --project test",
+    "test": "jest test/*.test.ts"
   },
   "dependencies": {
     "@celo/utils": "^0.0.6-beta3",
@@ -31,7 +32,7 @@
   },
   "engines": {
     "node": ">=8.16.0"
-  },  
+  },
   "files": [
     "lib/**/*"
   ]
