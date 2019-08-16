@@ -11,7 +11,8 @@
   "keywords": ["celo", "blockchain", "contractkit", "defi"],
   "scripts": {
     "build": "tsc -b .",
-    "clean": "tsc -b . --clean && rm -rf src/generated",
+    "clean": "tsc -b . --clean",
+    "clean:all": "yarn clean && rm -rf src/generated",
     "build:gen": "yarn --cwd ../protocol build",
     "prepublishOnly": "yarn build:gen && yarn build",
     "lint": "tslint -c tslint.json --project . && tslint -c tslint.json --project test"
@@ -26,7 +27,8 @@
   },
   "devDependencies": {
     "@celo/protocol": "1.0.0",
-    "@types/jest": "^24.0.13",
+    "@types/debug": "^4.1.5",
+    "@types/jest": "^24.0.17",
     "@types/web3": "^1.0.18"
   },
   "engines": {
