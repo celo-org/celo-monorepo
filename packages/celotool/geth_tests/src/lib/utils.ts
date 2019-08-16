@@ -27,6 +27,7 @@ export interface GethInstanceConfig {
   etherbase?: string
   peers?: string[]
   pid?: number
+  maxtxpoolsize?: number
 }
 
 export interface GethTestConfig {
@@ -249,9 +250,26 @@ export async function getEnode(port: number, ws: boolean = false) {
   return (await admin.getNodeInfo()).enode
 }
 
+// TODO(kevjue): Be less hacky!  Get this working with web3-eth-txpool module.
+export function getTxpoolContents(gethBinaryPath: string, instance: GethInstanceConfig) {
+  return new Promise((resolve, reject) => {
+	        var command = spawn(gethBinaryPath, ['--datadir', getDatadir(instance), 'attach', '--exec', 'console.log(JSON.stringify(txpool.content))'])
+		var result = ''
+		command.stdout.on('data', function(data) {
+		      result += data.toString()
+		})
+		command.on('close', function(_) {
+		      result = result.replace("undefined", "")
+		      result = result.trim()
+		      resolve(result)
+		})
+		command.on('error', function(err) { reject(err) })
+  })
+}
+
 export async function startGeth(gethBinaryPath: string, instance: GethInstanceConfig) {
   const datadir = getDatadir(instance)
-  const { syncmode, port, rpcport, wsport, validating } = instance
+  const { syncmode, port, rpcport, wsport, validating, maxtxpoolsize } = instance
   const privateKey = instance.privateKey || ''
   const lightserv = instance.lightserv || false
   const etherbase = instance.etherbase || ''
@@ -306,6 +324,13 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     gethArgs.push('--password=/dev/null', `--unlock=0`)
     gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
   }
+
+  if (maxtxpoolsize) {
+    gethArgs.push(`--txpool.globalslots=${maxtxpoolsize}`)
+    gethArgs.push(`--txpool.globalqueue=${maxtxpoolsize}`)
+    gethArgs.push(`--txpool.nolocals`)
+  }
+  
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`)
   instance.pid = gethProcess.pid
 
