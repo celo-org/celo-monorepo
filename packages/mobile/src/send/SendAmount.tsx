@@ -17,7 +17,7 @@ import {
   View,
 } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { NavigationInjectedProps, NavigationScreenProps } from 'react-navigation'
+import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -29,10 +29,11 @@ import { FeeType } from 'src/fees/actions'
 import EstimateFee from 'src/fees/EstimateFee'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
 import { CURRENCIES, CURRENCY_ENUM as Tokens } from 'src/geth/consts'
-import { Namespaces } from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/contactMapping'
 import { E164NumberToAddressType } from 'src/identity/reducer'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import {
@@ -124,11 +125,10 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
   }
 }
 
-export class SendAmount extends React.PureComponent<Props, State> {
-  static navigationOptions = ({ navigation }: NavigationScreenProps) => ({
-    headerTitle: navigation.getParam('title', ''),
-    headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
-    headerRight: <View />, // This helps vertically center the title
+export class SendAmount extends React.Component<Props, State> {
+  static navigationOptions = () => ({
+    ...headerWithBackButton,
+    headerTitle: i18n.t('sendFlow7:send_or_request'),
   })
 
   state: State = {
@@ -141,7 +141,6 @@ export class SendAmount extends React.PureComponent<Props, State> {
   timeout: number | null = null
 
   componentDidMount() {
-    this.props.navigation.setParams({ title: this.props.t('send_or_request') })
     this.props.fetchDollarBalance()
     this.fetchLatestPhoneAddress()
   }

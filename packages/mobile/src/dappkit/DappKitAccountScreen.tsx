@@ -1,18 +1,15 @@
 import FullscreenCTA from '@celo/react-components/components/FullscreenCTA'
 import { componentStyles } from '@celo/react-components/styles/styles'
-import {
-  AccountAuthRequest,
-  AccountAuthResponseSuccess,
-  produceResponseDeeplink,
-} from '@celo/utils/src/dappkit'
+import { AccountAuthRequest } from '@celo/utils/src/dappkit'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { Linking, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import { NavigationParams, NavigationScreenProp } from 'react-navigation'
 import { connect } from 'react-redux'
+import { e164NumberSelector } from 'src/account/reducer'
+import { approveAccountAuth } from 'src/dappkit/dappkit'
 import { Namespaces } from 'src/i18n'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigateHome } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -26,12 +23,14 @@ interface OwnProps {
 
 interface StateProps {
   account: string | null
+  phoneNumber: string | null
 }
 
 type Props = OwnProps & StateProps & WithNamespaces
 
 const mapStateToProps = (state: RootState): StateProps => ({
   account: currentAccountSelector(state),
+  phoneNumber: e164NumberSelector(state),
 })
 
 class DappKitAccountAuthScreen extends React.Component<Props> {
@@ -46,7 +45,7 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
   }
 
   linkBack = () => {
-    const { account, navigation } = this.props
+    const { account, navigation, phoneNumber } = this.props
 
     if (!navigation) {
       Logger.error(TAG, 'Missing navigation props')
@@ -59,14 +58,16 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
       Logger.error(TAG, 'No request found in navigation props')
       return
     }
-
     if (!account) {
       Logger.error(TAG, 'No account set up for this wallet')
       return
     }
+    if (!phoneNumber) {
+      Logger.error(TAG, 'No phone number set up for this wallet')
+      return
+    }
 
-    navigate(Screens.WalletHome)
-    Linking.openURL(produceResponseDeeplink(request, AccountAuthResponseSuccess(account)))
+    navigateHome({ dispatchAfterNavigate: approveAccountAuth(request) })
   }
 
   render() {

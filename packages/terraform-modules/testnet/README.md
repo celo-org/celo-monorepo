@@ -15,3 +15,11 @@ pulled from a `.env` file by `celotool` and passed to `terraform`.
 Sometimes, if recreating an address right after deleting one, GCP will say
 that the resource already exists and `terraform apply` will fail. In this case,
 just wait a little bit and try again.
+
+## Google Cloud Permissions Needed
+
+A service account must be able to create/list/modify/delete networks,
+firewalls, instances, objects, addresses, and disks.
+
+For C-Labs employees, a Google Cloud role `Terraform Testnet Admin` has been
+created.

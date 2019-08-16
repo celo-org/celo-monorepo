@@ -52,7 +52,7 @@ export async function uploadStaticNodesToGoogleStorage(networkName: string) {
 //   So, if you run into an error that says something about being unauthorized,
 //   copy and paste this into your terminal: gcloud auth login
 // One can browse these files at https://console.cloud.google.com/storage/browser
-async function uploadFileToGoogleStorage(
+export async function uploadFileToGoogleStorage(
   localFilePath: string,
   googleStorageBucketName: string,
   googleStorageFileName: string,
