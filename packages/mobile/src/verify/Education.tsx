@@ -13,13 +13,9 @@ import VerifyAddressBook from 'src/icons/VerifyAddressBook'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
+
 export class Education extends React.Component<WithNamespaces> {
-  static navigationOptions = {
-    headerStyle: {
-      elevation: 0,
-    },
-    header: null,
-  }
+  static navigationOptions = { header: null }
 
   onSubmit = () => {
     navigate(Screens.VerifyVerifying)

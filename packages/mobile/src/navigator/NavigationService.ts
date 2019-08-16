@@ -79,8 +79,8 @@ export const navigateBack = () => {
   navigator.dispatch(NavigationActions.back())
 }
 
-export const navigateHome = () => {
-  navigate(Screens.WalletHome)
+export const navigateHome = (params?: NavigationParams) => {
+  navigate(Screens.WalletHome, params)
 }
 
 export const navigateToError = (errorMessage: string, error?: Error) => {
