@@ -9,6 +9,7 @@ import { getInvitationVerificationFee } from 'src/invite/saga'
 import { getSendFee } from 'src/send/saga'
 import { CeloDefaultRecipient } from 'src/send/Send'
 import Logger from 'src/utils/Logger'
+import { web3 } from 'src/web3/contracts'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'fees/saga'
@@ -30,7 +31,7 @@ export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
         // Just use default values here since it doesn't matter for fee estimation
         feeInWei = yield call(getSendFee, account, getStableTokenContract, {
           recipientAddress: CeloDefaultRecipient.address,
-          amount: '0.001',
+          amount: web3.utils.fromWei('1'),
           comment: 'Coffee or Tea?',
         })
         break
