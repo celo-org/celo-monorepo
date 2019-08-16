@@ -246,4 +246,24 @@ describe('transfer feed item renders correctly', () => {
     )
     expect(tree).toMatchSnapshot()
   })
+  it('for known sent', () => {
+    const tree = renderer.create(
+      <TransferFeedItem
+        __typename={EventTypeNames.Transfer}
+        comment={''}
+        type={TransactionTypes.SENT}
+        hash={'0x'}
+        value={100}
+        address={mockAccount}
+        invitees={{}}
+        symbol={CURRENCY_ENUM.DOLLAR}
+        timestamp={1}
+        commentKey={null}
+        addressToE164Number={mockAddressToE164Number}
+        recipientCache={mockRecipientCache}
+        {...getMockI18nProps()}
+      />
+    )
+    expect(tree).toMatchSnapshot()
+  })
 })
