@@ -5,7 +5,6 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { decryptComment as decryptCommentRaw } from '@celo/utils/src/commentEncryption'
 import BigNumber from 'bignumber.js'
-import * as _ from 'lodash'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
@@ -15,7 +14,7 @@ import { features } from 'src/flags'
 import { CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
-import { faucetIcon, inviteVerifyFee } from 'src/images/Images'
+import { faucetIcon, inviteVerifyFee, unknownUserIcon } from 'src/images/Images'
 import { Invitees } from 'src/invite/actions'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
@@ -186,8 +185,12 @@ export class TransferFeedItem extends React.PureComponent<Props> {
       comment = null
     } else {
       const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
-      fullName = recipient ? recipient.displayName : _.capitalize(t(type.toLowerCase()))
-      contactImage = <ContactCircle address={address} size={avatarSize} />
+      fullName = recipient ? recipient.displayName : t('unknown')
+      contactImage = recipient ? (
+        <Image source={unknownUserIcon} style={styles.image} />
+      ) : (
+        <ContactCircle address={address} size={avatarSize} />
+      )
     }
 
     return (
