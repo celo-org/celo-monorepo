@@ -11,8 +11,6 @@
   "characterLimitExceeded": "{{max}} Character Limit Exceeded",
   "invite": "Invite",
   "payRequest": "Pay Request",
-  "tryEnteringPhoneNumber":
-    "Try entering a phone number if you are unable to find who you're looking for",
   "sendTo": "Send to",
   "amount": "Amount",
   "celoDollarsAvailable": "Celo Dollars Available",
@@ -32,11 +30,12 @@
   "exchange": "Exchange",
   "inviteSendTo": "Invite & send to",
   "keepMoneySafe": "We'll keep this money safe until your friend creates a Celo account",
-  "searchFriends": "Try entering a phone number if you are unable to find who you’re looking for",
+  "searchFriends": "Try entering a phone number if you are unable to find who you're looking for",
   "inviteVerifyPayment": "Invite & Verify Payment",
   "total": "Total",
   "inviteFriends": "Invite Friends",
   "noResultsFor": "No results for",
+  "noContacts": "No contacts found",
   "searchForSomeone": "Search for someone using their name or phone number",
   "nameOrPhoneNumber": "Name or Phone Number",
   "pending": "Pending",
@@ -48,6 +47,7 @@
   "inviteSent": "Invite code sent!",
   "inviteFailed": "Failure sending invite",
   "loadingContacts": "Finding your contacts",
+  "QRCode": "QR Code",
   "saveCodeImage": "Save Code Image",
   "scanCode": "Scan Code",
   "writeStorageNeededForQrDownload":
@@ -60,6 +60,6 @@
   "reclaimPayment": "Reclaim Payment",
   "totalSent": "Total Sent",
   "totalRefunded": "Total Refunded",
-  "loadingVerificationStatus": "Checking recipient verfication...",
+  "loadingVerificationStatus": "Checking recipient verification...",
   "askForContactsPermissionAction": "Get my Contacts"
 }

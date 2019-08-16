@@ -42,7 +42,7 @@ Build the Android application - requires environment param
 fastlane android integration
 ```
 
-Ship Integration to Playstore Alpha.
+Ship Integration to Playstore Internal
 
 ### android staging
 
@@ -50,7 +50,7 @@ Ship Integration to Playstore Alpha.
 fastlane android staging
 ```
 
-Ship Staging to Playstore Alpha.
+Ship Staging to Playstore Internal
 
 ### android production
 

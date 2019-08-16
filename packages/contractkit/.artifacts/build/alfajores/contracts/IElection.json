@@ -1,0 +1,277 @@
+{
+  "contractName": "IElection",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "isVoting",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata":
+    "{\"compiler\":{\"version\":\"0.5.8+commit.23d335f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"}],\"name\":\"isVoting\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/governance/interfaces/IElection.sol\":\"IElection\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/governance/interfaces/IElection.sol\":{\"keccak256\":\"0x7c0a40175f31cf4c350ef02302c04a7f8712e25bd2a960433200b418b9f8df3b\",\"urls\":[\"bzzr://ab43821fbeed38268b0312b313ddf57b4664d280ef7d68b483415ad55fc1fed0\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source":
+    "pragma solidity ^0.5.8;\n\n\ninterface IElection {\n  function isVoting(address) external view returns(bool);\n}\n",
+  "sourcePath":
+    "/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/governance/interfaces/IElection.sol",
+  "ast": {
+    "absolutePath":
+      "/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/governance/interfaces/IElection.sol",
+    "exportedSymbols": {
+      "IElection": [11149]
+    },
+    "id": 11150,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 11141,
+        "literals": ["solidity", "^", "0.5", ".8"],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:36"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": null,
+        "fullyImplemented": false,
+        "id": 11149,
+        "linearizedBaseContracts": [11149],
+        "name": "IElection",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": null,
+            "id": 11148,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "isVoting",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11144,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11143,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11148,
+                  "src": "68:7:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11142,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "68:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "67:9:36"
+            },
+            "returnParameters": {
+              "id": 11147,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11146,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11148,
+                  "src": "99:4:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 11145,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "99:4:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "98:6:36"
+            },
+            "scope": 11149,
+            "src": "50:55:36",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "external"
+          }
+        ],
+        "scope": 11150,
+        "src": "26:81:36"
+      }
+    ],
+    "src": "0:108:36"
+  },
+  "legacyAST": {
+    "absolutePath":
+      "/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/governance/interfaces/IElection.sol",
+    "exportedSymbols": {
+      "IElection": [11149]
+    },
+    "id": 11150,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 11141,
+        "literals": ["solidity", "^", "0.5", ".8"],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:36"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": null,
+        "fullyImplemented": false,
+        "id": 11149,
+        "linearizedBaseContracts": [11149],
+        "name": "IElection",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": null,
+            "id": 11148,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "isVoting",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11144,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11143,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11148,
+                  "src": "68:7:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11142,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "68:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "67:9:36"
+            },
+            "returnParameters": {
+              "id": 11147,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11146,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11148,
+                  "src": "99:4:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 11145,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "99:4:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "98:6:36"
+            },
+            "scope": 11149,
+            "src": "50:55:36",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "external"
+          }
+        ],
+        "scope": 11150,
+        "src": "26:81:36"
+      }
+    ],
+    "src": "0:108:36"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.8+commit.23d335f2.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.9",
+  "updatedAt": "2019-07-17T03:09:18.745Z",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}

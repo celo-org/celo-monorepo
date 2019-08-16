@@ -7,8 +7,8 @@ import { getUserContactDetails, UserContactDetails } from 'src/account/reducer'
 import SettingsItem from 'src/account/SettingsItem'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import CancelButton from 'src/components/CancelButton'
 import { Namespaces } from 'src/i18n'
+import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -31,9 +31,7 @@ const mapStateToProps = (state: RootState) => {
 }
 
 export class Profile extends React.Component<Props> {
-  static navigationOptions = {
-    headerLeft: <CancelButton eventName={CustomEventNames.edit_account_cancel} />,
-  }
+  static navigationOptions = headerWithCancelButton
 
   goToEditProfile = () => {
     CeloAnalytics.track(CustomEventNames.edit_name)

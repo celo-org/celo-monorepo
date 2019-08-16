@@ -1,0 +1,499 @@
+{
+  "contractName": "MockGovernance",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "isVoting",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "voter",
+          "type": "address"
+        }
+      ],
+      "name": "setVoting",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata":
+    "{\"compiler\":{\"version\":\"0.5.8+commit.23d335f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"address\"}],\"name\":\"isVoting\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"voter\",\"type\":\"address\"}],\"name\":\"setVoting\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{},\"title\":\"A mock Governance for testing.\"},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/governance/test/MockGovernance.sol\":\"MockGovernance\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/governance/test/MockGovernance.sol\":{\"keccak256\":\"0xf304fedc41159bbdfd4993069dda4fbf1d3ba6d161d920247aa1d337e4501f63\",\"urls\":[\"bzzr://afe784ac4b6be1e123e7a9cf1db9bb6daa0ede431b97106418fa0aea996fb382\"]}},\"version\":1}",
+  "bytecode":
+    "0x608060405234801561001057600080fd5b50610181806100206000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c80635f8dd6491461003b578063c4d0795114610097575b600080fd5b61007d6004803603602081101561005157600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506100db565b604051808215151515815260200191505060405180910390f35b6100d9600480360360208110156100ad57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506100fb565b005b60006020528060005260406000206000915054906101000a900460ff1681565b60016000808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060006101000a81548160ff0219169083151502179055505056fea165627a7a72305820c803dff352e40cd2c953b3cef0231d964856411f58deb4f6281860be7cb094c00029",
+  "deployedBytecode":
+    "0x608060405234801561001057600080fd5b50600436106100365760003560e01c80635f8dd6491461003b578063c4d0795114610097575b600080fd5b61007d6004803603602081101561005157600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506100db565b604051808215151515815260200191505060405180910390f35b6100d9600480360360208110156100ad57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506100fb565b005b60006020528060005260406000206000915054906101000a900460ff1681565b60016000808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060006101000a81548160ff0219169083151502179055505056fea165627a7a72305820c803dff352e40cd2c953b3cef0231d964856411f58deb4f6281860be7cb094c00029",
+  "sourceMap": "75:151:41:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;75:151:41;;;;;;;",
+  "deployedSourceMap":
+    "75:151:41:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;75:151:41;;;;;;;;;;;;;;;;;;;;;;;;103:40;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;103:40:41;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;148:76;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;148:76:41;;;;;;;;;;;;;;;;;;;:::i;:::-;;103:40;;;;;;;;;;;;;;;;;;;;;;:::o;148:76::-;215:4;197:8;:15;206:5;197:15;;;;;;;;;;;;;;;;:22;;;;;;;;;;;;;;;;;;148:76;:::o",
+  "source":
+    "pragma solidity ^0.5.8;\n\n\n/**\n * @title A mock Governance for testing.\n */\ncontract MockGovernance {\n  mapping(address => bool) public isVoting;\n\n  function setVoting(address voter) external {\n    isVoting[voter] = true;\n  }\n}\n",
+  "sourcePath":
+    "/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/governance/test/MockGovernance.sol",
+  "ast": {
+    "absolutePath":
+      "/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/governance/test/MockGovernance.sol",
+    "exportedSymbols": {
+      "MockGovernance": [11843]
+    },
+    "id": 11844,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 11826,
+        "literals": ["solidity", "^", "0.5", ".8"],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:41"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": "@title A mock Governance for testing.",
+        "fullyImplemented": true,
+        "id": 11843,
+        "linearizedBaseContracts": [11843],
+        "name": "MockGovernance",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "id": 11830,
+            "name": "isVoting",
+            "nodeType": "VariableDeclaration",
+            "scope": 11843,
+            "src": "103:40:41",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+              "typeString": "mapping(address => bool)"
+            },
+            "typeName": {
+              "id": 11829,
+              "keyType": {
+                "id": 11827,
+                "name": "address",
+                "nodeType": "ElementaryTypeName",
+                "src": "111:7:41",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "103:24:41",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+                "typeString": "mapping(address => bool)"
+              },
+              "valueType": {
+                "id": 11828,
+                "name": "bool",
+                "nodeType": "ElementaryTypeName",
+                "src": "122:4:41",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                }
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 11841,
+              "nodeType": "Block",
+              "src": "191:33:41",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 11839,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "baseExpression": {
+                        "argumentTypes": null,
+                        "id": 11835,
+                        "name": "isVoting",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 11830,
+                        "src": "197:8:41",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+                          "typeString": "mapping(address => bool)"
+                        }
+                      },
+                      "id": 11837,
+                      "indexExpression": {
+                        "argumentTypes": null,
+                        "id": 11836,
+                        "name": "voter",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 11832,
+                        "src": "206:5:41",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "IndexAccess",
+                      "src": "197:15:41",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "hexValue": "74727565",
+                      "id": 11838,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "bool",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "215:4:41",
+                      "subdenomination": null,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      },
+                      "value": "true"
+                    },
+                    "src": "197:22:41",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 11840,
+                  "nodeType": "ExpressionStatement",
+                  "src": "197:22:41"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 11842,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setVoting",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11833,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11832,
+                  "name": "voter",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11842,
+                  "src": "167:13:41",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11831,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "167:7:41",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "166:15:41"
+            },
+            "returnParameters": {
+              "id": 11834,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "191:0:41"
+            },
+            "scope": 11843,
+            "src": "148:76:41",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          }
+        ],
+        "scope": 11844,
+        "src": "75:151:41"
+      }
+    ],
+    "src": "0:227:41"
+  },
+  "legacyAST": {
+    "absolutePath":
+      "/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/governance/test/MockGovernance.sol",
+    "exportedSymbols": {
+      "MockGovernance": [11843]
+    },
+    "id": 11844,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 11826,
+        "literals": ["solidity", "^", "0.5", ".8"],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:41"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": "@title A mock Governance for testing.",
+        "fullyImplemented": true,
+        "id": 11843,
+        "linearizedBaseContracts": [11843],
+        "name": "MockGovernance",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "id": 11830,
+            "name": "isVoting",
+            "nodeType": "VariableDeclaration",
+            "scope": 11843,
+            "src": "103:40:41",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+              "typeString": "mapping(address => bool)"
+            },
+            "typeName": {
+              "id": 11829,
+              "keyType": {
+                "id": 11827,
+                "name": "address",
+                "nodeType": "ElementaryTypeName",
+                "src": "111:7:41",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "103:24:41",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+                "typeString": "mapping(address => bool)"
+              },
+              "valueType": {
+                "id": 11828,
+                "name": "bool",
+                "nodeType": "ElementaryTypeName",
+                "src": "122:4:41",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                }
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 11841,
+              "nodeType": "Block",
+              "src": "191:33:41",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 11839,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "baseExpression": {
+                        "argumentTypes": null,
+                        "id": 11835,
+                        "name": "isVoting",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 11830,
+                        "src": "197:8:41",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+                          "typeString": "mapping(address => bool)"
+                        }
+                      },
+                      "id": 11837,
+                      "indexExpression": {
+                        "argumentTypes": null,
+                        "id": 11836,
+                        "name": "voter",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 11832,
+                        "src": "206:5:41",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "IndexAccess",
+                      "src": "197:15:41",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "hexValue": "74727565",
+                      "id": 11838,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "bool",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "215:4:41",
+                      "subdenomination": null,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      },
+                      "value": "true"
+                    },
+                    "src": "197:22:41",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 11840,
+                  "nodeType": "ExpressionStatement",
+                  "src": "197:22:41"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 11842,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setVoting",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 11833,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11832,
+                  "name": "voter",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 11842,
+                  "src": "167:13:41",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 11831,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "167:7:41",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "166:15:41"
+            },
+            "returnParameters": {
+              "id": 11834,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "191:0:41"
+            },
+            "scope": 11843,
+            "src": "148:76:41",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          }
+        ],
+        "scope": 11844,
+        "src": "75:151:41"
+      }
+    ],
+    "src": "0:227:41"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.8+commit.23d335f2.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.9",
+  "updatedAt": "2019-07-17T03:09:18.762Z",
+  "devdoc": {
+    "methods": {},
+    "title": "A mock Governance for testing."
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}

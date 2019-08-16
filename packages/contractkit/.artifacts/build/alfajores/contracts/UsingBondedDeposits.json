@@ -1,0 +1,3104 @@
+{
+  "contractName": "UsingBondedDeposits",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "registry",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "isOwner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "registryAddress",
+          "type": "address"
+        }
+      ],
+      "name": "setRegistry",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "registryAddress",
+          "type": "address"
+        }
+      ],
+      "name": "RegistrySet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    }
+  ],
+  "metadata":
+    "{\"compiler\":{\"version\":\"0.5.8+commit.23d335f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"registry\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"registryAddress\",\"type\":\"address\"}],\"name\":\"setRegistry\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"registryAddress\",\"type\":\"address\"}],\"name\":\"RegistrySet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"}],\"devdoc\":{\"details\":\"Any contract calling these functions should guard against reentrancy.\",\"methods\":{\"isOwner()\":{\"return\":\"true if `msg.sender` is the owner of the contract.\"},\"owner()\":{\"return\":\"the address of the owner.\"},\"renounceOwnership()\":{\"details\":\"Allows the current owner to relinquish control of the contract. It will not be possible to call the functions with the `onlyOwner` modifier anymore.\"},\"setRegistry(address)\":{\"params\":{\"registryAddress\":\"The address of a registry contract for routing to other contracts.\"}},\"transferOwnership(address)\":{\"details\":\"Allows the current owner to transfer control of the contract to a newOwner.\",\"params\":{\"newOwner\":\"The address to transfer ownership to.\"}}},\"title\":\"A contract for calling functions on the BondedDeposits contract.\"},\"userdoc\":{\"methods\":{\"renounceOwnership()\":{\"notice\":\"Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.\"},\"setRegistry(address)\":{\"notice\":\"Updates the address pointing to a Registry contract.\"}}}},\"settings\":{\"compilationTarget\":{\"/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/governance/UsingBondedDeposits.sol\":\"UsingBondedDeposits\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/common/UsingRegistry.sol\":{\"keccak256\":\"0x45c1256a5cb44d3413bf16b0c1eb10685092bbf3843cd62570d46ed41446a6c8\",\"urls\":[\"bzzr://25e0859f1c672219fe7c99e2cb89a2c9a2df747385323cf1ba1d5f2f1b174160\"]},\"/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/common/interfaces/IRegistry.sol\":{\"keccak256\":\"0x38c5daa148a7e1f3e626db95a587f33204cc4b973a7366aab612cc6c41b491b4\",\"urls\":[\"bzzr://847eb049a256b667da5bda15d60f7a1428fa1482e293fcc2fee02967b18f243c\"]},\"/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/governance/UsingBondedDeposits.sol\":{\"keccak256\":\"0x2a0e3196bd785701d20f6120e2baf3d38e3cbd5a46a13b99c238be9087c2a29e\",\"urls\":[\"bzzr://c74b07f1217b5985ee0d57f8b365e878f828cac742a125c2272d67fc42ce4c3e\"]},\"/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/governance/interfaces/IBondedDeposits.sol\":{\"keccak256\":\"0xf1909f50301420747cf0ebd0e5d38e44668d650e3ebef3415cbc5b778181a4b9\",\"urls\":[\"bzzr://067b94a31680134de7a7650f5ebe4335fd796db9bd4fd8c6bd5e399f8274e1da\"]},\"openzeppelin-solidity/contracts/ownership/Ownable.sol\":{\"keccak256\":\"0xcb16adc00dcf0d75e0bdf94379f4d5a6d74dca7c74e4183b94e15721159f8a30\",\"urls\":[\"bzzr://b81e03f7203cd628cfed19255911a04a05e8670d248afb48a7b067dd03b4ff55\"]}},\"version\":1}",
+  "bytecode":
+    "0x6080604052336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16600073ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a36104fe806100cf6000396000f3fe608060405234801561001057600080fd5b50600436106100625760003560e01c8063715018a6146100675780637b103999146100715780638da5cb5b146100bb5780638f32d59b14610105578063a91ee0dc14610127578063f2fde38b1461016b575b600080fd5b61006f6101af565b005b61007961027f565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6100c36102a5565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b61010d6102ce565b604051808215151515815260200191505060405180910390f35b6101696004803603602081101561013d57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610325565b005b6101ad6004803603602081101561018157600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506103bd565b005b6101b76102ce565b6101c057600080fd5b600073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a360008060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550565b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614905090565b61032d6102ce565b61033657600080fd5b80600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055508073ffffffffffffffffffffffffffffffffffffffff167f27fe5f0c1c3b1ed427cc63d0f05759ffdecf9aec9e18d31ef366fc8a6cb5dc3b60405160405180910390a250565b6103c56102ce565b6103ce57600080fd5b6103d7816103da565b50565b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16141561041457600080fd5b8073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a3806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505056fea165627a7a7230582067ac46448b2215c1f1330e20bdb54999da778c8feadccc12f444543cb9b8975e0029",
+  "deployedBytecode":
+    "0x608060405234801561001057600080fd5b50600436106100625760003560e01c8063715018a6146100675780637b103999146100715780638da5cb5b146100bb5780638f32d59b14610105578063a91ee0dc14610127578063f2fde38b1461016b575b600080fd5b61006f6101af565b005b61007961027f565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6100c36102a5565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b61010d6102ce565b604051808215151515815260200191505060405180910390f35b6101696004803603602081101561013d57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610325565b005b6101ad6004803603602081101561018157600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506103bd565b005b6101b76102ce565b6101c057600080fd5b600073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a360008060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550565b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614905090565b61032d6102ce565b61033657600080fd5b80600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055508073ffffffffffffffffffffffffffffffffffffffff167f27fe5f0c1c3b1ed427cc63d0f05759ffdecf9aec9e18d31ef366fc8a6cb5dc3b60405160405180910390a250565b6103c56102ce565b6103ce57600080fd5b6103d7816103da565b50565b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16141561041457600080fd5b8073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a3806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505056fea165627a7a7230582067ac46448b2215c1f1330e20bdb54999da778c8feadccc12f444543cb9b8975e0029",
+  "sourceMap":
+    "269:2681:32:-;;;524:10:77;515:6;;:19;;;;;;;;;;;;;;;;;;582:6;;;;;;;;;;;549:40;;578:1;549:40;;;;;;;;;;;;269:2681:32;;;;;;",
+  "deployedSourceMap":
+    "269:2681:32:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;269:2681:32;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1423:137:77;;;:::i;:::-;;1117:25:13;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;659:77:77;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;979:90;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;1320:150:13;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;1320:150:13;;;;;;;;;;;;;;;;;;;:::i;:::-;;1731:107:77;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;1731:107:77;;;;;;;;;;;;;;;;;;;:::i;:::-;;1423:137;863:9;:7;:9::i;:::-;855:18;;;;;;1521:1;1484:40;;1505:6;;;;;;;;;;;1484:40;;;;;;;;;;;;1551:1;1534:6;;:19;;;;;;;;;;;;;;;;;;1423:137::o;1117:25:13:-;;;;;;;;;;;;;:::o;659:77:77:-;697:7;723:6;;;;;;;;;;;716:13;;659:77;:::o;979:90::-;1019:4;1056:6;;;;;;;;;;;1042:20;;:10;:20;;;1035:27;;979:90;:::o;1320:150:13:-;863:9:77;:7;:9::i;:::-;855:18;;;;;;1410:15:13;1389:8;;:37;;;;;;;;;;;;;;;;;;1449:15;1437:28;;;;;;;;;;;;1320:150;:::o;1731:107:77:-;863:9;:7;:9::i;:::-;855:18;;;;;;1803:28;1822:8;1803:18;:28::i;:::-;1731:107;:::o;1982:183::-;2075:1;2055:22;;:8;:22;;;;2047:31;;;;;;2122:8;2093:38;;2114:6;;;;;;;;;;;2093:38;;;;;;;;;;;;2150:8;2141:6;;:17;;;;;;;;;;;;;;;;;;1982:183;:::o",
+  "source":
+    "pragma solidity ^0.5.8;\n\nimport \"./interfaces/IBondedDeposits.sol\";\nimport \"../common/UsingRegistry.sol\";\n\n\n/**\n * @title A contract for calling functions on the BondedDeposits contract.\n * @dev Any contract calling these functions should guard against reentrancy.\n */\ncontract UsingBondedDeposits is UsingRegistry {\n\n  /**\n   * @notice Returns whether or not an account's voting power is frozen.\n   * @param account The address of the account.\n   * @return Whether or not the account's voting power is frozen.\n   * @dev Frozen accounts can retract existing votes but not make future votes.\n   */\n  function isVotingFrozen(address account) internal view returns (bool) {\n    return getBondedDeposits().isVotingFrozen(account);\n  }\n\n  /**\n   * @notice Returns the account associated with the provided account or voting delegate.\n   * @param accountOrDelegate The address of the account or voting delegate.\n   * @dev Fails if the `accountOrDelegate` is a non-voting delegate.\n   * @return The associated account.\n   */\n  function getAccountFromVoter(address accountOrDelegate) internal view returns (address) {\n    return getBondedDeposits().getAccountFromVoter(accountOrDelegate);\n  }\n\n  /**\n   * @notice Returns the validator address for a particular account.\n   * @param account The account.\n   * @return The associated validator address.\n   */\n  function getValidatorFromAccount(address account) internal view returns (address) {\n    return getBondedDeposits().getValidatorFromAccount(account);\n  }\n\n  /**\n   * @notice Returns the account associated with the provided account or validating delegate.\n   * @param accountOrDelegate The address of the account or validating delegate.\n   * @dev Fails if the `accountOrDelegate` is a non-validating delegate.\n   * @return The associated account.\n   */\n  function getAccountFromValidator(address accountOrDelegate) internal view returns (address) {\n    return getBondedDeposits().getAccountFromValidator(accountOrDelegate);\n  }\n\n  /**\n   * @notice Returns voting weight for a particular account.\n   * @param account The address of the account.\n   * @return The voting weight of `account`.\n   */\n  function getAccountWeight(address account) internal view returns (uint256) {\n    return getBondedDeposits().getAccountWeight(account);\n  }\n\n  /**\n   * @notice Returns the bonded deposit value for particular account and notice period.\n   * @param account The address of the account.\n   * @param noticePeriod The notice period of the bonded deposit.\n   * @return The value of the bonded deposit.\n   */\n  function getBondedDepositValue(\n    address account,\n    uint256 noticePeriod\n  )\n    internal\n    view\n    returns (uint256)\n  {\n    uint256 value;\n    (value,) = getBondedDeposits().getBondedDeposit(account, noticePeriod);\n    return value;\n  }\n\n  function getBondedDeposits() private view returns(IBondedDeposits) {\n    return IBondedDeposits(registry.getAddressFor(BONDED_DEPOSITS_REGISTRY_ID));\n  }\n}\n",
+  "sourcePath":
+    "/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/governance/UsingBondedDeposits.sol",
+  "ast": {
+    "absolutePath":
+      "/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/governance/UsingBondedDeposits.sol",
+    "exportedSymbols": {
+      "UsingBondedDeposits": [9139]
+    },
+    "id": 9140,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 9026,
+        "literals": ["solidity", "^", "0.5", ".8"],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:32"
+      },
+      {
+        "absolutePath":
+          "/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/governance/interfaces/IBondedDeposits.sol",
+        "file": "./interfaces/IBondedDeposits.sol",
+        "id": 9027,
+        "nodeType": "ImportDirective",
+        "scope": 9140,
+        "sourceUnit": 11140,
+        "src": "25:42:32",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath":
+          "/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/common/UsingRegistry.sol",
+        "file": "../common/UsingRegistry.sol",
+        "id": 9028,
+        "nodeType": "ImportDirective",
+        "scope": 9140,
+        "sourceUnit": 2236,
+        "src": "68:37:32",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 9029,
+              "name": "UsingRegistry",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 2235,
+              "src": "301:13:32",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_UsingRegistry_$2235",
+                "typeString": "contract UsingRegistry"
+              }
+            },
+            "id": 9030,
+            "nodeType": "InheritanceSpecifier",
+            "src": "301:13:32"
+          }
+        ],
+        "contractDependencies": [2235, 20485],
+        "contractKind": "contract",
+        "documentation":
+          "@title A contract for calling functions on the BondedDeposits contract.\n@dev Any contract calling these functions should guard against reentrancy.",
+        "fullyImplemented": true,
+        "id": 9139,
+        "linearizedBaseContracts": [9139, 2235, 20485],
+        "name": "UsingBondedDeposits",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 9043,
+              "nodeType": "Block",
+              "src": "669:61:32",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 9040,
+                        "name": "account",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 9032,
+                        "src": "717:7:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "id": 9037,
+                          "name": "getBondedDeposits",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9138,
+                          "src": "682:17:32",
+                          "typeDescriptions": {
+                            "typeIdentifier":
+                              "t_function_internal_view$__$returns$_t_contract$_IBondedDeposits_$11139_$",
+                            "typeString": "function () view returns (contract IBondedDeposits)"
+                          }
+                        },
+                        "id": 9038,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "682:19:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IBondedDeposits_$11139",
+                          "typeString": "contract IBondedDeposits"
+                        }
+                      },
+                      "id": 9039,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "isVotingFrozen",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 11001,
+                      "src": "682:34:32",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_view$_t_address_$returns$_t_bool_$",
+                        "typeString": "function (address) view external returns (bool)"
+                      }
+                    },
+                    "id": 9041,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "682:43:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "functionReturnParameters": 9036,
+                  "id": 9042,
+                  "nodeType": "Return",
+                  "src": "675:50:32"
+                }
+              ]
+            },
+            "documentation":
+              "@notice Returns whether or not an account's voting power is frozen.\n@param account The address of the account.\n@return Whether or not the account's voting power is frozen.\n@dev Frozen accounts can retract existing votes but not make future votes.",
+            "id": 9044,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "isVotingFrozen",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 9033,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9032,
+                  "name": "account",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9044,
+                  "src": "623:15:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9031,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "623:7:32",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "622:17:32"
+            },
+            "returnParameters": {
+              "id": 9036,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9035,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9044,
+                  "src": "663:4:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 9034,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "663:4:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "662:6:32"
+            },
+            "scope": 9139,
+            "src": "599:131:32",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 9057,
+              "nodeType": "Block",
+              "src": "1107:76:32",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 9054,
+                        "name": "accountOrDelegate",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 9046,
+                        "src": "1160:17:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "id": 9051,
+                          "name": "getBondedDeposits",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9138,
+                          "src": "1120:17:32",
+                          "typeDescriptions": {
+                            "typeIdentifier":
+                              "t_function_internal_view$__$returns$_t_contract$_IBondedDeposits_$11139_$",
+                            "typeString": "function () view returns (contract IBondedDeposits)"
+                          }
+                        },
+                        "id": 9052,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1120:19:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IBondedDeposits_$11139",
+                          "typeString": "contract IBondedDeposits"
+                        }
+                      },
+                      "id": 9053,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "getAccountFromVoter",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 11131,
+                      "src": "1120:39:32",
+                      "typeDescriptions": {
+                        "typeIdentifier":
+                          "t_function_external_view$_t_address_$returns$_t_address_$",
+                        "typeString": "function (address) view external returns (address)"
+                      }
+                    },
+                    "id": 9055,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1120:58:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "functionReturnParameters": 9050,
+                  "id": 9056,
+                  "nodeType": "Return",
+                  "src": "1113:65:32"
+                }
+              ]
+            },
+            "documentation":
+              "@notice Returns the account associated with the provided account or voting delegate.\n@param accountOrDelegate The address of the account or voting delegate.\n@dev Fails if the `accountOrDelegate` is a non-voting delegate.\n@return The associated account.",
+            "id": 9058,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getAccountFromVoter",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 9047,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9046,
+                  "name": "accountOrDelegate",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9058,
+                  "src": "1048:25:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9045,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1048:7:32",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1047:27:32"
+            },
+            "returnParameters": {
+              "id": 9050,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9049,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9058,
+                  "src": "1098:7:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9048,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1098:7:32",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1097:9:32"
+            },
+            "scope": 9139,
+            "src": "1019:164:32",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 9071,
+              "nodeType": "Block",
+              "src": "1430:70:32",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 9068,
+                        "name": "account",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 9060,
+                        "src": "1487:7:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "id": 9065,
+                          "name": "getBondedDeposits",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9138,
+                          "src": "1443:17:32",
+                          "typeDescriptions": {
+                            "typeIdentifier":
+                              "t_function_internal_view$__$returns$_t_contract$_IBondedDeposits_$11139_$",
+                            "typeString": "function () view returns (contract IBondedDeposits)"
+                          }
+                        },
+                        "id": 9066,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1443:19:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IBondedDeposits_$11139",
+                          "typeString": "contract IBondedDeposits"
+                        }
+                      },
+                      "id": 9067,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "getValidatorFromAccount",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 11124,
+                      "src": "1443:43:32",
+                      "typeDescriptions": {
+                        "typeIdentifier":
+                          "t_function_external_view$_t_address_$returns$_t_address_$",
+                        "typeString": "function (address) view external returns (address)"
+                      }
+                    },
+                    "id": 9069,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1443:52:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "functionReturnParameters": 9064,
+                  "id": 9070,
+                  "nodeType": "Return",
+                  "src": "1436:59:32"
+                }
+              ]
+            },
+            "documentation":
+              "@notice Returns the validator address for a particular account.\n@param account The account.\n@return The associated validator address.",
+            "id": 9072,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getValidatorFromAccount",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 9061,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9060,
+                  "name": "account",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9072,
+                  "src": "1381:15:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9059,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1381:7:32",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1380:17:32"
+            },
+            "returnParameters": {
+              "id": 9064,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9063,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9072,
+                  "src": "1421:7:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9062,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1421:7:32",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1420:9:32"
+            },
+            "scope": 9139,
+            "src": "1348:152:32",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 9085,
+              "nodeType": "Block",
+              "src": "1893:80:32",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 9082,
+                        "name": "accountOrDelegate",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 9074,
+                        "src": "1950:17:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "id": 9079,
+                          "name": "getBondedDeposits",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9138,
+                          "src": "1906:17:32",
+                          "typeDescriptions": {
+                            "typeIdentifier":
+                              "t_function_internal_view$__$returns$_t_contract$_IBondedDeposits_$11139_$",
+                            "typeString": "function () view returns (contract IBondedDeposits)"
+                          }
+                        },
+                        "id": 9080,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1906:19:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IBondedDeposits_$11139",
+                          "typeString": "contract IBondedDeposits"
+                        }
+                      },
+                      "id": 9081,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "getAccountFromValidator",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 11138,
+                      "src": "1906:43:32",
+                      "typeDescriptions": {
+                        "typeIdentifier":
+                          "t_function_external_view$_t_address_$returns$_t_address_$",
+                        "typeString": "function (address) view external returns (address)"
+                      }
+                    },
+                    "id": 9083,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1906:62:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "functionReturnParameters": 9078,
+                  "id": 9084,
+                  "nodeType": "Return",
+                  "src": "1899:69:32"
+                }
+              ]
+            },
+            "documentation":
+              "@notice Returns the account associated with the provided account or validating delegate.\n@param accountOrDelegate The address of the account or validating delegate.\n@dev Fails if the `accountOrDelegate` is a non-validating delegate.\n@return The associated account.",
+            "id": 9086,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getAccountFromValidator",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 9075,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9074,
+                  "name": "accountOrDelegate",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9086,
+                  "src": "1834:25:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9073,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1834:7:32",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1833:27:32"
+            },
+            "returnParameters": {
+              "id": 9078,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9077,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9086,
+                  "src": "1884:7:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9076,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1884:7:32",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1883:9:32"
+            },
+            "scope": 9139,
+            "src": "1801:172:32",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 9099,
+              "nodeType": "Block",
+              "src": "2218:63:32",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 9096,
+                        "name": "account",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 9088,
+                        "src": "2268:7:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "id": 9093,
+                          "name": "getBondedDeposits",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9138,
+                          "src": "2231:17:32",
+                          "typeDescriptions": {
+                            "typeIdentifier":
+                              "t_function_internal_view$__$returns$_t_contract$_IBondedDeposits_$11139_$",
+                            "typeString": "function () view returns (contract IBondedDeposits)"
+                          }
+                        },
+                        "id": 9094,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "2231:19:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IBondedDeposits_$11139",
+                          "typeString": "contract IBondedDeposits"
+                        }
+                      },
+                      "id": 9095,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "getAccountWeight",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 11117,
+                      "src": "2231:36:32",
+                      "typeDescriptions": {
+                        "typeIdentifier":
+                          "t_function_external_view$_t_address_$returns$_t_uint256_$",
+                        "typeString": "function (address) view external returns (uint256)"
+                      }
+                    },
+                    "id": 9097,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2231:45:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 9092,
+                  "id": 9098,
+                  "nodeType": "Return",
+                  "src": "2224:52:32"
+                }
+              ]
+            },
+            "documentation":
+              "@notice Returns voting weight for a particular account.\n@param account The address of the account.\n@return The voting weight of `account`.",
+            "id": 9100,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getAccountWeight",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 9089,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9088,
+                  "name": "account",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9100,
+                  "src": "2169:15:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9087,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2169:7:32",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2168:17:32"
+            },
+            "returnParameters": {
+              "id": 9092,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9091,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9100,
+                  "src": "2209:7:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 9090,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2209:7:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2208:9:32"
+            },
+            "scope": 9139,
+            "src": "2143:138:32",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 9124,
+              "nodeType": "Block",
+              "src": "2673:118:32",
+              "statements": [
+                {
+                  "assignments": [9110],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 9110,
+                      "name": "value",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 9124,
+                      "src": "2679:13:32",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      },
+                      "typeName": {
+                        "id": 9109,
+                        "name": "uint256",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "2679:7:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 9111,
+                  "initialValue": null,
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "2679:13:32"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 9120,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "components": [
+                        {
+                          "argumentTypes": null,
+                          "id": 9112,
+                          "name": "value",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9110,
+                          "src": "2699:5:32",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        null
+                      ],
+                      "id": 9113,
+                      "isConstant": false,
+                      "isInlineArray": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "TupleExpression",
+                      "src": "2698:8:32",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_tuple$_t_uint256_$__$",
+                        "typeString": "tuple(uint256,)"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "arguments": [
+                        {
+                          "argumentTypes": null,
+                          "id": 9117,
+                          "name": "account",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9102,
+                          "src": "2746:7:32",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        {
+                          "argumentTypes": null,
+                          "id": 9118,
+                          "name": "noticePeriod",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9104,
+                          "src": "2755:12:32",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          },
+                          {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": null,
+                          "arguments": [],
+                          "expression": {
+                            "argumentTypes": [],
+                            "id": 9114,
+                            "name": "getBondedDeposits",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 9138,
+                            "src": "2709:17:32",
+                            "typeDescriptions": {
+                              "typeIdentifier":
+                                "t_function_internal_view$__$returns$_t_contract$_IBondedDeposits_$11139_$",
+                              "typeString": "function () view returns (contract IBondedDeposits)"
+                            }
+                          },
+                          "id": 9115,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "2709:19:32",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_contract$_IBondedDeposits_$11139",
+                            "typeString": "contract IBondedDeposits"
+                          }
+                        },
+                        "id": 9116,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "getBondedDeposit",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 11110,
+                        "src": "2709:36:32",
+                        "typeDescriptions": {
+                          "typeIdentifier":
+                            "t_function_external_view$_t_address_$_t_uint256_$returns$_t_uint256_$_t_uint256_$",
+                          "typeString":
+                            "function (address,uint256) view external returns (uint256,uint256)"
+                        }
+                      },
+                      "id": 9119,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "2709:59:32",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_tuple$_t_uint256_$_t_uint256_$",
+                        "typeString": "tuple(uint256,uint256)"
+                      }
+                    },
+                    "src": "2698:70:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 9121,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2698:70:32"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 9122,
+                    "name": "value",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 9110,
+                    "src": "2781:5:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 9108,
+                  "id": 9123,
+                  "nodeType": "Return",
+                  "src": "2774:12:32"
+                }
+              ]
+            },
+            "documentation":
+              "@notice Returns the bonded deposit value for particular account and notice period.\n@param account The address of the account.\n@param noticePeriod The notice period of the bonded deposit.\n@return The value of the bonded deposit.",
+            "id": 9125,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getBondedDepositValue",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 9105,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9102,
+                  "name": "account",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9125,
+                  "src": "2581:15:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9101,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2581:7:32",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 9104,
+                  "name": "noticePeriod",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9125,
+                  "src": "2602:20:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 9103,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2602:7:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2575:51:32"
+            },
+            "returnParameters": {
+              "id": 9108,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9107,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9125,
+                  "src": "2662:7:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 9106,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2662:7:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2661:9:32"
+            },
+            "scope": 9139,
+            "src": "2545:246:32",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 9137,
+              "nodeType": "Block",
+              "src": "2862:86:32",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "id": 9133,
+                            "name": "BONDED_DEPOSITS_REGISTRY_ID",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2193,
+                            "src": "2914:27:32",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_string_memory",
+                              "typeString": "string memory"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_string_memory",
+                              "typeString": "string memory"
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": null,
+                            "id": 9131,
+                            "name": "registry",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2216,
+                            "src": "2891:8:32",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_contract$_IRegistry_$2377",
+                              "typeString": "contract IRegistry"
+                            }
+                          },
+                          "id": 9132,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "getAddressFor",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": 2376,
+                          "src": "2891:22:32",
+                          "typeDescriptions": {
+                            "typeIdentifier":
+                              "t_function_external_view$_t_string_memory_ptr_$returns$_t_address_$",
+                            "typeString": "function (string memory) view external returns (address)"
+                          }
+                        },
+                        "id": 9134,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "2891:51:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 9130,
+                      "name": "IBondedDeposits",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 11139,
+                      "src": "2875:15:32",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_contract$_IBondedDeposits_$11139_$",
+                        "typeString": "type(contract IBondedDeposits)"
+                      }
+                    },
+                    "id": 9135,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "typeConversion",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2875:68:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IBondedDeposits_$11139",
+                      "typeString": "contract IBondedDeposits"
+                    }
+                  },
+                  "functionReturnParameters": 9129,
+                  "id": 9136,
+                  "nodeType": "Return",
+                  "src": "2868:75:32"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 9138,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getBondedDeposits",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 9126,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2821:2:32"
+            },
+            "returnParameters": {
+              "id": 9129,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9128,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9138,
+                  "src": "2845:15:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IBondedDeposits_$11139",
+                    "typeString": "contract IBondedDeposits"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 9127,
+                    "name": "IBondedDeposits",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 11139,
+                    "src": "2845:15:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IBondedDeposits_$11139",
+                      "typeString": "contract IBondedDeposits"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2844:17:32"
+            },
+            "scope": 9139,
+            "src": "2795:153:32",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "private"
+          }
+        ],
+        "scope": 9140,
+        "src": "269:2681:32"
+      }
+    ],
+    "src": "0:2951:32"
+  },
+  "legacyAST": {
+    "absolutePath":
+      "/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/governance/UsingBondedDeposits.sol",
+    "exportedSymbols": {
+      "UsingBondedDeposits": [9139]
+    },
+    "id": 9140,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 9026,
+        "literals": ["solidity", "^", "0.5", ".8"],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:32"
+      },
+      {
+        "absolutePath":
+          "/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/governance/interfaces/IBondedDeposits.sol",
+        "file": "./interfaces/IBondedDeposits.sol",
+        "id": 9027,
+        "nodeType": "ImportDirective",
+        "scope": 9140,
+        "sourceUnit": 11140,
+        "src": "25:42:32",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath":
+          "/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/common/UsingRegistry.sol",
+        "file": "../common/UsingRegistry.sol",
+        "id": 9028,
+        "nodeType": "ImportDirective",
+        "scope": 9140,
+        "sourceUnit": 2236,
+        "src": "68:37:32",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 9029,
+              "name": "UsingRegistry",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 2235,
+              "src": "301:13:32",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_UsingRegistry_$2235",
+                "typeString": "contract UsingRegistry"
+              }
+            },
+            "id": 9030,
+            "nodeType": "InheritanceSpecifier",
+            "src": "301:13:32"
+          }
+        ],
+        "contractDependencies": [2235, 20485],
+        "contractKind": "contract",
+        "documentation":
+          "@title A contract for calling functions on the BondedDeposits contract.\n@dev Any contract calling these functions should guard against reentrancy.",
+        "fullyImplemented": true,
+        "id": 9139,
+        "linearizedBaseContracts": [9139, 2235, 20485],
+        "name": "UsingBondedDeposits",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 9043,
+              "nodeType": "Block",
+              "src": "669:61:32",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 9040,
+                        "name": "account",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 9032,
+                        "src": "717:7:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "id": 9037,
+                          "name": "getBondedDeposits",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9138,
+                          "src": "682:17:32",
+                          "typeDescriptions": {
+                            "typeIdentifier":
+                              "t_function_internal_view$__$returns$_t_contract$_IBondedDeposits_$11139_$",
+                            "typeString": "function () view returns (contract IBondedDeposits)"
+                          }
+                        },
+                        "id": 9038,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "682:19:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IBondedDeposits_$11139",
+                          "typeString": "contract IBondedDeposits"
+                        }
+                      },
+                      "id": 9039,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "isVotingFrozen",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 11001,
+                      "src": "682:34:32",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_view$_t_address_$returns$_t_bool_$",
+                        "typeString": "function (address) view external returns (bool)"
+                      }
+                    },
+                    "id": 9041,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "682:43:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "functionReturnParameters": 9036,
+                  "id": 9042,
+                  "nodeType": "Return",
+                  "src": "675:50:32"
+                }
+              ]
+            },
+            "documentation":
+              "@notice Returns whether or not an account's voting power is frozen.\n@param account The address of the account.\n@return Whether or not the account's voting power is frozen.\n@dev Frozen accounts can retract existing votes but not make future votes.",
+            "id": 9044,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "isVotingFrozen",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 9033,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9032,
+                  "name": "account",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9044,
+                  "src": "623:15:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9031,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "623:7:32",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "622:17:32"
+            },
+            "returnParameters": {
+              "id": 9036,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9035,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9044,
+                  "src": "663:4:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 9034,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "663:4:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "662:6:32"
+            },
+            "scope": 9139,
+            "src": "599:131:32",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 9057,
+              "nodeType": "Block",
+              "src": "1107:76:32",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 9054,
+                        "name": "accountOrDelegate",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 9046,
+                        "src": "1160:17:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "id": 9051,
+                          "name": "getBondedDeposits",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9138,
+                          "src": "1120:17:32",
+                          "typeDescriptions": {
+                            "typeIdentifier":
+                              "t_function_internal_view$__$returns$_t_contract$_IBondedDeposits_$11139_$",
+                            "typeString": "function () view returns (contract IBondedDeposits)"
+                          }
+                        },
+                        "id": 9052,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1120:19:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IBondedDeposits_$11139",
+                          "typeString": "contract IBondedDeposits"
+                        }
+                      },
+                      "id": 9053,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "getAccountFromVoter",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 11131,
+                      "src": "1120:39:32",
+                      "typeDescriptions": {
+                        "typeIdentifier":
+                          "t_function_external_view$_t_address_$returns$_t_address_$",
+                        "typeString": "function (address) view external returns (address)"
+                      }
+                    },
+                    "id": 9055,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1120:58:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "functionReturnParameters": 9050,
+                  "id": 9056,
+                  "nodeType": "Return",
+                  "src": "1113:65:32"
+                }
+              ]
+            },
+            "documentation":
+              "@notice Returns the account associated with the provided account or voting delegate.\n@param accountOrDelegate The address of the account or voting delegate.\n@dev Fails if the `accountOrDelegate` is a non-voting delegate.\n@return The associated account.",
+            "id": 9058,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getAccountFromVoter",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 9047,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9046,
+                  "name": "accountOrDelegate",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9058,
+                  "src": "1048:25:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9045,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1048:7:32",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1047:27:32"
+            },
+            "returnParameters": {
+              "id": 9050,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9049,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9058,
+                  "src": "1098:7:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9048,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1098:7:32",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1097:9:32"
+            },
+            "scope": 9139,
+            "src": "1019:164:32",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 9071,
+              "nodeType": "Block",
+              "src": "1430:70:32",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 9068,
+                        "name": "account",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 9060,
+                        "src": "1487:7:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "id": 9065,
+                          "name": "getBondedDeposits",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9138,
+                          "src": "1443:17:32",
+                          "typeDescriptions": {
+                            "typeIdentifier":
+                              "t_function_internal_view$__$returns$_t_contract$_IBondedDeposits_$11139_$",
+                            "typeString": "function () view returns (contract IBondedDeposits)"
+                          }
+                        },
+                        "id": 9066,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1443:19:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IBondedDeposits_$11139",
+                          "typeString": "contract IBondedDeposits"
+                        }
+                      },
+                      "id": 9067,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "getValidatorFromAccount",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 11124,
+                      "src": "1443:43:32",
+                      "typeDescriptions": {
+                        "typeIdentifier":
+                          "t_function_external_view$_t_address_$returns$_t_address_$",
+                        "typeString": "function (address) view external returns (address)"
+                      }
+                    },
+                    "id": 9069,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1443:52:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "functionReturnParameters": 9064,
+                  "id": 9070,
+                  "nodeType": "Return",
+                  "src": "1436:59:32"
+                }
+              ]
+            },
+            "documentation":
+              "@notice Returns the validator address for a particular account.\n@param account The account.\n@return The associated validator address.",
+            "id": 9072,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getValidatorFromAccount",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 9061,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9060,
+                  "name": "account",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9072,
+                  "src": "1381:15:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9059,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1381:7:32",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1380:17:32"
+            },
+            "returnParameters": {
+              "id": 9064,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9063,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9072,
+                  "src": "1421:7:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9062,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1421:7:32",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1420:9:32"
+            },
+            "scope": 9139,
+            "src": "1348:152:32",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 9085,
+              "nodeType": "Block",
+              "src": "1893:80:32",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 9082,
+                        "name": "accountOrDelegate",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 9074,
+                        "src": "1950:17:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "id": 9079,
+                          "name": "getBondedDeposits",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9138,
+                          "src": "1906:17:32",
+                          "typeDescriptions": {
+                            "typeIdentifier":
+                              "t_function_internal_view$__$returns$_t_contract$_IBondedDeposits_$11139_$",
+                            "typeString": "function () view returns (contract IBondedDeposits)"
+                          }
+                        },
+                        "id": 9080,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1906:19:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IBondedDeposits_$11139",
+                          "typeString": "contract IBondedDeposits"
+                        }
+                      },
+                      "id": 9081,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "getAccountFromValidator",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 11138,
+                      "src": "1906:43:32",
+                      "typeDescriptions": {
+                        "typeIdentifier":
+                          "t_function_external_view$_t_address_$returns$_t_address_$",
+                        "typeString": "function (address) view external returns (address)"
+                      }
+                    },
+                    "id": 9083,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1906:62:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "functionReturnParameters": 9078,
+                  "id": 9084,
+                  "nodeType": "Return",
+                  "src": "1899:69:32"
+                }
+              ]
+            },
+            "documentation":
+              "@notice Returns the account associated with the provided account or validating delegate.\n@param accountOrDelegate The address of the account or validating delegate.\n@dev Fails if the `accountOrDelegate` is a non-validating delegate.\n@return The associated account.",
+            "id": 9086,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getAccountFromValidator",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 9075,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9074,
+                  "name": "accountOrDelegate",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9086,
+                  "src": "1834:25:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9073,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1834:7:32",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1833:27:32"
+            },
+            "returnParameters": {
+              "id": 9078,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9077,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9086,
+                  "src": "1884:7:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9076,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1884:7:32",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1883:9:32"
+            },
+            "scope": 9139,
+            "src": "1801:172:32",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 9099,
+              "nodeType": "Block",
+              "src": "2218:63:32",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 9096,
+                        "name": "account",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 9088,
+                        "src": "2268:7:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "id": 9093,
+                          "name": "getBondedDeposits",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9138,
+                          "src": "2231:17:32",
+                          "typeDescriptions": {
+                            "typeIdentifier":
+                              "t_function_internal_view$__$returns$_t_contract$_IBondedDeposits_$11139_$",
+                            "typeString": "function () view returns (contract IBondedDeposits)"
+                          }
+                        },
+                        "id": 9094,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "2231:19:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IBondedDeposits_$11139",
+                          "typeString": "contract IBondedDeposits"
+                        }
+                      },
+                      "id": 9095,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "getAccountWeight",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 11117,
+                      "src": "2231:36:32",
+                      "typeDescriptions": {
+                        "typeIdentifier":
+                          "t_function_external_view$_t_address_$returns$_t_uint256_$",
+                        "typeString": "function (address) view external returns (uint256)"
+                      }
+                    },
+                    "id": 9097,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2231:45:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 9092,
+                  "id": 9098,
+                  "nodeType": "Return",
+                  "src": "2224:52:32"
+                }
+              ]
+            },
+            "documentation":
+              "@notice Returns voting weight for a particular account.\n@param account The address of the account.\n@return The voting weight of `account`.",
+            "id": 9100,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getAccountWeight",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 9089,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9088,
+                  "name": "account",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9100,
+                  "src": "2169:15:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9087,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2169:7:32",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2168:17:32"
+            },
+            "returnParameters": {
+              "id": 9092,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9091,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9100,
+                  "src": "2209:7:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 9090,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2209:7:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2208:9:32"
+            },
+            "scope": 9139,
+            "src": "2143:138:32",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 9124,
+              "nodeType": "Block",
+              "src": "2673:118:32",
+              "statements": [
+                {
+                  "assignments": [9110],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 9110,
+                      "name": "value",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 9124,
+                      "src": "2679:13:32",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      },
+                      "typeName": {
+                        "id": 9109,
+                        "name": "uint256",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "2679:7:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 9111,
+                  "initialValue": null,
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "2679:13:32"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 9120,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "components": [
+                        {
+                          "argumentTypes": null,
+                          "id": 9112,
+                          "name": "value",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9110,
+                          "src": "2699:5:32",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        null
+                      ],
+                      "id": 9113,
+                      "isConstant": false,
+                      "isInlineArray": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "TupleExpression",
+                      "src": "2698:8:32",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_tuple$_t_uint256_$__$",
+                        "typeString": "tuple(uint256,)"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "arguments": [
+                        {
+                          "argumentTypes": null,
+                          "id": 9117,
+                          "name": "account",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9102,
+                          "src": "2746:7:32",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        {
+                          "argumentTypes": null,
+                          "id": 9118,
+                          "name": "noticePeriod",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9104,
+                          "src": "2755:12:32",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          },
+                          {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": null,
+                          "arguments": [],
+                          "expression": {
+                            "argumentTypes": [],
+                            "id": 9114,
+                            "name": "getBondedDeposits",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 9138,
+                            "src": "2709:17:32",
+                            "typeDescriptions": {
+                              "typeIdentifier":
+                                "t_function_internal_view$__$returns$_t_contract$_IBondedDeposits_$11139_$",
+                              "typeString": "function () view returns (contract IBondedDeposits)"
+                            }
+                          },
+                          "id": 9115,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "2709:19:32",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_contract$_IBondedDeposits_$11139",
+                            "typeString": "contract IBondedDeposits"
+                          }
+                        },
+                        "id": 9116,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "getBondedDeposit",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 11110,
+                        "src": "2709:36:32",
+                        "typeDescriptions": {
+                          "typeIdentifier":
+                            "t_function_external_view$_t_address_$_t_uint256_$returns$_t_uint256_$_t_uint256_$",
+                          "typeString":
+                            "function (address,uint256) view external returns (uint256,uint256)"
+                        }
+                      },
+                      "id": 9119,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "2709:59:32",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_tuple$_t_uint256_$_t_uint256_$",
+                        "typeString": "tuple(uint256,uint256)"
+                      }
+                    },
+                    "src": "2698:70:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 9121,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2698:70:32"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 9122,
+                    "name": "value",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 9110,
+                    "src": "2781:5:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 9108,
+                  "id": 9123,
+                  "nodeType": "Return",
+                  "src": "2774:12:32"
+                }
+              ]
+            },
+            "documentation":
+              "@notice Returns the bonded deposit value for particular account and notice period.\n@param account The address of the account.\n@param noticePeriod The notice period of the bonded deposit.\n@return The value of the bonded deposit.",
+            "id": 9125,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getBondedDepositValue",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 9105,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9102,
+                  "name": "account",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9125,
+                  "src": "2581:15:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9101,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2581:7:32",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 9104,
+                  "name": "noticePeriod",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9125,
+                  "src": "2602:20:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 9103,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2602:7:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2575:51:32"
+            },
+            "returnParameters": {
+              "id": 9108,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9107,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9125,
+                  "src": "2662:7:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 9106,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2662:7:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2661:9:32"
+            },
+            "scope": 9139,
+            "src": "2545:246:32",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 9137,
+              "nodeType": "Block",
+              "src": "2862:86:32",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "id": 9133,
+                            "name": "BONDED_DEPOSITS_REGISTRY_ID",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2193,
+                            "src": "2914:27:32",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_string_memory",
+                              "typeString": "string memory"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_string_memory",
+                              "typeString": "string memory"
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": null,
+                            "id": 9131,
+                            "name": "registry",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2216,
+                            "src": "2891:8:32",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_contract$_IRegistry_$2377",
+                              "typeString": "contract IRegistry"
+                            }
+                          },
+                          "id": 9132,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "getAddressFor",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": 2376,
+                          "src": "2891:22:32",
+                          "typeDescriptions": {
+                            "typeIdentifier":
+                              "t_function_external_view$_t_string_memory_ptr_$returns$_t_address_$",
+                            "typeString": "function (string memory) view external returns (address)"
+                          }
+                        },
+                        "id": 9134,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "2891:51:32",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 9130,
+                      "name": "IBondedDeposits",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 11139,
+                      "src": "2875:15:32",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_contract$_IBondedDeposits_$11139_$",
+                        "typeString": "type(contract IBondedDeposits)"
+                      }
+                    },
+                    "id": 9135,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "typeConversion",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2875:68:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IBondedDeposits_$11139",
+                      "typeString": "contract IBondedDeposits"
+                    }
+                  },
+                  "functionReturnParameters": 9129,
+                  "id": 9136,
+                  "nodeType": "Return",
+                  "src": "2868:75:32"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 9138,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getBondedDeposits",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 9126,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2821:2:32"
+            },
+            "returnParameters": {
+              "id": 9129,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9128,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9138,
+                  "src": "2845:15:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IBondedDeposits_$11139",
+                    "typeString": "contract IBondedDeposits"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 9127,
+                    "name": "IBondedDeposits",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 11139,
+                    "src": "2845:15:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IBondedDeposits_$11139",
+                      "typeString": "contract IBondedDeposits"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2844:17:32"
+            },
+            "scope": 9139,
+            "src": "2795:153:32",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "private"
+          }
+        ],
+        "scope": 9140,
+        "src": "269:2681:32"
+      }
+    ],
+    "src": "0:2951:32"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.8+commit.23d335f2.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.9",
+  "updatedAt": "2019-07-17T03:09:18.693Z",
+  "devdoc": {
+    "details": "Any contract calling these functions should guard against reentrancy.",
+    "methods": {
+      "isOwner()": {
+        "return": "true if `msg.sender` is the owner of the contract."
+      },
+      "owner()": {
+        "return": "the address of the owner."
+      },
+      "renounceOwnership()": {
+        "details":
+          "Allows the current owner to relinquish control of the contract. It will not be possible to call the functions with the `onlyOwner` modifier anymore."
+      },
+      "setRegistry(address)": {
+        "params": {
+          "registryAddress": "The address of a registry contract for routing to other contracts."
+        }
+      },
+      "transferOwnership(address)": {
+        "details": "Allows the current owner to transfer control of the contract to a newOwner.",
+        "params": {
+          "newOwner": "The address to transfer ownership to."
+        }
+      }
+    },
+    "title": "A contract for calling functions on the BondedDeposits contract."
+  },
+  "userdoc": {
+    "methods": {
+      "renounceOwnership()": {
+        "notice":
+          "Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+      },
+      "setRegistry(address)": {
+        "notice": "Updates the address pointing to a Registry contract."
+      }
+    }
+  }
+}

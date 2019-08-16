@@ -1,0 +1,1690 @@
+{
+  "contractName": "UsingRegistry",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "registry",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "isOwner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "registryAddress",
+          "type": "address"
+        }
+      ],
+      "name": "RegistrySet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "registryAddress",
+          "type": "address"
+        }
+      ],
+      "name": "setRegistry",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata":
+    "{\"compiler\":{\"version\":\"0.5.8+commit.23d335f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"registry\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"registryAddress\",\"type\":\"address\"}],\"name\":\"setRegistry\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"registryAddress\",\"type\":\"address\"}],\"name\":\"RegistrySet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"}],\"devdoc\":{\"methods\":{\"isOwner()\":{\"return\":\"true if `msg.sender` is the owner of the contract.\"},\"owner()\":{\"return\":\"the address of the owner.\"},\"renounceOwnership()\":{\"details\":\"Allows the current owner to relinquish control of the contract. It will not be possible to call the functions with the `onlyOwner` modifier anymore.\"},\"setRegistry(address)\":{\"params\":{\"registryAddress\":\"The address of a registry contract for routing to other contracts.\"}},\"transferOwnership(address)\":{\"details\":\"Allows the current owner to transfer control of the contract to a newOwner.\",\"params\":{\"newOwner\":\"The address to transfer ownership to.\"}}}},\"userdoc\":{\"methods\":{\"renounceOwnership()\":{\"notice\":\"Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.\"},\"setRegistry(address)\":{\"notice\":\"Updates the address pointing to a Registry contract.\"}}}},\"settings\":{\"compilationTarget\":{\"/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/common/UsingRegistry.sol\":\"UsingRegistry\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/common/UsingRegistry.sol\":{\"keccak256\":\"0x45c1256a5cb44d3413bf16b0c1eb10685092bbf3843cd62570d46ed41446a6c8\",\"urls\":[\"bzzr://25e0859f1c672219fe7c99e2cb89a2c9a2df747385323cf1ba1d5f2f1b174160\"]},\"/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/common/interfaces/IRegistry.sol\":{\"keccak256\":\"0x38c5daa148a7e1f3e626db95a587f33204cc4b973a7366aab612cc6c41b491b4\",\"urls\":[\"bzzr://847eb049a256b667da5bda15d60f7a1428fa1482e293fcc2fee02967b18f243c\"]},\"openzeppelin-solidity/contracts/ownership/Ownable.sol\":{\"keccak256\":\"0xcb16adc00dcf0d75e0bdf94379f4d5a6d74dca7c74e4183b94e15721159f8a30\",\"urls\":[\"bzzr://b81e03f7203cd628cfed19255911a04a05e8670d248afb48a7b067dd03b4ff55\"]}},\"version\":1}",
+  "bytecode":
+    "0x6080604052336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16600073ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a36104fe806100cf6000396000f3fe608060405234801561001057600080fd5b50600436106100625760003560e01c8063715018a6146100675780637b103999146100715780638da5cb5b146100bb5780638f32d59b14610105578063a91ee0dc14610127578063f2fde38b1461016b575b600080fd5b61006f6101af565b005b61007961027f565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6100c36102a5565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b61010d6102ce565b604051808215151515815260200191505060405180910390f35b6101696004803603602081101561013d57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610325565b005b6101ad6004803603602081101561018157600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506103bd565b005b6101b76102ce565b6101c057600080fd5b600073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a360008060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550565b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614905090565b61032d6102ce565b61033657600080fd5b80600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055508073ffffffffffffffffffffffffffffffffffffffff167f27fe5f0c1c3b1ed427cc63d0f05759ffdecf9aec9e18d31ef366fc8a6cb5dc3b60405160405180910390a250565b6103c56102ce565b6103ce57600080fd5b6103d7816103da565b50565b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16141561041457600080fd5b8073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a3806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505056fea165627a7a72305820102f012d04f6530625820d317146df23f1bd894873c3f4945c72ba2c9ff8a2e40029",
+  "deployedBytecode":
+    "0x608060405234801561001057600080fd5b50600436106100625760003560e01c8063715018a6146100675780637b103999146100715780638da5cb5b146100bb5780638f32d59b14610105578063a91ee0dc14610127578063f2fde38b1461016b575b600080fd5b61006f6101af565b005b61007961027f565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6100c36102a5565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b61010d6102ce565b604051808215151515815260200191505060405180910390f35b6101696004803603602081101561013d57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610325565b005b6101ad6004803603602081101561018157600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506103bd565b005b6101b76102ce565b6101c057600080fd5b600073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a360008060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550565b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614905090565b61032d6102ce565b61033657600080fd5b80600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055508073ffffffffffffffffffffffffffffffffffffffff167f27fe5f0c1c3b1ed427cc63d0f05759ffdecf9aec9e18d31ef366fc8a6cb5dc3b60405160405180910390a250565b6103c56102ce565b6103ce57600080fd5b6103d7816103da565b50565b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16141561041457600080fd5b8073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a3806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505056fea165627a7a72305820102f012d04f6530625820d317146df23f1bd894873c3f4945c72ba2c9ff8a2e40029",
+  "sourceMap":
+    "407:1065:13:-;;;524:10:77;515:6;;:19;;;;;;;;;;;;;;;;;;582:6;;;;;;;;;;;549:40;;578:1;549:40;;;;;;;;;;;;407:1065:13;;;;;;",
+  "deployedSourceMap":
+    "407:1065:13:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;407:1065:13;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1423:137:77;;;:::i;:::-;;1117:25:13;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;659:77:77;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;979:90;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;1320:150:13;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;1320:150:13;;;;;;;;;;;;;;;;;;;:::i;:::-;;1731:107:77;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;1731:107:77;;;;;;;;;;;;;;;;;;;:::i;:::-;;1423:137;863:9;:7;:9::i;:::-;855:18;;;;;;1521:1;1484:40;;1505:6;;;;;;;;;;;1484:40;;;;;;;;;;;;1551:1;1534:6;;:19;;;;;;;;;;;;;;;;;;1423:137::o;1117:25:13:-;;;;;;;;;;;;;:::o;659:77:77:-;697:7;723:6;;;;;;;;;;;716:13;;659:77;:::o;979:90::-;1019:4;1056:6;;;;;;;;;;;1042:20;;:10;:20;;;1035:27;;979:90;:::o;1320:150:13:-;863:9:77;:7;:9::i;:::-;855:18;;;;;;1410:15:13;1389:8;;:37;;;;;;;;;;;;;;;;;;1449:15;1437:28;;;;;;;;;;;;1320:150;:::o;1731:107:77:-;863:9;:7;:9::i;:::-;855:18;;;;;;1803:28;1822:8;1803:18;:28::i;:::-;1731:107;:::o;1982:183::-;2075:1;2055:22;;:8;:22;;;;2047:31;;;;;;2122:8;2093:38;;2114:6;;;;;;;;;;;2093:38;;;;;;;;;;;;2150:8;2141:6;;:17;;;;;;;;;;;;;;;;;;1982:183;:::o",
+  "source":
+    "pragma solidity ^0.5.8;\n\nimport \"openzeppelin-solidity/contracts/ownership/Ownable.sol\";\n\nimport \"./interfaces/IRegistry.sol\";\n\n// Ideally, UsingRegistry should inherit from Initializable and implement initialize() which calls\n// setRegistry(). TypeChain currently has problems resolving overloaded functions, so this is not\n// possible right now.\n// TODO(amy): Fix this when the TypeChain issue resolves.\n\ncontract UsingRegistry is Ownable {\n\n  event RegistrySet(address indexed registryAddress);\n\n  // solhint-disable state-visibility\n  string constant ATTESTATIONS_REGISTRY_ID = \"Attestations\";\n  string constant BONDED_DEPOSITS_REGISTRY_ID = \"BondedDeposits\";\n  string constant GAS_CURRENCY_WHITELIST_REGISTRY_ID = \"GasCurrencyWhitelist\";\n  string constant GOLD_TOKEN_REGISTRY_ID = \"GoldToken\";\n  string constant GOVERNANCE_REGISTRY_ID = \"Governance\";\n  string constant RESERVE_REGISTRY_ID = \"Reserve\";\n  string constant RANDOM_REGISTRY_ID = \"Random\";\n  string constant SORTED_ORACLES_REGISTRY_ID = \"SortedOracles\";\n  string constant VALIDATORS_REGISTRY_ID = \"Validators\";\n  // solhint-enable state-visibility\n\n  IRegistry public registry;\n\n  /**\n   * @notice Updates the address pointing to a Registry contract.\n   * @param registryAddress The address of a registry contract for routing to other contracts.\n   */\n  function setRegistry(address registryAddress) public onlyOwner {\n    registry = IRegistry(registryAddress);\n    emit RegistrySet(registryAddress);\n  }\n}\n",
+  "sourcePath":
+    "/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/common/UsingRegistry.sol",
+  "ast": {
+    "absolutePath":
+      "/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/common/UsingRegistry.sol",
+    "exportedSymbols": {
+      "UsingRegistry": [2235]
+    },
+    "id": 2236,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2179,
+        "literals": ["solidity", "^", "0.5", ".8"],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:13"
+      },
+      {
+        "absolutePath": "openzeppelin-solidity/contracts/ownership/Ownable.sol",
+        "file": "openzeppelin-solidity/contracts/ownership/Ownable.sol",
+        "id": 2180,
+        "nodeType": "ImportDirective",
+        "scope": 2236,
+        "sourceUnit": 20486,
+        "src": "25:63:13",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath":
+          "/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/common/interfaces/IRegistry.sol",
+        "file": "./interfaces/IRegistry.sol",
+        "id": 2181,
+        "nodeType": "ImportDirective",
+        "scope": 2236,
+        "sourceUnit": 2378,
+        "src": "90:36:13",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 2182,
+              "name": "Ownable",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 20485,
+              "src": "433:7:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_Ownable_$20485",
+                "typeString": "contract Ownable"
+              }
+            },
+            "id": 2183,
+            "nodeType": "InheritanceSpecifier",
+            "src": "433:7:13"
+          }
+        ],
+        "contractDependencies": [20485],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2235,
+        "linearizedBaseContracts": [2235, 20485],
+        "name": "UsingRegistry",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "documentation": null,
+            "id": 2187,
+            "name": "RegistrySet",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 2186,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2185,
+                  "indexed": true,
+                  "name": "registryAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2187,
+                  "src": "464:31:13",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2184,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "464:7:13",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "463:33:13"
+            },
+            "src": "446:51:13"
+          },
+          {
+            "constant": true,
+            "id": 2190,
+            "name": "ATTESTATIONS_REGISTRY_ID",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "539:57:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2188,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "539:6:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "4174746573746174696f6e73",
+              "id": 2189,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "582:14:13",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier":
+                  "t_stringliteral_e8a6bc619fd947af7cb3f971bf8c11a6681a56f819e04344ce5ada7a926ae983",
+                "typeString": "literal_string \"Attestations\""
+              },
+              "value": "Attestations"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 2193,
+            "name": "BONDED_DEPOSITS_REGISTRY_ID",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "600:62:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2191,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "600:6:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "426f6e6465644465706f73697473",
+              "id": 2192,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "646:16:13",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier":
+                  "t_stringliteral_2a288f09152973464c21cd7eba239bab9ba4fe7135577af73549447b9d169422",
+                "typeString": "literal_string \"BondedDeposits\""
+              },
+              "value": "BondedDeposits"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 2196,
+            "name": "GAS_CURRENCY_WHITELIST_REGISTRY_ID",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "666:75:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2194,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "666:6:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "47617343757272656e637957686974656c697374",
+              "id": 2195,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "719:22:13",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier":
+                  "t_stringliteral_20a843c14dd26f3c69ffb1828401a0f18617e70ebd40d404f27a2e1e3f47e827",
+                "typeString": "literal_string \"GasCurrencyWhitelist\""
+              },
+              "value": "GasCurrencyWhitelist"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 2199,
+            "name": "GOLD_TOKEN_REGISTRY_ID",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "745:52:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2197,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "745:6:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "476f6c64546f6b656e",
+              "id": 2198,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "786:11:13",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier":
+                  "t_stringliteral_d7e89ade8430819f08bf97a087285824af3351ee12d72a2d132b0c6c0687bfaf",
+                "typeString": "literal_string \"GoldToken\""
+              },
+              "value": "GoldToken"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 2202,
+            "name": "GOVERNANCE_REGISTRY_ID",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "801:53:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2200,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "801:6:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "476f7665726e616e6365",
+              "id": 2201,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "842:12:13",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier":
+                  "t_stringliteral_9409903de1e6fd852dfc61c9dacb48196c48535b60e25abf92acc92dd689078d",
+                "typeString": "literal_string \"Governance\""
+              },
+              "value": "Governance"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 2205,
+            "name": "RESERVE_REGISTRY_ID",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "858:47:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2203,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "858:6:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "52657365727665",
+              "id": 2204,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "896:9:13",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier":
+                  "t_stringliteral_aab74a77d8ce26d227789a153a9097d216f9d5859be6b3918f997a8823e92984",
+                "typeString": "literal_string \"Reserve\""
+              },
+              "value": "Reserve"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 2208,
+            "name": "RANDOM_REGISTRY_ID",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "909:45:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2206,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "909:6:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "52616e646f6d",
+              "id": 2207,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "946:8:13",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier":
+                  "t_stringliteral_02dfe2d0485b616b61db1800f30f4a14b26754b328fa09ba4ec73ee7276766cc",
+                "typeString": "literal_string \"Random\""
+              },
+              "value": "Random"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 2211,
+            "name": "SORTED_ORACLES_REGISTRY_ID",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "958:60:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2209,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "958:6:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "536f727465644f7261636c6573",
+              "id": 2210,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "1003:15:13",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier":
+                  "t_stringliteral_ab7ca110ac6f740fa4bdcd667652ab6f883b80daaedaf0cb53396dc5d5be6f2c",
+                "typeString": "literal_string \"SortedOracles\""
+              },
+              "value": "SortedOracles"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 2214,
+            "name": "VALIDATORS_REGISTRY_ID",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "1022:53:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2212,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "1022:6:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "56616c696461746f7273",
+              "id": 2213,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "1063:12:13",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier":
+                  "t_stringliteral_49dc7107d41d3c01a9f941a7d9a9f9177349b5521aeb56861470e42cf05da2ee",
+                "typeString": "literal_string \"Validators\""
+              },
+              "value": "Validators"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 2216,
+            "name": "registry",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "1117:25:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_contract$_IRegistry_$2377",
+              "typeString": "contract IRegistry"
+            },
+            "typeName": {
+              "contractScope": null,
+              "id": 2215,
+              "name": "IRegistry",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 2377,
+              "src": "1117:9:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_IRegistry_$2377",
+                "typeString": "contract IRegistry"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 2233,
+              "nodeType": "Block",
+              "src": "1383:87:13",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 2227,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 2223,
+                      "name": "registry",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 2216,
+                      "src": "1389:8:13",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_IRegistry_$2377",
+                        "typeString": "contract IRegistry"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "arguments": [
+                        {
+                          "argumentTypes": null,
+                          "id": 2225,
+                          "name": "registryAddress",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 2218,
+                          "src": "1410:15:13",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        ],
+                        "id": 2224,
+                        "name": "IRegistry",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2377,
+                        "src": "1400:9:13",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_contract$_IRegistry_$2377_$",
+                          "typeString": "type(contract IRegistry)"
+                        }
+                      },
+                      "id": 2226,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "typeConversion",
+                      "lValueRequested": false,
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1400:26:13",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_IRegistry_$2377",
+                        "typeString": "contract IRegistry"
+                      }
+                    },
+                    "src": "1389:37:13",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IRegistry_$2377",
+                      "typeString": "contract IRegistry"
+                    }
+                  },
+                  "id": 2228,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1389:37:13"
+                },
+                {
+                  "eventCall": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 2230,
+                        "name": "registryAddress",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2218,
+                        "src": "1449:15:13",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 2229,
+                      "name": "RegistrySet",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 2187,
+                      "src": "1437:11:13",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_address_$returns$__$",
+                        "typeString": "function (address)"
+                      }
+                    },
+                    "id": 2231,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1437:28:13",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2232,
+                  "nodeType": "EmitStatement",
+                  "src": "1432:33:13"
+                }
+              ]
+            },
+            "documentation":
+              "@notice Updates the address pointing to a Registry contract.\n@param registryAddress The address of a registry contract for routing to other contracts.",
+            "id": 2234,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "arguments": null,
+                "id": 2221,
+                "modifierName": {
+                  "argumentTypes": null,
+                  "id": 2220,
+                  "name": "onlyOwner",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 20419,
+                  "src": "1373:9:13",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_modifier$__$",
+                    "typeString": "modifier ()"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1373:9:13"
+              }
+            ],
+            "name": "setRegistry",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2219,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2218,
+                  "name": "registryAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2234,
+                  "src": "1341:23:13",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2217,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1341:7:13",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1340:25:13"
+            },
+            "returnParameters": {
+              "id": 2222,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1383:0:13"
+            },
+            "scope": 2235,
+            "src": "1320:150:13",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 2236,
+        "src": "407:1065:13"
+      }
+    ],
+    "src": "0:1473:13"
+  },
+  "legacyAST": {
+    "absolutePath":
+      "/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/common/UsingRegistry.sol",
+    "exportedSymbols": {
+      "UsingRegistry": [2235]
+    },
+    "id": 2236,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2179,
+        "literals": ["solidity", "^", "0.5", ".8"],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:13"
+      },
+      {
+        "absolutePath": "openzeppelin-solidity/contracts/ownership/Ownable.sol",
+        "file": "openzeppelin-solidity/contracts/ownership/Ownable.sol",
+        "id": 2180,
+        "nodeType": "ImportDirective",
+        "scope": 2236,
+        "sourceUnit": 20486,
+        "src": "25:63:13",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath":
+          "/Users/yorhodes/celo/celo-monorepo/packages/protocol/contracts/common/interfaces/IRegistry.sol",
+        "file": "./interfaces/IRegistry.sol",
+        "id": 2181,
+        "nodeType": "ImportDirective",
+        "scope": 2236,
+        "sourceUnit": 2378,
+        "src": "90:36:13",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 2182,
+              "name": "Ownable",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 20485,
+              "src": "433:7:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_Ownable_$20485",
+                "typeString": "contract Ownable"
+              }
+            },
+            "id": 2183,
+            "nodeType": "InheritanceSpecifier",
+            "src": "433:7:13"
+          }
+        ],
+        "contractDependencies": [20485],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2235,
+        "linearizedBaseContracts": [2235, 20485],
+        "name": "UsingRegistry",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "documentation": null,
+            "id": 2187,
+            "name": "RegistrySet",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 2186,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2185,
+                  "indexed": true,
+                  "name": "registryAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2187,
+                  "src": "464:31:13",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2184,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "464:7:13",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "463:33:13"
+            },
+            "src": "446:51:13"
+          },
+          {
+            "constant": true,
+            "id": 2190,
+            "name": "ATTESTATIONS_REGISTRY_ID",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "539:57:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2188,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "539:6:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "4174746573746174696f6e73",
+              "id": 2189,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "582:14:13",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier":
+                  "t_stringliteral_e8a6bc619fd947af7cb3f971bf8c11a6681a56f819e04344ce5ada7a926ae983",
+                "typeString": "literal_string \"Attestations\""
+              },
+              "value": "Attestations"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 2193,
+            "name": "BONDED_DEPOSITS_REGISTRY_ID",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "600:62:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2191,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "600:6:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "426f6e6465644465706f73697473",
+              "id": 2192,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "646:16:13",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier":
+                  "t_stringliteral_2a288f09152973464c21cd7eba239bab9ba4fe7135577af73549447b9d169422",
+                "typeString": "literal_string \"BondedDeposits\""
+              },
+              "value": "BondedDeposits"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 2196,
+            "name": "GAS_CURRENCY_WHITELIST_REGISTRY_ID",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "666:75:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2194,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "666:6:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "47617343757272656e637957686974656c697374",
+              "id": 2195,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "719:22:13",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier":
+                  "t_stringliteral_20a843c14dd26f3c69ffb1828401a0f18617e70ebd40d404f27a2e1e3f47e827",
+                "typeString": "literal_string \"GasCurrencyWhitelist\""
+              },
+              "value": "GasCurrencyWhitelist"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 2199,
+            "name": "GOLD_TOKEN_REGISTRY_ID",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "745:52:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2197,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "745:6:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "476f6c64546f6b656e",
+              "id": 2198,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "786:11:13",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier":
+                  "t_stringliteral_d7e89ade8430819f08bf97a087285824af3351ee12d72a2d132b0c6c0687bfaf",
+                "typeString": "literal_string \"GoldToken\""
+              },
+              "value": "GoldToken"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 2202,
+            "name": "GOVERNANCE_REGISTRY_ID",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "801:53:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2200,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "801:6:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "476f7665726e616e6365",
+              "id": 2201,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "842:12:13",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier":
+                  "t_stringliteral_9409903de1e6fd852dfc61c9dacb48196c48535b60e25abf92acc92dd689078d",
+                "typeString": "literal_string \"Governance\""
+              },
+              "value": "Governance"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 2205,
+            "name": "RESERVE_REGISTRY_ID",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "858:47:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2203,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "858:6:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "52657365727665",
+              "id": 2204,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "896:9:13",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier":
+                  "t_stringliteral_aab74a77d8ce26d227789a153a9097d216f9d5859be6b3918f997a8823e92984",
+                "typeString": "literal_string \"Reserve\""
+              },
+              "value": "Reserve"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 2208,
+            "name": "RANDOM_REGISTRY_ID",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "909:45:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2206,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "909:6:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "52616e646f6d",
+              "id": 2207,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "946:8:13",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier":
+                  "t_stringliteral_02dfe2d0485b616b61db1800f30f4a14b26754b328fa09ba4ec73ee7276766cc",
+                "typeString": "literal_string \"Random\""
+              },
+              "value": "Random"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 2211,
+            "name": "SORTED_ORACLES_REGISTRY_ID",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "958:60:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2209,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "958:6:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "536f727465644f7261636c6573",
+              "id": 2210,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "1003:15:13",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier":
+                  "t_stringliteral_ab7ca110ac6f740fa4bdcd667652ab6f883b80daaedaf0cb53396dc5d5be6f2c",
+                "typeString": "literal_string \"SortedOracles\""
+              },
+              "value": "SortedOracles"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 2214,
+            "name": "VALIDATORS_REGISTRY_ID",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "1022:53:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2212,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "1022:6:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "argumentTypes": null,
+              "hexValue": "56616c696461746f7273",
+              "id": 2213,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "1063:12:13",
+              "subdenomination": null,
+              "typeDescriptions": {
+                "typeIdentifier":
+                  "t_stringliteral_49dc7107d41d3c01a9f941a7d9a9f9177349b5521aeb56861470e42cf05da2ee",
+                "typeString": "literal_string \"Validators\""
+              },
+              "value": "Validators"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 2216,
+            "name": "registry",
+            "nodeType": "VariableDeclaration",
+            "scope": 2235,
+            "src": "1117:25:13",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_contract$_IRegistry_$2377",
+              "typeString": "contract IRegistry"
+            },
+            "typeName": {
+              "contractScope": null,
+              "id": 2215,
+              "name": "IRegistry",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 2377,
+              "src": "1117:9:13",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_IRegistry_$2377",
+                "typeString": "contract IRegistry"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 2233,
+              "nodeType": "Block",
+              "src": "1383:87:13",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 2227,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 2223,
+                      "name": "registry",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 2216,
+                      "src": "1389:8:13",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_IRegistry_$2377",
+                        "typeString": "contract IRegistry"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "arguments": [
+                        {
+                          "argumentTypes": null,
+                          "id": 2225,
+                          "name": "registryAddress",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 2218,
+                          "src": "1410:15:13",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        ],
+                        "id": 2224,
+                        "name": "IRegistry",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2377,
+                        "src": "1400:9:13",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_contract$_IRegistry_$2377_$",
+                          "typeString": "type(contract IRegistry)"
+                        }
+                      },
+                      "id": 2226,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "typeConversion",
+                      "lValueRequested": false,
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1400:26:13",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_IRegistry_$2377",
+                        "typeString": "contract IRegistry"
+                      }
+                    },
+                    "src": "1389:37:13",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IRegistry_$2377",
+                      "typeString": "contract IRegistry"
+                    }
+                  },
+                  "id": 2228,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1389:37:13"
+                },
+                {
+                  "eventCall": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 2230,
+                        "name": "registryAddress",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2218,
+                        "src": "1449:15:13",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 2229,
+                      "name": "RegistrySet",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 2187,
+                      "src": "1437:11:13",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_address_$returns$__$",
+                        "typeString": "function (address)"
+                      }
+                    },
+                    "id": 2231,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1437:28:13",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2232,
+                  "nodeType": "EmitStatement",
+                  "src": "1432:33:13"
+                }
+              ]
+            },
+            "documentation":
+              "@notice Updates the address pointing to a Registry contract.\n@param registryAddress The address of a registry contract for routing to other contracts.",
+            "id": 2234,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "arguments": null,
+                "id": 2221,
+                "modifierName": {
+                  "argumentTypes": null,
+                  "id": 2220,
+                  "name": "onlyOwner",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 20419,
+                  "src": "1373:9:13",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_modifier$__$",
+                    "typeString": "modifier ()"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1373:9:13"
+              }
+            ],
+            "name": "setRegistry",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 2219,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2218,
+                  "name": "registryAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2234,
+                  "src": "1341:23:13",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 2217,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1341:7:13",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1340:25:13"
+            },
+            "returnParameters": {
+              "id": 2222,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1383:0:13"
+            },
+            "scope": 2235,
+            "src": "1320:150:13",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 2236,
+        "src": "407:1065:13"
+      }
+    ],
+    "src": "0:1473:13"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.8+commit.23d335f2.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.9",
+  "updatedAt": "2019-07-17T03:09:18.497Z",
+  "devdoc": {
+    "methods": {
+      "isOwner()": {
+        "return": "true if `msg.sender` is the owner of the contract."
+      },
+      "owner()": {
+        "return": "the address of the owner."
+      },
+      "renounceOwnership()": {
+        "details":
+          "Allows the current owner to relinquish control of the contract. It will not be possible to call the functions with the `onlyOwner` modifier anymore."
+      },
+      "setRegistry(address)": {
+        "params": {
+          "registryAddress": "The address of a registry contract for routing to other contracts."
+        }
+      },
+      "transferOwnership(address)": {
+        "details": "Allows the current owner to transfer control of the contract to a newOwner.",
+        "params": {
+          "newOwner": "The address to transfer ownership to."
+        }
+      }
+    }
+  },
+  "userdoc": {
+    "methods": {
+      "renounceOwnership()": {
+        "notice":
+          "Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+      },
+      "setRegistry(address)": {
+        "notice": "Updates the address pointing to a Registry contract."
+      }
+    }
+  }
+}

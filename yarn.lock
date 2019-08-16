@@ -2010,10 +2010,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo/client@55cf94c":
-  version "0.0.54"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.54.tgz#b12e716b197d53686ac9e06566a48464cc0e2839"
-  integrity sha512-+L2S/cOQlbEjnVscvwi50HE1itBaxtBA0gHjIbO/MoqBXvips2FGSHvpU9Uz/usnqLm/FN6BaKo5JUKZMR9FUg==
+"@celo/client@f7095b7":
+  version "0.0.98"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.98.tgz#0c15460fe6508be6c7f400183500cd705c8827ab"
+  integrity sha512-r43CBGZx6BMD3TAcFGVEuG/r0Hsvbuc8wg9d564Sh5YsUgWoPtyDCEgsOfCwaEdF9MoaiavFxl/sGUeN7RL/5g==
 
 "@celo/dev-cli@^2.0.3":
   version "2.0.3"
@@ -4192,6 +4192,11 @@
   version "4.1.4"
   resolved "https://registry.yarnpkg.com/@types/debug/-/debug-4.1.4.tgz#56eec47706f0fd0b7c694eae2f3172e6b0b769da"
   integrity sha512-D9MyoQFI7iP5VdpEyPZyjjqIJ8Y8EDNQFIFVLOmeg1rI1xiHOChyUPMPRUVfqFCerxfE+yS3vMyj37F6IdtOoQ==
+
+"@types/debug@^4.1.5":
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/@types/debug/-/debug-4.1.5.tgz#b14efa8852b7768d898906613c23f688713e02cd"
+  integrity sha512-Q1y515GcOdTHgagaVFhHnIFQ38ygs/kmxdNpvpou+raI9UO3YZcHDngBSYKQklcKlvA7iuQlmIKbzvmxcOE9CQ==
 
 "@types/dotenv@^4.0.3":
   version "4.0.3"
@@ -28952,15 +28957,14 @@ truffle-typings@^1.0.6:
     "@types/chai" "^4.1.4"
     "@types/mocha" "^5.2.5"
 
-truffle@5.0.19:
-  version "5.0.19"
-  resolved "https://registry.yarnpkg.com/truffle/-/truffle-5.0.19.tgz#3187f11168ed526ffa17cfa6a0d9735208569381"
-  integrity sha512-d4fxChHYCjccW33IO/4KLcGqjTDn+mw7vqdGvGi307CMo+KTtns+5c91+1iOKDQcSKiv8SHYgvtyF7cn/+FPAg==
+truffle@5.0.20:
+  version "5.0.20"
+  resolved "https://registry.yarnpkg.com/truffle/-/truffle-5.0.20.tgz#6fa0ebaa8d3a5c325a717a3bfaf3fee2bf6f0475"
+  integrity sha512-Vr2+UnfoFXPf0shry1CawBrQYGveht4K+vfPx63JwVI71vqpeybPqFHiiuqmcnZ3ch+aQgaelNNQU4rsAKgTJg==
   dependencies:
     app-module-path "^2.2.0"
     mocha "^4.1.0"
     original-require "1.0.1"
-    solc "0.5.0"
 
 truncate-utf8-bytes@^1.0.0:
   version "1.0.2"
@@ -29062,6 +29066,17 @@ tsconfig-paths@3.6.0:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/tsconfig-paths/-/tsconfig-paths-3.6.0.tgz#f14078630d9d6e8b1dc690c1fc0cfb9cd0663891"
   integrity sha512-mrqQIP2F4e03aMTCiPdedCIT300//+q0ET53o5WqqtQjmEICxP9yfz/sHTpPqXpssuJEzODsEzJaLRaf5J2X1g==
+  dependencies:
+    "@types/json5" "^0.0.29"
+    deepmerge "^2.0.1"
+    json5 "^1.0.1"
+    minimist "^1.2.0"
+    strip-bom "^3.0.0"
+
+tsconfig-paths@^3.8.0:
+  version "3.8.0"
+  resolved "https://registry.yarnpkg.com/tsconfig-paths/-/tsconfig-paths-3.8.0.tgz#4e34202d5b41958f269cf56b01ed95b853d59f72"
+  integrity sha512-zZEYFo4sjORK8W58ENkRn9s+HmQFkkwydDG7My5s/fnfr2YYCaiyXe/HBUcIgU8epEKOXwiahOO+KZYjiXlWyQ==
   dependencies:
     "@types/json5" "^0.0.29"
     deepmerge "^2.0.1"
@@ -29295,9 +29310,9 @@ type-is@~1.6.17:
     media-typer "0.3.0"
     mime-types "~2.1.24"
 
-"typechain@git+https://github.com/celo-org/TypeChain.git#ce6a33b":
+"typechain@git+https://github.com/celo-org/TypeChain.git#832e628":
   version "0.3.11"
-  resolved "git+https://github.com/celo-org/TypeChain.git#ce6a33b06af43da8c3997a9d0ed1d27683d24bd9"
+  resolved "git+https://github.com/celo-org/TypeChain.git#832e628fab8f7d9946d46047afe73958d527c262"
   dependencies:
     command-line-args "^4.0.7"
     debug "^3.0.1"

@@ -27,8 +27,7 @@ export default withScreenSize(
     const { title, text, buttonOne, buttonTwo, label, children } = props
     return (
       <Fade duration={500} bottom={true} distance="20px">
-        <View>
-          <span id={props.id} />
+        <View nativeID={props.id}>
           <GridRow
             desktopStyle={standardStyles.blockMarginBottom}
             tabletStyle={standardStyles.blockMarginBottomTablet}

@@ -1,6 +1,6 @@
 import Web3 from 'web3'
 
-import { StableToken } from '@celo/contractkit'
+import { StableToken } from '@celo/walletkit'
 import { flags } from '@oclif/command'
 
 import { BaseCommand } from '../../base'

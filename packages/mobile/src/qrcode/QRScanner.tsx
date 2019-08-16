@@ -8,8 +8,8 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { RNCamera } from 'react-native-camera'
 import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
-import BackButton from 'src/components/BackButton'
-import { Namespaces } from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { handleBarcodeDetected } from 'src/send/actions'
@@ -28,17 +28,8 @@ const goToQrCodeScreen = () => {
 
 class QRScanner extends React.Component<Props> {
   static navigationOptions = {
-    headerTitle: 'Scanner',
-    headerTitleStyle: [
-      fontStyles.headerTitle,
-      {
-        flex: 1,
-        textAlign: 'center',
-      },
-    ],
-    // This helps vertically center the title
-    headerRight: <View />,
-    headerLeft: <BackButton />,
+    ...headerWithBackButton,
+    headerTitle: i18n.t('sendFlow7:scanCode'),
   }
 
   camera: RNCamera | null = null

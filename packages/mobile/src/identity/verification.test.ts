@@ -1,8 +1,4 @@
-import {
-  AttestationState,
-  getAttestationsContract,
-  getStableTokenContract,
-} from '@celo/contractkit'
+import { AttestationState, getAttestationsContract, getStableTokenContract } from '@celo/walletkit'
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { throwError } from 'redux-saga-test-plan/providers'
@@ -23,11 +19,10 @@ import {
   startVerification,
   VERIFICATION_TIMEOUT,
 } from 'src/identity/verification'
-import { sleep } from 'src/test/utils'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { privateCommentKeySelector } from 'src/web3/selectors'
-import { createMockContract } from 'test/utils'
+import { createMockContract, sleep } from 'test/utils'
 import {
   mockAccount,
   mockAccount2,

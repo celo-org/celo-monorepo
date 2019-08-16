@@ -1,5 +1,5 @@
-import { getErc20Balance, getStableTokenContract } from '@celo/contractkit'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
+import { getErc20Balance, getStableTokenContract } from '@celo/walletkit'
 import { expectSaga } from 'redux-saga-test-plan'
 import { call } from 'redux-saga/effects'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
@@ -17,7 +17,7 @@ const BALANCE = '45'
 const TX_ID = '1234'
 const COMMENT = 'a comment'
 
-jest.mock('@celo/contractkit', () => ({
+jest.mock('@celo/walletkit', () => ({
   getStableTokenContract: jest.fn(async () =>
     createMockContract({ decimals: () => '10', transferWithComment: () => true })
   ),
