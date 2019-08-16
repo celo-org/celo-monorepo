@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'column',
-    marginRight: 50,
+    marginHorizontal: 15,
     marginBottom: 25,
   },
   activeTab: {

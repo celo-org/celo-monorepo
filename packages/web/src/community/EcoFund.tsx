@@ -87,7 +87,9 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
             style={[
               standardStyles.row,
               standardStyles.centered,
-              standardStyles.elementalMarginBottom,
+              screen === ScreenSizes.MOBILE
+                ? standardStyles.blockMarginTop
+                : standardStyles.elementalMarginBottom,
             ]}
           >
             <Navigation
@@ -122,7 +124,7 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
                         label={ApplicationFields[key]}
                         value={formState.form[key]}
                         name={key}
-                        multiline={key === 'about' || key === 'product'}
+                        multiline={key === 'product'}
                         onInput={onInput}
                         hasError={formState.errors.includes(key)}
                       />
