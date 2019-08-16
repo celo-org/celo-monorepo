@@ -54,7 +54,7 @@
     "Storage write permission is needed for downloading the QR code",
   "ScanCodeByPlacingItInTheBox": "Scan code by placing it in the box",
   "needCameraPermissionToScan": "App needs camera permission to scan QR codes",
-  "backToYourQRCode": "Back to your QR Code",
+  "showYourQRCode": "Show your QR code",
   "toSentOrRequestPayment": "to send or request payment",
   "requestSent": "Request Sent",
   "reclaimPayment": "Reclaim Payment",
