@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   },
 })
 
-// MAX width 75 characters
+// MAX length 75 characters
 export const TEXT = 'Introducing the Celo SDK: build mobile-first DeFi apps'
 
 const LINK = 'https://medium.com/@celo.org/e6f85f2fe18c'
