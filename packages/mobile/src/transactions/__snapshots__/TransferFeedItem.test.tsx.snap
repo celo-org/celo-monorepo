@@ -138,6 +138,144 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
 </View>
 `;
 
+exports[`transfer feed item renders correctly for known received 1`] = `
+<View
+  accessible={true}
+  isTVSelectable={true}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    Object {
+      "opacity": 1,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "flex": 1,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "paddingLeft": 10,
+        "paddingTop": 20,
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "flexDirection": "column",
+          },
+          Object {
+            "opacity": 1,
+          },
+        ]
+      }
+    >
+      <Image
+        source={
+          Object {
+            "testUri": "../../../src/images/unknownUserIcon.png",
+          }
+        }
+        style={
+          Object {
+            "alignItems": "center",
+            "height": 40,
+            "justifyContent": "center",
+            "width": 40,
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        Object {
+          "borderBottomWidth": 1,
+          "borderColor": "rgba(134, 138, 141, 0.15)",
+          "flex": 1,
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "marginLeft": 10,
+          "paddingRight": 10,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "flex": 1,
+            "justifyContent": "flex-start",
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "opacity": 1,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 14,
+                "lineHeight": 18,
+              }
+            }
+          >
+            John Doe
+          </Text>
+        </View>
+      </View>
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "alignSelf": "flex-start",
+              "flexDirection": "row",
+              "justifyContent": "flex-end",
+            },
+            Object {
+              "opacity": 1,
+            },
+          ]
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 16,
+                "lineHeight": 20,
+              },
+              Object {
+                "color": "#42D689",
+              },
+            ]
+          }
+        >
+          +
+          $
+          100.00
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
 exports[`transfer feed item renders correctly for received 1`] = `
 <View
   accessible={true}
@@ -263,7 +401,7 @@ exports[`transfer feed item renders correctly for received 1`] = `
               }
             }
           >
-            Received
+            unknown
           </Text>
         </View>
       </View>
@@ -570,7 +708,7 @@ exports[`transfer feed item renders correctly for received with encrypted commen
               }
             }
           >
-            Received
+            unknown
           </Text>
           <Text
             style={
@@ -756,7 +894,7 @@ exports[`transfer feed item renders correctly for sent 1`] = `
               }
             }
           >
-            Sent
+            unknown
           </Text>
         </View>
       </View>
@@ -1063,7 +1201,7 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
               }
             }
           >
-            Sent
+            unknown
           </Text>
           <Text
             style={
@@ -1249,7 +1387,7 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
               }
             }
           >
-            Sent
+            unknown
           </Text>
           <Text
             style={

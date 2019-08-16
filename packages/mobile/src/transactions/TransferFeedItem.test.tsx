@@ -9,10 +9,12 @@ import { getMockI18nProps } from 'test/utils'
 import {
   mockAccount,
   mockAccount2,
+  mockAddressToE164Number,
   mockComment,
   mockE164Number,
   mockPrivateDEK,
   mockPrivateDEK2,
+  mockRecipientCache,
 } from 'test/values'
 
 const invitee = {
@@ -199,6 +201,26 @@ describe('transfer feed item renders correctly', () => {
         commentKey={null}
         addressToE164Number={{}}
         recipientCache={{}}
+        {...getMockI18nProps()}
+      />
+    )
+    expect(tree).toMatchSnapshot()
+  })
+  it('for known received', () => {
+    const tree = renderer.create(
+      <TransferFeedItem
+        __typename={EventTypeNames.Transfer}
+        comment={''}
+        type={TransactionTypes.RECEIVED}
+        hash={'0x'}
+        value={100}
+        address={mockAccount}
+        invitees={{}}
+        symbol={CURRENCY_ENUM.DOLLAR}
+        timestamp={1}
+        commentKey={null}
+        addressToE164Number={mockAddressToE164Number}
+        recipientCache={mockRecipientCache}
         {...getMockI18nProps()}
       />
     )
