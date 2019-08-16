@@ -5,6 +5,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { decryptComment as decryptCommentRaw } from '@celo/utils/src/commentEncryption'
 import BigNumber from 'bignumber.js'
+import _ from 'lodash'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
@@ -187,9 +188,9 @@ export class TransferFeedItem extends React.PureComponent<Props> {
       const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
       fullName = recipient ? recipient.displayName : t('unknown')
       contactImage = recipient ? (
-        <Image source={unknownUserIcon} style={styles.image} />
-      ) : (
         <ContactCircle address={address} size={avatarSize} />
+      ) : (
+        <Image source={unknownUserIcon} style={styles.image} />
       )
     }
 
