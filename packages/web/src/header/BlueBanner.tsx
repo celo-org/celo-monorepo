@@ -2,14 +2,19 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Chevron from 'src/icons/chevron'
 import { colors, fonts, textStyles } from 'src/styles'
+import getConfig from 'next/config'
 
 interface Props {
   link: string
   children: React.ReactNode
+  isVisible: boolean
 }
 
 export class BlueBanner extends React.PureComponent<Props> {
   render() {
+    if (!this.props.isVisible) {
+      return null
+    }
     return (
       <View style={styles.container}>
         <View style={styles.insideContainer}>
@@ -28,6 +33,10 @@ export class BlueBanner extends React.PureComponent<Props> {
       </View>
     )
   }
+}
+
+export function bannerVisible() {
+  return getConfig().publicRuntimeConfig.FLAGS.SDK
 }
 
 export const BANNER_HEIGHT = 50
@@ -71,5 +80,9 @@ export const TEXT = 'Introducing the Celo SDK: build mobile-first DeFi apps'
 const LINK = 'https://medium.com/@celo.org/e6f85f2fe18c'
 
 export default function() {
-  return <BlueBanner link={LINK}>{TEXT}</BlueBanner>
+  return (
+    <BlueBanner isVisible={bannerVisible()} link={LINK}>
+      {TEXT}
+    </BlueBanner>
+  )
 }
