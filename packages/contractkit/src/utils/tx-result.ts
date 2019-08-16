@@ -3,7 +3,7 @@ import PromiEvent from 'web3/promiEvent'
 import { TransactionReceipt } from 'web3/types'
 import { ExternalPromise } from './external-promise'
 
-const debug = debugFactory('contractkit:txresult')
+const debug = debugFactory('kit:tx:result')
 
 export function toTxResult(pe: PromiEvent<any>) {
   return new TransactionResult(pe)
