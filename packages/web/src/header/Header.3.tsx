@@ -1,6 +1,5 @@
 import debounce from 'debounce'
 import throttle from 'lodash.throttle'
-import getConfig from 'next/config'
 import { SingletonRouter as Router, withRouter } from 'next/router'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
@@ -29,10 +28,6 @@ const DARK_PAGES = new Set([
   CeloLinks.faucet,
   CeloLinks.walletApp,
 ])
-
-function isAlfajores() {
-  return getConfig().publicRuntimeConfig.FAUCET
-}
 
 interface OwnProps {
   router: Router
@@ -239,22 +234,17 @@ export class Header extends React.Component<Props, State> {
                       iconRight={<MediumLogo height={20} color={foreground} wrapWithLink={false} />}
                     />
                   </View>
-                  {isAlfajores() && (
-                    <View style={[styles.linkWrapper]}>
-                      <Button
-                        kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
-                        href={CeloLinks.gitHub}
-                        text={t('github')}
-                        target={'_new_tab'}
-                        iconRight={
-                          <Octocat
-                            size={18}
-                            color={this.isDarkMode() ? colors.white : colors.dark}
-                          />
-                        }
-                      />
-                    </View>
-                  )}
+                  <View style={[styles.linkWrapper]}>
+                    <Button
+                      kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
+                      href={CeloLinks.gitHub}
+                      text={t('github')}
+                      target={'_new_tab'}
+                      iconRight={
+                        <Octocat size={18} color={this.isDarkMode() ? colors.white : colors.dark} />
+                      }
+                    />
+                  </View>
                 </Animated.View>
               )}
           </View>
