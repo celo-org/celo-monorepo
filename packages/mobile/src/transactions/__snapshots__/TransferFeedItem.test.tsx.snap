@@ -178,21 +178,52 @@ exports[`transfer feed item renders correctly for known received 1`] = `
         ]
       }
     >
-      <Image
-        source={
-          Object {
-            "testUri": "../../../src/images/unknownUserIcon.png",
-          }
-        }
+      <View
         style={
-          Object {
-            "alignItems": "center",
-            "height": 40,
-            "justifyContent": "center",
-            "width": 40,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "center",
+            },
+            undefined,
+          ]
         }
-      />
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "justifyContent": "center",
+              },
+              Object {
+                "backgroundColor": "#7AD6FE",
+                "borderRadius": 20,
+                "height": 40,
+                "width": 40,
+              },
+            ]
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#FFFFFF",
+                  "fontFamily": "Hind-Medium",
+                  "fontSize": 16,
+                },
+                Object {
+                  "fontSize": 20,
+                },
+              ]
+            }
+          >
+            #
+          </Text>
+        </View>
+      </View>
     </View>
     <View
       style={
@@ -316,52 +347,21 @@ exports[`transfer feed item renders correctly for received 1`] = `
         ]
       }
     >
-      <View
-        style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "justifyContent": "center",
-            },
-            undefined,
-          ]
-        }
-      >
-        <View
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "#7AD6FE",
-                "borderRadius": 20,
-                "height": 40,
-                "width": 40,
-              },
-            ]
+      <Image
+        source={
+          Object {
+            "testUri": "../../../src/images/unknownUserIcon.png",
           }
-        >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#FFFFFF",
-                  "fontFamily": "Hind-Medium",
-                  "fontSize": 16,
-                },
-                Object {
-                  "fontSize": 20,
-                },
-              ]
-            }
-          >
-            #
-          </Text>
-        </View>
-      </View>
+        }
+        style={
+          Object {
+            "alignItems": "center",
+            "height": 40,
+            "justifyContent": "center",
+            "width": 40,
+          }
+        }
+      />
     </View>
     <View
       style={
@@ -623,52 +623,21 @@ exports[`transfer feed item renders correctly for received with encrypted commen
         ]
       }
     >
-      <View
-        style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "justifyContent": "center",
-            },
-            undefined,
-          ]
-        }
-      >
-        <View
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "#7AD6FE",
-                "borderRadius": 20,
-                "height": 40,
-                "width": 40,
-              },
-            ]
+      <Image
+        source={
+          Object {
+            "testUri": "../../../src/images/unknownUserIcon.png",
           }
-        >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#FFFFFF",
-                  "fontFamily": "Hind-Medium",
-                  "fontSize": 16,
-                },
-                Object {
-                  "fontSize": 20,
-                },
-              ]
-            }
-          >
-            #
-          </Text>
-        </View>
-      </View>
+        }
+        style={
+          Object {
+            "alignItems": "center",
+            "height": 40,
+            "justifyContent": "center",
+            "width": 40,
+          }
+        }
+      />
     </View>
     <View
       style={
@@ -809,52 +778,21 @@ exports[`transfer feed item renders correctly for sent 1`] = `
         ]
       }
     >
-      <View
-        style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "justifyContent": "center",
-            },
-            undefined,
-          ]
-        }
-      >
-        <View
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "#7AD6FE",
-                "borderRadius": 20,
-                "height": 40,
-                "width": 40,
-              },
-            ]
+      <Image
+        source={
+          Object {
+            "testUri": "../../../src/images/unknownUserIcon.png",
           }
-        >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#FFFFFF",
-                  "fontFamily": "Hind-Medium",
-                  "fontSize": 16,
-                },
-                Object {
-                  "fontSize": 20,
-                },
-              ]
-            }
-          >
-            #
-          </Text>
-        </View>
-      </View>
+        }
+        style={
+          Object {
+            "alignItems": "center",
+            "height": 40,
+            "justifyContent": "center",
+            "width": 40,
+          }
+        }
+      />
     </View>
     <View
       style={
@@ -1116,52 +1054,21 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
         ]
       }
     >
-      <View
-        style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "justifyContent": "center",
-            },
-            undefined,
-          ]
-        }
-      >
-        <View
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "#7AD6FE",
-                "borderRadius": 20,
-                "height": 40,
-                "width": 40,
-              },
-            ]
+      <Image
+        source={
+          Object {
+            "testUri": "../../../src/images/unknownUserIcon.png",
           }
-        >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#FFFFFF",
-                  "fontFamily": "Hind-Medium",
-                  "fontSize": 16,
-                },
-                Object {
-                  "fontSize": 20,
-                },
-              ]
-            }
-          >
-            #
-          </Text>
-        </View>
-      </View>
+        }
+        style={
+          Object {
+            "alignItems": "center",
+            "height": 40,
+            "justifyContent": "center",
+            "width": 40,
+          }
+        }
+      />
     </View>
     <View
       style={
@@ -1302,52 +1209,21 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
         ]
       }
     >
-      <View
-        style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "justifyContent": "center",
-            },
-            undefined,
-          ]
-        }
-      >
-        <View
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "#FEB45E",
-                "borderRadius": 20,
-                "height": 40,
-                "width": 40,
-              },
-            ]
+      <Image
+        source={
+          Object {
+            "testUri": "../../../src/images/unknownUserIcon.png",
           }
-        >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#FFFFFF",
-                  "fontFamily": "Hind-Medium",
-                  "fontSize": 16,
-                },
-                Object {
-                  "fontSize": 20,
-                },
-              ]
-            }
-          >
-            #
-          </Text>
-        </View>
-      </View>
+        }
+        style={
+          Object {
+            "alignItems": "center",
+            "height": 40,
+            "justifyContent": "center",
+            "width": 40,
+          }
+        }
+      />
     </View>
     <View
       style={
