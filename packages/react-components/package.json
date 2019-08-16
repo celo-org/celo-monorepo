@@ -8,16 +8,17 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "lint-checks": "yarn run lint && yarn run build --noEmit",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "test": "export TZ=UTC && jest --ci --silent --coverage --maxWorkers=2",
     "test:verbose": "export TZ=UTC && jest --ci --verbose --runInBand",
     "test:watch": "export TZ=UTC && jest --watch"
   },
   "dependencies": {
-    "@celo/utils": "^0.0.5",
+    "@celo/utils": "^0.0.6-beta3",
     "lodash": "^4.17.14",
+    "react-native-autocomplete-input": "^3.6.0",
     "react-native-platform-touchable": "^1.1.1",
+    "react-native-contacts": "git://github.com/celo-org/react-native-contacts#4989b0b",
     "svgs": "^3.2.1"
   },
   "devDependencies": {

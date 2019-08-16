@@ -1,6 +1,6 @@
 import { cli } from 'cli-ux'
 
-import { Exchange } from '@celo/contractkit'
+import { Exchange } from '@celo/walletkit'
 import { flags } from '@oclif/command'
 
 import { BaseCommand } from '../../base'

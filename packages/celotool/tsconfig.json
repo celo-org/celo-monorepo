@@ -15,6 +15,7 @@
     "noUnusedParameters": true,
     "resolveJsonModule": true,
     "strict": true,
+    "noEmit": true,
     "target": "es6",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

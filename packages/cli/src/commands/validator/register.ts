@@ -1,4 +1,4 @@
-import { Attestations, Validators } from '@celo/contractkit'
+import { Attestations, Validators } from '@celo/walletkit'
 import { flags } from '@oclif/command'
 
 import { BaseCommand } from '../../base'

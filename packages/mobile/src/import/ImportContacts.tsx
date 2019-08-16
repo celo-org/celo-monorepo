@@ -9,6 +9,7 @@ import { connect } from 'react-redux'
 import { e164NumberSelector } from 'src/account/reducer'
 import { errorSelector } from 'src/alert/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
+import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import GethAwareButton from 'src/geth/GethAwareButton'
@@ -26,6 +27,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 interface DispatchProps {
   importContacts: typeof importContacts
   denyImportContacts: typeof denyImportContacts
+  setNumberVerified: typeof setNumberVerified
 }
 
 interface StateProps {
@@ -84,6 +86,7 @@ class ImportContacts extends React.Component<Props, State> {
     const currentlyVerifiedAddress = await lookupAddressFromPhoneNumber(e164Number)
     if (account && areAddressesEqual(account, currentlyVerifiedAddress)) {
       // Wallet was imported and user is already verified to their current phone number
+      this.props.setNumberVerified(true)
       navigate(Stacks.AppStack)
     } else {
       // Not yet verified, navigate to verification flow
@@ -204,6 +207,7 @@ export default componentWithAnalytics(
     {
       importContacts,
       denyImportContacts,
+      setNumberVerified,
     }
   )(withNamespaces(Namespaces.nuxNamePin1)(ImportContacts))
 )

@@ -1,6 +1,5 @@
 import SectionHeader from '@celo/react-components/components/SectionHead'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
@@ -9,15 +8,16 @@ import { ScrollView, StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
 import { getPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
-import BackButton from 'src/components/BackButton'
 import { updatePaymentRequestStatus } from 'src/firebase/actions'
 import i18n, { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import PaymentRequestBalance from 'src/paymentRequest/PaymentRequestBalance'
 import PaymentRequestListEmpty from 'src/paymentRequest/PaymentRequestListEmpty'
 import PaymentRequestNotification from 'src/paymentRequest/PaymentRequestNotification'
-import { NumberToRecipient, phoneNumberToRecipient } from 'src/recipients/recipient'
+import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
+import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
@@ -47,43 +47,21 @@ type Props = WithNamespaces & StateProps & DispatchProps
 
 export class PaymentRequestListScreen extends React.Component<Props> {
   static navigationOptions = () => ({
+    ...headerWithBackButton,
     headerTitle: i18n.t('paymentRequestFlow:paymentRequests'),
-    headerLeft: <BackButton />,
-    headerRight: <View />,
-    headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
   })
 
-  getRequesterRecipient = (requesterE164Number: string) => {
-    return phoneNumberToRecipient(
-      requesterE164Number,
-      this.props.e164PhoneNumberAddressMapping[requesterE164Number],
-      this.props.recipientCache
-    )
-  }
-
-  componentDidMount = () => {
-    const { paymentRequests, e164PhoneNumberAddressMapping } = this.props
-    const missingAddresses = Array.from(
-      new Set(
-        paymentRequests
-          .map((paymentRequest) => paymentRequest.requesterE164Number)
-          .filter((e164Number) => !e164PhoneNumberAddressMapping[e164Number])
-      )
-    )
-    if (missingAddresses && missingAddresses.length) {
-      // fetch missing addresses and update the mapping
-      this.props.fetchPhoneAddresses(Array.from(missingAddresses))
-    }
-  }
-
   renderRequest = (request: PaymentRequest, key: number, allRequests: PaymentRequest[]) => {
+    const { recipientCache } = this.props
+    const requester = getRecipientFromPaymentRequest(request, recipientCache)
+
     return (
       <View key={key}>
         <PaymentRequestNotification
           id={request.uid || ''}
           amount={request.amount}
           updatePaymentRequestStatus={this.props.updatePaymentRequestStatus}
-          requester={this.getRequesterRecipient(request.requesterE164Number)}
+          requester={requester}
           comment={request.comment}
         />
         {key < allRequests.length - 1 && <View style={styles.separator} />}
