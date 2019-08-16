@@ -1,0 +1,10 @@
+{
+  "extends": "../../typescript/tsconfig.library.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true,
+    "baseUrl": "."
+  },
+  "include": ["."],
+  "references": [{ "path": ".." }]
+}
