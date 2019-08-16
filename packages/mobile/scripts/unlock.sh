@@ -20,17 +20,18 @@ adb wait-for-device shell \
 
 echo "Device is done booting"
 
+# back to ensure the screen is turned on
+adb shell input keyevent 4		# Back
 sleep 1
-# Sequence to unlock the app lock screen in any state
-# adb shell input keyevent 26		# Power
-# adb shell input keyevent 26		# Power
-# sleep 1
-# adb shell input keyevent 4		# Back
-# sleep 1
-# adb shell input keyevent 4		# Back
-# sleep 1
+# then double power button tap to lock in case it was unlocked
+adb shell input keyevent 26		# Power
+sleep 1
+adb shell input keyevent 26		# Power
+sleep 1
+# trigger the unlock menu
 adb shell input keyevent 82		# Menu
 sleep 2
+# Unlock
 adb shell input text $SECRET_PIN		# Input Pin
 sleep 1
 adb shell input keyevent 66		# Enter
