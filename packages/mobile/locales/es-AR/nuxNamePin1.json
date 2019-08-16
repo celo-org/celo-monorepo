@@ -9,26 +9,26 @@
   "verifyNumber":
     "Verifique su número de teléfono para conectarse con otros usuarios y recibir dinero",
   "syncNetwork": "Sincronizando con la red",
-  "welcomeCelo": "Le damos la bienvenida a Celo",
+  "welcomeCelo": "Te damos la bienvenida a Celo",
   "chooseCountryCode": "Código de país",
   "joinText": {
     "0":
-      "Bienvenido a Celo Wallet, un monedero digital que le permite enviar, recibir y guardar valor fácilmente.",
+      "Bienvenido a Celo Wallet, una billetera digital que te permite enviar, recibir y guardar valor fácilmente.",
     "1":
-      "Al unirte a esta red, nos das permiso para recopilar información anónima sobre cómo utilizas la aplicación. Además, si verificas tu número de teléfono, se almacenará una copia ofuscada en la Red de Celo. Más información en",
+      "Al unirte a esta red, nos das permiso para recopilar información anónima sobre cómo utilizas la aplicación. Adrmás, si verificas tu número de teléfono, se almacenará una copia ofuscada en la Red de Celo. Más información en ",
     "2": "celo.org/terms"
   },
   "phoneNumber": "000 000 0000",
   "inviteCodeText": {
-    "title": "Ingrese el código de invitación",
+    "title": "Ingresa el código de invitación",
     "copyInvite": {
-      "0": "Copia de invitación ",
+      "0": "Copia el código de invitación ",
       "1": "desde la aplicación de mensajes y vuelve."
     },
     "openMessages": {
       "message": "Abrir mensajes",
       "hint": {
-        "0": "Insinuación ",
+        "0": "Pista ",
         "1": "Copia el mensaje SMS completo"
       }
     },
@@ -42,9 +42,9 @@
     },
     "inviteAccepted": "🎉 Invitación aceptada!",
     "askForInvite": {
-      "0": "¿No tiene un código? ",
+      "0": "¿No tienes un código? ",
       "1":
-        "Solicite una invitación a alguien con un Monedero Celo o regístrese para obtener una cuenta de testnet en",
+        "Solicita una invitación a alguien con la Celo Wallet o regístrate para obtener una cuenta de testnet en",
       "2": "celo.org/build/wallet"
     }
   },
@@ -53,8 +53,8 @@
   "InvitationCode": "Código de invitación",
   "optIn": "Inscribirse",
   "submitting": "Enviando ...",
-  "haveWallet": "¿Ya tiene un Monedero Celo? ",
-  "importIt": "Importar",
+  "haveWallet": "¿Ya tienes una billetera de Celo? ",
+  "importIt": "Impórtala",
   "cancel": "Cancelar",
   "important": "Importante",
   "createPin": {
