@@ -3,7 +3,7 @@ import { TransactionObject } from 'web3/eth/types'
 import { Address } from '../base'
 import { toTxResult, TransactionResult } from './tx-result'
 
-const debug = debugFactory('contractkit:sendtx')
+const debug = debugFactory('kit:tx:send')
 
 export interface TxOptions {
   gasInflationFactor?: number
