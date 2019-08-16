@@ -9,8 +9,6 @@ import Contribute from 'src/community/connect/Contribute'
 import CoverArea from 'src/community/connect/CoverArea'
 import FellowSection from 'src/community/connect/FellowSection'
 import Tenets from 'src/community/connect/Tenets'
-import Contribute from 'src/community/connect/Contribute'
-
 import EcoFund from 'src/community/EcoFund'
 import { H2, H3 } from 'src/fonts/Fonts'
 import EmailForm, { After } from 'src/forms/EmailForm'
@@ -21,6 +19,7 @@ import { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import ArticleData from './ArticleData'
 import EventData from './EventsData'
+
 // @ts-ignore
 const Sweep = dynamic(() => import('src/community/connect/Sweep'))
 
@@ -70,7 +69,7 @@ export class ConnectPage extends React.Component<Props> {
           <EventData />
           <ArticleData />
           <Contribute />
-          <EcoFund />
+          {getConfig().publicRuntimeConfig.FLAGS.ECOFUND && <EcoFund />}
           <FellowSection />
           <View style={styles.darkBackground} nativeID={hashNav.connect.newsletter}>
             <GridRow

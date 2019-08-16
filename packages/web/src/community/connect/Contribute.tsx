@@ -1,3 +1,4 @@
+import getConfig from 'next/config'
 import { StyleSheet, View } from 'react-native'
 import QuarterCircle from 'src/community/connect/QuarterCircle'
 import { H2 } from 'src/fonts/Fonts'
@@ -17,7 +18,9 @@ function Contribute({ t }: I18nProps) {
         <Cell span={Spans.half} style={styles.verticalCenter}>
           <View style={styles.proposalText}>
             <H2 style={[textStyles.invert, standardStyles.elementalMarginBottom]}>
-              {t('contribute.title')}
+              {t(
+                `contribute.${getConfig().publicRuntimeConfig.FLAGS.ECOFUND ? 'title' : 'oldTitle'}`
+              )}
             </H2>
             <Button
               kind={BTN.NAKED}

@@ -83,6 +83,7 @@
   "contribute": {
     "title":
       "Have an idea for the Celo ecosystem? Propose a project as a Fellow or apply to the Celo Ecosystem Fund.",
+    "oldTitle": "Have an idea for the Celo ecosystem? Propose a project as a Fellow.",
     "button": "Call for Proposals"
   },
   "submit": "Submit",
