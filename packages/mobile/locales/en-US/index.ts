@@ -1,5 +1,6 @@
 import accountScreen10 from '@celo/mobile/locales/en-US/accountScreen10.json'
 import backupKeyFlow6 from '@celo/mobile/locales/en-US/backupKeyFlow6.json'
+import dappkit from '@celo/mobile/locales/en-US/dappkit.json'
 import dev from '@celo/mobile/locales/en-US/dev.json'
 import exchangeFlow9 from '@celo/mobile/locales/en-US/exchangeFlow9.json'
 import global from '@celo/mobile/locales/en-US/global.json'
@@ -12,7 +13,6 @@ import paymentRequestFlow from '@celo/mobile/locales/en-US/paymentRequestFlow.js
 import receiveFlow8 from '@celo/mobile/locales/en-US/receiveFlow8.json'
 import sendFlow7 from '@celo/mobile/locales/en-US/sendFlow7.json'
 import walletFlow5 from '@celo/mobile/locales/en-US/walletFlow5.json'
-import dappkit from '@celo/mobile/locales/en-US/dappkit.json'
 
 export default {
   accountScreen10,
