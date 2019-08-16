@@ -3,6 +3,7 @@ pragma solidity ^0.5.8;
 
 interface IGovernance {
   function setApprover(address) external;
+  function setAuditor(address) external;
   function setConcurrentProposals(uint256) external;
   function setMinDeposit(uint256) external;
   function setQueueExpiry(uint256) external;

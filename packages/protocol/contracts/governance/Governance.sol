@@ -75,8 +75,8 @@ contract Governance is
   mapping(address => ContractConstitution) private constitution;
   mapping(uint256 => Proposals.Proposal) private proposals;
   mapping(address => Voter) public voters;
-  mapping(bytes => HotfixSig) private hashWhitelist;
-  Proposals.Proposal private hotfix;
+  mapping(bytes32 => HotfixSig) private hashWhitelist;
+  Proposals.Proposal private hotfixProposal;
   SortedLinkedList.List private queue;
   uint256[] public dequeued;
   uint256[] public emptyIndices;
@@ -84,6 +84,10 @@ contract Governance is
 
   event ApproverSet(
     address approver
+  );
+
+  event AuditorSet(
+    address auditor
   );
 
   event ConcurrentProposalsSet(
@@ -180,13 +184,23 @@ contract Governance is
     int256 baselineQuorumFactor
   );
 
+  event HashWhitelisted(
+    bytes32 proposalHash,
+    address whitelister
+  );
+
+  // TODO(brice): Uncomment when bytecode limit not a problem
+  // event HotfixExecuted(
+  //   bytes32 proposalHash
+  // );
+
   function() external payable {} // solhint-disable no-empty-blocks
 
   /**
    * @notice Initializes critical variables.
    * @param registryAddress The address of the registry contract.
    * @param _approver The address that needs to approve proposals to move to the referendum stage.
-   * @param _auditor The address that needs to audit and permit hotfixes.
+   * @param _auditor The address that needs to whitelist hotfixes.
    * @param _concurrentProposals The number of proposals to dequeue at once.
    * @param _minDeposit The minimum Celo Gold deposit needed to make a proposal.
    * @param _queueExpiry The number of seconds a proposal can stay in the queue before expiring.
@@ -264,6 +278,17 @@ contract Governance is
     require(_approver != address(0) && _approver != approver);
     approver = _approver;
     emit ApproverSet(_approver);
+  }
+
+  /**
+   * @notice Updates the address that has permission to whitelist hotfixes.
+   * @param _auditor The address that has permission to whitelist hotfixes.
+   */
+  function setAuditor(address _auditor) external onlyOwner {
+    // TODO(brice): Should the auditor be allowed to be set to the approver address?
+    require(_auditor != address(0) && _auditor != auditor);
+    auditor = _auditor;
+    emit AuditorSet(_auditor);
   }
 
   /**
@@ -625,13 +650,15 @@ contract Governance is
    * @param proposalHash The hash of the proposal to be whitelisted.
    * @dev Can only be called by the approver or auditor.
    */
-  function whitelistHash(bytes proposalHash) external {
-    require(msg.sender == approver || msg.sender == auditor);
+  function whitelistHash(bytes32 proposalHash) external {
     if (msg.sender == approver) {
       hashWhitelist[proposalHash].approver = approver;
     } else if (msg.sender == auditor) {
       hashWhitelist[proposalHash].auditor = auditor;
+    } else {
+      require(false);
     }
+    emit HashWhitelisted(proposalHash, msg.sender);
   }
 
   /**
@@ -651,14 +678,17 @@ contract Governance is
     external
     nonReentrant
   {
-    bytes hotfixHash = keccak256(abi.encodePacked(values, destinations, data, dataLengths));
+    bytes32 proposalHash = keccak256(abi.encode(values, destinations, data, dataLengths));
     require(
-      hashWhitelist[hotfixHash].approver == approver &&
-      hashWhitelist[hotfixHash].auditor == auditor
+      hashWhitelist[proposalHash].approver == approver &&
+      hashWhitelist[proposalHash].auditor == auditor
     );
-    hotfix.make(values, destinations, data, dataLengths, msg.sender, 0);
-    hotfix.execute();
-    delete hotfix;
+    hotfixProposal.make(values, destinations, data, dataLengths, msg.sender, 0);
+    hotfixProposal.execute();
+    // TODO(brice): Uncomment when bytecode limit not a problem
+    // emit HotfixExecuted(proposalHash);
+    delete hotfixProposal;
+    delete hashWhitelist[proposalHash];
   }
 
   /**

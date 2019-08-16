@@ -13,6 +13,7 @@ import { GovernanceInstance, RegistryInstance, ReserveInstance } from 'types'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
   const approver = require('@celo/protocol/truffle.js').networks[networkName].from
+  const auditor = approver
 
   const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
     'Registry',
@@ -22,6 +23,7 @@ const initializeArgs = async (networkName: string): Promise<any[]> => {
   return [
     registry.address,
     approver,
+    auditor,
     config.governance.concurrentProposals,
     web3.utils.toWei(config.governance.minDeposit.toString(), 'ether'),
     config.governance.queueExpiry,

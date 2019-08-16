@@ -11,6 +11,7 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { toFixed } from '@celo/protocol/lib/fixidity'
 import BigNumber from 'bignumber.js'
+import { keccak256 } from 'ethereumjs-util'
 import {
   GovernanceContract,
   GovernanceInstance,
@@ -66,6 +67,7 @@ contract('Governance', (accounts: string[]) => {
   const nullFunctionId = '0x00000000'
   const account = accounts[0]
   const approver = accounts[0]
+  const auditor = accounts[1]
   const otherAccount = accounts[1]
   const nonOwner = accounts[1]
   const nonApprover = accounts[1]
@@ -89,6 +91,7 @@ contract('Governance', (accounts: string[]) => {
   let transactionSuccess1
   let transactionSuccess2
   let transactionFail
+  let proposalHash
   beforeEach(async () => {
     governance = await Governance.new()
     mockBondedDeposits = await MockBondedDeposits.new()
@@ -97,6 +100,7 @@ contract('Governance', (accounts: string[]) => {
     await governance.initialize(
       registry.address,
       approver,
+      auditor,
       concurrentProposals,
       minDeposit,
       queueExpiry,
@@ -145,6 +149,17 @@ contract('Governance', (accounts: string[]) => {
         'hex'
       ),
     }
+    proposalHash = keccak256(
+      web3.eth.abi.encodeParameters(
+        ['uint256[]', 'address[]', 'bytes', 'uint256[]'],
+        [
+          [String(transactionSuccess1.value)],
+          [transactionSuccess1.destination.toString()],
+          transactionSuccess1.data,
+          [String(transactionSuccess1.data.length)],
+        ]
+      )
+    )
   })
 
   describe('#initialize()', () => {
@@ -203,6 +218,7 @@ contract('Governance', (accounts: string[]) => {
         governance.initialize(
           registry.address,
           approver,
+          auditor,
           concurrentProposals,
           minDeposit,
           queueExpiry,
@@ -220,7 +236,7 @@ contract('Governance', (accounts: string[]) => {
   })
 
   describe('#setApprover', () => {
-    const newApprover = accounts[1]
+    const newApprover = accounts[2]
     it('should set the approver', async () => {
       await governance.setApprover(newApprover)
       assert.equal(await governance.approver(), newApprover)
@@ -248,6 +264,38 @@ contract('Governance', (accounts: string[]) => {
 
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(governance.setApprover(newApprover, { from: nonOwner }))
+    })
+  })
+
+  describe('#setAuditor', () => {
+    const newAuditor = accounts[2]
+    it('should set the auditor', async () => {
+      await governance.setAuditor(newAuditor)
+      assert.equal(await governance.auditor(), newAuditor)
+    })
+
+    it('should emit the AuditorSet event', async () => {
+      const resp = await governance.setAuditor(newAuditor)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertLogMatches2(log, {
+        event: 'AuditorSet',
+        args: {
+          auditor: newAuditor,
+        },
+      })
+    })
+
+    it('should revert when auditor is the null address', async () => {
+      await assertRevert(governance.setAuditor(NULL_ADDRESS))
+    })
+
+    it('should revert when the auditor is unchanged', async () => {
+      await assertRevert(governance.setAuditor(auditor))
+    })
+
+    it('should revert when called by anyone other than the owner', async () => {
+      await assertRevert(governance.setAuditor(newAuditor, { from: nonOwner }))
     })
   })
 
@@ -1804,6 +1852,150 @@ contract('Governance', (accounts: string[]) => {
             participationBaseline: toFixed(expectedParticipationBaseline),
           },
         })
+      })
+    })
+  })
+
+  describe('#whitelistHash()', () => {
+    it('should emit the HashWhitelisted event', async () => {
+      const resp = await governance.whitelistHash(proposalHash, { from: auditor })
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertLogMatches2(log, {
+        event: 'HashWhitelisted',
+        args: {
+          proposalHash: matchAny,
+          whitelister: auditor,
+        },
+      })
+      assert.isTrue(
+        Buffer.from(stripHexEncoding(log.args.proposalHash), 'hex').equals(proposalHash)
+      )
+    })
+
+    it('should revert if called by anyone other than the approver or auditor', async () => {
+      await assertRevert(governance.whitelistHash(proposalHash, { from: accounts[2] }))
+    })
+  })
+
+  describe('#hotfix()', () => {
+    describe('when the hotfix hash is whitelisted', () => {
+      beforeEach(async () => {
+        governance.whitelistHash(proposalHash, { from: approver })
+        governance.whitelistHash(proposalHash, { from: auditor })
+      })
+
+      it('should execute the proposal', async () => {
+        await governance.hotfix(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length]
+        )
+        assert.equal(await testTransactions.getValue(1).valueOf(), 1)
+      })
+
+      it('should not be executable again', async () => {
+        await governance.hotfix(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length]
+        )
+        await assertRevert(
+          governance.hotfix(
+            [transactionSuccess1.value],
+            [transactionSuccess1.destination],
+            transactionSuccess1.data,
+            [transactionSuccess1.data.length]
+          )
+        )
+      })
+
+      // TODO(brice): Uncomment when HotfixExecuted event is readded
+      // it('should emit the HotfixExecuted event', async () => {
+      //   const resp = await governance.hotfix(
+      //     [transactionSuccess1.value],
+      //     [transactionSuccess1.destination],
+      //     transactionSuccess1.data,
+      //     [transactionSuccess1.data.length]
+      //   )
+      //   assert.equal(resp.logs.length, 1)
+      //   const log = resp.logs[0]
+      //   assertLogMatches2(log, {
+      //     event: 'HotfixExecuted',
+      //     args: {
+      //       proposalHash: proposalHash
+      //     },
+      //   })
+      // })
+
+      describe('when the approver changes', () => {
+        beforeEach(async () => {
+          await governance.setApprover(accounts[2])
+        })
+
+        it('should revert', async () => {
+          await assertRevert(
+            governance.hotfix(
+              [transactionSuccess1.value],
+              [transactionSuccess1.destination],
+              transactionSuccess1.data,
+              [transactionSuccess1.data.length]
+            )
+          )
+        })
+      })
+
+      describe('when the auditor changes', () => {
+        beforeEach(async () => {
+          await governance.setAuditor(accounts[2])
+        })
+
+        it('should revert', async () => {
+          await assertRevert(
+            governance.hotfix(
+              [transactionSuccess1.value],
+              [transactionSuccess1.destination],
+              transactionSuccess1.data,
+              [transactionSuccess1.data.length]
+            )
+          )
+        })
+      })
+    })
+
+    describe('when the hotfix hash is not whitelisted by the approver', () => {
+      beforeEach(async () => {
+        governance.whitelistHash(proposalHash, { from: auditor })
+      })
+
+      it('should revert', async () => {
+        await assertRevert(
+          governance.hotfix(
+            [transactionSuccess1.value],
+            [transactionSuccess1.destination],
+            transactionSuccess1.data,
+            [transactionSuccess1.data.length]
+          )
+        )
+      })
+    })
+
+    describe('when the hotfix hash is not whitelisted by the auditor', () => {
+      beforeEach(async () => {
+        governance.whitelistHash(proposalHash, { from: approver })
+      })
+
+      it('should revert', async () => {
+        await assertRevert(
+          governance.hotfix(
+            [transactionSuccess1.value],
+            [transactionSuccess1.destination],
+            transactionSuccess1.data,
+            [transactionSuccess1.data.length]
+          )
+        )
       })
     })
   })
