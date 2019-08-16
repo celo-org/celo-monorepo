@@ -144,9 +144,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     alignSelf: 'center',
   },
-  space: {
-    paddingHorizontal: 5,
-  },
   sectionDivider: {
     alignItems: 'center',
     width: 200,
@@ -157,14 +154,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 20,
     marginBottom: 5,
-  },
-  lineDivider: {
-    position: 'absolute',
-    justifyContent: 'flex-start',
-    top: '50%',
-    width: '100%',
-    borderTopWidth: 1,
-    borderColor: colors.inactive,
   },
   bodyText: {
     ...fontStyles.paragraph,
