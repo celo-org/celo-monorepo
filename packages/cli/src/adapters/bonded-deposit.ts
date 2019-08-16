@@ -1,9 +1,7 @@
+import { BondedDeposits } from '@celo/walletkit'
 import BN from 'bn.js'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
-
-import { BondedDeposits } from '@celo/walletkit'
-
 import { Address, zip } from '../utils/helpers'
 
 export interface VotingDetails {
@@ -25,6 +23,13 @@ export interface Deposits {
     weight: BN
   }
 }
+
+enum Roles {
+  validating,
+  voting,
+  rewards,
+}
+
 export class BondedDepositAdapter {
   public contractPromise: ReturnType<typeof BondedDeposits>
 
@@ -45,7 +50,9 @@ export class BondedDepositAdapter {
   async getVotingDetails(accountOrVoterAddress: Address): Promise<VotingDetails> {
     const contract = await this.contract()
 
-    const accountAddress = await contract.methods.getAccountFromVoter(accountOrVoterAddress).call()
+    const accountAddress = await contract.methods
+      .getAccountFromDelegateAndRole(accountOrVoterAddress, Roles.voting)
+      .call()
 
     return {
       accountAddress,
@@ -124,7 +131,7 @@ export class BondedDepositAdapter {
     const contract = await this.contract()
     const sig = await this.getParsedSignatureOfAddress(account, delegate)
 
-    return contract.methods.delegateRewards(delegate, sig.v, sig.r, sig.s)
+    return contract.methods.delegateRole(Roles.rewards, delegate, sig.v, sig.r, sig.s)
   }
 
   async getParsedSignatureOfAddress(address: string, signer: string) {

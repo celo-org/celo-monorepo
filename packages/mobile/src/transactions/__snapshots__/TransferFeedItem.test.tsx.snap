@@ -94,7 +94,7 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
               }
             }
           >
-            Celo
+            Celo Faucet
           </Text>
         </View>
       </View>

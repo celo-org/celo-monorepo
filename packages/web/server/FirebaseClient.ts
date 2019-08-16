@@ -1,25 +1,15 @@
 import * as firebase from 'firebase/app'
-import 'firebase/auth'
 import 'firebase/database'
 import getConfig from 'next/config'
+
+// Code in this file is sent to the browser.
+// Code in FirebaseServerSide.ts is not sent to the browser.
 
 async function getFirebase() {
   if (!firebase.apps.length) {
     const { publicRuntimeConfig } = getConfig()
     // These variables are defined in `env-config.js` file in the parent directory.
     firebase.initializeApp(publicRuntimeConfig.FIREBASE_CONFIG)
-    const loginUsername = publicRuntimeConfig.FIREBASE_LOGIN_USERNAME
-    const loginPassword = publicRuntimeConfig.FIREBASE_LOGIN_PASSWORD
-    if (loginUsername === null || loginUsername.length === 0) {
-      throw new Error('Login username is empty')
-    }
-    try {
-      // Source: https://firebase.google.com/docs/auth
-      await firebase.auth().signInWithEmailAndPassword(loginUsername, loginPassword)
-    } catch (e) {
-      console.error(`Fail to login into Firebase: ${e}`)
-      throw e
-    }
   }
   return firebase
 }
@@ -31,7 +21,7 @@ async function getDB(): Promise<firebase.database.Database> {
 // Don't do this. It hangs next.js build process: https://github.com/zeit/next.js/issues/6824
 // const db = firebase.database()
 
-const NETWORK = 'alfajores'
+export const NETWORK = 'alfajores'
 
 export type Address = string
 export type E164Number = string
@@ -55,22 +45,6 @@ export interface RequestRecord {
   dollarTxHash?: string
   goldTxHash?: string
   escrowTxHash?: string // only on Invites
-}
-
-export async function sendRequest(beneficiary: Address | E164Number, type: RequestType) {
-  const newRequest: RequestRecord = {
-    beneficiary,
-    status: RequestStatus.Pending,
-    type,
-  }
-  try {
-    const db = await getDB()
-    const ref: firebase.database.Reference = await db.ref(`${NETWORK}/requests`).push(newRequest)
-    return ref.key
-  } catch (e) {
-    console.error(`Error while sendRequest: ${e}`)
-    throw e
-  }
 }
 
 export async function subscribeRequest(key: string, onChange: (record: RequestRecord) => void) {
