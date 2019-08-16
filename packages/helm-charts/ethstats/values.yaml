@@ -1,0 +1,12 @@
+imagePullPolicy: IfNotPresent
+
+# Node labels for pod assignment
+# ref: https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}
+
+ethstats:
+  image:
+    repository: ethereumex/eth-stats-dashboard
+    tag: v0.0.1
+  service:
+    type: NodePort

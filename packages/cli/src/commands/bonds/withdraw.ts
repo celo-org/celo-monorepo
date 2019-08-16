@@ -1,4 +1,4 @@
-import { BondedDeposits } from '@celo/contractkit'
+import { BondedDeposits } from '@celo/walletkit'
 
 import { BaseCommand } from '../../base'
 import { BondArgs } from '../../utils/bonds'

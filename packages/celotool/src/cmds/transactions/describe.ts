@@ -4,7 +4,7 @@ import {
   getContracts,
   parseFunctionCall,
   parseLog,
-} from '@celo/contractkit'
+} from '@celo/walletkit'
 import { getWeb3Client } from 'src/lib/blockchain'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import * as yargs from 'yargs'

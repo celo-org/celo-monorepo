@@ -8,6 +8,7 @@ import JobsTable from 'src/jobs/version3/JobTable'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ListItem } from 'src/shared/DropDown'
 import DropDownGroup from 'src/shared/DropDownGroup'
+import { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 enum Filters {
@@ -15,8 +16,6 @@ enum Filters {
   LOCATION = 'locationFilter',
   COMMITMENT = 'commitmentFilter',
 }
-
-export const ROLES_ID = 'roles'
 
 interface OwnProps {
   positions: LeverJob[]
@@ -140,8 +139,7 @@ class Jobs extends React.Component<Props, State> {
 
     return (
       <>
-        <div id={ROLES_ID} />
-        <View style={styles.container}>
+        <View nativeID={hashNav.join.roles} style={styles.container}>
           <GridRow desktopStyle={[styles.work]} tabletStyle={[styles.work]}>
             <Cell span={Spans.three4th} style={standardStyles.blockMargin}>
               <H1 style={[standardStyles.elementalMargin, textStyles.center]}>{t('workOnCelo')}</H1>

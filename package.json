@@ -18,10 +18,10 @@
     "build": "yarn run lerna run build",
     "report-coverage": "yarn run lerna run test-coverage",
     "test:watch": "node node_modules/jest/bin/jest.js --watch",
-    "postinstall": "yarn run lerna --concurrency 1 run postinstall && patch-package && sh scripts/custom_patch_packages.sh && yarn keys:decrypt",
+    "postinstall": "yarn run lerna run postinstall && patch-package && sh scripts/custom_patch_packages.sh && yarn keys:decrypt",
     "preinstall": "bash scripts/create_key_templates.sh",
     "keys:decrypt": "bash scripts/key_placer.sh decrypt",
-    "keys:encrypt": "bash scripts/key_placer.sh encrypt" 
+    "keys:encrypt": "bash scripts/key_placer.sh encrypt"
   },
   "husky": {
     "hooks": {
@@ -44,15 +44,20 @@
     ]
   },
   "devDependencies": {
+    "@types/jest": "^24.0.13",
     "husky": "^3.0.0",
     "lerna": "^3.16.0",
     "patch-package": "^5.1.1",
-    "postinstall-postinstall": "^1.0.0",
     "prettier": "1.13.5",
     "pretty-quick": "^1.11.1",
     "solc": "0.5.8",
     "tslint": "^5.12.1",
-    "typescript-tslint-plugin": "^0.5.0"
+    "typescript": "^3.3.3",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.0",
+    "typescript-tslint-plugin": "^0.5.0",
+    "tsconfig-paths": "^3.8.0",
+    "ts-node": "^8"
   },
   "dependencies": {
     "codecov": "^3.1.0"
