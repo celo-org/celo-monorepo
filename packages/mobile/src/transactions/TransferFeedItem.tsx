@@ -10,6 +10,7 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { HomeTransferFragment } from 'src/apollo/types'
+import { DEFAULT_TESTNET } from 'src/config'
 import { features } from 'src/flags'
 import { CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
@@ -169,7 +170,7 @@ export class TransferFeedItem extends React.PureComponent<Props> {
       comment = null
     } else if (type === TransactionTypes.FAUCET) {
       contactImage = <Image source={faucetIcon} style={styles.image} />
-      fullName = 'Celo'
+      fullName = DEFAULT_TESTNET ? `Celo ${_.startCase(DEFAULT_TESTNET)} Faucet` : 'Celo Faucet'
       comment = null
     } else if (type === TransactionTypes.INVITE_SENT) {
       contactImage = <Image source={inviteVerifyFee} style={styles.image} />
