@@ -72,7 +72,7 @@
     "@firebase/app-types": "^0.3.7",
     "@types/airtable": "^0.5.6",
     "@types/i18next": "^12.1.0",
-    "@types/jest": "^24.0.13",
+    "@types/jest": "^24.0.17",
     "@types/mailgun-js": "^0.16.3",
     "@types/next": "^8.0.3",
     "@types/node": "^10.12.18",
