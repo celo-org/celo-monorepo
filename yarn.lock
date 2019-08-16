@@ -2033,9 +2033,9 @@
     qqjs "^0.3.10"
     tslib "^1.9.3"
 
-"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#1ebae73":
+"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#6bd058a":
   version "6.4.3"
-  resolved "git+https://github.com/celo-org/ganache-cli.git#1ebae738b2aa961d55e52dfae14ee91e90965ef4"
+  resolved "git+https://github.com/celo-org/ganache-cli.git#6bd058a0ba59b1ab99f2ee909d8f9f3012ed3a81"
   dependencies:
     bn.js "4.11.8"
     source-map-support "0.5.9"
