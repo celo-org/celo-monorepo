@@ -49,7 +49,7 @@
     "@celo/client": "f7095b7",
     "@celo/walletkit": "^0.0.4",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#d3a2fdb",
-    "@celo/utils": "^0.0.5",
+    "@celo/utils": "^0.0.6-beta3",
     "@react-native-community/netinfo": "^2.0.4",
     "@segment/analytics-react-native": "^0.1.0-beta.0",
     "@segment/analytics-react-native-firebase": "^0.1.0-beta.0",
@@ -183,7 +183,6 @@
     "redux-saga-test-plan": "^4.0.0-beta.2",
     "remote-redux-devtools": "^0.5.12",
     "ts-jest": "^24.0.0",
-    "ts-node": "^7.0.1",
     "typescript": "^3.3.3"
   },
   "detox": {
