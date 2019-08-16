@@ -106,6 +106,7 @@ export interface TxToSignParam {
   to: string
   nonce: number
   gasCurrencyAddress: string
+  value: string
 }
 
 export interface SignTxRequest extends DappKitRequestBase {
@@ -122,6 +123,7 @@ export const SignTxRequest = (txs: TxToSignParam[], meta: DappKitRequestMeta): S
     to: tx.to,
     nonce: tx.nonce,
     gasCurrencyAddress: tx.gasCurrencyAddress,
+    value: tx.value,
   })),
   ...meta,
 })

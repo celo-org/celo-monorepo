@@ -124,6 +124,7 @@ export interface TxParams<T> {
   to: string
   gasCurrency: GasCurrency
   estimatedGas?: number
+  value?: string
 }
 
 export async function requestTxSig<T>(
@@ -136,8 +137,12 @@ export async function requestTxSig<T>(
   const txs: TxToSignParam[] = await Promise.all(
     txParams.map(async (txParam, index) => {
       const gasCurrencyContract = await getGasCurrencyContract(web3, txParam.gasCurrency)
+      const value = txParam.value === undefined ? '0' : txParam.value
+
       const estimatedTxParams = {
         gasCurrency: gasCurrencyContract.options.address,
+        from: txParam.from,
+        value,
       }
       const estimatedGas =
         txParam.estimatedGas === undefined
@@ -151,6 +156,7 @@ export async function requestTxSig<T>(
         estimatedGas,
         nonce: baseNonce + index,
         gasCurrencyAddress: gasCurrencyContract._address,
+        value,
         ...txParam,
       }
     })
