@@ -411,7 +411,7 @@ jobs:
       - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run: cd packages/web && ./circle_deploy.sh
 
-  test-npm-package-install:
+  test-typescript-npm-package-install:
     working_directory: ~/app
     docker:
       - image: celohq/node8:gcloud
@@ -419,15 +419,36 @@ jobs:
       - run:
           name: Installing npm package - @celo/typescript
           command: yarn add @celo/typescript
+
+  test-utils-npm-package-install:
+    working_directory: ~/app
+    docker:
+      - image: celohq/node8:gcloud
+    steps:
       - run:
           name: Installing npm package - @celo/utils
           command: yarn add @celo/utils
+
+  test-walletkit-npm-package-install:
+    working_directory: ~/app
+    docker:
+      - image: celohq/node8:gcloud
+    steps:
       - run:
           name: Installing npm package - @celo/walletkit
           command: yarn add @celo/walletkit
+
+  test-celocli-npm-package-install:
+    working_directory: ~/app
+    docker:
+      - image: celohq/node8:gcloud
+    steps:
       - run:
           name: Installing npm package - @celo/celocli
-          command: yarn add @celo/celocli
+          command: npm install @celo/celocli
+      - run:
+          name: Minor test of celocli
+          command: ./node_modules/.bin/celocli account:new  # Small test
 
 workflows:
   version: 2
@@ -486,4 +507,7 @@ workflows:
               only:
                 - master
     jobs:
-      - test-npm-package-install
+      - test-typescript-npm-package-install
+      - test-utils-npm-package-install
+      - test-walletkit-npm-package-install
+      - test-celocli-npm-package-install
