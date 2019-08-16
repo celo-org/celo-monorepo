@@ -6,7 +6,7 @@
   "author": "Celo",
   "license": "Apache-2.0",
   "dependencies": {
-    "@celo/contractkit": "^0.0.4",
+    "@celo/walletkit": "^0.0.4",
     "@google-cloud/monitoring": "0.7.1",
     "@google-cloud/pubsub": "^0.28.1",
     "@google-cloud/storage": "^2.4.3",
@@ -38,8 +38,7 @@
     "@types/web3": "^1.0.18",
     "@types/yargs": "^12.0.1",
     "jest": "^24.8.0",
-    "ts-jest": "^24.0.0",
-    "ts-node": "^7.0.1"
+    "ts-jest": "^24.0.0"
   },
   "scripts": {
     "cli": "TS_NODE_FILES=true ts-node -r tsconfig-paths/register src/cli.ts",

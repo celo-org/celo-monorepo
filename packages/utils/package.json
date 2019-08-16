@@ -1,12 +1,13 @@
 {
   "name": "@celo/utils",
-  "version": "0.0.5",
+  "version": "0.0.6-beta3",
   "description": "Celo common utils",
   "author": "Celo",
   "license": "Apache-2.0",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "scripts": {
+    "prepublishOnly": "yarn build",
     "build": "tsc",
     "lint": "tslint --project .",
     "test": "yarn build && jest --ci --silent --coverage --runInBand",
@@ -23,7 +24,6 @@
     "futoin-hkdf": "^1.0.3",
     "google-libphonenumber": "^3.2.1",
     "lodash": "^4.17.14",
-    "typescript": "^3.3.3",
     "web3-utils": "1.0.0-beta.37"
   },
   "devDependencies": {
