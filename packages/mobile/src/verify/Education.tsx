@@ -27,7 +27,7 @@ export class Education extends React.Component<WithNamespaces> {
       <View style={style.container}>
         <DevSkipButton nextScreen={Screens.WalletHome} />
         <DisconnectBanner />
-        <ScrollView contentContainerStyle={style.content}>
+        <ScrollView style={style.content}>
           <NuxLogo testID="VerifyLogo" />
           <Text style={fontStyles.h1} testID="VerifyEducationHeader">
             {t('verifyPhone')}
