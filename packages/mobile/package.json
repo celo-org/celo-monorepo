@@ -143,7 +143,7 @@
     "@types/graphql": "^14.0.7",
     "@types/hoist-non-react-statics": "^3.0.1",
     "@types/isomorphic-fetch": "^0.0.35",
-    "@types/jest": "^24.0.13",
+    "@types/jest": "^24.0.17",
     "@types/lodash": "^4.14.136",
     "@types/react": "^16.8.19",
     "@types/react-native": "^0.57.47",
