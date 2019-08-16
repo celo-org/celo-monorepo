@@ -16,6 +16,7 @@ if [[ ! $($ANDROID_SDK_ROOT/emulator/emulator -list-avds | grep ^$DEFAULT_AVD$) 
   exit 1
 fi
 
+# unlock device
 yarn dev:emulator
 
 # Just to be safe kill any process that listens on the port 'yarn start' is going to use
@@ -36,7 +37,11 @@ sleep 3
 echo "Emulator unlocked!"
 
 # start logs
-pidcat -t "ReactNativeJS" |& e2e_pidcat_run.log 
+pidcat -t "ReactNativeJS" > e2e_pidcat_run.log & 
+
+# sometimes the emulator locks itself after boot
+# this prevents that
+bash ./scripts/unlock.sh
 
 yarn test:detox
 STATUS=$?

@@ -1,9 +1,14 @@
 import { enterPin, skipTo, sleep } from './utils'
 
+const ENABLE_CONTACT_IMPORT = false
+
+// skip import because it's timing out for some reason
+// anyways the emulator currently has no contacts
+
 const SAMPLE_BACKUP_KEY =
   'nose inherit merry deal scout boss siren soul piece become better unit observe another horn ranch velvet kid frog pretty powder convince identify guilt'
 const VERIFICATION_COUNTRY = 'Germany'
-const VERIFICATION_PHONE_NUMBER = '030 901820'
+const VERIFICATION_PHONE_NUMBER = '030 111111'
 const EXAMPLE_NAME = 'Test Name'
 
 // clicks an element if it sees it
@@ -46,20 +51,14 @@ describe('Transfer Works', () => {
     await element(by.id('PhoneNumberField')).replaceText(VERIFICATION_PHONE_NUMBER)
 
     await element(by.id('JoinCeloContinueButton')).tap()
-
-    await waitFor(element(by.id('JoinCeloContinueButton')))
-      .toBeNotVisible()
-      .withTimeout(2000)
   })
 
   it('NUX->Pin', async () => {
     await expect(element(by.id('SystemAuthTitle'))).toBeVisible()
     await expect(element(by.id('SystemAuthContinue'))).toBeVisible()
     enterPin()
+
     await element(by.id('SystemAuthContinue')).tap()
-    await waitFor(element(by.id('SystemAuthContinue')))
-      .toBeNotVisible()
-      .withTimeout(2000)
   })
 
   it('NUX->Invite', async () => {
@@ -85,18 +84,18 @@ describe('Transfer Works', () => {
 
     await element(by.id('ImportWalletBackupKeyInputField')).replaceText(SAMPLE_BACKUP_KEY)
 
+    // waits for button to be enabled
     await sleep(10000)
 
     await element(by.id('ImportWalletButton')).tap()
 
+    // waits for import to finish
     await sleep(10000)
-    // await waitFor(element(by.id('InviteCodeTitle')))
-    //   .toBeVisible()
-    //   .withTimeout(1000)
   })
 
   it('NUX->ImportContacts', async () => {
     await device.launchApp({ permissions: { contacts: 'YES' } })
+
     await waitFor(element(by.id('ImportContactsPermissionTitle')))
       .toBeVisible()
       .withTimeout(1000)
@@ -105,14 +104,15 @@ describe('Transfer Works', () => {
       .toBeVisible()
       .withTimeout(1000)
 
-    // skip import because it's timing out for some reason
-    // anyways the emulator currently has no contacts
-    // await element(by.id('importContactsEnable')).tap()
-
     await waitFor(element(by.id('importContactsSkip')))
       .toBeVisible()
       .withTimeout(1000)
-    await element(by.id('importContactsSkip')).tap()
+
+    if (ENABLE_CONTACT_IMPORT) {
+      await element(by.id('importContactsEnable')).tap()
+    } else {
+      await element(by.id('importContactsSkip')).tap()
+    }
   })
 
   it('NUX->VerifyEducation', async () => {

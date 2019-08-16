@@ -47,12 +47,3 @@ export const FIREBASE_WEB_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 
 export const SENTRY_URL = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SENTRY_URL')
 
 export const PROMOTE_REWARDS_APP = false
-
-// const DISABLE_RN_BANNER = keyOrUndefined(secretsFile, Config.DISABLE_RN_BANNER, 'DISABLE_RN_BANNER')
-
-// if (DISABLE_RN_BANNER && stringToBoolean(DISABLE_RN_BANNER)) {
-//   Logger.info("logger", "DISABLE_RN_BANNER is true")
-//   console.disableYellowBox = true
-// } else {
-//   Logger.info("logger", "DISABLE_RN_BANNER is false")
-// }
