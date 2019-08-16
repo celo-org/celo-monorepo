@@ -184,6 +184,9 @@
     "ts-node": "^7.0.1",
     "typescript": "^3.3.3"
   },
+  "resolutions": {
+    "react-native-udp": "2.6.1"
+  },
   "detox": {
     "test-runner": "jest",
     "configurations": {

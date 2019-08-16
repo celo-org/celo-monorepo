@@ -25,7 +25,6 @@
 		8192F4DEC00F35136670FE28 /* Pods_celoTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68A3495573DF0B753CD4BB83 /* Pods_celoTests.framework */; };
 		85E8054E767BF68843B24D43 /* Pods_celo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 691B91F2E7383B2AF94AAA8B /* Pods_celo.framework */; };
 		A3642B9D22B607BF0071CBC5 /* Dummy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3642B9C22B607BF0071CBC5 /* Dummy.swift */; };
-		A3E591E723066D76002F1C12 /* libbls_zexe.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A3E591E623066D76002F1C12 /* libbls_zexe.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,7 +88,6 @@
 		A26D9E327B644E9BA7D393F2 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		A3642B9B22B607BE0071CBC5 /* celo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "celo-Bridging-Header.h"; sourceTree = "<group>"; };
 		A3642B9C22B607BF0071CBC5 /* Dummy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Dummy.swift; sourceTree = "<group>"; };
-		A3E591E623066D76002F1C12 /* libbls_zexe.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libbls_zexe.a; sourceTree = "<group>"; };
 		AAE92820119F4CC5B23C6636 /* Hind-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Hind-Medium.ttf"; path = "../fonts/Hind-Medium.ttf"; sourceTree = "<group>"; };
 		B59F6FDB7D084157A12E7A52 /* Hind-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Hind-Bold.ttf"; path = "../fonts/Hind-Bold.ttf"; sourceTree = "<group>"; };
 		BF61F27C85F8E9CE335BA142 /* Pods-celoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-celoTests.release.xcconfig"; path = "Target Support Files/Pods-celoTests/Pods-celoTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -114,7 +112,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A3E591E723066D76002F1C12 /* libbls_zexe.a in Frameworks */,
 				67911AC6D310414DAAC1498E /* libz.tbd in Frameworks */,
 				85E8054E767BF68843B24D43 /* Pods_celo.framework in Frameworks */,
 			);
@@ -157,7 +154,6 @@
 		080C3131575C4BB58D359856 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				A3E591E623066D76002F1C12 /* libbls_zexe.a */,
 				F3F5FA21E7EC46BBB744FE54 /* libz.tbd */,
 				691B91F2E7383B2AF94AAA8B /* Pods_celo.framework */,
 				68A3495573DF0B753CD4BB83 /* Pods_celoTests.framework */,
@@ -355,6 +351,7 @@
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
+						DevelopmentTeam = M93QQZEGDE;
 						LastSwiftMigration = 1020;
 					};
 					2D02E47A1E0B4A5D006451C7 = {
@@ -770,6 +767,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
+				DEVELOPMENT_TEAM = M93QQZEGDE;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = celo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -798,6 +796,7 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M93QQZEGDE;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = celo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

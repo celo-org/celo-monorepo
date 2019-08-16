@@ -1,7 +1,7 @@
 import { DEFAULT_TESTNET, SEGMENT_API_KEY } from '@celo/mobile/src/config'
 import ReactNativeLogger from '@celo/react-components/services/ReactNativeLogger'
 import Analytics, { Analytics as analytics } from '@segment/analytics-react-native'
-import * as Firebase from '@segment/analytics-react-native-firebase'
+// import * as Firebase from '@segment/analytics-react-native-firebase'
 import * as _ from 'lodash'
 import DeviceInfo from 'react-native-device-info'
 
@@ -43,7 +43,7 @@ function getDeviceInfo() {
 }
 
 const SEGMENT_OPTIONS: analytics.Configuration = {
-  using: [Firebase],
+  // using: [Firebase],
   flushAt: 20,
   trackAttributionData: false,
   debug: __DEV__,
