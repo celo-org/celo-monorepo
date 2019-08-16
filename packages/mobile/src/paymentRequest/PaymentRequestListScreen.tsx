@@ -1,6 +1,5 @@
 import SectionHeader from '@celo/react-components/components/SectionHead'
 import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
@@ -9,11 +8,11 @@ import { ScrollView, StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
 import { getPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
-import BackButton from 'src/components/BackButton'
 import { updatePaymentRequestStatus } from 'src/firebase/actions'
 import i18n, { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import PaymentRequestBalance from 'src/paymentRequest/PaymentRequestBalance'
 import PaymentRequestListEmpty from 'src/paymentRequest/PaymentRequestListEmpty'
 import PaymentRequestNotification from 'src/paymentRequest/PaymentRequestNotification'
@@ -48,10 +47,8 @@ type Props = WithNamespaces & StateProps & DispatchProps
 
 export class PaymentRequestListScreen extends React.Component<Props> {
   static navigationOptions = () => ({
+    ...headerWithBackButton,
     headerTitle: i18n.t('paymentRequestFlow:paymentRequests'),
-    headerLeft: <BackButton />,
-    headerRight: <View />,
-    headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
   })
 
   renderRequest = (request: PaymentRequest, key: number, allRequests: PaymentRequest[]) => {
