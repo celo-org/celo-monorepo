@@ -2,8 +2,8 @@ import {
   convertToContractDecimalsBN,
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
-import { GoldTokenInstance, StableTokenInstance } from 'types'
 import { BigNumber } from 'bignumber.js'
+import { GoldTokenInstance, StableTokenInstance } from 'types'
 
 /*
  * A simple script to transfer token balances on a testnet.
