@@ -1,1 +1,1 @@
-export const CELO_ENV = 'alfajoresstaging'
+export const CELO_ENV = 'alfajores'
