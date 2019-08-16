@@ -12,4 +12,4 @@ const FLAGS = {
     SDK: false,
   },
 }
-module.exports = FLAGS
+module.exports = FLAGS[process.env.DEPLOY_ENV]
