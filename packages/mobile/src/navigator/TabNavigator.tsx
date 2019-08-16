@@ -12,13 +12,11 @@ import { Namespaces } from 'src/i18n'
 import ExchangeIcon from 'src/icons/Exchange'
 import PaymentsIcon from 'src/icons/PaymentsIcon'
 import WalletIcon from 'src/icons/Wallet'
-import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { TabBar } from 'src/navigator/TabBar'
 import { RootState } from 'src/redux/reducers'
 import { getTabBarActiveNotification } from 'src/redux/selectors'
-import TabBar from 'src/tab/TabBar'
-
-const SendStack = () => <View />
+import Send from 'src/send/Send'
 
 interface LabelProps {
   tintColor: string
@@ -96,16 +94,13 @@ export const TabNavigator = createBottomTabNavigator(
         },
       },
     },
-    Send: {
-      screen: SendStack,
+    [Screens.Send]: {
+      screen: Send,
       navigationOptions: {
         tabBarButtonComponent: TabBarButtonComponent,
         tabBarIcon: (props: any) => <PaymentsIcon color={props.tintColor} />,
         tabBarLabel: ({ tintColor }: LabelProps) => {
           return <MenuText testID="SendNavigator" transKey="payments" tintColor={tintColor} />
-        },
-        tabBarOnPress: () => {
-          navigate(Screens.SendStack)
         },
       },
     },
@@ -117,13 +112,11 @@ export const TabNavigator = createBottomTabNavigator(
         tabBarLabel: ({ tintColor }: LabelProps) => {
           return <MenuText testID="ExchangeNavigator" transKey="exchange" tintColor={tintColor} />
         },
-        tabBarOnPress: () => {
-          navigate(Screens.ExchangeHomeScreen)
-        },
       },
     },
   },
   {
+    navigationOptions: { header: null },
     initialRouteName: Screens.WalletHome,
     tabBarComponent: TabBar as any,
     tabBarOptions: {

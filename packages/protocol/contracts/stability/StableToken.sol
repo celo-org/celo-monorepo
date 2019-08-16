@@ -59,7 +59,7 @@ Initializable, UsingRegistry, UsingFixidity {
 
   // The `rate` is how much the `factor` is adjusted by per `updatePeriod`.
   // The `factor` describes units/value of StableToken, and is greater than or equal to 1.
-  // The `updatePeriod` governs often the `factor` is updated.
+  // The `updatePeriod` governs how often the `factor` is updated.
   // `factorLastUpdated` indicates when the inflation factor was last updated.
   struct InflationState {
     int256 rate;
