@@ -481,7 +481,7 @@ exports[`NotificationBox Educations not completed yet 1`] = `
                 }
               }
             >
-              celoGold
+              global:celoGold
             </Text>
             <View>
               <View
