@@ -20,7 +20,7 @@ import {
 import { Linking } from 'expo'
 import { Contact, Fields, getContactsAsync, PhoneNumber } from 'expo-contacts'
 import { E164Number, parsePhoneNumberFromString } from 'libphonenumber-js'
-import { chunk, Dictionary, flatten, fromPairs, zipObject } from 'lodash'
+import { chunk, flatten, fromPairs, zipObject } from 'lodash'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
 
@@ -217,8 +217,8 @@ function createPhoneNumberToContactMapping(contacts: Contact[]) {
 
 async function lookupPhoneNumbersOnAttestations(
   web3: Web3,
-  allPhoneNumbers: Dictionary<string>
-): Promise<Dictionary<PhoneNumberMappingEntry>> {
+  allPhoneNumbers: { [phoneNumber: string]: string }
+): Promise<{ [address: string]: PhoneNumberMappingEntry }> {
   const attestations = await Attestations(web3)
   const nestedResult = await Promise.all(
     chunk(Object.keys(allPhoneNumbers), 20).map(async (phoneNumbers) => {
@@ -242,9 +242,15 @@ async function lookupPhoneNumbersOnAttestations(
   return fromPairs(flatten(nestedResult).map((entry) => [entry.address, entry]))
 }
 
+export interface ContactsById {
+  [id: string]: Contact
+}
+export interface PhoneNumberMappingEntryByAddress {
+  [address: string]: PhoneNumberMappingEntry
+}
 export async function fetchContacts(
   web3: Web3
-): Promise<[Dictionary<Contact>, Dictionary<PhoneNumberMappingEntry>]> {
+): Promise<[ContactsById, PhoneNumberMappingEntryByAddress]> {
   const contacts = await getContactsAsync({
     fields: [Fields.PhoneNumbers, Fields.Image],
   })
@@ -266,4 +272,23 @@ export async function fetchContacts(
   )
 
   return [rawContacts, phoneNumbersWithAddresses]
+}
+
+export function getContactForAddress(
+  address: string,
+  rawContacts: ContactsById,
+  addressMapping: PhoneNumberMappingEntryByAddress
+): Contact | undefined {
+  const entry = addressMapping[address]
+
+  if (entry === undefined) {
+    return undefined
+  }
+
+  const contact = rawContacts[entry.id]
+  if (contact === undefined) {
+    return undefined
+  }
+
+  return contact
 }
