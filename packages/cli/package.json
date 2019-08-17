@@ -61,7 +61,6 @@
     "@types/node": "^10",
     "@types/web3": "^1.0.18",
     "globby": "^8",
-
     "tslint": "^5",
     "typescript": "^3.3.3"
   },
