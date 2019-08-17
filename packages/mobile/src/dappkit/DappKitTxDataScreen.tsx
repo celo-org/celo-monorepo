@@ -3,25 +3,24 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { NavigationInjectedProps } from 'react-navigation'
 import { Namespaces } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 
-interface OwnProps {
-  data: string
-}
+type Props = NavigationInjectedProps & WithNamespaces
 
-type Props = OwnProps & WithNamespaces
-
-class DappKitSignTxScreen extends React.Component<Props> {
+class DappKitTxDataScreen extends React.Component<Props> {
   static navigationOptions = headerWithBackButton
 
   render() {
-    const { t, data } = this.props
+    const dappKitData = this.props.navigation.getParam('dappKitData')
+
+    const { t } = this.props
     return (
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <Text style={styles.header}>{t('data')}</Text>
-          <Text style={styles.bodyText}>{data}</Text>
+          <Text style={styles.bodyText}>{dappKitData}</Text>
         </ScrollView>
       </View>
     )
@@ -51,4 +50,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.dappkit)(DappKitSignTxScreen)
+export default withNamespaces(Namespaces.dappkit)(DappKitTxDataScreen)
