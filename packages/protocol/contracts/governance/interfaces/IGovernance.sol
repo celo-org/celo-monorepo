@@ -27,6 +27,15 @@ interface IGovernance {
   function revokeUpvote(uint256, uint256) external returns (bool);
   function approve(uint256, uint256) external returns (bool);
   function execute(uint256, uint256) external returns (bool);
+  function whitelist(bytes32) external;
+
+  function hotfix(
+    uint256[] calldata,
+    address[] calldata,
+    bytes calldata,
+    uint256[] calldata
+  ) external;
+
   function withdraw() external returns (bool);
   function dequeueProposalsIfReady() external;
   function getStageDurations() external view returns (uint256, uint256, uint256);

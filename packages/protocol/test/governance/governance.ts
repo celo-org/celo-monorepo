@@ -1856,13 +1856,13 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe('#whitelistHash()', () => {
-    it('should emit the HashWhitelisted event', async () => {
-      const resp = await governance.whitelistHash(proposalHash, { from: auditor })
+  describe('#whitelist()', () => {
+    it('should emit the ProposalWhitelisted event', async () => {
+      const resp = await governance.whitelist(proposalHash, { from: auditor })
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertLogMatches2(log, {
-        event: 'HashWhitelisted',
+        event: 'ProposalWhitelisted',
         args: {
           proposalHash: matchAny,
           whitelister: auditor,
@@ -1874,15 +1874,15 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert if called by anyone other than the approver or auditor', async () => {
-      await assertRevert(governance.whitelistHash(proposalHash, { from: accounts[2] }))
+      await assertRevert(governance.whitelist(proposalHash, { from: accounts[2] }))
     })
   })
 
   describe('#hotfix()', () => {
-    describe('when the hotfix hash is whitelisted', () => {
+    describe('when the proposal hash is whitelisted', () => {
       beforeEach(async () => {
-        governance.whitelistHash(proposalHash, { from: approver })
-        governance.whitelistHash(proposalHash, { from: auditor })
+        governance.whitelist(proposalHash, { from: approver })
+        governance.whitelist(proposalHash, { from: auditor })
       })
 
       it('should execute the proposal', async () => {
@@ -1965,9 +1965,9 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe('when the hotfix hash is not whitelisted by the approver', () => {
+    describe('when the proposal hash is not whitelisted by the approver', () => {
       beforeEach(async () => {
-        governance.whitelistHash(proposalHash, { from: auditor })
+        governance.whitelist(proposalHash, { from: auditor })
       })
 
       it('should revert', async () => {
@@ -1982,9 +1982,9 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe('when the hotfix hash is not whitelisted by the auditor', () => {
+    describe('when the proposal hash is not whitelisted by the auditor', () => {
       beforeEach(async () => {
-        governance.whitelistHash(proposalHash, { from: approver })
+        governance.whitelist(proposalHash, { from: approver })
       })
 
       it('should revert', async () => {

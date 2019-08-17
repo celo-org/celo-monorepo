@@ -75,7 +75,7 @@ contract Governance is
   mapping(address => ContractConstitution) private constitution;
   mapping(uint256 => Proposals.Proposal) private proposals;
   mapping(address => Voter) public voters;
-  mapping(bytes32 => HotfixSig) private hashWhitelist;
+  mapping(bytes32 => HotfixSig) private proposalWhitelist;
   Proposals.Proposal private hotfixProposal;
   SortedLinkedList.List private queue;
   uint256[] public dequeued;
@@ -184,10 +184,11 @@ contract Governance is
     int256 baselineQuorumFactor
   );
 
-  event HashWhitelisted(
-    bytes32 proposalHash,
-    address whitelister
-  );
+  // TODO(brice): Uncomment when bytecode limit not a problem
+  // event ProposalWhitelisted(
+  //   bytes32 proposalHash,
+  //   address whitelister
+  // );
 
   // TODO(brice): Uncomment when bytecode limit not a problem
   // event HotfixExecuted(
@@ -239,6 +240,7 @@ contract Governance is
   {
     require(
       _approver != address(0) &&
+      _auditor != address(0) &&
       _concurrentProposals != 0 &&
       _minDeposit != 0 &&
       _queueExpiry != 0 &&
@@ -650,15 +652,16 @@ contract Governance is
    * @param proposalHash The hash of the proposal to be whitelisted.
    * @dev Can only be called by the approver or auditor.
    */
-  function whitelistHash(bytes32 proposalHash) external {
+  function whitelist(bytes32 proposalHash) external {
     if (msg.sender == approver) {
-      hashWhitelist[proposalHash].approver = approver;
+      proposalWhitelist[proposalHash].approver = approver;
     } else if (msg.sender == auditor) {
-      hashWhitelist[proposalHash].auditor = auditor;
+      proposalWhitelist[proposalHash].auditor = auditor;
     } else {
       require(false);
     }
-    emit HashWhitelisted(proposalHash, msg.sender);
+    // TODO(brice): Uncomment when bytecode limit not a problem
+    // emit ProposalWhitelisted(proposalHash, msg.sender);
   }
 
   /**
@@ -680,15 +683,15 @@ contract Governance is
   {
     bytes32 proposalHash = keccak256(abi.encode(values, destinations, data, dataLengths));
     require(
-      hashWhitelist[proposalHash].approver == approver &&
-      hashWhitelist[proposalHash].auditor == auditor
+      proposalWhitelist[proposalHash].approver == approver &&
+      proposalWhitelist[proposalHash].auditor == auditor
     );
     hotfixProposal.make(values, destinations, data, dataLengths, msg.sender, 0);
     hotfixProposal.execute();
     // TODO(brice): Uncomment when bytecode limit not a problem
     // emit HotfixExecuted(proposalHash);
     delete hotfixProposal;
-    delete hashWhitelist[proposalHash];
+    delete proposalWhitelist[proposalHash];
   }
 
   /**
