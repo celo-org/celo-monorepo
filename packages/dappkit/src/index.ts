@@ -4,7 +4,7 @@ import {
   DappKitRequestTypes,
   DappKitResponse,
   DappKitResponseStatus,
-  parseDappkitResponseDepplink,
+  parseDappkitResponseDeeplink,
   PhoneNumberUtils,
   serializeDappKitRequestDeeplink,
   SignTxRequest,
@@ -20,7 +20,7 @@ import {
 import { Linking } from 'expo'
 import { Contact, Fields, getContactsAsync, PhoneNumber } from 'expo-contacts'
 import { E164Number, parsePhoneNumberFromString } from 'libphonenumber-js'
-import { chunk, flatten, fromPairs, zipObject } from 'lodash'
+import { chunk, flatMap, flatten, fromPairs, zipObject } from 'lodash'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
 
@@ -34,7 +34,7 @@ export {
 export function listenToAccount(callback: (account: string) => void) {
   return Linking.addEventListener('url', ({ url }: { url: string }) => {
     try {
-      const [dappKitResponse] = parseDappkitResponseDepplink(url)
+      const dappKitResponse = parseDappkitResponseDeeplink(url)
       if (
         dappKitResponse.type === DappKitRequestTypes.ACCOUNT_ADDRESS &&
         dappKitResponse.status === DappKitResponseStatus.SUCCESS
@@ -49,9 +49,9 @@ export function waitForAccountAuth(requestId: string): Promise<DappKitResponse> 
   return new Promise((resolve, reject) => {
     const handler = ({ url }: { url: string }) => {
       try {
-        const [dappKitResponse, returnedRequestId] = parseDappkitResponseDepplink(url)
+        const dappKitResponse = parseDappkitResponseDeeplink(url)
         if (
-          requestId === returnedRequestId &&
+          requestId === dappKitResponse.requestId &&
           dappKitResponse.type === DappKitRequestTypes.ACCOUNT_ADDRESS &&
           dappKitResponse.status === DappKitResponseStatus.SUCCESS
         ) {
@@ -70,9 +70,9 @@ export function waitForSignedTxs(requestId: string): Promise<DappKitResponse> {
   return new Promise((resolve, reject) => {
     const handler = ({ url }: { url: string }) => {
       try {
-        const [dappKitResponse, returnedRequestId] = parseDappkitResponseDepplink(url)
+        const dappKitResponse = parseDappkitResponseDeeplink(url)
         if (
-          requestId === returnedRequestId &&
+          requestId === dappKitResponse.requestId &&
           dappKitResponse.type === DappKitRequestTypes.SIGN_TX &&
           dappKitResponse.status === DappKitResponseStatus.SUCCESS
         ) {
@@ -90,7 +90,7 @@ export function waitForSignedTxs(requestId: string): Promise<DappKitResponse> {
 export function listenToSignedTxs(callback: (signedTxs: string[]) => void) {
   return Linking.addEventListener('url', ({ url }: { url: string }) => {
     try {
-      const [dappKitResponse] = parseDappkitResponseDepplink(url)
+      const dappKitResponse = parseDappkitResponseDeeplink(url)
       if (
         dappKitResponse.type === DappKitRequestTypes.SIGN_TX &&
         dappKitResponse.status === DappKitResponseStatus.SUCCESS
@@ -149,12 +149,10 @@ export async function requestTxSig<T>(
         gasCurrency: gasCurrencyContract.options.address,
         from: txParam.from,
         value,
-      }
+      } as any
       const estimatedGas =
         txParam.estimatedGas === undefined
-          ? //
-            // @ts-ignore
-            await txParam.tx.estimateGas(estimatedTxParams)
+          ? await txParam.tx.estimateGas(estimatedTxParams)
           : txParam.estimatedGas
 
       return {
@@ -200,17 +198,14 @@ export interface PhoneNumberMappingEntry {
 }
 
 function createPhoneNumberToContactMapping(contacts: Contact[]) {
-  // @ts-ignore
-  const phoneNumberObjects: [{ e164Number: E164Number; id: string }] = contacts.flatMap(
-    (contact) => {
-      return contact.phoneNumbers
-        ? contact.phoneNumbers.flatMap((phoneNumber) => {
-            const e164Number = isValidPhoneNumber(phoneNumber)
-            return e164Number ? { e164Number, id: contact.id } : []
-          })
-        : []
-    }
-  )
+  const phoneNumberObjects = flatMap(contacts, (contact) => {
+    return contact.phoneNumbers
+      ? contact.phoneNumbers.flatMap((phoneNumber) => {
+          const e164Number = isValidPhoneNumber(phoneNumber)
+          return e164Number ? { e164Number, id: contact.id } : []
+        })
+      : []
+  }) as [{ e164Number: E164Number; id: string }]
   const flattened = phoneNumberObjects.map(({ e164Number, id }) => [e164Number.toString(), id])
   return fromPairs(flattened)
 }
@@ -228,7 +223,7 @@ async function lookupPhoneNumbersOnAttestations(
 
       const result = await lookupPhoneNumbers(attestations, hashedPhoneNumbers)
 
-      return Object.entries(result).flatMap(([phoneHash, attestationStats]) =>
+      return flatMap(Object.entries(result), ([phoneHash, attestationStats]) =>
         Object.entries(attestationStats).map(([address, attestationStat]) => ({
           address,
           phoneNumber: phoneNumbersByHash[phoneHash],
