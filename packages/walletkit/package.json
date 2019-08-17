@@ -1,6 +1,6 @@
 {
   "name": "@celo/walletkit",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Celo's WalletKit to interact with Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",

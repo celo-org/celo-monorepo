@@ -28,7 +28,7 @@
     "test": "export TZ=UTC && jest --ci --silent"
   },
   "dependencies": {
-    "@celo/walletkit": "^0.0.13",
+    "@celo/walletkit": "^0.0.14",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
@@ -61,7 +61,7 @@
     "@types/node": "^10",
     "@types/web3": "^1.0.18",
     "globby": "^8",
-    
+
     "tslint": "^5",
     "typescript": "^3.3.3"
   },
