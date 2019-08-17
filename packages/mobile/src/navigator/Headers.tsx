@@ -13,8 +13,8 @@ export const nuxNavigationOptions = {
   headerLeftContainerStyle: { paddingHorizontal: 20 },
   headerLeft: <BackButton />,
   headerRightContainerStyle: { paddingRight: 15 },
-  headerRight: (
-    <View>
+  header: (
+    <View style={{ paddingVertical: 30 }}>
       <DisconnectBanner />
     </View>
   ),
