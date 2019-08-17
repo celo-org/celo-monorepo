@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "0.0.15",
+  "version": "0.0.17",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -24,11 +24,11 @@
     "build": "rm -rf lib && tsc -b",
     "docs": "yarn oclif-dev readme --multi --dir=../docs/command-line-interface && yarn prettier ../docs/command-line-interface/*.md --write",
     "lint": "tslint -c tslint.json --project tsconfig.json",
-    "prepublishOnly": "yarn run build && oclif-dev manifest && oclif-dev readme",
+    "prepublishOnly": "yarn --cwd=../walletkit build && yarn run build && oclif-dev manifest && oclif-dev readme",
     "test": "export TZ=UTC && jest --ci --silent"
   },
   "dependencies": {
-    "@celo/walletkit": "^0.0.10",
+    "@celo/walletkit": "^0.0.13",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
