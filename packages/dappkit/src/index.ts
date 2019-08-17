@@ -34,7 +34,7 @@ export {
 export function listenToAccount(callback: (account: string) => void) {
   return Linking.addEventListener('url', ({ url }: { url: string }) => {
     try {
-      const dappKitResponse = parseDappkitResponseDepplink(url)
+      const [dappKitResponse] = parseDappkitResponseDepplink(url)
       if (
         dappKitResponse.type === DappKitRequestTypes.ACCOUNT_ADDRESS &&
         dappKitResponse.status === DappKitResponseStatus.SUCCESS
@@ -45,46 +45,52 @@ export function listenToAccount(callback: (account: string) => void) {
   })
 }
 
-export function waitForAccountAuth(): Promise<DappKitResponse> {
+export function waitForAccountAuth(requestId: string): Promise<DappKitResponse> {
   return new Promise((resolve, reject) => {
-    Linking.addEventListener('url', ({ url }: { url: string }) => {
+    const handler = ({ url }: { url: string }) => {
       try {
-        const dappKitResponse = parseDappkitResponseDepplink(url)
+        const [dappKitResponse, returnedRequestId] = parseDappkitResponseDepplink(url)
         if (
+          requestId === returnedRequestId &&
           dappKitResponse.type === DappKitRequestTypes.ACCOUNT_ADDRESS &&
           dappKitResponse.status === DappKitResponseStatus.SUCCESS
         ) {
+          Linking.removeEventListener('url', handler)
           resolve(dappKitResponse)
         }
       } catch (error) {
         reject(error)
       }
-    })
+    }
+    Linking.addEventListener('url', handler)
   })
 }
 
-export function waitForSignedTxs(): Promise<DappKitResponse> {
+export function waitForSignedTxs(requestId: string): Promise<DappKitResponse> {
   return new Promise((resolve, reject) => {
-    Linking.addEventListener('url', ({ url }: { url: string }) => {
+    const handler = ({ url }: { url: string }) => {
       try {
-        const dappKitResponse = parseDappkitResponseDepplink(url)
+        const [dappKitResponse, returnedRequestId] = parseDappkitResponseDepplink(url)
         if (
+          requestId === returnedRequestId &&
           dappKitResponse.type === DappKitRequestTypes.SIGN_TX &&
           dappKitResponse.status === DappKitResponseStatus.SUCCESS
         ) {
+          Linking.removeEventListener('url', handler)
           resolve(dappKitResponse)
         }
       } catch (error) {
         reject(error)
       }
-    })
+    }
+    Linking.addEventListener('url', handler)
   })
 }
 
 export function listenToSignedTxs(callback: (signedTxs: string[]) => void) {
   return Linking.addEventListener('url', ({ url }: { url: string }) => {
     try {
-      const dappKitResponse = parseDappkitResponseDepplink(url)
+      const [dappKitResponse] = parseDappkitResponseDepplink(url)
       if (
         dappKitResponse.type === DappKitRequestTypes.SIGN_TX &&
         dappKitResponse.status === DappKitResponseStatus.SUCCESS

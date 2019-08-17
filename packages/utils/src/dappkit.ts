@@ -152,27 +152,40 @@ export function serializeDappKitRequestDeeplink(request: DappKitRequest) {
 
 // TODO: parsing query params yields broad types
 // once interface stabilizes, properly type the parsing
-export function parseDappkitResponseDepplink(url: string): DappKitResponse {
+export function parseDappkitResponseDepplink(url: string): [DappKitResponse, string] {
   const rawParams = parse(url, true)
   if (rawParams.query.type === undefined) {
     throw new Error('Invalid Deeplink: does not contain type:' + url)
   }
 
+  if (rawParams.query.requestId === undefined) {
+    throw new Error('Invalid Deeplink: does not contain requestId')
+  }
+
+  // @ts-ignore
+  const requestId: string = rawParams.query.requestId
+
   switch (rawParams.query.type) {
     case DappKitRequestTypes.ACCOUNT_ADDRESS:
       if (rawParams.query.status === DappKitResponseStatus.SUCCESS) {
-        // @ts-ignore
-        return {
-          type: DappKitRequestTypes.ACCOUNT_ADDRESS,
-          status: DappKitResponseStatus.SUCCESS,
-          address: rawParams.query.account,
-          phoneNumber: rawParams.query.phoneNumber,
-        }
+        return [
+          // @ts-ignore
+          {
+            type: DappKitRequestTypes.ACCOUNT_ADDRESS,
+            status: DappKitResponseStatus.SUCCESS,
+            address: rawParams.query.account,
+            phoneNumber: rawParams.query.phoneNumber,
+          },
+          requestId,
+        ]
       } else {
-        return {
-          type: DappKitRequestTypes.ACCOUNT_ADDRESS,
-          status: DappKitResponseStatus.UNAUTHORIZED,
-        }
+        return [
+          {
+            type: DappKitRequestTypes.ACCOUNT_ADDRESS,
+            status: DappKitResponseStatus.UNAUTHORIZED,
+          },
+          requestId,
+        ]
       }
     case DappKitRequestTypes.SIGN_TX:
       if (rawParams.query.status === DappKitResponseStatus.SUCCESS) {
@@ -181,16 +194,22 @@ export function parseDappkitResponseDepplink(url: string): DappKitResponse {
           rawTxs = [rawTxs]
         }
         // @ts-ignore
-        return {
-          type: DappKitRequestTypes.SIGN_TX,
-          status: DappKitResponseStatus.SUCCESS,
-          rawTxs,
-        }
+        return [
+          {
+            type: DappKitRequestTypes.SIGN_TX,
+            status: DappKitResponseStatus.SUCCESS,
+            rawTxs,
+          },
+          requestId,
+        ]
       } else {
-        return {
-          type: DappKitRequestTypes.SIGN_TX,
-          status: DappKitResponseStatus.UNAUTHORIZED,
-        }
+        return [
+          {
+            type: DappKitRequestTypes.SIGN_TX,
+            status: DappKitResponseStatus.UNAUTHORIZED,
+          },
+          requestId,
+        ]
       }
     default:
       throw new Error('Invalid Deeplink: does not match defined requests')
