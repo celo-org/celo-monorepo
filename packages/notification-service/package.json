@@ -36,7 +36,7 @@
     "@types/dotenv": "^4.0.3",
     "@types/express": "^4.16.1",
     "@types/i18next": "^11.9.3",
-    "@types/jest": "^24.0.13",
+    "@types/jest": "^24.0.17",
     "@types/node-fetch": "^2.1.2",
     "@types/utf8": "^2.1.6",
     "@types/web3": "^1.0.18",
