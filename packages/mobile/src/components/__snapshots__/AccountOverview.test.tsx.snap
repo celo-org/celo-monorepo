@@ -47,7 +47,7 @@ exports[`renders correctly when Dollar education NUX flow hasn't been completed 
             ]
           }
         >
-          celoDollars cUSD
+          global:celoDollars cUSD
         </Text>
         <View
           accessible={true}
@@ -160,7 +160,7 @@ exports[`renders correctly when Dollar education NUX flow hasn't been completed 
             ]
           }
         >
-          celoGold cGLD
+          global:celoGold cGLD
         </Text>
         <View
           accessible={true}
@@ -189,6 +189,28 @@ exports[`renders correctly when Dollar education NUX flow hasn't been completed 
               }
             }
           >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#FBCC5C",
+                    "fontSize": 21,
+                    "lineHeight": 29,
+                    "transform": Array [
+                      Object {
+                        "translateY": 2,
+                      },
+                    ],
+                  },
+                ]
+              }
+            >
+              
+            </Text>
             <Text
               numberOfLines={1}
               style={
@@ -264,7 +286,7 @@ exports[`renders correctly when Gold education NUX flow hasn't been completed 1`
             ]
           }
         >
-          celoDollars cUSD
+          global:celoDollars cUSD
         </Text>
         <View
           accessible={true}
@@ -376,7 +398,7 @@ exports[`renders correctly when Gold education NUX flow hasn't been completed 1`
             ]
           }
         >
-          celoGold cGLD
+          global:celoGold cGLD
         </Text>
         <View
           accessible={true}
@@ -406,6 +428,28 @@ exports[`renders correctly when Gold education NUX flow hasn't been completed 1`
               }
             }
           >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#FBCC5C",
+                    "fontSize": 21,
+                    "lineHeight": 29,
+                    "transform": Array [
+                      Object {
+                        "translateY": 2,
+                      },
+                    ],
+                  },
+                ]
+              }
+            >
+              
+            </Text>
             <Text
               numberOfLines={1}
               style={
@@ -481,7 +525,7 @@ exports[`renders correctly when not ready 1`] = `
             ]
           }
         >
-          celoDollars cUSD
+          global:celoDollars cUSD
         </Text>
         <View
           accessible={true}
@@ -593,7 +637,7 @@ exports[`renders correctly when not ready 1`] = `
             ]
           }
         >
-          celoGold cGLD
+          global:celoGold cGLD
         </Text>
         <View
           accessible={true}
@@ -622,6 +666,28 @@ exports[`renders correctly when not ready 1`] = `
               }
             }
           >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#FBCC5C",
+                    "fontSize": 21,
+                    "lineHeight": 29,
+                    "transform": Array [
+                      Object {
+                        "translateY": 2,
+                      },
+                    ],
+                  },
+                ]
+              }
+            >
+              
+            </Text>
             <Text
               numberOfLines={1}
               style={
@@ -697,7 +763,7 @@ exports[`renders correctly when ready 1`] = `
             ]
           }
         >
-          celoDollars cUSD
+          global:celoDollars cUSD
         </Text>
         <View
           accessible={true}
@@ -809,7 +875,7 @@ exports[`renders correctly when ready 1`] = `
             ]
           }
         >
-          celoGold cGLD
+          global:celoGold cGLD
         </Text>
         <View
           accessible={true}
@@ -838,6 +904,28 @@ exports[`renders correctly when ready 1`] = `
               }
             }
           >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#FBCC5C",
+                    "fontSize": 21,
+                    "lineHeight": 29,
+                    "transform": Array [
+                      Object {
+                        "translateY": 2,
+                      },
+                    ],
+                  },
+                ]
+              }
+            >
+              
+            </Text>
             <Text
               numberOfLines={1}
               style={
@@ -913,7 +1001,7 @@ exports[`renders correctly when transaction pending 1`] = `
             ]
           }
         >
-          celoDollars cUSD
+          global:celoDollars cUSD
         </Text>
         <View
           accessible={true}
@@ -1025,7 +1113,7 @@ exports[`renders correctly when transaction pending 1`] = `
             ]
           }
         >
-          celoGold cGLD
+          global:celoGold cGLD
         </Text>
         <View
           accessible={true}
@@ -1054,6 +1142,28 @@ exports[`renders correctly when transaction pending 1`] = `
               }
             }
           >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#FBCC5C",
+                    "fontSize": 21,
+                    "lineHeight": 29,
+                    "transform": Array [
+                      Object {
+                        "translateY": 2,
+                      },
+                    ],
+                  },
+                ]
+              }
+            >
+              
+            </Text>
             <Text
               numberOfLines={1}
               style={
