@@ -12,6 +12,7 @@ export enum Screens {
   Backup = 'Backup',
   DappKitAccountAuth = 'DappKitAccountAuth',
   DappKitSignTxScreen = 'DappKitSignTxScreen',
+  DappKitTxDataScreen = 'DappKitTxDataScreen',
   Debug = 'Debug',
   DollarEducation = 'DollarEducation',
   EditProfile = 'EditProfile',

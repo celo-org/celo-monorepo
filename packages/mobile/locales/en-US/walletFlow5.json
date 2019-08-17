@@ -1,6 +1,4 @@
 {
-  "celoDollars": "Celo Dollars",
-  "celoGold": "Celo Gold",
   "getStarted": "Get Started",
   "paymentRequest": "Payment Request",
   "paymentRequestWithCount_plural": "{{count}} Payment Requests",
@@ -47,7 +45,6 @@
     "0": "Unable to load your feed",
     "1": "Please try again later"
   },
-  "sendCeloDollars": "Send Celo Dollars",
   "noTransactionActivity": "You will see your sent and received payments here",
   "noExchangeActivity": "You will see completed exchanges here",
   "maybeLater": "Maybe Later",

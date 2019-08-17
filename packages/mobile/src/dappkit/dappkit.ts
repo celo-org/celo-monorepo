@@ -97,6 +97,6 @@ export function handleDappkitDeepLink(deepLink: string) {
         Logger.warn(TAG, 'Unsupported dapp request type')
     }
   } catch (error) {
-    Logger.debug(TAG, 'Deep link not valid for dappkit. Ignoring.')
+    Logger.debug(TAG, `Deep link not valid for dappkit: ${error}`)
   }
 }

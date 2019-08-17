@@ -149,7 +149,7 @@ export class NotificationBox extends React.Component<Props, State> {
 
     if (!goldEducationCompleted) {
       actions.push({
-        title: t('celoGold'),
+        title: t('global:celoGold'),
         text: i18n.t('exchangeFlow9:whatIsGold'),
         image: homeIcon,
         ctaList: [
