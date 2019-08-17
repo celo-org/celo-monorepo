@@ -21,6 +21,7 @@ export enum Namespaces {
   sendFlow7 = 'sendFlow7',
   paymentRequestFlow = 'paymentRequestFlow',
   walletFlow5 = 'walletFlow5',
+  dappkit = 'dappkit',
 }
 
 const languageDetector = {
