@@ -78,4 +78,4 @@ a few useful commands to make running a node really easy.
 - Clone [Celo Blockchain repo](https://github.com/celo-org/celo-blockchain)
 - Build `celotooljs geth build --geth-dir <directory-where-you-cloned-geth-repo> -c`
 - Init `celotooljs geth init --geth-dir <directory-where-you-cloned-geth-repo> --data-dir <geth-data-dir> -e <env-name>`
-- Run `celotooljs geth run --geth-dir <directory-where-you-cloned-geth-repo> --data-dir <geth-data-dir> --sync-mode <full | fast | light | celolatest>`
+- Run `celotooljs geth run --geth-dir <directory-where-you-cloned-geth-repo> --data-dir <geth-data-dir> --sync-mode <full | fast | light | ultralight>`
