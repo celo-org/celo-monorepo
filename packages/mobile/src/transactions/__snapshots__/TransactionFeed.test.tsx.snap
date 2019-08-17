@@ -504,6 +504,7 @@ exports[`renders for error 1`] = `
                   ]
                 }
               >
+                
                 30.00
               </Text>
             </View>
@@ -1014,6 +1015,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
+                
                 30.00
               </Text>
             </View>
@@ -1216,6 +1218,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
+                
                 200.00
               </Text>
             </View>
@@ -1716,6 +1719,7 @@ exports[`renders for loading 1`] = `
                   ]
                 }
               >
+                
                 30.00
               </Text>
             </View>
@@ -2216,6 +2220,7 @@ exports[`renders for no transactions 1`] = `
                   ]
                 }
               >
+                
                 30.00
               </Text>
             </View>
@@ -2716,6 +2721,7 @@ exports[`renders for standbyTransactions 1`] = `
                   ]
                 }
               >
+                
                 30.00
               </Text>
             </View>
