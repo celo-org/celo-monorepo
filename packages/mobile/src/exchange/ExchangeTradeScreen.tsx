@@ -10,7 +10,6 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { NavigationScreenProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
@@ -18,13 +17,13 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import CancelButton from 'src/components/CancelButton'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import ExchangeRate from 'src/exchange/ExchangeRate'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM as Token } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
+import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -67,11 +66,9 @@ const mapStateToProps = (state: RootState): StateProps => ({
 })
 
 export class ExchangeTradeScreen extends React.Component<Props, State> {
-  static navigationOptions = ({ navigation }: NavigationScreenProps) => ({
+  static navigationOptions = () => ({
+    ...headerWithCancelButton,
     headerTitle: i18n.t(`${Namespaces.exchangeFlow9}:exchange`),
-    headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
-    headerRight: <View />, // This helps vertically center the title
-    headerLeft: <CancelButton eventName={CustomEventNames.exchange_cancel} />,
   })
 
   state = {
@@ -104,7 +101,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     if (this.getMakerBalance().isLessThan(amount)) {
       this.props.showError(
         this.isDollar() ? ErrorMessages.NSF_DOLLARS : ErrorMessages.NSF_GOLD,
-        ERROR_BANNER_DURATION
+        ALERT_BANNER_DURATION
       )
     } else {
       this.props.hideAlert()

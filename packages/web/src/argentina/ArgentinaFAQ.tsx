@@ -1,10 +1,10 @@
 import Head from 'next/head'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { H1 } from 'src/fonts/Fonts'
 import Link from 'src/shared/Link'
 import Responsive from 'src/shared/Responsive'
 import { TextStyles } from 'src/shared/Styles'
-import { ResponsiveH1 } from 'src/shared/Text'
 
 export default class Argentina extends React.Component {
   render() {
@@ -21,9 +21,7 @@ export default class Argentina extends React.Component {
         <View style={styles.container}>
           <View style={styles.maxWidth}>
             <View style={styles.headerBox}>
-              <ResponsiveH1 style={styles.header}>
-                Prueba Argentina: preguntas frecuentes de los usuarios
-              </ResponsiveH1>
+              <H1 style={styles.header}>Prueba Argentina: preguntas frecuentes de los usuarios</H1>
             </View>
             <View style={styles.communityBox}>
               <Responsive>

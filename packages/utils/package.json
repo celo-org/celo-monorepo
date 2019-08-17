@@ -1,18 +1,17 @@
 {
   "name": "@celo/utils",
-  "version": "0.0.5",
+  "version": "0.0.6-beta3",
   "description": "Celo common utils",
   "author": "Celo",
   "license": "Apache-2.0",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "scripts": {
-    "pretest": "tsc",
-    "postinstall": "yarn run build || exit 1 && yarn run prettify || true",
-    "prettify": "yarn run prettier --config ../../.prettierrc.js --write '{contracts,types,lib}/**/*.+(ts|tsx|js|jsx)'",
+    "prepublishOnly": "yarn build",
     "build": "tsc",
-    "test": "npm run pretest && jest --ci --silent --coverage --runInBand",
-    "test:verbose": "npm run pretest && jest --ci --verbose --runInBand"
+    "lint": "tslint --project .",
+    "test": "yarn build && jest --ci --silent --coverage --runInBand",
+    "test:verbose": "yarn build && jest --ci --verbose --runInBand"
   },
   "dependencies": {
     "@umpirsky/country-list": "git://github.com/umpirsky/country-list#05fda51",
@@ -25,7 +24,6 @@
     "futoin-hkdf": "^1.0.3",
     "google-libphonenumber": "^3.2.1",
     "lodash": "^4.17.14",
-    "typescript": "^3.3.3",
     "web3-utils": "1.0.0-beta.37"
   },
   "devDependencies": {
@@ -34,7 +32,7 @@
     "@types/elliptic": "^6.4.9",
     "@types/ethereumjs-util": "^5.2.0",
     "@types/google-libphonenumber": "^7.4.17",
-    "@types/jest": "^24.0.13",
+    "@types/jest": "^24.0.17",
     "@types/lodash": "^4.14.136",
     "@types/node": "^10.12.18",
     "@types/web3": "^1.0.18",

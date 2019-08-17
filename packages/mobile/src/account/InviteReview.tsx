@@ -13,7 +13,7 @@ import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { ERROR_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import GethAwareButton from 'src/geth/GethAwareButton'
 import { Namespaces } from 'src/i18n'
 import SMSLogo from 'src/icons/InviteSendReceive'
@@ -114,7 +114,7 @@ export class InviteReview extends React.Component<Props, State> {
     this.props.hideAlert()
 
     if (!this.state.amountIsValid) {
-      this.props.showError(this.props.t('needMoreFundsToInvite'), ERROR_BANNER_DURATION)
+      this.props.showError(this.props.t('needMoreFundsToInvite'), ALERT_BANNER_DURATION)
       return
     }
 
