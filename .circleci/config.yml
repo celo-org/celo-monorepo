@@ -201,8 +201,8 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            DIRS_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+            FILES_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: test
           # Flaky tests - run them twice
@@ -257,8 +257,8 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: Setup Go language
           command: |
@@ -298,8 +298,8 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: Setup Go language
           command: |
@@ -331,14 +331,16 @@ jobs:
 
   end-to-end-geth-sync-test:
     <<: *defaults
+    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
+    resource_class: medium+
     steps:
       - attach_workspace:
           at: ~/app
       - run:
           name: Check if the test should run
           command: |
-            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: Setup Go language
           command: |
@@ -375,8 +377,8 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: Setup Go language
           command: |
