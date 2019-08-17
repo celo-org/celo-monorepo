@@ -151,7 +151,7 @@ const style = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 100,
     backgroundColor: colors.background,
   },
   content: {

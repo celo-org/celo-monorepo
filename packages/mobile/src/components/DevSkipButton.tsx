@@ -67,7 +67,7 @@ export class DevSkipButton extends React.Component<Props> {
 const styles = StyleSheet.create({
   devButtonContainer: {
     position: 'absolute',
-    top: 0,
+    top: 100,
     right: 0,
     width: 70,
     height: 35,
