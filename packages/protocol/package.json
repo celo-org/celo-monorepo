@@ -68,7 +68,7 @@
   "devDependencies": {
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#6bd058a",
     "@celo/typescript": "0.0.1",
-    "@celo/utils": "^0.0.6-beta3",
+    "@celo/utils": "^0.0.6-beta4",
     "@types/bignumber.js": "^5.0.0",
     "@types/bn.js": "^4.11.0",
     "@types/chai": "^4.1.3",

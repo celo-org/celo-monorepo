@@ -1,6 +1,6 @@
 {
   "name": "@celo/utils",
-  "version": "0.0.6-beta3",
+  "version": "0.0.6-beta4",
   "description": "Celo common utils",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -13,6 +13,7 @@
     "test": "yarn build && jest --ci --silent --coverage --runInBand",
     "test:verbose": "yarn build && jest --ci --verbose --runInBand"
   },
+  "files": ["lib/**/*"],
   "dependencies": {
     "@umpirsky/country-list": "git://github.com/umpirsky/country-list#05fda51",
     "bignumber.js": "^7.2.0",
