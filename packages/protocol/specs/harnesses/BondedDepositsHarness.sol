@@ -95,4 +95,15 @@ contract BondedDepositsHarness is BondedDeposits {
 		return validators.isValidating(account);
 	}
 	
+	
+	function ext_updateBondedDeposit(address accountAddr, uint256 value, uint256 noticePeriod) public {
+		Account storage account = accounts[accountAddr];
+		updateBondedDeposit(account,value,noticePeriod);
+	}
+	
+	function getFromNoticePeriods(address accountAddr,uint256 index) public view returns (uint256) {
+		Account storage account = accounts[accountAddr];
+		return account.deposits.noticePeriods[index];
+	}
+	
 }
