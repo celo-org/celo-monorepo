@@ -107,7 +107,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
   }
 
   keyExtractor = (item: Event | StandbyTransaction) => {
-    return item.timestamp.toString()
+    return item.hash + item.timestamp.toString()
   }
 
   render() {

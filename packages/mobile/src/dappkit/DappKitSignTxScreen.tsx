@@ -1,42 +1,58 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { AccountAuthRequest } from '@celo/utils/src/dappkit'
+import { SignTxRequest } from '@celo/utils/src/dappkit'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { NavigationParams, NavigationScreenProp } from 'react-navigation'
 import { connect } from 'react-redux'
-import { e164NumberSelector } from 'src/account/reducer'
-import { approveAccountAuth } from 'src/dappkit/dappkit'
+import { requestTxSignature } from 'src/dappkit/dappkit'
 import { Namespaces } from 'src/i18n'
 import DappkitExchangeIcon from 'src/icons/DappkitExchange'
-import { navigateBack, navigateHome } from 'src/navigator/NavigationService'
-import { RootState } from 'src/redux/reducers'
+import { navigate, navigateBack, navigateHome } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
-import { currentAccountSelector } from 'src/web3/selectors'
 
-const TAG = 'dappkit/DappKitAccountScreen'
+const TAG = 'dappkit/DappKitSignTxScreen'
+
+interface State {
+  request: SignTxRequest
+}
 
 interface OwnProps {
   errorMessage?: string
   navigation?: NavigationScreenProp<NavigationParams>
 }
 
-interface StateProps {
-  account: string | null
-  phoneNumber: string | null
+interface DispatchProps {
+  requestTxSignature: typeof requestTxSignature
 }
 
-type Props = OwnProps & StateProps & WithNamespaces
+type Props = OwnProps & DispatchProps & WithNamespaces
 
-const mapStateToProps = (state: RootState): StateProps => ({
-  account: currentAccountSelector(state),
-  phoneNumber: e164NumberSelector(state),
-})
+const mapDispatchToProps = {
+  requestTxSignature,
+}
 
-class DappKitAccountAuthScreen extends React.Component<Props> {
+class DappKitSignTxScreen extends React.Component<Props, State> {
   static navigationOptions = { header: null }
+
+  componentDidMount() {
+    if (!this.props.navigation) {
+      Logger.error(TAG, 'Missing navigation props')
+      return
+    }
+
+    const request: SignTxRequest = this.props.navigation.getParam('dappKitRequest', null)
+
+    if (!request) {
+      Logger.error(TAG, 'No request found in navigation props')
+      return
+    }
+
+    this.setState({ request })
+  }
 
   getErrorMessage() {
     return (
@@ -47,29 +63,12 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
   }
 
   linkBack = () => {
-    const { account, navigation, phoneNumber } = this.props
+    navigateHome({ dispatchAfterNavigate: requestTxSignature(this.state.request) })
+  }
 
-    if (!navigation) {
-      Logger.error(TAG, 'Missing navigation props')
-      return
-    }
-
-    const request: AccountAuthRequest = navigation.getParam('dappKitRequest', null)
-
-    if (!request) {
-      Logger.error(TAG, 'No request found in navigation props')
-      return
-    }
-    if (!account) {
-      Logger.error(TAG, 'No account set up for this wallet')
-      return
-    }
-    if (!phoneNumber) {
-      Logger.error(TAG, 'No phone number set up for this wallet')
-      return
-    }
-
-    navigateHome({ dispatchAfterNavigate: approveAccountAuth(request) })
+  showDetails = () => {
+    // TODO(sallyjyl): figure out which data to pass in for multitx
+    navigate(Screens.DappKitTxDataScreen, { dappKitData: this.state.request.txs[0].txData })
   }
 
   cancel = () => {
@@ -77,7 +76,7 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
   }
 
   render() {
-    const { t, account } = this.props
+    const { t } = this.props
     return (
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -86,17 +85,21 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
           </View>
           <Text style={styles.header}>{t('connectToWallet')}</Text>
 
-          <Text style={styles.share}>{t('shareInfo')}</Text>
+          <Text style={styles.share}> {t('shareInfo')} </Text>
 
           <View style={styles.sectionDivider}>
-            <Text style={styles.sectionHeaderText}>{t('address')}</Text>
-            <Text style={styles.bodyText}>{account}</Text>
+            <Text style={styles.sectionHeaderText}>{t('transaction.operation')}</Text>
+            <Text style={styles.bodyText}>{t('transaction.signTX')}</Text>
+            <Text style={styles.sectionHeaderText}>{t('transaction.data')}</Text>
+            <TouchableOpacity onPress={this.showDetails}>
+              <Text style={[styles.bodyText, styles.underLine]}>{t('transaction.details')}</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
 
         <View style={styles.footer}>
           <Button
-            text={t('connect')}
+            text={t('allow')}
             onPress={this.linkBack}
             standard={false}
             type={BtnTypes.PRIMARY}
@@ -144,14 +147,17 @@ const styles = StyleSheet.create({
     fontSize: 13,
     alignSelf: 'center',
   },
+  space: {
+    paddingHorizontal: 5,
+  },
   sectionDivider: {
     alignItems: 'center',
-    width: 200,
   },
   sectionHeaderText: {
-    ...fontStyles.bodyBold,
+    ...fontStyles.sectionLabel,
+    ...fontStyles.semiBold,
+    color: colors.dark,
     textTransform: 'uppercase',
-    fontSize: 12,
     marginTop: 20,
     marginBottom: 5,
   },
@@ -161,8 +167,12 @@ const styles = StyleSheet.create({
     color: colors.darkSecondary,
     textAlign: 'center',
   },
+  underLine: {
+    textDecorationLine: 'underline',
+  },
 })
 
-export default connect<StateProps, null, {}, RootState>(mapStateToProps)(
-  withNamespaces(Namespaces.dappkit)(DappKitAccountAuthScreen)
-)
+export default connect<null, DispatchProps>(
+  null,
+  mapDispatchToProps
+)(withNamespaces(Namespaces.dappkit)(DappKitSignTxScreen))
