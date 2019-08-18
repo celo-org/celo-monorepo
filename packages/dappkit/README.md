@@ -12,13 +12,13 @@ DAppKit is currently built with the excellent [Expo framework](https://expo.io) 
 
 # Usage
 
-This section walks you through the main functionalities of dappkit. You can also find the result of this walkthrough on the [expo base template](https://github.com/celo-org/dappkit-base) on branch [`dappkit-usage`](https://github.com/celo-org/dappkit-base/tree/dappkit-usage).
+This section walks you through the main functionalities of DAppKit. You can also find the result of this walkthrough on the [expo base template](https://github.com/celo-org/dappkit-base) on branch [`dappkit-usage`](https://github.com/celo-org/dappkit-base/tree/dappkit-usage).
 
-DAppKit uses deeplinks to communicate between your DApp and the Celo wallet. All "requests" that your DApp makes to the wallet needs to contain the follwing meta payload:
+DAppKit uses deeplinks to communicate between your DApp and the Celo Wallt. All "requests" that your DApp makes to the Wallet needs to contain the follwing meta payload:
 
 - `requestId` A string you can pass to DAppKit, that you can use to listen to the resopnse for that request
 - `dappName` A string that will be displayed to the user, indicating the DApp requesting access/signature.
-- `callback` The deeplink that the Celo wallet will use to redirect the user back to the DApp with the appropriate payload. If you want the user to be directed to a particular page in your DApp. With Expo, it's as simple as `Linking.makeUrl('/my/path')`
+- `callback` The deeplink that the Celo Wallet will use to redirect the user back to the DApp with the appropriate payload. If you want the user to be directed to a particular page in your DApp. With Expo, it's as simple as `Linking.makeUrl('/my/path')`
 
 ## Requesting Account Address
 
@@ -47,7 +47,7 @@ login = async () => {
 }
 ```
 
-Once you have the account address, you can make calls against your own smart contract, or use [ContractKit](../contractkit/README.md) to fetch a users balance
+Once you have the account address, you can make calls against your own smart contract, or use [ContractKit](../contractkit/README.md) to fetch a user's balance:
 
 ([expo base template commit](https://github.com/celo-org/dappkit-base/commit/4fa0dd16a04cd2831dd685378bc49399984bd553))
 
@@ -68,7 +68,7 @@ Once you have the account address, you can make calls against your own smart con
 
 ## Get Contact List Addresses
 
-For many real-world applications, your user will want to interact with their friends and family on your DApp. Celo has a built-in [Identity Protocol](../../celo-codebase/protocol/identity/README.md) that maps phone numbers to account addresses. You can use DAppkit to fetch that mapping for a users contact list.
+For many real-world applications, your user will want to interact with their friends and family on your DApp. Celo has a built-in [Identity Protocol](../../celo-codebase/protocol/identity/README.md) that maps phone numbers to account addresses. You can use DAppkit to fetch that mapping for a user's contact list.
 
 ([expo base template commit](https://github.com/celo-org/dappkit-base/commit/ea99ff02009de806c0e248eb7aec617c14223fa5))
 
@@ -96,7 +96,7 @@ Object.entries(this.state.phoneNumbersByAddress).map(([address, entry]) => {
 
 ## Signing Transactions
 
-Let's go from read-only to submitting transactions. To alter state on the blockchain, make a transaction object with your smart contract or any of the Celo Core Contracts in contractkit. All that is left to do is to pass the transaction object to dappkit.
+Let's go from accessing account information to submitting transactions. To alter state on the blockchain, make a transaction object with your smart contract or any of the Celo Core Contracts in ContractKit. All that is left to do is to pass the transaction object to DAppKit.
 
 ([expo base template commit](https://github.com/celo-org/dappkit-base/commit/cf35c82d7650e7b6bc7208ece32440d3a32d9cc5))
 

@@ -20,7 +20,7 @@ Read more about general Expo setup at [https://expo.io/learn](https://expo.io/le
 
 ## Typescript Support
 
-We are big fans of Typescript, so if you used the tabs template, you can support typescript by just following [these guide lines](https://docs.expo.io/versions/latest/guides/typescript/)
+We are big fans of Typescript, so if you used the tabs template, you can support typescript by just following [these guidelines](https://docs.expo.io/versions/latest/guides/typescript/)
 
 ## Setup
 
@@ -32,7 +32,7 @@ npm install @celo/dappkit@0.0.6
 yarn add @celo/dappkit@0.0.6
 ```
 
-DAppkit's dependencies require a bit of adjustment to a vanilla Expo. The first are a lot of the Node.js modules that are expected. You can get those mostly by using the following modules
+DAppKit's dependencies require a bit of adjustment to a vanilla Expo. The first are a lot of the Node.js modules that are expected. You can get those mostly by using the following modules
 
 ```bash
 npm install node-libs-react-native vm-browserify
