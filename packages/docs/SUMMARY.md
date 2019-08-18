@@ -57,7 +57,7 @@
 - [Introduction](developer-resources/introduction.md)
 - [DAppKit](developer-resources/dappkit/README.md)
   - [Getting Started](developer-resources/dappkit/setup.md)
-  - [Examples](developer-resources/dappkit/examples.md)
+  - [Usage](developer-resources/dappkit/usage.md)
 - [ContractKit](developer-resources/contractkit/README.md)
   - [Getting Started](developer-resources/contractkit/setup.md)
   - [Examples](developer-resources/contractkit/examples.md)
