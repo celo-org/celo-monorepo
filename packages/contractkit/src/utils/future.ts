@@ -1,11 +1,17 @@
-export class ExternalPromise<T> extends Promise<T> {
+export class Future<T> {
   public resolve!: (value: T) => void
   public reject!: (err: any) => void
 
+  private promise: Promise<T>
+
   constructor() {
-    super((resolve, reject) => {
+    this.promise = new Promise<T>((resolve, reject) => {
       this.resolve = resolve
       this.reject = reject
     })
+  }
+
+  wait() {
+    return this.promise
   }
 }

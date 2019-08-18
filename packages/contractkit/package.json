@@ -15,6 +15,7 @@
     "clean:all": "yarn clean && rm -rf src/generated",
     "build:gen": "yarn --cwd ../protocol build",
     "prepublishOnly": "yarn build:gen && yarn build",
+    "test": "jest",
     "lint": "tslint -c tslint.json --project . && tslint -c tslint.json --project test"
   },
   "dependencies": {
