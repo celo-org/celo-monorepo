@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@celo/react-components": "1.0.0",
-    "@celo/utils": "^0.0.6-beta3",
+    "@celo/utils": "^0.0.6-beta5",
     "@react-native-community/netinfo": "^2.0.4",
     "@segment/analytics-react-native": "^0.1.0-beta.0",
     "@segment/analytics-react-native-firebase": "^0.1.0-beta.0",

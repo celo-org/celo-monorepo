@@ -1,6 +1,6 @@
 {
   "name": "@celo/walletkit",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Celo's WalletKit to interact with Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@0x/subproviders": "^4.1.0",
-    "@celo/utils": "^0.0.6-beta3",
+    "@celo/utils": "^0.0.6-beta5",
     "@google-cloud/storage": "^2.3.3",
     "@types/jest": "^24.0.17",
     "babel-jest": "^24.8.0",

@@ -67,6 +67,7 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
         gas: tx.estimatedGas,
         data: tx.txData,
         nonce: tx.nonce,
+        value: tx.value,
         // @ts-ignore
         gasCurrency: action.request.gasCurrency,
       })
