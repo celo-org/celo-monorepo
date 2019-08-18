@@ -106,6 +106,7 @@ export interface TxToSignParam {
   to: string
   nonce: number
   gasCurrencyAddress: string
+  value: string
 }
 
 export interface SignTxRequest extends DappKitRequestBase {
@@ -122,6 +123,7 @@ export const SignTxRequest = (txs: TxToSignParam[], meta: DappKitRequestMeta): S
     to: tx.to,
     nonce: tx.nonce,
     gasCurrencyAddress: tx.gasCurrencyAddress,
+    value: tx.value,
   })),
   ...meta,
 })
@@ -150,11 +152,17 @@ export function serializeDappKitRequestDeeplink(request: DappKitRequest) {
 
 // TODO: parsing query params yields broad types
 // once interface stabilizes, properly type the parsing
-export function parseDappkitResponseDepplink(url: string): DappKitResponse {
+export function parseDappkitResponseDeeplink(url: string): DappKitResponse & { requestId: string } {
   const rawParams = parse(url, true)
   if (rawParams.query.type === undefined) {
     throw new Error('Invalid Deeplink: does not contain type:' + url)
   }
+
+  if (rawParams.query.requestId === undefined) {
+    throw new Error('Invalid Deeplink: does not contain requestId')
+  }
+
+  const requestId = rawParams.query.requestId as string
 
   switch (rawParams.query.type) {
     case DappKitRequestTypes.ACCOUNT_ADDRESS:
@@ -165,11 +173,13 @@ export function parseDappkitResponseDepplink(url: string): DappKitResponse {
           status: DappKitResponseStatus.SUCCESS,
           address: rawParams.query.account,
           phoneNumber: rawParams.query.phoneNumber,
+          requestId,
         }
       } else {
         return {
           type: DappKitRequestTypes.ACCOUNT_ADDRESS,
           status: DappKitResponseStatus.UNAUTHORIZED,
+          requestId,
         }
       }
     case DappKitRequestTypes.SIGN_TX:
@@ -183,11 +193,13 @@ export function parseDappkitResponseDepplink(url: string): DappKitResponse {
           type: DappKitRequestTypes.SIGN_TX,
           status: DappKitResponseStatus.SUCCESS,
           rawTxs,
+          requestId,
         }
       } else {
         return {
           type: DappKitRequestTypes.SIGN_TX,
           status: DappKitResponseStatus.UNAUTHORIZED,
+          requestId,
         }
       }
     default:

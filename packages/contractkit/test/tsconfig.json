@@ -2,8 +2,7 @@
   "extends": "../../typescript/tsconfig.library.json",
   "compilerOptions": {
     "rootDir": ".",
-    "noEmit": true,
-    "baseUrl": "."
+    "noEmit": true
   },
   "include": ["."],
   "references": [{ "path": ".." }]
