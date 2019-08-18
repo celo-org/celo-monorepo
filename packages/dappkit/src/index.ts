@@ -245,7 +245,7 @@ export interface PhoneNumberMappingEntryByAddress {
 }
 export async function fetchContacts(
   web3: Web3
-): Promise<[ContactsById, PhoneNumberMappingEntryByAddress]> {
+): Promise<{ rawContacts: ContactsById; phoneNumbersByAddress: PhoneNumberMappingEntryByAddress }> {
   const contacts = await getContactsAsync({
     fields: [Fields.PhoneNumbers, Fields.Image],
   })
@@ -261,12 +261,12 @@ export async function fetchContacts(
   // @ts-ignore
   const phoneNumbersToContacts = createPhoneNumberToContactMapping(filteredContacts)
 
-  const phoneNumbersWithAddresses = await lookupPhoneNumbersOnAttestations(
-    web3,
-    phoneNumbersToContacts
-  )
+  const phoneNumbersByAddress = await lookupPhoneNumbersOnAttestations(web3, phoneNumbersToContacts)
 
-  return [rawContacts, phoneNumbersWithAddresses]
+  return {
+    rawContacts,
+    phoneNumbersByAddress,
+  }
 }
 
 export function getContactForAddress(
