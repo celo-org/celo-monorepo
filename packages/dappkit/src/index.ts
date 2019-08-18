@@ -1,3 +1,4 @@
+import { CeloContract, newKitFromWeb3 } from '@celo/contractkit'
 import {
   AccountAuthRequest,
   DappKitRequestMeta,
@@ -10,20 +11,13 @@ import {
   SignTxRequest,
   TxToSignParam,
 } from '@celo/utils'
-import {
-  Attestations,
-  CeloTokenType,
-  GoldToken,
-  lookupPhoneNumbers,
-  StableToken,
-} from '@celo/walletkit'
+import { Attestations, lookupPhoneNumbers } from '@celo/walletkit'
 import { Linking } from 'expo'
 import { Contact, Fields, getContactsAsync, PhoneNumber } from 'expo-contacts'
 import { E164Number, parsePhoneNumberFromString } from 'libphonenumber-js'
 import { chunk, flatMap, flatten, fromPairs, zipObject } from 'lodash'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
-
 export {
   AccountAuthRequest,
   DappKitRequestMeta,
@@ -110,17 +104,18 @@ export enum GasCurrency {
   cGLD = 'cGLD',
 }
 
-async function getGasCurrencyContract(
+async function getGasCurrencyContractAddress(
   web3: Web3,
   gasCurrency: GasCurrency
-): Promise<CeloTokenType> {
+): Promise<string> {
+  const kit = newKitFromWeb3(web3)
   switch (gasCurrency) {
     case GasCurrency.cUSD:
-      return StableToken(web3)
+      return kit.registry.addressFor(CeloContract.StableToken)
     case GasCurrency.cGLD:
-      return GoldToken(web3)
+      return kit.registry.addressFor(CeloContract.GoldToken)
     default:
-      return StableToken(web3)
+      return kit.registry.addressFor(CeloContract.StableToken)
   }
 }
 
@@ -142,11 +137,14 @@ export async function requestTxSig<T>(
   const baseNonce = await web3.eth.getTransactionCount(txParams[0].from)
   const txs: TxToSignParam[] = await Promise.all(
     txParams.map(async (txParam, index) => {
-      const gasCurrencyContract = await getGasCurrencyContract(web3, txParam.gasCurrency)
+      const gasCurrencyContractAddress = await getGasCurrencyContractAddress(
+        web3,
+        txParam.gasCurrency
+      )
       const value = txParam.value === undefined ? '0' : txParam.value
 
       const estimatedTxParams = {
-        gasCurrency: gasCurrencyContract.options.address,
+        gasCurrency: gasCurrencyContractAddress,
         from: txParam.from,
         value,
       } as any
@@ -159,7 +157,7 @@ export async function requestTxSig<T>(
         txData: txParam.tx.encodeABI(),
         estimatedGas,
         nonce: baseNonce + index,
-        gasCurrencyAddress: gasCurrencyContract._address,
+        gasCurrencyAddress: gasCurrencyContractAddress,
         value,
         ...txParam,
       }
