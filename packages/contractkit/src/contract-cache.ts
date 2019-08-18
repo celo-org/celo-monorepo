@@ -25,6 +25,7 @@ const WrapperFactories = {
 }
 
 type CFType = typeof WrapperFactories
+export type ValidWrappers = keyof CFType
 
 interface WrapperCacheMap {
   // [CeloContract.Attestations]?: AttestationsWrapper,
@@ -93,7 +94,7 @@ export class WrapperCache {
     return this.getContract(CeloContract.Validators)
   }
 
-  public async getContract<C extends keyof CFType>(contract: C) {
+  public async getContract<C extends ValidWrappers>(contract: C) {
     if (this.wrapperCache[contract] == null) {
       const instance = await this.kit._web3Contracts.getContract(contract)
       const Klass: CFType[C] = WrapperFactories[contract]
