@@ -4029,10 +4029,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/airtable@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@types/airtable/-/airtable-0.5.0.tgz#7d1b6334bfd4e42c244799bcdd949ab7e218dd11"
-  integrity sha512-kvG9Zmec2yk8wf/RU6GU4ujWnI7EqLLNkgqvOE72pLWUW1IdM1cqbMa+IZnWM6bsCIhBBKgs8hM3HZvM9Hsgcw==
+"@types/airtable@^0.5.6":
+  version "0.5.6"
+  resolved "https://registry.yarnpkg.com/@types/airtable/-/airtable-0.5.6.tgz#fbe63da52420be49e45fadddc42f0db35eaaaa0d"
+  integrity sha512-bujDg9lhzSKW/giQsGnvxCBrsu+i0k0w/L0jRip8HEOzG9DDqQ7IdPPqoW1EQrxwcYocMxIHzyQrtTiyWshrqA==
 
 "@types/anymatch@*":
   version "1.3.0"

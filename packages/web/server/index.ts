@@ -7,12 +7,12 @@ import * as helmet from 'helmet'
 import * as next from 'next'
 import nextI18NextMiddleware from 'next-i18next/middleware'
 import addToCRM from '../server/addToCRM'
+import ecoFundSubmission from '../server/EcoFundApp'
 import nextI18next from '../src/i18n'
 import { faucetOrInviteController } from './controllers'
 import { submitFellowApp } from './FellowshipApp'
 import { RequestType } from './FirebaseClient'
 import mailer from './mailer'
-
 const port = parseInt(process.env.PORT, 10) || 3000
 const dev = process.env.NEXT_DEV === 'true'
 const app = next({ dev })
@@ -73,16 +73,28 @@ function wwwRedirect(req, res, nextAction) {
   server.post('/fellowship', async (req, res) => {
     const { ideas, email, name, bio, deliverables, resume } = req.body
 
-    await submitFellowApp({
-      name,
-      email,
-      ideas,
-      bio,
-      deliverables,
-      resume,
-    })
+    try {
+      await submitFellowApp({
+        name,
+        email,
+        ideas,
+        bio,
+        deliverables,
+        resume,
+      })
+      res.status(204)
+    } catch (e) {
+      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+    }
+  })
 
-    res.status(204).send('ok')
+  server.post('/ecosystem/:table', async (req, res) => {
+    try {
+      const record = await ecoFundSubmission(req.body, req.params.table)
+      res.status(204).json({ id: record.id })
+    } catch (e) {
+      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+    }
   })
 
   server.post('/faucet', async (req, res) => {
