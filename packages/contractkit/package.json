@@ -17,7 +17,7 @@
     "lint": "tslint -c tslint.json --project . && tslint -c tslint.json --project test"
   },
   "dependencies": {
-    "@celo/utils": "^0.0.6-beta3",
+    "@celo/utils": "^0.0.6-beta5",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^7.2.0",
     "debug": "^4.1.1",
@@ -31,8 +31,8 @@
     "@types/web3": "^1.0.18"
   },
   "engines": {
-    "node": ">=8.16.0"
-  },  
+    "node": ">=8.13.0"
+  },
   "files": [
     "lib/**/*"
   ]
