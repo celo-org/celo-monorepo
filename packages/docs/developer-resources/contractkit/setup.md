@@ -19,7 +19,7 @@ To start working with contractkit you need a `kit` instance:
 ```ts
 import { newKit } from '@celo/contractkit'
 
-const kit = newKit('https://alfajores-infura.celo-testnet.org:8545')
+const kit = newKit('https://alfajores-infura.celo-testnet.org')
 ```
 
 To access web3:
