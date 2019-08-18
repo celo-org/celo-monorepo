@@ -1,16 +1,20 @@
+import getConfig from 'next/config'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron from 'src/icons/chevron'
 import { colors, fonts, textStyles } from 'src/styles'
 
 interface Props {
   link: string
   children: React.ReactNode
+  isVisible: boolean
 }
 
 export class BlueBanner extends React.PureComponent<Props> {
   render() {
+    if (!this.props.isVisible) {
+      return null
+    }
     return (
       <View style={styles.container}>
         <View style={styles.insideContainer}>
@@ -29,6 +33,10 @@ export class BlueBanner extends React.PureComponent<Props> {
       </View>
     )
   }
+}
+
+export function bannerVisible() {
+  return getConfig().publicRuntimeConfig.FLAGS.SDK
 }
 
 export const BANNER_HEIGHT = 50
@@ -66,8 +74,15 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces('common')(({ t }: I18nProps) => (
-  <BlueBanner link="https://medium.com/celohq/introducing-alfajores-1b162ebcb44d">
-    {t('blueBanner')}
-  </BlueBanner>
-))
+// MAX length 75 characters
+export const TEXT = 'Introducing the Celo SDK: build mobile-first DeFi apps'
+
+const LINK = 'https://medium.com/@celo.org/e6f85f2fe18c'
+
+export default function() {
+  return (
+    <BlueBanner isVisible={bannerVisible()} link={LINK}>
+      {TEXT}
+    </BlueBanner>
+  )
+}
