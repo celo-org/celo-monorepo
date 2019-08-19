@@ -98,13 +98,13 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   async componentDidMount() {
-    AppState.addEventListener('change', this.handleValidCodeInClipboard)
+    AppState.addEventListener('change', this.handleAppStateChange)
     this.checkForReferrerCode()
     this.checkIfValidCodeInClipboard()
   }
 
   componentWillUnmount() {
-    AppState.removeEventListener('change', this.handleValidCodeInClipboard)
+    AppState.removeEventListener('change', this.handleAppStateChange)
   }
 
   openMessage = () => {
@@ -121,15 +121,12 @@ export class EnterInviteCode extends React.Component<Props, State> {
   checkIfValidCodeInClipboard = async () => {
     const message = await Clipboard.getString()
     const validCode = extractValidInviteCode(message)
-
     if (validCode) {
       this.setState({ validCode })
-    } else {
-      this.setState({ validCode: null })
     }
   }
 
-  handleValidCodeInClipboard = async (nextAppState: AppStateStatus) => {
+  handleAppStateChange = async (nextAppState: AppStateStatus) => {
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
       this.checkIfValidCodeInClipboard()
     }
