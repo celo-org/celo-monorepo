@@ -1,4 +1,4 @@
-import { toTxResult } from '../../src/utils/tx-result'
+import { toTxResult } from '@src/utils/tx-result'
 import { promiEventSpy } from '../test-utils/PromiEventStub'
 
 test('should resolve to hash & receipt on normal flow', async () => {
