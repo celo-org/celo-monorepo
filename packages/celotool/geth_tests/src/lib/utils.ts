@@ -20,13 +20,15 @@ export interface GethInstanceConfig {
   validating: boolean
   syncmode: string
   port: number
-  proxyport?: number
+  proxyport: number
+  proxyname?: string
   rpcport?: number
   wsport?: number
   lightserv?: boolean
   privateKey?: string
   etherbase?: string
   peers?: string[]
+  proxypeers?: string[]
   pid?: number
 }
 
@@ -225,6 +227,10 @@ export async function addStaticPeers(datadir: string, enodes: string[]) {
   fs.writeFileSync(`${datadir}/static-nodes.json`, JSON.stringify(enodes))
 }
 
+export async function addProxiedPeers(datadir: string, enodes: string[]) {
+  fs.writeFileSync(`${datadir}/proxied-nodes.json`, JSON.stringify(enodes))
+}
+
 async function isPortOpen(host: string, port: number) {
   return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
 }
@@ -389,6 +395,9 @@ export async function initAndStartGeth(gethBinaryPath: string, instance: GethIns
   if (instance.peers) {
     await addStaticPeers(datadir, instance.peers)
   }
+  if (instance.proxypeers) {
+    await addProxiedPeers(datadir, instance.proxypeers)
+  }
   return startGeth(gethBinaryPath, instance)
 }
 
@@ -400,7 +409,18 @@ export function getHooks(gethConfig: GethTestConfig) {
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
   const validators = getValidators(mnemonic, numValidators)
   const validatorEnodes = validatorPrivateKeys.map((x: any, i: number) =>
-    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
+    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].proxyport)
+  )
+  const proxymnemonic =
+    'wife mixed rain envelope open emotion life settle ball hazard spray jewel near note card'
+  const proxyInstances = gethConfig.instances.filter((x: any) => x.proxyname)
+  const numProxies = proxyInstances.length
+  const proxyPrivateKeys = getPrivateKeysFor(AccountType.TX_NODE, proxymnemonic, numProxies)
+  const proxyEnodes = proxyPrivateKeys.map((x: any, i: number) =>
+    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', proxyInstances[i].port)
+  )
+  const proxyproxyEnodes = proxyPrivateKeys.map((x: any, i: number) =>
+    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', proxyInstances[i].proxyport)
   )
   const argv = require('minimist')(process.argv.slice(2))
   const branch = argv.branch || 'master'
@@ -414,20 +434,37 @@ export function getHooks(gethConfig: GethTestConfig) {
     await buildGeth(gethRepoPath)
     await setupTestDir(TEST_DIR)
     await writeGenesis(validators, GENESIS_PATH)
-    let validatorIndex = 0
+    let validatorIndex = 0,
+      proxyIndex = 0
     for (const instance of gethConfig.instances) {
       if (instance.validating) {
-        if (!instance.peers) {
-          instance.peers = []
+        if (!instance.proxypeers) {
+          instance.proxypeers = []
         }
-        // Automatically connect validator nodes to eachother.
-        instance.peers = instance.peers.concat(
-          validatorEnodes.filter((_: string, i: number) => i !== validatorIndex)
-        )
+        // Automatically connect validator nodes to their proxies.
+        instance.proxypeers = instance.proxypeers.concat([proxyproxyEnodes[validatorIndex]])
         if (!instance.privateKey) {
           instance.privateKey = validatorPrivateKeys[validatorIndex]
         }
         validatorIndex++
+      }
+      if (instance.proxyname) {
+        if (!instance.proxypeers) {
+          instance.proxypeers = []
+        }
+        // Automatically connect validator nodes to their proxies.
+        instance.proxypeers = instance.proxypeers.concat([validatorEnodes[proxyIndex]])
+        if (!instance.peers) {
+          instance.peers = []
+        }
+        // Automatically connect proxy nodes to eachother.
+        instance.peers = instance.peers.concat(
+          proxyEnodes.filter((_: string, i: number) => i !== proxyIndex)
+        )
+        if (!instance.privateKey) {
+          instance.privateKey = proxyPrivateKeys[proxyIndex]
+        }
+        proxyIndex++
       }
       await initAndStartGeth(gethBinaryPath, instance)
     }
