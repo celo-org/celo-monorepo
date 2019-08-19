@@ -16,7 +16,7 @@ EXAMPLE
   balance 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
 
-_See code: [packages/cli/src/commands/account/balance.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/balance.ts)_
+_See code: [packages/cli/src/src/commands/account/balance.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/account/balance.ts)_
 
 ### New
 
@@ -30,7 +30,7 @@ EXAMPLE
   new
 ```
 
-_See code: [packages/cli/src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/new.ts)_
+_See code: [packages/cli/src/src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/account/new.ts)_
 
 ### Transferdollar
 
@@ -50,7 +50,7 @@ EXAMPLE
   --amountInWei 1
 ```
 
-_See code: [packages/cli/src/commands/account/transferdollar.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/transferdollar.ts)_
+_See code: [packages/cli/src/src/commands/account/transferdollar.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/account/transferdollar.ts)_
 
 ### Transfergold
 
@@ -70,7 +70,7 @@ EXAMPLE
   --amountInWei 1
 ```
 
-_See code: [packages/cli/src/commands/account/transfergold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/transfergold.ts)_
+_See code: [packages/cli/src/src/commands/account/transfergold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/account/transfergold.ts)_
 
 ### Unlock
 
@@ -88,4 +88,4 @@ EXAMPLE
   unlock --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --password 1234
 ```
 
-_See code: [packages/cli/src/commands/account/unlock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/unlock.ts)_
+_See code: [packages/cli/src/src/commands/account/unlock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/account/unlock.ts)_
