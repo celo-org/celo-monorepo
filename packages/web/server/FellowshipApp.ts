@@ -1,29 +1,15 @@
-const AirtableAPI = require('airtable')
 import getConfig from 'next/config'
 import { FellowApp, FellowKeys } from '../fullstack/Fellowship'
-
-const APP_NAME = 'Fellowship Application'
-
-let airTableSingleton
+import airtableInit from '../server/airtable'
+const TABLE_NAME = 'Fellowship Application'
 
 function getAirtable() {
   const { serverRuntimeConfig } = getConfig()
-
-  if (!airTableSingleton) {
-    airTableSingleton = new AirtableAPI({ apiKey: serverRuntimeConfig.AIRTABLE_API_KEY }).base(
-      serverRuntimeConfig.AIRTABLE_APP_ID
-    )(APP_NAME)
-  }
-
-  return airTableSingleton
+  return airtableInit(serverRuntimeConfig.AIRTABLE_FELLOW_ID)(TABLE_NAME)
 }
 
 export async function submitFellowApp(fields: FellowApp) {
-  try {
-    await getAirtable().create(migrate(fields))
-  } catch {
-    return []
-  }
+  return getAirtable().create(migrate(fields))
 }
 
 function migrate(fields: FellowApp) {

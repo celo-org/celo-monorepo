@@ -14,7 +14,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 
-export class Education extends React.Component<WithNamespaces> {
+export class VerifyPhoneEducation extends React.Component<WithNamespaces> {
   static navigationOptions = { header: null }
 
   onSubmit = () => {
@@ -26,8 +26,8 @@ export class Education extends React.Component<WithNamespaces> {
     return (
       <View style={style.container}>
         <DevSkipButton nextScreen={Screens.WalletHome} />
+        <DisconnectBanner />
         <ScrollView style={style.content}>
-          <DisconnectBanner />
           <NuxLogo testID="VerifyLogo" />
           <Text style={fontStyles.h1} testID="VerifyEducationHeader">
             {t('verifyPhone')}
@@ -88,4 +88,4 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withNamespaces('nuxVerification2')(Education))
+export default componentWithAnalytics(withNamespaces('nuxVerification2')(VerifyPhoneEducation))
