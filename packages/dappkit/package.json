@@ -5,7 +5,6 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@celo/walletkit": "0.0.14",
     "@celo/contractkit": "0.0.5-beta3",
     "@celo/utils": "0.0.6-beta5",
     "expo": "^34.0.1",

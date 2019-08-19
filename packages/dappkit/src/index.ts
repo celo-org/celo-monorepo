@@ -11,7 +11,6 @@ import {
   SignTxRequest,
   TxToSignParam,
 } from '@celo/utils'
-import { Attestations, lookupPhoneNumbers } from '@celo/walletkit'
 import { Linking } from 'expo'
 import { Contact, Fields, getContactsAsync, PhoneNumber } from 'expo-contacts'
 import { E164Number, parsePhoneNumberFromString } from 'libphonenumber-js'
@@ -212,14 +211,15 @@ async function lookupPhoneNumbersOnAttestations(
   web3: Web3,
   allPhoneNumbers: { [phoneNumber: string]: string }
 ): Promise<{ [address: string]: PhoneNumberMappingEntry }> {
-  const attestations = await Attestations(web3)
+  const kit = newKitFromWeb3(web3)
+  const attestations = await kit.contracts.getAttestations()
   const nestedResult = await Promise.all(
     chunk(Object.keys(allPhoneNumbers), 20).map(async (phoneNumbers) => {
       const hashedPhoneNumbers = phoneNumbers.map(PhoneNumberUtils.getPhoneHash)
 
       const phoneNumbersByHash = zipObject(hashedPhoneNumbers, phoneNumbers)
 
-      const result = await lookupPhoneNumbers(attestations, hashedPhoneNumbers)
+      const result = await attestations.lookupPhoneNumbers(hashedPhoneNumbers)
 
       return flatMap(Object.entries(result), ([phoneHash, attestationStats]) =>
         Object.entries(attestationStats).map(([address, attestationStat]) => ({
