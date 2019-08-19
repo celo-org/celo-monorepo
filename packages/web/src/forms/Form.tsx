@@ -71,8 +71,13 @@ export default class Form extends React.Component<Props, State> {
 
   postForm = async () => {
     this.setState({ isLoading: true })
-    await postForm(this.props.route, this.form())
-    this.setState({ isComplete: true, form: this.props.blankForm, isLoading: false })
+    const response = await postForm(this.props.route, this.form())
+    this.setState({
+      isComplete: response.ok,
+      form: this.props.blankForm,
+      isLoading: false,
+      errors: !response.ok ? ['unknownError'] : [],
+    })
   }
 
   validates = () => {

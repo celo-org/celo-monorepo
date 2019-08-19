@@ -33,7 +33,7 @@ interface ButtonProps {
   iconRight?: React.ReactNode
   iconLeft?: React.ReactNode
   onPress?: () => void
-  style?: TextStyle
+  style?: TextStyle | TextStyle[]
   align?: 'center' | 'flex-start' | 'flex-end'
 }
 

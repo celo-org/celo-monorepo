@@ -1,60 +1,6 @@
-# ContractKit
+# Examples
 
-Celo's ContractKit is a library to help developers and validators to interact with the celo-blockchain.
-
-ContractKit supports the following functionality:
-
-- Connect to a node
-- Access web3 object to interact with node's Json RPC API
-- Send Transaction with celo's extra fields: (gasCurrency)
-- Simple interface to interact with cGold and cDollar
-- Simple interface to interact with Celo Core contracts
-- Utilities
-
-## User Guide
-
-### Getting Started
-
-To install:
-
-```bash
-npm install @celo/contractkit
-// or
-yarn add @celo/contractkit
-```
-
-You will need node version `8.13.0` or higher.
-
-To start working with contractkit you need a `kit` instance:
-
-```ts
-import { newKit } from '@celo/contractkit'
-
-const kit = newKit('https://alfajores-infura.celo-testnet.org:8545')
-```
-
-To access web3:
-
-```ts
-const web3 = kit.web3
-
-web3.eth.getBalance(someAddress)
-```
-
-### Setting Default Tx Options
-
-`kit` allows you to set default transaction options:
-
-```ts
-import { CeloContract } from '@celo/contractkit'
-
-// default from
-kit.defaultAccount = myAddress
-// paid gas in celo dollars
-await kit.setGasCurrency(CeloContract.StableToken)
-```
-
-### Interacting with cGold & cDollar
+## Interacting with cGold & cDollar
 
 celo-blockchain has two initial coins: cGold and cDollar (stableToken).
 Both implement the ERC20 standard, and to interact with them is as simple as:
@@ -83,7 +29,7 @@ To interact with cDollar, is the same but with a different contract:
 const stabletoken = await kit.contract.getStableToken()
 ```
 
-### Interacting with Other Contracts
+## Interacting with Other Contracts
 
 Apart from GoldToken and StableToken, there are many core contracts.
 
@@ -95,7 +41,7 @@ For the moment, we have contract wrappers for:
 
 In the following weeks will add wrapper for all other contracts
 
-### Accessing web3 contract wrappers
+## Accessing web3 contract wrappers
 
 Some user might want to access web3 native contract wrappers.
 
@@ -118,7 +64,7 @@ We expose the registry api, which can be accessed by:
 const goldTokenAddress = await kit.registry.addressFor(CeloContract.GoldToken)
 ```
 
-### Sending Custom Transactions
+## Sending Custom Transactions
 
 Celo transaction object is not the same as Ethereum's. There are two new fields present:
 
@@ -153,7 +99,7 @@ const hash = await tx.getHash()
 const receipt = await tx.waitReceipt()
 ```
 
-### Debugging
+## Debugging
 
 If you need to debug `kit`, we use the well known [debug](https://github.com/visionmedia/debug) node library.
 

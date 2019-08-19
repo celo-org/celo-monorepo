@@ -57,9 +57,11 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
   onCaptcha = (value: string | null) => {
     this.setState({ captchaOK: !!value })
   }
+
   resetCaptcha = () => {
     this.recaptchaRef.current.reset()
   }
+
   getCaptchaToken = () => {
     return this.recaptchaRef.current.getValue()
   }
