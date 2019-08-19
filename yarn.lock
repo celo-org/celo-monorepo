@@ -7761,6 +7761,11 @@ big-integer@^1.6.31:
   resolved "https://registry.yarnpkg.com/big-integer/-/big-integer-1.6.31.tgz#6d7852486e67c642502dcc03f7225a245c9fc7fa"
   integrity sha512-lDbZNHHwxDKnjP7LWg2leO+tjs4SyVs2Z83dsR1Idbe2urRnxZAUdeQ8YBhHaGaWK/4WM3mz+RlbZsgqck17CA==
 
+big-integer@^1.6.44:
+  version "1.6.44"
+  resolved "https://registry.yarnpkg.com/big-integer/-/big-integer-1.6.44.tgz#4ee9ae5f5839fc11ade338fea216b4513454a539"
+  integrity sha512-7MzElZPTyJ2fNvBkPxtFQ2fWIkVmuzw41+BZHSzpEq3ymB2MfeKp1+yXl/tS75xCx+WnyV+yb0kp+K1C3UNwmQ==
+
 big-integer@^1.6.7:
   version "1.6.28"
   resolved "https://registry.yarnpkg.com/big-integer/-/big-integer-1.6.28.tgz#8cef0fda3ccde8759c2c66efcfacc35aea658283"
@@ -7918,12 +7923,24 @@ bl@~1.1.2:
   dependencies:
     readable-stream "~2.0.5"
 
+blake2s-js@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/blake2s-js/-/blake2s-js-1.3.0.tgz#ebbe068c3277077f68b6ab40914b63f6b83d367f"
+  integrity sha512-+H4oLkODOSeDfDD11PxaZ3Gqi9mtr0QribQRPkQ+v29ZQ689mK/rk5hUVtEjgh3Vq8c4uHPALV0rWjfC6ygrug==
+
 block-stream@0.0.9:
   version "0.0.9"
   resolved "https://registry.yarnpkg.com/block-stream/-/block-stream-0.0.9.tgz#13ebfe778a03205cfe03751481ebb4b3300c126a"
   integrity sha1-E+v+d4oDIFz+A3UUgeu0szAMEmo=
   dependencies:
     inherits "~2.0.0"
+
+"bls12377js@https://github.com/celo-org/bls12377js#4f596cabb659c4f8969ae4b617f185f2bc74cbbb":
+  version "0.1.0"
+  resolved "https://github.com/celo-org/bls12377js#4f596cabb659c4f8969ae4b617f185f2bc74cbbb"
+  dependencies:
+    big-integer "^1.6.44"
+    blake2s-js "^1.3.0"
 
 bluebird@3.5.x, bluebird@^3.5.5, bluebird@~3.5.0:
   version "3.5.5"
