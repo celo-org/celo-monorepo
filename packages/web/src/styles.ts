@@ -172,6 +172,9 @@ export const textStyles = StyleSheet.create({
   heavy: {
     fontWeight: 'bold',
   },
+  italic: {
+    fontStyle: 'italic',
+  },
   heading: {
     marginBottom: 20,
   },
@@ -214,6 +217,9 @@ export const standardStyles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
+  },
+  wrap: {
+    flexWrap: 'wrap',
   },
   sectionMargin: {
     marginVertical: margins.large,

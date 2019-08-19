@@ -81,7 +81,7 @@ export class AccountOverview extends React.Component<Props> {
           <View style={style.currencyContainer}>
             <View style={[style.currencyArea, Styles.center]} testID={`${testID}/dollarBalance`}>
               <Text style={[style.currencyLabel, fontStyles.bodySmall]}>
-                {t('celoDollars') + ' ' + CURRENCIES[Tokens.DOLLAR].code}
+                {t('global:celoDollars') + ' ' + CURRENCIES[Tokens.DOLLAR].code}
               </Text>
               <TouchableOpacity
                 onPress={this.goToStableTokenEducation}
@@ -98,7 +98,7 @@ export class AccountOverview extends React.Component<Props> {
             <View style={style.line} />
             <View style={[style.currencyArea]} testID={`${testID}/goldBalance`}>
               <Text style={[style.currencyLabel, fontStyles.bodySmall]}>
-                {t('celoGold') + ' ' + CURRENCIES[Tokens.GOLD].code}
+                {t('global:celoGold') + ' ' + CURRENCIES[Tokens.GOLD].code}
               </Text>
               <TouchableOpacity
                 onPress={this.goToGoldTokenEducation}

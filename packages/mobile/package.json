@@ -1,6 +1,6 @@
 {
   "name": "@celo/mobile",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "author": "Celo",
   "license": "Apache-2.0",
   "private": true,
@@ -45,9 +45,9 @@
   },
   "dependencies": {
     "@celo/client": "f7095b7",
-    "@celo/walletkit": "^0.0.4",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#d3a2fdb",
-    "@celo/utils": "^0.0.6-beta3",
+    "@celo/utils": "^0.0.6-beta5",
+    "@celo/walletkit": "^0.0.14",
     "@react-native-community/netinfo": "^2.0.4",
     "@segment/analytics-react-native": "^0.1.0-beta.0",
     "@segment/analytics-react-native-firebase": "^0.1.0-beta.0",
@@ -143,7 +143,7 @@
     "@types/graphql": "^14.0.7",
     "@types/hoist-non-react-statics": "^3.0.1",
     "@types/isomorphic-fetch": "^0.0.35",
-    "@types/jest": "^24.0.13",
+    "@types/jest": "^24.0.17",
     "@types/lodash": "^4.14.136",
     "@types/react": "^16.8.19",
     "@types/react-native": "^0.57.47",
