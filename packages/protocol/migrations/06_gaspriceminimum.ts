@@ -1,10 +1,6 @@
 /* tslint:disable:no-console */
 import { CeloContract } from '@celo/protocol/lib/registry-utils'
-import {
-  deployProxyAndImplementation,
-  getDeployedProxiedContract,
-  setInRegistry,
-} from '@celo/protocol/lib/web3-utils'
+import { deployerForCoreContract, getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { GasPriceMinimumInstance, RegistryInstance } from 'types'
 
@@ -25,16 +21,9 @@ const initializeArgs = async (): Promise<any[]> => {
   ]
 }
 
-module.exports = deployProxyAndImplementation<GasPriceMinimumInstance>(
+module.exports = deployerForCoreContract<GasPriceMinimumInstance>(
   web3,
   artifacts,
-  'GasPriceMinimum',
-  initializeArgs,
-  async (gasPriceMinimum: GasPriceMinimumInstance) => {
-    const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-      'Registry',
-      artifacts
-    )
-    await setInRegistry(gasPriceMinimum, registry, CeloContract.GasPriceMinimum)
-  }
+  CeloContract.GasPriceMinimum,
+  initializeArgs
 )

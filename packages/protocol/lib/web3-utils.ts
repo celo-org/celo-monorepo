@@ -1,6 +1,7 @@
 /* tslint:disable:no-console */
 // TODO(asa): Refactor and rename to 'deployment-utils.ts'
 import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
+import { CeloContract } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
 import { BigNumber } from 'bignumber.js'
 import { ec as EC } from 'elliptic'
@@ -192,30 +193,6 @@ export async function getDeployedProxiedContract<ContractInstance extends Truffl
   return Contract.at(proxy.address) as ContractInstance
 }
 
-export async function setInRegistry(
-  contract: Truffle.ContractInstance,
-  registry: RegistryInstance,
-  registryId: string
-) {
-  console.log(`  Setting ${registryId} in Registry`)
-  await registry.setAddressFor(registryId, contract.address)
-}
-
-export async function setInRegistryViaMultiSig(
-  contract: Truffle.ContractInstance,
-  multiSig: MultiSigInstance,
-  registry: RegistryInstance,
-  registryId: string
-) {
-  console.log(`  Setting ${registryId} in Registry`)
-  await submitMultiSigTransaction(
-    multiSig,
-    registry.address,
-    // @ts-ignore There is a property 'contract' on the variable contract
-    registry.contract.setAddressFor.getData(registryId, contract.address)
-  )
-}
-
 /*
  * Abstracts away the overhead of a typical Proxy+Implementation contract deployment.
  *
@@ -233,11 +210,11 @@ export async function setInRegistryViaMultiSig(
  * A function with a signature as expected to be exported from a Truffle
  * migration script.
  */
-export function deployProxyAndImplementation<ContractInstance extends Truffle.ContractInstance>(
+export function deployerForCoreContract<ContractInstance extends Truffle.ContractInstance>(
   web3: Web3,
   artifacts: any,
-  name: string,
-  args: (networkName?: string) => Promise<any[]>,
+  name: CeloContract,
+  args: (networkName?: string) => Promise<any[]> = async () => [],
   then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
 ) {
   const Contract = artifacts.require(name)
@@ -252,6 +229,10 @@ export function deployProxyAndImplementation<ContractInstance extends Truffle.Co
       const proxiedContract: ContractInstance = await setInitialProxyImplementation<
         ContractInstance
       >(web3, artifacts, name, ...(await args(networkName)))
+
+      const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
+      await registry.setAddressFor(name, proxiedContract.address)
+
       if (then) {
         await then(proxiedContract, web3, networkName)
       }

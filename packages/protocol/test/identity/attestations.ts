@@ -1,11 +1,11 @@
 import Web3 = require('web3')
 
-import { randomRegistryId, validatorsRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContract } from '@celo/protocol/lib/registry-utils'
 import {
   assertLogMatches2,
   assertRevert,
-  timeTravel,
   NULL_ADDRESS,
+  timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { SignatureUtils } from '@celo/utils'
 import { getPhoneHash } from '@celo/utils/lib/src/phoneNumbers'
@@ -111,8 +111,8 @@ contract('Attestations', (accounts: string[]) => {
     mockValidators = await MockValidators.new()
     await Promise.all(accounts.map((account) => mockValidators.addValidator(account)))
     registry = await Registry.new()
-    await registry.setAddressFor(randomRegistryId, random.address)
-    await registry.setAddressFor(validatorsRegistryId, mockValidators.address)
+    await registry.setAddressFor(CeloContract.Random, random.address)
+    await registry.setAddressFor(CeloContract.Validators, mockValidators.address)
 
     await attestations.initialize(
       registry.address,

@@ -1,13 +1,13 @@
-import { bondedDepositsRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContract } from '@celo/protocol/lib/registry-utils'
 import {
   assertBalance,
   assertEqualBN,
   assertLogMatches2,
   assertRevert,
   matchAny,
+  NULL_ADDRESS,
   stripHexEncoding,
   timeTravel,
-  NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
@@ -93,7 +93,7 @@ contract('Governance', (accounts: string[]) => {
       referendumStageDuration,
       executionStageDuration
     )
-    await registry.setAddressFor(bondedDepositsRegistryId, mockBondedDeposits.address)
+    await registry.setAddressFor(CeloContract.BondedDeposits, mockBondedDeposits.address)
     transactionSuccess1 = {
       value: 0,
       destination: testTransactions.address,

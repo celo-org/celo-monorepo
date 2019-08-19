@@ -1,29 +1,11 @@
 import { CeloContract } from '@celo/protocol/lib/registry-utils'
-import {
-  deployProxyAndImplementation,
-  getDeployedProxiedContract,
-} from '@celo/protocol/lib/web3-utils'
+import { deployerForCoreContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { BondedDepositsInstance, RegistryInstance } from 'types'
+import { BondedDepositsInstance } from 'types'
 
-const initializeArgs = async (): Promise<any[]> => {
-  const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-    'Registry',
-    artifacts
-  )
-  return [registry.address, config.bondedDeposits.maxNoticePeriod]
-}
-
-module.exports = deployProxyAndImplementation<BondedDepositsInstance>(
+module.exports = deployerForCoreContract<BondedDepositsInstance>(
   web3,
   artifacts,
-  'BondedDeposits',
-  initializeArgs,
-  async (bondedDeposits: BondedDepositsInstance) => {
-    const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-      'Registry',
-      artifacts
-    )
-    await registry.setAddressFor(CeloContract.BondedDeposits, bondedDeposits.address)
-  }
+  CeloContract.BondedDeposits,
+  async () => [config.registry.predeployedProxyAddress, config.bondedDeposits.maxNoticePeriod]
 )

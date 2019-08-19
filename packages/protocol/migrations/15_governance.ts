@@ -2,24 +2,19 @@
 
 import { CeloContract } from '@celo/protocol/lib/registry-utils'
 import {
-  deployProxyAndImplementation,
+  deployerForCoreContract,
   getDeployedProxiedContract,
   transferOwnershipOfProxy,
   transferOwnershipOfProxyAndImplementation,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { GovernanceInstance, RegistryInstance, ReserveInstance } from 'types'
+import { GovernanceInstance, ReserveInstance } from 'types'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
   const approver = require('@celo/protocol/truffle.js').networks[networkName].from
 
-  const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-    'Registry',
-    artifacts
-  )
-
   return [
-    registry.address,
+    config.registry.predeployedProxyAddress,
     approver,
     config.governance.concurrentProposals,
     web3.utils.toWei(config.governance.minDeposit.toString(), 'ether'),
@@ -31,18 +26,12 @@ const initializeArgs = async (networkName: string): Promise<any[]> => {
   ]
 }
 
-module.exports = deployProxyAndImplementation<GovernanceInstance>(
+module.exports = deployerForCoreContract<GovernanceInstance>(
   web3,
   artifacts,
-  'Governance',
+  CeloContract.Governance,
   initializeArgs,
   async (governance: GovernanceInstance) => {
-    const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-      'Registry',
-      artifacts
-    )
-    await registry.setAddressFor(CeloContract.Governance, governance.address)
-
     console.log('Setting Governance as a Reserve spender')
     const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
       'Reserve',
