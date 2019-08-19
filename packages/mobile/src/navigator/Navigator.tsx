@@ -38,10 +38,10 @@ import SendAmount from 'src/send/SendAmount'
 import SendConfirmation from 'src/send/SendConfirmation'
 import SetClock from 'src/set-clock/SetClock'
 import TransactionReviewScreen from 'src/transactions/TransactionReviewScreen'
-import VerifyEducation from 'src/verify/Education'
 import VerifyInput from 'src/verify/Input'
 import VerifyVerified from 'src/verify/Verified'
 import VerifyVerifying from 'src/verify/Verifying'
+import VerifyEducation from 'src/verify/VerifyPhoneEducation'
 
 export const headerArea = {
   defaultNavigationOptions: {

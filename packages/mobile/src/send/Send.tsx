@@ -211,6 +211,7 @@ class Send extends React.Component<Props, State> {
           </View>
         ) : (
           <RecipientPicker
+            testID={'RecipientPicker'}
             sections={this.buildSections()}
             searchQuery={searchQuery}
             defaultCountryCode={defaultCountryCode}
