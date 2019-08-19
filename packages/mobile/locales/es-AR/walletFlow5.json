@@ -1,6 +1,4 @@
 {
-  "celoDollars": "Celo Dólares",
-  "celoGold": "Celo Oro",
   "getStarted": "Primeros pasos",
   "paymentRequest": "Solicitud de pago",
   "paymentRequestWithCount_plural": "{{count}} solicitudes de pago",
@@ -48,7 +46,6 @@
     "0": "No se puede cargar tu actividad",
     "1": "Por favor inténtalo de nuevo más tarde"
   },
-  "sendCeloDollars": "Enviar Celo Dólares",
   "noTransactionActivity": "Verá sus pagos enviados y recibidos aquí",
   "noExchangeActivity": "Verá intercambios completados aquí",
   "maybeLater": "quizas mas tarde",

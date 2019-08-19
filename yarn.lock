@@ -4029,10 +4029,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/airtable@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@types/airtable/-/airtable-0.5.0.tgz#7d1b6334bfd4e42c244799bcdd949ab7e218dd11"
-  integrity sha512-kvG9Zmec2yk8wf/RU6GU4ujWnI7EqLLNkgqvOE72pLWUW1IdM1cqbMa+IZnWM6bsCIhBBKgs8hM3HZvM9Hsgcw==
+"@types/airtable@^0.5.6":
+  version "0.5.6"
+  resolved "https://registry.yarnpkg.com/@types/airtable/-/airtable-0.5.6.tgz#fbe63da52420be49e45fadddc42f0db35eaaaa0d"
+  integrity sha512-bujDg9lhzSKW/giQsGnvxCBrsu+i0k0w/L0jRip8HEOzG9DDqQ7IdPPqoW1EQrxwcYocMxIHzyQrtTiyWshrqA==
 
 "@types/anymatch@*":
   version "1.3.0"
@@ -10921,10 +10921,10 @@ detect-node@^2.0.4:
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.0.4.tgz#014ee8f8f669c5c58023da64b8179c083a28c46c"
   integrity sha512-ZIzRpLJrOj7jjP2miAtgqIfmzbxa4ZOr5jJc601zklsfEx9oTzmmj2nVpIPRpNlRTIh8lc1kyViIY7BWSGNmKw==
 
-detox@^12.8.0:
-  version "12.11.1"
-  resolved "https://registry.yarnpkg.com/detox/-/detox-12.11.1.tgz#d383a92d69c1ed0a4acea1c70b835bdc9a268f43"
-  integrity sha512-9TMG8Q0s+eBv9prUkdFJ5qaHmBkq1PjvOhb0B0j2G3MzSfUGS63Ld+tK96zy/95+1uFDjxsBqZSwMyv+ol57vQ==
+detox@14.0.2:
+  version "14.0.2"
+  resolved "https://registry.yarnpkg.com/detox/-/detox-14.0.2.tgz#9c7fd7a83227c989b9d12361b1bfa959b197d802"
+  integrity sha512-4OVND4dAWgD2kRB8EkWq7W1vguVVM1iwpoEm+Y52H5q70E01Nf/oQtMSxeR0jHnvZMKcZPzlI3dL1XDO8UbuZg==
   dependencies:
     "@babel/core" "^7.4.5"
     bunyan "^1.8.12"
@@ -10932,6 +10932,7 @@ detox@^12.8.0:
     chalk "^2.4.2"
     child-process-promise "^2.2.0"
     fs-extra "^4.0.2"
+    funpermaproxy "^1.0.1"
     get-port "^2.1.0"
     ini "^1.3.4"
     lodash "^4.17.5"
@@ -12703,6 +12704,13 @@ expo-constants@~6.0.0:
   dependencies:
     ua-parser-js "^0.7.19"
 
+expo-contacts@6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/expo-contacts/-/expo-contacts-6.0.0.tgz#6db388806c6c4d77e0a39fc0277b4535454fdde4"
+  integrity sha512-DhPno7HKBa+r3sAhtyyCaUY9w4baqOsLUFYFZ7kRvB49qHOVAqJ1uioy+Ut3YWMHrFAgdmNyqcutzNwfK8up/w==
+  dependencies:
+    uuid-js "^0.7.5"
+
 expo-file-system@~6.0.0:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/expo-file-system/-/expo-file-system-6.0.2.tgz#e65f30eb6a7213e07933df9688116eaf4e25bbf8"
@@ -14094,6 +14102,11 @@ functional-red-black-tree@^1.0.1, functional-red-black-tree@~1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
   integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
+
+funpermaproxy@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/funpermaproxy/-/funpermaproxy-1.0.1.tgz#4650e69b7c334d9717c06beba9b339cc08ac3335"
+  integrity sha512-9pEzs5vnNtR7ZGihly98w/mQ7blsvl68Wj30ZCDAXy7qDN4CWLLjdfjtH/P2m6whsnaJkw15hysCNHMXue+wdA==
 
 futoin-hkdf@^1.0.3:
   version "1.0.3"
@@ -18617,6 +18630,14 @@ levn@^0.3.0, levn@~0.3.0:
   dependencies:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
+
+libphonenumber-js@^1.7.22:
+  version "1.7.22"
+  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.7.22.tgz#e206e3c227ec47ff306f7405ac52c331911e1b35"
+  integrity sha512-KCK4874gp640B+d1zjNi2ZiZ3ubEUPH/0B9AwcuhHDVAL6NdthxC8obbdhGlo7FcEpjFVwEMDoHRfi+lI8NM/g==
+  dependencies:
+    minimist "^1.2.0"
+    xml2js "^0.4.17"
 
 lines-and-columns@^1.1.6:
   version "1.1.6"
@@ -26341,7 +26362,7 @@ sass-loader@6.0.6:
     lodash.tail "^4.1.1"
     pify "^3.0.0"
 
-sax@^1.2.4:
+sax@>=0.6.0, sax@^1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
@@ -31560,6 +31581,14 @@ xml-name-validator@^3.0.0:
   resolved "https://registry.yarnpkg.com/xml-name-validator/-/xml-name-validator-3.0.0.tgz#6ae73e06de4d8c6e47f9fb181f78d648ad457c6a"
   integrity sha512-A5CUptxDsvxKJEU3yO6DuWBSJz/qizqzJKOMIfUJHETbBw/sFaDxgd6fxm1ewUaM0jZ444Fc5vC5ROYurg/4Pw==
 
+xml2js@^0.4.17:
+  version "0.4.19"
+  resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.4.19.tgz#686c20f213209e94abf0d1bcf1efaa291c7827a7"
+  integrity sha512-esZnJZJOiJR9wWKMyuvSE1y6Dq5LCuJanqhxslH2bxM6duahNZ+HMpCLhBQGZkbX6xRf8x1Y2eJlgt2q3qo49Q==
+  dependencies:
+    sax ">=0.6.0"
+    xmlbuilder "~9.0.1"
+
 xml@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/xml/-/xml-1.0.1.tgz#78ba72020029c5bc87b8a81a3cfcd74b4a2fc1e5"
@@ -31575,7 +31604,7 @@ xmlbuilder@9.0.1:
   resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-9.0.1.tgz#91cd70897755363eba57c12ddeeab4a341a61f65"
   integrity sha1-kc1wiXdVNj66V8Et3uq0o0GmH2U=
 
-xmlbuilder@^9.0.7:
+xmlbuilder@^9.0.7, xmlbuilder@~9.0.1:
   version "9.0.7"
   resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-9.0.7.tgz#132ee63d2ec5565c557e20f4c22df9aca686b10d"
   integrity sha1-Ey7mPS7FVlxVfiD0wi35rKaGsQ0=

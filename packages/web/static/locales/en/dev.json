@@ -28,6 +28,11 @@
       "title": "Browse the Code",
       "text": "Explore and contribute to the Celo codebase",
       "link": "View on GitHub"
+    },
+    "sdk": {
+      "title": "SDK",
+      "text": "Build on the Celo Platform",
+      "link": "See Documentation"
     }
   },
   "levelLabel": {
