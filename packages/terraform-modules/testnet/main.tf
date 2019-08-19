@@ -49,6 +49,21 @@ resource "google_compute_firewall" "geth_firewall" {
   }
 }
 
+resource "google_compute_firewall" "rpc_firewall" {
+  name = "${var.celo_env}-rpc-firewall"
+  network = google_compute_network.network.name
+
+  allow {
+    protocol = "tcp"
+    ports = ["8545"]
+  }
+
+  allow {
+    protocol = "tcp"
+    ports = ["8546"]
+  }
+}
+
 resource "google_compute_firewall" "bootnode_firewall" {
   name = "${var.celo_env}-bootnode-firewall"
   network = google_compute_network.network.name
@@ -69,6 +84,26 @@ module "bootnode" {
   geth_bootnode_docker_image_repository = var.geth_bootnode_docker_image_repository
   geth_bootnode_docker_image_tag = var.geth_bootnode_docker_image_tag
   network_name = google_compute_network.network.name
+}
+
+module "tx_node" {
+  source = "./modules/tx-node"
+  # variables
+  block_time = var.block_time
+  bootnode_ip_address = module.bootnode.ip_address
+  celo_env = var.celo_env
+  ethstats_host = var.ethstats_host
+  gcloud_secrets_base_path = var.gcloud_secrets_base_path
+  gcloud_secrets_bucket = var.gcloud_secrets_bucket
+  gcloud_vm_service_account_email = var.gcloud_vm_service_account_email
+  genesis_content_base64 = var.genesis_content_base64
+  geth_node_docker_image_repository = var.geth_node_docker_image_repository
+  geth_node_docker_image_tag = var.geth_node_docker_image_tag
+  geth_verbosity = var.geth_verbosity
+  network_id = var.network_id
+  network_name = google_compute_network.network.name
+  tx_node_count = var.tx_node_count
+  verification_pool_url = var.verification_pool_url
 }
 
 module "validator" {

@@ -17,9 +17,10 @@ GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_i
 # download & apply secrets pulled from Cloud Storage as environment vars
 echo "Downloading secrets from Google Cloud Storage..."
 SECRETS_ENV_PATH=/var/.env.celo.secrets
-gsutil cp gs://${gcloud_secrets_bucket}/${gcloud_secrets_base_path}/.env.validator-${rid} $SECRETS_ENV_PATH
+gsutil cp gs://${gcloud_secrets_bucket}/${gcloud_secrets_base_path}/.env.tx-node-${rid} $SECRETS_ENV_PATH
 # Apply the .env file
 . $SECRETS_ENV_PATH
+
 
 echo "Address: $ACCOUNT_ADDRESS"
 echo "Bootnode enode address: $BOOTNODE_ENODE_ADDRESS"
@@ -30,10 +31,9 @@ echo "Bootnode enode: $BOOTNODE_ENODE"
 echo "Pulling geth..."
 docker pull $GETH_NODE_DOCKER_IMAGE
 
-
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`)
-docker run --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
+docker run -p 8545:8545/tcp -p 8546:8546/tcp --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
   set -euo pipefail && \
   mkdir -p /root/.celo/account /var/geth && \
   echo -n '${genesis_content_base64}' | base64 -d > /var/geth/genesis.json && \
@@ -48,9 +48,9 @@ docker run --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
   geth account import --password /root/.celo/account/accountSecret /root/.celo/pkey && \
   geth \
     --bootnodes=enode://$BOOTNODE_ENODE \
-    --password=/root/.celo/account/accountSecret \
-    --unlock=$ACCOUNT_ADDRESS \
-    --mine \
+    --lightserv 90 \
+    --lightpeers 1000 \
+    --maxpeers 1100 \
     --rpc \
     --rpcaddr 0.0.0.0 \
     --rpcapi=eth,net,web3,debug \
@@ -68,8 +68,6 @@ docker run --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
     --consoleformat=json \
     --consoleoutput=stdout \
     --verbosity=${geth_verbosity} \
-    --ethstats=${validator_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
-    --istanbul.blockperiod=${block_time} \
-    --maxpeers=${max_peers} \
+    --ethstats=${tx_node_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
     --nat=extip:${ip_address} \
     --ping-ip-from-packet"

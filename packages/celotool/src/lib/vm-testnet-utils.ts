@@ -35,6 +35,7 @@ const terraformEnvVars: { [varName: string]: string } = {
   geth_node_docker_image_repository: envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY,
   geth_node_docker_image_tag: envVar.GETH_NODE_DOCKER_IMAGE_TAG,
   network_id: envVar.NETWORK_ID,
+  tx_node_count: envVar.TX_NODES,
   validator_count: envVar.VALIDATORS,
   verification_pool_url: envVar.VERIFICATION_POOL_URL,
 }
@@ -102,12 +103,16 @@ function getTerraformEnvVarValues() {
   return vars
 }
 
-// TODO(trevor): update this to include tx-nodes when they are added to
-// the terraform module
 export async function generateAndUploadSecrets(celoEnv: string) {
   // Bootnode
   const bootnodeSecrets = generateBootnodeSecretEnvVars()
   await uploadSecrets(celoEnv, bootnodeSecrets, 'bootnode')
+  // Tx Nodes
+  const txNodeCount = parseInt(fetchEnv(envVar.TX_NODES), 10)
+  for (let i = 0; i < txNodeCount; i++) {
+    const secrets = generateValidatorSecretEnvVars(AccountType.TX_NODE, i)
+    await uploadSecrets(celoEnv, secrets, `tx-node-${i}`)
+  }
   // Validators
   const validatorCount = parseInt(fetchEnv(envVar.VALIDATORS), 10)
   for (let i = 0; i < validatorCount; i++) {
