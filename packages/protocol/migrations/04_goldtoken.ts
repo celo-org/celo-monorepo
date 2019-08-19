@@ -1,5 +1,5 @@
 /* tslint:disable:no-console */
-import { goldTokenRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContract } from '@celo/protocol/lib/registry-utils'
 import {
   deployProxyAndImplementation,
   getDeployedProxiedContract,
@@ -22,7 +22,7 @@ module.exports = deployProxyAndImplementation<GoldTokenInstance>(
       artifacts
     )
 
-    await setInRegistry(goldToken, registry, goldTokenRegistryId)
+    await setInRegistry(goldToken, registry, CeloContract.GoldToken)
 
     console.log('Whitelisting GoldToken as a gas currency')
     const gasCurrencyWhitelist: GasCurrencyWhitelistInstance = await getDeployedProxiedContract<

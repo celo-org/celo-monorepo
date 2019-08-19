@@ -1,4 +1,4 @@
-import { gasCurrencyWhitelistRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContract } from '@celo/protocol/lib/registry-utils'
 import {
   deployProxyAndImplementation,
   getDeployedProxiedContract,
@@ -20,6 +20,6 @@ module.exports = deployProxyAndImplementation<GasCurrencyWhitelistInstance>(
       artifacts
     )
 
-    await registry.setAddressFor(gasCurrencyWhitelistRegistryId, gasCurrencyWhitelist.address)
+    await registry.setAddressFor(CeloContract.GasCurrencyWhitelist, gasCurrencyWhitelist.address)
   }
 )

@@ -1,7 +1,7 @@
 /* tslint:disable:no-console */
 import Web3 = require('web3')
 
-import { reserveRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContract } from '@celo/protocol/lib/registry-utils'
 import {
   deployProxyAndImplementation,
   getDeployedProxiedContract,
@@ -30,7 +30,7 @@ module.exports = deployProxyAndImplementation<ReserveInstance>(
       artifacts
     )
 
-    await setInRegistry(reserve, registry, reserveRegistryId)
+    await setInRegistry(reserve, registry, CeloContract.Reserve)
 
     const network: any = truffle.networks[networkName]
     console.log('Sending the reserve an initial gold balance')

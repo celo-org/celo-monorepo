@@ -1,4 +1,4 @@
-import { randomRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContract } from '@celo/protocol/lib/registry-utils'
 import {
   deployProxyAndImplementation,
   getDeployedProxiedContract,
@@ -20,6 +20,6 @@ module.exports = deployProxyAndImplementation<RandomInstance>(
       'Registry',
       artifacts
     )
-    await setInRegistry(random, registry, randomRegistryId)
+    await setInRegistry(random, registry, CeloContract.Random)
   }
 )

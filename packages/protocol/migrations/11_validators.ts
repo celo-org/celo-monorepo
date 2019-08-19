@@ -1,4 +1,4 @@
-import { validatorsRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContract } from '@celo/protocol/lib/registry-utils'
 import {
   deployProxyAndImplementation,
   getDeployedProxiedContract,
@@ -30,6 +30,6 @@ module.exports = deployProxyAndImplementation<ValidatorsInstance>(
       'Registry',
       artifacts
     )
-    await registry.setAddressFor(validatorsRegistryId, validators.address)
+    await registry.setAddressFor(CeloContract.Validators, validators.address)
   }
 )

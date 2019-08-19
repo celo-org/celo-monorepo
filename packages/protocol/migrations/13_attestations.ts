@@ -1,4 +1,4 @@
-import { attestationsRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContract } from '@celo/protocol/lib/registry-utils'
 import {
   add0x,
   convertToContractDecimals,
@@ -63,6 +63,6 @@ module.exports = deployProxyAndImplementation<AttestationsInstance>(
       artifacts
     )
 
-    await setInRegistry(attestations, registry, attestationsRegistryId)
+    await setInRegistry(attestations, registry, CeloContract.Attestations)
   }
 )

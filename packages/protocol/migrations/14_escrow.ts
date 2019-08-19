@@ -1,4 +1,4 @@
-import { escrowRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContract } from '@celo/protocol/lib/registry-utils'
 import {
   deployProxyAndImplementation,
   getDeployedProxiedContract,
@@ -24,6 +24,6 @@ module.exports = deployProxyAndImplementation<EscrowInstance>(
       'Registry',
       artifacts
     )
-    await setInRegistry(escrow, registry, escrowRegistryId)
+    await setInRegistry(escrow, registry, CeloContract.Escrow)
   }
 )

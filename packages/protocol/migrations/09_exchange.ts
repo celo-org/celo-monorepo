@@ -1,6 +1,6 @@
 /* tslint:disable:no-console */
 
-import { exchangeRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContract } from '@celo/protocol/lib/registry-utils'
 import {
   deployProxyAndImplementation,
   getDeployedProxiedContract,
@@ -55,6 +55,6 @@ module.exports = deployProxyAndImplementation<ExchangeInstance>(
     )
     await reserve.addSpender(exchange.address)
 
-    await setInRegistry(exchange, registry, exchangeRegistryId)
+    await setInRegistry(exchange, registry, CeloContract.Exchange)
   }
 )

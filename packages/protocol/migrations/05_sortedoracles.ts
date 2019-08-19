@@ -1,5 +1,5 @@
 /* tslint:disable:no-console */
-import { sortedOraclesRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContract } from '@celo/protocol/lib/registry-utils'
 import {
   deployProxyAndImplementation,
   getDeployedProxiedContract,
@@ -23,6 +23,6 @@ module.exports = deployProxyAndImplementation<SortedOraclesInstance>(
       artifacts
     )
 
-    await setInRegistry(sortedOracles, registry, sortedOraclesRegistryId)
+    await setInRegistry(sortedOracles, registry, CeloContract.SortedOracles)
   }
 )

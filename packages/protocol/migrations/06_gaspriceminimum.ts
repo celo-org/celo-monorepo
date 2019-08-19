@@ -1,5 +1,5 @@
 /* tslint:disable:no-console */
-import { gasPriceMinimumRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContract } from '@celo/protocol/lib/registry-utils'
 import {
   deployProxyAndImplementation,
   getDeployedProxiedContract,
@@ -35,6 +35,6 @@ module.exports = deployProxyAndImplementation<GasPriceMinimumInstance>(
       'Registry',
       artifacts
     )
-    await setInRegistry(gasPriceMinimum, registry, gasPriceMinimumRegistryId)
+    await setInRegistry(gasPriceMinimum, registry, CeloContract.GasPriceMinimum)
   }
 )

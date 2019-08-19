@@ -1,7 +1,7 @@
 /* tslint:disable:no-console */
 import Web3 = require('web3')
 
-import { stableTokenRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContract } from '@celo/protocol/lib/registry-utils'
 import {
   convertToContractDecimalsBN,
   deployProxyAndImplementation,
@@ -47,7 +47,7 @@ module.exports = deployProxyAndImplementation<StableTokenInstance>(
       'Registry',
       artifacts
     )
-    await setInRegistry(stableToken, registry, stableTokenRegistryId)
+    await setInRegistry(stableToken, registry, CeloContract.StableToken)
 
     const minerAddress: string = truffle.networks[networkName].from
     const minerStartBalance = await convertToContractDecimalsBN(

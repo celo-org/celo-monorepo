@@ -1,4 +1,4 @@
-import { bondedDepositsRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContract } from '@celo/protocol/lib/registry-utils'
 import {
   deployProxyAndImplementation,
   getDeployedProxiedContract,
@@ -24,6 +24,6 @@ module.exports = deployProxyAndImplementation<BondedDepositsInstance>(
       'Registry',
       artifacts
     )
-    await registry.setAddressFor(bondedDepositsRegistryId, bondedDeposits.address)
+    await registry.setAddressFor(CeloContract.BondedDeposits, bondedDeposits.address)
   }
 )

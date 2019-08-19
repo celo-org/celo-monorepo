@@ -1,6 +1,6 @@
 /* tslint:disable:no-console */
 
-import { governanceRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContract } from '@celo/protocol/lib/registry-utils'
 import {
   deployProxyAndImplementation,
   getDeployedProxiedContract,
@@ -41,7 +41,7 @@ module.exports = deployProxyAndImplementation<GovernanceInstance>(
       'Registry',
       artifacts
     )
-    await registry.setAddressFor(governanceRegistryId, governance.address)
+    await registry.setAddressFor(CeloContract.Governance, governance.address)
 
     console.log('Setting Governance as a Reserve spender')
     const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
