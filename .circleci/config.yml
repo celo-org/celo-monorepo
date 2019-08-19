@@ -201,8 +201,8 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            DIRS_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+            FILES_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: test
           # Flaky tests - run them twice
@@ -257,8 +257,8 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: Setup Go language
           command: |
@@ -298,8 +298,8 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: Setup Go language
           command: |
@@ -331,14 +331,16 @@ jobs:
 
   end-to-end-geth-sync-test:
     <<: *defaults
+    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
+    resource_class: medium+
     steps:
       - attach_workspace:
           at: ~/app
       - run:
           name: Check if the test should run
           command: |
-            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: Setup Go language
           command: |
@@ -375,8 +377,8 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: Setup Go language
           command: |
@@ -411,7 +413,7 @@ jobs:
       - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run: cd packages/web && ./circle_deploy.sh
 
-  test-npm-package-install:
+  test-typescript-npm-package-install:
     working_directory: ~/app
     docker:
       - image: celohq/node8:gcloud
@@ -419,15 +421,36 @@ jobs:
       - run:
           name: Installing npm package - @celo/typescript
           command: yarn add @celo/typescript
+
+  test-utils-npm-package-install:
+    working_directory: ~/app
+    docker:
+      - image: celohq/node8:gcloud
+    steps:
       - run:
           name: Installing npm package - @celo/utils
           command: yarn add @celo/utils
+
+  test-walletkit-npm-package-install:
+    working_directory: ~/app
+    docker:
+      - image: celohq/node8:gcloud
+    steps:
       - run:
           name: Installing npm package - @celo/walletkit
           command: yarn add @celo/walletkit
+
+  test-celocli-npm-package-install:
+    working_directory: ~/app
+    docker:
+      - image: celohq/node8:gcloud
+    steps:
       - run:
           name: Installing npm package - @celo/celocli
-          command: yarn add @celo/celocli
+          command: npm install @celo/celocli
+      - run:
+          name: Minor test of celocli
+          command: ./node_modules/.bin/celocli account:new  # Small test
 
 workflows:
   version: 2
@@ -486,4 +509,7 @@ workflows:
               only:
                 - master
     jobs:
-      - test-npm-package-install
+      - test-typescript-npm-package-install
+      - test-utils-npm-package-install
+      - test-walletkit-npm-package-install
+      - test-celocli-npm-package-install
