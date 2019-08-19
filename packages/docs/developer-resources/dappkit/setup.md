@@ -88,7 +88,7 @@ global.location = {
 }
 ```
 
-You'll also constantly get two warnings that can be ignores, you can suppress them in the yellow banner with the following in your `App.js/tsx`
+You'll also constantly get two warnings that can be ignored, you can suppress them in the yellow banner with the following in your `App.js/tsx`
 
 ```typescript
 import { YellowBox } from 'react-native'
