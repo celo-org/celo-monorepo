@@ -5,7 +5,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 
 import "./interfaces/IStableToken.sol";
-import "./FractionUtil.sol";
+import "../common/FractionUtil.sol";
 import "../common/interfaces/IERC20Token.sol";
 import "../common/interfaces/ICeloToken.sol";
 import "../common/Initializable.sol";
@@ -61,7 +61,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
 
   // The `rate` is how much the `factor` is adjusted by per `updatePeriod`.
   // The `factor` describes units/value of StableToken, and is greater than or equal to 1.
-  // The `updatePeriod` governs often the `factor` is updated.
+  // The `updatePeriod` governs how often the `factor` is updated.
   // `factorLastUpdated` indicates when the inflation factor was last updated.
   struct InflationState {
     FractionUtil.Fraction rate;

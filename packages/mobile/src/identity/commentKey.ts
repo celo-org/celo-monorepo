@@ -1,8 +1,8 @@
-import { getAttestationsContract, getDataEncryptionKey } from '@celo/contractkit'
 import {
   encryptComment as encryptCommentRaw,
   stripHexLeader,
 } from '@celo/utils/src/commentEncryption'
+import { getAttestationsContract, getDataEncryptionKey } from '@celo/walletkit'
 import { web3 } from 'src/web3/contracts'
 
 export async function getCommentKey(address: string): Promise<Buffer | null> {

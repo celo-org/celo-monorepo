@@ -38,14 +38,14 @@ class ExchangeConfirmationCard extends React.PureComponent<Props> {
           <Text style={[fontStyles.pCurrency, styles.title]}>{t('newBalance')}</Text>
         </View>
         <View style={styles.tabular}>
-          <Text style={fontStyles.bodySecondary}>{t('celoDollars')}</Text>
+          <Text style={fontStyles.bodySecondary}>{t('global:celoDollars')}</Text>
           <Text numberOfLines={1} style={[fontStyles.currency, styles.dollar]}>
             ${newDollarBalance}
           </Text>
         </View>
 
         <View style={styles.tabular}>
-          <Text style={fontStyles.bodySecondary}>{t('celoGold')}</Text>
+          <Text style={fontStyles.bodySecondary}>{t('global:celoGold')}</Text>
           <Text numberOfLines={1} style={[fontStyles.currency, styles.gold]}>
             {newGoldBalance}
           </Text>
@@ -75,7 +75,6 @@ class ExchangeConfirmationCard extends React.PureComponent<Props> {
             amount={leftCurrencyAmount.toString()}
             size={36}
             type={this.props.token}
-            balanceOutOfSync={false}
           />
           <View style={styles.arrow}>
             <RoundedArrow />
@@ -85,7 +84,6 @@ class ExchangeConfirmationCard extends React.PureComponent<Props> {
             amount={rightCurrencyAmount.toString()}
             size={36}
             type={this.takerToken()}
-            balanceOutOfSync={false}
           />
         </View>
 

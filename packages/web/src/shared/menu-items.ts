@@ -52,6 +52,7 @@ export enum CeloLinks {
   disclaimer = 'https://docs.celo.org/important-information/alfajores-testnet-disclaimer',
   docs = 'https://docs.celo.org/',
   docsOverview = 'https://docs.celo.org/overview',
+  sdkDocs = 'https://docs.celo.org/celo-sdk/introduction',
   nodeDocs = 'https://docs.celo.org/getting-started/running-a-full-node',
   gettingStarted = 'https://docs.celo.org/getting-started/alfajores-testnet',
   gitHub = 'https://github.com/celo-org',
@@ -71,6 +72,35 @@ export const languageOptions = {
   ES: {
     label: 'ES',
     language: 'ES',
+  },
+}
+
+export const hashNav = {
+  about: {
+    backers: 'backers',
+  },
+  build: {
+    features: 'features',
+    stack: 'stack',
+    newsletter: 'newsletter',
+    applications: 'applications',
+    contracts: 'contracts',
+    blockchain: 'blockchain',
+  },
+  connect: {
+    tenets: 'tenets',
+    code: 'code',
+    events: 'events',
+    blog: 'blog',
+    fellowship: 'fellowship',
+    fund: 'fund',
+    newsletter: 'newsletter',
+  },
+  join: {
+    roles: 'roles',
+  },
+  home: {
+    partnerships: 'partnerships',
   },
 }
 

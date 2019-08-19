@@ -30,7 +30,6 @@
   "startEarning": "Start Earning",
   "backToWallet": "Back to Wallet",
   "exchangeForGold": "Exchange for Gold",
-  "restoreCeloWallet": "Restore Celo Wallet",
   "invalidKey": "Invalid Backup Key ",
   "invalidPhone": "Invalid Phone Number",
   "cantSelectInvalidPhone": "Cannot select contact: invalid phone number",
@@ -66,8 +65,9 @@
   "importContactsFailed": "Failed to import contacts",
   "sendPaymentFailed": "Failure sending payment",
   "paymentRequestFailed": "Payment Request did not send",
-  "reclaimingEscrowedPaymentFailed": "Payment could not be reclaimed.",
-  "fetchingReclaimFeeFailed": "Error fetching suggested fee.",
+  "escrowTransferFailed": "Transfer to escrow failed",
+  "escrowWithdrawalFailed": "Withdrawal from escrow failed",
+  "reclaimingEscrowedPaymentFailed": "Payment could not be reclaimed",
   "connectingToCelo": "Connecting to the Celo Network...",
   "poorConnection": {
     "0": "Bad Connection",
@@ -81,5 +81,9 @@
   "thisVersionIsInsecure": "This version is insecure",
   "update": "Update",
   "qrFailedNoAddress": "QR code read failed. Reason: wallet address not found.",
-  "qrFailedInvalidAddress": "QR code read failed. Reason: wallet address invalid."
+  "qrFailedInvalidAddress": "QR code read failed. Reason: wallet address invalid.",
+  "corruptedChainDeleted": "Corrupted chain data has been deleted, please restart the app",
+  "web3FailedToSync": "Failing to sync, check your network connection",
+  "errorDuringSync": "Error occurred during sync, please try again later",
+  "calculateFeeFailed": "Could not calculate fee"
 }

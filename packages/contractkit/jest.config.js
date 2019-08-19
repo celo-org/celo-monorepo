@@ -1,13 +1,14 @@
-const defaultConfig = require('../../jest.config.js')
+const { pathsToModuleNameMapper } = require('ts-jest/utils')
+
+const { compilerOptions } = require('./test/tsconfig')
 
 module.exports = {
-  ...defaultConfig,
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
   globals: {
-    navigator: true,
-    window: true,
-  },
-  moduleNameMapper: {
-    '@celo/mobile': '<rootDir>',
-    '^crypto-js$': '<rootDir>/node_modules/crypto-js',
+    'ts-jest': {
+      tsConfig: '<rootDir>/test/tsconfig.json',
+    },
   },
 }

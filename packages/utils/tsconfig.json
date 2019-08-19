@@ -1,6 +1,11 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "plugins": [
+      {
+        "name": "typescript-tslint-plugin"
+      }
+    ],
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "composite": true,

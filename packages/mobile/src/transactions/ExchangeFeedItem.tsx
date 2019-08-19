@@ -7,7 +7,7 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { HomeExchangeFragment } from 'src/apollo/types'
-import { CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { navigateToExchangeReview } from 'src/transactions/actions'
 import { ExchangeStandby, TransactionStatus } from 'src/transactions/reducer'
@@ -115,14 +115,14 @@ export class ExchangeFeedItem extends React.PureComponent<Props> {
             </View>
             <View style={[styles.amountContainer, opacityStyle]}>
               <Text style={[fontStyles.activityCurrency, inStyle]}>
-                {inCurrency === CURRENCY_ENUM.DOLLAR && '$'}
+                {CURRENCIES[inCurrency].symbol}
                 {getMoneyDisplayValue(inValue)}
               </Text>
               <View style={styles.arrow}>
                 <ExchangeArrow />
               </View>
               <Text style={[fontStyles.activityCurrency, outStyle]}>
-                {outCurrency === CURRENCY_ENUM.DOLLAR && '$'}
+                {CURRENCIES[outCurrency].symbol}
                 {getMoneyDisplayValue(outValue)}
               </Text>
             </View>
@@ -186,4 +186,5 @@ const styles = StyleSheet.create({
   },
 })
 
+// @ts-ignore
 export default withNamespaces(Namespaces.walletFlow5)(ExchangeFeedItem)

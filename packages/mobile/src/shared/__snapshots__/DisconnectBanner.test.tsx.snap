@@ -19,6 +19,7 @@ exports[`renders banner when app is disconnected 1`] = `
       },
     ]
   }
+  testID="connectingToCeloBanner"
 >
   connectingToCelo
 </Text>

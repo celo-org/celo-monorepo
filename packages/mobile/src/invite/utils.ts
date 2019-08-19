@@ -1,4 +1,4 @@
-import { sanitizeBase64 } from '@celo/contractkit'
+import { sanitizeBase64 } from '@celo/walletkit'
 import URLSearchParamsReal from '@ungap/url-search-params'
 import RNInstallReferrer from 'react-native-install-referrer'
 import Logger from 'src/utils/Logger'

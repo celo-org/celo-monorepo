@@ -13,7 +13,6 @@
     "deploy:dev": "gcloud config set project celo-testnet; NODE_ENV=production DEPLOY_ENV=development MANIFEST=development.yaml yarn run deploy",
     "deploy:staging": "gcloud config set project celo-testnet; NODE_ENV=production DEPLOY_ENV=staging MANIFEST=staging.yaml yarn run deploy",
     "deploy:prod": "gcloud config set project celo-testnet-production; NODE_ENV=production DEPLOY_ENV=production MANIFEST=production.yaml yarn run deploy",
-    "lint-checks": "yarn run lint && yarn run tsc --noEmit",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "kill-dev": "kill -9 $(lsof -ti :3000)",
     "test": "jest --runInBand",
@@ -71,9 +70,9 @@
   },
   "devDependencies": {
     "@firebase/app-types": "^0.3.7",
-    "@types/airtable": "^0.5.0",
+    "@types/airtable": "^0.5.6",
     "@types/i18next": "^12.1.0",
-    "@types/jest": "^24.0.13",
+    "@types/jest": "^24.0.17",
     "@types/mailgun-js": "^0.16.3",
     "@types/next": "^8.0.3",
     "@types/node": "^10.12.18",
@@ -91,7 +90,6 @@
     "postcss-scss": "^1.0.5",
     "react-native-svg": "^9.3.6",
     "ts-jest": "24.0.0",
-    "ts-node": "^7.0.1",
     "typescript": "^3.3.3",
     "webpack": "4.20.2"
   },

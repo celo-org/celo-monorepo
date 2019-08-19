@@ -1,6 +1,6 @@
-import { getAttestationsContract, lookupPhoneNumbers } from '@celo/contractkit'
-import { Attestations as AttestationsType } from '@celo/contractkit/types/Attestations'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
+import { getAttestationsContract, lookupPhoneNumbers } from '@celo/walletkit'
+import { Attestations as AttestationsType } from '@celo/walletkit/types/Attestations'
 import BigNumber from 'bignumber.js'
 import { chunk } from 'lodash'
 import { MinimalContact } from 'react-native-contacts'
@@ -19,10 +19,11 @@ import {
   e164NumberToAddressSelector,
   E164NumberToAddressType,
 } from 'src/identity/reducer'
-import { setRecipientCache } from 'src/send/actions'
+import { setRecipientCache } from 'src/recipients/actions'
+import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipient'
+import { checkContactsPermission } from 'src/utils/androidPermissions'
 import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
-import { contactsToRecipients, NumberToRecipient } from 'src/utils/recipient'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
 
@@ -31,14 +32,19 @@ const MAPPING_CHUNK_SIZE = 25
 const NUM_PARALLEL_REQUESTS = 3
 
 export function* doImportContacts() {
+  Logger.debug(TAG, 'Importing user contacts')
   try {
     yield call(getConnectedAccount)
 
-    Logger.debug(TAG, 'Importing user contacts')
+    const result: boolean = yield call(checkContactsPermission)
+
+    if (!result) {
+      return Logger.warn(TAG, 'Contact permissions denied. Skipping import.')
+    }
 
     const contacts: MinimalContact[] = yield call(getAllContacts)
     if (!contacts || !contacts.length) {
-      return Logger.warn(TAG, 'Empty contacts list. Missing contacts permission?')
+      return Logger.warn(TAG, 'Empty contacts list. Skipping import.')
     }
 
     const defaultCountryCode: string = yield select(defaultCountryCodeSelector)

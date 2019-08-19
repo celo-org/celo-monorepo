@@ -2,7 +2,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 interface Props {
@@ -10,21 +10,13 @@ interface Props {
   amount: string | null | number
   size: number
   type: CURRENCY_ENUM
-  balanceOutOfSync: boolean
 }
 
 const symbolRatio = 0.6
 
 export default class CurrencyDisplay extends React.PureComponent<Props> {
   color() {
-    const { balanceOutOfSync } = this.props
-    if (balanceOutOfSync) {
-      return this.props.type === CURRENCY_ENUM.DOLLAR
-        ? colors.celoGreenInactiveExtra
-        : colors.celoGoldInactive
-    } else {
-      return this.props.type === CURRENCY_ENUM.DOLLAR ? colors.celoGreen : colors.celoGold
-    }
+    return this.props.type === CURRENCY_ENUM.DOLLAR ? colors.celoGreen : colors.celoGold
   }
 
   symbolStyle(fontSize: number) {
@@ -41,16 +33,15 @@ export default class CurrencyDisplay extends React.PureComponent<Props> {
   }
 
   render() {
-    const { size } = this.props
+    const { size, type } = this.props
     const fontSize = size
     const dollarStyle = { fontSize, lineHeight: Math.round(fontSize * 1.3), color: this.color() }
+    const currencySymbol = CURRENCIES[type].symbol
     return (
       <View style={styles.container}>
-        {this.props.type === CURRENCY_ENUM.DOLLAR ? (
-          <Text numberOfLines={1} style={[fontStyles.regular, this.symbolStyle(fontSize)]}>
-            $
-          </Text>
-        ) : null}
+        <Text numberOfLines={1} style={[fontStyles.regular, this.symbolStyle(fontSize)]}>
+          {currencySymbol}
+        </Text>
         <Text numberOfLines={1} style={[styles.currency, fontStyles.regular, dollarStyle]}>
           {this.amount()}
         </Text>

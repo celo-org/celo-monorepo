@@ -2,25 +2,25 @@
 
 exports[`AlertBanner when error message passed in renders error message 1`] = `
 <View
-  accessible={true}
-  isTVSelectable={true}
-  onResponderGrant={[Function]}
-  onResponderMove={[Function]}
-  onResponderRelease={[Function]}
-  onResponderTerminate={[Function]}
-  onResponderTerminationRequest={[Function]}
-  onStartShouldSetResponder={[Function]}
   style={
     Object {
-      "opacity": 1,
+      "overflow": "hidden",
     }
   }
+  testID="errorBanner"
 >
   <View
+    accessible={true}
+    isTVSelectable={true}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
     style={
       Object {
-        "backgroundColor": "#FD785B",
-        "height": 36,
+        "opacity": 1,
       }
     }
   >
@@ -28,11 +28,16 @@ exports[`AlertBanner when error message passed in renders error message 1`] = `
       style={
         Object {
           "alignItems": "center",
-          "flex": 1,
+          "backgroundColor": "#FD785B",
           "flexDirection": "row",
           "justifyContent": "center",
-          "opacity": 1,
           "paddingHorizontal": 25,
+          "paddingVertical": 10,
+          "transform": Array [
+            Object {
+              "translateY": -500,
+            },
+          ],
         }
       }
     >
@@ -68,7 +73,6 @@ exports[`AlertBanner when error message passed in renders error message 1`] = `
         </svg>
       </View>
       <Text
-        numberOfLines={1}
         style={
           Array [
             Object {
@@ -79,7 +83,7 @@ exports[`AlertBanner when error message passed in renders error message 1`] = `
             },
             Object {
               "color": "white",
-              "lineHeight": 20,
+              "lineHeight": undefined,
               "textAlign": "center",
             },
             Object {
@@ -97,25 +101,25 @@ exports[`AlertBanner when error message passed in renders error message 1`] = `
 
 exports[`AlertBanner when message and title passed in renders title with message 1`] = `
 <View
-  accessible={true}
-  isTVSelectable={true}
-  onResponderGrant={[Function]}
-  onResponderMove={[Function]}
-  onResponderRelease={[Function]}
-  onResponderTerminate={[Function]}
-  onResponderTerminationRequest={[Function]}
-  onStartShouldSetResponder={[Function]}
   style={
     Object {
-      "opacity": 1,
+      "overflow": "hidden",
     }
   }
+  testID="infoBanner"
 >
   <View
+    accessible={true}
+    isTVSelectable={true}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
     style={
       Object {
-        "backgroundColor": "#3C9BF4",
-        "height": 36,
+        "opacity": 1,
       }
     }
   >
@@ -123,16 +127,20 @@ exports[`AlertBanner when message and title passed in renders title with message
       style={
         Object {
           "alignItems": "center",
-          "flex": 1,
+          "backgroundColor": "#3C9BF4",
           "flexDirection": "row",
           "justifyContent": "center",
-          "opacity": 1,
           "paddingHorizontal": 25,
+          "paddingVertical": 10,
+          "transform": Array [
+            Object {
+              "translateY": -500,
+            },
+          ],
         }
       }
     >
       <Text
-        numberOfLines={1}
         style={
           Array [
             Object {
@@ -143,7 +151,7 @@ exports[`AlertBanner when message and title passed in renders title with message
             },
             Object {
               "color": "white",
-              "lineHeight": 20,
+              "lineHeight": undefined,
               "textAlign": "center",
             },
             false,
@@ -155,7 +163,7 @@ exports[`AlertBanner when message and title passed in renders title with message
             Array [
               Object {
                 "color": "white",
-                "lineHeight": 20,
+                "lineHeight": undefined,
                 "textAlign": "center",
               },
               Object {
@@ -177,25 +185,25 @@ exports[`AlertBanner when message and title passed in renders title with message
 
 exports[`AlertBanner when message passed in renders message 1`] = `
 <View
-  accessible={true}
-  isTVSelectable={true}
-  onResponderGrant={[Function]}
-  onResponderMove={[Function]}
-  onResponderRelease={[Function]}
-  onResponderTerminate={[Function]}
-  onResponderTerminationRequest={[Function]}
-  onStartShouldSetResponder={[Function]}
   style={
     Object {
-      "opacity": 1,
+      "overflow": "hidden",
     }
   }
+  testID="infoBanner"
 >
   <View
+    accessible={true}
+    isTVSelectable={true}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
     style={
       Object {
-        "backgroundColor": "#3C9BF4",
-        "height": 36,
+        "opacity": 1,
       }
     }
   >
@@ -203,16 +211,20 @@ exports[`AlertBanner when message passed in renders message 1`] = `
       style={
         Object {
           "alignItems": "center",
-          "flex": 1,
+          "backgroundColor": "#3C9BF4",
           "flexDirection": "row",
           "justifyContent": "center",
-          "opacity": 1,
           "paddingHorizontal": 25,
+          "paddingVertical": 10,
+          "transform": Array [
+            Object {
+              "translateY": -500,
+            },
+          ],
         }
       }
     >
       <Text
-        numberOfLines={1}
         style={
           Array [
             Object {
@@ -223,7 +235,7 @@ exports[`AlertBanner when message passed in renders message 1`] = `
             },
             Object {
               "color": "white",
-              "lineHeight": 20,
+              "lineHeight": undefined,
               "textAlign": "center",
             },
             false,

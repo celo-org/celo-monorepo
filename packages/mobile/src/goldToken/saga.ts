@@ -1,4 +1,4 @@
-import { getGoldTokenContract } from '@celo/contractkit'
+import { getGoldTokenContract } from '@celo/walletkit'
 import { spawn } from 'redux-saga/effects'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Actions, fetchGoldBalance, setBalance } from 'src/goldToken/actions'

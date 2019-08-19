@@ -3,7 +3,7 @@ import * as React from 'react'
 import FadeIn from 'react-lazyload-fadein'
 import { Dimensions, Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
-import CarouselDot from 'src/home/images/CarouselDot'
+import CarouselDot from 'src/home/carousel/CarouselDot'
 import Responsive from 'src/shared/Responsive'
 import { DESKTOP_BREAKPOINT, TABLET_BREAKPOINT } from 'src/shared/Styles'
 import { fonts } from 'src/styles'
@@ -60,8 +60,8 @@ const images = [
   {
     height: 300,
     width: 450,
-    image: require('src/home/carousel/04-jason-will-wfp@2x.jpg'),
-    caption: 'Jason and Will participating in the World Food Programme’s Innovation Accelerator',
+    image: require('src/home/carousel/04-anna-onboarding@2x.jpg'),
+    caption: 'Anna onboarding merchants in the Philippines',
   },
   {
     height: 300,

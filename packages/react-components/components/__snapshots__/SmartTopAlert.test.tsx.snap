@@ -2,25 +2,25 @@
 
 exports[`SmartTopAlert renders correctly 1`] = `
 <View
-  accessible={true}
-  isTVSelectable={true}
-  onResponderGrant={[Function]}
-  onResponderMove={[Function]}
-  onResponderRelease={[Function]}
-  onResponderTerminate={[Function]}
-  onResponderTerminationRequest={[Function]}
-  onStartShouldSetResponder={[Function]}
   style={
     Object {
-      "opacity": 1,
+      "overflow": "hidden",
     }
   }
+  testID="infoBanner"
 >
   <View
+    accessible={true}
+    isTVSelectable={true}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
     style={
       Object {
-        "backgroundColor": "#3C9BF4",
-        "height": 36,
+        "opacity": 1,
       }
     }
   >
@@ -28,16 +28,20 @@ exports[`SmartTopAlert renders correctly 1`] = `
       style={
         Object {
           "alignItems": "center",
-          "flex": 1,
+          "backgroundColor": "#3C9BF4",
           "flexDirection": "row",
           "justifyContent": "center",
-          "opacity": 1,
           "paddingHorizontal": 25,
+          "paddingVertical": 10,
+          "transform": Array [
+            Object {
+              "translateY": -500,
+            },
+          ],
         }
       }
     >
       <Text
-        numberOfLines={1}
         style={
           Array [
             Object {
@@ -48,7 +52,7 @@ exports[`SmartTopAlert renders correctly 1`] = `
             },
             Object {
               "color": "white",
-              "lineHeight": 20,
+              "lineHeight": undefined,
               "textAlign": "center",
             },
             false,
@@ -60,7 +64,7 @@ exports[`SmartTopAlert renders correctly 1`] = `
             Array [
               Object {
                 "color": "white",
-                "lineHeight": 20,
+                "lineHeight": undefined,
                 "textAlign": "center",
               },
               Object {

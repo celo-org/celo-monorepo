@@ -1,20 +1,13 @@
 import SmallButton from '@celo/react-components/components/SmallButton'
-import TopAlert from '@celo/react-components/components/TopAlert'
 import Error from '@celo/react-components/icons/Error'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
-import * as React from 'react'
-import { StyleSheet, Text, TouchableOpacity } from 'react-native'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 export enum NotificationTypes {
   MESSAGE = 'message',
   ERROR = 'error',
-}
-
-interface State {
-  cachedTitle?: string | null
-  cachedText: string | null
-  visible: boolean
 }
 
 interface Props {
@@ -22,80 +15,176 @@ interface Props {
   text: string | null
   onPress: () => void
   type: NotificationTypes
-  dismissAfter: number | null
+  dismissAfter?: number | null
   buttonMessage?: string | null
 }
 
-class SmartTopAlert extends React.Component<Props, State> {
-  timeout: number | null = null
+// This component needs to be always mounted for the hide animation to be visible
+function SmartTopAlert(props: Props) {
+  const [visibleAlertState, setVisibleAlertState] = useState<Props | null>(null)
+  const yOffset = useRef(new Animated.Value(-500))
+  const containerRef = useRef<View>()
+  const animatedRef = useCallback((node) => {
+    containerRef.current = node && node.getNode()
+  }, [])
 
-  constructor(props: Props) {
-    super(props)
-    this.state = {
-      cachedTitle: props.title,
-      cachedText: props.text,
-      visible: !!props.text,
+  const alertState = useMemo(
+    () => {
+      // tslint bug?
+      // tslint:disable-next-line: no-shadowed-variable
+      const { type, title, text, buttonMessage, dismissAfter, onPress } = props
+      if (title || text) {
+        return {
+          type,
+          title,
+          text,
+          buttonMessage,
+          dismissAfter,
+          onPress,
+        }
+      } else {
+        return null
+      }
+    },
+    [props.type, props.title, props.text, props.buttonMessage, props.dismissAfter, props.onPress]
+  )
+
+  function hide() {
+    if (!containerRef.current) {
+      return
     }
+
+    containerRef.current.measure((l, t, w, height) => {
+      Animated.timing(yOffset.current, {
+        toValue: -height,
+        duration: 150,
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished) {
+          setVisibleAlertState(null)
+        }
+      })
+    })
   }
 
-  componentDidUpdate(prevProps: Props) {
-    if (this.props.text && prevProps.text !== this.props.text) {
-      this.setState({ cachedText: this.props.text, cachedTitle: this.props.title })
-      if (this.timeout) {
-        clearTimeout(this.timeout)
-        this.timeout = null
+  useEffect(
+    () => {
+      if (alertState) {
+        // show
+        setVisibleAlertState(alertState)
+      } else {
+        // hide
+        hide()
       }
-      if (this.props.dismissAfter) {
-        this.timeout = window.setTimeout(prevProps.onPress, this.props.dismissAfter)
+    },
+    [alertState]
+  )
+
+  useEffect(
+    () => {
+      let rafHandle: number
+      let timeoutHandle: number
+
+      if (!visibleAlertState) {
+        return
       }
-    }
+
+      rafHandle = requestAnimationFrame(() => {
+        if (!containerRef.current) {
+          return
+        }
+
+        containerRef.current.measure((l, t, w, height) => {
+          Animated.timing(yOffset.current, {
+            // @ts-ignore, react-native type defs are missing this one!
+            fromValue: -height,
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+          }).start()
+
+          if (visibleAlertState.dismissAfter) {
+            timeoutHandle = window.setTimeout(hide, visibleAlertState.dismissAfter)
+          }
+        })
+      })
+
+      return () => {
+        if (rafHandle) {
+          cancelAnimationFrame(rafHandle)
+        }
+        if (timeoutHandle) {
+          window.clearTimeout(timeoutHandle)
+        }
+      }
+    },
+    [visibleAlertState]
+  )
+
+  if (!visibleAlertState) {
+    return null
   }
 
-  render() {
-    const { text, type, onPress, buttonMessage } = this.props
-    const { cachedText, cachedTitle } = this.state
-    const height = buttonMessage ? 105 : 36
-    const numberOfLines = buttonMessage ? 2 : 1
-    const isError = type === NotificationTypes.ERROR
-    const bgColor = isError ? colors.errorRed : colors.messageBlue
+  const { type, title, text, buttonMessage, onPress } = visibleAlertState
+  const isError = type === NotificationTypes.ERROR
 
-    return (
+  const testID = isError ? 'errorBanner' : 'infoBanner'
+
+  return (
+    <View style={styles.overflowContainer} testID={testID}>
       <TouchableOpacity onPress={onPress}>
-        <TopAlert
-          height={height}
-          backgroundColor={bgColor}
-          visible={!!text}
-          style={buttonMessage ? styles.container : null}
+        <Animated.View
+          ref={animatedRef}
+          style={[
+            styles.container,
+            buttonMessage && styles.containerWithButton,
+            isError && styles.containerError,
+            { transform: [{ translateY: yOffset.current }] },
+          ]}
         >
           {isError && <Error style={styles.errorIcon} />}
-          <Text
-            style={[fontStyles.bodySmall, styles.text, isError && fontStyles.semiBold]}
-            numberOfLines={numberOfLines}
-          >
-            {!!cachedTitle && (
-              <Text style={[styles.text, fontStyles.semiBold]}> {cachedTitle} </Text>
-            )}
-            {cachedText}
+          <Text style={[fontStyles.bodySmall, styles.text, isError && fontStyles.semiBold]}>
+            {!!title && <Text style={[styles.text, fontStyles.semiBold]}> {title} </Text>}
+            {text}
           </Text>
-          {this.props.buttonMessage && (
+          {buttonMessage && (
             <SmallButton
               onPress={onPress}
-              text={this.props.buttonMessage}
+              text={buttonMessage}
               solid={false}
               style={styles.button}
               textStyle={styles.buttonText}
+              testID={'SmartTopAlertButton'}
             />
           )}
-        </TopAlert>
+        </Animated.View>
       </TouchableOpacity>
-    )
-  }
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
+  overflowContainer: {
+    overflow: 'hidden',
+  },
+  container: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.messageBlue,
+    paddingVertical: 10,
+    paddingHorizontal: 25,
+  },
+  containerError: {
+    backgroundColor: colors.errorRed,
+  },
+  containerWithButton: {
+    flexDirection: 'column',
+  },
   text: {
     color: 'white',
-    lineHeight: 20,
+    // Unset explicit lineHeight set by fonts.tsx otherwise the text is not centered vertically
+    lineHeight: undefined,
     textAlign: 'center',
   },
   errorIcon: {
@@ -108,10 +197,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: colors.white,
-  },
-  container: {
-    alignItems: 'center',
-    flexDirection: 'column',
   },
 })
 

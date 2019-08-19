@@ -6,7 +6,11 @@ import { EscrowedPayment } from 'src/escrow/actions'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { AttestationCode } from 'src/identity/verification'
-import { RecipientKind, RecipientWithContact, RecipientWithMobileNumber } from 'src/utils/recipient'
+import {
+  RecipientKind,
+  RecipientWithContact,
+  RecipientWithMobileNumber,
+} from 'src/recipients/recipient'
 
 export const mockName = 'John Doe'
 export const mockAccount = '0x0000000000000000000000000000000000007E57'
@@ -33,14 +37,26 @@ export const mockCountryCode = '+1'
 
 export const mockQrCodeData = `{"address":"${mockAccount}","e164PhoneNumber":"${mockE164Number}","displayName":"${mockName}"}`
 
-export const mockRecipient: RecipientWithContact = {
+export const mockInvitableRecipient: RecipientWithContact = {
   kind: RecipientKind.Contact,
-  address: mockAccount,
   displayName: mockName,
   displayId: '14155550000',
   e164PhoneNumber: mockE164Number,
   contactId: 'contactId',
   phoneNumberLabel: 'phoneNumLabel',
+}
+
+export const mockRecipient: RecipientWithContact = {
+  ...mockInvitableRecipient,
+  address: mockAccount,
+}
+
+export const mockE164NumberToInvitableRecipient = {
+  [mockE164Number]: mockInvitableRecipient,
+}
+
+export const mockRecipientCache = {
+  [mockE164Number]: mockRecipient,
 }
 
 export const mockRecipientWithPhoneNumber: RecipientWithMobileNumber = {

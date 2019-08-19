@@ -5,14 +5,14 @@ import { connect } from 'react-redux'
 import { Event, EventTypeNames, UserTransactionsData } from 'src/apollo/types'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { Invitees, SENTINEL_INVITE_COMMENT } from 'src/invite/actions'
+import { NumberToRecipient } from 'src/recipients/recipient'
+import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
-import { recipientCacheSelector } from 'src/send/reducers'
 import ExchangeFeedItem from 'src/transactions/ExchangeFeedItem'
 import NoActivity from 'src/transactions/NoActivity'
 import { StandbyTransaction, TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
 import TransferFeedItem from 'src/transactions/TransferFeedItem'
 import Logger from 'src/utils/Logger'
-import { NumberToRecipient } from 'src/utils/recipient'
 import { privateCommentKeySelector } from 'src/web3/selectors'
 
 export enum FeedType {
@@ -107,7 +107,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
   }
 
   keyExtractor = (item: Event | StandbyTransaction) => {
-    return item.timestamp.toString()
+    return item.hash + item.timestamp.toString()
   }
 
   render() {

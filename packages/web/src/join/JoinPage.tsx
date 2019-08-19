@@ -6,7 +6,7 @@ import { H1, H4 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import fetchLeverJobs, { LeverJob } from 'src/jobs/lever'
-import Jobs, { ROLES_ID } from 'src/jobs/version3/Jobs'
+import Jobs from 'src/jobs/version3/Jobs'
 import Benefits from 'src/join/Benefits'
 import FeaturedVideo from 'src/join/FeaturedVideo'
 import ImagePanes from 'src/join/ImagePanes'
@@ -16,7 +16,7 @@ import ThreePillars from 'src/join/ThreePillars'
 import { scrollTo } from 'src/utils/utils'
 
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import menuItems from 'src/shared/menu-items'
+import menuItems, { hashNav } from 'src/shared/menu-items'
 import { colors, standardStyles, textStyles } from 'src/styles'
 
 const DESCRIPTION =
@@ -29,7 +29,7 @@ interface OwnProps {
 type Props = I18nProps & OwnProps
 
 function onExploreRoles() {
-  scrollTo(ROLES_ID)
+  scrollTo(hashNav.join.roles)
 }
 
 class JoinPage extends React.PureComponent<Props> {
@@ -57,7 +57,7 @@ class JoinPage extends React.PureComponent<Props> {
           <View style={styles.cover}>
             <View style={styles.heading}>
               <View style={[standardStyles.centered, styles.cloud, styles.inside]}>
-                <Fade bottom={true} delay={10} distance={'20px'}>
+                <Fade ssrReveal={true} bottom={true} delay={10} distance={'20px'}>
                   <View style={standardStyles.centered}>
                     <H1 style={[textStyles.center, standardStyles.elementalMarginBottom]}>
                       {t('workWithValue')}
@@ -69,7 +69,7 @@ class JoinPage extends React.PureComponent<Props> {
                 </Fade>
               </View>
               <View style={[styles.cloud]}>
-                <Fade bottom={true} delay={20} distance={'20px'}>
+                <Fade ssrReveal={true} bottom={true} delay={20} distance={'20px'}>
                   <Button
                     kind={BTN.PRIMARY}
                     text={t('exploreRoles')}

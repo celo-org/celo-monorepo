@@ -1,18 +1,21 @@
+import getConfig from 'next/config'
 import dynamic from 'next/dynamic'
 import * as React from 'react'
 import LazyLoad from 'react-lazyload'
 import { StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import CodeOfConduct from 'src/community/connect/CodeOfConduct'
+import Contribute from 'src/community/connect/Contribute'
 import CoverArea from 'src/community/connect/CoverArea'
 import FellowSection from 'src/community/connect/FellowSection'
 import Tenets from 'src/community/connect/Tenets'
-
+import EcoFund from 'src/community/EcoFund'
 import { H2, H3 } from 'src/fonts/Fonts'
 import EmailForm, { After } from 'src/forms/EmailForm'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import ArticleData from './ArticleData'
 import EventData from './EventsData'
@@ -50,8 +53,10 @@ export class ConnectPage extends React.Component<Props> {
         <View>
           <CoverArea />
           <Tenets />
+
           <CodeOfConduct />
           <GridRow
+            nativeID={hashNav.connect.events}
             desktopStyle={standardStyles.sectionMarginTop}
             mobileStyle={standardStyles.sectionMarginTopMobile}
           >
@@ -63,8 +68,10 @@ export class ConnectPage extends React.Component<Props> {
           </GridRow>
           <EventData />
           <ArticleData />
+          <Contribute />
+          {getConfig().publicRuntimeConfig.FLAGS.ECOFUND && <EcoFund />}
           <FellowSection />
-          <View style={styles.darkBackground}>
+          <View style={styles.darkBackground} nativeID={hashNav.connect.newsletter}>
             <GridRow
               desktopStyle={standardStyles.sectionMargin}
               tabletStyle={standardStyles.sectionMarginTablet}
