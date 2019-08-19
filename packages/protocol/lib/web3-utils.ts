@@ -15,11 +15,8 @@ import {
   StableTokenInstance,
 } from 'types'
 import { TransactionObject } from 'web3/eth/types'
-import { build_directory } from '../migrationsConfig'
 
 import Web3 = require('web3')
-
-const Artifactor = require('truffle-artifactor')
 
 const ec = new EC('secp256k1')
 const cachedWeb3 = new Web3()
@@ -243,11 +240,10 @@ export function deployProxyAndImplementation<ContractInstance extends Truffle.Co
   args: (networkName?: string) => Promise<any[]>,
   then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
 ) {
-  return async (deployer: any, networkName: string, _accounts: string[]) => {
+  const Contract = artifacts.require(name)
+  const ContractProxy = artifacts.require(name + 'Proxy')
+  return (deployer: any, networkName: string, _accounts: string[]) => {
     console.log('Deploying', name)
-    const Contract = artifacts.require(name)
-    const ContractProxy = artifacts.require(name + 'Proxy')
-
     deployer.deploy(ContractProxy)
     deployer.deploy(Contract)
     deployer.then(async () => {
@@ -260,67 +256,6 @@ export function deployProxyAndImplementation<ContractInstance extends Truffle.Co
         await then(proxiedContract, web3, networkName)
       }
     })
-  }
-}
-
-/*
- * Used to deploy contracts whose Proxies have already been deployed.
- *
- * Arguments:
- * - artifacts: the Resolver object provided by Truffle
- * - name: name of the contract to deploy
- * - args: array of arguments to the contract's initializer
- * - then: a callback that can perform additional migration operations after deployment
- *
- * The callback will be called with the deployed proxied contract, a web3
- * instance (derived from the provider of the deployer given by Truffle), and the
- * name of the network (as given by Truffle).
- *
- * Returns:
- * A function with a signature as expected to be exported from a Truffle
- * migration script.
- */
-export function deployImplementationAndRepointProxy<
-  ContractInstance extends Truffle.ContractInstance
->(
-  web3: Web3,
-  artifacts: any,
-  deployedProxyAddress: string,
-  name: string,
-  args: (networkName?: string) => Promise<any[]>,
-  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
-) {
-  return async (deployer: any, networkName: string, _accounts: string[]) => {
-    console.log('Deploying', name)
-    const Contract = artifacts.require(name)
-    const ContractProxy = artifacts.require(name + 'Proxy')
-    let proxiedContract: ContractInstance
-    deployer.deploy(ContractProxy)
-    deployer.deploy(Contract)
-    deployer.then(async () => {
-      // Hack to create build artifact.
-      const artifact = ContractProxy._json
-      artifact.networks[await web3.eth.net.getId()] = {
-        address: deployedProxyAddress,
-        // @ts-ignore
-        transactionHash: '0x',
-      }
-      const contractsDir = build_directory + '/contracts'
-      const artifactor = new Artifactor(contractsDir)
-
-      await artifactor.save(artifact)
-    })
-
-    proxiedContract = await setInitialProxyImplementation<ContractInstance>(
-      web3,
-      artifacts,
-      name,
-      ...(await args(networkName))
-    )
-
-    if (then) {
-      await then(proxiedContract, web3, networkName)
-    }
   }
 }
 
