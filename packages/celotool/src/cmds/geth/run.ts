@@ -32,7 +32,7 @@ export const builder = (argv: yargs.Argv) => {
       default: '1101',
     })
     .option('sync-mode', {
-      choices: ['full', 'fast', 'light', 'celolatest', 'ultralight'],
+      choices: ['full', 'fast', 'light', 'ultralight'],
       demandOption: true,
     })
     .option('mining', {

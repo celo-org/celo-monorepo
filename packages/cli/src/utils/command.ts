@@ -4,7 +4,8 @@ import Web3 from 'web3'
 import { failWith } from './cli'
 
 const parsePublicKey: ParseFn<string> = (input) => {
-  if (Web3.utils.isHex(input) && input.length === 130 && input.startsWith('0x')) {
+  // Check that the string starts with 0x and has byte length of ecdsa pub key (64 bytes) + bls pub key (48 bytes) + proof of pos (96 bytes)
+  if (Web3.utils.isHex(input) && input.length === 418 && input.startsWith('0x')) {
     return input
   } else {
     return failWith(`${input} is not a public key`)
