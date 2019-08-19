@@ -28,28 +28,32 @@ jobs:
   install_dependencies:
     <<: *defaults
     steps:
-      # The standard Circle CI checkout steps makes a shallow clone with the depth of 1
-      # Which means we have no way of knowing which commits are specifically in this branch.
-      # We need that for incremental testing.
-      # This checkout assumes that a single branch will not have more than a certain number commits
-      # on top of master and if it does, then the incremental testing script will fail. The committer can
-      # than squash those commits. Which is OK since we squash commits on merge to master
-      # anyways.
+
+      - restore_cache:
+          keys:
+            - source-v1-{{ .Branch }}-{{ .Revision }}
+            - source-v1-{{ .Branch }}-
+            - source-v1-
+
+      - checkout
+
+      - save_cache:
+          key: source-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ".git"
+
       - run:
-          name: Checkout (with last 100 commits)
+          name: Verify setup for incremental testing
           command: |
-            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            git clone --depth 100 --no-single-branch --branch ${CIRCLE_BRANCH} git@github.com:celo-org/celo-monorepo.git ~/app
+            set -euo pipefail
             cd ~/app
             set -v
             # To get the "master" branch mapping
             git checkout master
             git checkout ${CIRCLE_BRANCH}
-            # Verify that these commands work, they are later called in the incremental testing script
+            # Verify that following commands work, they are later called in the incremental testing script
             # There output does not matter here, the fact that they finish successfully does.
             git rev-parse --abbrev-ref HEAD
-            git merge-base master $(git rev-parse --abbrev-ref HEAD)
-            git log --format=format:%H $(git merge-base master $(git rev-parse --abbrev-ref HEAD))..HEAD > /dev/null
 
       - attach_workspace:
           at: ~/app
@@ -197,8 +201,8 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            DIRS_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+            FILES_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: test
           # Flaky tests - run them twice
@@ -253,8 +257,8 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: Setup Go language
           command: |
@@ -286,14 +290,16 @@ jobs:
 
   end-to-end-geth-governance-test:
     <<: *defaults
+    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
+    resource_class: medium+
     steps:
       - attach_workspace:
           at: ~/app
       - run:
           name: Check if the test should run
           command: |
-            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: Setup Go language
           command: |
@@ -325,14 +331,16 @@ jobs:
 
   end-to-end-geth-sync-test:
     <<: *defaults
+    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
+    resource_class: medium+
     steps:
       - attach_workspace:
           at: ~/app
       - run:
           name: Check if the test should run
           command: |
-            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: Setup Go language
           command: |
@@ -369,8 +377,8 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            DIRS_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${DIRS_TO_CHECK}
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: Setup Go language
           command: |
@@ -405,7 +413,7 @@ jobs:
       - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run: cd packages/web && ./circle_deploy.sh
 
-  test-npm-package-install:
+  test-typescript-npm-package-install:
     working_directory: ~/app
     docker:
       - image: celohq/node8:gcloud
@@ -413,15 +421,36 @@ jobs:
       - run:
           name: Installing npm package - @celo/typescript
           command: yarn add @celo/typescript
+
+  test-utils-npm-package-install:
+    working_directory: ~/app
+    docker:
+      - image: celohq/node8:gcloud
+    steps:
       - run:
           name: Installing npm package - @celo/utils
           command: yarn add @celo/utils
+
+  test-walletkit-npm-package-install:
+    working_directory: ~/app
+    docker:
+      - image: celohq/node8:gcloud
+    steps:
       - run:
           name: Installing npm package - @celo/walletkit
           command: yarn add @celo/walletkit
+
+  test-celocli-npm-package-install:
+    working_directory: ~/app
+    docker:
+      - image: celohq/node8:gcloud
+    steps:
       - run:
           name: Installing npm package - @celo/celocli
-          command: yarn add @celo/celocli
+          command: npm install @celo/celocli
+      - run:
+          name: Minor test of celocli
+          command: ./node_modules/.bin/celocli account:new  # Small test
 
 workflows:
   version: 2
@@ -480,4 +509,7 @@ workflows:
               only:
                 - master
     jobs:
-      - test-npm-package-install
+      - test-typescript-npm-package-install
+      - test-utils-npm-package-install
+      - test-walletkit-npm-package-install
+      - test-celocli-npm-package-install

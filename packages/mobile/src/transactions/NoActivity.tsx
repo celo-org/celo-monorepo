@@ -11,7 +11,7 @@ import { Screens } from 'src/navigator/Screens'
 import { FeedType } from 'src/transactions/TransactionFeed'
 
 const goToSend = () => {
-  navigate(Screens.SendStack)
+  navigate(Screens.Send)
 }
 
 interface OwnProps {
@@ -56,7 +56,7 @@ export class NoActivity extends React.PureComponent<Props> {
         {kind === FeedType.HOME && (
           <SmallButton
             onPress={goToSend}
-            text={t('sendCeloDollars')}
+            text={t('global:sendCeloDollars')}
             solid={true}
             style={styles.button}
           />

@@ -1,0 +1,15 @@
+{
+  "connectToWallet": "Círculo de Ahorro le gustaría conectarse a Celo Monedero",
+  "connect": "Conectar",
+  "cancel": "Cancelar",
+  "allow": "Permitir",
+  "address": "Dirección",
+  "transaction": {
+    "operation": "Operación",
+    "data": "Datos",
+    "signTX": "Boleto TX",
+    "details": "Mostrar detalles"
+  },
+  "shareInfo": "Comparte la siguiente información:",
+  "data": "Datos"
+}

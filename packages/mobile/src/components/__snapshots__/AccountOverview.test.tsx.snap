@@ -47,7 +47,7 @@ exports[`renders correctly when Dollar education NUX flow hasn't been completed 
             ]
           }
         >
-          celoDollars cUSD
+          global:celoDollars cUSD
         </Text>
         <View
           accessible={true}
@@ -120,54 +120,6 @@ exports[`renders correctly when Dollar education NUX flow hasn't been completed 
               55.00
             </Text>
           </View>
-          <View
-            style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "justifyContent": "center",
-                },
-                Object {
-                  "height": 15,
-                  "width": 15,
-                },
-                Object {
-                  "padding": 10,
-                },
-              ]
-            }
-          >
-            <View
-              style={
-                Object {
-                  "backgroundColor": "#3C9BF4",
-                  "borderRadius": 2.5,
-                  "height": 5,
-                  "opacity": 1,
-                  "transform": Array [
-                    Object {
-                      "scale": 1,
-                    },
-                    Object {
-                      "perspective": 1000,
-                    },
-                  ],
-                  "width": 5,
-                }
-              }
-            />
-            <View
-              style={
-                Object {
-                  "backgroundColor": "#3C9BF4",
-                  "borderRadius": 2.5,
-                  "height": 5,
-                  "position": "absolute",
-                  "width": 5,
-                }
-              }
-            />
-          </View>
         </View>
       </View>
       <View
@@ -208,7 +160,7 @@ exports[`renders correctly when Dollar education NUX flow hasn't been completed 
             ]
           }
         >
-          celoGold cGLD
+          global:celoGold cGLD
         </Text>
         <View
           accessible={true}
@@ -237,6 +189,28 @@ exports[`renders correctly when Dollar education NUX flow hasn't been completed 
               }
             }
           >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#FBCC5C",
+                    "fontSize": 21,
+                    "lineHeight": 29,
+                    "transform": Array [
+                      Object {
+                        "translateY": 2,
+                      },
+                    ],
+                  },
+                ]
+              }
+            >
+              
+            </Text>
             <Text
               numberOfLines={1}
               style={
@@ -312,7 +286,7 @@ exports[`renders correctly when Gold education NUX flow hasn't been completed 1`
             ]
           }
         >
-          celoDollars cUSD
+          global:celoDollars cUSD
         </Text>
         <View
           accessible={true}
@@ -424,7 +398,7 @@ exports[`renders correctly when Gold education NUX flow hasn't been completed 1`
             ]
           }
         >
-          celoGold cGLD
+          global:celoGold cGLD
         </Text>
         <View
           accessible={true}
@@ -459,6 +433,28 @@ exports[`renders correctly when Gold education NUX flow hasn't been completed 1`
               style={
                 Array [
                   Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#FBCC5C",
+                    "fontSize": 21,
+                    "lineHeight": 29,
+                    "transform": Array [
+                      Object {
+                        "translateY": 2,
+                      },
+                    ],
+                  },
+                ]
+              }
+            >
+              
+            </Text>
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
                     "paddingHorizontal": 3,
                   },
                   Object {
@@ -474,54 +470,6 @@ exports[`renders correctly when Gold education NUX flow hasn't been completed 1`
             >
               55.00
             </Text>
-          </View>
-          <View
-            style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "justifyContent": "center",
-                },
-                Object {
-                  "height": 15,
-                  "width": 15,
-                },
-                Object {
-                  "padding": 10,
-                },
-              ]
-            }
-          >
-            <View
-              style={
-                Object {
-                  "backgroundColor": "#3C9BF4",
-                  "borderRadius": 2.5,
-                  "height": 5,
-                  "opacity": 1,
-                  "transform": Array [
-                    Object {
-                      "scale": 1,
-                    },
-                    Object {
-                      "perspective": 1000,
-                    },
-                  ],
-                  "width": 5,
-                }
-              }
-            />
-            <View
-              style={
-                Object {
-                  "backgroundColor": "#3C9BF4",
-                  "borderRadius": 2.5,
-                  "height": 5,
-                  "position": "absolute",
-                  "width": 5,
-                }
-              }
-            />
           </View>
         </View>
       </View>
@@ -577,7 +525,7 @@ exports[`renders correctly when not ready 1`] = `
             ]
           }
         >
-          celoDollars cUSD
+          global:celoDollars cUSD
         </Text>
         <View
           accessible={true}
@@ -689,7 +637,7 @@ exports[`renders correctly when not ready 1`] = `
             ]
           }
         >
-          celoGold cGLD
+          global:celoGold cGLD
         </Text>
         <View
           accessible={true}
@@ -718,6 +666,28 @@ exports[`renders correctly when not ready 1`] = `
               }
             }
           >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#FBCC5C",
+                    "fontSize": 21,
+                    "lineHeight": 29,
+                    "transform": Array [
+                      Object {
+                        "translateY": 2,
+                      },
+                    ],
+                  },
+                ]
+              }
+            >
+              
+            </Text>
             <Text
               numberOfLines={1}
               style={
@@ -793,7 +763,7 @@ exports[`renders correctly when ready 1`] = `
             ]
           }
         >
-          celoDollars cUSD
+          global:celoDollars cUSD
         </Text>
         <View
           accessible={true}
@@ -905,7 +875,7 @@ exports[`renders correctly when ready 1`] = `
             ]
           }
         >
-          celoGold cGLD
+          global:celoGold cGLD
         </Text>
         <View
           accessible={true}
@@ -934,6 +904,28 @@ exports[`renders correctly when ready 1`] = `
               }
             }
           >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#FBCC5C",
+                    "fontSize": 21,
+                    "lineHeight": 29,
+                    "transform": Array [
+                      Object {
+                        "translateY": 2,
+                      },
+                    ],
+                  },
+                ]
+              }
+            >
+              
+            </Text>
             <Text
               numberOfLines={1}
               style={
@@ -1009,7 +1001,7 @@ exports[`renders correctly when transaction pending 1`] = `
             ]
           }
         >
-          celoDollars cUSD
+          global:celoDollars cUSD
         </Text>
         <View
           accessible={true}
@@ -1121,7 +1113,7 @@ exports[`renders correctly when transaction pending 1`] = `
             ]
           }
         >
-          celoGold cGLD
+          global:celoGold cGLD
         </Text>
         <View
           accessible={true}
@@ -1150,6 +1142,28 @@ exports[`renders correctly when transaction pending 1`] = `
               }
             }
           >
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "fontFamily": "Hind-Regular",
+                  },
+                  Object {
+                    "color": "#FBCC5C",
+                    "fontSize": 21,
+                    "lineHeight": 29,
+                    "transform": Array [
+                      Object {
+                        "translateY": 2,
+                      },
+                    ],
+                  },
+                ]
+              }
+            >
+              
+            </Text>
             <Text
               numberOfLines={1}
               style={

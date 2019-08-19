@@ -9,9 +9,9 @@ import {
   requestStatusToState,
   validateBeneficary,
 } from 'src/fauceting/utils'
+import { postForm } from 'src/forms/Form'
 import { TextInput } from 'src/forms/FormComponents'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
-import { postForm } from 'src/shared/Form'
 import { colors, standardStyles } from 'src/styles'
 import { RequestRecord, RequestType, subscribeRequest } from '../../server/FirebaseClient'
 
@@ -57,9 +57,11 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
   onCaptcha = (value: string | null) => {
     this.setState({ captchaOK: !!value })
   }
+
   resetCaptcha = () => {
     this.recaptchaRef.current.reset()
   }
+
   getCaptchaToken = () => {
     return this.recaptchaRef.current.getValue()
   }
