@@ -170,8 +170,7 @@ export async function setInitialProxyImplementation<
   const implementation: ContractInstance = await Contract.deployed()
   const proxy: ProxyInstance = await ContractProxy.deployed()
 
-  // @ts-ignore abi property exists
-  const initializerAbi = implementation.abi.find(
+  const initializerAbi = (implementation as any).abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'initialize'
   )
 
@@ -246,38 +245,21 @@ export function deployProxyAndImplementation<ContractInstance extends Truffle.Co
 ) {
   return async (deployer: any, networkName: string, _accounts: string[]) => {
     console.log('Deploying', name)
-    let Contract = artifacts.require(name)
-    let ContractProxy = artifacts.require(name + 'Proxy')
-    try {
-      Contract = artifacts.require(name)
-      ContractProxy = artifacts.require(name + 'Proxy')
-    } catch (e) {
-      console.error(e)
-      process.exit(1)
-    }
-    let proxiedContract: ContractInstance
-    deployer
-      .deploy(ContractProxy)
-      .then(async () => {
-        const proxy: ProxyInstance = await ContractProxy.deployed()
-        await proxy._transferOwnership(_accounts[0])
-      })
-      .then(() => {
-        return deployer.deploy(Contract)
-      })
-      .then(async () => {
-        proxiedContract = await setInitialProxyImplementation<ContractInstance>(
-          web3,
-          artifacts,
-          name,
-          ...(await args(networkName))
-        )
-      })
-      .then(async () => {
-        if (then) {
-          return then(proxiedContract, web3, networkName)
-        }
-      })
+    const Contract = artifacts.require(name)
+    const ContractProxy = artifacts.require(name + 'Proxy')
+
+    deployer.deploy(ContractProxy)
+    deployer.deploy(Contract)
+    deployer.then(async () => {
+      const proxy: ProxyInstance = await ContractProxy.deployed()
+      await proxy._transferOwnership(_accounts[0])
+      const proxiedContract: ContractInstance = await setInitialProxyImplementation<
+        ContractInstance
+      >(web3, artifacts, name, ...(await args(networkName)))
+      if (then) {
+        await then(proxiedContract, web3, networkName)
+      }
+    })
   }
 }
 
@@ -313,37 +295,32 @@ export function deployImplementationAndRepointProxy<
     const Contract = artifacts.require(name)
     const ContractProxy = artifacts.require(name + 'Proxy')
     let proxiedContract: ContractInstance
-    deployer
+    deployer.deploy(ContractProxy)
+    deployer.deploy(Contract)
+    deployer.then(async () => {
       // Hack to create build artifact.
-      .deploy(ContractProxy)
-      .then(async () => {
-        const artifact = ContractProxy._json
-        artifact.networks[await web3.eth.net.getId()] = {
-          address: deployedProxyAddress,
-          // @ts-ignore
-          transactionHash: '0x',
-        }
-        const contractsDir = build_directory + '/contracts'
-        const artifactor = new Artifactor(contractsDir)
+      const artifact = ContractProxy._json
+      artifact.networks[await web3.eth.net.getId()] = {
+        address: deployedProxyAddress,
+        // @ts-ignore
+        transactionHash: '0x',
+      }
+      const contractsDir = build_directory + '/contracts'
+      const artifactor = new Artifactor(contractsDir)
 
-        await artifactor.save(artifact)
-      })
-      .then(() => {
-        return deployer.deploy(Contract)
-      })
-      .then(async () => {
-        proxiedContract = await setInitialProxyImplementation<ContractInstance>(
-          web3,
-          artifacts,
-          name,
-          ...(await args(networkName))
-        )
-      })
-      .then(async () => {
-        if (then) {
-          return then(proxiedContract, web3, networkName)
-        }
-      })
+      await artifactor.save(artifact)
+    })
+
+    proxiedContract = await setInitialProxyImplementation<ContractInstance>(
+      web3,
+      artifacts,
+      name,
+      ...(await args(networkName))
+    )
+
+    if (then) {
+      await then(proxiedContract, web3, networkName)
+    }
   }
 }
 

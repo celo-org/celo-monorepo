@@ -51,9 +51,11 @@ module.exports = deployProxyAndImplementation<GovernanceInstance>(
     await reserve.addSpender(governance.address)
 
     const proxyOwnedByGovernance = ['GoldToken', 'Random']
-    for (const contractName of proxyOwnedByGovernance) {
-      await transferOwnershipOfProxy(contractName, governance.address, artifacts)
-    }
+    await Promise.all(
+      proxyOwnedByGovernance.map((contractName) =>
+        transferOwnershipOfProxy(contractName, governance.address, artifacts)
+      )
+    )
 
     const proxyAndImplementationOwnedByGovernance = [
       'Attestations',
@@ -69,8 +71,11 @@ module.exports = deployProxyAndImplementation<GovernanceInstance>(
       'StableToken',
       'Validators',
     ]
-    for (const contractName of proxyAndImplementationOwnedByGovernance) {
-      await transferOwnershipOfProxyAndImplementation(contractName, governance.address, artifacts)
-    }
+
+    await Promise.all(
+      proxyAndImplementationOwnedByGovernance.map((contractName) =>
+        transferOwnershipOfProxyAndImplementation(contractName, governance.address, artifacts)
+      )
+    )
   }
 )
