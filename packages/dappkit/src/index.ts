@@ -1,13 +1,14 @@
 import {
   AccountAuthRequest,
+  AccountAuthResponseSuccess,
   DappKitRequestMeta,
   DappKitRequestTypes,
-  DappKitResponse,
   DappKitResponseStatus,
   parseDappkitResponseDeeplink,
   PhoneNumberUtils,
   serializeDappKitRequestDeeplink,
   SignTxRequest,
+  SignTxResponseSuccess,
   TxToSignParam,
 } from '@celo/utils'
 import {
@@ -45,7 +46,7 @@ export function listenToAccount(callback: (account: string) => void) {
   })
 }
 
-export function waitForAccountAuth(requestId: string): Promise<DappKitResponse> {
+export function waitForAccountAuth(requestId: string): Promise<AccountAuthResponseSuccess> {
   return new Promise((resolve, reject) => {
     const handler = ({ url }: { url: string }) => {
       try {
@@ -66,7 +67,7 @@ export function waitForAccountAuth(requestId: string): Promise<DappKitResponse> 
   })
 }
 
-export function waitForSignedTxs(requestId: string): Promise<DappKitResponse> {
+export function waitForSignedTxs(requestId: string): Promise<SignTxResponseSuccess> {
   return new Promise((resolve, reject) => {
     const handler = ({ url }: { url: string }) => {
       try {

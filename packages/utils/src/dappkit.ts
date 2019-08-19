@@ -130,7 +130,25 @@ export const SignTxRequest = (txs: TxToSignParam[], meta: DappKitRequestMeta): S
 
 export type DappKitRequest = AccountAuthRequest | SignTxRequest
 
+function assertString(objectName: string, key: string, value: any) {
+  if (value === undefined) {
+    throw new Error(`Expected ${objectName} to contain ${key}`)
+  }
+
+  if (typeof value !== 'string') {
+    throw new Error(`Expected ${objectName}[${key}] to be a string, but is ${typeof value}`)
+  }
+
+  return
+}
+
 export function serializeDappKitRequestDeeplink(request: DappKitRequest) {
+  // TODO: Probably use a proper validation library here
+  assertString('request', 'type', request.type)
+  assertString('request', 'requestId', request.requestId)
+  assertString('request', 'callback', request.callback)
+  assertString('request', 'dappName', request.dappName)
+
   let params: any = {
     type: request.type,
     requestId: request.requestId,
@@ -143,8 +161,11 @@ export function serializeDappKitRequestDeeplink(request: DappKitRequest) {
         ...params,
         txs: Buffer.from(JSON.stringify(request.txs), 'utf8').toString('base64'),
       }
-    default:
       break
+    case DappKitRequestTypes.ACCOUNT_ADDRESS:
+      break
+    default:
+      throw new Error(`Invalid DappKitRequest type: ${JSON.stringify(request)}`)
   }
 
   return DAPPKIT_BASE_HOST + '?' + stringify(params)
