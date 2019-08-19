@@ -15,7 +15,7 @@ import { features } from 'src/flags'
 import { CURRENCIES, CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
-import { faucetIcon, inviteVerifyFee } from 'src/images/Images'
+import { faucetIcon, inviteVerifyFee, unknownUserIcon } from 'src/images/Images'
 import { Invitees } from 'src/invite/actions'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
@@ -186,8 +186,12 @@ export class TransferFeedItem extends React.PureComponent<Props> {
       comment = null
     } else {
       const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
-      fullName = recipient ? recipient.displayName : _.capitalize(t(type.toLowerCase()))
-      contactImage = <ContactCircle address={address} size={avatarSize} />
+      fullName = recipient ? recipient.displayName : t('unknown')
+      contactImage = recipient ? (
+        <ContactCircle address={address} size={avatarSize} />
+      ) : (
+        <Image source={unknownUserIcon} style={styles.image} />
+      )
     }
 
     return (
