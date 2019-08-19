@@ -62,6 +62,17 @@ i18n
     },
   })
 
+const oldT = i18n.t
+
+const defaultTranslations = { lowercaseDollar: 'dollar', camelcaseDollar: 'Dollar' }
+
+const newT = (key: string | string[]) => {
+  // Make substitutions of dollar, dollars, etc
+  return oldT(key, defaultTranslations)
+}
+
+i18n.t = newT
+
 RNLanguages.addEventListener('change', ({ language }: { language: string }) => {
   i18n.changeLanguage(language)
 })
