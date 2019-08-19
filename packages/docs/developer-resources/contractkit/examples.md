@@ -39,7 +39,7 @@ For the moment, we have contract wrappers for:
 - Validators
 - BondedDeposits
 
-In the following weeks will add wrapper for all other contracts
+In the following weeks, we will add some wrappers for all other contracts
 
 ## Accessing web3 contract wrappers
 
