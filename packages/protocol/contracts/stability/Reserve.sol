@@ -1,5 +1,6 @@
 pragma solidity ^0.5.8;
 
+import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
@@ -72,7 +73,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry {
    * @notice Add a token that the reserve will stablize.
    * @param token The address of the token being stabilized.
    */
-  function addToken(address token) external onlyOwner returns (bool) {
+  function addToken(address token) external onlyOwner nonReentrant returns (bool) {
     require(!isToken[token], "token addr already registered");
     // Require an exchange rate between the new token and Gold exists.
     address sortedOraclesAddress = registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID);
@@ -102,7 +103,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry {
     returns (bool)
   {
     require(
-      index < _tokens.length && _tokens[index] == token, 
+      index < _tokens.length && _tokens[index] == token,
       "index into tokens list not mapped to token"
     );
     isToken[token] = false;
@@ -164,7 +165,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry {
    * @notice Returns the tobin tax, recomputing it if it's stale.
    * @return The tobin tax amount as a fraction.
    */
-  function getOrComputeTobinTax() external returns (uint256, uint256) {
+  function getOrComputeTobinTax() external nonReentrant returns (uint256, uint256) {
     // solhint-disable-next-line not-rely-on-time
     if (now.sub(tobinTaxCache.timestamp) > tobinTaxStalenessThreshold) {
       tobinTaxCache.numerator = uint128(computeTobinTax());

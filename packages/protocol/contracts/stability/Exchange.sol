@@ -1,5 +1,6 @@
 pragma solidity ^0.5.8;
 
+import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/IExchange.sol";
@@ -118,6 +119,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
   )
     external
     updateBucketsIfNecessary
+    nonReentrant
     returns (uint256)
   {
     uint256 buyAmount = _getBuyTokenAmount(sellAmount, sellGold);
@@ -293,7 +295,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
    * @notice If conditions are met, updates the Uniswap bucket sizes to track
    * the price reported by the Oracle.
    */
-  function _updateBucketsIfNecessary() private {
+  function _updateBucketsIfNecessary() private nonReentrant {
     if (shouldUpdateBuckets()) {
       // solhint-disable-next-line not-rely-on-time
       lastBucketUpdate = now;

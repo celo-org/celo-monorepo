@@ -537,6 +537,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     VoteValue value
   )
     external
+    nonReentrant
     returns (bool)
   {
     address account = getAccountFromVoter(msg.sender);
