@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "apollo-client": "^2.4.13",
+    "bls12377js": "https://github.com/celo-org/bls12377js#4f596cabb659c4f8969ae4b617f185f2bc74cbbb",
     "chai-subset": "^1.6.0",
     "csv-parser": "^2.0.0",
     "csv-stringify": "^4.3.1",
