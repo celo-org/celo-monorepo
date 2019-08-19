@@ -15,7 +15,8 @@ import ErrorScreen from 'src/app/ErrorScreen'
 import UpgradeScreen from 'src/app/UpgradeScreen'
 import Backup from 'src/backup/Backup'
 import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
-import DappKitTxSignScreen from 'src/dappkit/DappKitTxSignScreen'
+import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
+import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
@@ -55,7 +56,8 @@ export const commonScreens = {
   [Screens.ErrorScreen]: { screen: ErrorScreen },
   [Screens.UpgradeScreen]: { screen: UpgradeScreen },
   [Screens.DappKitAccountAuth]: { screen: DappKitAccountScreen },
-  [Screens.DappKitSignTxScreen]: { screen: DappKitTxSignScreen },
+  [Screens.DappKitSignTxScreen]: { screen: DappKitSignTxScreen },
+  [Screens.DappKitTxDataScreen]: { screen: DappKitTxDataScreen },
   [Screens.Debug]: { screen: Debug },
 }
 

@@ -76,7 +76,7 @@ spec:
           --wsorigins=* \
           --wsapi=eth,net,web3,debug \
           --networkid={{ .Values.networkID }} \
-          --syncmode=celolatest \
+          --syncmode=ultralight \
           --consoleformat=json \
           --consoleoutput=stdout \
           --verbosity={{ .Values.geth.verbosity }}"

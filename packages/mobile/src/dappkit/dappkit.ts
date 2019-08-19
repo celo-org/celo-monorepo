@@ -67,6 +67,7 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
         gas: tx.estimatedGas,
         data: tx.txData,
         nonce: tx.nonce,
+        value: tx.value,
         // @ts-ignore
         gasCurrency: action.request.gasCurrency,
       })
@@ -97,6 +98,6 @@ export function handleDappkitDeepLink(deepLink: string) {
         Logger.warn(TAG, 'Unsupported dapp request type')
     }
   } catch (error) {
-    Logger.debug(TAG, 'Deep link not valid for dappkit. Ignoring.')
+    Logger.debug(TAG, `Deep link not valid for dappkit: ${error}`)
   }
 }

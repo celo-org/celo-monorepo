@@ -8,7 +8,7 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM as Tokens } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import Logo from 'src/icons/Logo'
 import { RecipientWithContact } from 'src/recipients/recipient'
@@ -70,7 +70,7 @@ export interface OwnProps {
   fee?: BigNumber
   isLoadingFee?: boolean
   feeError?: Error
-  currency: CURRENCY_ENUM
+  currency: Tokens
 }
 
 interface StateProps {
@@ -95,10 +95,11 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
   ) => {
     const { t } = this.props
     const amountWithFees = total.minus(fee || 0)
+    const dollarSymbol = CURRENCIES[Tokens.DOLLAR].symbol
 
     return (
       <View style={style.feeContainer}>
-        <LineItemRow currencySymbol={'$'} amount={total} title={t('totalSent')} />
+        <LineItemRow currencySymbol={dollarSymbol} amount={total} title={t('totalSent')} />
         <LineItemRow
           currencySymbol={currencySymbol}
           amount={fee && roundedUpNumber(fee)}
@@ -109,7 +110,7 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
           hasError={!!feeError}
         />
         <LineItemRow
-          currencySymbol={'$'}
+          currencySymbol={dollarSymbol}
           amount={amountWithFees}
           title={t('totalRefunded')}
           boldedStyle={true}

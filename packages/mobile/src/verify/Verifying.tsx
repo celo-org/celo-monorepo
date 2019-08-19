@@ -243,8 +243,8 @@ export class Verifying extends React.Component<Props, State> {
             <CancelButton onCancel={this.onCancelVerification} />
           </View>
         )}
+        <DisconnectBanner />
         <ScrollView style={style.content}>
-          <DisconnectBanner />
           <NuxLogo testID="VerifyLogo" />
           <ProgressIndicatorRow step={numCompleteAttestations} hasFailure={verificationFailed} />
           <Text style={style.textPhoneNumber}>
