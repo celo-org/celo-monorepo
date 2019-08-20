@@ -10,8 +10,8 @@ import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
-import { faucetIcon } from 'src/images/Images'
-import { Recipient } from 'src/recipients/recipient'
+import { faucetIcon, unknownUserIcon } from 'src/images/Images'
+import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import FeeIcon from 'src/send/FeeIcon'
 import { TransactionTypes } from 'src/transactions/reducer'
@@ -106,6 +106,8 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
     e164PhoneNumber: string | undefined,
     defaultCountryCode: string
   ) => {
+    const defaultThumbnail = <Image source={unknownUserIcon} style={[style.defaultIcon]} />
+
     if (type === TransactionTypes.VERIFICATION_FEE || type === TransactionTypes.FAUCET) {
       return <Image source={faucetIcon} style={style.icon} />
     } else {
@@ -113,7 +115,8 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
         <View style={style.avatar}>
           <Avatar
             name={recipient ? recipient.displayName : undefined}
-            recipient={recipient}
+            thumbnailPath={recipient ? getRecipientThumbnail(recipient) : undefined}
+            thumbnail={!recipient ? defaultThumbnail : undefined}
             address={address}
             e164Number={e164PhoneNumber}
             defaultCountryCode={defaultCountryCode}
@@ -355,6 +358,8 @@ const style = StyleSheet.create({
   },
   avatar: {
     marginTop: 5,
+    flexDirection: 'column',
+    justifyContent: 'center',
   },
   pSmall: {
     fontSize: 14,
@@ -365,6 +370,12 @@ const style = StyleSheet.create({
   },
   inviteLine: {
     marginVertical: 30,
+  },
+  defaultIcon: {
+    height: iconSize,
+    width: iconSize,
+    alignSelf: 'center',
+    margin: 'auto',
   },
   inviteTitle: {
     ...fontStyles.pCurrency,

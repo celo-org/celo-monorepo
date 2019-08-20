@@ -6,21 +6,29 @@ import { getE164Number } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { MinimalContact } from 'react-native-contacts'
-import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 
 interface Props {
   contact?: MinimalContact
-  recipient?: Recipient
   name?: string
   address?: string
   e164Number?: string
+  thumbnailPath?: string
+  thumbnail?: JSX.Element
   defaultCountryCode: string
   iconSize: number
 }
 
 export class Avatar extends React.PureComponent<Props> {
   render() {
-    const { contact, recipient, address, defaultCountryCode, iconSize, name } = this.props
+    const {
+      contact,
+      thumbnailPath,
+      thumbnail,
+      address,
+      defaultCountryCode,
+      iconSize,
+      name,
+    } = this.props
     let { e164Number } = this.props
     const userName = contact ? contact.displayName : name
     let nameOrAddress = userName ? userName : address
@@ -40,14 +48,18 @@ export class Avatar extends React.PureComponent<Props> {
 
     return (
       <View style={style.container}>
-        <ContactCircle
-          style={style.contactCircle}
-          contact={contact}
-          thumbnailPath={recipient ? getRecipientThumbnail(recipient) : undefined}
-          name={userName}
-          address={address}
-          size={iconSize}
-        />
+        {thumbnail ? (
+          thumbnail
+        ) : (
+          <ContactCircle
+            style={style.contactCircle}
+            contact={contact}
+            thumbnailPath={thumbnailPath}
+            name={userName}
+            address={address}
+            size={iconSize}
+          />
+        )}
         <Text
           style={[fontStyles.bodySmallSemiBold, style.contactName]}
           numberOfLines={1}

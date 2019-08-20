@@ -12,7 +12,7 @@ interface Props {
   address?: string
   size: number
   preferNameInitial?: boolean
-  thumbnailPath?: string | null
+  thumbnailPath?: string
   displayInitials?: string | null
 }
 
@@ -25,12 +25,13 @@ const getContactInitial = (contact: MinimalContact) => getNameInitial(contact.di
 const getNameInitial = (name: string) => name.charAt(0).toLocaleUpperCase()
 
 export default class ContactCircle extends React.PureComponent<Props> {
-  getInitials = (): string | undefined => {
+  getInitials = (): string => {
     const { preferNameInitial, name, contact } = this.props
     return (
       (preferNameInitial && name && getNameInitial(name)) ||
       (contact && getContactInitial(contact)) ||
-      (name && getNameInitial(name))
+      (name && getNameInitial(name)) ||
+      '#'
     )
   }
 
@@ -54,7 +55,7 @@ export default class ContactCircle extends React.PureComponent<Props> {
     }
 
     // Initial conditional check in render(), must be valid here
-    const initials = this.getInitials()!
+    const initials = this.getInitials()
 
     return <Text style={textStyle}>{initials.toLocaleUpperCase()}</Text>
   }
