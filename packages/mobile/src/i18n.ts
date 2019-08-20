@@ -37,10 +37,17 @@ const languageDetector = {
   cacheUserLanguage: () => {},
 }
 
-const defaultTranslationsENUS: { [key: string]: string } = { dollar: 'dollar', Dollar: 'Dollar' }
+const defaultTranslationsENUS: { [key: string]: string } = {
+  CeloDollars: 'Celo Dollars',
+  Dollar: 'Dollar',
+  Dollars: 'Dollars',
+  dollars: 'dollars',
+}
 const defaultTranslationsESAR: { [key: string]: string } = {
-  lowercaseDollar: 'dollares',
-  Dollar: 'Dollares',
+  CeloDollars: 'Celo Dólares',
+  Dollar: 'Dólar',
+  Dollars: 'Dólares',
+  dollars: 'dólares',
 }
 const defaultTranslations: { [key: string]: any } = {
   ['en-US']: defaultTranslationsENUS,
