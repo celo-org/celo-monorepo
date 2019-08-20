@@ -32,7 +32,7 @@ async function getPortForwardArgs(celoEnv: string, component?: string, ports = d
   }
   console.log(`Port-forwarding to ${celoEnv} ${component} ${ports}`)
   const podName = await execCmd(
-    `kubectl get pods --namespace ${celoEnv} -l "app=ethereum, component=${component}, release=${celoEnv}" --field-selector=status.phase=Running -o jsonpath="{.items[1].metadata.name}"`
+    `kubectl get pods --namespace ${celoEnv} -l "app=ethereum, component=${component}, release=${celoEnv}" --field-selector=status.phase=Running -o jsonpath="{.items[0].metadata.name}"`
   )
   return ['port-forward', `--namespace=${celoEnv}`, podName[0], ...ports.split(' ')]
 }
