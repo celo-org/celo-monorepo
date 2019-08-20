@@ -2,9 +2,9 @@
 
 This page walks you through the main functionalities of DAppKit. You can also find the result of this walkthrough on the [expo base template](https://github.com/celo-org/dappkit-base) on branch [`dappkit-usage`](https://github.com/celo-org/dappkit-base/tree/dappkit-usage).
 
-DAppKit uses deeplinks to communicate between your DApp and the Celo Wallet. All "requests" that your DApp makes to the Wallet needs to contain the follwing meta payload:
+DAppKit uses deeplinks to communicate between your DApp and the Celo Wallet. All "requests" that your DApp makes to the Wallet needs to contain the following meta payload:
 
-- `requestId` A string you can pass to DAppKit, that you can use to listen to the resopnse for that request
+- `requestId` A string you can pass to DAppKit, that you can use to listen to the response for that request
 - `dappName` A string that will be displayed to the user, indicating the DApp requesting access/signature.
 - `callback` The deeplink that the Celo Wallet will use to redirect the user back to the DApp with the appropriate payload. If you want the user to be directed to a particular page in your DApp. With Expo, it's as simple as `Linking.makeUrl('/my/path')`
 
@@ -84,7 +84,7 @@ Object.entries(this.state.phoneNumbersByAddress).map(([address, entry]) => {
 
 ## Signing Transactions
 
-Let's go from accessing account information to submitting transactions. To alter state on the blockchain, make a transaction object with your smart contract or any of the Celo Core Contracts in ContractKit. All that is left to do is to pass the transaction object to DAppKit.
+Let's go from accessing account information to submitting transactions. To alter state on the blockchain, you need to make a transaction object with your smart contract or any of the Celo Core Contracts in ContractKit. All that is left to do is to pass the transaction object to DAppKit.
 
 ([expo base template commit](https://github.com/celo-org/dappkit-base/commit/cf35c82d7650e7b6bc7208ece32440d3a32d9cc5))
 

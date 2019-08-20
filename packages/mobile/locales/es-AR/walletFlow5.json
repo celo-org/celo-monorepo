@@ -59,5 +59,6 @@
     "1":
       "Un recordatorio amistoso de que está utilizando una compilación de Testnet - los saldos aquí no son reales."
   },
-  "dismiss": "Ocultar"
+  "dismiss": "Ocultar",
+  "unknown": "Desconocido"
 }
