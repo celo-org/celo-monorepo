@@ -1,6 +1,6 @@
 import { CeloContract } from './base'
 import { newAttestations } from './generated/Attestations'
-import { newBondedDeposits } from './generated/BondedDeposits'
+import { newLockedGold } from './generated/LockedGold'
 import { newEscrow } from './generated/Escrow'
 import { newExchange } from './generated/Exchange'
 import { newGasCurrencyWhitelist } from './generated/GasCurrencyWhitelist'
@@ -18,7 +18,7 @@ import { ContractKit } from './kit'
 
 const ContractFactories = {
   [CeloContract.Attestations]: newAttestations,
-  [CeloContract.BondedDeposits]: newBondedDeposits,
+  [CeloContract.LockedGold]: newLockedGold,
   [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
   [CeloContract.GasCurrencyWhitelist]: newGasCurrencyWhitelist,
@@ -45,8 +45,8 @@ export class Web3ContractCache {
   getAttestations() {
     return this.getContract(CeloContract.Attestations)
   }
-  getBondedDeposits() {
-    return this.getContract(CeloContract.BondedDeposits)
+  getLockedGold() {
+    return this.getContract(CeloContract.LockedGold)
   }
   getEscrow() {
     return this.getContract(CeloContract.Escrow)

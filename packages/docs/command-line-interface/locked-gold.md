@@ -1,12 +1,12 @@
 ---
-description: Manage bonded deposits to participate in governance and earn rewards
+description: Manage locked Gold to participate in governance and earn rewards
 ---
 
 ## Commands
 
-### Deposit
+### Commitment
 
-Create a bonded deposit given notice period and gold amount
+Create a locked Gold commitment given notice period and gold amount
 
 ```
 USAGE
@@ -27,7 +27,7 @@ _See code: [packages/cli/src/src/commands/bonds/deposit.ts](https://github.com/c
 
 ### List
 
-View information about all of the account's deposits
+View information about all of the account's commitments
 
 ```
 USAGE
@@ -41,7 +41,7 @@ _See code: [packages/cli/src/src/commands/bonds/list.ts](https://github.com/celo
 
 ### Notify
 
-Notify a bonded deposit given notice period and gold amount
+Notify a locked Gold commitment given notice period and gold amount
 
 ```
 USAGE
@@ -52,7 +52,7 @@ OPTIONS
   --goldAmount=goldAmount                            (required) unit amount of gold token (cGLD)
 
   --noticePeriod=noticePeriod                        (required) duration (seconds) from notice to withdrawable; doubles
-                                                     as ID of a bonded deposit;
+                                                     as ID of a locked Gold commitment;
 
 EXAMPLE
   notify --noticePeriod=3600 --goldAmount=500
@@ -62,7 +62,7 @@ _See code: [packages/cli/src/src/commands/bonds/notify.ts](https://github.com/ce
 
 ### Register
 
-Register an account for bonded deposit eligibility
+Register an account for locked Gold commitment eligibility
 
 ```
 USAGE
@@ -79,7 +79,7 @@ _See code: [packages/cli/src/src/commands/bonds/register.ts](https://github.com/
 
 ### Rewards
 
-Manage rewards for bonded deposit account
+Manage rewards for locked Gold account
 
 ```
 USAGE
@@ -87,7 +87,7 @@ USAGE
 
 OPTIONS
   -d, --delegate=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Delegate rewards to provided account
-  -r, --redeem                                               Redeem accrued rewards from bonded deposits
+  -r, --redeem                                               Redeem accrued rewards from locked Gold
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d          (required) Account Address
 
 EXAMPLES

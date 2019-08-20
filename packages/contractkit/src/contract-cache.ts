@@ -1,6 +1,6 @@
 import { CeloContract } from './base'
 import { ContractKit } from './kit'
-import { BondedDepositsWrapper } from './wrappers/BondedDeposits'
+import { LockedGoldWrapper } from './wrappers/LockedGold'
 import { ExchangeWrapper } from './wrappers/Exchange'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
@@ -8,7 +8,7 @@ import { ValidatorsWrapper } from './wrappers/Validators'
 
 const WrapperFactories = {
   // [CeloContract.Attestations]: AttestationsWrapper,
-  [CeloContract.BondedDeposits]: BondedDepositsWrapper,
+  [CeloContract.LockedGold]: LockedGoldWrapper,
   // [CeloContract.Escrow]: EscrowWrapper,
   [CeloContract.Exchange]: ExchangeWrapper,
   // [CeloContract.GasCurrencyWhitelist]: GasCurrencyWhitelistWrapper,
@@ -29,7 +29,7 @@ export type ValidWrappers = keyof CFType
 
 interface WrapperCacheMap {
   // [CeloContract.Attestations]?: AttestationsWrapper,
-  [CeloContract.BondedDeposits]?: BondedDepositsWrapper
+  [CeloContract.LockedGold]?: LockedGoldWrapper
   // [CeloContract.Escrow]?: EscrowWrapper,
   [CeloContract.Exchange]?: ExchangeWrapper
   // [CeloContract.GasCurrencyWhitelist]?: GasCurrencyWhitelistWrapper,
@@ -54,8 +54,8 @@ export class WrapperCache {
   // getAttestations() {
   //   return this.getWrapper(CeloContract.Attestations, newAttestations)
   // }
-  getBondedDeposits() {
-    return this.getContract(CeloContract.BondedDeposits)
+  getLockedGold() {
+    return this.getContract(CeloContract.LockedGold)
   }
   // getEscrow() {
   //   return this.getWrapper(CeloContract.Escrow, newEscrow)

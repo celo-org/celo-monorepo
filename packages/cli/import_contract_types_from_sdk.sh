@@ -3,7 +3,7 @@ set -euo pipefail
 
 environment="$1"
 
-yarn --cwd=../walletkit build $environment
+yarn --cwd=../walletkit build:for-env $environment
 
 rm -rf ./src/generated
 mkdir -p ./src/generated/contracts

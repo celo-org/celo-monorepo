@@ -1,29 +1,29 @@
-import { bondedDepositsRegistryId } from '@celo/protocol/lib/registry-utils'
+import { lockedGoldRegistryId } from '@celo/protocol/lib/registry-utils'
 import {
   deployProxyAndImplementation,
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { BondedDepositsInstance, RegistryInstance } from 'types'
+import { LockedGoldInstance, RegistryInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
   const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
     'Registry',
     artifacts
   )
-  return [registry.address, config.bondedDeposits.maxNoticePeriod]
+  return [registry.address, config.lockedGold.maxNoticePeriod]
 }
 
-module.exports = deployProxyAndImplementation<BondedDepositsInstance>(
+module.exports = deployProxyAndImplementation<LockedGoldInstance>(
   web3,
   artifacts,
-  'BondedDeposits',
+  'LockedGold',
   initializeArgs,
-  async (bondedDeposits: BondedDepositsInstance) => {
+  async (lockedGold: LockedGoldInstance) => {
     const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
       'Registry',
       artifacts
     )
-    await registry.setAddressFor(bondedDepositsRegistryId, bondedDeposits.address)
+    await registry.setAddressFor(lockedGoldRegistryId, lockedGold.address)
   }
 )

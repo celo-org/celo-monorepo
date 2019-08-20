@@ -1,5 +1,5 @@
 export const attestationsRegistryId: string = 'Attestations'
-export const bondedDepositsRegistryId: string = 'BondedDeposits'
+export const lockedGoldRegistryId: string = 'LockedGold'
 export const escrowRegistryId: string = 'Escrow'
 export const exchangeRegistryId: string = 'Exchange'
 export const gasCurrencyWhitelistRegistryId: string = 'GasCurrencyWhitelist'

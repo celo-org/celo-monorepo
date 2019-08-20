@@ -1,7 +1,7 @@
 const argv = require('minimist')(process.argv.slice(2), { string: ['truffle_override', 'network'] })
 require('ts-node/register')
 
-const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
+const OG_FROM = '0xF4314cb9046bECe6AA54bb9533155434d0c76909'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
 const INTEGRATION_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
 const INTEGRATION_TESTING_FROM = '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'

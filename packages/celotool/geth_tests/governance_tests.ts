@@ -13,7 +13,7 @@ const assert = require('chai').assert
 const Web3 = require('web3')
 
 // TODO(asa): Use the contract kit here instead
-const bondedDepositsAbi = [
+const lockedGoldAbi = [
   {
     constant: true,
     inputs: [
@@ -183,7 +183,7 @@ describe('governance tests', () => {
 
   const hooks: any = getHooks(gethConfig)
   let web3: any
-  let bondedDeposits: any
+  let lockedGold: any
   let validators: any
   let goldToken: any
 
@@ -197,10 +197,7 @@ describe('governance tests', () => {
   const restart = async () => {
     await hooks.restart()
     web3 = new Web3('http://localhost:8545')
-    bondedDeposits = new web3.eth.Contract(
-      bondedDepositsAbi,
-      await getContractAddress('BondedDepositsProxy')
-    )
+    lockedGold = new web3.eth.Contract(lockedGoldAbi, await getContractAddress('LockedGoldProxy'))
     goldToken = new web3.eth.Contract(erc20Abi, await getContractAddress('GoldTokenProxy'))
     validators = new web3.eth.Contract(validatorsAbi, await getContractAddress('ValidatorsProxy'))
   }
@@ -270,7 +267,7 @@ describe('governance tests', () => {
     const { r, s, v } = await getParsedSignatureOfAddress(account, delegate, delegateWeb3)
     await unlockAccount(account, web3)
     const rewardRole = 2
-    const tx = bondedDeposits.methods.delegateRole(rewardRole, delegate, v, r, s)
+    const tx = lockedGold.methods.delegateRole(rewardRole, delegate, v, r, s)
     let gas = txOptions.gas
     // We overestimate to account for variations in the fraction reduction necessary to redeem
     // rewards.
@@ -282,7 +279,7 @@ describe('governance tests', () => {
 
   const redeemRewards = async (account: string, txOptions: any = {}) => {
     await unlockAccount(account, web3)
-    const tx = bondedDeposits.methods.redeemRewards()
+    const tx = lockedGold.methods.redeemRewards()
     let gas = txOptions.gas
     // We overestimate to account for variations in the fraction reduction necessary to redeem
     // rewards.
@@ -363,7 +360,7 @@ describe('governance tests', () => {
     })
   })
 
-  describe('when a bonded deposit account with weight exists', () => {
+  describe('when a locked Gold account with weight exists', () => {
     const account = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
     const delegate = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
 
@@ -379,7 +376,7 @@ describe('governance tests', () => {
         privateKey: 'f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d',
       }
       await initAndStartGeth(hooks.gethBinaryPath, delegateInstance)
-      // Note that we don't need to create an account or make a deposit as this has already been
+      // Note that we don't need to create an account or make a commitment as this has already been
       // done in the migration.
       await delegateRewards(account, delegate)
     })
@@ -404,10 +401,10 @@ describe('governance tests', () => {
         addressesWithBalance.push(validator)
         goldGenesisSupply = goldGenesisSupply.plus(genesis.alloc[validator].balance)
       }
-      // Block rewards are paid to governance and bonded deposits.
+      // Block rewards are paid to governance and locked Gold.
       // Governance also receives a portion of transaction fees.
       addressesWithBalance.push(await getContractAddress('GovernanceProxy'))
-      addressesWithBalance.push(await getContractAddress('BondedDepositsProxy'))
+      addressesWithBalance.push(await getContractAddress('LockedGoldProxy'))
       // Some gold is sent to the reserve and exchange during migrations.
       addressesWithBalance.push(await getContractAddress('ReserveProxy'))
       addressesWithBalance.push(await getContractAddress('ExchangeProxy'))
@@ -418,7 +415,7 @@ describe('governance tests', () => {
       // `addressesWithBalance`. Therefore, we check the gold total supply at a block before
       // that gold is sent.
       // We don't set the total supply until block rewards are paid out, which can happen once
-      // either BondedDeposits or Governance are registered.
+      // either LockedGold or Governance are registered.
       const blockNumber = 275
       const goldTotalSupply = await goldToken.methods.totalSupply().call({}, blockNumber)
       const balances = await Promise.all(

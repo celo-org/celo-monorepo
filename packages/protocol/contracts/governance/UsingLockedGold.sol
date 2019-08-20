@@ -1,14 +1,14 @@
 pragma solidity ^0.5.8;
 
-import "./interfaces/IBondedDeposits.sol";
+import "./interfaces/ILockedGold.sol";
 import "../common/UsingRegistry.sol";
 
 
 /**
- * @title A contract for calling functions on the BondedDeposits contract.
+ * @title A contract for calling functions on the LockedGold contract.
  * @dev Any contract calling these functions should guard against reentrancy.
  */
-contract UsingBondedDeposits is UsingRegistry {
+contract UsingLockedGold is UsingRegistry {
   /**
    * @notice Returns whether or not an account's voting power is frozen.
    * @param account The address of the account.
@@ -16,7 +16,7 @@ contract UsingBondedDeposits is UsingRegistry {
    * @dev Frozen accounts can retract existing votes but not make future votes.
    */
   function isVotingFrozen(address account) internal view returns (bool) {
-    return getBondedDeposits().isVotingFrozen(account);
+    return getLockedGold().isVotingFrozen(account);
   }
 
   /**
@@ -26,9 +26,9 @@ contract UsingBondedDeposits is UsingRegistry {
    * @return The associated account.
    */
   function getAccountFromVoter(address accountOrDelegate) internal view returns (address) {
-    return getBondedDeposits().getAccountFromDelegateAndRole(
+    return getLockedGold().getAccountFromDelegateAndRole(
       accountOrDelegate,
-      IBondedDeposits.DelegateRole.Voting
+      ILockedGold.DelegateRole.Voting
     );
   }
 
@@ -38,9 +38,9 @@ contract UsingBondedDeposits is UsingRegistry {
    * @return The associated validator address.
    */
   function getValidatorFromAccount(address account) internal view returns (address) {
-    return getBondedDeposits().getDelegateFromAccountAndRole(
+    return getLockedGold().getDelegateFromAccountAndRole(
       account,
-      IBondedDeposits.DelegateRole.Validating
+      ILockedGold.DelegateRole.Validating
     );
   }
 
@@ -51,9 +51,9 @@ contract UsingBondedDeposits is UsingRegistry {
    * @return The associated account.
    */
   function getAccountFromValidator(address accountOrDelegate) internal view returns (address) {
-    return getBondedDeposits().getAccountFromDelegateAndRole(
+    return getLockedGold().getAccountFromDelegateAndRole(
       accountOrDelegate,
-      IBondedDeposits.DelegateRole.Validating
+      ILockedGold.DelegateRole.Validating
     );
   }
 
@@ -63,16 +63,16 @@ contract UsingBondedDeposits is UsingRegistry {
    * @return The voting weight of `account`.
    */
   function getAccountWeight(address account) internal view returns (uint256) {
-    return getBondedDeposits().getAccountWeight(account);
+    return getLockedGold().getAccountWeight(account);
   }
 
   /**
-   * @notice Returns the bonded deposit value for particular account and notice period.
+   * @notice Returns the locked Gold commitment value for particular account and notice period.
    * @param account The address of the account.
-   * @param noticePeriod The notice period of the bonded deposit.
-   * @return The value of the bonded deposit.
+   * @param noticePeriod The notice period of the locked Gold commitment.
+   * @return The value of the locked Gold commitment.
    */
-  function getBondedDepositValue(
+  function getLockedCommitmentValue(
     address account,
     uint256 noticePeriod
   )
@@ -81,11 +81,11 @@ contract UsingBondedDeposits is UsingRegistry {
     returns (uint256)
   {
     uint256 value;
-    (value,) = getBondedDeposits().getBondedDeposit(account, noticePeriod);
+    (value,) = getLockedGold().getLockedCommitment(account, noticePeriod);
     return value;
   }
 
-  function getBondedDeposits() private view returns(IBondedDeposits) {
-    return IBondedDeposits(registry.getAddressForOrDie(BONDED_DEPOSITS_REGISTRY_ID));
+  function getLockedGold() private view returns(ILockedGold) {
+    return ILockedGold(registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
   }
 }

@@ -57,7 +57,7 @@ module.exports = deployProxyAndImplementation<GovernanceInstance>(
 
     const proxyAndImplementationOwnedByGovernance = [
       'Attestations',
-      'BondedDeposits',
+      'LockedGold',
       'Escrow',
       'Exchange',
       'GasCurrencyWhitelist',

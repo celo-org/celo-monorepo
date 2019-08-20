@@ -4,7 +4,7 @@ import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-import "./interfaces/IBondedDeposits.sol";
+import "./interfaces/ILockedGold.sol";
 import "./interfaces/IGovernance.sol";
 import "./interfaces/IValidators.sol";
 
@@ -14,22 +14,22 @@ import "../common/interfaces/IERC20Token.sol";
 import "../common/Signatures.sol";
 import "../common/FractionUtil.sol";
 
-contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, UsingRegistry {
+contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry {
 
   using FractionUtil for FractionUtil.Fraction;
   using SafeMath for uint256;
 
   // TODO(asa): Remove index for gas efficiency if two updates to the same slot costs extra gas.
-  struct Deposit {
+  struct Commitment {
     uint128 value;
     uint128 index;
   }
 
-  struct Deposits {
-    // Maps a notice period in seconds to a bonded deposit.
-    mapping(uint256 => Deposit) bonded;
-    // Maps an availability time in seconds since epoch to a notified deposit.
-    mapping(uint256 => Deposit) notified;
+  struct Commitments {
+    // Maps a notice period in seconds to a locked Gold commitment.
+    mapping(uint256 => Commitment) locked;
+    // Maps an availability time in seconds since epoch to a notified commitment.
+    mapping(uint256 => Commitment) notified;
     uint256[] noticePeriods;
     uint256[] availabilityTimes;
   }
@@ -47,7 +47,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     bool votingFrozen;
     // The timestamp of the last time that rewards were redeemed.
     uint96 rewardsLastRedeemed;
-    Deposits deposits;
+    Commitments commitments;
   }
 
   // TODO(asa): Add minNoticePeriod
@@ -77,20 +77,20 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     address indexed account
   );
 
-  event DepositBonded(
+  event NewCommitment(
     address indexed account,
     uint256 value,
     uint256 noticePeriod
   );
 
-  event DepositNotified(
+  event CommitmentNotified(
     address indexed account,
     uint256 value,
     uint256 noticePeriod,
     uint256 availabilityTime
   );
 
-  event DepositRebonded(
+  event CommitmentExtended(
     address indexed account,
     uint256 value,
     uint256 noticePeriod,
@@ -246,11 +246,11 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
   }
 
   /**
-   * @notice Adds a bonded deposit to `msg.sender`'s account.
-   * @param noticePeriod The notice period for the deposit.
+   * @notice Adds a locked Gold commitment to `msg.sender`'s account.
+   * @param noticePeriod The notice period for the commitment.
    * @return The account's new weight.
    */
-  function deposit(
+  function newCommitment(
     uint256 noticePeriod
   )
     external
@@ -263,19 +263,19 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     // _redeemRewards(msg.sender);
     require(msg.value > 0 && noticePeriod <= maxNoticePeriod);
     Account storage account = accounts[msg.sender];
-    Deposit storage bonded = account.deposits.bonded[noticePeriod];
-    updateBondedDeposit(account, uint256(bonded.value).add(msg.value), noticePeriod);
-    emit DepositBonded(msg.sender, msg.value, noticePeriod);
+    Commitment storage locked = account.commitments.locked[noticePeriod];
+    updateLockedCommitment(account, uint256(locked.value).add(msg.value), noticePeriod);
+    emit NewCommitment(msg.sender, msg.value, noticePeriod);
     return account.weight;
   }
 
   /**
-   * @notice Notifies a bonded deposit, allowing funds to be withdrawn after the notice period.
-   * @param value The amount of the deposit to eventually withdraw.
-   * @param noticePeriod The notice period of the bonded deposit.
+   * @notice Notifies a locked Gold commitment, allowing funds to be withdrawn after the notice period.
+   * @param value The amount of the commitment to eventually withdraw.
+   * @param noticePeriod The notice period of the locked Gold commitment.
    * @return The account's new weight.
    */
-  function notify(
+  function notifyCommitment(
     uint256 value,
     uint256 noticePeriod
   )
@@ -286,26 +286,26 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     require(isAccount(msg.sender) && isNotValidating(msg.sender) && !isVoting(msg.sender));
     // _redeemRewards(msg.sender);
     Account storage account = accounts[msg.sender];
-    Deposit storage bonded = account.deposits.bonded[noticePeriod];
-    require(bonded.value >= value && value > 0);
-    updateBondedDeposit(account, uint256(bonded.value).sub(value), noticePeriod);
+    Commitment storage locked = account.commitments.locked[noticePeriod];
+    require(locked.value >= value && value > 0);
+    updateLockedCommitment(account, uint256(locked.value).sub(value), noticePeriod);
 
     // solhint-disable-next-line not-rely-on-time
     uint256 availabilityTime = now.add(noticePeriod);
-    Deposit storage notified = account.deposits.notified[availabilityTime];
+    Commitment storage notified = account.commitments.notified[availabilityTime];
     updateNotifiedDeposit(account, uint256(notified.value).add(value), availabilityTime);
 
-    emit DepositNotified(msg.sender, value, noticePeriod, availabilityTime);
+    emit CommitmentNotified(msg.sender, value, noticePeriod, availabilityTime);
     return account.weight;
   }
 
   /**
-   * @notice Rebonds a notified deposit, with notice period >= the remaining time to availability.
-   * @param value The amount of the deposit to rebond.
-   * @param availabilityTime The availability time of the notified deposit.
+   * @notice Rebonds a notified commitment, with notice period >= the remaining time to availability.
+   * @param value The amount of the commitment to rebond.
+   * @param availabilityTime The availability time of the notified commitment.
    * @return The account's new weight.
    */
-  function rebond(
+  function extendCommitment(
     uint256 value,
     uint256 availabilityTime
   )
@@ -318,23 +318,23 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     require(availabilityTime > now);
     // _redeemRewards(msg.sender);
     Account storage account = accounts[msg.sender];
-    Deposit storage notified = account.deposits.notified[availabilityTime];
+    Commitment storage notified = account.commitments.notified[availabilityTime];
     require(notified.value >= value && value > 0);
     updateNotifiedDeposit(account, uint256(notified.value).sub(value), availabilityTime);
     // solhint-disable-next-line not-rely-on-time
     uint256 noticePeriod = availabilityTime.sub(now);
-    Deposit storage bonded = account.deposits.bonded[noticePeriod];
-    updateBondedDeposit(account, uint256(bonded.value).add(value), noticePeriod);
-    emit DepositRebonded(msg.sender, value, noticePeriod, availabilityTime);
+    Commitment storage locked = account.commitments.locked[noticePeriod];
+    updateLockedCommitment(account, uint256(locked.value).add(value), noticePeriod);
+    emit CommitmentExtended(msg.sender, value, noticePeriod, availabilityTime);
     return account.weight;
   }
 
   /**
-   * @notice Withdraws a notified deposit after the duration of the notice period.
-   * @param availabilityTime The availability time of the notified deposit.
+   * @notice Withdraws a notified commitment after the duration of the notice period.
+   * @param availabilityTime The availability time of the notified commitment.
    * @return The account's new weight.
    */
-  function withdraw(
+  function withdrawCommitment(
     uint256 availabilityTime
   )
     external
@@ -347,7 +347,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     require(now >= availabilityTime);
     _redeemRewards(msg.sender);
     Account storage account = accounts[msg.sender];
-    Deposit storage notified = account.deposits.notified[availabilityTime];
+    Commitment storage notified = account.commitments.notified[availabilityTime];
     uint256 value = notified.value;
     require(value > 0);
     updateNotifiedDeposit(account, 0, availabilityTime);
@@ -359,9 +359,9 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
   }
 
   /**
-   * @notice Increases the notice period for all or part of a bonded deposit.
-   * @param value The amount of the bonded deposit to increase the notice period for.
-   * @param noticePeriod The notice period of the bonded deposit.
+   * @notice Increases the notice period for all or part of a locked Gold commitment.
+   * @param value The amount of the locked Gold commitment to increase the notice period for.
+   * @param noticePeriod The notice period of the locked Gold commitment.
    * @param increase The amount to increase the notice period by.
    * @return The account's new weight.
    */
@@ -378,12 +378,12 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     // _redeemRewards(msg.sender);
     require(value > 0 && increase > 0);
     Account storage account = accounts[msg.sender];
-    Deposit storage bonded = account.deposits.bonded[noticePeriod];
-    require(bonded.value >= value);
-    updateBondedDeposit(account, uint256(bonded.value).sub(value), noticePeriod);
+    Commitment storage locked = account.commitments.locked[noticePeriod];
+    require(locked.value >= value);
+    updateLockedCommitment(account, uint256(locked.value).sub(value), noticePeriod);
     uint256 increasedNoticePeriod = noticePeriod.add(increase);
-    uint256 increasedValue = account.deposits.bonded[increasedNoticePeriod].value;
-    updateBondedDeposit(account, increasedValue.add(value), increasedNoticePeriod);
+    uint256 increasedValue = account.commitments.locked[increasedNoticePeriod].value;
+    updateLockedCommitment(account, increasedValue.add(value), increasedNoticePeriod);
     emit NoticePeriodIncreased(msg.sender, value, noticePeriod, increase);
     return account.weight;
   }
@@ -414,32 +414,32 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
   }
 
   /**
-   * @notice Returns the notice periods of all bonded deposits for an account.
+   * @notice Returns the notice periods of all locked Gold for an account.
    * @param _account The address of the account.
-   * @return The notice periods of all bonded deposits for `_account`.
+   * @return The notice periods of all locked Gold for `_account`.
    */
   function getNoticePeriods(address _account) external view returns (uint256[] memory) {
     Account storage account = accounts[_account];
-    return account.deposits.noticePeriods;
+    return account.commitments.noticePeriods;
   }
 
   /**
-   * @notice Returns the availability times of all notified deposits for an account.
+   * @notice Returns the availability times of all notified commitments for an account.
    * @param _account The address of the account.
-   * @return The availability times of all notified deposits for `_account`.
+   * @return The availability times of all notified commitments for `_account`.
    */
   function getAvailabilityTimes(address _account) external view returns (uint256[] memory) {
     Account storage account = accounts[_account];
-    return account.deposits.availabilityTimes;
+    return account.commitments.availabilityTimes;
   }
 
   /**
-   * @notice Returns the value and index of a specified bonded deposit.
+   * @notice Returns the value and index of a specified locked Gold commitment.
    * @param _account The address of the account.
-   * @param noticePeriod The notice period of the bonded deposit.
-   * @return The value and index of the specified bonded deposit.
+   * @param noticePeriod The notice period of the locked Gold commitment.
+   * @return The value and index of the specified locked Gold commitment.
    */
-  function getBondedDeposit(
+  function getLockedCommitment(
     address _account,
     uint256 noticePeriod
   )
@@ -448,17 +448,17 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     returns (uint256, uint256)
   {
     Account storage account = accounts[_account];
-    Deposit storage bonded = account.deposits.bonded[noticePeriod];
-    return (bonded.value, bonded.index);
+    Commitment storage locked = account.commitments.locked[noticePeriod];
+    return (locked.value, locked.index);
   }
 
   /**
-   * @notice Returns the value and index of a specified notified deposit.
+   * @notice Returns the value and index of a specified notified commitment.
    * @param _account The address of the account.
-   * @param availabilityTime The availability time of the notified deposit.
-   * @return The value and index of the specified notified deposit.
+   * @param availabilityTime The availability time of the notified commitment.
+   * @return The value and index of the specified notified commitment.
    */
-  function getNotifiedDeposit(
+  function getNotifiedCommitment(
     address _account,
     uint256 availabilityTime
   )
@@ -467,7 +467,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     returns (uint256, uint256)
   {
     Account storage account = accounts[_account];
-    Deposit storage notified = account.deposits.notified[availabilityTime];
+    Commitment storage notified = account.commitments.notified[availabilityTime];
     return (notified.value, notified.index);
   }
 
@@ -518,13 +518,13 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
   }
 
   /**
-   * @notice Returns the weight of a deposit for a given notice period.
-   * @param value The value of the deposit.
-   * @param noticePeriod The notice period of the deposit.
-   * @return The weight of the deposit.
-   * @dev A deposit's weight is (1 + sqrt(noticePeriodDays) / 30) * value.
+   * @notice Returns the weight of a commitment for a given notice period.
+   * @param value The value of the commitment.
+   * @param noticePeriod The notice period of the commitment.
+   * @return The weight of the commitment.
+   * @dev A commitment's weight is (1 + sqrt(noticePeriodDays) / 30) * value.
    */
-  function getDepositWeight(uint256 value, uint256 noticePeriod) public pure returns (uint256) {
+  function getCommitmentWeight(uint256 value, uint256 noticePeriod) public pure returns (uint256) {
     uint256 precision = 10000;
     uint256 noticeDays = noticePeriod.div(1 days);
     uint256 preciseMultiplier = sqrt(noticeDays).mul(precision).div(30).add(precision);
@@ -589,36 +589,36 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
   }
 
   /**
-   * @notice Updates the bonded deposit for a given notice period to a new value.
-   * @param account The account to update the bonded deposit for.
-   * @param value The new value of the bonded deposit.
-   * @param noticePeriod The notice period of the bonded deposit.
+   * @notice Updates the locked Gold commitment for a given notice period to a new value.
+   * @param account The account to update the locked Gold commitment for.
+   * @param value The new value of the locked Gold commitment.
+   * @param noticePeriod The notice period of the locked Gold commitment.
    */
-  function updateBondedDeposit(
+  function updateLockedCommitment(
     Account storage account,
     uint256 value,
     uint256 noticePeriod
   )
     private
   {
-    Deposit storage bonded = account.deposits.bonded[noticePeriod];
-    require(value != bonded.value);
+    Commitment storage locked = account.commitments.locked[noticePeriod];
+    require(value != locked.value);
     uint256 weight;
-    if (bonded.value == 0) {
-      bonded.index = uint128(account.deposits.noticePeriods.length);
-      bonded.value = uint128(value);
-      account.deposits.noticePeriods.push(noticePeriod);
-      weight = getDepositWeight(value, noticePeriod);
+    if (locked.value == 0) {
+      locked.index = uint128(account.commitments.noticePeriods.length);
+      locked.value = uint128(value);
+      account.commitments.noticePeriods.push(noticePeriod);
+      weight = getCommitmentWeight(value, noticePeriod);
       account.weight = account.weight.add(weight);
       totalWeight = totalWeight.add(weight);
     } else if (value == 0) {
-      weight = getDepositWeight(bonded.value, noticePeriod);
+      weight = getCommitmentWeight(locked.value, noticePeriod);
       account.weight = account.weight.sub(weight);
       totalWeight = totalWeight.sub(weight);
-      deleteDeposit(bonded, account.deposits, DepositType.Bonded);
+      deleteCommitment(locked, account.commitments, CommitmentType.Locked);
     } else {
-      uint256 originalWeight = getDepositWeight(bonded.value, noticePeriod);
-      weight = getDepositWeight(value, noticePeriod);
+      uint256 originalWeight = getCommitmentWeight(locked.value, noticePeriod);
+      weight = getCommitmentWeight(value, noticePeriod);
 
       uint256 difference;
       if (weight >= originalWeight) {
@@ -631,15 +631,15 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
         totalWeight = totalWeight.sub(difference);
       }
 
-      bonded.value = uint128(value);
+      locked.value = uint128(value);
     }
   }
 
   /**
-   * @notice Updates the notified deposit for a given availability time to a new value.
-   * @param account The account to update the notified deposit for.
-   * @param value The new value of the notified deposit.
-   * @param availabilityTime The availability time of the notified deposit.
+   * @notice Updates the notified commitment for a given availability time to a new value.
+   * @param account The account to update the notified commitment for.
+   * @param value The new value of the notified commitment.
+   * @param availabilityTime The availability time of the notified commitment.
    */
   function updateNotifiedDeposit(
     Account storage account,
@@ -648,18 +648,18 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
   )
     private
   {
-    Deposit storage notified = account.deposits.notified[availabilityTime];
+    Commitment storage notified = account.commitments.notified[availabilityTime];
     require(value != notified.value);
     if (notified.value == 0) {
-      notified.index = uint128(account.deposits.availabilityTimes.length);
+      notified.index = uint128(account.commitments.availabilityTimes.length);
       notified.value = uint128(value);
-      account.deposits.availabilityTimes.push(availabilityTime);
+      account.commitments.availabilityTimes.push(availabilityTime);
       account.weight = account.weight.add(notified.value);
       totalWeight = totalWeight.add(notified.value);
     } else if (value == 0) {
       account.weight = account.weight.sub(notified.value);
       totalWeight = totalWeight.sub(notified.value);
-      deleteDeposit(notified, account.deposits, DepositType.Notified);
+      deleteCommitment(notified, account.commitments, CommitmentType.Notified);
     } else {
       uint256 difference;
       if (value >= notified.value) {
@@ -677,32 +677,32 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
   }
 
   /**
-   * @notice Deletes a deposit from an account.
-   * @param _deposit The deposit to delete.
-   * @param deposits The struct containing the account's deposits.
-   * @param depositType Whether the deleted deposit is bonded or notified.
+   * @notice Deletes a commitment from an account.
+   * @param _commitment The commitment to delete.
+   * @param commitments The struct containing the account's commitments.
+   * @param commitmentType Whether the deleted commitment is locked or notified.
    */
-  function deleteDeposit(
-    Deposit storage _deposit,
-    Deposits storage deposits,
-    DepositType depositType
+  function deleteCommitment(
+    Commitment storage _commitment,
+    Commitments storage commitments,
+    CommitmentType commitmentType
   )
     private
   {
     uint256 lastIndex;
-    if (depositType == DepositType.Bonded) {
-      lastIndex = deposits.noticePeriods.length.sub(1);
-      deposits.bonded[deposits.noticePeriods[lastIndex]].index = _deposit.index;
-      deleteElement(deposits.noticePeriods, _deposit.index, lastIndex);
+    if (commitmentType == CommitmentType.Locked) {
+      lastIndex = commitments.noticePeriods.length.sub(1);
+      commitments.locked[commitments.noticePeriods[lastIndex]].index = _commitment.index;
+      deleteElement(commitments.noticePeriods, _commitment.index, lastIndex);
     } else {
-      lastIndex = deposits.availabilityTimes.length.sub(1);
-      deposits.notified[deposits.availabilityTimes[lastIndex]].index = _deposit.index;
-      deleteElement(deposits.availabilityTimes, _deposit.index, lastIndex);
+      lastIndex = commitments.availabilityTimes.length.sub(1);
+      commitments.notified[commitments.availabilityTimes[lastIndex]].index = _commitment.index;
+      deleteElement(commitments.availabilityTimes, _commitment.index, lastIndex);
     }
 
-    // Delete deposit info.
-    _deposit.index = 0;
-    _deposit.value = 0;
+    // Delete commitment info.
+    _commitment.index = 0;
+    _commitment.value = 0;
   }
 
   /**

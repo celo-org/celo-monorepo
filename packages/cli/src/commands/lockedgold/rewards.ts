@@ -1,18 +1,18 @@
 import { flags } from '@oclif/command'
-import { BondedDepositAdapter } from '../../adapters/bonded-deposit'
+import { LockedGoldAdapter } from '../../adapters/locked-gold'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class Rewards extends BaseCommand {
-  static description = 'Manage rewards for bonded deposit account'
+  static description = 'Manage rewards for locked Gold account'
 
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({ required: true }),
     redeem: flags.boolean({
       char: 'r',
-      description: 'Redeem accrued rewards from bonded deposits',
+      description: 'Redeem accrued rewards from locked Gold',
       exclusive: ['delegate'],
     }),
     delegate: Flags.address({
@@ -37,7 +37,7 @@ export default class Rewards extends BaseCommand {
       return
     }
 
-    const adapter = await new BondedDepositAdapter(this.web3, res.flags.from)
+    const adapter = await new LockedGoldAdapter(this.web3, res.flags.from)
     if (res.flags.redeem) {
       const contract = await adapter.contract()
       const tx = contract.methods.redeemRewards()

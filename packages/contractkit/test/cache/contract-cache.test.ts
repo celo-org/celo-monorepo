@@ -6,7 +6,7 @@ const TestedWrappers: ValidWrappers[] = [
   CeloContract.StableToken,
   CeloContract.Exchange,
   CeloContract.Validators,
-  CeloContract.BondedDeposits,
+  CeloContract.LockedGold,
 ]
 
 function newWrapperCache() {
