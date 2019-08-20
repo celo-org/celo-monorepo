@@ -1,7 +1,10 @@
 /* tslint:disable:no-console */
 
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { deployerForCoreContract, getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import {
+  deploymentForCoreContract,
+  getDeployedProxiedContract,
+} from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { ExchangeInstance, ReserveInstance, StableTokenInstance } from 'types'
 
@@ -22,7 +25,7 @@ const initializeArgs = async (): Promise<any[]> => {
   ]
 }
 
-module.exports = deployerForCoreContract<ExchangeInstance>(
+module.exports = deploymentForCoreContract<ExchangeInstance>(
   web3,
   artifacts,
   CeloContractName.Exchange,

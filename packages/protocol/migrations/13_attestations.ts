@@ -2,7 +2,7 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   add0x,
   convertToContractDecimals,
-  deployerForCoreContract,
+  deploymentForCoreContract,
   generatePublicKeyFromPrivateKey,
   getDeployedProxiedContract,
   sendTransactionWithPrivateKey,
@@ -42,7 +42,7 @@ async function setDataEncryptionKey(attestations: AttestationsInstance, privateK
   })
 }
 
-module.exports = deployerForCoreContract<AttestationsInstance>(
+module.exports = deploymentForCoreContract<AttestationsInstance>(
   web3,
   artifacts,
   CeloContractName.Attestations,

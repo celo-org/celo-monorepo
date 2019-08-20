@@ -210,7 +210,7 @@ export async function getDeployedProxiedContract<ContractInstance extends Truffl
  * A function with a signature as expected to be exported from a Truffle
  * migration script.
  */
-export function deployerForCoreContract<ContractInstance extends Truffle.ContractInstance>(
+export function deploymentForCoreContract<ContractInstance extends Truffle.ContractInstance>(
   web3: Web3,
   artifacts: any,
   name: CeloContractName,

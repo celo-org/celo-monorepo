@@ -1,5 +1,5 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { deployerForCoreContract } from '@celo/protocol/lib/web3-utils'
+import { deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
 import { RandomInstance } from 'types'
 
-module.exports = deployerForCoreContract<RandomInstance>(web3, artifacts, CeloContractName.Random)
+module.exports = deploymentForCoreContract<RandomInstance>(web3, artifacts, CeloContractName.Random)

@@ -2,7 +2,10 @@
 import Web3 = require('web3')
 
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { deployerForCoreContract, getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import {
+  deploymentForCoreContract,
+  getDeployedProxiedContract,
+} from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { RegistryInstance, ReserveInstance } from 'types'
 const truffle = require('@celo/protocol/truffle.js')
@@ -15,7 +18,7 @@ const initializeArgs = async (): Promise<[string, number]> => {
   return [registry.address, config.reserve.tobinTaxStalenessThreshold]
 }
 
-module.exports = deployerForCoreContract<ReserveInstance>(
+module.exports = deploymentForCoreContract<ReserveInstance>(
   web3,
   artifacts,
   CeloContractName.Reserve,

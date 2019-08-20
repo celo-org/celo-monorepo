@@ -2,7 +2,7 @@
 
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
-  deployerForCoreContract,
+  deploymentForCoreContract,
   getDeployedProxiedContract,
   transferOwnershipOfProxy,
   transferOwnershipOfProxyAndImplementation,
@@ -26,7 +26,7 @@ const initializeArgs = async (networkName: string): Promise<any[]> => {
   ]
 }
 
-module.exports = deployerForCoreContract<GovernanceInstance>(
+module.exports = deploymentForCoreContract<GovernanceInstance>(
   web3,
   artifacts,
   CeloContractName.Governance,

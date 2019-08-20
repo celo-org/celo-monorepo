@@ -4,7 +4,7 @@ import Web3 = require('web3')
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   convertToContractDecimalsBN,
-  deployerForCoreContract,
+  deploymentForCoreContract,
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
@@ -30,7 +30,7 @@ const initializeArgs = async (): Promise<any[]> => {
   ]
 }
 
-module.exports = deployerForCoreContract<StableTokenInstance>(
+module.exports = deploymentForCoreContract<StableTokenInstance>(
   web3,
   artifacts,
   CeloContractName.StableToken,
