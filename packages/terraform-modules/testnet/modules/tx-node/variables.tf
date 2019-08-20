@@ -1,74 +1,74 @@
 variable block_time {
-  type = number
+  type        = number
   description = "Number of seconds between each block"
 }
 
 variable bootnode_ip_address {
-  type = string
+  type        = string
   description = "The external IP address of the bootnode"
 }
 
 variable celo_env {
-  type = string
+  type        = string
   description = "Name of the testnet Celo environment"
 }
 
 variable ethstats_host {
-  type = "string"
+  type        = "string"
   description = "Ethstats url or IP address"
 }
 
 variable gcloud_secrets_base_path {
-  type = string
+  type        = string
   description = "Base path in the secrets bucket of a Google Cloud Storage file containing tx-node secrets"
 }
 
 variable gcloud_secrets_bucket {
-  type = string
+  type        = string
   description = "Name of the Google Cloud Storage bucket where secrets are kept"
 }
 
 variable gcloud_vm_service_account_email {
-  type = string
+  type        = string
   description = "The email of the service account to associate virtual machines with"
 }
 
 variable genesis_content_base64 {
-  type = string
+  type        = string
   description = "Content of the genesis file encoded in base64"
 }
 
 variable geth_node_docker_image_repository {
-  type = string
+  type        = string
   description = "Repository of the geth docker image"
 }
 
 variable geth_node_docker_image_tag {
-  type = string
+  type        = string
   description = "Tag of the geth docker image"
 }
 
 variable geth_verbosity {
-  type = number
+  type        = number
   description = "Verbosity of the tx-nodes"
 }
 
 variable network_id {
-  type = number
+  type        = number
   description = "The network ID number"
 }
 
 variable network_name {
-  type = string
+  type        = string
   description = "Name of the GCP network the tx-node VM is in"
 }
 
 variable tx_node_count {
-  type = number
+  type        = number
   description = "Number of tx-nodes to create"
 }
 
 variable verification_pool_url {
-  type = string
+  type        = string
   description = "URL of the verification pool"
 }
