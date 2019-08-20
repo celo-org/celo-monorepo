@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { TransactionObject } from 'web3/eth/types'
 import { ContractKit } from '../kit'
 import { TxOptions } from '../utils/send-tx'
@@ -36,4 +37,12 @@ export abstract class BaseWrapper<T> {
 export interface CeloTransactionObject<O> {
   txo: TransactionObject<O>
   send(options?: TxOptions): Promise<TransactionResult>
+}
+
+export function toBigNumber(input: string) {
+  return new BigNumber(input)
+}
+
+export function toNumber(input: string) {
+  return parseInt(input, 10)
 }
