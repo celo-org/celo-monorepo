@@ -1,7 +1,7 @@
 /* tslint:disable:no-console */
 // TODO(asa): Refactor and rename to 'deployment-utils.ts'
 import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
-import { CeloContract } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
 import { BigNumber } from 'bignumber.js'
 import { ec as EC } from 'elliptic'
@@ -213,7 +213,7 @@ export async function getDeployedProxiedContract<ContractInstance extends Truffl
 export function deployerForCoreContract<ContractInstance extends Truffle.ContractInstance>(
   web3: Web3,
   artifacts: any,
-  name: CeloContract,
+  name: CeloContractName,
   args: (networkName?: string) => Promise<any[]> = async () => [],
   then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
 ) {

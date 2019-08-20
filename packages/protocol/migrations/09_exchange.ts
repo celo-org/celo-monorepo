@@ -1,6 +1,6 @@
 /* tslint:disable:no-console */
 
-import { CeloContract } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { deployerForCoreContract, getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { ExchangeInstance, ReserveInstance, StableTokenInstance } from 'types'
@@ -25,7 +25,7 @@ const initializeArgs = async (): Promise<any[]> => {
 module.exports = deployerForCoreContract<ExchangeInstance>(
   web3,
   artifacts,
-  CeloContract.Exchange,
+  CeloContractName.Exchange,
   initializeArgs,
   async (exchange: ExchangeInstance) => {
     console.log('Setting Exchange as StableToken minter')

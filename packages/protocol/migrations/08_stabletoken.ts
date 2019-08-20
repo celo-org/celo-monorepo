@@ -1,7 +1,7 @@
 /* tslint:disable:no-console */
 import Web3 = require('web3')
 
-import { CeloContract } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   convertToContractDecimalsBN,
   deployerForCoreContract,
@@ -33,7 +33,7 @@ const initializeArgs = async (): Promise<any[]> => {
 module.exports = deployerForCoreContract<StableTokenInstance>(
   web3,
   artifacts,
-  CeloContract.StableToken,
+  CeloContractName.StableToken,
   initializeArgs,
   async (stableToken: StableTokenInstance, _web3: Web3, networkName: string) => {
     const minerAddress: string = truffle.networks[networkName].from

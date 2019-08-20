@@ -1,6 +1,6 @@
 /* tslint:disable:no-console */
 
-import { CeloContract } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deployerForCoreContract,
   getDeployedProxiedContract,
@@ -29,7 +29,7 @@ const initializeArgs = async (networkName: string): Promise<any[]> => {
 module.exports = deployerForCoreContract<GovernanceInstance>(
   web3,
   artifacts,
-  CeloContract.Governance,
+  CeloContractName.Governance,
   initializeArgs,
   async (governance: GovernanceInstance) => {
     console.log('Setting Governance as a Reserve spender')

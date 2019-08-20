@@ -1,4 +1,4 @@
-import { CeloContract } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   add0x,
   convertToContractDecimals,
@@ -45,7 +45,7 @@ async function setDataEncryptionKey(attestations: AttestationsInstance, privateK
 module.exports = deployerForCoreContract<AttestationsInstance>(
   web3,
   artifacts,
-  CeloContract.Attestations,
+  CeloContractName.Attestations,
   initializeArgs,
   async (attestations: AttestationsInstance) => {
     const valKeys: string[] = config.validators.validatorKeys

@@ -1,7 +1,7 @@
 /* tslint:disable:no-console */
 import Web3 = require('web3')
 
-import { CeloContract } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { deployerForCoreContract, getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { RegistryInstance, ReserveInstance } from 'types'
@@ -18,7 +18,7 @@ const initializeArgs = async (): Promise<[string, number]> => {
 module.exports = deployerForCoreContract<ReserveInstance>(
   web3,
   artifacts,
-  CeloContract.Reserve,
+  CeloContractName.Reserve,
   initializeArgs,
   async (reserve: ReserveInstance, web3: Web3, networkName: string) => {
     const network: any = truffle.networks[networkName]
