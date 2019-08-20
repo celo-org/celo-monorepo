@@ -39,12 +39,14 @@ const languageDetector = {
 
 const defaultTranslationsENUS: { [key: string]: string } = {
   CeloDollars: 'Celo Dollars',
+  CeloDollar: 'Celo Dollar',
   Dollar: 'Dollar',
   Dollars: 'Dollars',
   dollars: 'dollars',
 }
 const defaultTranslationsESAR: { [key: string]: string } = {
   CeloDollars: 'Celo Dólares',
+  CeloDollar: 'Celo Dólar',
   Dollar: 'Dólar',
   Dollars: 'Dólares',
   dollars: 'dólares',

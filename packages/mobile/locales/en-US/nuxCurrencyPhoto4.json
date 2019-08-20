@@ -6,7 +6,7 @@
   "activity": "Activity",
   "cancel": "Cancel",
   "stableDollar":
-    "Celo Dollar is a stable digital asset that tracks to the value of the US {{Dollar}}",
+    "{{CeloDollar}} is a stable digital asset that tracks to the value of the US {{Dollar}}",
   "feeTransaction": "Sending transactions cost a small fee",
   "sendCelo": "Send {{CeloDollars}} to anyone with a mobile phone",
   "backToWallet": "Back to Wallet",

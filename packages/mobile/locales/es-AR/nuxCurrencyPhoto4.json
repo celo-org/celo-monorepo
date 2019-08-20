@@ -6,7 +6,7 @@
   "activity": "Actividad",
   "cancel": "Cancelar",
   "stableDollar":
-    "El Celo Dólar constituye un activo digital estable que está alineado con el valor del {{Dollar}} estadounidense",
+    "El {{CeloDollar}} constituye un activo digital estable que está alineado con el valor del {{Dollar}} estadounidense",
   "feeTransaction": "El envío de transacciones tiene una pequeña comisión",
   "sendCelo": "Enviar {{CeloDollars}} a cualquier persona con un celular",
   "backToWallet": "Volver a el Monedero",
