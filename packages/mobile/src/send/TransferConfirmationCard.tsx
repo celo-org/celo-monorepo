@@ -113,6 +113,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
         <View style={style.avatar}>
           <Avatar
             name={recipient ? recipient.displayName : undefined}
+            recipient={recipient}
             address={address}
             e164Number={e164PhoneNumber}
             defaultCountryCode={defaultCountryCode}

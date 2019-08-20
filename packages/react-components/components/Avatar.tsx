@@ -6,9 +6,11 @@ import { getE164Number } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { MinimalContact } from 'react-native-contacts'
+import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 
 interface Props {
   contact?: MinimalContact
+  recipient?: Recipient
   name?: string
   address?: string
   e164Number?: string
@@ -18,7 +20,7 @@ interface Props {
 
 export class Avatar extends React.PureComponent<Props> {
   render() {
-    const { contact, address, defaultCountryCode, iconSize, name } = this.props
+    const { contact, recipient, address, defaultCountryCode, iconSize, name } = this.props
     let { e164Number } = this.props
     const userName = contact ? contact.displayName : name
     let nameOrAddress = userName ? userName : address
@@ -40,6 +42,8 @@ export class Avatar extends React.PureComponent<Props> {
       <View style={style.container}>
         <ContactCircle
           style={style.contactCircle}
+          contact={contact}
+          thumbnailPath={recipient ? getRecipientThumbnail(recipient) : undefined}
           name={userName}
           address={address}
           size={iconSize}

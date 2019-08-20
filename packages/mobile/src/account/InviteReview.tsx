@@ -182,6 +182,7 @@ export class InviteReview extends React.Component<Props, State> {
     return (
       <ReviewFrame HeaderComponent={this.renderHeader} FooterComponent={this.renderFooter}>
         <TransferConfirmationCard
+          recipient={recipient}
           type={TransactionTypes.INVITE_SENT}
           address={recipient.address}
           value={new BigNumber(staticInviteFeeAmount)}
