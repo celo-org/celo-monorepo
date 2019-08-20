@@ -53,7 +53,10 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group
   --id=id                                            (required)
   --name=name                                        (required)
-  --noticePeriod=noticePeriod                        (required) Notice Period for the Bonded deposit to use
+
+  --noticePeriod=noticePeriod                        (required) Notice Period that identifies the Locked Gold commitment
+                                                     to use
+
   --url=url                                          (required)
 
 EXAMPLE

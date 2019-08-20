@@ -69,7 +69,7 @@
 - [Config](command-line-interface/config.md)
 - [Account](command-line-interface/account.md)
 - [Exchange](command-line-interface/exchange.md)
-- [Locked Gold](command-line-interface/locked-gold.md)
+- [Locked Gold](command-line-interface/lockedgold.md)
 - [Validator Node](command-line-interface/validator.md)
 - [Validator Groups](command-line-interface/validatorgroup.md)
 

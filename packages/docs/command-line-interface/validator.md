@@ -50,7 +50,7 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator
   --id=id                                            (required)
   --name=name                                        (required)
-  --noticePeriod=noticePeriod                        (required) Notice Period for the Bonded deposit to use
+  --noticePeriod=noticePeriod                        (required) Notice period of the Locked Gold commitment
   --publicKey=0x                                     (required) Public Key
   --url=url                                          (required)
 
