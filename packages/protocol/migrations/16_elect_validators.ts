@@ -11,15 +11,9 @@ import {
 import { config } from '@celo/protocol/migrationsConfig'
 import { BigNumber } from 'bignumber.js'
 import * as bls12377js from 'bls12377js'
-import * as minimist from 'minimist'
 import { BondedDepositsInstance, ValidatorsInstance } from 'types'
 
 const Web3 = require('web3')
-
-const argv = minimist(process.argv, {
-  string: ['keys'],
-  default: { keys: '' },
-})
 
 function serializeKeystore(keystore: any) {
   return Buffer.from(JSON.stringify(keystore)).toString('base64')
@@ -136,7 +130,7 @@ module.exports = async (_deployer: any) => {
     BondedDepositsInstance
   >('BondedDeposits', artifacts)
 
-  const valKeys: string[] = argv.keys ? argv.keys.split(',') : []
+  const valKeys: string[] = config.validators.validatorKeys
 
   if (valKeys.length === 0) {
     console.log('  No validators to register')
