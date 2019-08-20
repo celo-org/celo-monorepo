@@ -1,4 +1,4 @@
-import { CeloContract, newKitFromWeb3 } from '@celo/contractkit'
+import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import {
   AccountAuthRequest,
   AccountAuthResponseSuccess,
@@ -105,10 +105,9 @@ export enum GasCurrency {
 }
 
 async function getGasCurrencyContractAddress(
-  web3: Web3,
+  kit: ContractKit,
   gasCurrency: GasCurrency
 ): Promise<string> {
-  const kit = newKitFromWeb3(web3)
   switch (gasCurrency) {
     case GasCurrency.cUSD:
       return kit.registry.addressFor(CeloContract.StableToken)
@@ -129,16 +128,16 @@ export interface TxParams<T> {
 }
 
 export async function requestTxSig<T>(
-  web3: Web3,
+  kit: ContractKit,
   txParams: TxParams<T>[],
   meta: DappKitRequestMeta
 ) {
   // TODO: For multi-tx payloads, we for now just assume the same from address for all txs. We should apply a better heuristic
-  const baseNonce = await web3.eth.getTransactionCount(txParams[0].from)
+  const baseNonce = await kit.web3.eth.getTransactionCount(txParams[0].from)
   const txs: TxToSignParam[] = await Promise.all(
     txParams.map(async (txParam, index) => {
       const gasCurrencyContractAddress = await getGasCurrencyContractAddress(
-        web3,
+        kit,
         txParam.gasCurrency
       )
       const value = txParam.value === undefined ? '0' : txParam.value

@@ -8,7 +8,9 @@ export interface AttestationStat {
 }
 
 export class AttestationsWrapper extends BaseWrapper<Attestations> {
-  async lookupPhoneNumbers(phoneNumberHashes: string[]) {
+  async lookupPhoneNumbers(
+    phoneNumberHashes: string[]
+  ): Promise<Record<string, Record<string, AttestationStat>>> {
     // Unfortunately can't be destructured
     const stats = await this.contract.methods.batchGetAttestationStats(phoneNumberHashes).call()
 
@@ -18,7 +20,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     const completed = stats[2].map(toNum)
     const total = stats[3].map(toNum)
     // Map of phone hash -> (Map of address -> AttestationStat)
-    const result: { [phoneHash: string]: { [address: string]: AttestationStat } | undefined } = {}
+    const result: Record<string, Record<string, AttestationStat>> = {}
 
     let rIndex = 0
 
@@ -29,7 +31,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
         continue
       }
 
-      const matchingAddresses: { [address: string]: AttestationStat } = {}
+      const matchingAddresses: Record<string, AttestationStat> = {}
       for (let mIndex = 0; mIndex < numberOfMatches; mIndex++) {
         const matchingAddress = addresses[rIndex]
         matchingAddresses[matchingAddress] = {
