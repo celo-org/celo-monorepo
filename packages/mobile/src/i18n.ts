@@ -37,28 +37,28 @@ const languageDetector = {
   cacheUserLanguage: () => {},
 }
 
-const defaultTranslationsENUS: { [key: string]: string } = {
+const currencyTranslationsENUS: { [key: string]: string } = {
   CeloDollars: 'Celo Dollars',
   CeloDollar: 'Celo Dollar',
   Dollar: 'Dollar',
   Dollars: 'Dollars',
   dollars: 'dollars',
 }
-const defaultTranslationsESAR: { [key: string]: string } = {
+const currencyTranslationsESAR: { [key: string]: string } = {
   CeloDollars: 'Celo Dólares',
   CeloDollar: 'Celo Dólar',
   Dollar: 'Dólar',
   Dollars: 'Dólares',
   dollars: 'dólares',
 }
-const defaultTranslations: { [key: string]: any } = {
-  ['en-US']: defaultTranslationsENUS,
-  ['es-AR']: defaultTranslationsESAR,
+const currencyTranslations: { [key: string]: any } = {
+  ['en-US']: currencyTranslationsENUS,
+  ['es-AR']: currencyTranslationsESAR,
 }
 
 const currencyInterpolator = (text: string, value: any) => {
   const key = value[1]
-  const translations = defaultTranslations[i18n.language]
+  const translations = currencyTranslations[i18n.language]
   if (key in translations) {
     return translations[key]
   } else {
