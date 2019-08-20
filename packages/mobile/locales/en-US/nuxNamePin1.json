@@ -8,7 +8,7 @@
     "Celo Dollars are a stable digital asset that tracks to the value of the US Dollar",
   "verifyNumber": "Verify your phone number so other Celo users can find you and send you value",
   "syncNetwork": "Syncing with Network",
-  "welcomeCelo": "Welcome to Celo Wallet",
+  "welcomeCelo": "Welcome to Celo Wallet {{lowercaseDollar}}",
   "chooseCountryCode": "Country Code",
   "joinText": {
     "0":

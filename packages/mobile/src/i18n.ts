@@ -5,6 +5,7 @@ import es_LA from '@celo/mobile/locales/es.json'
 import i18n from 'i18next'
 import { reactI18nextModule } from 'react-i18next'
 import RNLanguages from 'react-native-languages'
+import Logger from 'src/utils/Logger'
 
 export enum Namespaces {
   accountScreen10 = 'accountScreen10',
@@ -68,6 +69,7 @@ const defaultTranslations = { lowercaseDollar: 'dollar', camelcaseDollar: 'Dolla
 
 const newT = (key: string | string[]) => {
   // Make substitutions of dollar, dollars, etc
+  Logger.debug('Translating', key.toString())
   return oldT(key, defaultTranslations)
 }
 
