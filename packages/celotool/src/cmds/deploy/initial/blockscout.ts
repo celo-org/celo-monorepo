@@ -9,14 +9,23 @@ import {
   grantRoles,
 } from 'src/lib/helm_deploy'
 import { fetchEnvOrFallback } from 'src/lib/utils'
+import yargs from 'yargs'
 
 export const command = 'blockscout'
 
 export const describe = 'deploy the blockscout package'
 
-export const builder = {}
+export const builder = (argv: yargs.Argv) => {
+  return argv.option('vmTestnet', {
+    type: 'boolean',
+    description: 'Deploy blockscout for an already deployed VM testnet',
+    default: false,
+  })
+}
 
-export const handler = async (argv: InitialArgv) => {
+type BlockscoutInitialArgv = InitialArgv & { vmTestnet: boolean }
+
+export const handler = async (argv: BlockscoutInitialArgv) => {
   await createClusterIfNotExists()
   await switchToClusterFromEnv()
 
@@ -40,6 +49,7 @@ export const handler = async (argv: InitialArgv) => {
     argv.celoEnv,
     blockscoutDBUsername,
     blockscoutDBPassword,
-    blockscoutDBConnectionName
+    blockscoutDBConnectionName,
+    argv.vmTestnet
   )
 }

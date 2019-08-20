@@ -8,8 +8,19 @@ export interface TerraformVars {
   [key: string]: string
 }
 
-export function initTerraformModule(moduleName: string, vars: TerraformVars) {
-  return execTerraformCmd('init', getModulePath(moduleName), getVarOptions(vars))
+// Terraform requires the `backend-config` options to configure a remote backend
+// with dynamic values
+export function initTerraformModule(
+  moduleName: string,
+  vars: TerraformVars,
+  backendConfigVars: TerraformVars
+) {
+  return execTerraformCmd(
+    'init',
+    getModulePath(moduleName),
+    getVarOptions(vars),
+    getVarOptions(backendConfigVars, 'backend-config')
+  )
 }
 
 export function planTerraformModule(
@@ -40,6 +51,31 @@ export function destroyTerraformModule(moduleName: string, vars: TerraformVars) 
   return execTerraformCmd('destroy', getModulePath(moduleName), getVarOptions(vars), '-force')
 }
 
+// This is a workaround to `terraform output` requiring users to run it from
+// inside the Terraform module directory. See:
+// https://github.com/hashicorp/terraform/issues/15581
+// https://github.com/hashicorp/terraform/issues/17300
+export async function getTerraformModuleOutputs(
+  moduleName: string,
+  vars: TerraformVars,
+  backendConfigVars: TerraformVars
+) {
+  const initCmd = buildTerraformCmd(
+    'init',
+    getModulePath(moduleName),
+    getVarOptions(vars),
+    getVarOptions(backendConfigVars, 'backend-config')
+  )
+  const refreshCmd = buildTerraformCmd('refresh', getModulePath(moduleName), getVarOptions(vars))
+  const [stdout] = await execCmd(`
+    cd ${getModulePath(moduleName)} && \
+    ${initCmd} > /dev/null 2>&1 && \
+    ${refreshCmd} > /dev/null 2>&1 && \
+    terraform output -json
+  `)
+  return JSON.parse(stdout)
+}
+
 function getModulePath(moduleName: string) {
   return path.join(terraformModulesPath, moduleName)
 }
@@ -49,14 +85,20 @@ function getPlanPath(moduleName: string) {
 }
 
 // Uses a TerraformVars object to generate command line var options for Terraform
-function getVarOptions(vars: TerraformVars) {
-  const nameValuePairs = Object.keys(vars).map((varName) => `-var='${varName}=${vars[varName]}'`)
+function getVarOptions(vars: TerraformVars, optionName: string = 'var') {
+  const nameValuePairs = Object.keys(vars).map(
+    (varName) => `-${optionName}='${varName}=${vars[varName]}'`
+  )
   return nameValuePairs.join(' ')
 }
 
 function execTerraformCmd(command: string, workspacePath: string, ...options: string[]) {
-  const optionsStr = options ? options.join(' ') : ''
-  const cmd = `terraform ${command} -input=false ${optionsStr} ${workspacePath}`
+  const cmd = buildTerraformCmd(command, workspacePath, ...options)
   // use the middle two default arguments
   return execCmd(cmd, {}, false, true)
+}
+
+function buildTerraformCmd(command: string, workspacePath: string, ...options: string[]) {
+  const optionsStr = options ? options.join(' ') : ''
+  return `terraform ${command} -input=false ${optionsStr} ${workspacePath}`
 }

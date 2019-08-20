@@ -8,6 +8,7 @@ import {
 import {
   applyTerraformModule,
   destroyTerraformModule,
+  getTerraformModuleOutputs,
   initTerraformModule,
   planTerraformModule,
   TerraformVars,
@@ -45,9 +46,10 @@ export async function deploy(celoEnv: string) {
   console.info(`Deploying ${celoEnv} in environment ${envType}`)
 
   const vars: TerraformVars = getTerraformVars(celoEnv)
+  const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(celoEnv)
 
   console.info('Initializing...')
-  await initTerraformModule(terraformModule, vars)
+  await initTerraformModule(terraformModule, vars, backendConfigVars)
 
   console.info('Planning...')
   await planTerraformModule(terraformModule, vars)
@@ -70,9 +72,10 @@ export async function destroy(celoEnv: string) {
   console.info(`Destroying ${celoEnv} in environment ${envType}`)
 
   const vars: TerraformVars = getTerraformVars(celoEnv)
+  const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(celoEnv)
 
   console.info('Initializing...')
-  await initTerraformModule(terraformModule, vars)
+  await initTerraformModule(terraformModule, vars, backendConfigVars)
 
   console.info('Planning...')
   await planTerraformModule(terraformModule, vars, true)
@@ -80,6 +83,19 @@ export async function destroy(celoEnv: string) {
   await confirmAction(`Are you sure you want to destroy ${celoEnv} in environment ${envType}?`)
 
   await destroyTerraformModule(terraformModule, vars)
+}
+
+export async function getOutputs(celoEnv: string) {
+  const vars: TerraformVars = getTerraformVars(celoEnv)
+  const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(celoEnv)
+
+  return getTerraformModuleOutputs(terraformModule, vars, backendConfigVars)
+}
+
+function getTerraformBackendConfigVars(celoEnv: string) {
+  return {
+    prefix: `${celoEnv}/state`,
+  }
 }
 
 function getTerraformVars(celoEnv: string) {
