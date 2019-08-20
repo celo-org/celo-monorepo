@@ -20,7 +20,8 @@ export class Avatar extends React.PureComponent<Props> {
   render() {
     const { contact, address, defaultCountryCode, iconSize, name } = this.props
     let { e164Number } = this.props
-    let userName = contact ? contact.displayName : name ? name : address
+    const userName = contact ? contact.displayName : name
+    let nameOrAddress = userName ? userName : address
     if (!e164Number && contact) {
       const phoneNumber = getContactPhoneNumber(contact)
       if (phoneNumber) {
@@ -31,8 +32,8 @@ export class Avatar extends React.PureComponent<Props> {
       }
     }
 
-    if (userName && userName.startsWith('0x')) {
-      userName = '#' + userName.substring(2, 17) + '...'
+    if (nameOrAddress && nameOrAddress.startsWith('0x')) {
+      nameOrAddress = '#' + nameOrAddress.substring(2, 17) + '...'
     }
 
     return (
@@ -48,7 +49,7 @@ export class Avatar extends React.PureComponent<Props> {
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          {userName}
+          {nameOrAddress}
         </Text>
         {e164Number ? (
           <PhoneNumberWithFlag
