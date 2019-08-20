@@ -9,7 +9,7 @@
   "verifyNumber":
     "Verifique su número de teléfono para conectarse con otros usuarios y recibir dinero",
   "syncNetwork": "Sincronizando con la red",
-  "welcomeCelo": "Te damos la bienvenida a Celo",
+  "welcomeCelo": "Te damos la bienvenida a Celo {{lowercaseDollar}}",
   "chooseCountryCode": "Código de país",
   "joinText": {
     "0":

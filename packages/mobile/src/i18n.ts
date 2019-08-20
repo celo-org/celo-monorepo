@@ -37,6 +37,30 @@ const languageDetector = {
   cacheUserLanguage: () => {},
 }
 
+const defaultTranslationsENUS: { [key: string]: string } = { dollar: 'dollar', Dollar: 'Dollar' }
+const defaultTranslationsESAR: { [key: string]: string } = {
+  lowercaseDollar: 'dollares',
+  Dollar: 'Dollares',
+}
+const defaultTranslations: { [key: string]: any } = {
+  ['en-US']: defaultTranslationsENUS,
+  ['es-AR']: defaultTranslationsESAR,
+}
+
+const currencyInterpolator = (text: string, value: any) => {
+  const key = value[1]
+  const translations = defaultTranslations[i18n.language]
+  if (key in translations) {
+    return translations[key]
+  } else {
+    Logger.warn(
+      '@currencyInterpolator',
+      `Unexpected currency interpolation: ${text} in ${i18n.language}`
+    )
+    return ''
+  }
+}
+
 i18n
   .use(languageDetector)
   .use(reactI18nextModule)
@@ -61,19 +85,8 @@ i18n
     interpolation: {
       escapeValue: false,
     },
+    missingInterpolationHandler: currencyInterpolator,
   })
-
-const oldT = i18n.t
-
-const defaultTranslations = { lowercaseDollar: 'dollar', camelcaseDollar: 'Dollar' }
-
-const newT = (key: string | string[]) => {
-  // Make substitutions of dollar, dollars, etc
-  Logger.debug('Translating', key.toString())
-  return oldT(key, defaultTranslations)
-}
-
-i18n.t = newT
 
 RNLanguages.addEventListener('change', ({ language }: { language: string }) => {
   i18n.changeLanguage(language)
