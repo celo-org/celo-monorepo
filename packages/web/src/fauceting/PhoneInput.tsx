@@ -98,16 +98,8 @@ class PhoneInput extends React.PureComponent<Props, State> {
           renderTextInput={this.renderTextInput}
         /> */}
         <View style={[standardStyles.row, styles.fakeInputBorder]}>
-          <Text
-            style={[
-              standardStyles.input,
-              fonts.legal,
-              textStyles.invert,
-              textStyles.center,
-              { width: 70 },
-            ]}
-          >
-            {this.state.countryCallingCode} +00
+          <Text style={[fonts.legal, textStyles.invert, textStyles.center, styles.countryCode]}>
+            {this.state.countryCallingCode}+00
           </Text>
           <View style={styles.line} />
           <TextInput
@@ -128,12 +120,17 @@ class PhoneInput extends React.PureComponent<Props, State> {
 
 const styles = StyleSheet.create({
   line: {
-    height: 40,
+    height: 35,
     width: 1,
     borderLeftWidth: 1,
     borderColor: colors.placeholderGray,
     marginHorizontal: 10,
     flex: 1,
+  },
+  countryCode: {
+    alignSelf: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 15,
   },
   input: {
     borderWidth: 0,
