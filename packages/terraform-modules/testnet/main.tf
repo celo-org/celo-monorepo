@@ -55,12 +55,7 @@ resource "google_compute_firewall" "rpc_firewall" {
 
   allow {
     protocol = "tcp"
-    ports = ["8545"]
-  }
-
-  allow {
-    protocol = "tcp"
-    ports = ["8546"]
+    ports = ["8545", "8546"]
   }
 }
 
@@ -104,6 +99,15 @@ module "tx_node" {
   network_name = google_compute_network.network.name
   tx_node_count = var.tx_node_count
   verification_pool_url = var.verification_pool_url
+}
+
+# used for access by blockscout
+module "tx_node_lb" {
+  source = "./modules/tx-node-load-balancer"
+  # variables
+  celo_env = var.celo_env
+  network_name = google_compute_network.network.name
+  tx_node_self_links = module.tx_node.self_links
 }
 
 module "validator" {

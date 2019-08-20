@@ -53,13 +53,13 @@ docker run -p 8545:8545/tcp -p 8546:8546/tcp --net=host --entrypoint /bin/sh -d 
     --maxpeers 1100 \
     --rpc \
     --rpcaddr 0.0.0.0 \
-    --rpcapi=eth,net,web3,debug \
+    --rpcapi=eth,net,web3 \
     --rpccorsdomain='*' \
     --rpcvhosts=* \
     --ws \
     --wsaddr 0.0.0.0 \
     --wsorigins=* \
-    --wsapi=eth,net,web3,debug \
+    --wsapi=eth,net,web3 \
     --nodekey=/root/.celo/pkey \
     --etherbase=$ACCOUNT_ADDRESS \
     --networkid=${network_id} \

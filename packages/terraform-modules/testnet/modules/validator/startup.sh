@@ -30,7 +30,6 @@ echo "Bootnode enode: $BOOTNODE_ENODE"
 echo "Pulling geth..."
 docker pull $GETH_NODE_DOCKER_IMAGE
 
-
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`)
 docker run --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
@@ -53,13 +52,13 @@ docker run --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
     --mine \
     --rpc \
     --rpcaddr 0.0.0.0 \
-    --rpcapi=eth,net,web3,debug \
+    --rpcapi=eth,net,web3 \
     --rpccorsdomain='*' \
     --rpcvhosts=* \
     --ws \
     --wsaddr 0.0.0.0 \
     --wsorigins=* \
-    --wsapi=eth,net,web3,debug \
+    --wsapi=eth,net,web3 \
     --nodekey=/root/.celo/pkey \
     --etherbase=$ACCOUNT_ADDRESS \
     --networkid=${network_id} \
