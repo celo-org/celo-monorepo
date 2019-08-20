@@ -11,6 +11,7 @@ import {
   ReserveInstance,
   StableTokenInstance,
 } from 'types'
+const soliditySha3 = new (require('web3'))().utils.soliditySha3
 
 enum VoteValue {
   None = 0,
@@ -123,8 +124,8 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
 
     it('should execute the proposal', async () => {
-      assert.equal(await registry.getAddressForOrDie('test1'), accounts[1])
-      assert.equal(await registry.getAddressForOrDie('test2'), accounts[2])
+      assert.equal(await registry.getAddressForOrDie(soliditySha3('test1')), accounts[1])
+      assert.equal(await registry.getAddressForOrDie(soliditySha3('test2')), accounts[2])
     })
   })
 })

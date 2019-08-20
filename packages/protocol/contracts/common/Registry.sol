@@ -38,25 +38,19 @@ contract Registry is IRegistry, Ownable, Initializable {
 
   /**
    * @notice Gets address associated with the given identifier.
-   * @param identifier Identifier of contract whose address we want to look up.
+   * @param identifier Identifier hash of contract whose address we want to look up.
    * @dev Throws if address not set.
    */
-  function getAddressForOrDie(string calldata identifier) external view returns (address) {
-    bytes32 hash = keccak256(
-      abi.encodePacked(identifier)
-    );
-    require(registry[hash] != address(0), "identifier has no registry entry");
-    return registry[hash];
+  function getAddressForOrDie(bytes32 identifier) external view returns (address) {
+    require(registry[identifier] != address(0), "identifier has no registry entry");
+    return registry[identifier];
   }
 
   /**
    * @notice Gets address associated with the given identifier.
-   * @param identifier Identifier of contract whose address we want to look up.
+   * @param identifier Identifier hash of contract whose address we want to look up.
    */
-  function getAddressFor(string calldata identifier) external view returns (address) {
-    bytes32 hash = keccak256(
-      abi.encodePacked(identifier)
-    );
-    return registry[hash];
+  function getAddressFor(bytes32 identifier) external view returns (address) {
+    return registry[identifier];
   }
 }
