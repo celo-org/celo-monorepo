@@ -1,4 +1,4 @@
-import { CeloContract } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
   assertLogMatches,
@@ -68,9 +68,9 @@ contract('BondedDeposits', (accounts: string[]) => {
     mockGovernance = await MockGovernance.new()
     mockValidators = await MockValidators.new()
     registry = await Registry.new()
-    await registry.setAddressFor(CeloContract.GoldToken, mockGoldToken.address)
-    await registry.setAddressFor(CeloContract.Governance, mockGovernance.address)
-    await registry.setAddressFor(CeloContract.Validators, mockValidators.address)
+    await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
+    await registry.setAddressFor(CeloContractName.Governance, mockGovernance.address)
+    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await bondedDeposits.initialize(registry.address, maxNoticePeriod)
     await bondedDeposits.createAccount()
   })

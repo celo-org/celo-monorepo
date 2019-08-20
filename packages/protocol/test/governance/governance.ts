@@ -1,4 +1,4 @@
-import { CeloContract } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertBalance,
   assertEqualBN,
@@ -93,7 +93,7 @@ contract('Governance', (accounts: string[]) => {
       referendumStageDuration,
       executionStageDuration
     )
-    await registry.setAddressFor(CeloContract.BondedDeposits, mockBondedDeposits.address)
+    await registry.setAddressFor(CeloContractName.BondedDeposits, mockBondedDeposits.address)
     transactionSuccess1 = {
       value: 0,
       destination: testTransactions.address,

@@ -1,4 +1,4 @@
-import { CeloContract } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertRevert, NULL_ADDRESS, timeTravel } from '@celo/protocol/lib/test-utils'
 import {
   EscrowContract,
@@ -66,7 +66,7 @@ contract('Escrow', (accounts: string[]) => {
     escrow = await Escrow.new({ from: owner })
     await escrow.initialize(registry.address)
     mockAttestations = await MockAttestations.new({ from: owner })
-    await registry.setAddressFor(CeloContract.Attestations, mockAttestations.address)
+    await registry.setAddressFor(CeloContractName.Attestations, mockAttestations.address)
   })
 
   describe('#initialize()', () => {
