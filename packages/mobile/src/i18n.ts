@@ -1,6 +1,7 @@
 import locales from '@celo/mobile/locales'
 import en_US from '@celo/mobile/locales/en.json'
 import es_LA from '@celo/mobile/locales/es.json'
+import { currencyTranslations } from '@celo/utils/src/currencies'
 // @ts-ignore
 import i18n from 'i18next'
 import { reactI18nextModule } from 'react-i18next'
@@ -35,25 +36,6 @@ const languageDetector = {
   init: () => {},
   // tslint:disable-next-line
   cacheUserLanguage: () => {},
-}
-
-const currencyTranslationsENUS: { [key: string]: string } = {
-  CeloDollars: 'Celo Dollars',
-  CeloDollar: 'Celo Dollar',
-  Dollar: 'Dollar',
-  Dollars: 'Dollars',
-  dollars: 'dollars',
-}
-const currencyTranslationsESAR: { [key: string]: string } = {
-  CeloDollars: 'Celo Dólares',
-  CeloDollar: 'Celo Dólar',
-  Dollar: 'Dólar',
-  Dollars: 'Dólares',
-  dollars: 'dólares',
-}
-const currencyTranslations: { [key: string]: any } = {
-  ['en-US']: currencyTranslationsENUS,
-  ['es-AR']: currencyTranslationsESAR,
 }
 
 const currencyInterpolator = (text: string, value: any) => {
