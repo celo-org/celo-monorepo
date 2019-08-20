@@ -1,6 +1,4 @@
 {
-  "celoDollars": "Celo Dollars",
-  "celoGold": "Celo Gold",
   "getStarted": "Get Started",
   "getBackupKey": "Get Backup Key",
   "setYourBackupKey":
@@ -10,7 +8,6 @@
   "stableDollar": "Celo Dollar is a stable digital asset that tracks to the value of the US Dollar",
   "feeTransaction": "Sending transactions cost a small fee",
   "sendCelo": "Send Celo Dollars to anyone with a mobile phone",
-  "sendCeloDollars": "Send Celo Dollars",
   "backToWallet": "Back to Wallet",
   "celoLikeGold": "Celo Gold is like real gold",
   "goldFluctuates": "There’s a limited amount of Celo Gold and the value can go up and down",

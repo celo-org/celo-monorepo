@@ -1,11 +1,12 @@
-const argv = require('minimist')(process.argv.slice(2), { string: ['migration_override'] })
 const BigNumber = require('bignumber.js')
+const minimist = require('minimist')
+const path = require('path')
 
 // Almost never use exponential notation in toString
 // http://mikemcl.github.io/bignumber.js/#exponential-at
 BigNumber.config({ EXPONENTIAL_AT: 1e9 })
 
-const defaultConfig = {
+const DefaultConfig = {
   attestations: {
     attestationExpirySeconds: 60 * 60, // 1 hour,
     attestationRequestFeeInDollars: 0.05,
@@ -61,6 +62,7 @@ const defaultConfig = {
     minBondedDepositValue: '1000000000000000000', // 1 gold
     minBondedDepositNoticePeriod: 60 * 24 * 60 * 60, // 60 days
 
+    validatorKeys: [],
     // We register a single validator group during the migration.
     groupName: 'C-Labs',
     groupUrl: 'https://www.celo.org',
@@ -91,13 +93,26 @@ const linkedLibraries = {
   Signatures: ['BondedDeposits', 'Escrow'],
 }
 
+const argv = minimist(process.argv.slice(2), {
+  string: ['migration_override', 'keys', 'build_directory'],
+  default: {
+    keys: '',
+    build_directory: path.join(__dirname, 'build'),
+  },
+})
+const validatorKeys = argv.keys ? argv.keys.split(',') : []
+
 const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
-config = {}
-for (const key in defaultConfig) {
-  config[key] = { ...defaultConfig[key], ...migrationOverride[key] }
+const config = {}
+
+for (const key of Object.keys(DefaultConfig)) {
+  config[key] = { ...DefaultConfig[key], ...migrationOverride[key] }
 }
 
+config.validators.validatorKeys = validatorKeys
+
 module.exports = {
+  build_directory: argv.build_directory,
   config,
   linkedLibraries,
 }

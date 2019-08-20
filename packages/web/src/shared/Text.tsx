@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Text, View } from 'react-native'
 
-import Responsive from 'src/shared/Responsive'
 import { TextStyles } from 'src/shared/Styles'
 
 interface Props {
@@ -9,43 +8,6 @@ interface Props {
   children?: any
   tabIndex?: number
   accessibilityRole?: 'button' | 'label' | 'link' | 'heading' | 'listitem'
-}
-
-export const ResponsiveH1 = ({ style, children }: Props) => {
-  return (
-    <Responsive medium={[TextStyles.largeHeader, style]}>
-      <Text style={[TextStyles.mediumMain, style]}>{children}</Text>
-    </Responsive>
-  )
-}
-
-export const ResponsiveH3 = ({ style, children }: Props) => {
-  return (
-    <Responsive medium={[TextStyles.sectionHeader, style]}>
-      <Text style={[TextStyles.mediumMain, style]}>{children}</Text>
-    </Responsive>
-  )
-}
-
-export const P = ({ style, children }: Props) => {
-  return <Text style={[TextStyles.smallMain, TextStyles.p, style]}>{children}</Text>
-}
-
-export const UL = ({ style, children }: Props) => {
-  return <View style={[TextStyles.ul, style]}>{children}</View>
-}
-
-export const LI = ({ style, children }: Props) => {
-  return (
-    <View style={TextStyles.li}>
-      <Text style={TextStyles.smallMain}>{`\u2022`}</Text>
-      <Text style={[TextStyles.smallMain, TextStyles.liText, style]}>{children}</Text>
-    </View>
-  )
-}
-
-export const B = ({ style, children }: Props) => {
-  return <Text style={[TextStyles.smallMain, TextStyles.bold, style]}>{children}</Text>
 }
 
 export const TABLE = ({ style, children }: Props) => {

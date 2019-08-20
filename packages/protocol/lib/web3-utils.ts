@@ -15,6 +15,7 @@ import {
   StableTokenInstance,
 } from 'types'
 import { TransactionObject } from 'web3/eth/types'
+import { build_directory } from '../migrationsConfig'
 
 import Web3 = require('web3')
 
@@ -316,19 +317,16 @@ export function deployImplementationAndRepointProxy<
       // Hack to create build artifact.
       .deploy(ContractProxy)
       .then(async () => {
-        const argv = require('minimist')(process.argv.slice(2))
-        if (argv.build_directory) {
-          const artifact = ContractProxy._json
-          artifact.networks[await web3.eth.net.getId()] = {
-            address: deployedProxyAddress,
-            // @ts-ignore
-            transactionHash: '0x',
-          }
-          const contractsDir = argv.build_directory + '/contracts'
-          const artifactor = new Artifactor(contractsDir)
-
-          await artifactor.save(artifact)
+        const artifact = ContractProxy._json
+        artifact.networks[await web3.eth.net.getId()] = {
+          address: deployedProxyAddress,
+          // @ts-ignore
+          transactionHash: '0x',
         }
+        const contractsDir = build_directory + '/contracts'
+        const artifactor = new Artifactor(contractsDir)
+
+        await artifactor.save(artifact)
       })
       .then(() => {
         return deployer.deploy(Contract)
