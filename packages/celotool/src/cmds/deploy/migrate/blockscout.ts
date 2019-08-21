@@ -32,7 +32,6 @@ export const handler = async (argv: TestnetArgv) => {
     argv.celoEnv,
     blockscoutDBUsername,
     blockscoutDBPassword,
-    blockscoutDBConnectionName,
-    false
+    blockscoutDBConnectionName
   )
 }
