@@ -3,7 +3,7 @@
   "from": "de",
   "celoWallet": "Monedero de Celo",
   "at": "a las",
-  "receivedDollars": "Celo Dólares Recibidos",
+  "receivedDollars": "{{CeloDollars}} Recibidos",
   "verificationMessage": "La tasa de verificación fue pagada. ¡Bienvenido a Celo!",
   "receivedAmountFromCelo": {
     "0": "¡Recibiste ",

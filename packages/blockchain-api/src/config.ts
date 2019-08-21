@@ -15,4 +15,4 @@ export const BLOCKSCOUT_API = (process.env.BLOCKSCOUT_API as string).toLowerCase
 export const FAUCET_ADDRESS = (process.env.FAUCET_ADDRESS as string).toLowerCase()
 export const VERIFICATION_REWARDS_ADDRESS = (process.env
   .VERIFICATION_REWARDS_ADDRESS as string).toLowerCase()
-export const ABE_ADDRESS = (process.env.ABE_ADDRESS as string).toLowerCase()
+export const ATTESTATIONS_ADDRESS = (process.env.ATTESTATIONS_ADDRESS as string).toLowerCase()
