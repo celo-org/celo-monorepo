@@ -1,4 +1,4 @@
-import { lockedGoldRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertContainSubset,
   assertEqualBN,
@@ -67,7 +67,7 @@ contract('Validators', (accounts: string[]) => {
     validators = await Validators.new()
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
-    await registry.setAddressFor(lockedGoldRegistryId, mockLockedGold.address)
+    await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await validators.initialize(
       registry.address,
       minElectableValidators,

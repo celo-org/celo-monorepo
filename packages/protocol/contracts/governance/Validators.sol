@@ -41,7 +41,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     address affiliation;
   }
 
-  struct BondedDeposit {
+  struct LockedGoldCommitment {
     uint256 noticePeriod;
     uint256 value;
   }
@@ -54,7 +54,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   address[] private _validators;
   SortedLinkedList.List private votes;
   // TODO(asa): Support different requirements for groups vs. validators.
-  BondedDeposit private registrationRequirement;
+  LockedGoldCommitment private registrationRequirement;
   uint256 public minElectableValidators;
   uint256 public maxElectableValidators;
 

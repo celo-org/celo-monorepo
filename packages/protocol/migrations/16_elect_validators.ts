@@ -28,12 +28,12 @@ async function makeMinimumDeposit(lockedGold: LockedGoldInstance, privateKey: st
 
   // @ts-ignore
   const bondTx = lockedGold.contract.methods.newCommitment(
-    config.validators.minBondedDepositNoticePeriod
+    config.validators.minLockedGoldNoticePeriod
   )
 
   await sendTransactionWithPrivateKey(web3, bondTx, privateKey, {
     to: lockedGold.address,
-    value: config.validators.minBondedDepositValue,
+    value: config.validators.minLockedGoldValue,
   })
 }
 
@@ -57,7 +57,7 @@ async function registerValidatorGroup(
   await web3.eth.sendTransaction({
     from: generateAccountAddressFromPrivateKey(privateKey.slice(0)),
     to: account.address,
-    value: config.validators.minBondedDepositValue * 2, // Add a premium to cover tx fees
+    value: config.validators.minLockedGoldValue * 2, // Add a premium to cover tx fees
   })
 
   await makeMinimumDeposit(lockedGold, account.privateKey)
@@ -67,7 +67,7 @@ async function registerValidatorGroup(
     encodedKey,
     config.validators.groupName,
     config.validators.groupUrl,
-    config.validators.minBondedDepositNoticePeriod
+    config.validators.minLockedGoldNoticePeriod
   )
 
   await sendTransactionWithPrivateKey(web3, tx, account.privateKey, {

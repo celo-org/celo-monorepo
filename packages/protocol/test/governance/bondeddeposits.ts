@@ -1,8 +1,4 @@
-import {
-  goldTokenRegistryId,
-  governanceRegistryId,
-  validatorsRegistryId,
-} from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
   assertLogMatches,
@@ -72,9 +68,9 @@ contract('LockedGold', (accounts: string[]) => {
     mockGovernance = await MockGovernance.new()
     mockValidators = await MockValidators.new()
     registry = await Registry.new()
-    await registry.setAddressFor(goldTokenRegistryId, mockGoldToken.address)
-    await registry.setAddressFor(governanceRegistryId, mockGovernance.address)
-    await registry.setAddressFor(validatorsRegistryId, mockValidators.address)
+    await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
+    await registry.setAddressFor(CeloContractName.Governance, mockGovernance.address)
+    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await lockedGold.initialize(registry.address, maxNoticePeriod)
     await lockedGold.createAccount()
   })
