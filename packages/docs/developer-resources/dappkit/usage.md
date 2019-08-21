@@ -2,9 +2,9 @@
 
 This page walks you through the main functionalities of DAppKit. You can also find the result of this walkthrough on the [expo base template](https://github.com/celo-org/dappkit-base) on branch [`dappkit-usage`](https://github.com/celo-org/dappkit-base/tree/dappkit-usage).
 
-DAppKit uses deeplinks to communicate between your DApp and the Celo Wallet. All "requests" that your DApp makes to the Wallet needs to contain the follwing meta payload:
+DAppKit uses deeplinks to communicate between your DApp and the Celo Wallet. All "requests" that your DApp makes to the Wallet needs to contain the following meta payload:
 
-- `requestId` A string you can pass to DAppKit, that you can use to listen to the resopnse for that request
+- `requestId` A string you can pass to DAppKit, that you can use to listen to the response for that request
 - `dappName` A string that will be displayed to the user, indicating the DApp requesting access/signature.
 - `callback` The deeplink that the Celo Wallet will use to redirect the user back to the DApp with the appropriate payload. If you want the user to be directed to a particular page in your DApp. With Expo, it's as simple as `Linking.makeUrl('/my/path')`
 
@@ -12,7 +12,7 @@ DAppKit uses deeplinks to communicate between your DApp and the Celo Wallet. All
 
 One of the first actions you will want to do as a DApp Developer is to get the address of your user's account, to display relevant informtion to them. It can be done as simply as:
 
-([expo base template commit](https://github.com/celo-org/dappkit-base/commit/9ef5d8916018a1f7b09d062fdd601b851fb4bf79))
+([expo base template commit](https://github.com/celo-org/dappkit-base/commit/7d04983f0875eac7a1e44963a97b5ecd81a0d1d0))
 
 ```javascript
 import { requestAccountAddress, waitForAccountAuth } from '@celo/dappkit'
@@ -37,7 +37,7 @@ login = async () => {
 
 Once you have the account address, you can make calls against your own smart contract, or use [ContractKit](../contractkit/README.md) to fetch a users balance
 
-([expo base template commit](https://github.com/celo-org/dappkit-base/commit/4fa0dd16a04cd2831dd685378bc49399984bd553))
+([expo base template commit](https://github.com/celo-org/dappkit-base/commit/3be9f5c506788bcc1c22c4e8e02fac62c0821ee9))
 
 ```javascript
   const address = dappkitResponse.address
@@ -58,7 +58,7 @@ Once you have the account address, you can make calls against your own smart con
 
 For many real-world applications, your user will want to interact with their friends and family on your DApp. Celo has a built-in [Identity Protocol](../../celo-codebase/protocol/identity/README.md) that maps phone numbers to account addresses. You can use DAppkit to fetch that mapping for a user's contact list.
 
-([expo base template commit](https://github.com/celo-org/dappkit-base/commit/ea99ff02009de806c0e248eb7aec617c14223fa5))
+([expo base template commit](https://github.com/celo-org/dappkit-base/commit/532b72b0a5b0f5356a1e535700e53d649554ed57))
 
 ```javascript
 import { fetchContacts } from "@celo/dappkit";
@@ -70,7 +70,7 @@ if (status != Permissions.PermissionStatus.GRANTED) {
   return
 }
 
-const { rawContacts, phoneNumbersByAddress } = await fetchContacts(kit.web3)
+const { rawContacts, phoneNumbersByAddress } = await fetchContacts(kit)
 
 this.setState({ rawContacts, phoneNumbersByAddress })
 
@@ -84,9 +84,9 @@ Object.entries(this.state.phoneNumbersByAddress).map(([address, entry]) => {
 
 ## Signing Transactions
 
-Let's go from accessing account information to submitting transactions. To alter state on the blockchain, make a transaction object with your smart contract or any of the Celo Core Contracts in ContractKit. All that is left to do is to pass the transaction object to DAppKit.
+Let's go from accessing account information to submitting transactions. To alter state on the blockchain, you need to make a transaction object with your smart contract or any of the Celo Core Contracts in ContractKit. All that is left to do is to pass the transaction object to DAppKit.
 
-([expo base template commit](https://github.com/celo-org/dappkit-base/commit/cf35c82d7650e7b6bc7208ece32440d3a32d9cc5))
+([expo base template commit](https://github.com/celo-org/dappkit-base/commit/e3a1c00f2b8a6f6f6891c515a131ff66b55cb563))
 
 ```javascript
 import {
@@ -108,7 +108,7 @@ const callback = Linking.makeUrl("/my/path");
 
 // Request the TX signature from DAppKit
 requestTxSig(
-  kit.web3,
+  kit,
   [
     {
       tx: txObject,
@@ -124,16 +124,17 @@ const dappkitResponse = await waitForSignedTxs(requestId);
 const tx = dappkitResponse.rawTxs[0];
 
 // Send the signed transaction via web3
-kit.web3.eth.sendSignedTransaction(tx).on("confirmation", async () => {
-  const [cUSDBalanceBig, cUSDDecimals] = await Promise.all([
-    stableToken.balanceOf(this.state.address),
-    stableToken.decimals()
-  ]);
-  const cUSDBalance = this.convertToContractDecimals(
-    cUSDBalanceBig,
-    cUSDDecimals
-  );
+await toTxResult(kit.web3.eth.sendSignedTransaction(tx)).waitReceipt()
 
-  this.setState({ cUSDBalance, isLoadingBalance: false });
+const [cUSDBalanceBig, cUSDDecimals] = await Promise.all([
+  stableToken.balanceOf(this.state.address),
+  stableToken.decimals()
+]);
+const cUSDBalance = this.convertToContractDecimals(
+  cUSDBalanceBig,
+  cUSDDecimals
+);
+
+this.setState({ cUSDBalance, isLoadingBalance: false })
 })
 ```

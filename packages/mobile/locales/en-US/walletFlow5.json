@@ -57,5 +57,6 @@
     "0": "Testnet",
     "1": "A friendly reminder you're using a Testnet build - the balances here are not real."
   },
-  "dismiss": "Dismiss"
+  "dismiss": "Dismiss",
+  "unknown": "Unknown"
 }
