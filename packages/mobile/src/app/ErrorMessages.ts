@@ -31,6 +31,7 @@ export enum ErrorMessages {
   EXCHANGE_RATE_FAILED = 'exchangeFlow9:errorRefreshingRate',
   EXCHANGE_RATE_CHANGE = 'exchangeFlow9:exchangeRateChange',
   REDEEM_INVITE_FAILED = 'inviteFlow11:redeemFailed',
+  REDEEM_INVITE_TIMEOUT = 'inviteFlow11:redeemInviteTimeout',
   FIREBASE_DISABLED = 'dev:firebaseDisabled',
   FIREBASE_FAILED = 'firebaseFailed',
   IMPORT_CONTACTS_FAILED = 'importContactsFailed',
