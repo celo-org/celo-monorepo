@@ -56,7 +56,7 @@ export class NoActivity extends React.PureComponent<Props> {
         {kind === FeedType.HOME && (
           <SmallButton
             onPress={goToSend}
-            text={t('sendCeloDollars')}
+            text={t('global:sendCeloDollars')}
             solid={true}
             style={styles.button}
           />

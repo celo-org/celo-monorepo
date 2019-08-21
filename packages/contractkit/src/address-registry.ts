@@ -1,7 +1,10 @@
+import debugFactory from 'debug'
 import { Address, AllContracts, CeloContract, NULL_ADDRESS } from './base'
 import { newRegistry } from './generated/Registry'
 import { Registry } from './generated/types/Registry'
 import { ContractKit } from './kit'
+
+const debug = debugFactory('kit:registry')
 
 // Registry contract is always predeployed to this address
 const REGISTRY_CONTRACT_ADDRESS = '0x000000000000000000000000000000000000ce10'
@@ -24,7 +27,9 @@ export class AddressRegistry {
       }
       this.cache.set(contract, address)
     }
-    return this.cache.get(contract)!
+    const cachedAddress = this.cache.get(contract)!
+    debug('Getting Address for %O = %s', contract, cachedAddress)
+    return cachedAddress
   }
 
   async allAddresses(): Promise<Record<CeloContract, Address>> {

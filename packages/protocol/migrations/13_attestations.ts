@@ -9,7 +9,6 @@ import {
   setInRegistry,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import * as minimist from 'minimist'
 import { AttestationsInstance, RegistryInstance, StableTokenInstance } from 'types'
 import { TransactionObject } from 'web3/eth/types'
 const initializeArgs = async (): Promise<[string, string, string[], string[]]> => {
@@ -55,11 +54,7 @@ module.exports = deployProxyAndImplementation<AttestationsInstance>(
   'Attestations',
   initializeArgs,
   async (attestations: AttestationsInstance) => {
-    const argv = minimist(process.argv, {
-      string: ['keys'],
-      default: { keys: '' },
-    })
-    const valKeys: string[] = argv.keys ? argv.keys.split(',') : []
+    const valKeys: string[] = config.validators.validatorKeys
 
     await Promise.all(valKeys.map((key) => setDataEncryptionKey(attestations, key)))
 
