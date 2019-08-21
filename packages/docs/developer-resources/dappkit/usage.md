@@ -108,7 +108,7 @@ const callback = Linking.makeUrl("/my/path");
 
 // Request the TX signature from DAppKit
 requestTxSig(
-  kit.web3,
+  kit,
   [
     {
       tx: txObject,

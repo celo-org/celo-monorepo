@@ -1,4 +1,4 @@
-import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { CeloContract, ContractKit } from '@celo/contractkit'
 import {
   AccountAuthRequest,
   AccountAuthResponseSuccess,
@@ -15,8 +15,7 @@ import {
 import { Linking } from 'expo'
 import { Contact, Fields, getContactsAsync, PhoneNumber } from 'expo-contacts'
 import { E164Number, parsePhoneNumberFromString } from 'libphonenumber-js'
-import { chunk, flatMap, flatten, fromPairs, zipObject } from 'lodash'
-import Web3 from 'web3'
+import { chunk, find, flatMap, flatten, fromPairs, zipObject } from 'lodash'
 import { TransactionObject } from 'web3/eth/types'
 export {
   AccountAuthRequest,
@@ -197,7 +196,7 @@ export interface PhoneNumberMappingEntry {
 function createPhoneNumberToContactMapping(contacts: Contact[]) {
   const phoneNumberObjects = flatMap(contacts, (contact) => {
     return contact.phoneNumbers
-      ? contact.phoneNumbers.flatMap((phoneNumber) => {
+      ? flatMap(contact.phoneNumbers, (phoneNumber) => {
           const e164Number = isValidPhoneNumber(phoneNumber)
           return e164Number ? { e164Number, id: contact.id } : []
         })
@@ -208,10 +207,9 @@ function createPhoneNumberToContactMapping(contacts: Contact[]) {
 }
 
 async function lookupPhoneNumbersOnAttestations(
-  web3: Web3,
+  kit: ContractKit,
   allPhoneNumbers: { [phoneNumber: string]: string }
 ): Promise<{ [address: string]: PhoneNumberMappingEntry }> {
-  const kit = newKitFromWeb3(web3)
   const attestations = await kit.contracts.getAttestations()
   const nestedResult = await Promise.all(
     chunk(Object.keys(allPhoneNumbers), 20).map(async (phoneNumbers) => {
@@ -221,14 +219,15 @@ async function lookupPhoneNumbersOnAttestations(
 
       const result = await attestations.lookupPhoneNumbers(hashedPhoneNumbers)
 
-      return flatMap(Object.entries(result), ([phoneHash, attestationStats]) =>
-        Object.entries(attestationStats).map(([address, attestationStat]) => ({
+      return flatMap(Object.keys(result), (phoneHash) => {
+        const attestationStats = result[phoneHash]
+        return Object.keys(attestationStats).map((address) => ({
           address,
           phoneNumber: phoneNumbersByHash[phoneHash],
           id: allPhoneNumbers[phoneNumbersByHash[phoneHash]],
-          attestationStat,
+          attestationStat: attestationStats[address],
         }))
-      )
+      })
     })
   )
 
@@ -242,7 +241,7 @@ export interface PhoneNumberMappingEntryByAddress {
   [address: string]: PhoneNumberMappingEntry
 }
 export async function fetchContacts(
-  web3: Web3
+  kit: ContractKit
 ): Promise<{ rawContacts: ContactsById; phoneNumbersByAddress: PhoneNumberMappingEntryByAddress }> {
   const contacts = await getContactsAsync({
     fields: [Fields.PhoneNumbers, Fields.Image],
@@ -250,7 +249,7 @@ export async function fetchContacts(
 
   const filteredContacts = contacts.data.filter((contact) => {
     return (
-      contact.phoneNumbers && contact.phoneNumbers.some((p) => isValidPhoneNumber(p) !== undefined)
+      contact.phoneNumbers && find(contact.phoneNumbers, (p) => isValidPhoneNumber(p) !== undefined)
     )
   })
 
@@ -259,7 +258,7 @@ export async function fetchContacts(
   // @ts-ignore
   const phoneNumbersToContacts = createPhoneNumberToContactMapping(filteredContacts)
 
-  const phoneNumbersByAddress = await lookupPhoneNumbersOnAttestations(web3, phoneNumbersToContacts)
+  const phoneNumbersByAddress = await lookupPhoneNumbersOnAttestations(kit, phoneNumbersToContacts)
 
   return {
     rawContacts,
