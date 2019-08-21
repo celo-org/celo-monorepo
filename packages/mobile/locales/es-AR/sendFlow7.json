@@ -1,6 +1,6 @@
 {
   "cancel": "Cancelar",
-  "dollarsSent": "Dólares Enviados",
+  "dollarsSent": "{{Dollars}} Enviados",
   "to": "Para",
   "send": "Envío",
   "request": "Solicitud",
@@ -13,7 +13,7 @@
   "invite": "Invitar",
   "sendTo": "Enviar a",
   "amount": "Monto",
-  "celoDollarsAvailable": "Celo Dólares disponibles",
+  "celoDollarsAvailable": "{{CeloDollars}} disponibles",
   "for": "Por",
   "groceriesRent": "Supermercado, alquiler, etc. (Opcional)",
   "fee": "Comisión",

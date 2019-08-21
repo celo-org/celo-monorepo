@@ -1,6 +1,6 @@
 {
   "cancel": "Cancel",
-  "dollarsSent": "Dollars Sent",
+  "dollarsSent": "{{Dollars}} Sent",
   "to": "To",
   "send": "Send",
   "request": "Request",
@@ -13,7 +13,7 @@
   "payRequest": "Pay Request",
   "sendTo": "Send to",
   "amount": "Amount",
-  "celoDollarsAvailable": "Celo Dollars Available",
+  "celoDollarsAvailable": "{{CeloDollars}} Available",
   "for": "For",
   "groceriesRent": "Groceries, rent, etc. (Optional)",
   "fee": "Fee",
