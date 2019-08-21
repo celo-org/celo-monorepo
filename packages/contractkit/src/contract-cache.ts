@@ -1,13 +1,14 @@
 import { CeloContract } from './base'
 import { ContractKit } from './kit'
-import { LockedGoldWrapper } from './wrappers/LockedGold'
+import { AttestationsWrapper } from './wrappers/Attestations'
 import { ExchangeWrapper } from './wrappers/Exchange'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
+import { LockedGoldWrapper } from './wrappers/LockedGold'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
 import { ValidatorsWrapper } from './wrappers/Validators'
 
 const WrapperFactories = {
-  // [CeloContract.Attestations]: AttestationsWrapper,
+  [CeloContract.Attestations]: AttestationsWrapper,
   [CeloContract.LockedGold]: LockedGoldWrapper,
   // [CeloContract.Escrow]: EscrowWrapper,
   [CeloContract.Exchange]: ExchangeWrapper,
@@ -28,7 +29,7 @@ type CFType = typeof WrapperFactories
 export type ValidWrappers = keyof CFType
 
 interface WrapperCacheMap {
-  // [CeloContract.Attestations]?: AttestationsWrapper,
+  [CeloContract.Attestations]?: AttestationsWrapper
   [CeloContract.LockedGold]?: LockedGoldWrapper
   // [CeloContract.Escrow]?: EscrowWrapper,
   [CeloContract.Exchange]?: ExchangeWrapper
@@ -51,9 +52,9 @@ export class WrapperCache {
 
   constructor(readonly kit: ContractKit) {}
 
-  // getAttestations() {
-  //   return this.getWrapper(CeloContract.Attestations, newAttestations)
-  // }
+  getAttestations() {
+    return this.getContract(CeloContract.Attestations)
+  }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
   }
