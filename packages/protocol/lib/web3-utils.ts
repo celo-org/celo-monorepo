@@ -1,6 +1,7 @@
 /* tslint:disable:no-console */
 // TODO(asa): Refactor and rename to 'deployment-utils.ts'
 import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
 import { BigNumber } from 'bignumber.js'
 import { ec as EC } from 'elliptic'
@@ -17,8 +18,6 @@ import {
 import { TransactionObject } from 'web3/eth/types'
 
 import Web3 = require('web3')
-
-const Artifactor = require('truffle-artifactor')
 
 const ec = new EC('secp256k1')
 const cachedWeb3 = new Web3()
@@ -169,8 +168,7 @@ export async function setInitialProxyImplementation<
   const implementation: ContractInstance = await Contract.deployed()
   const proxy: ProxyInstance = await ContractProxy.deployed()
 
-  // @ts-ignore abi property exists
-  const initializerAbi = implementation.abi.find(
+  const initializerAbi = (implementation as any).abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'initialize'
   )
 
@@ -195,30 +193,6 @@ export async function getDeployedProxiedContract<ContractInstance extends Truffl
   return Contract.at(proxy.address) as ContractInstance
 }
 
-export async function setInRegistry(
-  contract: Truffle.ContractInstance,
-  registry: RegistryInstance,
-  registryId: string
-) {
-  console.log(`  Setting ${registryId} in Registry`)
-  await registry.setAddressFor(registryId, contract.address)
-}
-
-export async function setInRegistryViaMultiSig(
-  contract: Truffle.ContractInstance,
-  multiSig: MultiSigInstance,
-  registry: RegistryInstance,
-  registryId: string
-) {
-  console.log(`  Setting ${registryId} in Registry`)
-  await submitMultiSigTransaction(
-    multiSig,
-    registry.address,
-    // @ts-ignore There is a property 'contract' on the variable contract
-    registry.contract.setAddressFor.getData(registryId, contract.address)
-  )
-}
-
 /*
  * Abstracts away the overhead of a typical Proxy+Implementation contract deployment.
  *
@@ -236,116 +210,33 @@ export async function setInRegistryViaMultiSig(
  * A function with a signature as expected to be exported from a Truffle
  * migration script.
  */
-export function deployProxyAndImplementation<ContractInstance extends Truffle.ContractInstance>(
+export function deploymentForCoreContract<ContractInstance extends Truffle.ContractInstance>(
   web3: Web3,
   artifacts: any,
-  name: string,
-  args: (networkName?: string) => Promise<any[]>,
+  name: CeloContractName,
+  args: (networkName?: string) => Promise<any[]> = async () => [],
   then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
 ) {
-  return async (deployer: any, networkName: string, _accounts: string[]) => {
+  const Contract = artifacts.require(name)
+  const ContractProxy = artifacts.require(name + 'Proxy')
+  return (deployer: any, networkName: string, _accounts: string[]) => {
     console.log('Deploying', name)
-    let Contract = artifacts.require(name)
-    let ContractProxy = artifacts.require(name + 'Proxy')
-    try {
-      Contract = artifacts.require(name)
-      ContractProxy = artifacts.require(name + 'Proxy')
-    } catch (e) {
-      console.error(e)
-      process.exit(1)
-    }
-    let proxiedContract: ContractInstance
-    deployer
-      .deploy(ContractProxy)
-      .then(async () => {
-        const proxy: ProxyInstance = await ContractProxy.deployed()
-        await proxy._transferOwnership(_accounts[0])
-      })
-      .then(() => {
-        return deployer.deploy(Contract)
-      })
-      .then(async () => {
-        proxiedContract = await setInitialProxyImplementation<ContractInstance>(
-          web3,
-          artifacts,
-          name,
-          ...(await args(networkName))
-        )
-      })
-      .then(async () => {
-        if (then) {
-          return then(proxiedContract, web3, networkName)
-        }
-      })
-  }
-}
+    deployer.deploy(ContractProxy)
+    deployer.deploy(Contract)
+    deployer.then(async () => {
+      const proxy: ProxyInstance = await ContractProxy.deployed()
+      await proxy._transferOwnership(_accounts[0])
+      const proxiedContract: ContractInstance = await setInitialProxyImplementation<
+        ContractInstance
+      >(web3, artifacts, name, ...(await args(networkName)))
 
-/*
- * Used to deploy contracts whose Proxies have already been deployed.
- *
- * Arguments:
- * - artifacts: the Resolver object provided by Truffle
- * - name: name of the contract to deploy
- * - args: array of arguments to the contract's initializer
- * - then: a callback that can perform additional migration operations after deployment
- *
- * The callback will be called with the deployed proxied contract, a web3
- * instance (derived from the provider of the deployer given by Truffle), and the
- * name of the network (as given by Truffle).
- *
- * Returns:
- * A function with a signature as expected to be exported from a Truffle
- * migration script.
- */
-export function deployImplementationAndRepointProxy<
-  ContractInstance extends Truffle.ContractInstance
->(
-  web3: Web3,
-  artifacts: any,
-  deployedProxyAddress: string,
-  name: string,
-  args: (networkName?: string) => Promise<any[]>,
-  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
-) {
-  return async (deployer: any, networkName: string, _accounts: string[]) => {
-    console.log('Deploying', name)
-    const Contract = artifacts.require(name)
-    const ContractProxy = artifacts.require(name + 'Proxy')
-    let proxiedContract: ContractInstance
-    deployer
-      // Hack to create build artifact.
-      .deploy(ContractProxy)
-      .then(async () => {
-        const argv = require('minimist')(process.argv.slice(2))
-        if (argv.build_directory) {
-          const artifact = ContractProxy._json
-          artifact.networks[await web3.eth.net.getId()] = {
-            address: deployedProxyAddress,
-            // @ts-ignore
-            transactionHash: '0x',
-          }
-          const contractsDir = argv.build_directory + '/contracts'
-          const artifactor = new Artifactor(contractsDir)
+      const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
+      await registry.setAddressFor(name, proxiedContract.address)
 
-          await artifactor.save(artifact)
-        }
-      })
-      .then(() => {
-        return deployer.deploy(Contract)
-      })
-      .then(async () => {
-        proxiedContract = await setInitialProxyImplementation<ContractInstance>(
-          web3,
-          artifacts,
-          name,
-          ...(await args(networkName))
-        )
-      })
-      .then(async () => {
-        if (then) {
-          return then(proxiedContract, web3, networkName)
-        }
-      })
+      if (then) {
+        await then(proxiedContract, web3, networkName)
+      }
+    })
   }
 }
 

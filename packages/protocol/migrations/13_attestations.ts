@@ -1,25 +1,18 @@
-import { attestationsRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   add0x,
   convertToContractDecimals,
-  deployProxyAndImplementation,
+  deploymentForCoreContract,
   generatePublicKeyFromPrivateKey,
   getDeployedProxiedContract,
   sendTransactionWithPrivateKey,
-  setInRegistry,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import * as minimist from 'minimist'
-import { AttestationsInstance, RegistryInstance, StableTokenInstance } from 'types'
+import { AttestationsInstance, StableTokenInstance } from 'types'
 import { TransactionObject } from 'web3/eth/types'
 const initializeArgs = async (): Promise<[string, string, string[], string[]]> => {
   const stableToken: StableTokenInstance = await getDeployedProxiedContract<StableTokenInstance>(
     'StableToken',
-    artifacts
-  )
-
-  const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-    'Registry',
     artifacts
   )
 
@@ -28,7 +21,7 @@ const initializeArgs = async (): Promise<[string, string, string[], string[]]> =
     stableToken
   )
   return [
-    registry.address,
+    config.registry.predeployedProxyAddress,
     config.attestations.attestationExpirySeconds.toString(),
     [stableToken.address],
     [attestationFee.toString()],
@@ -49,25 +42,13 @@ async function setDataEncryptionKey(attestations: AttestationsInstance, privateK
   })
 }
 
-module.exports = deployProxyAndImplementation<AttestationsInstance>(
+module.exports = deploymentForCoreContract<AttestationsInstance>(
   web3,
   artifacts,
-  'Attestations',
+  CeloContractName.Attestations,
   initializeArgs,
   async (attestations: AttestationsInstance) => {
-    const argv = minimist(process.argv, {
-      string: ['keys'],
-      default: { keys: '' },
-    })
-    const valKeys: string[] = argv.keys ? argv.keys.split(',') : []
-
+    const valKeys: string[] = config.validators.validatorKeys
     await Promise.all(valKeys.map((key) => setDataEncryptionKey(attestations, key)))
-
-    const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-      'Registry',
-      artifacts
-    )
-
-    await setInRegistry(attestations, registry, attestationsRegistryId)
   }
 )
