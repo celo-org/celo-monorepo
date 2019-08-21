@@ -13,6 +13,8 @@ import VersionCheck from 'react-native-version-check'
 import { call, delay, put, race, select, spawn, takeLeading } from 'redux-saga/effects'
 import { setName } from 'src/account'
 import { showError, showMessage } from 'src/alert/actions'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ALERT_BANNER_DURATION } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
@@ -48,8 +50,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
-export const REDEEM_INVITE_TIMEOUT = 5 * 60 * 1000 // 5 minutes
-export const ERROR_DURATION = 5000 // 5 seconds
+export const REDEEM_INVITE_TIMEOUT = 1 * 60 * 1000 // 1 minute
 
 const USE_REAL_FEE = false
 const INVITE_FEE = '0.2'
@@ -208,12 +209,15 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
   })
 
   if (result === true) {
-    Logger.debug(TAG, 'Verification completed successfully')
+    CeloAnalytics.track(CustomEventNames.redeem_invite_success)
+    Logger.debug(TAG, 'Redeem Invite completed successfully')
   } else if (result === false) {
-    Logger.debug(TAG, 'Verification failed')
+    CeloAnalytics.track(CustomEventNames.redeem_invite_failed)
+    Logger.debug(TAG, 'Redeem Invite failed')
   } else if (timeout) {
-    Logger.debug(TAG, 'Verification timed out')
-    yield put(showError(ErrorMessages.REDEEM_INVITE_TIMEOUT, ERROR_DURATION))
+    CeloAnalytics.track(CustomEventNames.redeem_invite_timed_out)
+    Logger.debug(TAG, 'Redeem Invite timed out')
+    yield put(showError(ErrorMessages.REDEEM_INVITE_TIMEOUT, ALERT_BANNER_DURATION))
   }
   Logger.debug(TAG, 'Done Redeem invite')
 }
