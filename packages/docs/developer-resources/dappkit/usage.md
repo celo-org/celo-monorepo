@@ -58,7 +58,7 @@ Once you have the account address, you can make calls against your own smart con
 
 For many real-world applications, your user will want to interact with their friends and family on your DApp. Celo has a built-in [Identity Protocol](../../celo-codebase/protocol/identity/README.md) that maps phone numbers to account addresses. You can use DAppkit to fetch that mapping for a user's contact list.
 
-([expo base template commit](https://github.com/celo-org/dappkit-base/commit/7b037d555b8c0f64d8daa6e146a6c7f047a62f68))
+([expo base template commit](https://github.com/celo-org/dappkit-base/commit/532b72b0a5b0f5356a1e535700e53d649554ed57))
 
 ```javascript
 import { fetchContacts } from "@celo/dappkit";
@@ -86,7 +86,7 @@ Object.entries(this.state.phoneNumbersByAddress).map(([address, entry]) => {
 
 Let's go from accessing account information to submitting transactions. To alter state on the blockchain, you need to make a transaction object with your smart contract or any of the Celo Core Contracts in ContractKit. All that is left to do is to pass the transaction object to DAppKit.
 
-([expo base template commit](https://github.com/celo-org/dappkit-base/commit/0235667e2f2d4cd4782e3abf926f5801900b215d))
+([expo base template commit](https://github.com/celo-org/dappkit-base/commit/e3a1c00f2b8a6f6f6891c515a131ff66b55cb563))
 
 ```javascript
 import {
@@ -124,16 +124,17 @@ const dappkitResponse = await waitForSignedTxs(requestId);
 const tx = dappkitResponse.rawTxs[0];
 
 // Send the signed transaction via web3
-kit.web3.eth.sendSignedTransaction(tx).on("confirmation", async () => {
-  const [cUSDBalanceBig, cUSDDecimals] = await Promise.all([
-    stableToken.balanceOf(this.state.address),
-    stableToken.decimals()
-  ]);
-  const cUSDBalance = this.convertToContractDecimals(
-    cUSDBalanceBig,
-    cUSDDecimals
-  );
+await toTxResult(kit.web3.eth.sendSignedTransaction(tx)).waitReceipt()
 
-  this.setState({ cUSDBalance, isLoadingBalance: false });
+const [cUSDBalanceBig, cUSDDecimals] = await Promise.all([
+  stableToken.balanceOf(this.state.address),
+  stableToken.decimals()
+]);
+const cUSDBalance = this.convertToContractDecimals(
+  cUSDBalanceBig,
+  cUSDDecimals
+);
+
+this.setState({ cUSDBalance, isLoadingBalance: false })
 })
 ```
