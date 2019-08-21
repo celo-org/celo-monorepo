@@ -167,19 +167,19 @@ function getTestnetVars(celoEnv: string) {
   }
 }
 
+function getTestnetNetworkVars(celoEnv: string) {
+  return {
+    ...getEnvVarValues(testnetNetworkEnvVars),
+    network_name: networkName(celoEnv),
+  }
+}
+
 function getEnvVarValues(terraformEnvVars: TerraformVars) {
   const vars: { [key: string]: string } = {}
   for (const key of Object.keys(terraformEnvVars)) {
     vars[key] = fetchEnv(terraformEnvVars[key])
   }
   return vars
-}
-
-function getTestnetNetworkVars(celoEnv: string) {
-  return {
-    ...getEnvVarValues(testnetNetworkEnvVars),
-    network_name: networkName(celoEnv),
-  }
 }
 
 export async function generateAndUploadSecrets(celoEnv: string) {

@@ -15,8 +15,6 @@ export async function initTerraformModule(
   vars: TerraformVars,
   backendConfigVars: TerraformVars
 ) {
-  console.info('Resetting local state to force pull remote backend...')
-  await resetLocalTerraformState()
   const modulePath = getModulePath(moduleName)
   return execTerraformCmd(
     'init',
@@ -57,6 +55,11 @@ export function destroyTerraformModule(moduleName: string, vars: TerraformVars) 
   return execTerraformCmd('destroy', getModulePath(moduleName), getVarOptions(vars), '-force')
 }
 
+// pulls remote state
+function refreshTerraformModule(moduleName: string, vars: TerraformVars) {
+  return execTerraformCmd('refresh', getModulePath(moduleName), getVarOptions(vars))
+}
+
 // This is a workaround to `terraform output` requiring users to run it from
 // inside the Terraform module directory. See:
 // https://github.com/hashicorp/terraform/issues/15581
@@ -66,29 +69,11 @@ export async function getTerraformModuleOutputs(
   vars: TerraformVars,
   backendConfigVars: TerraformVars
 ) {
-  // console.info('Resetting local state to force pull remote backend...')
-  // await resetLocalTerraformState()
-
-  const initCmd = buildTerraformCmd(
-    'init',
-    getModulePath(moduleName),
-    getVarOptions(vars),
-    getVarOptions(backendConfigVars, 'backend-config')
-  )
-
-  const refreshCmd = buildTerraformCmd('refresh', getModulePath(moduleName), getVarOptions(vars))
-  const [stdout] = await execCmd(`
-    cd ${getModulePath(moduleName)} && \
-    ${initCmd} > /dev/null 2>&1 && \
-    ${refreshCmd} > /dev/null 2>&1 && \
-    terraform output -json
-  `)
-  console.log(stdout)
-  return JSON.parse(stdout)
-}
-
-function resetLocalTerraformState() {
-  // return execCmd('rm -f ./.terraform/terraform.tfstate')
+  await initTerraformModule(moduleName, vars, backendConfigVars)
+  await refreshTerraformModule(moduleName, vars)
+  const modulePath = getModulePath(moduleName)
+  const [output] = await execCmd(`cd ${modulePath} && terraform output -json`)
+  return JSON.parse(output)
 }
 
 function getModulePath(moduleName: string) {
@@ -122,7 +107,7 @@ function execTerraformCmd(
   return execCmd(`cd ${modulePath} && ${terraformCmd}`, {}, false, true)
 }
 
-function buildTerraformCmd(command: string, actionPath: string, ...options: string[]) {
+function buildTerraformCmd(command: string, cmdPath: string, ...options: string[]) {
   const optionsStr = options ? options.join(' ') : ''
-  return `terraform ${command} -input=false ${optionsStr} ${actionPath}`
+  return `terraform ${command} -input=false ${optionsStr} ${cmdPath}`
 }

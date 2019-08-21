@@ -4,7 +4,7 @@ import sleep from 'sleep-promise'
 import { installHelmChart, removeHelmRelease, upgradeHelmChart } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { resetCloudSQLInstance, retrieveCloudSQLConnectionInfo } from 'src/lib/helm_deploy'
-import { execCmd } from 'src/lib/utils'
+import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import * as yargs from 'yargs'
 
 export const command = 'blockscout'
@@ -53,7 +53,9 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
   } else {
     console.info(`Delete blockscout-migration`)
     try {
-      await execCmd(`kubectl delete job ${argv.celoEnv}-blockscout-migration -n ${argv.celoEnv}`)
+      await execCmdWithExitOnFailure(
+        `kubectl delete job ${argv.celoEnv}-blockscout-migration -n ${argv.celoEnv}`
+      )
     } catch (error) {
       console.error(error)
     }
