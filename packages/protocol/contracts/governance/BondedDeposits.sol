@@ -936,4 +936,9 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     }
     return FractionUtil.Fraction(y, precision);
   }
+  
+  // SG: For specification
+  function getTotalWeight() external view returns (uint256) {
+	return totalWeight;
+  }
 }

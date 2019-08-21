@@ -183,37 +183,62 @@ rule no_referendum_votes_unless_approved(method f, uint256 p) {
 		"Cannot move from 0 votes to positive number of yes,no,abstain votes unless proposal $p is approved.";
 }
 
-/* The sum of yes votes for a proposal cannot exceed total weight - requires linked governance */
-
-/* That's for referendum...
-A user should never be able to have multiple concurrent votes on the same proposal
---> What we will check: 
-	impossibility of: increase of p's yes votes for user u whose upvoted proposal is p 
-*/
-/*rule no_double_upvote(uint256 p, address u) {
-
+/* The sum of yes votes for a proposal cannot exceed total weight - requires linked BondedDeposits */
+// this rule requires linkage of BondedDeposits
+rule sum_of_votes_cannot_exceed_total_weight(method f, uint256 p) {
 	env _e;
+	env eF;
+	env e_;
+	
+	uint256 _totalWeight = sinvoke _getTotalWeightFromBondedDeposits(_e)
 	
 	uint256 _yes;
 	uint256 _no;
 	uint256 _abstain;
-	_yes, _no, _abstain = sinvoke  getVoteTotals(_e,p);
-
-
-	env e_;
+	_yes, _no, _abstain = sinvoke getVoteTotals(_e,p);
+	
+	require _yes+_no+_abstain <= _totalWeight;
+	
+	calldataarg arg;
+	sinvoke f(eF,arg);
+	
+	uint256 totalWeight_ = sinvoke _getTotalWeightFromBondedDeposits(e_)
 	
 	uint256 yes_;
 	uint256 no_;
 	uint256 abstain_;
-	_yes, _no, _abstain = sinvoke getVoteTotals(e_,p);
+	yes_, no_, abstain_ = sinvoke getVoteTotals(e_,p);
 	
-	
+	assert yes_+no_+abstain_ <= totalWeight_, "Sum of votes for a proposal cannot exceed total weight";
 }
-*/
+
+
+// TODO: Can a voting user provide weight to multiple proposals?
+
+
+rule cant_vote_twice_with_delegate(uint256 deqIndex, uint256 voteValue) {	
+	// If I delegated voting, can I vote? Probably not
+	env e;
+	env eF;
+	
+	uint256 NONE = getNoneVoteEnum(e);
+	// get the voting delegate
+	address voterDelegate = sinvoke getVoterFromAccount(e,eF.msg.sender);
+	
+	// check if voted
+	uint256 p;
+	uint256 recordValue;
+	p, recordValue = sinvoke getVoteRecord(e,voterDelegate,deqIndex);
+
+	invoke vote(eF,p,deqIndex,voteValue);
+	
+	assert voteValue == NONE => lastReverted, "Cannot vote for none"; // not voting none
+	assert recordValue != NONE => lastReverted, "Could not succeed if delegate already voted";
+}
 
 /*
 
-A user should never be able to have multiple concurrent votes on the same proposal
+TODO:
 A proposal should never be able to be promoted from the queue if it was not in the top concurrentProposals of upvote received
 
 */
@@ -258,6 +283,83 @@ rule execute_preconds(uint256 p, uint256 index) {
 	// TODO: if there are exactly yes==no then should it succeed or not?
 	assert _no > _yes => (!executeRetval || executeReverted), "If there are more no votes than yes votes, then we cannot succeed in executing";
 	// TODO: may require to make sure that all constitutions demand at least majority
+}
+
+// proposalId is timestamp
+
+rule approved_proposals_invariants(method f, uint256 p) {
+	env _e;
+	env eF;
+	env e_;
+	
+	bool _doesProposalExist = sinvoke proposalExists(_e,p);
+	bool _isApprovedProposal = sinvoke isApproved(_e,p);
+	
+	require _isApprovedProposal => _doesProposalExist; // if a proposal is approved, it must be existent
+	
+	calldataarg arg;
+	sinvoke f(eF,arg);
+	
+	bool doesProposalExist_ = sinvoke proposalExists(e_,p);
+	bool isApprovedProposal_ = sinvoke isApproved(e_,p);
+	
+	assert isApprovedProposal_ => doesProposalExist_, "An approved proposal must exist";
+	assert _isApprovedProposal => isApprovedProposal_, "An approved proposal cannot be disproved";
+}
+
+rule proposal_timestamp_invariants(method f, uint256 p) {
+	env _e;
+	env eF;
+	env e_;
+	
+	uint256 _proposalTimestamp;
+	_,_, _proposalTimestamp, _ = sinvoke getProposal(_e,p);
+		
+	require _proposalTimestamp == p || _proposalTimestamp == 0;	
+	calldataarg arg;
+	sinvoke f(eF,arg);
+	
+	uint256 proposalTimestamp_;
+	_,_, proposalTimestamp_, _ = sinvoke getProposal(e_,p);
+	
+	assert proposalTimestamp_ == p || proposalTimestamp_ == 0, "The timestamp of a proposal is either its ID ${p} or 0, but got ${proposalTimestamp_}";
+}
+
+
+rule no_double_vote_referendum(address account, uint256 deqIndex) {
+	/* A user that already has a vote record for a dequeued index, cannot make a transaction that will increase the weight of that choice */
+	env _e;
+	env eF;
+	env e_;
+	
+	uint256 NONE = sinvoke getNoneVoteEnum(_e);
+	uint256 ABSTAIN = sinvoke getAbstainVoteEnum(_e);
+	uint256 YES = sinvoke getYesVoteEnum(_e);
+	uint256 NO = sinvoke getNoVoteEnum(_e);
+	
+	uint256 p;
+	uint256 recordValue;
+	p, recordValue = sinvoke getVoteRecord(_e,account,deqIndex);
+	
+	uint256 _yes; uint256 _no; uint256 _abstain;
+	_yes,_no,_abstain = sinvoke getVoteTotals(_e,p);
+	
+	calldataarg arg;
+	require eF.msg.sender == account;
+	sinvoke f(eF,arg);
+	
+	
+	uint256 yes_; uint256 no_; uint256 abstain_;
+	yes_,no_,abstain_ = sinvoke getVoteTotals(e_,p);
+	
+	assert recordValue != NONE => yes_ + no_ + abstain_ == _yes + _no + _abstain, "Total votes could not have changed if already voted";
+	assert recordValue == YES => yes_ <= _yes, "Yes votes could not have increased if voted yes already";
+	assert recordValue == NO => no_ <= _no, "No votes could not have increased if voted no already";
+	assert recordValue == ABSTAIN => abstain_ <= _abstain, "Abstain votes could not have increased if voted abstain already";
+	assert recordValue == NONE => (yes_ == _yes && no_ == _no)
+									|| (yes_ == _yes && abstain_ == _abstain)
+									|| (no_ == _no && abstain_ == _abstain),
+									"If previously did not vote, only kind of vote may change, and the other two are the same";
 }
 
 // TODO: Write spec for isProposal passing, or just for constitution
