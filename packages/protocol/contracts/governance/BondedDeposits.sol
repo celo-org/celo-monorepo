@@ -19,7 +19,24 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
 
   using FractionUtil for FractionUtil.Fraction;
   using SafeMath for uint256;
-
+  
+	/* SG: SafeMath128 Start */
+	function safeCast128(uint256 x) internal pure returns (uint128 y) {
+		require (x < 2**128);
+		y = uint128(x);
+	}
+	
+	function add128(uint128 x, uint128 y) private pure returns (uint128 z) {
+		uint256 xy = uint256(x).add(uint256(y));
+		z = safeCast128(xy);
+	}
+	
+	function sub128(uint128 x, uint128 y) private pure returns (uint128 z) {
+		uint256 xy = uint256(x).sub(uint256(y));
+		z = safeCast128(xy);
+	}
+	/* SG: SafeMath128 End */
+	
   enum DepositType {
     Bonded,
     Notified
@@ -382,7 +399,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     require(msg.value > 0 && noticePeriod <= maxNoticePeriod);
     Account storage account = accounts[msg.sender];
     Deposit storage bonded = account.deposits.bonded[noticePeriod];
-    updateBondedDeposit(account, uint256(bonded.value).add(msg.value), noticePeriod);
+    updateBondedDeposit(account, add128(bonded.value,safeCast128(msg.value)), noticePeriod);
     emit DepositBonded(msg.sender, msg.value, noticePeriod);
     return account.weight;
   }
@@ -408,7 +425,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     Account storage account = accounts[msg.sender];
     Deposit storage bonded = account.deposits.bonded[noticePeriod];
     require(bonded.value >= value && value > 0);
-    updateBondedDeposit(account, uint256(bonded.value).sub(value), noticePeriod);
+    updateBondedDeposit(account, add128(bonded.value,safeCast128(value)), noticePeriod);
 
     // solhint-disable-next-line not-rely-on-time
     uint256 availabilityTime = now.add(noticePeriod);
@@ -445,7 +462,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     // solhint-disable-next-line not-rely-on-time
     uint256 noticePeriod = availabilityTime.sub(now);
     Deposit storage bonded = account.deposits.bonded[noticePeriod];
-    updateBondedDeposit(account, uint256(bonded.value).add(value), noticePeriod);
+    updateBondedDeposit(account, add128(bonded.value,safeCast128(value)), noticePeriod);
     emit DepositRebonded(msg.sender, value, noticePeriod, availabilityTime);
     return account.weight;
   }
@@ -505,7 +522,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     updateBondedDeposit(account, uint256(bonded.value).sub(value), noticePeriod);
     uint256 increasedNoticePeriod = noticePeriod.add(increase);
     uint256 increasedValue = account.deposits.bonded[increasedNoticePeriod].value;
-    updateBondedDeposit(account, increasedValue.add(value), increasedNoticePeriod);
+    updateBondedDeposit(account, add128(safeCast128(increasedValue),safeCast128(value)), increasedNoticePeriod);
     emit NoticePeriodIncreased(msg.sender, value, noticePeriod, increase);
     return account.weight;
   }
@@ -767,8 +784,8 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     require(value != bonded.value);
     uint256 weight;
     if (bonded.value == 0) {
-      bonded.index = uint128(account.deposits.noticePeriods.length);
-      bonded.value = uint128(value);
+      bonded.index = safeCast128(account.deposits.noticePeriods.length);
+      bonded.value = safeCast128(value);
       account.deposits.noticePeriods.push(noticePeriod);
       weight = getDepositWeight(value, noticePeriod);
       account.weight = account.weight.add(weight);
