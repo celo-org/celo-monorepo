@@ -111,8 +111,8 @@ class QRCodeDisplay extends React.Component<Props, State> {
         <View style={style.buttonContainer}>
           <Button
             onPress={this.downloadImage}
-            text={t('saveCodeImage')}
-            accessibilityLabel={t('saveCodeImage')}
+            text={t('shareCodeImage')}
+            accessibilityLabel={t('shareCodeImage')}
             standard={true}
             type={BtnTypes.PRIMARY}
             disabled={false}

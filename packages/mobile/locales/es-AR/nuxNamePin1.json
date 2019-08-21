@@ -5,7 +5,7 @@
   "secureAsset":
     "Celo mantiene su patrimonio seguro y le permite enviar capital a quien quiera y recibirlos de cualquier persona",
   "stableAsset":
-    "Los Celo Dólares constituyen un activo digital estable que está alineado con el valor del dólar estadounidense",
+    "Los {{CeloDollars}} constituyen un activo digital estable que está alineado con el valor del dólar estadounidense",
   "verifyNumber":
     "Verifique su número de teléfono para conectarse con otros usuarios y recibir dinero",
   "syncNetwork": "Sincronizando con la red",
@@ -60,7 +60,7 @@
   "createPin": {
     "title": "Crear un código PIN de 6 dígitos",
     "intro": "Cree un PIN para proteger su Monedero Celo.",
-    "why": "En ciertos casos, necesitará este PIN para enviar Celo Dólares a sus amigos.",
+    "why": "En ciertos casos, necesitará este PIN para enviar {{CeloDollars}} a sus amigos.",
     "warn":
       "escriba su código PIN de 6 dígitos en un papel y guárdelo en algún sitio seguro. Se lo solicitaremos más tarde para acceder a su monedero.",
     "yourPin": "Su PIN"
