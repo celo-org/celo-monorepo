@@ -44,7 +44,9 @@ class DisconnectBanner extends React.PureComponent<Props> {
         <Text style={fontStyles.bold}>{t('poorConnection.0')}</Text> {t('poorConnection.1')}
       </Text>
     ) : (
-      <Text style={[styles.text, styles.textGrey, fontStyles.bold]}>{t('connectingToCelo')}</Text>
+      <Text style={[styles.text, styles.textGrey, fontStyles.bold]} testID="connectingToCeloBanner">
+        {t('connectingToCelo')}
+      </Text>
     )
   }
 }
