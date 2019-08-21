@@ -70,7 +70,7 @@ if (status != Permissions.PermissionStatus.GRANTED) {
   return
 }
 
-const { rawContacts, phoneNumbersByAddress } = await fetchContacts(kit.web3)
+const { rawContacts, phoneNumbersByAddress } = await fetchContacts(kit)
 
 this.setState({ rawContacts, phoneNumbersByAddress })
 
