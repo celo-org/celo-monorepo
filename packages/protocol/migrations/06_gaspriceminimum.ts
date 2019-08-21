@@ -1,23 +1,13 @@
 /* tslint:disable:no-console */
 import { toFixed } from '@celo/protocol/lib/fixidity'
-import { gasPriceMinimumRegistryId } from '@celo/protocol/lib/registry-utils'
-import {
-  deployProxyAndImplementation,
-  getDeployedProxiedContract,
-  setInRegistry,
-} from '@celo/protocol/lib/web3-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { GasPriceMinimumInstance, RegistryInstance } from 'types'
+import { GasPriceMinimumInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
-  const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-    'Registry',
-    artifacts
-  )
-  // @ts-ignore
-  registry.numberFormat = 'BigNumber'
   return [
-    registry.address,
+    config.registry.predeployedProxyAddress,
     config.gasPriceMinimum.initialMinimum,
     toFixed(config.gasPriceMinimum.targetDensity).toString(),
     toFixed(config.gasPriceMinimum.adjustmentSpeed).toString(),
@@ -25,16 +15,9 @@ const initializeArgs = async (): Promise<any[]> => {
   ]
 }
 
-module.exports = deployProxyAndImplementation<GasPriceMinimumInstance>(
+module.exports = deploymentForCoreContract<GasPriceMinimumInstance>(
   web3,
   artifacts,
-  'GasPriceMinimum',
-  initializeArgs,
-  async (gasPriceMinimum: GasPriceMinimumInstance) => {
-    const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-      'Registry',
-      artifacts
-    )
-    await setInRegistry(gasPriceMinimum, registry, gasPriceMinimumRegistryId)
-  }
+  CeloContractName.GasPriceMinimum,
+  initializeArgs
 )

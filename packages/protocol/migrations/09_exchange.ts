@@ -1,26 +1,21 @@
 /* tslint:disable:no-console */
 
 import { toFixed } from '@celo/protocol/lib/fixidity'
-import { exchangeRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
-  deployProxyAndImplementation,
+  deploymentForCoreContract,
   getDeployedProxiedContract,
-  setInRegistry,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { ExchangeInstance, RegistryInstance, ReserveInstance, StableTokenInstance } from 'types'
+import { ExchangeInstance, ReserveInstance, StableTokenInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
-  const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-    'Registry',
-    artifacts
-  )
   const stableToken: StableTokenInstance = await getDeployedProxiedContract<StableTokenInstance>(
     'StableToken',
     artifacts
   )
   return [
-    registry.address,
+    config.registry.predeployedProxyAddress,
     stableToken.address,
     toFixed(config.exchange.spread).toString(),
     toFixed(config.exchange.reserveFraction).toString(),
@@ -29,17 +24,12 @@ const initializeArgs = async (): Promise<any[]> => {
   ]
 }
 
-module.exports = deployProxyAndImplementation<ExchangeInstance>(
+module.exports = deploymentForCoreContract<ExchangeInstance>(
   web3,
   artifacts,
-  'Exchange',
+  CeloContractName.Exchange,
   initializeArgs,
   async (exchange: ExchangeInstance) => {
-    const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-      'Registry',
-      artifacts
-    )
-
     console.log('Setting Exchange as StableToken minter')
     const stableToken: StableTokenInstance = await getDeployedProxiedContract<StableTokenInstance>(
       'StableToken',
@@ -53,7 +43,5 @@ module.exports = deployProxyAndImplementation<ExchangeInstance>(
       artifacts
     )
     await reserve.addSpender(exchange.address)
-
-    await setInRegistry(exchange, registry, exchangeRegistryId)
   }
 )
