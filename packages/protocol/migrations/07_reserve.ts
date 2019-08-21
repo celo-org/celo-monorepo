@@ -1,11 +1,10 @@
 /* tslint:disable:no-console */
 import Web3 = require('web3')
 
-import { reserveRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
-  deployProxyAndImplementation,
+  deploymentForCoreContract,
   getDeployedProxiedContract,
-  setInRegistry,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { RegistryInstance, ReserveInstance } from 'types'
@@ -19,19 +18,12 @@ const initializeArgs = async (): Promise<[string, number]> => {
   return [registry.address, config.reserve.tobinTaxStalenessThreshold]
 }
 
-module.exports = deployProxyAndImplementation<ReserveInstance>(
+module.exports = deploymentForCoreContract<ReserveInstance>(
   web3,
   artifacts,
-  'Reserve',
+  CeloContractName.Reserve,
   initializeArgs,
   async (reserve: ReserveInstance, web3: Web3, networkName: string) => {
-    const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-      'Registry',
-      artifacts
-    )
-
-    await setInRegistry(reserve, registry, reserveRegistryId)
-
     const network: any = truffle.networks[networkName]
     console.log('Sending the reserve an initial gold balance')
     await web3.eth.sendTransaction({
