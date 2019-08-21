@@ -157,11 +157,6 @@ const people: Person[] = [
     photo: require('./volpe@2x.jpg'),
   },
   {
-    name: 'Jared Greene',
-    role: 'Engineering',
-    photo: require('./jared@2x.jpg'),
-  },
-  {
     name: 'Audrey Penven',
     role: 'Engineering',
     photo: require('./audrey-final.jpg'),
