@@ -21,7 +21,7 @@ data "terraform_remote_state" "state" {
 }
 
 data "google_compute_network" "network" {
-  name        = var.network_name
+  name = var.network_name
 }
 
 resource "google_compute_firewall" "ssh_firewall" {
