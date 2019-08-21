@@ -1,7 +1,7 @@
 [
 	{
 		"type":"spec",
-		"primary_contract":"GovernanceHarness",
-		"specfile":"specs/governance.spec"
+		"primary_contract":"BondedDepositsHarness",
+		"specfile":"specs/bonded_deposits.spec"
 	}
 ]
