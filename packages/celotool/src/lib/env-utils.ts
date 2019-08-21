@@ -1,7 +1,7 @@
+import { confirmAction, execCmdWithExitOnFailure } from '@celo/celotool/src/lib/utils'
 import { config } from 'dotenv'
 import { existsSync } from 'fs'
 import path from 'path'
-import prompts from 'prompts'
 import yargs from 'yargs'
 
 export interface CeloEnvArgv extends yargs.Argv {
@@ -172,18 +172,6 @@ export async function doCheckOrPromptIfStagingOrProduction() {
       'You are about to apply a possibly irreversable action on a staging/production environment. Are you sure?'
     )
     process.env.CELOTOOL_CONFIRMED = 'true'
-  }
-}
-
-export async function confirmAction(message: string) {
-  const response = await prompts({
-    type: 'confirm',
-    name: 'confirmation',
-    message: `${message} (y/n)`,
-  })
-  if (!response.confirmation) {
-    console.info('Aborting due to user response')
-    process.exit(0)
   }
 }
 

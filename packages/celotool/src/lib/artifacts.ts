@@ -1,10 +1,11 @@
 /* tslint:disable: no-console */
-import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
 import {
   doCheckOrPromptIfStagingOrProduction,
-  execCmd,
+  envVar,
+  fetchEnv,
   isProduction,
-} from '@celo/celotool/src/lib/utils'
+} from '@celo/celotool/src/lib/env-utils'
+import { execCmd } from '@celo/celotool/src/lib/utils'
 import { existsSync, mkdirSync, readFileSync, writeFile } from 'fs'
 import { promisify } from 'util'
 

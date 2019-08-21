@@ -1,18 +1,22 @@
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from '@celo/celotool/src/lib/cluster'
-import { envVar, fetchEnv, fetchEnvOrFallback } from '@celo/celotool/src/lib/env-utils'
+import {
+  EnvTypes,
+  envVar,
+  fetchEnv,
+  fetchEnvOrFallback,
+  isProduction,
+  switchToProjectFromEnv,
+} from '@celo/celotool/src/lib/env-utils'
 import { ensureAuthenticatedGcloudAccount } from '@celo/celotool/src/lib/gcloud_utils'
 import { generateGenesisFromEnv } from '@celo/celotool/src/lib/generate_utils'
 import { OG_ACCOUNTS } from '@celo/celotool/src/lib/genesis_constants'
 import { getStatefulSetReplicas, scaleResource } from '@celo/celotool/src/lib/kubernetes'
 import {
-  EnvTypes,
   execCmd,
   execCmdWithExitOnFailure,
   getVerificationPoolRewardsURL,
   getVerificationPoolSMSURL,
-  isProduction,
   outputIncludes,
-  switchToProjectFromEnv,
 } from '@celo/celotool/src/lib/utils'
 import { entries, flatMap, range } from 'lodash'
 import sleep from 'sleep-promise'
