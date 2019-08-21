@@ -14,6 +14,7 @@
   "searchForSomeone": "Search for someone using their name or phone number",
   "redeemSuccess": "Successfully redeemed invite code.",
   "redeemFailed": "Failure redeeming code ",
+  "redeemInviteTimeout": "Redeem Invite Timed out",
   "withdrawGoldFromEscrow": "Withdrawing gold from escrow...",
   "transferGoldToAccount": "Gold transferred to your account!",
   "withdrawDollarsFromEscrow": "Withdrawing dollars from escrow...",

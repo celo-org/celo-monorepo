@@ -14,6 +14,7 @@
   "searchForSomeone": "Busque a alguien según el nombre o el número de teléfono",
   "redeemSuccess": "Código de invitación validado de forma exitosa.",
   "redeemFailed": "No pudimos validar el código de invitación",
+  "redeemInviteTimeout": "Canjear invitación agotada",
   "withdrawGoldFromEscrow": "Retirarndo el oro de la cuenta...",
   "transferGoldToAccount": "Oro transferido a su cuenta!",
   "withdrawDollarsFromEscrow": "Retirando los dólares de su cuenta...",

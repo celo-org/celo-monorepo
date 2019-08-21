@@ -10,7 +10,7 @@ import BigNumber from 'bignumber.js'
 import { Linking } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import VersionCheck from 'react-native-version-check'
-import { call, delay, put, select, spawn, takeLeading } from 'redux-saga/effects'
+import { call, delay, put, race, select, spawn, takeLeading } from 'redux-saga/effects'
 import { setName } from 'src/account'
 import { showError, showMessage } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -48,6 +48,8 @@ import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
+export const REDEEM_INVITE_TIMEOUT = 5 * 60 * 1000 // 5 minutes
+export const ERROR_DURATION = 5000 // 5 seconds
 
 const USE_REAL_FEE = false
 const INVITE_FEE = '0.2'
@@ -198,6 +200,25 @@ function* redeemSuccess(name: string, account: string) {
 }
 
 export function* redeemInviteSaga(action: RedeemInviteAction) {
+  Logger.debug(TAG, 'Starting Redeem Invite')
+
+  const { result, timeout } = yield race({
+    result: call(doRedeemInvite, action),
+    timeout: delay(REDEEM_INVITE_TIMEOUT),
+  })
+
+  if (result === true) {
+    Logger.debug(TAG, 'Verification completed successfully')
+  } else if (result === false) {
+    Logger.debug(TAG, 'Verification failed')
+  } else if (timeout) {
+    Logger.debug(TAG, 'Verification timed out')
+    yield put(showError(ErrorMessages.REDEEM_INVITE_TIMEOUT, ERROR_DURATION))
+  }
+  Logger.debug(TAG, 'Done Redeem invite')
+}
+
+export function* doRedeemInvite(action: RedeemInviteAction) {
   const { inviteCode, name } = action
 
   yield call(waitWeb3LastBlock)
@@ -276,9 +297,11 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
       throw Error('Transfer to new local account was not successful')
     }
     yield redeemSuccess(name, newAccount)
+    return true
   } catch (e) {
     Logger.error(TAG, 'Redeem invite error: ', e)
     yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ALERT_BANNER_DURATION))
+    return false
   }
 }
 
