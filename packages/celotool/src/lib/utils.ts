@@ -72,7 +72,7 @@ export function execCmd(
   cmd: string,
   execOptions: any = {},
   rejectWithOutput = false,
-  pipeOutput = true
+  pipeOutput = false
 ): Promise<[string, string]> {
   return new Promise((resolve, reject) => {
     if (process.env.CELOTOOL_VERBOSE === 'true') {
