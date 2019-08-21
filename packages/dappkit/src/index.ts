@@ -194,14 +194,14 @@ export interface PhoneNumberMappingEntry {
 }
 
 function createPhoneNumberToContactMapping(contacts: Contact[]) {
-  const phoneNumberObjects = flatMap(contacts, (contact) => {
+  const phoneNumberObjects = (flatMap(contacts, (contact) => {
     return contact.phoneNumbers
       ? flatMap(contact.phoneNumbers, (phoneNumber) => {
           const e164Number = isValidPhoneNumber(phoneNumber)
           return e164Number ? { e164Number, id: contact.id } : []
         })
       : []
-  }) as [{ e164Number: E164Number; id: string }]
+  }) as unknown) as [{ e164Number: E164Number; id: string }]
   const flattened = phoneNumberObjects.map(({ e164Number, id }) => [e164Number.toString(), id])
   return fromPairs(flattened)
 }
