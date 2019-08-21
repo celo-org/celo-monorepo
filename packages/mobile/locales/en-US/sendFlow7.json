@@ -48,7 +48,7 @@
   "inviteFailed": "Failure sending invite",
   "loadingContacts": "Finding your contacts",
   "QRCode": "QR Code",
-  "saveCodeImage": "Save Code Image",
+  "shareCodeImage": "Share Code Image",
   "scanCode": "Scan Code",
   "writeStorageNeededForQrDownload":
     "Storage write permission is needed for downloading the QR code",
