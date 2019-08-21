@@ -1,3 +1,4 @@
+import { CeloContract, ContractKit } from '@celo/contractkit'
 import {
   AccountAuthRequest,
   DappKitRequestMeta,
@@ -10,20 +11,11 @@ import {
   SignTxRequest,
   TxToSignParam,
 } from '@celo/utils'
-import {
-  Attestations,
-  CeloTokenType,
-  GoldToken,
-  lookupPhoneNumbers,
-  StableToken,
-} from '@celo/walletkit'
 import { Linking } from 'expo'
 import { Contact, Fields, getContactsAsync, PhoneNumber } from 'expo-contacts'
 import { E164Number, parsePhoneNumberFromString } from 'libphonenumber-js'
-import { chunk, flatMap, flatten, fromPairs, zipObject } from 'lodash'
-import Web3 from 'web3'
+import { chunk, find, flatMap, flatten, fromPairs, zipObject } from 'lodash'
 import { TransactionObject } from 'web3/eth/types'
-
 export {
   AccountAuthRequest,
   DappKitRequestMeta,
@@ -110,17 +102,17 @@ export enum GasCurrency {
   cGLD = 'cGLD',
 }
 
-async function getGasCurrencyContract(
-  web3: Web3,
+async function getGasCurrencyContractAddress(
+  kit: ContractKit,
   gasCurrency: GasCurrency
-): Promise<CeloTokenType> {
+): Promise<string> {
   switch (gasCurrency) {
     case GasCurrency.cUSD:
-      return StableToken(web3)
+      return kit.registry.addressFor(CeloContract.StableToken)
     case GasCurrency.cGLD:
-      return GoldToken(web3)
+      return kit.registry.addressFor(CeloContract.GoldToken)
     default:
-      return StableToken(web3)
+      return kit.registry.addressFor(CeloContract.StableToken)
   }
 }
 
@@ -134,19 +126,22 @@ export interface TxParams<T> {
 }
 
 export async function requestTxSig<T>(
-  web3: Web3,
+  kit: ContractKit,
   txParams: TxParams<T>[],
   meta: DappKitRequestMeta
 ) {
   // TODO: For multi-tx payloads, we for now just assume the same from address for all txs. We should apply a better heuristic
-  const baseNonce = await web3.eth.getTransactionCount(txParams[0].from)
+  const baseNonce = await kit.web3.eth.getTransactionCount(txParams[0].from)
   const txs: TxToSignParam[] = await Promise.all(
     txParams.map(async (txParam, index) => {
-      const gasCurrencyContract = await getGasCurrencyContract(web3, txParam.gasCurrency)
+      const gasCurrencyContractAddress = await getGasCurrencyContractAddress(
+        kit,
+        txParam.gasCurrency
+      )
       const value = txParam.value === undefined ? '0' : txParam.value
 
       const estimatedTxParams = {
-        gasCurrency: gasCurrencyContract.options.address,
+        gasCurrency: gasCurrencyContractAddress,
         from: txParam.from,
         value,
       } as any
@@ -159,7 +154,7 @@ export async function requestTxSig<T>(
         txData: txParam.tx.encodeABI(),
         estimatedGas,
         nonce: baseNonce + index,
-        gasCurrencyAddress: gasCurrencyContract._address,
+        gasCurrencyAddress: gasCurrencyContractAddress,
         value,
         ...txParam,
       }
@@ -198,39 +193,40 @@ export interface PhoneNumberMappingEntry {
 }
 
 function createPhoneNumberToContactMapping(contacts: Contact[]) {
-  const phoneNumberObjects = flatMap(contacts, (contact) => {
+  const phoneNumberObjects = (flatMap(contacts, (contact) => {
     return contact.phoneNumbers
-      ? contact.phoneNumbers.flatMap((phoneNumber) => {
+      ? flatMap(contact.phoneNumbers, (phoneNumber) => {
           const e164Number = isValidPhoneNumber(phoneNumber)
           return e164Number ? { e164Number, id: contact.id } : []
         })
       : []
-  }) as [{ e164Number: E164Number; id: string }]
+  }) as unknown) as [{ e164Number: E164Number; id: string }]
   const flattened = phoneNumberObjects.map(({ e164Number, id }) => [e164Number.toString(), id])
   return fromPairs(flattened)
 }
 
 async function lookupPhoneNumbersOnAttestations(
-  web3: Web3,
+  kit: ContractKit,
   allPhoneNumbers: { [phoneNumber: string]: string }
 ): Promise<{ [address: string]: PhoneNumberMappingEntry }> {
-  const attestations = await Attestations(web3)
+  const attestations = await kit.contracts.getAttestations()
   const nestedResult = await Promise.all(
     chunk(Object.keys(allPhoneNumbers), 20).map(async (phoneNumbers) => {
       const hashedPhoneNumbers = phoneNumbers.map(PhoneNumberUtils.getPhoneHash)
 
       const phoneNumbersByHash = zipObject(hashedPhoneNumbers, phoneNumbers)
 
-      const result = await lookupPhoneNumbers(attestations, hashedPhoneNumbers)
+      const result = await attestations.lookupPhoneNumbers(hashedPhoneNumbers)
 
-      return flatMap(Object.entries(result), ([phoneHash, attestationStats]) =>
-        Object.entries(attestationStats).map(([address, attestationStat]) => ({
+      return flatMap(Object.keys(result), (phoneHash) => {
+        const attestationStats = result[phoneHash]
+        return Object.keys(attestationStats).map((address) => ({
           address,
           phoneNumber: phoneNumbersByHash[phoneHash],
           id: allPhoneNumbers[phoneNumbersByHash[phoneHash]],
-          attestationStat,
+          attestationStat: attestationStats[address],
         }))
-      )
+      })
     })
   )
 
@@ -244,7 +240,7 @@ export interface PhoneNumberMappingEntryByAddress {
   [address: string]: PhoneNumberMappingEntry
 }
 export async function fetchContacts(
-  web3: Web3
+  kit: ContractKit
 ): Promise<{ rawContacts: ContactsById; phoneNumbersByAddress: PhoneNumberMappingEntryByAddress }> {
   const contacts = await getContactsAsync({
     fields: [Fields.PhoneNumbers, Fields.Image],
@@ -252,7 +248,7 @@ export async function fetchContacts(
 
   const filteredContacts = contacts.data.filter((contact) => {
     return (
-      contact.phoneNumbers && contact.phoneNumbers.some((p) => isValidPhoneNumber(p) !== undefined)
+      contact.phoneNumbers && find(contact.phoneNumbers, (p) => isValidPhoneNumber(p) !== undefined)
     )
   })
 
@@ -261,7 +257,7 @@ export async function fetchContacts(
   // @ts-ignore
   const phoneNumbersToContacts = createPhoneNumberToContactMapping(filteredContacts)
 
-  const phoneNumbersByAddress = await lookupPhoneNumbersOnAttestations(web3, phoneNumbersToContacts)
+  const phoneNumbersByAddress = await lookupPhoneNumbersOnAttestations(kit, phoneNumbersToContacts)
 
   return {
     rawContacts,
