@@ -1,7 +1,7 @@
 import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
 import { fetchEnvOrFallback } from '@celo/celotool/src/lib/env-utils'
 import { installHelmChart } from 'src/lib/blockscout'
-import { createClusterIfNotExists, switchToClusterFromEnv, setupCluster } from 'src/lib/cluster'
+import { createClusterIfNotExists, setupCluster, switchToClusterFromEnv } from 'src/lib/cluster'
 import {
   createAndUploadCloudSQLSecretIfNotExists,
   createCloudSQLInstance,
