@@ -16,17 +16,17 @@ data "terraform_remote_state" "state" {
   backend = "gcs"
   config = {
     bucket = "celo_tf_state"
-    prefix = "${var.celo_env}/state"
+    prefix = "${var.celo_env}/testnet"
   }
 }
 
-resource "google_compute_network" "network" {
-  name = "${var.celo_env}-network"
+data "google_compute_network" "network" {
+  name        = var.network_name
 }
 
 resource "google_compute_firewall" "ssh_firewall" {
   name    = "${var.celo_env}-ssh-firewall"
-  network = google_compute_network.network.name
+  network = data.google_compute_network.network.name
 
   allow {
     protocol = "tcp"
@@ -36,7 +36,7 @@ resource "google_compute_firewall" "ssh_firewall" {
 
 resource "google_compute_firewall" "geth_firewall" {
   name    = "${var.celo_env}-geth-firewall"
-  network = google_compute_network.network.name
+  network = data.google_compute_network.network.name
 
   allow {
     protocol = "tcp"
@@ -51,7 +51,7 @@ resource "google_compute_firewall" "geth_firewall" {
 
 resource "google_compute_firewall" "rpc_firewall" {
   name    = "${var.celo_env}-rpc-firewall"
-  network = google_compute_network.network.name
+  network = data.google_compute_network.network.name
 
   allow {
     protocol = "tcp"
@@ -61,7 +61,7 @@ resource "google_compute_firewall" "rpc_firewall" {
 
 resource "google_compute_firewall" "bootnode_firewall" {
   name    = "${var.celo_env}-bootnode-firewall"
-  network = google_compute_network.network.name
+  network = data.google_compute_network.network.name
 
   allow {
     protocol = "udp"
@@ -78,7 +78,7 @@ module "bootnode" {
   gcloud_vm_service_account_email       = var.gcloud_vm_service_account_email
   geth_bootnode_docker_image_repository = var.geth_bootnode_docker_image_repository
   geth_bootnode_docker_image_tag        = var.geth_bootnode_docker_image_tag
-  network_name                          = google_compute_network.network.name
+  network_name                          = data.google_compute_network.network.name
 }
 
 module "tx_node" {
@@ -96,7 +96,7 @@ module "tx_node" {
   geth_node_docker_image_tag        = var.geth_node_docker_image_tag
   geth_verbosity                    = var.geth_verbosity
   network_id                        = var.network_id
-  network_name                      = google_compute_network.network.name
+  network_name                      = data.google_compute_network.network.name
   tx_node_count                     = var.tx_node_count
   verification_pool_url             = var.verification_pool_url
 }
@@ -106,7 +106,7 @@ module "tx_node_lb" {
   source = "./modules/tx-node-load-balancer"
   # variables
   celo_env           = var.celo_env
-  network_name       = google_compute_network.network.name
+  network_name       = data.google_compute_network.network.name
   tx_node_self_links = module.tx_node.self_links
 }
 
@@ -125,7 +125,7 @@ module "validator" {
   geth_node_docker_image_tag        = var.geth_node_docker_image_tag
   geth_verbosity                    = var.geth_verbosity
   network_id                        = var.network_id
-  network_name                      = google_compute_network.network.name
+  network_name                      = data.google_compute_network.network.name
   validator_count                   = var.validator_count
   verification_pool_url             = var.verification_pool_url
 }

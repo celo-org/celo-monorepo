@@ -9,21 +9,27 @@ import * as yargs from 'yargs'
 export const command = 'blockscout'
 export const describe = 'upgrade an existing deploy of the blockscout package'
 
-// Can't extend because yargs.Argv already has a `reset` property
-type TestnetArgv = UpgradeArgv & {
+export const builder = (argv: yargs.Argv) => {
+  return argv
+    .option('reset', {
+      type: 'boolean',
+      description:
+        'when enabled, deletes the database and redeploys the helm chart. keeps the instance.',
+      default: false,
+    })
+    .option('vmTestnet', {
+      type: 'boolean',
+      description: 'Deploy blockscout for an already deployed VM testnet',
+      default: false,
+    })
+}
+
+type BlockscoutUpgradeArgv = UpgradeArgv & {
   reset: boolean
+  vmTestnet: boolean
 }
 
-export const builder: { [key: string]: yargs.Options } = {
-  reset: {
-    description:
-      'when enabled, deletes the database and redeploys the helm chart. keeps the instance.',
-    default: false,
-    type: 'boolean',
-  },
-}
-
-export const handler = async (argv: TestnetArgv) => {
+export const handler = async (argv: BlockscoutUpgradeArgv) => {
   await switchToClusterFromEnv()
 
   const instanceName = `${argv.celoEnv}${fetchEnvOrFallback('BLOCKSCOUT_DB_SUFFIX', '')}`
@@ -50,7 +56,8 @@ export const handler = async (argv: TestnetArgv) => {
       argv.celoEnv,
       blockscoutDBUsername,
       blockscoutDBPassword,
-      blockscoutDBConnectionName
+      blockscoutDBConnectionName,
+      argv.vmTestnet
     )
   } else {
     console.info(`Delete blockscout-migration`)
@@ -66,7 +73,8 @@ export const handler = async (argv: TestnetArgv) => {
       argv.celoEnv,
       blockscoutDBUsername,
       blockscoutDBPassword,
-      blockscoutDBConnectionName
+      blockscoutDBConnectionName,
+      argv.vmTestnet
     )
   }
 }

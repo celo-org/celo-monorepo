@@ -73,6 +73,11 @@ variable network_id {
   description = "The network ID number"
 }
 
+variable network_name {
+  type        = string
+  description = "The name of the network to use"
+}
+
 variable tx_node_count {
   type        = number
   description = "Number of tx-nodes to create"

@@ -4,7 +4,7 @@ import {
   fetchEnv,
   fetchEnvOrFallback,
 } from '@celo/celotool/src/lib/utils'
-import { getOutputs } from '@celo/celotool/src/lib/vm-testnet-utils'
+import { getTestnetOutputs } from '@celo/celotool/src/lib/vm-testnet-utils'
 
 export async function installHelmChart(
   celoEnv: string,
@@ -78,7 +78,7 @@ async function helmParameters(
     `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
   ]
   if (vmTestnet) {
-    const outputs = await getOutputs(celoEnv)
+    const outputs = await getTestnetOutputs(celoEnv)
     const txNodeLbIp = outputs.tx_node_lb_ip_address.value
     params.push(`--set blockscout.jsonrpc_http_url=http://${txNodeLbIp}:8545`)
     params.push(`--set blockscout.jsonrpc_ws_url=ws://${txNodeLbIp}:8546`)
