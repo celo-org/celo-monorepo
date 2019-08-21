@@ -126,6 +126,7 @@ module "validator" {
   geth_verbosity                    = var.geth_verbosity
   network_id                        = var.network_id
   network_name                      = data.google_compute_network.network.name
+  tx_node_count                     = var.tx_node_count
   validator_count                   = var.validator_count
   verification_pool_url             = var.verification_pool_url
 }

@@ -9,5 +9,5 @@ it as a `data` source. This prevents the network from being deleted upon `terraf
 but also prevents the network from being created. Terraform lacks basic
 conditionals to directly implement this logic in the `testnet` module.
 
-This module is only intended to be used by `celotool`, which only creates
-a network if it is not for the `default` VPC.
+This module is only intended to be used by `celotool`, which only creates/destroys
+a network if it is not the `default` VPC.

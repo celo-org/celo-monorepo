@@ -63,6 +63,11 @@ variable network_name {
   description = "Name of the GCP network the validator VM is in"
 }
 
+variable tx_node_count {
+  type        = number
+  description = "Number of tx-nodes that are created"
+}
+
 variable validator_count {
   type        = number
   description = "Number of validators to create"
