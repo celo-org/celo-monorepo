@@ -25,6 +25,7 @@
     "dev:emulator": "bash ./scripts/start_emulator.sh &",
     "dev:remote": "remotedev --hostname=localhost --port=8000",
     "test": "export TZ=UTC && jest --silent",
+    "test:all": "yarn lint && yarn build && yarn test",
     "test:ci": "yarn test --coverage --runInBand",
     "test:watch": "yarn test --watch",
     "test:verbose": "export TZ=UTC && jest --verbose",
