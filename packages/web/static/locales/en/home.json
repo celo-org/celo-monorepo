@@ -61,9 +61,9 @@
   "buildOnCelo": "Build on Celo",
   "buildOnCeloCopy":
     "Celo is a platform that is open and open-source, allowing for an ecosystem of powerful applications built on top, including easier cash transfer programs, peer-to-peer lending, collaborative small-scale insurance, and other digital assets and wallets.",
-  "verifyToEarn": "Earn with Celo",
-  "verifyToEarnCopy":
-    "Celo increases access by enabling anyone with even a simple Android smartphone to participate and earn Celo for decentralized verifications.",
+  "poweredByCommunity": "Powered by our community",
+  "poweredByCommunityCopy":
+    "Celo's platform is powered by the community. Users can earn currency by hosting software that forwards mobile devices' requests or validates their transactions.",
   "mobileFirstPlatform": "Mobile-First Platform",
   "mobileFirstPlatformCopy":
     "To create a truly inclusive financial system, we started by building an infrastructure to serve those excluded from the current system. Celo’s protocol includes unique features that create a seamless user experience on mobile phones.",

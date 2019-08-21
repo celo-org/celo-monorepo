@@ -1,7 +1,8 @@
 import {
-  convertToContractDecimals,
+  convertToContractDecimalsBN,
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
+import { BigNumber } from 'bignumber.js'
 import { GoldTokenInstance, StableTokenInstance } from 'types'
 
 /*
@@ -24,13 +25,14 @@ module.exports = async (callback: (error?: any) => number) => {
       string: ['to'],
     })
 
+    BigNumber.config({ EXPONENTIAL_AT: 500 })
     const goldToken = await getDeployedProxiedContract<GoldTokenInstance>('GoldToken', artifacts)
     const stableToken = await getDeployedProxiedContract<StableTokenInstance>(
       'StableToken',
       artifacts
     )
-    const goldAmount = await convertToContractDecimals(argv.goldValue, goldToken)
-    const stableAmount = await convertToContractDecimals(argv.stableValue, stableToken)
+    const goldAmount = await convertToContractDecimalsBN(argv.goldValue, goldToken)
+    const stableAmount = await convertToContractDecimalsBN(argv.stableValue, stableToken)
     await goldToken.transfer(argv.to, goldAmount.toString())
     await stableToken.transfer(argv.to, stableAmount.toString())
     callback()

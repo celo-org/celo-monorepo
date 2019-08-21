@@ -10,7 +10,7 @@ description: >-
 
 ### NPM Package
 
-The Celo CLI is also published as a node module on NPM. Assuming you have [npm installed](https://www.npmjs.com/get-npm), you can install the Celo CLI using the following command:
+The Celo CLI is published as a node module on NPM. Assuming you have [npm installed](https://www.npmjs.com/get-npm), you can install the Celo CLI using the following command:
 
 `$ npm install -g @celo/celocli`
 
@@ -20,7 +20,7 @@ We are currently deploying the CLI with only Node v10.x LTS support. If you are 
 
 ### Docker Image
 
-A docker image that runs the Celo Blockchain client in full sync mode which includes the Celo CLI is available for Node version pinning.
+Additionally, if don't have NPM or are having trouble installing the Celo CLI with your version of node, you can use a docker image that runs the Celo Blockchain client in full sync mode which includes the Celo CLI.
 
 `$ docker pull us.gcr.io/celo-testnet/celocli:master`
 

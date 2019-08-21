@@ -122,12 +122,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 export class Verifying extends React.Component<Props, State> {
-  static navigationOptions = {
-    headerStyle: {
-      elevation: 0,
-    },
-    header: null,
-  }
+  static navigationOptions = { header: null }
 
   state = {
     useManualEntry: false,
@@ -248,8 +243,8 @@ export class Verifying extends React.Component<Props, State> {
             <CancelButton onCancel={this.onCancelVerification} />
           </View>
         )}
+        <DisconnectBanner />
         <ScrollView style={style.content}>
-          <DisconnectBanner />
           <NuxLogo testID="VerifyLogo" />
           <ProgressIndicatorRow step={numCompleteAttestations} hasFailure={verificationFailed} />
           <Text style={style.textPhoneNumber}>

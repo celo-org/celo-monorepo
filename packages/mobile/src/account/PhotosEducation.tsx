@@ -5,7 +5,7 @@ import Education from 'src/account/Education'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { addressBook, bigPhoneAvatar, cameraUpload } from 'src/images/Images'
-import { navigateBack } from 'src/navigator/NavigationService'
+import { navigateHome } from 'src/navigator/NavigationService'
 
 interface DispatchProps {
   photosNUXCompleted: typeof photosNUXCompleted
@@ -14,9 +14,10 @@ type Props = DispatchProps
 
 export class PhotosEducation extends React.Component<Props> {
   static navigationOptions = { header: null }
-  goToWallet = () => {
+
+  goToWalletHome = () => {
     this.props.photosNUXCompleted()
-    navigateBack()
+    navigateHome()
   }
 
   render() {
@@ -40,7 +41,9 @@ export class PhotosEducation extends React.Component<Props> {
         screenName: 'Photo_Nux_3',
       },
     ]
-    return <Education stepInfo={stepInfo} onFinish={this.goToWallet} buttonText={'backToWallet'} />
+    return (
+      <Education stepInfo={stepInfo} onFinish={this.goToWalletHome} buttonText={'backToWallet'} />
+    )
   }
 }
 

@@ -270,7 +270,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       publicKeysData.length == (64 + 48 + 96)
     );
     bytes memory proofOfPossessionBytes = publicKeysData.slice(64, 48 + 96);
-    // TODO(Kobi): Should call checkProofOfPossession once the input is generated correctly.
+    require(checkProofOfPossession(proofOfPossessionBytes));
 
     address account = getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
