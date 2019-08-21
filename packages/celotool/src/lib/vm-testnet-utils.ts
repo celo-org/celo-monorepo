@@ -1,4 +1,9 @@
-import { confirmAction, envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
+import {
+  confirmAction,
+  envVar,
+  fetchEnv,
+  fetchEnvOrFallback,
+} from '@celo/celotool/src/lib/env-utils'
 import {
   AccountType,
   generateGenesisFromEnv,
@@ -242,7 +247,10 @@ function secretsBasePath(celoEnv: string) {
 }
 
 function useDefaultNetwork() {
-  return fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) === 'celo-networks-dev'
+  return (
+    fetchEnvOrFallback(envVar.VM_BASED, 'false') !== 'true' ||
+    fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) === 'celo-networks-dev'
+  )
 }
 
 export function networkName(celoEnv: string) {
