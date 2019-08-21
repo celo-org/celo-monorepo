@@ -1,8 +1,8 @@
 import { switchToClusterFromEnv } from '@celo/celotool/src/lib/cluster'
-import { fetchEnv } from '@celo/celotool/src/lib/env-utils'
+import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
 import { retrieveIPAddress } from '@celo/celotool/src/lib/helm_deploy'
 import { exec } from 'child_process'
-import prompts from 'prompts'
+// import prompts from 'prompts'
 import yargs from 'yargs'
 
 export function execCmd(
@@ -109,6 +109,19 @@ export async function getVerificationPoolConfig(celoEnv: string) {
   }
 }
 
+export async function switchToProject(projectName: string) {
+  const [currentProject] = await execCmdWithExitOnFailure('gcloud config get-value project')
+
+  if (currentProject !== projectName) {
+    await execCmdWithExitOnFailure(`gcloud config set project ${projectName}`)
+  }
+}
+
+export async function switchToProjectFromEnv() {
+  const expectedProject = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+  await switchToProject(expectedProject)
+}
+
 export function addCeloGethMiddleware(argv: yargs.Argv) {
   return argv
     .option('geth-dir', {
@@ -121,18 +134,6 @@ export function addCeloGethMiddleware(argv: yargs.Argv) {
       description: 'path to datadir',
       demand: 'Please, specify geth datadir',
     })
-}
-
-export async function confirmAction(message: string) {
-  const response = await prompts({
-    type: 'confirm',
-    name: 'confirmation',
-    message: `${message} (y/n)`,
-  })
-  if (!response.confirmation) {
-    console.info('Aborting due to user response')
-    process.exit(0)
-  }
 }
 
 // Some tools require hex address to be preceeded by 0x, some don't.

@@ -1,4 +1,4 @@
-import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
+import { confirmAction, envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
 import {
   AccountType,
   generateGenesisFromEnv,
@@ -18,15 +18,12 @@ import {
   uploadFileToGoogleStorage,
   uploadGenesisBlockToGoogleStorage,
 } from '@celo/celotool/src/lib/testnet-utils'
-import { confirmAction } from '@celo/celotool/src/lib/utils'
-console.log(envVar)
 import { writeFileSync } from 'fs'
 
 const secretsBucketName = 'celo-testnet-secrets'
 const testnetTerraformModule = 'testnet'
 const testnetNetworkTerraformModule = 'testnet-network'
 
-console.log(envVar)
 // The keys correspond to the variable names that Terraform expects and
 // the values correspond to the names of the appropriate env variables
 const terraformEnvVars: { [varName: string]: string } = {
@@ -217,6 +214,8 @@ function secretsBasePath(celoEnv: string) {
 }
 
 function useDefaultNetwork() {
+  console.log(process.env)
+  console.log('yeeeet')
   return fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) === 'celo-networks-dev'
 }
 

@@ -5,7 +5,6 @@ import {
   fetchEnv,
   fetchEnvOrFallback,
   isProduction,
-  switchToProjectFromEnv,
 } from '@celo/celotool/src/lib/env-utils'
 import { ensureAuthenticatedGcloudAccount } from '@celo/celotool/src/lib/gcloud_utils'
 import { generateGenesisFromEnv } from '@celo/celotool/src/lib/generate_utils'
@@ -17,6 +16,7 @@ import {
   getVerificationPoolRewardsURL,
   getVerificationPoolSMSURL,
   outputIncludes,
+  switchToProjectFromEnv,
 } from '@celo/celotool/src/lib/utils'
 import { entries, flatMap, range } from 'lodash'
 import sleep from 'sleep-promise'

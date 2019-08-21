@@ -3,9 +3,13 @@ import {
   EnvTypes,
   envVar,
   fetchEnv,
-  switchToProjectFromEnv,
 } from '@celo/celotool/src/lib/env-utils'
-import { execCmd, execCmdWithExitOnFailure, outputIncludes } from '@celo/celotool/src/lib/utils'
+import {
+  execCmd,
+  execCmdWithExitOnFailure,
+  outputIncludes,
+  switchToProjectFromEnv,
+} from '@celo/celotool/src/lib/utils'
 import { networkName } from '@celo/celotool/src/lib/vm-testnet-utils'
 import sleep from 'sleep-promise'
 
