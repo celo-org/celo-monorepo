@@ -5,14 +5,14 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class Rewards extends BaseCommand {
-  static description = 'Manage rewards for locked Gold account'
+  static description = 'Manage rewards for Locked Gold account'
 
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({ required: true }),
     redeem: flags.boolean({
       char: 'r',
-      description: 'Redeem accrued rewards from locked Gold',
+      description: 'Redeem accrued rewards from Locked Gold',
       exclusive: ['delegate'],
     }),
     delegate: Flags.address({

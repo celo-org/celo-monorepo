@@ -77,7 +77,7 @@
         "description": "Manage your account, send and receive Celo Gold and Celo Dollars"
       },
       "bonds": {
-        "description": "Manage locked Gold to participate in governance and earn rewards"
+        "description": "Manage Locked Gold to participate in governance and earn rewards"
       },
       "config": {
         "description": "Configure CLI options which persist across commands"

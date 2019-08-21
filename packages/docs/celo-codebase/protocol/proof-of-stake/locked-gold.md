@@ -1,4 +1,4 @@
-# Bonding Funds
+# Locking Up Funds
 
 To lock-up funds, Celo Gold account holders must put up a staking value and define a notice period. The notice period is the time interval between a withdrawal request and the release of the staked value. Since locked funds are referenced by notice period, each account holder has at most one locked fund per each notice period.
 

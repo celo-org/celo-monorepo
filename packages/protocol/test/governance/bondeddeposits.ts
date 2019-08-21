@@ -257,7 +257,7 @@ contract('LockedGold', (accounts: string[]) => {
     const value = 1000
     const expectedWeight = 1033
 
-    it('should add a locked Gold commitment', async () => {
+    it('should add a Locked Gold commitment', async () => {
       // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
       await lockedGold.newCommitment(noticePeriod, { value })
       const noticePeriods = await lockedGold.getNoticePeriods(account)
@@ -339,7 +339,7 @@ contract('LockedGold', (accounts: string[]) => {
       assert.equal(index.toNumber(), 0)
     })
 
-    it('should remove the locked Gold commitment', async () => {
+    it('should remove the Locked Gold commitment', async () => {
       await lockedGold.notifyCommitment(value, noticePeriod)
       const noticePeriods = await lockedGold.getNoticePeriods(account)
       assert.equal(noticePeriods.length, 0)
@@ -374,11 +374,11 @@ contract('LockedGold', (accounts: string[]) => {
       })
     })
 
-    it('should revert when the value of the locked Gold commitment is 0', async () => {
+    it('should revert when the value of the Locked Gold commitment is 0', async () => {
       await assertRevert(lockedGold.notifyCommitment(1, noticePeriod + 1))
     })
 
-    it('should revert when value is greater than the value of the locked Gold commitment', async () => {
+    it('should revert when value is greater than the value of the Locked Gold commitment', async () => {
       await assertRevert(lockedGold.notifyCommitment(value + 1, noticePeriod))
     })
 
@@ -414,7 +414,7 @@ contract('LockedGold', (accounts: string[]) => {
       )
     })
 
-    it('should add a locked Gold commitment', async () => {
+    it('should add a Locked Gold commitment', async () => {
       await lockedGold.extendCommitment(value, availabilityTime)
       const noticePeriods = await lockedGold.getNoticePeriods(account)
       assert.equal(noticePeriods.length, 1)
@@ -570,7 +570,7 @@ contract('LockedGold', (accounts: string[]) => {
       await lockedGold.newCommitment(noticePeriod, { value })
     })
 
-    it('should update the locked Gold commitment', async () => {
+    it('should update the Locked Gold commitment', async () => {
       await lockedGold.increaseNoticePeriod(value, noticePeriod, increase)
       const noticePeriods = await lockedGold.getNoticePeriods(account)
       assert.equal(noticePeriods.length, 1)
@@ -615,7 +615,7 @@ contract('LockedGold', (accounts: string[]) => {
       await assertRevert(lockedGold.increaseNoticePeriod(value, noticePeriod, 0))
     })
 
-    it('should revert if the locked Gold commitment is smaller than the value', async () => {
+    it('should revert if the Locked Gold commitment is smaller than the value', async () => {
       await assertRevert(lockedGold.increaseNoticePeriod(value, noticePeriod + 1, increase))
     })
 

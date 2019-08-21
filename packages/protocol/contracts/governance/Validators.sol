@@ -142,8 +142,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param registryAddress The address of the registry contract.
    * @param _minElectableValidators The minimum number of validators that can be elected.
    * @param _maxElectableValidators The maximum number of validators that can be elected.
-   * @param requirementValue The minimum locked Gold commitment value to register a group or validator.
-   * @param requirementNoticePeriod The minimum locked Gold commitment notice period to register a group or
+   * @param requirementValue The minimum Locked Gold commitment value to register a group or validator.
+   * @param requirementNoticePeriod The minimum Locked Gold commitment notice period to register a group or
    *   validator.
    * @dev Should be called only once.
    */
@@ -211,8 +211,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
   /**
    * @notice Updates the minimum bonding requirements to register a validator group or validator.
-   * @param value The minimum locked Gold commitment value to register a group or validator.
-   * @param noticePeriod The minimum locked Gold commitment notice period to register a group or validator.
+   * @param value The minimum Locked Gold commitment value to register a group or validator.
+   * @param noticePeriod The minimum Locked Gold commitment notice period to register a group or validator.
    * @return True upon success.
    * @dev The new requirement is only enforced for future validator or group registrations.
    */
@@ -239,7 +239,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param identifier An identifier for this validator.
    * @param name A name for the validator.
    * @param url A URL for the validator.
-   * @param noticePeriod The notice period of the locked Gold commitment that meets the requirements for
+   * @param noticePeriod The notice period of the Locked Gold commitment that meets the requirements for
    *   validator registration.
    * @param publicKeysData Comprised of three tightly-packed elements:
    *    - publicKey - The public key that the validator is using for consensus, should match
@@ -350,7 +350,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param identifier A identifier for this validator group.
    * @param name A name for the validator group.
    * @param url A URL for the validator group.
-   * @param noticePeriod The notice period of the locked Gold commitment that meets the requirements for
+   * @param noticePeriod The notice period of the Locked Gold commitment that meets the requirements for
    *   validator registration.
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
@@ -605,8 +605,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   }
 
   /**
-   * @notice Returns the locked Gold commitment requirements to register a validator or group.
-   * @return The minimum value and notice period for the locked Gold commitment.
+   * @notice Returns the Locked Gold commitment requirements to register a validator or group.
+   * @return The minimum value and notice period for the Locked Gold commitment.
    */
   function getRegistrationRequirement() external view returns (uint256, uint256) {
     return (registrationRequirement.value, registrationRequirement.noticePeriod);
@@ -722,7 +722,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   /**
    * @notice Returns whether an account meets the requirements to register a validator or group.
    * @param account The account.
-   * @param noticePeriod The notice period of the locked Gold commitment that meets the requirements.
+   * @param noticePeriod The notice period of the Locked Gold commitment that meets the requirements.
    * @return Whether an account meets the requirements to register a validator or group.
    */
   function meetsRegistrationRequirements(

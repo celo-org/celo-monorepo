@@ -360,7 +360,7 @@ describe('governance tests', () => {
     })
   })
 
-  describe('when a locked Gold account with weight exists', () => {
+  describe('when a Locked Gold account with weight exists', () => {
     const account = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
     const delegate = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
 
@@ -401,7 +401,7 @@ describe('governance tests', () => {
         addressesWithBalance.push(validator)
         goldGenesisSupply = goldGenesisSupply.plus(genesis.alloc[validator].balance)
       }
-      // Block rewards are paid to governance and locked Gold.
+      // Block rewards are paid to governance and Locked Gold.
       // Governance also receives a portion of transaction fees.
       addressesWithBalance.push(await getContractAddress('GovernanceProxy'))
       addressesWithBalance.push(await getContractAddress('LockedGoldProxy'))

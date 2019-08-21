@@ -9,7 +9,7 @@ import { LockedGoldArgs } from '../../utils/lockedgold'
 import { Op, requireCall } from '../../utils/require'
 
 export default class Commitment extends BaseCommand {
-  static description = 'Create a locked Gold commitment given notice period and gold amount'
+  static description = 'Create a Locked Gold commitment given notice period and gold amount'
 
   static flags = {
     ...BaseCommand.flags,

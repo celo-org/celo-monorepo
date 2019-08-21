@@ -26,7 +26,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   struct Commitments {
-    // Maps a notice period in seconds to a locked Gold commitment.
+    // Maps a notice period in seconds to a Locked Gold commitment.
     mapping(uint256 => Commitment) locked;
     // Maps an availability time in seconds since epoch to a notified commitment.
     mapping(uint256 => Commitment) notified;
@@ -246,7 +246,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   /**
-   * @notice Adds a locked Gold commitment to `msg.sender`'s account.
+   * @notice Adds a Locked Gold commitment to `msg.sender`'s account.
    * @param noticePeriod The notice period for the commitment.
    * @return The account's new weight.
    */
@@ -270,9 +270,9 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   /**
-   * @notice Notifies a locked Gold commitment, allowing funds to be withdrawn after the notice period.
+   * @notice Notifies a Locked Gold commitment, allowing funds to be withdrawn after the notice period.
    * @param value The amount of the commitment to eventually withdraw.
-   * @param noticePeriod The notice period of the locked Gold commitment.
+   * @param noticePeriod The notice period of the Locked Gold commitment.
    * @return The account's new weight.
    */
   function notifyCommitment(
@@ -359,9 +359,9 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   /**
-   * @notice Increases the notice period for all or part of a locked Gold commitment.
-   * @param value The amount of the locked Gold commitment to increase the notice period for.
-   * @param noticePeriod The notice period of the locked Gold commitment.
+   * @notice Increases the notice period for all or part of a Locked Gold commitment.
+   * @param value The amount of the Locked Gold commitment to increase the notice period for.
+   * @param noticePeriod The notice period of the Locked Gold commitment.
    * @param increase The amount to increase the notice period by.
    * @return The account's new weight.
    */
@@ -414,9 +414,9 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   /**
-   * @notice Returns the notice periods of all locked Gold for an account.
+   * @notice Returns the notice periods of all Locked Gold for an account.
    * @param _account The address of the account.
-   * @return The notice periods of all locked Gold for `_account`.
+   * @return The notice periods of all Locked Gold for `_account`.
    */
   function getNoticePeriods(address _account) external view returns (uint256[] memory) {
     Account storage account = accounts[_account];
@@ -434,10 +434,10 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   /**
-   * @notice Returns the value and index of a specified locked Gold commitment.
+   * @notice Returns the value and index of a specified Locked Gold commitment.
    * @param _account The address of the account.
-   * @param noticePeriod The notice period of the locked Gold commitment.
-   * @return The value and index of the specified locked Gold commitment.
+   * @param noticePeriod The notice period of the Locked Gold commitment.
+   * @return The value and index of the specified Locked Gold commitment.
    */
   function getLockedCommitment(
     address _account,
@@ -589,10 +589,10 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   /**
-   * @notice Updates the locked Gold commitment for a given notice period to a new value.
-   * @param account The account to update the locked Gold commitment for.
-   * @param value The new value of the locked Gold commitment.
-   * @param noticePeriod The notice period of the locked Gold commitment.
+   * @notice Updates the Locked Gold commitment for a given notice period to a new value.
+   * @param account The account to update the Locked Gold commitment for.
+   * @param value The new value of the Locked Gold commitment.
+   * @param noticePeriod The notice period of the Locked Gold commitment.
    */
   function updateLockedCommitment(
     Account storage account,

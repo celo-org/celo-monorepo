@@ -8,7 +8,7 @@ import { Args } from '../../utils/command'
 import { LockedGoldArgs } from '../../utils/lockedgold'
 
 export default class Show extends BaseCommand {
-  static description = 'Show locked Gold and corresponding account weight of a commitment given ID'
+  static description = 'Show Locked Gold and corresponding account weight of a commitment given ID'
 
   static flags = {
     ...BaseCommand.flags,
@@ -42,7 +42,7 @@ export default class Show extends BaseCommand {
     let value = new BN(0)
     let contributingWeight = new BN(0)
     if (flags.noticePeriod) {
-      cli.action.start('Fetching locked Gold commitment...')
+      cli.action.start('Fetching Locked Gold commitment...')
       value = await contract.getLockedCommitmentValue(args.account, flags.noticePeriod)
       contributingWeight = value.mul(this.web3.utils.toBN(flags.noticePeriod))
     }

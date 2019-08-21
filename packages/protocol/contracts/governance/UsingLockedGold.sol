@@ -67,10 +67,10 @@ contract UsingLockedGold is UsingRegistry {
   }
 
   /**
-   * @notice Returns the locked Gold commitment value for particular account and notice period.
+   * @notice Returns the Locked Gold commitment value for particular account and notice period.
    * @param account The address of the account.
-   * @param noticePeriod The notice period of the locked Gold commitment.
-   * @return The value of the locked Gold commitment.
+   * @param noticePeriod The notice period of the Locked Gold commitment.
+   * @return The value of the Locked Gold commitment.
    */
   function getLockedCommitmentValue(
     address account,

@@ -2,7 +2,7 @@ export const LockedGoldArgs = {
   noticePeriodArg: {
     name: 'noticePeriod',
     description:
-      'duration (seconds) from notice to withdrawable; doubles as ID of a locked Gold commitment; ',
+      'duration (seconds) from notice to withdrawable; doubles as ID of a Locked Gold commitment; ',
   },
   availabilityTimeArg: {
     name: 'availabilityTime',

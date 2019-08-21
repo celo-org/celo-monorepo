@@ -6,7 +6,7 @@ import { Flags } from '../../utils/command'
 import { LockedGoldArgs } from '../../utils/lockedgold'
 
 export default class Notify extends BaseCommand {
-  static description = 'Notify a locked Gold commitment given notice period and gold amount'
+  static description = 'Notify a Locked Gold commitment given notice period and gold amount'
 
   static flags = {
     ...BaseCommand.flags,
