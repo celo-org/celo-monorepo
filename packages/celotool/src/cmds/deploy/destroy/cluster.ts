@@ -1,7 +1,8 @@
 import { DestroyArgv } from '@celo/celotool/src/cmds/deploy/destroy'
+import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
 import { printReleases } from 'src/cmds/deploy/list'
 import { deleteCluster, getNonSystemHelmReleases, switchToClusterFromEnv } from 'src/lib/cluster'
-import { EnvTypes, envVar, fetchEnv } from 'src/lib/utils'
+import { EnvTypes } from 'src/lib/utils'
 
 export const command = 'cluster'
 

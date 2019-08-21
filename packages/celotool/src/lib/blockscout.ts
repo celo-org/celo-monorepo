@@ -1,9 +1,6 @@
+import { fetchEnv, fetchEnvOrFallback } from '@celo/celotool/src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from '@celo/celotool/src/lib/helm_deploy'
-import {
-  execCmdWithExitOnFailure,
-  fetchEnv,
-  fetchEnvOrFallback,
-} from '@celo/celotool/src/lib/utils'
+import { execCmdWithExitOnFailure } from '@celo/celotool/src/lib/utils'
 import { getTestnetOutputs } from '@celo/celotool/src/lib/vm-testnet-utils'
 
 export async function installHelmChart(

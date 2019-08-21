@@ -1,4 +1,5 @@
 import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
+import { fetchEnvOrFallback } from '@celo/celotool/src/lib/env-utils'
 import { installHelmChart } from 'src/lib/blockscout'
 import { createClusterIfNotExists, switchToClusterFromEnv } from 'src/lib/cluster'
 import {
@@ -8,7 +9,6 @@ import {
   getServiceAccountName,
   grantRoles,
 } from 'src/lib/helm_deploy'
-import { fetchEnvOrFallback } from 'src/lib/utils'
 import yargs from 'yargs'
 
 export const command = 'blockscout'

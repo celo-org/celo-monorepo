@@ -1,4 +1,5 @@
 import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
+import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
 import {
   createClusterIfNotExists,
   pollForRunningCluster,
@@ -22,7 +23,7 @@ import {
   uploadGenesisBlockToGoogleStorage,
   uploadStaticNodesToGoogleStorage,
 } from 'src/lib/testnet-utils'
-import { EnvTypes, envVar, execCmdWithExitOnFailure, fetchEnv, outputIncludes } from 'src/lib/utils'
+import { EnvTypes, execCmdWithExitOnFailure, outputIncludes } from 'src/lib/utils'
 import yargs from 'yargs'
 
 export const command = 'testnet'

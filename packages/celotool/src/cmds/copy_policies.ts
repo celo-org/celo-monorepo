@@ -1,15 +1,15 @@
 import {
-  deleteOtherPolicies,
-  downloadPolicies,
-  uploadPolicies,
-} from '@celo/celotool/src/lib/policies'
-import {
   addCeloEnvMiddleware,
   CeloEnvArgv,
   envVar,
   fetchEnv,
   validateAndSwitchToEnv,
-} from '@celo/celotool/src/lib/utils'
+} from '@celo/celotool/src/lib/env-utils'
+import {
+  deleteOtherPolicies,
+  downloadPolicies,
+  uploadPolicies,
+} from '@celo/celotool/src/lib/policies'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import * as yargs from 'yargs'
 

@@ -1,9 +1,8 @@
 /* tslint:disable: no-console */
+import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
 import {
   doCheckOrPromptIfStagingOrProduction,
-  envVar,
   execCmd,
-  fetchEnv,
   isProduction,
 } from '@celo/celotool/src/lib/utils'
 import { existsSync, mkdirSync, readFileSync, writeFile } from 'fs'

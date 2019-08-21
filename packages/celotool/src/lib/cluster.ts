@@ -1,15 +1,16 @@
+import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
 import {
   doCheckOrPromptIfStagingOrProduction,
   EnvTypes,
-  envVar,
   execCmd,
   execCmdWithExitOnFailure,
-  fetchEnv,
   outputIncludes,
   switchToProjectFromEnv,
 } from '@celo/celotool/src/lib/utils'
+import { networkName } from '@celo/celotool/src/lib/vm-testnet-utils'
 import sleep from 'sleep-promise'
 
+console.log(networkName('yo'))
 const SYSTEM_HELM_RELEASES = ['nginx-ingress-release', 'kube-lego-release']
 const HELM_RELEASE_REGEX = new RegExp(/(.*)-\d+\.\d+\.\d+$/)
 
