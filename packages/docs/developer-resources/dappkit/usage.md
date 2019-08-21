@@ -12,7 +12,7 @@ DAppKit uses deeplinks to communicate between your DApp and the Celo Wallet. All
 
 One of the first actions you will want to do as a DApp Developer is to get the address of your user's account, to display relevant informtion to them. It can be done as simply as:
 
-([expo base template commit](https://github.com/celo-org/dappkit-base/commit/9ef5d8916018a1f7b09d062fdd601b851fb4bf79))
+([expo base template commit](https://github.com/celo-org/dappkit-base/commit/7d04983f0875eac7a1e44963a97b5ecd81a0d1d0))
 
 ```javascript
 import { requestAccountAddress, waitForAccountAuth } from '@celo/dappkit'
@@ -37,7 +37,7 @@ login = async () => {
 
 Once you have the account address, you can make calls against your own smart contract, or use [ContractKit](../contractkit/README.md) to fetch a users balance
 
-([expo base template commit](https://github.com/celo-org/dappkit-base/commit/4fa0dd16a04cd2831dd685378bc49399984bd553))
+([expo base template commit](https://github.com/celo-org/dappkit-base/commit/3be9f5c506788bcc1c22c4e8e02fac62c0821ee9))
 
 ```javascript
   const address = dappkitResponse.address
@@ -58,7 +58,7 @@ Once you have the account address, you can make calls against your own smart con
 
 For many real-world applications, your user will want to interact with their friends and family on your DApp. Celo has a built-in [Identity Protocol](../../celo-codebase/protocol/identity/README.md) that maps phone numbers to account addresses. You can use DAppkit to fetch that mapping for a user's contact list.
 
-([expo base template commit](https://github.com/celo-org/dappkit-base/commit/ea99ff02009de806c0e248eb7aec617c14223fa5))
+([expo base template commit](https://github.com/celo-org/dappkit-base/commit/7b037d555b8c0f64d8daa6e146a6c7f047a62f68))
 
 ```javascript
 import { fetchContacts } from "@celo/dappkit";
@@ -86,7 +86,7 @@ Object.entries(this.state.phoneNumbersByAddress).map(([address, entry]) => {
 
 Let's go from accessing account information to submitting transactions. To alter state on the blockchain, you need to make a transaction object with your smart contract or any of the Celo Core Contracts in ContractKit. All that is left to do is to pass the transaction object to DAppKit.
 
-([expo base template commit](https://github.com/celo-org/dappkit-base/commit/cf35c82d7650e7b6bc7208ece32440d3a32d9cc5))
+([expo base template commit](https://github.com/celo-org/dappkit-base/commit/0235667e2f2d4cd4782e3abf926f5801900b215d))
 
 ```javascript
 import {
