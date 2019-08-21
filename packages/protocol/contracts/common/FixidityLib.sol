@@ -16,6 +16,10 @@ pragma solidity ^0.5.0;
  */
 library FixidityLib2 {
 
+  struct Fraction {
+    int256 value;
+  }
+
   /**
    * @notice Number of positions that the comma is shifted to the right.
    */
@@ -23,13 +27,15 @@ library FixidityLib2 {
     return 24;
   }
 
+  int256 private constant FIXED1_INT = 1000000000000000000000000;
+
   /**
    * @notice This is 1 in the fixed point units used in this library.
    * @dev Test fixed1() equals 10^digits()
    * Hardcoded to 24 digits.
    */
-  function fixed1() internal pure returns(int256) {
-    return 1000000000000000000000000;
+  function fixed1() internal pure returns(Fraction memory) {
+    return Fraction(FIXED1_INT);
   }
 
   /**
@@ -149,105 +155,23 @@ library FixidityLib2 {
   function newFixed(int256 x)
     internal
     pure
-    returns (int256)
+      returns (Fraction memory)
   {
     assert(x <= maxNewFixed());
     assert(x >= minNewFixed());
-    return x * fixed1();
+    return Fraction(x * FIXED1_INT);
   }
 
   /**
    * @notice Converts an int256 in the fixed point representation of this
    * library to a non decimal. All decimal digits will be truncated.
    */
-  function fromFixed(int256 x)
+  function fromFixed(Fraction memory x)
     internal
     pure
     returns (int256)
   {
-    return x / fixed1();
-  }
-
-  /**
-   * @notice Converts an int256 which is already in some fixed point
-   * representation to a different fixed precision representation.
-   * Both the origin and destination precisions must be 38 or less digits.
-   * Origin values with a precision higher than the destination precision
-   * will be truncated accordingly.
-   * @dev
-   * Test convertFixed(1,0,0) returns 1;
-   * Test convertFixed(1,1,1) returns 1;
-   * Test convertFixed(1,1,0) returns 0;
-   * Test convertFixed(1,0,1) returns 10;
-   * Test convertFixed(10,1,0) returns 1;
-   * Test convertFixed(10,0,1) returns 100;
-   * Test convertFixed(100,1,0) returns 10;
-   * Test convertFixed(100,0,1) returns 1000;
-   * Test convertFixed(1000,2,0) returns 10;
-   * Test convertFixed(1000,0,2) returns 100000;
-   * Test convertFixed(1000,2,1) returns 100;
-   * Test convertFixed(1000,1,2) returns 10000;
-   * Test convertFixed(maxInt256,1,0) returns maxInt256/10;
-   * Test convertFixed(maxInt256,0,1) throws
-   * Test convertFixed(maxInt256,38,0) returns maxInt256/(10**38);
-   * Test convertFixed(1,0,38) returns 10**38;
-   * Test convertFixed(maxInt256,39,0) throws
-   * Test convertFixed(1,0,39) throws
-   */
-  function convertFixed(int256 x, uint8 _originDigits, uint8 _destinationDigits)
-    internal
-    pure
-    returns (int256)
-  {
-    assert(_originDigits <= 38 && _destinationDigits <= 38);
-
-    uint8 decimalDifference;
-    if ( _originDigits > _destinationDigits ){
-      decimalDifference = _originDigits - _destinationDigits;
-      return x/(uint128(10)**uint128(decimalDifference));
-    }
-    else if ( _originDigits < _destinationDigits ){
-      decimalDifference = _destinationDigits - _originDigits;
-      // Cast uint8 -> uint128 is safe
-      // Exponentiation is safe:
-      //   _originDigits and _destinationDigits limited to 38 or less
-      //   decimalDifference = abs(_destinationDigits - _originDigits)
-      //   decimalDifference < 38
-      //   10**38 < 2**128-1
-      assert(x <= maxInt256()/uint128(10)**uint128(decimalDifference));
-      assert(x >= minInt256()/uint128(10)**uint128(decimalDifference));
-      return x*(uint128(10)**uint128(decimalDifference));
-    }
-    // _originDigits == digits())
-    return x;
-  }
-
-  /**
-   * @notice Converts an int256 which is already in some fixed point
-   * representation to that of this library. The _originDigits parameter is the
-   * precision of x. Values with a precision higher than FixidityLib.digits()
-   * will be truncated accordingly.
-   */
-  function newFixed(int256 x, uint8 _originDigits)
-    internal
-    pure
-    returns (int256)
-  {
-    return convertFixed(x, _originDigits, digits());
-  }
-
-  /**
-   * @notice Converts an int256 in the fixed point representation of this
-   * library to a different representation. The _destinationDigits parameter is the
-   * precision of the output x. Values with a precision below than
-   * FixidityLib.digits() will be truncated accordingly.
-   */
-  function fromFixed(int256 x, uint8 _destinationDigits)
-    internal
-    pure
-    returns (int256)
-  {
-    return convertFixed(x, digits(), _destinationDigits);
+    return x.value / FIXED1_INT;
   }
 
   /**
@@ -269,13 +193,13 @@ library FixidityLib2 {
     )
     internal
     pure
-    returns (int256)
+    returns (Fraction memory)
   {
     assert(numerator <= maxNewFixed());
     assert(denominator <= maxNewFixed());
     assert(denominator != 0);
-    int256 convertedNumerator = newFixed(numerator);
-    int256 convertedDenominator = newFixed(denominator);
+    Fraction memory convertedNumerator = newFixed(numerator);
+    Fraction memory convertedDenominator = newFixed(denominator);
     return divide(convertedNumerator, convertedDenominator);
   }
 
@@ -288,8 +212,8 @@ library FixidityLib2 {
    * Test integer(-fixed1()) returns -fixed1()
    * Test integer(newFixed(-maxNewFixed())) returns -maxNewFixed()*fixed1()
    */
-  function integer(int256 x) internal pure returns (int256) {
-    return (x / fixed1()) * fixed1(); // Can't overflow
+  function integer(Fraction memory x) internal pure returns (Fraction memory) {
+    return Fraction((x.value / FIXED1_INT) * FIXED1_INT); // Can't overflow
   }
 
   /**
@@ -302,8 +226,8 @@ library FixidityLib2 {
    * Test fractional(-fixed1()) returns 0
    * Test fractional(-fixed1()+1) returns -10^24-1
    */
-  function fractional(int256 x) internal pure returns (int256) {
-    return x - (x / fixed1()) * fixed1(); // Can't overflow
+  function fractional(Fraction memory x) internal pure returns (Fraction memory) {
+    return Fraction(x.value - (x.value / FIXED1_INT) * FIXED1_INT); // Can't overflow
   }
 
   /**
@@ -317,13 +241,13 @@ library FixidityLib2 {
    * Test abs(newFixed(maxNewFixed())) returns maxNewFixed()*fixed1()
    * Test abs(newFixed(minNewFixed())) returns -minNewFixed()*fixed1()
    */
-  function abs(int256 x) internal pure returns (int256) {
-    if (x >= 0) {
+  function abs(Fraction memory x) internal pure returns (Fraction memory) {
+    if (x.value >= 0) {
       return x;
     } else {
-      int256 result = -x;
+      int256 result = -x.value;
       assert (result > 0);
-      return result;
+      return Fraction(result);
     }
   }
 
@@ -339,19 +263,19 @@ library FixidityLib2 {
    * Test add(maxInt256(),maxInt256()) fails
    * Test add(minInt256(),minInt256()) fails
    */
-  function add(int256 x, int256 y) internal pure returns (int256) {
-    int256 z = x + y;
-    if (x > 0 && y > 0) assert(z > x && z > y);
-    if (x < 0 && y < 0) assert(z < x && z < y);
-    return z;
+  function add(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
+    int256 z = x.value + y.value;
+    if (x.value > 0 && y.value > 0) assert(z > x.value && z > y.value);
+    if (x.value < 0 && y.value < 0) assert(z < x.value && z < y.value);
+    return Fraction(z);
   }
 
   /**
    * @notice x-y. You can use add(x,-y) instead.
    * @dev Tests covered by add(x,y)
    */
-  function subtract(int256 x, int256 y) internal pure returns (int256) {
-    return add(x,-y);
+  function subtract(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
+    return add(x,Fraction(-y.value));
   }
 
   /**
@@ -370,17 +294,17 @@ library FixidityLib2 {
    * Test multiply(maxFixedMul()+1,maxFixedMul()) fails
    * Test multiply(maxFixedMul(),maxFixedMul()+1) fails
    */
-  function multiply(int256 x, int256 y) internal pure returns (int256) {
-    if (x == 0 || y == 0) return 0;
-    if (y == fixed1()) return x;
-    if (x == fixed1()) return y;
+  function multiply(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
+    if (x.value == 0 || y.value == 0) return Fraction(0);
+    if (y.value == FIXED1_INT) return x;
+    if (x.value == FIXED1_INT) return y;
 
     // Separate into integer and fractional parts
     // x = x1 + x2, y = y1 + y2
-    int256 x1 = integer(x) / fixed1();
-    int256 x2 = fractional(x);
-    int256 y1 = integer(y) / fixed1();
-    int256 y2 = fractional(y);
+    int256 x1 = integer(x).value / FIXED1_INT;
+    int256 x2 = fractional(x).value;
+    int256 y1 = integer(y).value / FIXED1_INT;
+    int256 y2 = fractional(y).value;
 
     // (x1 + x2) * (y1 + y2) = (x1 * y1) + (x1 * y2) + (x2 * y1) + (x2 * y2)
     int256 x1y1 = x1 * y1;
@@ -388,8 +312,8 @@ library FixidityLib2 {
 
     // x1y1 needs to be multiplied back by fixed1
     // solium-disable-next-line mixedcase
-    int256 fixed_x1y1 = x1y1 * fixed1();
-    if (x1y1 != 0) assert(fixed_x1y1 / x1y1 == fixed1()); // Overflow x1y1 * fixed1
+    int256 fixed_x1y1 = x1y1 * FIXED1_INT;
+    if (x1y1 != 0) assert(fixed_x1y1 / x1y1 == FIXED1_INT); // Overflow x1y1 * fixed1
     x1y1 = fixed_x1y1;
 
     int256 x2y1 = x2 * y1;
@@ -404,10 +328,10 @@ library FixidityLib2 {
     if (x2 != 0) assert(x2y2 / x2 == y2); // Overflow x2y2
 
     // result = fixed1() * x1 * y1 + x1 * y2 + x2 * y1 + x2 * y2 / fixed1();
-    int256 result = x1y1;
-    result = add(result, x2y1); // Add checks for overflow
-    result = add(result, x1y2); // Add checks for overflow
-    result = add(result, x2y2); // Add checks for overflow
+    Fraction memory result = Fraction(x1y1);
+    result = add(result, Fraction(x2y1)); // Add checks for overflow
+    result = add(result, Fraction(x1y2)); // Add checks for overflow
+    result = add(result, Fraction(x2y2)); // Add checks for overflow
     return result;
   }
 
@@ -419,9 +343,9 @@ library FixidityLib2 {
    * Test reciprocal(fixed1()*fixed1()) returns 1 // Testing how the fractional is truncated
    * Test reciprocal(2*fixed1()*fixed1()) returns 0 // Testing how the fractional is truncated
    */
-  function reciprocal(int256 x) internal pure returns (int256) {
-    assert(x != 0);
-    return (fixed1()*fixed1()) / x; // Can't overflow
+  function reciprocal(Fraction memory x) internal pure returns (Fraction memory) {
+    assert(x.value != 0);
+    return Fraction((FIXED1_INT*FIXED1_INT) / x.value); // Can't overflow
   }
 
   /**
@@ -434,10 +358,10 @@ library FixidityLib2 {
    * Test divide(maxFixedDiv()+1,1) throws
    * Test divide(maxFixedDiv(),maxFixedDiv()) returns fixed1()
    */
-  function divide(int256 x, int256 y) internal pure returns (int256) {
-    if (y == fixed1()) return x;
-    assert(y != 0);
-    assert(y <= maxFixedDivisor());
+  function divide(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
+    if (y.value == FIXED1_INT) return x;
+    assert(y.value != 0);
+    assert(y.value <= maxFixedDivisor());
     return multiply(x, reciprocal(y));
   }
 }
