@@ -10,15 +10,15 @@ import addToCRM from '../server/addToCRM'
 import ecoFundSubmission from '../server/EcoFundApp'
 import nextI18next from '../src/i18n'
 import { faucetOrInviteController } from './controllers'
+import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
 import { RequestType } from './FirebaseClient'
 import mailer from './mailer'
+import { getFormattedMediumArticles } from './mediumAPI'
 const port = parseInt(process.env.PORT, 10) || 3000
 const dev = process.env.NEXT_DEV === 'true'
 const app = next({ dev })
 const handle = app.getRequestHandler()
-import getFormattedEvents from './EventHelpers'
-import { getFormattedMediumArticles } from './mediumAPI'
 
 // Strip the leading "www." prefix from the domain
 function wwwRedirect(req, res, nextAction) {
@@ -49,6 +49,12 @@ function wwwRedirect(req, res, nextAction) {
       res.redirect('/jobs')
     })
   })
+  ;['/about'].forEach((path) => {
+    server.get(path, (_, res) => {
+      res.redirect('/about-us')
+    })
+  })
+
   server.get('/connect', (_, res) => {
     res.redirect('/community')
   })
