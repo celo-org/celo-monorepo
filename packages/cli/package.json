@@ -25,7 +25,9 @@
     "docs": "yarn oclif-dev readme --multi --dir=../docs/command-line-interface && yarn prettier ../docs/command-line-interface/*.md --write",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "prepublishOnly": "yarn --cwd=../walletkit build && yarn run build && oclif-dev manifest && oclif-dev readme",
-    "test": "export TZ=UTC && jest --ci --silent"
+    "test": "export TZ=UTC && jest --ci --silent",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "dependencies": {
     "@celo/walletkit": "^0.0.14",
@@ -46,7 +48,8 @@
     "fs-extra": "^8.1.0",
     "path": "^0.12.7",
     "tslib": "^1",
-    "web3": "1.0.0-beta.37"
+    "web3": "1.0.0-beta.37",
+    "snyk": "^1.217.3"
   },
   "devDependencies": {
     "@celo/dev-cli": "^2.0.3",
@@ -100,5 +103,6 @@
       "@oclif/plugin-help"
     ],
     "repositoryPrefix": "https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/<%- commandPath %>"
-  }
+  },
+  "snyk": true
 }
