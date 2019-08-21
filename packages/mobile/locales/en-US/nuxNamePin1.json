@@ -5,7 +5,7 @@
   "secureAsset":
     "Celo keeps your assets secure and enables you to send and receive value with anyone",
   "stableAsset":
-    "Celo Dollars are a stable digital asset that tracks to the value of the US Dollar",
+    "{{CeloDollars}} are a stable digital asset that tracks to the value of the US {{Dollar}}",
   "verifyNumber": "Verify your phone number so other Celo users can find you and send you value",
   "syncNetwork": "Syncing with Network",
   "welcomeCelo": "Welcome to Celo Wallet",
@@ -58,7 +58,8 @@
   "createPin": {
     "title": "Create 6 digit PIN Code",
     "intro": "Create a PIN to secure your Celo Wallet.",
-    "why": "You'll need this PIN occasionally when you want to send Celo Dollars to your friends.",
+    "why":
+      "You'll need this PIN occasionally when you want to send {{CeloDollars}} to your friends.",
     "warn":
       "Write down your 6 digit PIN code & secure it somewhere safe. You will be asked for this later to access your wallet.",
     "yourPin": "Your PIN"
