@@ -26,7 +26,7 @@ const testnetNetworkTerraformModule = 'testnet-network'
 
 // The keys correspond to the variable names that Terraform expects and
 // the values correspond to the names of the appropriate env variables
-const terraformEnvVars: { [varName: string]: string } = {
+const testnetEnvVars: TerraformVars = {
   block_time: envVar.BLOCK_TIME,
   celo_env: envVar.CELOTOOL_CELOENV,
   gcloud_credentials_path: envVar.GOOGLE_APPLICATION_CREDENTIALS,
@@ -42,14 +42,23 @@ const terraformEnvVars: { [varName: string]: string } = {
   verification_pool_url: envVar.VERIFICATION_POOL_URL,
 }
 
+const testnetNetworkEnvVars: TerraformVars = {
+  celo_env: envVar.CELOTOOL_CELOENV,
+  gcloud_credentials_path: envVar.GOOGLE_APPLICATION_CREDENTIALS,
+  gcloud_project: envVar.TESTNET_PROJECT_NAME,
+}
+
 export async function deploy(celoEnv: string) {
   // If we are not using the default network, we want to create/upgrade our network
   if (!useDefaultNetwork()) {
     console.info('First deploying the testnet VPC network')
-    await deployModule(celoEnv, testnetNetworkTerraformModule)
+
+    const networkVars: TerraformVars = getTestnetNetworkVars(celoEnv)
+    await deployModule(celoEnv, testnetNetworkTerraformModule, networkVars)
   }
 
-  await deployModule(celoEnv, testnetTerraformModule, async () => {
+  const testnetVars: TerraformVars = getTestnetVars(celoEnv)
+  await deployModule(celoEnv, testnetTerraformModule, testnetVars, async () => {
     console.info('Generating and uploading secrets env files to Google Storage...')
     await generateAndUploadSecrets(celoEnv)
   })
@@ -60,8 +69,11 @@ export async function deploy(celoEnv: string) {
 async function deployModule(
   celoEnv: string,
   terraformModule: string,
+  vars: TerraformVars,
   preApplyAction?: () => Promise<void>
 ) {
+  const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(celoEnv, terraformModule)
+
   const envType = fetchEnv(envVar.ENV_TYPE)
   console.info(`
     Deploying:
@@ -69,9 +81,6 @@ async function deployModule(
     Celo Env: ${celoEnv}
     Environment: ${envType}
   `)
-
-  const vars: TerraformVars = getTerraformVars(celoEnv)
-  const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(celoEnv)
 
   console.info('Initializing...')
   await initTerraformModule(terraformModule, vars, backendConfigVars)
@@ -93,20 +102,29 @@ async function deployModule(
 }
 
 export async function destroy(celoEnv: string) {
-  await destroyModule(celoEnv, testnetTerraformModule)
+  const testnetVars: TerraformVars = getTestnetVars(celoEnv)
+
+  await destroyModule(celoEnv, testnetTerraformModule, testnetVars)
+
   // If we are not using the default network, we want to destroy our network
   if (!useDefaultNetwork()) {
     console.info('Destroying the testnet VPC network')
-    await destroyModule(celoEnv, testnetNetworkTerraformModule)
+
+    const networkVars: TerraformVars = getTestnetNetworkVars(celoEnv)
+    await destroyModule(celoEnv, testnetNetworkTerraformModule, networkVars)
   }
 }
 
-async function destroyModule(celoEnv: string, terraformModule: string) {
-  const envType = fetchEnv(envVar.ENV_TYPE)
-  console.info(`Destroying ${celoEnv} in environment ${envType}`)
+async function destroyModule(celoEnv: string, terraformModule: string, vars: TerraformVars = {}) {
+  const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(celoEnv, terraformModule)
 
-  const vars: TerraformVars = getTerraformVars(celoEnv)
-  const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(celoEnv)
+  const envType = fetchEnv(envVar.ENV_TYPE)
+  console.info(`
+    Destroying:
+    Terraform Module: ${terraformModule}
+    Celo Env: ${celoEnv}
+    Environment: ${envType}
+  `)
 
   console.info('Initializing...')
   await initTerraformModule(terraformModule, vars, backendConfigVars)
@@ -120,22 +138,25 @@ async function destroyModule(celoEnv: string, terraformModule: string) {
 }
 
 export async function getTestnetOutputs(celoEnv: string) {
-  const vars: TerraformVars = getTerraformVars(celoEnv)
-  const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(celoEnv)
+  const vars: TerraformVars = getTestnetVars(celoEnv)
+  const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(
+    celoEnv,
+    testnetTerraformModule
+  )
 
   return getTerraformModuleOutputs(testnetTerraformModule, vars, backendConfigVars)
 }
 
-function getTerraformBackendConfigVars(celoEnv: string) {
+function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string) {
   return {
-    prefix: `${celoEnv}/state`,
+    prefix: `${celoEnv}/${terraformModule}`,
   }
 }
 
-function getTerraformVars(celoEnv: string) {
+function getTestnetVars(celoEnv: string) {
   const genesisBuffer = new Buffer(generateGenesisFromEnv())
   return {
-    ...getTerraformEnvVarValues(),
+    ...getEnvVarValues(testnetEnvVars),
     ethstats_host: `${celoEnv}-ethstats.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org`,
     gcloud_secrets_bucket: secretsBucketName,
     gcloud_secrets_base_path: secretsBasePath(celoEnv),
@@ -146,12 +167,19 @@ function getTerraformVars(celoEnv: string) {
   }
 }
 
-function getTerraformEnvVarValues() {
+function getEnvVarValues(terraformEnvVars: TerraformVars) {
   const vars: { [key: string]: string } = {}
   for (const key of Object.keys(terraformEnvVars)) {
     vars[key] = fetchEnv(terraformEnvVars[key])
   }
   return vars
+}
+
+function getTestnetNetworkVars(celoEnv: string) {
+  return {
+    ...getEnvVarValues(testnetNetworkEnvVars),
+    network_name: networkName(celoEnv),
+  }
 }
 
 export async function generateAndUploadSecrets(celoEnv: string) {
@@ -214,8 +242,6 @@ function secretsBasePath(celoEnv: string) {
 }
 
 function useDefaultNetwork() {
-  console.log(process.env)
-  console.log('yeeeet')
   return fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) === 'celo-networks-dev'
 }
 

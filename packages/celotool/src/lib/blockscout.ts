@@ -1,4 +1,4 @@
-import { fetchEnv, fetchEnvOrFallback } from '@celo/celotool/src/lib/env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from '@celo/celotool/src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from '@celo/celotool/src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from '@celo/celotool/src/lib/utils'
 import { getTestnetOutputs } from '@celo/celotool/src/lib/vm-testnet-utils'
@@ -7,8 +7,7 @@ export async function installHelmChart(
   celoEnv: string,
   blockscoutDBUsername: string,
   blockscoutDBPassword: string,
-  blockscoutDBConnectionName: string,
-  vmTestnet: boolean
+  blockscoutDBConnectionName: string
 ) {
   return installGenericHelmChart(
     celoEnv,
@@ -18,8 +17,7 @@ export async function installHelmChart(
       celoEnv,
       blockscoutDBUsername,
       blockscoutDBPassword,
-      blockscoutDBConnectionName,
-      vmTestnet
+      blockscoutDBConnectionName
     )
   )
 }
@@ -32,16 +30,14 @@ export async function upgradeHelmChart(
   celoEnv: string,
   blockscoutDBUsername: string,
   blockscoutDBPassword: string,
-  blockscoutDBConnectionName: string,
-  vmTestnet: boolean
+  blockscoutDBConnectionName: string
 ) {
   console.info(`Upgrading helm release ${celoEnv}-blockscout`)
   const params = (await helmParameters(
     celoEnv,
     blockscoutDBUsername,
     blockscoutDBPassword,
-    blockscoutDBConnectionName,
-    vmTestnet
+    blockscoutDBConnectionName
   )).join(' ')
   if (process.env.CELOTOOL_VERBOSE === 'true') {
     await execCmdWithExitOnFailure(
@@ -58,8 +54,7 @@ async function helmParameters(
   celoEnv: string,
   blockscoutDBUsername: string,
   blockscoutDBPassword: string,
-  blockscoutDBConnectionName: string,
-  vmTestnet: boolean
+  blockscoutDBConnectionName: string
 ) {
   const params = [
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
@@ -74,11 +69,15 @@ async function helmParameters(
     `--set promtosd.scrape_interval=${fetchEnv('PROMTOSD_SCRAPE_INTERVAL')}`,
     `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
   ]
-  if (vmTestnet) {
+  if (isVmBased()) {
     const outputs = await getTestnetOutputs(celoEnv)
     const txNodeLbIp = outputs.tx_node_lb_ip_address.value
     params.push(`--set blockscout.jsonrpc_http_url=http://${txNodeLbIp}:8545`)
     params.push(`--set blockscout.jsonrpc_ws_url=ws://${txNodeLbIp}:8546`)
   }
   return params
+}
+
+function isVmBased() {
+  return fetchEnv(envVar.VM_BASED) === 'true'
 }

@@ -57,6 +57,7 @@ export enum envVar {
   TX_NODES = 'TX_NODES',
   VALIDATORS = 'VALIDATORS',
   VERIFICATION_POOL_URL = 'VERIFICATION_POOL_URL',
+  VM_BASED = 'VM_BASED',
 }
 
 export enum EnvTypes {

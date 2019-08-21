@@ -10,14 +10,18 @@ export interface TerraformVars {
 
 // Terraform requires the `backend-config` options to configure a remote backend
 // with dynamic values
-export function initTerraformModule(
+export async function initTerraformModule(
   moduleName: string,
   vars: TerraformVars,
   backendConfigVars: TerraformVars
 ) {
+  console.info('Resetting local state to force pull remote backend...')
+  await resetLocalTerraformState()
+  const modulePath = getModulePath(moduleName)
   return execTerraformCmd(
     'init',
-    getModulePath(moduleName),
+    modulePath,
+    modulePath,
     getVarOptions(vars),
     getVarOptions(backendConfigVars, 'backend-config')
   )
@@ -34,9 +38,11 @@ export function planTerraformModule(
   if (!fs.existsSync(planDir)) {
     fs.mkdirSync(planDir)
   }
+  const modulePath = getModulePath(moduleName)
   return execTerraformCmd(
     'plan',
-    getModulePath(moduleName),
+    modulePath,
+    modulePath,
     `-out=${planPath}`,
     getVarOptions(vars),
     destroy ? '-destroy' : ''
@@ -44,7 +50,7 @@ export function planTerraformModule(
 }
 
 export function applyTerraformModule(moduleName: string) {
-  return execTerraformCmd('apply', getPlanPath(moduleName))
+  return execTerraformCmd('apply', getModulePath(moduleName), getPlanPath(moduleName))
 }
 
 export function destroyTerraformModule(moduleName: string, vars: TerraformVars) {
@@ -60,12 +66,16 @@ export async function getTerraformModuleOutputs(
   vars: TerraformVars,
   backendConfigVars: TerraformVars
 ) {
+  // console.info('Resetting local state to force pull remote backend...')
+  // await resetLocalTerraformState()
+
   const initCmd = buildTerraformCmd(
     'init',
     getModulePath(moduleName),
     getVarOptions(vars),
     getVarOptions(backendConfigVars, 'backend-config')
   )
+
   const refreshCmd = buildTerraformCmd('refresh', getModulePath(moduleName), getVarOptions(vars))
   const [stdout] = await execCmd(`
     cd ${getModulePath(moduleName)} && \
@@ -73,7 +83,12 @@ export async function getTerraformModuleOutputs(
     ${refreshCmd} > /dev/null 2>&1 && \
     terraform output -json
   `)
+  console.log(stdout)
   return JSON.parse(stdout)
+}
+
+function resetLocalTerraformState() {
+  // return execCmd('rm -f ./.terraform/terraform.tfstate')
 }
 
 function getModulePath(moduleName: string) {
@@ -92,13 +107,22 @@ function getVarOptions(vars: TerraformVars, optionName: string = 'var') {
   return nameValuePairs.join(' ')
 }
 
-function execTerraformCmd(command: string, workspacePath: string, ...options: string[]) {
-  const cmd = buildTerraformCmd(command, workspacePath, ...options)
+// `modulePath` is the path to the module that will be cd'd into. We change
+// directories for each module so that module-specific configurations
+// that are stored in the local .terraform directories do not conflict.
+// `cmdPath` is the path to be provided to the terraform command
+function execTerraformCmd(
+  command: string,
+  modulePath: string,
+  cmdPath: string,
+  ...options: string[]
+) {
+  const terraformCmd = buildTerraformCmd(command, cmdPath, ...options)
   // use the middle two default arguments
-  return execCmd(cmd, {}, false, true)
+  return execCmd(`cd ${modulePath} && ${terraformCmd}`, {}, false, true)
 }
 
-function buildTerraformCmd(command: string, workspacePath: string, ...options: string[]) {
+function buildTerraformCmd(command: string, actionPath: string, ...options: string[]) {
   const optionsStr = options ? options.join(' ') : ''
-  return `terraform ${command} -input=false ${optionsStr} ${workspacePath}`
+  return `terraform ${command} -input=false ${optionsStr} ${actionPath}`
 }

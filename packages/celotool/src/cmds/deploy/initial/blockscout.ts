@@ -1,7 +1,7 @@
 import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
 import { fetchEnvOrFallback } from '@celo/celotool/src/lib/env-utils'
 import { installHelmChart } from 'src/lib/blockscout'
-import { createClusterIfNotExists, switchToClusterFromEnv } from 'src/lib/cluster'
+import { createClusterIfNotExists, switchToClusterFromEnv, setupCluster } from 'src/lib/cluster'
 import {
   createAndUploadCloudSQLSecretIfNotExists,
   createCloudSQLInstance,
@@ -16,18 +16,22 @@ export const command = 'blockscout'
 export const describe = 'deploy the blockscout package'
 
 export const builder = (argv: yargs.Argv) => {
-  return argv.option('vmTestnet', {
+  return argv.option('skipClusterSetup', {
     type: 'boolean',
-    description: 'Deploy blockscout for an already deployed VM testnet',
+    description: 'If you know that you can skip the cluster setup',
     default: false,
   })
 }
 
-type BlockscoutInitialArgv = InitialArgv & { vmTestnet: boolean }
+type BlockscoutInitialArgv = InitialArgv & { skipClusterSetup: boolean }
 
 export const handler = async (argv: BlockscoutInitialArgv) => {
-  await createClusterIfNotExists()
+  const createdCluster = await createClusterIfNotExists()
   await switchToClusterFromEnv()
+
+  if (!argv.skipClusterSetup) {
+    await setupCluster(argv.celoEnv, createdCluster)
+  }
 
   // Create cloud SQL account with 'Cloud SQL Client' permissions.
   const cloudSqlServiceAccountName = getServiceAccountName('cloud-sql-for')
@@ -49,7 +53,6 @@ export const handler = async (argv: BlockscoutInitialArgv) => {
     argv.celoEnv,
     blockscoutDBUsername,
     blockscoutDBPassword,
-    blockscoutDBConnectionName,
-    argv.vmTestnet
+    blockscoutDBConnectionName
   )
 }

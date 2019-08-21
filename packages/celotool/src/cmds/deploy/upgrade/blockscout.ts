@@ -4,31 +4,22 @@ import sleep from 'sleep-promise'
 import { installHelmChart, removeHelmRelease, upgradeHelmChart } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { resetCloudSQLInstance, retrieveCloudSQLConnectionInfo } from 'src/lib/helm_deploy'
-import { execCmdWithExitOnFailure } from 'src/lib/utils'
+import { execCmd } from 'src/lib/utils'
 import * as yargs from 'yargs'
 
 export const command = 'blockscout'
 export const describe = 'upgrade an existing deploy of the blockscout package'
 
 export const builder = (argv: yargs.Argv) => {
-  return argv
-    .option('reset', {
-      type: 'boolean',
-      description:
-        'when enabled, deletes the database and redeploys the helm chart. keeps the instance.',
-      default: false,
-    })
-    .option('vmTestnet', {
-      type: 'boolean',
-      description: 'Deploy blockscout for an already deployed VM testnet',
-      default: false,
-    })
+  return argv.option('reset', {
+    type: 'boolean',
+    description:
+      'when enabled, deletes the database and redeploys the helm chart. keeps the instance.',
+    default: false,
+  })
 }
 
-type BlockscoutUpgradeArgv = UpgradeArgv & {
-  reset: boolean
-  vmTestnet: boolean
-}
+type BlockscoutUpgradeArgv = UpgradeArgv & { reset: boolean }
 
 export const handler = async (argv: BlockscoutUpgradeArgv) => {
   await switchToClusterFromEnv()
@@ -57,15 +48,12 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
       argv.celoEnv,
       blockscoutDBUsername,
       blockscoutDBPassword,
-      blockscoutDBConnectionName,
-      argv.vmTestnet
+      blockscoutDBConnectionName
     )
   } else {
     console.info(`Delete blockscout-migration`)
     try {
-      await execCmdWithExitOnFailure(
-        `kubectl delete job ${argv.celoEnv}-blockscout-migration -n ${argv.celoEnv}`
-      )
+      await execCmd(`kubectl delete job ${argv.celoEnv}-blockscout-migration -n ${argv.celoEnv}`)
     } catch (error) {
       console.error(error)
     }
@@ -74,8 +62,7 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
       argv.celoEnv,
       blockscoutDBUsername,
       blockscoutDBPassword,
-      blockscoutDBConnectionName,
-      argv.vmTestnet
+      blockscoutDBConnectionName
     )
   }
 }

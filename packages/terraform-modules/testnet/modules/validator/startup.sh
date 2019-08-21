@@ -30,6 +30,7 @@ echo "Bootnode enode: $BOOTNODE_ENODE"
 echo "Pulling geth..."
 docker pull $GETH_NODE_DOCKER_IMAGE
 
+
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`)
 docker run --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\

@@ -21,7 +21,6 @@ gsutil cp gs://${gcloud_secrets_bucket}/${gcloud_secrets_base_path}/.env.tx-node
 # Apply the .env file
 . $SECRETS_ENV_PATH
 
-
 echo "Address: $ACCOUNT_ADDRESS"
 echo "Bootnode enode address: $BOOTNODE_ENODE_ADDRESS"
 

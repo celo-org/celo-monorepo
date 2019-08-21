@@ -12,3 +12,8 @@ variable gcloud_project {
   type        = string
   description = "Name of the Google Cloud project to use"
 }
+
+variable network_name {
+  type        = string
+  description = "The name of the network to use"
+}

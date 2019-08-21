@@ -20,6 +20,6 @@ data "terraform_remote_state" "state" {
   }
 }
 
-resource "google_compute_network" "network" {
+resource "google_compute_network" "testnet-network" {
   name = var.network_name
 }
