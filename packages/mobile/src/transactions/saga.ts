@@ -1,7 +1,6 @@
 import { call, put, take } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { fetchGoldBalance } from 'src/goldToken/actions'
 import { fetchDollarBalance } from 'src/stableToken/actions'
@@ -27,7 +26,7 @@ export function* waitForTransactionWithId(txId: string) {
 
 function* onSendAndMonitorTransactionError(txId: string) {
   yield put(removeStandbyTransaction(txId))
-  yield put(showError(ErrorMessages.TRANSACTION_FAILED, ALERT_BANNER_DURATION))
+  yield put(showError(ErrorMessages.TRANSACTION_FAILED))
 }
 
 export function* sendAndMonitorTransaction(

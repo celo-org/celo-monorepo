@@ -1,5 +1,5 @@
+import { addCeloEnvMiddleware, CeloEnvArgv } from '@celo/celotool/src/lib/env-utils'
 import { defaultPortsString, portForward } from '@celo/celotool/src/lib/port_forward'
-import { addCeloEnvMiddleware, CeloEnvArgv } from '@celo/celotool/src/lib/utils'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import * as yargs from 'yargs'
 export const command = 'port-forward'

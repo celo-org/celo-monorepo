@@ -1,10 +1,6 @@
 import { GethArgv } from '@celo/celotool/src/cmds/geth'
-import {
-  addCeloEnvMiddleware,
-  addCeloGethMiddleware,
-  CeloEnvArgv,
-  execCmdWithExitOnFailure,
-} from '@celo/celotool/src/lib/utils'
+import { addCeloEnvMiddleware, CeloEnvArgv } from '@celo/celotool/src/lib/env-utils'
+import { addCeloGethMiddleware, execCmdWithExitOnFailure } from '@celo/celotool/src/lib/utils'
 import fs from 'fs'
 import path from 'path'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
