@@ -1,4 +1,4 @@
-import { CeloEnvArgv } from '@celo/celotool/src/lib/utils'
+import { CeloEnvArgv } from '@celo/celotool/src/lib/env-utils'
 import { getMetrics } from 'src/lib/monitoring'
 export const command = 'list'
 
