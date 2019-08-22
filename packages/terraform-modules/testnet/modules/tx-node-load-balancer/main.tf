@@ -39,8 +39,4 @@ resource "google_compute_instance_group" "tx_node_lb" {
   name = "${var.celo_env}-tx-node-lb-group"
 
   instances = var.tx_node_self_links
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }

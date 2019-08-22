@@ -60,10 +60,6 @@ function refreshTerraformModule(moduleName: string, vars: TerraformVars) {
   return execTerraformCmd('refresh', getModulePath(moduleName), getVarOptions(vars))
 }
 
-// This is a workaround to `terraform output` requiring users to run it from
-// inside the Terraform module directory. See:
-// https://github.com/hashicorp/terraform/issues/15581
-// https://github.com/hashicorp/terraform/issues/17300
 export async function getTerraformModuleOutputs(
   moduleName: string,
   vars: TerraformVars,
