@@ -86,7 +86,6 @@
     "eth-gas-reporter": "^0.1.2",
     "nodemailer": "^4.6.8",
     "truffle-typings": "^1.0.6",
-    "typescript": "^3.3.3",
     "yargs": "^14.0.0"
   }
 }
