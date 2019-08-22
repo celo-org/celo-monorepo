@@ -59,7 +59,6 @@ const showAlert = (
   title?: string | null,
   underlyingError?: ErrorMessages | null
 ): ShowAlertAction => {
-  console.log('DISMISS DURATION', dismissAfter)
   return {
     type: Actions.SHOW,
     alertType,
