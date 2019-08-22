@@ -12,7 +12,6 @@
     "libphonenumber-js": "^1.7.22"
   },
   "devDependencies": {
-    "typescript": "3.3.3",
     "@types/web3": "^1.0.18"
   },
   "main": "./lib/index.js",

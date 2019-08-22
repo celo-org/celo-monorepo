@@ -39,7 +39,6 @@
     "firebase-bolt": "^0.8.4",
     "firebase-tools": "^7.0.1",
     "rimraf": "2.6.3",
-    "typescript": "^3.3.0",
     "yargs": "14.0.0"
 
   }

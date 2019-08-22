@@ -146,7 +146,6 @@
     "@types/graphql": "^14.0.7",
     "@types/hoist-non-react-statics": "^3.0.1",
     "@types/isomorphic-fetch": "^0.0.35",
-    "@types/jest": "^24.0.17",
     "@types/lodash": "^4.14.136",
     "@types/react": "^16.8.19",
     "@types/react-native": "^0.57.47",
@@ -165,7 +164,6 @@
     "enzyme-to-json": "^3.3.5",
     "escape-string-regexp": "^1.0.5",
     "graphql-code-generator": "^0.16.1",
-    "jest": "^24.8.0",
     "jest-fetch-mock": "^2.1.2",
     "jest-junit": "^6.3.0",
     "jest-snapshot": "^24.8.0",
@@ -182,9 +180,7 @@
     "react-test-renderer": "16.8.3",
     "redux-mock-store": "^1.5.3",
     "redux-saga-test-plan": "^4.0.0-beta.2",
-    "remote-redux-devtools": "^0.5.12",
-    "ts-jest": "^24.0.0",
-    "typescript": "^3.3.3"
+    "remote-redux-devtools": "^0.5.12"
   },
   "detox": {
     "test-runner": "jest",
