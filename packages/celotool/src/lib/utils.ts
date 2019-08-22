@@ -77,6 +77,7 @@ export function execCmd(
   return new Promise((resolve, reject) => {
     if (process.env.CELOTOOL_VERBOSE === 'true') {
       console.debug('$ ' + cmd)
+      pipeOutput = true
     }
 
     const execProcess = exec(
