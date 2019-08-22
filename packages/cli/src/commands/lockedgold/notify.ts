@@ -1,4 +1,3 @@
-import { LockedGold } from '@celo/walletkit'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
@@ -21,10 +20,11 @@ export default class Notify extends BaseCommand {
 
   async run() {
     const res = this.parse(Notify)
-    const lockedGold = await LockedGold(this.web3, res.flags.from)
+    this.kit.defaultAccount = res.flags.from
+    const lockedgold = await this.kit.contracts.getLockedGold()
     await displaySendTx(
-      'notify',
-      lockedGold.methods.notifyCommitment(res.flags.goldAmount, res.flags.noticePeriod)
+      'notifyCommitment',
+      lockedgold.notifyCommitment(res.flags.goldAmount, res.flags.noticePeriod)
     )
   }
 }

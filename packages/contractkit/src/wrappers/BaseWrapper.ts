@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import Contract from 'web3/eth/contract'
 import { TransactionObject } from 'web3/eth/types'
 import { ContractKit } from '../kit'
 import { TxOptions } from '../utils/send-tx'
@@ -6,8 +7,13 @@ import { TransactionResult } from '../utils/tx-result'
 
 type Method<I extends any[], O> = (...args: I) => TransactionObject<O>
 
-export abstract class BaseWrapper<T> {
+export abstract class BaseWrapper<T extends Contract> {
   constructor(protected readonly kit: ContractKit, protected readonly contract: T) {}
+
+  get address(): string {
+    // TODO fix typings
+    return (this.contract as any)._address
+  }
 
   protected proxySend<I extends any[], O>(methodFn: Method<I, O>) {
     return (...args: I) => this.wrapSend(methodFn(...args))

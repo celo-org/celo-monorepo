@@ -1,28 +1,28 @@
 import { zip } from '@celo/utils/lib/src/collections'
-import BN from 'bn.js'
+import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
 import { Address } from '../base'
 import { LockedGold } from '../generated/types/LockedGold'
-import { BaseWrapper } from '../wrappers/BaseWrapper'
+import { BaseWrapper, CeloTransactionObject, toBigNumber } from '../wrappers/BaseWrapper'
 
 export interface VotingDetails {
   accountAddress: Address
   voterAddress: Address
-  weight: BN
+  weight: BigNumber
 }
 
 interface Commitment {
-  time: BN
-  value: BN
+  time: BigNumber
+  value: BigNumber
 }
 
 export interface Commitments {
   locked: Commitment[]
   notified: Commitment[]
   total: {
-    gold: BN
-    weight: BN
+    gold: BigNumber
+    weight: BigNumber
   }
 }
 
@@ -33,10 +33,16 @@ enum Roles {
 }
 
 export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
-  async getAccountWeight(account: Address): Promise<BN> {
-    const accountWeight = await this.contract.methods.getAccountWeight(account).call()
-    return Web3.utils.toBN(accountWeight)
-  }
+  notifyCommitment = this.proxySend(this.contract.methods.notifyCommitment)
+  createAccount = this.proxySend(this.contract.methods.createAccount)
+  withdrawCommitment = this.proxySend(this.contract.methods.withdrawCommitment)
+  redeemRewards = this.proxySend(this.contract.methods.redeemRewards)
+  newCommitment = this.proxySend(this.contract.methods.newCommitment)
+  extendCommitment = this.proxySend(this.contract.methods.extendCommitment)
+  isVoting = this.proxyCall(this.contract.methods.isVoting)
+  maxNoticePeriod = this.proxyCallAndTransform(this.contract.methods.maxNoticePeriod, toBigNumber)
+
+  getAccountWeight = this.proxyCallAndTransform(this.contract.methods.getAccountWeight, toBigNumber)
 
   async getVotingDetails(accountOrVoterAddress: Address): Promise<VotingDetails> {
     const accountAddress = await this.contract.methods
@@ -50,7 +56,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     }
   }
 
-  async getLockedCommitmentValue(account: string, noticePeriod: string): Promise<BN> {
+  async getLockedCommitmentValue(account: string, noticePeriod: string): Promise<BigNumber> {
     const commitment = await this.contract.methods.getLockedCommitment(account, noticePeriod).call()
     return this.getValueFromCommitment(commitment)
   }
@@ -63,7 +69,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     )
   }
 
-  async getNotifiedCommitmentValue(account: string, availTime: string): Promise<BN> {
+  async getNotifiedCommitmentValue(account: string, availTime: string): Promise<BigNumber> {
     const commitment = await this.contract.methods.getNotifiedCommitment(account, availTime).call()
     return this.getValueFromCommitment(commitment)
   }
@@ -81,9 +87,11 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     const notified = await this.getNotifiedCommitments(account)
     const weight = await this.getAccountWeight(account)
 
-    let gold = new BN(0)
-    locked.forEach((bond) => (gold = gold.add(bond.value)))
-    notified.forEach((bond) => (gold = gold.add(bond.value)))
+    const totalLocked = locked.reduce(
+      (acc, commitment) => acc.plus(commitment.value),
+      new BigNumber(0)
+    )
+    const gold = notified.reduce((acc, commitment) => acc.plus(commitment.value), totalLocked)
 
     return {
       locked,
@@ -93,14 +101,16 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   }
 
   // FIXME this.contract.methods.delegateRewards does not exist
-  async delegateRewardsTx(account: string, delegate: string): Promise<TransactionObject<void>> {
+  async delegateRewardsTx(account: string, delegate: string): Promise<CeloTransactionObject<void>> {
     const sig = await this.getParsedSignatureOfAddress(account, delegate)
 
-    return this.contract.methods.delegateRole(Roles.rewards, delegate, sig.v, sig.r, sig.s)
+    return this.wrapSend(
+      this.contract.methods.delegateRole(Roles.rewards, delegate, sig.v, sig.r, sig.s)
+    )
   }
 
   private getValueFromCommitment(commitment: { 0: string; 1: string }) {
-    return Web3.utils.toBN(commitment[0])
+    return new BigNumber(commitment[0])
   }
 
   private async getParsedSignatureOfAddress(address: string, signer: string) {
@@ -116,14 +126,14 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   private async zipAccountTimesAndValuesToCommitments(
     account: string,
     timesFunc: (account: string) => TransactionObject<string[]>,
-    valueFunc: (account: string, time: string) => Promise<BN>
+    valueFunc: (account: string, time: string) => Promise<BigNumber>
   ) {
     const accountTimes = await timesFunc(account).call()
     const accountValues = await Promise.all(accountTimes.map((time) => valueFunc(account, time)))
     return zip(
       // tslint:disable-next-line: no-object-literal-type-assertion
       (time, value) => ({ time, value } as Commitment),
-      accountTimes.map((time) => Web3.utils.toBN(time)),
+      accountTimes.map((time) => new BigNumber(time)),
       accountValues
     )
   }

@@ -1,15 +1,15 @@
 import { StableToken } from '../generated/types/StableToken'
-import { BaseWrapper } from './BaseWrapper'
+import { BaseWrapper, toBigNumber, toNumber } from './BaseWrapper'
 
 export class StableTokenWrapper extends BaseWrapper<StableToken> {
-  allowance = this.proxyCall(this.contract.methods.allowance)
-  balanceOf = this.proxyCall(this.contract.methods.balanceOf)
-  minter = this.proxyCall(this.contract.methods.minter)
+  allowance = this.proxyCallAndTransform(this.contract.methods.allowance, toBigNumber)
   name = this.proxyCall(this.contract.methods.name)
   symbol = this.proxyCall(this.contract.methods.symbol)
-  decimals = this.proxyCall(this.contract.methods.decimals)
+  decimals = this.proxyCallAndTransform(this.contract.methods.decimals, toNumber)
+  totalSupply = this.proxyCallAndTransform(this.contract.methods.totalSupply, toBigNumber)
+  balanceOf = this.proxyCallAndTransform(this.contract.methods.balanceOf, toBigNumber)
+  minter = this.proxyCall(this.contract.methods.minter)
   owner = this.proxyCall(this.contract.methods.owner)
-  totalSupply = this.proxyCall(this.contract.methods.totalSupply)
   getInflationParameters = this.proxyCall(this.contract.methods.getInflationParameters)
   valueToUnits = this.proxyCall(this.contract.methods.valueToUnits)
   unitsToValue = this.proxyCall(this.contract.methods.unitsToValue)

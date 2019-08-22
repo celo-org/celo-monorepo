@@ -1,4 +1,4 @@
-import BN from 'bn.js'
+import BigNumber from 'bignumber.js'
 import { Attestations } from '../generated/types/Attestations'
 import { BaseWrapper } from './BaseWrapper'
 
@@ -8,13 +8,15 @@ export interface AttestationStat {
 }
 
 export class AttestationsWrapper extends BaseWrapper<Attestations> {
+  setAccountDataEncryptionKey = this.proxySend(this.contract.methods.setAccountDataEncryptionKey)
+
   async lookupPhoneNumbers(
     phoneNumberHashes: string[]
   ): Promise<Record<string, Record<string, AttestationStat>>> {
     // Unfortunately can't be destructured
     const stats = await this.contract.methods.batchGetAttestationStats(phoneNumberHashes).call()
 
-    const toNum = (n: string) => new BN(n).toNumber()
+    const toNum = (n: string) => new BigNumber(n).toNumber()
     const matches = stats[0].map(toNum)
     const addresses = stats[1]
     const completed = stats[2].map(toNum)
