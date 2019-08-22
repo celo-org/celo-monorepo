@@ -3,7 +3,7 @@
 import json
 import os
 
-buildPath = "./build/tmp/contracts"
+buildPath = "./build/contracts"
 
 bytecodeLimit = 2**14 + 2**13
 print("Limit: " + str(bytecodeLimit))

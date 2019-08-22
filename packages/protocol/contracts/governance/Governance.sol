@@ -72,7 +72,7 @@ contract Governance is
   SortedLinkedList.List private queue;
   uint256[] public dequeued;
   uint256[] public emptyIndices;
-  ParticipationParameters public participationParameters;
+  ParticipationParameters private participationParameters;
 
   event ApproverSet(
     address approver
