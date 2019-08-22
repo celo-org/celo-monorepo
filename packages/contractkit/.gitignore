@@ -1,3 +1,4 @@
 src/generated
 tsconfig.tsbuildinfo
 lib/
+.devchain
