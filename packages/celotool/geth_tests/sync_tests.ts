@@ -21,6 +21,7 @@ describe('sync tests', function(this: any) {
         syncmode: 'full',
         port: 30303,
         proxyport: 30503,
+        rpcport: 8545,
       },
       {
         name: 'validator1',
@@ -50,7 +51,7 @@ describe('sync tests', function(this: any) {
         syncmode: 'full',
         port: 30403,
         proxyport: 30603,
-        rpcport: 8545,
+        rpcport: 8543,
       },
       {
         name: 'proxy1',
