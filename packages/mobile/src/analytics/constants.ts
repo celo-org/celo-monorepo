@@ -50,6 +50,10 @@ export enum CustomEventNames {
   verification_success = 'verification_success',
   verification_timed_out = 'verification_timed_out',
 
+  redeem_invite_success = 'redeem_invite_success',
+  redeem_invite_timed_out = 'redeem_invite_timed_out',
+  redeem_invite_failed = 'redeem_invite_failed',
+
   photos_education = 'photos_education',
   get_backup_key = 'earn_celo_gold',
   earn_celo_gold = 'earn_celo_gold',
