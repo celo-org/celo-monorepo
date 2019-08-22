@@ -24,7 +24,6 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
 import { FeeType } from 'src/fees/actions'
 import EstimateFee from 'src/fees/EstimateFee'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
@@ -215,12 +214,12 @@ export class SendAmount extends React.Component<Props, State> {
     // TODO(Rossy) this almost never shows because numeral is swalling the errors
     // and returning 0 for invalid numbers
     if (!amountIsValid) {
-      this.props.showError(ErrorMessages.INVALID_AMOUNT, ALERT_BANNER_DURATION)
+      this.props.showError(ErrorMessages.INVALID_AMOUNT)
       return
     }
 
     if (!userHasEnough) {
-      this.props.showError(ErrorMessages.NSF_TO_SEND, ALERT_BANNER_DURATION)
+      this.props.showError(ErrorMessages.NSF_TO_SEND)
       return
     }
 
@@ -312,7 +311,7 @@ export class SendAmount extends React.Component<Props, State> {
   renderBottomContainer = (amountIsValid: boolean, userHasEnough: boolean) => {
     const onPress = () => {
       if (!amountIsValid) {
-        this.props.showError(ErrorMessages.INVALID_AMOUNT, ALERT_BANNER_DURATION)
+        this.props.showError(ErrorMessages.INVALID_AMOUNT)
         return
       }
     }
