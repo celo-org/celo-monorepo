@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { AsyncStorage } from 'react-native'
 import { connect } from 'react-redux'
-import { setBackupCompleted } from 'src/account/actions'
+import { setBackupCompleted, setBackupDelayed } from 'src/account/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
 import BackupComplete from 'src/backup/BackupComplete'
@@ -11,9 +11,12 @@ import BackupQuestion from 'src/backup/BackupQuestion'
 import { createQuizWordList, selectQuizWordOptions } from 'src/backup/utils'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
+import { isBackupTooLate } from 'src/redux/selectors'
 import Logger from 'src/utils/Logger'
 
-export const DAYS_TO_BACKUP = 7
+export const DAYS_TO_BACKUP = 1
+export const DAYS_TO_DELAY = 1 / 24 // 1 hour delay
+
 const OPTIONS_PER_QUESTION = 4
 const INDICES_TO_TEST = [0, 2, 3, 6]
 const NUMBER_OF_TEST_QUESTIONS = INDICES_TO_TEST.length
@@ -26,10 +29,13 @@ interface State {
 
 interface StateProps {
   language: string | null
+  backupTooLate: boolean
+  backupDelayed: boolean
 }
 
 interface DispatchProps {
   setBackupCompleted: typeof setBackupCompleted
+  setBackupDelayed: typeof setBackupDelayed
   enterBackupFlow: typeof enterBackupFlow
   exitBackupFlow: typeof exitBackupFlow
 }
@@ -39,6 +45,8 @@ type Props = StateProps & DispatchProps
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     language: state.app.language,
+    backupTooLate: isBackupTooLate(state),
+    backupDelayed: state.account.backupDelayed,
   }
 }
 
@@ -99,6 +107,11 @@ export class Backup extends React.Component<Props, State> {
     navigateBack()
   }
 
+  onDelay = () => {
+    this.props.setBackupDelayed()
+    navigateBack()
+  }
+
   onFinish = async () => {
     this.props.exitBackupFlow()
     this.props.setBackupCompleted()
@@ -107,8 +120,17 @@ export class Backup extends React.Component<Props, State> {
 
   render() {
     const { mnemonic, currentQuestion, wordsForBackupQuiz } = this.state
+    const { backupDelayed, backupTooLate } = this.props
     if (currentQuestion === -1) {
-      return <BackupIntroduction onPress={this.showBackupPhrase} onCancel={this.onCancel} />
+      return (
+        <BackupIntroduction
+          onPress={this.showBackupPhrase}
+          onCancel={this.onCancel}
+          onDelay={this.onDelay}
+          backupTooLate={backupTooLate}
+          backupDelayed={backupDelayed}
+        />
+      )
     }
     if (currentQuestion === 0) {
       return (
@@ -150,6 +172,6 @@ export class Backup extends React.Component<Props, State> {
 export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
-    { setBackupCompleted, enterBackupFlow, exitBackupFlow }
+    { setBackupCompleted, setBackupDelayed, enterBackupFlow, exitBackupFlow }
   )(Backup)
 )

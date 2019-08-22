@@ -17,6 +17,7 @@ export interface State {
   pincodeSet: boolean
   accountCreationTime: number
   backupCompleted: boolean
+  backupDelayed: boolean
   paymentRequests: PaymentRequest[]
   dismissedEarnRewards: boolean
   dismissedInviteFriends: boolean
@@ -42,6 +43,7 @@ export const initialState = {
   accountCreationTime: 99999999999999,
   paymentRequests: [],
   backupCompleted: false,
+  backupDelayed: false,
   dismissedEarnRewards: false,
   dismissedInviteFriends: false,
 }
@@ -89,6 +91,11 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
       return {
         ...state,
         backupCompleted: true,
+      }
+    case Actions.SET_BACKUP_DELAYED_ACTION:
+      return {
+        ...state,
+        backupDelayed: true,
       }
     case Actions.UPDATE_PAYMENT_REQUESTS:
       return {
