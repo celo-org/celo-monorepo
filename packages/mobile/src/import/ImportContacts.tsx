@@ -1,40 +1,32 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
-import { areAddressesEqual } from '@celo/utils/src/signatureUtils'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
-import { e164NumberSelector } from 'src/account/reducer'
 import { errorSelector } from 'src/alert/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
-import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import GethAwareButton from 'src/geth/GethAwareButton'
 import { Namespaces } from 'src/i18n'
 import VerifyAddressBook from 'src/icons/VerifyAddressBook'
 import { denyImportContacts, importContacts } from 'src/identity/actions'
-import { lookupAddressFromPhoneNumber } from 'src/identity/verification'
 import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
-import { Screens, Stacks } from 'src/navigator/Screens'
+import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { requestContactsPermission } from 'src/utils/androidPermissions'
-import { currentAccountSelector } from 'src/web3/selectors'
 
 interface DispatchProps {
   importContacts: typeof importContacts
   denyImportContacts: typeof denyImportContacts
-  setNumberVerified: typeof setNumberVerified
 }
 
 interface StateProps {
   error: ErrorMessages | null
   isLoadingImportContacts: boolean
-  e164Number: string
-  account: string | null
 }
 
 interface State {
@@ -47,8 +39,6 @@ const mapStateToProps = (state: RootState): StateProps => {
   return {
     error: errorSelector(state),
     isLoadingImportContacts: state.identity.isLoadingImportContacts,
-    e164Number: e164NumberSelector(state),
-    account: currentAccountSelector(state),
   }
 }
 
@@ -82,16 +72,7 @@ class ImportContacts extends React.Component<Props, State> {
   }
 
   nextScreen = async () => {
-    const { account, e164Number } = this.props
-    const currentlyVerifiedAddress = await lookupAddressFromPhoneNumber(e164Number)
-    if (account && areAddressesEqual(account, currentlyVerifiedAddress)) {
-      // Wallet was imported and user is already verified to their current phone number
-      this.props.setNumberVerified(true)
-      navigate(Stacks.AppStack)
-    } else {
-      // Not yet verified, navigate to verification flow
-      navigate(Screens.VerifyEducation)
-    }
+    navigate(Screens.VerifyEducation)
   }
 
   onPressEnable = async () => {
@@ -207,7 +188,6 @@ export default componentWithAnalytics(
     {
       importContacts,
       denyImportContacts,
-      setNumberVerified,
     }
   )(withNamespaces(Namespaces.nuxNamePin1)(ImportContacts))
 )
