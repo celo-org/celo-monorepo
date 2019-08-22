@@ -241,7 +241,7 @@ export class Header extends React.Component<Props, State> {
                       text={t('github')}
                       target={'_new_tab'}
                       iconRight={
-                        <Octocat size={18} color={this.isDarkMode() ? colors.white : colors.dark} />
+                        <Octocat size={22} color={this.isDarkMode() ? colors.white : colors.dark} />
                       }
                     />
                   </View>
