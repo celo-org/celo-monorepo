@@ -1,29 +1,27 @@
 import { UpgradeArgv } from '@celo/celotool/src/cmds/deploy/upgrade'
+import { fetchEnvOrFallback } from '@celo/celotool/src/lib/env-utils'
 import sleep from 'sleep-promise'
 import { installHelmChart, removeHelmRelease, upgradeHelmChart } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { resetCloudSQLInstance, retrieveCloudSQLConnectionInfo } from 'src/lib/helm_deploy'
-import { execCmdWithExitOnFailure, fetchEnvOrFallback } from 'src/lib/utils'
+import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import * as yargs from 'yargs'
 
 export const command = 'blockscout'
 export const describe = 'upgrade an existing deploy of the blockscout package'
 
-// Can't extend because yargs.Argv already has a `reset` property
-type TestnetArgv = UpgradeArgv & {
-  reset: boolean
-}
-
-export const builder: { [key: string]: yargs.Options } = {
-  reset: {
+export const builder = (argv: yargs.Argv) => {
+  return argv.option('reset', {
+    type: 'boolean',
     description:
       'when enabled, deletes the database and redeploys the helm chart. keeps the instance.',
     default: false,
-    type: 'boolean',
-  },
+  })
 }
 
-export const handler = async (argv: TestnetArgv) => {
+type BlockscoutUpgradeArgv = UpgradeArgv & { reset: boolean }
+
+export const handler = async (argv: BlockscoutUpgradeArgv) => {
   await switchToClusterFromEnv()
 
   const instanceName = `${argv.celoEnv}${fetchEnvOrFallback('BLOCKSCOUT_DB_SUFFIX', '')}`
