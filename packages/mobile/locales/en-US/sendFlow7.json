@@ -1,6 +1,6 @@
 {
   "cancel": "Cancel",
-  "dollarsSent": "Dollars Sent",
+  "dollarsSent": "{{Dollars}} Sent",
   "to": "To",
   "send": "Send",
   "request": "Request",
@@ -13,7 +13,7 @@
   "payRequest": "Pay Request",
   "sendTo": "Send to",
   "amount": "Amount",
-  "celoDollarsAvailable": "Celo Dollars Available",
+  "celoDollarsAvailable": "{{CeloDollars}} Available",
   "for": "For",
   "groceriesRent": "Groceries, rent, etc. (Optional)",
   "fee": "Fee",
@@ -48,7 +48,7 @@
   "inviteFailed": "Failure sending invite",
   "loadingContacts": "Finding your contacts",
   "QRCode": "QR Code",
-  "saveCodeImage": "Save Code Image",
+  "shareCodeImage": "Share Code Image",
   "scanCode": "Scan Code",
   "writeStorageNeededForQrDownload":
     "Storage write permission is needed for downloading the QR code",
