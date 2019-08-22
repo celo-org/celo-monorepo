@@ -2,7 +2,7 @@
   "requests": "Solicitudes",
   "empty": "No tienes solicitudes de pago",
   "paymentRequests": "Solicitudes de pago",
-  "celoDollarBalance": "Saldo en {{CeloDollar}}",
+  "celoDollarBalance": "Saldo de {{CeloDollar}}",
   "pay": "Paga",
   "decline": "Disminución",
   "requestDeclined": "Solicitud rechazada",

@@ -1,6 +1,7 @@
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import i18n from 'src/i18n'
 
 export enum Actions {
@@ -31,17 +32,14 @@ export type ActionTypes = ShowAlertAction | HideAlertAction
 
 export const showMessage = (
   message: string,
-  dismissAfter: number | null = null,
+  dismissAfter?: number | null,
   buttonMessage?: string | null,
   title?: string | null
 ): ShowAlertAction => {
   return showAlert(AlertTypes.MESSAGE, message, dismissAfter, buttonMessage, title)
 }
 
-export const showError = (
-  error: ErrorMessages,
-  dismissAfter: number | null = null
-): ShowAlertAction => {
+export const showError = (error: ErrorMessages, dismissAfter?: number): ShowAlertAction => {
   CeloAnalytics.track(DefaultEventNames.errorDisplayed, { error })
   return showAlert(
     AlertTypes.ERROR,
@@ -56,7 +54,7 @@ export const showError = (
 const showAlert = (
   alertType: AlertTypes,
   message: string,
-  dismissAfter: number | null,
+  dismissAfter: number | null = ALERT_BANNER_DURATION,
   buttonMessage?: string | null,
   title?: string | null,
   underlyingError?: ErrorMessages | null

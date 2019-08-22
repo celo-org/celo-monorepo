@@ -19,6 +19,7 @@ BOOTNODE_VERBOSITY=1
 
 GETH_BOOTNODE_DOCKER_IMAGE=${geth_bootnode_docker_image_repository}:${geth_bootnode_docker_image_tag}
 
+
 # download & apply secrets pulled from Cloud Storage as environment vars
 echo "Downloading secrets from Google Cloud Storage..."
 SECRETS_ENV_PATH=/var/.env.celo.secrets

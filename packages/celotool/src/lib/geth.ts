@@ -1,11 +1,12 @@
 /* tslint:disable: no-console */
+import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
 import {
   AccountType,
   generatePrivateKey,
   privateKeyToPublicKey,
 } from '@celo/celotool/src/lib/generate_utils'
 import { retrieveIPAddress } from '@celo/celotool/src/lib/helm_deploy'
-import { envVar, execCmd, execCmdWithExitOnFailure, fetchEnv } from '@celo/celotool/src/lib/utils'
+import { execCmd, execCmdWithExitOnFailure } from '@celo/celotool/src/lib/utils'
 import {
   convertToContractDecimals,
   GoldToken,

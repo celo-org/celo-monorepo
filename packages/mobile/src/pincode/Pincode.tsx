@@ -14,7 +14,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
-import { ALERT_BANNER_DURATION, SUPPORTS_KEYSTORE } from 'src/config'
+import { SUPPORTS_KEYSTORE } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import BackupIcon from 'src/icons/BackupIcon'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
@@ -104,7 +104,7 @@ export class Pincode extends React.Component<Props, State> {
       this.props.pincodeSet()
       navigate(Screens.EnterInviteCode)
     } else {
-      this.props.showError(ErrorMessages.INCORRECT_PIN, ALERT_BANNER_DURATION)
+      this.props.showError(ErrorMessages.INCORRECT_PIN)
     }
   }
 

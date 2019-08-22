@@ -3,7 +3,7 @@ import {
   genericEnvFilePath,
   isValidCeloEnv,
   monorepoRoot,
-} from '@celo/celotool/src/lib/utils'
+} from '@celo/celotool/src/lib/env-utils'
 import { parse } from 'dotenv'
 import { readFileSync, writeFileSync } from 'fs'
 import { map, merge, reduce } from 'lodash'

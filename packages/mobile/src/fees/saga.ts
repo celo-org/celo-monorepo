@@ -2,7 +2,6 @@ import { getStableTokenContract } from '@celo/walletkit'
 import { call, put, select, spawn, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
 import { getReclaimEscrowFee } from 'src/escrow/saga'
 import { Actions, EstimateFeeAction, feeEstimated, FeeType } from 'src/fees/actions'
 import { getInvitationVerificationFee } from 'src/invite/saga'
@@ -54,7 +53,7 @@ export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
     }
   } catch (error) {
     Logger.error(`${TAG}/estimateFeeSaga`, 'Error estimating fee', error)
-    yield put(showError(ErrorMessages.CALCULATE_FEE_FAILED, ALERT_BANNER_DURATION))
+    yield put(showError(ErrorMessages.CALCULATE_FEE_FAILED))
   }
 }
 
