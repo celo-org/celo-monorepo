@@ -69,11 +69,10 @@ android/app/celo-release-key.keystore
 
 .vscode/
 
-# geth user configs
-src/geth/additionalNetworks.ts
-
 # End to end tests
 e2e/tmp/
+e2e_run.log
+e2e_pidcat_run.log
 
 # keys
 android/app/google-services.json

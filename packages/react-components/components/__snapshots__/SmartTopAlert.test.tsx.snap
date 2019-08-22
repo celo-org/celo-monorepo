@@ -7,6 +7,7 @@ exports[`SmartTopAlert renders correctly 1`] = `
       "overflow": "hidden",
     }
   }
+  testID="infoBanner"
 >
   <View
     accessible={true}

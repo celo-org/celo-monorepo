@@ -24,12 +24,12 @@ We are big fans of Typescript, so if you used the tabs template, you can support
 
 ## Setup
 
-To add DAppKit, simply add `@celo/dappkit@0.0.5` to your package.json or
+To add DAppKit, simply add `@celo/dappkit@0.0.8` to your package.json or
 
 ```bash
-npm install @celo/dappkit@0.0.6
+npm install @celo/dappkit@0.0.8
 // or
-yarn add @celo/dappkit@0.0.6
+yarn add @celo/dappkit@0.0.8
 ```
 
 DAppKit's dependencies require a bit of adjustment to a vanilla Expo. The first are a lot of the Node.js modules that are expected. You can get those mostly by using the following modules
@@ -88,7 +88,7 @@ global.location = {
 }
 ```
 
-You'll also constantly get two warnings that can be ignores, you can suppress them in the yellow banner with the following in your `App.js/tsx`
+You'll also constantly get two warnings that can be ignored, you can suppress them in the yellow banner with the following in your `App.js/tsx`
 
 ```typescript
 import { YellowBox } from 'react-native'

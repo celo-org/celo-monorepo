@@ -2,10 +2,10 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { Education } from 'src/verify/Education'
 import { Input } from 'src/verify/Input'
 import { Verified } from 'src/verify/Verified'
 import Verifying from 'src/verify/Verifying'
+import { VerifyPhoneEducation } from 'src/verify/VerifyPhoneEducation'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 import { mockAttestationMessage } from 'test/values'
 
@@ -14,7 +14,7 @@ const store = createMockStore({})
 it('renders the Education step correctly', () => {
   const tree = renderer.create(
     <Provider store={store}>
-      <Education {...getMockI18nProps()} />
+      <VerifyPhoneEducation {...getMockI18nProps()} />
     </Provider>
   )
   expect(tree).toMatchSnapshot()

@@ -1,4 +1,4 @@
-import { goldTokenRegistryId, sortedOraclesRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
   assertRevert,
@@ -41,8 +41,8 @@ contract('Reserve', (accounts: string[]) => {
     registry = await Registry.new()
     mockSortedOracles = await MockSortedOracles.new()
     mockGoldToken = await MockGoldToken.new()
-    await registry.setAddressFor(sortedOraclesRegistryId, mockSortedOracles.address)
-    await registry.setAddressFor(goldTokenRegistryId, mockGoldToken.address)
+    await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
+    await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
     await reserve.initialize(registry.address, aTobinTaxStalenessThreshold)
   })
 
@@ -185,7 +185,7 @@ contract('Reserve', (accounts: string[]) => {
 
     beforeEach(async () => {
       mockStableToken = await MockStableToken.new()
-      await registry.setAddressFor(sortedOraclesRegistryId, mockSortedOracles.address)
+      await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
       await mockSortedOracles.setMedianRate(mockStableToken.address, 10, 1)
       await reserve.addToken(mockStableToken.address)
       const reserveGoldBalance = new BigNumber(10).pow(19)
