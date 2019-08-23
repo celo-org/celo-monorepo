@@ -140,21 +140,51 @@ exports[`renders for error 1`] = `
               ]
             }
           >
-            <Image
-              source={
-                Object {
-                  "testUri": "../../../src/images/unknownUserIcon.png",
-                }
-              }
+            <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "height": 40,
-                  "justifyContent": "center",
-                  "width": 40,
-                }
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  undefined,
+                ]
               }
-            />
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "backgroundColor": "#FEB45E",
+                      "borderRadius": 20,
+                      "height": 40,
+                      "width": 40,
+                    },
+                  ]
+                }
+              >
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../src/images/unknown-user-icon.png",
+                    }
+                  }
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "height": 40,
+                      "justifyContent": "center",
+                      "width": 40,
+                    }
+                  }
+                />
+              </View>
+            </View>
           </View>
           <View
             style={
@@ -194,7 +224,7 @@ exports[`renders for error 1`] = `
                     }
                   }
                 >
-                  unknown
+                  sentTo 0072bvy2
                 </Text>
                 <Text
                   style={
@@ -588,21 +618,51 @@ exports[`renders for gold to dollar exchange properly 1`] = `
               ]
             }
           >
-            <Image
-              source={
-                Object {
-                  "testUri": "../../../src/images/unknownUserIcon.png",
-                }
-              }
+            <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "height": 40,
-                  "justifyContent": "center",
-                  "width": 40,
-                }
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  undefined,
+                ]
               }
-            />
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "backgroundColor": "#FEB45E",
+                      "borderRadius": 20,
+                      "height": 40,
+                      "width": 40,
+                    },
+                  ]
+                }
+              >
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../src/images/unknown-user-icon.png",
+                    }
+                  }
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "height": 40,
+                      "justifyContent": "center",
+                      "width": 40,
+                    }
+                  }
+                />
+              </View>
+            </View>
           </View>
           <View
             style={
@@ -642,7 +702,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                     }
                   }
                 >
-                  unknown
+                  sentTo 0072bvy2
                 </Text>
                 <Text
                   style={
@@ -1261,21 +1321,51 @@ exports[`renders for loading 1`] = `
               ]
             }
           >
-            <Image
-              source={
-                Object {
-                  "testUri": "../../../src/images/unknownUserIcon.png",
-                }
-              }
+            <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "height": 40,
-                  "justifyContent": "center",
-                  "width": 40,
-                }
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  undefined,
+                ]
               }
-            />
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "backgroundColor": "#FEB45E",
+                      "borderRadius": 20,
+                      "height": 40,
+                      "width": 40,
+                    },
+                  ]
+                }
+              >
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../src/images/unknown-user-icon.png",
+                    }
+                  }
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "height": 40,
+                      "justifyContent": "center",
+                      "width": 40,
+                    }
+                  }
+                />
+              </View>
+            </View>
           </View>
           <View
             style={
@@ -1315,7 +1405,7 @@ exports[`renders for loading 1`] = `
                     }
                   }
                 >
-                  unknown
+                  sentTo 0072bvy2
                 </Text>
                 <Text
                   style={
@@ -1731,21 +1821,51 @@ exports[`renders for no transactions 1`] = `
               ]
             }
           >
-            <Image
-              source={
-                Object {
-                  "testUri": "../../../src/images/unknownUserIcon.png",
-                }
-              }
+            <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "height": 40,
-                  "justifyContent": "center",
-                  "width": 40,
-                }
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  undefined,
+                ]
               }
-            />
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "backgroundColor": "#FEB45E",
+                      "borderRadius": 20,
+                      "height": 40,
+                      "width": 40,
+                    },
+                  ]
+                }
+              >
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../src/images/unknown-user-icon.png",
+                    }
+                  }
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "height": 40,
+                      "justifyContent": "center",
+                      "width": 40,
+                    }
+                  }
+                />
+              </View>
+            </View>
           </View>
           <View
             style={
@@ -1785,7 +1905,7 @@ exports[`renders for no transactions 1`] = `
                     }
                   }
                 >
-                  unknown
+                  sentTo 0072bvy2
                 </Text>
                 <Text
                   style={
@@ -2201,21 +2321,51 @@ exports[`renders for standbyTransactions 1`] = `
               ]
             }
           >
-            <Image
-              source={
-                Object {
-                  "testUri": "../../../src/images/unknownUserIcon.png",
-                }
-              }
+            <View
               style={
-                Object {
-                  "alignItems": "center",
-                  "height": 40,
-                  "justifyContent": "center",
-                  "width": 40,
-                }
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  undefined,
+                ]
               }
-            />
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "backgroundColor": "#FEB45E",
+                      "borderRadius": 20,
+                      "height": 40,
+                      "width": 40,
+                    },
+                  ]
+                }
+              >
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../src/images/unknown-user-icon.png",
+                    }
+                  }
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "height": 40,
+                      "justifyContent": "center",
+                      "width": 40,
+                    }
+                  }
+                />
+              </View>
+            </View>
           </View>
           <View
             style={
@@ -2255,7 +2405,7 @@ exports[`renders for standbyTransactions 1`] = `
                     }
                   }
                 >
-                  unknown
+                  sentTo 0072bvy2
                 </Text>
                 <Text
                   style={
