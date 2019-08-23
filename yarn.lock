@@ -24485,9 +24485,9 @@ react-native-gesture-handler@^1.1.0:
     invariant "^2.2.2"
     prop-types "^15.5.10"
 
-"react-native-geth@git+https://github.com/celo-org/react-native-geth#cd92070":
+"react-native-geth@git+https://github.com/celo-org/react-native-geth#51dc4f1":
   version "0.1.0-development"
-  resolved "git+https://github.com/celo-org/react-native-geth#cd9207002c34343aec819ab8141682a9ca447d0d"
+  resolved "git+https://github.com/celo-org/react-native-geth#51dc4f1bb36bcf6280d19ff7ef2546d631a1eb32"
 
 react-native-iphone-x-helper@^1.0.1:
   version "1.0.2"
@@ -29363,12 +29363,12 @@ typescript-tuple@^2.1.0:
   dependencies:
     typescript-compare "^0.0.2"
 
-typescript@3.3.3, typescript@^3.2.2:
+typescript@^3.2.2:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.3.3.tgz#f1657fc7daa27e1a8930758ace9ae8da31403221"
   integrity sha512-Y21Xqe54TBVp+VDSNbuDYdGw0BpoR/Q6wo/+35M8PAU0vipahnyduJWirxxdxjsAkS7hue53x2zp8gz7F05u0A==
 
-typescript@^3.3.3:
+typescript@^3.5.3:
   version "3.5.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.5.3.tgz#c830f657f93f1ea846819e929092f5fe5983e977"
   integrity sha512-ACzBtm/PhXBDId6a6sDJfroT2pOWt/oOnk4/dElG5G33ZL776N3Y6/6bKZJBFpd+b05F3Ct9qDjMeJmRWtE2/g==
