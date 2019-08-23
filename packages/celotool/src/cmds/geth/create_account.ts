@@ -1,9 +1,8 @@
 /* tslint:disable no-console */
 import { GethArgv } from '@celo/celotool/src/cmds/geth'
+import { addCeloEnvMiddleware, CeloEnvArgv } from '@celo/celotool/src/lib/env-utils'
 import {
-  addCeloEnvMiddleware,
   addCeloGethMiddleware,
-  CeloEnvArgv,
   execCmd,
   execCmdWithExitOnFailure,
 } from '@celo/celotool/src/lib/utils'

@@ -58,9 +58,9 @@ describe(ExchangeTradeScreen, () => {
       )
 
       component.root.instance.setExchangeAmount('500')
-      expect(mockShowError).toBeCalledWith(ErrorMessages.NSF_DOLLARS, 5000)
+      expect(mockShowError).toBeCalledWith(ErrorMessages.NSF_DOLLARS)
       component.root.instance.switchTokens()
-      expect(mockShowError).toBeCalledWith(ErrorMessages.NSF_GOLD, 5000)
+      expect(mockShowError).toBeCalledWith(ErrorMessages.NSF_GOLD)
       component.root.instance.setExchangeAmount('5')
       expect(mockhideAlert).toBeCalled()
     })
