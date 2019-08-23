@@ -4,5 +4,5 @@ import "../../common/Proxy.sol";
 
 
 /* solhint-disable no-empty-blocks */
-contract BondedDepositsProxy is Proxy {
+contract LockedGoldProxy is Proxy {
 }

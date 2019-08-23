@@ -11,7 +11,7 @@ export const ProxyContracts = [
   'GasCurrencyWhitelistProxy',
   'GasPriceMinimumProxy',
   'MultiSigProxy',
-  'BondedDepositsProxy',
+  'LockedGoldProxy',
   'AttestationsProxy',
   'EscrowProxy',
   'ExchangeProxy',
@@ -32,7 +32,7 @@ export const CoreContracts = [
   'Validators',
 
   // governance
-  'BondedDeposits',
+  'LockedGold',
   'Governance',
 
   // identity

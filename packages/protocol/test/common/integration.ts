@@ -3,10 +3,10 @@ import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import BigNumber from 'bignumber.js'
 import {
-  BondedDepositsInstance,
   ExchangeInstance,
   GoldTokenInstance,
   GovernanceInstance,
+  LockedGoldInstance,
   RegistryInstance,
   ReserveInstance,
   StableTokenInstance,
@@ -22,23 +22,23 @@ enum VoteValue {
 contract('Integration: Governance', (accounts: string[]) => {
   const proposalId = 1
   const dequeuedIndex = 0
-  let bondedDeposits: BondedDepositsInstance
+  let lockedGold: LockedGoldInstance
   let governance: GovernanceInstance
   let registry: RegistryInstance
   let proposalTransactions: any
   let weight: BigNumber
 
   before(async () => {
-    bondedDeposits = await getDeployedProxiedContract('BondedDeposits', artifacts)
+    lockedGold = await getDeployedProxiedContract('LockedGold', artifacts)
     governance = await getDeployedProxiedContract('Governance', artifacts)
     registry = await getDeployedProxiedContract('Registry', artifacts)
-    // Set up a BondedDeposits account with which we can vote.
-    await bondedDeposits.createAccount()
+    // Set up a LockedGold account with which we can vote.
+    await lockedGold.createAccount()
     const noticePeriod = 60 * 60 * 24 // 1 day
     const value = 1000
     // @ts-ignore
-    await bondedDeposits.deposit(noticePeriod, { value })
-    weight = await bondedDeposits.getAccountWeight(accounts[0])
+    await lockedGold.newCommitment(noticePeriod, { value })
+    weight = await lockedGold.getAccountWeight(accounts[0])
     proposalTransactions = [
       {
         value: 0,

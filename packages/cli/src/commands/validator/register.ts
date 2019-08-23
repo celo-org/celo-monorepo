@@ -1,6 +1,5 @@
 import { Attestations, Validators } from '@celo/walletkit'
 import { flags } from '@oclif/command'
-
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -18,7 +17,7 @@ export default class ValidatorRegister extends BaseCommand {
     publicKey: Flags.publicKey({ required: true }),
     noticePeriod: flags.string({
       required: true,
-      description: 'Notice Period for the Bonded deposit to use',
+      description: 'Notice period of the Locked Gold commitment',
     }),
   }
 
