@@ -1,8 +1,8 @@
 import { UpgradeArgv } from '@celo/celotool/src/cmds/deploy/upgrade'
+import { fetchEnvOrFallback } from '@celo/celotool/src/lib/env-utils'
 import { installHelmChart } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { retrieveCloudSQLConnectionInfo, upgradeHelmChart } from 'src/lib/helm_deploy'
-import { fetchEnvOrFallback } from 'src/lib/utils'
 
 export const command = 'blockscout'
 export const describe = 'migrate an existing deploy to the blockscout package'

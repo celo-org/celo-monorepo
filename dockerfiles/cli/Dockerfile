@@ -2,7 +2,7 @@
 # us.gcr.io/celo-testnet/celocli:master
 #
 # How to test changes to this file
-# docker build -f dockerfiles/cli/Dockerfile.cli -t gcr.io/celo-testnet/celocli:$USER . --build-arg celo_env=alfajores
+# docker build -f dockerfiles/cli/Dockerfile -t gcr.io/celo-testnet/celocli:$USER . --build-arg celo_env=alfajores
 # To run this image locally
 # docker rm cli_container; docker run --name cli_container -p 8545:8545 gcr.io/celo-testnet/celocli:$USER -v /
 # To run this image locally in ultralight mode
