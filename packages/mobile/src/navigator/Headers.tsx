@@ -15,10 +15,16 @@ export const nuxNavigationOptions = {
   headerRightContainerStyle: { paddingHorizontal: 20 },
   headerRight: <View />,
   headerTitle: (
-    <View style={{ paddingTop: 5, alignItems: 'center', flex: 1, justifyContent: 'center' }}>
+    <View>
       <DisconnectBanner />
     </View>
   ),
+  headerTitleContainerStyle: {
+    paddingTop: 5,
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+  },
 }
 
 export const nuxNavigationOptionsNoBackButton = {
