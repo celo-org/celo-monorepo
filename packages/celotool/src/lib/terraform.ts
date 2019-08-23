@@ -16,7 +16,7 @@ export async function initTerraformModule(
   backendConfigVars: TerraformVars
 ) {
   const modulePath = getModulePath(moduleName)
-  return execTerraformCmd(
+  return buildAndExecTerraformCmd(
     'init',
     modulePath,
     modulePath,
@@ -37,7 +37,7 @@ export function planTerraformModule(
     fs.mkdirSync(planDir)
   }
   const modulePath = getModulePath(moduleName)
-  return execTerraformCmd(
+  return buildAndExecTerraformCmd(
     'plan',
     modulePath,
     modulePath,
@@ -48,16 +48,29 @@ export function planTerraformModule(
 }
 
 export function applyTerraformModule(moduleName: string) {
-  return execTerraformCmd('apply', getModulePath(moduleName), getPlanPath(moduleName))
+  return buildAndExecTerraformCmd('apply', getModulePath(moduleName), getPlanPath(moduleName))
 }
 
 export function destroyTerraformModule(moduleName: string, vars: TerraformVars) {
-  return execTerraformCmd('destroy', getModulePath(moduleName), getVarOptions(vars), '-force')
+  return buildAndExecTerraformCmd(
+    'destroy',
+    getModulePath(moduleName),
+    getVarOptions(vars),
+    '-force'
+  )
+}
+
+export function taintTerraformModuleResource(moduleName: string, resourceName: string) {
+  return execTerraformCmd(`terraform taint ${resourceName}`, getModulePath(moduleName), false)
+}
+
+export function untaintTerraformModuleResource(moduleName: string, resourceName: string) {
+  return execTerraformCmd(`terraform untaint ${resourceName}`, getModulePath(moduleName), false)
 }
 
 // pulls remote state
 function refreshTerraformModule(moduleName: string, vars: TerraformVars) {
-  return execTerraformCmd('refresh', getModulePath(moduleName), getVarOptions(vars))
+  return buildAndExecTerraformCmd('refresh', getModulePath(moduleName), getVarOptions(vars))
 }
 
 export async function getTerraformModuleOutputs(
@@ -70,6 +83,12 @@ export async function getTerraformModuleOutputs(
   const modulePath = getModulePath(moduleName)
   const [output] = await execCmd(`cd ${modulePath} && terraform output -json`)
   return JSON.parse(output)
+}
+
+// returns an array of resource and data names in the current state
+export async function getTerraformModuleState(moduleName: string) {
+  const [output] = await execTerraformCmd(`terraform state list`, getModulePath(moduleName), false)
+  return output.split('\n')
 }
 
 function getModulePath(moduleName: string) {
@@ -88,19 +107,23 @@ function getVarOptions(vars: TerraformVars, optionName: string = 'var') {
   return nameValuePairs.join(' ')
 }
 
+function execTerraformCmd(command: string, modulePath: string, pipeOutput: boolean) {
+  // use the middle two default arguments
+  return execCmd(`cd ${modulePath} && ${command}`, {}, false, pipeOutput)
+}
+
 // `modulePath` is the path to the module that will be cd'd into. We change
 // directories for each module so that module-specific configurations
 // that are stored in the local .terraform directories do not conflict.
 // `cmdPath` is the path to be provided to the terraform command
-function execTerraformCmd(
-  command: string,
+function buildAndExecTerraformCmd(
+  commandName: string,
   modulePath: string,
   cmdPath: string,
   ...options: string[]
 ) {
-  const terraformCmd = buildTerraformCmd(command, cmdPath, ...options)
-  // use the middle two default arguments
-  return execCmd(`cd ${modulePath} && ${terraformCmd}`, {}, false, true)
+  const terraformCmd = buildTerraformCmd(commandName, cmdPath, ...options)
+  return execTerraformCmd(terraformCmd, modulePath, true)
 }
 
 function buildTerraformCmd(command: string, cmdPath: string, ...options: string[]) {
