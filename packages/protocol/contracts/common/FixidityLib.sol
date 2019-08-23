@@ -123,7 +123,7 @@ library FixidityLib2 {
    * Hardcoded to 24 digits.
    */
   function maxFixedMul() internal pure returns(int256) {
-    return 240615969168004498257251713877715648331380787511296;
+    return 240615969168004511545033772477625056927114980741063;
   }
 
   /**
