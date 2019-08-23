@@ -33,7 +33,7 @@ const mapStateToProps = (state: RootState) => ({
 const getPhoneNumbersForVerifications = (
   messagePhoneMapping: MessagePhoneMapping,
   txComment: string
-) => {
+): string[] => {
   // TODO: when blockchain-api knows about rewards transfers, we can probably remove this comment check
   const messageIds = txComment && txComment.split(',')
   if (!messageIds || !messageIds.length) {
@@ -41,7 +41,7 @@ const getPhoneNumbersForVerifications = (
     return [maskPhoneNumber()]
   }
 
-  const phoneNumbersSet = new Set()
+  const phoneNumbersSet = new Set<string>()
   for (const messageId of messageIds) {
     if (messagePhoneMapping[messageId]) {
       phoneNumbersSet.add(messagePhoneMapping[messageId])

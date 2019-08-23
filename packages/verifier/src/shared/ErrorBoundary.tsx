@@ -16,7 +16,7 @@ interface OwnProps {
 type Props = OwnProps & WithNamespaces
 
 class ErrorBoundary extends React.Component<Props, State> {
-  state = {
+  state: State = {
     childError: null,
   }
 

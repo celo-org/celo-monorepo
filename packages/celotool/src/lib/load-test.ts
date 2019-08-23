@@ -1,6 +1,6 @@
+import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
 import { getEnodesAddresses } from 'src/lib/geth'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
-import { envVar, fetchEnv } from 'src/lib/utils'
 
 export async function installHelmChart(
   celoEnv: string,

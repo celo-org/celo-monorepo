@@ -53,13 +53,13 @@ docker run --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
     --mine \
     --rpc \
     --rpcaddr 0.0.0.0 \
-    --rpcapi=eth,net,web3,debug \
+    --rpcapi=eth,net,web3 \
     --rpccorsdomain='*' \
     --rpcvhosts=* \
     --ws \
     --wsaddr 0.0.0.0 \
     --wsorigins=* \
-    --wsapi=eth,net,web3,debug \
+    --wsapi=eth,net,web3 \
     --nodekey=/root/.celo/pkey \
     --etherbase=$ACCOUNT_ADDRESS \
     --networkid=${network_id} \
@@ -71,4 +71,5 @@ docker run --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
     --ethstats=${validator_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
     --istanbul.blockperiod=${block_time} \
     --maxpeers=${max_peers} \
-    --nat=extip:${ip_address}"
+    --nat=extip:${ip_address} \
+    --ping-ip-from-packet"

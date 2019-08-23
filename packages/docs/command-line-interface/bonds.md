@@ -23,7 +23,7 @@ EXAMPLE
   deposit --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --noticePeriod 8640 --goldAmount 1000000000000000000
 ```
 
-_See code: [packages/cli/src/src/commands/bonds/deposit.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/bonds/deposit.ts)_
+_See code: [packages/cli/lib/src/commands/bonds/deposit.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/src/commands/bonds/deposit.js)_
 
 ### List
 
@@ -37,7 +37,7 @@ EXAMPLE
   list 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
 
-_See code: [packages/cli/src/src/commands/bonds/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/bonds/list.ts)_
+_See code: [packages/cli/lib/src/commands/bonds/list.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/src/commands/bonds/list.js)_
 
 ### Notify
 
@@ -58,7 +58,7 @@ EXAMPLE
   notify --noticePeriod=3600 --goldAmount=500
 ```
 
-_See code: [packages/cli/src/src/commands/bonds/notify.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/bonds/notify.ts)_
+_See code: [packages/cli/lib/src/commands/bonds/notify.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/src/commands/bonds/notify.js)_
 
 ### Register
 
@@ -75,7 +75,7 @@ EXAMPLE
   register
 ```
 
-_See code: [packages/cli/src/src/commands/bonds/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/bonds/register.ts)_
+_See code: [packages/cli/lib/src/commands/bonds/register.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/src/commands/bonds/register.js)_
 
 ### Rewards
 
@@ -95,7 +95,7 @@ EXAMPLES
   rewards --delegate=0x56e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
-_See code: [packages/cli/src/src/commands/bonds/rewards.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/bonds/rewards.ts)_
+_See code: [packages/cli/lib/src/commands/bonds/rewards.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/src/commands/bonds/rewards.js)_
 
 ### Show
 
@@ -116,7 +116,7 @@ EXAMPLES
   show 0x5409ed021d9299bf6814279a6a1411a7e866a631 --availabilityTime=1562206887
 ```
 
-_See code: [packages/cli/src/src/commands/bonds/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/bonds/show.ts)_
+_See code: [packages/cli/lib/src/commands/bonds/show.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/src/commands/bonds/show.js)_
 
 ### Withdraw
 
@@ -136,4 +136,4 @@ EXAMPLE
   withdraw 3600
 ```
 
-_See code: [packages/cli/src/src/commands/bonds/withdraw.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/bonds/withdraw.ts)_
+_See code: [packages/cli/lib/src/commands/bonds/withdraw.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/src/commands/bonds/withdraw.js)_

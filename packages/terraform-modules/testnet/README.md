@@ -4,7 +4,9 @@ This creates a VM-based testnet with a bootnode and multiple validators.
 
 ## Overview
 
-Each type of node (validator/bootnode/soon to be tx-node) is in its own module.
+Each type of node (validator/bootnode/tx-node) is in its own module.
+A separate module `tx-node-load-balancer` defines an internal TCP load balancer
+for ports 8545 and 8546. This is so Blockscout on the same VPC can reach the tx-nodes.
 The GCP provider, network, firewall etc declarations are found in the `main.tf` file.
 
 The script that is run immediately upon the startup of a VM instance is found in
