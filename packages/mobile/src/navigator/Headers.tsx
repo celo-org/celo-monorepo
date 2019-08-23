@@ -12,8 +12,7 @@ export const nuxNavigationOptions = {
   },
   headerLeftContainerStyle: { paddingHorizontal: 20 },
   headerLeft: <BackButton />,
-  headerRightContainerStyle: { paddingRight: 15 },
-  header: (
+  headerTitle: (
     <View style={{ paddingVertical: 30 }}>
       <DisconnectBanner />
     </View>
@@ -22,13 +21,13 @@ export const nuxNavigationOptions = {
 
 export const nuxNavigationOptionsNoBackButton = {
   ...nuxNavigationOptions,
-  headerLeft: null,
+  headerLeft: <View />, // This helps vertically center the title
 }
 
 export const headerWithBackButton = {
   headerTitle: '',
   headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
-  headerLeftContainerStyle: { paddingHorizontal: 10 },
+  headerLeftContainerStyle: { paddingHorizontal: 20 },
   headerLeft: <BackButton />,
   headerRight: <View />, // This helps vertically center the title
 }

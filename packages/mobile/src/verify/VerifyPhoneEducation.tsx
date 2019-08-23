@@ -10,12 +10,12 @@ import FindUser from 'src/icons/FindUser'
 import NuxLogo from 'src/icons/NuxLogo'
 import ThreeChecks from 'src/icons/ThreeChecks'
 import VerifyAddressBook from 'src/icons/VerifyAddressBook'
+import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import DisconnectBanner from 'src/shared/DisconnectBanner'
 
 export class VerifyPhoneEducation extends React.Component<WithNamespaces> {
-  static navigationOptions = { header: null }
+  static navigationOptions = nuxNavigationOptionsNoBackButton
 
   onSubmit = () => {
     navigate(Screens.VerifyVerifying)
@@ -25,10 +25,9 @@ export class VerifyPhoneEducation extends React.Component<WithNamespaces> {
     const { t } = this.props
     return (
       <View style={style.container}>
-        <DevSkipButton nextScreen={Screens.WalletHome} />
-        <DisconnectBanner />
         <ScrollView style={style.content}>
-          <NuxLogo testID="VerifyLogo" />
+          <DevSkipButton nextScreen={Screens.WalletHome} />
+          <NuxLogo testID="VerifyLogo" style={style.logo} />
           <Text style={fontStyles.h1} testID="VerifyEducationHeader">
             {t('verifyPhone')}
           </Text>
@@ -63,8 +62,10 @@ const style = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
-    paddingTop: 20,
     backgroundColor: colors.background,
+  },
+  logo: {
+    marginTop: 0,
   },
   content: {
     flex: 1,
