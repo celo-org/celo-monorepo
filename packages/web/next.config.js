@@ -16,13 +16,17 @@ module.exports = withImages(
       cssModules: true,
       publicRuntimeConfig: envConfig,
       serverRuntimeConfig: serverEnvConfig,
-      webpack: (config, { dev }) => {
+      // options: {buildId, dev, isServer, defaultLoaders, webpack}   https://nextjs.org/docs#customizing-webpack-config
+      webpack: (config, { dev, isServer }) => {
         config.node = {
           fs: 'empty',
         }
         config.resolve.alias = {
           ...config.resolve.alias,
           'react-native$': 'react-native-web',
+        }
+        if (isServer) {
+          config.resolve.alias['@sentry/browser'] = '@sentry/node'
         }
         return config
       },

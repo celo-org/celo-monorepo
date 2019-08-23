@@ -2,6 +2,7 @@
 const fecha = require('fecha')
 const Tabletop = require('tabletop')
 
+import Sentry from 'fullstack/sentry'
 import getConfig from 'next/config'
 import { EventProps } from '../fullstack/EventProps'
 import { abort } from '../src/utils/abortableFetch'
@@ -66,7 +67,7 @@ export function intializeTableTop() {
       })
     } catch (e) {
       resolve([])
-      console.error(e)
+      Sentry.captureException(e)
     }
   })
   return Promise.race([promise, abort(getURL(), 3000).catch(() => [])])

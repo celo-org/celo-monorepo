@@ -1,5 +1,6 @@
 import { parse, validate } from 'fast-xml-parser'
 import { Articles } from 'fullstack/ArticleProps'
+import Sentry from 'fullstack/sentry'
 import * as htmlToFormattedText from 'html-to-formatted-text'
 import abortableFetch from '../src/utils/abortableFetch'
 interface JSONRSS {
@@ -81,7 +82,8 @@ export async function getFormattedMediumArticles(): Promise<Articles> {
     const xmlString = await fetchMediumArticles()
     const articles = transform(parseXML(xmlString))
     return { articles }
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e)
     return { articles: [] }
   }
 }

@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/browser'
 import App, { Container } from 'next/app'
 import * as React from 'react'
 import { View } from 'react-native'
@@ -22,6 +23,13 @@ class MyApp extends App {
   // currently this is just the animation demo pages
   skipHeader() {
     return this.props.router.asPath.startsWith('/animation')
+  }
+
+  componentDidCatch = (error: Error, info: object) => {
+    Sentry.withScope((scope: Sentry.Scope) => {
+      scope.setExtras(info)
+      Sentry.captureException(error)
+    })
   }
 
   render() {
