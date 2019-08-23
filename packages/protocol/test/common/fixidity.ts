@@ -60,6 +60,15 @@ contract('FixidityLib', () => {
       assertEqualBN(result, expected)
     })
 
+    it('should subtract two fractions', async () => {
+      const a = toFixed(23.4)
+      const b = toFixed(23.2)
+      const expected = toFixed(0.2)
+      const result = await fixidityTest.subtract(a, b)
+
+      assertEqualBN(result, expected)
+    })
+
     it('should fail to subtract a larger number from a smaller one', async () => {
       const a = toFixed(6)
       const b = toFixed(10)
