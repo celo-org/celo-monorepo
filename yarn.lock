@@ -26817,6 +26817,11 @@ sentence-case@^2.1.0:
     no-case "^2.2.0"
     upper-case-first "^1.1.2"
 
+sentry-testkit@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/sentry-testkit/-/sentry-testkit-3.0.2.tgz#cfed7537b574ee1c2e741d916ac1e37a0f8727f9"
+  integrity sha512-t0UgrVaGrhJi0v61nn7vma2VmmwGhRYFFaD+HBTnw+QZY5QLrYwdHTSwBgezx6BULmx0WgkEPklWM2BAbEcYVA==
+
 serialize-error@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/serialize-error/-/serialize-error-2.1.0.tgz#50b679d5635cdf84667bdc8e59af4e5b81d5f60a"

@@ -2,9 +2,9 @@
 const fecha = require('fecha')
 const Tabletop = require('tabletop')
 
-import Sentry from 'fullstack/sentry'
 import getConfig from 'next/config'
 import { EventProps } from '../fullstack/EventProps'
+import Sentry from '../fullstack/sentry'
 import { abort } from '../src/utils/abortableFetch'
 
 // Intermediate step Event With all String Values
