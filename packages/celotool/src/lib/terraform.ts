@@ -86,7 +86,7 @@ export async function getTerraformModuleOutputs(
 }
 
 // returns an array of resource and data names in the current state
-export async function getTerraformModuleState(moduleName: string) {
+export async function getTerraformModuleResourceNames(moduleName: string) {
   const [output] = await execTerraformCmd(`terraform state list`, getModulePath(moduleName), false)
   return output.split('\n')
 }

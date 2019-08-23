@@ -15,7 +15,7 @@ import {
   applyTerraformModule,
   destroyTerraformModule,
   getTerraformModuleOutputs,
-  getTerraformModuleState,
+  getTerraformModuleResourceNames,
   initTerraformModule,
   planTerraformModule,
   taintTerraformModuleResource,
@@ -145,6 +145,7 @@ async function destroyModule(celoEnv: string, terraformModule: string, vars: Ter
 
 // force the recreation of various resources upon the next deployment
 export async function taintTestnet(celoEnv: string) {
+  console.info('Tainting testnet...')
   const vars: TerraformVars = getTestnetVars(celoEnv)
   const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(
     celoEnv,
@@ -153,21 +154,25 @@ export async function taintTestnet(celoEnv: string) {
   await initTerraformModule(testnetTerraformModule, vars, backendConfigVars)
 
   // bootnode
+  console.info('Tainting bootnode...')
   await taintTerraformModuleResource(
     testnetTerraformModule,
     `module.bootnode.google_compute_instance.bootnode`
   )
   // validators
+  console.info('Tainting validators...')
   await taintEveryResourceWithPrefix(
     testnetTerraformModule,
     `module.validator.google_compute_instance.validator`
   )
   // validator disks
+  console.info('Tainting validator disks...')
   await taintEveryResourceWithPrefix(
     testnetTerraformModule,
     `module.validator.google_compute_disk.validator`
   )
   // tx-nodes
+  console.info('Tainting tx-nodes...')
   await taintEveryResourceWithPrefix(
     testnetTerraformModule,
     `module.tx_node.google_compute_instance.tx_node`
@@ -175,8 +180,7 @@ export async function taintTestnet(celoEnv: string) {
 }
 
 export async function untaintTestnet(celoEnv: string) {
-  console.log('untainting')
-
+  console.info('Untainting testnet...')
   const vars: TerraformVars = getTestnetVars(celoEnv)
   const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(
     celoEnv,
@@ -185,21 +189,25 @@ export async function untaintTestnet(celoEnv: string) {
   await initTerraformModule(testnetTerraformModule, vars, backendConfigVars)
 
   // bootnode
+  console.info('Untainting bootnode...')
   await untaintTerraformModuleResource(
     testnetTerraformModule,
     `module.bootnode.google_compute_instance.bootnode`
   )
   // validators
+  console.info('Untainting validators...')
   await untaintEveryResourceWithPrefix(
     testnetTerraformModule,
     `module.validator.google_compute_instance.validator`
   )
   // validator disks
+  console.info('Untainting validator disks...')
   await untaintEveryResourceWithPrefix(
     testnetTerraformModule,
     `module.validator.google_compute_disk.validator`
   )
   // tx-nodes
+  console.info('Untainting tx-nodes...')
   await untaintEveryResourceWithPrefix(
     testnetTerraformModule,
     `module.tx_node.google_compute_instance.tx_node`
@@ -221,7 +229,7 @@ async function untaintEveryResourceWithPrefix(moduleName: string, resourceName: 
 }
 
 async function getEveryResourceWithPrefix(moduleName: string, resourcePrefix: string) {
-  const resources = await getTerraformModuleState(moduleName)
+  const resources = await getTerraformModuleResourceNames(moduleName)
   return resources.filter((resource: string) => resource.startsWith(resourcePrefix))
 }
 

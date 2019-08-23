@@ -11,7 +11,7 @@ type VmTestnetArgv = UpgradeArgv & {
 
 export const builder = (argv: yargs.Argv) => {
   return argv.option('reset', {
-    describe: 'deletes any chain data in persistent disks',
+    describe: 'recreates all nodes and deletes any chain data in persistent disks',
     default: false,
     type: 'boolean',
   })
@@ -20,7 +20,7 @@ export const builder = (argv: yargs.Argv) => {
 export const handler = async (argv: VmTestnetArgv) => {
   let onDeployFailed = () => Promise.resolve()
   if (argv.reset) {
-    onDeployFailed = async () => untaintTestnet(argv.celoEnv)
+    onDeployFailed = () => untaintTestnet(argv.celoEnv)
     await taintTestnet(argv.celoEnv)
   }
   await deploy(argv.celoEnv, onDeployFailed)
