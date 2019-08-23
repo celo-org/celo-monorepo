@@ -1,8 +1,5 @@
-import {
-  addCeloEnvMiddleware,
-  CeloEnvArgv,
-  execCmdWithExitOnFailure,
-} from '@celo/celotool/src/lib/utils'
+import { addCeloEnvMiddleware, CeloEnvArgv } from '@celo/celotool/src/lib/env-utils'
+import { execCmdWithExitOnFailure } from '@celo/celotool/src/lib/utils'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import * as yargs from 'yargs'
 

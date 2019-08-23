@@ -1,5 +1,5 @@
 import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
-import { fetchEnv } from '@celo/celotool/src/lib/utils'
+import { fetchEnv } from '@celo/celotool/src/lib/env-utils'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { installHelmChart } from 'src/lib/load-test'
 import * as yargs from 'yargs'
