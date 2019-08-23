@@ -142,7 +142,7 @@ exports[`renders home 1`] = `
         ]
       }
     >
-      sendCeloDollars
+      global:sendCeloDollars
     </Text>
   </View>
 </View>

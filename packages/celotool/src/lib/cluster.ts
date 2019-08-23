@@ -2,12 +2,25 @@ import {
   doCheckOrPromptIfStagingOrProduction,
   EnvTypes,
   envVar,
+  fetchEnv,
+} from '@celo/celotool/src/lib/env-utils'
+import {
+  createAndUploadBackupSecretIfNotExists,
+  createServiceAccountIfNotExists,
+  getServiceAccountName,
+  grantRoles,
+  installAndEnableMetricsDeps,
+  installLegoAndNginx,
+  redeployTiller,
+  uploadStorageClass,
+} from '@celo/celotool/src/lib/helm_deploy'
+import {
   execCmd,
   execCmdWithExitOnFailure,
-  fetchEnv,
   outputIncludes,
   switchToProjectFromEnv,
 } from '@celo/celotool/src/lib/utils'
+import { networkName } from '@celo/celotool/src/lib/vm-testnet-utils'
 import sleep from 'sleep-promise'
 
 const SYSTEM_HELM_RELEASES = ['nginx-ingress-release', 'kube-lego-release']
@@ -51,16 +64,65 @@ export async function createClusterIfNotExists() {
   )
 
   if (!clusterExists) {
-    console.info(`Creating cluster ${kubernetesClusterName}...`)
+    const network = networkName(fetchEnv(envVar.CELOTOOL_CELOENV))
+    console.info(`Creating cluster ${kubernetesClusterName} on network ${network}...`)
     await execCmdWithExitOnFailure(
       `gcloud container clusters create ${kubernetesClusterName} --zone ${kubernetesClusterZone} ${fetchEnv(
         envVar.CLUSTER_CREATION_FLAGS
-      )}`
+      )} --network ${network}`
     )
     return true
   }
 
   return false
+}
+
+export async function setupCluster(celoEnv: string, createdCluster: boolean) {
+  const envType = fetchEnv(envVar.ENV_TYPE)
+
+  const namespaceExists = await outputIncludes(
+    `kubectl get namespaces ${celoEnv} || true`,
+    celoEnv,
+    `Namespace ${celoEnv} exists, skipping creation`
+  )
+  if (!namespaceExists) {
+    console.info('Creating kubernetes namespace')
+    await execCmdWithExitOnFailure(`kubectl create namespace ${celoEnv}`)
+  }
+
+  const blockchainBackupServiceAccountName = getServiceAccountName('blockchain-backup-for')
+  console.info(`Service account for blockchain backup is \"${blockchainBackupServiceAccountName}\"`)
+
+  await createServiceAccountIfNotExists(blockchainBackupServiceAccountName)
+  // This role is required for "compute.snapshots.get" permission
+  // Source: https://cloud.google.com/compute/docs/access/iam
+  await grantRoles(blockchainBackupServiceAccountName, 'roles/compute.storageAdmin')
+  // This role is required for "gcloud.container.clusters.get-credentials" permission
+  // This role is required for "container.clusters.get" permission
+  // Source: https://cloud.google.com/kubernetes-engine/docs/how-to/iam
+  await grantRoles(blockchainBackupServiceAccountName, 'roles/container.viewer')
+
+  await createAndUploadBackupSecretIfNotExists(blockchainBackupServiceAccountName)
+
+  // poll for cluster availability
+  if (createdCluster) {
+    await pollForRunningCluster()
+  }
+
+  console.info('Deploying Tiller and Helm chart...')
+
+  await uploadStorageClass()
+  await redeployTiller()
+
+  await installLegoAndNginx()
+
+  if (envType !== EnvTypes.DEVELOPMENT) {
+    await installAndEnableMetricsDeps()
+  } else {
+    console.info('Skipping metrics installation for this development env.')
+  }
+
+  await setClusterLabels(celoEnv)
 }
 
 export async function pollForRunningCluster() {

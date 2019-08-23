@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "0.0.6",
+  "version": "0.0.17",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -24,10 +24,11 @@
     "build": "rm -rf lib && tsc -b",
     "docs": "yarn oclif-dev readme --multi --dir=../docs/command-line-interface && yarn prettier ../docs/command-line-interface/*.md --write",
     "lint": "tslint -c tslint.json --project tsconfig.json",
+    "prepublishOnly": "yarn --cwd=../walletkit build && yarn run build && oclif-dev manifest && oclif-dev readme",
     "test": "export TZ=UTC && jest --ci --silent"
   },
   "dependencies": {
-    "@celo/walletkit": "^0.0.4",
+    "@celo/walletkit": "^0.0.14",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
@@ -52,17 +53,13 @@
     "@types/bip32": "^1.0.1",
     "@types/bip39": "^2.4.2",
     "@types/elliptic": "^6.4.9",
-    "@types/jest": "^24.0.15",
     "@types/mocha": "^5.2.7",
     "@types/cli-table": "^0.3.0",
     "@types/debug": "^4.1.4",
     "@types/fs-extra": "^8.0.0",
     "@types/node": "^10",
     "@types/web3": "^1.0.18",
-    "globby": "^8",
-    "ts-node": "^8",
-    "tslint": "^5",
-    "typescript": "^3.3.3"
+    "globby": "^8"
   },
   "files": [
     "README.md",
@@ -71,7 +68,7 @@
     "/oclif.manifest.json"
   ],
   "oclif": {
-    "commands": "./lib/commands",
+    "commands": "./lib/src/commands",
     "topics": {
       "account": {
         "description": "Manage your account, send and receive Celo Gold and Celo Dollars"

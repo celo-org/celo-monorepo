@@ -1,5 +1,6 @@
 /* tslint:disable: no-console */
-import { envVar, execBackgroundCmd, execCmd, fetchEnv } from '@celo/celotool/src/lib/utils'
+import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
+import { execBackgroundCmd, execCmd } from '@celo/celotool/src/lib/utils'
 import { ChildProcess, spawnSync } from 'child_process'
 
 function sleep(ms: number) {

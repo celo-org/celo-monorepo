@@ -22,7 +22,7 @@ cat /root/staticnodes >> $DATA_DIR/static-nodes.json;
 
 echo "Running geth...";
 
-$CELOTOOL geth run --geth-dir $GETH_DIR --data-dir $DATA_DIR --sync-mode celolatest --verbosity 1 &
+$CELOTOOL geth run --geth-dir $GETH_DIR --data-dir $DATA_DIR --sync-mode ultralight --verbosity 1 &
 
 sleep 15;
 

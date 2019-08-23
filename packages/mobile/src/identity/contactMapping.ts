@@ -21,7 +21,7 @@ import {
 } from 'src/identity/reducer'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipient'
-import { requestContactsPermission } from 'src/utils/androidPermissions'
+import { checkContactsPermission } from 'src/utils/androidPermissions'
 import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
@@ -36,7 +36,8 @@ export function* doImportContacts() {
   try {
     yield call(getConnectedAccount)
 
-    const result: boolean = yield call(requestContactsPermission)
+    const result: boolean = yield call(checkContactsPermission)
+
     if (!result) {
       return Logger.warn(TAG, 'Contact permissions denied. Skipping import.')
     }

@@ -1,4 +1,5 @@
 yarn
+yarn build
 cd packages/mobile/
 yarn test:build-e2e
 

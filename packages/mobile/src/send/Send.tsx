@@ -1,19 +1,16 @@
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import { throttle } from 'lodash'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
-import { NavigationInjectedProps, NavigationScreenProps, withNavigation } from 'react-navigation'
+import { NavigationInjectedProps, withNavigation } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import CancelButton from 'src/components/CancelButton'
-import { ALERT_BANNER_DURATION } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import { importContacts } from 'src/identity/actions'
 import { E164NumberToAddressType } from 'src/identity/reducer'
@@ -97,14 +94,6 @@ const mapDispatchToProps = {
 type FilterType = (searchQuery: string) => Recipient[]
 
 class Send extends React.Component<Props, State> {
-  static navigationOptions = ({ navigation }: NavigationScreenProps) => ({
-    headerTitle: navigation.getParam('title', ''),
-    headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
-    // This helps vertically center the title
-    headerRight: <View />,
-    headerLeft: <CancelButton eventName={CustomEventNames.send_select_cancel} />,
-  })
-
   throttledSearch: (searchQuery: string) => void
   allRecipientsFilter: FilterType
   recentRecipientsFilter: FilterType
@@ -132,8 +121,7 @@ class Send extends React.Component<Props, State> {
   }
 
   async componentDidMount() {
-    const { t, recentRecipients, allRecipients } = this.props
-    this.props.navigation.setParams({ title: t('send_or_request') })
+    const { recentRecipients, allRecipients } = this.props
 
     this.setState({
       loading: false,
@@ -143,6 +131,21 @@ class Send extends React.Component<Props, State> {
 
     const hasGivenPermission = await checkContactsPermission()
     this.setState({ hasGivenPermission })
+  }
+
+  componentDidUpdate(prevPops: Props) {
+    const { recentRecipients, allRecipients } = this.props
+
+    if (
+      recentRecipients !== prevPops.recentRecipients ||
+      allRecipients !== prevPops.allRecipients
+    ) {
+      this.setState({
+        loading: false,
+        recentFiltered: filterRecipients(recentRecipients, this.state.searchQuery, false),
+        allFiltered: filterRecipients(allRecipients, this.state.searchQuery, true),
+      })
+    }
   }
 
   onSearchQueryChanged = (searchQuery: string) => {
@@ -160,7 +163,7 @@ class Send extends React.Component<Props, State> {
     })
 
     if (!recipient.e164PhoneNumber && !recipient.address) {
-      this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE, ALERT_BANNER_DURATION)
+      this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE)
       return
     }
 
@@ -199,6 +202,7 @@ class Send extends React.Component<Props, State> {
 
     return (
       <View style={style.body}>
+        <Text style={[fontStyles.headerTitle, style.header]}>{t('send_or_request')}</Text>
         {loading ? (
           <View style={style.container}>
             <ActivityIndicator style={style.icon} size="large" color={colors.celoGreen} />
@@ -206,6 +210,7 @@ class Send extends React.Component<Props, State> {
           </View>
         ) : (
           <RecipientPicker
+            testID={'RecipientPicker'}
             sections={this.buildSections()}
             searchQuery={searchQuery}
             defaultCountryCode={defaultCountryCode}
@@ -225,6 +230,10 @@ const style = StyleSheet.create({
   body: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  header: {
+    textAlign: 'center',
+    marginVertical: 10,
   },
   container: {
     flex: 1,

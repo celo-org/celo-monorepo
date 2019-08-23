@@ -5,7 +5,6 @@ import DownloadIcon from '@celo/react-components/icons/Download'
 import ScanCodeIcon from '@celo/react-components/icons/ScanCode'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
@@ -13,8 +12,8 @@ import { StyleSheet, Text, View } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 import { connect } from 'react-redux'
 import { getUserContactDetails, UserContactDetails } from 'src/account/reducer'
-import BackButton from 'src/components/BackButton'
-import { Namespaces } from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -54,13 +53,10 @@ const mapDispatchToProps = {
 }
 
 class QRCodeDisplay extends React.Component<Props, State> {
-  static navigationOptions = {
-    headerTitle: 'QR Code',
-    headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
-    headerLeft: <BackButton />,
-    // This helps vertically center the title
-    headerRight: <View />,
-  }
+  static navigationOptions = () => ({
+    ...headerWithBackButton,
+    headerTitle: i18n.t('sendFlow7:QRCode'),
+  })
 
   state = {
     qrContent: '{}',
@@ -115,8 +111,8 @@ class QRCodeDisplay extends React.Component<Props, State> {
         <View style={style.buttonContainer}>
           <Button
             onPress={this.downloadImage}
-            text={t('saveCodeImage')}
-            accessibilityLabel={t('saveCodeImage')}
+            text={t('shareCodeImage')}
+            accessibilityLabel={t('shareCodeImage')}
             standard={true}
             type={BtnTypes.PRIMARY}
             disabled={false}
