@@ -41,6 +41,7 @@ describe('Testnet banner', () => {
           hideAlert={jest.fn()}
           importContacts={jest.fn()}
           loading={false}
+          appConnected={true}
           address={null}
           recipientCache={{}}
           activeNotificationCount={0}
