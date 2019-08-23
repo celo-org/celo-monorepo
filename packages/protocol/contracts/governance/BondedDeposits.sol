@@ -825,7 +825,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     uint256 value,
     uint256 availabilityTime
   )
-    private
+    internal /* TODO: SG: Was originally private, but could not call from harness. Changed to private. */
   {
     Deposit storage notified = account.deposits.notified[availabilityTime];
     require(value != notified.value);

@@ -24,4 +24,5 @@ interface IBondedDeposits {
   function getAccountFromVoter(address) external view returns (address);
   function getAccountFromValidator(address) external view returns (address);
   function getTotalWeight() external view returns (uint256); // SG: For specification
+  function getVoterFromAccount(address) external view returns (address); // SG: For specification
 }

@@ -14,7 +14,7 @@ rule account_empty_unless_created(method f, address account) {
 
 	env ePre;
 	bool _empty1 = (sinvoke _lenNoticePeriods(ePre,account) == 0) && (sinvoke _lenAvailabilityTimes(ePre,account) == 0);
-	bool _empty2 = (sinvoke _rewardsDelegate(ePre,account) == 0) && (sinvoke _rewardsLastRedeemed(ePre,account) == 0); // TODO: Add support for uint96
+	bool _empty2 = (sinvoke _rewardsDelegate(ePre,account) == 0) && (sinvoke _rewardsLastRedeemed(ePre,account) == 0);
 	bool _empty3 = (sinvoke _votingDelegate(ePre,account) == 0) && (sinvoke _votingFrozen(ePre,account) == false);
 	bool _empty4 = (sinvoke _validatingDelegate(ePre,account) == 0);
 	bool _empty5 = (sinvoke _weight(ePre,account) == 0);
@@ -25,11 +25,11 @@ rule account_empty_unless_created(method f, address account) {
 	
 	env eF; 
 	calldataarg arg; 
-	invoke f(eF,arg);
+	sinvoke f(eF,arg);
  
 	env ePost;
 	bool empty1_ = (sinvoke _lenNoticePeriods(ePost,account) == 0) && (sinvoke _lenAvailabilityTimes(ePost,account) == 0);
-	bool empty2_ = (sinvoke _rewardsDelegate(ePost,account) == 0) && (sinvoke _rewardsLastRedeemed(ePost,account) == 0); // TODO: Add support for uint96
+	bool empty2_ = (sinvoke _rewardsDelegate(ePost,account) == 0) && (sinvoke _rewardsLastRedeemed(ePost,account) == 0); 
 	bool empty3_ = (sinvoke _votingDelegate(ePost,account) == 0) && (sinvoke _votingFrozen(ePost,account) == false);
 	bool empty4_ = (sinvoke _validatingDelegate(ePost,account) == 0);
 	bool empty5_ = (sinvoke _weight(ePost,account) == 0);
@@ -58,24 +58,21 @@ rule address_cant_be_both_account_and_delegate(method f, address x) {
 	
 	require !(_isDelegate && _isAccount); // x cannot be both a delegate and an account
 	require _isDelegate <=> _delegatedBy == account; // x is a delegate of account iff x got a delegate role from account (see delegations_in_sync_and_exclusive)
-	// we require but do not check, the invariant that if x is a delegate, it is exclusive for one role
+	// we require but do not check here, the invariant that if x is a delegate, it is exclusive for one role
 	require _isDelegate => (_aRewardsDelegate == x => (_aVotingDelegate != x && _aValidatingDelegate != x)); 
 	require _isDelegate => (_aVotingDelegate == x => (_aRewardsDelegate != x && _aValidatingDelegate != x)); 
 	require _isDelegate => (_aValidatingDelegate == x => (_aVotingDelegate != x && _aRewardsDelegate != x)); 
 	
 	env eF; 
-	/* Missing: forall a1,a2. delegations(x)==a1 => x does not have a delegate role for a2 
-		We instantitate this invariant for eF.msg.sender
+	/* Missing: forall a1,a2. a1 != a2 => delegations(x)==a1 => x does not have a delegate role for a2 
+		We instantitate this invariant for a2=eF.msg.sender and a1=_delegatedBy
 	*/
-	require sinvoke _rewardsDelegate(ePre,eF.msg.sender) != x 
+	require _delegatedBy != eF.msg.sender => (sinvoke _rewardsDelegate(ePre,eF.msg.sender) != x 
 			&& sinvoke _votingDelegate(ePre,eF.msg.sender) != x 
-			&& sinvoke _validatingDelegate(ePre,eF.msg.sender) != x;
-	// TODO: Prove the above invariant
-	// TODO: Consider adding the requirement delegations[account.validating.delegate] == msg.sender to all delegate* functions
+			&& sinvoke _validatingDelegate(ePre,eF.msg.sender) != x);
 	
 	calldataarg arg; 
-	invoke f(eF,arg);
-
+	sinvoke f(eF,arg);
 
 	env ePost;
 	bool isAccount_ = sinvoke _exists(ePost,x); // x is an account if true
@@ -101,8 +98,9 @@ rule address_zero_cannot_become_an_account(method f) {
 	bool _isAccount = sinvoke _exists(ePre,account);
 	
 	env eF;
+	require eF.msg.sender != 0; // Assuming sender 0 will never, ever, be able to initiate a transaction.
 	calldataarg arg; 
-	invoke f(eF,arg);
+	sinvoke f(eF,arg);
 	
 	env ePost;
 	bool isAccount_ = sinvoke _exists(ePost,account);
@@ -111,7 +109,9 @@ rule address_zero_cannot_become_an_account(method f) {
 }
 
 rule delegations_in_sync_and_exclusive(method f, address delegatedTo) {
-	// TODO: What if delegatedTo is 0?
+	// delegatedTo assumed to be non zero
+	require delegatedTo != 0;
+	
 	env ePre;
 	address _delegatingAccount = sinvoke delegations(ePre,delegatedTo); // an account that delegates one of the roles to delegatedTo
 
@@ -133,7 +133,7 @@ rule delegations_in_sync_and_exclusive(method f, address delegatedTo) {
 			
 	env eF;
 	calldataarg arg;	
-	invoke f(eF,arg);
+	sinvoke f(eF,arg);
 	
 	env ePost;
 	address aRewardsDelegate_ = sinvoke _rewardsDelegate(ePre,_delegatingAccount);
@@ -155,7 +155,7 @@ rule delegations_in_sync_and_exclusive(method f, address delegatedTo) {
 	// otherwise, delegatedTo was removed as a delegation
 	assert delegatingAccount_ != _delegatingAccount => 
 			(!aRewardsDelegateTo_ && !aVotingDelegateTo_ && !aValidatingDelegateTo_),
-				"Delegated $delegatedTo before executing $f was removed as a delegate of ${_delegatingAccount}, therefore it cannot have a delegate role, although at least one of the roles stayed: rewards: ${aRewardsDelegateTo_}, voting: ${aVotingDelegateTo_}, validating: ${aValidatingDelegateTo_}";
+				"Delegated $delegatedTo before executing $f was removed as a delegate of ${_delegatingAccount}, therefore it cannot have a delegate role, although at least one of the roles remained: rewards: ${aRewardsDelegateTo_}, voting: ${aVotingDelegateTo_}, validating: ${aValidatingDelegateTo_}";
 	
 } 
 
@@ -167,7 +167,7 @@ rule delegations_can_be_removed_but_not_moved(method f, address delegatedTo)
 
 	env eF;
 	calldataarg arg;	
-	invoke f(eF,arg);
+	sinvoke f(eF,arg);
 	
 	env ePost;
 	address delegatingAccount_ = sinvoke delegations(ePre,delegatedTo); // an account that delegates one of the roles to delegatedTo
@@ -444,11 +444,9 @@ rule cant_rebond_non_notified(uint256 rebondValue, uint256 depositAvailabilityTi
 	
 	invoke rebond(eF, rebondValue, depositAvailabilityTime);
 	
-	// TODO: How exactly is a deposit non-notified? If its availabilityTime is not in the map? value < requirested value?
 	assert _someNotifiedValue < rebondValue => lastReverted, "Trying to rebond more deposits then there are notified ($rebondValue > ${_someNotifiedValue}), and did not revert rebond()";
 }
 
-// TODO: deleteElement should always be called with lastIndex == list.length-1 - check using assertion in the code and assert mode?
 
 rule withdrawing_removes_notified_deposit(uint256 someNoticePeriod) {
 	// Withdrawing should remove the notified deposit
@@ -466,8 +464,6 @@ rule withdrawing_removes_notified_deposit(uint256 someNoticePeriod) {
 	someNotifiedValue_, someNotifiedIndex_ = sinvoke getNotifiedDeposit(e_,a,matchingAvailabilityTime);
 	
 	assert withdrawSucceeded => (someNotifiedValue_ == 0 && someNotifiedIndex_ == 0), "Violated: withdraw succeeded but for deposit $someNoticePeriod with availability time $matchingAvailabilityTime we still have value: ${someNotifiedValue_} and index ${someBondedIndex_}";
-	
-	// TODO: What about bonded deposit? Already removed or added new one by that time?
 }
 
 rule withdraw_precond(uint256 someAvailabilityTime) {
@@ -533,13 +529,13 @@ rule notify_only_updates_the_expected_deposit_availability_time(uint256 someNoti
 	assert _someNotifiedIndex == someNotifiedIndex_ && _someNotifiedValue == someNotifiedValue_, "Invocation of notify with notice period $someNoticePeriod and matching availability time $matchingAvailabilityTime should not have updated any entry in notified deposit of $randomTime";
 }
 
+
 // Update bonded deposits rule(s) + Update notified deposits rule(s)
 /* 	Invariant 1:
 		forall i,np. (0 <= i && i < deposits.length) => (deposits[i] == np <=> (bonded[np].value != 0 && bonded[np].index == i))
 
 	Rule 2 - weights:
 		Changes account's weight and total weight by getDepositWeight(value=(value - bonded[np].value),np)
-		TODO: Note that we need to check if getDepositWeight is distributive. Write two rules for that
 	
 	Rule 3 - deletion:
 		If new value is 0, new index of np must be 0 too. (i.e. deleted from array and overwrite map's stored index).
@@ -583,7 +579,6 @@ rule check_update_bonded_deposit_inv1(address account, uint256 noticePeriod, uin
 	/* Invariant 1 assertion */
 	assert bondValue_ == 0 => bondIndex_ == 0, "Bonded map cannot store a zero valued bond unless the index is zero";
 	assert element_ == noticePeriod <=> (bondValue_ != 0 && bondIndex_ == index), "Violated invariant linking noticePeriods array and bonded map";
-	//TODO: Check that if index >= lenDeposits then index is 0? This should be in deletion rule
 }
 
 rule check_update_bonded_deposit_rule2_weights(address account, uint256 noticePeriod, uint256 value) {
@@ -720,7 +715,6 @@ rule check_update_notified_deposit_inv1(address account, uint256 availabilityTim
 	/* Invariant 1 assertion */
 	assert bondValue_ == 0 => bondIndex_ == 0, "Notified map cannot store a zero valued bond unless the index is zero";
 	assert element_ == availabilityTime <=> (bondValue_ != 0 && bondIndex_ == index), "Violated invariant linking availabilityTimes array and notified map";
-	//TODO: Check that if index >= lenAvailabilityTimes then index is 0? This should be in deletion rule
 }
 
 rule check_update_notified_deposit_rule2_weights(address account, uint256 availabilityTime, uint256 value) {
@@ -748,7 +742,7 @@ rule check_update_notified_deposit_rule2_weights(address account, uint256 availa
 	
 	uint actualValueChange = bondValue_ - _bondValue;
 	
-	uint256 weightOldBond = _bondValues; // sinvoke getDepositWeight(ePure,_bondValue,noticePeriod);
+	uint256 weightOldBond = _bondValue; // sinvoke getDepositWeight(ePure,_bondValue,noticePeriod);
 	uint256 weightNewBond = value; //sinvoke getDepositWeight(ePure,value,noticePeriod);
 	
 	assert actualValueChange == expectedValueChange, "Unexpected change in value of bond in chosen availability time";
@@ -825,8 +819,6 @@ rule check_update_notified_deposit_rule4(address account, uint256 availabilityTi
 	assert bondIndex_ == lenAvailabilityTimes_, "Expected new bond index to be length of the array, got mismatch";
 }
 
-
-// TODO: Sqrt sufficiently precise for [0..1000]?
 
 // initialization rules
 rule only_initializer_changes_initialized_field(method f) {
