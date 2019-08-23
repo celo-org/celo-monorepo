@@ -36,6 +36,7 @@ import { withDispatchAfterNavigate } from 'src/navigator/WithDispatchAfterNaviga
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
+import { isAppConnected } from 'src/redux/selectors'
 import { initializeSentryUserContext } from 'src/sentry/Sentry'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { resetStandbyTransactions } from 'src/transactions/actions'
@@ -49,6 +50,7 @@ interface StateProps {
   activeNotificationCount: number
   callToActNotification: boolean
   recipientCache: NumberToRecipient
+  appConnected: boolean
 }
 
 interface DispatchProps {
@@ -70,12 +72,12 @@ const mapStateToProps = (state: RootState): StateProps => ({
   activeNotificationCount: getActiveNotificationCount(state),
   callToActNotification: callToActNotificationSelector(state),
   recipientCache: recipientCacheSelector(state),
+  appConnected: isAppConnected(state),
 })
 
 const Header = () => {
   return (
     <>
-      <DisconnectBanner />
       <AccountInfo />
       <AccountOverview testID="AccountOverviewInHome" />
     </>
@@ -209,9 +211,15 @@ export class WalletHome extends React.Component<Props> {
           </BoxShadow>
         </Animated.View>
         <View style={[componentStyles.topBar, styles.head]}>
-          <Animated.Text style={[fontStyles.headerTitle, { opacity: this.headerOpacity }]}>
-            {t('wallet')}
-          </Animated.Text>
+          {this.props.appConnected ? (
+            <Animated.Text style={[fontStyles.headerTitle, { opacity: this.headerOpacity }]}>
+              {t('wallet')}
+            </Animated.Text>
+          ) : (
+            <View style={styles.banner}>
+              <DisconnectBanner />
+            </View>
+          )}
           <HeaderIcon />
         </View>
         <AnimatedSectionList
@@ -237,6 +245,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     position: 'relative',
   },
+  banner: { paddingVertical: 15 },
   containerFeed: {
     paddingBottom: 40,
   },
