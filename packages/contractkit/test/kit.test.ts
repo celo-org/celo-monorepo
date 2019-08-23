@@ -64,6 +64,14 @@ describe('ContractKit', () => {
         await kit.setGasCurrency(CeloContract.StableToken)
         expect(kit.registry.addressFor).toHaveBeenCalledWith(CeloContract.StableToken)
         expect(kit.defaultOptions.gasCurrency).toEqual(`${mockContractAddress}StableToken`)
+        jest.clearAllMocks()
+      })
+    })
+
+    describe('sendTransaction()', () => {
+      it('uses values from defaultOptions in a call to web3.eth.sendTransaction', () => {
+        const kit = newKit(testUrl)
+        const spy = jest.spyOn(kit.web3.eth, 'sendTransaction')
       })
     })
   })
