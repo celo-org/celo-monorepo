@@ -4,7 +4,14 @@ import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
 import { Address } from '../base'
 import { LockedGold } from '../generated/types/LockedGold'
-import { BaseWrapper, CeloTransactionObject, toBigNumber } from '../wrappers/BaseWrapper'
+import {
+  BaseWrapper,
+  CeloTransactionObject,
+  proxyCall,
+  proxySend,
+  toBigNumber,
+  wrapSend,
+} from '../wrappers/BaseWrapper'
 
 export interface VotingDetails {
   accountAddress: Address
@@ -33,16 +40,16 @@ enum Roles {
 }
 
 export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
-  notifyCommitment = this.proxySend(this.contract.methods.notifyCommitment)
-  createAccount = this.proxySend(this.contract.methods.createAccount)
-  withdrawCommitment = this.proxySend(this.contract.methods.withdrawCommitment)
-  redeemRewards = this.proxySend(this.contract.methods.redeemRewards)
-  newCommitment = this.proxySend(this.contract.methods.newCommitment)
-  extendCommitment = this.proxySend(this.contract.methods.extendCommitment)
-  isVoting = this.proxyCall(this.contract.methods.isVoting)
-  maxNoticePeriod = this.proxyCallAndTransform(this.contract.methods.maxNoticePeriod, toBigNumber)
+  notifyCommitment = proxySend(this.kit, this.contract.methods.notifyCommitment)
+  createAccount = proxySend(this.kit, this.contract.methods.createAccount)
+  withdrawCommitment = proxySend(this.kit, this.contract.methods.withdrawCommitment)
+  redeemRewards = proxySend(this.kit, this.contract.methods.redeemRewards)
+  newCommitment = proxySend(this.kit, this.contract.methods.newCommitment)
+  extendCommitment = proxySend(this.kit, this.contract.methods.extendCommitment)
+  isVoting = proxyCall(this.contract.methods.isVoting)
+  maxNoticePeriod = proxyCall(this.contract.methods.maxNoticePeriod, undefined, toBigNumber)
 
-  getAccountWeight = this.proxyCallAndTransform(this.contract.methods.getAccountWeight, toBigNumber)
+  getAccountWeight = proxyCall(this.contract.methods.getAccountWeight, undefined, toBigNumber)
 
   async getVotingDetails(accountOrVoterAddress: Address): Promise<VotingDetails> {
     const accountAddress = await this.contract.methods
@@ -104,7 +111,8 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   async delegateRewardsTx(account: string, delegate: string): Promise<CeloTransactionObject<void>> {
     const sig = await this.getParsedSignatureOfAddress(account, delegate)
 
-    return this.wrapSend(
+    return wrapSend(
+      this.kit,
       this.contract.methods.delegateRole(Roles.rewards, delegate, sig.v, sig.r, sig.s)
     )
   }

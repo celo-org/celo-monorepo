@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { Attestations } from '../generated/types/Attestations'
-import { BaseWrapper } from './BaseWrapper'
+import { BaseWrapper, proxySend } from './BaseWrapper'
 
 export interface AttestationStat {
   completed: number
@@ -8,7 +8,10 @@ export interface AttestationStat {
 }
 
 export class AttestationsWrapper extends BaseWrapper<Attestations> {
-  setAccountDataEncryptionKey = this.proxySend(this.contract.methods.setAccountDataEncryptionKey)
+  setAccountDataEncryptionKey = proxySend(
+    this.kit,
+    this.contract.methods.setAccountDataEncryptionKey
+  )
 
   async lookupPhoneNumbers(
     phoneNumberHashes: string[]

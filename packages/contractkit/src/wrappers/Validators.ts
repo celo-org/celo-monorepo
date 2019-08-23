@@ -3,7 +3,7 @@ import { zip } from '@celo/utils/lib/src/collections'
 import BigNumber from 'bignumber.js'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
-import { BaseWrapper, CeloTransactionObject } from './BaseWrapper'
+import { BaseWrapper, CeloTransactionObject, proxyCall, proxySend, wrapSend } from './BaseWrapper'
 
 export interface Validator {
   address: Address
@@ -28,12 +28,15 @@ export interface ValidatorGroupVote {
 }
 
 export class ValidatorsWrapper extends BaseWrapper<Validators> {
-  affiliate = this.proxySend(this.contract.methods.affiliate)
-  deaffiliate = this.proxySend(this.contract.methods.deaffiliate)
-  addMember = this.proxySend(this.contract.methods.addMember)
-  removeMember = this.proxySend(this.contract.methods.removeMember)
-  registerValidator = this.proxySend(this.contract.methods.registerValidator)
-  registerValidatorGroup = this.proxySend(this.contract.methods.registerValidatorGroup)
+  affiliate = proxySend(this.kit, this.contract.methods.affiliate)
+  deaffiliate = proxySend(this.kit, this.contract.methods.deaffiliate)
+  addMember = proxySend(this.kit, this.contract.methods.addMember)
+  removeMember = proxySend(this.kit, this.contract.methods.removeMember)
+  registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
+  registerValidatorGroup = proxySend(this.kit, this.contract.methods.registerValidatorGroup)
+  getVoteFrom: (validatorAddress: Address) => Promise<Address | null> = proxyCall(
+    this.contract.methods.voters
+  )
 
   async getRegisteredValidators(): Promise<Validator[]> {
     const vgAddresses = await this.contract.methods.getRegisteredValidators().call()
@@ -75,10 +78,6 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return r
   }
 
-  async getVoteFrom(validatorAddress: Address): Promise<Address | null> {
-    return this.contract.methods.voters(validatorAddress).call()
-  }
-
   async revokeVote(): Promise<CeloTransactionObject<boolean>> {
     if (this.kit.defaultAccount == null) {
       throw new Error(`missing from at new ValdidatorUtils()`)
@@ -97,7 +96,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       votingDetails.weight.negated()
     )
 
-    return this.wrapSend(this.contract.methods.revokeVote(lesser, greater))
+    return wrapSend(this.kit, this.contract.methods.revokeVote(lesser, greater))
   }
 
   async vote(validatorGroup: Address): Promise<CeloTransactionObject<boolean>> {
@@ -113,7 +112,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       votingDetails.weight
     )
 
-    return this.wrapSend(this.contract.methods.vote(validatorGroup, lesser, greater))
+    return wrapSend(this.kit, this.contract.methods.vote(validatorGroup, lesser, greater))
   }
 
   private async findLesserAndGreaterAfterVote(

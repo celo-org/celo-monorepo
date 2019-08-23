@@ -1,22 +1,18 @@
 import BigNumber from 'bignumber.js'
 import { Exchange } from '../generated/types/Exchange'
-import { BaseWrapper, toBigNumber } from './BaseWrapper'
+import { BaseWrapper, proxyCall, proxySend, toBigNumber } from './BaseWrapper'
 
 export class ExchangeWrapper extends BaseWrapper<Exchange> {
-  getBuyTokenAmount = this.proxyCallAndTransform(
-    this.contract.methods.getBuyTokenAmount,
-    toBigNumber
-  )
+  getBuyTokenAmount = proxyCall(this.contract.methods.getBuyTokenAmount, undefined, toBigNumber)
 
-  getSellTokenAmount = this.proxyCallAndTransform(
-    this.contract.methods.getSellTokenAmount,
-    toBigNumber
-  )
+  getSellTokenAmount = proxyCall(this.contract.methods.getSellTokenAmount, undefined, toBigNumber)
 
-  getBuyAndSellBuckets = this.proxyCallAndTransform(
+  getBuyAndSellBuckets = proxyCall(
     this.contract.methods.getBuyAndSellBuckets,
-    (callRes) => [toBigNumber(callRes[0]), toBigNumber(callRes[1])] as [BigNumber, BigNumber]
+    undefined,
+    (callRes: { 0: string; 1: string }) =>
+      [toBigNumber(callRes[0]), toBigNumber(callRes[1])] as [BigNumber, BigNumber]
   )
 
-  exchange = this.proxySend(this.contract.methods.exchange)
+  exchange = proxySend(this.kit, this.contract.methods.exchange)
 }
