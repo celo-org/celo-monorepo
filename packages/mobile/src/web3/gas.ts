@@ -5,7 +5,6 @@ import { call, put, select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ALERT_BANNER_DURATION } from 'src/config'
-import { GAS_PRICE_STALE_AFTER } from 'src/geth/consts'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
@@ -13,6 +12,7 @@ import { setGasPrice } from 'src/web3/actions'
 import { web3 } from 'src/web3/contracts'
 
 const TAG = 'web3/gas'
+const GAS_PRICE_STALE_AFTER = 150000 // 15 seconds
 
 export const gasPriceSelector = (state: RootState) => state.web3.gasPrice
 export const gasPriceLastUpdatedSelector = (state: RootState) => state.web3.gasPriceLastUpdated
@@ -29,7 +29,7 @@ export function* refreshGasPrice() {
       yield put(setGasPrice(gasPrice.toNumber()))
     }
   } catch (error) {
-    Logger.error(`${TAG}}/refreshGasPrice`, 'Could not fetch and update gas price.', error)
+    Logger.error(`${TAG}/refreshGasPrice`, 'Could not fetch and update gas price.', error)
     yield put(showError(ErrorMessages.GAS_PRICE_UPDATE_FAILED, ALERT_BANNER_DURATION))
   }
 }
@@ -39,9 +39,7 @@ export const fetchGasPrice = async (currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLL
   Logger.debug(
     TAG,
     'fetchGasPrice',
-    `Gas price fetched in ${currency} with value:`,
-    gasPrice.toString()
+    `Gas price fetched in ${currency} with value: ${gasPrice.toString()}`
   )
-
   return gasPrice
 }

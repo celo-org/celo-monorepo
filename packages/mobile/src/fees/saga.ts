@@ -1,4 +1,5 @@
 import { getStableTokenContract } from '@celo/walletkit'
+import BigNumber from 'bignumber.js'
 import { call, put, select, spawn, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -13,11 +14,11 @@ import { web3 } from 'src/web3/contracts'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'fees/saga'
+const feeCache = new Map<FeeType, BigNumber>()
 
 // TODO: skip fee update if it was calculated recently
 export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
   Logger.debug(`${TAG}/estimateFeeSaga`, `updating for ${feeType}`)
-
   try {
     const account = yield select(currentAccountSelector)
 

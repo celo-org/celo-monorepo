@@ -18,7 +18,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ALERT_BANNER_DURATION } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
-import { CURRENCY_ENUM, INVITE_REDEMPTION_GAS } from 'src/geth/consts'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import {
@@ -51,6 +51,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
 export const REDEEM_INVITE_TIMEOUT = 1 * 60 * 1000 // 1 minute
+export const INVITE_REDEMPTION_GAS = 100000000000000000
 
 const USE_REAL_FEE = false
 const INVITE_FEE = '0.2'
