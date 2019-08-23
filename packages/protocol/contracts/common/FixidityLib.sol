@@ -236,27 +236,6 @@ library FixidityLib2 {
   }
 
   /**
-   * @notice Converts to positive if negative.
-   * Due to int256 having one more negative number than positive numbers
-   * abs(minInt256) reverts.
-   * @dev
-   * Test abs(0) returns 0
-   * Test abs(fixed1()) returns -fixed1()
-   * Test abs(-fixed1()) returns fixed1()
-   * Test abs(newFixed(maxNewFixed())) returns maxNewFixed()*fixed1()
-   * Test abs(newFixed(minNewFixed())) returns -minNewFixed()*fixed1()
-   */
-  function abs(Fraction memory x) internal pure returns (Fraction memory) {
-    if (x.value >= 0) {
-      return x;
-    } else {
-      int256 result = -x.value;
-      require (result > 0);
-      return Fraction(result);
-    }
-  }
-
-  /**
    * @notice x+y. If any operator is higher than maxFixedAdd() it
    * might overflow.
    * In solidity maxInt256 + 1 = minInt256 and viceversa.
