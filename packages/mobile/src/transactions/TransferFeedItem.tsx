@@ -186,11 +186,20 @@ export class TransferFeedItem extends React.PureComponent<Props> {
       comment = null
     } else {
       const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
-      fullName = recipient ? recipient.displayName : t('unknown')
-      contactImage = recipient ? (
-        <ContactCircle address={address} size={avatarSize} />
-      ) : (
-        <Image source={unknownUserIcon} style={styles.image} />
+      if (recipient) {
+        fullName = recipient.displayName
+      } else if (type === TransactionTypes.RECEIVED) {
+        fullName = `${t('receivedFrom')} ${address.substring(0, 8)}`
+      } else if (type === TransactionTypes.SENT) {
+        fullName = `${t('sentTo')} ${address.substring(0, 8)}`
+      } else {
+        // Fallback to just using the type
+        fullName = _.capitalize(t(_.camelCase(type)))
+      }
+      contactImage = (
+        <ContactCircle address={address} size={avatarSize}>
+          {!recipient ? <Image source={unknownUserIcon} style={styles.image} /> : null}
+        </ContactCircle>
       )
     }
 
