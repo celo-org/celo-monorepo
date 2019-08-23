@@ -8,8 +8,10 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./Proposals.sol";
 import "./UsingBondedDeposits.sol";
 import "./interfaces/IGovernance.sol";
+import "./interfaces/IValidators.sol";
 import "../common/Initializable.sol";
 import "../common/UsingFixidity.sol";
+import "../common/UsingRegistry.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 
 
@@ -43,11 +45,6 @@ contract Governance is
     mapping(bytes4 => int256) functionThresholds;
   }
 
-  struct HotfixSig {
-    address approver;
-    address auditor;
-  }
-
   // All parameters are Fixidity fractions.
   // The baseline is updated as
   // max{floor, (1 - baselineUpdateFactor) * baseline + baselineUpdateFactor * participation}
@@ -62,11 +59,28 @@ contract Governance is
     int256 baselineQuorumFactor;
   }
 
+  struct HotfixVote {
+    bytes32 hash;
+    uint256 epoch;
+  }
+
+  struct HotfixTally {
+    uint256 voteCount;
+    uint256 totalVotes;
+    uint256 epoch;
+  }
+
+  struct HotfixRecord {
+    mapping(address => HotfixVote) whitelist;
+    mapping(bytes32 => HotfixTally) tally;
+    mapping(bytes32 => bool) completed;
+    Proposals.Proposal proposal;
+  }
+
   Proposals.StageDurations public stageDurations;
   uint256 public queueExpiry;
   uint256 public dequeueFrequency;
   address public approver;
-  address public auditor;
   uint256 public lastDequeue;
   uint256 public concurrentProposals;
   uint256 public proposalCount;
@@ -75,19 +89,14 @@ contract Governance is
   mapping(address => ContractConstitution) private constitution;
   mapping(uint256 => Proposals.Proposal) private proposals;
   mapping(address => Voter) public voters;
-  mapping(bytes32 => HotfixSig) private proposalWhitelist;
-  Proposals.Proposal private hotfixProposal;
   SortedLinkedList.List private queue;
   uint256[] public dequeued;
   uint256[] public emptyIndices;
   ParticipationParameters private participationParameters;
+  HotfixRecord private hotfixRecord;
 
   event ApproverSet(
     address approver
-  );
-
-  event AuditorSet(
-    address auditor
   );
 
   event ConcurrentProposalsSet(
@@ -185,14 +194,15 @@ contract Governance is
   );
 
   // TODO(brice): Uncomment when bytecode limit not a problem
-  // event ProposalWhitelisted(
-  //   bytes32 proposalHash,
-  //   address whitelister
+  // event HotfixWhitelisted(
+  //   address whitelister,
+  //   bytes32 hash,
+  //   uint256 epoch
   // );
 
   // TODO(brice): Uncomment when bytecode limit not a problem
   // event HotfixExecuted(
-  //   bytes32 proposalHash
+  //   bytes32 hash
   // );
 
   function() external payable {} // solhint-disable no-empty-blocks
@@ -201,7 +211,6 @@ contract Governance is
    * @notice Initializes critical variables.
    * @param registryAddress The address of the registry contract.
    * @param _approver The address that needs to approve proposals to move to the referendum stage.
-   * @param _auditor The address that needs to whitelist hotfixes.
    * @param _concurrentProposals The number of proposals to dequeue at once.
    * @param _minDeposit The minimum Celo Gold deposit needed to make a proposal.
    * @param _queueExpiry The number of seconds a proposal can stay in the queue before expiring.
@@ -222,7 +231,6 @@ contract Governance is
   function initialize(
     address registryAddress,
     address _approver,
-    address _auditor,
     uint256 _concurrentProposals,
     uint256 _minDeposit,
     uint256 _queueExpiry,
@@ -240,7 +248,6 @@ contract Governance is
   {
     require(
       _approver != address(0) &&
-      _auditor != address(0) &&
       _concurrentProposals != 0 &&
       _minDeposit != 0 &&
       _queueExpiry != 0 &&
@@ -256,7 +263,6 @@ contract Governance is
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     approver = _approver;
-    auditor = _auditor;
     concurrentProposals = _concurrentProposals;
     minDeposit = _minDeposit;
     queueExpiry = _queueExpiry;
@@ -280,17 +286,6 @@ contract Governance is
     require(_approver != address(0) && _approver != approver);
     approver = _approver;
     emit ApproverSet(_approver);
-  }
-
-  /**
-   * @notice Updates the address that has permission to whitelist hotfixes.
-   * @param _auditor The address that has permission to whitelist hotfixes.
-   */
-  function setAuditor(address _auditor) external onlyOwner {
-    // TODO(brice): Should the auditor be allowed to be set to the approver address?
-    require(_auditor != address(0) && _auditor != auditor);
-    auditor = _auditor;
-    emit AuditorSet(_auditor);
   }
 
   /**
@@ -648,20 +643,35 @@ contract Governance is
   }
 
   /**
-   * @notice Whitelists the hash of a proposal.
-   * @param proposalHash The hash of the proposal to be whitelisted.
-   * @dev Can only be called by the approver or auditor.
+   * @notice Whitelists the hash of a hotfix.
+   * @param hash The hash of the hotfix to be whitelisted.
    */
-  function whitelist(bytes32 proposalHash) external {
-    if (msg.sender == approver) {
-      proposalWhitelist[proposalHash].approver = approver;
-    } else if (msg.sender == auditor) {
-      proposalWhitelist[proposalHash].auditor = auditor;
-    } else {
-      require(false);
+  function whitelist(bytes32 hash) external {
+    // TODO(brice): use m-chrzan's magical validator indexing to check inclusion
+    IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
+    address[] memory validatorSet = validators.getValidators();
+    bool isValidator = false;
+    for (uint256 i = 0; i < validatorSet.length; i = i.add(1)) {
+      if (msg.sender == validatorSet[i]) {
+        isValidator = true;
+        break;
+      }
     }
-    // TODO(brice): Uncomment when bytecode limit not a problem
-    // emit ProposalWhitelisted(proposalHash, msg.sender);
+    require(isValidator);
+    // TODO(brice): get epoch number in a better way
+    uint256 epoch = block.number.div(30000);
+    if (epoch > hotfixRecord.tally[hash].epoch) {
+      hotfixRecord.tally[hash].voteCount = 0;
+    }
+    if (
+      hotfixRecord.whitelist[msg.sender].hash != hash ||
+      hotfixRecord.whitelist[msg.sender].epoch != epoch
+    ) {
+      hotfixRecord.whitelist[msg.sender] = HotfixVote(hash, validatorSet.length, epoch);
+      hotfixRecord.tally[hash].voteCount = hotfixRecord.tally[hash].voteCount.add(1);
+      // TODO(brice): Uncomment when bytecode limit not a problem
+      // emit HotfixWhitelisted(msg.sender, hash, epoch);
+    }
   }
 
   /**
@@ -681,17 +691,20 @@ contract Governance is
     external
     nonReentrant
   {
-    bytes32 proposalHash = keccak256(abi.encode(values, destinations, data, dataLengths));
+    // TODO(brice): get epoch number in a better way
+    uint256 epoch = block.number.div(30000);
+    bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths));
+    uint256 totalVotes = hotfixRecord.tally[hash].totalVotes;
     require(
-      proposalWhitelist[proposalHash].approver == approver &&
-      proposalWhitelist[proposalHash].auditor == auditor
+      hotfixRecord.tally[hash].epoch == epoch &&
+      hotfixRecord.tally[hash].voteCount >= totalVotes.sub(totalVotes.sub(1).div(3))
     );
-    hotfixProposal.make(values, destinations, data, dataLengths, msg.sender, 0);
-    hotfixProposal.execute();
+    hotfixRecord.proposal.make(values, destinations, data, dataLengths, msg.sender, 0);
+    hotfixRecord.proposal.execute();
     // TODO(brice): Uncomment when bytecode limit not a problem
-    // emit HotfixExecuted(proposalHash);
-    delete hotfixProposal;
-    delete proposalWhitelist[proposalHash];
+    // emit HotfixExecuted(hash);
+    hotfixRecord.completed[hash] = true;
+    delete hotfixRecord.proposal;
   }
 
   /**
