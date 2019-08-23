@@ -189,3 +189,7 @@ export function addCeloEnvMiddleware(argv: yargs.Argv) {
       .middleware([celoEnvMiddleware])
   )
 }
+
+export function isVmBased() {
+  return fetchEnv(envVar.VM_BASED) === 'true'
+}

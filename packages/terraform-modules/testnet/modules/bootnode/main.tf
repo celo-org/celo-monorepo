@@ -1,10 +1,14 @@
+locals {
+  name_prefix = "${var.celo_env}-bootnode"
+}
+
 resource "google_compute_address" "bootnode" {
-  name         = "${var.celo_env}-bootnode-address"
+  name         = "${local.name_prefix}-address"
   address_type = "EXTERNAL"
 }
 
 resource "google_compute_instance" "bootnode" {
-  name         = "${var.celo_env}-bootnode"
+  name         = local.name_prefix
   machine_type = "n1-standard-1"
 
   boot_disk {
