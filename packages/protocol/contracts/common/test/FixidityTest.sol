@@ -7,18 +7,18 @@ contract FixidityTest {
   using FixidityLib2 for FixidityLib2.Fraction;
 
   function add(uint256 a, uint256 b) external view returns (uint256) {
-    return FixidityLib2.wrapUint256(a).add(FixidityLib2.wrapUint256(b)).value;
+    return FixidityLib2.wrap(a).add(FixidityLib2.wrap(b)).unwrap();
   }
 
   function subtract(uint256 a, uint256 b) external view returns (uint256) {
-    return FixidityLib2.wrapUint256(a).subtract(FixidityLib2.wrapUint256(b)).value;
+    return FixidityLib2.wrap(a).subtract(FixidityLib2.wrap(b)).unwrap();
   }
 
   function multiply(uint256 a, uint256 b) external view returns (uint256) {
-    return FixidityLib2.wrapUint256(a).multiply(FixidityLib2.wrapUint256(b)).value;
+    return FixidityLib2.wrap(a).multiply(FixidityLib2.wrap(b)).unwrap();
   }
 
   function divide(uint256 a, uint256 b) external view returns (uint256) {
-    return FixidityLib2.wrapUint256(a).divide(FixidityLib2.wrapUint256(b)).value;
+    return FixidityLib2.wrap(a).divide(FixidityLib2.wrap(b)).unwrap();
   }
 }

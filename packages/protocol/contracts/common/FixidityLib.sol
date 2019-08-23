@@ -38,9 +38,12 @@ library FixidityLib2 {
     return Fraction(FIXED1_INT);
   }
 
-  function wrapUint256(uint256 x) internal view returns (Fraction memory) {
-    require(x <= uint256(maxUint256()));
+  function wrap(uint256 x) internal view returns (Fraction memory) {
     return Fraction(x);
+  }
+
+  function unwrap(Fraction memory x) internal view returns (uint256) {
+    return x.value;
   }
 
   /**
