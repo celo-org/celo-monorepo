@@ -49,7 +49,7 @@ describe('ContractKit', () => {
         const kit = newKit(testUrl)
 
         // To make sure it can set it to `undefined`, start with some other address
-        kit.defaultOptions.gasCurrency = mockContractAddress
+        kit.setGasCurrencyAddress(mockContractAddress)
 
         await kit.setGasCurrency(CeloContract.GoldToken)
         expect(kit.defaultOptions.gasCurrency).toBeUndefined()
@@ -68,10 +68,34 @@ describe('ContractKit', () => {
       })
     })
 
+    describe('setting the default account', () => {
+      it('sets the value in defaultOptions and for web3.eth', () => {
+        const kit = newKit(testUrl)
+        kit.defaultAccount = mockContractAddress
+
+        expect(kit.defaultOptions.from).toEqual(mockContractAddress)
+        expect(kit.web3.eth.defaultAccount).toEqual(mockContractAddress)
+      })
+    })
+
     describe('sendTransaction()', () => {
       it('uses values from defaultOptions in a call to web3.eth.sendTransaction', () => {
+        const gasCurrencyAddress = '0x0000000000000000000000000000000000004321'
         const kit = newKit(testUrl)
-        const spy = jest.spyOn(kit.web3.eth, 'sendTransaction')
+        const tx = {}
+
+        kit.defaultAccount = mockContractAddress
+        kit.setGasCurrencyAddress(gasCurrencyAddress)
+
+        const sendTransactionSpy = jest.spyOn(kit.web3.eth, 'sendTransaction')
+
+        kit.sendTransaction(tx)
+        expect(sendTransactionSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            from: mockContractAddress,
+            gasCurrency: gasCurrencyAddress,
+          })
+        )
       })
     })
   })

@@ -13,7 +13,7 @@ type MockMethod = (
 
 type SendMethod = (...params: any) => { on: (...params: any) => any }
 
-export const mockContractAddress = '0x000000000000000000000000000000000000FAKE'
+export const mockContractAddress = '0x0000000000000000000000000000000000001234'
 
 export function createMockContract(methods: { [methodName: string]: any }) {
   const contract: MockContract = {
