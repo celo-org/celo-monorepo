@@ -4441,6 +4441,13 @@
   resolved "https://registry.yarnpkg.com/@types/jest-diff/-/jest-diff-20.0.1.tgz#35cc15b9c4f30a18ef21852e255fdb02f6d59b89"
   integrity sha512-yALhelO3i0hqZwhjtcr6dYyaLoCHbAMshwtj6cGxTvHZAKXHsYGdff6E8EPw3xLKY0ELUTQ69Q1rQiJENnccMA==
 
+"@types/jest@^24.0.15":
+  version "24.0.18"
+  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-24.0.18.tgz#9c7858d450c59e2164a8a9df0905fc5091944498"
+  integrity sha512-jcDDXdjTcrQzdN06+TSVsPPqxvsZA/5QkYfIZlq1JMw7FdP5AZylbOc+6B/cuDurctRe+MziUMtQ3xQdrbjqyQ==
+  dependencies:
+    "@types/jest-diff" "*"
+
 "@types/jest@^24.0.17":
   version "24.0.17"
   resolved "https://registry.yarnpkg.com/@types/jest/-/jest-24.0.17.tgz#b66ea026efb746eb5db1356ee28518aaff7af416"
@@ -6159,10 +6166,10 @@ argv@^0.0.2:
   resolved "https://registry.yarnpkg.com/argv/-/argv-0.0.2.tgz#ecbd16f8949b157183711b1bda334f37840185ab"
   integrity sha1-7L0W+JSbFXGDcRsb2jNPN4QBhas=
 
-armlet@^2.6.0:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/armlet/-/armlet-2.6.0.tgz#6b58b5eea7674a802e13f6c19dc4fefbc2965ea7"
-  integrity sha512-VnMocgMGTfEZ6EEzD/EK+XYoqPi6Ot+EWdx+uoAG0eKTgThtE0IjY8MuRAcjGGqNohYDUKy+hAwS+L0z+wDdag==
+armlet@^2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/armlet/-/armlet-2.7.0.tgz#21c4f9884de17fd75785d8468a669c0f12b01370"
+  integrity sha512-+j89VqGIf/E9a6aBaJa1OG9AZ93OnlfBzZz76TegU40ELcHcKb5b05XU7a1xKJsikdt6Da/fRaYHQ36oyLLj9Q==
   dependencies:
     http-errors "^1.7.1"
     humanize-duration "^3.17.0"
@@ -10694,15 +10701,10 @@ deep-equal@~0.2.1:
   resolved "https://registry.yarnpkg.com/deep-equal/-/deep-equal-0.2.2.tgz#84b745896f34c684e98f2ce0e42abaf43bba017d"
   integrity sha1-hLdFiW80xoTpjyzg5Cq69Du6AX0=
 
-deep-extend@^0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/deep-extend/-/deep-extend-0.6.0.tgz#c4fa7c95404a17a9c3e8ca7e1537312b736330ac"
-  integrity sha512-LOHxIOaPYdHlJRtCQfDIVZtfw/ufM8+rVj649RIHzcm/vGwQRXFt6OPqIFWsm2XEMrNIEtWR64sY1LEKD2vAOA==
-
-deep-extend@~0.4.0:
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/deep-extend/-/deep-extend-0.4.2.tgz#48b699c27e334bf89f10892be432f6e4c7d34a7f"
-  integrity sha1-SLaZwn4zS/ifEIkr5DL25MfTSn8=
+deep-extend@^0.5.1, deep-extend@^0.6.0, deep-extend@~0.4.0:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/deep-extend/-/deep-extend-0.5.1.tgz#b894a9dd90d3023fbf1c55a394fb858eb2066f1f"
+  integrity sha512-N8vBdOa+DF7zkRrDCsaOXoCs/E2fJfx9B9MrKnnSiHNh4ws7eSys6YQE4KvT1cecKmOASYQBhbKjeuDD9lT81w==
 
 deep-is@~0.1.3:
   version "0.1.3"
@@ -12934,15 +12936,10 @@ extend-shallow@^3.0.0, extend-shallow@^3.0.2:
     assign-symbols "^1.0.0"
     is-extendable "^1.0.1"
 
-extend@3, extend@^3.0.2, extend@~3.0.2:
+extend@3, extend@^3.0.0, extend@^3.0.1, extend@^3.0.2, extend@~3.0.0, extend@~3.0.1, extend@~3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/extend/-/extend-3.0.2.tgz#f8b1136b4071fbd8eb140aff858b1019ec2915fa"
   integrity sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==
-
-extend@^3.0.0, extend@^3.0.1, extend@~3.0.0, extend@~3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/extend/-/extend-3.0.1.tgz#a755ea7bc1adfcc5a31ce7e762dbaadc5e636444"
-  integrity sha1-p1Xqe8Gt/MWjHOfnYtuq3F5jZEQ=
 
 external-editor@^2.0.4, external-editor@^2.1.0:
   version "2.2.0"
@@ -13489,21 +13486,7 @@ firebase-functions-test@^0.1.6:
     "@types/lodash" "^4.14.104"
     lodash "^4.17.5"
 
-firebase-functions@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/firebase-functions/-/firebase-functions-2.2.0.tgz#499d4703f97b15cd59420b0fb4f0e5e5014484cc"
-  integrity sha512-83rJvXreTH98q1XEEUZ4G9nFZ0sUVaqkxPC+v25L9FuXsWgAFpW7G28K0MJ9DBPNo/RaeNNw0zvZVtDw11CEbQ==
-  dependencies:
-    "@types/cors" "^2.8.1"
-    "@types/express" "^4.11.1"
-    "@types/jsonwebtoken" "^7.2.6"
-    "@types/lodash" "^4.14.34"
-    cors "^2.8.4"
-    express "^4.16.2"
-    jsonwebtoken "^8.2.1"
-    lodash "^4.6.1"
-
-firebase-functions@^2.2.2:
+firebase-functions@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/firebase-functions/-/firebase-functions-2.3.1.tgz#6ad741cb5f38f4ed1a679607ffdbec68fa11127f"
   integrity sha512-MPeuzGFLS63VqfGErgf+kbZinXE4SoK+jxXh1NBWrjYUjXlOJBKRmVNAFJoQB8wzCvOtBuDYjGcnBNz6sKXsfw==
@@ -17920,7 +17903,7 @@ js-tokens@^3.0.0, js-tokens@^3.0.2:
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
   integrity sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==
 
-js-yaml@3.12.0, js-yaml@^3.10.0, js-yaml@^3.12.0, js-yaml@^3.9.0:
+js-yaml@3.12.0, js-yaml@^3.10.0, js-yaml@^3.9.0:
   version "3.12.0"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.12.0.tgz#eaed656ec8344f10f527c6bfa1b6e2244de167d1"
   integrity sha512-PIt2cnwmPfL4hKNwqeiuz4bKfnzHTBv6HyVgjahA6mPLwPDzjDWrplJBMjHUFxku/N3FlmrbyPclad+I+4mJ3A==
@@ -17944,7 +17927,7 @@ js-yaml@3.x, js-yaml@^3.7.0:
     argparse "^1.0.7"
     esprima "^4.0.0"
 
-js-yaml@^3.13.0, js-yaml@^3.13.1:
+js-yaml@^3.12.0, js-yaml@^3.13.0, js-yaml@^3.13.1:
   version "3.13.1"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.13.1.tgz#aff151b30bfdfa8e49e05da22e7415e9dfa37847"
   integrity sha512-YfbcO7jXDdyj0DGxYVSlSeQNHbD7XPWvrVWeVUujrQEoZzWJIRrCPoyk6kL6IAjAG2IolMK4T0hNUe0HOUs5Jw==
@@ -19278,45 +19261,10 @@ lodash.without@~4.4.0:
   resolved "https://registry.yarnpkg.com/lodash.without/-/lodash.without-4.4.0.tgz#3cd4574a00b67bae373a94b748772640507b7aac"
   integrity sha1-PNRXSgC2e643OpS3SHcmQFB7eqw=
 
-lodash@4.17.10, lodash@^4.0.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.15.0, lodash@^4.17.10, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.6.1, lodash@^4.8.0, lodash@~4.17.4:
-  version "4.17.10"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
-  integrity sha512-UejweD1pDoXu+AD825lWwp4ZGtSwgnpZxb3JDViD7StjQz+Nb/6l093lx4OQ0foGWNRoc19mWy7BzL+UAK2iVg==
-
-lodash@4.17.11, lodash@4.x.x, lodash@=4.17.11, lodash@^4.16.4, lodash@^4.17.11:
-  version "4.17.11"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
-  integrity sha512-cQKh8igo5QUhZ7lg38DYWAxMvjSAKG0A8wGSVimP07SIUEK2UO+arSRKbRZWtelMtN5V0Hkwh5ryOto/SshYIg==
-
-lodash@4.17.4, lodash@=4.17.4:
-  version "4.17.4"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
-  integrity sha1-eCA6TRwyiuHYbcpkYONptX9AVa4=
-
-lodash@4.17.5:
-  version "4.17.5"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.5.tgz#99a92d65c0272debe8c96b6057bc8fbfa3bed511"
-  integrity sha512-svL3uiZf1RwhH+cWrfZn3A4+U58wbP0tGVTLQPbjplZxZ8ROD9VLuNgsRniTlLe7OlSqR79RUehXgpBW/s0IQw==
-
-lodash@^2.4.1:
-  version "2.4.2"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-2.4.2.tgz#fadd834b9683073da179b3eae6d9c0d15053f73e"
-  integrity sha1-+t2DS5aDBz2hebPq5tnA0VBT9z4=
-
-lodash@^3.10.1:
-  version "3.10.1"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
-  integrity sha1-W/Rejkm6QYnhfUgnid/RW9FAt7Y=
-
-lodash@^4.17.12, lodash@^4.17.13, lodash@^4.5.0, lodash@^4.6.0:
+lodash@4.17.10, lodash@4.17.11, lodash@4.17.15, lodash@4.17.4, lodash@4.17.5, lodash@4.x.x, lodash@=4.17.11, lodash@=4.17.4, lodash@^2.4.1, lodash@^3.10.1, lodash@^4.0.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.15.0, lodash@^4.16.4, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.12, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0, lodash@^4.5.0, lodash@^4.6.0, lodash@^4.6.1, lodash@^4.8.0, lodash@~4.17.4:
   version "4.17.15"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
-
-lodash@^4.17.14:
-  version "4.17.14"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.14.tgz#9ce487ae66c96254fe20b599f21b6816028078ba"
-  integrity sha512-mmKYbW3GLuJeX+iGP+Y7Gp1AiGHGbXHCOh/jZmrawMmsE7MS4znI3RL2FsjbqOyMayHInjOeykW7PEajUk1/xw==
 
 log-driver@1.2.7:
   version "1.2.7"
@@ -27215,6 +27163,20 @@ solc@^0.4.2:
     semver "^5.3.0"
     yargs "^4.7.1"
 
+solc@^0.5.8:
+  version "0.5.10"
+  resolved "https://registry.yarnpkg.com/solc/-/solc-0.5.10.tgz#e57d789b1028f3d35f7989e5134d6ddc0e3b32aa"
+  integrity sha512-Stdrh/MDkopsXYPRzPehTNYuV80Grr2CnQMuFvWj+EeRVbe3piGHxW47KebWn1sGdmK8FLaMfUehccqJP0KovQ==
+  dependencies:
+    command-exists "^1.2.8"
+    fs-extra "^0.30.0"
+    keccak "^1.0.2"
+    memorystream "^0.3.1"
+    require-from-string "^2.0.0"
+    semver "^5.5.0"
+    tmp "0.0.33"
+    yargs "^11.0.0"
+
 solhint@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/solhint/-/solhint-2.0.0.tgz#67aa3499d2427a3a6abe8600f4a920aa9720a83f"
@@ -28738,16 +28700,16 @@ triple-beam@^1.2.0, triple-beam@^1.3.0:
     glob "^6.0.4"
 
 truffle-artifactor@^3.0.7:
-  version "3.0.7"
-  resolved "https://registry.yarnpkg.com/truffle-artifactor/-/truffle-artifactor-3.0.7.tgz#c5dc0b35d0fa76eb5190db208fefbed1ce24d03d"
-  integrity sha1-xdwLNdD6dutRkNsgj+++0c4k0D0=
+  version "3.0.8"
+  resolved "https://registry.yarnpkg.com/truffle-artifactor/-/truffle-artifactor-3.0.8.tgz#7cae18265a7d3fdb8d35e2eaf0837fe561df563f"
+  integrity sha512-FlJp5qIyqrBkmuNOxhe/m4Bnj/QPMdkL6idSsY4qQhsKK94CcF1YVyd1odcxjUNo60gCHSKdbGiW4umCdfwD9g==
   dependencies:
     async "2.6.1"
     debug "^3.1.0"
     fs-extra "6.0.1"
     lodash "4.17.10"
-    truffle-contract "^3.0.6"
-    truffle-contract-schema "^2.0.1"
+    truffle-contract "^3.0.7"
+    truffle-contract-schema "^2.0.2"
     truffle-expect "^0.0.4"
 
 truffle-artifactor@^4.0.13:
@@ -28821,6 +28783,15 @@ truffle-contract-schema@^2.0.1:
     crypto-js "^3.1.9-1"
     debug "^3.1.0"
 
+truffle-contract-schema@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/truffle-contract-schema/-/truffle-contract-schema-2.0.2.tgz#9db59e3a5ea85b63dca453a2dba9897c2c3523fd"
+  integrity sha512-8mYAu0Y7wgMqcIa612dxiN9pzr6rq2YxZCzPizvqyDq+/rGWy8s0irl/T7i92a/4ME1V5ddNFf3+86uIlYbPUg==
+  dependencies:
+    ajv "^5.1.1"
+    crypto-js "^3.1.9-1"
+    debug "^3.1.0"
+
 truffle-contract-schema@^3.0.9:
   version "3.0.9"
   resolved "https://registry.yarnpkg.com/truffle-contract-schema/-/truffle-contract-schema-3.0.9.tgz#8dff0b254561194f64452cf9c6c9fefdd7d46fe4"
@@ -28846,6 +28817,17 @@ truffle-contract@^3.0.6:
     ethjs-abi "0.1.8"
     truffle-blockchain-utils "^0.0.5"
     truffle-contract-schema "^2.0.1"
+    truffle-error "^0.0.3"
+    web3 "0.20.6"
+
+truffle-contract@^3.0.7:
+  version "3.0.7"
+  resolved "https://registry.yarnpkg.com/truffle-contract/-/truffle-contract-3.0.7.tgz#487b2e1e9c5f01d223148766f6f320ba16bb4f63"
+  integrity sha512-av4MTJDP29PI3oVh8TrvRzRHt+nZJH8ODSiil/TfcXrKMSes52DTA5LHj00siLvcadkxUgoEZfEZ04qqhNGoiA==
+  dependencies:
+    ethjs-abi "0.1.8"
+    truffle-blockchain-utils "^0.0.5"
+    truffle-contract-schema "^2.0.2"
     truffle-error "^0.0.3"
     web3 "0.20.6"
 
@@ -28959,17 +28941,18 @@ truffle-resolver@^5.0.13:
     truffle-expect "^0.0.8"
     truffle-provisioner "^0.1.4"
 
-truffle-security@^1.3.7:
-  version "1.4.4"
-  resolved "https://registry.yarnpkg.com/truffle-security/-/truffle-security-1.4.4.tgz#2db43804855d2a0bc1afb1fdaf2f7fffd0dcbadd"
-  integrity sha512-jUBwLUfECXtw/7QUjKdasx/PqNkJekhrq0LzvakLv9pf4VoBYnHfKoPsTfyawiqRoLQlynDgCw//4Z8b+LOvlQ==
+truffle-security@^1.4.4:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/truffle-security/-/truffle-security-1.5.2.tgz#26969e08f55e6e4e05e92fc443c37e9798c5033a"
+  integrity sha512-qf+IPxrdi7VKLsVMjgZqM9fh/E5XbjdrL4pvSDuCy2cMFOnCLkWbiyeLuDrt2YFJL4pBxhaVf6g4gQq6Y3OvEQ==
   dependencies:
-    armlet "^2.6.0"
+    armlet "^2.7.0"
     configstore "^4.0.0"
     debug "^4.1.1"
     find-cache-dir "^2.1.0"
     inquirer "^6.2.2"
     js-yaml "^3.13.1"
+    lodash "^4.17.11"
     mkdirp "^0.5.1"
     mocha "^5.2.0"
     multi-progress "^2.0.0"
@@ -28977,6 +28960,7 @@ truffle-security@^1.3.7:
     remix-lib ">=0.4.1"
     scrypt "^6.0.3"
     sleep "^6.0.0"
+    solc "^0.5.8"
     tiny-async-pool "^1.0.4"
     truffle-artifactor "^4.0.13"
     truffle-compile-vyper "^1.0.13"
