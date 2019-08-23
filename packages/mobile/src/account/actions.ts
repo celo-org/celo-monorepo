@@ -3,7 +3,7 @@ import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION, SUPPORTS_KEYSTORE } from 'src/config'
+import { SUPPORTS_KEYSTORE } from 'src/config'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getPin as getPinCred, setPin as setPinCred } from 'src/pincode/PincodeViaAndroidKeystore'
@@ -177,7 +177,7 @@ export const setPin = (pin: string) => async (dispatch: DispatchType, getState: 
     Logger.info(TAG + '@setPin', 'pincode set')
     return true
   } else {
-    dispatch(showError(ErrorMessages.SET_PIN_FAILED, ALERT_BANNER_DURATION))
+    dispatch(showError(ErrorMessages.SET_PIN_FAILED))
     return false
   }
 }
