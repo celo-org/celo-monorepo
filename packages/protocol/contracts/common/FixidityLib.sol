@@ -38,6 +38,11 @@ library FixidityLib2 {
     return Fraction(FIXED1_INT);
   }
 
+  function wrapUint256(uint256 x) internal view returns (Fraction memory) {
+    require(x <= uint256(maxInt256()));
+    return Fraction(int256(x));
+  }
+
   /**
    * @notice The amount of decimals lost on each multiplication operand.
    * @dev Test mulPrecision() equals sqrt(fixed1)
