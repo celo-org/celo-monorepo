@@ -3,18 +3,17 @@ import { FixidityTestInstance } from 'types'
 import { toFixed, fixed1 } from '@celo/protocol/lib/fixidity'
 import BigNumber from 'bignumber.js'
 
-contract('FixidityLib', (accounts: string[]) => {
-  console.log(accounts)
+contract('FixidityLib', () => {
   const FixidityTest = artifacts.require('FixidityTest')
   let fixidityTest: FixidityTestInstance
 
   const maxFixedAdd = new BigNumber(
-    '28948022309329048855892746252171976963317496166410141009864396001978282409983'
-  )
-  const maxInt256 = new BigNumber(
     '57896044618658097711785492504343953926634992332820282019728792003956564819967'
   )
-  const maxFixedMul = new BigNumber('240615969168004511545033772477625056927114980741063')
+  const maxUint256 = new BigNumber(
+    '115792089237316195423570985008687907853269984665640564039457584007913129639935'
+  )
+  const maxFixedMul = new BigNumber('340282366920938463463374607431768211455999999999999')
 
   beforeEach(async () => {
     fixidityTest = await FixidityTest.new()
@@ -41,7 +40,7 @@ contract('FixidityLib', (accounts: string[]) => {
 
     it('should add two maxFixedAdd numbers', async () => {
       const result = await fixidityTest.add(maxFixedAdd, maxFixedAdd)
-      const expected = maxInt256.minus(1)
+      const expected = maxUint256.minus(1)
       assertEqualBN(result, expected)
     })
 
@@ -61,7 +60,7 @@ contract('FixidityLib', (accounts: string[]) => {
       assertEqualBN(result, expected)
     })
 
-    it.skip('should fail to subtract a larger number from a smaller one', async () => {
+    it('should fail to subtract a larger number from a smaller one', async () => {
       const a = toFixed(6)
       const b = toFixed(10)
 
@@ -99,7 +98,7 @@ contract('FixidityLib', (accounts: string[]) => {
 
     it('should fail to multiply numbers larger than maxFixedMul', async () => {
       const bigNumber = maxFixedMul.plus(1)
-      await assertRevert(fixidityTest.multiply(maxFixedMul, bigNumber))
+      await assertRevert(fixidityTest.multiply(bigNumber, bigNumber))
     })
   })
 
