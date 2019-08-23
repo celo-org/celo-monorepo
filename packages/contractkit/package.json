@@ -21,7 +21,7 @@
     "build:gen": "yarn --cwd ../protocol build",
     "prepublishOnly": "yarn build:gen && yarn build",
     "test:prepare": "yarn --cwd ../protocol devchain generate .devchain",
-    "test": "jest",
+    "test": "jest --runInBand",
     "lint": "tslint -c tslint.json --project . && tslint -c tslint.json --project test"
   },
   "dependencies": {
