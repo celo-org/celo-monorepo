@@ -270,7 +270,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   /**
-   * @notice Notifies a Locked Gold commitment, allowing funds to be withdrawn after the notice period.
+   * @notice Notifies a Locked Gold commitment, allowing funds to be withdrawn after the notice
+   *   period.
    * @param value The amount of the commitment to eventually withdraw.
    * @param noticePeriod The notice period of the Locked Gold commitment.
    * @return The account's new weight.
@@ -300,7 +301,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   /**
-   * @notice Rebonds a notified commitment, with notice period >= the remaining time to availability.
+   * @notice Rebonds a notified commitment, with notice period >= the remaining time to
+  *    availability.
    * @param value The amount of the commitment to rebond.
    * @param availabilityTime The availability time of the notified commitment.
    * @return The account's new weight.
