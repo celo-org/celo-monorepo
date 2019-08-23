@@ -1,4 +1,4 @@
-import { addCeloEnvMiddleware, CeloEnvArgv } from '@celo/celotool/src/lib/utils'
+import { addCeloEnvMiddleware, CeloEnvArgv } from '@celo/celotool/src/lib/env-utils'
 import * as fs from 'fs'
 import { CONTRACTS_TO_COPY, downloadArtifacts, getContractAddresses } from 'src/lib/artifacts'
 import * as yargs from 'yargs'

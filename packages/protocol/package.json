@@ -30,6 +30,9 @@
     "console": "./scripts/bash/console.sh",
     "invite": "./scripts/bash/invite.sh",
     "ganache-dev": "./scripts/bash/ganache.sh",
+    "pretruffle:migrate": "yarn build:ts",
+    "truffle:migrate": "truffle migrate",
+    "devchain": "ts-node scripts/devchain.ts",
     "weekly-faucet": "./scripts/bash/weekly_faucet.sh",
     "set-exchange-rate": "./scripts/bash/set_exchange_rate.sh",
     "network-check": "./scripts/bash/network_check.sh",
@@ -78,10 +81,11 @@
     "@types/nodemailer": "^4.6.5",
     "@types/underscore": "^1.8.8",
     "@types/web3": "^1.0.18",
+    "@types/yargs": "^13.0.2",
     "cross-env": "^5.1.6",
     "eth-gas-reporter": "^0.1.2",
     "nodemailer": "^4.6.8",
     "truffle-typings": "^1.0.6",
-    "typescript": "^3.3.3"
+    "yargs": "^14.0.0"
   }
 }
