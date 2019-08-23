@@ -8,8 +8,11 @@ it('renders correctly', () => {
     <Backup
       language={'en'}
       setBackupCompleted={jest.fn()}
+      setBackupDelayed={jest.fn()}
       enterBackupFlow={jest.fn()}
       exitBackupFlow={jest.fn()}
+      backupTooLate={true}
+      backupDelayed={false}
     />
   )
   expect(tree).toMatchSnapshot()
