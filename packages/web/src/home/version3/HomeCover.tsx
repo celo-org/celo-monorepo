@@ -37,7 +37,7 @@ class HomeCover extends React.PureComponent<Props> {
       <Responsive medium={styles.mediumCover}>
         <View style={styles.smallCover}>
           <View style={styles.animationBackground}>
-            <Responsive large={[styles.animationWrapper, { justifyContent: 'flex-start' }]}>
+            <Responsive large={[styles.animationWrapper, styles.animationWrapperLargeAug]}>
               <View style={styles.animationWrapper}>
                 <HomeAnimation onLoaded={this.onLoaded} onFinished={this.onFinished} />
               </View>
@@ -84,6 +84,9 @@ const styles = StyleSheet.create({
     maxWidth: MENU_MAX_WIDTH,
     justifyContent: 'center',
   },
+  animationWrapperLargeAug: {
+    justifyContent: 'flex-start',
+  },
   smallCover: {
     minHeight: 600,
     height: '100vh',
@@ -94,7 +97,6 @@ const styles = StyleSheet.create({
   },
   mediumCover: {
     height: '100vh',
-    minHeight: 800,
     flex: 1,
     justifyContent: 'flex-end',
     backgroundColor: colors.dark,
