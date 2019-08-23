@@ -20,16 +20,6 @@ class RecipientItem extends React.PureComponent<Props> {
     return recipientKind === RecipientKind.Address || recipientKind === RecipientKind.MobileNumber
   }
 
-  displayInitials = (recipientKind: RecipientKind) => {
-    if (recipientKind && recipientKind === RecipientKind.Address) {
-      return '0x'
-    }
-    if (recipientKind && recipientKind === RecipientKind.MobileNumber) {
-      return '#'
-    }
-    return null
-  }
-
   render() {
     const { recipient } = this.props
 
