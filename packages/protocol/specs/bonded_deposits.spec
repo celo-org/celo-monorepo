@@ -555,10 +555,11 @@ rule check_update_bonded_deposit_inv123(address account, uint256 noticePeriod) {
 	// forall np. bonded[np].value == 0 => bonded[np].index == 0
 	// forall np. bonded[np].value != 0 => deposits[bonded[np].index] == np [also implies index is in range of deposits array]
 	// [distinct] forall np1,np2. (np1 != np2 && bonded[np1].value != 0 && bonded[np2].value != 0) => bonded[np1].index != bonded[np2].index
+	// [distinct array] forall i1,i2. i1 != i2 => deposits[i1] != deposits[i2]
 	// universe includes parameters to updateBondedDeposit: 
 	// 	np universe is noticePeriod and arg_noticePeriod
 	// 	index universe is bonded[noticePeriod].index and bonded[arg_noticePeriod].index [if they do not exist, invariant 2 imply they are 0]
-	//		as well as _lenNoticePeriods-1 (case of deletion) TODO
+	//		as well as _lenNoticePeriods-1 (case of deletion) and 0 (if len is at least 1)
 	env _e;
 	env eF;
 	env e_;
@@ -586,18 +587,32 @@ rule check_update_bonded_deposit_inv123(address account, uint256 noticePeriod) {
 	uint256 _element = sinvoke getFromNoticePeriods(_e,account,_bondIndex);
 	uint256 _arg_element = sinvoke getFromNoticePeriods(_e,arg_account,_arg_bondIndex);
 	uint256 _last_element = sinvoke getFromNoticePeriods(_e,arg_account,_lenDeposits-1);
+	uint256 _zero_element = sinvoke getFromNoticePeriods(_e,arg_account,0);
 	
-	uint256 _last_bondValue; 
-	_last_bondValue, _ = sinvoke getBondedDeposit(_e,arg_account,_last_element);
+	uint256 _last_bondValue; uint256 _last_bondIndex; 
+	_last_bondValue, _last_bondIndex = sinvoke getBondedDeposit(_e,arg_account,_last_element);
 	require _last_bondValue != 0; // can't store 0's in the array (another invariant...)
+	require _last_bondIndex == _lenDeposits-1; // because it's the index from which we started
+	require _lenDeposits > 0 => _zero_element != 0; // can't store 0's in the array (another invariant...)
 	
-	require _bondValue == 0 <=> (_element != noticePeriod && _arg_element != noticePeriod && _last_element != noticePeriod); // partial instantiation?
+	require _bondValue == 0 <=> (_element != noticePeriod && _arg_element != noticePeriod && _last_element != noticePeriod && _zero_element != noticePeriod); // partial instantiation?
 	
 	// invariant 3 assumption
 	require _bondValue != 0 => _element == noticePeriod;
 	
 	// distinct assumption
-	require (_bondValue != 0 && _arg_bondValue != 0 && noticePeriod != arg_noticePeriod) => _bondIndex != _arg_bondIndex;
+		// for noticePeriod and arg_noticePeriod
+	require (_bondValue != 0 && _arg_bondValue != 0 && noticePeriod != arg_noticePeriod) => (_bondIndex != _arg_bondIndex && _element != _arg_element);
+		// for noticePeriod and _lenDeposits-1 element (_last_bondIndex)
+	require (_bondValue != 0 && _last_bondValue != 0 && noticePeriod != _last_bondIndex) => (_bondIndex != _last_bondIndex && _element != _last_element);	
+		// for noticePeriod and _zero_element (if exists)
+	require (_lenDeposits > 0) => ((_bondValue != 0 && noticePeriod != _zero_element) => (_bondIndex != 0 && _element != _zero_element)	);
+	
+	// distinct assumption for array
+		// zero and noticePeriod's index
+	if (_bondValue > 0 && _lenDeposits > 0) {
+		require _bondIndex != 0 => noticePeriod != _zero_element;
+	}
 	
 	sinvoke ext_updateBondedDeposit(eF,arg_account,arg_value,arg_noticePeriod);
 		
@@ -610,7 +625,7 @@ rule check_update_bonded_deposit_inv123(address account, uint256 noticePeriod) {
 	uint256 arg_bondValue_; uint256 arg_bondIndex_;
 	arg_bondValue_, arg_bondIndex_ = sinvoke getBondedDeposit(e_,arg_account,arg_noticePeriod);
 	
-	
+	// these are valid only if the value is non zero
 	uint256 element_ = sinvoke getFromNoticePeriods(e_,account,bondIndex_);
 	uint256 arg_element_ = sinvoke getFromNoticePeriods(e_,arg_account,arg_bondIndex_);
 	
@@ -620,7 +635,7 @@ rule check_update_bonded_deposit_inv123(address account, uint256 noticePeriod) {
 	assert bondValue_ != 0 => element_ == noticePeriod, "Violated invariant linking noticePeriods array and bonded map";
 	// invariant 1 assertion - suspect it's only partially stated here - e.g. for _lenDeposits-1 but also "any i"
 	assert bondValue_ == 0 <=> (element_ != noticePeriod && arg_element_ != noticePeriod), "If value is zero, no element in the array contains the key";
-	// distinct assertion
+	// distinct assertion (partial for maps, and not including array distinct assertion)
 	assert (bondValue_ != 0 && arg_bondValue_ != 0 && noticePeriod != arg_noticePeriod) => bondIndex_ != arg_bondIndex_, "Indices for existing distinct keys must be distinct";
 }
 
@@ -728,16 +743,16 @@ rule check_update_bonded_deposit_rule4(address account, uint256 noticePeriod, ui
 }
 
 // update notified deposit
-// TODO: Make sure it's the same structure as for bonded
 rule check_update_notified_deposit_inv123(address account, uint256 availabilityTime) {
 	// forall np. bonded[np].value == 0 <=> (forall i. (0 <= i < deposits.length) => deposits[i] != np)
 	// forall np. bonded[np].value == 0 => bonded[np].index == 0
 	// forall np. bonded[np].value != 0 => deposits[bonded[np].index] == np [also implies index is in range of deposits array]
 	// [distinct] forall np1,np2. (np1 != np2 && bonded[np1].value != 0 && bonded[np2].value != 0) => bonded[np1].index != bonded[np2].index
+	// [distinct array] forall i1,i2. i1 != i2 => deposits[i1] != deposits[i2]
 	// universe includes parameters to updateBondedDeposit: 
-	// 	np universe is noticePeriod and arg_noticePeriod
-	// 	index universe is bonded[noticePeriod].index and bonded[arg_noticePeriod].index [if they do not exist, invariant 2 imply they are 0]
-	//		as well as _lenNoticePeriods-1 (case of deletion) TODO
+	// 	np universe is availabilityTime and arg_availabilityTime
+	// 	index universe is bonded[availabilityTime].index and bonded[arg_availabilityTime].index [if they do not exist, invariant 2 imply they are 0]
+	//		as well as _lenAvailabilityTimes-1 (case of deletion) and 0 (if len is at least 1)
 	env _e;
 	env eF;
 	env e_;
@@ -745,7 +760,7 @@ rule check_update_notified_deposit_inv123(address account, uint256 availabilityT
 	address arg_account; uint256 arg_value; uint256 arg_availabilityTime;
 	require arg_account == account; // simplification of quantifiers - not quantifying on account
 	
-	uint256 _lengthAvailabilityTimes = sinvoke _lenAvailabilityTimes(_e,account);
+	uint256 _lenArray = sinvoke _lenAvailabilityTimes(_e,account);
 	
 	uint256 _bondValue; uint256 _bondIndex;
 	_bondValue,_bondIndex = sinvoke getNotifiedDeposit(_e,account,availabilityTime);
@@ -758,26 +773,44 @@ rule check_update_notified_deposit_inv123(address account, uint256 availabilityT
 	require _bondValue == 0 => _bondIndex == 0;
 	
 	// this is OK by invariant 2:
-	require (0 <= _bondIndex && _bondIndex < _lengthAvailabilityTimes);
-	require (0 <= _arg_bondIndex && _arg_bondIndex < _lengthAvailabilityTimes);
+	require (0 <= _bondIndex && _bondIndex < _lenArray);
+	require (0 <= _arg_bondIndex && _arg_bondIndex < _lenArray);
 	
 	// invariant 1 assumption: depends on which indices are actually in the universe:
 	uint256 _element = sinvoke getFromAvailabilityTimes(_e,account,_bondIndex);
 	uint256 _arg_element = sinvoke getFromAvailabilityTimes(_e,arg_account,_arg_bondIndex);
-	uint256 _last_element = sinvoke getFromAvailabilityTimes(_e,arg_account,_lengthAvailabilityTimes-1);
+	uint256 _last_element = sinvoke getFromAvailabilityTimes(_e,arg_account,_lenArray-1);
+	uint256 _zero_element = sinvoke getFromAvailabilityTimes(_e,arg_account,0);
 	
-	require _bondValue == 0 <=> (_element != availabilityTime && _arg_element != availabilityTime && _last_element != availabilityTime); // partial instantiation?
+	uint256 _last_bondValue; uint256 _last_bondIndex; 
+	_last_bondValue, _last_bondIndex = sinvoke getNotifiedDeposit(_e,arg_account,_last_element);
+	require _last_bondValue != 0; // can't store 0's in the array (another invariant...)
+	require _last_bondIndex == _lenArray-1; // because it's the index from which we started
+	require _lenArray > 0 => _zero_element != 0; // can't store 0's in the array (another invariant...)
+	
+	require _bondValue == 0 <=> (_element != availabilityTime && _arg_element != availabilityTime && _last_element != availabilityTime && _zero_element != availabilityTime); // partial instantiation?
 	
 	// invariant 3 assumption
 	require _bondValue != 0 => _element == availabilityTime;
 	
 	// distinct assumption
-	require (_bondValue != 0 && _arg_bondValue != 0 && availabilityTime != arg_availabilityTime) => _bondIndex != _arg_bondIndex;
+		// for availabilityTime and arg_availabilityTime
+	require (_bondValue != 0 && _arg_bondValue != 0 && availabilityTime != arg_availabilityTime) => (_bondIndex != _arg_bondIndex && _element != _arg_element);
+		// for availabilityTime and _lenArray-1 element (_last_bondIndex)
+	require (_bondValue != 0 && _last_bondValue != 0 && availabilityTime != _last_bondIndex) => (_bondIndex != _last_bondIndex && _element != _last_element);	
+		// for availabilityTime and _zero_element (if exists)
+	require (_lenArray > 0) => ((_bondValue != 0 && availabilityTime != _zero_element) => (_bondIndex != 0 && _element != _zero_element)	);
+	
+	// distinct assumption for array
+		// zero and availabilityTime's index
+	if (_bondValue > 0 && _lenArray > 0) {
+		require _bondIndex != 0 => availabilityTime != _zero_element;
+	}
 	
 	sinvoke ext_updateNotifiedDeposit(eF,arg_account,arg_value,arg_availabilityTime);
 		
 	// starting assertions
-	uint256 lengthAvailabilityTimes_ = sinvoke _lenAvailabilityTimes(e_,account);
+	uint256 lenArray_ = sinvoke _lenAvailabilityTimes(e_,account);
 	
 	uint256 bondValue_; uint256 bondIndex_;
 	bondValue_,bondIndex_ = sinvoke getNotifiedDeposit(e_,account,availabilityTime);
@@ -785,7 +818,7 @@ rule check_update_notified_deposit_inv123(address account, uint256 availabilityT
 	uint256 arg_bondValue_; uint256 arg_bondIndex_;
 	arg_bondValue_, arg_bondIndex_ = sinvoke getNotifiedDeposit(e_,arg_account,arg_availabilityTime);
 	
-	
+	// these are valid only if the value is non zero
 	uint256 element_ = sinvoke getFromAvailabilityTimes(e_,account,bondIndex_);
 	uint256 arg_element_ = sinvoke getFromAvailabilityTimes(e_,arg_account,arg_bondIndex_);
 	
@@ -793,9 +826,9 @@ rule check_update_notified_deposit_inv123(address account, uint256 availabilityT
 	assert bondValue_ == 0 => bondIndex_ == 0, "Bonded map cannot store a zero valued bond unless the index is zero";
 	// invariant 3 assertion
 	assert bondValue_ != 0 => element_ == availabilityTime, "Violated invariant linking availabilityTimes array and bonded map";
-	// invariant 1 assertion - suspect it's only partially stated here - e.g. for _lenDeposits-1 but also "any i"
+	// invariant 1 assertion - suspect it's only partially stated here - e.g. for _lenArray-1 but also "any i"
 	assert bondValue_ == 0 <=> (element_ != availabilityTime && arg_element_ != availabilityTime), "If value is zero, no element in the array contains the key";
-	// distinct assertion
+	// distinct assertion (partial for maps, and not including array distinct assertion)
 	assert (bondValue_ != 0 && arg_bondValue_ != 0 && availabilityTime != arg_availabilityTime) => bondIndex_ != arg_bondIndex_, "Indices for existing distinct keys must be distinct";
 }
 
