@@ -799,7 +799,7 @@ rule sortedness_remove(uint256 i, uint256 j)
 	assert valI_ <= valJ_, "Not sorted";
 }
 
-rule remove_nullifies_value_and_removes(uint key) {
+rule remove_nullifies_value_and_removes(uint256 key) {
 	env _e;
 	env eF;
 	env e_;
@@ -813,8 +813,9 @@ rule remove_nullifies_value_and_removes(uint key) {
 	uint256 _lesserKey = sinvoke getElementLesser(_e, key);
 	uint256 _greaterKey = sinvoke getElementGreater(_e, key);
 	
-	require sinvoke contains(_e,_lesserKey); // invariant
-	require sinvoke contains(_e,_greaterKey); // invariant
+	require !sinvoke contains(_e,0); // invariant
+	require _lesserKey == 0 || sinvoke contains(_e,_lesserKey); // invariant
+	require _greaterKey == 0 || sinvoke contains(_e,_greaterKey); // invariant
 	
 	uint256 _greaterOfLesserKey = sinvoke getElementGreater(_e,_lesserKey);
 	uint256 _lesserOfGreaterKey = sinvoke getElementLesser(_e,_greaterKey);
@@ -831,18 +832,18 @@ rule remove_nullifies_value_and_removes(uint key) {
 	
 	assert !sinvoke contains(e_,key), "Key not removed";
 	assert sinvoke getValue(e_,key) == 0, "Value of removed key not nullified";
-	assert sinvoke getElementGreater(e_,_lesserKey) == _greaterKey, "Lesser key of removed key should now point to greater as next";
-	assert sinvoke getElementLesser(ePre,_greaterKey) == _lesserKey, "Greater key of removed key should now point to lesser as prev";
-	assert _lesserOfLesserKey == lesserOfLesserKey_, "Lesser key of lesser key has unexpectedly changed";
-	assert _greaterOfGreaterKey == greaterOfGreaterKey_, "Lesser key of lesser key has unexpectedly changed";
+	assert _lesserKey != 0 => sinvoke getElementGreater(e_,_lesserKey) == _greaterKey, "Lesser key of removed key should now point to greater as next";
+	assert _greaterKey != 0 => sinvoke getElementLesser(e_,_greaterKey) == _lesserKey, "Greater key of removed key should now point to lesser as prev";
+	assert _lesserKey != 0 => _lesserOfLesserKey == lesserOfLesserKey_, "Lesser key of lesser key has unexpectedly changed";
+	assert _greaterKey != 0 => _greaterOfGreaterKey == greaterOfGreaterKey_, "Lesser key of lesser key has unexpectedly changed";
 }
 
-rule remove_preconditions(uint key) {
+rule remove_preconditions(uint256 key) {
 	env _e;
 	env eF;
 	env e_;
 	
-	bool _keyIn = contains(_e,key);
+	bool _keyIn = sinvoke contains(_e,key);
 	
 	invoke remove(eF,key);
 	bool removeSucceeded = !lastReverted;
@@ -867,7 +868,7 @@ rule sortedness_update(uint256 i, uint256 j)
 	require valI <= valJ;
 	
 	uint256 arg1; uint256 arg2; uint256 arg3; uint256 arg4;
-	require (arg1 != i && arg1 != j || (valI <= arg2 && arg2 <= valJ); // new value does not break the order - either updating a different element, or new value still maintains original order
+	require (arg1 != i && arg1 != j) || (valI <= arg2 && arg2 <= valJ); // new value does not break the order - either updating a different element, or new value still maintains original order
 	invoke update(eF, arg1, arg2, arg3, arg4);
 	
 	uint256 valI_ = sinvoke getValue(ePost,i);

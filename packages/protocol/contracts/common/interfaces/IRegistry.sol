@@ -7,4 +7,7 @@ interface IRegistry {
   function setAddressFor(string calldata, address) external;
   function getAddressForOrDie(string calldata) external view returns (address);
   function getAddressFor(string calldata) external view returns (address);
+  
+  // SG: Instrumentation
+  function isValidating(address account) external view returns (bool);
 }

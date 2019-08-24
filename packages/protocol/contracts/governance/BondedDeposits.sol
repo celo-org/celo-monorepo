@@ -25,13 +25,13 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
 		require (x < 2**128);
 		y = uint128(x);
 	}
-	
-	function add128(uint128 x, uint128 y) private pure returns (uint128 z) {
+		
+	function add128(uint256 x, uint256 y) private pure returns (uint128 z) {
 		uint256 xy = uint256(x).add(uint256(y));
 		z = safeCast128(xy);
 	}
-	
-	function sub128(uint128 x, uint128 y) private pure returns (uint128 z) {
+		
+	function sub128(uint256 x, uint256 y) private pure returns (uint128 z) {
 		uint256 xy = uint256(x).sub(uint256(y));
 		z = safeCast128(xy);
 	}
@@ -425,12 +425,12 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     Account storage account = accounts[msg.sender];
     Deposit storage bonded = account.deposits.bonded[noticePeriod];
     require(bonded.value >= value && value > 0);
-    updateBondedDeposit(account, add128(bonded.value,safeCast128(value)), noticePeriod);
+    updateBondedDeposit(account, sub128(bonded.value,value), noticePeriod); // SG: Stack depth error if applying safeCast128
 
     // solhint-disable-next-line not-rely-on-time
     uint256 availabilityTime = now.add(noticePeriod);
     Deposit storage notified = account.deposits.notified[availabilityTime];
-    updateNotifiedDeposit(account, uint256(notified.value).add(value), availabilityTime);
+    updateNotifiedDeposit(account, add128(notified.value,value), availabilityTime); // SG: Stack depth error if applying safeCast128
 
     emit DepositNotified(msg.sender, value, noticePeriod, availabilityTime);
     return account.weight;
@@ -458,7 +458,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     Account storage account = accounts[msg.sender];
     Deposit storage notified = account.deposits.notified[availabilityTime];
     require(notified.value >= value && value > 0);
-    updateNotifiedDeposit(account, uint256(notified.value).sub(value), availabilityTime);
+    updateNotifiedDeposit(account, sub128(notified.value,uint128(value)), availabilityTime); // SG: Stack depth error if applying safeCast128
     // solhint-disable-next-line not-rely-on-time
     uint256 noticePeriod = availabilityTime.sub(now);
     Deposit storage bonded = account.deposits.bonded[noticePeriod];
@@ -519,7 +519,7 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     Account storage account = accounts[msg.sender];
     Deposit storage bonded = account.deposits.bonded[noticePeriod];
     require(bonded.value >= value);
-    updateBondedDeposit(account, uint256(bonded.value).sub(value), noticePeriod);
+    updateBondedDeposit(account, sub128(bonded.value,safeCast128(value)), noticePeriod);
     uint256 increasedNoticePeriod = noticePeriod.add(increase);
     uint256 increasedValue = account.deposits.bonded[increasedNoticePeriod].value;
     updateBondedDeposit(account, add128(safeCast128(increasedValue),safeCast128(value)), increasedNoticePeriod);

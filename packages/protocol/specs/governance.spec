@@ -43,7 +43,7 @@ rule no_double_upvote(uint256 p, address u) {
 	assert _usersUpvotedProposal == p => upvotes_ <= _upvotes, "Upvotes increased from ${_upvotes} to ${upvotes_} even though upvoted by user $u who already upvoted $p";
 }
 
-
+/*
 rule proposal_id_is_never_zero(method f, uint256 p) {
 	// Proposal ID cannot be zero -- i.e., if p did not exist and after f it does, then it cannot be that p==0
 	env _e;
@@ -59,8 +59,8 @@ rule proposal_id_is_never_zero(method f, uint256 p) {
 	
 	assert (!_exists && exists_) => p != 0, "If after executing the method a new proposal was added, then it cannot be zero";
 	
-	// TODO: This does not work since timestamp (evidence for existence) is updated in dequeue. So we need to assert that when proposing, timestamp is non zero, which we did, and that can dequeue only non zero - but that's true because we can't add spurious elements to the list (will check which methods can increase queue size).
-}
+	// This does not work since timestamp (evidence for existence) is updated in dequeue. So we need to assert that when proposing, timestamp is non zero, which we did, and that can dequeue only non zero - but that's true because we can't add spurious elements to the list (will check which methods can increase queue size).
+}*/
 
 rule can_add_to_queue(method f) {
 	env _e;
@@ -239,7 +239,6 @@ rule sum_of_votes_cannot_exceed_total_weight(method f, uint256 p) {
 // TODO: Can a voting user provide weight to multiple proposals?
 
 rule cant_unvote(uint256 deqIndex, uint256 voteValue) {	
-	// If I delegated voting, can I vote? Probably not
 	env e;
 	env eF;
 	
@@ -258,13 +257,15 @@ rule cant_unvote(uint256 deqIndex, uint256 voteValue) {
 }
 
 rule cant_vote_twice_with_delegate(uint256 deqIndex, uint256 voteValue) {	
-	// If I delegated voting, can I vote? Probably not
+	// If I delegated voting, can I vote? Answer should be no
 	env e;
 	env eF;
 	
 	uint256 NONE = sinvoke getNoneVoteEnum(e);
 	// get the voting delegate
 	address voterDelegate = sinvoke _getVoterFromAccount(e,eF.msg.sender);
+	
+	require eF.msg.sender != voterDelegate; // account delegates to someone else
 	
 	// check if voted
 	uint256 p;
@@ -376,25 +377,6 @@ rule approved_proposals_invariants(method f, uint256 p) {
 	
 	assert isApprovedProposal_ => doesProposalExist_, "An approved proposal must exist";
 	assert _isApprovedProposal => isApprovedProposal_, "An approved proposal cannot be disproved";
-}
-
-rule proposal_timestamp_invariants(method f, uint256 p) {
-// TODO: Seems to be wrong since after dequeue the timestamp grows to now
-	env _e;
-	env eF;
-	env e_;
-	
-	uint256 _proposalTimestamp;
-	_,_, _proposalTimestamp, _ = sinvoke getProposal(_e,p);
-		
-	require _proposalTimestamp == p || _proposalTimestamp == 0;	
-	calldataarg arg;
-	sinvoke f(eF,arg);
-	
-	uint256 proposalTimestamp_;
-	_,_, proposalTimestamp_, _ = sinvoke getProposal(e_,p);
-	
-	assert proposalTimestamp_ == p || proposalTimestamp_ == 0, "The timestamp of a proposal is either its ID ${p} or 0, but got ${proposalTimestamp_}";
 }
 
 

@@ -34,6 +34,7 @@ contract RegistryHarness {
 			whoami = iamSpartacus; // random! irrelevant!
 		}
 		
+		// Need to statically reason that registry always returns itself now. In particular if can call state-modifying code through the registry (goldToken?).
 		return address(this);
 	}
 
@@ -50,7 +51,7 @@ contract RegistryHarness {
 	mapping (uint => uint256) randomUInt256Map;
 	
 	
-	function isValidating(address account) public returns (bool) {
+	function isValidating(address account) external view returns (bool) {
 		if (whoami == iamValidators) {
 			return validators_validating[account];
 		}

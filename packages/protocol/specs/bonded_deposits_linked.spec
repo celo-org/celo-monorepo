@@ -26,9 +26,9 @@ rule no_vote_delegation_when_voting {
 	assert _isAccountVoting => !succeededDelegate, "Account successfully delegated voting even though it is already a voter";
 } 
 
-rule no_weight_changing_when_voting(method f) {
+rule no_weight_changing_when_voting(method f, address account) {
 	env _e;
-	uint256 _accountWeight = sinvoke _weight(_e,a);
+	uint256 _accountWeight = sinvoke _weight(_e,account);
 	
 	bool isAccountVoting = sinvoke isVoting(_e,account);
 	
@@ -37,7 +37,7 @@ rule no_weight_changing_when_voting(method f) {
 	invoke f(eF,arg);
 	
 	env e_;
-	uint256 accountWeight_ = sinvoke _weight(e_,a);
+	uint256 accountWeight_ = sinvoke _weight(e_,account);
 	
 	assert isAccountVoting => _accountWeight == accountWeight_, "Method changed weight of account if voting";
 }

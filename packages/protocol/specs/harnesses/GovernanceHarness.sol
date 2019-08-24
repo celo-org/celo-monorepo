@@ -28,13 +28,14 @@ contract GovernanceHarness is Governance {
 	
 	
 	// requires linkage of registry
+	// TODO: Note in the harness we assume already that getAddressFor always returns just the registry address
 	function _getTotalWeightFromBondedDeposits() public view returns (uint256) {
 		IBondedDeposits bondedDeposits = IBondedDeposits(registry.getAddressFor(BONDED_DEPOSITS_REGISTRY_ID));
-		return bondedDeposits.getTotalWeight();
+		return registry.getTotalWeight();
 	}
 	
 	function _getVoterFromAccount(address account) public view returns (address) {
 		IBondedDeposits bondedDeposits = IBondedDeposits(registry.getAddressFor(BONDED_DEPOSITS_REGISTRY_ID));
-		return bondedDeposits.getVoterFromAccount(account);
+		return registry.getVoterFromAccount(account);
 	}
 }
