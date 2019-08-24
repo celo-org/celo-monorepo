@@ -104,6 +104,29 @@ export function proxyCall<
   PreParsedOutput,
   Output
 >(
+  methodFn: Method<ParsedInputArgs, PreParsedOutput>,
+  parseInputArgs: (...args: InputArgs) => ParsedInputArgs,
+  parseOutput: (o: PreParsedOutput) => Output
+): (...args: InputArgs) => Promise<Output>
+export function proxyCall<InputArgs extends any[], PreParsedOutput, Output>(
+  methodFn: Method<InputArgs, PreParsedOutput>,
+  x: undefined,
+  parseOutput: (o: PreParsedOutput) => Output
+): (...args: InputArgs) => Promise<Output>
+export function proxyCall<InputArgs extends any[], ParsedInputArgs extends any[], Output>(
+  methodFn: Method<ParsedInputArgs, Output>,
+  parseInputArgs: (...args: InputArgs) => ParsedInputArgs
+): (...args: InputArgs) => Promise<Output>
+export function proxyCall<InputArgs extends any[], Output>(
+  methodFn: Method<InputArgs, Output>
+): (...args: InputArgs) => Promise<Output>
+
+export function proxyCall<
+  InputArgs extends any[],
+  ParsedInputArgs extends any[],
+  PreParsedOutput,
+  Output
+>(
   ...callArgs: ProxyCallArgs<InputArgs, ParsedInputArgs, PreParsedOutput, Output>
 ): (...args: InputArgs) => Promise<Output> {
   if (callArgs.length === 3 && callArgs[1] != null) {
