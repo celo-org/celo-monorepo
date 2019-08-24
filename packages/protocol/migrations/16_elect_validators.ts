@@ -11,7 +11,7 @@ import {
 import { config } from '@celo/protocol/migrationsConfig'
 import { BigNumber } from 'bignumber.js'
 import * as bls12377js from 'bls12377js'
-import { BondedDepositsInstance, ValidatorsInstance } from 'types'
+import { LockedGoldInstance, ValidatorsInstance } from 'types'
 
 const Web3 = require('web3')
 
@@ -19,26 +19,26 @@ function serializeKeystore(keystore: any) {
   return Buffer.from(JSON.stringify(keystore)).toString('base64')
 }
 
-async function makeMinimumDeposit(bondedDeposits: BondedDepositsInstance, privateKey: string) {
+async function makeMinimumDeposit(lockedGold: LockedGoldInstance, privateKey: string) {
   // @ts-ignore
-  const createAccountTx = bondedDeposits.contract.methods.createAccount()
+  const createAccountTx = lockedGold.contract.methods.createAccount()
   await sendTransactionWithPrivateKey(web3, createAccountTx, privateKey, {
-    to: bondedDeposits.address,
+    to: lockedGold.address,
   })
 
   // @ts-ignore
-  const bondTx = bondedDeposits.contract.methods.deposit(
-    config.validators.minBondedDepositNoticePeriod
+  const bondTx = lockedGold.contract.methods.newCommitment(
+    config.validators.minLockedGoldNoticePeriod
   )
 
   await sendTransactionWithPrivateKey(web3, bondTx, privateKey, {
-    to: bondedDeposits.address,
-    value: config.validators.minBondedDepositValue,
+    to: lockedGold.address,
+    value: config.validators.minLockedGoldValue,
   })
 }
 
 async function registerValidatorGroup(
-  bondedDeposits: BondedDepositsInstance,
+  lockedGold: LockedGoldInstance,
   validators: ValidatorsInstance,
   privateKey: string
 ) {
@@ -57,17 +57,17 @@ async function registerValidatorGroup(
   await web3.eth.sendTransaction({
     from: generateAccountAddressFromPrivateKey(privateKey.slice(0)),
     to: account.address,
-    value: config.validators.minBondedDepositValue * 2, // Add a premium to cover tx fees
+    value: config.validators.minLockedGoldValue * 2, // Add a premium to cover tx fees
   })
 
-  await makeMinimumDeposit(bondedDeposits, account.privateKey)
+  await makeMinimumDeposit(lockedGold, account.privateKey)
 
   // @ts-ignore
   const tx = validators.contract.methods.registerValidatorGroup(
     encodedKey,
     config.validators.groupName,
     config.validators.groupUrl,
-    config.validators.minBondedDepositNoticePeriod
+    config.validators.minLockedGoldNoticePeriod
   )
 
   await sendTransactionWithPrivateKey(web3, tx, account.privateKey, {
@@ -78,7 +78,7 @@ async function registerValidatorGroup(
 }
 
 async function registerValidator(
-  bondedDeposits: BondedDepositsInstance,
+  lockedGold: LockedGoldInstance,
   validators: ValidatorsInstance,
   validatorPrivateKey: string,
   groupAddress: string
@@ -95,7 +95,7 @@ async function registerValidator(
   const blsPoP = bls12377js.BLS.signPoP(blsValidatorPrivateKeyBytes).toString('hex')
   const publicKeysData = publicKey + blsPublicKey + blsPoP
 
-  await makeMinimumDeposit(bondedDeposits, validatorPrivateKey)
+  await makeMinimumDeposit(lockedGold, validatorPrivateKey)
 
   // @ts-ignore
   const registerTx = validators.contract.methods.registerValidator(
@@ -103,7 +103,7 @@ async function registerValidator(
     address,
     config.validators.groupUrl,
     add0x(publicKeysData),
-    config.validators.minBondedDepositNoticePeriod
+    config.validators.minLockedGoldNoticePeriod
   )
 
   await sendTransactionWithPrivateKey(web3, registerTx, validatorPrivateKey, {
@@ -126,9 +126,10 @@ module.exports = async (_deployer: any) => {
     artifacts
   )
 
-  const bondedDeposits: BondedDepositsInstance = await getDeployedProxiedContract<
-    BondedDepositsInstance
-  >('BondedDeposits', artifacts)
+  const lockedGold: LockedGoldInstance = await getDeployedProxiedContract<LockedGoldInstance>(
+    'LockedGold',
+    artifacts
+  )
 
   const valKeys: string[] = config.validators.validatorKeys
 
@@ -147,11 +148,11 @@ module.exports = async (_deployer: any) => {
 
   console.info('  Registering ValidatorGroup ...')
   const firstPrivateKey = valKeys[0]
-  const account = await registerValidatorGroup(bondedDeposits, validators, firstPrivateKey)
+  const account = await registerValidatorGroup(lockedGold, validators, firstPrivateKey)
 
   console.info('  Registering Validators ...')
   await Promise.all(
-    valKeys.map((key) => registerValidator(bondedDeposits, validators, key, account.address))
+    valKeys.map((key) => registerValidator(lockedGold, validators, key, account.address))
   )
 
   console.info('  Adding Validators to Validator Group ...')
@@ -166,12 +167,12 @@ module.exports = async (_deployer: any) => {
 
   console.info('  Voting for Validator Group ...')
   // Make another deposit so our vote has more weight.
-  const minBondedDepositVotePerValidator = 10000
-  await bondedDeposits.deposit(0, {
+  const minLockedGoldVotePerValidator = 10000
+  await lockedGold.newCommitment(0, {
     // @ts-ignore
     value: new BigNumber(valKeys.length)
-      .times(minBondedDepositVotePerValidator)
-      .times(config.validators.minBondedDepositValue),
+      .times(minLockedGoldVotePerValidator)
+      .times(config.validators.minLockedGoldValue),
   })
   await validators.vote(account.address, NULL_ADDRESS, NULL_ADDRESS)
 }

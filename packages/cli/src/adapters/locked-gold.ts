@@ -1,4 +1,4 @@
-import { BondedDeposits } from '@celo/walletkit'
+import { LockedGold } from '@celo/walletkit'
 import BN from 'bn.js'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
@@ -10,14 +10,14 @@ export interface VotingDetails {
   weight: BN
 }
 
-interface Deposit {
+interface Commitment {
   time: BN
   value: BN
 }
 
-export interface Deposits {
-  bonded: Deposit[]
-  notified: Deposit[]
+export interface Commitments {
+  locked: Commitment[]
+  notified: Commitment[]
   total: {
     gold: BN
     weight: BN
@@ -30,11 +30,11 @@ enum Roles {
   rewards,
 }
 
-export class BondedDepositAdapter {
-  public contractPromise: ReturnType<typeof BondedDeposits>
+export class LockedGoldAdapter {
+  public contractPromise: ReturnType<typeof LockedGold>
 
   constructor(private web3: Web3, from?: Address) {
-    this.contractPromise = BondedDeposits(this.web3, from)
+    this.contractPromise = LockedGold(this.web3, from)
   }
 
   contract() {
@@ -61,13 +61,13 @@ export class BondedDepositAdapter {
     }
   }
 
-  async getBondedDepositValue(account: string, noticePeriod: string) {
+  async getLockedCommitmentValue(account: string, noticePeriod: string) {
     const contract = await this.contract()
-    const deposit = await contract.methods.getBondedDeposit(account, noticePeriod).call()
-    return this.getValueFromDeposit(deposit)
+    const commitment = await contract.methods.getLockedCommitment(account, noticePeriod).call()
+    return this.getValueFromCommitment(commitment)
   }
 
-  async zipAccountTimesAndValuesToDeposits(
+  async zipAccountTimesAndValuesToCommitments(
     account: string,
     timesFunc: (account: string) => TransactionObject<string[]>,
     valueFunc: (account: string, time: string) => Promise<BN>
@@ -77,51 +77,51 @@ export class BondedDepositAdapter {
       accountTimes.map((time) => valueFunc.apply(this, [account, time]))
     )
     return zip(
-      (time, value) => ({ time, value } as Deposit),
+      (time, value) => ({ time, value } as Commitment),
       accountTimes.map((time) => Web3.utils.toBN(time)),
       accountValues
     )
   }
 
-  async getBondedDeposits(account: string): Promise<Deposit[]> {
+  async getLockedGold(account: string): Promise<Commitment[]> {
     const contract = await this.contract()
-    return this.zipAccountTimesAndValuesToDeposits(
+    return this.zipAccountTimesAndValuesToCommitments(
       account,
       contract.methods.getNoticePeriods,
-      this.getBondedDepositValue
+      this.getLockedCommitmentValue
     )
   }
 
-  async getNotifiedDepositValue(account: string, availTime: string) {
+  async getNotifiedCommitmentValue(account: string, availTime: string) {
     const contract = await this.contract()
-    const deposit = await contract.methods.getNotifiedDeposit(account, availTime).call()
-    return this.getValueFromDeposit(deposit)
+    const commitment = await contract.methods.getNotifiedCommitment(account, availTime).call()
+    return this.getValueFromCommitment(commitment)
   }
 
-  async getNotifiedDeposits(account: string): Promise<Deposit[]> {
+  async getNotifiedCommitments(account: string): Promise<Commitment[]> {
     const contract = await this.contract()
-    return this.zipAccountTimesAndValuesToDeposits(
+    return this.zipAccountTimesAndValuesToCommitments(
       account,
       contract.methods.getAvailabilityTimes,
-      this.getNotifiedDepositValue
+      this.getNotifiedCommitmentValue
     )
   }
 
-  getValueFromDeposit(deposit: { 0: string; 1: string }) {
-    return Web3.utils.toBN(deposit[0])
+  getValueFromCommitment(commitment: { 0: string; 1: string }) {
+    return Web3.utils.toBN(commitment[0])
   }
 
-  async getDeposits(account: string): Promise<Deposits> {
-    const bonded = await this.getBondedDeposits(account)
-    const notified = await this.getNotifiedDeposits(account)
+  async getCommitments(account: string): Promise<Commitments> {
+    const locked = await this.getLockedGold(account)
+    const notified = await this.getNotifiedCommitments(account)
     const weight = await this.getAccountWeight(account)
 
     let gold = new BN(0)
-    bonded.forEach((bond) => (gold = gold.add(bond.value)))
-    notified.forEach((bond) => (gold = gold.add(bond.value)))
+    locked.forEach((commitment) => (gold = gold.add(commitment.value)))
+    notified.forEach((commitment) => (gold = gold.add(commitment.value)))
 
     return {
-      bonded,
+      locked,
       notified,
       total: { weight, gold },
     }

@@ -11,6 +11,7 @@
   "syncNetwork": "Sincronizando con la red",
   "welcomeCelo": "Te damos la bienvenida a Celo",
   "chooseCountryCode": "Código de país",
+  "chooseCountry": "País",
   "joinText": {
     "0":
       "Bienvenido a Celo Wallet, una billetera digital que te permite enviar, recibir y guardar valor fácilmente.",

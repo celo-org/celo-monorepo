@@ -1,10 +1,8 @@
+import { Validators } from '@celo/walletkit'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
-
-import { Validators } from '@celo/walletkit'
-
 import { Address, compareBN, eqAddress, NULL_ADDRESS, zip } from '../utils/helpers'
-import { BondedDepositAdapter } from './bonded-deposit'
+import { LockedGoldAdapter } from './locked-gold'
 
 import BN = require('bn.js')
 
@@ -96,7 +94,7 @@ export class ValidatorsAdapter {
       throw new Error(`missing from at new ValdidatorUtils()`)
     }
 
-    const votingDetails = await new BondedDepositAdapter(this.web3).getVotingDetails(this.from)
+    const votingDetails = await new LockedGoldAdapter(this.web3).getVotingDetails(this.from)
     const votedGroup = await this.getVoteFrom(votingDetails.accountAddress)
 
     if (votedGroup == null) {
@@ -117,7 +115,7 @@ export class ValidatorsAdapter {
       throw new Error(`missing from at new ValdidatorUtils()`)
     }
 
-    const votingDetails = await new BondedDepositAdapter(this.web3).getVotingDetails(this.from)
+    const votingDetails = await new LockedGoldAdapter(this.web3).getVotingDetails(this.from)
 
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(
       validatorGroup,

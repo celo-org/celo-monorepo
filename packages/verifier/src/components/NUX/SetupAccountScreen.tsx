@@ -57,7 +57,7 @@ const mapDispatchToProps = {
 }
 
 class SetupAccountScreen extends React.Component<Props, State> {
-  state = {
+  state: State = {
     name: null,
     e164Number: null,
     countryCode: null,

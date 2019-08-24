@@ -1,13 +1,13 @@
 pragma solidity ^0.5.8;
 
-import "../interfaces/IBondedDeposits.sol";
+import "../interfaces/ILockedGold.sol";
 
 
  /**
- * @title A mock BondedDeposits for testing.
+ * @title A mock LockedGold for testing.
  */
-contract MockBondedDeposits is IBondedDeposits {
-  mapping(address => mapping(uint256 => uint256)) public bonded;
+contract MockLockedGold is ILockedGold {
+  mapping(address => mapping(uint256 => uint256)) public locked;
   mapping(address => uint256) public weights;
   mapping(address => bool) public frozen;
   // Maps a delegating address to an account.
@@ -25,10 +25,10 @@ contract MockBondedDeposits is IBondedDeposits {
   function redeemRewards() external returns (uint256) {}
   function freezeVoting() external {}
   function unfreezeVoting() external {}
-  function deposit(uint256) external payable returns (uint256) {}
-  function notify(uint256, uint256) external returns (uint256) {}
-  function rebond(uint256, uint256) external returns (uint256) {}
-  function withdraw(uint256) external returns (uint256) {}
+  function newCommitment(uint256) external payable returns (uint256) {}
+  function notifyCommitment(uint256, uint256) external returns (uint256) {}
+  function extendCommitment(uint256, uint256) external returns (uint256) {}
+  function withdrawCommitment(uint256) external returns (uint256) {}
   function increaseNoticePeriod(uint256, uint256, uint256) external returns (uint256) {}
   function getRewardsLastRedeemed(address) external view returns (uint96) {}
   function getNoticePeriods(address) external view returns (uint256[] memory) {}
@@ -43,8 +43,8 @@ contract MockBondedDeposits is IBondedDeposits {
     weights[account] = weight;
   }
 
-  function setBondedDeposit(address account, uint256 noticePeriod, uint256 value) external {
-    bonded[account][noticePeriod] = value;
+  function setLockedCommitment(address account, uint256 noticePeriod, uint256 value) external {
+    locked[account][noticePeriod] = value;
   }
 
   function setVotingFrozen(address account) external {
@@ -94,7 +94,7 @@ contract MockBondedDeposits is IBondedDeposits {
     }
   }
 
-  function getBondedDeposit(
+  function getLockedCommitment(
     address account,
     uint256 noticePeriod
   )
@@ -103,6 +103,6 @@ contract MockBondedDeposits is IBondedDeposits {
     returns (uint256, uint256)
   {
     // Always return 0 for the index.
-    return (bonded[account][noticePeriod], 0);
+    return (locked[account][noticePeriod], 0);
   }
 }

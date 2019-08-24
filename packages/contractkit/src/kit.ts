@@ -20,9 +20,9 @@ export class ContractKit {
   readonly _web3Contracts: Web3ContractCache
   readonly contracts: WrapperCache
 
-  defaultOptions: TxOptions
+  private _defaultOptions: TxOptions
   constructor(readonly web3: Web3) {
-    this.defaultOptions = {
+    this._defaultOptions = {
       gasInflationFactor: 1.3,
     }
 
@@ -32,11 +32,12 @@ export class ContractKit {
   }
 
   async setGasCurrency(token: CeloToken) {
-    this.defaultOptions.gasCurrency =
+    this._defaultOptions.gasCurrency =
       token === CeloContract.GoldToken ? undefined : await this.registry.addressFor(token)
   }
 
   set defaultAccount(address: Address) {
+    this._defaultOptions.from = address
     this.web3.eth.defaultAccount = address
   }
 
@@ -44,17 +45,21 @@ export class ContractKit {
     return this.web3.eth.defaultAccount
   }
 
+  get defaultOptions(): Readonly<TxOptions> {
+    return { ...this._defaultOptions }
+  }
+
   setGasCurrencyAddress(address: Address) {
-    this.defaultOptions.gasCurrency = address
+    this._defaultOptions.gasCurrency = address
   }
 
   sendTransaction(tx: Tx): TransactionResult {
     const promiEvent = this.web3.eth.sendTransaction({
-      from: this.defaultOptions.from,
+      from: this._defaultOptions.from,
       // TODO this won't work for locally signed TX
       gasPrice: '0',
       // @ts-ignore
-      gasCurrency: this.defaultOptions.gasCurrency,
+      gasCurrency: this._defaultOptions.gasCurrency,
       // TODO needed for locally signed tx, ignored by now (celo-blockchain with set it)
       // gasFeeRecipient: this.defaultOptions.gasFeeRecipient,
       ...tx,
@@ -67,7 +72,7 @@ export class ContractKit {
     options?: TxOptions
   ): Promise<TransactionResult> {
     return sendTransaction(txObj, {
-      ...this.defaultOptions,
+      ...this._defaultOptions,
       ...options,
     })
   }

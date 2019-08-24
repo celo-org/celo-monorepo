@@ -17,8 +17,8 @@
   "for": "Por",
   "groceriesRent": "Supermercado, alquiler, etc. (Opcional)",
   "fee": "Comisión",
-  "securityFee": "Security Comisión",
-  "inviteAndSecurityFee": "Cuota de Invitación",
+  "securityFee": "Comisión de seguridad",
+  "inviteAndSecurityFee": "Comisión de Invitación",
   "feeEducation":
     "~Sending payments and making exchanges include a small fee for service security and maintenance.",
   "learnMore": "Saber más",
@@ -48,7 +48,7 @@
   "inviteFailed": "Falló el envío de la invitación",
   "loadingContacts": "Encontrando tus contactos",
   "QRCode": "QR código",
-  "saveCodeImage": "Guardar imagen de código",
+  "shareCodeImage": "Compartir imagen de código",
   "scanCode": "Escanear código",
   "writeStorageNeededForQrDownload":
     "Se necesita permiso de escritura de almacenamiento para descargar el código QR",

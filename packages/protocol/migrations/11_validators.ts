@@ -8,8 +8,8 @@ const initializeArgs = async (): Promise<any[]> => {
     config.registry.predeployedProxyAddress,
     config.validators.minElectableValidators,
     config.validators.maxElectableValidators,
-    config.validators.minBondedDepositValue,
-    config.validators.minBondedDepositNoticePeriod,
+    config.validators.minLockedGoldValue,
+    config.validators.minLockedGoldNoticePeriod,
   ]
 }
 

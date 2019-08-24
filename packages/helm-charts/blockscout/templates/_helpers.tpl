@@ -39,9 +39,9 @@ volumes:
 - name: ETHEREUM_JSONRPC_VARIANT
   value: geth
 - name: ETHEREUM_JSONRPC_HTTP_URL
-  value: http://tx-nodes:8545
+  value: {{ .Values.blockscout.jsonrpc_http_url }}
 - name: ETHEREUM_JSONRPC_WEB_SOCKET_URL
-  value: ws://tx-nodes:8546
+  value: {{ .Values.blockscout.jsonrpc_ws_url }}
 - name: DATABASE_URL
   value: postgres://$(DB_USERNAME):$(DB_PASSWORD)@127.0.0.1:5432/{{ .Values.blockscout.db.name }}
 {{- end -}}
