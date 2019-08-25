@@ -830,8 +830,8 @@ contract BondedDeposits is IBondedDeposits, ReentrancyGuard, Initializable, Usin
     Deposit storage notified = account.deposits.notified[availabilityTime];
     require(value != notified.value);
     if (notified.value == 0) {
-      notified.index = uint128(account.deposits.availabilityTimes.length);
-      notified.value = uint128(value);
+      notified.index = safeCast128(account.deposits.availabilityTimes.length);
+      notified.value = safeCast128(value);
       account.deposits.availabilityTimes.push(availabilityTime);
       account.weight = account.weight.add(notified.value);
       totalWeight = totalWeight.add(notified.value);
