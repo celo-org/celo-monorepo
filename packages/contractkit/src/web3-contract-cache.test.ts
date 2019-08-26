@@ -1,26 +1,18 @@
-import { ValidWrappers, WrapperCache } from '@src/contract-cache'
-import { CeloContract, newKit } from '@src/index'
+import { AllContracts, newKit } from '.'
+import { Web3ContractCache } from './web3-contract-cache'
 
-const TestedWrappers: ValidWrappers[] = [
-  CeloContract.GoldToken,
-  CeloContract.StableToken,
-  CeloContract.Exchange,
-  CeloContract.Validators,
-  CeloContract.LockedGold,
-]
-
-function newWrapperCache() {
+function newWeb3ContractCache() {
   const kit = newKit('')
   const AnyContractAddress = '0xe832065fb5117dbddcb566ff7dc4340999583e38'
   jest.spyOn(kit.registry, 'addressFor').mockResolvedValue(AnyContractAddress)
-  const contractCache = new WrapperCache(kit)
+  const contractCache = new Web3ContractCache(kit)
   return contractCache
 }
 
 describe('getContract()', () => {
-  const contractCache = newWrapperCache()
+  const contractCache = newWeb3ContractCache()
 
-  for (const contractName of TestedWrappers) {
+  for (const contractName of AllContracts) {
     test(`SBAT get ${contractName}`, async () => {
       const contract = await contractCache.getContract(contractName)
       expect(contract).not.toBeNull()
@@ -30,8 +22,8 @@ describe('getContract()', () => {
 })
 
 test('should cache contracts', async () => {
-  const contractCache = newWrapperCache()
-  for (const contractName of TestedWrappers) {
+  const contractCache = newWeb3ContractCache()
+  for (const contractName of AllContracts) {
     const contract = await contractCache.getContract(contractName)
     const contractBis = await contractCache.getContract(contractName)
     expect(contract).toBe(contractBis)

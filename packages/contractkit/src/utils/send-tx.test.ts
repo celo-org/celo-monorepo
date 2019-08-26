@@ -1,8 +1,8 @@
-import { sendTransaction } from '@src/utils/send-tx'
 import { TransactionObject, Tx } from 'web3/eth/types'
 import PromiEvent from 'web3/promiEvent'
 import { TransactionReceipt } from 'web3/types'
 import { promiEventSpy } from '../test-utils/PromiEventStub'
+import { sendTransaction } from './send-tx'
 
 interface TransactionObjectStub<T> extends TransactionObject<T> {
   sendMock: jest.Mock<PromiEvent<any>, [Tx | undefined]>

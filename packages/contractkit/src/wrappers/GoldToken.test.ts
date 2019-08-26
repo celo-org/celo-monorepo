@@ -1,6 +1,6 @@
-import { newKitFromWeb3 } from '@src/kit'
-import { GoldTokenWrapper } from '@src/wrappers/GoldTokenWrapper'
+import { newKitFromWeb3 } from '../kit'
 import { testWithGanache } from '../test-utils/ganache-test'
+import { GoldTokenWrapper } from './GoldTokenWrapper'
 
 testWithGanache('GoldToken Wrapper', (web3) => {
   const ONE_GOLD = web3.utils.toWei('1', 'ether')
