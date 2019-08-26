@@ -1,11 +1,11 @@
 import chalk from 'chalk'
 import { cli } from 'cli-ux'
-import { BondedDepositAdapter } from '../../adapters/bonded-deposit'
+import { LockedGoldAdapter } from '../../adapters/locked-gold'
 import { BaseCommand } from '../../base'
 import { Args } from '../../utils/command'
 
 export default class List extends BaseCommand {
-  static description = "View information about all of the account's deposits"
+  static description = "View information about all of the account's commitments"
 
   static flags = {
     ...BaseCommand.flags,
@@ -17,20 +17,20 @@ export default class List extends BaseCommand {
 
   async run() {
     const { args } = this.parse(List)
-    cli.action.start('Fetching deposits...')
-    const deposits = await new BondedDepositAdapter(this.web3).getDeposits(args.account)
+    cli.action.start('Fetching commitments...')
+    const commitments = await new LockedGoldAdapter(this.web3).getCommitments(args.account)
     cli.action.stop()
 
-    cli.log(chalk.bold.yellow('Total Gold Bonded \t') + deposits.total.gold)
-    cli.log(chalk.bold.red('Total Account Weight \t') + deposits.total.weight)
-    if (deposits.bonded.length > 0) {
-      cli.table(deposits.bonded, {
+    cli.log(chalk.bold.yellow('Total Gold Locked \t') + commitments.total.gold)
+    cli.log(chalk.bold.red('Total Account Weight \t') + commitments.total.weight)
+    if (commitments.locked.length > 0) {
+      cli.table(commitments.locked, {
         noticePeriod: { header: 'NoticePeriod', get: (a) => a.time.toString() },
         value: { get: (a) => a.value.toString() },
       })
     }
-    if (deposits.notified.length > 0) {
-      cli.table(deposits.notified, {
+    if (commitments.notified.length > 0) {
+      cli.table(commitments.notified, {
         availabilityTime: { header: 'AvailabilityTime', get: (a) => a.time.toString() },
         value: { get: (a) => a.value.toString() },
       })

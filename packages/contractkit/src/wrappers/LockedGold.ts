@@ -3,7 +3,7 @@ import BN from 'bn.js'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
 import { Address } from '../base'
-import { BondedDeposits } from '../generated/types/BondedDeposits'
+import { LockedGold } from '../generated/types/LockedGold'
 import { BaseWrapper } from '../wrappers/BaseWrapper'
 
 export interface VotingDetails {
@@ -12,14 +12,14 @@ export interface VotingDetails {
   weight: BN
 }
 
-interface Deposit {
+interface Commitment {
   time: BN
   value: BN
 }
 
-export interface Deposits {
-  bonded: Deposit[]
-  notified: Deposit[]
+export interface Commitments {
+  locked: Commitment[]
+  notified: Commitment[]
   total: {
     gold: BN
     weight: BN
@@ -32,7 +32,7 @@ enum Roles {
   rewards,
 }
 
-export class BondedDepositsWrapper extends BaseWrapper<BondedDeposits> {
+export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   async getAccountWeight(account: Address): Promise<BN> {
     const accountWeight = await this.contract.methods.getAccountWeight(account).call()
     return Web3.utils.toBN(accountWeight)
@@ -50,43 +50,43 @@ export class BondedDepositsWrapper extends BaseWrapper<BondedDeposits> {
     }
   }
 
-  async getBondedDepositValue(account: string, noticePeriod: string): Promise<BN> {
-    const deposit = await this.contract.methods.getBondedDeposit(account, noticePeriod).call()
-    return this.getValueFromDeposit(deposit)
+  async getLockedCommitmentValue(account: string, noticePeriod: string): Promise<BN> {
+    const commitment = await this.contract.methods.getLockedCommitment(account, noticePeriod).call()
+    return this.getValueFromCommitment(commitment)
   }
 
-  async getBondedDeposits(account: string): Promise<Deposit[]> {
-    return this.zipAccountTimesAndValuesToDeposits(
+  async getLockedCommitments(account: string): Promise<Commitment[]> {
+    return this.zipAccountTimesAndValuesToCommitments(
       account,
       this.contract.methods.getNoticePeriods,
-      this.getBondedDepositValue.bind(this)
+      this.getLockedCommitmentValue.bind(this)
     )
   }
 
-  async getNotifiedDepositValue(account: string, availTime: string): Promise<BN> {
-    const deposit = await this.contract.methods.getNotifiedDeposit(account, availTime).call()
-    return this.getValueFromDeposit(deposit)
+  async getNotifiedCommitmentValue(account: string, availTime: string): Promise<BN> {
+    const commitment = await this.contract.methods.getNotifiedCommitment(account, availTime).call()
+    return this.getValueFromCommitment(commitment)
   }
 
-  async getNotifiedDeposits(account: string): Promise<Deposit[]> {
-    return this.zipAccountTimesAndValuesToDeposits(
+  async getNotifiedCommitments(account: string): Promise<Commitment[]> {
+    return this.zipAccountTimesAndValuesToCommitments(
       account,
       this.contract.methods.getAvailabilityTimes,
-      this.getNotifiedDepositValue.bind(this)
+      this.getNotifiedCommitmentValue.bind(this)
     )
   }
 
-  async getDeposits(account: string): Promise<Deposits> {
-    const bonded = await this.getBondedDeposits(account)
-    const notified = await this.getNotifiedDeposits(account)
+  async getCommitments(account: string): Promise<Commitments> {
+    const locked = await this.getLockedCommitments(account)
+    const notified = await this.getNotifiedCommitments(account)
     const weight = await this.getAccountWeight(account)
 
     let gold = new BN(0)
-    bonded.forEach((bond) => (gold = gold.add(bond.value)))
+    locked.forEach((bond) => (gold = gold.add(bond.value)))
     notified.forEach((bond) => (gold = gold.add(bond.value)))
 
     return {
-      bonded,
+      locked,
       notified,
       total: { weight, gold },
     }
@@ -99,8 +99,8 @@ export class BondedDepositsWrapper extends BaseWrapper<BondedDeposits> {
     return this.contract.methods.delegateRole(Roles.rewards, delegate, sig.v, sig.r, sig.s)
   }
 
-  private getValueFromDeposit(deposit: { 0: string; 1: string }) {
-    return Web3.utils.toBN(deposit[0])
+  private getValueFromCommitment(commitment: { 0: string; 1: string }) {
+    return Web3.utils.toBN(commitment[0])
   }
 
   private async getParsedSignatureOfAddress(address: string, signer: string) {
@@ -113,7 +113,7 @@ export class BondedDepositsWrapper extends BaseWrapper<BondedDeposits> {
     }
   }
 
-  private async zipAccountTimesAndValuesToDeposits(
+  private async zipAccountTimesAndValuesToCommitments(
     account: string,
     timesFunc: (account: string) => TransactionObject<string[]>,
     valueFunc: (account: string, time: string) => Promise<BN>
@@ -122,7 +122,7 @@ export class BondedDepositsWrapper extends BaseWrapper<BondedDeposits> {
     const accountValues = await Promise.all(accountTimes.map((time) => valueFunc(account, time)))
     return zip(
       // tslint:disable-next-line: no-object-literal-type-assertion
-      (time, value) => ({ time, value } as Deposit),
+      (time, value) => ({ time, value } as Commitment),
       accountTimes.map((time) => Web3.utils.toBN(time)),
       accountValues
     )

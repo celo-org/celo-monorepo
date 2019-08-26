@@ -1,5 +1,5 @@
 import { flags } from '@oclif/command'
-import { BondedDepositAdapter } from '../../adapters/bonded-deposit'
+import { LockedGoldAdapter } from '../../adapters/locked-gold'
 import { ValidatorsAdapter } from '../../adapters/validators'
 import { BaseCommand } from '../../base'
 import { displaySendTx, printValueMap } from '../../utils/cli'
@@ -35,7 +35,7 @@ export default class ValidatorGroupVote extends BaseCommand {
     const vUtils = new ValidatorsAdapter(this.web3, res.flags.from)
 
     if (res.flags.current) {
-      const bdUtils = new BondedDepositAdapter(this.web3)
+      const bdUtils = new LockedGoldAdapter(this.web3)
       const details = await bdUtils.getVotingDetails(res.flags.from)
       const myVote = await vUtils.getVoteFrom(details.accountAddress)
 
