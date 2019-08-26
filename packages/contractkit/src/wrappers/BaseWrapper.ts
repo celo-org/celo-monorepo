@@ -8,6 +8,8 @@ import { TransactionResult } from '../utils/tx-result'
 
 type Method<I extends any[], O> = (...args: I) => TransactionObject<O>
 
+export type NumberLike = string | number | BigNumber
+
 export abstract class BaseWrapper<T extends Contract> {
   constructor(protected readonly kit: ContractKit, protected readonly contract: T) {}
 
@@ -30,7 +32,11 @@ export function toNumber(input: string) {
   return parseInt(input, 10)
 }
 
-export function parseNumber(input: string | number | BigNumber) {
+export function noopParser<A>(input: A): A {
+  return input
+}
+
+export function parseNumber(input: NumberLike) {
   return new BigNumber(input).toString()
 }
 

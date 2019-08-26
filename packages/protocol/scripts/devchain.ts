@@ -1,3 +1,4 @@
+// import * as ganache from '@celo/ganache-core/public-exports'
 import * as ganache from '@celo/ganache-cli'
 import chalk from 'chalk'
 import { spawn, SpawnOptions } from 'child_process'
