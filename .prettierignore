@@ -38,3 +38,5 @@ packages/verification-pool-api/contracts/*.ts
 packages/web/dist
 packages/web/.next
 
+# prettier eats Latex underscore escapting and doesn't seem to have an option to disable
+packages/docs/celo-codebase/protocol/proof-of-stake/epoch-rewards.md

@@ -91,7 +91,7 @@ For the moment, we have contract wrappers for:
 
 - Exchange (Uniswap kind exchange between Gold and Stable tokens)
 - Validators
-- BondedDeposits
+- LockedGold
 
 In the following weeks will add wrapper for all other contracts
 

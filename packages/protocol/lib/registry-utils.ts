@@ -1,6 +1,6 @@
 export enum CeloContractName {
   Attestations = 'Attestations',
-  BondedDeposits = 'BondedDeposits',
+  LockedGold = 'LockedGold',
   Escrow = 'Escrow',
   Exchange = 'Exchange',
   GasCurrencyWhitelist = 'GasCurrencyWhitelist',
