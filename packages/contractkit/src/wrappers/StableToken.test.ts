@@ -1,6 +1,6 @@
-import { newKitFromWeb3 } from '@src/kit'
-import { StableTokenWrapper } from '@src/wrappers/StableTokenWrapper'
+import { newKitFromWeb3 } from '../kit'
 import { testWithGanache } from '../test-utils/ganache-test'
+import { StableTokenWrapper } from './StableTokenWrapper'
 
 /*
 TEST NOTES:

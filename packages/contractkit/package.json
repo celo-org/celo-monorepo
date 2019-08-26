@@ -22,7 +22,7 @@
     "prepublishOnly": "yarn build:gen && yarn build",
     "test:prepare": "yarn --cwd ../protocol devchain generate .devchain",
     "test": "jest --runInBand",
-    "lint": "tslint -c tslint.json --project . && tslint -c tslint.json --project test"
+    "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
     "@celo/utils": "^0.0.6-beta5",
@@ -40,8 +40,5 @@
   },
   "engines": {
     "node": ">=8.13.0"
-  },
-  "files": [
-    "lib/**/*"
-  ]
+  }
 }
