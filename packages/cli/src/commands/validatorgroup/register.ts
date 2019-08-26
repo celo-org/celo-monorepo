@@ -25,11 +25,11 @@ export default class ValidatorGroupRegister extends BaseCommand {
     const res = this.parse(ValidatorGroupRegister)
 
     this.kit.defaultAccount = res.flags.from
-    const wrapper = await this.kit.contracts.getValidators()
+    const validators = await this.kit.contracts.getValidators()
 
     await displaySendTx(
       'registerValidatorGroup',
-      wrapper.registerValidatorGroup(
+      validators.registerValidatorGroup(
         res.flags.id,
         res.flags.name,
         res.flags.url,

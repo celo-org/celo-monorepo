@@ -21,13 +21,9 @@ export default class List extends BaseCommand {
     const { flags: parsedFlags } = this.parse(List)
 
     cli.action.start('Fetching exchange rates...')
-
     const exchange = await this.kit.contracts.getExchange()
-
     const dollarForGold = await exchange.getBuyTokenAmount(parsedFlags.amount as string, true)
-
     const goldForDollar = await exchange.getBuyTokenAmount(parsedFlags.amount as string, false)
-
     cli.action.stop()
 
     this.log(`${parsedFlags.amount} cGLD => ${dollarForGold.toString()} cUSD`)

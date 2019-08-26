@@ -25,7 +25,7 @@ export default class ValidatorAffiliate extends BaseCommand {
     const res = this.parse(ValidatorAffiliate)
 
     this.kit.defaultAccount = res.flags.from
-    const wrapper = await this.kit.contracts.getValidators()
+    const validators = await this.kit.contracts.getValidators()
 
     if (!(res.flags.set || res.flags.unset)) {
       this.error(`Specify action: --set or --unset`)
@@ -33,9 +33,9 @@ export default class ValidatorAffiliate extends BaseCommand {
     }
 
     if (res.flags.set) {
-      await displaySendTx('affiliate', wrapper.affiliate(res.flags.set))
+      await displaySendTx('affiliate', validators.affiliate(res.flags.set))
     } else if (res.flags.unset) {
-      await displaySendTx('deaffiliate', wrapper.deaffiliate())
+      await displaySendTx('deaffiliate', validators.deaffiliate())
     }
   }
 }

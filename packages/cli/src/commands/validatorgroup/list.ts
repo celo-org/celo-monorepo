@@ -14,9 +14,9 @@ export default class ValidatorGroupList extends BaseCommand {
     this.parse(ValidatorGroupList)
 
     cli.action.start('Fetching Validator Groups')
-    const wrapper = await this.kit.contracts.getValidators()
-    const vgroups = await wrapper.getRegisteredValidatorGroups()
-    const votes = await wrapper.getValidatorGroupsVotes()
+    const validators = await this.kit.contracts.getValidators()
+    const vgroups = await validators.getRegisteredValidatorGroups()
+    const votes = await validators.getValidatorGroupsVotes()
     cli.action.stop()
 
     cli.table(vgroups, {

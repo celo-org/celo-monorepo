@@ -17,8 +17,8 @@ export default class ValidatorShow extends BaseCommand {
   async run() {
     const { args } = this.parse(ValidatorShow)
     const address = args.validatorAddress
-    const wrapper = await this.kit.contracts.getValidators()
-    const validator = await wrapper.getValidator(address)
+    const validators = await this.kit.contracts.getValidators()
+    const validator = await validators.getValidator(address)
     printValueMap(validator)
   }
 }

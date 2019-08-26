@@ -14,11 +14,11 @@ export default class ValidatorList extends BaseCommand {
     this.parse(ValidatorList)
 
     cli.action.start('Fetching Validators')
-    const wrapper = await this.kit.contracts.getValidators()
-    const validators = await wrapper.getRegisteredValidators()
+    const validators = await this.kit.contracts.getValidators()
+    const validatorList = await validators.getRegisteredValidators()
 
     cli.action.stop()
-    cli.table(validators, {
+    cli.table(validatorList, {
       address: {},
       id: {},
       name: {},
