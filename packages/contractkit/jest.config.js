@@ -11,6 +11,7 @@ module.exports = {
       tsConfig: '<rootDir>/test/tsconfig.json',
     },
   },
+  testPathIgnorePatterns: ['<rootDir>/lib/', '<rootDir>/node_modules/'],
   setupFilesAfterEnv: ['<rootDir>/test/test-utils/matchers.ts'],
   globalSetup: '<rootDir>/test/test-utils/ganache.setup.ts',
   globalTeardown: '<rootDir>/test/test-utils/ganache.teardown.ts',
