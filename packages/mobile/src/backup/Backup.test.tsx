@@ -12,7 +12,7 @@ it('renders correctly', () => {
       enterBackupFlow={jest.fn()}
       exitBackupFlow={jest.fn()}
       backupTooLate={true}
-      backupDelayed={false}
+      backupDelayedTime={0}
     />
   )
   expect(tree).toMatchSnapshot()

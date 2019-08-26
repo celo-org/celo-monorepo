@@ -15,7 +15,7 @@ import { Namespaces } from 'src/i18n'
 import backupIcon from 'src/images/backup-icon.png'
 
 type Props = {
-  backupDelayed: boolean
+  backupDelayedTime: number
   backupTooLate: boolean
   onPress: () => void
   onCancel: () => void
@@ -91,7 +91,7 @@ class BackupIntroduction extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, backupDelayed, backupTooLate } = this.props
+    const { t, backupDelayedTime, backupTooLate } = this.props
     return (
       <View style={styles.container}>
         <View style={componentStyles.topBar}>
@@ -117,7 +117,7 @@ class BackupIntroduction extends React.Component<Props, State> {
             type={BtnTypes.PRIMARY}
           />
           {backupTooLate &&
-            !backupDelayed && (
+            !backupDelayedTime && (
               <Button
                 onPress={this.onDelay}
                 style={styles.skipLink}

@@ -9,17 +9,18 @@ import { timeDeltaInDays, timeDeltaInSeconds } from 'src/utils/time'
 export const disabledDueToNoBackup = (
   accountCreationTime: number,
   backupCompleted: boolean,
-  backupDelayed: boolean
+  backupDelayedTime: number
 ) => {
-  const disableThreshold = DAYS_TO_BACKUP + (backupDelayed ? DAYS_TO_DELAY : 0)
-  return timeDeltaInDays(Date.now(), accountCreationTime) > disableThreshold && !backupCompleted
+  const disableThreshold = backupDelayedTime ? DAYS_TO_DELAY : DAYS_TO_BACKUP
+  const startTime = backupDelayedTime || accountCreationTime
+  return timeDeltaInDays(Date.now(), startTime) > disableThreshold && !backupCompleted
 }
 
 export const isBackupTooLate = (state: RootState) => {
   return disabledDueToNoBackup(
     state.account.accountCreationTime,
     state.account.backupCompleted,
-    state.account.backupDelayed
+    state.account.backupDelayedTime
   )
 }
 

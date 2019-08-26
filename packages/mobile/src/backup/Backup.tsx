@@ -30,7 +30,7 @@ interface State {
 interface StateProps {
   language: string | null
   backupTooLate: boolean
-  backupDelayed: boolean
+  backupDelayedTime: number
 }
 
 interface DispatchProps {
@@ -46,7 +46,7 @@ const mapStateToProps = (state: RootState): StateProps => {
   return {
     language: state.app.language,
     backupTooLate: isBackupTooLate(state),
-    backupDelayed: state.account.backupDelayed,
+    backupDelayedTime: state.account.backupDelayedTime,
   }
 }
 
@@ -120,7 +120,7 @@ export class Backup extends React.Component<Props, State> {
 
   render() {
     const { mnemonic, currentQuestion, wordsForBackupQuiz } = this.state
-    const { backupDelayed, backupTooLate } = this.props
+    const { backupDelayedTime, backupTooLate } = this.props
     if (currentQuestion === -1) {
       return (
         <BackupIntroduction
@@ -128,7 +128,7 @@ export class Backup extends React.Component<Props, State> {
           onCancel={this.onCancel}
           onDelay={this.onDelay}
           backupTooLate={backupTooLate}
-          backupDelayed={backupDelayed}
+          backupDelayedTime={backupDelayedTime}
         />
       )
     }
