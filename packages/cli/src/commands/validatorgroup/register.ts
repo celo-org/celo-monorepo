@@ -1,4 +1,3 @@
-import { Validators } from '@celo/walletkit'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
@@ -25,11 +24,12 @@ export default class ValidatorGroupRegister extends BaseCommand {
   async run() {
     const res = this.parse(ValidatorGroupRegister)
 
-    const validatorsInstance = await Validators(this.web3, res.flags.from)
+    this.kit.defaultAccount = res.flags.from
+    const validators = await this.kit.contracts.getValidators()
 
     await displaySendTx(
       'registerValidatorGroup',
-      validatorsInstance.methods.registerValidatorGroup(
+      validators.registerValidatorGroup(
         res.flags.id,
         res.flags.name,
         res.flags.url,
