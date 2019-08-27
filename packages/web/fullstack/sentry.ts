@@ -5,9 +5,9 @@ export function initSentry() {
   const config = publicRuntimeConfig.SENTRY
 
   Sentry.init({
-    debug: process.env.DEPLOY_ENV === 'development',
+    debug: publicRuntimeConfig.ENV === 'development',
     dsn: `https://${config.KEY}@sentry.io/${config.PROJECT}`,
-    environment: process.env.DEPLOY_ENV,
+    environment: publicRuntimeConfig.ENV,
   })
 }
 
