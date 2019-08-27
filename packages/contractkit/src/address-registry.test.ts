@@ -1,12 +1,11 @@
-import { AddressRegistry } from '@src/address-registry'
-import { AllContracts, CeloContract, NULL_ADDRESS } from '@src/base'
-import { newKit } from '@src/kit'
+import { AllContracts, CeloContract, newKit, NULL_ADDRESS } from '.'
+import { AddressRegistry } from './address-registry'
 import { createMockContract, mockContractAddress } from './test-utils/mock-contracts'
 
 const kit = newKit('')
 const mockedGetAddressFor = jest.fn()
 
-jest.mock('@src/generated/Registry', () => ({
+jest.mock('./generated/Registry', () => ({
   newRegistry: () => createMockContract({ getAddressFor: mockedGetAddressFor }),
 }))
 

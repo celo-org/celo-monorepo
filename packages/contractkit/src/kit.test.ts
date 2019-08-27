@@ -1,10 +1,9 @@
-import { AddressRegistry } from '@src/address-registry'
-import { CeloContract } from '@src/base'
-import { WrapperCache } from '@src/contract-cache'
-import { ContractKit, newKit, newKitFromWeb3 } from '@src/kit'
-import { Web3ContractCache } from '@src/web3-contract-cache'
 import Web3 from 'web3'
+import { CeloContract, ContractKit, newKit, newKitFromWeb3 } from '.'
+import { AddressRegistry } from './address-registry'
+import { WrapperCache } from './contract-cache'
 import { mockContractAddress } from './test-utils/mock-contracts'
+import { Web3ContractCache } from './web3-contract-cache'
 
 describe('ContractKit', () => {
   const testUrl = 'http://127.0.0.`:8545'
