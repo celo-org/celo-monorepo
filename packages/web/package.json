@@ -90,7 +90,6 @@
     "nodemon": "^1.18.8",
     "postcss-scss": "^1.0.5",
     "react-native-svg": "^9.3.6",
-    "sentry-testkit": "^3.0.2",
     "webpack": "4.20.2"
   },
   "engines": {
