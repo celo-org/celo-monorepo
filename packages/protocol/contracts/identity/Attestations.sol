@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -150,12 +150,13 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
    * @param attestationRequestFeeToken The address of the token with which the attestation fee will
    * be paid.
    */
-  function nonReentrant request(
+  function request(
     bytes32 identifier,
     uint256 attestationsRequested,
     address attestationRequestFeeToken
   )
     external
+    nonReentrant
   {
     require(
       attestationRequestFees[attestationRequestFeeToken] > 0,

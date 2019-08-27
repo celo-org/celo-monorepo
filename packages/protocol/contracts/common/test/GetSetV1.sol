@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 
 contract GetSetV1 {
@@ -9,7 +9,7 @@ contract GetSetV1 {
     return (x, y);
   }
 
-  function set(uint256 _x, string memory _y) external {
+  function set(uint256 _x, string memory _y) public {
     x = _x;
     y = _y;
   }

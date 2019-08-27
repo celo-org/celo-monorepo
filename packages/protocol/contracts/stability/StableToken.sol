@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -323,21 +323,21 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable, Initiali
 
   /**
    * @notice Gets the amount of owner's StableToken allowed to be spent by spender.
-   * @param owner The owner of the StableToken.
+   * @param accountOwner The owner of the StableToken.
    * @param spender The spender of the StableToken.
    * @return The amount of StableToken owner is allowing spender to spend.
    */
-  function allowance(address owner, address spender) external view returns (uint256) {
-    return allowed[owner][spender];
+  function allowance(address accountOwner, address spender) external view returns (uint256) {
+    return allowed[accountOwner][spender];
   }
 
   /**
    * @notice Gets the balance of the specified address using the presently stored inflation factor.
-   * @param owner The address to query the balance of.
+   * @param accountOwner The address to query the balance of.
    * @return The balance of the specified address.
    */
-  function balanceOf(address owner) external view returns (uint256) {
-    return unitsToValue(balances[owner]);
+  function balanceOf(address accountOwner) external view returns (uint256) {
+    return unitsToValue(balances[accountOwner]);
   }
 
   /**
