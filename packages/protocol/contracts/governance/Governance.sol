@@ -6,7 +6,7 @@ import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
-import "./UsingBondedDeposits.sol";
+import "./UsingLockedGold.sol";
 import "./interfaces/IGovernance.sol";
 import "../common/FractionUtil.sol";
 import "../common/Initializable.sol";
@@ -17,7 +17,7 @@ import "../common/linkedlists/IntegerSortedLinkedList.sol";
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
  */
-contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits, ReentrancyGuard {
+contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, ReentrancyGuard {
   using SafeMath for uint256;
   using FractionUtil for FractionUtil.Fraction;
   using IntegerSortedLinkedList for SortedLinkedList.List;
@@ -627,7 +627,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   }
 
   /**
-   * @notice Withdraws refunded Celo Gold deposits.
+   * @notice Withdraws refunded Celo Gold commitments.
    * @return Whether or not the withdraw was successful.
    */
   function withdraw() external nonReentrant returns (bool) {

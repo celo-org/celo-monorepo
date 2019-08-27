@@ -11,7 +11,6 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import { importContacts } from 'src/identity/actions'
 import { E164NumberToAddressType } from 'src/identity/reducer'
@@ -134,6 +133,21 @@ class Send extends React.Component<Props, State> {
     this.setState({ hasGivenPermission })
   }
 
+  componentDidUpdate(prevPops: Props) {
+    const { recentRecipients, allRecipients } = this.props
+
+    if (
+      recentRecipients !== prevPops.recentRecipients ||
+      allRecipients !== prevPops.allRecipients
+    ) {
+      this.setState({
+        loading: false,
+        recentFiltered: filterRecipients(recentRecipients, this.state.searchQuery, false),
+        allFiltered: filterRecipients(allRecipients, this.state.searchQuery, true),
+      })
+    }
+  }
+
   onSearchQueryChanged = (searchQuery: string) => {
     this.props.hideAlert()
     this.setState({
@@ -149,7 +163,7 @@ class Send extends React.Component<Props, State> {
     })
 
     if (!recipient.e164PhoneNumber && !recipient.address) {
-      this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE, ALERT_BANNER_DURATION)
+      this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE)
       return
     }
 
@@ -196,6 +210,7 @@ class Send extends React.Component<Props, State> {
           </View>
         ) : (
           <RecipientPicker
+            testID={'RecipientPicker'}
             sections={this.buildSections()}
             searchQuery={searchQuery}
             defaultCountryCode={defaultCountryCode}

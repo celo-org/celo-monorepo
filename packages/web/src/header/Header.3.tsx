@@ -4,7 +4,7 @@ import { SingletonRouter as Router, withRouter } from 'next/router'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Animated, Dimensions, Easing, StyleSheet, View } from 'react-native'
-import BlueBanner, { BANNER_HEIGHT } from 'src/header/BlueBanner'
+import BlueBanner, { BANNER_HEIGHT, bannerVisible } from 'src/header/BlueBanner'
 import cssStyles from 'src/header/Header.3.scss'
 import MediumLogo from 'src/icons/MediumLogo'
 import Octocat from 'src/icons/Octocat'
@@ -164,7 +164,7 @@ export class Header extends React.Component<Props, State> {
       <View
         style={[
           styles.container,
-          { top: isHomePage ? BANNER_HEIGHT : 0 },
+          { top: isHomePage && bannerVisible() ? BANNER_HEIGHT : 0 },
           this.state.mobileMenuActive && styles.mobileMenuActive,
         ]}
       >
@@ -241,7 +241,7 @@ export class Header extends React.Component<Props, State> {
                       text={t('github')}
                       target={'_new_tab'}
                       iconRight={
-                        <Octocat size={18} color={this.isDarkMode() ? colors.white : colors.dark} />
+                        <Octocat size={22} color={this.isDarkMode() ? colors.white : colors.dark} />
                       }
                     />
                   </View>

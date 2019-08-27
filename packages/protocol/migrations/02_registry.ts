@@ -1,15 +1,31 @@
-import { deployImplementationAndRepointProxy } from '@celo/protocol/lib/web3-utils'
-import { config } from '@celo/protocol/migrationsConfig'
+import { build_directory, config } from '@celo/protocol/migrationsConfig'
 import { RegistryInstance } from 'types'
+import { setInitialProxyImplementation } from '../lib/web3-utils'
 
-const initializeArgs = async (): Promise<any[]> => {
-  return []
+const Artifactor = require('truffle-artifactor')
+
+const name = 'Registry'
+const Contract = artifacts.require(name)
+const ContractProxy = artifacts.require(name + 'Proxy')
+
+module.exports = (deployer: any, _networkName: string, _accounts: string[]) => {
+  // tslint:disable-next-line: no-console
+  console.log('Deploying Registry')
+  deployer.deploy(ContractProxy)
+  deployer.deploy(Contract)
+  deployer.then(async () => {
+    const networkId = await web3.eth.net.getId()
+    // Hack to create build artifact.
+    const artifact = ContractProxy._json
+    artifact.networks[networkId] = {
+      address: config.registry.predeployedProxyAddress,
+      // @ts-ignore
+      transactionHash: '0x',
+    }
+    const contractsDir = build_directory + '/contracts'
+    const artifactor = new Artifactor(contractsDir)
+
+    await artifactor.save(artifact)
+    await setInitialProxyImplementation<RegistryInstance>(web3, artifacts, name)
+  })
 }
-
-module.exports = deployImplementationAndRepointProxy<RegistryInstance>(
-  web3,
-  artifacts,
-  config.registry.predeployedProxyAddress,
-  'Registry',
-  initializeArgs
-)

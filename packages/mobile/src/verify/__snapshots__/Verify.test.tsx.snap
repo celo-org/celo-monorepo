@@ -1903,36 +1903,9 @@ exports[`renders the Education step correctly 1`] = `
       "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
-      "paddingTop": 20,
     }
   }
 >
-  <View
-    style={
-      Object {
-        "height": 35,
-        "paddingRight": 10,
-        "paddingTop": 10,
-        "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "width": 70,
-        "zIndex": 100,
-      }
-    }
-  >
-    <Text
-      accessible={true}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-    >
-         
-    </Text>
-  </View>
   <RCTScrollView
     style={
       Object {
@@ -1944,13 +1917,41 @@ exports[`renders the Education step correctly 1`] = `
     <View>
       <View
         style={
+          Object {
+            "height": 35,
+            "paddingRight": 10,
+            "paddingTop": 10,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+            "width": 70,
+            "zIndex": 100,
+          }
+        }
+      >
+        <Text
+          accessible={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+        >
+             
+        </Text>
+      </View>
+      <View
+        style={
           Array [
             Object {
               "alignItems": "center",
               "marginBottom": 25,
               "marginTop": 25,
             },
-            Object {},
+            Object {
+              "marginTop": 0,
+            },
           ]
         }
         testID="VerifyLogo"

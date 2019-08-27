@@ -3,7 +3,6 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { call, select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
 import { GAS_PRICE_STALE_AFTER } from 'src/geth/consts'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { setGasPrice } from 'src/web3/actions'
@@ -77,7 +76,7 @@ describe('refreshGasPrice', () => {
         [select(gasPriceSelector), 0],
         [select(gasPriceLastUpdatedSelector), null],
       ])
-      .put(showError(ErrorMessages.GAS_PRICE_UPDATE_FAILED, ALERT_BANNER_DURATION))
+      .put(showError(ErrorMessages.GAS_PRICE_UPDATE_FAILED))
       .run()
   })
 })

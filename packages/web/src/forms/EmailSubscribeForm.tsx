@@ -23,6 +23,7 @@ const blankForm = {
   interest: '',
 }
 
+// This can be removed
 export class EmailSubscribeForm extends React.Component<Props & I18nProps> {
   render() {
     const { cta, t } = this.props

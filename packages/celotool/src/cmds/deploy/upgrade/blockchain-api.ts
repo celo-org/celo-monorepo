@@ -1,5 +1,6 @@
 import { UpgradeArgv } from '@celo/celotool/src/cmds/deploy/upgrade'
-import { envVar, execCmd, fetchEnv } from '@celo/celotool/src/lib/utils'
+import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
+import { execCmd } from '@celo/celotool/src/lib/utils'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import * as yargs from 'yargs'
 export const command = 'blockchain-api'

@@ -12,10 +12,10 @@ import { Image, StyleSheet, Text, View } from 'react-native'
 import { HomeTransferFragment } from 'src/apollo/types'
 import { DEFAULT_TESTNET } from 'src/config'
 import { features } from 'src/flags'
-import { CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
-import { faucetIcon, inviteVerifyFee } from 'src/images/Images'
+import { faucetIcon, inviteVerifyFee, unknownUserIcon } from 'src/images/Images'
 import { Invitees } from 'src/invite/actions'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
@@ -43,7 +43,7 @@ interface CurrencySymbolProps {
   direction: string
 }
 
-export function getCurrencyStyles(currency: string, type: string): CurrencySymbolProps {
+export function getCurrencyStyles(currency: CURRENCY_ENUM, type: string): CurrencySymbolProps {
   if (
     type === TransactionTypes.SENT ||
     type === TransactionTypes.VERIFICATION_FEE ||
@@ -51,7 +51,7 @@ export function getCurrencyStyles(currency: string, type: string): CurrencySymbo
   ) {
     return {
       color: colors.darkSecondary,
-      symbol: currency === CURRENCY_ENUM.DOLLAR ? '$' : '',
+      symbol: CURRENCIES[currency].symbol,
       direction: '',
     }
   }
@@ -64,14 +64,14 @@ export function getCurrencyStyles(currency: string, type: string): CurrencySymbo
     if (currency === CURRENCY_ENUM.DOLLAR) {
       return {
         color: colors.celoGreen,
-        symbol: '$',
+        symbol: CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol,
         direction: '+',
       }
     }
     if (currency === CURRENCY_ENUM.GOLD) {
       return {
         color: colors.celoGold,
-        symbol: '',
+        symbol: CURRENCIES[CURRENCY_ENUM.GOLD].symbol,
         direction: '+',
       }
     }
@@ -153,7 +153,7 @@ export class TransferFeedItem extends React.PureComponent<Props> {
     let comment: string | null = this.decryptComment(type)
     const timeFormatted = formatFeedTime(timestamp, i18n)
     const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
-    const currencyStyle = getCurrencyStyles(symbol, type)
+    const currencyStyle = getCurrencyStyles(resolveCurrency(symbol), type)
     const isPending = status === TransactionStatus.Pending
     const opacityStyle = { opacity: isPending ? 0.3 : 1 }
 
@@ -186,8 +186,12 @@ export class TransferFeedItem extends React.PureComponent<Props> {
       comment = null
     } else {
       const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
-      fullName = recipient ? recipient.displayName : _.capitalize(t(type.toLowerCase()))
-      contactImage = <ContactCircle address={address} size={avatarSize} />
+      fullName = recipient ? recipient.displayName : t('unknown')
+      contactImage = recipient ? (
+        <ContactCircle address={address} size={avatarSize} />
+      ) : (
+        <Image source={unknownUserIcon} style={styles.image} />
+      )
     }
 
     return (

@@ -10,7 +10,6 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
 import { importContacts } from 'src/identity/actions'
 import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
@@ -86,7 +85,7 @@ class Invite extends React.Component<Props, State> {
       CeloAnalytics.track(CustomEventNames.friend_invited)
       navigate(Screens.InviteReview, { recipient })
     } else {
-      this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE, ALERT_BANNER_DURATION)
+      this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE)
     }
   }
 

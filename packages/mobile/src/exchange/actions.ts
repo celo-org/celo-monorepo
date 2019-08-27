@@ -11,7 +11,6 @@ import BigNumber from 'bignumber.js'
 import { call, put, select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM as Tokens } from 'src/geth/consts'
 import { RootState } from 'src/redux/reducers'
@@ -131,7 +130,7 @@ export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: Token
     )
   } catch (error) {
     Logger.error(TAG, 'Error fetching exchange rate', error)
-    yield put(showError(ErrorMessages.EXCHANGE_RATE_FAILED, ALERT_BANNER_DURATION))
+    yield put(showError(ErrorMessages.EXCHANGE_RATE_FAILED))
   }
 }
 
@@ -202,7 +201,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
         TAG,
         `Not receiving enough ${makerToken} due to change in exchange rate. Exchange failed.`
       )
-      yield put(showError(ErrorMessages.EXCHANGE_RATE_CHANGE, ALERT_BANNER_DURATION))
+      yield put(showError(ErrorMessages.EXCHANGE_RATE_CHANGE))
       return
     }
 
@@ -249,7 +248,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     yield call(sendAndMonitorTransaction, txId, tx, account)
   } catch (error) {
     Logger.error(TAG, 'Error doing exchange', error)
-    yield put(showError(ErrorMessages.EXCHANGE_FAILED, ALERT_BANNER_DURATION))
+    yield put(showError(ErrorMessages.EXCHANGE_FAILED))
     if (txId) {
       yield put(removeStandbyTransaction(txId))
     }
