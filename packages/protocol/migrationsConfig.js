@@ -6,7 +6,7 @@ const DefaultConfig = {
     attestationExpirySeconds: 60 * 60, // 1 hour,
     attestationRequestFeeInDollars: 0.05,
   },
-  bondedDeposits: {
+  lockedGold: {
     maxNoticePeriod: 60 * 60 * 24 * 365 * 3, // 3 years
   },
   oracles: {
@@ -65,8 +65,8 @@ const DefaultConfig = {
   validators: {
     minElectableValidators: '10',
     maxElectableValidators: '100',
-    minBondedDepositValue: '1000000000000000000', // 1 gold
-    minBondedDepositNoticePeriod: 60 * 24 * 60 * 60, // 60 days
+    minLockedGoldValue: '1000000000000000000', // 1 gold
+    minLockedGoldNoticePeriod: 60 * 24 * 60 * 60, // 60 days
 
     validatorKeys: [],
     // We register a single validator group during the migration.
@@ -87,7 +87,7 @@ const linkedLibraries = {
   AddressSortedLinkedList: ['Validators'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
-  Signatures: ['BondedDeposits', 'Escrow'],
+  Signatures: ['LockedGold', 'Escrow'],
 }
 
 const argv = minimist(process.argv.slice(2), {
