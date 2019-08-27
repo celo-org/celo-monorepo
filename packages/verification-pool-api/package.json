@@ -22,6 +22,7 @@
     "test:verbose": "jest --ci --verbose --runInBand --detectOpenHandles"
   },
   "dependencies": {
+    "@types/node": "^12.7.2",
     "bignumber.js": "^7.2.0",
     "eth-lib": "^0.2.8",
     "ethereumjs-util": "^5.2.0",
@@ -30,6 +31,7 @@
     "firebase-functions": "^2.2.0",
     "google-libphonenumber": "^3.2.1",
     "lodash": "^4.17.14",
+    "minimist": "^1.2.0",
     "sleep-promise": "^8.0.1",
     "twilio": "^3.23.2",
     "web3": "1.0.0-beta.37",

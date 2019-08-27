@@ -1,7 +1,7 @@
 // Script used for deploying to firebase
 // To use call ts-node deploy.ts --celo-env YOUR_ENV_NAME --celo-proj YOUR_PROJECT_NAME
 
-import util from '@celo/verification-pool-api/deployment/deployment-utils'
+import * as util from '@celo/verification-pool-api/deployment/deployment-utils'
 import parseArgs from 'minimist'
 
 async function main() {
@@ -14,4 +14,5 @@ async function main() {
   await util.setEnv(envArg)
   await util.deploy(envArg)
 }
+// tslint:disable-next-line: no-floating-promises
 main()
