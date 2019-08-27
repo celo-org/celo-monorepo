@@ -33,6 +33,7 @@
     "lodash": "^4.17.14",
     "minimist": "^1.2.0",
     "sleep-promise": "^8.0.1",
+    "ts-node": "^8.3.0",
     "twilio": "^3.23.2",
     "web3": "1.0.0-beta.37",
     "web3-core-helpers": "1.0.0-beta.37",
