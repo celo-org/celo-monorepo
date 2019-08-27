@@ -64,6 +64,11 @@ export class Backup extends React.Component<Props, State> {
     this.props.enterBackupFlow()
   }
 
+  componentWillUnmount() {
+    // Exit backup flow in unmount instead of cancel, as back button will not trigger onCancel().
+    this.props.exitBackupFlow()
+  }
+
   // TODO(Rossy): Move out of here into a saga
   retrieveMnemonic = async () => {
     if (this.state.mnemonic) {
@@ -103,7 +108,6 @@ export class Backup extends React.Component<Props, State> {
   }
 
   onCancel = async () => {
-    this.props.exitBackupFlow()
     navigateBack()
   }
 
