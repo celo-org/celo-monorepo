@@ -186,12 +186,14 @@ export class TransferFeedItem extends React.PureComponent<Props> {
       comment = null
     } else {
       const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
+      const shortAddr = address.substring(0, 8)
+
       if (recipient) {
         fullName = recipient.displayName
       } else if (type === TransactionTypes.RECEIVED) {
-        fullName = `${t('receivedFrom')} ${address.substring(0, 8)}`
+        fullName = t('receivedFrom', { address: shortAddr })
       } else if (type === TransactionTypes.SENT) {
-        fullName = `${t('sentTo')} ${address.substring(0, 8)}`
+        fullName = t('sentTo', { address: shortAddr })
       } else {
         // Fallback to just using the type
         fullName = _.capitalize(t(_.camelCase(type)))
