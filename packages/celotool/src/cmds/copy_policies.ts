@@ -59,7 +59,7 @@ export const handler = async (argv: CopyPoliciesArgv) => {
 
     const toProject = fetchEnv(envVar.TESTNET_PROJECT_NAME)
 
-    for (var policy of fromPolicies) {
+    for (let policy of fromPolicies) {
       // Delete automatically generated fields per
       // https://cloud.google.com/monitoring/alerts/using-alerting-api#monitoring_alert_list_policies-gcloud
       delete policy.name
@@ -78,7 +78,7 @@ export const handler = async (argv: CopyPoliciesArgv) => {
 
       // It's an Applications alert if displayName matches one of the prefixes specified by
       // STACKDRIVER_NOTIFICATION_APPLICATIONS_PREFIX. Otherwise Protocol.
-      var toNotificationChannel = toNotificationChannelProtocol
+      let toNotificationChannel = toNotificationChannelProtocol
       for (const prefix of policyApplicationsPrefixs) {
         if (policy.displayName.startsWith(prefix)) {
           toNotificationChannel = toNotificationChannelApplications
