@@ -78,7 +78,7 @@ Celo uses a Proof of Stake mechanism for selecting the validator set for a fixed
 
 Celo uses an on-chain governance mechanism to manage and upgrade aspects of the protocol that reside in the Celo Core Contracts, and for a number of parameters used by the Celo Blockchain. This includes operations like upgrading smart contracts, adding new stable currencies, modifying the reserve target asset allocation, and changing how validator elections are decided.
 
-The Governance contract is set as “owner” for all of the Celo Core Contracts. This allows the protocol to carry out agreed governance proposals by executing code in the context of the Governance contract. Proposals are selected for consideration and voted on by Celo Gold holders using a weighted vote based on the same bonded deposit used to vote to elect validators.
+The Governance contract is set as “owner” for all of the Celo Core Contracts. This allows the protocol to carry out agreed governance proposals by executing code in the context of the Governance contract. Proposals are selected for consideration and voted on by Celo Gold holders using a weighted vote based on the same Locked Gold commitment used to vote to elect validators.
 
 ### Ultralight Synchronization
 
