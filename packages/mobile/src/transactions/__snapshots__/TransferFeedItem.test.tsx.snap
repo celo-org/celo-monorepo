@@ -600,7 +600,7 @@ exports[`transfer feed item renders correctly for received 1`] = `
               }
             }
           >
-            receivedFrom 0x000000
+            receivedFrom
           </Text>
         </View>
       </View>
@@ -906,7 +906,7 @@ exports[`transfer feed item renders correctly for received with encrypted commen
               }
             }
           >
-            receivedFrom 0x000000
+            receivedFrom
           </Text>
           <Text
             style={
@@ -1091,7 +1091,7 @@ exports[`transfer feed item renders correctly for sent 1`] = `
               }
             }
           >
-            sentTo 0x000000
+            sentTo
           </Text>
         </View>
       </View>
@@ -1397,7 +1397,7 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
               }
             }
           >
-            sentTo 0x000000
+            sentTo
           </Text>
           <Text
             style={
@@ -1582,7 +1582,7 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
               }
             }
           >
-            sentTo 0x1Ff482
+            sentTo
           </Text>
           <Text
             style={

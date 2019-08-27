@@ -224,7 +224,7 @@ exports[`renders for error 1`] = `
                     }
                   }
                 >
-                  sentTo 0072bvy2
+                  sentTo
                 </Text>
                 <Text
                   style={
@@ -702,7 +702,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                     }
                   }
                 >
-                  sentTo 0072bvy2
+                  sentTo
                 </Text>
                 <Text
                   style={
@@ -1405,7 +1405,7 @@ exports[`renders for loading 1`] = `
                     }
                   }
                 >
-                  sentTo 0072bvy2
+                  sentTo
                 </Text>
                 <Text
                   style={
@@ -1905,7 +1905,7 @@ exports[`renders for no transactions 1`] = `
                     }
                   }
                 >
-                  sentTo 0072bvy2
+                  sentTo
                 </Text>
                 <Text
                   style={
@@ -2405,7 +2405,7 @@ exports[`renders for standbyTransactions 1`] = `
                     }
                   }
                 >
-                  sentTo 0072bvy2
+                  sentTo
                 </Text>
                 <Text
                   style={
