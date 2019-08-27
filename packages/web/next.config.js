@@ -24,8 +24,8 @@ module.exports = withImages(
           ...config.resolve.alias,
           'react-native$': 'react-native-web',
         }
-        if (isServer) {
-          config.resolve.alias['@sentry/browser'] = '@sentry/node'
+        if (!isServer) {
+          config.resolve.alias['@sentry/node'] = '@sentry/browser'
         }
 
         return config

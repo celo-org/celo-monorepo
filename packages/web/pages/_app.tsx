@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/browser'
+import Sentry, { initSentry } from '../fullstack/sentry'
 import App, { Container } from 'next/app'
 import * as React from 'react'
 import { View } from 'react-native'
@@ -12,6 +12,7 @@ import { appWithTranslation } from '../src/i18n'
 config({ ssrReveal: true })
 class MyApp extends App {
   componentDidMount() {
+    initSentry()
     if (window.location.hash) {
       setTimeout(() => {
         scrollTo(window.location.hash.slice(1), 'start')

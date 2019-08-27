@@ -6,7 +6,7 @@ import * as expressEnforcesSsl from 'express-enforces-ssl'
 import * as helmet from 'helmet'
 import * as next from 'next'
 import nextI18NextMiddleware from 'next-i18next/middleware'
-import Sentry from '../fullstack/sentry'
+import Sentry, { initSentry } from '../fullstack/sentry'
 import addToCRM from '../server/addToCRM'
 import ecoFundSubmission from '../server/EcoFundApp'
 import nextI18next from '../src/i18n'
@@ -146,6 +146,7 @@ function wwwRedirect(req, res, nextAction) {
     return handle(req, res)
   })
 
+  initSentry()
   await server.listen(port)
 
   // tslint:disable-next-line

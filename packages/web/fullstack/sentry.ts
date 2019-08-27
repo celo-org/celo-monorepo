@@ -1,20 +1,14 @@
-import * as Sentry from '@sentry/browser'
+import * as Sentry from '@sentry/node'
 import getConfig from 'next/config'
-import * as sentryTestkit from 'sentry-testkit'
-
-const { testkit, sentryTransport } = sentryTestkit()
-;(() => {
-  const { publicRuntimeConfig } = getConfig() || { publicRuntimeConfig: {} }
-  const config = publicRuntimeConfig.SENTRY || {}
+export function initSentry() {
+  const { publicRuntimeConfig } = getConfig()
+  const config = publicRuntimeConfig.SENTRY
 
   Sentry.init({
-    debug: true,
+    debug: process.env.DEPLOY_ENV === 'development',
     dsn: `https://${config.KEY}@sentry.io/${config.PROJECT}`,
-    // environment: publicRuntimeConfig.FLAGS.ENV,
-    transport: sentryTransport,
+    environment: process.env.DEPLOY_ENV,
   })
-})()
+}
 
 export default Sentry
-
-export const kit = testkit
