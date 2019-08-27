@@ -1,12 +1,16 @@
+locals {
+  name_prefix = "${var.celo_env}-tx-node"
+}
+
 resource "google_compute_address" "tx_node" {
-  name         = "${var.celo_env}-tx-node-address-${count.index}"
+  name         = "${local.name_prefix}-address-${count.index}"
   address_type = "EXTERNAL"
 
   count = var.tx_node_count
 }
 
 resource "google_compute_instance" "tx_node" {
-  name         = "${var.celo_env}-tx-node-${count.index}"
+  name         = "${local.name_prefix}-${count.index}"
   machine_type = "n1-standard-1"
 
   count = var.tx_node_count
