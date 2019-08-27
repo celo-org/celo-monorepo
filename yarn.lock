@@ -3940,15 +3940,15 @@
   dependencies:
     any-observable "^0.3.0"
 
-"@segment/analytics-react-native-firebase@^0.1.0-beta.0":
-  version "0.1.0-beta.0"
-  resolved "https://registry.yarnpkg.com/@segment/analytics-react-native-firebase/-/analytics-react-native-firebase-0.1.0-beta.0.tgz#b4d0a75b38f7e8a432286cdd00c6e3191383e407"
-  integrity sha512-l0W8QTXYLLIRXX3DWZGKz9sjO8bsDgG9eStCjby1rpVFtvFDKjfH71NbkIp1h3FTlEoo1MVXPk/5GEB72rs2xA==
+"@segment/analytics-react-native-firebase@^1.1.0-beta.1":
+  version "1.1.0-beta.1"
+  resolved "https://registry.yarnpkg.com/@segment/analytics-react-native-firebase/-/analytics-react-native-firebase-1.1.0-beta.1.tgz#3871a502776c83ff9e853808c5f4bc27a1d3b428"
+  integrity sha512-o1IrUR4BlwWaQYLU17jFqEgx1YNjNdUeDDJql3ojj03YfxpUbB7baVtgzJ6osArLH7hfHVmEPLBjsj71iM/uMw==
 
-"@segment/analytics-react-native@^0.1.0-beta.0":
-  version "0.1.0-beta.0"
-  resolved "https://registry.yarnpkg.com/@segment/analytics-react-native/-/analytics-react-native-0.1.0-beta.0.tgz#fb1c5ff9f72d6946b263777943af7d7abb157694"
-  integrity sha512-hIVs10hZn7i13BqKu/ikHhgOZUwXCFjjy61DFFsZbD7d/3Xi/X810TjQva+lBH1E27kbp+WIJ8nh+UzWlKTjPw==
+"@segment/analytics-react-native@^1.1.0-beta.1":
+  version "1.1.0-beta.1"
+  resolved "https://registry.yarnpkg.com/@segment/analytics-react-native/-/analytics-react-native-1.1.0-beta.1.tgz#37c76996f96289807d318607616450df948aae4c"
+  integrity sha512-anx+qRgDpiBIfcWUu7cbgyV+uacWwdH0ObmLKxAiZPwQH796M7om9QzgO7k6GTnre9uVwaT99T5nW7FuiBZjBg==
 
 "@segment/in-eu@^0.2.1":
   version "0.2.1"
@@ -7986,11 +7986,6 @@ bn.js@^2.0.3:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-2.2.0.tgz#12162bc2ae71fc40a5626c33438f3a875cd37625"
   integrity sha1-EhYrwq5x/EClYmwzQ486h1zTdiU=
-
-bn.js@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-5.0.0.tgz#5c3d398021b3ddb548c1296a16f857e908f35c70"
-  integrity sha512-bVwDX8AF+72fIUNuARelKAlQUNtPOfG2fRxorbVvFk4zpHbqLrPdOGfVg5vrKwVzLLePqPBiATaOZNELQzmS0A==
 
 body-parser@1.18.2, body-parser@^1.16.0:
   version "1.18.2"

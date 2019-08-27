@@ -46,8 +46,8 @@ export async function startGanache(datadir: string, opts: { verbose?: boolean } 
 
 export default function setup() {
   const DATADIR = path.resolve(path.join(__dirname, '../../.devchain'))
-  console.log('Starting Ganache: datadir=', DATADIR)
-  startGanache(DATADIR)
+  // console.log('Starting Ganache: datadir=', DATADIR)
+  return startGanache(DATADIR)
     .then((stopGanache) => {
       ;(global as any).stopGanache = stopGanache
     })

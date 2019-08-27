@@ -1,12 +1,10 @@
-import { LockedGold } from '@celo/walletkit'
+import { Address } from '@celo/utils/lib/src/address'
 import { flags } from '@oclif/command'
-import Web3 from 'web3'
+import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
 import { displaySendTx, failWith } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { Address } from '../../utils/helpers'
 import { LockedGoldArgs } from '../../utils/lockedgold'
-import { Op, requireCall } from '../../utils/require'
 
 export default class Commitment extends BaseCommand {
   static description = 'Create a Locked Gold commitment given notice period and gold amount'
@@ -27,23 +25,27 @@ export default class Commitment extends BaseCommand {
   async run() {
     const res = this.parse(Commitment)
     const address: Address = res.flags.from
-    const lockedGold = await LockedGold(this.web3, address)
 
-    const noticePeriod = Web3.utils.toBN(res.flags.noticePeriod)
-    const goldAmount = Web3.utils.toBN(res.flags.goldAmount)
+    this.kit.defaultAccount = address
+    const lockedGold = await this.kit.contracts.getLockedGold()
 
-    await requireCall(lockedGold.methods.isVoting(address), Op.EQ, false, '!isVoting(address)')
+    const noticePeriod = new BigNumber(res.flags.noticePeriod)
+    const goldAmount = new BigNumber(res.flags.goldAmount)
 
-    const maxNoticePeriod = Web3.utils.toBN(await lockedGold.methods.maxNoticePeriod().call())
+    if (!(await lockedGold.isVoting(address))) {
+      failWith(`require(!isVoting(address)) => false`)
+    }
+
+    const maxNoticePeriod = await lockedGold.maxNoticePeriod()
     if (!maxNoticePeriod.gte(noticePeriod)) {
       failWith(`require(noticePeriod <= maxNoticePeriod) => [${noticePeriod}, ${maxNoticePeriod}]`)
     }
-    if (!goldAmount.gt(Web3.utils.toBN(0))) {
+    if (!goldAmount.gt(new BigNumber(0))) {
       failWith(`require(goldAmount > 0) => [${goldAmount}]`)
     }
 
     // await displaySendTx('redeemRewards', lockedGold.methods.redeemRewards())
-    const tx = lockedGold.methods.newCommitment(noticePeriod.toString())
+    const tx = lockedGold.newCommitment(noticePeriod.toString())
     await displaySendTx('lockup', tx, { value: goldAmount.toString() })
   }
 }
