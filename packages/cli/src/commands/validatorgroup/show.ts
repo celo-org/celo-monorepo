@@ -1,5 +1,4 @@
 import { IArg } from '@oclif/parser/lib/args'
-import { ValidatorsAdapter } from '../../adapters/validators'
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 import { Args } from '../../utils/command'
@@ -17,9 +16,8 @@ export default class ValidatorGroupShow extends BaseCommand {
 
   async run() {
     const { args } = this.parse(ValidatorGroupShow)
-    const validatorGroup = await new ValidatorsAdapter(this.web3).getValidatorGroup(
-      args.groupAddress
-    )
+    const validators = await this.kit.contracts.getValidators()
+    const validatorGroup = await validators.getValidatorGroup(args.groupAddress)
     printValueMap(validatorGroup)
   }
 }
