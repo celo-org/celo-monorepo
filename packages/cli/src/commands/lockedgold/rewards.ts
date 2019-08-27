@@ -1,5 +1,4 @@
 import { flags } from '@oclif/command'
-import { LockedGoldAdapter } from '../../adapters/locked-gold'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -37,15 +36,15 @@ export default class Rewards extends BaseCommand {
       return
     }
 
-    const adapter = await new LockedGoldAdapter(this.web3, res.flags.from)
+    this.kit.defaultAccount = res.flags.from
+    const lockedGold = await this.kit.contracts.getLockedGold()
     if (res.flags.redeem) {
-      const contract = await adapter.contract()
-      const tx = contract.methods.redeemRewards()
+      const tx = lockedGold.redeemRewards()
       await displaySendTx('redeemRewards', tx)
     }
 
     if (res.flags.delegate) {
-      const tx = await adapter.delegateRewardsTx(res.flags.from, res.flags.delegate)
+      const tx = await lockedGold.delegateRewardsTx(res.flags.from, res.flags.delegate)
       await displaySendTx('delegateRewards', tx)
     }
   }

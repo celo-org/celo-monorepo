@@ -1,6 +1,5 @@
 import chalk from 'chalk'
 import { cli } from 'cli-ux'
-import { LockedGoldAdapter } from '../../adapters/locked-gold'
 import { BaseCommand } from '../../base'
 import { Args } from '../../utils/command'
 
@@ -18,7 +17,8 @@ export default class List extends BaseCommand {
   async run() {
     const { args } = this.parse(List)
     cli.action.start('Fetching commitments...')
-    const commitments = await new LockedGoldAdapter(this.web3).getCommitments(args.account)
+    const lockedGold = await this.kit.contracts.getLockedGold()
+    const commitments = await lockedGold.getCommitments(args.account)
     cli.action.stop()
 
     cli.log(chalk.bold.yellow('Total Gold Locked \t') + commitments.total.gold)
