@@ -7,13 +7,12 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { MinimalContact } from 'react-native-contacts'
 
-interface Props {
+export interface Props {
   contact?: MinimalContact
   name?: string
   address?: string
   e164Number?: string
   thumbnailPath?: string
-  thumbnail?: JSX.Element
   defaultCountryCode: string
   iconSize: number
 }
@@ -23,11 +22,11 @@ export class Avatar extends React.PureComponent<Props> {
     const {
       contact,
       thumbnailPath,
-      thumbnail,
       address,
       defaultCountryCode,
       iconSize,
       name,
+      children,
     } = this.props
     let { e164Number } = this.props
     const userName = contact ? contact.displayName : name
@@ -48,8 +47,8 @@ export class Avatar extends React.PureComponent<Props> {
 
     return (
       <View style={style.container}>
-        {thumbnail ? (
-          thumbnail
+        {children ? (
+          children
         ) : (
           <ContactCircle
             style={style.contactCircle}

@@ -1,4 +1,3 @@
-import { Avatar } from '@celo/react-components/components/Avatar'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
@@ -8,10 +7,11 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import { Avatar } from 'src/components/Avatar'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
-import { faucetIcon, unknownUserIcon } from 'src/images/Images'
-import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
+import { faucetIcon } from 'src/images/Images'
+import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import FeeIcon from 'src/send/FeeIcon'
 import { TransactionTypes } from 'src/transactions/reducer'
@@ -106,22 +106,12 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
     e164PhoneNumber: string | undefined,
     defaultCountryCode: string
   ) => {
-    const defaultThumbnail = <Image source={unknownUserIcon} style={[style.defaultIcon]} />
-
     if (type === TransactionTypes.VERIFICATION_FEE || type === TransactionTypes.FAUCET) {
       return <Image source={faucetIcon} style={style.icon} />
     } else {
       return (
         <View style={style.avatar}>
-          <Avatar
-            name={recipient ? recipient.displayName : undefined}
-            thumbnailPath={recipient ? getRecipientThumbnail(recipient) : undefined}
-            thumbnail={!recipient ? defaultThumbnail : undefined}
-            address={address}
-            e164Number={e164PhoneNumber}
-            defaultCountryCode={defaultCountryCode}
-            iconSize={iconSize}
-          />
+          <Avatar recipient={recipient} defaultCountryCode={defaultCountryCode} />
         </View>
       )
     }

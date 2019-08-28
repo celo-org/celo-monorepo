@@ -12,7 +12,7 @@ interface Props {
   address?: string
   size: number
   preferNameInitial?: boolean
-  thumbnailPath?: string
+  thumbnailPath?: string | null
   displayInitials?: string | null
 }
 

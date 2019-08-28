@@ -1,4 +1,3 @@
-import { Avatar } from '@celo/react-components/components/Avatar'
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
@@ -24,6 +23,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { Avatar } from 'src/components/Avatar'
 import { FeeType } from 'src/fees/actions'
 import EstimateFee from 'src/fees/EstimateFee'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
@@ -340,13 +340,7 @@ export class SendAmount extends React.Component<Props, State> {
           contentContainerStyle={style.scrollViewContentContainer}
         >
           <DisconnectBanner />
-          <Avatar
-            name={recipient.displayName}
-            address={recipient.address}
-            e164Number={recipient.e164PhoneNumber}
-            defaultCountryCode={this.props.defaultCountryCode}
-            iconSize={40}
-          />
+          <Avatar recipient={recipient} defaultCountryCode={this.props.defaultCountryCode} />
           {verificationStatus === VerificationStatus.UNKNOWN && (
             <View style={style.verificationStatusContainer}>
               <Text style={[fontStyles.bodySmall]}>{t('loadingVerificationStatus')}</Text>
@@ -460,6 +454,12 @@ const style = StyleSheet.create({
   },
   loadingIcon: {
     marginHorizontal: 5,
+  },
+  defaultIcon: {
+    height: 40,
+    width: 40,
+    alignSelf: 'center',
+    margin: 'auto',
   },
 })
 
