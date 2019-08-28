@@ -1,4 +1,4 @@
-import { envVar, fetchEnv, fetchEnvOrFallback } from '@celo/celotool/src/lib/env-utils'
+import { fetchEnv, fetchEnvOrFallback, isVmBased } from '@celo/celotool/src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from '@celo/celotool/src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from '@celo/celotool/src/lib/utils'
 import { getTestnetOutputs } from '@celo/celotool/src/lib/vm-testnet-utils'
@@ -76,8 +76,4 @@ async function helmParameters(
     params.push(`--set blockscout.jsonrpc_ws_url=ws://${txNodeLbIp}:8546`)
   }
   return params
-}
-
-function isVmBased() {
-  return fetchEnv(envVar.VM_BASED) === 'true'
 }

@@ -24426,11 +24426,6 @@ react-move@^5.0.0:
     prop-types "^15.7.2"
     react-lifecycles-compat "^3.0.4"
 
-react-native-android-broadcast-receiver-for-referrer@^1.0.7:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/react-native-android-broadcast-receiver-for-referrer/-/react-native-android-broadcast-receiver-for-referrer-1.0.7.tgz#95b9ec9ee810b44b88feaec80cd0572fc072e478"
-  integrity sha512-/Beeo65b7XE23e2N4hlHfC4xDnYLdVjrWpuQ+JBorcYGxIMGMvLi71OjV/dn63lxIg4U1iXYhLCGtmckwBBXLQ==
-
 react-native-android-open-settings@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/react-native-android-open-settings/-/react-native-android-open-settings-1.2.0.tgz#95d045df5da51f52a9ade939ae3c4f28d7d9dec0"
@@ -24483,10 +24478,10 @@ react-native-config@^0.11.7:
   resolved "https://registry.yarnpkg.com/react-native-config/-/react-native-config-0.11.7.tgz#a2b323f2ecd76a4df88cbb6bc86eaa2ef9febee7"
   integrity sha512-dn5s+zhwLyE25vRT/vaEtLk/j8ZL1UZKvejORNDWakSwpOnLmFurFeaZV83IqkPlfWHXHFdsYe2IRYG1WN4WkQ==
 
-react-native-confirm-device-credentials@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/react-native-confirm-device-credentials/-/react-native-confirm-device-credentials-1.0.0.tgz#7802ace025c366e162835ecd6617355118dbd2e8"
-  integrity sha512-/44Pm1HonCH4wsOPu4LvItoUpe9viLs4icIEgRL8k/3JV4WKLgNIVstrxLFBdm7ouF77a8rHtNFYvIOr0G0vdg==
+react-native-confirm-device-credentials@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-confirm-device-credentials/-/react-native-confirm-device-credentials-2.0.0.tgz#f414056b38f24b0128846e1b9b2662c578133d43"
+  integrity sha512-RIrvU0Kkm061IxK7MEoCrvk4tQNu0W2hBYpuhKgVBzB2yYJbs9pzuk4U3GkFjeUUSiUioZoTE50OD2I7bNlktA==
 
 "react-native-contacts@git://github.com/celo-org/react-native-contacts#4989b0b":
   version "4.0.2"
@@ -24554,6 +24549,11 @@ react-native-gesture-handler@^1.1.0:
 "react-native-geth@git+https://github.com/celo-org/react-native-geth#51dc4f1":
   version "0.1.0-development"
   resolved "git+https://github.com/celo-org/react-native-geth#51dc4f1bb36bcf6280d19ff7ef2546d631a1eb32"
+
+react-native-install-referrer@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-install-referrer/-/react-native-install-referrer-1.0.1.tgz#a44ce5353aee503ca3d56af3d94bd445445e8611"
+  integrity sha512-eOG5YOU/CSmqgbYQkmgiCLScLB20VSu2L+1+KY7VOM8/PaE39PCPxme0FynUFjABPmeZ21FTnTqu89DeMR18jQ==
 
 react-native-iphone-x-helper@^1.0.1:
   version "1.0.2"

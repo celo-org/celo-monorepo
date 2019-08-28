@@ -1,4 +1,5 @@
 import App, { Container } from 'next/app'
+import getConfig from 'next/config'
 import * as React from 'react'
 import { View } from 'react-native'
 import config from 'react-reveal/globals'
@@ -17,6 +18,10 @@ class MyApp extends App {
       setTimeout(() => {
         scrollTo(window.location.hash.slice(1), 'start')
       }, 200)
+    }
+
+    if (getConfig().publicRuntimeConfig.FLAGS.ENV === 'development') {
+      checkH1Count()
     }
   }
 
@@ -52,3 +57,14 @@ class MyApp extends App {
 }
 
 export default appWithTranslation(MyApp)
+
+function checkH1Count() {
+  setTimeout(() => {
+    if (document.getElementsByTagName('h1').length > 1) {
+      console.warn(
+        'To many h1 tags on page. This decreases search rank, please limit to 1 per page',
+        Array.from(document.getElementsByTagName('h1')).map((el) => el.innerText)
+      )
+    }
+  }, 500)
+}
