@@ -50,10 +50,5 @@ resource "google_compute_instance_group" "tx_node_lb" {
 }
 
 resource "random_id" "tx_node_lb" {
-  # generate a new id if the tx_node_self_links change
-  keepers = {
-    tx_node_self_links = var.tx_node_self_links
-  }
-
   byte_length = 8
 }

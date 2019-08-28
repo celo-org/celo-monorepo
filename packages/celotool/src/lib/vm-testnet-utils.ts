@@ -171,15 +171,30 @@ export async function taintTestnet(celoEnv: string) {
     testnetTerraformModule,
     `module.validator.google_compute_disk.validator`
   )
+  // tx-node random id
+  console.info('Tainting tx-node random ids...')
+  await taintEveryResourceWithPrefix(testnetTerraformModule, `module.tx_node.random_id.tx_node`)
+  // tx-node addresses
+  console.info('Tainting tx-node addresses...')
+  await taintEveryResourceWithPrefix(
+    testnetTerraformModule,
+    `module.tx_node.google_compute_address.tx_node`
+  )
   // tx-nodes
   console.info('Tainting tx-nodes...')
   await taintEveryResourceWithPrefix(
     testnetTerraformModule,
     `module.tx_node.google_compute_instance.tx_node`
   )
+  // tx-node instance group random id
+  console.info('Tainting tx-node instance group random id...')
+  await taintTerraformModuleResource(
+    testnetTerraformModule,
+    `module.tx_node_lb.random_id.tx_node_lb`
+  )
   // tx-node instance group
   console.info('Tainting tx-node instance group...')
-  await untaintTerraformModuleResource(
+  await taintTerraformModuleResource(
     testnetTerraformModule,
     `module.tx_node_lb.google_compute_instance_group.tx_node_lb`
   )
@@ -212,13 +227,27 @@ export async function untaintTestnet(celoEnv: string) {
     testnetTerraformModule,
     `module.validator.google_compute_disk.validator`
   )
+  // tx-node random id
+  console.info('Untainting tx-node random ids...')
+  await untaintEveryResourceWithPrefix(testnetTerraformModule, `module.tx_node.random_id.tx_node`)
+  // tx-node addresses
+  console.info('Untainting tx-node addresses...')
+  await untaintEveryResourceWithPrefix(
+    testnetTerraformModule,
+    `module.tx_node.google_compute_address.tx_node`
+  )
   // tx-nodes
   console.info('Untainting tx-nodes...')
   await untaintEveryResourceWithPrefix(
     testnetTerraformModule,
     `module.tx_node.google_compute_instance.tx_node`
   )
-
+  // tx-node instance group random id
+  console.info('Untainting tx-node instance group random id...')
+  await untaintTerraformModuleResource(
+    testnetTerraformModule,
+    `module.tx_node_lb.random_id.tx_node_lb`
+  )
   // tx-node instance group
   console.info('Untainting tx-node instance group...')
   await untaintTerraformModuleResource(

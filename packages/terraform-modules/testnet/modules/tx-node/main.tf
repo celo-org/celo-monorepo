@@ -3,10 +3,14 @@ locals {
 }
 
 resource "google_compute_address" "tx_node" {
-  name         = "${local.name_prefix}-address-${count.index}"
+  name         = "${local.name_prefix}-address-${count.index}-${random_id.tx_node[count.index].hex}"
   address_type = "EXTERNAL"
 
   count = var.tx_node_count
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "google_compute_instance" "tx_node" {
@@ -56,15 +60,14 @@ resource "google_compute_instance" "tx_node" {
     email  = var.gcloud_vm_service_account_email
     scopes = ["storage-ro"]
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "random_id" "tx_node" {
   count = var.tx_node_count
-
-  # generate a new id if the instance_id of the tx_node instance changes
-  keepers = {
-    instance_id = google_compute_instance.tx_node[count.index].instance_id
-  }
 
   byte_length = 8
 }
