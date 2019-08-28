@@ -1,4 +1,3 @@
-import Sentry, { initSentry } from '../fullstack/sentry'
 import App, { Container } from 'next/app'
 import * as React from 'react'
 import { View } from 'react-native'
@@ -7,6 +6,7 @@ import Header from 'src/header/Header.3'
 import { ScreenSizeProvider } from 'src/layout/ScreenSize'
 import Footer from 'src/shared/Footer.3'
 import { scrollTo } from 'src/utils/utils'
+import Sentry, { initSentry } from '../fullstack/sentry'
 import { appWithTranslation } from '../src/i18n'
 
 config({ ssrReveal: true })

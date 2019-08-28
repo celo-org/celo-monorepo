@@ -3,8 +3,8 @@ import * as React from 'react'
 import { AppRegistry, I18nManager } from 'react-native-web'
 import analytics from 'src/analytics/analytics'
 import { setDimensionsForScreen } from 'src/layout/ScreenSize'
-import { isLocaleRTL } from '../server/i18nSetup'
 import Sentry from '../fullstack/sentry'
+import { isLocaleRTL } from '../server/i18nSetup'
 // @ts-ignore
 const a = analytics
 
