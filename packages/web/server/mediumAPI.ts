@@ -83,7 +83,10 @@ export async function getFormattedMediumArticles(): Promise<Articles> {
     const articles = transform(parseXML(xmlString))
     return { articles }
   } catch (e) {
-    Sentry.captureException(e)
+    Sentry.withScope((scope) => {
+      scope.setTag('Service', 'Medium')
+      Sentry.captureException(e)
+    })
     return { articles: [] }
   }
 }

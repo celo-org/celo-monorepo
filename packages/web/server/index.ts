@@ -92,7 +92,10 @@ function wwwRedirect(req, res, nextAction) {
       })
       res.status(204)
     } catch (e) {
-      Sentry.captureException(e)
+      Sentry.withScope((scope) => {
+        scope.setTag('Service', 'Airtable')
+        Sentry.captureException(e)
+      })
       res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
     }
   })
@@ -102,7 +105,10 @@ function wwwRedirect(req, res, nextAction) {
       const record = await ecoFundSubmission(req.body, req.params.table)
       res.status(204).json({ id: record.id })
     } catch (e) {
-      Sentry.captureException(e)
+      Sentry.withScope((scope) => {
+        scope.setTag('Service', 'Airtable')
+        Sentry.captureException(e)
+      })
       res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
     }
   })

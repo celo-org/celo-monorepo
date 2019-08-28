@@ -67,7 +67,10 @@ export function intializeTableTop() {
       })
     } catch (e) {
       resolve([])
-      Sentry.captureException(e)
+      Sentry.withScope((scope) => {
+        scope.setTag('Service', 'GoogleSheets')
+        Sentry.captureException(e)
+      })
     }
   })
   return Promise.race([promise, abort(getURL(), 3000).catch(() => [])])

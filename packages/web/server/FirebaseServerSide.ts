@@ -27,7 +27,7 @@ async function getFirebase() {
       await firebase.auth().signInWithEmailAndPassword(loginUsername, loginPassword)
     } catch (e) {
       Sentry.withScope((scope) => {
-        scope.setTag('Firebase', 'auth')
+        scope.setTag('Service', 'Firebase')
         Sentry.captureException(e)
       })
       console.error(`Fail to login into Firebase: ${e}`)
@@ -53,7 +53,7 @@ export async function sendRequest(beneficiary: Address | E164Number, type: Reque
     return ref.key
   } catch (e) {
     Sentry.withScope((scope) => {
-      scope.setTag('Firebase', 'sendRequest')
+      scope.setTag('Service', 'Firebase')
       Sentry.captureException(e)
     })
 
