@@ -15,9 +15,12 @@ import {
   applyTerraformModule,
   destroyTerraformModule,
   getTerraformModuleOutputs,
+  getTerraformModuleResourceNames,
   initTerraformModule,
   planTerraformModule,
+  taintTerraformModuleResource,
   TerraformVars,
+  untaintTerraformModuleResource,
 } from '@celo/celotool/src/lib/terraform'
 import {
   uploadFileToGoogleStorage,
@@ -53,17 +56,17 @@ const testnetNetworkEnvVars: TerraformVars = {
   gcloud_project: envVar.TESTNET_PROJECT_NAME,
 }
 
-export async function deploy(celoEnv: string) {
+export async function deploy(celoEnv: string, onConfirmFailed?: () => Promise<void>) {
   // If we are not using the default network, we want to create/upgrade our network
   if (!useDefaultNetwork()) {
     console.info('First deploying the testnet VPC network')
 
     const networkVars: TerraformVars = getTestnetNetworkVars(celoEnv)
-    await deployModule(celoEnv, testnetNetworkTerraformModule, networkVars)
+    await deployModule(celoEnv, testnetNetworkTerraformModule, networkVars, onConfirmFailed)
   }
 
   const testnetVars: TerraformVars = getTestnetVars(celoEnv)
-  await deployModule(celoEnv, testnetTerraformModule, testnetVars, async () => {
+  await deployModule(celoEnv, testnetTerraformModule, testnetVars, onConfirmFailed, async () => {
     console.info('Generating and uploading secrets env files to Google Storage...')
     await generateAndUploadSecrets(celoEnv)
   })
@@ -75,7 +78,8 @@ async function deployModule(
   celoEnv: string,
   terraformModule: string,
   vars: TerraformVars,
-  preApplyAction?: () => Promise<void>
+  onConfirmFailed?: () => Promise<void>,
+  onConfirmSuccess?: () => Promise<void>
 ) {
   const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(celoEnv, terraformModule)
 
@@ -94,13 +98,10 @@ async function deployModule(
   await planTerraformModule(terraformModule, vars)
 
   await confirmAction(
-    `Are you sure you want to perform the above plan for Celo env ${celoEnv} in environment ${envType}?`
+    `Are you sure you want to perform the above plan for Celo env ${celoEnv} in environment ${envType}?`,
+    onConfirmFailed,
+    onConfirmSuccess
   )
-
-  // Perform anything we want to do before applying
-  if (preApplyAction) {
-    await preApplyAction()
-  }
 
   console.info('Applying...')
   await applyTerraformModule(terraformModule)
@@ -140,6 +141,96 @@ async function destroyModule(celoEnv: string, terraformModule: string, vars: Ter
   await confirmAction(`Are you sure you want to destroy ${celoEnv} in environment ${envType}?`)
 
   await destroyTerraformModule(terraformModule, vars)
+}
+
+// force the recreation of various resources upon the next deployment
+export async function taintTestnet(celoEnv: string) {
+  console.info('Tainting testnet...')
+  const vars: TerraformVars = getTestnetVars(celoEnv)
+  const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(
+    celoEnv,
+    testnetTerraformModule
+  )
+  await initTerraformModule(testnetTerraformModule, vars, backendConfigVars)
+
+  // bootnode
+  console.info('Tainting bootnode...')
+  await taintTerraformModuleResource(
+    testnetTerraformModule,
+    `module.bootnode.google_compute_instance.bootnode`
+  )
+  // validators
+  console.info('Tainting validators...')
+  await taintEveryResourceWithPrefix(
+    testnetTerraformModule,
+    `module.validator.google_compute_instance.validator`
+  )
+  // validator disks
+  console.info('Tainting validator disks...')
+  await taintEveryResourceWithPrefix(
+    testnetTerraformModule,
+    `module.validator.google_compute_disk.validator`
+  )
+  // tx-nodes
+  console.info('Tainting tx-nodes...')
+  await taintEveryResourceWithPrefix(
+    testnetTerraformModule,
+    `module.tx_node.google_compute_instance.tx_node`
+  )
+}
+
+export async function untaintTestnet(celoEnv: string) {
+  console.info('Untainting testnet...')
+  const vars: TerraformVars = getTestnetVars(celoEnv)
+  const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(
+    celoEnv,
+    testnetTerraformModule
+  )
+  await initTerraformModule(testnetTerraformModule, vars, backendConfigVars)
+
+  // bootnode
+  console.info('Untainting bootnode...')
+  await untaintTerraformModuleResource(
+    testnetTerraformModule,
+    `module.bootnode.google_compute_instance.bootnode`
+  )
+  // validators
+  console.info('Untainting validators...')
+  await untaintEveryResourceWithPrefix(
+    testnetTerraformModule,
+    `module.validator.google_compute_instance.validator`
+  )
+  // validator disks
+  console.info('Untainting validator disks...')
+  await untaintEveryResourceWithPrefix(
+    testnetTerraformModule,
+    `module.validator.google_compute_disk.validator`
+  )
+  // tx-nodes
+  console.info('Untainting tx-nodes...')
+  await untaintEveryResourceWithPrefix(
+    testnetTerraformModule,
+    `module.tx_node.google_compute_instance.tx_node`
+  )
+}
+
+async function taintEveryResourceWithPrefix(moduleName: string, resourceName: string) {
+  const matches = await getEveryResourceWithPrefix(moduleName, resourceName)
+  for (const match of matches) {
+    await taintTerraformModuleResource(moduleName, match)
+  }
+}
+
+async function untaintEveryResourceWithPrefix(moduleName: string, resourceName: string) {
+  const matches = await getEveryResourceWithPrefix(moduleName, resourceName)
+  for (const match of matches) {
+    await untaintTerraformModuleResource(moduleName, match)
+  }
+}
+
+async function getEveryResourceWithPrefix(moduleName: string, resourcePrefix: string) {
+  const resources = await getTerraformModuleResourceNames(moduleName)
+  return resources.filter((resource: string) => resource.startsWith(resourcePrefix))
 }
 
 export async function getTestnetOutputs(celoEnv: string) {

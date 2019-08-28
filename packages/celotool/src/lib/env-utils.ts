@@ -166,7 +166,11 @@ export async function doCheckOrPromptIfStagingOrProduction() {
   }
 }
 
-export async function confirmAction(message: string) {
+export async function confirmAction(
+  message: string,
+  onConfirmFailed?: () => Promise<void>,
+  onConfirmSuccess?: () => Promise<void>
+) {
   const response = await prompts({
     type: 'confirm',
     name: 'confirmation',
@@ -174,7 +178,13 @@ export async function confirmAction(message: string) {
   })
   if (!response.confirmation) {
     console.info('Aborting due to user response')
+    if (onConfirmFailed) {
+      await onConfirmFailed()
+    }
     process.exit(0)
+  }
+  if (onConfirmSuccess) {
+    await onConfirmSuccess()
   }
 }
 
@@ -190,4 +200,8 @@ export function addCeloEnvMiddleware(argv: yargs.Argv) {
       // @ts-ignore Since we pass it right above, we know that celoEnv will be there at runtime
       .middleware([celoEnvMiddleware])
   )
+}
+
+export function isVmBased() {
+  return fetchEnv(envVar.VM_BASED) === 'true'
 }
