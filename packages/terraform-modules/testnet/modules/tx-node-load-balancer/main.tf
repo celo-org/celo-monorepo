@@ -22,8 +22,6 @@ resource "google_compute_region_backend_service" "tx_node_lb" {
 
   protocol = "TCP"
 
-  # session_affinity = "CLIENT_IP_PROTO"
-
   backend {
     group = google_compute_instance_group.tx_node_lb.self_link
   }
