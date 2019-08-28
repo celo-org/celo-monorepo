@@ -190,8 +190,10 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
               Array [
                 Object {
                   "alignSelf": "center",
-                  "height": 40,
                   "margin": "auto",
+                },
+                Object {
+                  "height": 40,
                   "width": 40,
                 },
               ]
@@ -416,8 +418,10 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
               Array [
                 Object {
                   "alignSelf": "center",
-                  "height": 40,
                   "margin": "auto",
+                },
+                Object {
+                  "height": 40,
                   "width": 40,
                 },
               ]
