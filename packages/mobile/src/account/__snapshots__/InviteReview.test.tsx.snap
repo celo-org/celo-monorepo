@@ -90,8 +90,6 @@ exports[`InviteReview renders correctly 1`] = `
           <View
             style={
               Object {
-                "flexDirection": "column",
-                "justifyContent": "center",
                 "marginTop": 5,
               }
             }

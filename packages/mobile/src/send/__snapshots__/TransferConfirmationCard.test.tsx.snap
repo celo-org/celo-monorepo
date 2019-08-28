@@ -136,8 +136,6 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
   <View
     style={
       Object {
-        "flexDirection": "column",
-        "justifyContent": "center",
         "marginTop": 5,
       }
     }
@@ -364,8 +362,6 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
   <View
     style={
       Object {
-        "flexDirection": "column",
-        "justifyContent": "center",
         "marginTop": 5,
       }
     }

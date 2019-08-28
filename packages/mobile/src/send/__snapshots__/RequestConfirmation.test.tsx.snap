@@ -99,8 +99,6 @@ exports[`RequestConfirmation renders correctly for request payment confirmation 
             <View
               style={
                 Object {
-                  "flexDirection": "column",
-                  "justifyContent": "center",
                   "marginTop": 5,
                 }
               }
