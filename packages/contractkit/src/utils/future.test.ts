@@ -1,4 +1,4 @@
-import { Future } from '@src/utils/future'
+import { Future } from './future'
 
 test('it should expose resolve/reject inmediately', async () => {
   const ep = new Future<number>()

@@ -1,13 +1,9 @@
 import { eqAddress } from '@celo/utils/lib/src/address'
-import { compareBN } from '@celo/utils/lib/src/bn'
 import { zip } from '@celo/utils/lib/src/collections'
-import Web3 from 'web3'
-import { TransactionObject } from 'web3/eth/types'
+import BigNumber from 'bignumber.js'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
-import { BaseWrapper } from './BaseWrapper'
-
-import BN = require('bn.js')
+import { BaseWrapper, CeloTransactionObject, proxyCall, proxySend, wrapSend } from './BaseWrapper'
 
 export interface Validator {
   address: Address
@@ -28,10 +24,20 @@ export interface ValidatorGroup {
 
 export interface ValidatorGroupVote {
   address: Address
-  votes: BN
+  votes: BigNumber
 }
 
 export class ValidatorsWrapper extends BaseWrapper<Validators> {
+  affiliate = proxySend(this.kit, this.contract.methods.affiliate)
+  deaffiliate = proxySend(this.kit, this.contract.methods.deaffiliate)
+  addMember = proxySend(this.kit, this.contract.methods.addMember)
+  removeMember = proxySend(this.kit, this.contract.methods.removeMember)
+  registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
+  registerValidatorGroup = proxySend(this.kit, this.contract.methods.registerValidatorGroup)
+  getVoteFrom: (validatorAddress: Address) => Promise<Address | null> = proxyCall(
+    this.contract.methods.voters
+  )
+
   async getRegisteredValidators(): Promise<Validator[]> {
     const vgAddresses = await this.contract.methods.getRegisteredValidators().call()
 
@@ -63,20 +69,16 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   async getValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
     const vgAddresses = await this.contract.methods.getRegisteredValidatorGroups().call()
     const res = await this.contract.methods.getValidatorGroupVotes().call()
-    const r = zip((a, b) => ({ address: a, votes: Web3.utils.toBN(b) }), res[0], res[1])
+    const r = zip((a, b) => ({ address: a, votes: new BigNumber(b) }), res[0], res[1])
     for (const vgAddress of vgAddresses) {
       if (!res[0].includes(vgAddress)) {
-        r.push({ address: vgAddress, votes: Web3.utils.toBN(0) })
+        r.push({ address: vgAddress, votes: new BigNumber(0) })
       }
     }
     return r
   }
 
-  async getVoteFrom(validatorAddress: Address): Promise<Address | null> {
-    return this.contract.methods.voters(validatorAddress).call()
-  }
-
-  async revokeVote(): Promise<TransactionObject<boolean>> {
+  async revokeVote(): Promise<CeloTransactionObject<boolean>> {
     if (this.kit.defaultAccount == null) {
       throw new Error(`missing from at new ValdidatorUtils()`)
     }
@@ -91,13 +93,13 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
 
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(
       votedGroup,
-      votingDetails.weight.neg()
+      votingDetails.weight.negated()
     )
 
-    return this.contract.methods.revokeVote(lesser, greater)
+    return wrapSend(this.kit, this.contract.methods.revokeVote(lesser, greater))
   }
 
-  async vote(validatorGroup: Address): Promise<TransactionObject<boolean>> {
+  async vote(validatorGroup: Address): Promise<CeloTransactionObject<boolean>> {
     if (this.kit.defaultAccount == null) {
       throw new Error(`missing from at new ValdidatorUtils()`)
     }
@@ -110,12 +112,12 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       votingDetails.weight
     )
 
-    return this.contract.methods.vote(validatorGroup, lesser, greater)
+    return wrapSend(this.kit, this.contract.methods.vote(validatorGroup, lesser, greater))
   }
 
   private async findLesserAndGreaterAfterVote(
     votedGroup: Address,
-    voteWeight: BN
+    voteWeight: BigNumber
   ): Promise<{ lesser: Address; greater: Address }> {
     const currentVotes = await this.getValidatorGroupsVotes()
 
@@ -123,7 +125,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
 
     // modify the list
     if (selectedGroup) {
-      selectedGroup.votes = selectedGroup.votes.add(voteWeight)
+      selectedGroup.votes = selectedGroup.votes.plus(voteWeight)
     } else {
       currentVotes.push({
         address: votedGroup,
@@ -132,7 +134,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     }
 
     // re-sort
-    currentVotes.sort((a, b) => compareBN(a.votes, b.votes))
+    currentVotes.sort((a, b) => a.votes.comparedTo(b.votes))
 
     // find new index
     const newIdx = currentVotes.findIndex((cv) => eqAddress(cv.address, votedGroup))

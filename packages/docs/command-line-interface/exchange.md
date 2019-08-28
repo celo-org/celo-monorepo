@@ -19,7 +19,7 @@ EXAMPLE
   list
 ```
 
-_See code: [packages/cli/lib/src/commands/exchange/list.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/src/commands/exchange/list.js)_
+_See code: [packages/cli/lib/commands/exchange/list.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/exchange/list.js)_
 
 ### Selldollar
 
@@ -38,7 +38,7 @@ EXAMPLE
   selldollar 100 300 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
 ```
 
-_See code: [packages/cli/lib/src/commands/exchange/selldollar.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/src/commands/exchange/selldollar.js)_
+_See code: [packages/cli/lib/commands/exchange/selldollar.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/exchange/selldollar.js)_
 
 ### Sellgold
 
@@ -57,4 +57,4 @@ EXAMPLE
   sellgold 100 300 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
 ```
 
-_See code: [packages/cli/lib/src/commands/exchange/sellgold.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/src/commands/exchange/sellgold.js)_
+_See code: [packages/cli/lib/commands/exchange/sellgold.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/exchange/sellgold.js)_

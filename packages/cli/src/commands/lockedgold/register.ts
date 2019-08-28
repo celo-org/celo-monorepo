@@ -1,4 +1,3 @@
-import { LockedGold } from '@celo/walletkit'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -17,8 +16,8 @@ export default class Register extends BaseCommand {
 
   async run() {
     const res = this.parse(Register)
-    const lockedGold = await LockedGold(this.web3, res.flags.from)
-    const tx = lockedGold.methods.createAccount()
-    await displaySendTx('register', tx)
+    this.kit.defaultAccount = res.flags.from
+    const lockedGold = await this.kit.contracts.getLockedGold()
+    await displaySendTx('register', lockedGold.createAccount())
   }
 }
