@@ -18,6 +18,7 @@ import {
   getTerraformModuleResourceNames,
   initTerraformModule,
   planTerraformModule,
+  showTerraformModulePlan,
   taintTerraformModuleResource,
   TerraformVars,
   untaintTerraformModuleResource,
@@ -25,10 +26,12 @@ import {
 import {
   uploadFileToGoogleStorage,
   uploadGenesisBlockToGoogleStorage,
+  uploadStaticNodesToGoogleStorage,
 } from '@celo/celotool/src/lib/testnet-utils'
 import { writeFileSync } from 'fs'
 
 const secretsBucketName = 'celo-testnet-secrets'
+
 const testnetTerraformModule = 'testnet'
 const testnetNetworkTerraformModule = 'testnet-network'
 
@@ -72,6 +75,7 @@ export async function deploy(celoEnv: string, onConfirmFailed?: () => Promise<vo
   })
 
   await uploadGenesisBlockToGoogleStorage(celoEnv)
+  await uploadStaticNodesToGoogleStorage(celoEnv)
 }
 
 async function deployModule(
@@ -96,6 +100,8 @@ async function deployModule(
 
   console.info('Planning...')
   await planTerraformModule(terraformModule, vars)
+
+  await showTerraformModulePlan(terraformModule)
 
   await confirmAction(
     `Are you sure you want to perform the above plan for Celo env ${celoEnv} in environment ${envType}?`,
@@ -137,6 +143,8 @@ async function destroyModule(celoEnv: string, terraformModule: string, vars: Ter
 
   console.info('Planning...')
   await planTerraformModule(terraformModule, vars, true)
+
+  await showTerraformModulePlan(terraformModule)
 
   await confirmAction(`Are you sure you want to destroy ${celoEnv} in environment ${envType}?`)
 
