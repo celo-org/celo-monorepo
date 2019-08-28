@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { I18nProps, withNamespaces } from 'src/i18n'
-import Button, { BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { fonts, standardStyles } from 'src/styles'
 
 export interface Props {
@@ -31,7 +31,13 @@ export function Card({ imgSource, href, title, text, t, onLoad }: CompleteProps)
           <Text style={fonts.p}>{text}</Text>
         </View>
         <View style={standardStyles.elementalMargin}>
-          <Button text={t('readMore')} kind={BTN.NAKED} href={href} target={'_medium'} />
+          <Button
+            text={t('readMore')}
+            kind={BTN.NAKED}
+            size={SIZE.normal}
+            href={href}
+            target={'_medium'}
+          />
         </View>
       </View>
     </View>
