@@ -99,6 +99,8 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
             <View
               style={
                 Object {
+                  "flexDirection": "column",
+                  "justifyContent": "center",
                   "marginTop": 5,
                 }
               }
@@ -1163,6 +1165,8 @@ exports[`SendConfirmation renders correctly for payment request confirmation 2`]
             <View
               style={
                 Object {
+                  "flexDirection": "column",
+                  "justifyContent": "center",
                   "marginTop": 5,
                 }
               }
@@ -2222,6 +2226,8 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
             <View
               style={
                 Object {
+                  "flexDirection": "column",
+                  "justifyContent": "center",
                   "marginTop": 5,
                 }
               }
@@ -3286,6 +3292,8 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
             <View
               style={
                 Object {
+                  "flexDirection": "column",
+                  "justifyContent": "center",
                   "marginTop": 5,
                 }
               }
@@ -4344,6 +4352,8 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             <View
               style={
                 Object {
+                  "flexDirection": "column",
+                  "justifyContent": "center",
                   "marginTop": 5,
                 }
               }
@@ -5365,6 +5375,8 @@ exports[`SendConfirmation renders correctly for send payment confirmation 2`] = 
             <View
               style={
                 Object {
+                  "flexDirection": "column",
+                  "justifyContent": "center",
                   "marginTop": 5,
                 }
               }
@@ -6381,6 +6393,8 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             <View
               style={
                 Object {
+                  "flexDirection": "column",
+                  "justifyContent": "center",
                   "marginTop": 5,
                 }
               }
@@ -7402,6 +7416,8 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             <View
               style={
                 Object {
+                  "flexDirection": "column",
+                  "justifyContent": "center",
                   "marginTop": 5,
                 }
               }

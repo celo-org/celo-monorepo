@@ -136,6 +136,8 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
   <View
     style={
       Object {
+        "flexDirection": "column",
+        "justifyContent": "center",
         "marginTop": 5,
       }
     }
@@ -180,22 +182,23 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
             ]
           }
         >
-          <Text
+          <Image
+            source={
+              Object {
+                "testUri": "../../../src/images/unknown-user-icon.png",
+              }
+            }
             style={
               Array [
                 Object {
-                  "color": "#FFFFFF",
-                  "fontFamily": "Hind-Medium",
-                  "fontSize": 16,
-                },
-                Object {
-                  "fontSize": 20,
+                  "alignSelf": "center",
+                  "height": 40,
+                  "margin": "auto",
+                  "width": 40,
                 },
               ]
             }
-          >
-            #
-          </Text>
+          />
         </View>
       </View>
       <Text
@@ -361,6 +364,8 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
   <View
     style={
       Object {
+        "flexDirection": "column",
+        "justifyContent": "center",
         "marginTop": 5,
       }
     }
@@ -405,22 +410,23 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
             ]
           }
         >
-          <Text
+          <Image
+            source={
+              Object {
+                "testUri": "../../../src/images/unknown-user-icon.png",
+              }
+            }
             style={
               Array [
                 Object {
-                  "color": "#FFFFFF",
-                  "fontFamily": "Hind-Medium",
-                  "fontSize": 16,
-                },
-                Object {
-                  "fontSize": 20,
+                  "alignSelf": "center",
+                  "height": 40,
+                  "margin": "auto",
+                  "width": 40,
                 },
               ]
             }
-          >
-            #
-          </Text>
+          />
         </View>
       </View>
       <Text
