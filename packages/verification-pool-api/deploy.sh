@@ -19,10 +19,9 @@ done
 
 echo "Starting verification pool api deployment."
 
-echo "Running yarn install"
 yarn
-
-echo "Running yarn deploy"
-yarn deploy $NETWORK
+yarn set-env $NETWORK
+yarn run build:for-env $NETWORK
+yarn run firebase deploy --only 'database,hosting,functions:handleVerificationRequest$NETWORK'
 
 echo "Done deployment."
