@@ -10,7 +10,7 @@ resource "google_compute_address" "tx_node" {
 }
 
 resource "google_compute_instance" "tx_node" {
-  name         = "${local.name_prefix}-${count.index}"
+  name         = "${local.name_prefix}-${count.index}-${random_id.tx_node[count.index].hex}"
   machine_type = "n1-standard-1"
 
   count = var.tx_node_count
@@ -56,4 +56,15 @@ resource "google_compute_instance" "tx_node" {
     email  = var.gcloud_vm_service_account_email
     scopes = ["storage-ro"]
   }
+}
+
+resource "random_id" "tx_node" {
+  count = var.tx_node_count
+
+  # generate a new id if the instance_id of the tx_node instance changes
+  keepers = {
+    instance_id = google_compute_instance.tx_node[count.index].instance_id
+  }
+
+  byte_length = 8
 }

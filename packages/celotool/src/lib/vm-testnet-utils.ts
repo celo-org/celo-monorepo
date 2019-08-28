@@ -177,6 +177,12 @@ export async function taintTestnet(celoEnv: string) {
     testnetTerraformModule,
     `module.tx_node.google_compute_instance.tx_node`
   )
+  // tx-node instance group
+  console.info('Tainting tx-node instance group...')
+  await untaintTerraformModuleResource(
+    testnetTerraformModule,
+    `module.tx_node_lb.google_compute_instance_group.tx_node_lb`
+  )
 }
 
 export async function untaintTestnet(celoEnv: string) {
@@ -211,6 +217,13 @@ export async function untaintTestnet(celoEnv: string) {
   await untaintEveryResourceWithPrefix(
     testnetTerraformModule,
     `module.tx_node.google_compute_instance.tx_node`
+  )
+
+  // tx-node instance group
+  console.info('Untainting tx-node instance group...')
+  await untaintTerraformModuleResource(
+    testnetTerraformModule,
+    `module.tx_node_lb.google_compute_instance_group.tx_node_lb`
   )
 }
 
