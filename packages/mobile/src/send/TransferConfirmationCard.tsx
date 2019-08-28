@@ -7,7 +7,7 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { Avatar } from 'src/components/Avatar'
+import Avatar from 'src/components/Avatar'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { faucetIcon } from 'src/images/Images'
@@ -111,7 +111,12 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
     } else {
       return (
         <View style={style.avatar}>
-          <Avatar recipient={recipient} defaultCountryCode={defaultCountryCode} />
+          <Avatar
+            recipient={recipient}
+            address={address}
+            e164PhoneNumber={e164PhoneNumber}
+            defaultCountryCode={defaultCountryCode}
+          />
         </View>
       )
     }

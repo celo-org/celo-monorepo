@@ -47,18 +47,16 @@ export class Avatar extends React.PureComponent<Props> {
 
     return (
       <View style={style.container}>
-        {children ? (
-          children
-        ) : (
-          <ContactCircle
-            style={style.contactCircle}
-            contact={contact}
-            thumbnailPath={thumbnailPath}
-            name={userName}
-            address={address}
-            size={iconSize}
-          />
-        )}
+        <ContactCircle
+          style={style.contactCircle}
+          contact={contact}
+          thumbnailPath={thumbnailPath}
+          name={userName}
+          address={address}
+          size={iconSize}
+        >
+          {children ? children : null}
+        </ContactCircle>
         <Text
           style={[fontStyles.bodySmallSemiBold, style.contactName]}
           numberOfLines={1}
