@@ -340,7 +340,13 @@ export class SendAmount extends React.Component<Props, State> {
           contentContainerStyle={style.scrollViewContentContainer}
         >
           <DisconnectBanner />
-          <Avatar recipient={recipient} defaultCountryCode={this.props.defaultCountryCode} />
+          <Avatar
+            name={recipient.displayName}
+            recipient={recipient}
+            e164PhoneNumber={recipient.e164PhoneNumber}
+            address={recipient.address}
+            defaultCountryCode={this.props.defaultCountryCode}
+          />
           {verificationStatus === VerificationStatus.UNKNOWN && (
             <View style={style.verificationStatusContainer}>
               <Text style={[fontStyles.bodySmall]}>{t('loadingVerificationStatus')}</Text>

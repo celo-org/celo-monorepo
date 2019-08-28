@@ -8,10 +8,11 @@ import { Avatar as PlainAvatar } from '@celo/react-components/components/Avatar'
 import * as React from 'react'
 import { Image, StyleSheet } from 'react-native'
 import { unknownUserIcon } from 'src/images/Images'
-import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
+import { getRecipientThumbnail, Recipient, RecipientKind } from 'src/recipients/recipient'
 
 interface Props {
   recipient?: Recipient
+  name?: string
   address?: string
   e164PhoneNumber?: string
   defaultCountryCode: string
@@ -20,25 +21,36 @@ interface Props {
 
 export default class Avatar extends React.PureComponent<Props> {
   render() {
-    const { recipient, address, e164PhoneNumber, defaultCountryCode, iconSize } = this.props
+    const {
+      recipient,
+      name,
+      address,
+      e164PhoneNumber,
+      defaultCountryCode,
+      iconSize = 40,
+    } = this.props
 
-    return recipient ? (
+    return recipient && recipient.kind === RecipientKind.Contact ? (
       <PlainAvatar
         name={recipient.displayName}
         thumbnailPath={getRecipientThumbnail(recipient)}
         address={address}
         e164Number={recipient.e164PhoneNumber}
         defaultCountryCode={defaultCountryCode}
-        iconSize={iconSize || 40}
+        iconSize={iconSize}
       />
     ) : (
       <PlainAvatar
+        name={name}
         address={address}
         e164Number={e164PhoneNumber}
         defaultCountryCode={defaultCountryCode}
-        iconSize={iconSize || 40}
+        iconSize={iconSize}
       >
-        <Image source={unknownUserIcon} style={[style.defaultIcon]} />
+        <Image
+          source={unknownUserIcon}
+          style={[style.defaultIcon, { height: iconSize, width: iconSize }]}
+        />
       </PlainAvatar>
     )
   }
@@ -46,8 +58,6 @@ export default class Avatar extends React.PureComponent<Props> {
 
 const style = StyleSheet.create({
   defaultIcon: {
-    height: 40,
-    width: 40,
     alignSelf: 'center',
     margin: 'auto',
   },

@@ -70,6 +70,16 @@ export class Avatar extends React.PureComponent<Props> {
             defaultCountryCode={defaultCountryCode}
           />
         ) : null}
+
+        {!e164Number && address ? (
+          <Text
+            style={[fontStyles.bodySmall, fontStyles.light, style.contactName]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {'#' + address.substring(2, 17) + '...'}
+          </Text>
+        ) : null}
       </View>
     )
   }
