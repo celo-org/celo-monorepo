@@ -4,7 +4,6 @@ import BigNumber from 'bignumber.js'
 import { call, put, select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
@@ -29,8 +28,8 @@ export function* refreshGasPrice() {
       yield put(setGasPrice(gasPrice.toNumber()))
     }
   } catch (error) {
-    Logger.error(`${TAG}/refreshGasPrice`, 'Could not fetch and update gas price.', error)
-    yield put(showError(ErrorMessages.GAS_PRICE_UPDATE_FAILED, ALERT_BANNER_DURATION))
+    Logger.error(`${TAG}}/refreshGasPrice`, 'Could not fetch and update gas price.', error)
+    yield put(showError(ErrorMessages.GAS_PRICE_UPDATE_FAILED))
   }
 }
 

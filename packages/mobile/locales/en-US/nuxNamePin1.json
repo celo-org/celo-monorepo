@@ -10,6 +10,7 @@
   "syncNetwork": "Syncing with Network",
   "welcomeCelo": "Welcome to Celo Wallet",
   "chooseCountryCode": "Country Code",
+  "chooseCountry": "Country",
   "joinText": {
     "0":
       "Welcome to Celo Wallet, a digital wallet that allows you to easily send, receive, and save value.",

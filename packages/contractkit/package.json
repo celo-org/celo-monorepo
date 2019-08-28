@@ -21,8 +21,8 @@
     "build:gen": "yarn --cwd ../protocol build",
     "prepublishOnly": "yarn build:gen && yarn build",
     "test:prepare": "yarn --cwd ../protocol devchain generate .devchain",
-    "test": "jest",
-    "lint": "tslint -c tslint.json --project . && tslint -c tslint.json --project test"
+    "test": "jest --runInBand",
+    "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
     "@celo/utils": "^0.0.6-beta5",
@@ -36,13 +36,9 @@
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#6bd058a",
     "@celo/protocol": "1.0.0",
     "@types/debug": "^4.1.5",
-    "@types/jest": "^24.0.17",
     "@types/web3": "^1.0.18"
   },
   "engines": {
     "node": ">=8.13.0"
-  },
-  "files": [
-    "lib/**/*"
-  ]
+  }
 }

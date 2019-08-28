@@ -1,8 +1,8 @@
 import { DestroyArgv } from '@celo/celotool/src/cmds/deploy/destroy'
+import { fetchEnvOrFallback } from '@celo/celotool/src/lib/env-utils'
 import { removeHelmRelease } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { deleteCloudSQLInstance } from 'src/lib/helm_deploy'
-import { fetchEnvOrFallback } from 'src/lib/utils'
 
 export const command = 'blockscout'
 export const describe = 'upgrade an existing deploy of the blockscout package'

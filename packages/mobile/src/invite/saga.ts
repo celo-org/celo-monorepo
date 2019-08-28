@@ -16,7 +16,6 @@ import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
@@ -150,7 +149,7 @@ export function* sendInvite(
         yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress))
       } catch (e) {
         Logger.error(TAG, 'Error sending payment to unverified user: ', e)
-        yield put(showError(ErrorMessages.TRANSACTION_FAILED, ALERT_BANNER_DURATION))
+        yield put(showError(ErrorMessages.TRANSACTION_FAILED))
       }
     }
 
@@ -179,16 +178,11 @@ export function* sendInviteSaga(action: SendInviteAction) {
   try {
     yield call(sendInvite, recipientName, e164Number, inviteMode, amount, currency)
 
-    yield put(
-      showMessage(
-        i18n.t('inviteSent', { ns: 'inviteFlow11' }) + ' ' + e164Number,
-        ALERT_BANNER_DURATION
-      )
-    )
+    yield put(showMessage(i18n.t('inviteSent', { ns: 'inviteFlow11' }) + ' ' + e164Number))
     yield call(navigate, Screens.WalletHome)
     yield put(sendInviteSuccess())
   } catch (e) {
-    yield put(showError(ErrorMessages.INVITE_FAILED, ALERT_BANNER_DURATION))
+    yield put(showError(ErrorMessages.INVITE_FAILED))
     yield put(sendInviteFailure(ErrorMessages.INVITE_FAILED))
   }
 }
@@ -218,7 +212,7 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
   } else if (timeout) {
     CeloAnalytics.track(CustomEventNames.redeem_invite_timed_out)
     Logger.debug(TAG, 'Redeem Invite timed out')
-    yield put(showError(ErrorMessages.REDEEM_INVITE_TIMEOUT, ALERT_BANNER_DURATION))
+    yield put(showError(ErrorMessages.REDEEM_INVITE_TIMEOUT))
   }
   Logger.debug(TAG, 'Done Redeem invite')
 }
@@ -305,7 +299,7 @@ export function* doRedeemInvite(action: RedeemInviteAction) {
     return true
   } catch (e) {
     Logger.error(TAG, 'Redeem invite error: ', e)
-    yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ALERT_BANNER_DURATION))
+    yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED))
     return false
   }
 }

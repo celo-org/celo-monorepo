@@ -1,4 +1,3 @@
-import { DEFAULT_TESTNET, SEGMENT_API_KEY } from '@celo/mobile/src/config'
 import ReactNativeLogger from '@celo/react-components/services/ReactNativeLogger'
 import Analytics, { Analytics as analytics } from '@segment/analytics-react-native'
 import * as Firebase from '@segment/analytics-react-native-firebase'
@@ -65,19 +64,32 @@ export enum AnalyzedApps {
 type ActiveEvents = Map<string, Map<string, number>>
 
 class CeloAnalytics {
-  appName: AnalyzedApps | undefined
+  readonly appName: AnalyzedApps
+  readonly apiKey: string | undefined
+  readonly defaultTestnet: string | undefined
   readonly propertyPathWhiteList: string[]
   readonly Logger: ReactNativeLogger
   readonly activeEvents: ActiveEvents = new Map()
 
-  constructor(Logger: ReactNativeLogger, propertyPathWhiteList: string[]) {
+  constructor(
+    appName: AnalyzedApps,
+    propertyPathWhiteList: string[],
+    Logger: ReactNativeLogger,
+    apiKey?: string,
+    defaultTestnet?: string
+  ) {
+    this.appName = appName
     this.Logger = Logger
     this.propertyPathWhiteList = propertyPathWhiteList
-    if (!SEGMENT_API_KEY) {
+    this.apiKey = apiKey
+    this.defaultTestnet = defaultTestnet
+
+    if (!apiKey) {
       Logger.debug(TAG, 'Segment API Key not present, likely due to environment. Skipping enabling')
       return
     }
-    Analytics.setup(SEGMENT_API_KEY, SEGMENT_OPTIONS).catch(() => _)
+
+    Analytics.setup(apiKey, SEGMENT_OPTIONS).catch(() => _)
     Logger.debug(TAG, 'Segment Analytics Integration initialized!')
   }
 
@@ -93,7 +105,7 @@ class CeloAnalytics {
 
     this.Logger.info(TAG, `Tracking event ${eventName}`, JSON.stringify(eventProperties))
 
-    if (!SEGMENT_API_KEY) {
+    if (!this.apiKey) {
       return
     }
 
@@ -154,7 +166,7 @@ class CeloAnalytics {
   }
 
   page(page: string, eventProperties: {}) {
-    if (!SEGMENT_API_KEY) {
+    if (!this.apiKey) {
       return
     }
 
@@ -182,7 +194,7 @@ class CeloAnalytics {
     const baseProps = {
       appName: this.appName,
       timestamp: Date.now(),
-      defaultTestnet: DEFAULT_TESTNET,
+      defaultTestnet: this.defaultTestnet,
     }
     if (_.isEmpty(whitelistedProperties)) {
       return baseProps

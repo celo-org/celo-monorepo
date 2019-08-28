@@ -80,4 +80,4 @@ lerna-debug.log
 !.env.mnemonic*.enc
 
 .terraform/
-chain-data/
+tsconfig.tsbuildinfo

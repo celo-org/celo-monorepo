@@ -1,5 +1,5 @@
 import { GethArgv } from '@celo/celotool/src/cmds/geth'
-import { addCeloEnvMiddleware, CeloEnvArgv } from '@celo/celotool/src/lib/utils'
+import { addCeloEnvMiddleware, CeloEnvArgv } from '@celo/celotool/src/lib/env-utils'
 import { getBlockscoutUrl } from 'src/lib/endpoints'
 import { checkGethStarted, getWeb3AndTokensContracts, traceTransactions } from 'src/lib/geth'
 import * as yargs from 'yargs'
