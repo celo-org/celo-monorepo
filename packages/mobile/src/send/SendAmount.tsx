@@ -455,12 +455,6 @@ const style = StyleSheet.create({
   loadingIcon: {
     marginHorizontal: 5,
   },
-  defaultIcon: {
-    height: 40,
-    width: 40,
-    alignSelf: 'center',
-    margin: 'auto',
-  },
 })
 
 export default componentWithAnalytics(

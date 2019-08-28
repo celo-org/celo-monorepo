@@ -353,8 +353,6 @@ const style = StyleSheet.create({
   },
   avatar: {
     marginTop: 5,
-    flexDirection: 'column',
-    justifyContent: 'center',
   },
   pSmall: {
     fontSize: 14,
@@ -365,12 +363,6 @@ const style = StyleSheet.create({
   },
   inviteLine: {
     marginVertical: 30,
-  },
-  defaultIcon: {
-    height: iconSize,
-    width: iconSize,
-    alignSelf: 'center',
-    margin: 'auto',
   },
   inviteTitle: {
     ...fontStyles.pCurrency,
