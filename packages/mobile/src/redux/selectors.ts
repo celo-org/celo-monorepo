@@ -1,17 +1,27 @@
 import { createSelector } from 'reselect'
 import { getPaymentRequests } from 'src/account/selectors'
-import { DAYS_TO_BACKUP } from 'src/backup/Backup'
+import { DAYS_TO_BACKUP, DAYS_TO_DELAY } from 'src/backup/Backup'
 import { BALANCE_OUT_OF_SYNC_THRESHOLD } from 'src/config'
 import { isGethConnectedSelector } from 'src/geth/reducer'
 import { RootState } from 'src/redux/reducers'
 import { timeDeltaInDays, timeDeltaInSeconds } from 'src/utils/time'
 
-export const disabledDueToNoBackup = (accountCreationTime: number, backupCompleted: boolean) => {
-  return timeDeltaInDays(Date.now(), accountCreationTime) > DAYS_TO_BACKUP && !backupCompleted
+export const disabledDueToNoBackup = (
+  accountCreationTime: number,
+  backupCompleted: boolean,
+  backupDelayedTime: number
+) => {
+  const disableThreshold = backupDelayedTime ? DAYS_TO_DELAY : DAYS_TO_BACKUP
+  const startTime = backupDelayedTime || accountCreationTime
+  return timeDeltaInDays(Date.now(), startTime) > disableThreshold && !backupCompleted
 }
 
 export const isBackupTooLate = (state: RootState) => {
-  return disabledDueToNoBackup(state.account.accountCreationTime, state.account.backupCompleted)
+  return disabledDueToNoBackup(
+    state.account.accountCreationTime,
+    state.account.backupCompleted,
+    state.account.backupDelayedTime
+  )
 }
 
 export const getNetworkConnected = (state: RootState) => state.networkInfo.connected
