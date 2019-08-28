@@ -15,7 +15,7 @@ contract UsingRegistry is Ownable {
 
   // solhint-disable state-visibility
   bytes32 constant ATTESTATIONS_REGISTRY_ID = keccak256(abi.encodePacked("Attestations"));
-  bytes32 constant BONDED_DEPOSITS_REGISTRY_ID = keccak256(abi.encodePacked("BondedDeposits"));
+  bytes32 constant LOCKED_GOLD_REGISTRY_ID = keccak256(abi.encodePacked("LockedGold"));
   bytes32 constant GAS_CURRENCY_WHITELIST_REGISTRY_ID = keccak256(
     abi.encodePacked("GasCurrencyWhitelist")
   );

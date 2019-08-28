@@ -216,7 +216,7 @@ export class JoinCelo extends React.Component<Props, State> {
             setIsValidNumber={this.setIsValidNumber}
             onInputFocus={this.scrollToEnd}
             onInputChange={this.onChangePhoneInput}
-            inputCountryPlaceholder={t('chooseCountryCode')}
+            inputCountryPlaceholder={t('chooseCountry')}
             inputPhonePlaceholder={t('phoneNumber')}
             callingCode={true}
             lng={language}

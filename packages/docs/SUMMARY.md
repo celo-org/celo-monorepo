@@ -21,7 +21,7 @@
     - [Locating Validators](celo-codebase/protocol/consensus/locating-validators.md)
     - [Ultralight Sync](celo-codebase/protocol/consensus/ultralight-sync.md)
   - [Proof-of-Stake](celo-codebase/protocol/proof-of-stake/README.md)
-    - [Bonding Funds](celo-codebase/protocol/proof-of-stake/bonding-funds.md)
+    - [Locked Gold](celo-codebase/protocol/proof-of-stake/locked-gold.md)
     - [Electing Validators](celo-codebase/protocol/proof-of-stake/electing-validators.md)
     - [Becoming a Validator](celo-codebase/protocol/proof-of-stake/becoming-a-validator.md)
     - [Creating and Managing Validator Groups](celo-codebase/protocol/proof-of-stake/creating-and-managing-validator-groups.md)
@@ -69,7 +69,7 @@
 - [Config](command-line-interface/config.md)
 - [Account](command-line-interface/account.md)
 - [Exchange](command-line-interface/exchange.md)
-- [Bonded Deposits](command-line-interface/bonds.md)
+- [Locked Gold](command-line-interface/lockedgold.md)
 - [Validator Node](command-line-interface/validator.md)
 - [Validator Groups](command-line-interface/validatorgroup.md)
 

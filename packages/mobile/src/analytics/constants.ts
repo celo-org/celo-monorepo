@@ -75,6 +75,7 @@ export enum CustomEventNames {
 
   // Screen name: Backup_Phrase, Backup_Insist, Backup_Share, Backup_Set
   set_backup_phrase = 'set_backup_phrase', // (count # of taps on “Set Backup Phrase” in Backup_Phrase) [we should not track the actual value of this field, just whether the user filled it out]
+  delay_backup = 'delay_backup', // (Count # of taps on "Delay" button in Backup_Phrase)
   skip_backup = 'skip_backup', // (count # of taps on “Skip” button in Backup_Phrase)
   backup_cancel = 'backup_cancel', // (count # of taps on "Cancel" button in Backup_Phrase)
   insist_backup_phrase = 'insist_backup_phrase', // (count # of taps on “Set Backup Phrase” in Backup_Insist)

@@ -1,4 +1,32 @@
-#! /bin/sh
+#! /bin/bash
+
+# --- Set Up Persistent Disk ----
+
+# gives a path similar to `/dev/sdb`
+DISK_PATH=`readlink -f /dev/disk/by-id/google-${attached_disk_name}`
+DATA_DIR=/root/.celo
+
+echo "Setting up persistent disk ${attached_disk_name} at $DISK_PATH..."
+
+DISK_FORMAT=ext4
+CURRENT_DISK_FORMAT=`lsblk -i -n -o fstype $DISK_PATH`
+
+echo "Checking if disk $DISK_PATH format $CURRENT_DISK_FORMAT matches desired $DISK_FORMAT..."
+
+# If the disk has already been formatted previously (this will happen
+# if this instance has been recreated with the same disk), we skip formatting
+if [[ $CURRENT_DISK_FORMAT == $DISK_FORMAT ]]; then
+  echo "Disk $DISK_PATH is correctly formatted as $DISK_FORMAT"
+else
+  echo "Disk $DISK_PATH is not formatted correctly, formatting as $DISK_FORMAT..."
+  mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard $DISK_PATH
+fi
+
+mkdir -p $DATA_DIR
+echo "Mounting $DISK_PATH onto $DATA_DIR"
+mount -o discard,defaults $DISK_PATH $DATA_DIR
+
+# --- Install Docker ----
 
 echo "Installing Docker..."
 apt update && apt upgrade
@@ -11,6 +39,8 @@ systemctl start docker
 
 echo "Configuring Docker..."
 gcloud auth configure-docker
+
+# --- Set Up and Run Geth ----
 
 GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_image_tag}
 
@@ -30,45 +60,50 @@ echo "Bootnode enode: $BOOTNODE_ENODE"
 echo "Pulling geth..."
 docker pull $GETH_NODE_DOCKER_IMAGE
 
-
 echo "Starting geth..."
-# We need to override the entrypoint in the geth image (which is originally `geth`)
-docker run --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
-  set -euo pipefail && \
-  mkdir -p /root/.celo/account /var/geth && \
-  echo -n '${genesis_content_base64}' | base64 -d > /var/geth/genesis.json && \
-  echo -n '${rid}' > /root/.celo/replica_id && \
-  echo -n '${ip_address}' > /root/.celo/ipAddress && \
-  echo -n '$PRIVATE_KEY' > /root/.celo/pkey && \
-  echo -n '$ACCOUNT_ADDRESS' > /root/.celo/address && \
-  echo -n '$BOOTNODE_ENODE_ADDRESS' > /root/.celo/bootnodeEnodeAddress && \
-  echo -n '$BOOTNODE_ENODE' > /root/.celo/bootnodeEnode && \
-  echo -n '$GETH_ACCOUNT_SECRET' > /root/.celo/account/accountSecret && \
-  geth init /var/geth/genesis.json && \
-  geth account import --password /root/.celo/account/accountSecret /root/.celo/pkey && \
-  geth \
-    --bootnodes=enode://$BOOTNODE_ENODE \
-    --password=/root/.celo/account/accountSecret \
-    --unlock=$ACCOUNT_ADDRESS \
-    --mine \
-    --rpc \
-    --rpcaddr 0.0.0.0 \
-    --rpcapi=eth,net,web3,debug \
-    --rpccorsdomain='*' \
-    --rpcvhosts=* \
-    --ws \
-    --wsaddr 0.0.0.0 \
-    --wsorigins=* \
-    --wsapi=eth,net,web3,debug \
-    --nodekey=/root/.celo/pkey \
-    --etherbase=$ACCOUNT_ADDRESS \
-    --networkid=${network_id} \
-    --syncmode=full \
-    --miner.verificationpool=${verification_pool_url} \
-    --consoleformat=json \
-    --consoleoutput=stdout \
-    --verbosity=${geth_verbosity} \
-    --ethstats=${validator_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
-    --istanbul.blockperiod=${block_time} \
-    --maxpeers=${max_peers} \
-    --nat=extip:${ip_address}"
+# We need to override the entrypoint in the geth image (which is originally `geth`).
+# `geth account import` fails when the account has already been imported. In
+# this case, we do not want to pipefail
+docker run -v $DATA_DIR:$DATA_DIR --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
+  (
+    set -euo pipefail && \
+    mkdir -p $DATA_DIR/account /var/geth && \
+    echo -n '${genesis_content_base64}' | base64 -d > /var/geth/genesis.json && \
+    echo -n '${rid}' > $DATA_DIR/replica_id && \
+    echo -n '${ip_address}' > $DATA_DIR/ipAddress && \
+    echo -n '$PRIVATE_KEY' > $DATA_DIR/pkey && \
+    echo -n '$ACCOUNT_ADDRESS' > $DATA_DIR/address && \
+    echo -n '$BOOTNODE_ENODE_ADDRESS' > $DATA_DIR/bootnodeEnodeAddress && \
+    echo -n '$BOOTNODE_ENODE' > $DATA_DIR/bootnodeEnode && \
+    echo -n '$GETH_ACCOUNT_SECRET' > $DATA_DIR/account/accountSecret && \
+    geth init /var/geth/genesis.json
+  ) && ( \
+    geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey ; \
+    geth \
+      --bootnodes=enode://$BOOTNODE_ENODE \
+      --password=$DATA_DIR/account/accountSecret \
+      --unlock=$ACCOUNT_ADDRESS \
+      --mine \
+      --rpc \
+      --rpcaddr 0.0.0.0 \
+      --rpcapi=eth,net,web3 \
+      --rpccorsdomain='*' \
+      --rpcvhosts=* \
+      --ws \
+      --wsaddr 0.0.0.0 \
+      --wsorigins=* \
+      --wsapi=eth,net,web3 \
+      --nodekey=$DATA_DIR/pkey \
+      --etherbase=$ACCOUNT_ADDRESS \
+      --networkid=${network_id} \
+      --syncmode=full \
+      --miner.verificationpool=${verification_pool_url} \
+      --consoleformat=json \
+      --consoleoutput=stdout \
+      --verbosity=${geth_verbosity} \
+      --ethstats=${validator_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
+      --istanbul.blockperiod=${block_time} \
+      --maxpeers=${max_peers} \
+      --nat=extip:${ip_address} \
+      --ping-ip-from-packet \
+  )"

@@ -1,9 +1,9 @@
 import { GethArgv } from '@celo/celotool/src/cmds/geth'
+import { addCeloEnvMiddleware, CeloEnvArgv } from '@celo/celotool/src/lib/env-utils'
 import fs from 'fs'
 import { getBlockscoutClusterInternalUrl } from 'src/lib/endpoints'
 import { privateKeyToAddress } from 'src/lib/generate_utils'
 import { checkGethStarted, getWeb3AndTokensContracts, simulateClient, sleep } from 'src/lib/geth'
-import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/utils'
 import * as yargs from 'yargs'
 
 export const command = 'simulate-client'

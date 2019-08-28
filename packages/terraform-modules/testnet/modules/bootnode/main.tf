@@ -1,11 +1,15 @@
+locals {
+  name_prefix = "${var.celo_env}-bootnode"
+}
+
 resource "google_compute_address" "bootnode" {
-  name = "${var.celo_env}-bootnode-address"
+  name         = "${local.name_prefix}-address"
   address_type = "EXTERNAL"
 }
 
 resource "google_compute_instance" "bootnode" {
-  name          = "${var.celo_env}-bootnode"
-  machine_type  = "n1-standard-1"
+  name         = local.name_prefix
+  machine_type = "n1-standard-1"
 
   boot_disk {
     initialize_params {
@@ -26,16 +30,16 @@ resource "google_compute_instance" "bootnode" {
 
   metadata_startup_script = templatefile(
     format("%s/startup.sh", path.module), {
-      gcloud_secrets_base_path: var.gcloud_secrets_base_path,
-      gcloud_secrets_bucket: var.gcloud_secrets_bucket,
-      geth_bootnode_docker_image_repository: var.geth_bootnode_docker_image_repository,
-      geth_bootnode_docker_image_tag: var.geth_bootnode_docker_image_tag,
-      ip_address: google_compute_address.bootnode.address,
+      gcloud_secrets_base_path : var.gcloud_secrets_base_path,
+      gcloud_secrets_bucket : var.gcloud_secrets_bucket,
+      geth_bootnode_docker_image_repository : var.geth_bootnode_docker_image_repository,
+      geth_bootnode_docker_image_tag : var.geth_bootnode_docker_image_tag,
+      ip_address : google_compute_address.bootnode.address,
     }
   )
 
   service_account {
-    email = var.gcloud_vm_service_account_email
+    email  = var.gcloud_vm_service_account_email
     scopes = ["storage-ro"]
   }
 }

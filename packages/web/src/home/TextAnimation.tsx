@@ -162,7 +162,7 @@ class TextAnimation extends React.PureComponent<Props, State> {
     return (
       <Responsive large={[styles.textContainer, styles.textContainerLarge]}>
         <View style={styles.textContainer}>
-          <H1 accessibilityRole={'heading'} style={[styles.white, styles.letsMake]}>
+          <H1 ariaLevel={'2'} accessibilityRole={'heading'} style={[styles.white, styles.letsMake]}>
             Let's make money{' '}
           </H1>
           <View>
@@ -174,6 +174,7 @@ class TextAnimation extends React.PureComponent<Props, State> {
             </>
 
             <H1
+              ariaLevel={'2'}
               accessibilityRole={'heading'}
               style={[styles.white, textStyles.heavy, textStyles.center]}
             >
