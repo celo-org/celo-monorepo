@@ -8,7 +8,7 @@ import "./interfaces/IReserve.sol";
 import "./interfaces/IStableToken.sol";
 import "../common/FractionUtil.sol";
 import "../common/Initializable.sol";
-import "../common/UsingFixidity.sol";
+import "../common/FixidityLib.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/IERC20Token.sol";
 
@@ -17,9 +17,10 @@ import "../common/interfaces/IERC20Token.sol";
  * @title Contract that allows to exchange StableToken for GoldToken and vice versa
  * using a Constant Product Market Maker Model
  */
-contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, UsingFixidity {
+contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
   using SafeMath for uint256;
   using FractionUtil for FractionUtil.Fraction;
+  using FixidityLib for FixidityLib.Fraction;
 
   event Exchanged(
     address indexed exchanger,
@@ -36,10 +37,10 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, UsingFixi
     uint256 minimumReports
   );
 
-  int256 public spread;
+  FixidityLib.Fraction public spread;
   // Fraction of the Reserve that is committed to the gold bucket when updating
   // buckets.
-  int256 public reserveFraction;
+  FixidityLib.Fraction public reserveFraction;
 
   address public stable;
 
@@ -66,8 +67,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, UsingFixi
    * @param registryAddress Address of the Registry contract
    * @param stableToken Address of the stable token
    * @param _spread Spread charged on exchanges
-   * @param _reserveFraction Fraction to commit
-   * to the gold bucket
+   * @param _reserveFraction Fraction to commit to the gold bucket
    * @param _updateFrequency The time period that needs to elapse between bucket
    * updates
    * @param _minimumReports The minimum number of fresh reports that need to be
@@ -77,8 +77,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, UsingFixi
   function initialize(
     address registryAddress,
     address stableToken,
-    int256 _spread,
-    int256 _reserveFraction,
+    uint256 _spread,
+    uint256 _reserveFraction,
     uint256 _updateFrequency,
     uint256 _minimumReports
   )
@@ -88,8 +88,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, UsingFixi
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     stable = stableToken;
-    spread = _spread;
-    reserveFraction = _reserveFraction;
+    spread = FixidityLib.wrap(_spread);
+    reserveFraction = FixidityLib.wrap(_reserveFraction);
     updateFrequency = _updateFrequency;
     minimumReports = _minimumReports;
     _updateBucketsIfNecessary();
@@ -161,9 +161,9 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, UsingFixi
     uint256 buyTokenBucket;
     (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);
 
-    int256 reducedSellAmount = getReducedSellAmount(sellAmount);
-    int256 numerator = reducedSellAmount.multiply(toFixed(buyTokenBucket));
-    int256 denominator = toFixed(sellTokenBucket).add(reducedSellAmount);
+    FixidityLib.Fraction memory reducedSellAmount = getReducedSellAmount(sellAmount);
+    FixidityLib.Fraction memory numerator = reducedSellAmount.multiply(FixidityLib.newFixed(buyTokenBucket));
+    FixidityLib.Fraction memory denominator = FixidityLib.newFixed(sellTokenBucket).add(reducedSellAmount);
 
     return uint256(numerator.divide(denominator).fromFixed());
   }
@@ -187,9 +187,9 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, UsingFixi
     uint256 buyTokenBucket;
     (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);
 
-    int256 numerator = toFixed(buyAmount.mul(sellTokenBucket));
-    int256 denominator = toFixed(buyTokenBucket.sub(buyAmount))
-      .multiply(FIXED1.subtract(spread));
+    FixidityLib.Fraction memory numerator = FixidityLib.newFixed(buyAmount.mul(sellTokenBucket));
+    FixidityLib.Fraction memory denominator = FixidityLib.newFixed(buyTokenBucket.sub(buyAmount))
+      .multiply(FixidityLib.fixed1().subtract(spread));
 
     return uint256(numerator.divide(denominator).fromFixed());
   }
@@ -265,9 +265,10 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, UsingFixi
     uint256 buyTokenBucket;
     (buyTokenBucket, sellTokenBucket) = _getBuyAndSellBuckets(sellGold);
 
-    int256 reducedSellAmount = getReducedSellAmount(sellAmount);
-    int256 numerator = reducedSellAmount.multiply(toFixed(buyTokenBucket));
-    int256 denominator = toFixed(sellTokenBucket).add(reducedSellAmount);
+    FixidityLib.Fraction memory reducedSellAmount = getReducedSellAmount(sellAmount);
+    FixidityLib.Fraction memory numerator =
+      reducedSellAmount.multiply(FixidityLib.newFixed(buyTokenBucket));
+    FixidityLib.Fraction memory denominator = FixidityLib.newFixed(sellTokenBucket).add(reducedSellAmount);
 
     return uint256(numerator.divide(denominator).fromFixed());
   }
@@ -281,7 +282,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, UsingFixi
 
   function getUpdatedGoldBucket() private view returns (uint256) {
     uint256 reserveGoldBalance = gold().balanceOf(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
-    return uint256(reserveFraction.multiply(toFixed(reserveGoldBalance)).fromFixed());
+    return uint256(reserveFraction.multiply(FixidityLib.newFixed(reserveGoldBalance)).fromFixed());
   }
 
   /**
@@ -302,10 +303,14 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, UsingFixi
    * @param sellAmount The original sell amount.
    * @return The reduced sell amount, computed as (1 - spread) * sellAmount
    */
-  function getReducedSellAmount(uint256 sellAmount) private view returns (int256) {
-    return FIXED1
+  function getReducedSellAmount(uint256 sellAmount)
+    private
+    view
+    returns (FixidityLib.Fraction memory)
+  {
+    return FixidityLib.fixed1()
       .subtract(spread)
-      .multiply(toFixed(sellAmount));
+      .multiply(FixidityLib.newFixed(sellAmount));
   }
 
   /*

@@ -9,7 +9,7 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "./UsingBondedDeposits.sol";
 import "./interfaces/IGovernance.sol";
 import "../common/Initializable.sol";
-import "../common/UsingFixidity.sol";
+import "../common/FixidityLib.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 
 
@@ -18,10 +18,13 @@ import "../common/linkedlists/IntegerSortedLinkedList.sol";
  * @title A contract for making, passing, and executing on-chain governance proposals.
  */
 contract Governance is
-  IGovernance, Ownable, Initializable, UsingBondedDeposits, ReentrancyGuard, UsingFixidity {
+  IGovernance, Ownable, Initializable, UsingBondedDeposits, ReentrancyGuard {
+  using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
   using IntegerSortedLinkedList for SortedLinkedList.List;
   using BytesLib for bytes;
+
+  uint256 constant private FIXED_HALF = 500000000000000000000000;
 
   // TODO(asa): Consider a delay stage.
   enum ProposalStage {
@@ -76,10 +79,10 @@ contract Governance is
   }
 
   struct ContractConstitution {
-    int256 defaultThreshold;
+    FixidityLib.Fraction defaultThreshold;
     // Maps a function ID to a corresponding passing function, overriding the
     // default.
-    mapping(bytes4 => int256) functionThresholds;
+    mapping(bytes4 => FixidityLib.Fraction) functionThresholds;
   }
 
   struct StageDurations {
@@ -139,7 +142,7 @@ contract Governance is
   event ConstitutionSet(
     address indexed destination,
     bytes4 indexed functionId,
-    int256 threshold
+    uint256 threshold
   );
 
   event ProposalQueued(
@@ -336,7 +339,7 @@ contract Governance is
   function setConstitution(
     address destination,
     bytes4 functionId,
-    int256 threshold
+    uint256 threshold
   )
     external
     onlyOwner
@@ -344,11 +347,12 @@ contract Governance is
     // TODO(asa): https://github.com/celo-org/celo-monorepo/pull/3414#discussion_r283588332
     require(destination != address(0));
     // Threshold has to be greater than majority and not greater than unaninimty
-    require(threshold > FIXED_HALF && threshold <= FIXED1);
+    require(threshold > FIXED_HALF && threshold <= FixidityLib.fixed1().unwrap());
     if (functionId == 0) {
-      constitution[destination].defaultThreshold = threshold;
+      constitution[destination].defaultThreshold = FixidityLib.wrap(threshold);
     } else {
-      constitution[destination].functionThresholds[functionId] = threshold;
+      constitution[destination].functionThresholds[functionId] =
+        FixidityLib.wrap(threshold);
     }
     emit ConstitutionSet(destination, functionId, threshold);
   }
@@ -872,17 +876,17 @@ contract Governance is
     if (yesNoVotes == 0) {
       return false;
     }
-    int256 yesRatio = toFixed(proposal.votes.yes).divide(
-      toFixed(yesNoVotes)
+    FixidityLib.Fraction memory yesRatio = FixidityLib.newFixed(proposal.votes.yes).divide(
+      FixidityLib.newFixed(yesNoVotes)
     );
 
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
       bytes4 functionId = extractFunctionSignature(proposal.transactions[i].data);
-      int256 threshold = getConstitution(
+      FixidityLib.Fraction memory threshold = _getConstitution(
         proposal.transactions[i].destination,
         functionId
       );
-      if (yesRatio <= threshold) {
+      if (yesRatio.leq(threshold)) {
         return false;
       }
     }
@@ -991,6 +995,17 @@ contract Governance is
     return proposal.timestamp > 0;
   }
 
+  function getConstitution(
+    address destination,
+    bytes4 functionId
+  )
+    external
+    view
+    returns (uint256)
+  {
+    return _getConstitution(destination, functionId).unwrap();
+  }
+
   /**
    * @notice Returns the constitution for a particular destination and function ID.
    * @param destination The destination address to get the constitution for.
@@ -998,19 +1013,19 @@ contract Governance is
    *   default.
    * @return The ratio of yes:no votes needed in order to pass the proposal.
    */
-  function getConstitution(
+  function _getConstitution(
     address destination,
     bytes4 functionId
   )
-    public
+    private
     view
-    returns (int256)
+    returns (FixidityLib.Fraction memory)
   {
     // Default to a simple majority.
-    int256 threshold = FIXED_HALF;
-    if (constitution[destination].functionThresholds[functionId] != 0) {
+    FixidityLib.Fraction memory threshold = FixidityLib.wrap(FIXED_HALF);
+    if (constitution[destination].functionThresholds[functionId].unwrap() != 0) {
       threshold = constitution[destination].functionThresholds[functionId];
-    } else if (constitution[destination].defaultThreshold != 0) {
+    } else if (constitution[destination].defaultThreshold.unwrap() != 0) {
       threshold = constitution[destination].defaultThreshold;
     }
     return threshold;

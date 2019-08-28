@@ -10,14 +10,15 @@ import "./interfaces/IValidators.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
-import "../common/UsingFixidity.sol";
+import "../common/FixidityLib.sol";
 import "../common/interfaces/IERC20Token.sol";
 import "../common/Signatures.sol";
 import "../common/FractionUtil.sol";
 
 contract BondedDeposits is
-  IBondedDeposits, ReentrancyGuard, Initializable, UsingRegistry, UsingFixidity {
+  IBondedDeposits, ReentrancyGuard, Initializable, UsingRegistry {
 
+  using FixidityLib for FixidityLib.Fraction;
   using FractionUtil for FractionUtil.Fraction;
   using SafeMath for uint256;
 
@@ -59,7 +60,7 @@ contract BondedDeposits is
   // Maps voting, rewards, and validating delegates to the account that delegated these rights.
   mapping(address => address) public delegations;
   // Maps a block number to the cumulative reward for an account with weight 1 since genesis.
-  mapping(uint256 => int256) public cumulativeRewardWeights;
+  mapping(uint256 => FixidityLib.Fraction) public cumulativeRewardWeights;
 
   event MaxNoticePeriodSet(
     uint256 maxNoticePeriod
@@ -564,23 +565,24 @@ contract BondedDeposits is
   function _redeemRewards(address _account) private returns (uint256) {
     Account storage account = accounts[_account];
     uint256 rewardBlockNumber = block.number.sub(1);
-    int256 previousCumulativeRewardWeight = cumulativeRewardWeights[
+    FixidityLib.Fraction memory previousCumulativeRewardWeight = cumulativeRewardWeights[
       account.rewardsLastRedeemed
     ];
-    int256 cumulativeRewardWeight = cumulativeRewardWeights[
+    FixidityLib.Fraction memory cumulativeRewardWeight = cumulativeRewardWeights[
       rewardBlockNumber
     ];
     // We should never get here except in testing, where cumulativeRewardWeight will not be set.
-    if (previousCumulativeRewardWeight == 0 || cumulativeRewardWeight == 0) {
+    if (previousCumulativeRewardWeight.unwrap() == 0 ||
+        cumulativeRewardWeight.unwrap() == 0) {
       return 0;
     }
 
-    int256 rewardWeight = cumulativeRewardWeight.subtract(
+    FixidityLib.Fraction memory rewardWeight = cumulativeRewardWeight.subtract(
       previousCumulativeRewardWeight
     );
-    require(rewardWeight != 0, "Rewards weight does not exist");
+    require(rewardWeight.unwrap() != 0, "Rewards weight does not exist");
     uint256 value =
-      uint256(rewardWeight.multiply(toFixed(account.weight)).fromFixed());
+      uint256(rewardWeight.multiply(FixidityLib.wrap(account.weight)).fromFixed());
     account.rewardsLastRedeemed = uint96(rewardBlockNumber);
     if (value > 0) {
       address recipient = getDelegateFromAccountAndRole(_account, DelegateRole.Rewards);

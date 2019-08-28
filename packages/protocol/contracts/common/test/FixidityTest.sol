@@ -4,21 +4,21 @@ import "../FixidityLib.sol";
 
 
 contract FixidityTest {
-  using FixidityLib2 for FixidityLib2.Fraction;
+  using FixidityLib for FixidityLib.Fraction;
 
   function add(uint256 a, uint256 b) external view returns (uint256) {
-    return FixidityLib2.wrap(a).add(FixidityLib2.wrap(b)).unwrap();
+    return FixidityLib.wrap(a).add(FixidityLib.wrap(b)).unwrap();
   }
 
   function subtract(uint256 a, uint256 b) external view returns (uint256) {
-    return FixidityLib2.wrap(a).subtract(FixidityLib2.wrap(b)).unwrap();
+    return FixidityLib.wrap(a).subtract(FixidityLib.wrap(b)).unwrap();
   }
 
   function multiply(uint256 a, uint256 b) external view returns (uint256) {
-    return FixidityLib2.wrap(a).multiply(FixidityLib2.wrap(b)).unwrap();
+    return FixidityLib.wrap(a).multiply(FixidityLib.wrap(b)).unwrap();
   }
 
   function divide(uint256 a, uint256 b) external view returns (uint256) {
-    return FixidityLib2.wrap(a).divide(FixidityLib2.wrap(b)).unwrap();
+    return FixidityLib.wrap(a).divide(FixidityLib.wrap(b)).unwrap();
   }
 }

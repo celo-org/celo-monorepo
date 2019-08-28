@@ -14,7 +14,7 @@ pragma solidity ^0.5.0;
  * maxFixedAdd() if you want to be certain that those operations don't
  * overflow.
  */
-library FixidityLib2 {
+library FixidityLib {
 
   struct Fraction {
     uint256 value;
@@ -38,11 +38,11 @@ library FixidityLib2 {
     return Fraction(FIXED1_INT);
   }
 
-  function wrap(uint256 x) internal view returns (Fraction memory) {
+  function wrap(uint256 x) internal pure returns (Fraction memory) {
     return Fraction(x);
   }
 
-  function unwrap(Fraction memory x) internal view returns (uint256) {
+  function unwrap(Fraction memory x) internal pure returns (uint256) {
     return x.value;
   }
 
@@ -320,4 +320,13 @@ library FixidityLib2 {
     require(y.value <= maxFixedDivisor());
     return multiply(x, reciprocal(y));
   }
+
+  function leq(Fraction memory x, Fraction memory y) internal pure returns (bool) {
+    return x.value <= y.value;
+  }
+
+  function gt(Fraction memory x, Fraction memory y) internal pure returns (bool) {
+    return x.value > y.value;
+  }
+
 }

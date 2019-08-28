@@ -8,7 +8,7 @@ import "./interfaces/IStableToken.sol";
 import "../common/interfaces/IERC20Token.sol";
 import "../common/interfaces/ICeloToken.sol";
 import "../common/Initializable.sol";
-import "../common/UsingFixidity.sol";
+import "../common/FixidityLib.sol";
 import "../common/UsingRegistry.sol";
 
 
@@ -17,18 +17,19 @@ import "../common/UsingRegistry.sol";
  */
 // solhint-disable-next-line max-line-length
 contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
-Initializable, UsingRegistry, UsingFixidity {
+Initializable, UsingRegistry {
+  using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
   event MinterSet(address indexed _minter);
 
   event InflationFactorUpdated(
-    int256 factor,
+    uint256 factor,
     uint256 lastUpdated
   );
 
   event InflationParametersUpdated(
-    int256 rate,
+    uint256 rate,
     uint256 updatePeriod,
     uint256 lastUpdated
   );
@@ -62,8 +63,8 @@ Initializable, UsingRegistry, UsingFixidity {
   // The `updatePeriod` governs how often the `factor` is updated.
   // `factorLastUpdated` indicates when the inflation factor was last updated.
   struct InflationState {
-    int256 rate;
-    int256 factor;
+    FixidityLib.Fraction rate;
+    FixidityLib.Fraction factor;
     uint256 updatePeriod;
     uint256 factorLastUpdated;
   }
@@ -92,7 +93,7 @@ Initializable, UsingRegistry, UsingFixidity {
    * has passed since last update.
    */
   modifier updateInflationFactor() {
-    int256 updatedInflationFactor;
+    FixidityLib.Fraction memory updatedInflationFactor;
     uint256 lastUpdated;
 
     (updatedInflationFactor, lastUpdated) = getUpdatedInflationFactor();
@@ -101,7 +102,7 @@ Initializable, UsingRegistry, UsingFixidity {
       inflationState.factor = updatedInflationFactor;
       inflationState.factorLastUpdated = lastUpdated;
       emit InflationFactorUpdated(
-        inflationState.factor,
+        inflationState.factor.unwrap(),
         inflationState.factorLastUpdated
       );
     }
@@ -121,7 +122,7 @@ Initializable, UsingRegistry, UsingFixidity {
     string calldata _symbol,
     uint8 _decimals,
     address registryAddress,
-    int256 inflationRate,
+    uint256 inflationRate,
     uint256 inflationFactorUpdatePeriod
   )
     external
@@ -137,8 +138,8 @@ Initializable, UsingRegistry, UsingFixidity {
     symbol_ = _symbol;
     decimals_ = _decimals;
 
-    inflationState.rate = inflationRate;
-    inflationState.factor = FIXED1;
+    inflationState.rate = FixidityLib.wrap(inflationRate);
+    inflationState.factor = FixidityLib.fixed1();
     inflationState.updatePeriod = inflationFactorUpdatePeriod;
     // solhint-disable-next-line not-rely-on-time
     inflationState.factorLastUpdated = now;
@@ -162,7 +163,7 @@ Initializable, UsingRegistry, UsingFixidity {
    * @param updatePeriod how often inflationFactor is updated.
    */
   function setInflationParameters(
-    int256 rate,
+    uint256 rate,
     uint256 updatePeriod
   )
     external
@@ -173,12 +174,12 @@ Initializable, UsingRegistry, UsingFixidity {
       rate != 0,
       "Must provide a non-zero inflation rate."
     );
-    inflationState.rate = rate;
+    inflationState.rate = FixidityLib.wrap(rate);
     inflationState.updatePeriod = updatePeriod;
 
     emit InflationParametersUpdated(
-      inflationState.rate,
-      inflationState.updatePeriod,
+      rate,
+      updatePeriod,
       // solhint-disable-next-line not-rely-on-time
       now
     );
@@ -346,11 +347,11 @@ Initializable, UsingRegistry, UsingFixidity {
   function getInflationParameters()
     external
     view
-    returns (int256, int256, uint256, uint256)
+    returns (uint256, uint256, uint256, uint256)
   {
     return (
-      inflationState.rate,
-      inflationState.factor,
+      inflationState.rate.unwrap(),
+      inflationState.factor.unwrap(),
       inflationState.updatePeriod,
       inflationState.factorLastUpdated
     );
@@ -364,7 +365,7 @@ Initializable, UsingRegistry, UsingFixidity {
    * we assume any function calling this will have updated the inflation factor.
    */
   function valueToUnits(uint256 value) external view returns (uint256) {
-    int256 updatedInflationFactor;
+    FixidityLib.Fraction memory updatedInflationFactor;
 
     (updatedInflationFactor, ) = getUpdatedInflationFactor();
     return _valueToUnits(updatedInflationFactor, value);
@@ -376,11 +377,11 @@ Initializable, UsingRegistry, UsingFixidity {
    * @return The value corresponding to `units` given the current inflation factor.
    */
   function unitsToValue(uint256 units) public view returns (uint256) {
-    int256 updatedInflationFactor;
+    FixidityLib.Fraction memory updatedInflationFactor;
 
     (updatedInflationFactor, ) = getUpdatedInflationFactor();
 
-    return uint256(toFixed(units).divide(updatedInflationFactor).fromFixed());
+    return FixidityLib.newFixed(units).divide(updatedInflationFactor).fromFixed();
   }
 
   /**
@@ -390,14 +391,14 @@ Initializable, UsingRegistry, UsingFixidity {
    * @dev we assume any function calling this will have updated the inflation factor.
    */
   function _valueToUnits(
-    int256 inflationFactor,
+    FixidityLib.Fraction memory inflationFactor,
     uint256 value
   )
     private
     pure
     returns (uint256)
   {
-    return uint256(inflationFactor.multiply(toFixed(value)).fromFixed());
+    return inflationFactor.multiply(FixidityLib.newFixed(value)).fromFixed();
   }
 
   /**
@@ -408,7 +409,7 @@ Initializable, UsingRegistry, UsingFixidity {
   function getUpdatedInflationFactor()
     private
     view
-    returns (int256, uint256)
+    returns (FixidityLib.Fraction memory, uint256)
   {
     /* solhint-disable not-rely-on-time */
     if (now < inflationState.factorLastUpdated.add(inflationState.updatePeriod)) {
@@ -425,10 +426,10 @@ Initializable, UsingRegistry, UsingFixidity {
     );
 
     (numerator, denominator) = fractionMulExp(
-      uint256(inflationState.factor),
-      uint256(FIXED1),
-      uint256(inflationState.rate),
-      uint256(FIXED1),
+      inflationState.factor.unwrap(),
+      FixidityLib.fixed1().unwrap(),
+      inflationState.rate.unwrap(),
+      FixidityLib.fixed1().unwrap(),
       timesToApplyInflation,
       decimals_
     );
@@ -439,8 +440,8 @@ Initializable, UsingRegistry, UsingFixidity {
       return (inflationState.factor, inflationState.factorLastUpdated);
     }
 
-    int256 currentInflationFactor =
-      toFixed(numerator).divide(toFixed(denominator));
+    FixidityLib.Fraction memory currentInflationFactor =
+      FixidityLib.wrap(numerator).divide(FixidityLib.wrap(denominator));
     uint256 lastUpdated = inflationState.factorLastUpdated.add(
       inflationState.updatePeriod.mul(timesToApplyInflation)
     );
