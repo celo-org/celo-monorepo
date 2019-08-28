@@ -1,4 +1,5 @@
-import { blsPrivateKeyToPublic } from '@celo/celotool/src/lib/bls_utils'
+import { blsPrivateKeyToProcessedPrivateKey } from '@celo/celotool/src/lib/bls_utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from '@celo/celotool/src/lib/env-utils'
 import {
   CONTRACT_ADDRESSES,
   CONTRACT_OWNER_STORAGE_LOCATION,
@@ -8,13 +9,8 @@ import {
   PROXY_CONTRACT_CODE,
   TEMPLATE,
 } from '@celo/celotool/src/lib/genesis_constants'
-import {
-  ensure0x,
-  envVar,
-  fetchEnv,
-  fetchEnvOrFallback,
-  strip0x,
-} from '@celo/celotool/src/lib/utils'
+import { ensure0x, strip0x } from '@celo/celotool/src/lib/utils'
+import * as bls12377js from 'bls12377js'
 import { ec as EC } from 'elliptic'
 import { range, repeat } from 'lodash'
 import rlp from 'rlp'
@@ -100,9 +96,10 @@ export const getValidators = (mnemonic: string, n: number) => {
   return range(0, n)
     .map((i) => generatePrivateKey(mnemonic, AccountType.VALIDATOR, i))
     .map((key) => {
+      const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(key)
       return {
         address: privateKeyToAddress(key).slice(2),
-        blsPublicKey: blsPrivateKeyToPublic(key),
+        blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
       }
     })
 }
@@ -112,9 +109,10 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const validators =
     validatorEnv === VALIDATOR_OG_SOURCE
       ? OG_ACCOUNTS.map((account) => {
+          const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(account.privateKey)
           return {
             address: account.address,
-            blsPublicKey: blsPrivateKeyToPublic(account.privateKey),
+            blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
           }
         })
       : getValidators(fetchEnv(envVar.MNEMONIC), parseInt(validatorEnv, 10))

@@ -24,7 +24,6 @@ class Licenses extends React.Component<Props> {
       <WebView
         style={styles.licensesWebView}
         source={{ uri: licenseURI }}
-        startInLoadingState={true}
         originWhitelist={['file://']}
       />
     )

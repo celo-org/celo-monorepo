@@ -5,7 +5,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
-import "./UsingBondedDeposits.sol";
+import "./UsingLockedGold.sol";
 import "./interfaces/IValidators.sol";
 import "../common/Initializable.sol";
 import "../common/FractionUtil.sol";
@@ -16,7 +16,7 @@ import "../common/linkedlists/AddressSortedLinkedList.sol";
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
  */
-contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, UsingBondedDeposits {
+contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, UsingLockedGold {
 
   using AddressLinkedList for LinkedList.List;
   using AddressSortedLinkedList for SortedLinkedList.List;
@@ -41,7 +41,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     address affiliation;
   }
 
-  struct BondedDeposit {
+  struct LockedGoldCommitment {
     uint256 noticePeriod;
     uint256 value;
   }
@@ -54,7 +54,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   address[] private _validators;
   SortedLinkedList.List private votes;
   // TODO(asa): Support different requirements for groups vs. validators.
-  BondedDeposit private registrationRequirement;
+  LockedGoldCommitment private registrationRequirement;
   uint256 public minElectableValidators;
   uint256 public maxElectableValidators;
 
@@ -142,9 +142,10 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param registryAddress The address of the registry contract.
    * @param _minElectableValidators The minimum number of validators that can be elected.
    * @param _maxElectableValidators The maximum number of validators that can be elected.
-   * @param requirementValue The minimum bonded deposit value to register a group or validator.
-   * @param requirementNoticePeriod The minimum bonded deposit notice period to register a group or
-   *   validator.
+   * @param requirementValue The minimum Locked Gold commitment value to register a group or 
+       validator.
+   * @param requirementNoticePeriod The minimum Locked Gold commitment notice period to register
+   *    a group or validator.
    * @dev Should be called only once.
    */
   function initialize(
@@ -211,8 +212,9 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
   /**
    * @notice Updates the minimum bonding requirements to register a validator group or validator.
-   * @param value The minimum bonded deposit value to register a group or validator.
-   * @param noticePeriod The minimum bonded deposit notice period to register a group or validator.
+   * @param value The minimum Locked Gold commitment value to register a group or validator.
+   * @param noticePeriod The minimum Locked Gold commitment notice period to register a group or
+   *   validator.
    * @return True upon success.
    * @dev The new requirement is only enforced for future validator or group registrations.
    */
@@ -239,8 +241,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param identifier An identifier for this validator.
    * @param name A name for the validator.
    * @param url A URL for the validator.
-   * @param noticePeriod The notice period of the bonded deposit that meets the requirements for
-   *   validator registration.
+   * @param noticePeriod The notice period of the Locked Gold commitment that meets the
+   *   requirements for validator registration.
    * @param publicKeysData Comprised of three tightly-packed elements:
    *    - publicKey - The public key that the validator is using for consensus, should match
    *      msg.sender. 64 bytes.
@@ -270,7 +272,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       publicKeysData.length == (64 + 48 + 96)
     );
     bytes memory proofOfPossessionBytes = publicKeysData.slice(64, 48 + 96);
-    // TODO(Kobi): Should call checkProofOfPossession once the input is generated correctly.
+    require(checkProofOfPossession(proofOfPossessionBytes));
 
     address account = getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
@@ -350,8 +352,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param identifier A identifier for this validator group.
    * @param name A name for the validator group.
    * @param url A URL for the validator group.
-   * @param noticePeriod The notice period of the bonded deposit that meets the requirements for
-   *   validator registration.
+   * @param noticePeriod The notice period of the Locked Gold commitment that meets the 
+   *   requirements for validator registration.
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient weight.
@@ -605,8 +607,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   }
 
   /**
-   * @notice Returns the bonded deposit requirements to register a validator or group.
-   * @return The minimum value and notice period for the bonded deposit.
+   * @notice Returns the Locked Gold commitment requirements to register a validator or group.
+   * @return The minimum value and notice period for the Locked Gold commitment.
    */
   function getRegistrationRequirement() external view returns (uint256, uint256) {
     return (registrationRequirement.value, registrationRequirement.noticePeriod);
@@ -722,7 +724,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   /**
    * @notice Returns whether an account meets the requirements to register a validator or group.
    * @param account The account.
-   * @param noticePeriod The notice period of the bonded deposit that meets the requirements.
+   * @param noticePeriod The notice period of the Locked Gold commitment that meets the
+   *   requirements.
    * @return Whether an account meets the requirements to register a validator or group.
    */
   function meetsRegistrationRequirements(
@@ -733,7 +736,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     view
     returns (bool)
   {
-    uint256 value = getBondedDepositValue(account, noticePeriod);
+    uint256 value = getLockedCommitmentValue(account, noticePeriod);
     return (
       value >= registrationRequirement.value &&
       noticePeriod >= registrationRequirement.noticePeriod
@@ -781,7 +784,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   /**
    * @notice De-affiliates a validator, removing it from the group for which it is a member.
    * @param validator The validator to deaffiliate from their affiliated validator group.
-   * @param validatorAccount The BondedDeposits account of the validator.
+   * @param validatorAccount The LockedGold account of the validator.
    * @return True upon success.
    */
   function _deaffiliate(

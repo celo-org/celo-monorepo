@@ -1,6 +1,6 @@
 {
   "readOnlyMode":
-    "Modo de solo lectura: cree la clave de respaldo para seguir enviando y recibiendo Celo Dólares",
+    "Modo de solo lectura: cree la clave de respaldo para seguir enviando y recibiendo {{CeloDollars}}",
   "getBackupKey": "Obtener clave de respaldo",
   "learnBackupKey": "Aprenda su clave de respaldo",
   "editProfile": "Editar perfil",
@@ -11,7 +11,7 @@
   "cancel": "Cancelar",
   "backupKeyImportance": {
     "0":
-      "Si pierde su teléfono o elimina la aplicación de Celo, perderá todo el oro y los dólares de su monedero.",
+      "Si pierde su teléfono o elimina la aplicación de Celo, perderá todo el oro y los {{dollars}} de su monedero.",
     "1":
       "Puede hacer un respaldo del monedero si escribe una clave de respaldo en un papel y la guarda en algún sitio seguro. Así, podrá restaurar el monedero en el futuro de ser necesario.",
     "2":
