@@ -99,6 +99,7 @@ export class TransferFeedItem extends React.PureComponent<Props> {
       timestamp,
       type,
       symbol,
+      invitees,
       value,
       addressToE164Number,
       recipientCache,
@@ -115,7 +116,11 @@ export class TransferFeedItem extends React.PureComponent<Props> {
       return
     }
 
-    const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
+    const recipient = getRecipientFromAddress(
+      address,
+      transactionType === TransactionTypes.INVITE_SENT ? invitees : addressToE164Number,
+      recipientCache
+    )
 
     const comment = this.decryptComment(type)
     navigateToPaymentTransferReview(type, timestamp, {
