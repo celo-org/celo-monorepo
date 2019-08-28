@@ -18,6 +18,7 @@ export class Backers extends React.Component<I18nProps> {
         <GridRow allStyle={standardStyles.centered}>
           <Cell span={Spans.three4th}>
             <H1
+              ariaLevel="2"
               style={[textStyles.center, standardStyles.elementalMarginBottom]}
               id={hashNav.about.backers}
             >
@@ -58,6 +59,7 @@ export class Backers extends React.Component<I18nProps> {
         >
           <Cell span={Spans.full}>
             <H1
+              ariaLevel="2"
               style={[textStyles.center, standardStyles.elementalMarginBottom]}
               id={hashNav.about.backers}
             >
