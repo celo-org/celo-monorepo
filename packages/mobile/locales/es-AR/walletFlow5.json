@@ -12,7 +12,9 @@
   "wallet": "Monedero",
   "send": "Envío",
   "sent": "Envió",
+  "sentTo": "Enviado a {{address}}",
   "received": "Recibido",
+  "receivedFrom": "Recibido de {{address}}",
   "pending": "Pendiente",
   "exchange": "Cambio",
   "review": "Revisión",
@@ -59,6 +61,5 @@
     "1":
       "Un recordatorio amistoso de que está utilizando una compilación de Testnet - los saldos aquí no son reales."
   },
-  "dismiss": "Ocultar",
-  "unknown": "Desconocido"
+  "dismiss": "Ocultar"
 }
