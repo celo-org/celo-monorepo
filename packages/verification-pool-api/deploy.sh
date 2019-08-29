@@ -24,6 +24,6 @@ yarn run firebase use celo-testnet
 yarn set-env $NETWORK
 yarn run build
 yarn firebase-bolt schema.bolt
-yarn run firebase deploy --only "database,hosting,functions:handleVerificationRequest$NETWORK"
+yarn run firebase deploy --only "database,functions:handleVerificationRequest$NETWORK"
 
 echo "Done deployment."
