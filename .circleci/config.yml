@@ -479,6 +479,9 @@ workflows:
       - cli-test:
           requires:
             - install_dependencies
+      - contractkit-test:
+          requires:
+            - install_dependencies      
       - mobile-test:
           requires:
             - lint-checks
