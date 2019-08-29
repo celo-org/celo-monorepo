@@ -824,6 +824,8 @@ rule remove_nullifies_value_and_removes(uint256 key) {
 	// those should not change
 	uint256 _lesserOfLesserKey = sinvoke getElementLesser(_e,_lesserKey);
 	uint256 _greaterOfGreaterKey = sinvoke getElementGreater(_e,_greaterKey);
+	
+	require _lesserOfLesserKey != key && _greaterOfGreaterKey != key; // invariant: list is not cyclic, need to check
 		
 	sinvoke remove(eF, key);
 	
@@ -941,44 +943,57 @@ rule contents_update(uint256 i)
 
 }
 
-rule invariants_update_basic_sorted(uint256 key, uint256 value, uint256 lesser, uint256 greater) {
-	/* 
+rule invariants_remove_basic_sorted(uint256 key) {
+/* 
 		The universe:
-		< tail      lesser greaterOfLesser    key     lesserOfGreater  greater             head > 
+		< tail      lesser     key      greater             head > 
 		+ some i
 	*/
 	uint256 i; // random i for checking forall key. contains(key) => (greater(key) == 0 <=> key == head) && (lesser(key) == 0 <=> key == tail)
 	uint256 j; // random j for checking sortedness together with i. 
 	
 	env ePre;
+	// key is contained for remove to succeed, so it hash lesser and greater
+	uint256 lesser = sinvoke getElementLesser(ePre,key);
+	uint256 greater = sinvoke getElementGreater(ePre,key);
 	/* Collect pre-data */
 	uint256 _head = sinvoke getHead(ePre);
 	uint256 _tail = sinvoke getTail(ePre);
 	uint256 _numElements = sinvoke getNumElements(ePre);
-	uint256 _greaterOfLesser = sinvoke getElementGreater(ePre, lesser);
-	uint256 _lesserOfGreater = sinvoke getElementLesser(ePre, greater);
 	
 	/* pre-contains */
 	bool _headContained = sinvoke contains(ePre,_head);
 	bool _tailContained = sinvoke contains(ePre,_tail);
 	bool _keyContained = sinvoke contains(ePre,key);
-	bool _lesserContained = sinvoke contains(ePre,lesser);
-	bool _greaterContained = sinvoke contains(ePre,greater);
-	bool _greaterOfLesserContained = sinvoke contains(ePre,_greaterOfLesser);
-	bool _lesserOfGreaterContained = sinvoke contains(ePre,_lesserOfGreater);
 	bool _iContained = sinvoke contains(ePre,i);
 	bool _jContained = sinvoke contains(ePre,j);
+	bool _lesserContained = sinvoke contains(ePre,lesser);
+	bool _greaterContained = sinvoke contains(ePre,greater);
 	
 	/* pre-value */
 	uint256 _headValue = sinvoke getValue(ePre,_head);
 	uint256 _tailValue = sinvoke getValue(ePre,_tail);
 	uint256 _keyValue = sinvoke getValue(ePre,key);
-	uint256 _lesserValue = sinvoke getValue(ePre,lesser);
-	uint256 _greaterValue = sinvoke getValue(ePre,greater);
-	uint256 _greaterOfLesserValue = sinvoke getValue(ePre,_greaterOfLesser);
-	uint256 _lesserOfGreaterValue = sinvoke getValue(ePre,_lesserOfGreater);
 	uint256 _iValue = sinvoke getValue(ePre,i);
 	uint256 _jValue = sinvoke getValue(ePre,j);
+	uint256 _lesserValue = sinvoke getValue(ePre,lesser);
+	uint256 _greaterValue = sinvoke getValue(ePre,greater);
+	
+	// extra requirements
+	/* if head == tail and non-zero, num elements is 1 (require only) */
+	require (_head == _tail && _head != 0) => _numElements == 1;
+	/* if num of elements is one, then i,j,key are necessarily head or not contains*/
+	require (_numElements == 1) => ((i == _head || !_iContained)
+										&& (j == _head || !_jContained)
+										&& (key == _head || !_keyContained)
+									);									
+	/* no cycles */
+	require lesser != key && greater != key;
+	require lesser != key => lesser != _head;
+	require greater != key => greater != _tail;
+	/* if there are two distinct elements then list size is >= 2 */
+	// check on universe i,j,key,head,tail,lesser,greater - but for easyness, just take the key and its lesser and greater - at least one additional must exist for size to be >= 2
+	require (_lesserContained || _greaterContained) => _numElements >= 2;
 	
 	/* list is empty iff num elements is 0 */
 	require _head == 0 <=> _numElements == 0;
@@ -987,8 +1002,6 @@ rule invariants_update_basic_sorted(uint256 key, uint256 value, uint256 lesser, 
 	/* (exists key. contains(key)) => head != 0 && contains(head) && tail != 0 && contains(tail) */
 	require ((_head != 0 && _headContained) 
 			|| (_tail != 0 && _tailContained) 
-			|| (lesser != 0 && _lesserContained) 
-			|| (greater != 0 && _greaterContained)
 			|| (key != 0 && _keyContained)
 			|| (i != 0 && _iContained)
 			|| (j != 0 && _jContained)
@@ -1022,16 +1035,6 @@ rule invariants_update_basic_sorted(uint256 key, uint256 value, uint256 lesser, 
 		require (_keyLesser == 0 <=> key == _tail) && (_keyLesser != 0 => sinvoke contains(ePre,_keyLesser));
 		require _tailValue <= _keyValue && _keyValue <= _headValue;		
 	}
-	if (_lesserContained) {
-		require (_greaterOfLesser == 0 <=> lesser == _head) && (_greaterOfLesser != 0 => _greaterOfLesserContained);
-		require sinvoke getElementLesser(ePre,lesser) == 0 <=> lesser == _tail;
-		require _tailValue <= _lesserValue && _lesserValue <= _headValue;
-	}
-	if (_greaterContained) {
-		require sinvoke getElementGreater(ePre,greater) == 0 <=> greater == _head;
-		require (_lesserOfGreater == 0 <=> greater == _tail) && (_lesserOfGreater != 0 => _lesserOfGreaterContained);
-		require _tailValue <= _greaterValue && _greaterValue <= _headValue;
-	}
 	if (_iContained) {
 		require sinvoke getElementGreater(ePre,i) == 0 <=> i == _head;
 		require sinvoke getElementLesser(ePre,i) == 0 <=> i == _tail;
@@ -1042,31 +1045,35 @@ rule invariants_update_basic_sorted(uint256 key, uint256 value, uint256 lesser, 
 		require sinvoke getElementLesser(ePre,j) == 0 <=> j == _tail;
 		require _tailValue <= _jValue && _jValue <= _headValue;
 	}
+	if (_lesserContained) {
+		require (sinvoke getElementGreater(ePre,lesser) == 0 <=> lesser == _head); // && (_greaterOfLesser != 0 => _greaterOfLesserContained);
+		require sinvoke getElementLesser(ePre,lesser) == 0 <=> lesser == _tail;
+		require _tailValue <= _lesserValue && _lesserValue <= _headValue;
+	}
+	if (_greaterContained) {
+		require sinvoke getElementGreater(ePre,greater) == 0 <=> greater == _head;
+		require (sinvoke getElementLesser(ePre,greater) == 0 <=> greater == _tail);// && (_lesserOfGreater != 0 => _lesserOfGreaterContained);
+		require _tailValue <= _greaterValue && _greaterValue <= _headValue;
+	}
 	/* more sortedness assumptions */
-	// TODO: Move each to one where lesserValue and greaterValue are actually defined
-	require _tailValue <= _lesserOfGreaterValue && _lesserOfGreaterValue <= _greaterValue
-			&& _lesserValue <= _greaterOfLesserValue && _greaterOfLesserValue <= _headValue;
-	
-		
+	require (lesser != 0 && _iValue > _lesserValue) => (_iValue > _keyValue || i == key || i == lesser);
+	require (lesser != 0 && _jValue > _lesserValue) => (_jValue > _keyValue || j == key || j == lesser);
+	require (greater != 0 && _iValue < _greaterValue) => (_iValue < _keyValue || i == key || i == greater);
+	require (greater != 0 && _jValue < _greaterValue) => (_jValue < _keyValue || j == key || j == greater);
+				
 	env e;
-	sinvoke update(e,key,value,lesser,greater);
+	sinvoke remove(e,key);
 
 	env ePost;
 	/* collect post-data */
 	uint256 head_ = sinvoke getHead(ePost);
 	uint256 tail_ = sinvoke getTail(ePost);
 	uint256 numElements_ = sinvoke getNumElements(ePost);
-	uint256 greaterOfLesser_ = sinvoke getElementGreater(ePost, lesser);
-	uint256 lesserOfGreater_ = sinvoke getElementLesser(ePost, greater);
 	
 	/* post-contains */
 	bool headContained_ = sinvoke contains(ePost,head_);
 	bool tailContained_ = sinvoke contains(ePost,tail_);
 	bool keyContained_ = sinvoke contains(ePost,key);
-	bool lesserContained_ = sinvoke contains(ePost,lesser);
-	bool greaterContained_ = sinvoke contains(ePost,greater);
-	bool greaterOfLesserContained_ = sinvoke contains(ePost,greaterOfLesser_);
-	bool lesserOfGreaterContained_ = sinvoke contains(ePost,lesserOfGreater_);
 	bool iContained_ = sinvoke contains(ePost, i);
 	bool jContained_ = sinvoke contains(ePost, j);
 	
@@ -1074,10 +1081,6 @@ rule invariants_update_basic_sorted(uint256 key, uint256 value, uint256 lesser, 
 	uint256 headValue_ = sinvoke getValue(ePost,head_);
 	uint256 tailValue_ = sinvoke getValue(ePost,tail_);
 	uint256 keyValue_ = sinvoke getValue(ePost,key);
-	uint256 lesserValue_ = sinvoke getValue(ePost,lesser);
-	uint256 greaterValue_ = sinvoke getValue(ePost,greater);
-	uint256 greaterOfLesserValue_ = sinvoke getValue(ePost,greaterOfLesser_);
-	uint256 lesserOfGreaterValue_ = sinvoke getValue(ePost,lesserOfGreater_);
 	uint256 iValue_ = sinvoke getValue(ePost, i);
 	uint256 jValue_ = sinvoke getValue(ePost, j);
 	
@@ -1087,8 +1090,6 @@ rule invariants_update_basic_sorted(uint256 key, uint256 value, uint256 lesser, 
 	assert head_ == 0 <=> tail_ == 0, "Violated: head-tail symmetry";
 	assert ((head_ != 0 && headContained_) 
 			|| (tail_ != 0 && tailContained_) 
-			|| (lesser != 0 && lesserContained_) 
-			|| (greater != 0 && greaterContained_)
 			|| (key != 0 && keyContained_)
 			|| (i != 0 && iContained_)
 			|| (j != 0 && jContained_)
@@ -1107,19 +1108,6 @@ rule invariants_update_basic_sorted(uint256 key, uint256 value, uint256 lesser, 
 		assert iValue_ <= jValue_ <=> _iValue <= _jValue, "Two elements that existed in the map must maintain their order"; // subsumed by the above
 	}	
 	
-	// assert that new element is sorted properly
-	uint256 actualNewValue = sinvoke getValue(ePost,key);
-	assert actualNewValue == value, "New key $key value should be $value, got ${actualNewValue}";
-	
-	uint256 nextOfNewKey = sinvoke getElementGreater(ePost,key);
-	uint256 nextOfNewKeyValue = sinvoke getValue(ePost,nextOfNewKey);
-	uint256 prevOfNewKey = sinvoke getElementLesser(ePost,key);
-	uint256 prevOfNewKeyValue = sinvoke getValue(ePost,prevOfNewKey);
-
-	assert nextOfNewKey == 0 || sinvoke contains(ePost,nextOfNewKey), "New key $key next $nextOfNewKey should be contained in the list";
-	assert prevOfNewKey == 0 || sinvoke contains(ePost,prevOfNewKey), "New key $key previous $prevOfNewKey should be contained in the list";
-	assert nextOfNewKey == 0 || nextOfNewKeyValue >= value, "New key $key next $nextOfNewKey value $nextOfNewKeyValue should be greater or equal to $value";
-	assert prevOfNewKey == 0 || prevOfNewKeyValue <= value, "New key $key previous $prevOfNewKey value $prevOfNewKeyValue value should be lesser or equal to $value";
 }
 
 rule pointers_updated_insert(uint256 key, uint256 value, uint256 lesser, uint256 greater) {

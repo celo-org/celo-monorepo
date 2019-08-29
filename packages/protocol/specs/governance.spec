@@ -130,6 +130,7 @@ rule promote_proposal(method f, uint256 p, uint256 index) {
 	
 	// p must be non zero
 	require p != 0;
+	// required? // require sinvoke proposalCount(_e) >= p;
 	
 	// get queue expiry
 	uint256 _queueExpiry = sinvoke queueExpiry(_e);
@@ -251,9 +252,14 @@ rule cant_unvote(uint256 deqIndex, uint256 voteValue) {
 	uint256 recordValue;
 	p, recordValue = sinvoke getVoteRecord(e,voterDelegate,deqIndex);
 
-	bool _ = invoke vote(eF,p,deqIndex,voteValue);
+	bool result = invoke vote(eF,p,deqIndex,voteValue);
+	bool voteReverted = lastReverted;
 	
-	assert voteValue == NONE => lastReverted, "Cannot vote for none"; // not voting none
+	uint256 p_;
+	uint256 recordValue_;
+	p_, recordValue_ = sinvoke getVoteRecord(e,voterDelegate,deqIndex);
+	
+	assert voteValue == NONE => (!result && recordValue_ == recordValue) || voteReverted, "Cannot vote for none: function either returns false and did not update the vote, or it reverted"; // not voting none
 }
 
 rule cant_vote_twice_with_delegate(uint256 deqIndex, uint256 voteValue) {	
@@ -380,10 +386,11 @@ rule approved_proposals_invariants(method f, uint256 p) {
 }
 
 
-rule no_double_vote_referendum(method f, address account, uint256 deqIndex) {
+rule no_double_vote_referendum_all_but_vote(method f, address account, uint256 deqIndex) {
 	/* A user that already has a vote record for a dequeued index, cannot make a transaction that will increase the weight of that choice */
 	env _e;
-	env eF;
+	env eF; 
+	env eFTime; // same time as eF;
 	env e_;
 	
 	uint256 NONE = sinvoke getNoneVoteEnum(_e);
@@ -391,14 +398,24 @@ rule no_double_vote_referendum(method f, address account, uint256 deqIndex) {
 	uint256 YES = sinvoke getYesVoteEnum(_e);
 	uint256 NO = sinvoke getNoVoteEnum(_e);
 	
-	uint256 p;
+	uint256 p; // a proposal - let's assume it already exists (required for propose() verification)
 	uint256 recordValue;
 	p, recordValue = sinvoke getVoteRecord(_e,account,deqIndex);
+	uint256 currentProposalCount = sinvoke proposalCount(_e);
+	require currentProposalCount >= p;
+	
 	
 	uint256 _yes; uint256 _no; uint256 _abstain;
 	_yes,_no,_abstain = sinvoke getVoteTotals(_e,p);
 	
+	// if can't vote for NONE, then necessarily if record vote is NONE, all votes are zero currently
+	require recordValue == NONE => (_yes == 0 && _no == 0 && _abstain == 0);
+	
+	//require eF.block.timestamp == eFTime.block.timestamp;
+	//bool isExpired = sinvoke isDequeuedProposalExpired(eFTime,p);
+	
 	calldataarg arg;
+	require f != vote;
 	require eF.msg.sender == account;
 	sinvoke f(eF,arg);
 	
@@ -408,7 +425,62 @@ rule no_double_vote_referendum(method f, address account, uint256 deqIndex) {
 	
 	bool doesProposalExist_ = sinvoke proposalExists(e_,p);
 	
-	assert recordValue != NONE => yes_ + no_ + abstain_ == _yes + _no + _abstain, "Total votes could not have changed if already voted";
+	// if p expires, then sum of votes is no longer relevant - happens in approve, vote, execute
+	assert (recordValue != NONE && doesProposalExist_) => (yes_ + no_ + abstain_) == (_yes + _no + _abstain), "Total votes could not have changed if already voted";
+	assert recordValue == YES => yes_ <= _yes, "Yes votes could not have increased if voted yes already";
+	assert recordValue == NO => no_ <= _no, "No votes could not have increased if voted no already";
+	assert recordValue == ABSTAIN => abstain_ <= _abstain, "Abstain votes could not have increased if voted abstain already";
+	assert recordValue == NONE => (!doesProposalExist_ && yes_ == 0 && no_ == 0 && abstain_ == 0)// proposal no longer exists so everything is 0
+									// or just one out of (yes,no,abstain) changed
+									|| (yes_ == _yes && no_ == _no)
+									|| (yes_ == _yes && abstain_ == _abstain)
+									|| (no_ == _no && abstain_ == _abstain),
+									"If previously did not vote, either this proposal was deleted, or only one kind of vote may change, and the other two are the same";
+}
+
+rule no_double_vote_referendum_vote(address account, uint256 deqIndex) {
+	/* A user that already has a vote record for a dequeued index, cannot make a transaction that will increase the weight of that choice */
+	env _e;
+	env eF; 
+	env eFTime; // same time as eF;
+	env e_;
+	
+	uint256 NONE = sinvoke getNoneVoteEnum(_e);
+	uint256 ABSTAIN = sinvoke getAbstainVoteEnum(_e);
+	uint256 YES = sinvoke getYesVoteEnum(_e);
+	uint256 NO = sinvoke getNoVoteEnum(_e);
+	
+	uint256 p; // a proposal - let's assume it already exists (required for propose() verification)
+	uint256 recordValue;
+	p, recordValue = sinvoke getVoteRecord(_e,account,deqIndex);
+	uint256 currentProposalCount = sinvoke proposalCount(_e);
+	require currentProposalCount >= p;
+	
+	
+	uint256 _yes; uint256 _no; uint256 _abstain;
+	_yes,_no,_abstain = sinvoke getVoteTotals(_e,p);
+	
+	// if can't vote for NONE, then necessarily if record vote is NONE, all votes are zero currently
+	require recordValue == NONE => (_yes == 0 && _no == 0 && _abstain == 0);
+	
+	require sinvoke getAccountFromVoter(_e,eF.msg.sender) == account;
+	uint256 someP; uint256 someIndex; uint8 someValue;
+	
+	uint256 pOfSomeIndex; uint256 recordValueOfSomeIndex;
+	pOfSomeIndex, recordValueOfSomeIndex = sinvoke getVoteRecord(_e,account,someIndex);
+	require pOfSomeIndex == p => someIndex == deqIndex; // no duplicates in the dequeued array
+	require someP == p => someIndex == deqIndex;
+	
+	sinvoke vote(eF,someP,someIndex,someValue);
+	
+	
+	uint256 yes_; uint256 no_; uint256 abstain_;
+	yes_,no_,abstain_ = sinvoke getVoteTotals(e_,p);
+	
+	bool doesProposalExist_ = sinvoke proposalExists(e_,p);
+	
+	// if p expires, then sum of votes is no longer relevant - happens in approve, vote, execute
+	assert (recordValue != NONE && doesProposalExist_) => (yes_ + no_ + abstain_) == (_yes + _no + _abstain), "Total votes could not have changed if already voted";
 	assert recordValue == YES => yes_ <= _yes, "Yes votes could not have increased if voted yes already";
 	assert recordValue == NO => no_ <= _no, "No votes could not have increased if voted no already";
 	assert recordValue == ABSTAIN => abstain_ <= _abstain, "Abstain votes could not have increased if voted abstain already";

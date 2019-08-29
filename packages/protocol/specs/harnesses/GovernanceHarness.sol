@@ -36,6 +36,17 @@ contract GovernanceHarness is Governance {
 	
 	function _getVoterFromAccount(address account) public view returns (address) {
 		IBondedDeposits bondedDeposits = IBondedDeposits(registry.getAddressFor(BONDED_DEPOSITS_REGISTRY_ID));
-		return registry.getVoterFromAccount(account);
+		return bondedDeposits.getVoterFromAccount(account); // TODO: Implement in registry harness
 	}
+	
+	function getAccountFromVoter(address voter) public view returns (address) {
+		/*IBondedDeposits bondedDeposits = IBondedDeposits(registry.getAddressFor(BONDED_DEPOSITS_REGISTRY_ID));*/
+		return registry.getAccountFromVoter(voter);
+	}
+	
+	// overriding get account weight
+	/*function getAccountWeight(address account) public view returns (uint256) {
+		IBondedDeposits bondedDeposits = IBondedDeposits(registry.getAddressFor(BONDED_DEPOSITS_REGISTRY_ID));
+		return registry.getAccountWeight(account);
+	}*/
 }

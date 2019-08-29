@@ -26,8 +26,8 @@ contract UsingBondedDeposits is UsingRegistry {
    * @dev Fails if the `accountOrDelegate` is a non-voting delegate.
    * @return The associated account.
    */
-  function getAccountFromVoter(address accountOrDelegate) internal view returns (address) {
-    return getBondedDeposits().getAccountFromVoter(accountOrDelegate);
+  function getAccountFromVoter(address accountOrDelegate) /*SG change: internal*/public view returns (address) {
+    return /*sg temp:getBondedDeposits()*/registry.getAccountFromVoter(accountOrDelegate);
   }
 
   /**
@@ -54,8 +54,8 @@ contract UsingBondedDeposits is UsingRegistry {
    * @param account The address of the account.
    * @return The voting weight of `account`.
    */
-  function getAccountWeight(address account) internal view returns (uint256) {
-    return getBondedDeposits().getAccountWeight(account);
+  function getAccountWeight(address account) /*SG change: internal*/public view returns (uint256) {
+    return /*sg temp: getBondedDeposits()*/registry.getAccountWeight(account);
   }
 
   /**

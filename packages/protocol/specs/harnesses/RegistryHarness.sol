@@ -45,10 +45,13 @@ contract RegistryHarness {
 	mapping (address => bool) validators_isVoting;
 	
 	uint256 bondedDeposits_totalWeight;
+	mapping (address => uint256) bondedDeposits_accountWeight;
+	mapping (address => address) bondedDeposits_accountFromVoter;
 	
 	uint256 randomIndex;
 	mapping (uint => bool) randomBoolMap;
 	mapping (uint => uint256) randomUInt256Map;
+	mapping (uint => address) randomAddressMap;
 	
 	
 	function isValidating(address account) external view returns (bool) {
@@ -69,12 +72,30 @@ contract RegistryHarness {
 	}
 	
 	function getTotalWeight() public returns (uint256) {
-		if (whoami == iamBondedDeposits) {
+		if (true ||  whoami == iamBondedDeposits) {
 			return bondedDeposits_totalWeight;
 		} else {
 			return getRandomUInt256();
 		}
 	}
+	
+	function getAccountWeight(address account) public returns (uint256) {
+		if (true || whoami == iamBondedDeposits) {
+			return bondedDeposits_accountWeight[account];
+		} else {
+			return getRandomUInt256();
+		}
+	}
+	
+	function getAccountFromVoter(address voter) public returns (address) {
+		if (true || whoami == iamBondedDeposits) {
+			return bondedDeposits_accountFromVoter[voter];
+		} else {
+			return getRandomAddress();
+		}
+	}
+	
+	// TODO: Add missing functionalities
 	
 	function getRandomBool() public returns (bool) {
 		randomIndex++;
@@ -84,6 +105,11 @@ contract RegistryHarness {
 	function getRandomUInt256() public returns (uint256) {
 		randomIndex++;
 		return randomUInt256Map[randomIndex];
+	}
+
+	function getRandomAddress() public returns (address) {
+		randomIndex++;
+		return randomAddressMap[randomIndex];
 	}
 	
 	// TODO: For gold token - spartacus behavior should include wrecking havoc on balances.

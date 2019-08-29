@@ -989,7 +989,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
    * @param proposalId The ID of the proposal to delete.
    * @return Whether or not the dequeued proposal has expired.
    */
-  function isDequeuedProposalExpired(uint256 proposalId) private view returns (bool) {
+  function isDequeuedProposalExpired(uint256 proposalId) public view returns (bool) { // SG: changed to public for verification
     Proposal storage proposal = proposals[proposalId];
     ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
     // The proposal is considered expired under the following conditions:

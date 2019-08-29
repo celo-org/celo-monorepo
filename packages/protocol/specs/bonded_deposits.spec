@@ -113,6 +113,7 @@ rule delegations_in_sync_and_exclusive(method f, address delegatedTo) {
 	require delegatedTo != 0;
 	
 	env ePre;
+	env eF;
 	address _delegatingAccount = sinvoke delegations(ePre,delegatedTo); // an account that delegates one of the roles to delegatedTo
 
 	require sinvoke _exists(ePre,_delegatingAccount); // _delegatingAccount must be an account
@@ -127,11 +128,15 @@ rule delegations_in_sync_and_exclusive(method f, address delegatedTo) {
 	bool _aValidatingDelegateTo = _aValidatingDelegate == delegatedTo;
 	
 	require _aRewardsDelegateTo || _aVotingDelegateTo || _aValidatingDelegateTo; // at least one of the roles must be delegated to delegatedTo
-	require _aRewardsDelegateTo => (!_aVotingDelegateTo && !_aValidatingDelegateTo)
-			&& _aVotingDelegateTo => (!_aRewardsDelegateTo && !_aValidatingDelegateTo)
-			&& _aValidatingDelegateTo => (!_aRewardsDelegateTo && !_aVotingDelegateTo); // at most one of the three roles is delegated to delegatedTo
-			
-	env eF;
+	require (_aRewardsDelegateTo => (!_aVotingDelegateTo && !_aValidatingDelegateTo))
+			&& (_aVotingDelegateTo => (!_aRewardsDelegateTo && !_aValidatingDelegateTo))
+			&& (_aValidatingDelegateTo => (!_aRewardsDelegateTo && !_aVotingDelegateTo)); // at most one of the three roles is delegated to delegatedTo
+	require _delegatingAccount == 0 => (!_aRewardsDelegateTo && !_aVotingDelegateTo && !_aValidatingDelegateTo); // if no delegate (0), then no roles from 0
+	// if delegatedTo is for _delegatingAccount, then it is not a delegate for eF.msg.sender for sure!
+	require (sinvoke _rewardsDelegate(ePre,eF.msg.sender) != delegatedTo) 
+			&& (sinvoke _votingDelegate(ePre,eF.msg.sender) != delegatedTo) 
+			&& (sinvoke _validatingDelegate(ePre,eF.msg.sender) != delegatedTo); 
+	
 	calldataarg arg;	
 	sinvoke f(eF,arg);
 	
@@ -148,12 +153,12 @@ rule delegations_in_sync_and_exclusive(method f, address delegatedTo) {
 	
 	if (delegatingAccount_ == _delegatingAccount) { // if delegatedTo was not removed
 		assert aRewardsDelegateTo_ || aVotingDelegateTo_ || aValidatingDelegateTo_, "at least one of the roles must be delegated to $delegatedTo";
-		assert aRewardsDelegateTo_ => (!aVotingDelegateTo_ && !aValidatingDelegateTo_)
-				&& aVotingDelegateTo_ => (!aRewardsDelegateTo_ && !aValidatingDelegateTo_)
-				&& aValidatingDelegateTo_ => (!aRewardsDelegateTo_ && !aVotingDelegateTo_), "at most one of the three roles is delegated to $delegatedTo";
+		assert (aRewardsDelegateTo_ => (!aVotingDelegateTo_ && !aValidatingDelegateTo_))
+				&& (aVotingDelegateTo_ => (!aRewardsDelegateTo_ && !aValidatingDelegateTo_))
+				&& (aValidatingDelegateTo_ => (!aRewardsDelegateTo_ && !aVotingDelegateTo_)), "at most one of the three roles is delegated to $delegatedTo";
 	}
 	// otherwise, delegatedTo was removed as a delegation
-	assert delegatingAccount_ != _delegatingAccount => 
+	assert (delegatingAccount_ != _delegatingAccount || delegatingAccount_ == 0) => 
 			(!aRewardsDelegateTo_ && !aVotingDelegateTo_ && !aValidatingDelegateTo_),
 				"Delegated $delegatedTo before executing $f was removed as a delegate of ${_delegatingAccount}, therefore it cannot have a delegate role, although at least one of the roles remained: rewards: ${aRewardsDelegateTo_}, voting: ${aVotingDelegateTo_}, validating: ${aValidatingDelegateTo_}";
 	
@@ -716,7 +721,7 @@ rule check_update_bonded_deposit_rule3_deletion(address account, uint256 noticeP
 }
 
 
-rule check_update_bonded_deposit_rule4(address account, uint256 noticePeriod, uint256 value) {
+rule check_update_bonded_deposit_rule4_insertion(address account, uint256 noticePeriod, uint256 value) {
 	// insert : current bond value == 0
 	// Index of np can be set to 0 only if original deposits len was 0.
 	// New array length must be +1 compared to previous one.
@@ -739,7 +744,7 @@ rule check_update_bonded_deposit_rule4(address account, uint256 noticePeriod, ui
 	
 	assert lenDeposits_ == _lenDeposits + 1, "Did not add an element";
 	assert bondIndex_ == 0 => _lenDeposits == 0, "Cannot add index 0 if deposits length is already non-zero";
-	assert bondIndex_ == _lenDeposits, "Expected new bond index to be length of the array, got mismatch";
+	assert bondIndex_ == _lenDeposits, "Expected new bond index to be original length of the array, got mismatch";
 }
 
 // update notified deposit
@@ -908,7 +913,7 @@ rule check_update_notified_deposit_rule3_deletion(address account, uint256 avail
 }
 
 
-rule check_update_notified_deposit_rule4(address account, uint256 availabilityTime, uint256 value) {
+rule check_update_notified_deposit_rule4_insertion(address account, uint256 availabilityTime, uint256 value) {
 	// insert : current bond value == 0
 	// Index of np can be set to 0 only if original deposits len was 0.
 	// New array length must be +1 compared to previous one.
@@ -931,7 +936,7 @@ rule check_update_notified_deposit_rule4(address account, uint256 availabilityTi
 	
 	assert lengthAvailabilityTimes_ == _lengthAvailabilityTimes + 1, "Did not add an element";
 	assert bondIndex_ == 0 => _lengthAvailabilityTimes == 0, "Cannot add index 0 if availability times array length is already non-zero";
-	assert bondIndex_ == _lengthAvailabilityTimes, "Expected new bond index to be length of the array, got mismatch";
+	assert bondIndex_ == _lengthAvailabilityTimes, "Expected new bond index to be original length of the array, got mismatch";
 }
 
 
