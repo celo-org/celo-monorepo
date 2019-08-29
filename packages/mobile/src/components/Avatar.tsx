@@ -30,6 +30,11 @@ export class Avatar extends React.PureComponent<AvatarProps> {
     let { name } = this.props
 
     if (!recipient && !name) {
+      // TransferFeedItem does not specify what kind of recipient was used, so
+      // here we assume if the address is missing, then it is a mobile # and
+      // if the phone number is missing, then it is an address.  Since
+      // blockchain-api responds only addresses and the recipient is fetched
+      // during navigation, then it (should) be only address & contact recipients
       if (!address) {
         name = t('mobileNumber')
       }

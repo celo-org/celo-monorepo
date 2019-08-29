@@ -219,9 +219,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
             },
           ]
         }
-      >
-        #000000000000000...
-      </Text>
+      />
       <View
         style={
           Object {
@@ -447,9 +445,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
             },
           ]
         }
-      >
-        #000000000000000...
-      </Text>
+      />
       <View
         style={
           Object {
