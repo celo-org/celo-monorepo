@@ -6,6 +6,7 @@ import * as expressEnforcesSsl from 'express-enforces-ssl'
 import * as helmet from 'helmet'
 import * as next from 'next'
 import nextI18NextMiddleware from 'next-i18next/middleware'
+import Sentry, { initSentry } from '../fullstack/sentry'
 import addToCRM from '../server/addToCRM'
 import ecoFundSubmission from '../server/EcoFundApp'
 import nextI18next from '../src/i18n'
@@ -16,6 +17,7 @@ import { RequestType } from './FirebaseClient'
 import mailer from './mailer'
 import { getFormattedMediumArticles } from './mediumAPI'
 const port = parseInt(process.env.PORT, 10) || 3000
+
 const dev = process.env.NEXT_DEV === 'true'
 const app = next({ dev })
 const handle = app.getRequestHandler()
@@ -90,6 +92,10 @@ function wwwRedirect(req, res, nextAction) {
       })
       res.status(204)
     } catch (e) {
+      Sentry.withScope((scope) => {
+        scope.setTag('Service', 'Airtable')
+        Sentry.captureException(e)
+      })
       res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
     }
   })
@@ -99,6 +105,10 @@ function wwwRedirect(req, res, nextAction) {
       const record = await ecoFundSubmission(req.body, req.params.table)
       res.status(204).json({ id: record.id })
     } catch (e) {
+      Sentry.withScope((scope) => {
+        scope.setTag('Service', 'Airtable')
+        Sentry.captureException(e)
+      })
       res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
     }
   })
@@ -142,6 +152,7 @@ function wwwRedirect(req, res, nextAction) {
     return handle(req, res)
   })
 
+  initSentry()
   await server.listen(port)
 
   // tslint:disable-next-line
