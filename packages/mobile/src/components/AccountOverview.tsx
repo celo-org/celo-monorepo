@@ -1,4 +1,3 @@
-import PulsingDot from '@celo/react-components/components/PulsingDot'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles, { estimateFontSize } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
@@ -6,11 +5,9 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { connect } from 'react-redux'
-import { CTA_CIRCLE_SIZE } from 'src/account/Education'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import Styles from 'src/components/Styles'
-import { isE2EEnv } from 'src/config'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM as Tokens } from 'src/geth/consts'
 import { startBalanceAutorefresh, stopBalanceAutorefresh } from 'src/home/actions'
@@ -84,7 +81,7 @@ export class AccountOverview extends React.Component<Props> {
           <View style={style.currencyContainer}>
             <View style={[style.currencyArea, Styles.center]} testID={`${testID}/dollarBalance`}>
               <Text style={[style.currencyLabel, fontStyles.bodySmall]}>
-                {t('celoDollars') + ' ' + CURRENCIES[Tokens.DOLLAR].code}
+                {t('global:celoDollars') + ' ' + CURRENCIES[Tokens.DOLLAR].code}
               </Text>
               <TouchableOpacity
                 onPress={this.goToStableTokenEducation}
@@ -96,20 +93,12 @@ export class AccountOverview extends React.Component<Props> {
                   size={this.getFontSize(dollarBalance, !this.props.stableEducationCompleted)}
                   type={Tokens.DOLLAR}
                 />
-                {!this.props.stableEducationCompleted && (
-                  <PulsingDot
-                    color={colors.messageBlue}
-                    circleStartSize={CTA_CIRCLE_SIZE}
-                    style={style.dot}
-                    animated={!isE2EEnv}
-                  />
-                )}
               </TouchableOpacity>
             </View>
             <View style={style.line} />
             <View style={[style.currencyArea]} testID={`${testID}/goldBalance`}>
               <Text style={[style.currencyLabel, fontStyles.bodySmall]}>
-                {t('celoGold') + ' ' + CURRENCIES[Tokens.GOLD].code}
+                {t('global:celoGold') + ' ' + CURRENCIES[Tokens.GOLD].code}
               </Text>
               <TouchableOpacity
                 onPress={this.goToGoldTokenEducation}
@@ -121,13 +110,6 @@ export class AccountOverview extends React.Component<Props> {
                   size={this.getFontSize(goldBalance, !this.props.goldEducationCompleted)}
                   type={Tokens.GOLD}
                 />
-                {!this.props.goldEducationCompleted && (
-                  <PulsingDot
-                    color={colors.messageBlue}
-                    circleStartSize={CTA_CIRCLE_SIZE}
-                    style={style.dot}
-                  />
-                )}
               </TouchableOpacity>
             </View>
           </View>

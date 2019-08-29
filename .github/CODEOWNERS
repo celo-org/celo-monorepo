@@ -11,7 +11,8 @@
 /packages/notification-service/ @jmrossy @cmcewen
 /packages/protocol/ @asaj @m-chrzan
 /packages/react-components/ @cmcewen @jmrossy
-/packages/contractkit/ @ashishb @yerdua
+/packages/walletkit/ @ashishb @yerdua
+/packages/terraform-modules/ @tkporter
 /packages/transaction-metrics-exporter @nambrot
 /packages/typescript/ @cmcewen
 /packages/utils/ @jmrossy

@@ -1,6 +1,6 @@
 import { GethArgv } from '@celo/celotool/src/cmds/geth'
+import { addCeloEnvMiddleware } from '@celo/celotool/src/lib/env-utils'
 import {
-  addCeloEnvMiddleware,
   addCeloGethMiddleware,
   ensure0x,
   execCmdWithExitOnFailure,

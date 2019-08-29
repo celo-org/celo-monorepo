@@ -9,10 +9,13 @@ let lastBlockRef: admin.database.Reference
 let pendingRequestsRef: admin.database.Reference
 
 export interface Registrations {
-  [address: string]: {
-    fcmToken: string
-    language?: string
-  }
+  [address: string]:
+    | {
+        fcmToken: string
+        language?: string
+      }
+    | undefined
+    | null
 }
 
 export enum PaymentRequestStatuses {
@@ -41,6 +44,10 @@ interface PendingRequests {
 let registrations: Registrations = {}
 let lastBlockNotified: number = -1
 let pendingRequests: PendingRequests = {}
+
+export function _setTestRegistrations(testRegistrations: Registrations) {
+  registrations = testRegistrations
+}
 
 function paymentObjectToNotification(po: PaymentRequest): { [key: string]: string } {
   return {
@@ -99,15 +106,17 @@ export function initializeDb() {
 }
 
 export function getTokenFromAddress(address: string) {
-  if (address in registrations) {
-    return registrations[address].fcmToken
+  const registration = registrations[address]
+  if (registration) {
+    return registration.fcmToken
   } else {
     return null
   }
 }
 
 export function getTranslatorForAddress(address: string) {
-  const language = registrations[address].language
+  const registration = registrations[address]
+  const language = registration && registration.language
   // Language is set and i18next has the proper config
   if (language) {
     console.info(`Language resolved as ${language} for user address ${address}`)
@@ -115,7 +124,7 @@ export function getTranslatorForAddress(address: string) {
   }
   // If language is not supported falls back to env.DEFAULT_LOCALE
   console.info(`Users ${address} language is not set, valid or supported`)
-  return i18next.t
+  return i18next.t.bind(i18next)
 }
 
 export function getLastBlockNotified() {

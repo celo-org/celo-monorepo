@@ -3,9 +3,8 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { call, select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION } from 'src/config'
 import { GAS_PRICE_STALE_AFTER } from 'src/geth/consts'
-import { waitForGethConnectivity } from 'src/geth/saga'
+import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { setGasPrice } from 'src/web3/actions'
 import {
   fetchGasPrice,
@@ -22,7 +21,7 @@ Date.now = jest.fn(() => now)
 it('sets the price correctly', () => {
   expectSaga(refreshGasPrice)
     .provide([
-      [call(waitForGethConnectivity), null],
+      [call(waitWeb3LastBlock), null],
       [select(gasPriceSelector), null],
       [select(gasPriceLastUpdatedSelector), null],
       [call(fetchGasPrice), GAS_PRICE_PLACEHOLDER],
@@ -38,7 +37,7 @@ describe('refreshGasPrice', () => {
 
     expectSaga(refreshGasPrice)
       .provide([
-        [call(waitForGethConnectivity), null],
+        [call(waitWeb3LastBlock), null],
         [select(gasPriceSelector), 0],
         [select(gasPriceLastUpdatedSelector), gasPriceLastUpdated],
         [call(fetchGasPrice), GAS_PRICE_PLACEHOLDER],
@@ -55,12 +54,12 @@ describe('refreshGasPrice', () => {
 
     expectSaga(refreshGasPrice)
       .provide([
-        [call(waitForGethConnectivity), null],
+        [call(waitWeb3LastBlock), null],
         [select(gasPriceSelector), 0],
         [select(gasPriceLastUpdatedSelector), gasPriceLastUpdated],
         [setGasPrice, setGasPriceMocked],
       ])
-      .put(call(waitForGethConnectivity))
+      .put(call(waitWeb3LastBlock))
       .run()
 
     expect(setGasPriceMocked.mock.calls.length).toBe(0)
@@ -73,11 +72,11 @@ describe('refreshGasPrice', () => {
 
     expectSaga(refreshGasPrice)
       .provide([
-        [call(waitForGethConnectivity), null],
+        [call(waitWeb3LastBlock), null],
         [select(gasPriceSelector), 0],
         [select(gasPriceLastUpdatedSelector), null],
       ])
-      .put(showError(ErrorMessages.GAS_PRICE_UPDATE_FAILED, ERROR_BANNER_DURATION))
+      .put(showError(ErrorMessages.GAS_PRICE_UPDATE_FAILED))
       .run()
   })
 })

@@ -1,11 +1,12 @@
-const argv = require('minimist')(process.argv.slice(2), { string: ['migration_override'] })
+const minimist = require('minimist')
+const path = require('path')
 
-const defaultConfig = {
+const DefaultConfig = {
   attestations: {
     attestationExpirySeconds: 60 * 60, // 1 hour,
     attestationRequestFeeInDollars: 0.05,
   },
-  bondedDeposits: {
+  lockedGold: {
     maxNoticePeriod: 60 * 60 * 24 * 365 * 3, // 3 years
   },
   oracles: {
@@ -64,9 +65,10 @@ const defaultConfig = {
   validators: {
     minElectableValidators: '10',
     maxElectableValidators: '100',
-    minBondedDepositValue: '1000000000000000000', // 1 gold
-    minBondedDepositNoticePeriod: 60 * 24 * 60 * 60, // 60 days
+    minLockedGoldValue: '1000000000000000000', // 1 gold
+    minLockedGoldNoticePeriod: 60 * 24 * 60 * 60, // 60 days
 
+    validatorKeys: [],
     // We register a single validator group during the migration.
     groupName: 'C-Labs',
     groupUrl: 'https://www.celo.org',
@@ -75,21 +77,39 @@ const defaultConfig = {
 
 const linkedLibraries = {
   LinkedList: ['AddressLinkedList', 'SortedLinkedList'],
-  SortedLinkedList: ['AddressSortedLinkedList', 'IntegerSortedLinkedList'],
+  SortedLinkedList: [
+    'AddressSortedLinkedList',
+    'IntegerSortedLinkedList',
+    'SortedLinkedListWithMedian',
+  ],
+  SortedLinkedListWithMedian: ['AddressSortedLinkedListWithMedian'],
   AddressLinkedList: ['Validators'],
   AddressSortedLinkedList: ['Validators'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
-  SortedFractionMedianList: ['SortedOracles', 'SortedFractionMedianListTest'],
-  Signatures: ['BondedDeposits', 'Escrow'],
+  AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
+  Signatures: ['LockedGold', 'Escrow'],
 }
+
+const argv = minimist(process.argv.slice(2), {
+  string: ['migration_override', 'keys', 'build_directory'],
+  default: {
+    keys: '',
+    build_directory: path.join(__dirname, 'build'),
+  },
+})
+const validatorKeys = argv.keys ? argv.keys.split(',') : []
 
 const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
-config = {}
-for (const key in defaultConfig) {
-  config[key] = { ...defaultConfig[key], ...migrationOverride[key] }
+const config = {}
+
+for (const key of Object.keys(DefaultConfig)) {
+  config[key] = { ...DefaultConfig[key], ...migrationOverride[key] }
 }
 
+config.validators.validatorKeys = validatorKeys
+
 module.exports = {
+  build_directory: argv.build_directory,
   config,
   linkedLibraries,
 }

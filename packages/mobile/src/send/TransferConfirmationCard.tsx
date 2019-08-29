@@ -8,15 +8,15 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { faucetIcon } from 'src/images/Images'
+import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import FeeIcon from 'src/send/FeeIcon'
 import { TransactionTypes } from 'src/transactions/reducer'
 import { getCurrencyStyles } from 'src/transactions/TransferFeedItem'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
-import { Recipient } from 'src/utils/recipient'
 
 const iconSize = 40
 
@@ -218,7 +218,11 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
           {(isLoadingFee || fee || feeError) && (
             <View style={style.feeContainer}>
               {this.props.type === TransactionTypes.PAY_REQUEST && (
-                <LineItemRow currencySymbol={'$'} amount={total} title={t('dollarsSent')} />
+                <LineItemRow
+                  currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+                  amount={total}
+                  title={t('dollarsSent')}
+                />
               )}
               <LineItemRow
                 currencySymbol={currencyStyle.symbol}
@@ -228,7 +232,11 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
                 isLoading={isLoadingFee}
                 hasError={!!feeError}
               />
-              <LineItemRow currencySymbol={'$'} amount={amountWithFees} title={t('total')} />
+              <LineItemRow
+                currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+                amount={amountWithFees}
+                title={t('total')}
+              />
             </View>
           )}
         </View>

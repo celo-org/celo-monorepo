@@ -1,3 +1,4 @@
+import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { Command, flags } from '@oclif/command'
 import Web3 from 'web3'
 import { getNodeUrl } from './utils/config'
@@ -10,6 +11,7 @@ export abstract class BaseCommand extends Command {
   }
 
   private _web3: Web3 | null = null
+  private _kit: ContractKit | null = null
   // This is required since we wrap the provider with a debug provider and
   // there is no way to unwrap the provider afterwards.
   // We need access to the original provider, so that, we can close it.
@@ -22,6 +24,13 @@ export abstract class BaseCommand extends Command {
       injectDebugProvider(this._web3)
     }
     return this._web3
+  }
+
+  get kit() {
+    if (!this._kit) {
+      this._kit = newKitFromWeb3(this.web3)
+    }
+    return this._kit
   }
 
   // TODO(yorke): implement log(msg) switch on logLevel with chalk colored output

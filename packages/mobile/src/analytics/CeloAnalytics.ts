@@ -4,13 +4,16 @@ import {
   DefaultEventNames,
   PROPERTY_PATH_WHITELIST,
 } from 'src/analytics/constants'
+import { DEFAULT_TESTNET, SEGMENT_API_KEY } from 'src/config'
 import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 
 type EventNames = CustomEventNames | DefaultEventNames
 
 class WalletAnalytics extends CeloAnalytics {
-  appName = AnalyzedApps.Wallet
+  constructor() {
+    super(AnalyzedApps.Wallet, PROPERTY_PATH_WHITELIST, Logger, SEGMENT_API_KEY, DEFAULT_TESTNET)
+  }
 
   isEnabled() {
     return store.getState().app.analyticsEnabled
@@ -21,4 +24,4 @@ class WalletAnalytics extends CeloAnalytics {
   }
 }
 
-export default new WalletAnalytics(Logger, PROPERTY_PATH_WHITELIST)
+export default new WalletAnalytics()

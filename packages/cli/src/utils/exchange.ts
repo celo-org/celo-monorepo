@@ -1,9 +1,3 @@
-import Web3 from 'web3'
-
-import { CeloTokenType, Exchange } from '@celo/contractkit'
-
-import { displaySendTx } from './cli'
-
 export const swapArguments = [
   {
     name: 'sellAmount',
@@ -20,25 +14,3 @@ export const swapArguments = [
     required: true,
   },
 ]
-
-interface SwapArgs {
-  // TODO: use big numbers
-  sellAmount: string
-  minBuyAmount: string
-  from: string
-}
-
-export const doSwap = async (
-  web3: Web3,
-  args: SwapArgs,
-  sellToken: CeloTokenType,
-  sellGold: boolean
-) => {
-  const exchange = await Exchange(web3, args.from)
-
-  const approveTx = sellToken.methods.approve(exchange._address, args.sellAmount)
-  await displaySendTx('approve', approveTx)
-
-  const exchangeTx = exchange.methods.exchange(args.sellAmount, args.minBuyAmount, sellGold)
-  await displaySendTx('exchange', exchangeTx)
-}

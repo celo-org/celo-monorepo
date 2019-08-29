@@ -11,14 +11,11 @@
   "scripts": {
     "preserve": "yarn run build",
     "serve": "cross-env NODE_ENV=production fi rebase serve",
-    "deploy": "firebase deploy",
+    "deploy:staging": "firebase deploy --project celo-faucet-staging",
+    "deploy:prod": "firebase deploy --project celo-faucet",
     "clean": "tsc -b . --clean",
-    "build:contracts": "yarn run --cwd=../celotool cli copy-contract-artifacts --output-path=../faucet/src/generated --celo-env=integration --contracts=StableToken",
     "build": "tsc -b .",
-    "lint:types-functions": "tsc -p . --noEmit",
-    "lint:functions": "tslint --project .",
-    "lint": "yarn lint:functions && yarn lint:types-functions",
-    "lint-checks": "yarn lint",
+    "lint": "tslint --project .",
     "transfer-funds": "ts-node scripts/transfer-funds.ts",
     "cli": "ts-node scripts/cli.ts"
   },
@@ -37,11 +34,12 @@
     "@types/debug": "^4.1.4",
     "@types/twilio": "^0.0.10",
     "@types/web3": "^1.0.19",
+    "@types/yargs": "^13.0.2",
     "cross-env": "5.2.0",
     "firebase-bolt": "^0.8.4",
     "firebase-tools": "^7.0.1",
     "rimraf": "2.6.3",
-    "typescript": "^3.3.0",
-    "yargs": "^13.2.4"
+    "yargs": "14.0.0"
+
   }
 }

@@ -6,19 +6,21 @@ import * as expressEnforcesSsl from 'express-enforces-ssl'
 import * as helmet from 'helmet'
 import * as next from 'next'
 import nextI18NextMiddleware from 'next-i18next/middleware'
+import Sentry, { initSentry } from '../fullstack/sentry'
 import addToCRM from '../server/addToCRM'
+import ecoFundSubmission from '../server/EcoFundApp'
 import nextI18next from '../src/i18n'
 import { faucetOrInviteController } from './controllers'
+import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
 import { RequestType } from './FirebaseClient'
 import mailer from './mailer'
-
+import { getFormattedMediumArticles } from './mediumAPI'
 const port = parseInt(process.env.PORT, 10) || 3000
+
 const dev = process.env.NEXT_DEV === 'true'
 const app = next({ dev })
 const handle = app.getRequestHandler()
-import getFormattedEvents from './EventHelpers'
-import { getFormattedMediumArticles } from './mediumAPI'
 
 // Strip the leading "www." prefix from the domain
 function wwwRedirect(req, res, nextAction) {
@@ -49,6 +51,12 @@ function wwwRedirect(req, res, nextAction) {
       res.redirect('/jobs')
     })
   })
+  ;['/about'].forEach((path) => {
+    server.get(path, (_, res) => {
+      res.redirect('/about-us')
+    })
+  })
+
   server.get('/connect', (_, res) => {
     res.redirect('/community')
   })
@@ -73,16 +81,36 @@ function wwwRedirect(req, res, nextAction) {
   server.post('/fellowship', async (req, res) => {
     const { ideas, email, name, bio, deliverables, resume } = req.body
 
-    await submitFellowApp({
-      name,
-      email,
-      ideas,
-      bio,
-      deliverables,
-      resume,
-    })
+    try {
+      await submitFellowApp({
+        name,
+        email,
+        ideas,
+        bio,
+        deliverables,
+        resume,
+      })
+      res.status(204)
+    } catch (e) {
+      Sentry.withScope((scope) => {
+        scope.setTag('Service', 'Airtable')
+        Sentry.captureException(e)
+      })
+      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+    }
+  })
 
-    res.status(204).send('ok')
+  server.post('/ecosystem/:table', async (req, res) => {
+    try {
+      const record = await ecoFundSubmission(req.body, req.params.table)
+      res.status(204).json({ id: record.id })
+    } catch (e) {
+      Sentry.withScope((scope) => {
+        scope.setTag('Service', 'Airtable')
+        Sentry.captureException(e)
+      })
+      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+    }
   })
 
   server.post('/faucet', async (req, res) => {
@@ -124,6 +152,7 @@ function wwwRedirect(req, res, nextAction) {
     return handle(req, res)
   })
 
+  initSentry()
   await server.listen(port)
 
   // tslint:disable-next-line

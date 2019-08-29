@@ -79,6 +79,7 @@ const vNeg1Schema = {
     paymentRequests: [],
     showFakeData: false,
     backupCompleted: false,
+    backupDelayedTime: 0,
     dismissedEarnRewards: false,
     dismissedInviteFriends: false,
   },
@@ -105,6 +106,15 @@ const v0Schema = {
   invite: {
     ...vNeg1Schema.invite,
     redeemComplete: false,
+  },
+  send: {
+    isSending: false,
+    recentPhoneNumbers: undefined,
+    recipientCache: undefined,
+    recentRecipients: [],
+  },
+  recipients: {
+    recipientCache: {},
   },
 }
 

@@ -1,14 +1,16 @@
 rootProject.name = 'celo'
+include ':react-native-install-referrer'
+project(':react-native-install-referrer').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-install-referrer/android')
 include ':react-native-send-intent'
 project(':react-native-send-intent').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-send-intent/android')
 include ':react-native-webview'
-project(':react-native-webview').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-webview/android')
+project(':react-native-webview').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-webview/android')
 include ':instabug-reactnative'
 project(':instabug-reactnative').projectDir = new File(rootProject.projectDir, '../../../node_modules/instabug-reactnative/android')
 include ':@react-native-community_netinfo'
-project(':@react-native-community_netinfo').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-community/netinfo/android')
+project(':@react-native-community_netinfo').projectDir = new File(rootProject.projectDir, '../../../node_modules/@react-native-community/netinfo/android')
 include ':react-native-screens'
-project(':react-native-screens').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-screens/android')
+project(':react-native-screens').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-screens/android')
 include ':react-native-gesture-handler'
 project(':react-native-gesture-handler').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-gesture-handler/android')
 include ':@segment_analytics-react-native-firebase'
@@ -23,8 +25,6 @@ include ':react-native-splash-screen'
 project(':react-native-splash-screen').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-splash-screen/android')
 include ':react-native-version-check'
 project(':react-native-version-check').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-version-check/android')
-include ':react-native-android-broadcast-receiver-for-referrer'
-project(':react-native-android-broadcast-receiver-for-referrer').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-android-broadcast-receiver-for-referrer/android')
 include ':react-native-android-open-settings'
 project(':react-native-android-open-settings').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-android-open-settings/android')
 include ':react-native-udp'
@@ -34,7 +34,7 @@ project(':react-native-languages').projectDir = new File(rootProject.projectDir,
 include ':react-native-config'
 project(':react-native-config').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-config/android')
 include ':react-native-firebase'
-project(':react-native-firebase').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-firebase/android')
+project(':react-native-firebase').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-firebase/android')
 include ':react-native-tcp'
 project(':react-native-tcp').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-tcp/android')
 include ':react-native-sentry'
@@ -42,7 +42,7 @@ project(':react-native-sentry').projectDir = new File(rootProject.projectDir, '.
 include ':react-native-secure-randombytes'
 project(':react-native-secure-randombytes').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-secure-randombytes/android')
 include ':react-native-svg'
-project(':react-native-svg').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-svg/android')
+project(':react-native-svg').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-svg/android')
 include ':react-native-contacts'
 project(':react-native-contacts').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-contacts/android')
 include ':react-native-keep-awake'
@@ -50,9 +50,9 @@ project(':react-native-keep-awake').projectDir = new File(rootProject.projectDir
 include ':react-native-device-info'
 project(':react-native-device-info').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-device-info/android')
 include ':react-native-fs'
-project(':react-native-fs').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-fs/android')
+project(':react-native-fs').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-fs/android')
 include ':react-native-geth'
-project(':react-native-geth').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-geth/android')
+project(':react-native-geth').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-geth/android')
 include ':react-native-flag-secure-android'
 project(':react-native-flag-secure-android').projectDir = new File(rootProject.projectDir, 	'../../../node_modules/react-native-flag-secure-android/android')
 include ':react-native-confirm-device-credentials'

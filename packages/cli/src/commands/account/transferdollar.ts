@@ -1,8 +1,5 @@
-import Web3 from 'web3'
-
-import { StableToken } from '@celo/contractkit'
 import { flags } from '@oclif/command'
-
+import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -26,32 +23,27 @@ export default class DollarTransfer extends BaseCommand {
 
     const from: string = res.flags.from
     const to: string = res.flags.to
-    const amountInWei = Web3.utils.toBN(res.flags.amountInWei)
+    const amountInWei = new BigNumber(res.flags.amountInWei)
 
-    const stableTokenContract = await StableToken(this.web3)
+    this.kit.defaultAccount = from
+    const goldToken = await this.kit.contracts.getGoldToken()
+    const stableToken = await this.kit.contracts.getStableToken()
 
     // Units of all balances are in wei, unless specified.
     // Check the balance before
-    const goldBalanceFromBefore = Web3.utils.toBN(await this.web3.eth.getBalance(from))
-    const dollarBalanceFromBefore = Web3.utils.toBN(
-      await stableTokenContract.methods.balanceOf(from).call()
-    )
+    const goldBalanceFromBefore = await goldToken.balanceOf(from)
+    const dollarBalanceFromBefore = await stableToken.balanceOf(from)
 
     // Perform the transfer
-    await displaySendTx(
-      'dollar.Transfer',
-      stableTokenContract.methods.transfer(to, amountInWei.toString())
-    )
+    await displaySendTx('dollar.Transfer', stableToken.transfer(to, amountInWei.toString()))
 
     // Check the balance after
-    const goldBalanceFromAfter = Web3.utils.toBN(await this.web3.eth.getBalance(from))
-    const dollarBalanceFromAfter = Web3.utils.toBN(
-      await stableTokenContract.methods.balanceOf(from).call()
-    )
+    const goldBalanceFromAfter = await goldToken.balanceOf(from)
+    const dollarBalanceFromAfter = await stableToken.balanceOf(from)
 
     // Get gas cost
-    const goldDifference = goldBalanceFromBefore.sub(goldBalanceFromAfter)
-    const dollarDifference = dollarBalanceFromBefore.sub(dollarBalanceFromAfter)
+    const goldDifference = goldBalanceFromBefore.minus(goldBalanceFromAfter)
+    const dollarDifference = dollarBalanceFromBefore.minus(dollarBalanceFromAfter)
     const gasCostInWei = goldDifference
     this.log(
       `Transferred ${amountInWei} from ${from} to ${to}, gas cost: ${gasCostInWei.toString()}`

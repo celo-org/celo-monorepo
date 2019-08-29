@@ -1,8 +1,5 @@
-import { cli } from 'cli-ux'
-
-import { Exchange } from '@celo/contractkit'
 import { flags } from '@oclif/command'
-
+import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 
 export default class List extends BaseCommand {
@@ -24,18 +21,12 @@ export default class List extends BaseCommand {
     const { flags: parsedFlags } = this.parse(List)
 
     cli.action.start('Fetching exchange rates...')
-
-    const exchange = await Exchange(this.web3)
-    const dollarForGold = await exchange.methods
-      .getBuyTokenAmount(parsedFlags.amount as string, true)
-      .call()
-    const goldForDollar = await exchange.methods
-      .getBuyTokenAmount(parsedFlags.amount as string, false)
-      .call()
-
+    const exchange = await this.kit.contracts.getExchange()
+    const dollarForGold = await exchange.getBuyTokenAmount(parsedFlags.amount as string, true)
+    const goldForDollar = await exchange.getBuyTokenAmount(parsedFlags.amount as string, false)
     cli.action.stop()
 
-    this.log(`${parsedFlags.amount} cGLD => ${dollarForGold} cUSD`)
-    this.log(`${parsedFlags.amount} cUSD => ${goldForDollar} cGLD`)
+    this.log(`${parsedFlags.amount} cGLD => ${dollarForGold.toString()} cUSD`)
+    this.log(`${parsedFlags.amount} cUSD => ${goldForDollar.toString()} cGLD`)
   }
 }

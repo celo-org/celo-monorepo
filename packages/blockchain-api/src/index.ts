@@ -4,12 +4,14 @@ import { server as apolloServer } from './apolloServer'
 declare var process: {
   env: {
     PORT: string
+    INTERFACE: string
   }
 }
 
 const GRAPHQL_PATH: string = '/'
 
 const PORT: number = Number(process.env.PORT) || 8080
+const INTERFACE: string = process.env.INTERFACE || '0.0.0.0'
 
 const app: any = express()
 
@@ -26,7 +28,7 @@ app.head('/', (req: express.Request, res: express.Response) => {
 
 apolloServer.applyMiddleware({ app, path: GRAPHQL_PATH })
 
-app.listen(PORT, () => {
-  console.info(`🚀 GraphQL accessible @ http://localhost:${PORT}${apolloServer.graphqlPath}`)
+app.listen(PORT, INTERFACE, () => {
+  console.info(`🚀 GraphQL accessible @ http://${INTERFACE}:${PORT}${apolloServer.graphqlPath}`)
   console.info('[Celo] Starting Server')
 })

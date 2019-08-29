@@ -1,6 +1,6 @@
 {
   "cancel": "Cancelar",
-  "dollarsSent": "Dólares Enviados",
+  "dollarsSent": "{{Dollars}} Enviados",
   "to": "Para",
   "send": "Envío",
   "request": "Solicitud",
@@ -11,15 +11,14 @@
   "recent": "Recientes",
   "contacts": "Contactos",
   "invite": "Invitar",
-  "tryEnteringPhoneNumber": "Ingrese un número de teléfono si no encuentra a la persona que busca",
   "sendTo": "Enviar a",
   "amount": "Monto",
-  "celoDollarsAvailable": "Celo Dólares disponibles",
+  "celoDollarsAvailable": "{{CeloDollars}} disponibles",
   "for": "Por",
   "groceriesRent": "Supermercado, alquiler, etc. (Opcional)",
   "fee": "Comisión",
-  "securityFee": "Security Comisión",
-  "inviteAndSecurityFee": "Cuota de Invitación",
+  "securityFee": "Comisión de seguridad",
+  "inviteAndSecurityFee": "Comisión de Invitación",
   "feeEducation":
     "~Sending payments and making exchanges include a small fee for service security and maintenance.",
   "learnMore": "Saber más",
@@ -36,6 +35,7 @@
   "total": "Total",
   "inviteFriends": "Invitar a amigos",
   "noResultsFor": "Sin resultados para",
+  "noContacts": "No se encontraron contactos",
   "searchForSomeone": "Busque a alguien según el nombre o el número de teléfono",
   "nameOrPhoneNumber": "Nombre o número de teléfono",
   "pending": "Pendiente",
@@ -47,18 +47,20 @@
   "inviteSent": "Código de invitación enviado!",
   "inviteFailed": "Falló el envío de la invitación",
   "loadingContacts": "Encontrando tus contactos",
-  "saveCodeImage": "Guardar imagen de código",
+  "QRCode": "QR código",
+  "shareCodeImage": "Compartir imagen de código",
   "scanCode": "Escanear código",
   "writeStorageNeededForQrDownload":
     "Se necesita permiso de escritura de almacenamiento para descargar el código QR",
   "ScanCodeByPlacingItInTheBox": "Escanee el código colocándolo en la caja",
   "needCameraPermissionToScan":
     "La aplicación necesita permiso de la cámara para escanear códigos QR",
-  "backToYourQRCode": "Volver a su código QR",
+  "showYourQRCode": "Muestra su código QR",
   "toSentOrRequestPayment": "enviar o solicitar pago",
   "requestSent": "Solicitud Enviada",
   "reclaimPayment": "Reclamar el Pago",
   "totalSent": "Total Enviado",
   "totalRefunded": "Total Reembolsado",
-  "loadingVerificationStatus": "Comprobando la verificación del destinatario..."
+  "loadingVerificationStatus": "Comprobando la verificación del destinatario...",
+  "askForContactsPermissionAction": "Recuperar mis contactos"
 }

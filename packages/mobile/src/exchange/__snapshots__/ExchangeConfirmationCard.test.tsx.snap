@@ -114,6 +114,28 @@ exports[`renders correctly with giant numbers 1`] = `
         style={
           Array [
             Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "color": "#FBCC5C",
+              "fontSize": 21,
+              "lineHeight": 29,
+              "transform": Array [
+                Object {
+                  "translateY": 2,
+                },
+              ],
+            },
+          ]
+        }
+      >
+        
+      </Text>
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
               "paddingHorizontal": 3,
             },
             Object {
@@ -241,7 +263,7 @@ exports[`renders correctly with giant numbers 1`] = `
           }
         }
       >
-        celoDollars
+        global:celoDollars
       </Text>
       <Text
         numberOfLines={1}
@@ -286,7 +308,7 @@ exports[`renders correctly with giant numbers 1`] = `
           }
         }
       >
-        celoGold
+        global:celoGold
       </Text>
       <Text
         numberOfLines={1}
@@ -343,6 +365,28 @@ exports[`renders correctly with no exchange rate 1`] = `
         }
       }
     >
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-Regular",
+            },
+            Object {
+              "color": "#FBCC5C",
+              "fontSize": 21,
+              "lineHeight": 29,
+              "transform": Array [
+                Object {
+                  "translateY": 2,
+                },
+              ],
+            },
+          ]
+        }
+      >
+        
+      </Text>
       <Text
         numberOfLines={1}
         style={
@@ -553,7 +597,7 @@ exports[`renders correctly with no exchange rate 1`] = `
           }
         }
       >
-        celoDollars
+        global:celoDollars
       </Text>
       <Text
         numberOfLines={1}
@@ -598,7 +642,7 @@ exports[`renders correctly with no exchange rate 1`] = `
           }
         }
       >
-        celoGold
+        global:celoGold
       </Text>
       <Text
         numberOfLines={1}

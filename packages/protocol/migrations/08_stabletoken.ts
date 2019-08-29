@@ -1,15 +1,15 @@
 /* tslint:disable:no-console */
 import Web3 = require('web3')
 
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   convertToContractDecimalsBN,
-  deployProxyAndImplementation,
+  deploymentForCoreContract,
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import {
   GasCurrencyWhitelistInstance,
-  RegistryInstance,
   ReserveInstance,
   SortedOraclesInstance,
   StableTokenInstance,
@@ -19,26 +19,21 @@ const truffle = require('@celo/protocol/truffle.js')
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 const initializeArgs = async (): Promise<any[]> => {
-  const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-    'Registry',
-    artifacts
-  )
-
   return [
     config.stableToken.tokenName,
     config.stableToken.tokenSymbol,
     config.stableToken.decimals,
-    registry.address,
+    config.registry.predeployedProxyAddress,
     config.stableToken.inflationRateNumerator,
     config.stableToken.inflationRateDenominator,
     config.stableToken.inflationPeriod,
   ]
 }
 
-module.exports = deployProxyAndImplementation<StableTokenInstance>(
+module.exports = deploymentForCoreContract<StableTokenInstance>(
   web3,
   artifacts,
-  'StableToken',
+  CeloContractName.StableToken,
   initializeArgs,
   async (stableToken: StableTokenInstance, _web3: Web3, networkName: string) => {
     const minerAddress: string = truffle.networks[networkName].from

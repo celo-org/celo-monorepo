@@ -1,22 +1,23 @@
+import { retryAsync } from '@celo/utils/src/async-helpers'
+import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import {
   getAttestationFee,
   getAttestationsContract,
   getStableTokenContract,
   parseFromContractDecimals,
-} from '@celo/contractkit'
-import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
+} from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { Linking } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import VersionCheck from 'react-native-version-check'
-import { call, delay, put, select, spawn, takeLeading } from 'redux-saga/effects'
+import { call, delay, put, race, select, spawn, takeLeading } from 'redux-saga/effects'
 import { setName } from 'src/account'
 import { showError, showMessage } from 'src/alert/actions'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { CURRENCY_ENUM, INVITE_REDEMPTION_GAS } from 'src/geth/consts'
-import { waitForGethConnectivity } from 'src/geth/saga'
 import i18n from 'src/i18n'
 import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import {
@@ -33,6 +34,7 @@ import {
 import { createInviteCode } from 'src/invite/utils'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { transferStableToken } from 'src/stableToken/actions'
 import { createTransaction } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
@@ -47,6 +49,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
+export const REDEEM_INVITE_TIMEOUT = 1 * 60 * 1000 // 1 minute
 
 const USE_REAL_FEE = false
 const INVITE_FEE = '0.2'
@@ -142,10 +145,10 @@ export function* sendInvite(
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
       try {
         const phoneHash = getPhoneHash(e164Number)
-        yield put(transferEscrowedPayment(phoneHash, amount, txId, temporaryAddress))
+        yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress))
       } catch (e) {
         Logger.error(TAG, 'Error sending payment to unverified user: ', e)
-        yield put(showError(ErrorMessages.TRANSACTION_FAILED, ERROR_BANNER_DURATION))
+        yield put(showError(ErrorMessages.TRANSACTION_FAILED))
       }
     }
 
@@ -174,16 +177,11 @@ export function* sendInviteSaga(action: SendInviteAction) {
   try {
     yield call(sendInvite, recipientName, e164Number, inviteMode, amount, currency)
 
-    yield put(
-      showMessage(
-        i18n.t('inviteSent', { ns: 'inviteFlow11' }) + ' ' + e164Number,
-        ERROR_BANNER_DURATION
-      )
-    )
+    yield put(showMessage(i18n.t('inviteSent', { ns: 'inviteFlow11' }) + ' ' + e164Number))
     yield call(navigate, Screens.WalletHome)
     yield put(sendInviteSuccess())
   } catch (e) {
-    yield put(showError(ErrorMessages.INVITE_FAILED, ERROR_BANNER_DURATION))
+    yield put(showError(ErrorMessages.INVITE_FAILED))
     yield put(sendInviteFailure(ErrorMessages.INVITE_FAILED))
   }
 }
@@ -197,9 +195,31 @@ function* redeemSuccess(name: string, account: string) {
 }
 
 export function* redeemInviteSaga(action: RedeemInviteAction) {
+  Logger.debug(TAG, 'Starting Redeem Invite')
+
+  const { result, timeout } = yield race({
+    result: call(doRedeemInvite, action),
+    timeout: delay(REDEEM_INVITE_TIMEOUT),
+  })
+
+  if (result === true) {
+    CeloAnalytics.track(CustomEventNames.redeem_invite_success)
+    Logger.debug(TAG, 'Redeem Invite completed successfully')
+  } else if (result === false) {
+    CeloAnalytics.track(CustomEventNames.redeem_invite_failed)
+    Logger.debug(TAG, 'Redeem Invite failed')
+  } else if (timeout) {
+    CeloAnalytics.track(CustomEventNames.redeem_invite_timed_out)
+    Logger.debug(TAG, 'Redeem Invite timed out')
+    yield put(showError(ErrorMessages.REDEEM_INVITE_TIMEOUT))
+  }
+  Logger.debug(TAG, 'Done Redeem invite')
+}
+
+export function* doRedeemInvite(action: RedeemInviteAction) {
   const { inviteCode, name } = action
 
-  yield call(waitForGethConnectivity)
+  yield call(waitWeb3LastBlock)
   try {
     // Add temp wallet so we can send money from it
     let tempAccount
@@ -217,7 +237,12 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
 
     // Check that the balance of the new account is not 0
     const StableToken = yield call(getStableTokenContract, web3)
-    const stableBalance = new BigNumber(yield call(StableToken.methods.balanceOf(tempAccount).call))
+
+    // Try to get balance once + two retries before failing
+    const stableBalance = new BigNumber(
+      yield call(retryAsync, StableToken.methods.balanceOf(tempAccount).call, 2, [])
+    )
+
     Logger.debug(TAG + '@redeemInviteCode', 'Temporary account balance: ' + stableBalance)
 
     if (stableBalance.isLessThan(1)) {
@@ -270,9 +295,11 @@ export function* redeemInviteSaga(action: RedeemInviteAction) {
       throw Error('Transfer to new local account was not successful')
     }
     yield redeemSuccess(name, newAccount)
+    return true
   } catch (e) {
     Logger.error(TAG, 'Redeem invite error: ', e)
-    yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED, ERROR_BANNER_DURATION))
+    yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED))
+    return false
   }
 }
 

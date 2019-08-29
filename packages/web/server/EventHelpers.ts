@@ -4,6 +4,7 @@ const Tabletop = require('tabletop')
 
 import getConfig from 'next/config'
 import { EventProps } from '../fullstack/EventProps'
+import Sentry from '../fullstack/sentry'
 import { abort } from '../src/utils/abortableFetch'
 
 // Intermediate step Event With all String Values
@@ -66,7 +67,10 @@ export function intializeTableTop() {
       })
     } catch (e) {
       resolve([])
-      console.error(e)
+      Sentry.withScope((scope) => {
+        scope.setTag('Service', 'GoogleSheets')
+        Sentry.captureException(e)
+      })
     }
   })
   return Promise.race([promise, abort(getURL(), 3000).catch(() => [])])
@@ -97,8 +101,8 @@ function convertValues(event: IncomingEvent): EventProps {
     celoHosted: event.celoHosted === 'TRUE',
     celoSpeaking: event.celoSpeaking === 'TRUE',
     celoAttending: event.celoAttending === 'TRUE',
-    startDate: parseDate(event.startDate),
-    endDate: event.endDate && parseDate(event.endDate),
+    startDate: event.startDate,
+    endDate: event.endDate,
   }
 }
 
@@ -109,7 +113,7 @@ export function splitEvents(normalizedEvents): State {
   const pastEvents = []
 
   normalizedEvents.forEach((event: EventProps) => {
-    const willHappen = event.startDate.valueOf() > today
+    const willHappen = parseDate(event.startDate).valueOf() > today
 
     if (willHappen) {
       upcomingEvents.unshift(event)
@@ -131,7 +135,7 @@ function removeEmpty(event: IncomingEvent): boolean {
 }
 
 function orderByDate(eventA: EventProps, eventB: EventProps) {
-  return eventA.startDate.valueOf() > eventB.startDate.valueOf() ? -1 : 1
+  return parseDate(eventA.startDate).valueOf() > parseDate(eventB.startDate).valueOf() ? -1 : 1
 }
 
 function celoFirst(eventA: EventProps, eventB: EventProps) {

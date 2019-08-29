@@ -70,8 +70,7 @@ exports[`PaymentRequestListScreen renders correctly with no requests 1`] = `
           ]
         }
       >
-        $
-        120
+        $120
       </Text>
     </View>
   </View>
@@ -191,8 +190,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
           ]
         }
       >
-        $
-        120
+        $120
       </Text>
     </View>
   </View>
@@ -364,6 +362,21 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                               "lineHeight": 20,
                             },
                             Object {
+                              "color": "#2E3338",
+                            },
+                          ]
+                        }
+                      />
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#81868B",
+                              "fontFamily": "Hind-Regular",
+                              "fontSize": 14,
+                              "lineHeight": 20,
+                            },
+                            Object {
                               "paddingTop": 10,
                             },
                           ]
@@ -485,8 +498,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                       ]
                     }
                   >
-                    $
-                    20
+                    $20
                   </Text>
                 </View>
               </View>
@@ -619,6 +631,21 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                     <View
                       style={Object {}}
                     >
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#81868B",
+                              "fontFamily": "Hind-Regular",
+                              "fontSize": 14,
+                              "lineHeight": 20,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                            },
+                          ]
+                        }
+                      />
                       <Text
                         style={
                           Array [
@@ -750,8 +777,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                       ]
                     }
                   >
-                    $
-                    102
+                    $102
                   </Text>
                 </View>
               </View>
@@ -894,6 +920,21 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                               "lineHeight": 20,
                             },
                             Object {
+                              "color": "#2E3338",
+                            },
+                          ]
+                        }
+                      />
+                      <Text
+                        style={
+                          Array [
+                            Object {
+                              "color": "#81868B",
+                              "fontFamily": "Hind-Regular",
+                              "fontSize": 14,
+                              "lineHeight": 20,
+                            },
+                            Object {
                               "paddingTop": 10,
                             },
                           ]
@@ -1015,8 +1056,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                       ]
                     }
                   >
-                    $
-                    1
+                    $1
                   </Text>
                 </View>
               </View>

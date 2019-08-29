@@ -20,7 +20,7 @@ To run unit tests:
 `yarn test` or `yarn test:verbose`
 
 For lint checks:
-`yarn lint-checks`
+`yarn lint`
 
 ## Deploy to Firebase Cloud Functions
 

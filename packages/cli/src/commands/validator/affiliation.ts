@@ -1,6 +1,4 @@
-import { Validators } from '@celo/contractkit'
 import { flags } from '@oclif/command'
-
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -25,7 +23,9 @@ export default class ValidatorAffiliate extends BaseCommand {
 
   async run() {
     const res = this.parse(ValidatorAffiliate)
-    const contract = await Validators(this.web3, res.flags.from)
+
+    this.kit.defaultAccount = res.flags.from
+    const validators = await this.kit.contracts.getValidators()
 
     if (!(res.flags.set || res.flags.unset)) {
       this.error(`Specify action: --set or --unset`)
@@ -33,9 +33,9 @@ export default class ValidatorAffiliate extends BaseCommand {
     }
 
     if (res.flags.set) {
-      await displaySendTx('affiliate', contract.methods.affiliate(res.flags.set))
+      await displaySendTx('affiliate', validators.affiliate(res.flags.set))
     } else if (res.flags.unset) {
-      await displaySendTx('deaffiliate', contract.methods.deaffiliate())
+      await displaySendTx('deaffiliate', validators.deaffiliate())
     }
   }
 }

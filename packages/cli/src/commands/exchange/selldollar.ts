@@ -1,7 +1,7 @@
-import { StableToken } from '@celo/contractkit'
-
+import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
-import { doSwap, swapArguments } from '../../utils/exchange'
+import { displaySendTx } from '../../utils/cli'
+import { swapArguments } from '../../utils/exchange'
 
 export default class SellDollar extends BaseCommand {
   static description = 'Sell Celo dollars for Celo gold on the exchange'
@@ -12,9 +12,16 @@ export default class SellDollar extends BaseCommand {
 
   async run() {
     const { args } = this.parse(SellDollar)
+    const sellAmount = new BigNumber(args.sellAmount)
+    const minBuyAmount = new BigNumber(args.minBuyAmount)
 
-    const stableToken = await StableToken(this.web3, args.from)
+    this.kit.defaultAccount = args.from
+    const stableToken = await this.kit.contracts.getStableToken()
+    const exchange = await this.kit.contracts.getExchange()
 
-    await doSwap(this.web3, args, stableToken, false)
+    await displaySendTx('approve', stableToken.approve(exchange.address, sellAmount.toString()))
+
+    const exchangeTx = exchange.exchange(sellAmount.toString(), minBuyAmount.toString(), false)
+    await displaySendTx('exchange', exchangeTx)
   }
 }

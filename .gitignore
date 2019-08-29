@@ -79,5 +79,5 @@ lerna-debug.log
 .env.mnemonic*
 !.env.mnemonic*.enc
 
-# LicenseDisclaimer
-**/LicenseDisclaimer.txt
+.terraform/
+tsconfig.tsbuildinfo

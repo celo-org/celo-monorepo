@@ -17,34 +17,35 @@ import {
   View,
 } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { NavigationInjectedProps, NavigationScreenProps } from 'react-navigation'
+import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION } from 'src/config'
 import { FeeType } from 'src/fees/actions'
 import EstimateFee from 'src/fees/EstimateFee'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
-import { Namespaces } from 'src/i18n'
+import { CURRENCIES, CURRENCY_ENUM as Tokens } from 'src/geth/consts'
+import i18n, { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/contactMapping'
 import { E164NumberToAddressType } from 'src/identity/reducer'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { RootState } from 'src/redux/reducers'
-import LabeledTextInput from 'src/send/LabeledTextInput'
-import { ConfirmationInput } from 'src/send/SendConfirmation'
-import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { fetchDollarBalance } from 'src/stableToken/actions'
 import {
   getAddressFromRecipient,
   getRecipientVerificationStatus,
   Recipient,
   RecipientKind,
-} from 'src/utils/recipient'
+} from 'src/recipients/recipient'
+import { RootState } from 'src/redux/reducers'
+import LabeledTextInput from 'src/send/LabeledTextInput'
+import { ConfirmationInput } from 'src/send/SendConfirmation'
+import DisconnectBanner from 'src/shared/DisconnectBanner'
+import { fetchDollarBalance } from 'src/stableToken/actions'
 
 const MAX_COMMENT_LENGTH = 70
 
@@ -123,11 +124,10 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
   }
 }
 
-export class SendAmount extends React.PureComponent<Props, State> {
-  static navigationOptions = ({ navigation }: NavigationScreenProps) => ({
-    headerTitle: navigation.getParam('title', ''),
-    headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
-    headerRight: <View />, // This helps vertically center the title
+export class SendAmount extends React.Component<Props, State> {
+  static navigationOptions = () => ({
+    ...headerWithBackButton,
+    headerTitle: i18n.t('sendFlow7:send_or_request'),
   })
 
   state: State = {
@@ -140,7 +140,6 @@ export class SendAmount extends React.PureComponent<Props, State> {
   timeout: number | null = null
 
   componentDidMount() {
-    this.props.navigation.setParams({ title: this.props.t('send_or_request') })
     this.props.fetchDollarBalance()
     this.fetchLatestPhoneAddress()
   }
@@ -215,12 +214,12 @@ export class SendAmount extends React.PureComponent<Props, State> {
     // TODO(Rossy) this almost never shows because numeral is swalling the errors
     // and returning 0 for invalid numbers
     if (!amountIsValid) {
-      this.props.showError(ErrorMessages.INVALID_AMOUNT, ERROR_BANNER_DURATION)
+      this.props.showError(ErrorMessages.INVALID_AMOUNT)
       return
     }
 
     if (!userHasEnough) {
-      this.props.showError(ErrorMessages.NSF_TO_SEND, ERROR_BANNER_DURATION)
+      this.props.showError(ErrorMessages.NSF_TO_SEND)
       return
     }
 
@@ -312,7 +311,7 @@ export class SendAmount extends React.PureComponent<Props, State> {
   renderBottomContainer = (amountIsValid: boolean, userHasEnough: boolean) => {
     const onPress = () => {
       if (!amountIsValid) {
-        this.props.showError(ErrorMessages.INVALID_AMOUNT, ERROR_BANNER_DURATION)
+        this.props.showError(ErrorMessages.INVALID_AMOUNT)
         return
       }
     }
@@ -361,7 +360,7 @@ export class SendAmount extends React.PureComponent<Props, State> {
           )}
           <LabeledTextInput
             keyboardType="numeric"
-            title={'$'}
+            title={CURRENCIES[Tokens.DOLLAR].symbol}
             placeholder={t('amount')}
             labelStyle={style.amountLabel as TextStyle}
             placeholderTextColor={colors.celoGreenInactive}

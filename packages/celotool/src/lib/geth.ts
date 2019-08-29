@@ -1,20 +1,21 @@
 /* tslint:disable: no-console */
+import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
 import {
   AccountType,
   generatePrivateKey,
   privateKeyToPublicKey,
 } from '@celo/celotool/src/lib/generate_utils'
 import { retrieveIPAddress } from '@celo/celotool/src/lib/helm_deploy'
-import { envVar, execCmd, execCmdWithExitOnFailure, fetchEnv } from '@celo/celotool/src/lib/utils'
+import { execCmd, execCmdWithExitOnFailure } from '@celo/celotool/src/lib/utils'
 import {
   convertToContractDecimals,
   GoldToken,
   sendTransaction,
   StableToken,
   unlockAccount,
-} from '@celo/contractkit'
-import { GoldToken as GoldTokenType } from '@celo/contractkit/types/GoldToken'
-import { StableToken as StableTokenType } from '@celo/contractkit/types/StableToken'
+} from '@celo/walletkit'
+import { GoldToken as GoldTokenType } from '@celo/walletkit/types/GoldToken'
+import { StableToken as StableTokenType } from '@celo/walletkit/types/StableToken'
 import BigNumber from 'bignumber.js'
 import fs from 'fs'
 import { range } from 'lodash'

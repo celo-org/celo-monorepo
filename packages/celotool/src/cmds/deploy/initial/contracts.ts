@@ -1,8 +1,9 @@
 /* tslint:disable no-console */
 import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
 import { uploadArtifacts } from '@celo/celotool/src/lib/artifacts'
+import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
 import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
-import { ensure0x, envVar, execCmd, fetchEnv } from '@celo/celotool/src/lib/utils'
+import { ensure0x, execCmd } from '@celo/celotool/src/lib/utils'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import {
   AccountType,

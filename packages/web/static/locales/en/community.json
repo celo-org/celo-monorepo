@@ -80,6 +80,12 @@
       "Let’s chat about building a new monetary system that creates the conditions for prosperity for all. We are open to working with bright and innovative people all over the world for short, fixed-term projects.",
     "callForProp": "Read More in our Call for Proposals"
   },
+  "contribute": {
+    "title":
+      "Have an idea for the Celo ecosystem? Propose a project as a Fellow or apply to the Celo Ecosystem Fund.",
+    "oldTitle": "Have an idea for the Celo ecosystem? Propose a project as a Fellow.",
+    "button": "Call for Proposals"
+  },
   "submit": "Submit",
   "events": {
     "pastEvents": "Past Events",
@@ -96,8 +102,6 @@
     "title": "Community voices"
   },
   "fellows": {
-    "title": "Have an idea for the Celo ecosystem? Propose a project as a Fellow.",
-    "button": "Call for Proposals",
     "formTitle": "Start your fellowship application"
   },
   "form": {
@@ -121,8 +125,22 @@
   },
   "validationErrors": {
     "email": "Please enter a valid email address",
-    "generic": "Oops I’m blank!"
+    "generic": "Oops I’m blank!",
+    "unknownError": "Something went wrong"
   },
+  "ecoFund": {
+    "title": "Celo Ecosystem Fund",
+    "poweredBy": "By Polychain",
+    "description":
+      "The Celo Ecosystem Fund is a Polychain-led venture, supported by founding investors Andreessen Horowitz and Celo, with the goal of investing in and developing the Celo ecosystem. The fund aims to foster Celo’s mission of creating a more accessible monetary system by making strategic, seed-stage deployments into tools and services which will leverage Celo’s protocol to build new financial infrastructure in the developing world.",
+    "generalPartner": "General Partner",
+    "limitedPartners": "Limited Partners",
+    "link": "Learn about building on Celo",
+    "applyForFunding": "Apply for Funding",
+    "recommendProject": "Recommend a Project "
+  },
+  "apply": "Apply",
+  "recommend": "Recommend",
   "website": "WEBSITE",
   "recap": "RECAP",
   "stayConnected": "Stay connected",

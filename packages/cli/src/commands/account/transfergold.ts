@@ -1,8 +1,5 @@
-import Web3 from 'web3'
-
-import { GoldToken } from '@celo/contractkit'
 import { flags } from '@oclif/command'
-
+import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -26,25 +23,25 @@ export default class GoldTransfer extends BaseCommand {
 
     const from: string = res.flags.from
     const to: string = res.flags.to
-    const amountInWei = Web3.utils.toBN(res.flags.amountInWei)
+    const amountInWei = new BigNumber(res.flags.amountInWei)
 
-    const goldTokenContract = await GoldToken(this.web3)
+    this.kit.defaultAccount = from
+    // Units of all balances are in wei, unless specified.
+    // Check the balance before
+    const goldToken = await this.kit.contracts.getGoldToken()
 
     // Check the balance before
-    const balanceFromBeforeInWei = Web3.utils.toBN(await this.web3.eth.getBalance(from))
+    const balanceFromBeforeInWei = await goldToken.balanceOf(from)
 
     // Perform the transfer
-    await displaySendTx(
-      'gold.Transfer',
-      goldTokenContract.methods.transfer(to, amountInWei.toString())
-    )
+    await displaySendTx('gold.Transfer', goldToken.transfer(to, amountInWei.toString()))
 
     // Check the balance after
-    const balanceFromAfterInWei = Web3.utils.toBN(await this.web3.eth.getBalance(from))
+    const balanceFromAfterInWei = await goldToken.balanceOf(from)
 
     // Get gas cost
-    const differenceInWei = balanceFromBeforeInWei.sub(balanceFromAfterInWei)
-    const gasCostInWei = differenceInWei.sub(amountInWei)
+    const differenceInWei = balanceFromBeforeInWei.minus(balanceFromAfterInWei)
+    const gasCostInWei = differenceInWei.minus(amountInWei)
     this.log(
       `Transferred ${amountInWei} from ${from} to ${to}, gas cost: ${gasCostInWei.toString()} wei`
     )

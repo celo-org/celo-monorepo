@@ -6,7 +6,7 @@ import { PaymentRequest, PaymentRequestStatuses, updatePaymentRequests } from 's
 import { showError } from 'src/alert/actions'
 import { Actions as AppActions } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION, FIREBASE_ENABLED } from 'src/config'
+import { FIREBASE_ENABLED } from 'src/config'
 import { Actions, firebaseAuthorized } from 'src/firebase/actions'
 import { initializeAuth, initializeCloudMessaging, setUserLanguage } from 'src/firebase/firebase'
 import Logger from 'src/utils/Logger'
@@ -33,7 +33,7 @@ function* initializeFirebase() {
 
   if (!FIREBASE_ENABLED) {
     Logger.info(TAG, 'Firebase disabled')
-    yield put(showError(ErrorMessages.FIREBASE_DISABLED, ERROR_BANNER_DURATION))
+    yield put(showError(ErrorMessages.FIREBASE_DISABLED))
     return
   }
 
@@ -54,7 +54,7 @@ function* initializeFirebase() {
     return
   } catch (error) {
     Logger.error(TAG, 'Error while initializing firebase', error)
-    yield put(showError(ErrorMessages.FIREBASE_FAILED, ERROR_BANNER_DURATION))
+    yield put(showError(ErrorMessages.FIREBASE_FAILED))
   }
 }
 

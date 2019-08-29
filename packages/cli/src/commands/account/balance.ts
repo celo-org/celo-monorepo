@@ -1,5 +1,3 @@
-import { StableToken } from '@celo/contractkit'
-
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 import { Args } from '../../utils/command'
@@ -18,10 +16,11 @@ export default class Balance extends BaseCommand {
   async run() {
     const { args } = this.parse(Balance)
 
-    const stableToken = await StableToken(this.web3)
+    const goldToken = await this.kit.contracts.getGoldToken()
+    const stableToken = await this.kit.contracts.getStableToken()
     const balances = {
-      goldBalance: await this.web3.eth.getBalance(args.account),
-      dollarBalance: await stableToken.methods.balanceOf(args.account).call(),
+      goldBalance: await goldToken.balanceOf(args.account),
+      dollarBalance: await stableToken.balanceOf(args.account),
     }
     printValueMap(balances)
   }

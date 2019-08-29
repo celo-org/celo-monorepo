@@ -1,8 +1,9 @@
-import { StaticNodeUtils } from '@celo/contractkit'
+import { ensureAuthenticatedGcloudAccount } from '@celo/celotool/src/lib/gcloud_utils'
+import { generateGenesisFromEnv } from '@celo/celotool/src/lib/generate_utils'
+import { getEnodesWithExternalIPAddresses, sleep } from '@celo/celotool/src/lib/geth'
+import { StaticNodeUtils } from '@celo/walletkit'
 import { Storage } from '@google-cloud/storage'
 import { writeFileSync } from 'fs'
-import { generateGenesisFromEnv } from 'src/lib/generate_utils'
-import { getEnodesWithExternalIPAddresses, sleep } from 'src/lib/geth'
 
 const genesisBlocksBucketName = 'genesis_blocks'
 const staticNodesBucketName = StaticNodeUtils.getStaticNodesGoogleStorageBucketName()
@@ -51,12 +52,13 @@ export async function uploadStaticNodesToGoogleStorage(networkName: string) {
 //   So, if you run into an error that says something about being unauthorized,
 //   copy and paste this into your terminal: gcloud auth login
 // One can browse these files at https://console.cloud.google.com/storage/browser
-async function uploadFileToGoogleStorage(
+export async function uploadFileToGoogleStorage(
   localFilePath: string,
   googleStorageBucketName: string,
   googleStorageFileName: string,
   makeFileWorldReadable: boolean
 ) {
+  await ensureAuthenticatedGcloudAccount()
   const storage = new Storage()
   await storage.bucket(googleStorageBucketName).upload(localFilePath, {
     destination: googleStorageFileName,

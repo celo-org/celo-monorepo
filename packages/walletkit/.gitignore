@@ -1,0 +1,5 @@
+.artifacts/
+contracts/
+dist/
+types/
+lib/

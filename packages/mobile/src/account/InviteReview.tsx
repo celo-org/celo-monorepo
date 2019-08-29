@@ -13,7 +13,6 @@ import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { ERROR_BANNER_DURATION } from 'src/config'
 import GethAwareButton from 'src/geth/GethAwareButton'
 import { Namespaces } from 'src/i18n'
 import SMSLogo from 'src/icons/InviteSendReceive'
@@ -21,11 +20,11 @@ import WhatsAppLogo from 'src/icons/WhatsAppLogo'
 import { isPhoneNumberVerified } from 'src/identity/verification'
 import { InviteBy, sendInvite } from 'src/invite/actions'
 import { navigateBack } from 'src/navigator/NavigationService'
+import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { TransactionTypes } from 'src/transactions/reducer'
-import { Recipient } from 'src/utils/recipient'
 
 interface State {
   contactIsVerified: boolean
@@ -114,7 +113,7 @@ export class InviteReview extends React.Component<Props, State> {
     this.props.hideAlert()
 
     if (!this.state.amountIsValid) {
-      this.props.showError(this.props.t('needMoreFundsToInvite'), ERROR_BANNER_DURATION)
+      this.props.showError(this.props.t('needMoreFundsToInvite'))
       return
     }
 

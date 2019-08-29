@@ -2,22 +2,26 @@ import * as firebase from 'firebase/app'
 import 'firebase/database'
 import getConfig from 'next/config'
 
-function getFirebase() {
+// Code in this file is sent to the browser.
+// Code in FirebaseServerSide.ts is not sent to the browser.
+
+async function getFirebase() {
   if (!firebase.apps.length) {
     const { publicRuntimeConfig } = getConfig()
+    // These variables are defined in `env-config.js` file in the parent directory.
     firebase.initializeApp(publicRuntimeConfig.FIREBASE_CONFIG)
   }
   return firebase
 }
 
-function getDB() {
-  return getFirebase().database()
+async function getDB(): Promise<firebase.database.Database> {
+  return (await getFirebase()).database()
 }
 
 // Don't do this. It hangs next.js build process: https://github.com/zeit/next.js/issues/6824
 // const db = firebase.database()
 
-const NETWORK = 'alfajores'
+export const NETWORK = 'alfajores'
 
 export type Address = string
 export type E164Number = string
@@ -43,21 +47,8 @@ export interface RequestRecord {
   escrowTxHash?: string // only on Invites
 }
 
-export async function sendRequest(beneficiary: Address | E164Number, type: RequestType) {
-  const newRequest: RequestRecord = {
-    beneficiary,
-    status: RequestStatus.Pending,
-    type,
-  }
-  const ref = await getDB()
-    .ref(`${NETWORK}/requests`)
-    .push(newRequest)
-
-  return ref.key
-}
-
 export async function subscribeRequest(key: string, onChange: (record: RequestRecord) => void) {
-  const ref = await getDB().ref(`${NETWORK}/requests/${key}`)
+  const ref: firebase.database.Reference = (await getDB()).ref(`${NETWORK}/requests/${key}`)
 
   const listener = ref.on('value', (snap) => {
     const record = snap.val() as RequestRecord

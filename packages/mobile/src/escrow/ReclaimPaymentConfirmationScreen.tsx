@@ -13,7 +13,6 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION } from 'src/config'
 import { EscrowedPayment, reclaimPayment } from 'src/escrow/actions'
 import ReclaimPaymentConfirmationCard from 'src/escrow/ReclaimPaymentConfirmationCard'
 import { FeeType } from 'src/fees/actions'
@@ -83,7 +82,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
       this.props.reclaimPayment(escrowedPayment.paymentID)
     } catch (error) {
       Logger.error(TAG, 'Reclaiming escrowed payment failed, show error message', error)
-      this.props.showError(ErrorMessages.RECLAIMING_ESCROWED_PAYMENT_FAILED, ERROR_BANNER_DURATION)
+      this.props.showError(ErrorMessages.RECLAIMING_ESCROWED_PAYMENT_FAILED)
       return
     }
   }

@@ -122,10 +122,6 @@ export class JoinCelo extends React.Component<Props, State> {
     })
   }
 
-  setName = (value: string) => {
-    this.setState({ name: value })
-  }
-
   onChangeNameInput = (value: string) => {
     this.setState({
       name: value,
@@ -204,7 +200,7 @@ export class JoinCelo extends React.Component<Props, State> {
           </Text>
           <TextInput
             onFocus={this.scrollToEnd}
-            onChangeText={this.setName}
+            onChangeText={this.onChangeNameInput}
             value={name}
             style={styles.box}
             placeholderTextColor={colors.inactive}
@@ -220,7 +216,7 @@ export class JoinCelo extends React.Component<Props, State> {
             setIsValidNumber={this.setIsValidNumber}
             onInputFocus={this.scrollToEnd}
             onInputChange={this.onChangePhoneInput}
-            inputCountryPlaceholder={t('chooseCountryCode')}
+            inputCountryPlaceholder={t('chooseCountry')}
             inputPhonePlaceholder={t('phoneNumber')}
             callingCode={true}
             lng={language}
@@ -254,9 +250,6 @@ const styles = StyleSheet.create({
   logo: {
     marginTop: 0,
   },
-  headerRight: {
-    paddingLeft: 15,
-  },
   scrollContainer: {
     paddingHorizontal: 10,
     paddingBottom: 10,
@@ -279,15 +272,6 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     flexDirection: 'row',
     flexWrap: 'wrap',
-  },
-  importWallet: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    marginVertical: 17,
-  },
-  description: {
-    padding: 30,
   },
 })
 

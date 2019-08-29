@@ -76,7 +76,7 @@ spec:
           --wsorigins=* \
           --wsapi=eth,net,web3,debug \
           --networkid={{ .Values.networkID }} \
-          --syncmode=celolatest \
+          --syncmode=ultralight \
           --consoleformat=json \
           --consoleoutput=stdout \
           --verbosity={{ .Values.geth.verbosity }}"
@@ -109,7 +109,7 @@ spec:
             CELOTOOL="/celo-monorepo/packages/celotool/bin/celotooljs.sh";
             ENV_NAME="{{ .Values.environment }}";
 
-            cd /celo-monorepo/packages/contractkit && yarn run build $ENV_NAME
+            cd /celo-monorepo/packages/walletkit && yarn run build $ENV_NAME
 
             $CELOTOOL geth simulate-client --delay 5 --data-dir /root/.celo -e $ENV_NAME --private-key /root/.celo/pkey --blockscout {{ .Values.blockscoutProb }} --load-test-id "{{ .Values.loadTestID }}"
         resources:

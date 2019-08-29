@@ -1,13 +1,12 @@
 import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import backerList from 'src/about/backers/backers'
+import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Responsive from 'src/shared/Responsive'
-import { TextStyles } from 'src/shared/Styles'
-export const BACKER_ID = 'backers'
-import { H1, H4 } from 'src/fonts/Fonts'
 import Button, { BTN } from 'src/shared/Button.3'
+import { hashNav } from 'src/shared/menu-items'
+import Responsive from 'src/shared/Responsive'
 import { fonts, standardStyles, textStyles } from 'src/styles'
 
 export class Backers extends React.Component<I18nProps> {
@@ -18,7 +17,11 @@ export class Backers extends React.Component<I18nProps> {
       <>
         <GridRow allStyle={standardStyles.centered}>
           <Cell span={Spans.three4th}>
-            <H1 style={[textStyles.center, standardStyles.elementalMarginBottom]} id={BACKER_ID}>
+            <H1
+              ariaLevel="2"
+              style={[textStyles.center, standardStyles.elementalMarginBottom]}
+              id={hashNav.about.backers}
+            >
               {t('celoBackers')}
             </H1>
             <H4 style={textStyles.center}>{t('celoBackersText')}</H4>
@@ -41,9 +44,7 @@ export class Backers extends React.Component<I18nProps> {
                         style={styles.photo}
                       />
                     ) : (
-                      <Responsive medium={[TextStyles.mediumMain, styles.centerText]}>
-                        <Text style={[TextStyles.small, styles.centerText]}>{backer.name}</Text>
-                      </Responsive>
+                      <Text style={[fonts.h4, textStyles.center]}>{backer.name}</Text>
                     )}
                   </View>
                 </Responsive>
@@ -57,7 +58,11 @@ export class Backers extends React.Component<I18nProps> {
           mobileStyle={standardStyles.sectionMarginMobile}
         >
           <Cell span={Spans.full}>
-            <H1 style={[textStyles.center, standardStyles.elementalMarginBottom]} id={BACKER_ID}>
+            <H1
+              ariaLevel="2"
+              style={[textStyles.center, standardStyles.elementalMarginBottom]}
+              id={hashNav.about.backers}
+            >
               {t('Press and Media')}
             </H1>
             <Text style={[fonts.p, textStyles.center]}>

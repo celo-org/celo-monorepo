@@ -49,13 +49,6 @@ export interface UpdateWeb3SyncProgressAction {
   }
 }
 
-export interface SetIsReadyAction {
-  type: Actions.SET_IS_READY
-  payload: {
-    isReady: boolean
-  }
-}
-
 export interface SetGasPriceAction {
   type: Actions.SET_GAS_PRICE
   gasPrice: number
@@ -66,7 +59,6 @@ export type ActionTypes =
   | SetAccountAction
   | SetCommentKeyAction
   | SetProgressAction
-  | SetIsReadyAction
   | SetLatestBlockNumberAction
   | UpdateWeb3SyncProgressAction
   | SetGasPriceAction
@@ -112,13 +104,6 @@ export const updateWeb3SyncProgress = (payload: {
 }): UpdateWeb3SyncProgressAction => ({
   type: Actions.UPDATE_WEB3_SYNC_PROGRESS,
   payload,
-})
-
-export const setIsReady = (isReady: boolean) => ({
-  type: Actions.SET_IS_READY,
-  payload: {
-    isReady,
-  },
 })
 
 async function isLocked(address: any) {

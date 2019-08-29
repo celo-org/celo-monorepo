@@ -6,8 +6,8 @@ jest.mock('src/web3/actions', () => ({
   unlockAccount: jest.fn(async () => true),
 }))
 
-jest.mock('@celo/contractkit', () => ({
-  ...jest.requireActual('@celo/contractkit'),
+jest.mock('@celo/walletkit', () => ({
+  ...jest.requireActual('@celo/walletkit'),
   sendTransaction: jest.fn(async () => null),
 }))
 

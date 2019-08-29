@@ -3,7 +3,7 @@ import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ERROR_BANNER_DURATION, SUPPORTS_KEYSTORE } from 'src/config'
+import { SUPPORTS_KEYSTORE } from 'src/config'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getPin as getPinCred, setPin as setPinCred } from 'src/pincode/PincodeViaAndroidKeystore'
@@ -20,6 +20,7 @@ export enum Actions {
   PINCODE_SET = 'ACCOUNT/PINCODE_SET',
   SET_ACCOUNT_CREATION_TIME_ACTION = 'ACCOUNT/SET_ACCOUNT_CREATION_TIME_ACTION',
   SET_BACKUP_COMPLETED_ACTION = 'ACCOUNT/SET_BACKUP_COMPLETED_ACTION',
+  SET_BACKUP_DELAYED_ACTION = 'ACCOUNT/SET_BACKUP_DELAYED_ACTION',
   UPDATE_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_PAYMENT_REQUESTS',
   DISMISS_EARN_REWARDS = 'ACCOUNT/DISMISS_EARN_REWARDS',
   DISMISS_INVITE_FRIENDS = 'ACCOUNT/DISMISS_INVITE_FRIENDS',
@@ -57,6 +58,10 @@ export interface SetBackupCompletedAction {
   type: Actions.SET_BACKUP_COMPLETED_ACTION
 }
 
+export interface SetBackupDelayedAction {
+  type: Actions.SET_BACKUP_DELAYED_ACTION
+}
+
 export interface UpdatePaymentRequestsAction {
   type: Actions.UPDATE_PAYMENT_REQUESTS
   paymentRequests: PaymentRequest[]
@@ -84,6 +89,7 @@ export type ActionTypes =
   | PincodeSetAction
   | SetAccountCreationAction
   | SetBackupCompletedAction
+  | SetBackupDelayedAction
   | UpdatePaymentRequestsAction
   | DismissEarnRewards
   | DismissInviteFriends
@@ -123,6 +129,10 @@ export const setAccountCreationTime = (): SetAccountCreationAction => ({
 
 export const setBackupCompleted = (): SetBackupCompletedAction => ({
   type: Actions.SET_BACKUP_COMPLETED_ACTION,
+})
+
+export const setBackupDelayed = (): SetBackupDelayedAction => ({
+  type: Actions.SET_BACKUP_DELAYED_ACTION,
 })
 
 export const updatePaymentRequests = (
@@ -177,7 +187,7 @@ export const setPin = (pin: string) => async (dispatch: DispatchType, getState: 
     Logger.info(TAG + '@setPin', 'pincode set')
     return true
   } else {
-    dispatch(showError(ErrorMessages.SET_PIN_FAILED, ERROR_BANNER_DURATION))
+    dispatch(showError(ErrorMessages.SET_PIN_FAILED))
     return false
   }
 }

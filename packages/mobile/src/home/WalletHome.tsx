@@ -23,6 +23,7 @@ import { hideAlert, showMessage } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { exitBackupFlow } from 'src/app/actions'
 import AccountOverview from 'src/components/AccountOverview'
+import { ALERT_BANNER_DURATION } from 'src/config'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
 import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
@@ -31,11 +32,14 @@ import { Namespaces } from 'src/i18n'
 import { importContacts } from 'src/identity/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { withDispatchAfterNavigate } from 'src/navigator/WithDispatchAfterNavigate'
+import { NumberToRecipient } from 'src/recipients/recipient'
+import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
+import { isAppConnected } from 'src/redux/selectors'
 import { initializeSentryUserContext } from 'src/sentry/Sentry'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { resetStandbyTransactions } from 'src/transactions/actions'
-import { NumberToRecipient } from 'src/utils/recipient'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const SCREEN_WIDTH = variables.width
@@ -46,6 +50,7 @@ interface StateProps {
   activeNotificationCount: number
   callToActNotification: boolean
   recipientCache: NumberToRecipient
+  appConnected: boolean
 }
 
 interface DispatchProps {
@@ -66,13 +71,13 @@ const mapStateToProps = (state: RootState): StateProps => ({
   address: currentAccountSelector(state),
   activeNotificationCount: getActiveNotificationCount(state),
   callToActNotification: callToActNotificationSelector(state),
-  recipientCache: state.send.recipientCache,
+  recipientCache: recipientCacheSelector(state),
+  appConnected: isAppConnected(state),
 })
 
 const Header = () => {
   return (
     <>
-      <DisconnectBanner />
       <AccountInfo />
       <AccountOverview testID="AccountOverviewInHome" />
     </>
@@ -107,7 +112,7 @@ const SHADOW_STYLE = {
   x: 0,
   y: 1,
 }
-export class WalletHome extends React.PureComponent<Props> {
+export class WalletHome extends React.Component<Props> {
   animatedValue: Animated.Value
   headerOpacity: Animated.AnimatedInterpolation
   shadowOpacity: Animated.AnimatedInterpolation
@@ -156,7 +161,7 @@ export class WalletHome extends React.PureComponent<Props> {
 
   showTestnetBanner = () => {
     const { t } = this.props
-    this.props.showMessage(t('testnetAlert.1'), null, t('dismiss'), t('testnetAlert.0'))
+    this.props.showMessage(t('testnetAlert.1'), ALERT_BANNER_DURATION, null, t('testnetAlert.0'))
   }
 
   importContactsIfNeeded = () => {
@@ -206,9 +211,15 @@ export class WalletHome extends React.PureComponent<Props> {
           </BoxShadow>
         </Animated.View>
         <View style={[componentStyles.topBar, styles.head]}>
-          <Animated.Text style={[fontStyles.headerTitle, { opacity: this.headerOpacity }]}>
-            {t('wallet')}
-          </Animated.Text>
+          {this.props.appConnected ? (
+            <Animated.Text style={[fontStyles.headerTitle, { opacity: this.headerOpacity }]}>
+              {t('wallet')}
+            </Animated.Text>
+          ) : (
+            <View style={styles.banner}>
+              <DisconnectBanner />
+            </View>
+          )}
           <HeaderIcon />
         </View>
         <AnimatedSectionList
@@ -234,6 +245,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     position: 'relative',
   },
+  banner: { paddingVertical: 15 },
   containerFeed: {
     paddingBottom: 40,
   },
@@ -265,18 +277,20 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    {
-      refreshAllBalances,
-      resetStandbyTransactions,
-      initializeSentryUserContext,
-      exitBackupFlow,
-      setLoading,
-      showMessage,
-      hideAlert,
-      importContacts,
-    }
-  )(withNamespaces(Namespaces.walletFlow5)(WalletHome))
+export default withDispatchAfterNavigate(
+  componentWithAnalytics(
+    connect<StateProps, DispatchProps, {}, RootState>(
+      mapStateToProps,
+      {
+        refreshAllBalances,
+        resetStandbyTransactions,
+        initializeSentryUserContext,
+        exitBackupFlow,
+        setLoading,
+        showMessage,
+        hideAlert,
+        importContacts,
+      }
+    )(withNamespaces(Namespaces.walletFlow5)(WalletHome))
+  )
 )
