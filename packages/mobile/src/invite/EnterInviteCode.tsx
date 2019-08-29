@@ -26,7 +26,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces } from 'src/i18n'
 import { redeemInvite } from 'src/invite/actions'
-import { extractValidInviteCode } from 'src/invite/utils'
+import { extractValidInviteCode, getInviteCodeFromReferrerData } from 'src/invite/utils'
 import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -46,7 +46,7 @@ interface StateProps {
 interface State {
   isSubmitting: boolean
   appState: AppStateStatus
-  validCodeInClipboard: boolean
+  validCode: string | null
 }
 
 interface DispatchProps {
@@ -93,30 +93,39 @@ export class EnterInviteCode extends React.Component<Props, State> {
   state: State = {
     isSubmitting: false,
     appState: AppState.currentState,
-    validCodeInClipboard: false,
+    validCode: null,
   }
 
   async componentDidMount() {
-    AppState.addEventListener('change', this.handleValidCodeInClipboard)
+    AppState.addEventListener('change', this.handleAppStateChange)
+    this.checkForReferrerCode()
     this.checkIfValidCodeInClipboard()
   }
 
   componentWillUnmount() {
-    AppState.removeEventListener('change', this.handleValidCodeInClipboard)
+    AppState.removeEventListener('change', this.handleAppStateChange)
   }
 
   openMessage = () => {
     SendIntentAndroid.openSMSApp()
   }
 
+  checkForReferrerCode = async () => {
+    const validCode = await getInviteCodeFromReferrerData()
+    if (validCode) {
+      this.setState({ validCode })
+    }
+  }
+
   checkIfValidCodeInClipboard = async () => {
     const message = await Clipboard.getString()
     const validCode = extractValidInviteCode(message)
-
-    this.setState({ validCodeInClipboard: validCode !== null })
+    if (validCode) {
+      this.setState({ validCode })
+    }
   }
 
-  handleValidCodeInClipboard = async (nextAppState: AppStateStatus) => {
+  handleAppStateChange = async (nextAppState: AppStateStatus) => {
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
       this.checkIfValidCodeInClipboard()
     }
@@ -127,8 +136,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
     this.setState({ isSubmitting: true })
     try {
       this.props.hideAlert()
-      const message = await Clipboard.getString()
-      const validCode = extractValidInviteCode(message)
+      const { validCode } = this.state
 
       Logger.debug('Extracted invite code:', validCode || '')
 
@@ -174,7 +182,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
             <Text style={fontStyles.bodySmallBold}>{t('inviteCodeText.inviteAccepted')}</Text>
           ) : (
             !this.state.isSubmitting &&
-            (!this.state.validCodeInClipboard ? (
+            (!this.state.validCode ? (
               <View>
                 <Text style={[styles.body, styles.hint]}>
                   <Text style={fontStyles.bodySmallSemiBold}>
