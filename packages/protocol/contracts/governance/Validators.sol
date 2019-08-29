@@ -271,8 +271,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       // secp256k1 public key + BLS public key + BLS proof of possession
       publicKeysData.length == (64 + 48 + 96)
     );
-    bytes memory proofOfPossessionBytes = publicKeysData.slice(64, 48 + 96);
-    require(checkProofOfPossession(proofOfPossessionBytes));
+    // Use the proof of possession bytes
+    require(checkProofOfPossession(publicKeysData.slice(64, 48 + 96)));
 
     address account = getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
@@ -352,7 +352,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param identifier A identifier for this validator group.
    * @param name A name for the validator group.
    * @param url A URL for the validator group.
-   * @param noticePeriods The notice period of the Locked Gold commitments that
+   * @param noticePeriods The notice periods of the Locked Gold commitments that
    *   cumulatively meet the requirements for validator registration.
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
@@ -724,7 +724,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   /**
    * @notice Returns whether an account meets the requirements to register a validator or group.
    * @param account The account.
-   * @param noticePeriods An array of notice periods of the  Locked Gold commitments
+   * @param noticePeriods An array of notice periods of the Locked Gold commitments
    *   that cumulatively meet the requirements for validator registration.
    * @return Whether an account meets the requirements to register a validator or group.
    */

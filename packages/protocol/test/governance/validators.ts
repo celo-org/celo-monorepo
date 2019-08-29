@@ -340,14 +340,14 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when multiple deposit notice periods are provided', () => {
       it('should accept a sufficient combination of deposits as stake', async () => {
-        // create registrationRequirement.value different bonded deposts each
+        // create registrationRequirement.value different locked commitments each
         // with value 1 and unique noticePeriods greater than registrationRequirement.noticePeriod
         const depositCount = registrationRequirement.value
         const noticePeriods = []
         for (let i = new BigNumber(1); i.lte(depositCount); i = i.plus(1)) {
           const noticePeriod = registrationRequirement.noticePeriod.plus(i)
           noticePeriods.push(noticePeriod)
-          await mockBondedDeposits.setBondedDeposit(validator, noticePeriod, 1)
+          await mockLockedGold.setLockedCommitment(validator, noticePeriod, 1)
         }
 
         await validators.registerValidator(
@@ -362,14 +362,14 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert when the combined deposit value is insufficient with all valid notice periods', async () => {
-        // create registrationRequirement.value - 1 different bonded deposts each
+        // create registrationRequirement.value - 1 different locked commitments each
         // with value 1 and valid noticePeriods
         const depositCount = registrationRequirement.value.minus(1)
         const noticePeriods = []
         for (let i = new BigNumber(1); i.lte(depositCount); i = i.plus(1)) {
           const noticePeriod = registrationRequirement.noticePeriod.plus(i)
           noticePeriods.push(noticePeriod)
-          await mockBondedDeposits.setBondedDeposit(validator, noticePeriod, 1)
+          await mockLockedGold.setLockedCommitment(validator, noticePeriod, 1)
         }
 
         await assertRevert(
@@ -385,17 +385,17 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert when the combined deposit value of valid notice periods is insufficient', async () => {
-        // create registrationRequirement.value different bonded deposts each
+        // create registrationRequirement.value different locked commitments each
         // with value 1, but with one noticePeriod that is less than
         // registrationRequirement.noticePeriod
         const depositCount = registrationRequirement.value.minus(1)
         const invalidNoticePeriod = registrationRequirement.noticePeriod.minus(1)
         const noticePeriods = [invalidNoticePeriod]
-        await mockBondedDeposits.setBondedDeposit(validator, invalidNoticePeriod, 1)
+        await mockLockedGold.setLockedCommitment(validator, invalidNoticePeriod, 1)
         for (let i = new BigNumber(1); i.lt(depositCount); i = i.plus(1)) {
           const noticePeriod = registrationRequirement.noticePeriod.plus(i)
           noticePeriods.push(noticePeriod)
-          await mockBondedDeposits.setBondedDeposit(validator, noticePeriod, 1)
+          await mockLockedGold.setLockedCommitment(validator, noticePeriod, 1)
         }
 
         await assertRevert(
@@ -891,7 +891,7 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(
-          validators.registerValidatorGroup(identifier, name, url, [
+          await validators.registerValidatorGroup(identifier, name, url, [
             registrationRequirement.noticePeriod,
           ])
         )
