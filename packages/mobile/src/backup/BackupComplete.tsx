@@ -15,6 +15,7 @@ import Logger from 'src/utils/Logger'
 type Props = {
   onPress: () => void
   mnemonic: string | null
+  backupCompleted?: boolean
 } & WithNamespaces
 
 interface State {
@@ -42,12 +43,14 @@ class BackupComplete extends React.Component<Props, State> {
   }
 
   render() {
-    const { t } = this.props
+    const { t, backupCompleted } = this.props
     return (
       <View style={styles.container}>
         <View style={styles.questionTextContainer}>
           <NuxLogo />
-          <Text style={[fontStyles.h1, styles.h1]}>{t('backupKeySet')}</Text>
+          <Text style={[fontStyles.h1, styles.h1]}>
+            {t(backupCompleted ? 'backupKey' : 'backupKeySet')}
+          </Text>
           <Text style={fontStyles.body}>{t('dontLoseIt')}</Text>
           <SmallButton
             text={t('copyToClipboard')}

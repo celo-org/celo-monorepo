@@ -29,6 +29,7 @@ interface State {
 
 interface StateProps {
   language: string | null
+  backupCompleted: boolean
   backupTooLate: boolean
   backupDelayedTime: number
 }
@@ -45,6 +46,7 @@ type Props = StateProps & DispatchProps
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     language: state.app.language,
+    backupCompleted: state.account.backupCompleted,
     backupTooLate: isBackupTooLate(state),
     backupDelayedTime: state.account.backupDelayedTime,
   }
@@ -124,7 +126,18 @@ export class Backup extends React.Component<Props, State> {
 
   render() {
     const { mnemonic, currentQuestion, wordsForBackupQuiz } = this.state
-    const { backupDelayedTime, backupTooLate } = this.props
+    const { backupCompleted, backupDelayedTime, backupTooLate } = this.props
+
+    if (backupCompleted) {
+      return (
+        <BackupComplete
+          backupCompleted={backupCompleted}
+          onPress={this.onFinish}
+          mnemonic={this.state.mnemonic}
+        />
+      )
+    }
+
     if (currentQuestion === -1) {
       return (
         <BackupIntroduction
