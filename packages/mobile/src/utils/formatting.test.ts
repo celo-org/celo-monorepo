@@ -1,9 +1,4 @@
-import BigNumber from 'bignumber.js'
-import {
-  getCentAwareMoneyDisplay,
-  getMoneyDisplayValue,
-  getMoneyFeeyDisplayValueFromBigNum,
-} from 'src/utils/formatting'
+import { getCentAwareMoneyDisplay, getMoneyDisplayValue, roundDown } from 'src/utils/formatting'
 
 describe('utils->formatting', () => {
   describe('getMoneyDisplayValue', () => {
@@ -30,22 +25,23 @@ describe('utils->formatting', () => {
     })
   })
 
-  describe('fees', () => {
-    it('rounds up the fees', () => {
-      const UNROUNDED_NUMBER = '0.00046'
-      const ROUNDED_NUMBER = '0.0005'
-      expect(getMoneyFeeyDisplayValueFromBigNum(new BigNumber(UNROUNDED_NUMBER))).toBe(
-        ROUNDED_NUMBER
-      )
+  describe('rounding', () => {
+    it('rounds up', () => {
+      const UNROUNDED_NUMBER1 = '0.50001'
+      const ROUNDED_NUMBER1 = '0.5001'
+      expect(roundDown(UNROUNDED_NUMBER1, 4)).toBe(ROUNDED_NUMBER1)
+      const UNROUNDED_NUMBER2 = '0.599'
+      const ROUNDED_NUMBER2 = '0.60'
+      expect(roundDown(UNROUNDED_NUMBER2, 2)).toBe(ROUNDED_NUMBER2)
     })
 
-    it('rounds up a big fees', () => {
-      const UNROUNDED_NUMBER = '0.50001'
-      const ROUNDED_NUMBER = '0.5001'
-
-      expect(getMoneyFeeyDisplayValueFromBigNum(new BigNumber(UNROUNDED_NUMBER))).toBe(
-        ROUNDED_NUMBER
-      )
+    it('rounds down', () => {
+      const UNROUNDED_NUMBER1 = '0.50001'
+      const ROUNDED_NUMBER1 = '0.5'
+      expect(roundDown(UNROUNDED_NUMBER1, 4)).toBe(ROUNDED_NUMBER1)
+      const UNROUNDED_NUMBER2 = '0.599'
+      const ROUNDED_NUMBER2 = '0.59'
+      expect(roundDown(UNROUNDED_NUMBER2, 2)).toBe(ROUNDED_NUMBER2)
     })
   })
 })

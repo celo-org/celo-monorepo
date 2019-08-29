@@ -10,7 +10,7 @@ import {
   fetchGasPrice,
   gasPriceLastUpdatedSelector,
   gasPriceSelector,
-  refreshGasPrice,
+  getGasPrice,
 } from 'src/web3/gas'
 
 const GAS_PRICE_PLACEHOLDER: BigNumber = new BigNumber(100000000000)
@@ -19,7 +19,7 @@ const now = Date.now()
 Date.now = jest.fn(() => now)
 
 it('sets the price correctly', () => {
-  expectSaga(refreshGasPrice)
+  expectSaga(getGasPrice)
     .provide([
       [call(waitWeb3LastBlock), null],
       [select(gasPriceSelector), null],
@@ -35,7 +35,7 @@ describe('refreshGasPrice', () => {
     const setGasPriceMocked = jest.fn(setGasPrice)
     const gasPriceLastUpdated = now - GAS_PRICE_STALE_AFTER
 
-    expectSaga(refreshGasPrice)
+    expectSaga(getGasPrice)
       .provide([
         [call(waitWeb3LastBlock), null],
         [select(gasPriceSelector), 0],
@@ -52,7 +52,7 @@ describe('refreshGasPrice', () => {
     const setGasPriceMocked = jest.fn()
     const gasPriceLastUpdated = now
 
-    expectSaga(refreshGasPrice)
+    expectSaga(getGasPrice)
       .provide([
         [call(waitWeb3LastBlock), null],
         [select(gasPriceSelector), 0],
@@ -70,7 +70,7 @@ describe('refreshGasPrice', () => {
       throw new Error()
     }
 
-    expectSaga(refreshGasPrice)
+    expectSaga(getGasPrice)
       .provide([
         [call(waitWeb3LastBlock), null],
         [select(gasPriceSelector), 0],

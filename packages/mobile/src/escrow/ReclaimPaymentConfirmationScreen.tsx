@@ -107,7 +107,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
   renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
     const { t, isReclaiming, appConnected } = this.props
     const payment = this.getReclaimPaymentInput()
-    const fee = asyncFee.result && getFeeDollars(asyncFee.result)
+    const fee = getFeeDollars(asyncFee.result)
     const convertedAmount = divideByWei(payment.amount.valueOf())
 
     const currentBalance = this.props.dollarBalance

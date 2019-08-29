@@ -16,13 +16,13 @@ import { RootState } from 'src/redux/reducers'
 import FeeIcon from 'src/send/FeeIcon'
 import { TransactionTypes } from 'src/transactions/reducer'
 import { getCurrencyStyles } from 'src/transactions/TransferFeedItem'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
+import { getFeeDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
 
 const iconSize = 40
 
 interface LineItemProps {
   currencySymbol: string
-  amount?: BigNumber
+  amount?: string
   title: string
   titleIcon?: React.ReactNode
   isLoading?: boolean
@@ -39,17 +39,12 @@ function LineItemRow({
 }: LineItemProps) {
   return (
     <View style={style.lineItemRow}>
-      <View style={style.feeDescription}>
-        <Text style={style.feeText}>{title}</Text>
+      <View style={style.lineItemDescription}>
+        <Text style={style.lineItemText}>{title}</Text>
         {titleIcon}
       </View>
-      {amount && (
-        <Text style={style.feeText}>
-          {currencySymbol}
-          {getMoneyDisplayValue(amount, 4)}
-        </Text>
-      )}
-      {hasError && <Text style={style.feeText}>---</Text>}
+      {!!amount && <Text style={style.lineItemText}>{currencySymbol + amount}</Text>}
+      {hasError && <Text style={style.lineItemText}>---</Text>}
       {isLoading && (
         <View style={style.loadingContainer}>
           <ActivityIndicator size="small" color={colors.celoGreen} />
@@ -163,6 +158,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
     const currencyStyle = getCurrencyStyles(currency, type)
     const amountWithFees = total.plus(fee || 0)
 
+    // TODO break this up into separate files
     if (type === TransactionTypes.VERIFICATION_FEE) {
       return <Text style={style.pSmall}>{t('receiveFlow8:verificationMessage')}</Text>
     } else if (type === TransactionTypes.FAUCET) {
@@ -205,28 +201,18 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
         <View style={style.bottomContainer}>
           {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
           {(!!this.props.dollarBalance || !!fee) && <HorizontalLine />}
-          {!!this.props.dollarBalance && (
-            <View style={style.celoDollarBalance}>
-              <Text style={style.feeText}>
-                {`${this.props.t('paymentRequestFlow:celoDollarBalance')} `}
-                <Text style={componentStyles.colorGreen}>
-                  {getMoneyDisplayValue(this.props.dollarBalance)}
-                </Text>
-              </Text>
-            </View>
-          )}
           {(isLoadingFee || fee || feeError) && (
             <View style={style.feeContainer}>
               {this.props.type === TransactionTypes.PAY_REQUEST && (
                 <LineItemRow
                   currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-                  amount={total}
+                  amount={getMoneyDisplayValue(total)}
                   title={t('dollarsSent')}
                 />
               )}
               <LineItemRow
-                currencySymbol={currencyStyle.symbol}
-                amount={fee}
+                currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+                amount={getFeeDisplayValue(fee)}
                 title={address ? t('securityFee') : t('inviteAndSecurityFee')}
                 titleIcon={<FeeIcon />}
                 isLoading={isLoadingFee}
@@ -234,7 +220,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
               />
               <LineItemRow
                 currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-                amount={amountWithFees}
+                amount={getMoneyDisplayValue(amountWithFees)}
                 title={t('total')}
               />
             </View>
@@ -283,7 +269,8 @@ const style = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     flexDirection: 'column',
-    padding: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 40,
   },
   amountContainer: {
     flexDirection: 'row',
@@ -302,6 +289,7 @@ const style = StyleSheet.create({
     lineHeight: 102,
   },
   bottomContainer: {
+    marginTop: 5,
     flexDirection: 'column',
     alignItems: 'stretch',
   },
@@ -311,13 +299,14 @@ const style = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'stretch',
   },
-  feeDescription: {
+  lineItemDescription: {
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
   lineItemRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 5,
   },
   celoDollarBalance: {
     justifyContent: 'center',
@@ -345,7 +334,7 @@ const style = StyleSheet.create({
   largeCurrencySymbol: {
     fontSize: 32,
   },
-  feeText: {
+  lineItemText: {
     ...fontStyles.subSmall,
     color: colors.dark,
   },

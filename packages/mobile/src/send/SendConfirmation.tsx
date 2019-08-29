@@ -39,7 +39,9 @@ export interface ConfirmationInput {
   amount: BigNumber
   reason: string
   recipientAddress?: string | null
+  type: TransactionTypes
 }
+
 interface StateProps {
   account: string | null
   isSending: boolean
@@ -136,15 +138,13 @@ class SendConfirmation extends React.Component<Props, State> {
   }
 
   renderHeader = () => {
-    const { isPaymentRequest } = this.getNavParams()
     const { t } = this.props
-    const { recipientAddress } = this.getConfirmationInput()
-    const showInvite = !recipientAddress
+    const { type } = this.getConfirmationInput()
     let title
 
-    if (isPaymentRequest) {
+    if (type === TransactionTypes.PAY_REQUEST) {
       title = t('payRequest')
-    } else if (showInvite) {
+    } else if (type === TransactionTypes.INVITE_SENT) {
       title = t('inviteVerifyPayment')
     } else {
       title = t('reviewPayment')
@@ -183,10 +183,10 @@ class SendConfirmation extends React.Component<Props, State> {
 
   renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
     const { t, appConnected, isSending } = this.props
-    const { amount, reason, recipient, recipientAddress } = this.getConfirmationInput()
+    const { amount, reason, recipient, recipientAddress, type } = this.getConfirmationInput()
 
     const currentBalance = this.props.dollarBalance
-    const fee = asyncFee.result && getFeeDollars(asyncFee.result)
+    const fee = getFeeDollars(asyncFee.result)
     const amountWithFee = new BigNumber(numeral(amount).value()).plus(fee || 0)
     const userHasEnough = !asyncFee.loading && amountWithFee.isLessThanOrEqualTo(currentBalance)
     const { isPaymentRequest } = this.getNavParams()
@@ -230,7 +230,7 @@ class SendConfirmation extends React.Component<Props, State> {
             fee={fee}
             isLoadingFee={asyncFee.loading}
             feeError={asyncFee.error}
-            type={isPaymentRequest && TransactionTypes.PAY_REQUEST}
+            type={type}
             dollarBalance={this.props.dollarBalance}
           />
           <Modal

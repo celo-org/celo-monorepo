@@ -43,7 +43,7 @@ import { sendTransaction } from 'src/transactions/send'
 import { dynamicLink } from 'src/utils/dynamicLink'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
-import { fetchGasPrice } from 'src/web3/gas'
+import { getGasPrice } from 'src/web3/gas'
 import { createNewAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -70,8 +70,7 @@ export async function getInvitationVerificationFee() {
     NUM_ATTESTATIONS_REQUIRED
   )
 
-  const gasPrice = await fetchGasPrice()
-  // TODO: estimate gas properly
+  const gasPrice = await getGasPrice()
   const gasFee = new BigNumber(INVITE_REDEMPTION_GAS).times(gasPrice)
 
   // We multiply by two to provide a buffer in the event that some requests fail.
