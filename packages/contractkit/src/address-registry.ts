@@ -1,9 +1,9 @@
 import debugFactory from 'debug'
+import Web3 from 'web3'
 import { Address, AllContracts, CeloContract, NULL_ADDRESS } from './base'
 import { newRegistry } from './generated/Registry'
 import { Registry } from './generated/types/Registry'
 import { ContractKit } from './kit'
-import Web3 from 'web3'
 
 const debug = debugFactory('kit:registry')
 
