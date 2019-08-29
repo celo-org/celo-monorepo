@@ -1,6 +1,6 @@
+import { createMockContract, mockContractAddress } from '@celo/test-utils'
 import { AllContracts, CeloContract, newKit, NULL_ADDRESS } from '.'
 import { AddressRegistry } from './address-registry'
-import { createMockContract, mockContractAddress } from './test-utils/mock-contracts'
 
 const kit = newKit('')
 const mockedGetAddressFor = jest.fn()

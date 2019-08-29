@@ -35,6 +35,7 @@
   "devDependencies": {
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#6bd058a",
     "@celo/protocol": "1.0.0",
+    "@celo/test-utils": "0.0.1",
     "@types/debug": "^4.1.5",
     "@types/web3": "^1.0.18"
   },

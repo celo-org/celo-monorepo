@@ -1,0 +1,3 @@
+{
+  "extends": ["@celo/typescript/tslint.json"]
+}

@@ -1,8 +1,8 @@
+import { mockContractAddress } from '@celo/test-utils'
 import Web3 from 'web3'
 import { CeloContract, ContractKit, newKit, newKitFromWeb3 } from '.'
 import { AddressRegistry } from './address-registry'
 import { WrapperCache } from './contract-cache'
-import { mockContractAddress } from './test-utils/mock-contracts'
 import { Web3ContractCache } from './web3-contract-cache'
 
 describe('ContractKit', () => {
