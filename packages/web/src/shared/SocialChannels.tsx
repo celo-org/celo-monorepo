@@ -24,7 +24,7 @@ interface DarkMode {
 }
 
 export const Channel = memo(function _Channel(props: ChannelProps & DarkMode) {
-  const openExternalLinkInNewTab = props.link.includes('//') ? '_new' : undefined
+  const openExternalLinkInNewTab = props.link.includes('//') ? '_blank' : undefined
   return (
     <Fade bottom={true} distance="20px" delay={200}>
       <View style={[standardStyles.centered, styles.channelContainer]}>
@@ -94,7 +94,7 @@ export const GitHubChannel = memo(function _GitHubChannel({ isDarkMode }: DarkMo
       isDarkMode={isDarkMode}
       title={'GitHub'}
       link={CeloLinks.gitHub}
-      icon={<Octocat size={40} color={isDarkMode ? colors.white : colors.dark} />}
+      icon={<Octocat size={41} color={isDarkMode ? colors.white : colors.dark} />}
       text={'Contribute to the codebase'}
     />
   )
