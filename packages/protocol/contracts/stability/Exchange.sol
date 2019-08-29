@@ -17,7 +17,7 @@ import "../common/interfaces/IERC20Token.sol";
  * @title Contract that allows to exchange StableToken for GoldToken and vice versa
  * using a Constant Product Market Maker Model
  */
-contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
+contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, ReentrancyGuard {
   using SafeMath for uint256;
   using FractionUtil for FractionUtil.Fraction;
 

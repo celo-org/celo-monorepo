@@ -16,7 +16,7 @@ import "../common/UsingRegistry.sol";
 /**
  * @title Contract mapping identifiers to accounts
  */
-contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
+contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, ReentrancyGuard {
 
 
   using SafeMath for uint256;

@@ -17,7 +17,7 @@ import "../common/interfaces/IERC20Token.sol";
 /**
  * @title Ensures price stability of StableTokens with respect to their pegs
  */
-contract Reserve is IReserve, Ownable, Initializable, UsingRegistry {
+contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyGuard {
 
   using FractionUtil for FractionUtil.Fraction;
   using SafeMath for uint256;
