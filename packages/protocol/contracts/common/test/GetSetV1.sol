@@ -9,7 +9,7 @@ contract GetSetV1 {
     return (x, y);
   }
 
-  function set(uint256 _x, string memory _y) public {
+  function set(uint256 _x, string calldata _y) external {
     x = _x;
     y = _y;
   }

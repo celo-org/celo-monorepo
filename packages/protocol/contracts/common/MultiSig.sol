@@ -108,10 +108,10 @@ contract MultiSig is Initializable {
   /// @param _owners List of initial owners.
   /// @param _required Number of required confirmations.
   function initialize(
-    address[] memory _owners,
+    address[] calldata _owners,
     uint256 _required
   )
-    public
+    external
     initializer
     validRequirement(_owners.length, _required)
   {
@@ -196,7 +196,7 @@ contract MultiSig is Initializable {
   /// @param value Transaction ether value.
   /// @param data Transaction data payload.
   /// @return Returns transaction ID.
-  function submitTransaction(address destination, uint value, bytes memory data)
+  function submitTransaction(address destination, uint value, bytes calldata data)
     external
     returns (uint transactionId)
   {
