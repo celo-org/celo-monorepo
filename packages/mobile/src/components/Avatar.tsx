@@ -6,7 +6,9 @@
 
 import { Avatar as PlainAvatar } from '@celo/react-components/components/Avatar'
 import * as React from 'react'
+import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Image, StyleSheet } from 'react-native'
+import { Namespaces } from 'src/i18n'
 import { unknownUserIcon } from 'src/images/Images'
 import { getRecipientThumbnail, Recipient, RecipientKind } from 'src/recipients/recipient'
 
@@ -19,29 +21,40 @@ interface Props {
   iconSize?: number
 }
 
-export default class Avatar extends React.PureComponent<Props> {
-  render() {
-    const {
-      recipient,
-      name,
-      address,
-      e164PhoneNumber,
-      defaultCountryCode,
-      iconSize = 40,
-    } = this.props
+type AvatarProps = Props & WithNamespaces
 
-    return recipient && recipient.kind === RecipientKind.Contact ? (
+export class Avatar extends React.PureComponent<AvatarProps> {
+  render() {
+    const { t, recipient, address, e164PhoneNumber, defaultCountryCode, iconSize = 40 } = this.props
+
+    let { name } = this.props
+
+    if (!recipient && !name) {
+      if (!address) {
+        name = t('mobileNumber')
+      }
+
+      if (!e164PhoneNumber) {
+        name = t('walletAddress')
+      }
+    }
+
+    if (recipient && recipient.kind === RecipientKind.Contact) {
+      return (
+        <PlainAvatar
+          name={recipient.displayName}
+          thumbnailPath={getRecipientThumbnail(recipient)}
+          address={address}
+          e164Number={recipient.e164PhoneNumber}
+          defaultCountryCode={defaultCountryCode}
+          iconSize={iconSize}
+        />
+      )
+    }
+
+    return (
       <PlainAvatar
-        name={recipient.displayName}
-        thumbnailPath={getRecipientThumbnail(recipient)}
-        address={address}
-        e164Number={recipient.e164PhoneNumber}
-        defaultCountryCode={defaultCountryCode}
-        iconSize={iconSize}
-      />
-    ) : (
-      <PlainAvatar
-        name={name}
+        name={recipient ? recipient.displayName : name}
         address={address}
         e164Number={e164PhoneNumber}
         defaultCountryCode={defaultCountryCode}
@@ -62,3 +75,5 @@ const style = StyleSheet.create({
     margin: 'auto',
   },
 })
+
+export default withNamespaces(Namespaces.sendFlow7)(Avatar)

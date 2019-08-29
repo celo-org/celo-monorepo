@@ -1,8 +1,6 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import PhoneNumberWithFlag from '@celo/react-components/components/PhoneNumberWithFlag'
 import { fontStyles } from '@celo/react-components/styles/fonts'
-import { getContactPhoneNumber } from '@celo/utils/src/contacts'
-import { getE164Number } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { MinimalContact } from 'react-native-contacts'
@@ -23,27 +21,12 @@ export class Avatar extends React.PureComponent<Props> {
       contact,
       thumbnailPath,
       address,
+      e164Number,
       defaultCountryCode,
       iconSize,
       name,
       children,
     } = this.props
-    let { e164Number } = this.props
-    const userName = contact ? contact.displayName : name
-    let nameOrAddress = userName ? userName : address
-    if (!e164Number && contact) {
-      const phoneNumber = getContactPhoneNumber(contact)
-      if (phoneNumber) {
-        const possibleE164Number = getE164Number(phoneNumber, defaultCountryCode)
-        if (possibleE164Number) {
-          e164Number = possibleE164Number
-        }
-      }
-    }
-
-    if (nameOrAddress && nameOrAddress.startsWith('0x')) {
-      nameOrAddress = '#' + nameOrAddress.substring(2, 17) + '...'
-    }
 
     return (
       <View style={style.container}>
@@ -51,7 +34,7 @@ export class Avatar extends React.PureComponent<Props> {
           style={style.contactCircle}
           contact={contact}
           thumbnailPath={thumbnailPath}
-          name={userName}
+          name={name}
           address={address}
           size={iconSize}
         >
@@ -62,7 +45,7 @@ export class Avatar extends React.PureComponent<Props> {
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          {nameOrAddress}
+          {name}
         </Text>
         {e164Number ? (
           <PhoneNumberWithFlag
