@@ -1,6 +1,4 @@
-import { Validators } from '@celo/walletkit'
 import { flags } from '@oclif/command'
-
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -16,7 +14,7 @@ export default class ValidatorGroupRegister extends BaseCommand {
     url: flags.string({ required: true }),
     noticePeriods: flags.string({
       required: true,
-      description: 'Notice Periods for the Bonded deposit to use',
+      description: 'Notice periods that identify the Locked Gold commitments to use',
       multiple: true,
     }),
   }
@@ -27,11 +25,12 @@ export default class ValidatorGroupRegister extends BaseCommand {
   async run() {
     const res = this.parse(ValidatorGroupRegister)
 
-    const validatorsInstance = await Validators(this.web3, res.flags.from)
+    this.kit.defaultAccount = res.flags.from
+    const validators = await this.kit.contracts.getValidators()
 
     await displaySendTx(
       'registerValidatorGroup',
-      validatorsInstance.methods.registerValidatorGroup(
+      validators.registerValidatorGroup(
         res.flags.id,
         res.flags.name,
         res.flags.url,

@@ -1,13 +1,13 @@
-import { getBlockchainApiUrl, getBlockscoutUrl, getEthstatsUrl } from 'src/lib/endpoints'
 import {
   addCeloEnvMiddleware,
   CeloEnvArgv,
   envVar,
-  execCmdWithExitOnFailure,
   fetchEnv,
   fetchEnvOrFallback,
   getEnvFile,
-} from 'src/lib/utils'
+} from '@celo/celotool/src/lib/env-utils'
+import { execCmdWithExitOnFailure } from '@celo/celotool/src/lib/utils'
+import { getBlockchainApiUrl, getBlockscoutUrl, getEthstatsUrl } from 'src/lib/endpoints'
 import { Arguments, Argv } from 'yargs'
 
 export const command = 'links <resource>'

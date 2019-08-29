@@ -2,7 +2,7 @@
   "Choose Language": "Choose Language",
   "syncText": {
     "0": "Celo keeps your assets secure and enables you to send and receive value with anyone",
-    "1": "Celo Dollars are a stable digital asset that tracks to the value of the US Dollar",
+    "1": "{{CeloDollars}} are a stable digital asset that tracks to the value of the US {{Dollar}}",
     "2": "Verify your phone number so other Celo users can find you and send you value"
   },
   "progressBarText": "Syncing with Network",
@@ -38,7 +38,7 @@
   "backupKey": "Backup Phrase",
   "backupIntro": {
     "0":
-      "If you lose your phone or delete the Celo app, you will lose all of the gold and dollars in your wallet.",
+      "If you lose your phone or delete the Celo app, you will lose all of the gold and {{dollars}} in your wallet.",
     "1":
       "You can back up your wallet by writing down a backup phrase on a piece of paper and storing it securely. This will allow you to restore your wallet in the future if you need to.",
     "2":
@@ -92,8 +92,6 @@
     "fee": "Fee"
   },
   "faq_terms_footer": "<0>Test FAQ is </0><1>here</1><2> Terms of service are </2><3>here</3>",
-  "celoDollars": "Celo Dollars",
-  "celoGold": "Celo Gold",
   "invalidInvitation": "Invalid Invitation Code ",
   "incorrectPin": "Incorrect PIN",
   "photosNUX": {

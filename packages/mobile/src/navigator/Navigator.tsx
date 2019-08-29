@@ -15,7 +15,8 @@ import ErrorScreen from 'src/app/ErrorScreen'
 import UpgradeScreen from 'src/app/UpgradeScreen'
 import Backup from 'src/backup/Backup'
 import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
-import DappKitTxSignScreen from 'src/dappkit/DappKitTxSignScreen'
+import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
+import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
@@ -37,10 +38,10 @@ import SendAmount from 'src/send/SendAmount'
 import SendConfirmation from 'src/send/SendConfirmation'
 import SetClock from 'src/set-clock/SetClock'
 import TransactionReviewScreen from 'src/transactions/TransactionReviewScreen'
-import VerifyEducation from 'src/verify/Education'
 import VerifyInput from 'src/verify/Input'
 import VerifyVerified from 'src/verify/Verified'
 import VerifyVerifying from 'src/verify/Verifying'
+import VerifyEducation from 'src/verify/VerifyPhoneEducation'
 
 export const headerArea = {
   defaultNavigationOptions: {
@@ -55,7 +56,8 @@ export const commonScreens = {
   [Screens.ErrorScreen]: { screen: ErrorScreen },
   [Screens.UpgradeScreen]: { screen: UpgradeScreen },
   [Screens.DappKitAccountAuth]: { screen: DappKitAccountScreen },
-  [Screens.DappKitSignTxScreen]: { screen: DappKitTxSignScreen },
+  [Screens.DappKitSignTxScreen]: { screen: DappKitSignTxScreen },
+  [Screens.DappKitTxDataScreen]: { screen: DappKitTxDataScreen },
   [Screens.Debug]: { screen: Debug },
 }
 

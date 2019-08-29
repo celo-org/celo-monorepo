@@ -1,5 +1,4 @@
 import { cli } from 'cli-ux'
-import { ValidatorsAdapter } from '../../adapters/validators'
 import { BaseCommand } from '../../base'
 
 export default class ValidatorGroupList extends BaseCommand {
@@ -15,9 +14,9 @@ export default class ValidatorGroupList extends BaseCommand {
     this.parse(ValidatorGroupList)
 
     cli.action.start('Fetching Validator Groups')
-    const validatorsAdapter = new ValidatorsAdapter(this.web3)
-    const vgroups = await validatorsAdapter.getRegisteredValidatorGroups()
-    const votes = await validatorsAdapter.getValidatorGroupsVotes()
+    const validators = await this.kit.contracts.getValidators()
+    const vgroups = await validators.getRegisteredValidatorGroups()
+    const votes = await validators.getValidatorGroupsVotes()
     cli.action.stop()
 
     cli.table(vgroups, {

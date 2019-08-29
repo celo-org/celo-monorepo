@@ -1,5 +1,6 @@
+import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
 import { getEnodesAddresses } from 'src/lib/geth'
-import { envVar, execCmdWithExitOnFailure, fetchEnv } from 'src/lib/utils'
+import { execCmdWithExitOnFailure } from 'src/lib/utils'
 
 export async function installHelmChart(celoEnv: string) {
   console.info(`Installing helm release ${celoEnv}-tracer-tool`)

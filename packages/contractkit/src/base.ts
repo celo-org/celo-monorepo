@@ -2,7 +2,7 @@ export type Address = string
 
 export enum CeloContract {
   Attestations = 'Attestations',
-  BondedDeposits = 'BondedDeposits',
+  LockedGold = 'LockedGold',
   Escrow = 'Escrow',
   Exchange = 'Exchange',
   GasCurrencyWhitelist = 'GasCurrencyWhitelist',
