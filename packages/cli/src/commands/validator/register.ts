@@ -14,9 +14,10 @@ export default class ValidatorRegister extends BaseCommand {
     name: flags.string({ required: true }),
     url: flags.string({ required: true }),
     publicKey: Flags.publicKey({ required: true }),
-    noticePeriods: flags.string({
+    noticePeriod: flags.string({
       required: true,
-      description: 'Notice periods of the Locked Gold commitments',
+      description:
+        'Notice period of the Locked Gold commitment. Specify multiple notice periods to use the sum of the commitments.',
       multiple: true,
     }),
   }
@@ -36,7 +37,7 @@ export default class ValidatorRegister extends BaseCommand {
         res.flags.name,
         res.flags.url,
         res.flags.publicKey as any,
-        res.flags.noticePeriods
+        res.flags.noticePeriod
       )
     )
 
