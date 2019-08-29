@@ -21,7 +21,8 @@ export async function initTerraformModule(
     modulePath,
     modulePath,
     getVarOptions(vars),
-    getVarOptions(backendConfigVars, 'backend-config')
+    getVarOptions(backendConfigVars, 'backend-config'),
+    '-reconfigure'
   )
 }
 
