@@ -155,7 +155,7 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#setMinElectableValidators', () => {
     const newMinElectableValidators = minElectableValidators.plus(1)
-    it('should set the minimum deposit', async () => {
+    it('should set the minimum commitment', async () => {
       await validators.setMinElectableValidators(newMinElectableValidators)
       assertEqualBN(await validators.minElectableValidators(), newMinElectableValidators)
     })
@@ -193,7 +193,7 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#setMaxElectableValidators', () => {
     const newMaxElectableValidators = maxElectableValidators.plus(1)
-    it('should set the minimum deposit', async () => {
+    it('should set the minimum commitment', async () => {
       await validators.setMaxElectableValidators(newMaxElectableValidators)
       assertEqualBN(await validators.maxElectableValidators(), newMaxElectableValidators)
     })
@@ -338,13 +338,13 @@ contract('Validators', (accounts: string[]) => {
       })
     })
 
-    describe('when multiple deposit notice periods are provided', () => {
-      it('should accept a sufficient combination of deposits as stake', async () => {
+    describe.only('when multiple commitment notice periods are provided', () => {
+      it('should accept a sufficient combination of commitments as stake', async () => {
         // create registrationRequirement.value different locked commitments each
         // with value 1 and unique noticePeriods greater than registrationRequirement.noticePeriod
-        const depositCount = registrationRequirement.value
+        const commitmentCount = registrationRequirement.value
         const noticePeriods = []
-        for (let i = new BigNumber(1); i.lte(depositCount); i = i.plus(1)) {
+        for (let i = new BigNumber(1); i.lte(commitmentCount); i = i.plus(1)) {
           const noticePeriod = registrationRequirement.noticePeriod.plus(i)
           noticePeriods.push(noticePeriod)
           await mockLockedGold.setLockedCommitment(validator, noticePeriod, 1)
@@ -361,12 +361,12 @@ contract('Validators', (accounts: string[]) => {
         assert.deepEqual(await validators.getRegisteredValidators(), [validator])
       })
 
-      it('should revert when the combined deposit value is insufficient with all valid notice periods', async () => {
+      it('should revert when the combined commitment value is insufficient with all valid notice periods', async () => {
         // create registrationRequirement.value - 1 different locked commitments each
         // with value 1 and valid noticePeriods
-        const depositCount = registrationRequirement.value.minus(1)
+        const commitmentCount = registrationRequirement.value.minus(1)
         const noticePeriods = []
-        for (let i = new BigNumber(1); i.lte(depositCount); i = i.plus(1)) {
+        for (let i = new BigNumber(1); i.lte(commitmentCount); i = i.plus(1)) {
           const noticePeriod = registrationRequirement.noticePeriod.plus(i)
           noticePeriods.push(noticePeriod)
           await mockLockedGold.setLockedCommitment(validator, noticePeriod, 1)
@@ -384,15 +384,15 @@ contract('Validators', (accounts: string[]) => {
         )
       })
 
-      it('should revert when the combined deposit value of valid notice periods is insufficient', async () => {
+      it('should revert when the combined commitment value of valid notice periods is insufficient', async () => {
         // create registrationRequirement.value different locked commitments each
         // with value 1, but with one noticePeriod that is less than
         // registrationRequirement.noticePeriod
-        const depositCount = registrationRequirement.value.minus(1)
+        const commitmentCount = registrationRequirement.value.minus(1)
         const invalidNoticePeriod = registrationRequirement.noticePeriod.minus(1)
         const noticePeriods = [invalidNoticePeriod]
         await mockLockedGold.setLockedCommitment(validator, invalidNoticePeriod, 1)
-        for (let i = new BigNumber(1); i.lt(depositCount); i = i.plus(1)) {
+        for (let i = new BigNumber(1); i.lt(commitmentCount); i = i.plus(1)) {
           const noticePeriod = registrationRequirement.noticePeriod.plus(i)
           noticePeriods.push(noticePeriod)
           await mockLockedGold.setLockedCommitment(validator, noticePeriod, 1)
