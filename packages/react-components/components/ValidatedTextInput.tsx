@@ -72,9 +72,7 @@ export default class ValidatedTextInput extends React.Component<Props> {
       return undefined
     }
 
-    if (decimalPos) {
-      return decimalPos + this.props.numberOfDecimals + 1
-    }
+    return decimalPos + this.props.numberOfDecimals + 1
   }
 
   render() {
