@@ -29,7 +29,7 @@ COPY packages/walletkit packages/walletkit/
 COPY packages/verification-pool-api packages/verification-pool-api/
 COPY packages/celotool packages/celotool/
 
-# RUN yarn build
+RUN yarn build
 
 ENV PATH="/celo-monorepo/packages/celotool/bin:${PATH}"
 
