@@ -74,7 +74,7 @@ function useAsyncShowError<R, Args extends any[]>(
     () => {
       // Generic error banner
       if (asyncResult.error) {
-        Logger.error(`CalculateFee`, 'Error calculating fee', asyncResult.error)
+        Logger.error('CalculateFee', 'Error calculating fee', asyncResult.error)
         showErrorFunction(ErrorMessages.CALCULATE_FEE_FAILED)
       }
     },
