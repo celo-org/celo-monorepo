@@ -7,7 +7,7 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { getReclaimEscrowFee } from 'src/escrow/saga'
 import { FeeType } from 'src/fees/actions'
-import { getInvitationVerificationFee } from 'src/invite/saga'
+import { getInviteFee } from 'src/invite/saga'
 import { getSendFee } from 'src/send/saga'
 
 export type CalculateFeeChildren = (
@@ -20,6 +20,9 @@ interface CommonProps {
 
 interface InviteProps extends CommonProps {
   feeType: FeeType.INVITE
+  account: string
+  amount: BigNumber
+  comment: string
 }
 
 interface SendProps extends CommonProps {
@@ -83,7 +86,12 @@ function useAsyncShowError<R, Args extends any[]>(
 }
 
 const CalculateInviteFee: FunctionComponent<DispatchProps & InviteProps> = (props) => {
-  const asyncResult = useAsyncShowError(getInvitationVerificationFee, [], props.showError)
+  const asyncResult = useAsyncShowError(
+    (account: string, amount: BigNumber, comment: string) =>
+      getInviteFee(account, getStableTokenContract, amount.valueOf(), comment),
+    [props.account, props.amount, props.comment],
+    props.showError
+  )
   return props.children(asyncResult) as React.ReactElement
 }
 

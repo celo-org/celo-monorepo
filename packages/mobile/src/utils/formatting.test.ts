@@ -1,4 +1,9 @@
-import { getCentAwareMoneyDisplay, getMoneyDisplayValue, roundDown } from 'src/utils/formatting'
+import {
+  getCentAwareMoneyDisplay,
+  getMoneyDisplayValue,
+  roundDown,
+  roundUp,
+} from 'src/utils/formatting'
 
 describe('utils->formatting', () => {
   describe('getMoneyDisplayValue', () => {
@@ -29,19 +34,19 @@ describe('utils->formatting', () => {
     it('rounds up', () => {
       const UNROUNDED_NUMBER1 = '0.50001'
       const ROUNDED_NUMBER1 = '0.5001'
-      expect(roundDown(UNROUNDED_NUMBER1, 4)).toBe(ROUNDED_NUMBER1)
+      expect(roundUp(UNROUNDED_NUMBER1, 4).toString()).toBe(ROUNDED_NUMBER1)
       const UNROUNDED_NUMBER2 = '0.599'
-      const ROUNDED_NUMBER2 = '0.60'
-      expect(roundDown(UNROUNDED_NUMBER2, 2)).toBe(ROUNDED_NUMBER2)
+      const ROUNDED_NUMBER2 = '0.6'
+      expect(roundUp(UNROUNDED_NUMBER2, 2).toString()).toBe(ROUNDED_NUMBER2)
     })
 
     it('rounds down', () => {
       const UNROUNDED_NUMBER1 = '0.50001'
       const ROUNDED_NUMBER1 = '0.5'
-      expect(roundDown(UNROUNDED_NUMBER1, 4)).toBe(ROUNDED_NUMBER1)
+      expect(roundDown(UNROUNDED_NUMBER1, 4).toString()).toBe(ROUNDED_NUMBER1)
       const UNROUNDED_NUMBER2 = '0.599'
       const ROUNDED_NUMBER2 = '0.59'
-      expect(roundDown(UNROUNDED_NUMBER2, 2)).toBe(ROUNDED_NUMBER2)
+      expect(roundDown(UNROUNDED_NUMBER2, 2).toString()).toBe(ROUNDED_NUMBER2)
     })
   })
 })

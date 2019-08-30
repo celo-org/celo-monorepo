@@ -1,81 +1,30 @@
 import { Avatar } from '@celo/react-components/components/Avatar'
+import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { faucetIcon } from 'src/images/Images'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import FeeIcon from 'src/send/FeeIcon'
 import { TransactionTypes } from 'src/transactions/reducer'
 import { getCurrencyStyles } from 'src/transactions/TransferFeedItem'
-import { getFeeDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
+import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 const iconSize = 40
-
-interface LineItemProps {
-  currencySymbol: string
-  amount?: string
-  title: string
-  titleIcon?: React.ReactNode
-  isLoading?: boolean
-  hasError?: boolean
-}
-
-function LineItemRow({
-  currencySymbol,
-  amount,
-  title,
-  titleIcon,
-  isLoading,
-  hasError,
-}: LineItemProps) {
-  return (
-    <View style={style.lineItemRow}>
-      <View style={style.lineItemDescription}>
-        <Text style={style.lineItemText}>{title}</Text>
-        {titleIcon}
-      </View>
-      {!!amount && <Text style={style.lineItemText}>{currencySymbol + amount}</Text>}
-      {hasError && <Text style={style.lineItemText}>---</Text>}
-      {isLoading && (
-        <View style={style.loadingContainer}>
-          <ActivityIndicator size="small" color={colors.celoGreen} />
-        </View>
-      )}
-    </View>
-  )
-}
-
-function HorizontalLine() {
-  return (
-    <View
-      style={{
-        width: '100%',
-        borderStyle: 'solid',
-        borderTopWidth: 1,
-        borderTopColor: colors.darkLightest,
-        marginTop: 10,
-      }}
-    />
-  )
-}
 
 export interface OwnProps {
   address?: string
   comment?: string
   value: BigNumber
   currency: CURRENCY_ENUM
-  fee?: BigNumber
-  isLoadingFee?: boolean
-  feeError?: Error
   type: TransactionTypes
   e164PhoneNumber?: string
   dollarBalance?: BigNumber
@@ -92,15 +41,11 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-// TODO @cmcewen: i18n the currency displays (#1526)
+// Bordered content placed in a ReviewFrame
+// Differs from TransferReviewCard which is used during Send flow, this is for completed txs
 class TransferConfirmationCard extends React.Component<OwnProps & StateProps & WithNamespaces> {
-  renderTopSection = (
-    type: TransactionTypes,
-    recipient: Recipient | undefined,
-    address: string | undefined,
-    e164PhoneNumber: string | undefined,
-    defaultCountryCode: string
-  ) => {
+  renderTopSection = () => {
+    const { address, recipient, type, e164PhoneNumber, defaultCountryCode } = this.props
     if (type === TransactionTypes.VERIFICATION_FEE || type === TransactionTypes.FAUCET) {
       return <Image source={faucetIcon} style={style.icon} />
     } else {
@@ -118,47 +63,37 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
     }
   }
 
-  renderAmountSection = (type: TransactionTypes, currency: CURRENCY_ENUM) => {
+  renderAmountSection = () => {
+    const { currency, type } = this.props
     const currencyStyle = getCurrencyStyles(currency, type)
 
     if (type === TransactionTypes.INVITE_SENT || type === TransactionTypes.INVITE_RECEIVED) {
       return null
-    } else {
-      return (
-        <View style={style.amountContainer}>
-          <Text style={[style.plusSign, { color: currencyStyle.color }]}>
-            {currencyStyle.direction}
-          </Text>
-          <Text style={[style.currencySymbol, { color: currencyStyle.color }]}>
-            {currencyStyle.symbol}
-          </Text>
-          <Text
-            style={[style.amount, { color: currencyStyle.color }]}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {getMoneyDisplayValue(this.props.value)}
-          </Text>
-        </View>
-      )
     }
+
+    return (
+      <View style={style.amountContainer}>
+        <Text style={[style.plusSign, { color: currencyStyle.color }]}>
+          {currencyStyle.direction}
+        </Text>
+        <Text style={[style.currencySymbol, { color: currencyStyle.color }]}>
+          {currencyStyle.symbol}
+        </Text>
+        <Text
+          style={[style.amount, { color: currencyStyle.color }]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {getMoneyDisplayValue(this.props.value)}
+        </Text>
+      </View>
+    )
   }
 
-  renderBottomSection = (
-    type: TransactionTypes,
-    total: BigNumber,
-    fee: BigNumber | undefined,
-    isLoadingFee: boolean | undefined,
-    feeError: Error | undefined,
-    currency: CURRENCY_ENUM,
-    comment?: string,
-    address?: string
-  ) => {
-    const { t } = this.props
+  renderBottomSection = () => {
+    const { t, currency, comment, type, value } = this.props
     const currencyStyle = getCurrencyStyles(currency, type)
-    const amountWithFees = total.plus(fee || 0)
 
-    // TODO break this up into separate files
     if (type === TransactionTypes.VERIFICATION_FEE) {
       return <Text style={style.pSmall}>{t('receiveFlow8:verificationMessage')}</Text>
     } else if (type === TransactionTypes.FAUCET) {
@@ -191,74 +126,23 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {getMoneyDisplayValue(this.props.value)}
+              {getMoneyDisplayValue(value)}
             </Text>
           </View>
         </View>
       )
-    } else {
-      return (
-        <View style={style.bottomContainer}>
-          {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
-          {(!!this.props.dollarBalance || !!fee) && <HorizontalLine />}
-          {(isLoadingFee || fee || feeError) && (
-            <View style={style.feeContainer}>
-              {this.props.type === TransactionTypes.PAY_REQUEST && (
-                <LineItemRow
-                  currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-                  amount={getMoneyDisplayValue(total)}
-                  title={t('dollarsSent')}
-                />
-              )}
-              <LineItemRow
-                currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-                amount={getFeeDisplayValue(fee)}
-                title={address ? t('securityFee') : t('inviteAndSecurityFee')}
-                titleIcon={<FeeIcon />}
-                isLoading={isLoadingFee}
-                hasError={!!feeError}
-              />
-              <LineItemRow
-                currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-                amount={getMoneyDisplayValue(amountWithFees)}
-                title={t('total')}
-              />
-            </View>
-          )}
-        </View>
-      )
+    } else if (comment) {
+      // When we want to add more info to the send tx drilldown, that will go here
+      return <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>
     }
   }
 
   render() {
-    const {
-      address,
-      recipient,
-      value,
-      currency,
-      comment,
-      fee,
-      isLoadingFee,
-      feeError,
-      type,
-      e164PhoneNumber,
-      defaultCountryCode,
-    } = this.props
-
     return (
       <View style={[componentStyles.roundedBorder, style.container]}>
-        {this.renderTopSection(type, recipient, address, e164PhoneNumber, defaultCountryCode)}
-        {this.renderAmountSection(type, currency)}
-        {this.renderBottomSection(
-          type,
-          value,
-          fee,
-          isLoadingFee,
-          feeError,
-          currency,
-          comment,
-          address
-        )}
+        {this.renderTopSection()}
+        {this.renderAmountSection()}
+        {this.renderBottomSection()}
       </View>
     )
   }
@@ -284,35 +168,10 @@ const style = StyleSheet.create({
     lineHeight: 64,
     color: colors.darkSecondary,
   },
-  largeAmount: {
-    fontSize: 80,
-    lineHeight: 102,
-  },
   bottomContainer: {
     marginTop: 5,
     flexDirection: 'column',
     alignItems: 'stretch',
-  },
-  feeContainer: {
-    marginTop: 10,
-    marginBottom: 10,
-    justifyContent: 'center',
-    alignItems: 'stretch',
-  },
-  lineItemDescription: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  lineItemRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 5,
-  },
-  celoDollarBalance: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 5,
-    marginTop: 20,
   },
   icon: {
     height: iconSize,
@@ -330,16 +189,6 @@ const style = StyleSheet.create({
     textAlignVertical: 'top',
     fontSize: 24,
     color: colors.darkSecondary,
-  },
-  largeCurrencySymbol: {
-    fontSize: 32,
-  },
-  lineItemText: {
-    ...fontStyles.subSmall,
-    color: colors.dark,
-  },
-  loadingContainer: {
-    transform: [{ scale: 0.8 }],
   },
   avatar: {
     marginTop: 5,

@@ -29,27 +29,6 @@ export async function getGasPrice(currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR
   }
 }
 
-// export function* getGasPrice(currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR) {
-//   Logger.debug(`${TAG}}/getGasPrice`, 'Getting gas price')
-//   yield call(waitWeb3LastBlock)
-
-//   try {
-//     if (
-//       !gasPriceLastUpdated ||
-//       !gasPrice ||
-//       Date.now() - gasPriceLastUpdated >= GAS_PRICE_STALE_AFTER
-//     ) {
-//       gasPrice = yield call(fetchGasPrice, currency)
-//       gasPriceLastUpdated = Date.now()
-//     }
-//     return gasPrice
-//   } catch (error) {
-//     Logger.error(`${TAG}}/getGasPrice`, 'Could not fetch and update gas price.', error)
-//     yield put(showError(ErrorMessages.GAS_PRICE_UPDATE_FAILED))
-//     return null
-//   }
-// }
-
 async function fetchGasPrice(currency: CURRENCY_ENUM) {
   const latestGasPrice = new BigNumber(await ContractUtils.getGasPrice(web3, currency))
   Logger.debug(

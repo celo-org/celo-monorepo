@@ -1,6 +1,7 @@
 jest.useFakeTimers()
 
 import Button from '@celo/react-components/components/Button'
+import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
@@ -41,7 +42,7 @@ describe('InviteReview', () => {
         <InviteReview
           inviteInProgress={false}
           defaultCountryCode={mockCountryCode}
-          dollarBalance={'100'}
+          dollarBalance={new BigNumber('100')}
           fetchDollarBalance={jest.fn()}
           hideAlert={hideAlert}
           showError={jest.fn()}

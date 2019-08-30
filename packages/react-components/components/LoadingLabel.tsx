@@ -60,10 +60,7 @@ const style = StyleSheet.create({
     marginHorizontal: 5,
     transform: [
       {
-        scaleX: 0.7,
-      },
-      {
-        scaleY: 0.7,
+        scale: 0.7,
       },
       {
         translateY: -3,

@@ -1,44 +1,60 @@
 import { getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
-import { call, put, select, takeLatest } from 'redux-saga/effects'
+import { call, put, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { getReclaimEscrowGas } from 'src/escrow/saga'
 import { Actions, EstimateFeeAction, feeEstimated, FeeType } from 'src/fees/actions'
-import { getInvitationVerificationFee } from 'src/invite/saga'
+import { getInvitationVerificationFee, getInviteTxGas } from 'src/invite/saga'
 import { getSendTxGas } from 'src/send/saga'
 import { CeloDefaultRecipient } from 'src/send/Send'
+import { BasicTokenTransfer } from 'src/tokens/saga'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { getGasPrice } from 'src/web3/gas'
-import { currentAccountSelector } from 'src/web3/selectors'
+import { getConnectedAccount } from 'src/web3/saga'
 
 const TAG = 'fees/saga'
 // Cache of the gas estimates for common tx types
 // Prevents us from having to recreate txs and estimate their gas each time
 const feeGasCache = new Map<FeeType, BigNumber>()
+// Just use default values here since it doesn't matter for fee estimation
+const placeholderSendTx: BasicTokenTransfer = {
+  recipientAddress: CeloDefaultRecipient.address,
+  amount: web3.utils.fromWei('1'),
+  comment: 'Coffee or Tea?',
+}
 
 export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
   Logger.debug(`${TAG}/estimateFeeSaga`, `updating for ${feeType}`)
   try {
-    const account = yield select(currentAccountSelector)
+    const account = yield call(getConnectedAccount)
 
     let feeInWei: BigNumber | null = null
 
     switch (feeType) {
       case FeeType.INVITE:
-        // TODO(Rossy) Once we stop using a flat fee for this
-        // then we should cache it like we do for send
-        feeInWei = yield call(getInvitationVerificationFee)
+        if (!feeGasCache.get(FeeType.INVITE)) {
+          const gas: BigNumber = yield call(
+            getInviteTxGas,
+            account,
+            getStableTokenContract,
+            placeholderSendTx.amount,
+            placeholderSendTx.comment
+          )
+          feeGasCache.set(FeeType.INVITE, gas)
+        }
+        feeInWei = yield call(calculateFee, feeGasCache.get(FeeType.INVITE)!)
+        feeInWei = feeInWei!.plus(getInvitationVerificationFee())
         break
       case FeeType.SEND:
         if (!feeGasCache.get(FeeType.SEND)) {
-          // Just use default values here since it doesn't matter for fee estimation
-          const gas: BigNumber = yield call(getSendTxGas, account, getStableTokenContract, {
-            recipientAddress: CeloDefaultRecipient.address,
-            amount: web3.utils.fromWei('1'),
-            comment: 'Coffee or Tea?',
-          })
+          const gas: BigNumber = yield call(
+            getSendTxGas,
+            account,
+            getStableTokenContract,
+            placeholderSendTx
+          )
           feeGasCache.set(FeeType.SEND, gas)
         }
         feeInWei = yield call(calculateFee, feeGasCache.get(FeeType.SEND)!)

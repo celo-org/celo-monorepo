@@ -26,7 +26,7 @@ import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import { sendPaymentOrInvite } from 'src/send/actions'
-import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
+import TransferReviewCard from 'src/send/TransferReviewCard'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { TransactionTypes } from 'src/transactions/reducer'
@@ -217,7 +217,7 @@ class SendConfirmation extends React.Component<Props, State> {
           modifyButton={secondaryBtnInfo}
           shouldReset={this.state.buttonReset}
         >
-          <TransferConfirmationCard
+          <TransferReviewCard
             recipient={recipient}
             address={recipientAddress || ''}
             e164PhoneNumber={recipient.e164PhoneNumber}
@@ -228,7 +228,6 @@ class SendConfirmation extends React.Component<Props, State> {
             isLoadingFee={asyncFee.loading}
             feeError={asyncFee.error}
             type={type}
-            dollarBalance={this.props.dollarBalance}
           />
           <Modal
             isVisible={this.state.modalVisible}
@@ -264,7 +263,7 @@ class SendConfirmation extends React.Component<Props, State> {
 
     const feeProps: CalculateFeeProps = recipientAddress
       ? { feeType: FeeType.SEND, account, recipientAddress, amount, comment: reason }
-      : { feeType: FeeType.INVITE }
+      : { feeType: FeeType.INVITE, account, amount, comment: reason }
 
     return (
       // Note: intentionally passing a new child func here otherwise
