@@ -130,7 +130,6 @@ rule promote_proposal(method f, uint256 p, uint256 index) {
 	
 	// p must be non zero
 	require p != 0;
-	// required? // require sinvoke proposalCount(_e) >= p;
 	
 	// get queue expiry
 	uint256 _queueExpiry = sinvoke queueExpiry(_e);
@@ -154,7 +153,7 @@ rule promote_proposal(method f, uint256 p, uint256 index) {
 	assert sinvoke getFromDequeued(e_,index) == p => eF.block.timestamp <= _proposalTimestamp+_queueExpiry, "Managed to promote $p in ${eF.block.timestamp} after proposal timestamp ${_proposalTimestamp} + ${_queueExpiry}";
 }
 
-rule approval_only_if_promoted_and_allowed(method f, uint256 p, uint256 index) {
+rule approval_only_if_promoted_and_allowed(uint256 p, uint256 index) {
 	// A proposal should never be able to be approved unless it was promoted from the queue
 	env _e;
 	env eF;
@@ -162,17 +161,20 @@ rule approval_only_if_promoted_and_allowed(method f, uint256 p, uint256 index) {
 	
 	bool _isProposalApproved = sinvoke isApproved(_e,p);
 	bool _isDequeued = sinvoke getFromDequeued(_e,index) == p;
+	bool _isExpired = sinvoke isDequeuedProposalExpired(_e,p);
 	
 	bool _approver = sinvoke approver(_e);
 	require !_isProposalApproved; // we assume not approved yet
+	require !_isExpired; // we also assume it did not expire
 		
-	calldataarg arg;
 	sinvoke approve(eF,p,index);
+	// should check if dequeued right during approve
+	bool isDequeued_ = sinvoke getFromDequeued(e_,index) == p;
 	
 	bool isProposalApproved_ = sinvoke isApproved(e_,p);
 	
 	// TODO: what if approve were to delete p from dequeued?
-	assert isProposalApproved_ => _isDequeued, "Cannot approve proposal $p unless $index points to it"; // index has p
+	assert isProposalApproved_ => _isDequeued || (!_isDequeued && isDequeued_), "Cannot approve proposal $p unless $index points to it before approve or during it"; // index has p
 	assert isProposalApproved_ => eF.msg.sender == _approver, "Only approver ${_approver} can approve";
 	
 	// it is possible to guess in advance "index", approve will dequeue it into index?? I would move the check in the code above
@@ -382,7 +384,7 @@ rule approved_proposals_invariants(method f, uint256 p) {
 	bool isApprovedProposal_ = sinvoke isApproved(e_,p);
 	
 	assert isApprovedProposal_ => doesProposalExist_, "An approved proposal must exist";
-	assert _isApprovedProposal => isApprovedProposal_, "An approved proposal cannot be disproved";
+	assert _isApprovedProposal => isApprovedProposal_ || !doesProposalExist_, "An approved proposal cannot be disproved if it still exists";
 }
 
 
