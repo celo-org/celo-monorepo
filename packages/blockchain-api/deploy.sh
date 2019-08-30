@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Deploys the notification serivice to App Engine
+# Deploys the blockchain api to App Engine
 #
 # Flags:
 # -n: Name of the network, maps to App Engine 'service' (integration, production, etc.)
