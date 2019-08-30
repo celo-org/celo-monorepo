@@ -2,7 +2,7 @@ steps:
 
 # Deploy using yarn command 
 - name: "gcr.io/celo-testnet/global/yarn-gcloud"
-  args: ['yarn', 'deploy:install', '-n', '$_NETWORK_NAME', '-t', '$_FIREBASE_TOKEN']
+  args: ['yarn', 'deploy:install', '-n', '$_NETWORK_NAME']
   id: Deploy verification pool api to firebase based on _NETWORK_NAME substitution (integration, production, etc.)
   dir: 'packages/verification-pool-api'
 timeout: "1200s"
