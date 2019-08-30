@@ -33,7 +33,12 @@ class BackupComplete extends React.Component<Props, State> {
   onSelectAnswer = (word: string) => this.setState({ selectedAnswer: word })
 
   onDone = () => {
-    CeloAnalytics.track(CustomEventNames.questions_done)
+    const { backupCompleted } = this.props
+
+    // Only track when going through backup flow, not viewing the backup again
+    if (!backupCompleted) {
+      CeloAnalytics.track(CustomEventNames.questions_done)
+    }
     this.props.onPress()
   }
 
