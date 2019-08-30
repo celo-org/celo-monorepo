@@ -16,6 +16,7 @@ import { submitFellowApp } from './FellowshipApp'
 import { RequestType } from './FirebaseClient'
 import mailer from './mailer'
 import { getFormattedMediumArticles } from './mediumAPI'
+import latest from './Announcement'
 const port = parseInt(process.env.PORT, 10) || 3000
 
 const dev = process.env.NEXT_DEV === 'true'
@@ -124,6 +125,16 @@ function wwwRedirect(req, res, nextAction) {
   server.post('/contacts', async (req, res) => {
     await addToCRM(req.body)
     res.status(204).send('ok')
+  })
+
+  server.get('/announcement', async (_, res) => {
+    try {
+      const annoucement = await latest()
+      console.log(annoucement)
+      res.json(annoucement)
+    } catch (e) {
+      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+    }
   })
 
   server.post('/partnerships-email', async (req, res) => {
