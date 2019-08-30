@@ -1,3 +1,4 @@
+import { AsyncStorage } from 'react-native'
 import { mnemonicToSeedHex } from 'react-native-bip39'
 import { call, put, spawn, takeLeading } from 'redux-saga/effects'
 import { setBackupCompleted } from 'src/account'
@@ -15,6 +16,7 @@ export function* importBackupPhraseSaga(action: ImportBackupPhraseAction) {
   const privateKey = mnemonicToSeedHex(phrase)
   const account = yield call(assignAccountFromPrivateKey, privateKey)
   if (account) {
+    yield call(AsyncStorage.setItem, 'mnemonic', phrase)
     yield put(setBackupCompleted())
     yield put(redeemComplete(true))
     yield put(refreshAllBalances())
