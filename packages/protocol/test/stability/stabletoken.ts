@@ -313,12 +313,9 @@ contract('StableToken', (accounts: string[]) => {
     })
 
     describe('#when there is 0.5% weekly inflation', () => {
-      beforeEach(async () => {
+      it('should return depreciated balance value', async () => {
         await stableToken.setInflationParameters(1005, 1000, SECONDS_IN_A_WEEK)
         await timeTravel(SECONDS_IN_A_WEEK, web3)
-      })
-
-      it('should return depreciated balance value', async () => {
         const adjustedBalance = (await stableToken.balanceOf(minter)).toNumber()
         assert.equal(adjustedBalance, 995)
       })
