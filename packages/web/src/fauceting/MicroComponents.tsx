@@ -87,7 +87,7 @@ export function ButtonWithFeedback({
   const isInvalid = requestState === RequestState.Invalid
   const isStarted = requestState === RequestState.Working
   const isEnded = requestState === RequestState.Completed || requestState === RequestState.Failed
-  const icon = isStarted && <Spinner color={colors.white} size="small" />
+  const icon = isStarted && <Spinner color={colors.primary} size="small" />
 
   return (
     <Button

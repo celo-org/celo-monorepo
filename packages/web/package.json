@@ -42,6 +42,7 @@
     "js-cookie": "^2.2.0",
     "load-segment": "^1.0.1",
     "lodash.throttle": "^4.1.1",
+    "lottie-web": "^5.5.7",
     "mailgun-js": "^0.22.0",
     "mobile-detect": "^1.4.2",
     "net": "^1.0.2",

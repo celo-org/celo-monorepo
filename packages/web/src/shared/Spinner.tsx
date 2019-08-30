@@ -1,32 +1,22 @@
-import { Image, StyleSheet } from 'react-native'
-import { colors } from '../styles'
 import { memo } from 'react'
+import LottieBase from 'src/animate/LottieBase'
+import { colors } from 'src/styles'
 interface Props {
   color: colors.white | colors.dark | colors.primary
-  size: 'small' | 'medium' | 'large'
+  size: 'small' | 'medium'
 }
 
-const SPINNERS = {
-  [colors.primary]: require('src/shared/greenSpinner.gif'),
-  [colors.white]: require('src/shared/whiteSpinner.gif'),
-  [colors.dark]: require('src/shared/darkSpinner.gif'),
+const PATHS = {
+  [colors.primary]: 'greenSpinner.json',
+  [colors.white]: 'whiteSpinner.json',
+  [colors.dark]: 'darkSpinner.json',
+}
+
+const SIZE = {
+  small: 25,
+  medium: 50,
 }
 
 export default memo(function Spinner(props: Props) {
-  return <Image resizeMode={'contain'} source={SPINNERS[props.color]} style={styles[props.size]} />
-})
-
-const styles = StyleSheet.create({
-  small: {
-    height: 20,
-    width: 20,
-  },
-  medium: {
-    height: 30,
-    width: 30,
-  },
-  large: {
-    height: 50,
-    width: 50,
-  },
+  return <LottieBase path={PATHS[props.color]} size={SIZE[props.size]} />
 })
