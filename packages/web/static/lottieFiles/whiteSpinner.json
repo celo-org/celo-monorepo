@@ -172,7 +172,6 @@
                     "ix": 2
                   },
                   "nm": "Path 1",
-                  "mn": "ADBE Vector Shape - Group",
                   "hd": false
                 },
                 {
@@ -184,7 +183,6 @@
                   "lj": 2,
                   "bm": 0,
                   "nm": "Stroke 1",
-                  "mn": "ADBE Vector Graphic - Stroke",
                   "hd": false
                 },
                 {
@@ -204,7 +202,6 @@
               "cix": 2,
               "bm": 0,
               "ix": 1,
-              "mn": "ADBE Vector Group",
               "hd": false
             },
             {
@@ -240,8 +237,6 @@
               "o": { "a": 0, "k": 0, "ix": 3 },
               "m": 1,
               "ix": 2,
-              "nm": "Trim Paths 1",
-              "mn": "ADBE Vector Filter - Trim",
               "hd": false
             }
           ],
