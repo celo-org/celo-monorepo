@@ -107,7 +107,8 @@ library FixidityLib {
    * @notice Maximum value that can be safely used as a dividend.
    * @dev divide(maxFixedDiv,newFixedFraction(1,fixed1())) = maxUint256().
    * Test maxFixedDiv() equals maxUint256()/fixed1()
-   * Test divide(maxFixedDiv(),multiply(mulPrecision(),mulPrecision())) = maxFixedDiv()*(10^digits())
+   * Test divide(maxFixedDiv(),multiply(mulPrecision(),mulPrecision())) =
+   *        maxFixedDiv()*(10^digits())
    * Test divide(maxFixedDiv()+1,multiply(mulPrecision(),mulPrecision())) throws
    * Hardcoded to 24 digits.
    */
@@ -245,8 +246,10 @@ library FixidityLib {
    * Test multiply(fixed1(),maxFixedMul()) returns maxFixedMul()
    * Test all combinations of (2,-2), (2, 2.5), (2, -2.5) and (0.5, -0.5)
    * Test multiply(fixed1()/mulPrecision(),fixed1()*mulPrecision())
-   * Test multiply(maxFixedMul()-1,maxFixedMul()) equals multiply(maxFixedMul(),maxFixedMul()-1)
-   * Test multiply(maxFixedMul(),maxFixedMul()) returns maxUint256() // Probably not to the last digits
+   * Test multiply(maxFixedMul()-1,maxFixedMul()) equals
+   *        multiply(maxFixedMul(),maxFixedMul()-1)
+   * Test multiply(maxFixedMul(),maxFixedMul()) returns
+   *        maxUint256() // Probably not to the last digits
    * Test multiply(maxFixedMul()+1,maxFixedMul()) fails
    * Test multiply(maxFixedMul(),maxFixedMul()+1) fails
    */

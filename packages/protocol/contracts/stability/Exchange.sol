@@ -162,8 +162,10 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);
 
     FixidityLib.Fraction memory reducedSellAmount = getReducedSellAmount(sellAmount);
-    FixidityLib.Fraction memory numerator = reducedSellAmount.multiply(FixidityLib.newFixed(buyTokenBucket));
-    FixidityLib.Fraction memory denominator = FixidityLib.newFixed(sellTokenBucket).add(reducedSellAmount);
+    FixidityLib.Fraction memory numerator =
+      reducedSellAmount.multiply(FixidityLib.newFixed(buyTokenBucket));
+    FixidityLib.Fraction memory denominator =
+      FixidityLib.newFixed(sellTokenBucket).add(reducedSellAmount);
 
     return uint256(numerator.divide(denominator).fromFixed());
   }
@@ -268,7 +270,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     FixidityLib.Fraction memory reducedSellAmount = getReducedSellAmount(sellAmount);
     FixidityLib.Fraction memory numerator =
       reducedSellAmount.multiply(FixidityLib.newFixed(buyTokenBucket));
-    FixidityLib.Fraction memory denominator = FixidityLib.newFixed(sellTokenBucket).add(reducedSellAmount);
+    FixidityLib.Fraction memory denominator =
+      FixidityLib.newFixed(sellTokenBucket).add(reducedSellAmount);
 
     return uint256(numerator.divide(denominator).fromFixed());
   }
