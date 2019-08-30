@@ -45,7 +45,7 @@
     "@types/web3": "^1.0.18",
     "firebase-bolt": "^0.8.3",
     "firebase-functions-test": "^0.1.6",
-    "firebase-tools": "^6.3.1",
+    "firebase-tools": "^7.3.0",
     "minimist": "^1.2.0",
     "supertest": "^3.4.2"
   },
