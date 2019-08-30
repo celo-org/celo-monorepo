@@ -133,7 +133,7 @@ export class Backup extends React.Component<Props, State> {
         <BackupComplete
           backupCompleted={backupCompleted}
           onPress={this.onFinish}
-          mnemonic={this.state.mnemonic}
+          mnemonic={mnemonic}
         />
       )
     }
