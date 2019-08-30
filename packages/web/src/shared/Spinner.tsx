@@ -1,7 +1,7 @@
 import { memo } from 'react'
+import { StyleSheet, View } from 'react-native'
 import LottieBase from 'src/animate/LottieBase'
 import { colors } from 'src/styles'
-import { StyleSheet, View } from 'react-native'
 interface Props {
   color: colors.white | colors.dark | colors.primary
   size: 'small' | 'medium'
