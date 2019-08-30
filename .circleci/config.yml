@@ -213,10 +213,11 @@ jobs:
       - attach_workspace:
           at: ~/app
       - run:
-          command: |
-            yarn --cwd=packages/contractkit test:prepare
-            yarn --cwd=packages/contractkit test
-
+          name: Test Prepare
+          command: yarn --cwd=packages/contractkit test:prepare
+      - run:
+          name: Run Tests      
+          command: yarn --cwd=packages/contractkit test
 
   walletkit-test:
     <<: *defaults
