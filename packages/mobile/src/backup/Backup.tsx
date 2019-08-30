@@ -119,7 +119,6 @@ export class Backup extends React.Component<Props, State> {
   }
 
   onFinish = async () => {
-    this.props.exitBackupFlow()
     this.props.setBackupCompleted()
     navigateBack()
   }
