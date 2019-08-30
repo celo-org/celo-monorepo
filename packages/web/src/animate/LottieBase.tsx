@@ -1,13 +1,11 @@
 import lottie, { AnimationItem } from 'lottie-web'
 import * as React from 'react'
-import { View } from 'react-native'
 interface Props {
   path: string
-  size: number
 }
 
 export default class LottieBase extends React.Component<Props> {
-  elementRef = React.createRef<HTMLElement>()
+  elementRef = React.createRef<HTMLSpanElement>()
 
   animation: AnimationItem
 
@@ -26,10 +24,8 @@ export default class LottieBase extends React.Component<Props> {
   }
 
   render() {
-    return (
-      <View style={[{ width: this.props.size, height: this.props.size }]}>
-        <span ref={this.elementRef} style={{ width: '100%', height: '100%' }} />
-      </View>
-    )
+    return <span ref={this.elementRef} style={expand} />
   }
 }
+
+const expand = { width: '100%', height: '100%' }

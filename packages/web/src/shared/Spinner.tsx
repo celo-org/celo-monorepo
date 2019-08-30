@@ -1,6 +1,7 @@
 import { memo } from 'react'
 import LottieBase from 'src/animate/LottieBase'
 import { colors } from 'src/styles'
+import { StyleSheet, View } from 'react-native'
 interface Props {
   color: colors.white | colors.dark | colors.primary
   size: 'small' | 'medium'
@@ -12,11 +13,21 @@ const PATHS = {
   [colors.dark]: 'darkSpinner.json',
 }
 
-const SIZE = {
-  small: 25,
-  medium: 50,
-}
-
 export default memo(function Spinner(props: Props) {
-  return <LottieBase path={PATHS[props.color]} size={SIZE[props.size]} />
+  return (
+    <View style={styles[props.size]}>
+      <LottieBase path={PATHS[props.color]} />
+    </View>
+  )
+})
+
+const styles = StyleSheet.create({
+  small: {
+    width: 25,
+    height: 25,
+  },
+  medium: {
+    width: 50,
+    height: 50,
+  },
 })
