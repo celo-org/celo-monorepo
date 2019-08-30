@@ -9,6 +9,7 @@ import { getReclaimEscrowFee } from 'src/escrow/saga'
 import { FeeType } from 'src/fees/actions'
 import { getInvitationVerificationFee } from 'src/invite/saga'
 import { getSendFee } from 'src/send/saga'
+import Logger from 'src/utils/Logger'
 
 export type CalculateFeeChildren = (
   asyncResult: UseAsyncReturn<BigNumber, never>
@@ -73,6 +74,7 @@ function useAsyncShowError<R, Args extends any[]>(
     () => {
       // Generic error banner
       if (asyncResult.error) {
+        Logger.error(`CalculateFee`, 'Error calculating fee', asyncResult.error)
         showErrorFunction(ErrorMessages.CALCULATE_FEE_FAILED)
       }
     },
