@@ -8,7 +8,7 @@ set -euo pipefail
 
 NETWORK=""
 
-while getopts 'a:n:' flag; do
+while getopts 'a:n:t:' flag; do
   case "${flag}" in
     n) NETWORK="$OPTARG" ;;
     t) TOKEN="$OPTARG" ;;
