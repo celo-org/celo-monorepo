@@ -8,6 +8,7 @@ import { Clipboard, StyleSheet, Text, View } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import BackupPhraseContainer from 'src/backup/BackupPhraseContainer'
 import { Namespaces } from 'src/i18n'
 import NuxLogo from 'src/icons/NuxLogo'
 import Logger from 'src/utils/Logger'
@@ -43,7 +44,7 @@ class BackupComplete extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, backupCompleted } = this.props
+    const { t, backupCompleted, mnemonic } = this.props
     return (
       <View style={styles.container}>
         <View style={styles.questionTextContainer}>
@@ -52,6 +53,7 @@ class BackupComplete extends React.Component<Props, State> {
             {t(backupCompleted ? 'backupKey' : 'backupKeySet')}
           </Text>
           <Text style={fontStyles.body}>{t('dontLoseIt')}</Text>
+          {backupCompleted && <BackupPhraseContainer words={mnemonic} />}
           <SmallButton
             text={t('copyToClipboard')}
             testID={'pasteMessageButton'}
