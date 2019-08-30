@@ -90,7 +90,7 @@ describe('SendConfirmation', () => {
       recipientAddress: mockAccount,
       amount: new BigNumber(10),
       reason: 'My Reason',
-      isPaymentRequest: true,
+      isPaymentRequest: true, //TODO
     })
 
     mockedGetSendFee.mockImplementation(async () => TEST_FEE)
@@ -118,7 +118,7 @@ describe('SendConfirmation', () => {
       recipientAddress: mockAccount,
       amount: new BigNumber(10),
       reason: 'My Reason',
-      isPaymentRequest: true,
+      isPaymentRequest: true, //TODO
     })
 
     mockedGetSendFee.mockImplementation(async () => {

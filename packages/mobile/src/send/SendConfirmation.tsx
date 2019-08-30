@@ -32,8 +32,6 @@ import { fetchDollarBalance } from 'src/stableToken/actions'
 import { TransactionTypes } from 'src/transactions/reducer'
 import { currentAccountSelector } from 'src/web3/selectors'
 
-const numeral = require('numeral')
-
 export interface ConfirmationInput {
   recipient: Recipient
   amount: BigNumber
@@ -187,9 +185,8 @@ class SendConfirmation extends React.Component<Props, State> {
 
     const currentBalance = this.props.dollarBalance
     const fee = getFeeDollars(asyncFee.result)
-    const amountWithFee = new BigNumber(numeral(amount).value()).plus(fee || 0)
+    const amountWithFee = amount.plus(fee || 0)
     const userHasEnough = !asyncFee.loading && amountWithFee.isLessThanOrEqualTo(currentBalance)
-    const { isPaymentRequest } = this.getNavParams()
     const isPrimaryButtonDisabled = isSending || !userHasEnough || !appConnected || !!asyncFee.error
     let primaryBtnInfo = {
       action: this.onSendButtonClick,
@@ -197,7 +194,7 @@ class SendConfirmation extends React.Component<Props, State> {
       disabled: isPrimaryButtonDisabled,
     }
     let secondaryBtnInfo = { action: this.onPressEdit, text: t('edit'), disabled: isSending }
-    if (isPaymentRequest) {
+    if (type === TransactionTypes.PAY_REQUEST) {
       primaryBtnInfo = {
         action: this.sendOrInvite,
         text: i18n.t('paymentRequestFlow:pay'),
