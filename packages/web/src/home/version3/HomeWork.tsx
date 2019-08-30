@@ -19,10 +19,10 @@ class HomeWork extends React.PureComponent<Props> {
         tabletStyle={[standardStyles.sectionMarginTablet]}
         desktopStyle={[standardStyles.sectionMargin]}
       >
-        <Cell span={Spans.half} style={{ alignItems: 'center' }}>
+        <Cell span={Spans.half} style={styles.alignCenter}>
           <Fade bottom={true} duration={750} distance="20px">
             <View>
-              <H1 accessibilityRole={'heading'} style={textStyles.center}>
+              <H1 ariaLevel="2" accessibilityRole={'heading'} style={textStyles.center}>
                 {this.props.t('workOnCelo')}
               </H1>
             </View>
@@ -41,4 +41,5 @@ const styles = StyleSheet.create({
   spacer: {
     height: 30,
   },
+  alignCenter: { alignItems: 'center' },
 })

@@ -15,7 +15,7 @@ contract UsingRegistry is Ownable {
 
   // solhint-disable state-visibility
   string constant ATTESTATIONS_REGISTRY_ID = "Attestations";
-  string constant BONDED_DEPOSITS_REGISTRY_ID = "BondedDeposits";
+  string constant LOCKED_GOLD_REGISTRY_ID = "LockedGold";
   string constant GAS_CURRENCY_WHITELIST_REGISTRY_ID = "GasCurrencyWhitelist";
   string constant GOLD_TOKEN_REGISTRY_ID = "GoldToken";
   string constant GOVERNANCE_REGISTRY_ID = "Governance";

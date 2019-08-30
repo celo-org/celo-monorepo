@@ -24,7 +24,7 @@ export class Team extends React.Component<Props & I18nProps> {
       <View style={styles.container}>
         <GridRow allStyle={standardStyles.centered}>
           <Cell span={Spans.half}>
-            <H1 style={[textStyles.center, standardStyles.elementalMarginBottom]}>
+            <H1 ariaLevel="2" style={[textStyles.center, standardStyles.elementalMarginBottom]}>
               {t('coreContributors')}
             </H1>
             <H4 style={textStyles.center}>{t('InNoOrder')}</H4>

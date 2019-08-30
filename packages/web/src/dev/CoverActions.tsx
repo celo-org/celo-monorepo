@@ -7,6 +7,7 @@ import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import { CeloLinks } from 'src/shared/menu-items'
 import { standardStyles } from 'src/styles'
 const docImage = require('src/dev/Documentation.png')
+const sdkImage = require('src/dev/SDK.png')
 const faucetImage = require('src/dev/Faucet.png')
 const evmImg = require('src/dev/features/evm.png')
 
@@ -61,7 +62,7 @@ export default withNamespaces('dev')(
             />
 
             <CoverAction
-              graphic={evmImg}
+              graphic={sdkImage}
               isMobile={screen === ScreenSizes.MOBILE}
               title={t('coverAction.sdk.title')}
               text={t('coverAction.sdk.text')}

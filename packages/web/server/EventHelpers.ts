@@ -4,6 +4,7 @@ const Tabletop = require('tabletop')
 
 import getConfig from 'next/config'
 import { EventProps } from '../fullstack/EventProps'
+import Sentry from '../fullstack/sentry'
 import { abort } from '../src/utils/abortableFetch'
 
 // Intermediate step Event With all String Values
@@ -66,7 +67,10 @@ export function intializeTableTop() {
       })
     } catch (e) {
       resolve([])
-      console.error(e)
+      Sentry.withScope((scope) => {
+        scope.setTag('Service', 'GoogleSheets')
+        Sentry.captureException(e)
+      })
     }
   })
   return Promise.race([promise, abort(getURL(), 3000).catch(() => [])])

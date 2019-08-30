@@ -54,7 +54,7 @@ export default class ContactCircle extends React.PureComponent<Props> {
   }
 
   render() {
-    const { address, contact, size } = this.props
+    const { address, contact, size, children } = this.props
     const iconColor =
       (contact && getContactColor(contact)) ||
       (address && getAddressColor(address)) ||
@@ -68,7 +68,7 @@ export default class ContactCircle extends React.PureComponent<Props> {
             { backgroundColor: iconColor, height: size, width: size, borderRadius: size / 2 },
           ]}
         >
-          {this.getContactCircleInner()}
+          {children ? children : this.getContactCircleInner()}
         </View>
       </View>
     )
