@@ -49,6 +49,7 @@ describe('SendConfirmation', () => {
     expect(queryByText('securityFee')).not.toBeNull()
     expect(queryByText('0.001')).toBeNull()
 
+    // TODO figure out why this waitForElement isn't working here and in tests below.
     // Wait for fee to be calculated and displayed
     // await waitForElement(() => getByText('0.001'))
     // expect(queryByText('0.001')).not.toBeNull()
