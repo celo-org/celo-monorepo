@@ -1,6 +1,4 @@
-import { Attestations, Validators } from '@celo/walletkit'
 import { flags } from '@oclif/command'
-
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -18,7 +16,7 @@ export default class ValidatorRegister extends BaseCommand {
     publicKey: Flags.publicKey({ required: true }),
     noticePeriod: flags.string({
       required: true,
-      description: 'Notice Period for the Bonded deposit to use',
+      description: 'Notice period of the Locked Gold commitment',
     }),
   }
 
@@ -27,10 +25,12 @@ export default class ValidatorRegister extends BaseCommand {
   ]
   async run() {
     const res = this.parse(ValidatorRegister)
-    const contract = await Validators(this.web3, res.flags.from)
+    this.kit.defaultAccount = res.flags.from
+    const validators = await this.kit.contracts.getValidators()
+    const attestations = await this.kit.contracts.getAttestations()
     await displaySendTx(
       'registerValidator',
-      contract.methods.registerValidator(
+      validators.registerValidator(
         res.flags.id,
         res.flags.name,
         res.flags.url,
@@ -40,11 +40,10 @@ export default class ValidatorRegister extends BaseCommand {
     )
 
     // register encryption key on attestations contract
-    const attestations = await Attestations(this.web3, res.flags.from)
     // TODO: Use a different key data encryption
     const pubKey = await getPubKeyFromAddrAndWeb3(res.flags.from, this.web3)
-    // @ts-ignore
-    const setKeyTx = attestations.methods.setAccountDataEncryptionKey(pubKey)
+    // TODO fix typing
+    const setKeyTx = attestations.setAccountDataEncryptionKey(pubKey as any)
     await displaySendTx('Set encryption key', setKeyTx)
   }
 }

@@ -55,6 +55,10 @@ export const mockE164NumberToInvitableRecipient = {
   [mockE164Number]: mockInvitableRecipient,
 }
 
+export const mockRecipientCache = {
+  [mockE164Number]: mockRecipient,
+}
+
 export const mockRecipientWithPhoneNumber: RecipientWithMobileNumber = {
   kind: RecipientKind.MobileNumber,
   address: mockAccount,

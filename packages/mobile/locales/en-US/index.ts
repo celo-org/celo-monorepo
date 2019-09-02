@@ -1,5 +1,6 @@
 import accountScreen10 from '@celo/mobile/locales/en-US/accountScreen10.json'
 import backupKeyFlow6 from '@celo/mobile/locales/en-US/backupKeyFlow6.json'
+import dappkit from '@celo/mobile/locales/en-US/dappkit.json'
 import dev from '@celo/mobile/locales/en-US/dev.json'
 import exchangeFlow9 from '@celo/mobile/locales/en-US/exchangeFlow9.json'
 import global from '@celo/mobile/locales/en-US/global.json'
@@ -28,4 +29,5 @@ export default {
   sendFlow7,
   walletFlow5,
   dev,
+  dappkit,
 }

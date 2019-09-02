@@ -45,7 +45,7 @@ export class DevSkipButton extends React.Component<Props> {
             <TouchableOpacity
               style={[styles.devButton, styles.debugButton]}
               onPress={this.showDebug}
-              testID={`ButtonDevScreen`}
+              testID={'ButtonDevScreen'}
             />
             <TouchableOpacity
               style={[styles.devButton, styles.skipButton]}

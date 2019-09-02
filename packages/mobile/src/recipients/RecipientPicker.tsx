@@ -64,6 +64,7 @@ interface Section {
 }
 
 interface Props {
+  testID?: string
   showQRCode: boolean
   searchQuery: string
   sections: Section[]
@@ -232,7 +233,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     const showFooter = sections.length > 0
 
     return (
-      <View style={style.body}>
+      <View style={style.body} testID={this.props.testID}>
         <DisconnectBanner />
         <LabeledTextInput
           keyboardType="default"

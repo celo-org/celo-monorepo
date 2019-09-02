@@ -248,8 +248,7 @@ exports[`PaymentRequestNotification renders correctly 1`] = `
             ]
           }
         >
-          $
-          24
+          $24
         </Text>
       </View>
     </View>

@@ -106,6 +106,7 @@ export interface TxToSignParam {
   to: string
   nonce: number
   gasCurrencyAddress: string
+  value: string
 }
 
 export interface SignTxRequest extends DappKitRequestBase {
@@ -122,13 +123,32 @@ export const SignTxRequest = (txs: TxToSignParam[], meta: DappKitRequestMeta): S
     to: tx.to,
     nonce: tx.nonce,
     gasCurrencyAddress: tx.gasCurrencyAddress,
+    value: tx.value,
   })),
   ...meta,
 })
 
 export type DappKitRequest = AccountAuthRequest | SignTxRequest
 
+function assertString(objectName: string, key: string, value: any) {
+  if (value === undefined) {
+    throw new Error(`Expected ${objectName} to contain ${key}`)
+  }
+
+  if (typeof value !== 'string') {
+    throw new Error(`Expected ${objectName}[${key}] to be a string, but is ${typeof value}`)
+  }
+
+  return
+}
+
 export function serializeDappKitRequestDeeplink(request: DappKitRequest) {
+  // TODO: Probably use a proper validation library here
+  assertString('request', 'type', request.type)
+  assertString('request', 'requestId', request.requestId)
+  assertString('request', 'callback', request.callback)
+  assertString('request', 'dappName', request.dappName)
+
   let params: any = {
     type: request.type,
     requestId: request.requestId,
@@ -141,8 +161,11 @@ export function serializeDappKitRequestDeeplink(request: DappKitRequest) {
         ...params,
         txs: Buffer.from(JSON.stringify(request.txs), 'utf8').toString('base64'),
       }
-    default:
       break
+    case DappKitRequestTypes.ACCOUNT_ADDRESS:
+      break
+    default:
+      throw new Error(`Invalid DappKitRequest type: ${JSON.stringify(request)}`)
   }
 
   return DAPPKIT_BASE_HOST + '?' + stringify(params)
@@ -150,11 +173,17 @@ export function serializeDappKitRequestDeeplink(request: DappKitRequest) {
 
 // TODO: parsing query params yields broad types
 // once interface stabilizes, properly type the parsing
-export function parseDappkitResponseDepplink(url: string): DappKitResponse {
+export function parseDappkitResponseDeeplink(url: string): DappKitResponse & { requestId: string } {
   const rawParams = parse(url, true)
   if (rawParams.query.type === undefined) {
     throw new Error('Invalid Deeplink: does not contain type:' + url)
   }
+
+  if (rawParams.query.requestId === undefined) {
+    throw new Error('Invalid Deeplink: does not contain requestId')
+  }
+
+  const requestId = rawParams.query.requestId as string
 
   switch (rawParams.query.type) {
     case DappKitRequestTypes.ACCOUNT_ADDRESS:
@@ -165,11 +194,13 @@ export function parseDappkitResponseDepplink(url: string): DappKitResponse {
           status: DappKitResponseStatus.SUCCESS,
           address: rawParams.query.account,
           phoneNumber: rawParams.query.phoneNumber,
+          requestId,
         }
       } else {
         return {
           type: DappKitRequestTypes.ACCOUNT_ADDRESS,
           status: DappKitResponseStatus.UNAUTHORIZED,
+          requestId,
         }
       }
     case DappKitRequestTypes.SIGN_TX:
@@ -183,11 +214,13 @@ export function parseDappkitResponseDepplink(url: string): DappKitResponse {
           type: DappKitRequestTypes.SIGN_TX,
           status: DappKitResponseStatus.SUCCESS,
           rawTxs,
+          requestId,
         }
       } else {
         return {
           type: DappKitRequestTypes.SIGN_TX,
           status: DappKitResponseStatus.UNAUTHORIZED,
+          requestId,
         }
       }
     default:

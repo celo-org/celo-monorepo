@@ -7,7 +7,6 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
 import { hashNav } from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
-import { TextStyles } from 'src/shared/Styles'
 import { fonts, standardStyles, textStyles } from 'src/styles'
 
 export class Backers extends React.Component<I18nProps> {
@@ -19,6 +18,7 @@ export class Backers extends React.Component<I18nProps> {
         <GridRow allStyle={standardStyles.centered}>
           <Cell span={Spans.three4th}>
             <H1
+              ariaLevel="2"
               style={[textStyles.center, standardStyles.elementalMarginBottom]}
               id={hashNav.about.backers}
             >
@@ -44,9 +44,7 @@ export class Backers extends React.Component<I18nProps> {
                         style={styles.photo}
                       />
                     ) : (
-                      <Responsive medium={[TextStyles.mediumMain, styles.centerText]}>
-                        <Text style={[TextStyles.small, styles.centerText]}>{backer.name}</Text>
-                      </Responsive>
+                      <Text style={[fonts.h4, textStyles.center]}>{backer.name}</Text>
                     )}
                   </View>
                 </Responsive>
@@ -61,6 +59,7 @@ export class Backers extends React.Component<I18nProps> {
         >
           <Cell span={Spans.full}>
             <H1
+              ariaLevel="2"
               style={[textStyles.center, standardStyles.elementalMarginBottom]}
               id={hashNav.about.backers}
             >

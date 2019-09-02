@@ -14,14 +14,13 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
 import { writePaymentRequest } from 'src/firebase/firebase'
 import { currencyToShortMap } from 'src/geth/consts'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
+import TransferReviewCard from 'src/send/TransferReviewCard'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { TransactionTypes } from 'src/transactions/reducer'
 import Logger from 'src/utils/Logger'
@@ -111,12 +110,12 @@ class RequestConfirmation extends React.Component<Props> {
         this.props.writePaymentRequest(paymentInfo)
       } catch (error) {
         Logger.error(TAG, 'Payment request failed, show error message', error)
-        this.props.showError(ErrorMessages.PAYMENT_REQUEST_FAILED, ALERT_BANNER_DURATION)
+        this.props.showError(ErrorMessages.PAYMENT_REQUEST_FAILED)
         return
       }
     } else {
       // TODO: handle unverified recepients, maybe send them a sms to download the app?
-      this.props.showError(ErrorMessages.CAN_NOT_REQUEST_FROM_UNVERIFIED, ALERT_BANNER_DURATION)
+      this.props.showError(ErrorMessages.CAN_NOT_REQUEST_FROM_UNVERIFIED)
       Logger.info(
         'RequestConfirmation/onConfirm',
         'Currently requesting from unverified users is not supported'
@@ -160,7 +159,7 @@ class RequestConfirmation extends React.Component<Props> {
           }}
           modifyButton={{ action: this.onPressEdit, text: t('edit'), disabled: false }}
         >
-          <TransferConfirmationCard
+          <TransferReviewCard
             type={TransactionTypes.PAY_REQUEST}
             recipient={recipient}
             address={requesteeAddress || ''}

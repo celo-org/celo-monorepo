@@ -33,7 +33,7 @@ export async function getMatchingPolicyNameIfExists(displayName: string) {
   }
 }
 
-export async function uploadPolicies(celoEnv: string, policies: any[]) {
+export async function uploadPolicies(celoEnv: string, policies: any[], dryRun: boolean) {
   const policiesDir = getPoliciesDir(celoEnv)
   if (!fs.existsSync(policiesDir)) {
     await execCmd(`mkdir -p ${policiesDir}`)
@@ -46,15 +46,18 @@ export async function uploadPolicies(celoEnv: string, policies: any[]) {
     )
     try {
       await writeFile(policyFilePath, policyString)
-      const matchingPolicyName = await getMatchingPolicyNameIfExists(policy.displayName)
-      if (matchingPolicyName) {
-        await execCmd(
-          `gcloud alpha monitoring policies update ${matchingPolicyName} --policy-from-file=${policyFilePath}`
-        )
-      } else {
-        await execCmd(
-          `gcloud alpha monitoring policies create --policy-from-file=${policyFilePath}`
-        )
+
+      if (!dryRun) {
+        const matchingPolicyName = await getMatchingPolicyNameIfExists(policy.displayName)
+        if (matchingPolicyName) {
+          await execCmd(
+            `gcloud alpha monitoring policies update ${matchingPolicyName} --policy-from-file=${policyFilePath}`
+          )
+        } else {
+          await execCmd(
+            `gcloud alpha monitoring policies create --policy-from-file=${policyFilePath}`
+          )
+        }
       }
     } catch (error) {
       console.error(`Unable to update/create policy at ${policyFilePath}:\n${error}`)

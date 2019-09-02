@@ -12,23 +12,26 @@ export const nuxNavigationOptions = {
   },
   headerLeftContainerStyle: { paddingHorizontal: 20 },
   headerLeft: <BackButton />,
-  headerRightContainerStyle: { paddingRight: 15 },
-  headerRight: (
-    <View>
-      <DisconnectBanner />
-    </View>
-  ),
+  headerRightContainerStyle: { paddingHorizontal: 20 },
+  headerRight: <View />,
+  headerTitle: <DisconnectBanner />,
+  headerTitleContainerStyle: {
+    paddingTop: 5,
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+  },
 }
 
 export const nuxNavigationOptionsNoBackButton = {
   ...nuxNavigationOptions,
-  headerLeft: null,
+  headerLeft: <View />,
 }
 
 export const headerWithBackButton = {
   headerTitle: '',
   headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
-  headerLeftContainerStyle: { paddingHorizontal: 10 },
+  headerLeftContainerStyle: { paddingHorizontal: 20 },
   headerLeft: <BackButton />,
   headerRight: <View />, // This helps vertically center the title
 }

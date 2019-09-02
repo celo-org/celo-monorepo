@@ -1,47 +1,40 @@
 import { CURRENCY_ENUM } from '@celo/utils'
 import { ContractUtils } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
-import { call, put, select } from 'redux-saga/effects'
-import { showError } from 'src/alert/actions'
-import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
-import { GAS_PRICE_STALE_AFTER } from 'src/geth/consts'
-import { waitWeb3LastBlock } from 'src/networkInfo/saga'
-import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
-import { setGasPrice } from 'src/web3/actions'
 import { web3 } from 'src/web3/contracts'
 
 const TAG = 'web3/gas'
+const GAS_PRICE_STALE_AFTER = 150000 // 15 seconds
 
-export const gasPriceSelector = (state: RootState) => state.web3.gasPrice
-export const gasPriceLastUpdatedSelector = (state: RootState) => state.web3.gasPriceLastUpdated
+let gasPrice: BigNumber | null = null
+let gasPriceLastUpdated: number | null = null
 
-export function* refreshGasPrice() {
-  yield call(waitWeb3LastBlock)
-
-  let gasPrice = yield select(gasPriceSelector)
-  const gasPriceLastUpdated = yield select(gasPriceLastUpdatedSelector)
+export async function getGasPrice(currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR) {
+  Logger.debug(`${TAG}}/getGasPrice`, 'Getting gas price')
 
   try {
-    if (Date.now() - gasPriceLastUpdated >= GAS_PRICE_STALE_AFTER || gasPrice === undefined) {
-      gasPrice = yield call(fetchGasPrice)
-      yield put(setGasPrice(gasPrice.toNumber()))
+    if (
+      !gasPriceLastUpdated ||
+      !gasPrice ||
+      Date.now() - gasPriceLastUpdated >= GAS_PRICE_STALE_AFTER
+    ) {
+      gasPrice = await fetchGasPrice(currency)
+      gasPriceLastUpdated = Date.now()
     }
+    return gasPrice
   } catch (error) {
-    Logger.error(`${TAG}}/refreshGasPrice`, 'Could not fetch and update gas price.', error)
-    yield put(showError(ErrorMessages.GAS_PRICE_UPDATE_FAILED, ALERT_BANNER_DURATION))
+    Logger.error(`${TAG}}/getGasPrice`, 'Could not fetch and update gas price.', error)
+    throw new Error('Error fetching gas price')
   }
 }
 
-export const fetchGasPrice = async (currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR) => {
-  const gasPrice = new BigNumber(await ContractUtils.getGasPrice(web3, currency))
+async function fetchGasPrice(currency: CURRENCY_ENUM) {
+  const latestGasPrice = new BigNumber(await ContractUtils.getGasPrice(web3, currency))
   Logger.debug(
     TAG,
     'fetchGasPrice',
-    `Gas price fetched in ${currency} with value:`,
-    gasPrice.toString()
+    `Gas price fetched in ${currency} with value: ${latestGasPrice.toString()}`
   )
-
-  return gasPrice
+  return latestGasPrice
 }

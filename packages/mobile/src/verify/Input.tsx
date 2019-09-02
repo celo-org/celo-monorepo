@@ -114,8 +114,8 @@ export class Input extends React.Component<Props, State> {
     return (
       <View style={style.container}>
         <DevSkipButton nextScreen={Screens.VerifyVerifying} />
+        <DisconnectBanner />
         <ScrollView style={style.content} ref={this.scrollView} keyboardShouldPersistTaps="always">
-          <DisconnectBanner />
           <NuxLogo testID="VerifyLogo" />
           <Text style={[fontStyles.h1, style.title]}>{t('enterPhoneToVerify')}</Text>
           <PhoneNumberInput

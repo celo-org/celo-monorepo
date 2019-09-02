@@ -1,5 +1,6 @@
 /* tslint:disable: no-console */
-import { envVar, execBackgroundCmd, execCmd, fetchEnv } from '@celo/celotool/src/lib/utils'
+import { envVar, fetchEnv, isVmBased } from '@celo/celotool/src/lib/env-utils'
+import { execBackgroundCmd, execCmd } from '@celo/celotool/src/lib/utils'
 import { ChildProcess, spawnSync } from 'child_process'
 
 function sleep(ms: number) {
@@ -19,6 +20,26 @@ function getDefaultComponent() {
 }
 
 function getPortForwardCmd(celoEnv: string, component?: string, ports = defaultPortsString) {
+  if (isVmBased()) {
+    return getVmPortForwardCmd(celoEnv, ports)
+  } else {
+    return getKubernetesPortForwardCmd(celoEnv, component, ports)
+  }
+}
+
+function getVmPortForwardCmd(celoEnv: string, ports = defaultPortsString) {
+  const zone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+  // this command expects port mappings to be of the form `[localPort]:localhost:[remotePort]`
+  const portMappings = ports.replace(/:/g, ':localhost:').split(' ')
+  const portsWithFlags = portMappings.map((mapping) => `-L ${mapping}`).join(' ')
+  return `gcloud compute ssh --zone ${zone} ${celoEnv}-validator-0 -- -N ${portsWithFlags}`
+}
+
+function getKubernetesPortForwardCmd(
+  celoEnv: string,
+  component?: string,
+  ports = defaultPortsString
+) {
   if (!component) {
     component = getDefaultComponent()
   }

@@ -70,8 +70,7 @@ exports[`PaymentRequestListScreen renders correctly with no requests 1`] = `
           ]
         }
       >
-        $
-        120
+        $120
       </Text>
     </View>
   </View>
@@ -191,8 +190,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
           ]
         }
       >
-        $
-        120
+        $120
       </Text>
     </View>
   </View>
@@ -500,8 +498,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                       ]
                     }
                   >
-                    $
-                    20
+                    $20
                   </Text>
                 </View>
               </View>
@@ -780,8 +777,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                       ]
                     }
                   >
-                    $
-                    102
+                    $102
                   </Text>
                 </View>
               </View>
@@ -1060,8 +1056,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                       ]
                     }
                   >
-                    $
-                    1
+                    $1
                   </Text>
                 </View>
               </View>

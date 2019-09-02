@@ -2,7 +2,7 @@
   "requests": "Requests",
   "empty": "You have no Payment Requests",
   "paymentRequests": "Payment Requests",
-  "celoDollarBalance": "Celo Dollar Balance",
+  "celoDollarBalance": "{{CeloDollar}} Balance",
   "pay": "Pay",
   "decline": "Decline",
   "requestDeclined": "Request Declined",

@@ -17,11 +17,10 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import ExchangeRate from 'src/exchange/ExchangeRate'
 import { ExchangeRatePair } from 'src/exchange/reducer'
-import { CURRENCY_ENUM as Token } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM as Token } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
@@ -90,7 +89,8 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   setExchangeAmount = (amount: string) => {
     // remove $ we inserted for display purposes
-    amount = amount.replace(/\$/g, '')
+    const currencySymbol = new RegExp('\\' + CURRENCIES[Token.DOLLAR].symbol, 'g')
+    amount = amount.replace(currencySymbol, '')
 
     this.setState({ makerTokenAmount: amount }, () => {
       this.updateError(amount)
@@ -99,10 +99,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   updateError(amount: string) {
     if (this.getMakerBalance().isLessThan(amount)) {
-      this.props.showError(
-        this.isDollar() ? ErrorMessages.NSF_DOLLARS : ErrorMessages.NSF_GOLD,
-        ALERT_BANNER_DURATION
-      )
+      this.props.showError(this.isDollar() ? ErrorMessages.NSF_DOLLARS : ErrorMessages.NSF_GOLD)
     } else {
       this.props.hideAlert()
     }
@@ -141,7 +138,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     const { dollarBalance, goldBalance } = this.props
     return isDollar
       ? getNewTakerBalance(goldBalance, takerTokenAmount)
-      : `$${getNewTakerBalance(dollarBalance, takerTokenAmount)}`
+      : CURRENCIES[Token.DOLLAR].symbol + getNewTakerBalance(dollarBalance, takerTokenAmount)
   }
 
   hasError = () => {
@@ -174,7 +171,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   inputValue = () => {
     if (this.state.makerTokenAmount) {
-      return `${this.isDollar() ? '$' : ''}${this.state.makerTokenAmount}`
+      return CURRENCIES[this.state.makerToken].symbol + this.state.makerTokenAmount
     } else {
       return ''
     }
@@ -183,8 +180,8 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   render() {
     const { t } = this.props
 
-    const dollarText = t('celoDollars') + ' (cUSD)'
-    const goldText = t('celoGold') + ' (cGLD)'
+    const dollarText = t('global:celoDollars') + ' (cUSD)'
+    const goldText = t('global:celoGold') + ' (cGLD)'
 
     const makerTokenText = this.isDollar() ? dollarText : goldText
     const takerTokenText = this.isDollar() ? goldText : dollarText
@@ -201,7 +198,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
     const borderStyle = { borderColor: this.hasError() ? colors.errorRed : colors.dark }
 
-    const takerDisplay = `${this.isDollar() ? '' : '$'}${getMoneyDisplayValue(takerTokenAmount)}`
+    const makerSymbol = CURRENCIES[this.state.makerToken].symbol
     return (
       <View style={styles.background}>
         <View>
@@ -222,7 +219,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
                 onFocus={this.recordFocus}
                 value={this.inputValue()}
                 placeholderTextColor={placeholderColor}
-                placeholder={this.isDollar() ? '$0' : '0'}
+                placeholder={makerSymbol + '0'}
                 underlineColorAndroid={'transparent'}
                 style={[
                   styles.input,
@@ -236,7 +233,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               <View style={styles.transferMeta}>
                 <Text style={fontStyles.bodySmall}>{t('available')} </Text>
                 <Text numberOfLines={1} style={[fontStyles.bodySmallBold, inputStyle]}>
-                  {(this.isDollar() ? '$' : '') + this.getFormattedMakerBalance()}
+                  {makerSymbol + this.getFormattedMakerBalance()}
                 </Text>
               </View>
             </View>
@@ -253,7 +250,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               <View style={[styles.outputBox, styles.ioBox]}>
                 <View style={styles.outputText}>
                   <Text numberOfLines={1} style={[styles.input, fontStyles.regular, takerStyle]}>
-                    {takerDisplay}
+                    {getMoneyDisplayValue(takerTokenAmount)}
                   </Text>
                   <Text style={[styles.input, fontStyles.regular, takerStyle, styles.superscript]}>
                     *

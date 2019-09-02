@@ -168,22 +168,21 @@ exports[`renders for error 1`] = `
                   ]
                 }
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#FFFFFF",
-                        "fontFamily": "Hind-Medium",
-                        "fontSize": 16,
-                      },
-                      Object {
-                        "fontSize": 20,
-                      },
-                    ]
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../src/images/unknown-user-icon.png",
+                    }
                   }
-                >
-                  #
-                </Text>
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "height": 40,
+                      "justifyContent": "center",
+                      "width": 40,
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -225,7 +224,7 @@ exports[`renders for error 1`] = `
                     }
                   }
                 >
-                  Sent
+                  sentTo
                 </Text>
                 <Text
                   style={
@@ -504,6 +503,7 @@ exports[`renders for error 1`] = `
                   ]
                 }
               >
+                
                 30.00
               </Text>
             </View>
@@ -646,22 +646,21 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#FFFFFF",
-                        "fontFamily": "Hind-Medium",
-                        "fontSize": 16,
-                      },
-                      Object {
-                        "fontSize": 20,
-                      },
-                    ]
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../src/images/unknown-user-icon.png",
+                    }
                   }
-                >
-                  #
-                </Text>
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "height": 40,
+                      "justifyContent": "center",
+                      "width": 40,
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -703,7 +702,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                     }
                   }
                 >
-                  Sent
+                  sentTo
                 </Text>
                 <Text
                   style={
@@ -1014,6 +1013,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
+                
                 30.00
               </Text>
             </View>
@@ -1216,6 +1216,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
+                
                 200.00
               </Text>
             </View>
@@ -1348,22 +1349,21 @@ exports[`renders for loading 1`] = `
                   ]
                 }
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#FFFFFF",
-                        "fontFamily": "Hind-Medium",
-                        "fontSize": 16,
-                      },
-                      Object {
-                        "fontSize": 20,
-                      },
-                    ]
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../src/images/unknown-user-icon.png",
+                    }
                   }
-                >
-                  #
-                </Text>
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "height": 40,
+                      "justifyContent": "center",
+                      "width": 40,
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -1405,7 +1405,7 @@ exports[`renders for loading 1`] = `
                     }
                   }
                 >
-                  Sent
+                  sentTo
                 </Text>
                 <Text
                   style={
@@ -1716,6 +1716,7 @@ exports[`renders for loading 1`] = `
                   ]
                 }
               >
+                
                 30.00
               </Text>
             </View>
@@ -1848,22 +1849,21 @@ exports[`renders for no transactions 1`] = `
                   ]
                 }
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#FFFFFF",
-                        "fontFamily": "Hind-Medium",
-                        "fontSize": 16,
-                      },
-                      Object {
-                        "fontSize": 20,
-                      },
-                    ]
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../src/images/unknown-user-icon.png",
+                    }
                   }
-                >
-                  #
-                </Text>
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "height": 40,
+                      "justifyContent": "center",
+                      "width": 40,
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -1905,7 +1905,7 @@ exports[`renders for no transactions 1`] = `
                     }
                   }
                 >
-                  Sent
+                  sentTo
                 </Text>
                 <Text
                   style={
@@ -2216,6 +2216,7 @@ exports[`renders for no transactions 1`] = `
                   ]
                 }
               >
+                
                 30.00
               </Text>
             </View>
@@ -2348,22 +2349,21 @@ exports[`renders for standbyTransactions 1`] = `
                   ]
                 }
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#FFFFFF",
-                        "fontFamily": "Hind-Medium",
-                        "fontSize": 16,
-                      },
-                      Object {
-                        "fontSize": 20,
-                      },
-                    ]
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../src/images/unknown-user-icon.png",
+                    }
                   }
-                >
-                  #
-                </Text>
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "height": 40,
+                      "justifyContent": "center",
+                      "width": 40,
+                    }
+                  }
+                />
               </View>
             </View>
           </View>
@@ -2405,7 +2405,7 @@ exports[`renders for standbyTransactions 1`] = `
                     }
                   }
                 >
-                  Sent
+                  sentTo
                 </Text>
                 <Text
                   style={
@@ -2716,6 +2716,7 @@ exports[`renders for standbyTransactions 1`] = `
                   ]
                 }
               >
+                
                 30.00
               </Text>
             </View>

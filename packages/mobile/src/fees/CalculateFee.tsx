@@ -5,11 +5,11 @@ import { useAsync, UseAsyncReturn } from 'react-async-hook'
 import { connect } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
 import { getReclaimEscrowFee } from 'src/escrow/saga'
 import { FeeType } from 'src/fees/actions'
-import { getInvitationVerificationFee } from 'src/invite/saga'
+import { getInviteFee } from 'src/invite/saga'
 import { getSendFee } from 'src/send/saga'
+import Logger from 'src/utils/Logger'
 
 export type CalculateFeeChildren = (
   asyncResult: UseAsyncReturn<BigNumber, never>
@@ -21,6 +21,9 @@ interface CommonProps {
 
 interface InviteProps extends CommonProps {
   feeType: FeeType.INVITE
+  account: string
+  amount: BigNumber
+  comment: string
 }
 
 interface SendProps extends CommonProps {
@@ -74,7 +77,8 @@ function useAsyncShowError<R, Args extends any[]>(
     () => {
       // Generic error banner
       if (asyncResult.error) {
-        showErrorFunction(ErrorMessages.CALCULATE_FEE_FAILED, ALERT_BANNER_DURATION)
+        Logger.error('CalculateFee', 'Error calculating fee', asyncResult.error)
+        showErrorFunction(ErrorMessages.CALCULATE_FEE_FAILED)
       }
     },
     [asyncResult.error]
@@ -84,7 +88,12 @@ function useAsyncShowError<R, Args extends any[]>(
 }
 
 const CalculateInviteFee: FunctionComponent<DispatchProps & InviteProps> = (props) => {
-  const asyncResult = useAsyncShowError(getInvitationVerificationFee, [], props.showError)
+  const asyncResult = useAsyncShowError(
+    (account: string, amount: BigNumber, comment: string) =>
+      getInviteFee(account, getStableTokenContract, amount.valueOf(), comment),
+    [props.account, props.amount, props.comment],
+    props.showError
+  )
   return props.children(asyncResult) as React.ReactElement
 }
 
