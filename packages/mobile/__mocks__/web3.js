@@ -62,5 +62,7 @@ export default class {
 
   utils = {
     sha3: () => 'a sha3 hash',
+    fromWei: (x) => x / 1000000000000000000.0,
+    toWei: (x) => x * 1000000000000000000.0,
   }
 }
