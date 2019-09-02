@@ -20,7 +20,7 @@ import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
+import TransferReviewCard from 'src/send/TransferReviewCard'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { TransactionTypes } from 'src/transactions/reducer'
 import Logger from 'src/utils/Logger'
@@ -159,7 +159,7 @@ class RequestConfirmation extends React.Component<Props> {
           }}
           modifyButton={{ action: this.onPressEdit, text: t('edit'), disabled: false }}
         >
-          <TransferConfirmationCard
+          <TransferReviewCard
             type={TransactionTypes.PAY_REQUEST}
             recipient={recipient}
             address={requesteeAddress || ''}
