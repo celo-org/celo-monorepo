@@ -166,7 +166,7 @@ PODS:
   - ReactNativeGeth (0.1.0-development):
     - CeloBlockchain
     - React
-  - RNAnalytics (0.1.0-beta.0):
+  - RNAnalytics (1.1.0-beta.1):
     - Analytics
     - React
   - RNDeviceInfo (2.1.0):
@@ -325,7 +325,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Analytics: 77fd5fb102a4a5eedafa2c2b0245ceb7b7c15e45
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  CeloBlockchain: 4779210b5840c586b131de638694044ecb362bda
+  CeloBlockchain: e62c7732f98b642188474ad9554a0b11364b1b9b
   Crashlytics: 2dfd686bcb918dc10ee0e76f7f853fe42c7bd552
   DoubleConversion: bb338842f62ab1d708ceb63ec3d999f0f3d98ecd
   Fabric: 706c8b8098fff96c33c0db69cbf81f9c551d0d74
@@ -350,7 +350,7 @@ SPEC CHECKSUMS:
   react-native-udp: 54a1aa9bf5c0824f930b1ba6dbfb3fd3e733bba9
   react-native-version-check: 901616b6d258b385628120441bd0b285b24c7be1
   ReactNativeGeth: 627e7b1fa8521ec5b2a37558e362fd82c1608dd0
-  RNAnalytics: 5c242b7f8117f108f5df71e96b908185db3fb4ee
+  RNAnalytics: 05243c1fa17186f07be3eae30514b43aeb2e0578
   RNDeviceInfo: 2b4f76adc479657bf37bfc927bbfb027b17515d4
   RNFirebase: 7d4733713a0f436d55388b55ca3744385c70fd2d
   RNFS: 0f4d630b538e93e0e9e3519ff0b7b7b48760d8ed
