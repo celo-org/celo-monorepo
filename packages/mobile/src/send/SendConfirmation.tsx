@@ -44,7 +44,7 @@ interface StateProps {
   account: string | null
   isSending: boolean
   defaultCountryCode: string
-  dollarBalance: BigNumber
+  dollarBalance: string
   appConnected: boolean
 }
 
@@ -63,7 +63,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     account: currentAccountSelector(state),
     isSending: state.send.isSending,
     defaultCountryCode: state.account.defaultCountryCode,
-    dollarBalance: new BigNumber(state.stableToken.balance || 0),
+    dollarBalance: state.stableToken.balance || '0',
     appConnected: isAppConnected(state),
   }
 }
@@ -180,13 +180,12 @@ class SendConfirmation extends React.Component<Props, State> {
   }
 
   renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
-    const { t, appConnected, isSending } = this.props
+    const { t, appConnected, isSending, dollarBalance } = this.props
     const { amount, reason, recipient, recipientAddress, type } = this.getConfirmationInput()
 
-    const currentBalance = this.props.dollarBalance
     const fee = getFeeDollars(asyncFee.result)
     const amountWithFee = amount.plus(fee || 0)
-    const userHasEnough = !asyncFee.loading && amountWithFee.isLessThanOrEqualTo(currentBalance)
+    const userHasEnough = !asyncFee.loading && amountWithFee.isLessThanOrEqualTo(dollarBalance)
     const isPrimaryButtonDisabled = isSending || !userHasEnough || !appConnected || !!asyncFee.error
     let primaryBtnInfo = {
       action: this.onSendButtonClick,

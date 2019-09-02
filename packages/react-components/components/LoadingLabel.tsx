@@ -1,16 +1,9 @@
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  TextStyle,
-  TouchableOpacityProps,
-  View,
-} from 'react-native'
+import { ActivityIndicator, StyleSheet, Text, TextStyle, View } from 'react-native'
 
-type Props = TouchableOpacityProps & {
+interface Props {
   isLoading: boolean
   loadingLabelText: string
   labelText?: string

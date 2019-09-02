@@ -47,10 +47,11 @@ describe('SendConfirmation', () => {
     // Initial render
     expect(toJSON()).toMatchSnapshot()
     expect(queryByText('securityFee')).not.toBeNull()
-    expect(queryByText('0.0100')).toBeNull()
+    expect(queryByText('0.001')).toBeNull()
 
     // Wait for fee to be calculated and displayed
-    // await waitForElement(() => getByText('0.0100'))
+    // await waitForElement(() => getByText('0.001'))
+    // expect(queryByText('0.001')).not.toBeNull()
 
     // expect(toJSON()).toMatchSnapshot()
   })

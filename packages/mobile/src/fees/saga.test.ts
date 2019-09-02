@@ -5,7 +5,7 @@ import { call } from 'redux-saga/effects'
 import { getReclaimEscrowGas } from 'src/escrow/saga'
 import { feeEstimated, FeeType } from 'src/fees/actions'
 import { estimateFeeSaga } from 'src/fees/saga'
-import { getInvitationVerificationFee, getInviteTxGas } from 'src/invite/saga'
+import { getInvitationVerificationFeeInWei, getInviteTxGas } from 'src/invite/saga'
 import { getSendTxGas } from 'src/send/saga'
 import { getConnectedAccount } from 'src/web3/saga'
 import { mockAccount } from 'test/values'
@@ -38,7 +38,7 @@ describe(estimateFeeSaga, () => {
           FeeType.INVITE,
           new BigNumber(10000)
             .times(GAS_AMOUNT)
-            .plus(getInvitationVerificationFee())
+            .plus(getInvitationVerificationFeeInWei())
             .toString()
         )
       )

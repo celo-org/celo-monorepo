@@ -73,11 +73,15 @@ export async function getInviteFee(
   comment: string
 ) {
   const gas = await getInviteTxGas(account, contractGetter, amount, comment)
-  return (await calculateFee(gas)).plus(getInvitationVerificationFee())
+  return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
 }
 
-export function getInvitationVerificationFee(inWei: boolean = true) {
-  return inWei ? new BigNumber(web3.utils.toWei(INVITE_FEE)) : new BigNumber(INVITE_FEE)
+export function getInvitationVerificationFeeInDollars() {
+  return new BigNumber(INVITE_FEE)
+}
+
+export function getInvitationVerificationFeeInWei() {
+  return new BigNumber(web3.utils.toWei(INVITE_FEE))
 }
 
 export async function generateLink(inviteCode: string, recipientName: string) {

@@ -32,21 +32,13 @@ describe('utils->formatting', () => {
 
   describe('rounding', () => {
     it('rounds up', () => {
-      const UNROUNDED_NUMBER1 = '0.50001'
-      const ROUNDED_NUMBER1 = '0.5001'
-      expect(roundUp(UNROUNDED_NUMBER1, 4).toString()).toBe(ROUNDED_NUMBER1)
-      const UNROUNDED_NUMBER2 = '0.599'
-      const ROUNDED_NUMBER2 = '0.6'
-      expect(roundUp(UNROUNDED_NUMBER2, 2).toString()).toBe(ROUNDED_NUMBER2)
+      expect(roundUp('0.50001', 4).toString()).toBe('0.5001')
+      expect(roundUp('0.599', 2).toString()).toBe('0.6')
     })
 
     it('rounds down', () => {
-      const UNROUNDED_NUMBER1 = '0.50001'
-      const ROUNDED_NUMBER1 = '0.5'
-      expect(roundDown(UNROUNDED_NUMBER1, 4).toString()).toBe(ROUNDED_NUMBER1)
-      const UNROUNDED_NUMBER2 = '0.599'
-      const ROUNDED_NUMBER2 = '0.59'
-      expect(roundDown(UNROUNDED_NUMBER2, 2).toString()).toBe(ROUNDED_NUMBER2)
+      expect(roundDown('0.50001', 4).toString()).toBe('0.5')
+      expect(roundDown('0.599', 2).toString()).toBe('0.59')
     })
   })
 })

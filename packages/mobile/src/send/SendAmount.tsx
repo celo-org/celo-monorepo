@@ -59,7 +59,7 @@ interface OwnProps {
 type Props = StateProps & DispatchProps & OwnProps & WithNamespaces
 
 interface StateProps {
-  dollarBalance: BigNumber
+  dollarBalance: string
   estimateFeeDollars?: BigNumber
   defaultCountryCode: string
   e164NumberToAddress: E164NumberToAddressType
@@ -110,7 +110,7 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
   const { e164NumberToAddress } = state.identity
   const feeType = getFeeType(navigation, e164NumberToAddress)
   return {
-    dollarBalance: new BigNumber(state.stableToken.balance || 0),
+    dollarBalance: state.stableToken.balance || '0',
     estimateFeeDollars: getFeeEstimateDollars(state, feeType),
     defaultCountryCode: state.account.defaultCountryCode,
     e164NumberToAddress,
@@ -152,7 +152,7 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   getNewAccountBalance = () => {
-    return this.props.dollarBalance
+    return new BigNumber(this.props.dollarBalance)
       .minus(parseInputAmount(this.state.amount))
       .minus(this.props.estimateFeeDollars || 0)
   }
@@ -163,10 +163,6 @@ export class SendAmount extends React.Component<Props, State> {
       isAmountValid,
       isDollarBalanceSufficient: isAmountValid && this.getNewAccountBalance().isGreaterThan(0),
     }
-  }
-
-  validateAmount = () => {
-    return true
   }
 
   getRecipient = (): Recipient => {

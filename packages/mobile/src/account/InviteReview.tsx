@@ -19,7 +19,7 @@ import SMSLogo from 'src/icons/InviteSendReceive'
 import WhatsAppLogo from 'src/icons/WhatsAppLogo'
 import { isPhoneNumberVerified } from 'src/identity/verification'
 import { InviteBy, sendInvite } from 'src/invite/actions'
-import { getInvitationVerificationFee } from 'src/invite/saga'
+import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
@@ -36,7 +36,7 @@ type Props = StateProps & DispatchProps & NavigationInjectedProps & WithNamespac
 
 interface StateProps {
   inviteInProgress: boolean
-  dollarBalance: BigNumber
+  dollarBalance: string
   defaultCountryCode: string
 }
 
@@ -49,7 +49,7 @@ interface DispatchProps {
 
 const mapStateToProps = (state: RootState): StateProps => ({
   inviteInProgress: state.invite.isSendingInvite,
-  dollarBalance: new BigNumber(state.stableToken.balance || 0),
+  dollarBalance: state.stableToken.balance || '0',
   defaultCountryCode: state.account.defaultCountryCode,
 })
 
@@ -93,8 +93,8 @@ export class InviteReview extends React.Component<Props, State> {
   }
 
   checkIfEnoughFundsAreAvailable = () => {
-    const amountIsValid = this.props.dollarBalance.isGreaterThan(
-      getInvitationVerificationFee(false)
+    const amountIsValid = new BigNumber(this.props.dollarBalance).isGreaterThan(
+      getInvitationVerificationFeeInDollars()
     )
     this.setState({ amountIsValid })
   }
@@ -184,7 +184,7 @@ export class InviteReview extends React.Component<Props, State> {
         <TransferReviewCard
           type={TransactionTypes.INVITE_SENT}
           address={recipient.address}
-          value={getInvitationVerificationFee(false)}
+          value={getInvitationVerificationFeeInDollars()}
           e164PhoneNumber={recipient.e164PhoneNumber}
           currency={CURRENCY_ENUM.DOLLAR}
           fee={new BigNumber(0)}

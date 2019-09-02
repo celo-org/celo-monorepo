@@ -1,25 +1,47 @@
 import BigNumber from 'bignumber.js'
+import { createSelector } from 'reselect'
 import { FeeType } from 'src/fees/actions'
 import { RootState } from 'src/redux/reducers'
 import { divideByWei } from 'src/utils/formatting'
+
+const getInviteFeeEstimateInWei = (state: RootState) => state.fees.estimates.invite.feeInWei
+const getSendFeeEstimateInWei = (state: RootState) => state.fees.estimates.send.feeInWei
+const getExchangeFeeEstimateInWei = (state: RootState) => state.fees.estimates.exchange.feeInWei
+const getReclaimEscrowFeeEstimateInWei = (state: RootState) =>
+  state.fees.estimates.reclaimEscrow.feeInWei
 
 export function getFeeDollars(feeInWei: BigNumber.Value | null | undefined) {
   return feeInWei ? divideByWei(feeInWei) : undefined
 }
 
-export function getFeeEstimateDollars(state: RootState, feeType: FeeType | null) {
+const feeEstimateDollarsSelectorFactory = (feeSelector: (state: RootState) => string | null) => {
+  return createSelector(feeSelector, (feeInWei) => getFeeDollars(feeInWei))
+}
+
+export const getInviteFeeEstimateDollars = feeEstimateDollarsSelectorFactory(
+  getInviteFeeEstimateInWei
+)
+export const getSendFeeEstimateDollars = feeEstimateDollarsSelectorFactory(getSendFeeEstimateInWei)
+export const getExchangeFeeEstimateDollars = feeEstimateDollarsSelectorFactory(
+  getExchangeFeeEstimateInWei
+)
+export const getReclaimEscrowFeeEstimateDollars = feeEstimateDollarsSelectorFactory(
+  getReclaimEscrowFeeEstimateInWei
+)
+
+export const getFeeEstimateDollars = (state: RootState, feeType: FeeType | null) => {
   if (feeType === null) {
     return undefined
   }
 
   switch (feeType) {
     case FeeType.INVITE:
-      return getFeeDollars(state.fees.estimates.invite.feeInWei)
+      return getInviteFeeEstimateDollars(state)
     case FeeType.SEND:
-      return getFeeDollars(state.fees.estimates.send.feeInWei)
+      return getSendFeeEstimateDollars(state)
     case FeeType.EXCHANGE:
-      return getFeeDollars(state.fees.estimates.exchange.feeInWei)
+      return getExchangeFeeEstimateDollars(state)
     case FeeType.RECLAIM_ESCROW:
-      return getFeeDollars(state.fees.estimates.reclaimEscrow.feeInWei)
+      return getReclaimEscrowFeeEstimateDollars(state)
   }
 }

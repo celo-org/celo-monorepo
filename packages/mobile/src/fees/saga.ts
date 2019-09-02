@@ -1,11 +1,11 @@
 import { getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
-import { call, put, takeLatest } from 'redux-saga/effects'
+import { call, CallEffect, put, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { getReclaimEscrowGas } from 'src/escrow/saga'
 import { Actions, EstimateFeeAction, feeEstimated, FeeType } from 'src/fees/actions'
-import { getInvitationVerificationFee, getInviteTxGas } from 'src/invite/saga'
+import { getInvitationVerificationFeeInWei, getInviteTxGas } from 'src/invite/saga'
 import { getSendTxGas } from 'src/send/saga'
 import { CeloDefaultRecipient } from 'src/send/Send'
 import { BasicTokenTransfer } from 'src/tokens/saga'
@@ -34,44 +34,35 @@ export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
 
     switch (feeType) {
       case FeeType.INVITE:
-        if (!feeGasCache.get(FeeType.INVITE)) {
-          const gas: BigNumber = yield call(
+        feeInWei = yield call(
+          getOrSetFee,
+          FeeType.INVITE,
+          call(
             getInviteTxGas,
             account,
             getStableTokenContract,
             placeholderSendTx.amount,
             placeholderSendTx.comment
           )
-          feeGasCache.set(FeeType.INVITE, gas)
-        }
-        feeInWei = yield call(calculateFee, feeGasCache.get(FeeType.INVITE)!)
-        feeInWei = feeInWei!.plus(getInvitationVerificationFee())
+        )
+        feeInWei = feeInWei!.plus(getInvitationVerificationFeeInWei())
         break
       case FeeType.SEND:
-        if (!feeGasCache.get(FeeType.SEND)) {
-          const gas: BigNumber = yield call(
-            getSendTxGas,
-            account,
-            getStableTokenContract,
-            placeholderSendTx
-          )
-          feeGasCache.set(FeeType.SEND, gas)
-        }
-        feeInWei = yield call(calculateFee, feeGasCache.get(FeeType.SEND)!)
+        feeInWei = yield call(
+          getOrSetFee,
+          FeeType.SEND,
+          call(getSendTxGas, account, getStableTokenContract, placeholderSendTx)
+        )
         break
       case FeeType.EXCHANGE:
         // TODO
         break
       case FeeType.RECLAIM_ESCROW:
-        if (!feeGasCache.get(FeeType.RECLAIM_ESCROW)) {
-          const gas: BigNumber = yield call(
-            getReclaimEscrowGas,
-            account,
-            CeloDefaultRecipient.address
-          )
-          feeGasCache.set(FeeType.RECLAIM_ESCROW, gas)
-        }
-        feeInWei = yield call(calculateFee, feeGasCache.get(FeeType.RECLAIM_ESCROW)!)
+        feeInWei = yield call(
+          getOrSetFee,
+          FeeType.RECLAIM_ESCROW,
+          call(getReclaimEscrowGas, account, CeloDefaultRecipient.address)
+        )
         break
     }
 
@@ -83,6 +74,15 @@ export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
     Logger.error(`${TAG}/estimateFeeSaga`, 'Error estimating fee', error)
     yield put(showError(ErrorMessages.CALCULATE_FEE_FAILED))
   }
+}
+
+function* getOrSetFee(feeType: FeeType, gasGetter: CallEffect) {
+  if (!feeGasCache.get(feeType)) {
+    const gas: BigNumber = yield gasGetter
+    feeGasCache.set(feeType, gas)
+  }
+  const feeInWei: BigNumber = yield call(calculateFee, feeGasCache.get(feeType)!)
+  return feeInWei
 }
 
 export async function calculateFee(gas: BigNumber) {

@@ -12,7 +12,7 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import LineItemRow from 'src/components/LineItemRow'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
-import { getInvitationVerificationFee } from 'src/invite/saga'
+import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import FeeIcon from 'src/send/FeeIcon'
@@ -37,13 +37,13 @@ export interface OwnProps {
 
 interface StateProps {
   defaultCountryCode: string
-  dollarBalance: BigNumber
+  dollarBalance: string
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     defaultCountryCode: state.account.defaultCountryCode,
-    dollarBalance: new BigNumber(state.stableToken.balance || 0),
+    dollarBalance: state.stableToken.balance || '0',
   }
 }
 
@@ -92,7 +92,7 @@ class TransferReviewCard extends React.Component<OwnProps & StateProps & WithNam
     const amountWithFees = value.plus(fee || 0)
     const adjustedFee =
       type === TransactionTypes.INVITE_SENT && fee
-        ? fee.minus(getInvitationVerificationFee(false))
+        ? fee.minus(getInvitationVerificationFeeInDollars())
         : fee
 
     return (
@@ -112,7 +112,7 @@ class TransferReviewCard extends React.Component<OwnProps & StateProps & WithNam
               {type === TransactionTypes.INVITE_SENT && (
                 <LineItemRow
                   currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-                  amount={getMoneyDisplayValue(getInvitationVerificationFee(false))}
+                  amount={getMoneyDisplayValue(getInvitationVerificationFeeInDollars())}
                   title={t('inviteAndSecurityFee')}
                 />
               )}
