@@ -32,10 +32,6 @@ export function toNumber(input: string) {
   return parseInt(input, 10)
 }
 
-export function noopParser<A>(input: A): A {
-  return input
-}
-
 export function parseNumber(input: NumberLike) {
   return new BigNumber(input).toString()
 }

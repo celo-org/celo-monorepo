@@ -7,6 +7,7 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
 import * as _ from 'lodash'
+import { beforeEach } from 'mocha'
 import { RegistryInstance, StableTokenInstance } from 'types'
 
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
@@ -313,9 +314,12 @@ contract('StableToken', (accounts: string[]) => {
     })
 
     describe('#when there is 0.5% weekly inflation', () => {
-      it('should return depreciated balance value', async () => {
+      beforeEach(async () => {
         await stableToken.setInflationParameters(1005, 1000, SECONDS_IN_A_WEEK)
         await timeTravel(SECONDS_IN_A_WEEK, web3)
+      })
+
+      it('should return depreciated balance value', async () => {
         const adjustedBalance = (await stableToken.balanceOf(minter)).toNumber()
         assert.equal(adjustedBalance, 995)
       })
