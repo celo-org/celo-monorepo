@@ -7,7 +7,6 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { BigNumber } from 'bignumber.js'
 import * as _ from 'lodash'
-import { beforeEach } from 'mocha'
 import { RegistryInstance, StableTokenInstance } from 'types'
 
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
