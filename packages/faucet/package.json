@@ -37,7 +37,7 @@
     "@types/yargs": "^13.0.2",
     "cross-env": "5.2.0",
     "firebase-bolt": "^0.8.4",
-    "firebase-tools": "^7.0.1",
+    "firebase-tools": "^7.3.0",
     "rimraf": "2.6.3",
     "yargs": "14.0.0"
 
