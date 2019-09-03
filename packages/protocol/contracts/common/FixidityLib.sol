@@ -222,8 +222,7 @@ library FixidityLib {
    */
   function add(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
     uint256 z = x.value + y.value;
-    if (x.value > 0 && y.value > 0) require(z > x.value && z > y.value);
-    if (x.value < 0 && y.value < 0) require(z < x.value && z < y.value);
+    require(z >= x.value);
     return Fraction(z);
   }
 
