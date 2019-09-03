@@ -20,9 +20,7 @@ const truffle = require('@celo/protocol/truffle.js')
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 const initializeArgs = async (): Promise<any[]> => {
-  const rate = toFixed(
-    config.stableToken.inflationRateNumerator.div(config.stableToken.inflationRateDenominator)
-  )
+  const rate = toFixed(config.stableToken.inflationRate)
 
   return [
     config.stableToken.tokenName,

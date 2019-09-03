@@ -52,8 +52,7 @@ const DefaultConfig = {
     tokenName: 'Celo Dollar',
     tokenSymbol: 'cUSD',
     // 52nd root of 1.005, equivalent to 0.5% annual inflation
-    inflationRateNumerator: BigNumber(100009591886),
-    inflationRateDenominator: BigNumber(100000000000),
+    inflationRate: 1.00009591886,
     inflationPeriod: 7 * 24 * 60 * 60, // 1 week
   },
   validators: {
