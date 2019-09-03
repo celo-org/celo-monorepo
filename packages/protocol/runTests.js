@@ -16,6 +16,7 @@ async function startGanache() {
     gasPrice: 0,
     mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
     network_id: '1101',
+    gasLimit: 8000000,
   })
 
   await new Promise((resolve, reject) => {
