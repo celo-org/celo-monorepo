@@ -23,7 +23,7 @@ library FixidityLib {
   /**
    * @notice Number of positions that the comma is shifted to the right.
    */
-  function digits() internal pure returns(uint8) {
+  function digits() internal pure returns (uint8) {
     return 24;
   }
 
@@ -34,7 +34,7 @@ library FixidityLib {
    * @dev Test fixed1() equals 10^digits()
    * Hardcoded to 24 digits.
    */
-  function fixed1() internal pure returns(Fraction memory) {
+  function fixed1() internal pure returns (Fraction memory) {
     return Fraction(FIXED1_INT);
   }
 
@@ -51,7 +51,7 @@ library FixidityLib {
    * @dev Test mulPrecision() equals sqrt(fixed1)
    * Hardcoded to 24 digits.
    */
-  function mulPrecision() internal pure returns(uint256) {
+  function mulPrecision() internal pure returns (uint256) {
     return 1000000000000;
   }
 
@@ -59,7 +59,7 @@ library FixidityLib {
    * @notice Maximum value that can be represented in a uint256
    * @dev Test maxUint256() equals 2^256 -1
    */
-  function maxUint256() internal pure returns(uint256) {
+  function maxUint256() internal pure returns (uint256) {
     return 115792089237316195423570985008687907853269984665640564039457584007913129639935;
   }
 
@@ -69,7 +69,7 @@ library FixidityLib {
    * Test maxNewFixed() equals maxUint256() / fixed1()
    * Hardcoded to 24 digits.
    */
-  function maxNewFixed() internal pure returns(uint256) {
+  function maxNewFixed() internal pure returns (uint256) {
     return 115792089237316195423570985008687907853269984665640564;
   }
 
@@ -81,7 +81,7 @@ library FixidityLib {
    * Test add(-maxFixedAdd(),-maxFixedAdd()) equals -maxFixedAdd() - maxFixedAdd()
    * Test add(-maxFixedAdd(),-maxFixedAdd()-1) throws
    */
-  function maxFixedAdd() internal pure returns(uint256) {
+  function maxFixedAdd() internal pure returns (uint256) {
     return 57896044618658097711785492504343953926634992332820282019728792003956564819967;
   }
 
@@ -99,7 +99,7 @@ library FixidityLib {
    * Test multiply(-maxFixedMul(),maxFixedMul()+1) throws
    * Hardcoded to 24 digits.
    */
-  function maxFixedMul() internal pure returns(uint256) {
+  function maxFixedMul() internal pure returns (uint256) {
     return 340282366920938463463374607431768211455999999999999;
   }
 
@@ -112,7 +112,7 @@ library FixidityLib {
    * Test divide(maxFixedDiv()+1,multiply(mulPrecision(),mulPrecision())) throws
    * Hardcoded to 24 digits.
    */
-  function maxFixedDiv() internal pure returns(uint256) {
+  function maxFixedDiv() internal pure returns (uint256) {
     return 57896044618658097711785492504343953926634992332820282;
   }
 
@@ -123,7 +123,7 @@ library FixidityLib {
    * Test divide(10**(digits()*2 + 1),10**(digits()*2 + 1)) = throws
    * Hardcoded to 24 digits.
    */
-  function maxFixedDivisor() internal pure returns(uint256) {
+  function maxFixedDivisor() internal pure returns (uint256) {
     return 1000000000000000000000000000000000000000000000000;
   }
 
@@ -138,7 +138,7 @@ library FixidityLib {
   function newFixed(uint256 x)
     internal
     pure
-      returns (Fraction memory)
+    returns (Fraction memory)
   {
     require(x <= maxNewFixed());
     return Fraction(x * FIXED1_INT);
@@ -172,7 +172,7 @@ library FixidityLib {
   function newFixedFraction(
     uint256 numerator,
     uint256 denominator
-    )
+  )
     internal
     pure
     returns (Fraction memory)
@@ -331,5 +331,4 @@ library FixidityLib {
   function gt(Fraction memory x, Fraction memory y) internal pure returns (bool) {
     return x.value > y.value;
   }
-
 }
