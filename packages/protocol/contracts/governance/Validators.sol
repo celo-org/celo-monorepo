@@ -241,7 +241,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param identifier An identifier for this validator.
    * @param name A name for the validator.
    * @param url A URL for the validator.
-   * @param noticePeriods The notice period of the Locked Gold commitments that
+   * @param noticePeriods The notice periods of the Locked Gold commitments that
    *   cumulatively meet the requirements for validator registration.
    * @param publicKeysData Comprised of three tightly-packed elements:
    *    - publicKey - The public key that the validator is using for consensus, should match

@@ -155,7 +155,7 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#setMinElectableValidators', () => {
     const newMinElectableValidators = minElectableValidators.plus(1)
-    it('should set the minimum commitment', async () => {
+    it('should set minElectableValidators', async () => {
       await validators.setMinElectableValidators(newMinElectableValidators)
       assertEqualBN(await validators.minElectableValidators(), newMinElectableValidators)
     })
@@ -193,7 +193,7 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#setMaxElectableValidators', () => {
     const newMaxElectableValidators = maxElectableValidators.plus(1)
-    it('should set the minimum commitment', async () => {
+    it('should set maxElectableValidators', async () => {
       await validators.setMaxElectableValidators(newMaxElectableValidators)
       assertEqualBN(await validators.maxElectableValidators(), newMaxElectableValidators)
     })
@@ -338,13 +338,13 @@ contract('Validators', (accounts: string[]) => {
       })
     })
 
-    describe.only('when multiple commitment notice periods are provided', () => {
+    describe('when multiple commitment notice periods are provided', () => {
       it('should accept a sufficient combination of commitments as stake', async () => {
         // create registrationRequirement.value different locked commitments each
         // with value 1 and unique noticePeriods greater than registrationRequirement.noticePeriod
         const commitmentCount = registrationRequirement.value
         const noticePeriods = []
-        for (let i = new BigNumber(1); i.lte(commitmentCount); i = i.plus(1)) {
+        for (let i = 1; i <= commitmentCount.toNumber(); i++) {
           const noticePeriod = registrationRequirement.noticePeriod.plus(i)
           noticePeriods.push(noticePeriod)
           await mockLockedGold.setLockedCommitment(validator, noticePeriod, 1)
@@ -366,7 +366,7 @@ contract('Validators', (accounts: string[]) => {
         // with value 1 and valid noticePeriods
         const commitmentCount = registrationRequirement.value.minus(1)
         const noticePeriods = []
-        for (let i = new BigNumber(1); i.lte(commitmentCount); i = i.plus(1)) {
+        for (let i = 1; i <= commitmentCount.toNumber(); i++) {
           const noticePeriod = registrationRequirement.noticePeriod.plus(i)
           noticePeriods.push(noticePeriod)
           await mockLockedGold.setLockedCommitment(validator, noticePeriod, 1)
@@ -392,7 +392,7 @@ contract('Validators', (accounts: string[]) => {
         const invalidNoticePeriod = registrationRequirement.noticePeriod.minus(1)
         const noticePeriods = [invalidNoticePeriod]
         await mockLockedGold.setLockedCommitment(validator, invalidNoticePeriod, 1)
-        for (let i = new BigNumber(1); i.lt(commitmentCount); i = i.plus(1)) {
+        for (let i = 1; i < commitmentCount.toNumber(); i++) {
           const noticePeriod = registrationRequirement.noticePeriod.plus(i)
           noticePeriods.push(noticePeriod)
           await mockLockedGold.setLockedCommitment(validator, noticePeriod, 1)
