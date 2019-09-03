@@ -87,7 +87,6 @@ async function exec(command: string, args: string[]) {
       }
     })
     proc.stderr.on('data', (error) => {
-      console.error(`stderr: ${error}`)
       reject(error)
     })
   })

@@ -11,7 +11,6 @@ NETWORK=""
 while getopts 'a:n:' flag; do
   case "${flag}" in
     n) NETWORK="$OPTARG" ;;
-    t) TOKEN="$OPTARG" ;;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
