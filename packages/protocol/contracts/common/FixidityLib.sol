@@ -323,11 +323,19 @@ library FixidityLib {
     return multiply(x, reciprocal(y));
   }
 
-  function leq(Fraction memory x, Fraction memory y) internal pure returns (bool) {
-    return x.value <= y.value;
-  }
-
   function gt(Fraction memory x, Fraction memory y) internal pure returns (bool) {
     return x.value > y.value;
+  }
+
+  function gte(Fraction memory x, Fraction memory y) internal pure returns (bool) {
+    return x.value >= y.value;
+  }
+
+  function lt(Fraction memory x, Fraction memory y) internal pure returns (bool) {
+    return x.value < y.value;
+  }
+
+  function lte(Fraction memory x, Fraction memory y) internal pure returns (bool) {
+    return x.value <= y.value;
   }
 }

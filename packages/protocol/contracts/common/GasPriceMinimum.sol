@@ -69,27 +69,29 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
    * @dev Value is expected to be < 1.
    */
   function setAdjustmentSpeed(uint256 _adjustmentSpeed) public onlyOwner {
-    require(_adjustmentSpeed < FixidityLib.fixed1().unwrap());
     adjustmentSpeed = FixidityLib.wrap(_adjustmentSpeed);
+    require(adjustmentSpeed.lt(FixidityLib.fixed1()));
     emit AdjustmentSpeedSet(_adjustmentSpeed);
   }
 
   /**
    * @notice Set the block density targeted by the gas price minimum algorithm.
+   * @dev Value is expected to be < 1.
    */
   function setTargetDensity(uint256 _targetDensity) public onlyOwner {
-    require(_targetDensity < FixidityLib.fixed1().unwrap());
     targetDensity = FixidityLib.wrap(_targetDensity);
+    require(targetDensity.lt(FixidityLib.fixed1()));
     emit TargetDensitySet(_targetDensity);
   }
 
   /**
    * @notice Set the fraction of the gas price minimum which is sent to
    * the infrastructure fund.
+   * @dev Value is expected to be < 1.
    */
   function setInfrastructureFraction(uint256 _infrastructureFraction) public onlyOwner {
-    require(_infrastructureFraction < FixidityLib.fixed1().unwrap());
     infrastructureFraction = FixidityLib.wrap(_infrastructureFraction);
+    require(infrastructureFraction.lt(FixidityLib.fixed1()));
     emit InfrastructureFractionSet(_infrastructureFraction);
   }
 

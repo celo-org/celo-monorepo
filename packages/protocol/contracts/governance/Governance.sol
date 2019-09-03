@@ -885,7 +885,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
         proposal.transactions[i].destination,
         functionId
       );
-      if (yesRatio.leq(threshold)) {
+      if (yesRatio.lte(threshold)) {
         return false;
       }
     }
