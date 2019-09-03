@@ -13,6 +13,8 @@
     "clean": "tsc -b . --clean",
     "lint": "tslint -c tslint.json --project ."
   },
-  "dependencies": {},
+  "dependencies": {
+    "jest": "^24.8.0"
+  },
   "devDependencies": {}
 }

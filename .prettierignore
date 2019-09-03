@@ -31,6 +31,7 @@ packages/protocol/tests/**/*.js
 packages/transaction-metrics-exporter/src/contracts/*.ts
 packages/dappkit/lib/
 packages/utils/lib/
+packages/test-utils/lib
 
 packages/verification-pool-api/lib/
 packages/verification-pool-api/contracts/*.ts
