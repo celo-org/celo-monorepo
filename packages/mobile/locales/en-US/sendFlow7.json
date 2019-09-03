@@ -60,6 +60,9 @@
   "reclaimPayment": "Reclaim Payment",
   "totalSent": "Total Sent",
   "totalRefunded": "Total Refunded",
-  "loadingVerificationStatus": "Checking recipient verification...",
-  "askForContactsPermissionAction": "Get my Contacts"
+  "loadingVerificationStatus": "Checking recipient verification",
+  "askForContactsPermissionAction": "Get my Contacts",
+  "newAccountBalance": "New account balance: ",
+  "estimatingFee": "Estimating fee ",
+  "estimatedFee": "Estimated fee: "
 }
