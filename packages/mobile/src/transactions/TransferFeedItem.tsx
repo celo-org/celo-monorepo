@@ -77,7 +77,7 @@ export function getCurrencyStyles(currency: CURRENCY_ENUM, type: string): Curren
     }
   }
 
-  Logger.error(TAG, 'Unsupported Transaction Type In Feed')
+  Logger.error(TAG, `Unsupported transaction type: ${type}`)
   return {
     color: colors.darkSecondary,
     symbol: '',

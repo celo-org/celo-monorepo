@@ -1,8 +1,8 @@
-import BigNumber from 'bignumber.js'
 import {
   getCentAwareMoneyDisplay,
   getMoneyDisplayValue,
-  getMoneyFeeyDisplayValueFromBigNum,
+  roundDown,
+  roundUp,
 } from 'src/utils/formatting'
 
 describe('utils->formatting', () => {
@@ -30,22 +30,15 @@ describe('utils->formatting', () => {
     })
   })
 
-  describe('fees', () => {
-    it('rounds up the fees', () => {
-      const UNROUNDED_NUMBER = '0.00046'
-      const ROUNDED_NUMBER = '0.0005'
-      expect(getMoneyFeeyDisplayValueFromBigNum(new BigNumber(UNROUNDED_NUMBER))).toBe(
-        ROUNDED_NUMBER
-      )
+  describe('rounding', () => {
+    it('rounds up', () => {
+      expect(roundUp('0.50001', 4).toString()).toBe('0.5001')
+      expect(roundUp('0.599', 2).toString()).toBe('0.6')
     })
 
-    it('rounds up a big fees', () => {
-      const UNROUNDED_NUMBER = '0.50001'
-      const ROUNDED_NUMBER = '0.5001'
-
-      expect(getMoneyFeeyDisplayValueFromBigNum(new BigNumber(UNROUNDED_NUMBER))).toBe(
-        ROUNDED_NUMBER
-      )
+    it('rounds down', () => {
+      expect(roundDown('0.50001', 4).toString()).toBe('0.5')
+      expect(roundDown('0.599', 2).toString()).toBe('0.59')
     })
   })
 })
