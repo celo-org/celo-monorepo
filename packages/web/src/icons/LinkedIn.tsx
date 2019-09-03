@@ -7,7 +7,7 @@ interface Props {
   size: number
 }
 
-export default React.memo(function Linkedin({ color, size }: Props) {
+export default React.memo(function LinkedIn({ color, size }: Props) {
   return (
     <Svg width={size} height={size} viewBox="0 0 40 46" fill="none">
       <Path
