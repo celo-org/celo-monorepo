@@ -6,7 +6,7 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { Namespaces } from 'src/i18n'
-import { getExchangeDisplayValueFromBigNum } from 'src/utils/formatting'
+import { getExchangeRateDisplayValue } from 'src/utils/formatting'
 
 interface ExchangeRateProps {
   showFinePrint?: boolean
@@ -30,7 +30,7 @@ export class ExchangeRate extends React.PureComponent<Props> {
           {isRateValid ? t('exchangeRate') : t('loadingExchangeRate')}
         </Text>
         {isRateValid && (
-          <Text style={styles.ratio}>{` ${getExchangeDisplayValueFromBigNum(
+          <Text style={styles.ratio}>{` ${getExchangeRateDisplayValue(
             rate
           )} ${makerTokenCode} : 1 ${takerTokenCode}`}</Text>
         )}

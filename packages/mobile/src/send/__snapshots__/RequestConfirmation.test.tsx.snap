@@ -91,7 +91,8 @@ exports[`RequestConfirmation renders correctly for request payment confirmation 
                   "flex": 1,
                   "flexDirection": "column",
                   "justifyContent": "flex-start",
-                  "padding": 20,
+                  "paddingHorizontal": 40,
+                  "paddingVertical": 20,
                 },
               ]
             }
@@ -297,6 +298,7 @@ exports[`RequestConfirmation renders correctly for request payment confirmation 
                 Object {
                   "alignItems": "stretch",
                   "flexDirection": "column",
+                  "marginTop": 5,
                 }
               }
             >
@@ -318,6 +320,71 @@ exports[`RequestConfirmation renders correctly for request payment confirmation 
               >
                 My Reason
               </Text>
+              <View
+                style={
+                  Object {
+                    "borderStyle": "solid",
+                    "borderTopColor": "#EEEEEE",
+                    "borderTopWidth": 1,
+                    "marginTop": 10,
+                    "width": "100%",
+                  }
+                }
+              />
+              <View
+                style={
+                  Object {
+                    "alignItems": "stretch",
+                    "justifyContent": "center",
+                    "marginBottom": 10,
+                    "marginTop": 10,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "flexDirection": "row",
+                      "justifyContent": "space-between",
+                      "marginTop": 5,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "alignItems": "flex-start",
+                        "flexDirection": "row",
+                      }
+                    }
+                  >
+                    <Text
+                      style={
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-Regular",
+                          "fontSize": 14,
+                          "lineHeight": 20,
+                        }
+                      }
+                    >
+                      newAccountBalance
+                    </Text>
+                  </View>
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 20,
+                      }
+                    }
+                  >
+                    $10.00
+                  </Text>
+                </View>
+              </View>
             </View>
           </View>
         </View>
