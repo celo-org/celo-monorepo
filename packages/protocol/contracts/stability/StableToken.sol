@@ -17,7 +17,7 @@ import "../common/UsingRegistry.sol";
  */
 // solhint-disable-next-line max-line-length
 contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
-Initializable, UsingRegistry {
+  Initializable, UsingRegistry {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
@@ -128,10 +128,7 @@ Initializable, UsingRegistry {
     external
     initializer
   {
-    require(
-      inflationRate != 0,
-      "Must provide a non-zero inflation rate."
-    );
+    require(inflationRate != 0, "Must provide a non-zero inflation rate.");
     _transferOwnership(msg.sender);
     totalSupply_ = 0;
     name_ = _name;
@@ -170,10 +167,7 @@ Initializable, UsingRegistry {
     onlyOwner
     updateInflationFactor
   {
-    require(
-      rate != 0,
-      "Must provide a non-zero inflation rate."
-    );
+    require(rate != 0, "Must provide a non-zero inflation rate.");
     inflationState.rate = FixidityLib.wrap(rate);
     inflationState.updatePeriod = updatePeriod;
 
