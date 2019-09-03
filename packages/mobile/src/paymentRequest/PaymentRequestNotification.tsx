@@ -17,6 +17,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import NotificationAmount from 'src/paymentRequest/NotificationAmount'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
+import { TransactionTypes } from 'src/transactions/reducer'
 import Logger from 'src/utils/Logger'
 
 interface OwnProps {
@@ -38,8 +39,8 @@ export class PaymentRequestNotification extends React.Component<Props> {
         recipient,
         amount: new BigNumber(amount),
         recipientAddress: recipient.address,
+        type: TransactionTypes.PAY_REQUEST,
       },
-      isPaymentRequest: true,
       onConfirm: this.onPaymentSuccess,
       onCancel: this.onPaymentDecline,
     })
