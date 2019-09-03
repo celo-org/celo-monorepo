@@ -7,6 +7,7 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import { pincodeSet, setPin } from 'src/account/actions'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -43,12 +44,18 @@ interface State {
 
 type Props = DispatchProps & WithNamespaces
 
-const mapDispatchToProps = {
-  showError,
-  hideAlert,
-  pincodeSet,
-  setPin,
-}
+// Use bindActionCreators to workaround a typescript error with the shorthand syntax with redux-thunk actions
+// see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37369
+const mapDispatchToProps = (dispatch: any) =>
+  bindActionCreators(
+    {
+      showError,
+      hideAlert,
+      pincodeSet,
+      setPin,
+    },
+    dispatch
+  )
 
 export class Pincode extends React.Component<Props, State> {
   static navigationOptions = nuxNavigationOptions
@@ -196,6 +203,7 @@ export class Pincode extends React.Component<Props, State> {
       case Steps.PIN_REENTER:
         return (
           <Button
+            testID="Pincode-ReEnter"
             text={t('verifyPin.finalPin')}
             style={style.button}
             standard={true}
@@ -207,6 +215,7 @@ export class Pincode extends React.Component<Props, State> {
       case Steps.PIN_ENTER:
         return (
           <Button
+            testID="Pincode-Enter"
             text={t('continue')}
             style={style.button}
             onPress={this.stepForward}
@@ -218,6 +227,7 @@ export class Pincode extends React.Component<Props, State> {
       default:
         return (
           <Button
+            testID="Pincode-Education"
             text={t('continue')}
             style={style.button}
             onPress={this.onPressEducation}
