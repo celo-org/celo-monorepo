@@ -6,7 +6,7 @@ pragma solidity ^0.5.0;
  * @author Gadi Guy, Alberto Cuesta Canada
  * @notice This library provides fixed point arithmetic with protection against
  * overflow.
- * All operations are done with int256 and the operands must have been created
+ * All operations are done with uint256 and the operands must have been created
  * with any of the newFrom* functions, which shift the comma digits() to the
  * right and check for limits.
  * When using this library be sure of using maxNewFixed() as the upper limit for
@@ -56,8 +56,8 @@ library FixidityLib {
   }
 
   /**
-   * @notice Maximum value that can be represented in an int256
-   * @dev Test maxUint256() equals 2^255 -1
+   * @notice Maximum value that can be represented in a uint256
+   * @dev Test maxUint256() equals 2^256 -1
    */
   function maxUint256() internal pure returns(uint256) {
     return 115792089237316195423570985008687907853269984665640564039457584007913129639935;
@@ -70,7 +70,7 @@ library FixidityLib {
    * Hardcoded to 24 digits.
    */
   function maxNewFixed() internal pure returns(uint256) {
-    return 57896044618658097711785492504343953926634992332820282;
+    return 115792089237316195423570985008687907853269984665640564;
   }
 
   /**
@@ -128,7 +128,7 @@ library FixidityLib {
   }
 
   /**
-   * @notice Converts an int256 to fixed point units, equivalent to multiplying
+   * @notice Converts a uint256 to fixed point units, equivalent to multiplying
    * by 10^digits().
    * @dev Test newFixed(0) returns 0
    * Test newFixed(1) returns fixed1()
@@ -145,7 +145,7 @@ library FixidityLib {
   }
 
   /**
-   * @notice Converts an int256 in the fixed point representation of this
+   * @notice Converts a uint256 in the fixed point representation of this
    * library to a non decimal. All decimal digits will be truncated.
    */
   function fromFixed(Fraction memory x)
@@ -157,7 +157,7 @@ library FixidityLib {
   }
 
   /**
-   * @notice Converts two int256 representing a fraction to fixed point units,
+   * @notice Converts two uint256 representing a fraction to fixed point units,
    * equivalent to multiplying dividend and divisor by 10^digits().
    * @dev
    * Test newFixedFraction(maxFixedDiv()+1,1) fails
