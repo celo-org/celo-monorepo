@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContextualInfo renders 1`] = `
+<div
+  className="css-text-76zvg2"
+  dir="auto"
+  style={
+    Object {
+      "color": "rgba(46,51,56,1.00)",
+      "fontFamily": "futura-pt, sans-serif",
+      "fontSize": "14px",
+      "textRendering": "geometricPrecision",
+    }
+  }
+>
+  eg. a0000aaa00a0000...a00a0a0000a00a00aa
+</div>
+`;

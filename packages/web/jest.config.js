@@ -4,8 +4,23 @@ module.exports = {
   ...defaultConfig,
   globals: {
     navigator: true,
+    'ts-jest': {
+      tsConfig: 'tsconfig.test.json',
+    },
     window: true,
   },
+  moduleDirectories: ['.', '../../node_modules', './node_modeles'],
+
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
+  moduleNameMapper: {
+    '^[./a-zA-Z0-9$_-]+\\.png$': '<rootDir>/RelativeImageStub.js',
+    '^image![a-zA-Z0-9$_-]+$': 'GlobalImageStub',
+    'next-i18next': '<rootDir>/node_modules/next-i18next',
+    'next/config': '<rootDir>/__mocks__/next-server/config',
+  },
+  modulePathIgnorePatterns: ['<rootDir>/node_modules/(.*)/node_modules/react-native'],
   preset: './node_modules/react-native-web/jest-preset.js',
+  setupFilesAfterEnv: ['<rootDir>/jest_setup.ts'],
   testEnvironment: 'node',
+  transformIgnorePatterns: ['node_modules/(?!react-native|react-navigation|)'],
 }

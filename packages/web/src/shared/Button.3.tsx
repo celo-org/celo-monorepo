@@ -140,7 +140,7 @@ interface Props {
   kind?: BTN
   children: React.ReactNode
   size?: SIZE
-  style?: TextStyle
+  style?: TextStyle | TextStyle[]
   href?: string
 }
 
