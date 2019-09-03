@@ -8,7 +8,7 @@ async function main() {
   const envArg = parseArgs(process.argv.slice(2))['celo-env']
   try {
     await util.setProject(parseArgs(process.argv.slice(2))['celo-proj'])
-  } catch {
+  } catch (e) {
     await util.setProject('celo-testnet')
   }
   await util.setEnv(envArg)
