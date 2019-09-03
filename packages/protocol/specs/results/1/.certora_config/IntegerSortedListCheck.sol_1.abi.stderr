@@ -1,6 +1,0 @@
-specs/harnesses/IntegerSortedListCheck.sol:53:2: Warning: Function state mutability can be restricted to view
-	function contains(uint256 key) public returns (bool) {
- ^ (Relevant source part starts here and spans across multiple lines).
-specs/harnesses/IntegerSortedListCheck.sol:57:2: Warning: Function state mutability can be restricted to view
-	function getValue(uint256 key) public returns (uint256) {
- ^ (Relevant source part starts here and spans across multiple lines).
