@@ -573,8 +573,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
       rewardBlockNumber
     ];
     // We should never get here except in testing, where cumulativeRewardWeight will not be set.
-    if (previousCumulativeRewardWeight.unwrap() == 0 ||
-        cumulativeRewardWeight.unwrap() == 0) {
+    if (previousCumulativeRewardWeight.unwrap() == 0 || cumulativeRewardWeight.unwrap() == 0) {
       return 0;
     }
 
