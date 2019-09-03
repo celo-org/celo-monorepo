@@ -131,6 +131,7 @@ export async function getGeth(): Promise<typeof gethInstance> {
   if (!gethInstance) {
     await initGeth()
   }
+  console.log('reeee')
   return gethInstance
 }
 
@@ -144,6 +145,8 @@ async function ensureStaticNodesInitialized(): Promise<boolean> {
     let enodes: string | null = null
     try {
       enodes = await StaticNodeUtils.getStaticNodesAsync(currentNetworkName)
+      console.log('----- trevor -----\ninside ensureStaticNodesInitialized')
+      enodes = `["enode://04ab809f886edbec3a5840f98de53bc7e6da18beeef8f977a373718e8a7bdf8814cab05a5ecfefb6595b0e592428ee6d62756bc8b274d8c72af9982641fd299e@35.247.89.129:30301"]`
     } catch (error) {
       Logger.error(
         `Failed to get static nodes for network ${currentNetworkName},` +

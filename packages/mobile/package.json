@@ -47,7 +47,7 @@
     ]
   },
   "dependencies": {
-    "@celo/client": "f7095b7",
+    "@celo/client": "^0.0.109",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#d3a2fdb",
     "@celo/utils": "^0.0.6-beta5",
     "@celo/walletkit": "^0.0.14",
@@ -95,7 +95,7 @@
     "react-native-flag-secure-android": "git://github.com/kristiansorens/react-native-flag-secure-android#e234251",
     "react-native-fs": "^2.12.1",
     "react-native-gesture-handler": "^1.1.0",
-    "react-native-geth": "git+https://github.com/celo-org/react-native-geth#51dc4f1",
+    "react-native-geth": "git+https://github.com/celo-org/react-native-geth#9c876b45e97c472039e4100e55561e10fa4752f5",
     "react-native-install-referrer": "^1.0.1",
     "react-native-keep-awake": "^3.0.1",
     "react-native-keyboard-aware-scroll-view": "^0.6.0",

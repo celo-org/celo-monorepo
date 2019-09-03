@@ -4,7 +4,7 @@ import { Testnets } from 'src/web3/testnets'
 export default {
   [Testnets.integration]: {
     nodeDir: `.${Testnets.integration}`,
-    peerDiscovery: false,
+    peerDiscovery: true,
     syncMode: SYNC_MODE_ULTRALIGHT,
   },
   [Testnets.alfajoresstaging]: {
