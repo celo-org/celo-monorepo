@@ -2,7 +2,7 @@ import { deriveCEK } from '@celo/utils/src/commentEncryption'
 import { AsyncStorage } from 'react-native'
 import { generateMnemonic, mnemonicToSeedHex } from 'react-native-bip39'
 import { REHYDRATE } from 'redux-persist/es/constants'
-import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
+import { call, delay, put, race, select, take } from 'redux-saga/effects'
 import { getPincode } from 'src/account'
 import { setAccountCreationTime } from 'src/account/actions'
 import { pincodeSelector } from 'src/account/reducer'
@@ -28,7 +28,6 @@ import {
   updateWeb3SyncProgress,
 } from 'src/web3/actions'
 import { web3 } from 'src/web3/contracts'
-import { refreshGasPrice } from 'src/web3/gas'
 import { currentAccountSelector } from 'src/web3/selectors'
 import { Block } from 'web3/eth/types'
 
@@ -218,14 +217,6 @@ export function* getConnectedUnlockedAccount() {
   } else {
     throw new Error(ErrorMessages.INCORRECT_PIN)
   }
-}
-
-export function* watchRefreshGasPrice() {
-  yield takeLatest(Actions.SET_GAS_PRICE, refreshGasPrice)
-}
-
-export function* web3Saga() {
-  yield spawn(watchRefreshGasPrice)
 }
 
 // exported for testing

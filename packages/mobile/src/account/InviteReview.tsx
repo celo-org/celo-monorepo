@@ -19,10 +19,11 @@ import SMSLogo from 'src/icons/InviteSendReceive'
 import WhatsAppLogo from 'src/icons/WhatsAppLogo'
 import { isPhoneNumberVerified } from 'src/identity/verification'
 import { InviteBy, sendInvite } from 'src/invite/actions'
+import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
+import TransferReviewCard from 'src/send/TransferReviewCard'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { TransactionTypes } from 'src/transactions/reducer'
 
@@ -35,7 +36,7 @@ type Props = StateProps & DispatchProps & NavigationInjectedProps & WithNamespac
 
 interface StateProps {
   inviteInProgress: boolean
-  dollarBalance: string | null
+  dollarBalance: string
   defaultCountryCode: string
 }
 
@@ -48,7 +49,7 @@ interface DispatchProps {
 
 const mapStateToProps = (state: RootState): StateProps => ({
   inviteInProgress: state.invite.isSendingInvite,
-  dollarBalance: state.stableToken.balance,
+  dollarBalance: state.stableToken.balance || '0',
   defaultCountryCode: state.account.defaultCountryCode,
 })
 
@@ -60,9 +61,7 @@ const mapDispatchToProps = {
   hideAlert,
 }
 
-// TODO: this will eventually be dynamic, but for the pilot is harcoded.
-const staticInviteFeeAmount = 0.3
-
+// TODO remove duplication between this screen and SendAmount/SendConfirmation
 export class InviteReview extends React.Component<Props, State> {
   static navigationOptions = { header: null }
 
@@ -94,8 +93,9 @@ export class InviteReview extends React.Component<Props, State> {
   }
 
   checkIfEnoughFundsAreAvailable = () => {
-    const currentBalance = this.props.dollarBalance ? parseFloat(this.props.dollarBalance) : 0
-    const amountIsValid = staticInviteFeeAmount <= currentBalance
+    const amountIsValid = new BigNumber(this.props.dollarBalance).isGreaterThan(
+      getInvitationVerificationFeeInDollars()
+    )
     this.setState({ amountIsValid })
   }
 
@@ -181,12 +181,13 @@ export class InviteReview extends React.Component<Props, State> {
     const recipient = this.getRecipient()
     return (
       <ReviewFrame HeaderComponent={this.renderHeader} FooterComponent={this.renderFooter}>
-        <TransferConfirmationCard
+        <TransferReviewCard
           type={TransactionTypes.INVITE_SENT}
           address={recipient.address}
-          value={new BigNumber(staticInviteFeeAmount)}
+          value={getInvitationVerificationFeeInDollars()}
           e164PhoneNumber={recipient.e164PhoneNumber}
           currency={CURRENCY_ENUM.DOLLAR}
+          fee={new BigNumber(0)}
         />
       </ReviewFrame>
     )

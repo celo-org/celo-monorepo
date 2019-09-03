@@ -1,8 +1,8 @@
 import { retryAsync } from '@celo/utils/src/async-helpers'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import {
-  getAttestationFee,
-  getAttestationsContract,
+  getEscrowContract,
+  getGoldTokenContract,
   getStableTokenContract,
   parseFromContractDecimals,
 } from '@celo/walletkit'
@@ -17,9 +17,9 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { transferEscrowedPayment } from 'src/escrow/actions'
-import { CURRENCY_ENUM, INVITE_REDEMPTION_GAS } from 'src/geth/consts'
+import { calculateFee } from 'src/fees/saga'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
-import { NUM_ATTESTATIONS_REQUIRED } from 'src/identity/verification'
 import {
   Actions,
   InviteBy,
@@ -35,6 +35,7 @@ import { createInviteCode } from 'src/invite/utils'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
+import { getSendTxGas } from 'src/send/saga'
 import { transferStableToken } from 'src/stableToken/actions'
 import { createTransaction } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
@@ -43,41 +44,44 @@ import { sendTransaction } from 'src/transactions/send'
 import { dynamicLink } from 'src/utils/dynamicLink'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
-import { fetchGasPrice } from 'src/web3/gas'
 import { createNewAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
 export const REDEEM_INVITE_TIMEOUT = 1 * 60 * 1000 // 1 minute
-
-const USE_REAL_FEE = false
 const INVITE_FEE = '0.2'
 
-// TODO(Rossy) Cache this so we don't recalculate it every time we invite someone
-// Especially relevant when inviting many friends
-export async function getInvitationVerificationFee() {
-  // TODO(cmcewen): don't use this
-  if (!USE_REAL_FEE) {
-    return new BigNumber(web3.utils.toWei(INVITE_FEE))
-  }
-  const attestationsContract = await getAttestationsContract(web3)
-  const stableTokenContract = await getStableTokenContract(web3)
-  const verificationFee = await getAttestationFee(
-    attestationsContract,
-    stableTokenContract,
-    NUM_ATTESTATIONS_REQUIRED
-  )
+export async function getInviteTxGas(
+  account: string,
+  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract,
+  amount: string,
+  comment: string
+) {
+  const escrowContract = await getEscrowContract(web3)
+  return getSendTxGas(account, contractGetter, {
+    amount,
+    comment,
+    recipientAddress: escrowContract._address,
+  })
+}
 
-  const gasPrice = await fetchGasPrice()
-  // TODO: estimate gas properly
-  const gasFee = new BigNumber(INVITE_REDEMPTION_GAS).times(gasPrice)
+export async function getInviteFee(
+  account: string,
+  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract,
+  amount: string,
+  comment: string
+) {
+  const gas = await getInviteTxGas(account, contractGetter, amount, comment)
+  return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
+}
 
-  // We multiply by two to provide a buffer in the event that some requests fail.
-  return verificationFee
-    .times(NUM_ATTESTATIONS_REQUIRED)
-    .plus(gasFee)
-    .times(2)
+export function getInvitationVerificationFeeInDollars() {
+  return new BigNumber(INVITE_FEE)
+}
+
+export function getInvitationVerificationFeeInWei() {
+  return new BigNumber(web3.utils.toWei(INVITE_FEE))
 }
 
 export async function generateLink(inviteCode: string, recipientName: string) {

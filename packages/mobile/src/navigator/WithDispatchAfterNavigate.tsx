@@ -19,6 +19,10 @@ export function withDispatchAfterNavigate<P extends {}>(
     }
 
   return connect<null, null, any>(null)(
+    // Can't get this to pass typescript validation
+    // Some other people have reported something similar in https://github.com/piotrwitek/react-redux-typescript-guide/issues/111
+    // Ignoring the error for now
+    // @ts-ignore Argument of type 'typeof WithDispatchAfterNavigateWrapper' is not assignable to parameter of type 'ComponentType<Matching<null & DispatchProp<AnyAction>, WrappedComponentProps>>' ...
     class WithDispatchAfterNavigateWrapper extends React.Component<WrappedComponentProps> {
       onDidFocus: NavigationEventCallback = (payload: NavigationEventPayload) => {
         if (!payload.state || !payload.state.params) {

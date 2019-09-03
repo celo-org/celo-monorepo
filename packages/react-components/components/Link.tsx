@@ -7,7 +7,7 @@ type Props = TouchableOpacityProps & {
   testID?: string
 }
 
-export default class Link extends React.Component<Props> {
+export default class Link extends React.PureComponent<Props> {
   render() {
     const { onPress, style: extraStyle, children, disabled, testID } = this.props
     return (

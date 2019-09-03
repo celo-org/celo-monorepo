@@ -11,8 +11,6 @@ export interface State {
   latestBlockNumber: number
   account: string | null
   commentKey: string | null
-  gasPrice?: number
-  gasPriceLastUpdated: number
 }
 
 const initialState: State = {
@@ -25,7 +23,6 @@ const initialState: State = {
   latestBlockNumber: 0,
   account: null,
   commentKey: null,
-  gasPriceLastUpdated: 0,
 }
 
 function calculateSyncProgress(action: UpdateWeb3SyncProgressAction) {
@@ -80,12 +77,6 @@ export const reducer = (
       return {
         ...state,
         syncProgress: calculateSyncProgress(action),
-      }
-    case Actions.SET_GAS_PRICE:
-      return {
-        ...state,
-        gasPrice: action.gasPrice,
-        gasPriceLastUpdated: action.gasPriceLastUpdated,
       }
 
     default:

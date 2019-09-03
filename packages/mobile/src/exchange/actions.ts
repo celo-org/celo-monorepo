@@ -23,7 +23,7 @@ import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
-import { roundedDownNumber } from 'src/utils/formatting'
+import { roundDown } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -207,7 +207,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     const takerTokenContract =
       makerToken === Tokens.DOLLAR ? goldTokenContract : stableTokenContract
-    const convertedTakerAmount: BigNumber = roundedDownNumber(
+    const convertedTakerAmount: BigNumber = roundDown(
       yield call(convertToContractDecimals, minimumTakerAmount, takerTokenContract),
       0
     )
