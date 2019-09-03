@@ -49,7 +49,7 @@ async function test() {
     const closeGanache = await startGanache()
     if (isCI) {
       // if we are running on circle ci we need to wait for ganache to be up
-      // TODO(mcortesi): improvement: check for open port instead of a fix wait time.
+      // TODO(mcortesi): improvement: check for open port instead of a fixed wait time.
       await sleep(60)
     }
 
