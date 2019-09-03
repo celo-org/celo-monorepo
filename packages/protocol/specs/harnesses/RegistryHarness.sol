@@ -1,6 +1,8 @@
 pragma solidity ^0.5.8;
 
-contract RegistryHarness {
+import "./IRegistryExtended.sol";
+
+contract RegistryHarness is IRegistryExtended {
   
 	string constant ATTESTATIONS_REGISTRY_ID = "Attestations";
 	string constant BONDED_DEPOSITS_REGISTRY_ID = "BondedDeposits";
@@ -48,17 +50,20 @@ contract RegistryHarness {
 	mapping (address => uint256) bondedDeposits_accountWeight;
 	mapping (address => address) bondedDeposits_accountFromVoter;
 	
+	mapping (address => uint256) goldToken_balanceOf;
+		
 	uint256 randomIndex;
 	mapping (uint => bool) randomBoolMap;
 	mapping (uint => uint256) randomUInt256Map;
 	mapping (uint => address) randomAddressMap;
 	
 	
-	function isValidating(address account) external view returns (bool) {
+	function isValidating(address account) external returns (bool) {
 		if (whoami == iamValidators) {
 			return validators_validating[account];
+		} else {
+			return getRandomBool();
 		}
-		
 	}
 	
 	function isVoting(address x) external returns (bool) {
@@ -71,7 +76,7 @@ contract RegistryHarness {
 		}
 	}
 	
-	function getTotalWeight() public returns (uint256) {
+	function getTotalWeight() external returns (uint256) {
 		if (true ||  whoami == iamBondedDeposits) {
 			return bondedDeposits_totalWeight;
 		} else {
@@ -79,7 +84,7 @@ contract RegistryHarness {
 		}
 	}
 	
-	function getAccountWeight(address account) public returns (uint256) {
+	function getAccountWeight(address account) external returns (uint256) {
 		if (true || whoami == iamBondedDeposits) {
 			return bondedDeposits_accountWeight[account];
 		} else {
@@ -87,7 +92,7 @@ contract RegistryHarness {
 		}
 	}
 	
-	function getAccountFromVoter(address voter) public returns (address) {
+	function getAccountFromVoter(address voter) external returns (address) {
 		if (true || whoami == iamBondedDeposits) {
 			return bondedDeposits_accountFromVoter[voter];
 		} else {
@@ -95,8 +100,13 @@ contract RegistryHarness {
 		}
 	}
 	
-	// TODO: Add missing functionalities
-	
+	function transfer(address recipient, uint256 value) external returns (bool) {
+		// a broken, havocing (not fully though - would need to add another key to the map for that) implementation
+		goldToken_balanceOf[msg.sender] = getRandomUInt256()-value;
+		goldToken_balanceOf[recipient] = getRandomUInt256()+value;
+		return getRandomBool();
+	}
+		
 	function getRandomBool() public returns (bool) {
 		randomIndex++;
 		return randomBoolMap[randomIndex];
@@ -112,5 +122,4 @@ contract RegistryHarness {
 		return randomAddressMap[randomIndex];
 	}
 	
-	// TODO: For gold token - spartacus behavior should include wrecking havoc on balances.
 }

@@ -93,7 +93,7 @@ contract BondedDepositsHarness is BondedDeposits {
 	// TODO: Note in the harness we assume already that getAddressFor always returns just the registry address
 	function _isValidating(address account) public view returns (bool) {
 		IValidators validators = IValidators(registry.getAddressFor(VALIDATORS_REGISTRY_ID));
-		return registry.isValidating(account);
+		return validators.isValidating(account);
 	}
 	
 	
