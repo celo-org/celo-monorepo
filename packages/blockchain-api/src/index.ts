@@ -11,7 +11,7 @@ declare var process: {
 const GRAPHQL_PATH: string = '/'
 
 const PORT: number = Number(process.env.PORT) || 8080
-const INTERFACE: string = process.env.INTERFACE || 'localhost'
+const INTERFACE: string = process.env.INTERFACE || '0.0.0.0'
 
 const app: any = express()
 

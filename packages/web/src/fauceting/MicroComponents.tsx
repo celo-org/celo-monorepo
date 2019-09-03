@@ -97,6 +97,7 @@ export function ButtonWithFeedback({
       onPress={onSubmit}
       iconLeft={icon}
       align={'flex-start'}
+      style={!isFaucet && isEnded && [textStyles.invert, styles.message]}
       size={isFaucet ? SIZE.normal : SIZE.big}
     />
   )
@@ -117,7 +118,6 @@ function buttonText({ requestState, t }: TextFuncArgs) {
       return t('getStarted')
   }
 }
-
 function faucetText({ requestState, t }: TextFuncArgs) {
   return (
     {
@@ -154,5 +154,8 @@ const styles = StyleSheet.create({
   statusesContainerTicker: {
     alignContent: 'center',
     height: '100%',
+  },
+  message: {
+    lineHeight: 20,
   },
 })

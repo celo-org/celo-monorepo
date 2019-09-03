@@ -7,13 +7,15 @@ interface Props {
   children?: any
   tabIndex?: number
   id?: string
+  ariaLevel?: '1' | '2' | '3' | '4' | '5'
   accessibilityRole?: 'button' | 'label' | 'link' | 'heading' | 'listitem'
 }
 
-export const H1 = ({ style, children, tabIndex, accessibilityRole, id }: Props) => {
+export const H1 = ({ style, children, tabIndex, accessibilityRole, id, ariaLevel }: Props) => {
   return (
     <Responsive large={[styles.reset, fonts.h1, style]}>
       <Text
+        aria-level={ariaLevel || '1'}
         id={id}
         tabIndex={tabIndex}
         accessibilityRole={accessibilityRole || 'heading'}

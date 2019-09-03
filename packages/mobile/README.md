@@ -1,5 +1,12 @@
 # Mobile (Celo Wallet)
 
+## Overview
+
+This is a wallet application for the [Celo platform].
+It's a self-soverign wallet that enables anyone to onboard onto the Celo network, manage their currencies, and send payments.
+
+![](https://storage.googleapis.com/celo-website/docs/wallet-preview.png)
+
 ## Architecture
 
 The app uses [React Native][react native] and a geth [light node][light node].
@@ -162,6 +169,7 @@ $ adb kill-server && adb start-server
 * daemon started successfully
 ```
 
+[celo platform]: https://celo.org
 [`src/components/bottombutton.test.tsx`]: ./src/components/BottomButton.test.tsx
 [detox]: https://github.com/wix/Detox
 [e2e readme]: ./e2e/README.md

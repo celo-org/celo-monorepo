@@ -21,15 +21,17 @@
     "build:gen": "yarn --cwd ../protocol build",
     "prepublishOnly": "yarn build:gen && yarn build",
     "test:prepare": "yarn --cwd ../protocol devchain generate .devchain",
-    "test": "jest",
-    "lint": "tslint -c tslint.json --project . && tslint -c tslint.json --project test"
+    "test": "jest --runInBand",
+    "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
     "@celo/utils": "^0.0.6-beta5",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^7.2.0",
     "debug": "^4.1.1",
+    "eth-lib": "^0.2.8",
     "web3": "1.0.0-beta.37",
+    "web3-core-helpers": "1.0.0-beta.37",
     "web3-utils": "1.0.0-beta.37"
   },
   "devDependencies": {
@@ -40,8 +42,5 @@
   },
   "engines": {
     "node": ">=8.13.0"
-  },
-  "files": [
-    "lib/**/*"
-  ]
+  }
 }

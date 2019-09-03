@@ -49,7 +49,9 @@ export enum envVar {
   PREDEPLOYED_CONTRACTS = 'PREDEPLOYED_CONTRACTS',
   SMS_RETRIEVER_HASH_CODE = 'SMS_RETRIEVER_HASH_CODE',
   STACKDRIVER_MONITORING_DASHBOARD = 'STACKDRIVER_MONITORING_DASHBOARD',
-  STACKDRIVER_NOTIFICATION_CHANNEL = 'STACKDRIVER_NOTIFICATION_CHANNEL',
+  STACKDRIVER_NOTIFICATION_APPLICATIONS_PREFIX = 'STACKDRIVER_NOTIFICATION_APPLICATIONS_PREFIX',
+  STACKDRIVER_NOTIFICATION_CHANNEL_APPLICATIONS = 'STACKDRIVER_NOTIFICATION_CHANNEL_APPLICATIONS',
+  STACKDRIVER_NOTIFICATION_CHANNEL_PROTOCOL = 'STACKDRIVER_NOTIFICATION_CHANNEL_PROTOCOL',
   STATIC_IPS_FOR_GETH_NODES = 'STATIC_IPS_FOR_GETH_NODES',
   TESTNET_PROJECT_NAME = 'TESTNET_PROJECT_NAME',
   TRANSACTION_METRICS_EXPORTER_DOCKER_IMAGE_REPOSITORY = 'TRANSACTION_METRICS_EXPORTER_DOCKER_IMAGE_REPOSITORY',
@@ -164,7 +166,11 @@ export async function doCheckOrPromptIfStagingOrProduction() {
   }
 }
 
-export async function confirmAction(message: string) {
+export async function confirmAction(
+  message: string,
+  onConfirmFailed?: () => Promise<void>,
+  onConfirmSuccess?: () => Promise<void>
+) {
   const response = await prompts({
     type: 'confirm',
     name: 'confirmation',
@@ -172,7 +178,13 @@ export async function confirmAction(message: string) {
   })
   if (!response.confirmation) {
     console.info('Aborting due to user response')
+    if (onConfirmFailed) {
+      await onConfirmFailed()
+    }
     process.exit(0)
+  }
+  if (onConfirmSuccess) {
+    await onConfirmSuccess()
   }
 }
 
@@ -188,4 +200,8 @@ export function addCeloEnvMiddleware(argv: yargs.Argv) {
       // @ts-ignore Since we pass it right above, we know that celoEnv will be there at runtime
       .middleware([celoEnvMiddleware])
   )
+}
+
+export function isVmBased() {
+  return fetchEnv(envVar.VM_BASED) === 'true'
 }
