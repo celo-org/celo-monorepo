@@ -13,11 +13,6 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
 >
   <RCTScrollView
     automaticallyAdjustContentInsets={false}
-    contentContainerStyle={
-      Object {
-        "justifyContent": "space-between",
-      }
-    }
     contentInset={
       Object {
         "bottom": 0,
@@ -171,6 +166,25 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             (415) 555-0000
           </Text>
         </View>
+      </View>
+      <View
+        style={
+          Object {
+            "marginVertical": 2,
+            "paddingHorizontal": 65,
+            "textAlign": "center",
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "center",
+            }
+          }
+        />
       </View>
       <View
         style={
@@ -404,6 +418,100 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             underlineColorAndroid="transparent"
             value=""
           />
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "marginTop": 15,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "center",
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                },
+                undefined,
+              ]
+            }
+          >
+            estimatedFee
+          </Text>
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                },
+                Object {
+                  "fontFamily": "Hind-SemiBold",
+                },
+              ]
+            }
+          >
+            0.001
+          </Text>
+        </View>
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "center",
+              "marginBottom": 15,
+              "marginTop": 7,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+              }
+            }
+          >
+            newAccountBalance
+          </Text>
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                },
+                Object {
+                  "fontFamily": "Hind-SemiBold",
+                },
+                Object {
+                  "color": "#FD785B",
+                },
+              ]
+            }
+          >
+            0.00
+          </Text>
         </View>
       </View>
     </View>
