@@ -19,7 +19,7 @@ import CalculateFee, {
   PropsWithoutChildren as CalculateFeeProps,
 } from 'src/fees/CalculateFee'
 import { getFeeDollars } from 'src/fees/selectors'
-import i18n from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
 import { InviteBy } from 'src/invite/actions'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { Recipient } from 'src/recipients/recipient'
@@ -99,7 +99,7 @@ class SendConfirmation extends React.Component<Props, State> {
     return confirmationInput
   }
 
-  onSendButtonClick = () => {
+  onSendClick = () => {
     const { recipientAddress } = this.getConfirmationInput()
     if (recipientAddress) {
       this.sendOrInvite()
@@ -122,12 +122,9 @@ class SendConfirmation extends React.Component<Props, State> {
     )
   }
 
-  onPressEdit = () => {
+  onEditClick = () => {
+    CeloAnalytics.track(CustomEventNames.edit_dollar_confirm)
     const { onCancel } = this.getNavParams()
-
-    this.getConfirmationInput().recipientAddress
-      ? CeloAnalytics.track(CustomEventNames.edit_dollar_confirm)
-      : CeloAnalytics.track(CustomEventNames.edit_send_invite)
     if (onCancel) {
       onCancel()
     } else {
@@ -187,12 +184,9 @@ class SendConfirmation extends React.Component<Props, State> {
     const amountWithFee = amount.plus(fee || 0)
     const userHasEnough = !asyncFee.loading && amountWithFee.isLessThanOrEqualTo(dollarBalance)
     const isPrimaryButtonDisabled = isSending || !userHasEnough || !appConnected || !!asyncFee.error
-    let primaryBtnInfo = {
-      action: this.onSendButtonClick,
-      text: t('send'),
-      disabled: isPrimaryButtonDisabled,
-    }
-    let secondaryBtnInfo = { action: this.onPressEdit, text: t('edit'), disabled: isSending }
+
+    let primaryBtnInfo
+    let secondaryBtnInfo
     if (type === TransactionTypes.PAY_REQUEST) {
       primaryBtnInfo = {
         action: this.sendOrInvite,
@@ -200,11 +194,21 @@ class SendConfirmation extends React.Component<Props, State> {
         disabled: isPrimaryButtonDisabled,
       }
       secondaryBtnInfo = {
-        action: this.onPressEdit,
+        action: this.onEditClick,
         text: i18n.t('paymentRequestFlow:decline'),
         disabled: isSending,
       }
+    } else {
+      primaryBtnInfo = {
+        action: this.onSendClick,
+        text: t('send'),
+        disabled: isPrimaryButtonDisabled,
+      }
+      secondaryBtnInfo = { action: this.onEditClick, text: t('edit'), disabled: isSending }
     }
+
+    // For fulfilling payment request confirmations, we want to show the send transfer card
+    const reviewCardType = type === TransactionTypes.PAY_REQUEST ? TransactionTypes.SENT : type
 
     return (
       <View style={styles.container}>
@@ -226,7 +230,7 @@ class SendConfirmation extends React.Component<Props, State> {
             fee={fee}
             isLoadingFee={asyncFee.loading}
             feeError={asyncFee.error}
-            type={type}
+            type={reviewCardType}
           />
           <Modal
             isVisible={this.state.modalVisible}
@@ -293,5 +297,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces('sendFlow7')(SendConfirmation))
+  )(withNamespaces(Namespaces.sendFlow7)(SendConfirmation))
 )

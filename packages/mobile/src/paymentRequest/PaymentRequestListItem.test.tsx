@@ -1,7 +1,7 @@
 import * as React from 'react'
 import 'react-native'
 import * as renderer from 'react-test-renderer'
-import PaymentRequestNotification from 'src/paymentRequest/PaymentRequestNotification'
+import PaymentRequestListItem from 'src/paymentRequest/PaymentRequestListItem'
 import { RecipientKind } from 'src/recipients/recipient'
 
 const commonProps = {
@@ -19,10 +19,10 @@ const commonProps = {
   },
 }
 
-describe('PaymentRequestNotification', () => {
+describe('PaymentRequestListItem', () => {
   it('renders correctly', () => {
     // @ts-ignore -- kind is not assignable?
-    const tree = renderer.create(<PaymentRequestNotification {...commonProps} />)
+    const tree = renderer.create(<PaymentRequestListItem {...commonProps} />)
 
     expect(tree).toMatchSnapshot()
   })

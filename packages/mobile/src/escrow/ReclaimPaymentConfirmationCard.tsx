@@ -5,9 +5,9 @@ import { componentStyles } from '@celo/react-components/styles/styles'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
-import componentWithAnalytics from 'src/analytics/wrapper'
+import LineItemRow from 'src/components/LineItemRow'
 import { CURRENCIES, CURRENCY_ENUM as Tokens } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import Logo from 'src/icons/Logo'
@@ -15,52 +15,6 @@ import { RecipientWithContact } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import FeeIcon from 'src/send/FeeIcon'
 import { getCurrencyColor, getMoneyDisplayValue, roundUp } from 'src/utils/formatting'
-
-interface LineItemProps {
-  currencySymbol: string
-  amount?: BigNumber
-  title: string
-  titleIcon?: React.ReactNode
-  negative?: boolean
-  boldedStyle?: boolean
-  isLoading?: boolean
-  hasError?: boolean
-}
-
-function LineItemRow({
-  currencySymbol,
-  amount,
-  title,
-  titleIcon,
-  negative,
-  boldedStyle,
-  isLoading,
-  hasError,
-}: LineItemProps) {
-  const fontStyle = boldedStyle ? fontStyles.bodyBold : fontStyles.body
-  const totalStyle = boldedStyle ? style.totalGreen : style.total
-  return (
-    <View style={style.lineItemRow}>
-      <View style={style.feeRow}>
-        <Text style={[fontStyle, style.totalTitle]}>{title}</Text>
-        {titleIcon}
-      </View>
-      {amount && (
-        <Text style={[fontStyle, totalStyle]}>
-          {negative && '-'}
-          {currencySymbol}
-          {getMoneyDisplayValue(amount)}
-        </Text>
-      )}
-      {hasError && <Text style={[fontStyle, totalStyle]}>---</Text>}
-      {isLoading && (
-        <View style={style.loadingContainer}>
-          <ActivityIndicator size="small" color={colors.celoGreen} />
-        </View>
-      )}
-    </View>
-  )
-}
 
 export interface OwnProps {
   recipientPhone: string
@@ -99,21 +53,23 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
 
     return (
       <View style={style.feeContainer}>
-        <LineItemRow currencySymbol={dollarSymbol} amount={total} title={t('totalSent')} />
+        <LineItemRow
+          currencySymbol={dollarSymbol}
+          amount={total.toString()}
+          title={t('totalSent')}
+        />
         <LineItemRow
           currencySymbol={currencySymbol}
-          amount={fee && roundUp(fee)}
+          amount={fee && roundUp(fee).toString()}
           title={t('securityFee')}
           titleIcon={<FeeIcon />}
-          negative={true}
           isLoading={isLoadingFee}
           hasError={!!feeError}
         />
         <LineItemRow
           currencySymbol={dollarSymbol}
-          amount={amountWithFees}
+          amount={amountWithFees.toString()}
           title={t('totalRefunded')}
-          boldedStyle={true}
         />
       </View>
     )
@@ -239,8 +195,6 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-    withNamespaces(Namespaces.sendFlow7)(ReclaimPaymentConfirmationCard)
-  )
+export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
+  withNamespaces(Namespaces.sendFlow7)(ReclaimPaymentConfirmationCard)
 )
