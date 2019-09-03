@@ -38,6 +38,10 @@ export function parseNumber(input: NumberLike) {
 
 type Parser<A, B> = (input: A) => B
 
+export function identity<A>(a: A) {
+  return a
+}
+
 export function tupleParser<A0, B0>(parser0: Parser<A0, B0>): (...args: [A0]) => [B0]
 export function tupleParser<A0, B0, A1, B1>(
   parser0: Parser<A0, B0>,

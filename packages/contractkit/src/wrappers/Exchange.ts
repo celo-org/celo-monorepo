@@ -3,6 +3,7 @@ import { Exchange } from '../generated/types/Exchange'
 import {
   BaseWrapper,
   CeloTransactionObject,
+  identity,
   NumberLike,
   parseNumber,
   proxyCall,
@@ -24,7 +25,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    */
   getBuyTokenAmount: (sellAmount: NumberLike, sellGold: boolean) => Promise<BigNumber> = proxyCall(
     this.contract.methods.getBuyTokenAmount,
-    tupleParser(parseNumber, (x: boolean) => x),
+    tupleParser(parseNumber, identity),
     toBigNumber
   )
 
@@ -37,7 +38,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    */
   getSellTokenAmount: (buyAmount: NumberLike, sellGold: boolean) => Promise<BigNumber> = proxyCall(
     this.contract.methods.getSellTokenAmount,
-    tupleParser(parseNumber, (x: boolean) => x),
+    tupleParser(parseNumber, identity),
     toBigNumber
   )
 
@@ -70,7 +71,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
   ) => CeloTransactionObject<string> = proxySend(
     this.kit,
     this.contract.methods.exchange,
-    tupleParser(parseNumber, parseNumber, (x: boolean) => x)
+    tupleParser(parseNumber, parseNumber, identity)
   )
 
   /**
