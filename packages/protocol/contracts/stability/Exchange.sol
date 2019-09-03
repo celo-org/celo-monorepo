@@ -167,7 +167,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     FixidityLib.Fraction memory denominator =
       FixidityLib.newFixed(sellTokenBucket).add(reducedSellAmount);
 
-    return uint256(numerator.divide(denominator).fromFixed());
+    return numerator.divide(denominator).fromFixed();
   }
 
   /**
@@ -193,7 +193,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     FixidityLib.Fraction memory denominator = FixidityLib.newFixed(buyTokenBucket.sub(buyAmount))
       .multiply(FixidityLib.fixed1().subtract(spread));
 
-    return uint256(numerator.divide(denominator).fromFixed());
+    return numerator.divide(denominator).fromFixed();
   }
 
   /**
@@ -273,7 +273,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     FixidityLib.Fraction memory denominator =
       FixidityLib.newFixed(sellTokenBucket).add(reducedSellAmount);
 
-    return uint256(numerator.divide(denominator).fromFixed());
+    return numerator.divide(denominator).fromFixed();
   }
 
   function getUpdatedBuckets() private view returns (uint256, uint256) {
@@ -285,7 +285,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
 
   function getUpdatedGoldBucket() private view returns (uint256) {
     uint256 reserveGoldBalance = gold().balanceOf(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
-    return uint256(reserveFraction.multiply(FixidityLib.newFixed(reserveGoldBalance)).fromFixed());
+    return reserveFraction.multiply(FixidityLib.newFixed(reserveGoldBalance)).fromFixed();
   }
 
   /**

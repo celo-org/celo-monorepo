@@ -582,8 +582,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
       previousCumulativeRewardWeight
     );
     require(rewardWeight.unwrap() != 0, "Rewards weight does not exist");
-    uint256 value =
-      uint256(rewardWeight.multiply(FixidityLib.wrap(account.weight)).fromFixed());
+    uint256 value = rewardWeight.multiply(FixidityLib.wrap(account.weight)).fromFixed();
     account.rewardsLastRedeemed = uint96(rewardBlockNumber);
     if (value > 0) {
       address recipient = getDelegateFromAccountAndRole(_account, DelegateRole.Rewards);
