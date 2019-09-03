@@ -14,7 +14,7 @@ const commonProps = {
   ...getMockI18nProps(),
 }
 
-describe(QRCode, () => {
+describe('QRCode', () => {
   const store = createMockStore({
     account: { name: mockName },
     web3: {

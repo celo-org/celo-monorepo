@@ -6,6 +6,7 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
 export interface SettingsItemProps {
+  testID?: string
   title?: string
   children?: React.ReactChild
   onPress?: () => void
@@ -13,10 +14,10 @@ export interface SettingsItemProps {
 
 class SettingsItem extends React.Component<SettingsItemProps> {
   render() {
-    const { title, onPress, children } = this.props
+    const { testID, title, onPress, children } = this.props
 
     return (
-      <Touchable onPress={onPress}>
+      <Touchable testID={testID} onPress={onPress}>
         <View style={style.settingsItemContainer}>
           <View style={[style.title]}>
             {children ? children : <Text style={fontStyles.body}>{title}</Text>}
