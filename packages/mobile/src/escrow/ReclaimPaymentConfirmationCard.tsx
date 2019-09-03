@@ -14,7 +14,7 @@ import Logo from 'src/icons/Logo'
 import { RecipientWithContact } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import FeeIcon from 'src/send/FeeIcon'
-import { getCurrencyColor, getMoneyDisplayValue, roundedUpNumber } from 'src/utils/formatting'
+import { getCurrencyColor, getMoneyDisplayValue, roundUp } from 'src/utils/formatting'
 
 interface LineItemProps {
   currencySymbol: string
@@ -102,7 +102,7 @@ class ReclaimPaymentConfirmationCard extends React.PureComponent<Props> {
         <LineItemRow currencySymbol={dollarSymbol} amount={total} title={t('totalSent')} />
         <LineItemRow
           currencySymbol={currencySymbol}
-          amount={fee && roundedUpNumber(fee)}
+          amount={fee && roundUp(fee)}
           title={t('securityFee')}
           titleIcon={<FeeIcon />}
           negative={true}
