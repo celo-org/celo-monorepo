@@ -19,9 +19,6 @@ done
 
 echo "Starting blockchain api deployment."
 
-echo 'Copying over config file'
-cp "config/config.${NETWORK}.env" .env
-
 echo 'Deploying to gcloud'
 gcloud --project celo-testnet app deploy -q "app.${NETWORK}.yaml"
 
