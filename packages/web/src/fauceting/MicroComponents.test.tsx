@@ -1,7 +1,7 @@
-import { ContextualInfo } from 'src/fauceting/MicroComponents'
-import * as renderer from 'react-test-renderer'
-import { RequestState } from './utils'
 import * as React from 'react'
+import * as renderer from 'react-test-renderer'
+import { ContextualInfo } from 'src/fauceting/MicroComponents'
+import { RequestState } from './utils'
 
 function translator(key: string) {
   return key
