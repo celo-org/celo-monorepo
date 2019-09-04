@@ -30,7 +30,7 @@ A few infrastructure assumptions are made by this module and `celotool`:
     remote backends are. Nothing very sensitive is stored in here, but it should be private.
 1.  A bucket called `celo-testnet-secrets` has been manually created. This is used to store
     sensitive secrets that are uploaded by celotool and downloaded at startup from inside
-    `startup.sh`. This is to ensure that secrets are not stored along in the state files.
+    `startup.sh`. This is to ensure that secrets are not stored in the state files.
 
 ## Google Cloud Permissions Needed
 
