@@ -6,6 +6,10 @@ import "../FixidityLib.sol";
 contract FixidityTest {
   using FixidityLib for FixidityLib.Fraction;
 
+  function newFixed(uint256 a) external view returns (uint256) {
+    return FixidityLib.newFixed(a).unwrap();
+  }
+
   function add(uint256 a, uint256 b) external view returns (uint256) {
     return FixidityLib.wrap(a).add(FixidityLib.wrap(b)).unwrap();
   }

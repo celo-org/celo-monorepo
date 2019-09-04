@@ -13,10 +13,38 @@ contract('FixidityLib', () => {
   const maxUint256 = new BigNumber(
     '115792089237316195423570985008687907853269984665640564039457584007913129639935'
   )
+  const maxNewFixed = new BigNumber('115792089237316195423570985008687907853269984665640564')
   const maxFixedMul = new BigNumber('340282366920938463463374607431768211455999999999999')
 
   beforeEach(async () => {
     fixidityTest = await FixidityTest.new()
+  })
+
+  describe('newFixed', () => {
+    it('should create 0', async () => {
+      const expected = new BigNumber(0)
+      const result = await fixidityTest.newFixed(0)
+
+      assertEqualBN(result, expected)
+    })
+
+    it('should create 1', async () => {
+      const result = await fixidityTest.newFixed(1)
+
+      assertEqualBN(result, fixed1)
+    })
+
+    it('should create maxNewFixed', async () => {
+      const expected = toFixed(maxNewFixed)
+      const result = await fixidityTest.newFixed(maxNewFixed)
+
+      assertEqualBN(expected, result)
+    })
+
+    it('should fail to create maxNewFixed + 1', async () => {
+      const bigNumber = maxNewFixed.plus(1)
+      await assertRevert(fixidityTest.newFixed(bigNumber))
+    })
   })
 
   describe('add', () => {
