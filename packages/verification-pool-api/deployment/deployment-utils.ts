@@ -1,5 +1,6 @@
 import { spawn } from 'child_process'
 import * as fs from 'fs'
+import console = require('console')
 
 export async function setProject(PROJECT_NAME: string) {
   await exec('yarn', ['run', 'firebase', 'use', PROJECT_NAME])
@@ -87,6 +88,7 @@ async function exec(command: string, args: string[]) {
       }
     })
     proc.stderr.on('data', (error) => {
+      console.log(error)
       reject(error)
     })
   })
