@@ -16,15 +16,14 @@ export function setEnv(CELO_ENV: string) {
 }
 
 export async function deploy(CELO_ENV: string) {
-  await exec('env', ['-v'])
-  // await exec('yarn', ['run', 'build:for-env', CELO_ENV])
-  // await exec('yarn', [
-  //   'run',
-  //   'firebase',
-  //   'deploy',
-  //   '--only',
-  //   `database,hosting,functions:handleVerificationRequest${CELO_ENV}`,
-  // ])
+  await exec('yarn', ['run', 'build:for-env', CELO_ENV])
+  await exec('yarn', [
+    'run',
+    'firebase',
+    'deploy',
+    '--only',
+    `database,hosting,functions:handleVerificationRequest${CELO_ENV}`,
+  ])
 }
 
 export async function setConfig(
@@ -73,11 +72,9 @@ export async function deleteDeployment(CELO_ENV: string) {
 // This function was based on one found in /protocol/lib/test-utils.ts
 async function exec(command: string, args: string[]) {
   return new Promise((resolve, reject) => {
-    const env = process.env
     const proc = spawn(command, args, {
-      stdio: [process.stdout, process.stderr],
       cwd: __dirname,
-      env: env,
+      shell: true,
     })
     proc.on('error', (error: any) => {
       reject(error)
@@ -88,6 +85,14 @@ async function exec(command: string, args: string[]) {
       } else {
         resolve()
       }
+    })
+    proc.stdout.on('data', (data: any) => {
+      console.log('Child data stdout: ' + data)
+      reject(data)
+    })
+    proc.stderr.on('data', (data: any) => {
+      console.log('Child data stderr: ' + data)
+      reject(data)
     })
   })
 }
