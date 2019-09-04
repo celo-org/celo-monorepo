@@ -1,10 +1,14 @@
 steps:
 
-# Deploy using yarn command 
+# Install using yarn command 
 - name: "gcr.io/celo-testnet/global/yarn-gcloud"
   args: ['yarn']
+  id: Install using yarn
+
+# Build using yarn build command 
+- name: "gcr.io/celo-testnet/global/yarn-gcloud"
+  args: ['yarn', 'build']
   id: Build install using yarn
-  dir: packages/verification-pool-api
 
 # Deploy using yarn command 
 - name: "gcr.io/celo-testnet/global/yarn-gcloud"
