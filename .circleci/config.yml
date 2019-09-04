@@ -448,7 +448,10 @@ jobs:
     steps:
       - run:
           name: Installing npm package - @celo/walletkit
-          command: yarn add @celo/walletkit
+          command: |
+            # Try one more time in case the first attempt fails
+            # to deal with scenarios like https://circleci.com/gh/celo-org/celo-monorepo/23329
+            yarn add @celo/walletkit || yarn add @celo/walletkit
 
   test-celocli-npm-package-install:
     working_directory: ~/app
