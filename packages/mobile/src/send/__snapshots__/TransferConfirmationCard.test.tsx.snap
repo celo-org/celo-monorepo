@@ -13,7 +13,8 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
         "flex": 1,
         "flexDirection": "column",
         "justifyContent": "flex-start",
-        "padding": 20,
+        "paddingHorizontal": 40,
+        "paddingVertical": 20,
       },
     ]
   }
@@ -128,7 +129,8 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
         "flex": 1,
         "flexDirection": "column",
         "justifyContent": "flex-start",
-        "padding": 20,
+        "paddingHorizontal": 40,
+        "paddingVertical": 20,
       },
     ]
   }
@@ -330,14 +332,6 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
       100.00
     </Text>
   </View>
-  <View
-    style={
-      Object {
-        "alignItems": "stretch",
-        "flexDirection": "column",
-      }
-    }
-  />
 </View>
 `;
 
@@ -354,7 +348,8 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
         "flex": 1,
         "flexDirection": "column",
         "justifyContent": "flex-start",
-        "padding": 20,
+        "paddingHorizontal": 40,
+        "paddingVertical": 20,
       },
     ]
   }
@@ -556,181 +551,24 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
       100.00
     </Text>
   </View>
-  <View
+  <Text
     style={
-      Object {
-        "alignItems": "stretch",
-        "flexDirection": "column",
-      }
+      Array [
+        Object {
+          "color": "#81868B",
+          "fontFamily": "Hind-Light",
+          "fontSize": 14,
+          "lineHeight": 18,
+          "textAlign": "center",
+        },
+        Object {
+          "paddingTop": 5,
+        },
+      ]
     }
   >
-    <Text
-      style={
-        Array [
-          Object {
-            "color": "#81868B",
-            "fontFamily": "Hind-Light",
-            "fontSize": 14,
-            "lineHeight": 18,
-            "textAlign": "center",
-          },
-          Object {
-            "paddingTop": 5,
-          },
-        ]
-      }
-    >
-      Rent request for June, it is already late!!!
-    </Text>
-    <View
-      style={
-        Object {
-          "borderStyle": "solid",
-          "borderTopColor": "#EEEEEE",
-          "borderTopWidth": 1,
-          "marginTop": 10,
-          "width": "100%",
-        }
-      }
-    />
-    <View
-      style={
-        Object {
-          "alignItems": "stretch",
-          "justifyContent": "center",
-          "marginBottom": 10,
-          "marginTop": 10,
-        }
-      }
-    >
-      <View
-        style={
-          Object {
-            "flexDirection": "row",
-            "justifyContent": "space-between",
-          }
-        }
-      >
-        <View
-          style={
-            Object {
-              "alignItems": "flex-start",
-              "flexDirection": "row",
-            }
-          }
-        >
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 20,
-              }
-            }
-          >
-            securityFee
-          </Text>
-          <View
-            accessible={true}
-            hitSlop={
-              Object {
-                "bottom": 10,
-                "left": 10,
-                "right": 10,
-                "top": 10,
-              }
-            }
-            isTVSelectable={true}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-            style={
-              Object {
-                "alignItems": "center",
-                "justifyContent": "flex-end",
-                "opacity": 1,
-                "paddingHorizontal": 5,
-              }
-            }
-          >
-            <Image
-              source={
-                Object {
-                  "testUri": "../../../src/images/info.png",
-                }
-              }
-              style={
-                Object {
-                  "height": 12,
-                  "width": 12,
-                }
-              }
-            />
-          </View>
-        </View>
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 14,
-              "lineHeight": 20,
-            }
-          }
-        >
-          $
-          0.0100
-        </Text>
-      </View>
-      <View
-        style={
-          Object {
-            "flexDirection": "row",
-            "justifyContent": "space-between",
-          }
-        }
-      >
-        <View
-          style={
-            Object {
-              "alignItems": "flex-start",
-              "flexDirection": "row",
-            }
-          }
-        >
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 20,
-              }
-            }
-          >
-            total
-          </Text>
-        </View>
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 14,
-              "lineHeight": 20,
-            }
-          }
-        >
-          $
-          100.0100
-        </Text>
-      </View>
-    </View>
-  </View>
+    Rent request for June, it is already late!!!
+  </Text>
 </View>
 `;
 
@@ -747,7 +585,8 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
         "flex": 1,
         "flexDirection": "column",
         "justifyContent": "flex-start",
-        "padding": 20,
+        "paddingHorizontal": 40,
+        "paddingVertical": 20,
       },
     ]
   }

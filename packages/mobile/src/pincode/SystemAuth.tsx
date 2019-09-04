@@ -5,6 +5,7 @@ import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { randomBytes } from 'react-native-randombytes'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import { setPin } from 'src/account/actions'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import DevSkipButton from 'src/components/DevSkipButton'
@@ -24,9 +25,15 @@ interface DispatchProps {
 
 type Props = StateProps & DispatchProps & WithNamespaces
 
-const mapDispatchToProps = {
-  setPin,
-}
+// Use bindActionCreators to workaround a typescript error with the shorthand syntax with redux-thunk actions
+// see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37369
+const mapDispatchToProps = (dispatch: any) =>
+  bindActionCreators(
+    {
+      setPin,
+    },
+    dispatch
+  )
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {

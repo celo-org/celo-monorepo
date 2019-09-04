@@ -79,6 +79,7 @@ const vNeg1Schema = {
     paymentRequests: [],
     showFakeData: false,
     backupCompleted: false,
+    backupDelayedTime: 0,
     dismissedEarnRewards: false,
     dismissedInviteFriends: false,
   },
@@ -114,6 +115,14 @@ const v0Schema = {
   },
   recipients: {
     recipientCache: {},
+  },
+  web3: {
+    ...vNeg1Schema.web3,
+    syncProgress: {
+      startingBlock: 0,
+      currentBlock: 0,
+      highestBlock: 0,
+    },
   },
 }
 

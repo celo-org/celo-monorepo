@@ -17,6 +17,7 @@ import {
   TransferPaymentAction,
 } from 'src/escrow/actions'
 import { sentEscrowedPaymentsSelector } from 'src/escrow/reducer'
+import { calculateFee } from 'src/fees/saga'
 import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { Actions as IdentityActions, EndVerificationAction } from 'src/identity/actions'
@@ -35,7 +36,6 @@ import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
-import { fetchGasPrice } from 'src/web3/gas'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 
 const TAG = 'escrow/saga'
@@ -158,20 +158,21 @@ async function createReclaimTransaction(paymentID: string) {
   return escrow.methods.revoke(paymentID)
 }
 
-export async function getReclaimEscrowFee(account: string, paymentID: string) {
-  // create mock transaction and get gas
+export async function getReclaimEscrowGas(account: string, paymentID: string) {
+  Logger.debug(`${TAG}/getReclaimEscrowGas`, 'Getting gas estimate for escrow reclaim tx')
   const tx = await createReclaimTransaction(paymentID)
   const txParams = {
     from: account,
     gasCurrency: (await getStableTokenContract(web3))._address,
   }
   const gas = new BigNumber(await tx.estimateGas(txParams))
-  const gasPrice = new BigNumber(await fetchGasPrice())
-  Logger.debug(`${TAG}/getReclaimEscrowFee`, `estimated gas: ${gas}`)
-  Logger.debug(`${TAG}/getReclaimEscrowFee`, `gas price: ${gasPrice}`)
-  const feeInWei = gas.multipliedBy(gasPrice)
-  Logger.debug(`${TAG}/getReclaimEscrowFee`, `New fee is: ${feeInWei}`)
-  return feeInWei
+  Logger.debug(`${TAG}/getReclaimEscrowGas`, `Estimated gas of ${gas.toString()}}`)
+  return gas
+}
+
+export async function getReclaimEscrowFee(account: string, paymentID: string) {
+  const gas = await getReclaimEscrowGas(account, paymentID)
+  return calculateFee(gas)
 }
 
 function* reclaimFromEscrow(action: ReclaimPaymentAction) {
