@@ -47,5 +47,5 @@ export enum CustomEventNames {
 }
 
 // REMOVE name and number at end of Pilot
-export const PROPERTY_PATH_WHITELIST = ['name', 'number', 'valid', 'lang', 'countryCode']
+export const PROPERTY_PATH_WHITELIST = ['name', 'number', 'valid', 'lang', 'countryCode', 'issuer']
 export { DefaultEventNames }
