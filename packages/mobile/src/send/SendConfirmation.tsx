@@ -207,9 +207,6 @@ class SendConfirmation extends React.Component<Props, State> {
       secondaryBtnInfo = { action: this.onEditClick, text: t('edit'), disabled: isSending }
     }
 
-    // For fulfilling payment request confirmations, we want to show the send transfer card
-    const reviewCardType = type === TransactionTypes.PAY_REQUEST ? TransactionTypes.SENT : type
-
     return (
       <View style={styles.container}>
         <DisconnectBanner />

@@ -37,53 +37,42 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 // Bordered content placed in a ReviewFrame for summarizing a payment request
 class PaymentRequestReviewCard extends React.Component<OwnProps & StateProps & WithNamespaces> {
-  renderTopSection = () => {
-    const { recipient, address, e164PhoneNumber } = this.props
-    return (
-      <Avatar
-        name={recipient ? recipient.displayName : undefined}
-        address={address}
-        e164Number={e164PhoneNumber}
-      />
-    )
-  }
-
-  renderAmountSection = () => {
-    const { currency, value } = this.props
-    return (
-      <MoneyAmount
-        symbol={CURRENCIES[currency].symbol}
-        amount={getMoneyDisplayValue(value)}
-        color={colors.celoGreen}
-        sign={'+'}
-      />
-    )
-  }
-
-  renderBottomSection = () => {
-    const { t, dollarBalance, value, comment } = this.props
-
-    return (
-      <View style={style.bottomContainer}>
-        {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
-        <HorizontalLine />
-        <View style={style.feeContainer}>
-          <LineItemRow
-            currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-            amount={getMoneyDisplayValue(value.plus(dollarBalance))}
-            title={t('newAccountBalance')}
-          />
-        </View>
-      </View>
-    )
-  }
-
   render() {
+    const {
+      recipient,
+      address,
+      e164PhoneNumber,
+      t,
+      dollarBalance,
+      currency,
+      value,
+      comment,
+    } = this.props
+
     return (
       <View style={[componentStyles.roundedBorder, style.container]}>
-        {this.renderTopSection()}
-        {this.renderAmountSection()}
-        {this.renderBottomSection()}
+        <Avatar
+          name={recipient ? recipient.displayName : undefined}
+          address={address}
+          e164Number={e164PhoneNumber}
+        />
+        <MoneyAmount
+          symbol={CURRENCIES[currency].symbol}
+          amount={getMoneyDisplayValue(value)}
+          color={colors.celoGreen}
+          sign={'+'}
+        />
+        <View style={style.bottomContainer}>
+          {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
+          <HorizontalLine />
+          <View style={style.feeContainer}>
+            <LineItemRow
+              currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+              amount={getMoneyDisplayValue(value.plus(dollarBalance))}
+              title={t('newAccountBalance')}
+            />
+          </View>
+        </View>
       </View>
     )
   }
