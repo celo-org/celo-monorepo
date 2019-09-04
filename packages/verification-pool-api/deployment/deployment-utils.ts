@@ -16,6 +16,7 @@ export function setEnv(CELO_ENV: string) {
 }
 
 export async function deploy(CELO_ENV: string) {
+  await exec('env', ['-v'])
   await exec('yarn', ['run', 'build:for-env', CELO_ENV])
   await exec('yarn', [
     'run',
@@ -77,6 +78,12 @@ async function exec(command: string, args: string[]) {
       shell: true,
     })
     proc.on('error', (error: any) => {
+      try {
+        console.log('Child data error: ' + error)
+        console.log('Child data error: ' + String.fromCharCode.apply(null, error))
+      } catch (e) {
+        console.log(e)
+      }
       reject(error)
     })
     proc.on('exit', (code: any) => {
