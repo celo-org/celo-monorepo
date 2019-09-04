@@ -50,7 +50,14 @@ class PaymentRequestReviewCard extends React.Component<OwnProps & StateProps & W
 
   renderAmountSection = () => {
     const { currency, value } = this.props
-    return <MoneyAmount symbol={CURRENCIES[currency].symbol} amount={getMoneyDisplayValue(value)} />
+    return (
+      <MoneyAmount
+        symbol={CURRENCIES[currency].symbol}
+        amount={getMoneyDisplayValue(value)}
+        color={colors.celoGreen}
+        sign={'+'}
+      />
+    )
   }
 
   renderBottomSection = () => {

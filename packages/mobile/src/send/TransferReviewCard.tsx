@@ -33,24 +33,21 @@ export interface OwnProps {
 // Bordered content placed in a ReviewFrame
 // Differs from TransferConfirmationCard which is used for viewing completed txs
 class TransferReviewCard extends React.Component<OwnProps & WithNamespaces> {
-  renderTopSection = () => {
-    const { recipient, address, e164PhoneNumber } = this.props
-    return (
-      <Avatar
-        name={recipient ? recipient.displayName : undefined}
-        address={address}
-        e164Number={e164PhoneNumber}
-      />
-    )
-  }
+  render() {
+    const {
+      recipient,
+      address,
+      e164PhoneNumber,
+      currency,
+      t,
+      type,
+      value,
+      comment,
+      fee,
+      isLoadingFee,
+      feeError,
+    } = this.props
 
-  renderAmountSection = () => {
-    const { currency, value } = this.props
-    return <MoneyAmount symbol={CURRENCIES[currency].symbol} amount={getMoneyDisplayValue(value)} />
-  }
-
-  renderBottomSection = () => {
-    const { t, type, value, comment, fee, isLoadingFee, feeError } = this.props
     const amountWithFees = value.plus(fee || 0)
     const adjustedFee =
       type === TransactionTypes.INVITE_SENT && fee
@@ -58,41 +55,39 @@ class TransferReviewCard extends React.Component<OwnProps & WithNamespaces> {
         : fee
 
     return (
-      <View style={style.bottomContainer}>
-        {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
-        <HorizontalLine />
-        <View style={style.feeContainer}>
-          {type === TransactionTypes.INVITE_SENT && (
+      <View style={[componentStyles.roundedBorder, style.container]}>
+        <Avatar
+          name={recipient ? recipient.displayName : undefined}
+          address={address}
+          e164Number={e164PhoneNumber}
+        />
+        <MoneyAmount symbol={CURRENCIES[currency].symbol} amount={getMoneyDisplayValue(value)} />
+        <View style={style.bottomContainer}>
+          {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
+          <HorizontalLine />
+          <View style={style.feeContainer}>
+            {type === TransactionTypes.INVITE_SENT && (
+              <LineItemRow
+                currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+                amount={getMoneyDisplayValue(getInvitationVerificationFeeInDollars())}
+                title={t('inviteAndSecurityFee')}
+              />
+            )}
             <LineItemRow
               currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-              amount={getMoneyDisplayValue(getInvitationVerificationFeeInDollars())}
-              title={t('inviteAndSecurityFee')}
+              amount={getFeeDisplayValue(adjustedFee)}
+              title={t('securityFee')}
+              titleIcon={<FeeIcon />}
+              isLoading={isLoadingFee}
+              hasError={!!feeError}
             />
-          )}
-          <LineItemRow
-            currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-            amount={getFeeDisplayValue(adjustedFee)}
-            title={t('securityFee')}
-            titleIcon={<FeeIcon />}
-            isLoading={isLoadingFee}
-            hasError={!!feeError}
-          />
-          <LineItemRow
-            currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-            amount={getMoneyDisplayValue(amountWithFees)}
-            title={t('total')}
-          />
+            <LineItemRow
+              currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+              amount={getMoneyDisplayValue(amountWithFees)}
+              title={t('total')}
+            />
+          </View>
         </View>
-      </View>
-    )
-  }
-
-  render() {
-    return (
-      <View style={[componentStyles.roundedBorder, style.container]}>
-        {this.renderTopSection()}
-        {this.renderAmountSection()}
-        {this.renderBottomSection()}
       </View>
     )
   }

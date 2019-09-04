@@ -14,7 +14,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
         "flexDirection": "column",
         "justifyContent": "flex-start",
         "paddingHorizontal": 40,
-        "paddingVertical": 20,
+        "paddingVertical": 25,
       },
     ]
   }
@@ -30,7 +30,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
         "alignSelf": "center",
         "height": 40,
         "marginBottom": 40,
-        "marginTop": 30,
+        "marginTop": 25,
         "width": 40,
       }
     }
@@ -49,28 +49,13 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
       style={
         Array [
           Object {
-            "fontFamily": "Hind-Regular",
-            "fontSize": 34,
-          },
-          Object {
-            "color": "#42D689",
-          },
-        ]
-      }
-    >
-      +
-    </Text>
-    <Text
-      style={
-        Array [
-          Object {
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 24,
             "textAlignVertical": "top",
           },
           Object {
-            "color": "#42D689",
+            "color": "#81868B",
           },
         ]
       }
@@ -89,7 +74,7 @@ exports[`TransferConfirmationCard renders correctly for faucet drilldown 1`] = `
             "lineHeight": 64,
           },
           Object {
-            "color": "#42D689",
+            "color": "#81868B",
           },
         ]
       }
@@ -130,7 +115,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
         "flexDirection": "column",
         "justifyContent": "flex-start",
         "paddingHorizontal": 40,
-        "paddingVertical": 20,
+        "paddingVertical": 25,
       },
     ]
   }
@@ -138,17 +123,25 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
   <View
     style={
       Object {
-        "marginTop": 5,
+        "flexDirection": "column",
+        "justifyContent": "center",
+        "marginBottom": 10,
       }
     }
   >
     <View
       style={
-        Object {
-          "flexDirection": "column",
-          "justifyContent": "center",
-          "marginBottom": 10,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "justifyContent": "center",
+          },
+          Object {
+            "alignSelf": "center",
+            "margin": "auto",
+          },
+        ]
       }
     >
       <View
@@ -156,117 +149,101 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
           Array [
             Object {
               "alignItems": "center",
-              "flexDirection": "row",
               "justifyContent": "center",
             },
             Object {
-              "alignSelf": "center",
-              "margin": "auto",
+              "backgroundColor": "#7AD6FE",
+              "borderRadius": 20,
+              "height": 40,
+              "width": 40,
             },
           ]
         }
       >
-        <View
+        <Text
           style={
             Array [
               Object {
-                "alignItems": "center",
-                "justifyContent": "center",
+                "color": "#FFFFFF",
+                "fontFamily": "Hind-Medium",
+                "fontSize": 16,
               },
               Object {
-                "backgroundColor": "#7AD6FE",
-                "borderRadius": 20,
-                "height": 40,
-                "width": 40,
+                "fontSize": 20,
               },
             ]
           }
         >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#FFFFFF",
-                  "fontFamily": "Hind-Medium",
-                  "fontSize": 16,
-                },
-                Object {
-                  "fontSize": 20,
-                },
-              ]
-            }
-          >
-            #
-          </Text>
-        </View>
+          #
+        </Text>
       </View>
+    </View>
+    <Text
+      ellipsizeMode="tail"
+      numberOfLines={1}
+      style={
+        Array [
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 14,
+            "lineHeight": 18,
+          },
+          Object {
+            "marginHorizontal": 20,
+            "paddingTop": 6,
+            "textAlign": "center",
+          },
+        ]
+      }
+    >
+      #000000000000000...
+    </Text>
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "alignSelf": "center",
+          "flexDirection": "row",
+          "justifyContent": "center",
+        }
+      }
+    >
       <Text
-        ellipsizeMode="tail"
-        numberOfLines={1}
         style={
           Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "marginHorizontal": 20,
-              "paddingTop": 6,
-              "textAlign": "center",
-            },
-          ]
-        }
-      >
-        #000000000000000...
-      </Text>
-      <View
-        style={
-          Object {
-            "alignItems": "center",
-            "alignSelf": "center",
-            "flexDirection": "row",
-            "justifyContent": "center",
-          }
-        }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Light",
-                "fontSize": 14,
-                "textAlignVertical": "center",
-              },
-              Object {
-                "alignItems": "center",
-                "backgroundColor": "#EEEEEE",
-                "borderRadius": 3,
-                "justifyContent": "center",
-                "marginRight": 5,
-                "paddingLeft": 6,
-                "paddingRight": 3,
-              },
-            ]
-          }
-        >
-           +1
-        </Text>
-        <Text
-          style={
             Object {
               "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 14,
               "textAlignVertical": "center",
-            }
+            },
+            Object {
+              "alignItems": "center",
+              "backgroundColor": "#EEEEEE",
+              "borderRadius": 3,
+              "justifyContent": "center",
+              "marginRight": 5,
+              "paddingLeft": 6,
+              "paddingRight": 3,
+            },
+          ]
+        }
+      >
+         +1
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Light",
+            "fontSize": 14,
+            "textAlignVertical": "center",
           }
-        >
-          (415) 555-0000
-        </Text>
-      </View>
+        }
+      >
+        (415) 555-0000
+      </Text>
     </View>
   </View>
   <View
@@ -283,28 +260,13 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
       style={
         Array [
           Object {
-            "fontFamily": "Hind-Regular",
-            "fontSize": 34,
-          },
-          Object {
-            "color": "#42D689",
-          },
-        ]
-      }
-    >
-      +
-    </Text>
-    <Text
-      style={
-        Array [
-          Object {
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 24,
             "textAlignVertical": "top",
           },
           Object {
-            "color": "#42D689",
+            "color": "#81868B",
           },
         ]
       }
@@ -323,7 +285,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
             "lineHeight": 64,
           },
           Object {
-            "color": "#42D689",
+            "color": "#81868B",
           },
         ]
       }
@@ -348,7 +310,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
         "flexDirection": "column",
         "justifyContent": "flex-start",
         "paddingHorizontal": 40,
-        "paddingVertical": 20,
+        "paddingVertical": 25,
       },
     ]
   }
@@ -356,17 +318,25 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
   <View
     style={
       Object {
-        "marginTop": 5,
+        "flexDirection": "column",
+        "justifyContent": "center",
+        "marginBottom": 10,
       }
     }
   >
     <View
       style={
-        Object {
-          "flexDirection": "column",
-          "justifyContent": "center",
-          "marginBottom": 10,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "justifyContent": "center",
+          },
+          Object {
+            "alignSelf": "center",
+            "margin": "auto",
+          },
+        ]
       }
     >
       <View
@@ -374,117 +344,101 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
           Array [
             Object {
               "alignItems": "center",
-              "flexDirection": "row",
               "justifyContent": "center",
             },
             Object {
-              "alignSelf": "center",
-              "margin": "auto",
+              "backgroundColor": "#7AD6FE",
+              "borderRadius": 20,
+              "height": 40,
+              "width": 40,
             },
           ]
         }
       >
-        <View
+        <Text
           style={
             Array [
               Object {
-                "alignItems": "center",
-                "justifyContent": "center",
+                "color": "#FFFFFF",
+                "fontFamily": "Hind-Medium",
+                "fontSize": 16,
               },
               Object {
-                "backgroundColor": "#7AD6FE",
-                "borderRadius": 20,
-                "height": 40,
-                "width": 40,
+                "fontSize": 20,
               },
             ]
           }
         >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#FFFFFF",
-                  "fontFamily": "Hind-Medium",
-                  "fontSize": 16,
-                },
-                Object {
-                  "fontSize": 20,
-                },
-              ]
-            }
-          >
-            #
-          </Text>
-        </View>
+          #
+        </Text>
       </View>
+    </View>
+    <Text
+      ellipsizeMode="tail"
+      numberOfLines={1}
+      style={
+        Array [
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 14,
+            "lineHeight": 18,
+          },
+          Object {
+            "marginHorizontal": 20,
+            "paddingTop": 6,
+            "textAlign": "center",
+          },
+        ]
+      }
+    >
+      #000000000000000...
+    </Text>
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "alignSelf": "center",
+          "flexDirection": "row",
+          "justifyContent": "center",
+        }
+      }
+    >
       <Text
-        ellipsizeMode="tail"
-        numberOfLines={1}
         style={
           Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "marginHorizontal": 20,
-              "paddingTop": 6,
-              "textAlign": "center",
-            },
-          ]
-        }
-      >
-        #000000000000000...
-      </Text>
-      <View
-        style={
-          Object {
-            "alignItems": "center",
-            "alignSelf": "center",
-            "flexDirection": "row",
-            "justifyContent": "center",
-          }
-        }
-      >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Light",
-                "fontSize": 14,
-                "textAlignVertical": "center",
-              },
-              Object {
-                "alignItems": "center",
-                "backgroundColor": "#EEEEEE",
-                "borderRadius": 3,
-                "justifyContent": "center",
-                "marginRight": 5,
-                "paddingLeft": 6,
-                "paddingRight": 3,
-              },
-            ]
-          }
-        >
-           +1
-        </Text>
-        <Text
-          style={
             Object {
               "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 14,
               "textAlignVertical": "center",
-            }
+            },
+            Object {
+              "alignItems": "center",
+              "backgroundColor": "#EEEEEE",
+              "borderRadius": 3,
+              "justifyContent": "center",
+              "marginRight": 5,
+              "paddingLeft": 6,
+              "paddingRight": 3,
+            },
+          ]
+        }
+      >
+         +1
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Light",
+            "fontSize": 14,
+            "textAlignVertical": "center",
           }
-        >
-          (415) 555-0000
-        </Text>
-      </View>
+        }
+      >
+        (415) 555-0000
+      </Text>
     </View>
   </View>
   <View
@@ -497,21 +451,6 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
       }
     }
   >
-    <Text
-      style={
-        Array [
-          Object {
-            "fontFamily": "Hind-Regular",
-            "fontSize": 34,
-          },
-          Object {
-            "color": "#81868B",
-          },
-        ]
-      }
-    >
-      
-    </Text>
     <Text
       style={
         Array [
@@ -584,7 +523,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
         "flexDirection": "column",
         "justifyContent": "flex-start",
         "paddingHorizontal": 40,
-        "paddingVertical": 20,
+        "paddingVertical": 25,
       },
     ]
   }
@@ -600,7 +539,7 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
         "alignSelf": "center",
         "height": 40,
         "marginBottom": 40,
-        "marginTop": 30,
+        "marginTop": 25,
         "width": 40,
       }
     }
@@ -615,21 +554,6 @@ exports[`TransferConfirmationCard renders correctly for verification fee drilldo
       }
     }
   >
-    <Text
-      style={
-        Array [
-          Object {
-            "fontFamily": "Hind-Regular",
-            "fontSize": 34,
-          },
-          Object {
-            "color": "#81868B",
-          },
-        ]
-      }
-    >
-      
-    </Text>
     <Text
       style={
         Array [
