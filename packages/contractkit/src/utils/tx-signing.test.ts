@@ -24,7 +24,7 @@ function generateAccountAddressFromPrivateKey(privateKey: string): string {
 
 testWithGanache('Transaction Utils', (web3: Web3) => {
   // describe('Transaction Utils', () => {
-  describe('Signer Testing', () => {
+  describe.skip('Signer Testing', () => {
     it('should be able to sign and get the signer back', async () => {
       jest.setTimeout(20 * 1000)
       await addLocalAccount(web3, PRIVATE_KEY)
