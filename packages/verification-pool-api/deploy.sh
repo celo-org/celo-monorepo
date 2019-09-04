@@ -19,7 +19,7 @@ done
 
 echo "Starting verification pool api deployment."
 
-yarn
+yarn --network-timeout 1000000
 yarn run firebase use celo-testnet
 yarn set-env $NETWORK
 yarn run build:for-env $NETWORK
