@@ -1,5 +1,4 @@
 import { deriveCEK } from '@celo/utils/src/commentEncryption'
-import { AsyncStorage } from 'react-native'
 import { generateMnemonic, mnemonicToSeedHex } from 'react-native-bip39'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { call, delay, put, race, select, take } from 'redux-saga/effects'
@@ -15,6 +14,7 @@ import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData } from 'src/geth/geth'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
+import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 import {
   Actions,
@@ -114,7 +114,7 @@ export function* createNewAccount() {
 
   if (accountAddress) {
     try {
-      yield call(AsyncStorage.setItem, 'mnemonic', mnemonic)
+      yield call(setKey, 'mnemonic', mnemonic)
     } catch (e) {
       Logger.debug(TAG + '@createNewAccount', 'Failed to set mnemonic: ' + e)
       Logger.error(TAG + '@createNewAccount', e)

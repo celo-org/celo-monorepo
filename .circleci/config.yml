@@ -212,10 +212,13 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
-      - run:
+      - run: 
+          name: Generate DevChain
           command: |
-            yarn --cwd=packages/contractkit test:prepare
-            yarn --cwd=packages/contractkit test
+            (cd packages/contractkit && yarn test:prepare)
+      - run:
+          name: Run Tests
+          command: yarn --cwd=packages/contractkit test
 
 
   walletkit-test:

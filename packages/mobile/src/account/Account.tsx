@@ -38,7 +38,6 @@ interface StateProps {
   account: string | null
   e164PhoneNumber: string
   devModeActive: boolean
-  backupCompleted: boolean
   analyticsEnabled: boolean
 }
 
@@ -53,7 +52,6 @@ const mapStateToProps = (state: RootState): StateProps => {
     account: state.web3.account,
     devModeActive: state.account.devModeActive || false,
     e164PhoneNumber: state.account.e164PhoneNumber,
-    backupCompleted: state.account.backupCompleted,
     analyticsEnabled: state.app.analyticsEnabled,
   }
 }
@@ -191,7 +189,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, backupCompleted, account } = this.props
+    const { t, account } = this.props
 
     return (
       <ScrollView style={style.scrollView}>
@@ -214,9 +212,7 @@ export class Account extends React.Component<Props, State> {
           />
         </View>
         <View style={style.containerList}>
-          {!backupCompleted ? (
-            <SettingsItem title={t('backupKey')} onPress={this.backupScreen} />
-          ) : null}
+          <SettingsItem title={t('backupKey')} onPress={this.backupScreen} />
           <SettingsItem title={t('invite')} onPress={this.goToInvite} />
           {features.SHOW_SHOW_REWARDS_APP_LINK && (
             <SettingsItem title={t('celoRewards')} onPress={navigateToVerifierApp} />
