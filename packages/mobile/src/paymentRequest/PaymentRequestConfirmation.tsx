@@ -8,6 +8,7 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import { PaymentRequestStatuses } from 'src/account'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -45,10 +46,16 @@ interface DispatchProps {
   showError: typeof showError
 }
 
-const mapDispatchToProps = {
-  writePaymentRequest,
-  showError,
-}
+// Use bindActionCreators to workaround a typescript error with the shorthand syntax with redux-thunk actions
+// see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37369
+const mapDispatchToProps = (dispatch: any) =>
+  bindActionCreators(
+    {
+      writePaymentRequest,
+      showError,
+    },
+    dispatch
+  )
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
