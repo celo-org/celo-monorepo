@@ -8,6 +8,7 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import { PaymentRequestStatuses } from 'src/account'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -20,7 +21,7 @@ import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
+import TransferReviewCard from 'src/send/TransferReviewCard'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { TransactionTypes } from 'src/transactions/reducer'
 import Logger from 'src/utils/Logger'
@@ -45,10 +46,16 @@ interface DispatchProps {
   showError: typeof showError
 }
 
-const mapDispatchToProps = {
-  writePaymentRequest,
-  showError,
-}
+// Use bindActionCreators to workaround a typescript error with the shorthand syntax with redux-thunk actions
+// see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37369
+const mapDispatchToProps = (dispatch: any) =>
+  bindActionCreators(
+    {
+      writePaymentRequest,
+      showError,
+    },
+    dispatch
+  )
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -159,7 +166,7 @@ class RequestConfirmation extends React.Component<Props> {
           }}
           modifyButton={{ action: this.onPressEdit, text: t('edit'), disabled: false }}
         >
-          <TransferConfirmationCard
+          <TransferReviewCard
             type={TransactionTypes.PAY_REQUEST}
             recipient={recipient}
             address={requesteeAddress || ''}

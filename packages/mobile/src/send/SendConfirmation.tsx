@@ -26,25 +26,25 @@ import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import { sendPaymentOrInvite } from 'src/send/actions'
-import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
+import TransferReviewCard from 'src/send/TransferReviewCard'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { TransactionTypes } from 'src/transactions/reducer'
 import { currentAccountSelector } from 'src/web3/selectors'
-
-const numeral = require('numeral')
 
 export interface ConfirmationInput {
   recipient: Recipient
   amount: BigNumber
   reason: string
   recipientAddress?: string | null
+  type: TransactionTypes
 }
+
 interface StateProps {
   account: string | null
   isSending: boolean
   defaultCountryCode: string
-  dollarBalance: BigNumber
+  dollarBalance: string
   appConnected: boolean
 }
 
@@ -63,7 +63,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     account: currentAccountSelector(state),
     isSending: state.send.isSending,
     defaultCountryCode: state.account.defaultCountryCode,
-    dollarBalance: new BigNumber(state.stableToken.balance || 0),
+    dollarBalance: state.stableToken.balance || '0',
     appConnected: isAppConnected(state),
   }
 }
@@ -136,15 +136,13 @@ class SendConfirmation extends React.Component<Props, State> {
   }
 
   renderHeader = () => {
-    const { isPaymentRequest } = this.getNavParams()
     const { t } = this.props
-    const { recipientAddress } = this.getConfirmationInput()
-    const showInvite = !recipientAddress
+    const { type } = this.getConfirmationInput()
     let title
 
-    if (isPaymentRequest) {
+    if (type === TransactionTypes.PAY_REQUEST) {
       title = t('payRequest')
-    } else if (showInvite) {
+    } else if (type === TransactionTypes.INVITE_SENT) {
       title = t('inviteVerifyPayment')
     } else {
       title = t('reviewPayment')
@@ -182,14 +180,12 @@ class SendConfirmation extends React.Component<Props, State> {
   }
 
   renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
-    const { t, appConnected, isSending } = this.props
-    const { amount, reason, recipient, recipientAddress } = this.getConfirmationInput()
+    const { t, appConnected, isSending, dollarBalance } = this.props
+    const { amount, reason, recipient, recipientAddress, type } = this.getConfirmationInput()
 
-    const currentBalance = this.props.dollarBalance
-    const fee = asyncFee.result && getFeeDollars(asyncFee.result)
-    const amountWithFee = new BigNumber(numeral(amount).value()).plus(fee || 0)
-    const userHasEnough = !asyncFee.loading && amountWithFee.isLessThanOrEqualTo(currentBalance)
-    const { isPaymentRequest } = this.getNavParams()
+    const fee = getFeeDollars(asyncFee.result)
+    const amountWithFee = amount.plus(fee || 0)
+    const userHasEnough = !asyncFee.loading && amountWithFee.isLessThanOrEqualTo(dollarBalance)
     const isPrimaryButtonDisabled = isSending || !userHasEnough || !appConnected || !!asyncFee.error
     let primaryBtnInfo = {
       action: this.onSendButtonClick,
@@ -197,7 +193,7 @@ class SendConfirmation extends React.Component<Props, State> {
       disabled: isPrimaryButtonDisabled,
     }
     let secondaryBtnInfo = { action: this.onPressEdit, text: t('edit'), disabled: isSending }
-    if (isPaymentRequest) {
+    if (type === TransactionTypes.PAY_REQUEST) {
       primaryBtnInfo = {
         action: this.sendOrInvite,
         text: i18n.t('paymentRequestFlow:pay'),
@@ -220,7 +216,7 @@ class SendConfirmation extends React.Component<Props, State> {
           modifyButton={secondaryBtnInfo}
           shouldReset={this.state.buttonReset}
         >
-          <TransferConfirmationCard
+          <TransferReviewCard
             recipient={recipient}
             address={recipientAddress || ''}
             e164PhoneNumber={recipient.e164PhoneNumber}
@@ -230,8 +226,7 @@ class SendConfirmation extends React.Component<Props, State> {
             fee={fee}
             isLoadingFee={asyncFee.loading}
             feeError={asyncFee.error}
-            type={isPaymentRequest && TransactionTypes.PAY_REQUEST}
-            dollarBalance={this.props.dollarBalance}
+            type={type}
           />
           <Modal
             isVisible={this.state.modalVisible}
@@ -267,7 +262,7 @@ class SendConfirmation extends React.Component<Props, State> {
 
     const feeProps: CalculateFeeProps = recipientAddress
       ? { feeType: FeeType.SEND, account, recipientAddress, amount, comment: reason }
-      : { feeType: FeeType.INVITE }
+      : { feeType: FeeType.INVITE, account, amount, comment: reason }
 
     return (
       // Note: intentionally passing a new child func here otherwise

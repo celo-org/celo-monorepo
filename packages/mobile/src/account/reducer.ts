@@ -1,5 +1,4 @@
 import { isE164Number } from '@celo/utils/src/phoneNumbers'
-import { AsyncStorage } from 'react-native'
 import { Actions, ActionTypes } from 'src/account/actions'
 import { PaymentRequest } from 'src/account/types'
 import { DEV_SETTINGS_ACTIVE_INITIALLY } from 'src/config'
@@ -87,7 +86,6 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
         accountCreationTime: getRemoteTime(),
       }
     case Actions.SET_BACKUP_COMPLETED_ACTION:
-      AsyncStorage.removeItem('mnemonic') // remove the backup key from storage
       return {
         ...state,
         backupCompleted: true,
