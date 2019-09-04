@@ -2033,9 +2033,9 @@
     qqjs "^0.3.10"
     tslib "^1.9.3"
 
-"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#224db21":
+"@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#816a475":
   version "6.6.0"
-  resolved "git+https://github.com/celo-org/ganache-cli.git#224db21eff76521175c08495ba1dcd0b6ffe6e4e"
+  resolved "git+https://github.com/celo-org/ganache-cli.git#816a475d82535c05b59c4c43b3603c39dd31cd88"
   dependencies:
     ethereumjs-util "6.1.0"
     source-map-support "0.5.12"
