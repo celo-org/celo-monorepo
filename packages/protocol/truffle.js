@@ -65,6 +65,9 @@ const networks = {
 
             // Test contracts
             '**/test/*.sol',
+
+            // Interfaces
+            '**/interfaces/*.sol',
           ],
         })
         coverageProvider.addProvider(global.coverageSubprovider)
