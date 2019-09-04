@@ -29,28 +29,46 @@ contract Registry is IRegistry, Ownable, Initializable {
    * @param addr Address of contract.
    */
   function setAddressFor(string calldata identifier, address addr) external onlyOwner {
-    bytes32 hash = keccak256(
-      abi.encodePacked(identifier)
-    );
-    registry[hash] = addr;
-    emit RegistryUpdated(identifier, hash, addr);
+    bytes32 identifierHash = keccak256(abi.encodePacked(identifier));
+    registry[identifierHash] = addr;
+    emit RegistryUpdated(identifier, identifierHash, addr);
   }
 
   /**
-   * @notice Gets address associated with the given identifier.
-   * @param identifier Identifier hash of contract whose address we want to look up.
+   * @notice Gets address associated with the given identifierHash.
+   * @param identifierHash Identifier hash of contract whose address we want to look up.
    * @dev Throws if address not set.
    */
-  function getAddressForOrDie(bytes32 identifier) external view returns (address) {
-    require(registry[identifier] != address(0), "identifier has no registry entry");
-    return registry[identifier];
+  function getAddressForOrDie(bytes32 identifierHash) external view returns (address) {
+    require(registry[identifierHash] != address(0), "identifier has no registry entry");
+    return registry[identifierHash];
+  }
+
+  /**
+   * @notice Gets address associated with the given identifierHash.
+   * @param identifierHash Identifier hash of contract whose address we want to look up.
+   */
+  function getAddressFor(bytes32 identifierHash) external view returns (address) {
+    return registry[identifierHash];
   }
 
   /**
    * @notice Gets address associated with the given identifier.
-   * @param identifier Identifier hash of contract whose address we want to look up.
+   * @param identifier Identifier of contract whose address we want to look up.
+   * @dev Throws if address not set.
    */
-  function getAddressFor(bytes32 identifier) external view returns (address) {
-    return registry[identifier];
+  function getAddressForOrDieString(string calldata identifier) external view returns (address) {
+    bytes32 identifierHash = keccak256(abi.encodePacked(identifier));
+    require(registry[identifierHash] != address(0), "identifier has no registry entry");
+    return registry[identifierHash];
+  }
+
+  /**
+   * @notice Gets address associated with the given identifier.
+   * @param identifier Identifier of contract whose address we want to look up.
+   */
+  function getAddressForString(string calldata identifier) external view returns (address) {
+    bytes32 identifierHash = keccak256(abi.encodePacked(identifier));
+    return registry[identifierHash];
   }
 }

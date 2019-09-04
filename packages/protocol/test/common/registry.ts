@@ -51,7 +51,7 @@ contract('Registry', (accounts: any) => {
   })
 
   describe('#getAddressForOrDie()', () => {
-    it('should provide access to registry by string identifier', async () => {
+    it('should provide access to registry by identifier hash', async () => {
       await registry.setAddressFor(anIdentifier, anAddress)
       assert.equal(await registry.getAddressForOrDie(hash), anAddress)
     })
@@ -62,13 +62,35 @@ contract('Registry', (accounts: any) => {
   })
 
   describe('#getAddressFor()', () => {
-    it('should provide access to registry by string identifier', async () => {
+    it('should provide access to registry by identifier hash', async () => {
       await registry.setAddressFor(anIdentifier, anAddress)
       assert.equal(await registry.getAddressFor(hash), anAddress)
     })
 
     it('should not revert if address not set', async () => {
       await registry.getAddressFor(hash)
+    })
+  })
+
+  describe('#getAddressForOrDieString()', () => {
+    it('should provide access to registry by string identifier', async () => {
+      await registry.setAddressFor(anIdentifier, anAddress)
+      assert.equal(await registry.getAddressForOrDieString(anIdentifier), anAddress)
+    })
+
+    it('should revert if address not set', async () => {
+      await assertRevert(registry.getAddressForOrDieString(anIdentifier))
+    })
+  })
+
+  describe('#getAddressForString()', () => {
+    it('should provide access to registry by identifier hash', async () => {
+      await registry.setAddressFor(anIdentifier, anAddress)
+      assert.equal(await registry.getAddressForString(anIdentifier), anAddress)
+    })
+
+    it('should not revert if address not set', async () => {
+      await registry.getAddressForString(anIdentifier)
     })
   })
 })
