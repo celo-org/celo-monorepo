@@ -18,6 +18,7 @@ import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { coinsIcon, unknownUserIcon } from 'src/images/Images'
 import { Invitees } from 'src/invite/actions'
+import useLocalAmount from 'src/localCurrency/useLocalAmount'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes, TransferStandby } from 'src/transactions/reducer'
@@ -87,25 +88,28 @@ export function getCurrencyStyles(currency: CURRENCY_ENUM, type: string): Curren
   }
 }
 
-export class TransferFeedItem extends React.PureComponent<Props> {
-  decryptComment = (type: string) => {
-    return this.props.comment && this.props.commentKey && features.USE_COMMENT_ENCRYPTION
-      ? decryptCommentRaw(this.props.comment, this.props.commentKey, type === TransactionTypes.SENT)
-          .comment
-      : this.props.comment
+export function TransferFeedItem(props: Props) {
+  const {
+    t,
+    value,
+    address,
+    timestamp,
+    i18n,
+    type,
+    symbol,
+    status,
+    invitees,
+    addressToE164Number,
+    recipientCache,
+  } = props
+
+  const decryptComment = () => {
+    return props.comment && props.commentKey && features.USE_COMMENT_ENCRYPTION
+      ? decryptCommentRaw(props.comment, props.commentKey, type === TransactionTypes.SENT).comment
+      : props.comment
   }
 
-  navigateToTransactionReview = () => {
-    const {
-      address,
-      timestamp,
-      type,
-      symbol,
-      value,
-      addressToE164Number,
-      recipientCache,
-    } = this.props
-
+  const navigateToTransactionReview = () => {
     if (!Object.values(TransactionTypes).includes(type)) {
       Logger.error(TAG, 'Invalid transaction type')
       return
@@ -119,10 +123,9 @@ export class TransferFeedItem extends React.PureComponent<Props> {
 
     const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
 
-    const comment = this.decryptComment(type)
     navigateToPaymentTransferReview(type, timestamp, {
       address,
-      comment,
+      comment: decryptComment(),
       currency: resolveCurrency(symbol),
       value: new BigNumber(value),
       recipient,
@@ -131,132 +134,116 @@ export class TransferFeedItem extends React.PureComponent<Props> {
     })
   }
 
-  renderRewardIcon() {
-    return (
+  const localValue = useLocalAmount(value)
+  let comment: string | null = decryptComment()
+  const timeFormatted = formatFeedTime(timestamp, i18n)
+  const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
+  const currencyStyle = getCurrencyStyles(resolveCurrency(symbol), type)
+  const isPending = status === TransactionStatus.Pending
+
+  let icon, title
+
+  // TODO move this out to a seperate file, too much clutter here
+  if (type === TransactionTypes.VERIFICATION_FEE) {
+    icon = <Image source={coinsIcon} style={styles.image} />
+    title = 'Celo'
+    comment = t('verificationFee')
+  } else if (type === TransactionTypes.VERIFICATION_REWARD) {
+    icon = (
       <View style={styles.image}>
         <RewardIcon height={38} />
       </View>
     )
-  }
+    title = 'Celo'
+    comment = t('verifierReward')
+  } else if (type === TransactionTypes.FAUCET) {
+    icon = <Image source={coinsIcon} style={styles.image} />
+    title = 'Celo'
+    comment = DEFAULT_TESTNET ? `${_.startCase(DEFAULT_TESTNET)} Faucet` : 'Faucet'
+  } else if (type === TransactionTypes.INVITE_SENT) {
+    icon = <Image source={coinsIcon} style={styles.image} />
+    const inviteeE164Number = invitees[address]
+    const inviteeRecipient = recipientCache[inviteeE164Number]
+    title = 'Celo'
+    comment = inviteeE164Number
+      ? `${t('invited')} ${inviteeRecipient ? inviteeRecipient.displayName : inviteeE164Number}`
+      : t('inviteFlow11:inviteSent')
+  } else if (type === TransactionTypes.INVITE_RECEIVED) {
+    icon = <Image source={coinsIcon} style={styles.image} />
+    title = 'Celo'
+    comment = t('inviteFlow11:inviteReceived')
+  } else {
+    const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
+    const shortAddr = address.substring(0, 8)
 
-  render() {
-    const {
-      t,
-      address,
-      timestamp,
-      i18n,
-      type,
-      symbol,
-      status,
-      invitees,
-      addressToE164Number,
-      recipientCache,
-    } = this.props
-    let comment: string | null = this.decryptComment(type)
-    const timeFormatted = formatFeedTime(timestamp, i18n)
-    const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
-    const currencyStyle = getCurrencyStyles(resolveCurrency(symbol), type)
-    const isPending = status === TransactionStatus.Pending
-    const opacityStyle = { opacity: isPending ? 0.3 : 1 }
-
-    let icon, title
-
-    // TODO move this out to a seperate file, too much clutter here
-    if (type === TransactionTypes.VERIFICATION_FEE) {
-      icon = <Image source={coinsIcon} style={styles.image} />
-      title = 'Celo'
-      comment = t('verificationFee')
-    } else if (type === TransactionTypes.VERIFICATION_REWARD) {
-      icon = this.renderRewardIcon()
-      title = 'Celo'
-      comment = t('verifierReward')
-    } else if (type === TransactionTypes.FAUCET) {
-      icon = <Image source={coinsIcon} style={styles.image} />
-      title = 'Celo'
-      comment = DEFAULT_TESTNET ? `${_.startCase(DEFAULT_TESTNET)} Faucet` : 'Faucet'
-    } else if (type === TransactionTypes.INVITE_SENT) {
-      icon = <Image source={coinsIcon} style={styles.image} />
-      const inviteeE164Number = invitees[address]
-      const inviteeRecipient = recipientCache[inviteeE164Number]
-      title = 'Celo'
-      comment = inviteeE164Number
-        ? `${t('invited')} ${inviteeRecipient ? inviteeRecipient.displayName : inviteeE164Number}`
-        : t('inviteFlow11:inviteSent')
-    } else if (type === TransactionTypes.INVITE_RECEIVED) {
-      icon = <Image source={coinsIcon} style={styles.image} />
-      title = 'Celo'
-      comment = t('inviteFlow11:inviteReceived')
+    if (recipient) {
+      title = recipient.displayName
+    } else if (type === TransactionTypes.RECEIVED) {
+      title = t('receivedFrom', { address: shortAddr })
+    } else if (type === TransactionTypes.SENT) {
+      title = t('sentTo', { address: shortAddr })
     } else {
-      const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
-      const shortAddr = address.substring(0, 8)
-
-      if (recipient) {
-        title = recipient.displayName
-      } else if (type === TransactionTypes.RECEIVED) {
-        title = t('receivedFrom', { address: shortAddr })
-      } else if (type === TransactionTypes.SENT) {
-        title = t('sentTo', { address: shortAddr })
-      } else {
-        // Fallback to just using the type
-        title = _.capitalize(t(_.camelCase(type)))
-      }
-      icon = (
-        <ContactCircle address={address} size={avatarSize}>
-          {!recipient ? <Image source={unknownUserIcon} style={styles.image} /> : null}
-        </ContactCircle>
-      )
+      // Fallback to just using the type
+      title = _.capitalize(t(_.camelCase(type)))
     }
-
-    return (
-      <Touchable onPress={this.navigateToTransactionReview}>
-        <View style={styles.container}>
-          <View style={styles.iconContainer}>{icon}</View>
-          <View style={styles.contentContainer}>
-            <View style={styles.titleContainer}>
-              <Text style={[fontStyles.semiBold, styles.title]}>{title}</Text>
-              <Text
-                style={[
-                  currencyStyle.direction === '-'
-                    ? fontStyles.activityCurrencySent
-                    : fontStyles.activityCurrencyReceived,
-                  styles.amount,
-                ]}
-              >
-                {currencyStyle.direction}
-                {getMoneyDisplayValue(this.props.value)}
-              </Text>
-            </View>
-            {!!comment && <Text style={[fontStyles.comment, styles.textComment]}>{comment}</Text>}
-            <View style={[styles.statusContainer, !!comment && styles.statusContainerUnderComment]}>
-              {isPending && (
-                <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
-                  <Text style={[fontStyles.bodySmallBold, styles.textPending]}>
-                    {t('confirmingPayment')}
-                  </Text>
-                  {' ' + timeFormatted}
-                </Text>
-              )}
-              {status === TransactionStatus.Complete && (
-                <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
-                  {dateTimeFormatted}
-                </Text>
-              )}
-              {status === TransactionStatus.Failed && (
-                <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
-                  <Text style={fontStyles.linkSmall}>{t('paymentFailed')}</Text>
-                  {' ' + timeFormatted}
-                </Text>
-              )}
-              <Text style={[fontStyles.bodySmall, styles.localAmount]}>
-                {currencyStyle.direction}
-                {`${getMoneyDisplayValue(this.props.value)} MXN`}
-              </Text>
-            </View>
-          </View>
-        </View>
-      </Touchable>
+    icon = (
+      <ContactCircle address={address} size={avatarSize}>
+        {!recipient ? <Image source={unknownUserIcon} style={styles.image} /> : null}
+      </ContactCircle>
     )
   }
+
+  return (
+    <Touchable onPress={navigateToTransactionReview}>
+      <View style={styles.container}>
+        <View style={styles.iconContainer}>{icon}</View>
+        <View style={styles.contentContainer}>
+          <View style={styles.titleContainer}>
+            <Text style={[fontStyles.semiBold, styles.title]}>{title}</Text>
+            <Text
+              style={[
+                currencyStyle.direction === '-'
+                  ? fontStyles.activityCurrencySent
+                  : fontStyles.activityCurrencyReceived,
+                styles.amount,
+              ]}
+            >
+              {currencyStyle.direction}
+              {getMoneyDisplayValue(props.value)}
+            </Text>
+          </View>
+          {!!comment && <Text style={[fontStyles.comment, styles.textComment]}>{comment}</Text>}
+          <View style={[styles.statusContainer, !!comment && styles.statusContainerUnderComment]}>
+            {isPending && (
+              <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
+                <Text style={[fontStyles.bodySmallBold, styles.textPending]}>
+                  {t('confirmingPayment')}
+                </Text>
+                {' ' + timeFormatted}
+              </Text>
+            )}
+            {status === TransactionStatus.Complete && (
+              <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
+                {dateTimeFormatted}
+              </Text>
+            )}
+            {status === TransactionStatus.Failed && (
+              <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
+                <Text style={fontStyles.linkSmall}>{t('paymentFailed')}</Text>
+                {' ' + timeFormatted}
+              </Text>
+            )}
+            {localValue && (
+              <Text style={[fontStyles.bodySmall, styles.localAmount]}>
+                {currencyStyle.direction}
+                {`${getMoneyDisplayValue(localValue)} MXN`}
+              </Text>
+            )}
+          </View>
+        </View>
+      </View>
+    </Touchable>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -322,4 +309,4 @@ const styles = StyleSheet.create({
 })
 
 // @ts-ignore
-export default withNamespaces(Namespaces.walletFlow5)(TransferFeedItem)
+export default withNamespaces(Namespaces.walletFlow5)(React.memo(TransferFeedItem))

@@ -7,6 +7,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import useBalanceAutoRefresh from 'src/home/useBalanceAutoRefresh'
 import { Namespaces } from 'src/i18n'
+import useLocalAmount from 'src/localCurrency/useLocalAmount'
 import useSelector from 'src/redux/useSelector'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
@@ -19,6 +20,7 @@ type Props = WithNamespaces & OwnProps
 function CeloDollarsOverview({ t }: Props) {
   useBalanceAutoRefresh()
   const dollarBalance = useSelector((state) => state.stableToken.balance)
+  const localBalance = useLocalAmount(dollarBalance)
 
   return (
     <View style={styles.container}>
@@ -27,7 +29,10 @@ function CeloDollarsOverview({ t }: Props) {
         {getMoneyDisplayValue(dollarBalance || 0)}
       </Text>
       <Text style={[fontStyles.light, styles.localBalance]}>
-        Equal to <Text style={fontStyles.semiBold}>8,083.21 MXN</Text>
+        Equal to{' '}
+        <Text style={fontStyles.semiBold}>
+          {localBalance ? getMoneyDisplayValue(localBalance) : '---'} MXN
+        </Text>
       </Text>
     </View>
   )
