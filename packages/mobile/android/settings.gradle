@@ -66,5 +66,5 @@ project(':react-native-sms-retriever').projectDir = new File(rootProject.project
 include ':react-native-share'
 project(':react-native-share').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-share/android')
 include ':react-native-secure-key-store'
-project(':react-native-secure-key-store').projectDir = new File(rootProject.projectDir, 	'../../../node_modules/react-native-secure-key-store/android')
+project(':react-native-secure-key-store').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-secure-key-store/android')
 include ':app'
