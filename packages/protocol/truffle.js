@@ -60,10 +60,6 @@ const networks = {
         global.coverageSubprovider = new CoverageSubprovider(artifactAdapter, DEVELOPMENT_FROM, {
           isVerbose: true,
           ignoreFilesGlobs: [
-            // Need custom precompiles
-            'common/GoldToken.sol',
-            'identity/Attestations.sol',
-
             // Proxies
             '**/*Proxy.sol',
 
