@@ -5,6 +5,7 @@ import * as util from './deployment-utils'
 import parseArgs from 'minimist'
 
 const envArg = parseArgs(process.argv.slice(2))['celo-env']
-util.setProject(parseArgs(process.argv.slice(2))['celo-proj'])
+const project = parseArgs(process.argv.slice(2))['celo-proj'] || 'celo-testnet'
+util.setProject(project)
 util.setEnv(envArg)
 util.deploy(envArg)
