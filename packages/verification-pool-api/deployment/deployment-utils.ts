@@ -16,14 +16,15 @@ export function setEnv(CELO_ENV: string) {
 }
 
 export async function deploy(CELO_ENV: string) {
-  await exec('yarn', ['run', 'build:for-env', CELO_ENV])
-  await exec('yarn', [
-    'run',
-    'firebase',
-    'deploy',
-    '--only',
-    `database,hosting,functions:handleVerificationRequest${CELO_ENV}`,
-  ])
+  await exec('echo', ['$(env)'])
+  // await exec('yarn', ['run', 'build:for-env', CELO_ENV])
+  // await exec('yarn', [
+  //   'run',
+  //   'firebase',
+  //   'deploy',
+  //   '--only',
+  //   `database,hosting,functions:handleVerificationRequest${CELO_ENV}`,
+  // ])
 }
 
 export async function setConfig(
