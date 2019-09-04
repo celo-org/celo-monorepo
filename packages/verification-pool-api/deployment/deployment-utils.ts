@@ -88,7 +88,7 @@ async function exec(command: string, args: string[]) {
       }
     })
     proc.stderr.on('data', (error) => {
-      console.log(error)
+      console.log(error.toString('ascii'))
       reject(error)
     })
   })
