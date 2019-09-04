@@ -72,9 +72,11 @@ export async function deleteDeployment(CELO_ENV: string) {
 // This function was based on one found in /protocol/lib/test-utils.ts
 async function exec(command: string, args: string[]) {
   return new Promise((resolve, reject) => {
+    const env = Object.create(process.env)
     const proc = spawn(command, args, {
       stdio: [process.stdout, process.stderr],
       cwd: __dirname,
+      env: env,
     })
     proc.on('error', (error: any) => {
       reject(error)
