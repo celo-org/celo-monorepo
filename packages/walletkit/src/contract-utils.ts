@@ -322,7 +322,7 @@ export interface Contracts {
 export async function getContracts(web3: Web3): Promise<Contracts> {
   const contractListToExport = [
     'Attestations',
-    'LockedGold',
+    'BondedDeposits',
     'Escrow',
     'Exchange',
     'GoldToken',

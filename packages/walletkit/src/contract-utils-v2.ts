@@ -158,7 +158,6 @@ export default class ContractUtils {
       .getGasPriceMinimum(currencyAddress)
       .call()
 
-    // TODO Revisit this multiplier?
     return new BigNumber(gasPriceMinimumInCurrency).times(5)
   }
 

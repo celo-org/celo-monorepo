@@ -2010,10 +2010,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo/client@^0.0.109":
-  version "0.0.109"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.109.tgz#1a5d36e97dd7c487f1f3a159fb55d88448dc2e39"
-  integrity sha512-YI4Ori+a6ZFYXc9vfscWuKTni1e/HxAULQ66/OoztCMLOk5+T27etCYhvYQ3l7qiQF81E8+2YQpKIUgTo57j4g==
+"@celo/client@6d0eb11":
+  version "0.0.110"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.110.tgz#9fd7257992a11faa6def3ad1617fba04ee368c35"
+  integrity sha512-9p4ZE+1Umrd+to7qr3WtBnYZD3x16UZRv0QZehgVX/RW3nmRHL6lW1B5TEN5CMNUqkaApesrpTahIMd2//+oyA==
 
 "@celo/dev-cli@^2.0.3":
   version "2.0.3"
@@ -24546,9 +24546,9 @@ react-native-gesture-handler@^1.1.0:
     invariant "^2.2.2"
     prop-types "^15.5.10"
 
-"react-native-geth@git+https://github.com/celo-org/react-native-geth#9c876b45e97c472039e4100e55561e10fa4752f5":
+"react-native-geth@git+https://github.com/celo-org/react-native-geth#3f8971d":
   version "0.1.0-development"
-  resolved "git+https://github.com/celo-org/react-native-geth#9c876b45e97c472039e4100e55561e10fa4752f5"
+  resolved "git+https://github.com/celo-org/react-native-geth#3f8971dd0ef8c79363dbf77e97c029ee7f3afbfa"
 
 react-native-install-referrer@^1.0.1:
   version "1.0.1"

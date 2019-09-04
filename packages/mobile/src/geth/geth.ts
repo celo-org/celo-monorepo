@@ -61,7 +61,12 @@ async function createNewGeth(): Promise<typeof RNGeth> {
     peerDiscovery,
     syncMode,
     useLightweightKDF: true,
+    enodes:
+      'enode://93dfb5cc7cf1fc9d60997427cca3d4c05a1705eae8b50393841267df3ea4d4eab6528137aa2d0d40b158c33555fb7b07c74882c60fb625423ac74c535db6c57e@35.185.215.79:30301',
+    // bootstrapEnodeUrls: ['enode://93dfb5cc7cf1fc9d60997427cca3d4c05a1705eae8b50393841267df3ea4d4eab6528137aa2d0d40b158c33555fb7b07c74882c60fb625423ac74c535db6c57e@35.185.215.79:30301']
   }
+
+  Logger.debug('Geth@newGeth gethOptions:', gethOptions)
 
   // Setup Logging
   const logFilePath = Logger.getGethLogFilePath()
@@ -73,6 +78,7 @@ async function createNewGeth(): Promise<typeof RNGeth> {
   // The logcat logging mode remains unchanged.
   gethOptions.logFileLogLevel = LogLevel.INFO
   Logger.debug('Geth@newGeth', 'Geth logs will be piped to ' + logFilePath)
+  Logger.debug('Geth@newGeth gethOptions:', gethOptions)
 
   return new RNGeth(gethOptions)
 }
@@ -87,11 +93,12 @@ async function initGeth() {
   gethLock = true
 
   try {
+    Logger.info('Geth@init', 'A')
     if (gethInstance) {
       Logger.debug('Geth@init', 'Geth already exists, trying to stop it.')
       await stop()
     }
-
+    Logger.info('Geth@init', 'B')
     if (!(await ensureGenesisBlockWritten())) {
       throw FailedToFetchGenesisBlockError
     }
@@ -101,10 +108,12 @@ async function initGeth() {
     const geth = await createNewGeth()
 
     try {
+      Logger.info('Geth@init', 'C reeeeee')
       await geth.start()
       gethInstance = geth
       geth.subscribeNewHead()
     } catch (e) {
+      Logger.info('Geth@init', 'D')
       const errorType = getGethErrorType(e)
       if (errorType === ErrorType.GethAlreadyRunning) {
         // Geth is already running, this is most likely RN restart.
@@ -123,6 +132,7 @@ async function initGeth() {
     }
   } finally {
     gethLock = false
+    Logger.info('Geth@init', 'E')
   }
 }
 
@@ -145,8 +155,9 @@ async function ensureStaticNodesInitialized(): Promise<boolean> {
     let enodes: string | null = null
     try {
       enodes = await StaticNodeUtils.getStaticNodesAsync(currentNetworkName)
-      console.log('----- trevor -----\ninside ensureStaticNodesInitialized')
-      enodes = `["enode://04ab809f886edbec3a5840f98de53bc7e6da18beeef8f977a373718e8a7bdf8814cab05a5ecfefb6595b0e592428ee6d62756bc8b274d8c72af9982641fd299e@35.247.89.129:30301"]`
+      Logger.debug('----- trevor -----\ninside ensureStaticNodesInitialized!')
+      enodes = `[]`
+      // enodes = `["enode://04ab809f886edbec3a5840f98de53bc7e6da18beeef8f977a373718e8a7bdf8814cab05a5ecfefb6595b0e592428ee6d62756bc8b274d8c72af9982641fd299e@35.247.89.129:30301"]`
     } catch (error) {
       Logger.error(
         `Failed to get static nodes for network ${currentNetworkName},` +
