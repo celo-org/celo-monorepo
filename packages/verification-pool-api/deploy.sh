@@ -23,10 +23,11 @@ cd ../../
 yarn --network-timeout 1000000
 yarn build
 cd packages/verification-pool-api
-yarn run firebase use celo-testnet
-yarn set-env $NETWORK
-yarn run build:for-env $NETWORK
-yarn firebase-bolt schema.bolt
-yarn run firebase deploy --only "database,functions:handleVerificationRequest$NETWORK" --debug
+# yarn run firebase use celo-testnet
+# yarn set-env $NETWORK
+# yarn run build:for-env $NETWORK
+# yarn firebase-bolt schema.bolt
+# yarn run firebase deploy --only "database,functions:handleVerificationRequest$NETWORK" --debug
+yarn deploy integration
 
 echo "Done deployment."

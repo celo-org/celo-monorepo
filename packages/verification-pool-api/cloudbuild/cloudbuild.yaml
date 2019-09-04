@@ -15,4 +15,4 @@ steps:
   args: ['yarn', 'deploy:cloudbuild', '-n', '$_NETWORK_NAME']
   id: Deploy verification pool api to firebase based on _NETWORK_NAME substitution (integration, production, etc.)
   dir: packages/verification-pool-api
-timeout: "1200s"
+timeout: "2200s"
