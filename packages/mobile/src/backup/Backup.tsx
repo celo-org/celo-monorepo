@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { AsyncStorage } from 'react-native'
 import { connect } from 'react-redux'
 import { setBackupCompleted, setBackupDelayed } from 'src/account/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
@@ -12,6 +11,7 @@ import { createQuizWordList, selectQuizWordOptions } from 'src/backup/utils'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
+import { getKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 
 export const DAYS_TO_BACKUP = 1
@@ -29,6 +29,7 @@ interface State {
 
 interface StateProps {
   language: string | null
+  backupCompleted: boolean
   backupTooLate: boolean
   backupDelayedTime: number
 }
@@ -45,6 +46,7 @@ type Props = StateProps & DispatchProps
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     language: state.app.language,
+    backupCompleted: state.account.backupCompleted,
     backupTooLate: isBackupTooLate(state),
     backupDelayedTime: state.account.backupDelayedTime,
   }
@@ -76,9 +78,9 @@ export class Backup extends React.Component<Props, State> {
     }
 
     try {
-      const mnemonic = await AsyncStorage.getItem('mnemonic')
+      const mnemonic = await getKey('mnemonic')
       if (!mnemonic) {
-        throw new Error('Mnemonic not stored in memory')
+        throw new Error('Mnemonic not stored in key store')
       }
       this.setState({ mnemonic })
 
@@ -117,14 +119,24 @@ export class Backup extends React.Component<Props, State> {
   }
 
   onFinish = async () => {
-    this.props.exitBackupFlow()
     this.props.setBackupCompleted()
     navigateBack()
   }
 
   render() {
     const { mnemonic, currentQuestion, wordsForBackupQuiz } = this.state
-    const { backupDelayedTime, backupTooLate } = this.props
+    const { backupCompleted, backupDelayedTime, backupTooLate } = this.props
+
+    if (backupCompleted) {
+      return (
+        <BackupComplete
+          backupCompleted={backupCompleted}
+          onPress={this.onCancel}
+          mnemonic={mnemonic}
+        />
+      )
+    }
+
     if (currentQuestion === -1) {
       return (
         <BackupIntroduction
