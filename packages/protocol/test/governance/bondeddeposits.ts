@@ -1058,7 +1058,7 @@ contract('LockedGold', (accounts: string[]) => {
       }
     }
 
-    it('should match a simple typescript implementation', async () => {
+    it.skip('should match a simple typescript implementation', async () => {
       const numActions = 100
       const numAccounts = 2
       await executeActionsAndAssertState(numActions, numAccounts)
