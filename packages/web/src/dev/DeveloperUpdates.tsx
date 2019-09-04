@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import Title from 'src/dev/Title'
@@ -18,7 +18,7 @@ const eventsImg = require('src/dev/devEvents.png')
 const discourseImg = require('src/dev/discourse.png')
 
 export default withNamespaces('dev')(
-  memo(function DeveloperUpdates({ t }: I18nProps) {
+  React.memo(function DeveloperUpdates({ t }: I18nProps) {
     return (
       <>
         <span id={'signup'} />

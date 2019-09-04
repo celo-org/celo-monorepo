@@ -22,6 +22,7 @@
     "@segment/in-eu": "^0.2.1",
     "@sentry/browser": "^5.6.2",
     "@sentry/node": "^5.6.2",
+    "@types/lodash.throttle": "^4.1.6",
     "@zeit/next-sass": "^1.0.1",
     "@zeit/next-typescript": "^1.1.1",
     "airtable": "^0.6.0",

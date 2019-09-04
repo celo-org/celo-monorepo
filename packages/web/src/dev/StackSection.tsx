@@ -22,8 +22,8 @@ interface Props {
   buttonTwo: BTNProps
 }
 
-export default withScreenSize(
-  React.memo(function StackSection(props: Props & ScreenProps) {
+export default withScreenSize<Props>(
+  React.memo<Props>(function StackSection(props: Props & ScreenProps) {
     const { title, text, buttonOne, buttonTwo, label, children } = props
     return (
       <Fade duration={500} bottom={true} distance="20px">

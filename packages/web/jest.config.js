@@ -11,10 +11,9 @@ module.exports = {
   },
   moduleDirectories: ['.', '../../node_modules', './node_modeles'],
 
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', '.png', '.jpg'],
   moduleNameMapper: {
-    '^[./a-zA-Z0-9$_-]+\\.png$': '<rootDir>/RelativeImageStub.js',
-    '^image![a-zA-Z0-9$_-]+$': 'GlobalImageStub',
+    '^[./a-zA-Z0-9$_-]+\\.(png|jpg)$': '<rootDir>/__mocks__/ImageStub.ts',
     'next-i18next': '<rootDir>/node_modules/next-i18next',
     'next/config': '<rootDir>/__mocks__/next-server/config',
   },

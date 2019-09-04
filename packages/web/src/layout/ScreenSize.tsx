@@ -1,5 +1,5 @@
 import throttle from 'lodash.throttle'
-import * as MobileDetect from 'mobile-detect'
+import MobileDetect from 'mobile-detect'
 import * as React from 'react'
 import { Dimensions } from 'react-native'
 import { DESKTOP_BREAKPOINT, TABLET_BREAKPOINT } from 'src/shared/Styles'
@@ -67,7 +67,7 @@ export interface ScreenProps {
 }
 
 export function withScreenSize<T>(Component: React.ComponentType<T>) {
-  return function ScreenSizeContainer(props: any) {
+  return function ScreenSizeContainer(props: T) {
     return (
       <ScreenSizeContext.Consumer>
         {({ screen }) => {
