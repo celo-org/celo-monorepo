@@ -227,7 +227,7 @@ class SendConfirmation extends React.Component<Props, State> {
             fee={fee}
             isLoadingFee={asyncFee.loading}
             feeError={asyncFee.error}
-            type={reviewCardType}
+            type={type}
           />
           <Modal
             isVisible={this.state.modalVisible}
