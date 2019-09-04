@@ -1,5 +1,5 @@
-import SectionHead from '@celo/react-components/components/SectionHead'
-import Touchable from '@celo/react-components/components/Touchable'
+import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
+import QRCodeIcon from '@celo/react-components/icons/QRCode'
 import SettingsIcon from '@celo/react-components/icons/Settings'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
@@ -19,13 +19,13 @@ import {
 import { BoxShadow } from 'react-native-shadow'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import AccountInfo from 'src/account/AccountInfo'
 import { hideAlert, showMessage } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { exitBackupFlow } from 'src/app/actions'
-import AccountOverview from 'src/components/AccountOverview'
 import { ALERT_BANNER_DURATION } from 'src/config'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
+import CeloDollarsOverview from 'src/home/CeloDollarsOverview'
+import HeaderButton from 'src/home/HeaderButton'
 import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
 import TransactionsList from 'src/home/TransactionsList'
@@ -44,6 +44,7 @@ import { resetStandbyTransactions } from 'src/transactions/actions'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const SCREEN_WIDTH = variables.width
+const HEADER_ICON_SIZE = 24
 
 interface StateProps {
   loading: boolean
@@ -92,30 +93,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
   recipientCache: recipientCacheSelector(state),
   appConnected: isAppConnected(state),
 })
-
-const Header = () => {
-  return (
-    <>
-      <AccountInfo />
-      <AccountOverview testID="AccountOverviewInHome" />
-    </>
-  )
-}
-
-const settings = () => {
-  navigate(Screens.Account)
-}
-
-const HeaderIcon = () => (
-  <Touchable
-    borderless={true}
-    hitSlop={{ left: 15, bottom: 15, top: 15, right: 15 }}
-    style={styles.settingsIcon}
-    onPress={settings}
-  >
-    <SettingsIcon color={colors.celoGreen} />
-  </Touchable>
-)
 
 const AnimatedSectionList: SectionList<any> = Animated.createAnimatedComponent(SectionList)
 
@@ -169,9 +146,12 @@ export class WalletHome extends React.Component<Props> {
     this.importContactsIfNeeded()
   }
 
-  renderSection = ({ section: { title, bubbleText } }: { section: SectionListData<any> }) => (
-    <SectionHead text={title} bubbleText={bubbleText} />
-  )
+  renderSection = ({ section: { title, bubbleText } }: { section: SectionListData<any> }) => {
+    if (!title) {
+      return null
+    }
+    return <SectionHeadNew text={title} bubbleText={bubbleText} />
+  }
 
   keyExtractor = (_item: any, index: number) => {
     return index.toString()
@@ -190,6 +170,14 @@ export class WalletHome extends React.Component<Props> {
     }
   }
 
+  onPressQrCode = () => {
+    navigate(Screens.QRCode)
+  }
+
+  onPressSettings = () => {
+    navigate(Screens.Account)
+  }
+
   render() {
     const { t, activeNotificationCount, callToActNotification } = this.props
 
@@ -205,7 +193,6 @@ export class WalletHome extends React.Component<Props> {
 
     if (activeNotificationCount > 0 || callToActNotification) {
       sections.push({
-        title: t('notifications'),
         data: [{}],
         renderItem: () => <NotificationBox key={'NotificationBox'} />,
         bubbleText: activeNotificationCount ? activeNotificationCount.toString() : null,
@@ -238,7 +225,14 @@ export class WalletHome extends React.Component<Props> {
               <DisconnectBanner />
             </View>
           )}
-          <HeaderIcon />
+          <View style={styles.headRight}>
+            <HeaderButton style={styles.settingsButton} onPress={this.onPressQrCode}>
+              <QRCodeIcon height={HEADER_ICON_SIZE} color={colors.celoGreen} />
+            </HeaderButton>
+            <HeaderButton style={styles.settingsButton} onPress={this.onPressSettings}>
+              <SettingsIcon height={HEADER_ICON_SIZE} color={colors.celoGreen} />
+            </HeaderButton>
+          </View>
         </View>
         <AnimatedSectionList
           onScroll={this.onScroll}
@@ -249,7 +243,7 @@ export class WalletHome extends React.Component<Props> {
           sections={sections}
           stickySectionHeadersEnabled={true}
           renderSectionHeader={this.renderSection}
-          ListHeaderComponent={Header}
+          ListHeaderComponent={CeloDollarsOverview}
           keyExtractor={this.keyExtractor}
         />
       </View>
@@ -267,19 +261,22 @@ const styles = StyleSheet.create({
   containerFeed: {
     paddingBottom: 40,
   },
-  settingsIcon: {
-    justifyContent: 'flex-end',
-    margin: 5,
-    position: 'absolute',
-    top: 10,
-    right: 10,
-  },
   head: {
     backgroundColor: colors.background,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 2,
+  },
+  headRight: {
+    flexDirection: 'row',
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  settingsButton: {
+    justifyContent: 'flex-end',
+    margin: 5,
   },
   shadowContainer: {
     height: TOP_BAR_HEIGHT,

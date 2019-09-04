@@ -3,6 +3,7 @@ import * as React from 'react'
 import { FlatList } from 'react-native'
 import { connect } from 'react-redux'
 import { Event, EventTypeNames, UserTransactionsData } from 'src/apollo/types'
+import ItemSeparator from 'src/components/ItemSeparator'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { Invitees, SENTINEL_INVITE_COMMENT } from 'src/invite/actions'
 import { NumberToRecipient } from 'src/recipients/recipient'
@@ -135,7 +136,12 @@ export class TransactionFeed extends React.PureComponent<Props> {
 
     if (txData.length > 0) {
       return (
-        <FlatList data={txData} keyExtractor={this.keyExtractor} renderItem={this.renderItem} />
+        <FlatList
+          data={txData}
+          keyExtractor={this.keyExtractor}
+          ItemSeparatorComponent={ItemSeparator}
+          renderItem={this.renderItem}
+        />
       )
     } else {
       return <NoActivity kind={kind} loading={loading} error={error} />

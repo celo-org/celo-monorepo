@@ -5,7 +5,6 @@ import Svg, { Path } from 'svgs'
 interface Props {
   height?: number
   color?: string
-  width?: number
 }
 
 export default class Settings extends React.PureComponent<Props> {
@@ -20,7 +19,7 @@ export default class Settings extends React.PureComponent<Props> {
       <Svg
         xmlns="http://www.w3.org/2000/svg"
         height={this.props.height}
-        width={this.props.width}
+        width={this.props.height}
         viewBox="0 0 18 18"
       >
         <Path
