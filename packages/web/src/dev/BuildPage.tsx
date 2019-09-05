@@ -12,7 +12,7 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import menuItems, { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { standardStyles, textStyles } from 'src/styles'
 
-export class BuildPage extends React.PureComponent<I18nProps> {
+class BuildPage extends React.PureComponent<I18nProps> {
   static getInitialProps() {
     return { namespacesRequired: ['common', 'dev'] }
   }
