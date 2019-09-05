@@ -11,6 +11,7 @@ export const CONTRACT_SYMBOL_MAPPING: { [key: string]: string } = {
   [(process.env.CELO_DOLLAR_ADDRESS as string).toLowerCase()]: 'Celo Dollar',
 }
 
+export const EXCHANGE_RATES_API = (process.env.EXCHANGE_RATES_API as string).toLowerCase()
 export const BLOCKSCOUT_API = (process.env.BLOCKSCOUT_API as string).toLowerCase()
 export const FAUCET_ADDRESS = (process.env.FAUCET_ADDRESS as string).toLowerCase()
 export const VERIFICATION_REWARDS_ADDRESS = (process.env
