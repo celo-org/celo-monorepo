@@ -10,7 +10,7 @@ interface Props {
   requesterRecipient: Recipient | null
 }
 
-export default function PaymentRequestLineItem(props: Props) {
+export default function PaymentRequestNotificationInner(props: Props) {
   const { requesterE164Number, comment: message, amount, requesterRecipient } = props
   return (
     <Text numberOfLines={1} ellipsizeMode="middle" style={styles.oneLine}>

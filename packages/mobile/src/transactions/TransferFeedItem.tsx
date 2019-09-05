@@ -59,7 +59,8 @@ export function getCurrencyStyles(currency: CURRENCY_ENUM, type: string): Curren
     type === TransactionTypes.RECEIVED ||
     type === TransactionTypes.FAUCET ||
     type === TransactionTypes.VERIFICATION_REWARD ||
-    type === TransactionTypes.INVITE_RECEIVED
+    type === TransactionTypes.INVITE_RECEIVED ||
+    type === TransactionTypes.PAY_REQUEST
   ) {
     if (currency === CURRENCY_ENUM.DOLLAR) {
       return {
@@ -77,7 +78,7 @@ export function getCurrencyStyles(currency: CURRENCY_ENUM, type: string): Curren
     }
   }
 
-  Logger.error(TAG, `Unsupported transaction type: ${type}`)
+  Logger.warn(TAG, `Unsupported transaction type: ${type}`)
   return {
     color: colors.darkSecondary,
     symbol: '',

@@ -121,7 +121,7 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
 export class SendAmount extends React.Component<Props, State> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
-    headerTitle: i18n.t('sendFlow7:send_or_request'),
+    headerTitle: i18n.t('sendFlow7:sendOrRequest'),
   })
 
   state: State = {
@@ -173,7 +173,7 @@ export class SendAmount extends React.Component<Props, State> {
     return getVerificationStatus(this.props.navigation, this.props.e164NumberToAddress)
   }
 
-  getConfirmationInput = () => {
+  getConfirmationInput = (type: TransactionTypes) => {
     const amount = parseInputAmount(this.state.amount)
     const recipient = this.getRecipient()
     // TODO (Rossy) Remove address field from some recipient types.
@@ -184,7 +184,7 @@ export class SendAmount extends React.Component<Props, State> {
       amount,
       reason: this.state.reason,
       recipientAddress,
-      type: recipientAddress ? TransactionTypes.SENT : TransactionTypes.INVITE_SENT,
+      type,
     }
     return confirmationInput
   }
@@ -207,13 +207,15 @@ export class SendAmount extends React.Component<Props, State> {
 
   onSend = () => {
     const verificationStatus = this.getVerificationStatus()
-    const confirmationInput = this.getConfirmationInput()
+    let confirmationInput: ConfirmationInput
 
     if (verificationStatus === VerificationStatus.VERIFIED) {
+      confirmationInput = this.getConfirmationInput(TransactionTypes.SENT)
       CeloAnalytics.track(CustomEventNames.transaction_details, {
         recipientAddress: confirmationInput.recipientAddress,
       })
     } else {
+      confirmationInput = this.getConfirmationInput(TransactionTypes.INVITE_SENT)
       CeloAnalytics.track(CustomEventNames.send_invite_details)
     }
 
@@ -224,12 +226,8 @@ export class SendAmount extends React.Component<Props, State> {
 
   onRequest = () => {
     CeloAnalytics.track(CustomEventNames.request_payment_continue)
-    const confirmationInput = this.getConfirmationInput()
-
-    CeloAnalytics.track(CustomEventNames.send_invite_details, {
-      requesteeAddress: confirmationInput.recipientAddress,
-    })
-    navigate(Screens.RequestConfirmation, { confirmationInput })
+    const confirmationInput = this.getConfirmationInput(TransactionTypes.PAY_REQUEST)
+    navigate(Screens.PaymentRequestConfirmation, { confirmationInput })
   }
 
   renderButtons = (isAmountValid: boolean, isDollarBalanceSufficient: boolean) => {
@@ -322,9 +320,8 @@ export class SendAmount extends React.Component<Props, State> {
           <Avatar
             name={recipient.displayName}
             recipient={recipient}
-            e164PhoneNumber={recipient.e164PhoneNumber}
+            e164Number={recipient.e164PhoneNumber}
             address={recipient.address}
-            defaultCountryCode={this.props.defaultCountryCode}
           />
           <View style={style.inviteDescription}>
             <LoadingLabel
