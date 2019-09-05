@@ -17,7 +17,7 @@ export interface Props {
   isSubmitDisabled: boolean
   currentSelected: string
   t: TranslationFunction
-  languages: any
+  languages: { name: string; code: string }
 }
 
 class LanguageSelectUI extends React.PureComponent<Props> {
