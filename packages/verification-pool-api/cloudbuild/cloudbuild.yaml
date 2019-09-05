@@ -2,7 +2,7 @@ steps:
 
 # Install using yarn command 
 - name: "gcr.io/celo-testnet/global/yarn-gcloud"
-  args: ['yarn', '--network-timeout 1000000']
+  args: ['yarn', '--network-timeout',  '1000000']
   id: Install using yarn
 
 # Build using yarn build command 
