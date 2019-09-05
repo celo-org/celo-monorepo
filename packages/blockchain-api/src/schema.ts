@@ -47,6 +47,10 @@ export interface EventArgs {
   endtimestamp: number
 }
 
+export interface ExchangeRate {
+  rate: number
+}
+
 export interface CurrencyConversionArgs {
   currencyCode: string
   timestamp?: number

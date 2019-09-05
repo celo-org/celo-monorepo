@@ -1,6 +1,6 @@
 import { RESTDataSource } from 'apollo-datasource-rest'
 import { EXCHANGE_RATES_API } from './config'
-import { CurrencyConversionArgs } from './schema'
+import { CurrencyConversionArgs, ExchangeRate } from './schema'
 
 // TODO move this caching to FirebaseDb
 // Currency code to date string to exchange rate
@@ -18,7 +18,10 @@ export class CurrencyConversionAPI extends RESTDataSource {
     this.baseURL = EXCHANGE_RATES_API
   }
 
-  async getExchangeRate({ currencyCode, timestamp }: CurrencyConversionArgs) {
+  async getExchangeRate({
+    currencyCode,
+    timestamp,
+  }: CurrencyConversionArgs): Promise<ExchangeRate> {
     console.debug('Getting exchange rate', currencyCode, timestamp)
     try {
       if (!currencyCode) {
