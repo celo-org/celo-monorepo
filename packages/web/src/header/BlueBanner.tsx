@@ -49,7 +49,7 @@ export const styles = StyleSheet.create({
   },
   slideDown: {
     transitionProperty: 'height, top',
-    transitionDuration: '200ms',
+    transitionDuration: '300ms',
   },
   isVisible: {
     height: BANNER_HEIGHT,
