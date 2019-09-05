@@ -24,10 +24,13 @@ const menuItems = [menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.COMMUNITY]
 const DARK_PAGES = new Set([
   menu.HOME.link,
   menu.COMMUNITY.link,
+  menu.ABOUT_US.link,
   menu.BUILD.link,
   CeloLinks.faucet,
   CeloLinks.walletApp,
 ])
+
+const TRANSLUCENT_PAGES = new Set([menu.ABOUT_US.link])
 
 interface OwnProps {
   router: Router
@@ -146,10 +149,17 @@ export class Header extends React.Component<Props, State> {
     return DARK_PAGES.has(this.props.router.pathname)
   }
 
+  isTranslucent = () => {
+    return TRANSLUCENT_PAGES.has(this.props.router.pathname)
+  }
+
   getForegroundColor = () => {
     return this.isDarkMode() ? colors.white : colors.dark
   }
   getBackgroundColor = () => {
+    if (this.isTranslucent()) {
+      return null
+    }
     return this.isDarkMode() ? colors.dark : colors.white
   }
 
@@ -198,7 +208,7 @@ export class Header extends React.Component<Props, State> {
                     <>
                       <Animated.View style={[{ opacity: this.state.menuFade }]}>
                         {this.isDarkMode() ? (
-                          <LogoDarkBg height={30} />
+                          <LogoDarkBg height={30} allWhite={this.isTranslucent()} />
                         ) : (
                           <LogoLightBg height={30} />
                         )}
@@ -220,7 +230,10 @@ export class Header extends React.Component<Props, State> {
                       />
                       {this.props.router.pathname === item.link && (
                         <View style={styles.activeTab}>
-                          <OvalCoin color={colors.primary} size={10} />
+                          <OvalCoin
+                            color={this.isTranslucent() ? colors.white : colors.primary}
+                            size={10}
+                          />
                         </View>
                       )}
                     </View>

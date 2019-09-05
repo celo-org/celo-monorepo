@@ -14,6 +14,7 @@ import menuItems from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { Colors, HEADER_HEIGHT, MENU_MAX_WIDTH } from 'src/shared/Styles'
 import { standardStyles } from 'src/styles'
+import VideoCover from 'src/about/VideoCover'
 
 const IMAGE_HEIGHT = 938
 const IMAGE_WIDTH = 835
@@ -38,30 +39,7 @@ export class About extends React.Component<Props & I18nProps> {
           description={t('description')}
         />
         <View style={styles.container}>
-          <View style={styles.background}>
-            <View style={styles.absolute}>
-              <View style={styles.maxWidth}>
-                <Responsive medium={styles.mediumHero} large={styles.largeHero}>
-                  <View style={styles.hero}>
-                    <H1>{t('aboutUs')}</H1>
-                    <H4>{t('ourTeam')}</H4>
-                  </View>
-                </Responsive>
-              </View>
-            </View>
-            <Responsive
-              medium={[styles.mintPlazaContainer, styles.mediumMintPlaza]}
-              large={[styles.mintPlazaContainer, styles.largeMintPlaza]}
-            >
-              <AspectRatio style={styles.mintPlazaContainer} ratio={IMAGE_WIDTH / IMAGE_HEIGHT}>
-                <Image
-                  resizeMode={'contain'}
-                  source={{ uri: mintPlaza }}
-                  style={styles.mintPlaza}
-                />
-              </AspectRatio>
-            </Responsive>
-          </View>
+          <VideoCover />
           <MissionText />
           <Team randomSeed={randomSeed} />
           <GridRow
