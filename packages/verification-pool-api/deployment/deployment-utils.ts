@@ -77,13 +77,7 @@ async function exec(command: string, args: string[]) {
       shell: true,
     })
     proc.on('error', (error: any) => {
-      try {
-        console.log('Child data error: ' + error)
-        console.log('Child data error: ' + String.fromCharCode.apply(null, error))
-      } catch (e) {
-        console.log(e)
-      }
-      // reject(error)
+      reject(error)
     })
     proc.on('exit', (code: any) => {
       if (code !== 0) {
@@ -93,10 +87,10 @@ async function exec(command: string, args: string[]) {
       }
     })
     proc.stdout.on('data', (data: any) => {
-      console.log('Child data stdout: ' + data)
+      console.log(data)
     })
     proc.stderr.on('data', (data: any) => {
-      console.log('Child data stderr: ' + data)
+      console.log(data)
     })
   }).catch((data) => {
     console.log(data)
