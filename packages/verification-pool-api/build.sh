@@ -11,7 +11,6 @@ set -euo pipefail
   esac
 done
 
-echo $(pwd) && pwd && ls && ls .. && exit 0 && \
-yarn run --cwd=../celotool cli copy-contract-artifacts --output-path=../verification-pool-api/contracts/ --celo-env=$ENVIRONMENT --contracts=Attestations,GoldToken,StableToken && \
+# yarn run --cwd=../celotool cli copy-contract-artifacts --output-path=../verification-pool-api/contracts/ --celo-env=$ENVIRONMENT --contracts=Attestations,GoldToken,StableToken && \
   yarn run build && \
   yarn run firebase-bolt schema.bolt
