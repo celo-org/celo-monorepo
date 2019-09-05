@@ -30,4 +30,5 @@ function Avatar(props: Props & StateProps) {
   return <BaseAvatar {...props} iconSize={props.iconSize || DEFAULT_ICON_SIZE} />
 }
 
+// TODO(Rossy + Jean) simplify this file with useSelector
 export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(Avatar)
