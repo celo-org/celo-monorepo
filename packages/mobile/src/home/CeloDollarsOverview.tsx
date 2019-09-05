@@ -12,11 +12,7 @@ import useLocalAmount from 'src/localCurrency/useLocalAmount'
 import useSelector from 'src/redux/useSelector'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
-interface OwnProps {
-  // testID: string
-}
-
-type Props = WithNamespaces & OwnProps
+type Props = WithNamespaces
 
 function CeloDollarsOverview({ t }: Props) {
   useBalanceAutoRefresh()
