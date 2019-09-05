@@ -63,7 +63,7 @@ const DefaultConfig = {
     inflationPeriod: 7 * 24 * 60 * 60, // 1 week
   },
   validators: {
-    minElectableValidators: '10',
+    minElectableValidators: '1',
     maxElectableValidators: '100',
     minLockedGoldValue: '1000000000000000000', // 1 gold
     minLockedGoldNoticePeriod: 60 * 24 * 60 * 60, // 60 days
