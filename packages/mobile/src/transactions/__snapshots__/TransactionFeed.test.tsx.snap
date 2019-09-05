@@ -49,6 +49,7 @@ exports[`filters out Failed 1`] = `
 
 exports[`renders for error 1`] = `
 <RCTScrollView
+  ItemSeparatorComponent={[Function]}
   data={
     Array [
       Object {
@@ -122,22 +123,16 @@ exports[`renders for error 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                },
-                Object {
-                  "opacity": 0.3,
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
             }
           >
             <View
@@ -189,61 +184,84 @@ exports[`renders for error 1`] = `
           <View
             style={
               Object {
-                "borderBottomWidth": 1,
-                "borderColor": "rgba(134, 138, 141, 0.15)",
                 "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "marginLeft": 10,
-                "paddingRight": 10,
+                "marginLeft": 16,
               }
             }
           >
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
+              <Text
                 style={
-                  Object {
-                    "opacity": 0.3,
-                  }
-                }
-              >
-                <Text
-                  style={
+                  Array [
+                    Object {
+                      "fontFamily": "Hind-SemiBold",
+                    },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  sentTo
-                </Text>
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Light",
-                        "fontSize": 16,
-                        "lineHeight": 24,
-                      },
-                      Object {
-                        "paddingTop": 10,
-                      },
-                    ]
-                  }
-                >
-                  Eye for an Eye
-                </Text>
-              </View>
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                  ]
+                }
+              >
+                sentTo
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                -
+                100.00
+              </Text>
+            </View>
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 15,
+                    "lineHeight": 20,
+                  },
+                  Object {},
+                ]
+              }
+            >
+              Eye for an Eye
+            </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                  },
+                  Object {
+                    "marginTop": 8,
+                  },
+                ]
+              }
+            >
               <Text
                 style={
                   Array [
@@ -254,8 +272,7 @@ exports[`renders for error 1`] = `
                       "lineHeight": 18,
                     },
                     Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
+                      "color": "#BDBDBD",
                     },
                   ]
                 }
@@ -281,44 +298,18 @@ exports[`renders for error 1`] = `
                  undefined
               </Text>
             </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
-              }
-            >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 20,
-                    },
-                    Object {
-                      "color": "#81868B",
-                    },
-                  ]
-                }
-              >
-                
-                $
-                100.00
-              </Text>
-            </View>
           </View>
         </View>
       </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
     </View>
     <View
       onLayout={[Function]}
@@ -449,8 +440,8 @@ exports[`renders for error 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -492,8 +483,8 @@ exports[`renders for error 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -517,6 +508,7 @@ exports[`renders for error 1`] = `
 
 exports[`renders for gold to dollar exchange properly 1`] = `
 <RCTScrollView
+  ItemSeparatorComponent={[Function]}
   data={
     Array [
       Object {
@@ -600,22 +592,16 @@ exports[`renders for gold to dollar exchange properly 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                },
-                Object {
-                  "opacity": 0.3,
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
             }
           >
             <View
@@ -667,61 +653,84 @@ exports[`renders for gold to dollar exchange properly 1`] = `
           <View
             style={
               Object {
-                "borderBottomWidth": 1,
-                "borderColor": "rgba(134, 138, 141, 0.15)",
                 "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "marginLeft": 10,
-                "paddingRight": 10,
+                "marginLeft": 16,
               }
             }
           >
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
+              <Text
                 style={
-                  Object {
-                    "opacity": 0.3,
-                  }
-                }
-              >
-                <Text
-                  style={
+                  Array [
+                    Object {
+                      "fontFamily": "Hind-SemiBold",
+                    },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  sentTo
-                </Text>
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Light",
-                        "fontSize": 16,
-                        "lineHeight": 24,
-                      },
-                      Object {
-                        "paddingTop": 10,
-                      },
-                    ]
-                  }
-                >
-                  Eye for an Eye
-                </Text>
-              </View>
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                  ]
+                }
+              >
+                sentTo
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                -
+                100.00
+              </Text>
+            </View>
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 15,
+                    "lineHeight": 20,
+                  },
+                  Object {},
+                ]
+              }
+            >
+              Eye for an Eye
+            </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                  },
+                  Object {
+                    "marginTop": 8,
+                  },
+                ]
+              }
+            >
               <Text
                 style={
                   Array [
@@ -732,8 +741,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                       "lineHeight": 18,
                     },
                     Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
+                      "color": "#BDBDBD",
                     },
                   ]
                 }
@@ -759,44 +767,18 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                  undefined
               </Text>
             </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
-              }
-            >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 20,
-                    },
-                    Object {
-                      "color": "#81868B",
-                    },
-                  ]
-                }
-              >
-                
-                $
-                100.00
-              </Text>
-            </View>
           </View>
         </View>
       </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
     </View>
     <View
       onLayout={[Function]}
@@ -959,8 +941,8 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -1002,8 +984,8 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -1020,6 +1002,15 @@ exports[`renders for gold to dollar exchange properly 1`] = `
           </View>
         </View>
       </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
     </View>
     <View
       onLayout={[Function]}
@@ -1162,8 +1153,8 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -1205,8 +1196,8 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -1230,6 +1221,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
 
 exports[`renders for loading 1`] = `
 <RCTScrollView
+  ItemSeparatorComponent={[Function]}
   data={
     Array [
       Object {
@@ -1303,22 +1295,16 @@ exports[`renders for loading 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                },
-                Object {
-                  "opacity": 0.3,
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
             }
           >
             <View
@@ -1370,61 +1356,84 @@ exports[`renders for loading 1`] = `
           <View
             style={
               Object {
-                "borderBottomWidth": 1,
-                "borderColor": "rgba(134, 138, 141, 0.15)",
                 "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "marginLeft": 10,
-                "paddingRight": 10,
+                "marginLeft": 16,
               }
             }
           >
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
+              <Text
                 style={
-                  Object {
-                    "opacity": 0.3,
-                  }
-                }
-              >
-                <Text
-                  style={
+                  Array [
+                    Object {
+                      "fontFamily": "Hind-SemiBold",
+                    },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  sentTo
-                </Text>
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Light",
-                        "fontSize": 16,
-                        "lineHeight": 24,
-                      },
-                      Object {
-                        "paddingTop": 10,
-                      },
-                    ]
-                  }
-                >
-                  Eye for an Eye
-                </Text>
-              </View>
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                  ]
+                }
+              >
+                sentTo
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                -
+                100.00
+              </Text>
+            </View>
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 15,
+                    "lineHeight": 20,
+                  },
+                  Object {},
+                ]
+              }
+            >
+              Eye for an Eye
+            </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                  },
+                  Object {
+                    "marginTop": 8,
+                  },
+                ]
+              }
+            >
               <Text
                 style={
                   Array [
@@ -1435,8 +1444,7 @@ exports[`renders for loading 1`] = `
                       "lineHeight": 18,
                     },
                     Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
+                      "color": "#BDBDBD",
                     },
                   ]
                 }
@@ -1462,44 +1470,18 @@ exports[`renders for loading 1`] = `
                  undefined
               </Text>
             </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
-              }
-            >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 20,
-                    },
-                    Object {
-                      "color": "#81868B",
-                    },
-                  ]
-                }
-              >
-                
-                $
-                100.00
-              </Text>
-            </View>
           </View>
         </View>
       </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
     </View>
     <View
       onLayout={[Function]}
@@ -1662,8 +1644,8 @@ exports[`renders for loading 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -1705,8 +1687,8 @@ exports[`renders for loading 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -1730,6 +1712,7 @@ exports[`renders for loading 1`] = `
 
 exports[`renders for no transactions 1`] = `
 <RCTScrollView
+  ItemSeparatorComponent={[Function]}
   data={
     Array [
       Object {
@@ -1803,22 +1786,16 @@ exports[`renders for no transactions 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                },
-                Object {
-                  "opacity": 0.3,
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
             }
           >
             <View
@@ -1870,61 +1847,84 @@ exports[`renders for no transactions 1`] = `
           <View
             style={
               Object {
-                "borderBottomWidth": 1,
-                "borderColor": "rgba(134, 138, 141, 0.15)",
                 "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "marginLeft": 10,
-                "paddingRight": 10,
+                "marginLeft": 16,
               }
             }
           >
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
+              <Text
                 style={
-                  Object {
-                    "opacity": 0.3,
-                  }
-                }
-              >
-                <Text
-                  style={
+                  Array [
+                    Object {
+                      "fontFamily": "Hind-SemiBold",
+                    },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  sentTo
-                </Text>
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Light",
-                        "fontSize": 16,
-                        "lineHeight": 24,
-                      },
-                      Object {
-                        "paddingTop": 10,
-                      },
-                    ]
-                  }
-                >
-                  Eye for an Eye
-                </Text>
-              </View>
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                  ]
+                }
+              >
+                sentTo
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                -
+                100.00
+              </Text>
+            </View>
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 15,
+                    "lineHeight": 20,
+                  },
+                  Object {},
+                ]
+              }
+            >
+              Eye for an Eye
+            </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                  },
+                  Object {
+                    "marginTop": 8,
+                  },
+                ]
+              }
+            >
               <Text
                 style={
                   Array [
@@ -1935,8 +1935,7 @@ exports[`renders for no transactions 1`] = `
                       "lineHeight": 18,
                     },
                     Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
+                      "color": "#BDBDBD",
                     },
                   ]
                 }
@@ -1962,44 +1961,18 @@ exports[`renders for no transactions 1`] = `
                  undefined
               </Text>
             </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
-              }
-            >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 20,
-                    },
-                    Object {
-                      "color": "#81868B",
-                    },
-                  ]
-                }
-              >
-                
-                $
-                100.00
-              </Text>
-            </View>
           </View>
         </View>
       </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
     </View>
     <View
       onLayout={[Function]}
@@ -2162,8 +2135,8 @@ exports[`renders for no transactions 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -2205,8 +2178,8 @@ exports[`renders for no transactions 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -2230,6 +2203,7 @@ exports[`renders for no transactions 1`] = `
 
 exports[`renders for standbyTransactions 1`] = `
 <RCTScrollView
+  ItemSeparatorComponent={[Function]}
   data={
     Array [
       Object {
@@ -2303,22 +2277,16 @@ exports[`renders for standbyTransactions 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                },
-                Object {
-                  "opacity": 0.3,
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
             }
           >
             <View
@@ -2370,61 +2338,84 @@ exports[`renders for standbyTransactions 1`] = `
           <View
             style={
               Object {
-                "borderBottomWidth": 1,
-                "borderColor": "rgba(134, 138, 141, 0.15)",
                 "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "marginLeft": 10,
-                "paddingRight": 10,
+                "marginLeft": 16,
               }
             }
           >
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
+              <Text
                 style={
-                  Object {
-                    "opacity": 0.3,
-                  }
-                }
-              >
-                <Text
-                  style={
+                  Array [
+                    Object {
+                      "fontFamily": "Hind-SemiBold",
+                    },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  sentTo
-                </Text>
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Light",
-                        "fontSize": 16,
-                        "lineHeight": 24,
-                      },
-                      Object {
-                        "paddingTop": 10,
-                      },
-                    ]
-                  }
-                >
-                  Eye for an Eye
-                </Text>
-              </View>
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                  ]
+                }
+              >
+                sentTo
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                -
+                100.00
+              </Text>
+            </View>
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 15,
+                    "lineHeight": 20,
+                  },
+                  Object {},
+                ]
+              }
+            >
+              Eye for an Eye
+            </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                  },
+                  Object {
+                    "marginTop": 8,
+                  },
+                ]
+              }
+            >
               <Text
                 style={
                   Array [
@@ -2435,8 +2426,7 @@ exports[`renders for standbyTransactions 1`] = `
                       "lineHeight": 18,
                     },
                     Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
+                      "color": "#BDBDBD",
                     },
                   ]
                 }
@@ -2462,44 +2452,18 @@ exports[`renders for standbyTransactions 1`] = `
                  undefined
               </Text>
             </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
-              }
-            >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 20,
-                    },
-                    Object {
-                      "color": "#81868B",
-                    },
-                  ]
-                }
-              >
-                
-                $
-                100.00
-              </Text>
-            </View>
           </View>
         </View>
       </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
     </View>
     <View
       onLayout={[Function]}
@@ -2662,8 +2626,8 @@ exports[`renders for standbyTransactions 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -2705,8 +2669,8 @@ exports[`renders for standbyTransactions 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },

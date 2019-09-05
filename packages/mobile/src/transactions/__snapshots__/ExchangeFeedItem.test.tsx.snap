@@ -108,8 +108,8 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
           style={
             Array [
               Object {
-                "color": "#81868B",
-                "fontFamily": "Hind-Regular",
+                "color": "#2E3338",
+                "fontFamily": "Hind-SemiBold",
                 "fontSize": 16,
                 "lineHeight": 20,
               },
@@ -151,8 +151,8 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
           style={
             Array [
               Object {
-                "color": "#81868B",
-                "fontFamily": "Hind-Regular",
+                "color": "#2E3338",
+                "fontFamily": "Hind-SemiBold",
                 "fontSize": 16,
                 "lineHeight": 20,
               },

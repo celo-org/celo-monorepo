@@ -1,4 +1,4 @@
-import ItemSeparator from '@celo/mobile/src/components/ItemSeparator'
+import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
@@ -10,7 +10,7 @@ interface Props {
   bubbleText?: string | null
 }
 
-export default class SectionHead extends React.PureComponent<Props> {
+export default class SectionHeadNew extends React.PureComponent<Props> {
   render() {
     return (
       <>
