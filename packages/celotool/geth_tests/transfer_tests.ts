@@ -455,7 +455,7 @@ describe('transfer tests', function(this: any) {
     })
   }
 
-  const GOLD_TRANSACTION_GAS_COST = 23511
+  const GOLD_TRANSACTION_GAS_COST = 29180
   const syncModes = ['full', 'fast', 'light', 'ultralight']
   for (const syncMode of syncModes) {
     describe(`when running ${syncMode} sync`, () => {
@@ -529,7 +529,7 @@ describe('transfer tests', function(this: any) {
               before(async function(this: any) {
                 await restartGeth(syncMode)
 
-                const expectedGasUsed = 158511
+                const expectedGasUsed = 164180
                 ;[txSuccess, newBalances, expectedFees] = await runTestTransaction(
                   transferCeloGold(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
                     gasCurrency: stableTokenAddress,
@@ -594,7 +594,7 @@ describe('transfer tests', function(this: any) {
 
                 await setInflationParams(2, 1, timeSinceLastUpdated.toNumber())
 
-                const expectedGasUsed = 158511
+                const expectedGasUsed = 164180
                 ;[txSuccess, newBalances, expectedFees] = await runTestTransaction(
                   transferCeloGold(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
                     gasCurrency: stableTokenAddress,
