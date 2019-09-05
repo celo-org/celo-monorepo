@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PaymentRequestNotification renders correctly 1`] = `
+exports[`PaymentRequestListItem renders correctly 1`] = `
 <View
   accessible={true}
   isTVSelectable={true}

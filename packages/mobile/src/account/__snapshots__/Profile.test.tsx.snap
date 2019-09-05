@@ -106,6 +106,7 @@ exports[`Profile renders correctly 1`] = `
             "opacity": 1,
           }
         }
+        testID="ProfileEditName"
       >
         <View
           style={

@@ -83,7 +83,7 @@ exports[`InviteReview renders correctly 1`] = `
                 "flexDirection": "column",
                 "justifyContent": "flex-start",
                 "paddingHorizontal": 40,
-                "paddingVertical": 20,
+                "paddingVertical": 25,
               },
             ]
           }
@@ -91,17 +91,25 @@ exports[`InviteReview renders correctly 1`] = `
           <View
             style={
               Object {
-                "marginTop": 5,
+                "flexDirection": "column",
+                "justifyContent": "center",
+                "marginBottom": 10,
               }
             }
           >
             <View
               style={
-                Object {
-                  "flexDirection": "column",
-                  "justifyContent": "center",
-                  "marginBottom": 10,
-                }
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  Object {
+                    "alignSelf": "center",
+                    "margin": "auto",
+                  },
+                ]
               }
             >
               <View
@@ -109,117 +117,101 @@ exports[`InviteReview renders correctly 1`] = `
                   Array [
                     Object {
                       "alignItems": "center",
-                      "flexDirection": "row",
                       "justifyContent": "center",
                     },
                     Object {
-                      "alignSelf": "center",
-                      "margin": "auto",
+                      "backgroundColor": "#7AD6FE",
+                      "borderRadius": 20,
+                      "height": 40,
+                      "width": 40,
                     },
                   ]
                 }
               >
-                <View
+                <Text
                   style={
                     Array [
                       Object {
-                        "alignItems": "center",
-                        "justifyContent": "center",
+                        "color": "#FFFFFF",
+                        "fontFamily": "Hind-Medium",
+                        "fontSize": 16,
                       },
                       Object {
-                        "backgroundColor": "#7AD6FE",
-                        "borderRadius": 20,
-                        "height": 40,
-                        "width": 40,
+                        "fontSize": 20,
                       },
                     ]
                   }
                 >
-                  <Text
-                    style={
-                      Array [
-                        Object {
-                          "color": "#FFFFFF",
-                          "fontFamily": "Hind-Medium",
-                          "fontSize": 16,
-                        },
-                        Object {
-                          "fontSize": 20,
-                        },
-                      ]
-                    }
-                  >
-                    #
-                  </Text>
-                </View>
+                  #
+                </Text>
               </View>
+            </View>
+            <Text
+              ellipsizeMode="tail"
+              numberOfLines={1}
+              style={
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  },
+                  Object {
+                    "marginHorizontal": 20,
+                    "paddingTop": 6,
+                    "textAlign": "center",
+                  },
+                ]
+              }
+            >
+              #000000000000000...
+            </Text>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "alignSelf": "center",
+                  "flexDirection": "row",
+                  "justifyContent": "center",
+                }
+              }
+            >
               <Text
-                ellipsizeMode="tail"
-                numberOfLines={1}
                 style={
                   Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "marginHorizontal": 20,
-                      "paddingTop": 6,
-                      "textAlign": "center",
-                    },
-                  ]
-                }
-              >
-                #000000000000000...
-              </Text>
-              <View
-                style={
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Light",
-                        "fontSize": 14,
-                        "textAlignVertical": "center",
-                      },
-                      Object {
-                        "alignItems": "center",
-                        "backgroundColor": "#EEEEEE",
-                        "borderRadius": 3,
-                        "justifyContent": "center",
-                        "marginRight": 5,
-                        "paddingLeft": 6,
-                        "paddingRight": 3,
-                      },
-                    ]
-                  }
-                >
-                   +1
-                </Text>
-                <Text
-                  style={
                     Object {
                       "color": "#2E3338",
                       "fontFamily": "Hind-Light",
                       "fontSize": 14,
                       "textAlignVertical": "center",
-                    }
+                    },
+                    Object {
+                      "alignItems": "center",
+                      "backgroundColor": "#EEEEEE",
+                      "borderRadius": 3,
+                      "justifyContent": "center",
+                      "marginRight": 5,
+                      "paddingLeft": 6,
+                      "paddingRight": 3,
+                    },
+                  ]
+                }
+              >
+                 +1
+              </Text>
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Light",
+                    "fontSize": 14,
+                    "textAlignVertical": "center",
                   }
-                >
-                  (415) 555-0000
-                </Text>
-              </View>
+                }
+              >
+                (415) 555-0000
+              </Text>
             </View>
           </View>
           <View
@@ -232,21 +224,6 @@ exports[`InviteReview renders correctly 1`] = `
               }
             }
           >
-            <Text
-              style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 34,
-                  },
-                  Object {
-                    "color": "#81868B",
-                  },
-                ]
-              }
-            >
-              
-            </Text>
             <Text
               style={
                 Array [
