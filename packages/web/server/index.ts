@@ -10,13 +10,13 @@ import Sentry, { initSentry } from '../fullstack/sentry'
 import addToCRM from '../server/addToCRM'
 import ecoFundSubmission from '../server/EcoFundApp'
 import nextI18next from '../src/i18n'
+import latestAnnouncements from './Announcement'
 import { faucetOrInviteController } from './controllers'
 import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
 import { RequestType } from './FirebaseClient'
 import mailer from './mailer'
 import { getFormattedMediumArticles } from './mediumAPI'
-import latest from './Announcement'
 const port = parseInt(process.env.PORT, 10) || 3000
 
 const dev = process.env.NEXT_DEV === 'true'
@@ -129,9 +129,8 @@ function wwwRedirect(req, res, nextAction) {
 
   server.get('/announcement', async (_, res) => {
     try {
-      const annoucement = await latest()
-      console.log(annoucement)
-      res.json(annoucement)
+      const annoucements = await latestAnnouncements()
+      res.json(annoucements)
     } catch (e) {
       res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
     }

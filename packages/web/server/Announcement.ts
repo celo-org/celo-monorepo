@@ -1,7 +1,18 @@
 import getConfig from 'next/config'
 import airtableInit from '../server/airtable'
 
-export default function latest() {
+interface Fields {
+  live: boolean
+  text: string
+  link: string
+}
+
+interface QueryError {
+  message: string
+  error: number
+}
+
+export default function latestAnnouncements(): Promise<Fields[]> {
   return new Promise((resolve, reject) => {
     getAirtable()
       .select({
@@ -9,12 +20,11 @@ export default function latest() {
         filterByFormula: IS_LIVE,
         sort: [{ field: 'order', direction: 'desc' }],
       })
-      .firstPage((err, records) => {
+      .firstPage((err: QueryError, records: Airtable.Response<Fields>) => {
         if (err) {
           reject(err)
           return
         }
-        console.log(records)
         resolve(records.map((record) => record.fields))
       })
   })

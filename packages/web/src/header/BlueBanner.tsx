@@ -2,6 +2,7 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Chevron from 'src/icons/chevron'
 import { colors, fonts, textStyles } from 'src/styles'
+import Sentry from '../../fullstack/sentry'
 
 interface Props {
   link: string
@@ -90,15 +91,19 @@ export default class Announcement extends React.Component<AnnouncementProps, Sta
     link: '',
   }
   componentDidMount = async () => {
-    const response = await fetch('/announcement')
-    const announcements = await response.json()
-    const visible = announcements.length > 0
+    try {
+      const response = await fetch('/announcement')
+      const announcements = await response.json()
+      const visible = announcements.length > 0
 
-    if (visible) {
-      this.setState(announcements[0])
+      if (visible) {
+        this.setState(announcements[0])
+      }
+
+      this.props.onVisibilityChange(visible)
+    } catch (e) {
+      Sentry.captureException(e)
     }
-
-    this.props.onVisibilityChange(visible)
   }
 
   render() {
