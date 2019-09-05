@@ -1,5 +1,5 @@
-import { Avatar } from '@celo/react-components/components/Avatar'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
+import { MoneyAmount } from '@celo/react-components/components/MoneyAmount'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
@@ -7,20 +7,15 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import { connect } from 'react-redux'
-import componentWithAnalytics from 'src/analytics/wrapper'
+import Avatar from 'src/components/Avatar'
 import LineItemRow from 'src/components/LineItemRow'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import { Recipient } from 'src/recipients/recipient'
-import { RootState } from 'src/redux/reducers'
 import FeeIcon from 'src/send/FeeIcon'
 import { TransactionTypes } from 'src/transactions/reducer'
-import { getCurrencyStyles } from 'src/transactions/TransferFeedItem'
 import { getFeeDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
-
-const iconSize = 40
 
 export interface OwnProps {
   address?: string
@@ -35,60 +30,24 @@ export interface OwnProps {
   recipient?: Recipient
 }
 
-interface StateProps {
-  defaultCountryCode: string
-  dollarBalance: string
-}
-
-const mapStateToProps = (state: RootState): StateProps => {
-  return {
-    defaultCountryCode: state.account.defaultCountryCode,
-    dollarBalance: state.stableToken.balance || '0',
-  }
-}
-
 // Bordered content placed in a ReviewFrame
 // Differs from TransferConfirmationCard which is used for viewing completed txs
-class TransferReviewCard extends React.Component<OwnProps & StateProps & WithNamespaces> {
-  renderTopSection = () => {
-    const { recipient, address, e164PhoneNumber, defaultCountryCode } = this.props
-    return (
-      <View style={style.avatar}>
-        <Avatar
-          name={recipient ? recipient.displayName : undefined}
-          address={address}
-          e164Number={e164PhoneNumber}
-          defaultCountryCode={defaultCountryCode}
-          iconSize={iconSize}
-        />
-      </View>
-    )
-  }
+class TransferReviewCard extends React.Component<OwnProps & WithNamespaces> {
+  render() {
+    const {
+      recipient,
+      address,
+      e164PhoneNumber,
+      currency,
+      t,
+      type,
+      value,
+      comment,
+      fee,
+      isLoadingFee,
+      feeError,
+    } = this.props
 
-  renderAmountSection = () => {
-    const { type, currency } = this.props
-    const currencyStyle = getCurrencyStyles(currency, type)
-    return (
-      <View style={style.amountContainer}>
-        <Text style={[style.plusSign, { color: currencyStyle.color }]}>
-          {currencyStyle.direction}
-        </Text>
-        <Text style={[style.currencySymbol, { color: currencyStyle.color }]}>
-          {currencyStyle.symbol}
-        </Text>
-        <Text
-          style={[style.amount, { color: currencyStyle.color }]}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {getMoneyDisplayValue(this.props.value)}
-        </Text>
-      </View>
-    )
-  }
-
-  renderBottomSection = () => {
-    const { t, type, dollarBalance, value, comment, fee, isLoadingFee, feeError } = this.props
     const amountWithFees = value.plus(fee || 0)
     const adjustedFee =
       type === TransactionTypes.INVITE_SENT && fee
@@ -96,52 +55,39 @@ class TransferReviewCard extends React.Component<OwnProps & StateProps & WithNam
         : fee
 
     return (
-      <View style={style.bottomContainer}>
-        {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
-        <HorizontalLine />
-        <View style={style.feeContainer}>
-          {type === TransactionTypes.PAY_REQUEST && (
+      <View style={[componentStyles.roundedBorder, style.container]}>
+        <Avatar
+          name={recipient ? recipient.displayName : undefined}
+          address={address}
+          e164Number={e164PhoneNumber}
+        />
+        <MoneyAmount symbol={CURRENCIES[currency].symbol} amount={getMoneyDisplayValue(value)} />
+        <View style={style.bottomContainer}>
+          {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
+          <HorizontalLine />
+          <View style={style.feeContainer}>
+            {type === TransactionTypes.INVITE_SENT && (
+              <LineItemRow
+                currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+                amount={getMoneyDisplayValue(getInvitationVerificationFeeInDollars())}
+                title={t('inviteAndSecurityFee')}
+              />
+            )}
             <LineItemRow
               currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-              amount={getMoneyDisplayValue(value.plus(dollarBalance))}
-              title={t('newAccountBalance')}
+              amount={getFeeDisplayValue(adjustedFee)}
+              title={t('securityFee')}
+              titleIcon={<FeeIcon />}
+              isLoading={isLoadingFee}
+              hasError={!!feeError}
             />
-          )}
-          {type !== TransactionTypes.PAY_REQUEST && (
-            <>
-              {type === TransactionTypes.INVITE_SENT && (
-                <LineItemRow
-                  currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-                  amount={getMoneyDisplayValue(getInvitationVerificationFeeInDollars())}
-                  title={t('inviteAndSecurityFee')}
-                />
-              )}
-              <LineItemRow
-                currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-                amount={getFeeDisplayValue(adjustedFee)}
-                title={t('securityFee')}
-                titleIcon={<FeeIcon />}
-                isLoading={isLoadingFee}
-                hasError={!!feeError}
-              />
-              <LineItemRow
-                currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-                amount={getMoneyDisplayValue(amountWithFees)}
-                title={t('total')}
-              />
-            </>
-          )}
+            <LineItemRow
+              currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+              amount={getMoneyDisplayValue(amountWithFees)}
+              title={t('total')}
+            />
+          </View>
         </View>
-      </View>
-    )
-  }
-
-  render() {
-    return (
-      <View style={[componentStyles.roundedBorder, style.container]}>
-        {this.renderTopSection()}
-        {this.renderAmountSection()}
-        {this.renderBottomSection()}
       </View>
     )
   }
@@ -152,20 +98,8 @@ const style = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     flexDirection: 'column',
-    paddingVertical: 20,
+    paddingVertical: 25,
     paddingHorizontal: 40,
-  },
-  amountContainer: {
-    flexDirection: 'row',
-    marginHorizontal: 25,
-    marginTop: 15,
-    alignSelf: 'center',
-  },
-  amount: {
-    ...fontStyles.regular,
-    fontSize: 48,
-    lineHeight: 64,
-    color: colors.darkSecondary,
   },
   bottomContainer: {
     marginTop: 5,
@@ -178,19 +112,6 @@ const style = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'stretch',
   },
-  plusSign: {
-    ...fontStyles.regular,
-    fontSize: 34,
-  },
-  currencySymbol: {
-    ...fontStyles.regular,
-    textAlignVertical: 'top',
-    fontSize: 24,
-    color: colors.darkSecondary,
-  },
-  avatar: {
-    marginTop: 5,
-  },
   pSmall: {
     fontSize: 14,
     color: colors.darkSecondary,
@@ -200,8 +121,4 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-    withNamespaces(Namespaces.sendFlow7)(TransferReviewCard)
-  )
-)
+export default withNamespaces(Namespaces.sendFlow7)(TransferReviewCard)
