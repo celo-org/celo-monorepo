@@ -4,8 +4,16 @@
 import * as util from './deployment-utils'
 import parseArgs from 'minimist'
 
-const envArg = parseArgs(process.argv.slice(2))['celo-env']
-const project = parseArgs(process.argv.slice(2))['celo-proj'] || 'celo-testnet'
-util.setProject(project)
-util.setEnv(envArg)
-util.deploy(envArg)
+async function main() {
+  const envArg = parseArgs(process.argv.slice(2))['celo-env']
+  const project = parseArgs(process.argv.slice(2))['celo-proj'] || 'celo-testnet'
+  await util.setProject(project)
+  await util.setEnv(envArg)
+  try {
+    await util.deploy(envArg)
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+main()

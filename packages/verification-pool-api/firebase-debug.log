@@ -1,0 +1,177 @@
+[debug] [2019-09-05T10:03:03.204Z] ----------------------------------------------------------------------
+[debug] [2019-09-05T10:03:03.207Z] Command:       /Users/rohit/.nvm/versions/node/v8.16.0/bin/node /Users/rohit/Documents/celo/temp/celo-monorepo/node_modules/.bin/firebase deploy --only database,hosting,functions:handleVerificationRequestintegration
+[debug] [2019-09-05T10:03:03.207Z] CLI Version:   7.3.0
+[debug] [2019-09-05T10:03:03.207Z] Platform:      darwin
+[debug] [2019-09-05T10:03:03.207Z] Node Version:  v8.16.0
+[debug] [2019-09-05T10:03:03.208Z] Time:          Thu Sep 05 2019 12:03:03 GMT+0200 (CEST)
+[debug] [2019-09-05T10:03:03.208Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2019-09-05T10:03:03.216Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2019-09-05T10:03:03.216Z] > authorizing via signed-in user
+[debug] [2019-09-05T10:03:03.216Z] [iam] checking project celo-testnet for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get","firebasedatabase.instances.update","firebasehosting.sites.update"]
+[debug] [2019-09-05T10:03:03.218Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/celo-testnet:testIamPermissions  
+
+[debug] [2019-09-05T10:03:05.075Z] <<< HTTP RESPONSE 200
+[debug] [2019-09-05T10:03:05.077Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/celo-testnet  
+ 
+[debug] [2019-09-05T10:03:05.372Z] <<< HTTP RESPONSE 200
+[warn] ⚠  functions: package.json indicates an outdated version of firebase-functions.
+ Please upgrade using npm install --save firebase-functions@latest in your functions directory.
+[info] 
+[info] === Deploying to 'celo-testnet'...
+[info] 
+[info] i  deploying database, functions, hosting
+[info] Running command: echo deploying
+[info] ✔  functions: Finished running predeploy script.
+[info] i  database: checking rules syntax...
+[debug] [2019-09-05T10:03:06.986Z] >>> HTTP REQUEST PUT https://celo-testnet.firebaseio.com/.settings/rules.json?dryRun=true  
+ {
+  "rules": {
+    "$environment": {
+      "mobileVerifiers": {
+        ".indexOn": [
+          "isVerifying"
+        ],
+        "$uid": {
+          ".validate": "newData.hasChildren(['fcmToken', 'name', 'phoneNum', 'supportedRegion', 'isVerifying'])",
+          "address": {
+            ".validate": "newData.isString()"
+          },
+          "fcmToken": {
+            ".validate": "newData.isString()"
+          },
+          "name": {
+            ".validate": "newData.isString()"
+          },
+          "phoneNum": {
+            ".validate": "newData.isString()"
+          },
+          "supportedRegion": {
+            ".validate": "newData.isString()"
+          },
+          "isVerifying": {
+            ".validate": "newData.isBoolean()"
+          },
+          "attemptCount": {
+            ".validate": "newData.isNumber()"
+          },
+          "$other": {
+            ".validate": "false"
+          },
+          ".read": "(auth != null && auth.uid == $uid)",
+          ".write": "(auth != null && auth.uid == $uid)"
+        }
+      },
+      "messages": {
+        ".indexOn": [
+          "messageState",
+          "phoneNum"
+        ],
+        "$key": {
+          ".validate": "newData.hasChildren(['phoneNum', 'address', 'message', 'startTime', 'messageState'])",
+          "phoneNum": {
+            ".validate": "newData.isString()"
+          },
+          "address": {
+            ".validate": "newData.isString()"
+          },
+          "message": {
+            ".validate": "newData.isString()"
+          },
+          "verifierId": {
+            ".validate": "newData.isString()"
+          },
+          "verifierCandidates": {
+            ".validate": "newData.isString()"
+          },
+          "startTime": {
+            ".validate": "newData.isNumber()"
+          },
+          "finishTime": {
+            ".validate": "newData.isNumber()"
+          },
+          "messageState": {
+            ".validate": "newData.isNumber()"
+          },
+          "$other": {
+            ".validate": "false"
+          },
+          ".read": "((auth != null && data.child('verifierCandidates').val() != null) && data.child('verifierCandidates').val().contains(auth.uid))",
+          ".write": "((auth != null && newData.child('verifierCandidates').val() != null) && newData.child('verifierCandidates').val().contains(auth.uid))"
+        }
+      },
+      "rewards": {
+        ".validate": "newData.hasChildren(['isRewarding'])",
+        "isRewarding": {
+          ".validate": "newData.isBoolean()"
+        },
+        "$other": {
+          ".validate": "false"
+        }
+      }
+    }
+  }
+}
+
+[debug] [2019-09-05T10:03:07.652Z] <<< HTTP RESPONSE 200
+[info] ✔  database: rules syntax for database celo-testnet is valid
+[debug] [2019-09-05T10:03:07.654Z] > [functions] package.json contents: {
+  "name": "@celo/verification-pool-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mobile verification pool firebase API",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "main": "lib/src/index.js",
+  "scripts": {
+    "build:for-env": "./build.sh -e",
+    "get-config": "firebase functions:config:get",
+    "set-config": "ts-node ./deployment/set-config.ts --celo-env",
+    "set-env": "ts-node ./deployment/set-env.ts --celo-env",
+    "deploy": "ts-node ./deployment/deploy.ts --celo-env",
+    "deploy:cloudbuild": "./deploy.sh",
+    "delete": " ts-node ./deployment/delete.ts --celo-env",
+    "shell": "firebase functions:shell",
+    "start": "yarn run shell",
+    "logs": "firebase functions:log",
+    "lint": "tslint -c tslint.json --project tsconfig.json",
+    "build": "tsc -p .",
+    "test": "jest --ci --coverage --runInBand --detectOpenHandles",
+    "test:verbose": "jest --ci --verbose --runInBand --detectOpenHandles"
+  },
+  "dependencies": {
+    "bignumber.js": "^7.2.0",
+    "eth-lib": "^0.2.8",
+    "ethereumjs-util": "^5.2.0",
+    "express": "^4.16.4",
+    "firebase-admin": "^7.0.0",
+    "firebase-functions": "^2.2.0",
+    "google-libphonenumber": "^3.2.1",
+    "lodash": "^4.17.14",
+    "sleep-promise": "^8.0.1",
+    "twilio": "^3.23.2",
+    "web3": "1.0.0-beta.37",
+    "web3-core-helpers": "1.0.0-beta.37",
+    "web3-utils": "^1.0.0-beta.37"
+  },
+  "devDependencies": {
+    "@types/express": "^4.16.1",
+    "@types/google-libphonenumber": "^7.4.17",
+    "@types/minimist": "^1.2.0",
+    "@types/supertest": "^2.0.7",
+    "@types/web3": "^1.0.18",
+    "firebase-bolt": "^0.8.3",
+    "firebase-functions-test": "^0.1.6",
+    "firebase-tools": "^7.3.0",
+    "minimist": "^1.2.0",
+    "supertest": "^3.4.2"
+  },
+  "engines": {
+    "node": "8"
+  }
+}
+[info] i  functions: ensuring necessary APIs are enabled...
+[debug] [2019-09-05T10:03:07.656Z] >>> HTTP REQUEST GET https://serviceusage.googleapis.com/v1/projects/celo-testnet/services/cloudfunctions.googleapis.com  
+ 
+[debug] [2019-09-05T10:03:07.656Z] >>> HTTP REQUEST GET https://serviceusage.googleapis.com/v1/projects/celo-testnet/services/runtimeconfig.googleapis.com  
+ 

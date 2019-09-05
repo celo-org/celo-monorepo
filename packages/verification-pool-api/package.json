@@ -11,7 +11,7 @@
     "get-config": "firebase functions:config:get",
     "set-config": "ts-node ./deployment/set-config.ts --celo-env",
     "set-env": "ts-node ./deployment/set-env.ts --celo-env",
-    "deploy": "./build.sh -e integration",
+    "deploy": "ts-node ./deployment/deploy.ts --celo-env",
     "deploy:cloudbuild": "./deploy.sh",
     "delete": " ts-node ./deployment/delete.ts --celo-env",
     "shell": "firebase functions:shell",

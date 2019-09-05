@@ -98,5 +98,7 @@ async function exec(command: string, args: string[]) {
     proc.stderr.on('data', (data: any) => {
       console.log('Child data stderr: ' + data)
     })
+  }).catch((data) => {
+    console.log(data)
   })
 }
