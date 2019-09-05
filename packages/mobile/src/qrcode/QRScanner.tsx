@@ -6,6 +6,7 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { RNCamera } from 'react-native-camera'
+import { NavigationFocusInjectedProps, withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import i18n, { Namespaces } from 'src/i18n'
@@ -20,7 +21,7 @@ interface DispatchProps {
   handleBarcodeDetected: typeof handleBarcodeDetected
 }
 
-type Props = DispatchProps & WithNamespaces
+type Props = DispatchProps & WithNamespaces & NavigationFocusInjectedProps
 
 const goToQrCodeScreen = () => {
   navigate(Screens.QRCode)
@@ -54,42 +55,43 @@ class QRScanner extends React.Component<Props> {
     const { t } = this.props
     return (
       <View style={styles.container}>
-        {this.state.camera && (
-          <RNCamera
-            ref={(ref) => {
-              this.camera = ref
-            }}
-            // @ts-ignore
-            style={styles.preview}
-            type={RNCamera.Constants.Type.back}
-            onBarCodeRead={this.props.handleBarcodeDetected}
-            barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
-            captureAudio={false}
-          >
-            <View style={styles.view}>
-              <View style={styles.viewFillVertical} />
-              <View style={styles.viewCameraRow}>
-                <View style={styles.viewFillHorizontal} />
-                <View style={styles.viewCameraContainer}>
-                  <View style={styles.camera} />
-                  <Text style={[fontStyles.bodySmall, styles.viewInfoBox]}>
-                    {t('ScanCodeByPlacingItInTheBox')}
-                  </Text>
+        {this.state.camera &&
+          this.props.isFocused && (
+            <RNCamera
+              ref={(ref) => {
+                this.camera = ref
+              }}
+              // @ts-ignore
+              style={styles.preview}
+              type={RNCamera.Constants.Type.back}
+              onBarCodeRead={this.props.handleBarcodeDetected}
+              barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
+              captureAudio={false}
+            >
+              <View style={styles.view}>
+                <View style={styles.viewFillVertical} />
+                <View style={styles.viewCameraRow}>
+                  <View style={styles.viewFillHorizontal} />
+                  <View style={styles.viewCameraContainer}>
+                    <View style={styles.camera} />
+                    <Text style={[fontStyles.bodySmall, styles.viewInfoBox]}>
+                      {t('ScanCodeByPlacingItInTheBox')}
+                    </Text>
+                  </View>
+                  <View style={styles.viewFillHorizontal} />
                 </View>
-                <View style={styles.viewFillHorizontal} />
+                <View style={styles.viewFillVertical} />
               </View>
-              <View style={styles.viewFillVertical} />
-            </View>
-            <View style={styles.footerContainer}>
-              <View style={styles.footerIcon}>
-                <QRCode />
+              <View style={styles.footerContainer}>
+                <View style={styles.footerIcon}>
+                  <QRCode />
+                </View>
+                <TouchableOpacity onPress={goToQrCodeScreen}>
+                  <Text style={styles.footerText}> {t('showYourQRCode')} </Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity onPress={goToQrCodeScreen}>
-                <Text style={styles.footerText}> {t('showYourQRCode')} </Text>
-              </TouchableOpacity>
-            </View>
-          </RNCamera>
-        )}
+            </RNCamera>
+          )}
       </View>
     )
   }
@@ -166,10 +168,12 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect(
-    null,
-    {
-      handleBarcodeDetected,
-    }
-  )(withNamespaces(Namespaces.sendFlow7)(QRScanner))
+  withNavigationFocus(
+    connect(
+      null,
+      {
+        handleBarcodeDetected,
+      }
+    )(withNamespaces(Namespaces.sendFlow7)(QRScanner))
+  )
 )
