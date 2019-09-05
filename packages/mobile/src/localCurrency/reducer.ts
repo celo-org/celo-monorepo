@@ -1,17 +1,39 @@
+import { LOCAL_CURRENCY_SYMBOL } from 'src/config'
 import { Actions, ActionTypes } from 'src/localCurrency/actions'
+import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 
 export interface State {
   isLoading: boolean
+  symbol: string | null
   exchangeRate?: number | null
 }
 
 const initialState = {
   isLoading: false,
+  symbol: LOCAL_CURRENCY_SYMBOL,
   exchangeRate: 1.33,
 }
 
-export const reducer = (state: State = initialState, action: ActionTypes): State => {
+export const reducer = (
+  state: State = initialState,
+  action: ActionTypes | RehydrateAction
+): State => {
   switch (action.type) {
+    case REHYDRATE: {
+      const persistedState = getRehydratePayload(action, 'localCurrency')
+
+      // Make sure we don't use the persisted exchange rate if the symbol is now different
+      if (persistedState && persistedState.symbol !== LOCAL_CURRENCY_SYMBOL) {
+        return initialState
+      }
+
+      // Ignore some persisted properties
+      return {
+        ...state,
+        ...persistedState,
+        isLoading: false,
+      }
+    }
     case Actions.FETCH_CURRENT_RATE:
       return {
         ...state,

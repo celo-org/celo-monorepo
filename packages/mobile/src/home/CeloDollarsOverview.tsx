@@ -5,6 +5,7 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import { LOCAL_CURRENCY_SYMBOL } from 'src/config'
 import useBalanceAutoRefresh from 'src/home/useBalanceAutoRefresh'
 import { Namespaces } from 'src/i18n'
 import useLocalAmount from 'src/localCurrency/useLocalAmount'
@@ -28,12 +29,17 @@ function CeloDollarsOverview({ t }: Props) {
       <Text style={[fontStyles.semiBold, styles.balance]}>
         {getMoneyDisplayValue(dollarBalance || 0)}
       </Text>
-      <Text style={[fontStyles.light, styles.localBalance]}>
-        Equal to{' '}
-        <Text style={fontStyles.semiBold}>
-          {localBalance ? getMoneyDisplayValue(localBalance) : '---'} MXN
+      {LOCAL_CURRENCY_SYMBOL && (
+        <Text style={[fontStyles.light, styles.localBalance]}>
+          Equal to{' '}
+          <Text style={fontStyles.semiBold}>
+            {localBalance || dollarBalance === null
+              ? getMoneyDisplayValue(localBalance || 0)
+              : '---'}{' '}
+            {LOCAL_CURRENCY_SYMBOL}
+          </Text>
         </Text>
-      </Text>
+      )}
     </View>
   )
 }

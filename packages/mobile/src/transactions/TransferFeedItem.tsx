@@ -11,7 +11,7 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { HomeTransferFragment } from 'src/apollo/types'
-import { DEFAULT_TESTNET } from 'src/config'
+import { DEFAULT_TESTNET, LOCAL_CURRENCY_SYMBOL } from 'src/config'
 import { features } from 'src/flags'
 import { CURRENCIES, CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
@@ -233,12 +233,13 @@ export function TransferFeedItem(props: Props) {
                 {' ' + timeFormatted}
               </Text>
             )}
-            {localValue && (
-              <Text style={[fontStyles.bodySmall, styles.localAmount]}>
-                {currencyStyle.direction}
-                {`${getMoneyDisplayValue(localValue)} MXN`}
-              </Text>
-            )}
+            {LOCAL_CURRENCY_SYMBOL &&
+              localValue && (
+                <Text style={[fontStyles.bodySmall, styles.localAmount]}>
+                  {currencyStyle.direction}
+                  {`${getMoneyDisplayValue(localValue)} ${LOCAL_CURRENCY_SYMBOL}`}
+                </Text>
+              )}
           </View>
         </View>
       </View>
