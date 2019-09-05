@@ -17,7 +17,6 @@ import { networkInfoSaga } from 'src/networkInfo/saga'
 import { sendSaga } from 'src/send/saga'
 import { stableTokenSaga } from 'src/stableToken/saga'
 import Logger from 'src/utils/Logger'
-import { web3Saga } from 'src/web3/saga'
 
 const loggerBlacklist = [
   'persist/REHYDRATE',
@@ -56,7 +55,6 @@ export function* rootSaga() {
   yield spawn(appSaga)
   yield spawn(networkInfoSaga)
   yield spawn(gethSaga)
-  yield spawn(web3Saga)
   yield spawn(identitySaga)
   yield spawn(goldTokenSaga)
   yield spawn(stableTokenSaga)

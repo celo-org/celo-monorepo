@@ -18,6 +18,7 @@ import {
 } from 'react-native'
 import { BoxShadow } from 'react-native-shadow'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import AccountInfo from 'src/account/AccountInfo'
 import { hideAlert, showMessage } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
@@ -65,6 +66,23 @@ interface DispatchProps {
 }
 
 type Props = StateProps & DispatchProps & WithNamespaces
+
+// Use bindActionCreators to workaround a typescript error with the shorthand syntax with redux-thunk actions
+// see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37369
+const mapDispatchToProps = (dispatch: any) =>
+  bindActionCreators(
+    {
+      refreshAllBalances,
+      resetStandbyTransactions,
+      initializeSentryUserContext,
+      exitBackupFlow,
+      setLoading,
+      showMessage,
+      hideAlert,
+      importContacts,
+    },
+    dispatch
+  )
 
 const mapStateToProps = (state: RootState): StateProps => ({
   loading: state.home.loading,
@@ -281,16 +299,7 @@ export default withDispatchAfterNavigate(
   componentWithAnalytics(
     connect<StateProps, DispatchProps, {}, RootState>(
       mapStateToProps,
-      {
-        refreshAllBalances,
-        resetStandbyTransactions,
-        initializeSentryUserContext,
-        exitBackupFlow,
-        setLoading,
-        showMessage,
-        hideAlert,
-        importContacts,
-      }
+      mapDispatchToProps
     )(withNamespaces(Namespaces.walletFlow5)(WalletHome))
   )
 )
