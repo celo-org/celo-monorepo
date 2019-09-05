@@ -35,6 +35,8 @@ export enum CustomEventNames {
   send_dollar_transaction = 'send_dollar_transaction',
   send_dollar_transaction_confirmed = 'send_dollar_transaction_confirmed',
 
+  fetch_balance = 'fetch_balance',
+
   // Verification event and sub-events
   verification = 'verification',
   verification_setup = 'verification_setup',

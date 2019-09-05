@@ -13,6 +13,7 @@ import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import * as utf8 from 'utf8'
+
 interface TokenFetchFactory {
   actionName: string
   contractGetter: (web3: any) => any
