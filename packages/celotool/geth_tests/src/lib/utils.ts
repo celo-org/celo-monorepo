@@ -387,7 +387,7 @@ export async function initAndStartGeth(gethBinaryPath: string, instance: GethIns
   return startGeth(gethBinaryPath, instance)
 }
 
-export function getHooks(gethConfig: GethTestConfig) {
+export function getContext(gethConfig: GethTestConfig) {
   const mnemonic =
     'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
@@ -455,7 +455,14 @@ export function getHooks(gethConfig: GethTestConfig) {
 
   const after = () => killGeth()
 
-  return { before, after, restart, gethBinaryPath }
+  return {
+    validators,
+    hooks: { before, after, restart, gethBinaryPath },
+  }
+}
+
+export function getHooks(gethConfig: GethTestConfig) {
+  return getContext(gethConfig).hooks
 }
 
 export async function assertRevert(promise: any, errorMessage: string = '') {

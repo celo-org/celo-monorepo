@@ -2,10 +2,11 @@ import {
   erc20Abi,
   getContractAddress,
   getEnode,
-  getHooks,
+  getContext,
   importGenesis,
   initAndStartGeth,
   sleep,
+  assertRevert,
 } from '@celo/celotool/geth_tests/src/lib/utils'
 import BigNumber from 'bignumber.js'
 import { strip0x } from '../src/lib/utils'
@@ -167,6 +168,25 @@ const validatorsAbi = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
+  {
+    constant: true,
+    inputs: [
+      {
+        name: 'index',
+        type: 'uint256',
+      },
+    ],
+    name: 'validatorAddressFromCurrentSet',
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
 ]
 
 describe('governance tests', () => {
@@ -181,7 +201,7 @@ describe('governance tests', () => {
     ],
   }
 
-  const hooks: any = getHooks(gethConfig)
+  const context: any = getContext(gethConfig)
   let web3: any
   let bondedDeposits: any
   let validators: any
@@ -189,13 +209,13 @@ describe('governance tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
-    await hooks.before()
+    // await context.hooks.before()
   })
 
-  after(hooks.after)
+  after(context.hooks.after)
 
   const restart = async () => {
-    await hooks.restart()
+    await context.hooks.restart()
     web3 = new Web3('http://localhost:8545')
     bondedDeposits = new web3.eth.Contract(
       bondedDepositsAbi,
@@ -292,6 +312,41 @@ describe('governance tests', () => {
     return await tx.send({ from: account, ...txOptions, gas })
   }
 
+  describe.only('Validators.validatorAddressFromCurrentSet()', () => {
+    before(async function() {
+      this.timeout(0)
+      await restart()
+      validators = new web3.eth.Contract(validatorsAbi, await getContractAddress('ValidatorsProxy'))
+    })
+
+    it('should return the first validator', async () => {
+      const resultAddress = await validators.methods.validatorAddressFromCurrentSet(0).call()
+
+      assert.equal(strip0x(resultAddress), context.validators[0].address)
+    })
+
+    it('should return the third validator', async () => {
+      const resultAddress = await validators.methods.validatorAddressFromCurrentSet(2).call()
+
+      assert.equal(strip0x(resultAddress), context.validators[2].address)
+    })
+
+    it('should return the fifth validator', async () => {
+      const resultAddress = await validators.methods.validatorAddressFromCurrentSet(4).call()
+
+      assert.equal(strip0x(resultAddress), context.validators[4].address)
+    })
+
+    it('should revert when asked for an out of bounds validator', async function(this: any) {
+      this.timeout(0) // Disable test timeout
+      await assertRevert(
+        validators.methods.validatorAddressFromCurrentSet(5).send({
+          from: `0x${context.validators[0].address}`,
+        })
+      )
+    })
+  })
+
   describe('when the validator set is changing', () => {
     const epoch = 10
     const expectedEpochMembership = new Map()
@@ -309,7 +364,7 @@ describe('governance tests', () => {
         privateKey: groupPrivateKey.slice(2),
         peers: [await getEnode(8545)],
       }
-      await initAndStartGeth(hooks.gethBinaryPath, groupInstance)
+      await initAndStartGeth(context.hooks.gethBinaryPath, groupInstance)
       const groupWeb3 = new Web3('ws://localhost:8567')
       validators = new groupWeb3.eth.Contract(
         validatorsAbi,
@@ -378,7 +433,7 @@ describe('governance tests', () => {
         rpcport: 8567,
         privateKey: 'f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d',
       }
-      await initAndStartGeth(hooks.gethBinaryPath, delegateInstance)
+      await initAndStartGeth(context.hooks.gethBinaryPath, delegateInstance)
       // Note that we don't need to create an account or make a deposit as this has already been
       // done in the migration.
       await delegateRewards(account, delegate)
