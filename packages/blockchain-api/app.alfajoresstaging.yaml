@@ -3,6 +3,7 @@ service: alfajoresstaging
 env_variables:
   NODE_ENV: 'development'
   DEPLOY_ENV: 'alfajoresstaging'
+  EXCHANGE_RATES_API: 'https://api.exchangeratesapi.io'
   BLOCKSCOUT_API: 'https://alfajoresstaging-blockscout.celo-testnet.org/api'
   # Pull addresses from the build artifacts of the network in protocol/build
   CELO_GOLD_ADDRESS: '0x1313e2f3EBef8f0d869EECEb796D55A066eEA863'

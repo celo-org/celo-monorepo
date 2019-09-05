@@ -1,6 +1,6 @@
 import { gql } from 'apollo-server-express'
+import { DataSources } from './apolloServer'
 
-// TODO(Kamyar): make apollo generate these types with codegen package
 export enum EventTypes {
   EXCHANGE = 'EXCHANGE',
   RECEIVED = 'RECEIVED',
@@ -47,6 +47,11 @@ export interface EventArgs {
   endtimestamp: number
 }
 
+export interface CurrencyConversionArgs {
+  currencyCode: string
+  timestamp?: number
+}
+
 export const typeDefs = gql`
   union Event = Exchange | Transfer
 
@@ -74,6 +79,10 @@ export const typeDefs = gql`
     hash: String!
   }
 
+  type ExchangeRate {
+    rate: Float!
+  }
+
   type Query {
     events(
       address: String!
@@ -98,16 +107,29 @@ export const typeDefs = gql`
       starttimestamp: Float
       endtimestamp: Float
     ): [Transfer]
+
+    currencyConversion(currencyCode: String!, timestamp: Float): ExchangeRate
   }
 `
 
+interface Context {
+  dataSources: DataSources
+}
+
 export const resolvers = {
   Query: {
-    events: async (_source: any, args: EventArgs, { dataSources }: { dataSources: any }) => {
+    events: async (_source: any, args: EventArgs, { dataSources }: Context) => {
       return dataSources.blockscoutAPI.getFeedEvents(args)
     },
-    rewards: async (_source: any, args: EventArgs, { dataSources }: { dataSources: any }) => {
+    rewards: async (_source: any, args: EventArgs, { dataSources }: Context) => {
       return dataSources.blockscoutAPI.getFeedRewards(args)
+    },
+    currencyConversion: async (
+      _source: any,
+      args: CurrencyConversionArgs,
+      { dataSources }: Context
+    ) => {
+      return dataSources.currencyConversionAPI.getExchangeRate(args)
     },
   },
   // TODO(kamyar):  see the comment about union causing problems
