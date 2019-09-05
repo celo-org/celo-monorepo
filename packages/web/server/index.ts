@@ -20,6 +20,7 @@ import { getFormattedMediumArticles } from './mediumAPI'
 const port = parseInt(process.env.PORT, 10) || 3000
 
 const dev = process.env.NEXT_DEV === 'true'
+// tslint:disable-next-line
 const app = next({ dev })
 const handle = app.getRequestHandler()
 
