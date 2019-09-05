@@ -22,7 +22,7 @@ export async function deploy(CELO_ENV: string) {
     'firebase',
     'deploy',
     '--only',
-    `database,hosting,functions:handleVerificationRequest${CELO_ENV}`,
+    `database,functions:handleVerificationRequest${CELO_ENV}`,
   ])
 }
 
