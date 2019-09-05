@@ -8,7 +8,7 @@ import * as React from 'react'
 import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, View } from 'react-native'
 
 // temp language list for Argentina pilot
-const languages = [{ name: 'English', code: 'en-US' }, { name: 'Español (AR)', code: 'es-AR' }]
+// const languages = [{ name: 'English', code: 'en-US' }, { name: 'Español (AR)', code: 'es-AR' }]
 
 export interface Props {
   logo: ImageSourcePropType
@@ -17,11 +17,20 @@ export interface Props {
   isSubmitDisabled: boolean
   currentSelected: string
   t: TranslationFunction
+  languages: any
 }
 
 class LanguageSelectUI extends React.PureComponent<Props> {
   render() {
-    const { logo, onLanguageSelected, onSubmit, isSubmitDisabled, currentSelected, t } = this.props
+    const {
+      logo,
+      onLanguageSelected,
+      onSubmit,
+      isSubmitDisabled,
+      currentSelected,
+      t,
+      languages,
+    } = this.props
 
     return (
       <View style={styles.container}>
@@ -33,7 +42,7 @@ class LanguageSelectUI extends React.PureComponent<Props> {
             {t('chooseLanguage')}
           </Text>
           <View style={componentStyles.line} testID="line" />
-          {languages.map((language) => (
+          {languages.map((language: any) => (
             <SelectionOption
               word={language.name}
               key={language.code}

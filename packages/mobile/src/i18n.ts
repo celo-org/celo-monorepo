@@ -65,9 +65,9 @@ i18n
         common: en_US,
         ...locales.enUS,
       },
-      'es-AR': {
+      'es-419': {
         common: es_LA,
-        ...locales.esAR,
+        ...locales.es_419,
       },
     },
     ns: ['common', ...Object.keys(Namespaces)],
