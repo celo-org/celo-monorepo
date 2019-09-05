@@ -24,6 +24,9 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   using FractionUtil for FractionUtil.Fraction;
   using BytesLib for bytes;
 
+  // Address of the getValidator precompiled contract
+  address constant public GET_VALIDATOR_ADDRESS = address(0xfa);
+
   // TODO(asa): These strings should be modifiable
   struct ValidatorGroup {
     string identifier;
@@ -539,6 +542,26 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     voters[account] = address(0);
     emit ValidatorGroupVoteRevoked(account, group, weight);
     return true;
+  }
+
+  function validatorAddressFromCurrentSet(uint256 index) external view returns (address) {
+    address validatorAddress;
+    assembly {
+      let newCallDataPosition := mload(0x40)
+      mstore(newCallDataPosition, index)
+      let success := staticcall(
+        5000,
+        0xfa,
+        newCallDataPosition,
+        32,
+        0,
+        0
+      )
+      returndatacopy(add(newCallDataPosition, 64), 0, 32)
+      validatorAddress := mload(add(newCallDataPosition, 64))
+    }
+
+    return validatorAddress;
   }
 
   /**
