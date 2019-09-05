@@ -1,48 +1,28 @@
-import { shallow } from 'enzyme'
-import toJson from 'enzyme-to-json'
 import * as React from 'react'
+import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import * as renderer from 'react-test-renderer'
-import Pincode, { Pincode as PincodeUnwrapped } from 'src/pincode/Pincode'
-import { createMockStore, getMockI18nProps } from 'test/utils'
+import Pincode from 'src/pincode/Pincode'
+import { createMockStore } from 'test/utils'
 
 describe('Pincode', () => {
-  it('renders correctly for education', () => {
-    const store = createMockStore()
-    const tree = renderer.create(
-      <Provider store={store}>
+  it('renders correctly', () => {
+    const { toJSON, getByTestId } = render(
+      <Provider store={createMockStore()}>
         <Pincode />
       </Provider>
     )
-    expect(tree).toMatchSnapshot()
-  })
 
-  it('renders correctly for pin enter', () => {
-    const wrapper = shallow(
-      <PincodeUnwrapped
-        showError={jest.fn()}
-        hideAlert={jest.fn()}
-        pincodeSet={jest.fn()}
-        setPin={jest.fn()}
-        {...getMockI18nProps()}
-      />
-    )
-    wrapper.find('Button').simulate('press')
-    expect(toJson(wrapper)).toMatchSnapshot()
-  })
+    // initial - education
+    expect(toJSON()).toMatchSnapshot()
 
-  it('renders correctly for pin re-enter', () => {
-    const wrapper = shallow(
-      <PincodeUnwrapped
-        showError={jest.fn()}
-        hideAlert={jest.fn()}
-        pincodeSet={jest.fn()}
-        setPin={jest.fn()}
-        {...getMockI18nProps()}
-      />
-    )
-    wrapper.find('Button').simulate('press')
-    wrapper.find('Button').simulate('press')
-    expect(toJson(wrapper)).toMatchSnapshot()
+    // Press continue
+    fireEvent.press(getByTestId('Pincode-Education'))
+    expect(toJSON()).toMatchSnapshot()
+
+    fireEvent.press(getByTestId('Pincode-Enter'))
+    expect(toJSON()).toMatchSnapshot()
+
+    fireEvent.press(getByTestId('Pincode-ReEnter'))
+    expect(toJSON()).toMatchSnapshot()
   })
 })
