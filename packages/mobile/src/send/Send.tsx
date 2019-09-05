@@ -209,7 +209,7 @@ class Send extends React.Component<Props, State> {
 
     return (
       <View style={style.body}>
-        <Text style={[fontStyles.headerTitle, style.header]}>{t('send_or_request')}</Text>
+        <Text style={[fontStyles.headerTitle, style.header]}>{t('sendOrRequest')}</Text>
         {loading ? (
           <View style={style.container}>
             <ActivityIndicator style={style.icon} size="large" color={colors.celoGreen} />

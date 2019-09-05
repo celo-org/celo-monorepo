@@ -7,52 +7,47 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
+import { connect } from 'react-redux'
 import Avatar from 'src/components/Avatar'
 import LineItemRow from 'src/components/LineItemRow'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
-import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import { Recipient } from 'src/recipients/recipient'
-import FeeIcon from 'src/send/FeeIcon'
-import { TransactionTypes } from 'src/transactions/reducer'
-import { getFeeDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
+import { RootState } from 'src/redux/reducers'
+import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 export interface OwnProps {
   address?: string
   comment?: string
   value: BigNumber
   currency: CURRENCY_ENUM
-  fee?: BigNumber
-  isLoadingFee?: boolean
-  feeError?: Error
-  type: TransactionTypes
   e164PhoneNumber?: string
   recipient?: Recipient
 }
 
-// Bordered content placed in a ReviewFrame
-// Differs from TransferConfirmationCard which is used for viewing completed txs
-class TransferReviewCard extends React.Component<OwnProps & WithNamespaces> {
+interface StateProps {
+  dollarBalance: string
+}
+
+const mapStateToProps = (state: RootState): StateProps => {
+  return {
+    dollarBalance: state.stableToken.balance || '0',
+  }
+}
+
+// Bordered content placed in a ReviewFrame for summarizing a payment request
+class PaymentRequestReviewCard extends React.Component<OwnProps & StateProps & WithNamespaces> {
   render() {
     const {
       recipient,
       address,
       e164PhoneNumber,
-      currency,
       t,
-      type,
+      dollarBalance,
+      currency,
       value,
       comment,
-      fee,
-      isLoadingFee,
-      feeError,
     } = this.props
-
-    const amountWithFees = value.plus(fee || 0)
-    const adjustedFee =
-      type === TransactionTypes.INVITE_SENT && fee
-        ? fee.minus(getInvitationVerificationFeeInDollars())
-        : fee
 
     return (
       <View style={[componentStyles.roundedBorder, style.container]}>
@@ -61,30 +56,20 @@ class TransferReviewCard extends React.Component<OwnProps & WithNamespaces> {
           address={address}
           e164Number={e164PhoneNumber}
         />
-        <MoneyAmount symbol={CURRENCIES[currency].symbol} amount={getMoneyDisplayValue(value)} />
+        <MoneyAmount
+          symbol={CURRENCIES[currency].symbol}
+          amount={getMoneyDisplayValue(value)}
+          color={colors.celoGreen}
+          sign={'+'}
+        />
         <View style={style.bottomContainer}>
           {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
           <HorizontalLine />
           <View style={style.feeContainer}>
-            {type === TransactionTypes.INVITE_SENT && (
-              <LineItemRow
-                currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-                amount={getMoneyDisplayValue(getInvitationVerificationFeeInDollars())}
-                title={t('inviteAndSecurityFee')}
-              />
-            )}
             <LineItemRow
               currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-              amount={getFeeDisplayValue(adjustedFee)}
-              title={t('securityFee')}
-              titleIcon={<FeeIcon />}
-              isLoading={isLoadingFee}
-              hasError={!!feeError}
-            />
-            <LineItemRow
-              currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-              amount={getMoneyDisplayValue(amountWithFees)}
-              title={t('total')}
+              amount={getMoneyDisplayValue(value.plus(dollarBalance))}
+              title={t('newAccountBalance')}
             />
           </View>
         </View>
@@ -121,4 +106,6 @@ const style = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.sendFlow7)(TransferReviewCard)
+export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
+  withNamespaces(Namespaces.sendFlow7)(PaymentRequestReviewCard)
+)

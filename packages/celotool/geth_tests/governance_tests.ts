@@ -416,7 +416,7 @@ describe('governance tests', () => {
       // that gold is sent.
       // We don't set the total supply until block rewards are paid out, which can happen once
       // either LockedGold or Governance are registered.
-      const blockNumber = 275
+      const blockNumber = 175
       const goldTotalSupply = await goldToken.methods.totalSupply().call({}, blockNumber)
       const balances = await Promise.all(
         addressesWithBalance.map(

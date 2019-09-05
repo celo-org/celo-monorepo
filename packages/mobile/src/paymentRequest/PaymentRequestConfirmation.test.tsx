@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import RequestConfirmation from 'src/send/RequestConfirmation'
+import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
 import { createMockNavigationProp, createMockStore } from 'test/utils'
 import { mockAccount, mockAccount2, mockE164Number, mockRecipient } from 'test/values'
 
@@ -15,7 +15,7 @@ const store = createMockStore({
   },
 })
 
-describe('RequestConfirmation', () => {
+describe('PaymentRequestConfirmation', () => {
   it('renders correctly for request payment confirmation', () => {
     const navigation = createMockNavigationProp({
       amount: new BigNumber(10),
@@ -26,7 +26,7 @@ describe('RequestConfirmation', () => {
 
     const tree = renderer.create(
       <Provider store={store}>
-        <RequestConfirmation navigation={navigation} />
+        <PaymentRequestConfirmation navigation={navigation} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`RequestConfirmation renders correctly for request payment confirmation 1`] = `
+exports[`PaymentRequestConfirmation renders correctly for request payment confirmation 1`] = `
 <View
   style={
     Object {
@@ -66,7 +66,7 @@ exports[`RequestConfirmation renders correctly for request payment confirmation 
                 ]
               }
             >
-              reviewPayment
+              requestPayment
             </Text>
           </View>
         </View>
@@ -92,7 +92,7 @@ exports[`RequestConfirmation renders correctly for request payment confirmation 
                   "flexDirection": "column",
                   "justifyContent": "flex-start",
                   "paddingHorizontal": 40,
-                  "paddingVertical": 20,
+                  "paddingVertical": 25,
                 },
               ]
             }
@@ -100,17 +100,25 @@ exports[`RequestConfirmation renders correctly for request payment confirmation 
             <View
               style={
                 Object {
-                  "marginTop": 5,
+                  "flexDirection": "column",
+                  "justifyContent": "center",
+                  "marginBottom": 10,
                 }
               }
             >
               <View
                 style={
-                  Object {
-                    "flexDirection": "column",
-                    "justifyContent": "center",
-                    "marginBottom": 10,
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "alignSelf": "center",
+                      "margin": "auto",
+                    },
+                  ]
                 }
               >
                 <View
@@ -118,117 +126,101 @@ exports[`RequestConfirmation renders correctly for request payment confirmation 
                     Array [
                       Object {
                         "alignItems": "center",
-                        "flexDirection": "row",
                         "justifyContent": "center",
                       },
                       Object {
-                        "alignSelf": "center",
-                        "margin": "auto",
+                        "backgroundColor": "#7AD6FE",
+                        "borderRadius": 20,
+                        "height": 40,
+                        "width": 40,
                       },
                     ]
                   }
                 >
-                  <View
+                  <Text
                     style={
                       Array [
                         Object {
-                          "alignItems": "center",
-                          "justifyContent": "center",
+                          "color": "#FFFFFF",
+                          "fontFamily": "Hind-Medium",
+                          "fontSize": 16,
                         },
                         Object {
-                          "backgroundColor": "#7AD6FE",
-                          "borderRadius": 20,
-                          "height": 40,
-                          "width": 40,
+                          "fontSize": 20,
                         },
                       ]
                     }
                   >
-                    <Text
-                      style={
-                        Array [
-                          Object {
-                            "color": "#FFFFFF",
-                            "fontFamily": "Hind-Medium",
-                            "fontSize": 16,
-                          },
-                          Object {
-                            "fontSize": 20,
-                          },
-                        ]
-                      }
-                    >
-                      J
-                    </Text>
-                  </View>
+                    J
+                  </Text>
                 </View>
+              </View>
+              <Text
+                ellipsizeMode="tail"
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "marginHorizontal": 20,
+                      "paddingTop": 6,
+                      "textAlign": "center",
+                    },
+                  ]
+                }
+              >
+                John Doe
+              </Text>
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  }
+                }
+              >
                 <Text
-                  ellipsizeMode="tail"
-                  numberOfLines={1}
                   style={
                     Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "marginHorizontal": 20,
-                        "paddingTop": 6,
-                        "textAlign": "center",
-                      },
-                    ]
-                  }
-                >
-                  John Doe
-                </Text>
-                <View
-                  style={
-                    Object {
-                      "alignItems": "center",
-                      "alignSelf": "center",
-                      "flexDirection": "row",
-                      "justifyContent": "center",
-                    }
-                  }
-                >
-                  <Text
-                    style={
-                      Array [
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-Light",
-                          "fontSize": 14,
-                          "textAlignVertical": "center",
-                        },
-                        Object {
-                          "alignItems": "center",
-                          "backgroundColor": "#EEEEEE",
-                          "borderRadius": 3,
-                          "justifyContent": "center",
-                          "marginRight": 5,
-                          "paddingLeft": 6,
-                          "paddingRight": 3,
-                        },
-                      ]
-                    }
-                  >
-                     +1
-                  </Text>
-                  <Text
-                    style={
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Hind-Light",
                         "fontSize": 14,
                         "textAlignVertical": "center",
-                      }
+                      },
+                      Object {
+                        "alignItems": "center",
+                        "backgroundColor": "#EEEEEE",
+                        "borderRadius": 3,
+                        "justifyContent": "center",
+                        "marginRight": 5,
+                        "paddingLeft": 6,
+                        "paddingRight": 3,
+                      },
+                    ]
+                  }
+                >
+                   +1
+                </Text>
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Light",
+                      "fontSize": 14,
+                      "textAlignVertical": "center",
                     }
-                  >
-                    (415) 555-0000
-                  </Text>
-                </View>
+                  }
+                >
+                  (415) 555-0000
+                </Text>
               </View>
             </View>
             <View
@@ -249,12 +241,12 @@ exports[`RequestConfirmation renders correctly for request payment confirmation 
                       "fontSize": 34,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": "#42D689",
                     },
                   ]
                 }
               >
-                
+                +
               </Text>
               <Text
                 style={
@@ -266,12 +258,12 @@ exports[`RequestConfirmation renders correctly for request payment confirmation 
                       "textAlignVertical": "top",
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": "#42D689",
                     },
                   ]
                 }
               >
-                
+                $
               </Text>
               <Text
                 ellipsizeMode="tail"
@@ -285,7 +277,7 @@ exports[`RequestConfirmation renders correctly for request payment confirmation 
                       "lineHeight": 64,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": "#42D689",
                     },
                   ]
                 }
