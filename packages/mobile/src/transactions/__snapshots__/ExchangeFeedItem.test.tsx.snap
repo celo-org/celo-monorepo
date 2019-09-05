@@ -22,8 +22,7 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
         "flex": 1,
         "flexDirection": "row",
         "justifyContent": "space-between",
-        "paddingLeft": 10,
-        "paddingTop": 20,
+        "padding": 16,
       }
     }
   >
@@ -31,12 +30,7 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
       style={
         Array [
           Object {
-            "borderBottomWidth": 1,
-            "borderColor": "rgba(134, 138, 141, 0.15)",
             "flex": 1,
-            "flexDirection": "row",
-            "justifyContent": "space-between",
-            "paddingRight": 10,
           },
           false,
         ]
@@ -45,63 +39,49 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
       <View
         style={
           Object {
-            "flex": 1,
-            "justifyContent": "flex-start",
+            "flexDirection": "row",
+            "marginTop": 3,
           }
         }
       >
-        <View
+        <Text
           style={
             Object {
-              "opacity": 1,
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 14,
+              "lineHeight": 18,
             }
           }
         >
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 14,
-                "lineHeight": 18,
-              }
-            }
-          >
-            exchange
-          </Text>
-        </View>
+          exchange
+        </Text>
         <Text
           style={
             Array [
               Object {
-                "color": "#2E3338",
+                "color": "#81868B",
                 "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
+                "fontSize": 15,
+                "lineHeight": 20,
               },
               Object {
-                "paddingBottom": 10,
-                "paddingTop": 25,
+                "marginLeft": "auto",
+                "paddingLeft": 10,
               },
             ]
           }
         >
-          Dec 31 at 5:00 PM
+          -
+          1.00
         </Text>
       </View>
       <View
         style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "alignSelf": "flex-start",
-              "flexDirection": "row",
-              "justifyContent": "flex-end",
-            },
-            Object {
-              "opacity": 1,
-            },
-          ]
+          Object {
+            "alignItems": "center",
+            "flexDirection": "row",
+          }
         }
       >
         <Text
@@ -125,7 +105,7 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
         <View
           style={
             Object {
-              "paddingBottom": 5,
+              "paddingBottom": 8,
               "paddingHorizontal": 5,
             }
           }
@@ -164,6 +144,34 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
         >
           
           10.00
+        </Text>
+      </View>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "marginTop": 8,
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+              },
+              Object {
+                "color": "#BDBDBD",
+              },
+            ]
+          }
+        >
+          Dec 31 at 5:00 PM
         </Text>
       </View>
     </View>

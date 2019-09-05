@@ -336,8 +336,7 @@ exports[`renders for error 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
@@ -345,12 +344,7 @@ exports[`renders for error 1`] = `
             style={
               Array [
                 Object {
-                  "borderBottomWidth": 1,
-                  "borderColor": "rgba(134, 138, 141, 0.15)",
                   "flex": 1,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "paddingRight": 10,
                 },
                 false,
               ]
@@ -359,81 +353,49 @@ exports[`renders for error 1`] = `
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
+              <Text
                 style={
                   Object {
-                    "opacity": 0.3,
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
                   }
                 }
               >
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  exchange
-                </Text>
-              </View>
+                exchange
+              </Text>
               <Text
                 style={
                   Array [
                     Object {
-                      "color": "#2E3338",
+                      "color": "#81868B",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
+                      "fontSize": 15,
+                      "lineHeight": 20,
                     },
                     Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
                     },
                   ]
                 }
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
-                  }
-                >
-                  confirmingExchange
-                </Text>
-                 undefined
+                -
+                20.00
               </Text>
             </View>
             <View
               style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
               }
             >
               <Text
@@ -457,7 +419,7 @@ exports[`renders for error 1`] = `
               <View
                 style={
                   Object {
-                    "paddingBottom": 5,
+                    "paddingBottom": 8,
                     "paddingHorizontal": 5,
                   }
                 }
@@ -496,6 +458,52 @@ exports[`renders for error 1`] = `
               >
                 
                 30.00
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "marginTop": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingExchange
+                </Text>
+                 undefined
               </Text>
             </View>
           </View>
@@ -805,25 +813,19 @@ exports[`renders for gold to dollar exchange properly 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                  "height": 40,
-                  "justifyContent": "center",
-                  "width": 40,
-                },
-                Object {
-                  "opacity": 0.3,
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "height": 40,
+                "justifyContent": "center",
+                "width": 40,
+              }
             }
           >
             <Image
@@ -844,15 +846,10 @@ exports[`renders for gold to dollar exchange properly 1`] = `
             style={
               Array [
                 Object {
-                  "borderBottomWidth": 1,
-                  "borderColor": "rgba(134, 138, 141, 0.15)",
                   "flex": 1,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "paddingRight": 10,
                 },
                 Object {
-                  "marginLeft": 10,
+                  "marginLeft": 16,
                 },
               ]
             }
@@ -860,81 +857,49 @@ exports[`renders for gold to dollar exchange properly 1`] = `
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
+              <Text
                 style={
                   Object {
-                    "opacity": 0.3,
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
                   }
                 }
               >
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  exchange
-                </Text>
-              </View>
+                exchange
+              </Text>
               <Text
                 style={
                   Array [
                     Object {
-                      "color": "#2E3338",
+                      "color": "#81868B",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
+                      "fontSize": 15,
+                      "lineHeight": 20,
                     },
                     Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
                     },
                   ]
                 }
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
-                  }
-                >
-                  confirmingExchange
-                </Text>
-                 undefined
+                -
+                20.00
               </Text>
             </View>
             <View
               style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
               }
             >
               <Text
@@ -958,7 +923,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
               <View
                 style={
                   Object {
-                    "paddingBottom": 5,
+                    "paddingBottom": 8,
                     "paddingHorizontal": 5,
                   }
                 }
@@ -997,6 +962,52 @@ exports[`renders for gold to dollar exchange properly 1`] = `
               >
                 
                 30.00
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "marginTop": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingExchange
+                </Text>
+                 undefined
               </Text>
             </View>
           </View>
@@ -1037,25 +1048,19 @@ exports[`renders for gold to dollar exchange properly 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                  "height": 40,
-                  "justifyContent": "center",
-                  "width": 40,
-                },
-                Object {
-                  "opacity": 1,
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "height": 40,
+                "justifyContent": "center",
+                "width": 40,
+              }
             }
           >
             <Image
@@ -1076,15 +1081,10 @@ exports[`renders for gold to dollar exchange properly 1`] = `
             style={
               Array [
                 Object {
-                  "borderBottomWidth": 1,
-                  "borderColor": "rgba(134, 138, 141, 0.15)",
                   "flex": 1,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "paddingRight": 10,
                 },
                 Object {
-                  "marginLeft": 10,
+                  "marginLeft": 16,
                 },
               ]
             }
@@ -1092,61 +1092,49 @@ exports[`renders for gold to dollar exchange properly 1`] = `
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
+              <Text
                 style={
                   Object {
-                    "opacity": 1,
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
                   }
                 }
               >
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  exchange
-                </Text>
-              </View>
+                exchange
+              </Text>
               <Text
                 style={
                   Array [
                     Object {
-                      "color": "#2E3338",
+                      "color": "#81868B",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
+                      "fontSize": 15,
+                      "lineHeight": 20,
                     },
                     Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
                     },
                   ]
                 }
-              />
+              >
+                -
+                30.00
+              </Text>
             </View>
             <View
               style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 1,
-                  },
-                ]
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
               }
             >
               <Text
@@ -1170,7 +1158,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
               <View
                 style={
                   Object {
-                    "paddingBottom": 5,
+                    "paddingBottom": 8,
                     "paddingHorizontal": 5,
                   }
                 }
@@ -1210,6 +1198,32 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 
                 200.00
               </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "marginTop": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                    },
+                  ]
+                }
+              />
             </View>
           </View>
         </View>
@@ -1508,25 +1522,19 @@ exports[`renders for loading 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                  "height": 40,
-                  "justifyContent": "center",
-                  "width": 40,
-                },
-                Object {
-                  "opacity": 0.3,
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "height": 40,
+                "justifyContent": "center",
+                "width": 40,
+              }
             }
           >
             <Image
@@ -1547,15 +1555,10 @@ exports[`renders for loading 1`] = `
             style={
               Array [
                 Object {
-                  "borderBottomWidth": 1,
-                  "borderColor": "rgba(134, 138, 141, 0.15)",
                   "flex": 1,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "paddingRight": 10,
                 },
                 Object {
-                  "marginLeft": 10,
+                  "marginLeft": 16,
                 },
               ]
             }
@@ -1563,81 +1566,49 @@ exports[`renders for loading 1`] = `
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
+              <Text
                 style={
                   Object {
-                    "opacity": 0.3,
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
                   }
                 }
               >
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  exchange
-                </Text>
-              </View>
+                exchange
+              </Text>
               <Text
                 style={
                   Array [
                     Object {
-                      "color": "#2E3338",
+                      "color": "#81868B",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
+                      "fontSize": 15,
+                      "lineHeight": 20,
                     },
                     Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
                     },
                   ]
                 }
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
-                  }
-                >
-                  confirmingExchange
-                </Text>
-                 undefined
+                -
+                20.00
               </Text>
             </View>
             <View
               style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
               }
             >
               <Text
@@ -1661,7 +1632,7 @@ exports[`renders for loading 1`] = `
               <View
                 style={
                   Object {
-                    "paddingBottom": 5,
+                    "paddingBottom": 8,
                     "paddingHorizontal": 5,
                   }
                 }
@@ -1700,6 +1671,52 @@ exports[`renders for loading 1`] = `
               >
                 
                 30.00
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "marginTop": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingExchange
+                </Text>
+                 undefined
               </Text>
             </View>
           </View>
@@ -1999,25 +2016,19 @@ exports[`renders for no transactions 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                  "height": 40,
-                  "justifyContent": "center",
-                  "width": 40,
-                },
-                Object {
-                  "opacity": 0.3,
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "height": 40,
+                "justifyContent": "center",
+                "width": 40,
+              }
             }
           >
             <Image
@@ -2038,15 +2049,10 @@ exports[`renders for no transactions 1`] = `
             style={
               Array [
                 Object {
-                  "borderBottomWidth": 1,
-                  "borderColor": "rgba(134, 138, 141, 0.15)",
                   "flex": 1,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "paddingRight": 10,
                 },
                 Object {
-                  "marginLeft": 10,
+                  "marginLeft": 16,
                 },
               ]
             }
@@ -2054,81 +2060,49 @@ exports[`renders for no transactions 1`] = `
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
+              <Text
                 style={
                   Object {
-                    "opacity": 0.3,
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
                   }
                 }
               >
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  exchange
-                </Text>
-              </View>
+                exchange
+              </Text>
               <Text
                 style={
                   Array [
                     Object {
-                      "color": "#2E3338",
+                      "color": "#81868B",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
+                      "fontSize": 15,
+                      "lineHeight": 20,
                     },
                     Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
                     },
                   ]
                 }
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
-                  }
-                >
-                  confirmingExchange
-                </Text>
-                 undefined
+                -
+                20.00
               </Text>
             </View>
             <View
               style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
               }
             >
               <Text
@@ -2152,7 +2126,7 @@ exports[`renders for no transactions 1`] = `
               <View
                 style={
                   Object {
-                    "paddingBottom": 5,
+                    "paddingBottom": 8,
                     "paddingHorizontal": 5,
                   }
                 }
@@ -2191,6 +2165,52 @@ exports[`renders for no transactions 1`] = `
               >
                 
                 30.00
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "marginTop": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingExchange
+                </Text>
+                 undefined
               </Text>
             </View>
           </View>
@@ -2490,25 +2510,19 @@ exports[`renders for standbyTransactions 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                  "height": 40,
-                  "justifyContent": "center",
-                  "width": 40,
-                },
-                Object {
-                  "opacity": 0.3,
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "height": 40,
+                "justifyContent": "center",
+                "width": 40,
+              }
             }
           >
             <Image
@@ -2529,15 +2543,10 @@ exports[`renders for standbyTransactions 1`] = `
             style={
               Array [
                 Object {
-                  "borderBottomWidth": 1,
-                  "borderColor": "rgba(134, 138, 141, 0.15)",
                   "flex": 1,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "paddingRight": 10,
                 },
                 Object {
-                  "marginLeft": 10,
+                  "marginLeft": 16,
                 },
               ]
             }
@@ -2545,81 +2554,49 @@ exports[`renders for standbyTransactions 1`] = `
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
+              <Text
                 style={
                   Object {
-                    "opacity": 0.3,
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
                   }
                 }
               >
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  exchange
-                </Text>
-              </View>
+                exchange
+              </Text>
               <Text
                 style={
                   Array [
                     Object {
-                      "color": "#2E3338",
+                      "color": "#81868B",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
+                      "fontSize": 15,
+                      "lineHeight": 20,
                     },
                     Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
                     },
                   ]
                 }
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
-                  }
-                >
-                  confirmingExchange
-                </Text>
-                 undefined
+                -
+                20.00
               </Text>
             </View>
             <View
               style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
               }
             >
               <Text
@@ -2643,7 +2620,7 @@ exports[`renders for standbyTransactions 1`] = `
               <View
                 style={
                   Object {
-                    "paddingBottom": 5,
+                    "paddingBottom": 8,
                     "paddingHorizontal": 5,
                   }
                 }
@@ -2682,6 +2659,52 @@ exports[`renders for standbyTransactions 1`] = `
               >
                 
                 30.00
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "marginTop": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingExchange
+                </Text>
+                 undefined
               </Text>
             </View>
           </View>
