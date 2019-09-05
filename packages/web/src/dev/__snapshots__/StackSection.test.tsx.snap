@@ -270,7 +270,6 @@ exports[`StackSection renders with typical props 1`] = `
                 "borderTopLeftRadius": "3px",
                 "borderTopRightRadius": "3px",
                 "borderTopWidth": "1px",
-                "color": "rgba(53,208,127,1.00)",
               }
             }
           >
