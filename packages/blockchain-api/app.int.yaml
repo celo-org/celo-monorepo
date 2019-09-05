@@ -3,6 +3,7 @@ service: integration
 env_variables:
   NODE_ENV: 'development'
   DEPLOY_ENV: 'integration'
+  EXCHANGE_RATES_API: 'https://api.exchangeratesapi.io'
   BLOCKSCOUT_API: 'https://integration-blockscout.celo-testnet.org/api'
   # Pull addresses from the build artifacts of the network in protocol/build
   CELO_GOLD_ADDRESS: '0x9102eCD93ac8D66bAc3D397BF52bc57Ee34Bcb87'

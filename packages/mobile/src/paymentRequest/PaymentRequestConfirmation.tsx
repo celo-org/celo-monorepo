@@ -17,17 +17,17 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { writePaymentRequest } from 'src/firebase/firebase'
 import { currencyToShortMap } from 'src/geth/consts'
+import { Namespaces } from 'src/i18n'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import PaymentRequestReviewCard from 'src/paymentRequest/PaymentRequestReviewCard'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import TransferReviewCard from 'src/send/TransferReviewCard'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { TransactionTypes } from 'src/transactions/reducer'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
-const TAG = 'send/RequestConfirmation'
+const TAG = 'paymentRequest/confirmation'
 
 export interface ConfirmationInput {
   recipient: Recipient
@@ -66,7 +66,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 type Props = NavigationInjectedProps & DispatchProps & StateProps & WithNamespaces
 
-class RequestConfirmation extends React.Component<Props> {
+class PaymentRequestConfirmation extends React.Component<Props> {
   static navigationOptions = { header: null }
 
   getConfirmationInput(): ConfirmationInput {
@@ -84,6 +84,7 @@ class RequestConfirmation extends React.Component<Props> {
       recipient,
       recipientAddress: requesteeAddress,
     } = this.getConfirmationInput()
+
     CeloAnalytics.track(CustomEventNames.request_payment_request, {
       requesteeAddress,
     })
@@ -112,22 +113,14 @@ class RequestConfirmation extends React.Component<Props> {
       notified: false,
     }
 
-    if (requesteeAddress) {
-      try {
-        this.props.writePaymentRequest(paymentInfo)
-      } catch (error) {
-        Logger.error(TAG, 'Payment request failed, show error message', error)
-        this.props.showError(ErrorMessages.PAYMENT_REQUEST_FAILED)
-        return
-      }
-    } else {
-      // TODO: handle unverified recepients, maybe send them a sms to download the app?
-      this.props.showError(ErrorMessages.CAN_NOT_REQUEST_FROM_UNVERIFIED)
-      Logger.info(
-        'RequestConfirmation/onConfirm',
-        'Currently requesting from unverified users is not supported'
-      )
+    try {
+      this.props.writePaymentRequest(paymentInfo)
+    } catch (error) {
+      Logger.error(TAG, 'Payment request failed, show error message', error)
+      this.props.showError(ErrorMessages.PAYMENT_REQUEST_FAILED)
+      return
     }
+
     navigate(Screens.WalletHome)
     Logger.showMessage(t('requestSent'))
   }
@@ -137,13 +130,7 @@ class RequestConfirmation extends React.Component<Props> {
     navigateBack()
   }
 
-  renderHeader = () => {
-    const { t } = this.props
-    const { recipientAddress: requesteeAddress } = this.getConfirmationInput()
-    const showInvite = !requesteeAddress
-    const title = showInvite ? t('inviteVerifyPayment') : t('reviewPayment')
-    return <ReviewHeader title={title} />
-  }
+  renderHeader = () => <ReviewHeader title={this.props.t('requestPayment')} />
 
   render() {
     const { t } = this.props
@@ -166,8 +153,7 @@ class RequestConfirmation extends React.Component<Props> {
           }}
           modifyButton={{ action: this.onPressEdit, text: t('edit'), disabled: false }}
         >
-          <TransferReviewCard
-            type={TransactionTypes.PAY_REQUEST}
+          <PaymentRequestReviewCard
             recipient={recipient}
             address={requesteeAddress || ''}
             e164PhoneNumber={recipient.e164PhoneNumber}
@@ -193,5 +179,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces('sendFlow7')(RequestConfirmation))
+  )(withNamespaces(Namespaces.sendFlow7)(PaymentRequestConfirmation))
 )
