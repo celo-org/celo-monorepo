@@ -4,6 +4,7 @@ export enum Stacks {
   HomeStack = 'HomeStack',
   NuxStack = 'NuxStack',
   SendStack = 'SendStack',
+  RequestStack = 'RequestStack',
 }
 
 export enum Screens {
@@ -39,7 +40,7 @@ export enum Screens {
   QRCode = 'QRCode',
   QRScanner = 'QRScanner',
   ReclaimPaymentConfirmationScreen = 'ReclaimPaymentConfirmationScreen',
-  RequestConfirmation = 'RequestConfirmation',
+  PaymentRequestConfirmation = 'PaymentRequestConfirmation',
   Send = 'Send',
   SendAmount = 'SendAmount',
   SendConfirmation = 'SendConfirmation',
