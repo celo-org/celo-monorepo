@@ -30,8 +30,7 @@ export default class NewAccount extends BaseCommand {
     if (!privateKey.startsWith('0x')) {
       privateKey = '0x' + privateKey
     }
-    // @ts-ignore-next-line
-    return new Web3.modules.Eth().accounts.privateKeyToAccount(privateKey).address
+    return new Web3().eth.accounts.privateKeyToAccount(privateKey).address
   }
 
   async run() {

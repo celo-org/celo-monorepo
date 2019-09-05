@@ -3,6 +3,7 @@ service: pilot
 env_variables:
   NODE_ENV: 'production'
   DEPLOY_ENV: 'pilot'
+  EXCHANGE_RATES_API: 'https://api.exchangeratesapi.io'
   BLOCKSCOUT_API: 'https://pilot-blockscout.celo-testnet.org/api'
   # Pull addresses from the build artifacts of the network in protocol/build
   CELO_GOLD_ADDRESS: '0x0ee512BC806Bd0Ca4C09211D035D2928FC43faA6'
