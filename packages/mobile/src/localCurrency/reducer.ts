@@ -11,7 +11,6 @@ export interface State {
 const initialState = {
   isLoading: false,
   symbol: LOCAL_CURRENCY_SYMBOL,
-  exchangeRate: 1.33,
 }
 
 export const reducer = (
