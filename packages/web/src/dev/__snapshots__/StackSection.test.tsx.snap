@@ -19,16 +19,14 @@ exports[`StackSection renders with typical props 1`] = `
         Object {
           "WebkitAlignSelf": "center",
           "WebkitBoxDirection": "normal",
-          "WebkitBoxOrient": "vertical",
-          "WebkitFlexDirection": "column",
+          "WebkitBoxOrient": "horizontal",
+          "WebkitFlexDirection": "row",
           "alignSelf": "center",
-          "flexDirection": "column",
-          "marginBottom": "30px",
-          "maxWidth": "100vw",
-          "msFlexDirection": "column",
+          "flexDirection": "row",
+          "marginBottom": "60px",
+          "maxWidth": "1100px",
+          "msFlexDirection": "row",
           "msFlexItemAlign": "center",
-          "paddingLeft": "10px",
-          "paddingRight": "10px",
           "width": "100%",
         }
       }
@@ -48,7 +46,7 @@ exports[`StackSection renders with typical props 1`] = `
             "paddingLeft": "10px",
             "paddingRight": "10px",
             "paddingTop": "10px",
-            "width": "100%",
+            "width": "25%",
           }
         }
       >
@@ -87,7 +85,7 @@ exports[`StackSection renders with typical props 1`] = `
             "paddingLeft": "10px",
             "paddingRight": "10px",
             "paddingTop": "10px",
-            "width": "100%",
+            "width": "50%",
           }
         }
       >
@@ -100,8 +98,8 @@ exports[`StackSection renders with typical props 1`] = `
             Object {
               "color": "rgba(255,255,255,1.00)",
               "fontFamily": "futura-pt, sans-serif",
-              "fontSize": "20px",
-              "lineHeight": "24px",
+              "fontSize": "28px",
+              "lineHeight": "32px",
               "marginBottom": "20px",
               "textRendering": "geometricPrecision",
               "textTransform": "none",
@@ -148,27 +146,18 @@ exports[`StackSection renders with typical props 1`] = `
         className="css-view-1dbjc4n"
         style={
           Object {
-            "WebkitBoxDirection": "normal",
             "WebkitBoxFlex": 0,
-            "WebkitBoxOrient": "horizontal",
-            "WebkitBoxPack": "space-evenly",
-            "WebkitFlexDirection": "row",
             "WebkitFlexGrow": 0,
             "WebkitFlexShrink": 0,
-            "WebkitJustifyContent": "space-evenly",
-            "flexDirection": "row",
             "flexGrow": 0,
             "flexShrink": 0,
-            "justifyContent": "space-evenly",
-            "msFlexDirection": "row",
             "msFlexNegative": 0,
-            "msFlexPack": "space-evenly",
             "msFlexPositive": 0,
             "paddingBottom": "10px",
             "paddingLeft": "10px",
             "paddingRight": "10px",
             "paddingTop": "10px",
-            "width": "100%",
+            "width": "25%",
           }
         }
       >

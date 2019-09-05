@@ -1,4 +1,4 @@
-import * as AirtableAPI from 'airtable'
+import AirtableAPI from 'airtable'
 import getConfig from 'next/config'
 
 let airTableSingleton

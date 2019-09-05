@@ -20,6 +20,6 @@ module.exports = {
   modulePathIgnorePatterns: ['<rootDir>/node_modules/(.*)/node_modules/react-native'],
   preset: './node_modules/react-native-web/jest-preset.js',
   setupFilesAfterEnv: ['<rootDir>/jest_setup.ts'],
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
   transformIgnorePatterns: ['node_modules/(?!react-native|react-navigation|)'],
 }
