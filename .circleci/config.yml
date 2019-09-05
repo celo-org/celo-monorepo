@@ -212,10 +212,13 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
-      - run:
+      - run: 
+          name: Generate DevChain
           command: |
-            yarn --cwd=packages/contractkit test:prepare
-            yarn --cwd=packages/contractkit test
+            (cd packages/contractkit && yarn test:prepare)
+      - run:
+          name: Run Tests
+          command: yarn --cwd=packages/contractkit test
 
 
   walletkit-test:
@@ -479,6 +482,9 @@ workflows:
       - cli-test:
           requires:
             - install_dependencies
+      - contractkit-test:
+          requires:
+            - install_dependencies      
       - mobile-test:
           requires:
             - lint-checks
