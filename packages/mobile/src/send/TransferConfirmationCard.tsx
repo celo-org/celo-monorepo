@@ -1,19 +1,18 @@
-import { Avatar } from '@celo/react-components/components/Avatar'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
+import { MoneyAmount } from '@celo/react-components/components/MoneyAmount'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
+import { CURRENCIES } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import { connect } from 'react-redux'
-import componentWithAnalytics from 'src/analytics/wrapper'
+import Avatar from 'src/components/Avatar'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { faucetIcon } from 'src/images/Images'
 import { Recipient } from 'src/recipients/recipient'
-import { RootState } from 'src/redux/reducers'
 import { TransactionTypes } from 'src/transactions/reducer'
 import { getCurrencyStyles } from 'src/transactions/TransferFeedItem'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
@@ -31,63 +30,33 @@ export interface OwnProps {
   recipient?: Recipient
 }
 
-interface StateProps {
-  defaultCountryCode: string
-}
-
-const mapStateToProps = (state: RootState): StateProps => {
-  return {
-    defaultCountryCode: state.account.defaultCountryCode,
-  }
-}
-
 // Bordered content placed in a ReviewFrame
 // Differs from TransferReviewCard which is used during Send flow, this is for completed txs
-class TransferConfirmationCard extends React.Component<OwnProps & StateProps & WithNamespaces> {
+class TransferConfirmationCard extends React.Component<OwnProps & WithNamespaces> {
   renderTopSection = () => {
-    const { address, recipient, type, e164PhoneNumber, defaultCountryCode } = this.props
+    const { address, recipient, type, e164PhoneNumber } = this.props
     if (type === TransactionTypes.VERIFICATION_FEE || type === TransactionTypes.FAUCET) {
       return <Image source={faucetIcon} style={style.icon} />
     } else {
       return (
-        <View style={style.avatar}>
-          <Avatar
-            name={recipient ? recipient.displayName : undefined}
-            address={address}
-            e164Number={e164PhoneNumber}
-            defaultCountryCode={defaultCountryCode}
-            iconSize={iconSize}
-          />
-        </View>
+        <Avatar
+          name={recipient ? recipient.displayName : undefined}
+          address={address}
+          e164Number={e164PhoneNumber}
+          iconSize={iconSize}
+        />
       )
     }
   }
 
   renderAmountSection = () => {
-    const { currency, type } = this.props
-    const currencyStyle = getCurrencyStyles(currency, type)
+    const { currency, type, value } = this.props
 
     if (type === TransactionTypes.INVITE_SENT || type === TransactionTypes.INVITE_RECEIVED) {
       return null
     }
 
-    return (
-      <View style={style.amountContainer}>
-        <Text style={[style.plusSign, { color: currencyStyle.color }]}>
-          {currencyStyle.direction}
-        </Text>
-        <Text style={[style.currencySymbol, { color: currencyStyle.color }]}>
-          {currencyStyle.symbol}
-        </Text>
-        <Text
-          style={[style.amount, { color: currencyStyle.color }]}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {getMoneyDisplayValue(this.props.value)}
-        </Text>
-      </View>
-    )
+    return <MoneyAmount symbol={CURRENCIES[currency].symbol} amount={getMoneyDisplayValue(value)} />
   }
 
   renderBottomSection = () => {
@@ -117,18 +86,8 @@ class TransferConfirmationCard extends React.Component<OwnProps & StateProps & W
           ) : (
             <Text style={style.pSmall}>{t('inviteFlow11:whyReceiveFees')}</Text>
           )}
-          <View style={style.amountContainer}>
-            <Text style={[style.currencySymbol, { color: currencyStyle.color }]}>
-              {currencyStyle.symbol}
-            </Text>
-            <Text
-              style={[style.amount, { color: currencyStyle.color }]}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {getMoneyDisplayValue(value)}
-            </Text>
-          </View>
+
+          <MoneyAmount symbol={CURRENCIES[currency].symbol} amount={getMoneyDisplayValue(value)} />
         </View>
       )
     } else if (comment) {
@@ -153,20 +112,8 @@ const style = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     flexDirection: 'column',
-    paddingVertical: 20,
+    paddingVertical: 25,
     paddingHorizontal: 40,
-  },
-  amountContainer: {
-    flexDirection: 'row',
-    marginHorizontal: 25,
-    marginTop: 15,
-    alignSelf: 'center',
-  },
-  amount: {
-    ...fontStyles.regular,
-    fontSize: 48,
-    lineHeight: 64,
-    color: colors.darkSecondary,
   },
   bottomContainer: {
     marginTop: 5,
@@ -176,22 +123,9 @@ const style = StyleSheet.create({
   icon: {
     height: iconSize,
     width: iconSize,
-    marginTop: 30,
+    marginTop: 25,
     marginBottom: 40,
     alignSelf: 'center',
-  },
-  plusSign: {
-    ...fontStyles.regular,
-    fontSize: 34,
-  },
-  currencySymbol: {
-    ...fontStyles.regular,
-    textAlignVertical: 'top',
-    fontSize: 24,
-    color: colors.darkSecondary,
-  },
-  avatar: {
-    marginTop: 5,
   },
   pSmall: {
     fontSize: 14,
@@ -210,8 +144,4 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-    withNamespaces(Namespaces.sendFlow7)(TransferConfirmationCard)
-  )
-)
+export default withNamespaces(Namespaces.sendFlow7)(TransferConfirmationCard)
