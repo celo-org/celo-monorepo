@@ -12,7 +12,7 @@ steps:
 
 # Deploy using yarn command 
 - name: "gcr.io/celo-testnet/global/yarn-gcloud"
-  args: ['yarn', 'deploy:cloudbuild', '-n', '$_NETWORK_NAME']
+  args: ['yarn', 'deploy']
   id: Deploy verification pool api to firebase based on _NETWORK_NAME substitution (integration, production, etc.)
   dir: packages/verification-pool-api
 timeout: "2200s"
