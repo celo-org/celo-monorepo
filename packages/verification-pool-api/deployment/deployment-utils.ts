@@ -84,7 +84,7 @@ async function exec(command: string, args: string[]) {
       } catch (e) {
         console.log(e)
       }
-      reject(error)
+      // reject(error)
     })
     proc.on('exit', (code: any) => {
       if (code !== 0) {
@@ -95,11 +95,9 @@ async function exec(command: string, args: string[]) {
     })
     proc.stdout.on('data', (data: any) => {
       console.log('Child data stdout: ' + data)
-      reject(data)
     })
     proc.stderr.on('data', (data: any) => {
       console.log('Child data stderr: ' + data)
-      reject(data)
     })
   })
 }
