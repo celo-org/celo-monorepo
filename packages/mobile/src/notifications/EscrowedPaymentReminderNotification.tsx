@@ -28,7 +28,6 @@ export class EscrowedPaymentReminderNotification extends React.PureComponent<Pro
       {
         text: this.props.t('sendMessage'),
         onPress: () => {
-          // TODO: move out of TSX file; business logic should be in .ts files
           CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_send_message)
           // TODO: open up whatsapp/text message slider with pre populated message
           try {
