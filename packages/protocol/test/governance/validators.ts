@@ -891,7 +891,7 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(
-          await validators.registerValidatorGroup(identifier, name, url, [
+          validators.registerValidatorGroup(identifier, name, url, [
             registrationRequirement.noticePeriod,
           ])
         )
