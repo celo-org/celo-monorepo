@@ -187,6 +187,20 @@ const validatorsAbi = [
     stateMutability: 'view',
     type: 'function',
   },
+  {
+    constant: true,
+    inputs: [],
+    name: 'numberValidatorsInCurrentSet',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
 ]
 
 describe('governance tests', () => {
@@ -312,7 +326,57 @@ describe('governance tests', () => {
     return await tx.send({ from: account, ...txOptions, gas })
   }
 
-  describe.only('Validators.validatorAddressFromCurrentSet()', () => {
+  describe('Validators.numberValidatorsInCurrentSet()', () => {
+    before(async function() {
+      this.timeout(0)
+      await restart()
+      validators = new web3.eth.Contract(validatorsAbi, await getContractAddress('ValidatorsProxy'))
+    })
+
+    it('should return the validator set size', async () => {
+      const numberValidators = await validators.methods.numberValidatorsInCurrentSet().call()
+
+      assert.equal(numberValidators, 5)
+    })
+
+    describe('after the validator set changes', () => {
+      before(async function() {
+        this.timeout(0)
+        await restart()
+        const [groupAddress, groupPrivateKey] = await getValidatorGroupKeys()
+        const epoch = 10
+
+        const groupInstance = {
+          name: 'validatorGroup',
+          validating: false,
+          syncmode: 'full',
+          port: 30325,
+          wsport: 8567,
+          privateKey: groupPrivateKey.slice(2),
+          peers: [await getEnode(8545)],
+        }
+        await initAndStartGeth(context.hooks.gethBinaryPath, groupInstance)
+        const groupWeb3 = new Web3('ws://localhost:8567')
+        validators = new groupWeb3.eth.Contract(
+          validatorsAbi,
+          await getContractAddress('ValidatorsProxy')
+        )
+        // Give the node time to sync.
+        await sleep(15)
+        const members = await getValidatorGroupMembers()
+        await removeMember(groupWeb3, groupAddress, members[0])
+        await sleep(epoch * 2)
+      })
+
+      it('should return the reduced validator set size', async () => {
+        const numberValidators = await validators.methods.numberValidatorsInCurrentSet().call()
+
+        assert.equal(numberValidators, 4)
+      })
+    })
+  })
+
+  describe('Validators.validatorAddressFromCurrentSet()', () => {
     before(async function() {
       this.timeout(0)
       await restart()
@@ -344,6 +408,62 @@ describe('governance tests', () => {
           from: `0x${context.validators[0].address}`,
         })
       )
+    })
+
+    describe('after the validator set changes', () => {
+      before(async function() {
+        this.timeout(0)
+        await restart()
+        const [groupAddress, groupPrivateKey] = await getValidatorGroupKeys()
+        const epoch = 10
+
+        const groupInstance = {
+          name: 'validatorGroup',
+          validating: false,
+          syncmode: 'full',
+          port: 30325,
+          wsport: 8567,
+          privateKey: groupPrivateKey.slice(2),
+          peers: [await getEnode(8545)],
+        }
+        await initAndStartGeth(context.hooks.gethBinaryPath, groupInstance)
+        const groupWeb3 = new Web3('ws://localhost:8567')
+        validators = new groupWeb3.eth.Contract(
+          validatorsAbi,
+          await getContractAddress('ValidatorsProxy')
+        )
+        // Give the node time to sync.
+        await sleep(15)
+        const members = await getValidatorGroupMembers()
+        await removeMember(groupWeb3, groupAddress, members[0])
+        await sleep(epoch * 2)
+
+        validators = new web3.eth.Contract(
+          validatorsAbi,
+          await getContractAddress('ValidatorsProxy')
+        )
+      })
+
+      it('should return the second validator in the first place', async () => {
+        const resultAddress = await validators.methods.validatorAddressFromCurrentSet(0).call()
+
+        assert.equal(strip0x(resultAddress), context.validators[1].address)
+      })
+
+      it('should return the last validator in the fourth place', async () => {
+        const resultAddress = await validators.methods.validatorAddressFromCurrentSet(3).call()
+
+        assert.equal(strip0x(resultAddress), context.validators[4].address)
+      })
+
+      it('should revert when asked for an out of bounds validator', async function(this: any) {
+        this.timeout(0)
+        await assertRevert(
+          validators.methods.validatorAddressFromCurrentSet(4).send({
+            from: `0x${context.validators[0].address}`,
+          })
+        )
+      })
     })
   })
 

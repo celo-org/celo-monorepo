@@ -564,6 +564,25 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     return validatorAddress;
   }
 
+  function numberValidatorsInCurrentSet() external view returns (uint256) {
+    uint256 numberValidators;
+    assembly {
+      let success := staticcall(
+        5000,
+        0xf9,
+        0,
+        0,
+        0,
+        0
+      )
+      let returnData := mload(0x40)
+      returndatacopy(returnData, 0, 32)
+      numberValidators := mload(returnData)
+    }
+
+    return numberValidators;
+  }
+
   /**
    * @notice Returns validator information.
    * @param account The account that registered the validator.
