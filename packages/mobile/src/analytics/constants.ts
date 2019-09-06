@@ -56,6 +56,9 @@ export enum CustomEventNames {
   verification_success = 'verification_success',
   verification_timed_out = 'verification_timed_out',
 
+  verification_actionable_attestation_start = 'verification_actionable_attestation_start',
+  verification_actionable_attestation_finish = 'verification_actionable_attestation_finish',
+
   redeem_invite_success = 'redeem_invite_success',
   redeem_invite_timed_out = 'redeem_invite_timed_out',
   redeem_invite_failed = 'redeem_invite_failed',
@@ -159,6 +162,12 @@ export enum CustomEventNames {
 
   // QR Code
   qrcode_main_screen_visit = 'qrcode_main_screen_visit',
+
+  // Performance
+  transaction_send_start = 'transaction_send_start',
+  transaction_send_gas_estimated = 'transaction_send_gas_estimated',
+  transaction_send_gas_hash_received = 'transaction_send_gas_hash_received',
+  transaction_send_gas_receipt = 'transaction_send_gas_receipt',
 }
 
 export enum CommonValues {
@@ -215,6 +224,7 @@ export const PROPERTY_PATH_WHITELIST = [
   'testnet',
   'timeElapsed',
   'title',
+  'txId',
   'verificationIndex',
   'verificationsRemaining',
 ]

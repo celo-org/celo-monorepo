@@ -233,8 +233,10 @@ export async function requestAndRetrieveAttestations(
       account
     )
 
+    CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_start)
     // Check if we have a sufficient set now by fetching the new total set
     attestations = await getActionableAttestations(attestationsContract, e164NumberHash, account)
+    CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_finish)
   }
 
   return attestations
