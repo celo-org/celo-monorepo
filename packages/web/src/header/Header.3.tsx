@@ -44,6 +44,7 @@ interface State {
   mobileMenuFade: Animated.Value
   menuFade: Animated.Value
   menuFaded: boolean
+  belowFoldUpScroll: boolean
 }
 
 function scrollOffset() {
@@ -60,9 +61,16 @@ export class Header extends React.Component<Props, State> {
   lastScrollOffset: number
 
   handleScroll = throttle(() => {
-    // GOing Up
+    const goingUp = this.lastScrollOffset > scrollOffset()
+    const belowFold = scrollOffset() > menuHidePoint()
 
-    if (this.lastScrollOffset > scrollOffset()) {
+    if (goingUp && belowFold) {
+      this.setState({ belowFoldUpScroll: true })
+    } else {
+      this.setState({ belowFoldUpScroll: false })
+    }
+
+    if (goingUp) {
       this.setState({ menuFaded: false }, () => {
         Animated.timing(this.state.menuFade, {
           toValue: 1,
@@ -70,13 +78,14 @@ export class Header extends React.Component<Props, State> {
           easing: Easing.in(Easing.quad),
         }).start()
       })
-    } else if (scrollOffset() > menuHidePoint()) {
+    } else if (belowFold) {
       Animated.timing(this.state.menuFade, {
         toValue: 0,
         duration: 100,
         easing: Easing.in(Easing.quad),
       }).start(() => this.setState({ menuFaded: true }))
     }
+
     this.lastScrollOffset = scrollOffset()
   }, 100)
 
@@ -108,6 +117,7 @@ export class Header extends React.Component<Props, State> {
       menuFade: new Animated.Value(1),
       menuFaded: false,
       mobileMenuActive: false,
+      belowFoldUpScroll: false,
     }
   }
 
@@ -157,8 +167,8 @@ export class Header extends React.Component<Props, State> {
     return this.isDarkMode() ? colors.white : colors.dark
   }
   getBackgroundColor = () => {
-    if (this.isTranslucent()) {
-      return null
+    if (this.isTranslucent() && !this.state.belowFoldUpScroll) {
+      return 'transparent'
     }
     return this.isDarkMode() ? colors.dark : colors.white
   }
