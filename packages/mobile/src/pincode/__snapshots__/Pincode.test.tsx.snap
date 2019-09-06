@@ -36,7 +36,14 @@ exports[`Pincode renders correctly 1`] = `
          
     </Text>
   </View>
-  <RCTScrollView>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "padding": 20,
+        "paddingTop": 0,
+      }
+    }
+  >
     <View>
       <Image
         source={
@@ -271,7 +278,14 @@ exports[`Pincode renders correctly 2`] = `
          
     </Text>
   </View>
-  <RCTScrollView>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "padding": 20,
+        "paddingTop": 0,
+      }
+    }
+  >
     <View>
       <Image
         source={
@@ -477,7 +491,14 @@ exports[`Pincode renders correctly 3`] = `
          
     </Text>
   </View>
-  <RCTScrollView>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "padding": 20,
+        "paddingTop": 0,
+      }
+    }
+  >
     <View>
       <Image
         source={
@@ -683,7 +704,14 @@ exports[`Pincode renders correctly 4`] = `
          
     </Text>
   </View>
-  <RCTScrollView>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "padding": 20,
+        "paddingTop": 0,
+      }
+    }
+  >
     <View>
       <Image
         source={
