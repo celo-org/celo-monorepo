@@ -7,8 +7,10 @@ import { TranslationFunction } from 'i18next'
 import * as React from 'react'
 import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, View } from 'react-native'
 
-// temp language list for Argentina pilot
-// const languages = [{ name: 'English', code: 'en-US' }, { name: 'Español (AR)', code: 'es-AR' }]
+interface LanguageType {
+  name: string
+  code: string
+}
 
 export interface Props {
   logo: ImageSourcePropType
@@ -17,7 +19,7 @@ export interface Props {
   isSubmitDisabled: boolean
   currentSelected: string
   t: TranslationFunction
-  languages: { name: string; code: string }
+  languages: LanguageType[]
 }
 
 class LanguageSelectUI extends React.PureComponent<Props> {
@@ -42,7 +44,7 @@ class LanguageSelectUI extends React.PureComponent<Props> {
             {t('chooseLanguage')}
           </Text>
           <View style={componentStyles.line} testID="line" />
-          {languages.map((language: any) => (
+          {languages.map((language: LanguageType) => (
             <SelectionOption
               word={language.name}
               key={language.code}
