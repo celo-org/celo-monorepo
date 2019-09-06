@@ -22,27 +22,43 @@ export enum SIZE {
   fullWidth = 'fullWidth',
 }
 
-// Note not all button props have an effect on all BTN kinds
-interface ButtonProps {
+interface AllButtonProps {
   text: string
   href?: string
   target?: string // only relevent if href used
   disabled?: boolean
-  kind: BTN
-  size?: SIZE
+  onPress?: () => void
   iconRight?: React.ReactNode
   iconLeft?: React.ReactNode
-  onPress?: () => void
-  style?: TextStyle | TextStyle[]
   align?: 'center' | 'flex-start' | 'flex-end'
 }
+
+type NakedProps = {
+  size: SIZE
+  kind: BTN.NAKED | BTN.DARKNAKED
+} & AllButtonProps
+
+type PrimaryProps = {
+  size?: SIZE
+  kind: BTN.PRIMARY | BTN.SECONDARY | BTN.TERTIARY
+} & AllButtonProps
+
+type InlineProps = {
+  kind: BTN.INLINE
+} & AllButtonProps
+
+type NavProps = {
+  kind: BTN.NAV | BTN.DARKNAV
+} & AllButtonProps
+
+type ButtonsProps = NakedProps | PrimaryProps | InlineProps | NavProps
 
 interface State {
   isHovering: boolean
   isPressed: boolean
 }
 
-export default class Button extends React.PureComponent<ButtonProps, State> {
+export default class Button extends React.PureComponent<ButtonsProps, State> {
   state = { isHovering: false, isPressed: false }
 
   getStatus = () => {
@@ -225,12 +241,24 @@ const nakedColor = {
   [BTNStates.disabled]: colors.inactive,
 }
 
+function nakedSize(size: SIZE) {
+  switch (size) {
+    case SIZE.big:
+    case SIZE.fullWidth:
+      return 20
+    case SIZE.normal:
+      return 16
+    case SIZE.small:
+      return 14
+  }
+}
+
 function ButtonNaked(props: Props) {
-  const { children, status, kind, style, href, target } = props
+  const { children, status, kind, style, href, size, target } = props
   const color = kind === BTN.DARKNAKED ? colors.dark : nakedColor[status]
   const textStyle = kind === BTN.DARKNAKED ? opacityStyle[status] : commonTextStyles[status]
   const opacity = kind === BTN.DARKNAKED ? opacityState[status].opacity : 1
-  const fontSize = props.size === SIZE.big ? 20 : null
+  const fontSize = nakedSize(size)
   return (
     <View style={[baseStyles.base, baseStyles.floating, nakedStyles.container]}>
       <Text
