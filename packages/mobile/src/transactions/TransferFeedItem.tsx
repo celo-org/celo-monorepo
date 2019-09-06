@@ -298,6 +298,7 @@ const styles = StyleSheet.create({
   textPending: {
     fontSize: 13,
     lineHeight: 18,
+    color: colors.celoGreen,
   },
   textInfo: {},
   transactionStatus: {
