@@ -15,8 +15,8 @@ export function MoneyAmount(props: Props) {
   const colorStyle = { color: color || colors.darkSecondary }
   return (
     <View style={style.container}>
-      {sign && <Text style={[style.plusSign, colorStyle]}>{sign}</Text>}
-      {symbol && <Text style={[style.currencySymbol, colorStyle]}>{symbol}</Text>}
+      {!!sign && <Text style={[style.plusSign, colorStyle]}>{sign}</Text>}
+      {!!symbol && <Text style={[style.currencySymbol, colorStyle]}>{symbol}</Text>}
       <Text style={[style.amount, colorStyle]} numberOfLines={1} ellipsizeMode="tail">
         {amount}
       </Text>
