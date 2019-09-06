@@ -8,6 +8,7 @@ import { connect } from 'react-redux'
 import VerifierAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { setLanguage } from 'src/app/actions'
+import { AVAILABLE_LANGUAGES } from 'src/config'
 import i18n from 'src/i18n'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -86,6 +87,7 @@ class LanguageScreen extends React.Component<Props, State> {
         onSubmit={this.onSubmit}
         isSubmitDisabled={!this.state.selectedAnswer}
         currentSelected={this.state.selectedAnswer}
+        languages={AVAILABLE_LANGUAGES}
         t={this.props.t}
       />
     )
