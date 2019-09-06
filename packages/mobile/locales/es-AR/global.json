@@ -87,5 +87,6 @@
   "corruptedChainDeleted": "Se ha borrado información corrupta, por favor reinicie la applicación",
   "web3FailedToSync": "Fallo la sincronización, por favor verifique su conexión",
   "errorDuringSync": "Ocurrió un error duranet la sincronización, por favor intente más tarde",
-  "calculateFeeFailed": "No se pudo calcular la comisión"
+  "calculateFeeFailed": "No se pudo calcular la comisión",
+  "gold": "Oro"
 }

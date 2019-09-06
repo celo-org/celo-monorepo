@@ -86,5 +86,6 @@
   "corruptedChainDeleted": "Corrupted chain data has been deleted, please restart the app",
   "web3FailedToSync": "Failing to sync, check your network connection",
   "errorDuringSync": "Error occurred during sync, please try again later",
-  "calculateFeeFailed": "Could not calculate fee"
+  "calculateFeeFailed": "Could not calculate fee",
+  "gold": "Gold"
 }
