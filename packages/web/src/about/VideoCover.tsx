@@ -1,5 +1,5 @@
 import React from 'react'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View, createElement } from 'react-native'
 import { standardStyles, textStyles, fonts } from 'src/styles'
 import { H1, H3 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces, NameSpaces } from 'src/i18n'
@@ -11,6 +11,10 @@ import Hoverable from 'src/shared/Hoverable'
 
 interface State {
   hovering: boolean
+}
+
+function Video(props) {
+  return createElement('video', props)
 }
 
 class VideoCover extends React.Component<I18nProps, State> {
@@ -28,11 +32,16 @@ class VideoCover extends React.Component<I18nProps, State> {
   render() {
     const { t } = this.props
     return (
-      <View style={[styles.cover, standardStyles.centered]}>
+      <View style={[styles.cover]}>
         <View style={styles.background}>
-          <Image resizeMode="cover" source={BeautifulMoneyPreview} style={standardStyles.image} />
+          <Video style={styles.video} muted={true} autoPlay={true} loop={true}>
+            <source src="/static/AboutPreview.mp4" type="video/mp4" />
+            <Image resizeMode="cover" source={BeautifulMoneyPreview} style={standardStyles.image} />
+          </Video>
         </View>
-        <Fade>
+        <View
+          style={[styles.overlay, standardStyles.centered, { backgroundColor: 'rgba(0,0,0,0.4)' }]}
+        >
           <Hoverable
             onHoverIn={this.onHoverStart}
             onHoverOut={this.onHoverEnd}
@@ -60,7 +69,7 @@ class VideoCover extends React.Component<I18nProps, State> {
               </View>
             </View>
           </Hoverable>
-        </Fade>
+        </View>
       </View>
     )
   }
@@ -88,9 +97,16 @@ const styles = StyleSheet.create({
     width: '100vw',
     height: '100vh',
   },
+  overlay: {
+    height: '100%',
+    width: '100%',
+  },
   cover: {
     width: '100vw',
     height: '100vh',
-    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  video: {
+    objectFit: 'cover',
+    height: '100%',
   },
 })
