@@ -103,6 +103,11 @@ export const fontStyles = StyleSheet.create({
     fontSize: 12,
     fontFamily: HindSilguri.Medium,
   },
+  sectionLabelNew: {
+    color: colors.dark,
+    fontSize: 18,
+    fontFamily: HindSilguri.SemiBold,
+  },
   subSmall: {
     fontSize: 14,
     lineHeight: 20,
@@ -118,6 +123,18 @@ export const fontStyles = StyleSheet.create({
   },
   activityCurrency: {
     fontSize: 16,
+    lineHeight: 20,
+    fontFamily: HindSilguri.SemiBold,
+    color: colors.dark,
+  },
+  activityCurrencyReceived: {
+    fontSize: 15,
+    lineHeight: 20,
+    fontFamily: HindSilguri.SemiBold,
+    color: colors.dark,
+  },
+  activityCurrencySent: {
+    fontSize: 15,
     lineHeight: 20,
     fontFamily: HindSilguri.Regular,
     color: colors.darkSecondary,
@@ -197,9 +214,9 @@ export const fontStyles = StyleSheet.create({
     fontFamily: HindSilguri.Bold,
   },
   comment: {
-    fontSize: 16,
-    lineHeight: 24,
-    fontFamily: HindSilguri.Light,
+    fontSize: 15,
+    lineHeight: 20,
+    fontFamily: HindSilguri.Regular,
     color: colors.darkSecondary,
   },
   notification: {

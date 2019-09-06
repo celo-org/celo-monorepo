@@ -13,7 +13,7 @@ exports[`renders correctly on 1st question 1`] = `
   <View
     style={
       Object {
-        "height": 45,
+        "height": 56,
       }
     }
   >
@@ -685,7 +685,7 @@ exports[`renders correctly on 2nd word 1`] = `
   <View
     style={
       Object {
-        "height": 45,
+        "height": 56,
       }
     }
   >
@@ -1357,7 +1357,7 @@ exports[`renders correctly on 3rd word 1`] = `
   <View
     style={
       Object {
-        "height": 45,
+        "height": 56,
       }
     }
   >
@@ -2029,7 +2029,7 @@ exports[`renders correctly on 3rd word 2`] = `
   <View
     style={
       Object {
-        "height": 45,
+        "height": 56,
       }
     }
   >
@@ -2701,7 +2701,7 @@ exports[`renders correctly on 3rd word 3`] = `
   <View
     style={
       Object {
-        "height": 45,
+        "height": 56,
       }
     }
   >

@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   },
   h1: {
     color: colors.dark,
-    paddingTop: 35,
+    paddingTop: 25,
   },
   copyToClipboardButton: {
     marginTop: 50,
