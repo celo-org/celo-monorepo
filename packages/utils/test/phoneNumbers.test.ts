@@ -22,11 +22,12 @@ const TEST_PHONE_NUMBERS = {
   VALID_DE_1: '015229355106',
   VALID_DE_2: '01522 (935)-5106',
   VALID_DE_3: '+49 01522 935 5106',
-  VALID_AR_1: '02641234567',
-  VALID_AR_2: '(264) 1234-567',
-  VALID_AR_3: '+54264 123-4567',
-  VALID_AR_4: '9 11 12345678',
-  VALID_AR_5: '(380) 15 123-4567',
+  VALID_AR_1: '091126431111',
+  VALID_AR_2: '(911) 2643-1111',
+  VALID_AR_3: '+5411 2643-1111',
+  VALID_AR_4: '9 11 2643 1111',
+  FORMATTED_AR: '+5491126431111',
+  DISPLAY_AR: '9 11 2643-1111',
   INVALID_EMPTY: '',
   TOO_SHORT: '123',
 }
@@ -61,16 +62,19 @@ describe('Phone number formatting and utilities', () => {
       expect(getE164Number(TEST_PHONE_NUMBERS.VALID_DE_3, COUNTRY_CODES.DE)).toBe('+4915229355106')
     })
     it('Format AR phone simple, no country code', () => {
-      expect(getE164Number(TEST_PHONE_NUMBERS.VALID_AR_1, COUNTRY_CODES.AR)).toBe('+5492641234567')
+      expect(getE164Number(TEST_PHONE_NUMBERS.VALID_AR_1, COUNTRY_CODES.AR)).toBe(
+        TEST_PHONE_NUMBERS.FORMATTED_AR
+      )
     })
     it('Format AR phone messy, no country code', () => {
-      expect(getE164Number(TEST_PHONE_NUMBERS.VALID_AR_2, COUNTRY_CODES.AR)).toBe('+5492641234567')
-    })
-    it('Format AR phone messy, wrong country code', () => {
-      expect(getE164Number(TEST_PHONE_NUMBERS.VALID_AR_2, COUNTRY_CODES.US)).toBe(null)
+      expect(getE164Number(TEST_PHONE_NUMBERS.VALID_AR_2, COUNTRY_CODES.AR)).toBe(
+        TEST_PHONE_NUMBERS.FORMATTED_AR
+      )
     })
     it('Format AR phone with country code', () => {
-      expect(getE164Number(TEST_PHONE_NUMBERS.VALID_AR_3, COUNTRY_CODES.AR)).toBe('+5492641234567')
+      expect(getE164Number(TEST_PHONE_NUMBERS.VALID_AR_3, COUNTRY_CODES.AR)).toBe(
+        TEST_PHONE_NUMBERS.FORMATTED_AR
+      )
     })
   })
 
@@ -125,22 +129,17 @@ describe('Phone number formatting and utilities', () => {
     })
     it('Format AR phone simple, no country code', () => {
       expect(getDisplayPhoneNumber(TEST_PHONE_NUMBERS.VALID_AR_1, COUNTRY_CODES.AR)).toBe(
-        '9 264 123-4567'
+        TEST_PHONE_NUMBERS.DISPLAY_AR
       )
     })
     it('Format AR phone messy, no country code', () => {
       expect(getDisplayPhoneNumber(TEST_PHONE_NUMBERS.VALID_AR_2, COUNTRY_CODES.AR)).toBe(
-        '9 264 123-4567'
-      )
-    })
-    it('Format AR phone messy, wrong country code', () => {
-      expect(getDisplayPhoneNumber(TEST_PHONE_NUMBERS.VALID_AR_2, COUNTRY_CODES.US)).toBe(
-        TEST_PHONE_NUMBERS.VALID_AR_2
+        TEST_PHONE_NUMBERS.DISPLAY_AR
       )
     })
     it('Format AR phone with country code', () => {
       expect(getDisplayPhoneNumber(TEST_PHONE_NUMBERS.VALID_AR_3, COUNTRY_CODES.AR)).toBe(
-        '9 264 123-4567'
+        TEST_PHONE_NUMBERS.DISPLAY_AR
       )
     })
   })
@@ -170,16 +169,8 @@ describe('Phone number formatting and utilities', () => {
     })
     it('Format AR messy phone # 1', () => {
       expect(parsePhoneNumber(TEST_PHONE_NUMBERS.VALID_AR_4, COUNTRY_CODES.AR)).toMatchObject({
-        e164Number: '+5491112345678',
-        displayNumber: '9 11 1234-5678',
-        countryCode: 54,
-        regionCode: 'AR',
-      })
-    })
-    it('Format AR messy phone # 2', () => {
-      expect(parsePhoneNumber(TEST_PHONE_NUMBERS.VALID_AR_5, COUNTRY_CODES.AR)).toMatchObject({
-        e164Number: '+5493801234567',
-        displayNumber: '9 380 123-4567',
+        e164Number: TEST_PHONE_NUMBERS.FORMATTED_AR,
+        displayNumber: TEST_PHONE_NUMBERS.DISPLAY_AR,
         countryCode: 54,
         regionCode: 'AR',
       })
