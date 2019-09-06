@@ -146,32 +146,36 @@ export function TransferFeedItem(props: Props) {
   // TODO move this out to a seperate file, too much clutter here
   if (type === TransactionTypes.VERIFICATION_FEE) {
     icon = <Image source={coinsIcon} style={styles.image} />
-    title = 'Celo'
-    comment = t('verificationFee')
+    title = t('feedItemVerificationFeeTitle')
+    comment = t('feedItemVerificationFeeInfo')
   } else if (type === TransactionTypes.VERIFICATION_REWARD) {
     icon = (
       <View style={styles.image}>
         <RewardIcon height={38} />
       </View>
     )
-    title = 'Celo'
-    comment = t('verifierReward')
+    title = t('feedItemVerificationRewardTitle')
+    comment = t('feedItemVerificationRewardInfo')
   } else if (type === TransactionTypes.FAUCET) {
     icon = <Image source={coinsIcon} style={styles.image} />
-    title = 'Celo'
-    comment = DEFAULT_TESTNET ? `${_.startCase(DEFAULT_TESTNET)} Faucet` : 'Faucet'
+    title = t('feedItemFaucetTitle')
+    comment = t('feedItemFaucetInfo', {
+      context: !DEFAULT_TESTNET ? 'missingTestnet' : null,
+      faucet: DEFAULT_TESTNET ? _.startCase(DEFAULT_TESTNET) : null,
+    })
   } else if (type === TransactionTypes.INVITE_SENT) {
     icon = <Image source={coinsIcon} style={styles.image} />
     const inviteeE164Number = invitees[address]
     const inviteeRecipient = recipientCache[inviteeE164Number]
-    title = 'Celo'
-    comment = inviteeE164Number
-      ? `${t('invited')} ${inviteeRecipient ? inviteeRecipient.displayName : inviteeE164Number}`
-      : t('inviteFlow11:inviteSent')
+    title = t('feedItemInviteSentTitle')
+    comment = t('feedItemInviteSentInfo', {
+      context: !inviteeE164Number ? 'missingInviteeDetails' : null,
+      nameOrNumber: inviteeRecipient ? inviteeRecipient.displayName : inviteeE164Number,
+    })
   } else if (type === TransactionTypes.INVITE_RECEIVED) {
     icon = <Image source={coinsIcon} style={styles.image} />
-    title = 'Celo'
-    comment = t('inviteFlow11:inviteReceived')
+    title = t('feedItemInviteReceivedTitle')
+    comment = t('feedItemInviteReceivedInfo')
   } else {
     const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
     const shortAddr = address.substring(0, 8)
@@ -179,9 +183,9 @@ export function TransferFeedItem(props: Props) {
     if (recipient) {
       title = recipient.displayName
     } else if (type === TransactionTypes.RECEIVED) {
-      title = t('receivedFrom', { address: shortAddr })
+      title = t('feedItemReceivedTitle', { context: 'missingSenderDetails', address: shortAddr })
     } else if (type === TransactionTypes.SENT) {
-      title = t('sentTo', { address: shortAddr })
+      title = t('feedItemSentTitle', { context: 'missingReceiverDetails', address: shortAddr })
     } else {
       // Fallback to just using the type
       title = _.capitalize(t(_.camelCase(type)))
@@ -236,8 +240,10 @@ export function TransferFeedItem(props: Props) {
             {LOCAL_CURRENCY_SYMBOL &&
               localValue && (
                 <Text style={[fontStyles.bodySmall, styles.localAmount]}>
-                  {currencyStyle.direction}
-                  {`${getMoneyDisplayValue(localValue)} ${LOCAL_CURRENCY_SYMBOL}`}
+                  {t('localCurrencyValue', {
+                    localValue: `${currencyStyle.direction}${getMoneyDisplayValue(localValue)}`,
+                    localCurrencySymbol: LOCAL_CURRENCY_SYMBOL,
+                  })}
                 </Text>
               )}
           </View>

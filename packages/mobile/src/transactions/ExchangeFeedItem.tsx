@@ -43,7 +43,7 @@ export function ExchangeFeedItem(props: Props) {
   const outCurrency = resolveCurrency(outSymbol)
   const dollarAmount = inCurrency === CURRENCY_ENUM.DOLLAR ? inValue : outValue
   const localAmount = useLocalAmount(dollarAmount)
-  const dollarDirection = inCurrency === CURRENCY_ENUM.DOLLAR && '-'
+  const dollarDirection = inCurrency === CURRENCY_ENUM.DOLLAR ? '-' : ''
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
   const isPending = status === TransactionStatus.Pending
@@ -131,8 +131,10 @@ export function ExchangeFeedItem(props: Props) {
             {LOCAL_CURRENCY_SYMBOL &&
               localAmount && (
                 <Text style={[fontStyles.bodySmall, styles.localAmount]}>
-                  {dollarDirection}
-                  {`${getMoneyDisplayValue(localAmount)} ${LOCAL_CURRENCY_SYMBOL}`}
+                  {t('localCurrencyValue', {
+                    localValue: `${dollarDirection}${getMoneyDisplayValue(localAmount)}`,
+                    localCurrencySymbol: LOCAL_CURRENCY_SYMBOL,
+                  })}
                 </Text>
               )}
           </View>

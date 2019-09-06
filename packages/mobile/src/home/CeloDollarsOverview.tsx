@@ -2,7 +2,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { Trans, withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { LOCAL_CURRENCY_SYMBOL } from 'src/config'
@@ -18,6 +18,9 @@ function CeloDollarsOverview({ t }: Props) {
   useBalanceAutoRefresh()
   const dollarBalance = useSelector((state) => state.stableToken.balance)
   const localBalance = useLocalAmount(dollarBalance)
+  const localValue =
+    localBalance || dollarBalance === null ? getMoneyDisplayValue(localBalance || 0) : '---'
+  const localCurrencySymbol = LOCAL_CURRENCY_SYMBOL
 
   return (
     <View style={styles.container}>
@@ -27,13 +30,12 @@ function CeloDollarsOverview({ t }: Props) {
       </Text>
       {LOCAL_CURRENCY_SYMBOL && (
         <Text style={[fontStyles.light, styles.localBalance]}>
-          Equal to{' '}
-          <Text style={fontStyles.semiBold}>
-            {localBalance || dollarBalance === null
-              ? getMoneyDisplayValue(localBalance || 0)
-              : '---'}{' '}
-            {LOCAL_CURRENCY_SYMBOL}
-          </Text>
+          <Trans i18nKey="localCurrencyEqual">
+            Equal to{' '}
+            <Text style={fontStyles.semiBold}>
+              {{ localValue }} {{ localCurrencySymbol }}
+            </Text>
+          </Trans>
         </Text>
       )}
     </View>

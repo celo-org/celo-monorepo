@@ -80,7 +80,7 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
             ]
           }
         >
-          Celo
+          feedItemFaucetTitle
         </Text>
         <Text
           style={
@@ -115,7 +115,7 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
           ]
         }
       >
-        Faucet
+        feedItemFaucetInfo
       </Text>
       <View
         style={
@@ -546,7 +546,7 @@ exports[`transfer feed item renders correctly for received 1`] = `
             ]
           }
         >
-          receivedFrom
+          feedItemReceivedTitle
         </Text>
         <Text
           style={
@@ -665,7 +665,7 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
             ]
           }
         >
-          Celo
+          feedItemInviteReceivedTitle
         </Text>
         <Text
           style={
@@ -700,7 +700,7 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
           ]
         }
       >
-        inviteFlow11:inviteReceived
+        feedItemInviteReceivedInfo
       </Text>
       <View
         style={
@@ -831,7 +831,7 @@ exports[`transfer feed item renders correctly for received with encrypted commen
             ]
           }
         >
-          receivedFrom
+          feedItemReceivedTitle
         </Text>
         <Text
           style={
@@ -997,7 +997,7 @@ exports[`transfer feed item renders correctly for sent 1`] = `
             ]
           }
         >
-          sentTo
+          feedItemSentTitle
         </Text>
         <Text
           style={
@@ -1116,7 +1116,7 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
             ]
           }
         >
-          Celo
+          feedItemInviteSentTitle
         </Text>
         <Text
           style={
@@ -1151,7 +1151,7 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
           ]
         }
       >
-        invited +14155550000
+        feedItemInviteSentInfo
       </Text>
       <View
         style={
@@ -1282,7 +1282,7 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
             ]
           }
         >
-          sentTo
+          feedItemSentTitle
         </Text>
         <Text
           style={
@@ -1448,7 +1448,7 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
             ]
           }
         >
-          sentTo
+          feedItemSentTitle
         </Text>
         <Text
           style={
@@ -1584,7 +1584,7 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
             ]
           }
         >
-          Celo
+          feedItemVerificationFeeTitle
         </Text>
         <Text
           style={
@@ -1619,7 +1619,7 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
           ]
         }
       >
-        verificationFee
+        feedItemVerificationFeeInfo
       </Text>
       <View
         style={
@@ -1739,7 +1739,7 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
             ]
           }
         >
-          Celo
+          feedItemVerificationRewardTitle
         </Text>
         <Text
           style={
@@ -1774,7 +1774,7 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
           ]
         }
       >
-        verifierReward
+        feedItemVerificationRewardInfo
       </Text>
       <View
         style={
