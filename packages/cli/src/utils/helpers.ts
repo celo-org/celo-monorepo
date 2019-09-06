@@ -1,4 +1,4 @@
-import { eqAddress } from '@celo/utils/lib/src/address'
+import { eqAddress } from '@celo/utils/lib/address'
 import ethjsutil from 'ethereumjs-util'
 import Web3 from 'web3'
 

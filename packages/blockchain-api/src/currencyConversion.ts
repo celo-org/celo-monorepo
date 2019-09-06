@@ -3,10 +3,6 @@ import { EXCHANGE_RATES_API } from './config'
 import { CurrencyConversionArgs, ExchangeRate } from './schema'
 import { formatDateString } from './utils'
 
-// TODO move this caching to FirebaseDb
-// Currency code to date string to exchange rate
-const exchangeRateCache = new Map<string, Map<string, number>>()
-
 interface ExchangeRateApiResult {
   rates: { [currencyCode: string]: number }
   base: string
@@ -14,6 +10,10 @@ interface ExchangeRateApiResult {
 }
 
 export class CurrencyConversionAPI extends RESTDataSource {
+  // TODO move this caching to FirebaseDb
+  // Currency code to date string to exchange rate
+  exchangeRateCache = new Map<string, Map<string, number>>()
+
   constructor() {
     super()
     this.baseURL = EXCHANGE_RATES_API
@@ -61,16 +61,16 @@ export class CurrencyConversionAPI extends RESTDataSource {
 
   private getRateForCurrencyCode(currencyCode: string, date: Date) {
     return (
-      (exchangeRateCache.get(currencyCode) &&
-        exchangeRateCache.get(currencyCode)!.get(date.toDateString())) ||
+      (this.exchangeRateCache.get(currencyCode) &&
+        this.exchangeRateCache.get(currencyCode)!.get(date.toDateString())) ||
       undefined
     )
   }
 
   private setRateForCurrencyCode(currencyCode: string, date: Date, rate: number) {
-    if (!exchangeRateCache.get(currencyCode)) {
-      exchangeRateCache.set(currencyCode, new Map())
+    if (!this.exchangeRateCache.get(currencyCode)) {
+      this.exchangeRateCache.set(currencyCode, new Map())
     }
-    exchangeRateCache.get(currencyCode)!.set(date.toDateString(), rate)
+    this.exchangeRateCache.get(currencyCode)!.set(date.toDateString(), rate)
   }
 }
