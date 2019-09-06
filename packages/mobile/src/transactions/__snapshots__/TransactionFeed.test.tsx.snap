@@ -287,6 +287,7 @@ exports[`renders for error 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
@@ -413,7 +414,6 @@ exports[`renders for error 1`] = `
                   ]
                 }
               >
-                $
                 20.00
               </Text>
               <View
@@ -456,7 +456,6 @@ exports[`renders for error 1`] = `
                   ]
                 }
               >
-                
                 30.00
               </Text>
             </View>
@@ -764,6 +763,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
@@ -917,7 +917,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
-                $
                 20.00
               </Text>
               <View
@@ -960,7 +959,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
-                
                 30.00
               </Text>
             </View>
@@ -1152,7 +1150,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
-                $
                 30.00
               </Text>
               <View
@@ -1195,7 +1192,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
-                
                 200.00
               </Text>
             </View>
@@ -1473,6 +1469,7 @@ exports[`renders for loading 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
@@ -1626,7 +1623,6 @@ exports[`renders for loading 1`] = `
                   ]
                 }
               >
-                $
                 20.00
               </Text>
               <View
@@ -1669,7 +1665,6 @@ exports[`renders for loading 1`] = `
                   ]
                 }
               >
-                
                 30.00
               </Text>
             </View>
@@ -1967,6 +1962,7 @@ exports[`renders for no transactions 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
@@ -2120,7 +2116,6 @@ exports[`renders for no transactions 1`] = `
                   ]
                 }
               >
-                $
                 20.00
               </Text>
               <View
@@ -2163,7 +2158,6 @@ exports[`renders for no transactions 1`] = `
                   ]
                 }
               >
-                
                 30.00
               </Text>
             </View>
@@ -2461,6 +2455,7 @@ exports[`renders for standbyTransactions 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
@@ -2614,7 +2609,6 @@ exports[`renders for standbyTransactions 1`] = `
                   ]
                 }
               >
-                $
                 20.00
               </Text>
               <View
@@ -2657,7 +2651,6 @@ exports[`renders for standbyTransactions 1`] = `
                   ]
                 }
               >
-                
                 30.00
               </Text>
             </View>
