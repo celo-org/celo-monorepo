@@ -42,7 +42,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 class WalletIconWithCircle extends React.Component<Props> {
   render() {
     return (
-      <View style={{ marginLeft: 3 }}>
+      <View style={styles.alignWallet}>
         {this.props.hasActiveNotifications && <View style={styles.circle} />}
         <WalletIcon color={this.props.tintColor} />
       </View>
@@ -152,6 +152,9 @@ const styles = StyleSheet.create({
     height: 6,
     width: 6,
     backgroundColor: colors.messageBlue,
+  },
+  alignWallet: {
+    marginLeft: 3,
   },
 })
 
