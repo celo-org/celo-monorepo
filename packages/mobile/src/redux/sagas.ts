@@ -13,6 +13,7 @@ import { homeSaga } from 'src/home/saga'
 import { identitySaga } from 'src/identity/saga'
 import { importSaga } from 'src/import/saga'
 import { inviteSaga } from 'src/invite/saga'
+import { localCurrencySaga } from 'src/localCurrency/sagas'
 import { networkInfoSaga } from 'src/networkInfo/saga'
 import { sendSaga } from 'src/send/saga'
 import { stableTokenSaga } from 'src/stableToken/saga'
@@ -67,4 +68,5 @@ export function* rootSaga() {
   yield spawn(importSaga)
   yield spawn(dappKitSaga)
   yield spawn(feesSaga)
+  yield spawn(localCurrencySaga)
 }
