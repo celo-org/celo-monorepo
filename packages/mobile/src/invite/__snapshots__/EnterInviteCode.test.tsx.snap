@@ -14,7 +14,10 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
     contentContainerStyle={
       Object {
         "alignItems": "center",
-        "marginHorizontal": 10,
+        "flex": 1,
+        "justifyContent": "center",
+        "padding": 20,
+        "paddingTop": 0,
       }
     }
   >
@@ -45,25 +48,6 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
              
         </Text>
       </View>
-      <Text
-        style={
-          Array [
-            Object {
-              "fontFamily": "Hind-Light",
-              "fontSize": 22,
-              "paddingBottom": 20,
-              "textAlign": "center",
-            },
-            Object {
-              "color": "#2E3338",
-              "paddingBottom": 63,
-            },
-          ]
-        }
-        testID="InviteCodeTitle"
-      >
-        inviteCodeText.title
-      </Text>
       <View
         style={
           Object {
@@ -145,135 +129,142 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
         style={
           Array [
             Object {
-              "alignSelf": "center",
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 14,
-              "lineHeight": 18,
+              "fontFamily": "Hind-Light",
+              "fontSize": 22,
+              "paddingBottom": 20,
               "textAlign": "center",
             },
             Object {
-              "width": 208,
+              "color": "#2E3338",
+            },
+          ]
+        }
+        testID="InviteCodeTitle"
+      >
+        inviteCodeText.title
+      </Text>
+      <View
+        style={
+          Array [
+            Object {
+              "borderColor": "#EEEEEE",
+              "borderRadius": 3,
+              "borderWidth": 1,
+            },
+            Object {
+              "marginHorizontal": 20,
+              "marginVertical": 30,
+              "padding": 30,
             },
           ]
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Bold",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-            ]
-          }
-        >
-          inviteCodeText.copyInvite.0
-        </Text>
-        inviteCodeText.copyInvite.1
-      </Text>
-      <View
-        style={
-          Object {
-            "borderColor": "#D1D5D8",
-            "borderTopWidth": 1,
-            "marginBottom": 26,
-            "marginTop": 21,
-            "width": "80%",
-          }
-        }
-      />
-      <View>
-        <Text
-          style={
-            Array [
-              Object {
-                "alignSelf": "center",
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "textAlign": "center",
-              },
-              Object {
-                "fontSize": 12,
-                "height": 20,
-                "width": 320,
-              },
-            ]
-          }
-        >
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 14,
-                "lineHeight": 18,
-              }
-            }
-          >
-            inviteCodeText.openMessages.hint.0
-          </Text>
-          inviteCodeText.openMessages.hint.1
-        </Text>
-        <View
-          accessible={true}
-          hitSlop={
             Object {
-              "bottom": 7,
-              "left": 7,
-              "right": 7,
-              "top": 7,
-            }
-          }
-          isTVSelectable={true}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            Object {
-              "alignItems": "center",
               "alignSelf": "center",
-              "backgroundColor": "#42D689",
-              "borderRadius": 2,
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
               "fontSize": 14,
-              "marginTop": 6,
-              "minWidth": 160,
-              "opacity": 1,
-              "paddingHorizontal": 18,
-              "paddingVertical": 8,
+              "lineHeight": 18,
               "textAlign": "center",
             }
           }
-          testID="openMessageButton"
         >
+          <Text>
+            inviteCodeText.copyInvite.0
+          </Text>
+          inviteCodeText.copyInvite.1
+        </Text>
+        <View>
           <Text
             style={
               Array [
                 Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 13,
-                  "lineHeight": 17,
+                  "alignSelf": "center",
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                  "textAlign": "center",
                 },
                 Object {
-                  "lineHeight": 20,
+                  "fontSize": 12,
+                  "marginVertical": 10,
                 },
-                Object {
-                  "color": "#FFFFFF",
-                },
-                undefined,
               ]
             }
           >
-            inviteCodeText.openMessages.message
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                }
+              }
+            >
+              inviteCodeText.openMessages.hint.0
+            </Text>
+            inviteCodeText.openMessages.hint.1
           </Text>
+          <View
+            accessible={true}
+            hitSlop={
+              Object {
+                "bottom": 7,
+                "left": 7,
+                "right": 7,
+                "top": 7,
+              }
+            }
+            isTVSelectable={true}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "alignItems": "center",
+                "alignSelf": "center",
+                "backgroundColor": "#42D689",
+                "borderRadius": 2,
+                "fontSize": 14,
+                "marginTop": 6,
+                "minWidth": 160,
+                "opacity": 1,
+                "paddingHorizontal": 18,
+                "paddingVertical": 8,
+                "textAlign": "center",
+              }
+            }
+            testID="openMessageButton"
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 13,
+                    "lineHeight": 17,
+                  },
+                  Object {
+                    "lineHeight": 20,
+                  },
+                  Object {
+                    "color": "#FFFFFF",
+                  },
+                  undefined,
+                ]
+              }
+            >
+              inviteCodeText.openMessages.message
+            </Text>
+          </View>
         </View>
       </View>
     </View>
@@ -291,35 +282,13 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
             "textAlign": "center",
           },
           Object {
-            "fontSize": 12,
-            "fontWeight": "300",
-            "marginBottom": 6,
-            "width": 320,
+            "marginHorizontal": 20,
+            "marginVertical": 10,
           },
         ]
       }
     >
-      <Text
-        style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Bold",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "fontSize": 12,
-              "fontWeight": "300",
-              "marginBottom": 6,
-              "width": 320,
-            },
-          ]
-        }
-      >
-        inviteCodeText.askForInvite.0
-      </Text>
-      inviteCodeText.askForInvite.1
+      inviteCodeText.askForInvite.0
       <Text
         onPress={[Function]}
         style={
@@ -337,13 +306,11 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
             Object {
               "fontSize": 12,
               "fontWeight": "300",
-              "marginBottom": 6,
-              "width": 320,
             },
           ]
         }
       >
-        inviteCodeText.askForInvite.2
+        inviteCodeText.askForInvite.1
       </Text>
     </Text>
     <View
@@ -519,7 +486,10 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
     contentContainerStyle={
       Object {
         "alignItems": "center",
-        "marginHorizontal": 10,
+        "flex": 1,
+        "justifyContent": "center",
+        "padding": 20,
+        "paddingTop": 0,
       }
     }
   >
@@ -550,25 +520,6 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
              
         </Text>
       </View>
-      <Text
-        style={
-          Array [
-            Object {
-              "fontFamily": "Hind-Light",
-              "fontSize": 22,
-              "paddingBottom": 20,
-              "textAlign": "center",
-            },
-            Object {
-              "color": "#2E3338",
-              "paddingBottom": 63,
-            },
-          ]
-        }
-        testID="InviteCodeTitle"
-      >
-        inviteCodeText.title
-      </Text>
       <View
         style={
           Object {
@@ -650,135 +601,142 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
         style={
           Array [
             Object {
-              "alignSelf": "center",
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 14,
-              "lineHeight": 18,
+              "fontFamily": "Hind-Light",
+              "fontSize": 22,
+              "paddingBottom": 20,
               "textAlign": "center",
             },
             Object {
-              "width": 208,
+              "color": "#2E3338",
+            },
+          ]
+        }
+        testID="InviteCodeTitle"
+      >
+        inviteCodeText.title
+      </Text>
+      <View
+        style={
+          Array [
+            Object {
+              "borderColor": "#EEEEEE",
+              "borderRadius": 3,
+              "borderWidth": 1,
+            },
+            Object {
+              "marginHorizontal": 20,
+              "marginVertical": 30,
+              "padding": 30,
             },
           ]
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Bold",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-            ]
-          }
-        >
-          inviteCodeText.copyInvite.0
-        </Text>
-        inviteCodeText.copyInvite.1
-      </Text>
-      <View
-        style={
-          Object {
-            "borderColor": "#D1D5D8",
-            "borderTopWidth": 1,
-            "marginBottom": 26,
-            "marginTop": 21,
-            "width": "80%",
-          }
-        }
-      />
-      <View>
-        <Text
-          style={
-            Array [
-              Object {
-                "alignSelf": "center",
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "textAlign": "center",
-              },
-              Object {
-                "fontSize": 12,
-                "height": 20,
-                "width": 320,
-              },
-            ]
-          }
-        >
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 14,
-                "lineHeight": 18,
-              }
-            }
-          >
-            inviteCodeText.openMessages.hint.0
-          </Text>
-          inviteCodeText.openMessages.hint.1
-        </Text>
-        <View
-          accessible={true}
-          hitSlop={
             Object {
-              "bottom": 7,
-              "left": 7,
-              "right": 7,
-              "top": 7,
-            }
-          }
-          isTVSelectable={true}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            Object {
-              "alignItems": "center",
               "alignSelf": "center",
-              "backgroundColor": "#42D689",
-              "borderRadius": 2,
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
               "fontSize": 14,
-              "marginTop": 6,
-              "minWidth": 160,
-              "opacity": 1,
-              "paddingHorizontal": 18,
-              "paddingVertical": 8,
+              "lineHeight": 18,
               "textAlign": "center",
             }
           }
-          testID="openMessageButton"
         >
+          <Text>
+            inviteCodeText.copyInvite.0
+          </Text>
+          inviteCodeText.copyInvite.1
+        </Text>
+        <View>
           <Text
             style={
               Array [
                 Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 13,
-                  "lineHeight": 17,
+                  "alignSelf": "center",
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                  "textAlign": "center",
                 },
                 Object {
-                  "lineHeight": 20,
+                  "fontSize": 12,
+                  "marginVertical": 10,
                 },
-                Object {
-                  "color": "#FFFFFF",
-                },
-                undefined,
               ]
             }
           >
-            inviteCodeText.openMessages.message
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                }
+              }
+            >
+              inviteCodeText.openMessages.hint.0
+            </Text>
+            inviteCodeText.openMessages.hint.1
           </Text>
+          <View
+            accessible={true}
+            hitSlop={
+              Object {
+                "bottom": 7,
+                "left": 7,
+                "right": 7,
+                "top": 7,
+              }
+            }
+            isTVSelectable={true}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "alignItems": "center",
+                "alignSelf": "center",
+                "backgroundColor": "#42D689",
+                "borderRadius": 2,
+                "fontSize": 14,
+                "marginTop": 6,
+                "minWidth": 160,
+                "opacity": 1,
+                "paddingHorizontal": 18,
+                "paddingVertical": 8,
+                "textAlign": "center",
+              }
+            }
+            testID="openMessageButton"
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#81868B",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 13,
+                    "lineHeight": 17,
+                  },
+                  Object {
+                    "lineHeight": 20,
+                  },
+                  Object {
+                    "color": "#FFFFFF",
+                  },
+                  undefined,
+                ]
+              }
+            >
+              inviteCodeText.openMessages.message
+            </Text>
+          </View>
         </View>
       </View>
     </View>
@@ -796,35 +754,13 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
             "textAlign": "center",
           },
           Object {
-            "fontSize": 12,
-            "fontWeight": "300",
-            "marginBottom": 6,
-            "width": 320,
+            "marginHorizontal": 20,
+            "marginVertical": 10,
           },
         ]
       }
     >
-      <Text
-        style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Bold",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "fontSize": 12,
-              "fontWeight": "300",
-              "marginBottom": 6,
-              "width": 320,
-            },
-          ]
-        }
-      >
-        inviteCodeText.askForInvite.0
-      </Text>
-      inviteCodeText.askForInvite.1
+      inviteCodeText.askForInvite.0
       <Text
         onPress={[Function]}
         style={
@@ -842,13 +778,11 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
             Object {
               "fontSize": 12,
               "fontWeight": "300",
-              "marginBottom": 6,
-              "width": 320,
             },
           ]
         }
       >
-        inviteCodeText.askForInvite.2
+        inviteCodeText.askForInvite.1
       </Text>
     </Text>
     <View
