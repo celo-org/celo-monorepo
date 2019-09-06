@@ -10,21 +10,12 @@ const getExchangeFeeEstimateInWei = (state: RootState) => state.fees.estimates.e
 const getReclaimEscrowFeeEstimateInWei = (state: RootState) =>
   state.fees.estimates.reclaimEscrow.feeInWei
 
-export function getFeeDollars(feeInWei: BigNumber | string) {
-  const adjustedFee = divideByWei(
-    feeInWei instanceof BigNumber ? feeInWei.toString() : feeInWei,
-    18
-  )
-  return new BigNumber(adjustedFee)
+export function getFeeDollars(feeInWei: BigNumber.Value | null | undefined) {
+  return feeInWei ? divideByWei(feeInWei) : undefined
 }
 
 const feeEstimateDollarsSelectorFactory = (feeSelector: (state: RootState) => string | null) => {
-  return createSelector(feeSelector, (feeInWei) => {
-    if (!feeInWei) {
-      return null
-    }
-    return getFeeDollars(feeInWei)
-  })
+  return createSelector(feeSelector, (feeInWei) => getFeeDollars(feeInWei))
 }
 
 export const getInviteFeeEstimateDollars = feeEstimateDollarsSelectorFactory(
@@ -38,7 +29,11 @@ export const getReclaimEscrowFeeEstimateDollars = feeEstimateDollarsSelectorFact
   getReclaimEscrowFeeEstimateInWei
 )
 
-export const getFeeEstimateDollars = (state: RootState, feeType: FeeType) => {
+export const getFeeEstimateDollars = (state: RootState, feeType: FeeType | null) => {
+  if (feeType === null) {
+    return undefined
+  }
+
   switch (feeType) {
     case FeeType.INVITE:
       return getInviteFeeEstimateDollars(state)

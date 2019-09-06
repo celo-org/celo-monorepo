@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Connect renders correctly 1`] = `
+exports[`QRCode renders correctly 1`] = `
 <View
   style={
     Object {
@@ -233,7 +233,7 @@ exports[`Connect renders correctly 1`] = `
             />
           </svg>
           <Text
-            accessibilityLabel="saveCodeImage"
+            accessibilityLabel="shareCodeImage"
             style={
               Array [
                 Object {
@@ -250,7 +250,7 @@ exports[`Connect renders correctly 1`] = `
               ]
             }
           >
-            saveCodeImage
+            shareCodeImage
           </Text>
         </View>
       </View>

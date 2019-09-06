@@ -123,7 +123,7 @@ jobs:
           name: jest tests
           command: |
             mkdir -p test-results/jest
-            yarn run lerna --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/walletkit --ignore @celo/celocli run test
+            yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/walletkit --ignore @celo/celocli run test
 
   mobile-test-build-app:
     working_directory: ~/app
@@ -207,6 +207,19 @@ jobs:
           name: test
           # Flaky tests - run them twice
           command: yarn --cwd packages/protocol test || yarn --cwd packages/protocol test
+  contractkit-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run: 
+          name: Generate DevChain
+          command: |
+            (cd packages/contractkit && yarn test:prepare)
+      - run:
+          name: Run Tests
+          command: yarn --cwd=packages/contractkit test
+
 
   walletkit-test:
     <<: *defaults
@@ -469,6 +482,9 @@ workflows:
       - cli-test:
           requires:
             - install_dependencies
+      - contractkit-test:
+          requires:
+            - install_dependencies      
       - mobile-test:
           requires:
             - lint-checks

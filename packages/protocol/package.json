@@ -30,6 +30,9 @@
     "console": "./scripts/bash/console.sh",
     "invite": "./scripts/bash/invite.sh",
     "ganache-dev": "./scripts/bash/ganache.sh",
+    "pretruffle:migrate": "yarn build:ts",
+    "truffle:migrate": "truffle migrate",
+    "devchain": "ts-node scripts/devchain.ts",
     "weekly-faucet": "./scripts/bash/weekly_faucet.sh",
     "set-exchange-rate": "./scripts/bash/set_exchange_rate.sh",
     "network-check": "./scripts/bash/network_check.sh",
@@ -37,6 +40,7 @@
   },
   "dependencies": {
     "apollo-client": "^2.4.13",
+    "bls12377js": "https://github.com/celo-org/bls12377js#4f596cabb659c4f8969ae4b617f185f2bc74cbbb",
     "chai-subset": "^1.6.0",
     "csv-parser": "^2.0.0",
     "csv-stringify": "^4.3.1",
@@ -66,7 +70,7 @@
     "web3": "1.0.0-beta.37"
   },
   "devDependencies": {
-    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#6bd058a",
+    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#816a475",
     "@celo/typescript": "0.0.1",
     "@celo/utils": "^0.0.6-beta5",
     "@types/bignumber.js": "^5.0.0",
@@ -77,10 +81,11 @@
     "@types/nodemailer": "^4.6.5",
     "@types/underscore": "^1.8.8",
     "@types/web3": "^1.0.18",
+    "@types/yargs": "^13.0.2",
     "cross-env": "^5.1.6",
     "eth-gas-reporter": "^0.1.2",
     "nodemailer": "^4.6.8",
     "truffle-typings": "^1.0.6",
-    "typescript": "^3.3.3"
+    "yargs": "^14.0.0"
   }
 }

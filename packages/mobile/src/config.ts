@@ -27,7 +27,12 @@ export const FAQ_LINK = 'https://celo.org/faq'
 export const CELO_SUPPORT_EMAIL_ADDRESS = 'support@celo.org'
 
 export const BALANCE_OUT_OF_SYNC_THRESHOLD = 5 * 60 // 5 minutes
+
 export const ALERT_BANNER_DURATION = 5000
+
+export const NUMBER_INPUT_MAX_DECIMALS = 2
+export const MAX_COMMENT_LENGTH = 70
+
 export const INPUT_DEBOUNCE_TIME = 1000 // milliseconds
 
 export const SUPPORTS_KEYSTORE = Platform.Version >= 23
@@ -47,3 +52,8 @@ export const FIREBASE_WEB_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 
 export const SENTRY_URL = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SENTRY_URL')
 
 export const PROMOTE_REWARDS_APP = false
+
+export const LOCAL_CURRENCY_SYMBOL = Config.LOCAL_CURRENCY_SYMBOL || null
+
+// The number of seconds before the sender can reclaim the payment.
+export const ESCROW_PAYMENT_EXPIRY_SECONDS = 172800 // 2 days

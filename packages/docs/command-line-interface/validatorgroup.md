@@ -16,7 +16,7 @@ EXAMPLE
   list
 ```
 
-_See code: [packages/cli/src/src/commands/validatorgroup/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/validatorgroup/list.ts)_
+_See code: [packages/cli/lib/commands/validatorgroup/list.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/validatorgroup/list.js)_
 
 ### Member
 
@@ -39,7 +39,7 @@ EXAMPLES
   member --remove 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
 ```
 
-_See code: [packages/cli/src/src/commands/validatorgroup/member.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/validatorgroup/member.ts)_
+_See code: [packages/cli/lib/commands/validatorgroup/member.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/validatorgroup/member.js)_
 
 ### Register
 
@@ -53,15 +53,14 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group
   --id=id                                            (required)
   --name=name                                        (required)
-  --noticePeriod=noticePeriod                        (required) Notice Period for the Bonded deposit to use
+  --noticePeriod=noticePeriod                        (required) Notice period of the Locked Gold commitment. Specify multiple notice periods to use the sum of the commitments.
   --url=url                                          (required)
 
 EXAMPLE
-  register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --id myID --name myName --noticePeriod 5184000 --url
-  "http://vgroup.com"
+  register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --id myID --name myName --noticePeriod 5184000 --noticePeriod 5184001 --url "http://vgroup.com"
 ```
 
-_See code: [packages/cli/src/src/commands/validatorgroup/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/validatorgroup/register.ts)_
+_See code: [packages/cli/lib/commands/validatorgroup/register.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/validatorgroup/register.js)_
 
 ### Show
 
@@ -78,7 +77,7 @@ EXAMPLE
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3
 ```
 
-_See code: [packages/cli/src/src/commands/validatorgroup/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/validatorgroup/show.ts)_
+_See code: [packages/cli/lib/commands/validatorgroup/show.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/validatorgroup/show.js)_
 
 ### Vote
 
@@ -100,4 +99,4 @@ EXAMPLES
   vote --from 0x4443d0349e8b3075cba511a0a87796597602a0f1 --current
 ```
 
-_See code: [packages/cli/src/src/commands/validatorgroup/vote.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/validatorgroup/vote.ts)_
+_See code: [packages/cli/lib/commands/validatorgroup/vote.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/validatorgroup/vote.js)_

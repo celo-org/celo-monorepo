@@ -230,7 +230,7 @@ export class Header extends React.Component<Props, State> {
                       kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
                       href={'https://medium.com/CeloHQ'}
                       text={t('blog')}
-                      target={'_new_tab'}
+                      target={'_blank'}
                       iconRight={<MediumLogo height={20} color={foreground} wrapWithLink={false} />}
                     />
                   </View>
@@ -239,9 +239,9 @@ export class Header extends React.Component<Props, State> {
                       kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
                       href={CeloLinks.gitHub}
                       text={t('github')}
-                      target={'_new_tab'}
+                      target={'_blank'}
                       iconRight={
-                        <Octocat size={18} color={this.isDarkMode() ? colors.white : colors.dark} />
+                        <Octocat size={22} color={this.isDarkMode() ? colors.white : colors.dark} />
                       }
                     />
                   </View>

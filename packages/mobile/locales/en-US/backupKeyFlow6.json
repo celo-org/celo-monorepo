@@ -1,16 +1,17 @@
 {
-  "readOnlyMode": "Read Only Mode Set Backup Key to continue sending and receiving Celo Dollars",
+  "readOnlyMode": "Read Only Mode Set Backup Key to continue sending and receiving {{CeloDollars}}",
   "getBackupKey": "Get Backup Key",
   "learnBackupKey": "Learn Your Backup Key",
   "editProfile": "Edit Profile",
   "backupKey": "Backup Key",
+  "delayBackup": "Dismiss for an hour",
   "inviteFriends": "Invite Friends",
   "verifierApp": "Verifier App",
   "languageSettings": "Language Settings",
   "cancel": "Cancel",
   "backupKeyImportance": {
     "0":
-      "If you lose your phone or delete the Celo app, you will lose all of the gold and dollars in your wallet.",
+      "If you lose your phone or delete the Celo app, you will lose all of the gold and {{dollars}} in your wallet.",
     "1":
       "You can back up your wallet by writing down a Backup Key on a piece of paper and storing it securely. This allows you to restore your wallet in the future if you need to.",
     "2":

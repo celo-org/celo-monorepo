@@ -1,18 +1,21 @@
 import * as React from 'react'
 import 'react-native'
+import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { EventTypeNames } from 'src/apollo/types'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { TransactionTypes } from 'src/transactions/reducer'
 import { TransferFeedItem } from 'src/transactions/TransferFeedItem'
-import { getMockI18nProps } from 'test/utils'
+import { createMockStore, getMockI18nProps } from 'test/utils'
 import {
   mockAccount,
   mockAccount2,
+  mockAddressToE164Number,
   mockComment,
   mockE164Number,
   mockPrivateDEK,
   mockPrivateDEK2,
+  mockRecipientCache,
 } from 'test/values'
 
 const invitee = {
@@ -26,201 +29,265 @@ const encryptedMockComment =
 describe('transfer feed item renders correctly', () => {
   it('for sent transaction', () => {
     const tree = renderer.create(
-      <TransferFeedItem
-        __typename={EventTypeNames.Transfer}
-        comment={mockComment}
-        type={TransactionTypes.SENT}
-        hash={'0x'}
-        value={1}
-        address={mockAccount}
-        invitees={{}}
-        symbol={CURRENCY_ENUM.DOLLAR}
-        timestamp={1}
-        commentKey={null}
-        addressToE164Number={{}}
-        recipientCache={{}}
-        {...getMockI18nProps()}
-      />
+      <Provider store={createMockStore({})}>
+        <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
+          comment={mockComment}
+          type={TransactionTypes.SENT}
+          hash={'0x'}
+          value={1}
+          address={mockAccount}
+          invitees={{}}
+          symbol={CURRENCY_ENUM.DOLLAR}
+          timestamp={1}
+          commentKey={null}
+          addressToE164Number={{}}
+          recipientCache={{}}
+          {...getMockI18nProps()}
+        />
+      </Provider>
     )
     expect(tree).toMatchSnapshot()
   })
   it('for sent with encrypted comment', () => {
     const tree = renderer.create(
-      <TransferFeedItem
-        __typename={EventTypeNames.Transfer}
-        comment={encryptedMockComment}
-        type={TransactionTypes.SENT}
-        hash={'0x'}
-        value={1}
-        address={mockAccount2}
-        invitees={{}}
-        symbol={CURRENCY_ENUM.DOLLAR}
-        timestamp={1}
-        commentKey={mockPrivateDEK}
-        addressToE164Number={{}}
-        recipientCache={{}}
-        {...getMockI18nProps()}
-      />
+      <Provider store={createMockStore({})}>
+        <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
+          comment={encryptedMockComment}
+          type={TransactionTypes.SENT}
+          hash={'0x'}
+          value={1}
+          address={mockAccount2}
+          invitees={{}}
+          symbol={CURRENCY_ENUM.DOLLAR}
+          timestamp={1}
+          commentKey={mockPrivateDEK}
+          addressToE164Number={{}}
+          recipientCache={{}}
+          {...getMockI18nProps()}
+        />
+      </Provider>
     )
     expect(tree).toMatchSnapshot()
   })
   it('for received with encrypted comment', () => {
     const tree = renderer.create(
-      <TransferFeedItem
-        __typename={EventTypeNames.Transfer}
-        comment={encryptedMockComment}
-        type={TransactionTypes.RECEIVED}
-        hash={'0x'}
-        value={100}
-        address={mockAccount}
-        invitees={{}}
-        symbol={CURRENCY_ENUM.DOLLAR}
-        timestamp={1}
-        commentKey={mockPrivateDEK2}
-        addressToE164Number={{}}
-        recipientCache={{}}
-        {...getMockI18nProps()}
-      />
+      <Provider store={createMockStore({})}>
+        <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
+          comment={encryptedMockComment}
+          type={TransactionTypes.RECEIVED}
+          hash={'0x'}
+          value={100}
+          address={mockAccount}
+          invitees={{}}
+          symbol={CURRENCY_ENUM.DOLLAR}
+          timestamp={1}
+          commentKey={mockPrivateDEK2}
+          addressToE164Number={{}}
+          recipientCache={{}}
+          {...getMockI18nProps()}
+        />
+      </Provider>
     )
     expect(tree).toMatchSnapshot()
   })
   it('for verification fee', () => {
     const tree = renderer.create(
-      <TransferFeedItem
-        __typename={EventTypeNames.Transfer}
-        comment={''}
-        type={TransactionTypes.VERIFICATION_FEE}
-        hash={'0x'}
-        value={0.33}
-        address={mockAccount}
-        invitees={{}}
-        symbol={CURRENCY_ENUM.DOLLAR}
-        timestamp={1}
-        commentKey={null}
-        addressToE164Number={{}}
-        recipientCache={{}}
-        {...getMockI18nProps()}
-      />
+      <Provider store={createMockStore({})}>
+        <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
+          comment={''}
+          type={TransactionTypes.VERIFICATION_FEE}
+          hash={'0x'}
+          value={0.33}
+          address={mockAccount}
+          invitees={{}}
+          symbol={CURRENCY_ENUM.DOLLAR}
+          timestamp={1}
+          commentKey={null}
+          addressToE164Number={{}}
+          recipientCache={{}}
+          {...getMockI18nProps()}
+        />
+      </Provider>
     )
     expect(tree).toMatchSnapshot()
   })
   it('for verification reward', () => {
     const tree = renderer.create(
-      <TransferFeedItem
-        __typename={EventTypeNames.Transfer}
-        comment={''}
-        type={TransactionTypes.VERIFICATION_REWARD}
-        hash={'0x'}
-        value={1}
-        address={mockAccount}
-        invitees={{}}
-        symbol={CURRENCY_ENUM.DOLLAR}
-        timestamp={1}
-        commentKey={null}
-        addressToE164Number={{}}
-        recipientCache={{}}
-        {...getMockI18nProps()}
-      />
+      <Provider store={createMockStore({})}>
+        <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
+          comment={''}
+          type={TransactionTypes.VERIFICATION_REWARD}
+          hash={'0x'}
+          value={1}
+          address={mockAccount}
+          invitees={{}}
+          symbol={CURRENCY_ENUM.DOLLAR}
+          timestamp={1}
+          commentKey={null}
+          addressToE164Number={{}}
+          recipientCache={{}}
+          {...getMockI18nProps()}
+        />
+      </Provider>
     )
     expect(tree).toMatchSnapshot()
   })
   it('for faucet', () => {
     const tree = renderer.create(
-      <TransferFeedItem
-        __typename={EventTypeNames.Transfer}
-        comment={''}
-        type={TransactionTypes.FAUCET}
-        hash={'0x'}
-        value={100}
-        address={mockAccount}
-        invitees={{}}
-        symbol={CURRENCY_ENUM.DOLLAR}
-        timestamp={1}
-        commentKey={null}
-        addressToE164Number={{}}
-        recipientCache={{}}
-        {...getMockI18nProps()}
-      />
+      <Provider store={createMockStore({})}>
+        <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
+          comment={''}
+          type={TransactionTypes.FAUCET}
+          hash={'0x'}
+          value={100}
+          address={mockAccount}
+          invitees={{}}
+          symbol={CURRENCY_ENUM.DOLLAR}
+          timestamp={1}
+          commentKey={null}
+          addressToE164Number={{}}
+          recipientCache={{}}
+          {...getMockI18nProps()}
+        />
+      </Provider>
     )
     expect(tree).toMatchSnapshot()
   })
   it('for sent invite', () => {
     const tree = renderer.create(
-      <TransferFeedItem
-        __typename={EventTypeNames.Transfer}
-        comment={''}
-        type={TransactionTypes.INVITE_SENT}
-        hash={'0x'}
-        value={1}
-        address={mockAccount}
-        invitees={invitee}
-        symbol={CURRENCY_ENUM.DOLLAR}
-        timestamp={1}
-        commentKey={null}
-        addressToE164Number={{}}
-        recipientCache={{}}
-        {...getMockI18nProps()}
-      />
+      <Provider store={createMockStore({})}>
+        <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
+          comment={''}
+          type={TransactionTypes.INVITE_SENT}
+          hash={'0x'}
+          value={1}
+          address={mockAccount}
+          invitees={invitee}
+          symbol={CURRENCY_ENUM.DOLLAR}
+          timestamp={1}
+          commentKey={null}
+          addressToE164Number={{}}
+          recipientCache={{}}
+          {...getMockI18nProps()}
+        />
+      </Provider>
     )
     expect(tree).toMatchSnapshot()
   })
   it('for received invite', () => {
     const tree = renderer.create(
-      <TransferFeedItem
-        __typename={EventTypeNames.Transfer}
-        comment={''}
-        type={TransactionTypes.INVITE_RECEIVED}
-        hash={'0x'}
-        value={1}
-        address={mockAccount}
-        invitees={invitee}
-        symbol={CURRENCY_ENUM.DOLLAR}
-        timestamp={1}
-        commentKey={null}
-        addressToE164Number={{}}
-        recipientCache={{}}
-        {...getMockI18nProps()}
-      />
+      <Provider store={createMockStore({})}>
+        <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
+          comment={''}
+          type={TransactionTypes.INVITE_RECEIVED}
+          hash={'0x'}
+          value={1}
+          address={mockAccount}
+          invitees={invitee}
+          symbol={CURRENCY_ENUM.DOLLAR}
+          timestamp={1}
+          commentKey={null}
+          addressToE164Number={{}}
+          recipientCache={{}}
+          {...getMockI18nProps()}
+        />
+      </Provider>
     )
     expect(tree).toMatchSnapshot()
   })
   it('for received', () => {
     const tree = renderer.create(
-      <TransferFeedItem
-        __typename={EventTypeNames.Transfer}
-        comment={''}
-        type={TransactionTypes.RECEIVED}
-        hash={'0x'}
-        value={100}
-        address={mockAccount}
-        invitees={{}}
-        symbol={CURRENCY_ENUM.DOLLAR}
-        timestamp={1}
-        commentKey={null}
-        addressToE164Number={{}}
-        recipientCache={{}}
-        {...getMockI18nProps()}
-      />
+      <Provider store={createMockStore({})}>
+        <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
+          comment={''}
+          type={TransactionTypes.RECEIVED}
+          hash={'0x'}
+          value={100}
+          address={mockAccount}
+          invitees={{}}
+          symbol={CURRENCY_ENUM.DOLLAR}
+          timestamp={1}
+          commentKey={null}
+          addressToE164Number={{}}
+          recipientCache={{}}
+          {...getMockI18nProps()}
+        />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+  it('for known received', () => {
+    const tree = renderer.create(
+      <Provider store={createMockStore({})}>
+        <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
+          comment={''}
+          type={TransactionTypes.RECEIVED}
+          hash={'0x'}
+          value={100}
+          address={mockAccount}
+          invitees={{}}
+          symbol={CURRENCY_ENUM.DOLLAR}
+          timestamp={1}
+          commentKey={null}
+          addressToE164Number={mockAddressToE164Number}
+          recipientCache={mockRecipientCache}
+          {...getMockI18nProps()}
+        />
+      </Provider>
     )
     expect(tree).toMatchSnapshot()
   })
   it('for sent', () => {
     const tree = renderer.create(
-      <TransferFeedItem
-        __typename={EventTypeNames.Transfer}
-        comment={''}
-        type={TransactionTypes.SENT}
-        hash={'0x'}
-        value={100}
-        address={mockAccount}
-        invitees={{}}
-        symbol={CURRENCY_ENUM.DOLLAR}
-        timestamp={1}
-        commentKey={null}
-        addressToE164Number={{}}
-        recipientCache={{}}
-        {...getMockI18nProps()}
-      />
+      <Provider store={createMockStore({})}>
+        <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
+          comment={''}
+          type={TransactionTypes.SENT}
+          hash={'0x'}
+          value={100}
+          address={mockAccount}
+          invitees={{}}
+          symbol={CURRENCY_ENUM.DOLLAR}
+          timestamp={1}
+          commentKey={null}
+          addressToE164Number={{}}
+          recipientCache={{}}
+          {...getMockI18nProps()}
+        />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+  it('for known sent', () => {
+    const tree = renderer.create(
+      <Provider store={createMockStore({})}>
+        <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
+          comment={''}
+          type={TransactionTypes.SENT}
+          hash={'0x'}
+          value={100}
+          address={mockAccount}
+          invitees={{}}
+          symbol={CURRENCY_ENUM.DOLLAR}
+          timestamp={1}
+          commentKey={null}
+          addressToE164Number={mockAddressToE164Number}
+          recipientCache={mockRecipientCache}
+          {...getMockI18nProps()}
+        />
+      </Provider>
     )
     expect(tree).toMatchSnapshot()
   })

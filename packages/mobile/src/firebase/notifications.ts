@@ -7,7 +7,6 @@ import {
   TransferNotificationData,
 } from 'src/account'
 import { showMessage } from 'src/alert/actions'
-import { ALERT_BANNER_DURATION } from 'src/config'
 import { resolveCurrency } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
@@ -44,6 +43,7 @@ const handlePaymentRequested = (
     amount: new BigNumber(paymentRequest.amount),
     reason: paymentRequest.comment,
     recipientAddress: targetRecipient.address,
+    type: TransactionTypes.PAY_REQUEST,
   })
 }
 
@@ -78,7 +78,7 @@ export const handleNotification = (
   notificationState: NotificationReceiveState
 ) => async (dispatch: DispatchType, getState: GetStateType) => {
   if (notificationState === NotificationReceiveState.APP_ALREADY_OPEN) {
-    dispatch(showMessage(notification.title, ALERT_BANNER_DURATION))
+    dispatch(showMessage(notification.title))
   }
   switch (notification.data.type) {
     case NotificationTypes.PAYMENT_REQUESTED:

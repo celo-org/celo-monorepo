@@ -210,6 +210,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-install-referrer')
     implementation project(':react-native-send-intent')
     // implementation project(':instabug-reactnative')
     // implementation project(':react-native-screens')
@@ -222,7 +223,6 @@ dependencies {
     implementation project(':react-native-mail')
     implementation project(':react-native-splash-screen')
     implementation project(':react-native-version-check')
-    implementation project(':react-native-android-broadcast-receiver-for-referrer')
     implementation project(':react-native-android-open-settings')
     implementation project(':react-native-udp')
     implementation project(':react-native-languages')
@@ -243,6 +243,7 @@ dependencies {
     implementation project(':react-native-restart-android')
     implementation project(':react-native-sms-retriever')
     implementation project(':react-native-share')
+    implementation project(':react-native-secure-key-store')
 
     androidTestImplementation('com.wix:detox:+') { transitive = true }
     androidTestImplementation 'junit:junit:4.12'

@@ -1,35 +1,21 @@
-import { validatorsRegistryId } from '@celo/protocol/lib/registry-utils'
-import {
-  deployProxyAndImplementation,
-  getDeployedProxiedContract,
-} from '@celo/protocol/lib/web3-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { RegistryInstance, ValidatorsInstance } from 'types'
+import { ValidatorsInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
-  const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-    'Registry',
-    artifacts
-  )
   return [
-    registry.address,
+    config.registry.predeployedProxyAddress,
     config.validators.minElectableValidators,
     config.validators.maxElectableValidators,
-    config.validators.minBondedDepositValue,
-    config.validators.minBondedDepositNoticePeriod,
+    config.validators.minLockedGoldValue,
+    config.validators.minLockedGoldNoticePeriod,
   ]
 }
 
-module.exports = deployProxyAndImplementation<ValidatorsInstance>(
+module.exports = deploymentForCoreContract<ValidatorsInstance>(
   web3,
   artifacts,
-  'Validators',
-  initializeArgs,
-  async (validators: ValidatorsInstance) => {
-    const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-      'Registry',
-      artifacts
-    )
-    await registry.setAddressFor(validatorsRegistryId, validators.address)
-  }
+  CeloContractName.Validators,
+  initializeArgs
 )

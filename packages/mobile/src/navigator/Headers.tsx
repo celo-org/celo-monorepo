@@ -9,26 +9,29 @@ import DisconnectBanner from 'src/shared/DisconnectBanner'
 export const nuxNavigationOptions = {
   headerStyle: {
     elevation: 0,
+    height: 45,
   },
-  headerLeftContainerStyle: { paddingHorizontal: 20 },
+  headerLeftContainerStyle: { paddingHorizontal: 10 },
   headerLeft: <BackButton />,
-  headerRightContainerStyle: { paddingRight: 15 },
-  header: (
-    <View style={{ paddingVertical: 30 }}>
-      <DisconnectBanner />
-    </View>
-  ),
+  headerRightContainerStyle: { paddingHorizontal: 10 },
+  headerRight: <View />,
+  headerTitle: <DisconnectBanner />,
+  headerTitleContainerStyle: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+  },
 }
 
 export const nuxNavigationOptionsNoBackButton = {
   ...nuxNavigationOptions,
-  headerLeft: null,
+  headerLeft: <View />,
 }
 
 export const headerWithBackButton = {
   headerTitle: '',
   headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
-  headerLeftContainerStyle: { paddingHorizontal: 10 },
+  headerLeftContainerStyle: { paddingHorizontal: 20 },
   headerLeft: <BackButton />,
   headerRight: <View />, // This helps vertically center the title
 }

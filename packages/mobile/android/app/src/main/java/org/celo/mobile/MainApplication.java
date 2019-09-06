@@ -8,7 +8,6 @@ import org.reactnative.camera.RNCameraPackage;
 import com.chirag.RNMail.RNMail;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import io.xogus.reactnative.versioncheck.RNVersionCheckPackage;
-import com.androidbroadcastreceiverforreferrer.RNAndroidBroadcastReceiverForReferrerPackage;
 import com.levelasquez.androidopensettings.AndroidOpenSettingsPackage;
 import com.tradle.react.UdpSocketsModule;
 
@@ -44,13 +43,15 @@ import com.reactnativegeth.RNGethPackage;
 import com.rnfs.RNFSPackage;
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
 import com.tradle.react.UdpSocketsModule;
-import com.reactlibrary.RNConfirmDeviceCredentialsPackage;
+import org.celo.devicecredentials.RNConfirmDeviceCredentialsPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.reactmodule.RNSystemClockPackage;
 import com.rnrestartandroid.RNRestartAndroidPackage;
 import me.furtado.smsretriever.RNSmsRetrieverPackage;
 import cl.json.RNSharePackage;
 import cl.json.ShareApplication;
+import com.reactlibrary.RNInstallReferrerPackage;
+import com.reactlibrary.securekeystore.RNSecureKeyStorePackage;
 
 import android.util.Log;
 
@@ -80,6 +81,7 @@ public class MainApplication extends MultiDexApplication implements ShareApplica
 
       ReactPackage basePackages[] = new ReactPackage[] {
               new MainReactPackage(),
+              new RNInstallReferrerPackage(),
               new RNSendIntentPackage(),
               new RNCWebViewPackage(),
               new NetInfoPackage(),
@@ -89,7 +91,6 @@ public class MainApplication extends MultiDexApplication implements ShareApplica
               new RNCameraPackage(),
               new RNMail(),
               new SplashScreenReactPackage(),
-              new RNAndroidBroadcastReceiverForReferrerPackage(),
               new AndroidOpenSettingsPackage(),
               new UdpSocketsModule(),
               new RNLanguagesPackage(),
@@ -114,7 +115,8 @@ public class MainApplication extends MultiDexApplication implements ShareApplica
               new RNSystemClockPackage(),
               new RNRestartAndroidPackage(),
               new RNSmsRetrieverPackage(),
-              new RNSharePackage()
+              new RNSharePackage(),
+              new RNSecureKeyStorePackage()
               // Disabled due to dex count
               // new RNScreensPackage(),
       };

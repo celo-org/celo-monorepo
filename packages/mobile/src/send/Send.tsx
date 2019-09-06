@@ -11,7 +11,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
+import { estimateFee, FeeType } from 'src/fees/actions'
 import { Namespaces } from 'src/i18n'
 import { importContacts } from 'src/identity/actions'
 import { E164NumberToAddressType } from 'src/identity/reducer'
@@ -70,6 +70,7 @@ interface DispatchProps {
   hideAlert: typeof hideAlert
   storeLatestInRecents: typeof storeLatestInRecents
   importContacts: typeof importContacts
+  estimateFee: typeof estimateFee
 }
 
 type Props = StateProps & DispatchProps & WithNamespaces & NavigationInjectedProps
@@ -90,6 +91,7 @@ const mapDispatchToProps = {
   hideAlert,
   storeLatestInRecents,
   importContacts,
+  estimateFee,
 }
 
 type FilterType = (searchQuery: string) => Recipient[]
@@ -132,6 +134,10 @@ class Send extends React.Component<Props, State> {
 
     const hasGivenPermission = await checkContactsPermission()
     this.setState({ hasGivenPermission })
+
+    // Trigger a fee estimation so it'll likely be finished and cached
+    // when SendAmount screen is shown
+    this.props.estimateFee(FeeType.SEND)
   }
 
   componentDidUpdate(prevPops: Props) {
@@ -164,7 +170,7 @@ class Send extends React.Component<Props, State> {
     })
 
     if (!recipient.e164PhoneNumber && !recipient.address) {
-      this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE, ALERT_BANNER_DURATION)
+      this.props.showError(ErrorMessages.CANT_SELECT_INVALID_PHONE)
       return
     }
 
@@ -203,7 +209,7 @@ class Send extends React.Component<Props, State> {
 
     return (
       <View style={style.body}>
-        <Text style={[fontStyles.headerTitle, style.header]}>{t('send_or_request')}</Text>
+        <Text style={[fontStyles.headerTitle, style.header]}>{t('sendOrRequest')}</Text>
         {loading ? (
           <View style={style.container}>
             <ActivityIndicator style={style.icon} size="large" color={colors.celoGreen} />

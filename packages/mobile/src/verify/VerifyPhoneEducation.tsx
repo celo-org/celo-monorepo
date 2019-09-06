@@ -10,12 +10,12 @@ import FindUser from 'src/icons/FindUser'
 import NuxLogo from 'src/icons/NuxLogo'
 import ThreeChecks from 'src/icons/ThreeChecks'
 import VerifyAddressBook from 'src/icons/VerifyAddressBook'
+import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import DisconnectBanner from 'src/shared/DisconnectBanner'
 
 export class VerifyPhoneEducation extends React.Component<WithNamespaces> {
-  static navigationOptions = { header: null }
+  static navigationOptions = nuxNavigationOptionsNoBackButton
 
   onSubmit = () => {
     navigate(Screens.VerifyVerifying)
@@ -25,9 +25,8 @@ export class VerifyPhoneEducation extends React.Component<WithNamespaces> {
     const { t } = this.props
     return (
       <View style={style.container}>
-        <DevSkipButton nextScreen={Screens.WalletHome} />
-        <DisconnectBanner />
-        <ScrollView style={style.content}>
+        <ScrollView contentContainerStyle={style.scrollContainer}>
+          <DevSkipButton nextScreen={Screens.WalletHome} />
           <NuxLogo testID="VerifyLogo" />
           <Text style={fontStyles.h1} testID="VerifyEducationHeader">
             {t('verifyPhone')}
@@ -63,25 +62,28 @@ const style = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
-    paddingTop: 20,
     backgroundColor: colors.background,
   },
-  content: {
+  scrollContainer: {
     flex: 1,
-    paddingHorizontal: 20,
+    padding: 30,
+    paddingTop: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   firstBullet: {
-    marginTop: 20,
+    marginTop: 10,
   },
   bullet: {
     flexDirection: 'row',
     flexWrap: 'nowrap',
-    marginTop: 30,
+    marginTop: 20,
     alignItems: 'center',
   },
   bulletImage: {
     flex: 0,
     marginRight: 20,
+    marginLeft: 10,
   },
   bulletText: {
     flex: 1,

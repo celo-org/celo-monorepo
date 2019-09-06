@@ -186,7 +186,7 @@ export class JoinCelo extends React.Component<Props, State> {
           keyboardShouldPersistTaps="always"
           ref={this.scrollView}
         >
-          <NuxLogo style={styles.logo} />
+          <NuxLogo />
           <Text style={[fontStyles.h1, styles.center]} testID="InviteWallTitle">
             {' '}
             {t('welcomeCelo')}
@@ -216,7 +216,7 @@ export class JoinCelo extends React.Component<Props, State> {
             setIsValidNumber={this.setIsValidNumber}
             onInputFocus={this.scrollToEnd}
             onInputChange={this.onChangePhoneInput}
-            inputCountryPlaceholder={t('chooseCountryCode')}
+            inputCountryPlaceholder={t('chooseCountry')}
             inputPhonePlaceholder={t('phoneNumber')}
             callingCode={true}
             lng={language}
@@ -247,12 +247,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: colors.background,
   },
-  logo: {
-    marginTop: 0,
-  },
   scrollContainer: {
-    paddingHorizontal: 10,
-    paddingBottom: 10,
+    padding: 20,
+    paddingTop: 0,
   },
   box: {
     alignItems: 'center',

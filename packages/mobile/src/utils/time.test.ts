@@ -1,5 +1,8 @@
 import i18n from 'src/i18n'
-import { formatFeedDate, formatFeedTime } from 'src/utils/time'
+import { formatFeedDate, formatFeedTime, timeDeltaInDays } from 'src/utils/time'
+
+const ONE_HOUR_MS = 60 * 60 * 1000
+const ONE_DAY_MS = 24 * ONE_HOUR_MS
 
 describe('utils/time', () => {
   let dateNowSpy: any
@@ -30,6 +33,11 @@ describe('utils/time', () => {
     })
     it('works when number is in seconds', () => {
       expect(formatFeedDate(wedMarch132019at350pacific / 1000, i18n)).toEqual('Mar 13')
+    })
+  })
+  describe('timeDeltaInDays', () => {
+    it('returns correct time delta', () => {
+      expect(timeDeltaInDays(new Date().getTime(), new Date().getTime() - ONE_DAY_MS)).toEqual(1)
     })
   })
 })

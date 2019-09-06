@@ -105,7 +105,7 @@ The `mine` flag does not mean the node starts mining blocks, but rather starts t
 
 The `networkid` parameter value of `44782` indicates we are connecting the Alfajores Testnet.
 
-## Set up deposits
+## Obtain and lock up some Celo Gold for staking
 
 Visit the [Alfajores Faucet](https://celo.org/build/faucet) to send **both** of your accounts some funds.
 
@@ -116,18 +116,18 @@ $ celocli account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS --password <YOU
 $ celocli account:unlock --account $CELO_VALIDATOR_ADDRESS --password <YOUR_SECOND_PASSWORD>
 ```
 
-In a new tab, make a bonded deposits account for both of your addresses by running the Celo CLI. This will allow you to stake Celo Gold, which is required to register a validator and validator groups:
+In a new tab, make a locked Gold account for both of your addresses by running the Celo CLI. This will allow you to stake Celo Gold, which is required to register a validator and validator groups:
 
 ```
-$ celocli bonds:register --from $CELO_VALIDATOR_GROUP_ADDRESS
-$ celocli bonds:register --from $CELO_VALIDATOR_ADDRESS
+$ celocli lockedgold:register --from $CELO_VALIDATOR_GROUP_ADDRESS
+$ celocli lockedgold:register --from $CELO_VALIDATOR_ADDRESS
 ```
 
-Make a bonded deposit for both accounts in order to secure the right to register a validator and validator group. The current requirement is 1 Celo Gold with a notice period of 60 days. If you choose to stake more gold, or a longer notice period, be sure to use those values below:
+Make a locked Gold commitment for both accounts in order to secure the right to register a validator and validator group. The current requirement is 1 Celo Gold with a notice period of 60 days. If you choose to stake more gold, or a longer notice period, be sure to use those values below:
 
 ```
-$ celocli bonds:deposit --from $CELO_VALIDATOR_GROUP_ADDRESS --goldAmount 1000000000000000000 --noticePeriod 5184000
-$ celocli bonds:deposit --from $CELO_VALIDATOR_ADDRESS --goldAmount 1000000000000000000 --noticePeriod 5184000
+$ celocli lockedgold:deposit --from $CELO_VALIDATOR_GROUP_ADDRESS --goldAmount 1000000000000000000 --noticePeriod 5184000
+$ celocli lockedgold:deposit --from $CELO_VALIDATOR_ADDRESS --goldAmount 1000000000000000000 --noticePeriod 5184000
 ```
 
 ## Run for election

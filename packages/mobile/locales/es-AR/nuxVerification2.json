@@ -46,7 +46,7 @@
   "copyPaste": "Copiar y Pegar ",
   "entireSmsMessage": "Mensaje completo desde tu SMS",
   "pasteCode": "Pegar código de verificación {{codeNumber}}",
-  "startingVerification": "Verificando tu número de teléfono",
+  "startingVerification": "Verificando su número de teléfono",
   "nextCode": "Recibiendo el Siguiente Código",
   "verificationComplete": "Verificación completa",
   "leaveOpen": "Por favor dejá la aplicación abierta",
