@@ -1,5 +1,5 @@
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
-import QRCodeIcon from '@celo/react-components/icons/QRCode'
+import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
 import SettingsIcon from '@celo/react-components/icons/Settings'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
@@ -228,7 +228,7 @@ export class WalletHome extends React.Component<Props> {
           )}
           <View style={styles.headerRight}>
             <HeaderButton style={styles.headerButton} onPress={this.onPressQrCode}>
-              <QRCodeIcon height={HEADER_ICON_SIZE} color={colors.celoGreen} />
+              <QRCodeBorderlessIcon height={HEADER_ICON_SIZE} color={colors.celoGreen} />
             </HeaderButton>
             <HeaderButton style={styles.headerButton} onPress={this.onPressSettings}>
               <SettingsIcon height={HEADER_ICON_SIZE} color={colors.celoGreen} />
