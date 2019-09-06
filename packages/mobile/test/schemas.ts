@@ -124,6 +124,11 @@ const v0Schema = {
       highestBlock: 0,
     },
   },
+  localCurrency: {
+    isLoading: false,
+    symbol: 'MXN',
+    exchangeRate: 1.33,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
