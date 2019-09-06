@@ -3,7 +3,6 @@ import dotenv from 'dotenv'
 // Load environment variables from .env file
 dotenv.config()
 
-// TODO(kamyar): import from /packages/mobile/src/geth/currencies.ts
 export const CONTRACT_SYMBOL_MAPPING: { [key: string]: string } = {
   // GOLD_CONTRACT_ADDRESS
   [(process.env.CELO_GOLD_ADDRESS as string).toLowerCase()]: 'Celo Gold',
