@@ -31,6 +31,12 @@ export enum CustomEventNames {
   send_invite = 'send_invite',
   edit_send_invite = 'edit_send_invite',
 
+  // Send events, separate from button tracking above
+  send_dollar_transaction = 'send_dollar_transaction',
+  send_dollar_transaction_confirmed = 'send_dollar_transaction_confirmed',
+
+  fetch_balance = 'fetch_balance',
+
   // Verification event and sub-events
   verification = 'verification',
   verification_setup = 'verification_setup',
