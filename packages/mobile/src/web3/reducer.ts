@@ -1,11 +1,10 @@
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
-import { Actions, ActionTypes, UpdateWeb3SyncProgressAction } from 'src/web3/actions'
+import { Actions, ActionTypes } from 'src/web3/actions'
 
 export interface State {
-  syncProgress: number
-  syncProgressData: {
+  syncProgress: {
+    startingBlock: number
     currentBlock: number
-    startBlock: number
     highestBlock: number
   }
   latestBlockNumber: number
@@ -14,24 +13,14 @@ export interface State {
 }
 
 const initialState: State = {
-  syncProgress: 0,
-  syncProgressData: {
+  syncProgress: {
+    startingBlock: 0,
     currentBlock: 0,
     highestBlock: 0,
-    startBlock: 0,
   },
   latestBlockNumber: 0,
   account: null,
   commentKey: null,
-}
-
-function calculateSyncProgress(action: UpdateWeb3SyncProgressAction) {
-  if (action.payload.currentBlock === 0) {
-    return 0
-  }
-  const numerator = action.payload.currentBlock - action.payload.startingBlock
-  const denominator = action.payload.highestBlock - action.payload.startingBlock
-  return (100 * numerator) / denominator
 }
 
 export const reducer = (
@@ -44,11 +33,10 @@ export const reducer = (
       return {
         ...state,
         ...getRehydratePayload(action, 'web3'),
-        syncProgress: 0,
-        syncProgressData: {
+        syncProgress: {
+          startingBlock: 0,
           currentBlock: 0,
           highestBlock: 0,
-          startBlock: 0,
         },
         latestBlockNumber: 0,
       }
@@ -63,11 +51,6 @@ export const reducer = (
         ...state,
         commentKey: action.commentKey,
       }
-    case Actions.SET_PROGRESS:
-      return {
-        ...state,
-        syncProgress: action.payload.syncProgress,
-      }
     case Actions.SET_BLOCK_NUMBER:
       return {
         ...state,
@@ -76,7 +59,7 @@ export const reducer = (
     case Actions.UPDATE_WEB3_SYNC_PROGRESS:
       return {
         ...state,
-        syncProgress: calculateSyncProgress(action),
+        syncProgress: action.payload,
       }
 
     default:

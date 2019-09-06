@@ -211,7 +211,7 @@ export async function importPrivateKey(gethBinaryPath: string, instance: GethIns
 
 export async function killGeth() {
   console.info(`Killing ALL geth instances`)
-  await execCmd('pkill', ['-9', 'geth'], { silent: true })
+  await execCmd('pkill', ['-SIGINT', 'geth'], { silent: true })
 }
 
 export async function killInstance(instance: GethInstanceConfig) {

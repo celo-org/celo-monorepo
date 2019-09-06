@@ -15,7 +15,7 @@ import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identi
 import { headerWithBackButton } from 'src/navigator/Headers'
 import PaymentRequestBalance from 'src/paymentRequest/PaymentRequestBalance'
 import PaymentRequestListEmpty from 'src/paymentRequest/PaymentRequestListEmpty'
-import PaymentRequestNotification from 'src/paymentRequest/PaymentRequestNotification'
+import PaymentRequestListItem from 'src/paymentRequest/PaymentRequestListItem'
 import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
@@ -57,7 +57,7 @@ export class PaymentRequestListScreen extends React.Component<Props> {
 
     return (
       <View key={key}>
-        <PaymentRequestNotification
+        <PaymentRequestListItem
           id={request.uid || ''}
           amount={request.amount}
           updatePaymentRequestStatus={this.props.updatePaymentRequestStatus}
