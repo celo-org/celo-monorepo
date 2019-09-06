@@ -111,11 +111,11 @@ const styles = StyleSheet.create({
   video: {
     objectFit: 'cover',
     height: '100%',
-    filter: 'blur(3px) brightness(0.75)',
+    filter: 'saturate(0.6) brightness(0.75)',
     transitionProperty: 'filter',
     transitionDuration: '400ms',
   },
   videoHover: {
-    filter: 'blur(0) brightness(0.9)',
+    filter: 'saturate(1) brightness(0.9)',
   },
 })
