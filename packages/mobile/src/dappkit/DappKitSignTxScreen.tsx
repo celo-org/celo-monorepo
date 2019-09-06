@@ -83,7 +83,9 @@ class DappKitSignTxScreen extends React.Component<Props, State> {
           <View style={styles.logo}>
             <DappkitExchangeIcon />
           </View>
-          <Text style={styles.header}>{t('connectToWallet')}</Text>
+          <Text style={styles.header}>
+            {t('connectToWallet', { dappname: this.state.request.dappName })}
+          </Text>
 
           <Text style={styles.share}> {t('shareInfo')} </Text>
 
