@@ -362,6 +362,7 @@ function attestationCodeReceiver(
 
       Logger.debug(TAG + '@attestationCodeReceiver', `Received code for issuer ${issuer}`)
 
+      CeloAnalytics.track(CustomEventNames.verification_validate_code_start, { issuer })
       const isValidRequest = yield call(
         validateAttestationCode,
         attestationsContract,
@@ -370,6 +371,8 @@ function attestationCodeReceiver(
         issuer,
         code
       )
+      CeloAnalytics.track(CustomEventNames.verification_validate_code_finish, { issuer })
+
       if (isValidRequest === NULL_ADDRESS) {
         throw new Error('Code is not valid')
       }

@@ -58,6 +58,8 @@ export enum CustomEventNames {
 
   verification_actionable_attestation_start = 'verification_actionable_attestation_start',
   verification_actionable_attestation_finish = 'verification_actionable_attestation_finish',
+  verification_validate_code_start = 'verification_validate_code_start',
+  verification_validate_code_finish = 'verification_validate_code_finish',
 
   redeem_invite_success = 'redeem_invite_success',
   redeem_invite_timed_out = 'redeem_invite_timed_out',
