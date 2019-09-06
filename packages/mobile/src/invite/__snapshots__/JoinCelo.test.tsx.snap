@@ -39,8 +39,8 @@ exports[`JoinCeloScreen renders correctly 1`] = `
   <RCTScrollView
     contentContainerStyle={
       Object {
-        "paddingBottom": 10,
-        "paddingHorizontal": 10,
+        "padding": 20,
+        "paddingTop": 0,
       }
     }
     keyboardShouldPersistTaps="always"
@@ -51,12 +51,9 @@ exports[`JoinCeloScreen renders correctly 1`] = `
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
-            Object {
-              "marginTop": 0,
-            },
+            Object {},
           ]
         }
       >
@@ -69,8 +66,8 @@ exports[`JoinCeloScreen renders correctly 1`] = `
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -566,8 +563,8 @@ exports[`JoinCeloScreen renders with an error 1`] = `
   <RCTScrollView
     contentContainerStyle={
       Object {
-        "paddingBottom": 10,
-        "paddingHorizontal": 10,
+        "padding": 20,
+        "paddingTop": 0,
       }
     }
     keyboardShouldPersistTaps="always"
@@ -578,12 +575,9 @@ exports[`JoinCeloScreen renders with an error 1`] = `
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
-            Object {
-              "marginTop": 0,
-            },
+            Object {},
           ]
         }
       >
@@ -596,8 +590,8 @@ exports[`JoinCeloScreen renders with an error 1`] = `
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />

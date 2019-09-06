@@ -43,10 +43,8 @@
     },
     "inviteAccepted": "🎉 Invitación aceptada!",
     "askForInvite": {
-      "0": "¿No tienes un código? ",
-      "1":
-        "Solicita una invitación a alguien con la Celo Wallet o regístrate para obtener una cuenta de testnet en",
-      "2": "celo.org/build/wallet"
+      "0": "Solicite una invitación de alguien con Celo Wallet o regístrese en Testnet en ",
+      "1": "celo.org/build/wallet"
     }
   },
   "enterFullName": "Ingrese su nombre y apellido",
@@ -76,13 +74,15 @@
     "submit": "Enviar"
   },
   "systemAuth": {
-    "title": "Configura la seguridad Celo",
+    "title": "Asegure su Teléfono",
     "secure":
       "Agregar un PIN a tu teléfono ayuda a que tus fondos en Celo se mantengan seguros y protegidos.",
     "intro":
       "Necesitaremos que ingreses el código de bloqueo de pantalla de tu dispositivo o tu huella, si el mismo lo soporta.",
     "why":
-      "Necesitamos este nivel de protección adicional para asegurar que el contenido de tu monedero se encuentra a salvo."
+      "Necesitamos este nivel de protección adicional para asegurar que el contenido de tu monedero se encuentra a salvo.",
+    "summary":
+      "Celo requiere que los teléfonos estén protegidos con un PIN o huella digital. El bloqueo de su dispositivo ayuda a garantizar que los fondos en su billetera estén protegidos."
   },
   "goToSystemSecuritySettingsActionLabel": "Vaya a seguridad",
   "enableSystemScreenLockFailedMessage": "Error al intentar habilitar el bloqueo de pantalla",
@@ -92,9 +92,9 @@
     "Por favor habilitá el bloqueo de pantalla para usar Celo. Si deshabilitás el bloqueo de pantalla en el futuro, vas a necesitar tu clave de respaldo para acceder a tu cuenta",
   "importContactsPermission": {
     "title": "Importar contactos",
-    "0": "Celo es mejor con los demás.",
-    "1":
-      "Importar tus contactos te permite enviar y solicitar pagos fácilmente a tu comunidad y ver quién ya está usando Celo",
+    "0":
+      "Conectar su libreta de direcciones facilita el envío y la solicitud de pagos con sus amigos. De lo contrario, deberá ingresar su información individualmente.",
+    "1": "No se preocupe: la conexión no envía invitaciones a sus contactos.",
     "enable": "Habilitar acceso a contactos",
     "loading": "Encontrar amigos en Celo..."
   },
