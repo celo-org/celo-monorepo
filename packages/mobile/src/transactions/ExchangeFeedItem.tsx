@@ -8,10 +8,8 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { HomeExchangeFragment } from 'src/apollo/types'
-import { LOCAL_CURRENCY_SYMBOL } from 'src/config'
 import { CURRENCIES, CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
-import useLocalAmount from 'src/localCurrency/useLocalAmount'
 import { navigateToExchangeReview } from 'src/transactions/actions'
 import { ExchangeStandby, TransactionStatus } from 'src/transactions/reducer'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
@@ -42,7 +40,6 @@ export function ExchangeFeedItem(props: Props) {
   const inCurrency = resolveCurrency(inSymbol)
   const outCurrency = resolveCurrency(outSymbol)
   const dollarAmount = inCurrency === CURRENCY_ENUM.DOLLAR ? inValue : outValue
-  const localAmount = useLocalAmount(dollarAmount)
   const dollarDirection = inCurrency === CURRENCY_ENUM.DOLLAR ? '-' : ''
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
@@ -128,15 +125,6 @@ export function ExchangeFeedItem(props: Props) {
                 {' ' + timeFormatted}
               </Text>
             )}
-            {LOCAL_CURRENCY_SYMBOL &&
-              localAmount && (
-                <Text style={[fontStyles.bodySmall, styles.localAmount]}>
-                  {t('localCurrencyValue', {
-                    localValue: `${dollarDirection}${getMoneyDisplayValue(localAmount)}`,
-                    localCurrencySymbol: LOCAL_CURRENCY_SYMBOL,
-                  })}
-                </Text>
-              )}
           </View>
         </View>
       </View>
