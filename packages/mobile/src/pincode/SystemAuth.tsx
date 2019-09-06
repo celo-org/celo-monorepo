@@ -69,18 +69,15 @@ class SystemAuth extends React.Component<Props> {
   render() {
     const { t } = this.props
     return (
-      <View style={style.pincodeContainer}>
+      <View style={style.container}>
         <DevSkipButton nextScreen={Screens.EnterInviteCode} />
-        <ScrollView>
-          <View style={style.header} />
+        <ScrollView contentContainerStyle={style.scrollContainer}>
           <View>
             <BackupIcon style={style.pincodeLogo} />
             <Text style={[fontStyles.h1, style.h1]} testID="SystemAuthTitle">
               {t('systemAuth.title')}
             </Text>
-            <Text style={[fontStyles.bodySmall, style.explanation]}>{t('systemAuth.secure')}</Text>
-            <Text style={[fontStyles.bodySmall, style.explanation]}>{t('systemAuth.intro')}</Text>
-            <Text style={[fontStyles.bodySmall, style.explanation]}>{t('systemAuth.why')}</Text>
+            <Text style={[fontStyles.h2, style.explanation]}>{t('systemAuth.summary')}</Text>
           </View>
         </ScrollView>
         <View style={style.pincodeFooter}>
@@ -99,18 +96,25 @@ class SystemAuth extends React.Component<Props> {
 }
 
 const style = StyleSheet.create({
-  pincodeContainer: {
+  container: {
     flex: 1,
     backgroundColor: 'white',
     justifyContent: 'space-between',
+  },
+  scrollContainer: {
+    flex: 1,
+    padding: 20,
+    paddingTop: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   pincodeLogo: {
     alignSelf: 'center',
   },
   explanation: {
+    textAlign: 'center',
     paddingHorizontal: 10,
     marginVertical: 10,
-    fontWeight: '300',
   },
   pincodeFooter: {
     flexDirection: 'column',
@@ -125,10 +129,6 @@ const style = StyleSheet.create({
   h1: {
     textAlign: 'center',
     padding: 25,
-  },
-  header: {
-    paddingTop: 10,
-    flexDirection: 'row',
   },
 })
 
