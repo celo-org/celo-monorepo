@@ -196,6 +196,7 @@ export const PROPERTY_PATH_WHITELIST = [
   'goldPendingBalance',
   'inviteCode',
   'isCorrect',
+  'issuer',
   'label',
   'language',
   'makerAmount',
