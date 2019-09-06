@@ -41,7 +41,8 @@ const languageDetector = {
 const currencyInterpolator = (text: string, value: any) => {
   const key = value[1]
   const translations = currencyTranslations[i18n.language]
-  if (key in translations) {
+
+  if (translations && key in translations) {
     return translations[key]
   } else {
     Logger.warn(
