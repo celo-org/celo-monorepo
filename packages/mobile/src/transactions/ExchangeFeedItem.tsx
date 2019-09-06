@@ -8,7 +8,7 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { HomeExchangeFragment } from 'src/apollo/types'
-import { CURRENCIES, CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
+import { CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { navigateToExchangeReview } from 'src/transactions/actions'
 import { ExchangeStandby, TransactionStatus } from 'src/transactions/reducer'
@@ -94,14 +94,12 @@ export function ExchangeFeedItem(props: Props) {
           </View>
           <View style={styles.exchangeContainer}>
             <Text style={[fontStyles.activityCurrency, inStyle]}>
-              {CURRENCIES[inCurrency].symbol}
               {getMoneyDisplayValue(inValue)}
             </Text>
             <View style={styles.arrow}>
               <ExchangeArrow />
             </View>
             <Text style={[fontStyles.activityCurrency, outStyle]}>
-              {CURRENCIES[outCurrency].symbol}
               {getMoneyDisplayValue(outValue)}
             </Text>
           </View>
