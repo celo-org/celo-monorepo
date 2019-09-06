@@ -5,13 +5,13 @@ import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { ESCROW_PAYMENT_EXPIRY_SECONDS } from 'src/config'
 import {
   Actions,
   EscrowedPayment,
   EscrowFetchSentPaymentsAction,
   EscrowReclaimPaymentAction,
   EscrowTransferPaymentAction,
-  EXPIRY_SECONDS,
   fetchSentEscrowPayments,
   reclaimEscrowPaymentFailure,
   reclaimEscrowPaymentSuccess,
@@ -64,7 +64,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
       phoneHash,
       stableToken.options.address,
       convertedAmount,
-      EXPIRY_SECONDS,
+      ESCROW_PAYMENT_EXPIRY_SECONDS,
       tempWalletAddress,
       NUM_ATTESTATIONS_REQUIRED
     )
@@ -224,6 +224,12 @@ function* doFetchSentPayments({ forceRefresh }: EscrowFetchSentPaymentsAction) {
     const existingPaymentsIds = new Set(existingPayments.map((p) => p.paymentID))
 
     const sentPaymentIDs: string[] = yield call(escrow.methods.getSentPaymentIds(account).call) // Note: payment ids are currently temp wallet addresses
+    if (!sentPaymentIDs || !sentPaymentIDs.length) {
+      Logger.debug(TAG + '@doFetchSentPayments', 'No payments ids found, clearing stored payments')
+      yield put(storeSentEscrowPayments([]))
+      return
+    }
+
     const paymentIdsToFetch = forceRefresh
       ? sentPaymentIDs
       : sentPaymentIDs.filter((id) => !existingPaymentsIds.has(id.toLowerCase()))

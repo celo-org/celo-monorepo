@@ -52,3 +52,7 @@ export const FIREBASE_WEB_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 
 export const SENTRY_URL = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SENTRY_URL')
 
 export const PROMOTE_REWARDS_APP = false
+
+// The number of seconds before the sender can reclaim the payment.
+// export const ESCROW_PAYMENT_EXPIRY_SECONDS = 432000 // 5 days
+export const ESCROW_PAYMENT_EXPIRY_SECONDS = 60 // 5 days
