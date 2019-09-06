@@ -45,6 +45,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 
 const SCREEN_WIDTH = variables.width
 const HEADER_ICON_SIZE = 24
+const HEADER_BUTTON_MARGIN = 12
 
 interface StateProps {
   loading: boolean
@@ -215,7 +216,7 @@ export class WalletHome extends React.Component<Props> {
             <View style={styles.shadowPlaceholder} />
           </BoxShadow>
         </Animated.View>
-        <View style={[componentStyles.topBar, styles.head]}>
+        <View style={[componentStyles.topBar, styles.header]}>
           {this.props.appConnected ? (
             <Animated.Text style={[fontStyles.headerTitle, { opacity: this.headerOpacity }]}>
               {t('wallet')}
@@ -225,11 +226,11 @@ export class WalletHome extends React.Component<Props> {
               <DisconnectBanner />
             </View>
           )}
-          <View style={styles.headRight}>
-            <HeaderButton style={styles.settingsButton} onPress={this.onPressQrCode}>
+          <View style={styles.headerRight}>
+            <HeaderButton style={styles.headerButton} onPress={this.onPressQrCode}>
               <QRCodeIcon height={HEADER_ICON_SIZE} color={colors.celoGreen} />
             </HeaderButton>
-            <HeaderButton style={styles.settingsButton} onPress={this.onPressSettings}>
+            <HeaderButton style={styles.headerButton} onPress={this.onPressSettings}>
               <SettingsIcon height={HEADER_ICON_SIZE} color={colors.celoGreen} />
             </HeaderButton>
           </View>
@@ -261,22 +262,24 @@ const styles = StyleSheet.create({
   containerFeed: {
     paddingBottom: 40,
   },
-  head: {
+  header: {
     backgroundColor: colors.background,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 2,
   },
-  headRight: {
-    flexDirection: 'row',
+  headerRight: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    top: 0,
+    right: variables.contentPadding - HEADER_BUTTON_MARGIN,
+    bottom: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  settingsButton: {
+  headerButton: {
     justifyContent: 'flex-end',
-    margin: 5,
+    margin: HEADER_BUTTON_MARGIN,
   },
   shadowContainer: {
     height: TOP_BAR_HEIGHT,
