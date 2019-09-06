@@ -9,7 +9,7 @@ import { H2 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import MediumLogo from 'src/icons/MediumLogo'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Button, { BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems, { hashNav } from 'src/shared/menu-items'
 import { colors, standardStyles } from 'src/styles'
 
@@ -42,6 +42,7 @@ class ArticlesSection extends React.PureComponent<Props> {
             <Button
               text={t('readMoreFromOurBlog')}
               kind={BTN.DARKNAKED}
+              size={SIZE.normal}
               href={menuItems.MEDIUM.link}
               target={'_blog'}
               iconRight={<MediumLogo height={16} color={colors.dark} wrapWithLink={false} />}
