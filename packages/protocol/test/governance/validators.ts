@@ -89,7 +89,7 @@ contract('Validators', (accounts: string[]) => {
       url,
       // @ts-ignore bytes type
       publicKeysData,
-      registrationRequirement.noticePeriod,
+      [registrationRequirement.noticePeriod],
       { from: validator }
     )
   }
@@ -104,7 +104,7 @@ contract('Validators', (accounts: string[]) => {
       identifier,
       name,
       url,
-      registrationRequirement.noticePeriod,
+      [registrationRequirement.noticePeriod],
       { from: group }
     )
   }
@@ -155,7 +155,7 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#setMinElectableValidators', () => {
     const newMinElectableValidators = minElectableValidators.plus(1)
-    it('should set the minimum deposit', async () => {
+    it('should set minElectableValidators', async () => {
       await validators.setMinElectableValidators(newMinElectableValidators)
       assertEqualBN(await validators.minElectableValidators(), newMinElectableValidators)
     })
@@ -193,7 +193,7 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#setMaxElectableValidators', () => {
     const newMaxElectableValidators = maxElectableValidators.plus(1)
-    it('should set the minimum deposit', async () => {
+    it('should set maxElectableValidators', async () => {
       await validators.setMaxElectableValidators(newMaxElectableValidators)
       assertEqualBN(await validators.maxElectableValidators(), newMaxElectableValidators)
     })
@@ -282,7 +282,7 @@ contract('Validators', (accounts: string[]) => {
         url,
         // @ts-ignore bytes type
         publicKeysData,
-        registrationRequirement.noticePeriod
+        [registrationRequirement.noticePeriod]
       )
       assert.isTrue(await validators.isValidator(validator))
     })
@@ -294,7 +294,7 @@ contract('Validators', (accounts: string[]) => {
         url,
         // @ts-ignore bytes type
         publicKeysData,
-        registrationRequirement.noticePeriod
+        [registrationRequirement.noticePeriod]
       )
       assert.deepEqual(await validators.getRegisteredValidators(), [validator])
     })
@@ -306,7 +306,7 @@ contract('Validators', (accounts: string[]) => {
         url,
         // @ts-ignore bytes type
         publicKeysData,
-        registrationRequirement.noticePeriod
+        [registrationRequirement.noticePeriod]
       )
       const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
       assert.equal(parsedValidator.identifier, identifier)
@@ -322,7 +322,7 @@ contract('Validators', (accounts: string[]) => {
         url,
         // @ts-ignore bytes type
         publicKeysData,
-        registrationRequirement.noticePeriod
+        [registrationRequirement.noticePeriod]
       )
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
@@ -338,6 +338,79 @@ contract('Validators', (accounts: string[]) => {
       })
     })
 
+    describe('when multiple commitment notice periods are provided', () => {
+      it('should accept a sufficient combination of commitments as stake', async () => {
+        // create registrationRequirement.value different locked commitments each
+        // with value 1 and unique noticePeriods greater than registrationRequirement.noticePeriod
+        const commitmentCount = registrationRequirement.value
+        const noticePeriods = []
+        for (let i = 1; i <= commitmentCount.toNumber(); i++) {
+          const noticePeriod = registrationRequirement.noticePeriod.plus(i)
+          noticePeriods.push(noticePeriod)
+          await mockLockedGold.setLockedCommitment(validator, noticePeriod, 1)
+        }
+
+        await validators.registerValidator(
+          identifier,
+          name,
+          url,
+          // @ts-ignore bytes type
+          publicKeysData,
+          noticePeriods
+        )
+        assert.deepEqual(await validators.getRegisteredValidators(), [validator])
+      })
+
+      it('should revert when the combined commitment value is insufficient with all valid notice periods', async () => {
+        // create registrationRequirement.value - 1 different locked commitments each
+        // with value 1 and valid noticePeriods
+        const commitmentCount = registrationRequirement.value.minus(1)
+        const noticePeriods = []
+        for (let i = 1; i <= commitmentCount.toNumber(); i++) {
+          const noticePeriod = registrationRequirement.noticePeriod.plus(i)
+          noticePeriods.push(noticePeriod)
+          await mockLockedGold.setLockedCommitment(validator, noticePeriod, 1)
+        }
+
+        await assertRevert(
+          validators.registerValidator(
+            identifier,
+            name,
+            url,
+            // @ts-ignore bytes type
+            publicKeysData,
+            noticePeriods
+          )
+        )
+      })
+
+      it('should revert when the combined commitment value of valid notice periods is insufficient', async () => {
+        // create registrationRequirement.value different locked commitments each
+        // with value 1, but with one noticePeriod that is less than
+        // registrationRequirement.noticePeriod
+        const commitmentCount = registrationRequirement.value.minus(1)
+        const invalidNoticePeriod = registrationRequirement.noticePeriod.minus(1)
+        const noticePeriods = [invalidNoticePeriod]
+        await mockLockedGold.setLockedCommitment(validator, invalidNoticePeriod, 1)
+        for (let i = 1; i < commitmentCount.toNumber(); i++) {
+          const noticePeriod = registrationRequirement.noticePeriod.plus(i)
+          noticePeriods.push(noticePeriod)
+          await mockLockedGold.setLockedCommitment(validator, noticePeriod, 1)
+        }
+
+        await assertRevert(
+          validators.registerValidator(
+            identifier,
+            name,
+            url,
+            // @ts-ignore bytes type
+            publicKeysData,
+            noticePeriods
+          )
+        )
+      })
+    })
+
     describe('when the account is already a registered validator', () => {
       beforeEach(async () => {
         await validators.registerValidator(
@@ -346,7 +419,7 @@ contract('Validators', (accounts: string[]) => {
           url,
           // @ts-ignore bytes type
           publicKeysData,
-          registrationRequirement.noticePeriod
+          [registrationRequirement.noticePeriod]
         )
       })
 
@@ -358,7 +431,7 @@ contract('Validators', (accounts: string[]) => {
             url,
             // @ts-ignore bytes type
             publicKeysData,
-            registrationRequirement.noticePeriod
+            [registrationRequirement.noticePeriod]
           )
         )
       })
@@ -366,12 +439,9 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the account is already a registered validator group', () => {
       beforeEach(async () => {
-        await validators.registerValidatorGroup(
-          identifier,
-          name,
-          url,
-          registrationRequirement.noticePeriod
-        )
+        await validators.registerValidatorGroup(identifier, name, url, [
+          registrationRequirement.noticePeriod,
+        ])
       })
 
       it('should revert', async () => {
@@ -382,7 +452,7 @@ contract('Validators', (accounts: string[]) => {
             url,
             // @ts-ignore bytes type
             publicKeysData,
-            registrationRequirement.noticePeriod
+            [registrationRequirement.noticePeriod]
           )
         )
       })
@@ -405,7 +475,7 @@ contract('Validators', (accounts: string[]) => {
             url,
             // @ts-ignore bytes type
             publicKeysData,
-            registrationRequirement.noticePeriod
+            [registrationRequirement.noticePeriod]
           )
         )
       })
@@ -758,32 +828,23 @@ contract('Validators', (accounts: string[]) => {
     })
 
     it('should mark the account as a validator group', async () => {
-      await validators.registerValidatorGroup(
-        identifier,
-        name,
-        url,
-        registrationRequirement.noticePeriod
-      )
+      await validators.registerValidatorGroup(identifier, name, url, [
+        registrationRequirement.noticePeriod,
+      ])
       assert.isTrue(await validators.isValidatorGroup(group))
     })
 
     it('should add the account to the list of validator groups', async () => {
-      await validators.registerValidatorGroup(
-        identifier,
-        name,
-        url,
-        registrationRequirement.noticePeriod
-      )
+      await validators.registerValidatorGroup(identifier, name, url, [
+        registrationRequirement.noticePeriod,
+      ])
       assert.deepEqual(await validators.getRegisteredValidatorGroups(), [group])
     })
 
     it('should set the validator group identifier, name, and url', async () => {
-      await validators.registerValidatorGroup(
-        identifier,
-        name,
-        url,
-        registrationRequirement.noticePeriod
-      )
+      await validators.registerValidatorGroup(identifier, name, url, [
+        registrationRequirement.noticePeriod,
+      ])
       const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
       assert.equal(parsedGroup.identifier, identifier)
       assert.equal(parsedGroup.name, name)
@@ -791,12 +852,9 @@ contract('Validators', (accounts: string[]) => {
     })
 
     it('should emit the ValidatorGroupRegistered event', async () => {
-      const resp = await validators.registerValidatorGroup(
-        identifier,
-        name,
-        url,
-        registrationRequirement.noticePeriod
-      )
+      const resp = await validators.registerValidatorGroup(identifier, name, url, [
+        registrationRequirement.noticePeriod,
+      ])
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertContainSubset(log, {
@@ -817,34 +875,25 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(
-          validators.registerValidatorGroup(
-            identifier,
-            name,
-            url,
-            registrationRequirement.noticePeriod
-          )
+          validators.registerValidatorGroup(identifier, name, url, [
+            registrationRequirement.noticePeriod,
+          ])
         )
       })
     })
 
     describe('when the account is already a registered validator group', () => {
       beforeEach(async () => {
-        await validators.registerValidatorGroup(
-          identifier,
-          name,
-          url,
-          registrationRequirement.noticePeriod
-        )
+        await validators.registerValidatorGroup(identifier, name, url, [
+          registrationRequirement.noticePeriod,
+        ])
       })
 
       it('should revert', async () => {
         await assertRevert(
-          validators.registerValidatorGroup(
-            identifier,
-            name,
-            url,
-            registrationRequirement.noticePeriod
-          )
+          validators.registerValidatorGroup(identifier, name, url, [
+            registrationRequirement.noticePeriod,
+          ])
         )
       })
     })
@@ -860,12 +909,9 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(
-          validators.registerValidatorGroup(
-            identifier,
-            name,
-            url,
-            registrationRequirement.noticePeriod
-          )
+          validators.registerValidatorGroup(identifier, name, url, [
+            registrationRequirement.noticePeriod,
+          ])
         )
       })
     })

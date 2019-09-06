@@ -25,8 +25,7 @@ exports[`Backup renders correctly if backup completed 1`] = `
         Array [
           Object {
             "alignItems": "center",
-            "marginBottom": 25,
-            "marginTop": 25,
+            "marginBottom": 20,
           },
           Object {},
         ]
@@ -41,8 +40,8 @@ exports[`Backup renders correctly if backup completed 1`] = `
         }
         style={
           Object {
-            "height": 50,
-            "width": 50,
+            "height": 35,
+            "width": 35,
           }
         }
       />
@@ -58,7 +57,7 @@ exports[`Backup renders correctly if backup completed 1`] = `
           },
           Object {
             "color": "#2E3338",
-            "paddingTop": 35,
+            "paddingTop": 25,
           },
         ]
       }
@@ -253,7 +252,7 @@ exports[`Backup renders correctly if backup not completed 1`] = `
   <View
     style={
       Object {
-        "height": 45,
+        "height": 56,
       }
     }
   >
