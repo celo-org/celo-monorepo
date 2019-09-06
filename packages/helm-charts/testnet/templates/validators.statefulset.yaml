@@ -150,7 +150,8 @@ spec:
             --istanbul.blockperiod={{ .Values.geth.blocktime }} \
             --maxpeers={{ mul 2 (add .Values.geth.validators .Values.geth.tx_nodes) }} \
             --nat=extip:`cat /root/.celo/ipAddress` \
-            --metrics
+            --metrics \
+            --ping-ip-from-packet
         env:
         - name: POD_IP
           valueFrom:
