@@ -60,7 +60,7 @@
   "localCurrencyEqual": "Igual a <2>{{localValue}} {{localCurrencySymbol}}</2>",
   "localCurrencyValue": "{{localValue}} {{localCurrencySymbol}}",
   "feedItemVerificationFeeTitle": "Celo",
-  "feedItemVerificationFeeInfo": "t('verificationFee')",
+  "feedItemVerificationFeeInfo": "$t(verificationFee)",
   "feedItemVerificationRewardTitle": "Celo",
   "feedItemVerificationRewardInfo": "Recompensa del Verificador",
   "feedItemFaucetTitle": "Celo",
@@ -68,9 +68,9 @@
   "feedItemFaucetInfo_missingTestnet": "Faucet",
   "feedItemInviteSentTitle": "Celo",
   "feedItemInviteSentInfo": "Invitado {{nameOrNumber}}",
-  "feedItemInviteSentInfo_missingInviteeDetails": "t('inviteFlow11:inviteSent')",
+  "feedItemInviteSentInfo_missingInviteeDetails": "$t(inviteFlow11:inviteSent)",
   "feedItemInviteReceivedTitle": "Celo",
-  "feedItemInviteReceivedInfo": "t('inviteFlow11:inviteReceived')",
+  "feedItemInviteReceivedInfo": "$t(inviteFlow11:inviteReceived)",
   "feedItemReceivedTitle_missingSenderDetails": "Pago Recibido de {{address}}",
   "feedItemSentTitle_missingReceiverDetails": "Pago Enviado a {{address}}"
 }
