@@ -8,10 +8,11 @@
   "types": "./lib/index.d.ts",
   "scripts": {
     "prepublishOnly": "yarn build",
-    "build": "tsc",
-    "lint": "tslint --project .",
-    "test": "yarn build && jest --ci --silent --coverage --runInBand",
-    "test:verbose": "yarn build && jest --ci --verbose --runInBand"
+    "build": "tsc -b .",
+    "clean": "tsc -b . --clean",
+    "test": "jest --runInBand",
+    "test:verbose": "jest --verbose --runInBand",
+    "lint": "tslint -c tslint.json --project ."
   },
   "files": ["lib/**/*"],
   "dependencies": {
