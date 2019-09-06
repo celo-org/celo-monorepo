@@ -58,7 +58,7 @@ exports[`Backup renders correctly if backup completed 1`] = `
           },
           Object {
             "color": "#2E3338",
-            "paddingTop": 35,
+            "paddingTop": 25,
           },
         ]
       }
