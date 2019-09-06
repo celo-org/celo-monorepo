@@ -54,5 +54,4 @@ export const SENTRY_URL = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SENTR
 export const PROMOTE_REWARDS_APP = false
 
 // The number of seconds before the sender can reclaim the payment.
-// export const ESCROW_PAYMENT_EXPIRY_SECONDS = 432000 // 5 days
-export const ESCROW_PAYMENT_EXPIRY_SECONDS = 60 // 5 days
+export const ESCROW_PAYMENT_EXPIRY_SECONDS = 172800 // 2 days
