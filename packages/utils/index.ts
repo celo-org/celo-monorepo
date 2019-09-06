@@ -1,8 +1,0 @@
-export { commentEncryption } from './src/commentEncryption'
-export * from './src/contacts'
-export * from './src/countries'
-export * from './src/currencies'
-export * from './src/dappkit'
-export { ECIES } from './src/ecies'
-export { PhoneNumberUtils } from './src/phoneNumbers'
-export { SignatureUtils } from './src/signatureUtils'
