@@ -34,14 +34,17 @@ class VideoCover extends React.Component<I18nProps, State> {
     return (
       <View style={[styles.cover]}>
         <View style={styles.background}>
-          <Video style={styles.video} muted={true} autoPlay={true} loop={true}>
+          <Video
+            style={[styles.video, this.state.hovering && styles.videoHover]}
+            muted={true}
+            autoPlay={true}
+            loop={true}
+          >
             <source src="/static/AboutPreview.mp4" type="video/mp4" />
             <Image resizeMode="cover" source={BeautifulMoneyPreview} style={standardStyles.image} />
           </Video>
         </View>
-        <View
-          style={[styles.overlay, standardStyles.centered, { backgroundColor: 'rgba(0,0,0,0.4)' }]}
-        >
+        <View style={[styles.overlay, standardStyles.centered]}>
           <Hoverable
             onHoverIn={this.onHoverStart}
             onHoverOut={this.onHoverEnd}
@@ -90,7 +93,7 @@ const styles = StyleSheet.create({
     transitionDuration: '500ms',
   },
   hover: {
-    transform: [{ scale: 1.01 }],
+    transform: [{ scale: 1.015 }],
   },
   background: {
     position: 'absolute',
@@ -108,5 +111,11 @@ const styles = StyleSheet.create({
   video: {
     objectFit: 'cover',
     height: '100%',
+    filter: 'blur(3px) brightness(0.75)',
+    transitionProperty: 'filter',
+    transitionDuration: '400ms',
+  },
+  videoHover: {
+    filter: 'blur(0) brightness(0.9)',
   },
 })
