@@ -135,7 +135,7 @@ export function TransferFeedItem(props: Props) {
   }
 
   const localValue = useLocalAmount(value)
-  let comment: string | null = decryptComment()
+  let info: string | null = decryptComment()
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
   const currencyStyle = getCurrencyStyles(resolveCurrency(symbol), type)
@@ -147,7 +147,7 @@ export function TransferFeedItem(props: Props) {
   if (type === TransactionTypes.VERIFICATION_FEE) {
     icon = <Image source={coinsIcon} style={styles.image} />
     title = t('feedItemVerificationFeeTitle')
-    comment = t('feedItemVerificationFeeInfo')
+    info = t('feedItemVerificationFeeInfo')
   } else if (type === TransactionTypes.VERIFICATION_REWARD) {
     icon = (
       <View style={styles.image}>
@@ -155,11 +155,11 @@ export function TransferFeedItem(props: Props) {
       </View>
     )
     title = t('feedItemVerificationRewardTitle')
-    comment = t('feedItemVerificationRewardInfo')
+    info = t('feedItemVerificationRewardInfo')
   } else if (type === TransactionTypes.FAUCET) {
     icon = <Image source={coinsIcon} style={styles.image} />
     title = t('feedItemFaucetTitle')
-    comment = t('feedItemFaucetInfo', {
+    info = t('feedItemFaucetInfo', {
       context: !DEFAULT_TESTNET ? 'missingTestnet' : null,
       faucet: DEFAULT_TESTNET ? _.startCase(DEFAULT_TESTNET) : null,
     })
@@ -168,14 +168,14 @@ export function TransferFeedItem(props: Props) {
     const inviteeE164Number = invitees[address]
     const inviteeRecipient = recipientCache[inviteeE164Number]
     title = t('feedItemInviteSentTitle')
-    comment = t('feedItemInviteSentInfo', {
+    info = t('feedItemInviteSentInfo', {
       context: !inviteeE164Number ? 'missingInviteeDetails' : null,
       nameOrNumber: inviteeRecipient ? inviteeRecipient.displayName : inviteeE164Number,
     })
   } else if (type === TransactionTypes.INVITE_RECEIVED) {
     icon = <Image source={coinsIcon} style={styles.image} />
     title = t('feedItemInviteReceivedTitle')
-    comment = t('feedItemInviteReceivedInfo')
+    info = t('feedItemInviteReceivedInfo')
   } else {
     const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
     const shortAddr = address.substring(0, 8)
@@ -216,8 +216,8 @@ export function TransferFeedItem(props: Props) {
               {getMoneyDisplayValue(props.value)}
             </Text>
           </View>
-          {!!comment && <Text style={[fontStyles.comment, styles.textComment]}>{comment}</Text>}
-          <View style={[styles.statusContainer, !!comment && styles.statusContainerUnderComment]}>
+          {!!info && <Text style={[fontStyles.comment, styles.textInfo]}>{info}</Text>}
+          <View style={[styles.statusContainer, !!info && styles.statusContainerUnderComment]}>
             {isPending && (
               <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
                 <Text style={[fontStyles.bodySmallBold, styles.textPending]}>
@@ -299,13 +299,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
   },
-  textComment: {
-    // paddingTop: 10,
-  },
+  textInfo: {},
   transactionStatus: {
     color: '#BDBDBD',
   },
-  // localAmountContainer: {},
   localAmount: {
     marginLeft: 'auto',
     paddingLeft: 10,
