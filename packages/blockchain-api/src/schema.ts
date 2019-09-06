@@ -53,6 +53,15 @@ export interface CurrencyConversionArgs {
   timestamp?: number
 }
 
+export interface ExchangeRate {
+  rate: number
+}
+
+export interface CurrencyConversionArgs {
+  currencyCode: string
+  timestamp?: number
+}
+
 export const typeDefs = gql`
   union Event = Exchange | Transfer
 
