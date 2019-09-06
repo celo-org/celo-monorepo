@@ -35,16 +35,13 @@ export interface TransferEvent {
 export type EventInterface = ExchangeEvent | TransferEvent
 
 export interface EventArgs {
+  // Query params as defined by Blockscout's API
   address: string
-  sort: string
-  filterby: string
-  startblock: number
-  endblock: number
-  page: number
-  offset: number
-  // TODO(Kamyar): investigate why timestamp filters are not working
-  starttimestamp: number
-  endtimestamp: number
+  sort?: 'asc' | 'desc'
+  startblock?: number
+  endblock?: number
+  page?: number
+  offset?: number
 }
 
 export interface ExchangeRate {
@@ -91,25 +88,19 @@ export const typeDefs = gql`
     events(
       address: String!
       sort: String
-      filterby: String
       startblock: Int
       endblock: Int
       page: Int
       offset: Int
-      starttimestamp: Float
-      endtimestamp: Float
     ): [Event]
 
     rewards(
       address: String!
       sort: String
-      filterby: String
       startblock: Int
       endblock: Int
       page: Int
       offset: Int
-      starttimestamp: Float
-      endtimestamp: Float
     ): [Transfer]
 
     currencyConversion(currencyCode: String!, timestamp: Float): ExchangeRate

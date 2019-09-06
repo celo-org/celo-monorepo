@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CeloDollarsOverview renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "paddingHorizontal": 16,
+      "paddingVertical": 20,
+    }
+  }
+>
+  <Text
+    style={
+      Array [
+        Object {
+          "fontFamily": "Hind-SemiBold",
+        },
+        Object {
+          "color": "#2E3338",
+          "fontSize": 18,
+        },
+      ]
+    }
+  >
+    global:celoDollars
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "fontFamily": "Hind-SemiBold",
+        },
+        Object {
+          "color": "#2E3338",
+          "fontSize": 44,
+          "height": 48,
+          "lineHeight": 62,
+        },
+      ]
+    }
+  >
+    0.00
+  </Text>
+</View>
+`;

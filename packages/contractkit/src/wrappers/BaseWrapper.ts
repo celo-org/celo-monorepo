@@ -1,4 +1,4 @@
-import { zip } from '@celo/utils/lib/src/collections'
+import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import Contract from 'web3/eth/contract'
 import { TransactionObject } from 'web3/eth/types'
