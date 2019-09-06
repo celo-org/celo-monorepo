@@ -149,7 +149,9 @@ spec:
             ${FAULTY_NODE_FLAGS} \
             --istanbul.blockperiod={{ .Values.geth.blocktime }} \
             --maxpeers={{ mul 2 (add .Values.geth.validators .Values.geth.tx_nodes) }} \
-            --nat=extip:`cat /root/.celo/ipAddress`
+            --nat=extip:`cat /root/.celo/ipAddress` \
+            --lightpeers=0 \
+            --lightserv=0
         env:
         - name: POD_IP
           valueFrom:

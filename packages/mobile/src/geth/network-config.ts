@@ -9,7 +9,7 @@ export default {
   },
   [Testnets.alfajoresstaging]: {
     nodeDir: `.${Testnets.alfajoresstaging}`,
-    peerDiscovery: true,
+    peerDiscovery: false,
     syncMode: SYNC_MODE_ULTRALIGHT,
   },
   [Testnets.alfajores]: {
@@ -25,6 +25,11 @@ export default {
   [Testnets.pilotstaging]: {
     nodeDir: `.${Testnets.pilotstaging}`,
     peerDiscovery: false,
+    syncMode: SYNC_MODE_ULTRALIGHT,
+  },
+  trevor2: {
+    nodeDir: `.trevor2`,
+    peerDiscovery: true,
     syncMode: SYNC_MODE_ULTRALIGHT,
   },
 }
