@@ -39,8 +39,9 @@ import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { dynamicLink } from 'src/utils/dynamicLink'
 import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
+import { addLocalAccount, isZeroSyncMode, web3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
+import Web3 from 'web3'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
@@ -76,7 +77,7 @@ export function getInvitationVerificationFeeInDollars() {
 }
 
 export function getInvitationVerificationFeeInWei() {
-  return new BigNumber(web3.utils.toWei(INVITE_FEE))
+  return new BigNumber(Web3.utils.toWei(INVITE_FEE))
 }
 
 export async function generateLink(inviteCode: string, recipientName: string) {
@@ -212,7 +213,6 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
     yield put(redeemInviteFailure())
     yield put(showError(ErrorMessages.REDEEM_INVITE_TIMEOUT))
   }
-  Logger.debug(TAG, 'Done Redeem invite')
 }
 
 export function* doRedeemInvite(inviteCode: string) {
@@ -220,20 +220,24 @@ export function* doRedeemInvite(inviteCode: string) {
   try {
     const tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
     Logger.debug(`TAG@doRedeemInvite`, 'Invite code contains temp account', tempAccount)
-
+    // TODO(ashishb): check getAccountBalance for zero sync mode - should be fine
     const tempAccountBalanceWei: BigNumber = yield call(getAccountBalance, tempAccount)
     if (tempAccountBalanceWei.isLessThanOrEqualTo(0)) {
       yield put(showError(ErrorMessages.EMPTY_INVITE_CODE))
       return false
     }
 
+    // TODO(ashishb): check getOrCreateAccount for zero sync mode
     const newAccount = yield call(getOrCreateAccount)
     if (!newAccount) {
       throw Error('Unable to create your account')
     }
 
+    // TODO(ashishb): check addTempAccountToWallet for zero sync mode - fixed
     yield call(addTempAccountToWallet, inviteCode)
+    // TODO(ashishb): check withdrawFundsFromTempAccount for zero sync mode - fixed
     yield call(withdrawFundsFromTempAccount, tempAccount, tempAccountBalanceWei, newAccount)
+    // TODO(ashishb): check fetchDollarBalance for zero sync mode - most likely fine?
     yield put(fetchDollarBalance())
     return true
   } catch (e) {
@@ -246,9 +250,21 @@ export function* doRedeemInvite(inviteCode: string) {
 async function addTempAccountToWallet(inviteCode: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
-    // @ts-ignore
-    const tempAccount = await web3.eth.personal.importRawKey(stripHexLeader(inviteCode), TEMP_PW)
-    Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount)
+    let tempAccount: string | null = null
+    if (isZeroSyncMode()) {
+      tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
+      Logger.debug(
+        TAG + '@redeemInviteCode',
+        'web3 is connected:',
+        String(await web3.eth.net.isListening())
+      )
+      addLocalAccount(web3, inviteCode)
+    } else {
+      // Import account into the local geth node
+      // @ts-ignore
+      tempAccount = await web3.eth.personal.importRawKey(stripHexLeader(inviteCode), TEMP_PW)
+    }
+    Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount!)
   } catch (e) {
     if (e.toString().includes('account already exists')) {
       Logger.warn(TAG + '@addTempAccountToWallet', 'Account already exists, using it')
@@ -274,8 +290,9 @@ export async function withdrawFundsFromTempAccount(
   newAccount: string
 ) {
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Unlocking temporary account')
-  await web3.eth.personal.unlockAccount(tempAccount, TEMP_PW, 600)
-
+  if (!isZeroSyncMode()) {
+    await web3.eth.personal.unlockAccount(tempAccount, TEMP_PW, 600)
+  }
   const tempAccountBalance = new BigNumber(web3.utils.fromWei(tempAccountBalanceWei.toString()))
 
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Creating send transaction')

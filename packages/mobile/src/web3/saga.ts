@@ -1,5 +1,7 @@
 import { deriveCEK } from '@celo/utils/src/commentEncryption'
+import { getAccountAddressFromPrivateKey } from '@celo/walletkit'
 import { generateMnemonic, mnemonicToSeedHex } from 'react-native-bip39'
+import * as RNFS from 'react-native-fs'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { call, delay, put, race, select, take } from 'redux-saga/effects'
 import { setAccountCreationTime } from 'src/account/actions'
@@ -23,7 +25,7 @@ import {
   setPrivateCommentKey,
   updateWeb3SyncProgress,
 } from 'src/web3/actions'
-import { web3 } from 'src/web3/contracts'
+import { addLocalAccount, isZeroSyncMode, web3 } from 'src/web3/contracts'
 import { currentAccountSelector } from 'src/web3/selectors'
 import { Block } from 'web3/eth/types'
 
@@ -37,6 +39,11 @@ const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect 
 
 // checks if web3 claims it is currently syncing and attempts to wait for it to complete
 export function* checkWeb3SyncProgress() {
+  if (isZeroSyncMode()) {
+    // In this mode, the check seems to fail with
+    // web3/saga/checking web3 sync progress: Error: Invalid JSON RPC response: "":
+    return true
+  }
   while (true) {
     try {
       Logger.debug(TAG, 'checkWeb3SyncProgress', 'Checking sync progress')
@@ -134,20 +141,34 @@ export function* assignAccountFromPrivateKey(key: string) {
     }
 
     let account: string
-    try {
-      // @ts-ignore
-      account = yield call(web3.eth.personal.importRawKey, String(key), pincode)
-    } catch (e) {
-      if (e.toString().includes('account already exists')) {
-        account = currentAccount
-        Logger.warn(TAG + '@assignAccountFromPrivateKey', 'Importing same account as current one')
-      } else {
-        Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error importing raw key')
-        throw e
+    if (isZeroSyncMode()) {
+      const privateKey = String(key)
+      Logger.debug(TAG + '@assignAccountFromPrivateKey', 'Init web3 with private key')
+      addLocalAccount(web3, privateKey)
+      // Save the account to a local file on the disk.
+      // This is only required in Geth free mode because if geth is running
+      // it has its own mechanism to save the encrypted key in its keystore.
+      account = getAccountAddressFromPrivateKey(privateKey)
+      yield savePrivateKeyToLocalDisk(account, privateKey, pincode)
+    } else {
+      try {
+        // @ts-ignore
+        account = yield call(web3.eth.personal.importRawKey, String(key), pincode)
+      } catch (e) {
+        if (e.toString().includes('account already exists')) {
+          account = currentAccount
+          Logger.debug(
+            TAG + '@assignAccountFromPrivateKey',
+            'Importing same account as current one'
+          )
+        } else {
+          Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error importing raw key')
+          throw e
+        }
       }
+      yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
     }
 
-    yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
     Logger.debug(
       TAG + '@assignAccountFromPrivateKey',
       `Created account from mnemonic and added to wallet: ${account}`
@@ -157,7 +178,9 @@ export function* assignAccountFromPrivateKey(key: string) {
     yield put(setAccountCreationTime())
     yield call(assignDataKeyFromPrivateKey, key)
 
-    web3.eth.defaultAccount = account
+    if (!isZeroSyncMode()) {
+      web3.eth.defaultAccount = account
+    }
     return account
   } catch (e) {
     Logger.error(
@@ -172,6 +195,43 @@ export function* assignAccountFromPrivateKey(key: string) {
 function* assignDataKeyFromPrivateKey(key: string) {
   const privateCEK = deriveCEK(key).toString('hex')
   yield put(setPrivateCommentKey(privateCEK))
+}
+
+function getPrivateKeyFilePath(account: string): string {
+  return `${RNFS.DocumentDirectoryPath}/private_key_for_${account}.txt`
+}
+
+function ensureAddressAndKeyMatch(address: string, privateKey: string) {
+  const generatedAddress = getAccountAddressFromPrivateKey(privateKey)
+  if (address.toLowerCase() !== generatedAddress.toLowerCase()) {
+    throw new Error(
+      `Address from private key: ${generatedAddress}, ` + `address of sender ${address}`
+    )
+  }
+  console.debug(`signing-utils@ensureCorrectSigner: sender and private key match`)
+}
+
+async function savePrivateKeyToLocalDisk(
+  account: string,
+  privateKey: string,
+  encryptionPassword: string
+) {
+  ensureAddressAndKeyMatch(account, privateKey)
+  const filePath = getPrivateKeyFilePath(account)
+  Logger.debug('savePrivateKeyToLocalDisk', `Writing private key to ${filePath}`)
+  // TODO(ashishb): Store encrypted private key instead
+  await RNFS.writeFile(getPrivateKeyFilePath(account), privateKey)
+}
+
+// Reads and returns unencrypted private key
+export async function readPrivateKeyFromLocalDisk(
+  account: string,
+  encryptionPassword: string
+): Promise<string> {
+  const filePath = getPrivateKeyFilePath(account)
+  Logger.debug('readPrivateKeyFromLocalDisk', `Reading private key from ${filePath}`)
+  // TODO(ashishb): Read and decrypt private key instead
+  return RNFS.readFile(getPrivateKeyFilePath(account))
 }
 
 // Wait for account to exist and then return it
@@ -204,6 +264,8 @@ async function isLocked(address: string) {
   return false
 }
 
+let accountAlreadyAddedInZeroSyncMode = false
+
 export function* unlockAccount(account: string) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
   try {
@@ -213,9 +275,21 @@ export function* unlockAccount(account: string) {
     }
 
     const pincode = yield call(getPincode)
-    yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
-    Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
-    return true
+    if (isZeroSyncMode()) {
+      if (accountAlreadyAddedInZeroSyncMode) {
+        Logger.info(TAG + 'unlockAccount', `Account ${account} already added to web3 for signing`)
+      } else {
+        Logger.info(TAG + '@unlockAccount', `unlockDuration is ignored in Geth free mode`)
+        const privateKey: string = yield readPrivateKeyFromLocalDisk(account, pincode)
+        addLocalAccount(web3, privateKey)
+        accountAlreadyAddedInZeroSyncMode = true
+      }
+      return true
+    } else {
+      yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
+      Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
+      return true
+    }
   } catch (error) {
     Logger.error(TAG + '@unlockAccount', 'Web3 account unlock failed', error)
     return false

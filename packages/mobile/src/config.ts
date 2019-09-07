@@ -53,6 +53,7 @@ export const FIREBASE_ENABLED = stringToBoolean(Config.FIREBASE_ENABLED || 'true
 // react-native-config is undefined.
 export const DEFAULT_TESTNET: Testnets = Config.DEFAULT_TESTNET || 'integration'
 export const BLOCKCHAIN_API_URL = config[DEFAULT_TESTNET].blockchainApiUrl
+export const DEFAULT_INFURA_URL = `https://${DEFAULT_TESTNET}-infura.celo-testnet.org/`
 
 export const SEGMENT_API_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SEGMENT_API_KEY')
 export const FIREBASE_WEB_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'FIREBASE_WEB_KEY')
