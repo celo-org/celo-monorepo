@@ -17,7 +17,7 @@ const keyOrUndefined = (file: any, secretsKey: any, attribute: any) => {
 
 export const AVAILABLE_LANGUAGES = [
   { name: 'English', code: 'en-US' },
-  { name: 'Español (America Latina)', code: 'es-419' },
+  { name: 'Español (América Latina)', code: 'es-419' },
 ]
 
 export const isE2EEnv = Config.IS_E2E || false
