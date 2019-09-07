@@ -51,11 +51,7 @@ class PaymentRequestReviewCard extends React.Component<OwnProps & StateProps & W
 
     return (
       <View style={[componentStyles.roundedBorder, style.container]}>
-        <Avatar
-          name={recipient ? recipient.displayName : undefined}
-          address={address}
-          e164Number={e164PhoneNumber}
-        />
+        <Avatar recipient={recipient} address={address} e164Number={e164PhoneNumber} />
         <MoneyAmount
           symbol={CURRENCIES[currency].symbol}
           amount={getMoneyDisplayValue(value)}

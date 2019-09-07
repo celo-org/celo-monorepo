@@ -142,7 +142,7 @@ exports[`InviteReview renders correctly 1`] = `
                     ]
                   }
                 >
-                  #
+                  J
                 </Text>
               </View>
             </View>
@@ -165,7 +165,7 @@ exports[`InviteReview renders correctly 1`] = `
                 ]
               }
             >
-              #000000000000000...
+              John Doe
             </Text>
             <View
               style={
