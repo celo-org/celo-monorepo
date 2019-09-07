@@ -14,7 +14,7 @@ describe('LanguageSelectUI', () => {
         t={jest.fn()}
         languages={[
           { name: 'English', code: 'en-US' },
-          { name: 'Español (America Latina)', code: 'es-419' },
+          { name: 'Español (América Latina)', code: 'es-419' },
         ]}
       />
     )
