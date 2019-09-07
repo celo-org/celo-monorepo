@@ -57,7 +57,7 @@ exports[`Backup renders correctly if backup completed 1`] = `
           },
           Object {
             "color": "#2E3338",
-            "paddingTop": 35,
+            "paddingTop": 25,
           },
         ]
       }
@@ -252,7 +252,7 @@ exports[`Backup renders correctly if backup not completed 1`] = `
   <View
     style={
       Object {
-        "height": 45,
+        "height": 56,
       }
     }
   >

@@ -1,3 +1,4 @@
+import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import { ApolloError } from 'apollo-boost'
 import * as React from 'react'
 import { FlatList } from 'react-native'
@@ -135,7 +136,12 @@ export class TransactionFeed extends React.PureComponent<Props> {
 
     if (txData.length > 0) {
       return (
-        <FlatList data={txData} keyExtractor={this.keyExtractor} renderItem={this.renderItem} />
+        <FlatList
+          data={txData}
+          keyExtractor={this.keyExtractor}
+          ItemSeparatorComponent={ItemSeparator}
+          renderItem={this.renderItem}
+        />
       )
     } else {
       return <NoActivity kind={kind} loading={loading} error={error} />

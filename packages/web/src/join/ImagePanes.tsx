@@ -3,7 +3,7 @@ import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import AspectRatio from 'src/shared/AspectRatio'
-import { fonts } from 'src/styles'
+import { fonts, textStyles } from 'src/styles'
 
 export default class ImagePanes extends React.PureComponent {
   render() {
@@ -19,7 +19,7 @@ export default class ImagePanes extends React.PureComponent {
                   source={{ uri: require('./will-teal-org.jpg') }}
                 />
               </AspectRatio>
-              <Text style={[fonts.h5, styles.caption]}>
+              <Text style={[fonts.legal, textStyles.caption]}>
                 Applying distributed authority and decision-making with our Teal org design
               </Text>
             </View>
@@ -33,7 +33,7 @@ export default class ImagePanes extends React.PureComponent {
                   source={{ uri: require('./laurance-joe.jpg') }}
                 />
               </AspectRatio>
-              <Text style={[fonts.h5, styles.caption]}>
+              <Text style={[fonts.legal, textStyles.caption]}>
                 Joe completing the Gold Book of Values, a reflection on wholeness
               </Text>
             </View>
@@ -49,7 +49,7 @@ export default class ImagePanes extends React.PureComponent {
                   source={{ uri: require('./connectionfun.jpg') }}
                 />
               </AspectRatio>
-              <Text style={[fonts.h5, styles.caption]}>
+              <Text style={[fonts.legal, textStyles.caption]}>
                 Quarterly Celo retreat focusing on self, team, and company evolution
               </Text>
             </View>
