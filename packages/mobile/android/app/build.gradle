@@ -193,7 +193,7 @@ android {
             matchingFallbacks = ['release']
         }
 
-        alfajores {
+        pilot {
             applicationIdSuffix ".pilot"
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
