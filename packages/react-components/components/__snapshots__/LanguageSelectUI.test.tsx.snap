@@ -201,7 +201,7 @@ exports[`LanguageSelectUI renders correctly with minimum props 1`] = `
                 }
               }
             >
-              Español (AR)
+              Español (América Latina)
             </Text>
           </View>
         </View>

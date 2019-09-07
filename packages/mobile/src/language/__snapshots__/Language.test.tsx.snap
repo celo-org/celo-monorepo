@@ -203,7 +203,7 @@ exports[`renders correctly 1`] = `
                 }
               }
             >
-              Español (America Latina)
+              Español (América Latina)
             </Text>
           </View>
         </View>
