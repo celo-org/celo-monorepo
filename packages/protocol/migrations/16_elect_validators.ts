@@ -67,7 +67,7 @@ async function registerValidatorGroup(
     encodedKey,
     config.validators.groupName,
     config.validators.groupUrl,
-    config.validators.minLockedGoldNoticePeriod
+    [config.validators.minLockedGoldNoticePeriod]
   )
 
   await sendTransactionWithPrivateKey(web3, tx, account.privateKey, {
@@ -103,7 +103,7 @@ async function registerValidator(
     address,
     config.validators.groupUrl,
     add0x(publicKeysData),
-    config.validators.minLockedGoldNoticePeriod
+    [config.validators.minLockedGoldNoticePeriod]
   )
 
   await sendTransactionWithPrivateKey(web3, registerTx, validatorPrivateKey, {

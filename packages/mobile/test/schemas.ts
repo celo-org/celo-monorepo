@@ -116,6 +116,19 @@ const v0Schema = {
   recipients: {
     recipientCache: {},
   },
+  web3: {
+    ...vNeg1Schema.web3,
+    syncProgress: {
+      startingBlock: 0,
+      currentBlock: 0,
+      highestBlock: 0,
+    },
+  },
+  localCurrency: {
+    isLoading: false,
+    symbol: 'MXN',
+    exchangeRate: 1.33,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {

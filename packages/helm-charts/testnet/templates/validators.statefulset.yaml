@@ -152,6 +152,7 @@ spec:
             --istanbul.blockperiod={{ .Values.geth.blocktime }} \
             --maxpeers={{ mul 2 (add .Values.geth.validators .Values.geth.tx_nodes) }} \
             --nat=extip:`cat /root/.celo/ipAddress` \
+            --metrics \
             ${PING_IP_FROM_PACKET_FLAG}
         env:
         - name: POD_IP
@@ -201,6 +202,8 @@ spec:
         - name: account
           mountPath: /root/.celo/account
           readOnly: true
+{{ include "celo.geth-exporter-container" .  | indent 6 }}
+{{ include "celo.prom-to-sd-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "geth" "metricsPort" "9200" "metricsPath" "filteredmetrics" "containerNameLabel" "validators" )  | indent 6 }}
       volumes:
       - name: data
         emptyDir: {}

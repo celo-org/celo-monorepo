@@ -117,6 +117,7 @@ spec:
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
             --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
+            --metrics \
             ${PING_IP_FROM_PACKET_FLAG}
         env:
         - name: ETHSTATS_SVC
@@ -157,6 +158,8 @@ spec:
         - name: account
           mountPath: /root/.celo/account
           readOnly: true
+{{ include "celo.geth-exporter-container" .  | indent 6 }}
+{{ include "celo.prom-to-sd-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "geth" "metricsPort" "9200" "metricsPath" "filteredmetrics" "containerNameLabel" "tx-nodes" )  | indent 6 }}
       volumes:
       - name: data
         emptyDir: {}

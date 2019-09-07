@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
     justifyContent: 'space-between',
-    paddingTop: 70,
+    paddingTop: 30,
   },
   logo: {
     height: 40,

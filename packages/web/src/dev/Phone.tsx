@@ -37,7 +37,9 @@ function GreenLine() {
       style={[standardStyles.row, standardStyles.centered, styles.lightspeed, styles.animations]}
     >
       <View style={styles.line} />
-      <OvalCoin color={colors.primary} size={20} />
+      <View style={styles.onLine}>
+        <OvalCoin color={colors.primary} size={20} />
+      </View>
     </View>
   )
 }
@@ -98,5 +100,8 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.primary,
     borderBottomWidth: 1,
     width: `calc(50vw + ${LINE_OFFSET}px)`,
+  },
+  onLine: {
+    transform: [{ translateX: -5 }],
   },
 })

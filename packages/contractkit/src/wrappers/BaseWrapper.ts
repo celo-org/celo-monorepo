@@ -1,4 +1,4 @@
-import { zip } from '@celo/utils/lib/src/collections'
+import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import Contract from 'web3/eth/contract'
 import { TransactionObject } from 'web3/eth/types'
@@ -7,6 +7,8 @@ import { TxOptions } from '../utils/send-tx'
 import { TransactionResult } from '../utils/tx-result'
 
 type Method<I extends any[], O> = (...args: I) => TransactionObject<O>
+
+export type NumberLike = string | number | BigNumber
 
 export abstract class BaseWrapper<T extends Contract> {
   constructor(protected readonly kit: ContractKit, protected readonly contract: T) {}
@@ -30,11 +32,15 @@ export function toNumber(input: string) {
   return parseInt(input, 10)
 }
 
-export function parseNumber(input: string | number | BigNumber) {
+export function parseNumber(input: NumberLike) {
   return new BigNumber(input).toString()
 }
 
 type Parser<A, B> = (input: A) => B
+
+export function identity<A>(a: A) {
+  return a
+}
 
 export function tupleParser<A0, B0>(parser0: Parser<A0, B0>): (...args: [A0]) => [B0]
 export function tupleParser<A0, B0, A1, B1>(
