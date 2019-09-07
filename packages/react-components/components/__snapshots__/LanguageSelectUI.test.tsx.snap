@@ -148,7 +148,7 @@ exports[`LanguageSelectUI renders correctly with minimum props 1`] = `
             "opacity": 1,
           }
         }
-        testID="ChooseLanguage/es-AR"
+        testID="ChooseLanguage/es-419"
       >
         <View
           style={
@@ -201,7 +201,7 @@ exports[`LanguageSelectUI renders correctly with minimum props 1`] = `
                 }
               }
             >
-              Español (AR)
+              Español (América Latina)
             </Text>
           </View>
         </View>
