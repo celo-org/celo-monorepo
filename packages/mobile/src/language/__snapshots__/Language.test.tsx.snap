@@ -7,7 +7,7 @@ exports[`renders correctly 1`] = `
       "backgroundColor": "white",
       "flex": 1,
       "justifyContent": "space-between",
-      "paddingTop": 70,
+      "paddingTop": 30,
     }
   }
 >
@@ -150,7 +150,7 @@ exports[`renders correctly 1`] = `
             "opacity": 1,
           }
         }
-        testID="ChooseLanguage/es-AR"
+        testID="ChooseLanguage/es-419"
       >
         <View
           style={
@@ -203,7 +203,7 @@ exports[`renders correctly 1`] = `
                 }
               }
             >
-              Español (AR)
+              Español (América Latina)
             </Text>
           </View>
         </View>
