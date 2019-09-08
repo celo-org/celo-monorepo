@@ -10,8 +10,8 @@
     "prepublishOnly": "yarn build",
     "build": "tsc -b .",
     "clean": "tsc -b . --clean",
-    "test": "jest --runInBand",
-    "test:verbose": "jest --verbose --runInBand",
+    "test": "jest",
+    "test:verbose": "jest --verbose",
     "lint": "tslint -c tslint.json --project ."
   },
   "files": ["lib/**/*"],
@@ -41,13 +41,5 @@
   "resolutions": {
     "elliptic/bn.js": "4.11.8",
     "web3-utils/bn.js": "4.11.8"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "jsx",
-      "node"
-    ]
   }
 }

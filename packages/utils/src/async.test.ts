@@ -1,13 +1,13 @@
-import { retryAsync } from '../src/async-helpers'
+import { retryAsync } from './async'
 
-describe('utils->async-helpers', () => {
-  it('tries once if it works', async () => {
+describe('retryAsync()', () => {
+  test('tries once if it works', async () => {
     const mockFunction = jest.fn()
     await retryAsync(mockFunction, 2, [], 1)
     expect(mockFunction).toHaveBeenCalledTimes(1)
   })
 
-  it('retries n times', async () => {
+  test('retries n times', async () => {
     const mockFunction = jest.fn(() => {
       throw new Error('error')
     })
