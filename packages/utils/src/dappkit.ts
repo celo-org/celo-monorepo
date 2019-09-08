@@ -103,7 +103,7 @@ export interface TxToSignParam {
   txData: string
   estimatedGas: number
   from: string
-  to: string
+  to?: string
   nonce: number
   gasCurrencyAddress: string
   value: string

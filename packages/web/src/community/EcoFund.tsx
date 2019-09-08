@@ -261,7 +261,6 @@ const styles = StyleSheet.create({
   },
   button: {
     marginVertical: 15,
-    fontSize: 18,
   },
   partners: {
     justifyContent: 'space-between',

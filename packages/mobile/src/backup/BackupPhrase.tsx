@@ -10,6 +10,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import BackupPhraseContainer from 'src/backup/BackupPhraseContainer'
 import CancelButton from 'src/components/CancelButton'
 import { Namespaces } from 'src/i18n'
 
@@ -60,9 +61,7 @@ class BackupPhrase extends React.Component<Props, State> {
             <Text style={[fontStyles.h1, styles.title]}>{t('learnBackupKey')}</Text>
             <Text style={styles.verifyText}>{t('learnYourKey')}</Text>
             <Text style={styles.verifyText}>{t('keyWillBeVerified')}</Text>
-            <View style={styles.phraseContainer}>
-              <Text style={styles.phraseText}>{`${this.props.words}`}</Text>
-            </View>
+            <BackupPhraseContainer words={this.props.words} />
           </View>
           <View>
             <Button
