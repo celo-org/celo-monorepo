@@ -14,9 +14,9 @@
   "chooseCountry": "País",
   "joinText": {
     "0":
-      "Bienvenido a Celo Wallet, una billetera digital que te permite enviar, recibir y guardar valor fácilmente.",
+      "Bienvenido a Celo Wallet, un monedero digital que te permite enviar, recibir y guardar valor fácilmente.",
     "1":
-      "Al unirte a esta red, nos das permiso para recopilar información anónima sobre cómo utilizas la aplicación. Adrmás, si verificas tu número de teléfono, se almacenará una copia ofuscada en la Red de Celo. Más información en ",
+      "Al unirte a esta red, nos das permiso para recopilar información anónima sobre cómo utilizas la aplicación. Además, si verificas tu número de teléfono, se almacenará una copia ofuscada en la Red de Celo. Más información en ",
     "2": "celo.org/terms"
   },
   "phoneNumber": "000 000 0000",
@@ -52,7 +52,7 @@
   "InvitationCode": "Código de invitación",
   "optIn": "Inscribirse",
   "submitting": "Enviando ...",
-  "haveWallet": "¿Ya tienes una billetera de Celo? ",
+  "haveWallet": "¿Ya tienes un monedero de Celo? ",
   "importIt": "Impórtala",
   "cancel": "Cancelar",
   "important": "Importante",
@@ -82,7 +82,7 @@
     "why":
       "Necesitamos este nivel de protección adicional para asegurar que el contenido de tu monedero se encuentra a salvo.",
     "summary":
-      "Celo requiere que los teléfonos estén protegidos con un PIN o huella digital. El bloqueo de su dispositivo ayuda a garantizar que los fondos en su billetera estén protegidos."
+      "Celo requiere que los teléfonos estén protegidos con un PIN o huella digital. El bloqueo de su dispositivo ayuda a garantizar que los fondos en su monedero estén protegidos."
   },
   "goToSystemSecuritySettingsActionLabel": "Vaya a seguridad",
   "enableSystemScreenLockFailedMessage": "Error al intentar habilitar el bloqueo de pantalla",

@@ -98,11 +98,8 @@ export class Countries {
       return []
     }
 
-    const lng = this.language
-
-    const exactMatch = this.localizedCountries.find(
-      (c: LocalizedCountry) =>
-        c.names && c.names[lng] !== undefined && c.names[lng].toLowerCase() === query.toLowerCase()
+    const exactMatch = this.countriesWithNoDiacritics.find(
+      (country) => country.displayName === query
     )
 
     // since we no longer have the country name as the map key, we have to
