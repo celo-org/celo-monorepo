@@ -14,7 +14,7 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
   <View
     style={
       Object {
-        "height": 45,
+        "height": 56,
       }
     }
   >
@@ -87,6 +87,7 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
         style={
           Array [
             Object {
+              "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 22,
               "paddingBottom": 20,
@@ -510,7 +511,7 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
   <View
     style={
       Object {
-        "height": 45,
+        "height": 56,
       }
     }
   >
@@ -583,6 +584,7 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
         style={
           Array [
             Object {
+              "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 22,
               "paddingBottom": 20,
@@ -934,7 +936,7 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
   <View
     style={
       Object {
-        "height": 45,
+        "height": 56,
       }
     }
   >
@@ -1007,6 +1009,7 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
         style={
           Array [
             Object {
+              "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 22,
               "paddingBottom": 20,

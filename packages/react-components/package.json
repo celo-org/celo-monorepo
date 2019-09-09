@@ -20,7 +20,7 @@
     "react-native-autocomplete-input": "^3.6.0",
     "react-native-contacts": "git://github.com/celo-org/react-native-contacts#4989b0b",
     "react-native-platform-touchable": "^1.1.1",
-    "svgs": "^3.2.1"
+    "svgs": "^4.1.0"
   },
   "devDependencies": {
     "@celo/typescript": "0.0.1",

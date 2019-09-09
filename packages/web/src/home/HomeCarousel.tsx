@@ -6,7 +6,7 @@ import Fade from 'react-reveal/Fade'
 import CarouselDot from 'src/home/carousel/CarouselDot'
 import Responsive from 'src/shared/Responsive'
 import { DESKTOP_BREAKPOINT, TABLET_BREAKPOINT } from 'src/shared/Styles'
-import { fonts } from 'src/styles'
+import { fonts, textStyles } from 'src/styles'
 
 const Cell = ({ image: { image, width, height, caption }, imageWidth }) => {
   const imageHeight = (height * imageWidth) / width
@@ -22,7 +22,7 @@ const Cell = ({ image: { image, width, height, caption }, imageWidth }) => {
             />
           )}
         </FadeIn>
-        <Text style={[fonts.a, styles.caption]}>{caption}</Text>
+        <Text style={[fonts.legal, textStyles.caption]}>{caption}</Text>
       </View>
     </Responsive>
   )
@@ -274,10 +274,6 @@ const styles = StyleSheet.create({
         },
       },
     ],
-  },
-  caption: {
-    paddingTop: 15,
-    fontWeight: '500',
   },
   overlay: {
     position: 'absolute',

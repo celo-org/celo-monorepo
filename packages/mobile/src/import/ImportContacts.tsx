@@ -1,6 +1,7 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
+import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -104,19 +105,16 @@ class ImportContacts extends React.Component<Props, State> {
             <Text style={[fontStyles.h1, style.h1]} testID="ImportContactsPermissionTitle">
               {t('importContactsPermission.title')}
             </Text>
-            <View style={style.explanation}>
-              <Text style={fontStyles.bodySmall}>{t('importContactsPermission.0')}</Text>
-            </View>
-            <Text style={[fontStyles.bodySmall, style.explanation]}>
+            <Text style={[fontStyles.bodyLarge, fontStyles.center]}>
+              {t('importContactsPermission.0')}
+            </Text>
+            <Text style={[fontStyles.bodyLarge, fontStyles.center, componentStyles.marginTop10]}>
               {t('importContactsPermission.1')}
             </Text>
           </View>
         </ScrollView>
         {isSubmitting && (
           <View style={style.loadingContainer}>
-            <Text style={[fontStyles.bodySmall, style.loadingLabel]}>
-              {t('importContactsPermission.loading')}
-            </Text>
             <ActivityIndicator size="large" color={colors.celoGreen} style={style.activity} />
           </View>
         )}
@@ -148,15 +146,16 @@ const style = StyleSheet.create({
     justifyContent: 'space-between',
   },
   scrollContainer: {
-    marginHorizontal: 10,
+    flex: 1,
+    padding: 20,
+    paddingTop: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   contactsLogo: {
     alignSelf: 'center',
     marginBottom: 10,
     marginTop: 10,
-  },
-  explanation: {
-    marginVertical: 10,
   },
   loadingContainer: {
     marginVertical: 30,

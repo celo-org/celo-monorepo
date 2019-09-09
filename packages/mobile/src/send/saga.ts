@@ -146,6 +146,7 @@ export function* sendPaymentOrInviteSaga({
 
     if (recipientAddress) {
       yield call(sendPayment, recipientAddress, amount, comment, CURRENCY_ENUM.DOLLAR)
+      CeloAnalytics.track(CustomEventNames.send_dollar_transaction)
     } else if (recipient.e164PhoneNumber) {
       yield call(
         sendInvite,

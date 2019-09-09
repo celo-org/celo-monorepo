@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "alignContent": "center",
+      "backgroundColor": "#F8F8F8",
+      "justifyContent": "center",
+      "marginTop": 30,
+      "padding": 16,
+      "position": "relative",
+    }
+  }
+>
+  <Text
+    style={
+      Object {
+        "color": "#2E3338",
+        "fontFamily": "Hind-Light",
+        "fontSize": 18,
+        "textAlign": "left",
+      }
+    }
+  >
+    tuna assault reward enjoy quit trash eyebrow spatial core south pilot wall sample swim humor over garlic charge mix radio sudden transfer mirror wide
+  </Text>
+</View>
+`;

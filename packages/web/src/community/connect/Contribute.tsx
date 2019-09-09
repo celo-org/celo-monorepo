@@ -4,7 +4,7 @@ import QuarterCircle from 'src/community/connect/QuarterCircle'
 import { H2 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Button, { BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { hashNav } from 'src/shared/menu-items'
 import { colors, standardStyles, textStyles } from 'src/styles'
 
@@ -24,6 +24,7 @@ function Contribute({ t }: I18nProps) {
             </H2>
             <Button
               kind={BTN.NAKED}
+              size={SIZE.normal}
               text={t('contribute.button')}
               target={'_cfp'}
               href={'https://medium.com/celohq/call-for-proposals-the-celo-fellowship-3c43b06b10f9'}

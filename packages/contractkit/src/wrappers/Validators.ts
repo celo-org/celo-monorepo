@@ -1,5 +1,5 @@
-import { eqAddress } from '@celo/utils/lib/src/address'
-import { zip } from '@celo/utils/lib/src/collections'
+import { eqAddress } from '@celo/utils/lib/address'
+import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
