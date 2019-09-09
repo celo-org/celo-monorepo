@@ -515,6 +515,7 @@ exports[`renders for error 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
@@ -1039,6 +1040,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
@@ -1766,6 +1768,7 @@ exports[`renders for loading 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
@@ -2280,6 +2283,7 @@ exports[`renders for no transactions 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
@@ -2794,6 +2798,7 @@ exports[`renders for standbyTransactions 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
