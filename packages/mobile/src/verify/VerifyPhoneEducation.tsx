@@ -25,9 +25,9 @@ export class VerifyPhoneEducation extends React.Component<WithNamespaces> {
     const { t } = this.props
     return (
       <View style={style.container}>
-        <ScrollView style={style.content}>
+        <ScrollView contentContainerStyle={style.scrollContainer}>
           <DevSkipButton nextScreen={Screens.WalletHome} />
-          <NuxLogo testID="VerifyLogo" style={style.logo} />
+          <NuxLogo testID="VerifyLogo" />
           <Text style={fontStyles.h1} testID="VerifyEducationHeader">
             {t('verifyPhone')}
           </Text>
@@ -64,25 +64,26 @@ const style = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: colors.background,
   },
-  logo: {
-    marginTop: 0,
-  },
-  content: {
+  scrollContainer: {
     flex: 1,
-    paddingHorizontal: 20,
+    padding: 30,
+    paddingTop: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   firstBullet: {
-    marginTop: 20,
+    marginTop: 10,
   },
   bullet: {
     flexDirection: 'row',
     flexWrap: 'nowrap',
-    marginTop: 30,
+    marginTop: 20,
     alignItems: 'center',
   },
   bulletImage: {
     flex: 0,
     marginRight: 20,
+    marginLeft: 10,
   },
   bulletText: {
     flex: 1,

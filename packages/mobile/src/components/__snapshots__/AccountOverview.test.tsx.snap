@@ -10,7 +10,7 @@ exports[`renders correctly when Dollar education NUX flow hasn't been completed 
         Object {
           "flexDirection": "row",
           "paddingBottom": 5,
-          "paddingHorizontal": 20,
+          "paddingHorizontal": 32,
           "paddingTop": 15,
           "position": "relative",
         }
@@ -249,7 +249,7 @@ exports[`renders correctly when Gold education NUX flow hasn't been completed 1`
         Object {
           "flexDirection": "row",
           "paddingBottom": 5,
-          "paddingHorizontal": 20,
+          "paddingHorizontal": 32,
           "paddingTop": 15,
           "position": "relative",
         }
@@ -488,7 +488,7 @@ exports[`renders correctly when not ready 1`] = `
         Object {
           "flexDirection": "row",
           "paddingBottom": 5,
-          "paddingHorizontal": 20,
+          "paddingHorizontal": 32,
           "paddingTop": 15,
           "position": "relative",
         }
@@ -726,7 +726,7 @@ exports[`renders correctly when ready 1`] = `
         Object {
           "flexDirection": "row",
           "paddingBottom": 5,
-          "paddingHorizontal": 20,
+          "paddingHorizontal": 32,
           "paddingTop": 15,
           "position": "relative",
         }
@@ -964,7 +964,7 @@ exports[`renders correctly when transaction pending 1`] = `
         Object {
           "flexDirection": "row",
           "paddingBottom": 5,
-          "paddingHorizontal": 20,
+          "paddingHorizontal": 32,
           "paddingTop": 15,
           "position": "relative",
         }

@@ -136,7 +136,7 @@ export class ImportWallet extends React.Component<Props, State> {
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="always"
         >
-          <NuxLogo style={styles.logo} />
+          <NuxLogo />
           <Text style={[fontStyles.h1, styles.h1]}>{t('restoreYourWallet.title')}</Text>
           <Text style={[fontStyles.bodySmall, styles.body]}>
             {t('restoreYourWallet.userYourBackupKey')}
@@ -195,14 +195,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
-  logo: {
-    marginTop: 0,
-  },
   cancel: {
     alignItems: 'flex-start',
   },
   scrollContainer: {
-    paddingHorizontal: 10,
+    padding: 20,
+    paddingTop: 0,
   },
   h1: {
     textAlign: 'center',

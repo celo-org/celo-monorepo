@@ -14,7 +14,8 @@ exports[`ImportWallet renders correctly 1`] = `
     automaticallyAdjustContentInsets={false}
     contentContainerStyle={
       Object {
-        "paddingHorizontal": 10,
+        "padding": 20,
+        "paddingTop": 0,
       }
     }
     contentInset={
@@ -50,12 +51,9 @@ exports[`ImportWallet renders correctly 1`] = `
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
-            Object {
-              "marginTop": 0,
-            },
+            Object {},
           ]
         }
       >
@@ -68,8 +66,8 @@ exports[`ImportWallet renders correctly 1`] = `
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -78,6 +76,7 @@ exports[`ImportWallet renders correctly 1`] = `
         style={
           Array [
             Object {
+              "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 22,
               "paddingBottom": 20,
@@ -292,7 +291,8 @@ exports[`ImportWallet renders with an error 1`] = `
     automaticallyAdjustContentInsets={false}
     contentContainerStyle={
       Object {
-        "paddingHorizontal": 10,
+        "padding": 20,
+        "paddingTop": 0,
       }
     }
     contentInset={
@@ -328,12 +328,9 @@ exports[`ImportWallet renders with an error 1`] = `
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
-            Object {
-              "marginTop": 0,
-            },
+            Object {},
           ]
         }
       >
@@ -346,8 +343,8 @@ exports[`ImportWallet renders with an error 1`] = `
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -356,6 +353,7 @@ exports[`ImportWallet renders with an error 1`] = `
         style={
           Array [
             Object {
+              "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 22,
               "paddingBottom": 20,

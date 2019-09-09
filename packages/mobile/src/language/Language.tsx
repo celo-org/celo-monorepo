@@ -8,6 +8,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { setLanguage } from 'src/app/actions'
+import { AVAILABLE_LANGUAGES } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
 import logo from 'src/images/celo-logo.png'
 import { Screens } from 'src/navigator/Screens'
@@ -64,6 +65,7 @@ export class Language extends React.Component<Props, State> {
         onSubmit={this.onSubmit}
         isSubmitDisabled={!this.state.selectedAnswer}
         currentSelected={this.state.selectedAnswer}
+        languages={AVAILABLE_LANGUAGES}
         t={t}
       />
     )

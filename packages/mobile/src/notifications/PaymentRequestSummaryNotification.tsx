@@ -19,8 +19,8 @@ import {
 } from 'src/identity/reducer'
 import { sendDollar } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
-import PaymentRequestLineItem from 'src/paymentRequest/PaymentRequestLineItem'
+import { Stacks } from 'src/navigator/Screens'
+import PaymentRequestNotificationInner from 'src/paymentRequest/PaymentRequestNotificationInner'
 import { NumberToRecipient, phoneNumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -45,6 +45,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 const PREVIEW_SIZE = 2
 
+// Payment Request notification for the notification center on home screen
 export class PaymentRequestSummaryNotification extends React.Component<Props> {
   getCTA = () => {
     return [
@@ -52,7 +53,7 @@ export class PaymentRequestSummaryNotification extends React.Component<Props> {
         text: this.props.t('review'),
         onPress: () => {
           CeloAnalytics.track(CustomEventNames.request_payment_review)
-          navigate(Screens.PaymentRequestListScreen)
+          navigate(Stacks.RequestStack)
         },
       },
     ]
@@ -103,7 +104,7 @@ export class PaymentRequestSummaryNotification extends React.Component<Props> {
           <View style={styles.requests}>
             {requests.slice(0, PREVIEW_SIZE).map((item, key) => {
               return (
-                <PaymentRequestLineItem
+                <PaymentRequestNotificationInner
                   key={key}
                   amount={item.amount}
                   comment={item.comment}
