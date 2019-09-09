@@ -10,7 +10,7 @@
     "prepublishOnly": "yarn build",
     "build": "tsc -b .",
     "clean": "tsc -b . --clean",
-    "test": "jest",
+    "test": "jest --runInBand --ci",
     "test:verbose": "jest --verbose",
     "lint": "tslint -c tslint.json --project ."
   },
