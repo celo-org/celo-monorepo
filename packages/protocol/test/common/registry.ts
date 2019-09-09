@@ -72,14 +72,14 @@ contract('Registry', (accounts: any) => {
     })
   })
 
-  describe('#getAddressForOrDieString()', () => {
+  describe('#getAddressForStringOrDie()', () => {
     it('should provide access to registry by string identifier', async () => {
       await registry.setAddressFor(anIdentifier, anAddress)
-      assert.equal(await registry.getAddressForOrDieString(anIdentifier), anAddress)
+      assert.equal(await registry.getAddressForStringOrDie(anIdentifier), anAddress)
     })
 
     it('should revert if address not set', async () => {
-      await assertRevert(registry.getAddressForOrDieString(anIdentifier))
+      await assertRevert(registry.getAddressForStringOrDie(anIdentifier))
     })
   })
 

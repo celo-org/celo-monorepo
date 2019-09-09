@@ -57,7 +57,7 @@ contract Registry is IRegistry, Ownable, Initializable {
    * @param identifier Identifier of contract whose address we want to look up.
    * @dev Throws if address not set.
    */
-  function getAddressForOrDieString(string calldata identifier) external view returns (address) {
+  function getAddressForStringOrDie(string calldata identifier) external view returns (address) {
     bytes32 identifierHash = keccak256(abi.encodePacked(identifier));
     require(registry[identifierHash] != address(0), "identifier has no registry entry");
     return registry[identifierHash];
