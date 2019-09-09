@@ -7,11 +7,10 @@ import BackupComplete from 'src/backup/BackupComplete'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
 import BackupPhrase from 'src/backup/BackupPhrase'
 import BackupQuestion from 'src/backup/BackupQuestion'
-import { createQuizWordList, selectQuizWordOptions } from 'src/backup/utils'
+import { createQuizWordList, getStoredMnemonic, selectQuizWordOptions } from 'src/backup/utils'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
-import { getKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 
 export const DAYS_TO_BACKUP = 1
@@ -71,14 +70,13 @@ export class Backup extends React.Component<Props, State> {
     this.props.exitBackupFlow()
   }
 
-  // TODO(Rossy): Move out of here into a saga
   retrieveMnemonic = async () => {
     if (this.state.mnemonic) {
       return
     }
 
     try {
-      const mnemonic = await getKey('mnemonic')
+      const mnemonic = await getStoredMnemonic()
       if (!mnemonic) {
         throw new Error('Mnemonic not stored in key store')
       }
