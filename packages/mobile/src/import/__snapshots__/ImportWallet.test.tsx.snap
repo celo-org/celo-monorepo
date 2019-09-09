@@ -76,6 +76,7 @@ exports[`ImportWallet renders correctly 1`] = `
         style={
           Array [
             Object {
+              "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 22,
               "paddingBottom": 20,
@@ -352,6 +353,7 @@ exports[`ImportWallet renders with an error 1`] = `
         style={
           Array [
             Object {
+              "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 22,
               "paddingBottom": 20,
