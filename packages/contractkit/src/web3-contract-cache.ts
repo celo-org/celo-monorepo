@@ -7,7 +7,6 @@ import { newGasPriceMinimum } from './generated/GasPriceMinimum'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
 import { newLockedGold } from './generated/LockedGold'
-import { newMultiSig } from './generated/MultiSig'
 import { newRandom } from './generated/Random'
 import { newRegistry } from './generated/Registry'
 import { newReserve } from './generated/Reserve'
@@ -25,7 +24,6 @@ const ContractFactories = {
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
-  [CeloContract.MultiSig]: newMultiSig,
   [CeloContract.Random]: newRandom,
   [CeloContract.Registry]: newRegistry,
   [CeloContract.Reserve]: newReserve,
@@ -65,9 +63,6 @@ export class Web3ContractCache {
   }
   getGovernance() {
     return this.getContract(CeloContract.Governance)
-  }
-  getMultiSig() {
-    return this.getContract(CeloContract.MultiSig)
   }
   getRandom() {
     return this.getContract(CeloContract.Random)
