@@ -60,13 +60,13 @@ export async function advanceBlockNum(numBlocks: number, web3: Web3) {
   return returnValue
 }
 
-export async function timeTravel(seconds: number, web3: Web3) {
+export async function jsonRpc(web3: Web3, method: string, params: any[] = []): Promise<any> {
   return new Promise((resolve, reject) => {
     web3.currentProvider.send(
       {
         jsonrpc: '2.0',
-        method: 'evm_increaseTime',
-        params: [seconds],
+        method,
+        params,
         id: new Date().getTime(),
       },
       // @ts-ignore
@@ -78,6 +78,11 @@ export async function timeTravel(seconds: number, web3: Web3) {
       }
     )
   })
+}
+
+export async function timeTravel(seconds: number, web3: Web3) {
+  await jsonRpc(web3, 'evm_increaseTime', [seconds])
+  await jsonRpc(web3, 'evm_mine', [])
 }
 
 export async function assertBalance(address: string, balance: BigNumber) {

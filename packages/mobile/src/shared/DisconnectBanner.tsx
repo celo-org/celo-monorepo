@@ -58,6 +58,8 @@ const styles = StyleSheet.create({
   text: {
     ...fontStyles.bodySmall,
     textAlign: 'center',
+    // Unset explicit lineHeight set by fonts.tsx otherwise the text is not centered vertically
+    lineHeight: undefined,
   },
   textGrey: {
     color: colors.disconnectBannerGrey,

@@ -32,13 +32,6 @@ export interface SetLatestBlockNumberAction {
   latestBlockNumber: number
 }
 
-export interface SetProgressAction {
-  type: Actions.SET_PROGRESS
-  payload: {
-    syncProgress: number
-  }
-}
-
 export interface UpdateWeb3SyncProgressAction {
   type: Actions.UPDATE_WEB3_SYNC_PROGRESS
   payload: {
@@ -51,7 +44,6 @@ export interface UpdateWeb3SyncProgressAction {
 export type ActionTypes =
   | SetAccountAction
   | SetCommentKeyAction
-  | SetProgressAction
   | SetLatestBlockNumberAction
   | UpdateWeb3SyncProgressAction
 
@@ -73,13 +65,6 @@ export const setPrivateCommentKey = (commentKey: string): SetCommentKeyAction =>
 export const setLatestBlockNumber = (latestBlockNumber: number): SetLatestBlockNumberAction => ({
   type: Actions.SET_BLOCK_NUMBER,
   latestBlockNumber,
-})
-
-export const setSyncProgress = (syncProgress: number) => ({
-  type: Actions.SET_PROGRESS,
-  payload: {
-    syncProgress,
-  },
 })
 
 // TODO: Remove duplicaiton with SetProgress action (this is currently unused)

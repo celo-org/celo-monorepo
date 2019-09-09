@@ -1,0 +1,101 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders bubble text 1`] = `
+Array [
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "#FFFFFF",
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "padding": 16,
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Hind-SemiBold",
+          "fontSize": 18,
+        }
+      }
+    >
+      
+    </Text>
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#FFFFFF",
+            "fontFamily": "Hind-Bold",
+            "fontSize": 10,
+            "lineHeight": 18,
+          },
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "#3C9BF4",
+            "borderRadius": 10,
+            "flexDirection": "row",
+            "height": 20,
+            "justifyContent": "space-around",
+            "margin": 5,
+            "padding": 1,
+            "textAlign": "center",
+            "width": 20,
+          },
+        ]
+      }
+    >
+      This is a Bubble
+    </Text>
+  </View>,
+  <View
+    style={
+      Object {
+        "backgroundColor": "rgba(134, 138, 141, 0.15)",
+        "height": 1,
+        "marginHorizontal": 16,
+      }
+    }
+  />,
+]
+`;
+
+exports[`renders text 1`] = `
+Array [
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "#FFFFFF",
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "padding": 16,
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Hind-SemiBold",
+          "fontSize": 18,
+        }
+      }
+    >
+      This is a Test
+    </Text>
+  </View>,
+  <View
+    style={
+      Object {
+        "backgroundColor": "rgba(134, 138, 141, 0.15)",
+        "height": 1,
+        "marginHorizontal": 16,
+      }
+    }
+  />,
+]
+`;

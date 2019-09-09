@@ -12,7 +12,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { EscrowedPayment, reclaimPayment } from 'src/escrow/actions'
+import { EscrowedPayment, reclaimEscrowPayment } from 'src/escrow/actions'
 import ReclaimPaymentConfirmationCard from 'src/escrow/ReclaimPaymentConfirmationCard'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, { CalculateFeeChildren } from 'src/fees/CalculateFee'
@@ -37,12 +37,12 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  reclaimPayment: typeof reclaimPayment
+  reclaimPayment: typeof reclaimEscrowPayment
   showError: typeof showError
 }
 
 const mapDispatchToProps = {
-  reclaimPayment,
+  reclaimPayment: reclaimEscrowPayment,
   showError,
 }
 
@@ -131,7 +131,6 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
           <ReclaimPaymentConfirmationCard
             recipientPhone={payment.recipientPhone}
             recipientContact={payment.recipientContact}
-            comment={payment.message}
             amount={convertedAmount}
             currency={CURRENCY_ENUM.DOLLAR} // User can only request in Dollars
             fee={fee}
