@@ -72,7 +72,7 @@ export function splitMnemonic(mnemonic: string, language: string | null): string
 }
 
 function sortStringArray(a: string[], b: string[]): number {
-  // localeCompare is slower
+  // localeCompare is slower -- https://jsperf.com/operator-vs-localecompage/3
   if (a[0] < b[0]) {
     return -1
   }
@@ -85,14 +85,11 @@ function sortStringArray(a: string[], b: string[]): number {
 }
 
 export function joinMnemonic(mnemonicShards: string[]) {
-  return {
-    original: mnemonicShards,
-    joined: mnemonicShards
-      .map((shard) => shard.split(' '))
-      .sort(sortStringArray)
-      .map((shard) => shard.slice(1).join(' '))
-      .join(' '),
-  }
+  return mnemonicShards
+    .map((shard) => shard.split(' '))
+    .sort(sortStringArray)
+    .map((shard) => shard.slice(1).join(' '))
+    .join(' ')
 }
 
 // TODO(Rossy) Remove after the next alfa testnet reset

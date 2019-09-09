@@ -69,14 +69,14 @@ describe('backup/utils', () => {
       const split = splitMnemonic(mockMnemonic, 'en')
       const joined = joinMnemonic(split)
 
-      expect(joined.joined).toBe(mockMnemonic)
+      expect(joined).toBe(mockMnemonic)
     })
 
     it('joins a flipped split mnemonic', () => {
       const split = splitMnemonic(mockMnemonic, 'en').reverse()
       const joined = joinMnemonic(split)
 
-      expect(joined).toStrictEqual({ original: split, joined: mockMnemonic })
+      expect(joined).toStrictEqual(mockMnemonic)
     })
   })
 })
