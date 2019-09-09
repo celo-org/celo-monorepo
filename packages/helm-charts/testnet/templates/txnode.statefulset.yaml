@@ -91,7 +91,7 @@ spec:
           NAT_FLAG=""
           [[ "$STATIC_IPS_FOR_GETH_NODES" == "true" ]] && NAT_FLAG="--nat=extip:`cat /root/.celo/ipAddress`"
           geth \
-            --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
+            --bootnodesv4=enode://`cat /root/.celo/bootnodeEnode` \
             --lightserv 90 \
             --lightpeers 1000 \
             --maxpeers 1100 \

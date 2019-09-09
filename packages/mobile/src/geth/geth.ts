@@ -35,6 +35,7 @@ enum LogLevel {
   INFO = 3,
   DEBUG = 4,
   TRACE = 5,
+  INSANE = 6,
 }
 
 // The logs will be uploaded only if they are larger than this size
@@ -79,7 +80,7 @@ async function createNewGeth(): Promise<typeof RNGeth> {
   gethOptions.logFile = logFilePath
   // Only log info and above to the log file.
   // The logcat logging mode remains unchanged.
-  gethOptions.logFileLogLevel = 6
+  gethOptions.logFileLogLevel = LogLevel.INSANE
   Logger.debug('Geth@newGeth', 'Geth logs will be piped to ' + logFilePath)
   Logger.debug('Geth@newGeth gethOptions:', gethOptions)
 
