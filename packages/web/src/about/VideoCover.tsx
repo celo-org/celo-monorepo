@@ -1,13 +1,12 @@
 import React from 'react'
-import { Image, StyleSheet, Text, View, createElement } from 'react-native'
-import { standardStyles, textStyles, fonts } from 'src/styles'
-import { H1, H3 } from 'src/fonts/Fonts'
-import { I18nProps, withNamespaces, NameSpaces } from 'src/i18n'
-import VideoModal from 'src/shared/VideoModal'
+import { createElement, Image, StyleSheet, View } from 'react-native'
 import { BeautifulMoneyPreview } from 'src/about/images/index'
-import { PlayCircle2 } from 'src/shared/PlayCircle'
-import Fade from 'react-reveal/Fade'
+import { H1, H3 } from 'src/fonts/Fonts'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import Hoverable from 'src/shared/Hoverable'
+import { PlayCircle2 } from 'src/shared/PlayCircle'
+import VideoModal from 'src/shared/VideoModal'
+import { standardStyles, textStyles } from 'src/styles'
 
 interface State {
   hovering: boolean
@@ -45,33 +44,39 @@ class VideoCover extends React.Component<I18nProps, State> {
           </Video>
         </View>
         <View style={[styles.overlay, standardStyles.centered]}>
-          <Hoverable
-            onHoverIn={this.onHoverStart}
-            onHoverOut={this.onHoverEnd}
-            onPress={this.onPlay}
-          >
-            <View
-              style={[
-                standardStyles.centered,
-                styles.interactive,
-                this.state.hovering && styles.hover,
-              ]}
-            >
-              <H1 style={[textStyles.invert, styles.title, standardStyles.elementalMarginBottom]}>
-                {t('prosperityForAll')}
-              </H1>
-              <View
-                style={[
-                  standardStyles.centered,
-                  standardStyles.row,
-                  standardStyles.elementalMargin,
-                ]}
+          <VideoModal videoID="kKggE5OvyhE" ariaDescription="Video: What if money were beautiful?">
+            {(onPlay) => (
+              <Hoverable
+                onHoverIn={this.onHoverStart}
+                onHoverOut={this.onHoverEnd}
+                onPress={onPlay}
               >
-                <PlayCircle2 height={40} />
-                <H3 style={[textStyles.invert, styles.subtitle]}>{t('whatIfMoney')}</H3>
-              </View>
-            </View>
-          </Hoverable>
+                <View
+                  style={[
+                    standardStyles.centered,
+                    styles.interactive,
+                    this.state.hovering && styles.hover,
+                  ]}
+                >
+                  <H1
+                    style={[textStyles.invert, styles.title, standardStyles.elementalMarginBottom]}
+                  >
+                    {t('prosperityForAll')}
+                  </H1>
+                  <View
+                    style={[
+                      standardStyles.centered,
+                      standardStyles.row,
+                      standardStyles.elementalMargin,
+                    ]}
+                  >
+                    <PlayCircle2 height={40} />
+                    <H3 style={[textStyles.invert, styles.subtitle]}>{t('whatIfMoney')}</H3>
+                  </View>
+                </View>
+              </Hoverable>
+            )}
+          </VideoModal>
         </View>
       </View>
     )
