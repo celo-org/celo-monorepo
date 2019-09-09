@@ -6,7 +6,7 @@ import {
   getRegionCodeFromCountryCode,
   isE164Number,
   parsePhoneNumber,
-} from '../src/phoneNumbers'
+} from './phoneNumbers'
 
 const COUNTRY_CODES = {
   US: '+1',
