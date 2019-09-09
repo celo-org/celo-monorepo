@@ -35,69 +35,64 @@ export function selectQuizWordOptions(correctWord: string, allWords: string[], n
   return wordOptions
 }
 
-export function getWordlist(language: string | null) {
-  let wordlist
+export function getWordlist(language: string | null): string[] {
   switch (language) {
     case 'es': {
-      wordlist = wordlists.ES
-      break
+      return wordlists.ES
     }
     default: {
-      wordlist = wordlists.EN
+      return wordlists.EN
     }
   }
-  return wordlist
 }
 
-function getPartitionWord(
-  wordlist: string[],
-  partitions: number,
-  partitionIndex: number
-): string | undefined {
-  if (partitionIndex >= partitions) {
-    throw new Error('Partition cannot be greater than number of partitions')
+function getPrefixWords(wordlist: string[], words: number): string[] {
+  // Use random words in sorted order for split phrase prefixes
+  const prefixes = _.chain(wordlist)
+    .sampleSize(words)
+    .uniq()
+    .value()
+    .sort()
+
+  if (prefixes.length < words) {
+    throw new Error('Word list has duplicate words')
   }
 
-  const chunkSize = Math.ceil(wordlist.length / partitions)
-  return _.sample(_.chunk(wordlist, chunkSize)[partitionIndex])
+  return prefixes
 }
 
 export function splitMnemonic(mnemonic: string, language: string | null): string[] {
-  const wordlist = getWordlist(language)
   const mnemonicWords = mnemonic.split(' ')
+
+  const wordlist = getWordlist(language)
+  const prefixes = getPrefixWords(wordlist, MNEMONIC_SPLITS)
+
   const chunkSize = Math.ceil(mnemonicWords.length / MNEMONIC_SPLITS)
-  return _.chunk(mnemonicWords, chunkSize).map((words, i) =>
-    [getPartitionWord(wordlist, MNEMONIC_SPLITS, i), ...words].join(' ')
-  )
+  return _.chunk(mnemonicWords, chunkSize).map((words, i) => [prefixes[i], ...words].join(' '))
 }
 
-function getPartitionNumber(word: string, wordlist: string[], partitions: number): number {
-  // Since wordlist is alphabetical, sortedIndexOf can be used to binary search
-  const index = _.sortedIndexOf(wordlist, word)
-  const chunkSize = wordlist.length / partitions
-
-  let partition = 0
-  // Index has to be >= to chunkSize, to include the first element in next chunk
-  while (index >= chunkSize * partition) {
-    partition++
+function sortStringArray(a: string[], b: string[]): number {
+  // localeCompare is slower
+  if (a[0] < b[0]) {
+    return -1
   }
 
-  return partition
+  if (a[0] > b[0]) {
+    return 1
+  }
+
+  return 0
 }
 
-export function joinMnemonic(mnemonicShards: string[], language: string | null): string {
-  const wordlist = getWordlist(language)
-  return mnemonicShards
-    .map((shard) => {
-      const shardArray = shard.split(' ')
-      return {
-        partition: getPartitionNumber(shardArray[0], wordlist, MNEMONIC_SPLITS),
-        words: shardArray.slice(1).join(' '),
-      }
-    })
-    .sort((a, b) => a.partition - b.partition)
-    .map((shard) => shard.words)
-    .join(' ')
+export function joinMnemonic(mnemonicShards: string[]) {
+  return {
+    original: mnemonicShards,
+    joined: mnemonicShards
+      .map((shard) => shard.split(' '))
+      .sort(sortStringArray)
+      .map((shard) => shard.slice(1).join(' '))
+      .join(' '),
+  }
 }
 
 // TODO(Rossy) Remove after the next alfa testnet reset
