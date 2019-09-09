@@ -1,10 +1,11 @@
-import { sampleSize } from 'lodash'
+import * as _ from 'lodash'
 import { AsyncStorage } from 'react-native'
 import { generateMnemonic, wordlists } from 'react-native-bip39'
 import { getKey, setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'Backup/utils'
+const MNEMONIC_SPLITS = 2
 
 export async function createQuizWordList(mnemonic: string, language: string | null) {
   const disallowedWordSet = new Set(mnemonic.split(' '))
@@ -19,7 +20,7 @@ export async function createQuizWordList(mnemonic: string, language: string | nu
 export function selectQuizWordOptions(correctWord: string, allWords: string[], numOptions: number) {
   const wordOptions = []
   const correctWordPosition = Math.floor(Math.random() * numOptions)
-  const randomWordIndexList = sampleSize([...Array(allWords.length).keys()], numOptions - 1)
+  const randomWordIndexList = _.sampleSize([...Array(allWords.length).keys()], numOptions - 1)
   let randomWordIndex: number = 0
 
   for (let i = 0; i < numOptions; i++) {
@@ -46,6 +47,57 @@ export function getWordlist(language: string | null) {
     }
   }
   return wordlist
+}
+
+function getPartitionWord(
+  wordlist: string[],
+  partitions: number,
+  partitionIndex: number
+): string | undefined {
+  if (partitionIndex >= partitions) {
+    throw new Error('Partition cannot be greater than number of partitions')
+  }
+
+  const chunkSize = Math.ceil(wordlist.length / partitions)
+  return _.sample(_.chunk(wordlist, chunkSize)[partitionIndex])
+}
+
+export function splitMnemonic(mnemonic: string, language: string | null): string[] {
+  const wordlist = getWordlist(language)
+  const mnemonicWords = mnemonic.split(' ')
+  const chunkSize = Math.ceil(mnemonicWords.length / MNEMONIC_SPLITS)
+  return _.chunk(mnemonicWords, chunkSize).map((words, i) =>
+    [getPartitionWord(wordlist, MNEMONIC_SPLITS, i), ...words].join(' ')
+  )
+}
+
+function getPartitionNumber(word: string, wordlist: string[], partitions: number): number {
+  // Since wordlist is alphabetical, sortedIndexOf can be used to binary search
+  const index = _.sortedIndexOf(wordlist, word)
+  const chunkSize = wordlist.length / partitions
+
+  let partition = 0
+  // Index has to be >= to chunkSize, to include the first element in next chunk
+  while (index >= chunkSize * partition) {
+    partition++
+  }
+
+  return partition
+}
+
+export function joinMnemonic(mnemonicShards: string[], language: string | null): string {
+  const wordlist = getWordlist(language)
+  return mnemonicShards
+    .map((shard) => {
+      const shardArray = shard.split(' ')
+      return {
+        partition: getPartitionNumber(shardArray[0], wordlist, MNEMONIC_SPLITS),
+        words: shardArray.slice(1).join(' '),
+      }
+    })
+    .sort((a, b) => a.partition - b.partition)
+    .map((shard) => shard.words)
+    .join(' ')
 }
 
 // TODO(Rossy) Remove after the next alfa testnet reset
