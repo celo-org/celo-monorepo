@@ -81,6 +81,7 @@ exports[`ImportContacts Screen renders correctly 1`] = `
           style={
             Array [
               Object {
+                "color": "#2E3338",
                 "fontFamily": "Hind-Light",
                 "fontSize": 22,
                 "paddingBottom": 20,
@@ -95,31 +96,33 @@ exports[`ImportContacts Screen renders correctly 1`] = `
         >
           importContactsPermission.title
         </Text>
-        <View
-          style={
-            Object {
-              "marginTop": 10,
-            }
-          }
-        >
-          <Text
-            style={
-              Object {
-                "fontFamily": "Hind-Light",
-                "fontSize": 18,
-                "textAlign": "center",
-              }
-            }
-          >
-            importContactsPermission.0
-          </Text>
-        </View>
         <Text
           style={
             Array [
               Object {
-                "fontFamily": "Hind-Light",
-                "fontSize": 18,
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 17,
+                "lineHeight": 26,
+              },
+              Object {
+                "textAlign": "center",
+              },
+            ]
+          }
+        >
+          importContactsPermission.0
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 17,
+                "lineHeight": 26,
+              },
+              Object {
                 "textAlign": "center",
               },
               Object {
