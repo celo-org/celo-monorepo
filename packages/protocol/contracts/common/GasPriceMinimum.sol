@@ -154,8 +154,9 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
     view
     returns (uint256)
   {
-    FixidityLib.Fraction memory blockDensity =
-      FixidityLib.newFixedFraction(blockGasTotal, blockGasLimit);
+    FixidityLib.Fraction memory blockDensity = FixidityLib.newFixedFraction(
+      blockGasTotal, blockGasLimit
+    );
     bool densityGreaterThanTarget = blockDensity.gt(targetDensity);
     FixidityLib.Fraction memory densityDelta = densityGreaterThanTarget ?
       blockDensity.subtract(targetDensity) :
