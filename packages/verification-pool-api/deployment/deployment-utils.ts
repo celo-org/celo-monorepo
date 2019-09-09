@@ -90,9 +90,9 @@ async function exec(command: string, args: string[]) {
       console.log(data)
     })
     proc.stderr.on('data', (data: any) => {
-      console.log(data)
+      console.error(data)
     })
   }).catch((data) => {
-    console.log(data)
+    console.error(data)
   })
 }
