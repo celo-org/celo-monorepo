@@ -30,15 +30,16 @@ export function selectQuizWordOptions(correctWord: string, allWords: string[], n
 }
 
 export function getWordlist(language: string | null) {
-  let wordlist
-  switch (language) {
+  if (!language) {
+    return wordlists.EN
+  }
+
+  switch (language.slice(0, 2)) {
     case 'es': {
-      wordlist = wordlists.ES
-      break
+      return wordlists.ES
     }
     default: {
-      wordlist = wordlists.EN
+      return wordlists.EN
     }
   }
-  return wordlist
 }

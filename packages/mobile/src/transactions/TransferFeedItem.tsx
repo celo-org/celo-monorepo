@@ -18,7 +18,7 @@ import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { coinsIcon, unknownUserIcon } from 'src/images/Images'
 import { Invitees } from 'src/invite/actions'
-import useLocalAmount from 'src/localCurrency/useLocalAmount'
+import { useDollarsToLocalAmount } from 'src/localCurrency/useLocalAmount'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes, TransferStandby } from 'src/transactions/reducer'
@@ -138,7 +138,7 @@ export function TransferFeedItem(props: Props) {
     })
   }
 
-  const localValue = useLocalAmount(value)
+  const localValue = useDollarsToLocalAmount(value)
   let info: string | null = decryptComment()
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
