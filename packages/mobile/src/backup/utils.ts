@@ -49,7 +49,7 @@ export function getWordlist(language: string | null) {
 }
 
 // TODO(Rossy) Remove after the next alfa testnet reset
-export async function getMnemonicFromStorage(): Promise<string | null> {
+export async function getStoredMnemonic(): Promise<string | null> {
   try {
     Logger.debug(TAG, 'Checking keystore for mnemonic')
     let mnemonic = await getKey('mnemonic')
