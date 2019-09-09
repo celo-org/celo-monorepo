@@ -68,7 +68,7 @@ export const setNumberVerified = (numberVerified: boolean) => ({
 })
 
 export const setLanguage = (language: string, nextScreen?: Screens) => {
-  numeral.locale(language.substring(0, 2))
+  // numeral.locale(language.substring(0, 2))
   i18n.changeLanguage(language)
 
   if (nextScreen) {
