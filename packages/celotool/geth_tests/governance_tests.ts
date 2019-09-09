@@ -223,7 +223,7 @@ describe('governance tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
-    // await context.hooks.before()
+    await context.hooks.before()
   })
 
   after(context.hooks.after)
