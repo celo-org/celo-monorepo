@@ -238,7 +238,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
         </ScrollView>
 
         <View>
-          <Text style={[styles.body, styles.askInviteContainer]}>
+          {/* <Text style={[styles.body, styles.askInviteContainer]}>
             {t('inviteCodeText.askForInvite.0')}
             <Text
               onPress={goToFaucet}
@@ -246,7 +246,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
             >
               {t('inviteCodeText.askForInvite.1')}
             </Text>
-          </Text>
+          </Text> */}
           <Button
             onPress={this.onContinue}
             text={t('continue')}
