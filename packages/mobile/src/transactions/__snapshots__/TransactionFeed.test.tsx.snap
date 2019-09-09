@@ -298,6 +298,27 @@ exports[`renders for error 1`] = `
                 </Text>
                  undefined
               </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                localCurrencyValue
+              </Text>
             </View>
           </View>
         </View>
@@ -773,6 +794,27 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   confirmingPayment
                 </Text>
                  undefined
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                localCurrencyValue
               </Text>
             </View>
           </View>
@@ -1480,6 +1522,27 @@ exports[`renders for loading 1`] = `
                 </Text>
                  undefined
               </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                localCurrencyValue
+              </Text>
             </View>
           </View>
         </View>
@@ -1973,6 +2036,27 @@ exports[`renders for no transactions 1`] = `
                 </Text>
                  undefined
               </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                localCurrencyValue
+              </Text>
             </View>
           </View>
         </View>
@@ -2465,6 +2549,27 @@ exports[`renders for standbyTransactions 1`] = `
                   confirmingPayment
                 </Text>
                  undefined
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                localCurrencyValue
               </Text>
             </View>
           </View>
