@@ -82,6 +82,7 @@ exports[`renders correctly on 1st question 1`] = `
           style={
             Array [
               Object {
+                "color": "#2E3338",
                 "fontFamily": "Hind-Light",
                 "fontSize": 22,
                 "paddingBottom": 20,
@@ -754,6 +755,7 @@ exports[`renders correctly on 2nd word 1`] = `
           style={
             Array [
               Object {
+                "color": "#2E3338",
                 "fontFamily": "Hind-Light",
                 "fontSize": 22,
                 "paddingBottom": 20,
@@ -1426,6 +1428,7 @@ exports[`renders correctly on 3rd word 1`] = `
           style={
             Array [
               Object {
+                "color": "#2E3338",
                 "fontFamily": "Hind-Light",
                 "fontSize": 22,
                 "paddingBottom": 20,
@@ -2098,6 +2101,7 @@ exports[`renders correctly on 3rd word 2`] = `
           style={
             Array [
               Object {
+                "color": "#2E3338",
                 "fontFamily": "Hind-Light",
                 "fontSize": 22,
                 "paddingBottom": 20,
@@ -2770,6 +2774,7 @@ exports[`renders correctly on 3rd word 3`] = `
           style={
             Array [
               Object {
+                "color": "#2E3338",
                 "fontFamily": "Hind-Light",
                 "fontSize": 22,
                 "paddingBottom": 20,

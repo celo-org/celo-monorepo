@@ -22,6 +22,7 @@ exports[`ErrorScreen with errorMessage renders correctly 1`] = `
     <Text
       style={
         Object {
+          "color": "#2E3338",
           "fontFamily": "Hind-Light",
           "fontSize": 22,
           "paddingBottom": 20,
@@ -34,6 +35,7 @@ exports[`ErrorScreen with errorMessage renders correctly 1`] = `
     <Text
       style={
         Object {
+          "color": "#2E3338",
           "fontFamily": "Hind-Light",
           "fontSize": 18,
           "textAlign": "center",
@@ -170,6 +172,7 @@ exports[`ErrorScreen without errorMessage renders correctly 1`] = `
     <Text
       style={
         Object {
+          "color": "#2E3338",
           "fontFamily": "Hind-Light",
           "fontSize": 22,
           "paddingBottom": 20,
@@ -182,6 +185,7 @@ exports[`ErrorScreen without errorMessage renders correctly 1`] = `
     <Text
       style={
         Object {
+          "color": "#2E3338",
           "fontFamily": "Hind-Light",
           "fontSize": 18,
           "textAlign": "center",
