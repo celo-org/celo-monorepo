@@ -105,10 +105,10 @@ class ImportContacts extends React.Component<Props, State> {
             <Text style={[fontStyles.h1, style.h1]} testID="ImportContactsPermissionTitle">
               {t('importContactsPermission.title')}
             </Text>
-            <View style={componentStyles.marginTop10}>
-              <Text style={fontStyles.h2}>{t('importContactsPermission.0')}</Text>
-            </View>
-            <Text style={[fontStyles.h2, componentStyles.marginTop10]}>
+            <Text style={[fontStyles.bodyLarge, fontStyles.center]}>
+              {t('importContactsPermission.0')}
+            </Text>
+            <Text style={[fontStyles.bodyLarge, fontStyles.center, componentStyles.marginTop10]}>
               {t('importContactsPermission.1')}
             </Text>
           </View>

@@ -77,7 +77,7 @@ class SystemAuth extends React.Component<Props> {
             <Text style={[fontStyles.h1, style.h1]} testID="SystemAuthTitle">
               {t('systemAuth.title')}
             </Text>
-            <Text style={[fontStyles.h2, style.explanation]}>{t('systemAuth.summary')}</Text>
+            <Text style={[fontStyles.bodyLarge, style.explanation]}>{t('systemAuth.summary')}</Text>
           </View>
         </ScrollView>
         <View style={style.pincodeFooter}>
@@ -113,22 +113,16 @@ const style = StyleSheet.create({
   },
   explanation: {
     textAlign: 'center',
-    paddingHorizontal: 10,
-    marginVertical: 10,
+    paddingHorizontal: 15,
+    marginBottom: 20,
   },
   pincodeFooter: {
     flexDirection: 'column',
     alignItems: 'flex-end',
     textAlign: 'center',
   },
-  pincodeFooterText: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingBottom: 35,
-  },
   h1: {
-    textAlign: 'center',
-    padding: 25,
+    marginTop: 20,
   },
 })
 
