@@ -53,6 +53,14 @@ export class ContractKit {
     this._defaultOptions.gasCurrency = address
   }
 
+  isListening(): Promise<boolean> {
+    return this.web3.eth.net.isListening()
+  }
+
+  isSyncing(): Promise<boolean> {
+    return this.web3.eth.isSyncing()
+  }
+
   sendTransaction(tx: Tx): TransactionResult {
     const promiEvent = this.web3.eth.sendTransaction({
       from: this._defaultOptions.from,
