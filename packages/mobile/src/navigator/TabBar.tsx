@@ -11,6 +11,7 @@ interface StateProps {
 
 interface OwnProps {
   onTabPress?: () => void
+  inactiveTintColor: string
 }
 
 type Props = StateProps & OwnProps
@@ -26,7 +27,7 @@ const onPress = () => {}
 
 export const TabBar = (props: Props) => {
   const { backupTooLate } = props
-  const inactiveTintColor = backupTooLate ? colors.inactive : colors.darkSecondary
+  const inactiveTintColor = backupTooLate ? colors.inactive : props.inactiveTintColor
   const onTabPress = backupTooLate ? onPress : props.onTabPress
   return <BottomTabBar {...props} inactiveTintColor={inactiveTintColor} onTabPress={onTabPress} />
 }

@@ -7,7 +7,7 @@ exports[`renders correctly 1`] = `
       "backgroundColor": "white",
       "flex": 1,
       "justifyContent": "space-between",
-      "paddingTop": 70,
+      "paddingTop": 30,
     }
   }
 >
@@ -39,6 +39,7 @@ exports[`renders correctly 1`] = `
         style={
           Array [
             Object {
+              "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 22,
               "paddingBottom": 20,
