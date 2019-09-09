@@ -1,5 +1,4 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import Link from '@celo/react-components/components/Link'
 import SmallButton from '@celo/react-components/components/SmallButton'
 import InviteCodeIcon from '@celo/react-components/icons/InviteCodeIcon'
 import colors from '@celo/react-components/styles/colors'
@@ -167,9 +166,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <DevSkipButton nextScreen={Screens.ImportContacts} />
-          <View style={styles.image}>
-            <InviteCodeIcon />
-          </View>
+          <InviteCodeIcon />
           <Text style={[fontStyles.h1, styles.h1]} testID={'InviteCodeTitle'}>
             {t('inviteCodeText.title')}
           </Text>
@@ -256,19 +253,14 @@ export class EnterInviteCode extends React.Component<Props, State> {
             disabled={!this.props.redeemComplete}
             testID="ContinueInviteButton"
           />
-          <View style={styles.importWallet}>
-            <Text style={[fontStyles.bodySmall, styles.body, styles.importWalletText]}>
-              {t('haveWallet')}
-            </Text>
-            <Link
-              style={[fontStyles.linkInline, styles.importWalletText]}
-              onPress={this.onImportClick}
-              disabled={this.state.isSubmitting}
-              testID="ImportExistingUsingBackupKey"
-            >
-              {t('importIt')}
-            </Link>
-          </View>
+          <Button
+            onPress={this.onImportClick}
+            text={t('importIt')}
+            standard={false}
+            style={styles.continueButton}
+            type={BtnTypes.SECONDARY}
+            testID="ContinueInviteButton"
+          />
         </View>
       </View>
     )
@@ -294,7 +286,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   h1: {
-    color: colors.dark,
+    marginTop: 20,
   },
   body: {
     ...fontStyles.bodySmall,
@@ -322,20 +314,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     fontSize: 14,
   },
-  image: {
-    marginBottom: 20,
-  },
   continueButton: {
     width: '100%',
-  },
-  importWallet: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    marginVertical: 17,
-  },
-  importWalletText: {
-    fontSize: 13,
   },
 })
 
