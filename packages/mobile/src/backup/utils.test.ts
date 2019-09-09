@@ -55,12 +55,17 @@ describe('backup/utils', () => {
   })
 
   describe('splitMnemonic', () => {
-    it('splits mnemonic with prefix', () => {
-      const split = splitMnemonic(mockMnemonic, 'en')
+    it('splits mnemonic with prefixes', () => {
+      const shards = splitMnemonic(mockMnemonic, 'en')
+      const shard0 = shards[0].split(' ')
+      const shard1 = shards[1].split(' ')
 
-      expect(split.length).toBe(2)
-      expect(split[0].split(' ').length).toBe(13)
-      expect(split[1].split(' ').length).toBe(13)
+      expect(shards.length).toBe(2)
+
+      expect(shard0.length).toBe(13)
+      expect(shard1.length).toBe(13)
+
+      expect(shard0[0]).not.toBe(shard1[0])
     })
   })
 
