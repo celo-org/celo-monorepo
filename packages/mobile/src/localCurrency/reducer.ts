@@ -6,6 +6,7 @@ export interface State {
   isLoading: boolean
   symbol: string | null
   exchangeRate?: number | null
+  lastSuccessfulUpdate?: number
 }
 
 const initialState = {
@@ -33,7 +34,7 @@ export const reducer = (
         isLoading: false,
       }
     }
-    case Actions.FETCH_CURRENT_RATE:
+    case Actions.FETCH_CURRENT_RATE_START:
       return {
         ...state,
         isLoading: true,
@@ -43,6 +44,7 @@ export const reducer = (
         ...state,
         isLoading: false,
         exchangeRate: action.exchangeRate,
+        lastSuccessfulUpdate: action.now,
       }
     case Actions.FETCH_CURRENT_RATE_FAILURE:
       return {

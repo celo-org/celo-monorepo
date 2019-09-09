@@ -1,23 +1,24 @@
 import gql from 'graphql-tag'
-import { call, delay, put, spawn } from 'redux-saga/effects'
+import { call, delay, put, select, spawn, take } from 'redux-saga/effects'
 import { apolloClient } from 'src/apollo'
 import { waitForRehydrate } from 'src/app/saga'
 import { LOCAL_CURRENCY_SYMBOL } from 'src/config'
 import {
-  fetchCurrentRate,
   fetchCurrentRateFailure,
+  fetchCurrentRateStart,
   fetchCurrentRateSuccess,
 } from 'src/localCurrency/actions'
+import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'localCurrency/saga'
 
-const POLLING_DELAY = 3600 * 1000 // 1 hour
+const MIN_UPDATE_INTERVAL = 24 * 3600 * 1000 // 24 hours
 
 // Delay before retrying when an error is raised
 const RETRY_DELAY = 10 * 1000 // 10 secs
 
-async function fetchExchangeRate(symbol: string): Promise<number> {
+export async function fetchExchangeRate(symbol: string): Promise<number> {
   const response = await apolloClient.query({
     query: gql`
     {    
@@ -48,7 +49,7 @@ async function fetchExchangeRate(symbol: string): Promise<number> {
   return rate
 }
 
-function* updateLocalCurrencyRate() {
+export function* updateLocalCurrencyRate() {
   if (!LOCAL_CURRENCY_SYMBOL) {
     return
   }
@@ -57,10 +58,17 @@ function* updateLocalCurrencyRate() {
 
   while (true) {
     try {
-      yield put(fetchCurrentRate())
+      const lastSuccessfulUpdate: number | undefined = yield select(
+        (state: RootState) => state.localCurrency.lastSuccessfulUpdate
+      )
+      if (lastSuccessfulUpdate && Date.now() - lastSuccessfulUpdate < MIN_UPDATE_INTERVAL) {
+        yield take()
+        continue
+      }
+
+      yield put(fetchCurrentRateStart())
       const rate = yield call(fetchExchangeRate, LOCAL_CURRENCY_SYMBOL)
-      yield put(fetchCurrentRateSuccess(rate))
-      yield delay(POLLING_DELAY)
+      yield put(fetchCurrentRateSuccess(rate, Date.now()))
     } catch (error) {
       Logger.error(`${TAG}@updateLocalCurrencyRate`, error)
       yield put(fetchCurrentRateFailure())
