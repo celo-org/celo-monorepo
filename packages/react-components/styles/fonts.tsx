@@ -44,11 +44,13 @@ export const fontStyles = StyleSheet.create({
     fontFamily: HindSilguri.Light,
     paddingBottom: 20,
     textAlign: 'center',
+    color: colors.dark,
   },
   h2: {
     fontSize: 18,
     fontFamily: HindSilguri.Light,
     textAlign: 'center',
+    color: colors.dark,
   },
   paragraph: {
     fontSize: 16,
@@ -59,6 +61,12 @@ export const fontStyles = StyleSheet.create({
   body: {
     fontSize: 16,
     lineHeight: 24,
+    fontFamily: HindSilguri.Regular,
+    color: colors.dark,
+  },
+  bodyLarge: {
+    fontSize: 17,
+    lineHeight: 26,
     fontFamily: HindSilguri.Regular,
     color: colors.dark,
   },
@@ -80,6 +88,12 @@ export const fontStyles = StyleSheet.create({
     fontFamily: HindSilguri.Bold,
     color: colors.dark,
   },
+  bodyXSmall: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontFamily: HindSilguri.Regular,
+    color: colors.dark,
+  },
   bodyBold: {
     fontSize: 16,
     lineHeight: 24,
@@ -91,12 +105,6 @@ export const fontStyles = StyleSheet.create({
     lineHeight: 18,
     fontFamily: HindSilguri.SemiBold,
     color: colors.dark,
-  },
-  linkSmall: {
-    fontSize: 13,
-    lineHeight: 17,
-    fontFamily: HindSilguri.SemiBold,
-    color: colors.darkSecondary,
   },
   sectionLabel: {
     color: colors.darkSecondary,
@@ -161,15 +169,15 @@ export const fontStyles = StyleSheet.create({
     lineHeight: 18,
     fontFamily: HindSilguri.Medium,
   },
+  linkSmall: {
+    fontSize: 13,
+    lineHeight: 17,
+    fontFamily: HindSilguri.SemiBold,
+    color: colors.darkSecondary,
+  },
   linkInline: {
     color: colors.celoGreen,
     fontFamily: HindSilguri.SemiBold,
-  },
-  bodyLink: {
-    color: colors.celoDarkGreen,
-    fontFamily: HindSilguri.Medium,
-    fontSize: 16,
-    lineHeight: 24,
   },
   headerTitle: {
     fontSize: 14,

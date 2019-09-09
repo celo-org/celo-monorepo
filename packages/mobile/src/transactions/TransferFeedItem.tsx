@@ -121,7 +121,11 @@ export function TransferFeedItem(props: Props) {
       return
     }
 
-    const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
+    const recipient = getRecipientFromAddress(
+      address,
+      transactionType === TransactionTypes.INVITE_SENT ? invitees : addressToE164Number,
+      recipientCache
+    )
 
     navigateToPaymentTransferReview(type, timestamp, {
       address,

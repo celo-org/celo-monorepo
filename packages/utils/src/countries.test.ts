@@ -1,10 +1,10 @@
-import { Countries } from '../src/countries'
+import { Countries } from './countries'
 
 const countries = new Countries('en-us')
 
 describe('countries', () => {
   describe('getCountryMap', () => {
-    it('Valid Country', () => {
+    test('Valid Country', () => {
       const country = countries.getCountryByCode('US')
 
       expect(country).toBeDefined()
@@ -15,7 +15,7 @@ describe('countries', () => {
       }
     })
 
-    it('Invalid Country', () => {
+    test('Invalid Country', () => {
       // canary islands, no calling code
       const invalidCountry = countries.getCountryByCode('IC')
 
@@ -38,7 +38,7 @@ describe('countries', () => {
     })
   })
   describe('getLocalizedCountries', () => {
-    it('has all country data', () => {
+    test('has all country data', () => {
       const country = countries.getCountry('taiwan')
 
       const taiwan = {
@@ -60,7 +60,7 @@ describe('countries', () => {
   })
 
   describe('Country Search', () => {
-    it('returns empty array on exact match', () => {
+    test('returns empty array on exact match', () => {
       const results = countries.getFilteredCountries('taiwan')
 
       expect(results.length).toBe(0)
