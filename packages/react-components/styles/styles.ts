@@ -2,7 +2,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontFamily } from '@celo/react-components/styles/fonts'
 import { StyleSheet } from 'react-native'
 
-export const TOP_BAR_HEIGHT = 45
+export const TOP_BAR_HEIGHT = 56
 
 export const componentStyles = StyleSheet.create({
   marginTop10: {

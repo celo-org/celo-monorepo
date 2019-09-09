@@ -9,8 +9,8 @@ interface Props {
 
 export default class VerifyAddressBook extends React.PureComponent<Props> {
   static defaultProps = {
-    height: 70,
-    width: 80,
+    height: 50,
+    width: 50,
   }
 
   render() {

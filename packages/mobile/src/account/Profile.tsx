@@ -53,7 +53,11 @@ export class Profile extends React.Component<Props> {
           </View>
         </View>
         <View style={[style.container, style.underlinedBox]}>
-          <SettingsItem title={t('editName')} onPress={this.goToEditProfile} />
+          <SettingsItem
+            testID="ProfileEditName"
+            title={t('editName')}
+            onPress={this.goToEditProfile}
+          />
         </View>
       </ScrollView>
     )

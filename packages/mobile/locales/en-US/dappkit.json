@@ -1,5 +1,5 @@
 {
-  "connectToWallet": "Savings Circle would like to connect to Celo Wallet",
+  "connectToWallet": "{{dappname}} would like to connect to Celo Wallet",
   "connect": "Connect",
   "cancel": "Cancel",
   "allow": "Allow",

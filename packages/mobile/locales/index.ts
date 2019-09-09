@@ -1,4 +1,4 @@
 import enUS from 'locales/en-US'
-import esAR from 'locales/es-AR'
+import es_419 from 'locales/es-419'
 
-export default { enUS, esAR }
+export default { enUS, es_419 }

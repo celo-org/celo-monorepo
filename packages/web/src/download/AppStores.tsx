@@ -7,7 +7,7 @@ import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
-import Button, { BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { CeloLinks } from 'src/shared/menu-items'
 import { standardStyles, textStyles } from 'src/styles'
 
@@ -37,7 +37,12 @@ export default withNamespaces(NameSpaces.download)(
                 <H4 style={[textStyles.center, standardStyles.elementalMargin, styles.seedPhrase]}>
                   {t('useSeed')}
                 </H4>
-                <Button kind={BTN.NAKED} text={t('learnMore')} href={CeloLinks.gettingStarted} />
+                <Button
+                  size={SIZE.normal}
+                  kind={BTN.NAKED}
+                  text={t('learnMore')}
+                  href={CeloLinks.gettingStarted}
+                />
               </View>
             </Fade>
           </Cell>

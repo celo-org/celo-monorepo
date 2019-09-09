@@ -1,5 +1,7 @@
 import { call, put, take } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { fetchGoldBalance } from 'src/goldToken/actions'
@@ -54,6 +56,7 @@ export function* sendAndMonitorTransaction(
     if (currency === CURRENCY_ENUM.GOLD) {
       yield put(fetchGoldBalance())
     } else if (currency === CURRENCY_ENUM.DOLLAR) {
+      CeloAnalytics.track(CustomEventNames.send_dollar_transaction_confirmed)
       yield put(fetchDollarBalance())
     } else {
       // Fetch both balances for exchange

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Image, ImageRequireSource, StyleSheet, View } from 'react-native'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Button, { BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import Responsive from 'src/shared/Responsive'
 import { standardStyles } from 'src/styles'
 const forbes = require('./forbes-logo.png')
@@ -39,6 +39,7 @@ class Press extends React.PureComponent<I18nProps> {
             <Button
               text={t('recentNews')}
               kind={BTN.NAKED}
+              size={SIZE.normal}
               href={
                 'https://www.wsj.com/articles/startup-celo-aims-to-make-crypto-accessible-to-mainstream-mobile-users-11554204600'
               }

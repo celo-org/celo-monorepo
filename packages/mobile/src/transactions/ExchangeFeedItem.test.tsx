@@ -1,11 +1,12 @@
 import * as React from 'react'
 import 'react-native'
+import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { EventTypeNames } from 'src/apollo/types'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { ExchangeFeedItem } from 'src/transactions/ExchangeFeedItem'
 import { TransactionStatus } from 'src/transactions/reducer'
-import { getMockI18nProps } from 'test/utils'
+import { createMockStore, getMockI18nProps } from 'test/utils'
 
 describe('ExchangeFeedItem', () => {
   let dateNowSpy: any
@@ -24,19 +25,21 @@ describe('ExchangeFeedItem', () => {
 
   it('renders correctly', () => {
     const tree = renderer.create(
-      <ExchangeFeedItem
-        status={TransactionStatus.Complete}
-        __typename={EventTypeNames.Exchange}
-        type={'EXCHANGE'}
-        hash={'0x'}
-        inValue={1}
-        outValue={10}
-        outSymbol={CURRENCY_ENUM.GOLD}
-        inSymbol={CURRENCY_ENUM.DOLLAR}
-        timestamp={1}
-        showImage={false}
-        {...getMockI18nProps()}
-      />
+      <Provider store={createMockStore({})}>
+        <ExchangeFeedItem
+          status={TransactionStatus.Complete}
+          __typename={EventTypeNames.Exchange}
+          type={'EXCHANGE'}
+          hash={'0x'}
+          inValue={1}
+          outValue={10}
+          outSymbol={CURRENCY_ENUM.GOLD}
+          inSymbol={CURRENCY_ENUM.DOLLAR}
+          timestamp={1}
+          showImage={false}
+          {...getMockI18nProps()}
+        />
+      </Provider>
     )
     expect(tree).toMatchSnapshot()
   })
