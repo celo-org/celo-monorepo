@@ -16,11 +16,11 @@
   "redeemFailed": "No pudimos validar el código de invitación",
   "redeemInviteTimeout": "Canjear invitación agotada",
   "withdrawGoldFromEscrow": "Retirarndo el oro de la cuenta...",
-  "transferGoldToAccount": "Oro transferido a su cuenta!",
-  "withdrawDollarsFromEscrow": "Retirando los {{dollars}} de su cuenta...",
-  "transferDollarsToAccount": "{{Dollars}} transferidos a su cuenta!",
+  "transferGoldToAccount": "Oro transferido a tu cuenta!",
+  "withdrawDollarsFromEscrow": "Retirando los {{dollars}} de tu cuenta...",
+  "transferDollarsToAccount": "{{Dollars}} transferidos a tu cuenta!",
   "inviteFriendsToCelo": "Invitar amigos a Celo",
-  "inviteAnyone": "Invite a cualquiera en su libreta de direcciones para enviar y recibir valor",
+  "inviteAnyone": "Invite a cualquiera en tu libreta de direcciones para enviar y recibir valor",
   "inviteComplete": "Invitación completa",
   "inviteReceived": "Invitación recibida"
 }

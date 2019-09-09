@@ -3,11 +3,11 @@
   "chooseLanguage": "Elegir idioma",
   "continue": "Continuar",
   "secureAsset":
-    "Celo mantiene su patrimonio seguro y le permite enviar capital a quien quiera y recibirlos de cualquier persona",
+    "Celo mantiene tu patrimonio seguro y le permite enviar capital a quien quiera y recibirlos de cualquier persona",
   "stableAsset":
     "Los {{CeloDollars}} constituyen un activo digital estable que está alineado con el valor del dólar estadounidense",
   "verifyNumber":
-    "Verifique su número de teléfono para conectarse con otros usuarios y recibir dinero",
+    "Verifique tu número de teléfono para conectarse con otros usuarios y recibir dinero",
   "syncNetwork": "Sincronizando con la red",
   "welcomeCelo": "Te damos la bienvenida a Celo",
   "chooseCountryCode": "Código de país",
@@ -47,7 +47,7 @@
       "1": "celo.org/build/wallet"
     }
   },
-  "enterFullName": "Ingrese su nombre y apellido",
+  "enterFullName": "Ingresa tu nombre y apellido",
   "fullName": "Nombre completo",
   "InvitationCode": "Código de invitación",
   "optIn": "Inscribirse",
@@ -58,10 +58,10 @@
   "important": "Importante",
   "createPin": {
     "title": "Crear un código PIN de 6 dígitos",
-    "intro": "Cree un PIN para proteger su Monedero Celo.",
+    "intro": "Cree un PIN para proteger tu Monedero Celo.",
     "why": "En ciertos casos, necesitará este PIN para enviar {{CeloDollars}} a sus amigos.",
     "warn":
-      "escriba su código PIN de 6 dígitos en un papel y guárdelo en algún sitio seguro. Se lo solicitaremos más tarde para acceder a su monedero.",
+      "escribe tu código PIN de 6 dígitos en un papel y guárdelo en algún sitio seguro. Se lo solicitaremos más tarde para acceder a tu monedero.",
     "yourPin": "Su PIN"
   },
   "enableSecurity": "Habilitar seguridad",
@@ -74,7 +74,7 @@
     "submit": "Enviar"
   },
   "systemAuth": {
-    "title": "Asegure su Teléfono",
+    "title": "Asegura tu Teléfono",
     "secure":
       "Agregar un PIN a tu teléfono ayuda a que tus fondos en Celo se mantengan seguros y protegidos.",
     "intro":
@@ -82,7 +82,7 @@
     "why":
       "Necesitamos este nivel de protección adicional para asegurar que el contenido de tu monedero se encuentra a salvo.",
     "summary":
-      "Celo requiere que los teléfonos estén protegidos con un PIN o huella digital. El bloqueo de su dispositivo ayuda a garantizar que los fondos en su billetera estén protegidos."
+      "Celo requiere que los teléfonos estén protegidos con un PIN o huella digital. Bloquear de tu dispositivo ayuda a garantizar que los fondos en su billetera estén protegidos."
   },
   "goToSystemSecuritySettingsActionLabel": "Vaya a seguridad",
   "enableSystemScreenLockFailedMessage": "Error al intentar habilitar el bloqueo de pantalla",
