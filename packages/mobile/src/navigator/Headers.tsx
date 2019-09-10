@@ -39,5 +39,6 @@ export const headerWithBackButton = {
 // TODO(Rossy) align designs to consistently use back button
 export const headerWithCancelButton = {
   ...headerWithBackButton,
+  headerLeftContainerStyle: { paddingHorizontal: 0 },
   headerLeft: <CancelButton />,
 }

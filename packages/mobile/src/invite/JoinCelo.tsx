@@ -187,22 +187,15 @@ export class JoinCelo extends React.Component<Props, State> {
           ref={this.scrollView}
         >
           <NuxLogo />
-          <Text style={[fontStyles.h1, styles.center]} testID="InviteWallTitle">
-            {' '}
+          <Text style={fontStyles.h1} testID="InviteWallTitle">
             {t('welcomeCelo')}
           </Text>
-          <Text style={[fontStyles.bodySmall, styles.body]}>{t('joinText.0')}</Text>
-          <Text style={[fontStyles.bodySmall, styles.body]}>
-            {t('joinText.1')}
-            <Text onPress={goToCeloSite} style={fontStyles.link}>
-              {t('joinText.2')}
-            </Text>
-          </Text>
+          <Text style={fontStyles.bodySmall}>{t('joinText.0')}</Text>
           <TextInput
             onFocus={this.scrollToEnd}
             onChangeText={this.onChangeNameInput}
             value={name}
-            style={styles.box}
+            style={styles.nameInputField}
             placeholderTextColor={colors.inactive}
             underlineColorAndroid="transparent"
             enablesReturnKeyAutomatically={true}
@@ -227,6 +220,12 @@ export class JoinCelo extends React.Component<Props, State> {
               this.props.cachedNumber !== '' ? this.props.cachedNumber : undefined
             }
           />
+          <Text style={[fontStyles.bodyXSmall, styles.disclaimer]}>
+            {t('joinText.1')}
+            <Text onPress={goToCeloSite} style={fontStyles.link}>
+              {t('joinText.2')}
+            </Text>
+          </Text>
         </ScrollView>
         <Button
           standard={false}
@@ -251,7 +250,8 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 0,
   },
-  box: {
+  nameInputField: {
+    marginTop: 25,
     alignItems: 'center',
     borderColor: colors.inputBorder,
     borderRadius: 3,
@@ -261,14 +261,8 @@ const styles = StyleSheet.create({
     color: colors.inactive,
     height: 50,
   },
-  center: {
-    textAlign: 'center',
-  },
-  body: {
-    paddingBottom: 15,
-    fontWeight: '300',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  disclaimer: {
+    marginTop: 25,
   },
 })
 

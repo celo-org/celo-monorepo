@@ -1,5 +1,5 @@
 import { randomBytes } from 'crypto'
-import { ECIES } from '../src/ecies'
+import { ECIES } from './ecies'
 const eutil = require('ethereumjs-util')
 
 describe('ECIES', () => {

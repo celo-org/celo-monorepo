@@ -1,4 +1,4 @@
-import Web3 from 'web3'
+import Web3 from 'web3';
 
 export default async function getInstance(web3: Web3) {
   return new web3.eth.Contract(
@@ -801,6 +801,6 @@ export default async function getInstance(web3: Web3) {
     "type": "function"
   }
 ],
-   "0xE3085194DFf8230EBccd5D6C55C59D52Fd9D5b90"
+   "0x2cDEc3af5727dF2d490cF6068980E67dc6c19438"
   )
 }

@@ -13,8 +13,7 @@
   "chooseCountryCode": "Código de país",
   "chooseCountry": "País",
   "joinText": {
-    "0":
-      "Bienvenido a Celo Wallet, una billetera digital que te permite enviar, recibir y guardar valor fácilmente.",
+    "0": "Celo Wallet le ayuda a enviar, recibir y guardar valor en la red de Celo.",
     "1":
       "Al unirte a esta red, nos das permiso para recopilar información anónima sobre cómo utilizas la aplicación. Adrmás, si verificas tu número de teléfono, se almacenará una copia ofuscada en la Red de Celo. Más información en ",
     "2": "celo.org/terms"
@@ -52,8 +51,7 @@
   "InvitationCode": "Código de invitación",
   "optIn": "Inscribirse",
   "submitting": "Enviando ...",
-  "haveWallet": "¿Ya tienes una billetera de Celo? ",
-  "importIt": "Impórtala",
+  "importIt": "Importar billetera existente",
   "cancel": "Cancelar",
   "important": "Importante",
   "createPin": {

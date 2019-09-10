@@ -1,4 +1,4 @@
-import { BaseProps, validateInput, ValidatorKind } from '../src/inputValidation'
+import { BaseProps, validateInput, ValidatorKind } from './inputValidation'
 
 describe('inputValidation', () => {
   function validateFunction(

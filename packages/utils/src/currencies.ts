@@ -58,5 +58,5 @@ const currencyTranslationsESAR: { [key: string]: string } = {
 }
 export const currencyTranslations: { [key: string]: any } = {
   ['en-US']: currencyTranslationsENUS,
-  ['es-AR']: currencyTranslationsESAR,
+  ['es-419']: currencyTranslationsESAR,
 }
