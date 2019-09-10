@@ -36,6 +36,10 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     uint256 minimumReports
   );
 
+  event StableTokenSet(
+    address stable
+  );
+
   FractionUtil.Fraction public spread;
   // Fraction of the Reserve that is committed to the gold bucket when updating
   // buckets.
@@ -92,7 +96,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    stable = stableToken;
+    setStableToken(stableToken);
     spread = FractionUtil.Fraction(spreadNumerator, spreadDenominator);
     reserveFraction = FractionUtil.Fraction(
       reserveFractionNumerator,
@@ -241,6 +245,15 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   function setMinimumReports(uint256 newMininumReports) public onlyOwner {
     minimumReports = newMininumReports;
     emit MinimumReportsSet(newMininumReports);
+  }
+
+  /**
+    * @notice Allows owner to set the Stable Token address
+    * @param newStableToken The new address for Stable Token
+    */
+  function setStableToken(address newStableToken) public onlyOwner {
+    stable = newStableToken;
+    emit StableTokenSet(newStableToken);
   }
 
   /**
