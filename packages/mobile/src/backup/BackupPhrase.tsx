@@ -62,7 +62,7 @@ class BackupPhrase extends React.Component<Props> {
             />
             <Button
               onPress={this.confirmBackup}
-              text={t('continue')}
+              text={t('backupWithFriends')}
               standard={true}
               type={BtnTypes.SECONDARY}
             />

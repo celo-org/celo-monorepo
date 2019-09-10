@@ -10,6 +10,7 @@ interface Props {
   mnemonic: string
   wordsForBackupQuiz: string[]
   setCurrentQuestion: (currentQuestion: number) => void
+  showBackupPhrase: () => void
   onCancel: () => void
 }
 
@@ -23,7 +24,7 @@ export default class BackupQuiz extends React.Component<Props> {
   }
 
   render() {
-    const { currentQuestion, mnemonic, wordsForBackupQuiz } = this.props
+    const { currentQuestion, mnemonic, wordsForBackupQuiz, showBackupPhrase, onCancel } = this.props
 
     const indexToTest = INDICES_TO_TEST[currentQuestion - 1]
     const correctWord = mnemonic.split(' ')[indexToTest]
@@ -35,10 +36,10 @@ export default class BackupQuiz extends React.Component<Props> {
         testWordIndex={indexToTest}
         words={wordOptions}
         correctAnswer={correctWord}
-        onReturnToPhrase={this.returnToPhrase}
+        onReturnToPhrase={showBackupPhrase}
         onCorrectSubmit={this.showNextQuestion}
         onWrongSubmit={this.returnToPhrase}
-        onCancel={this.props.onCancel}
+        onCancel={onCancel}
       />
     )
   }

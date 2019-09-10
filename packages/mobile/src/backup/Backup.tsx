@@ -18,10 +18,19 @@ export const DAYS_TO_DELAY = 1 / 24 // 1 hour delay
 
 const NUMBER_OF_TEST_QUESTIONS = INDICES_TO_TEST.length
 
+enum BackupStep {
+  introduction,
+  phrase,
+  socialBackup,
+  quiz,
+  complete,
+}
+
 interface State {
   mnemonic: string
   currentQuestion: number | null
   wordsForBackupQuiz: string[]
+  backupStep: BackupStep
 }
 
 interface StateProps {
@@ -56,6 +65,7 @@ export class Backup extends React.Component<Props, State> {
     mnemonic: '',
     currentQuestion: -1,
     wordsForBackupQuiz: [],
+    backupStep: BackupStep.introduction,
   }
 
   componentDidMount() {
@@ -90,15 +100,20 @@ export class Backup extends React.Component<Props, State> {
   }
 
   setCurrentQuestion = (currentQuestion: number) => {
+    if (currentQuestion > NUMBER_OF_TEST_QUESTIONS) {
+      this.setState({ backupStep: BackupStep.complete })
+      return
+    }
+
     this.setState({ currentQuestion })
   }
 
   showBackupPhrase = () => {
-    this.setCurrentQuestion(0)
+    this.setState({ backupStep: BackupStep.phrase })
   }
 
   showQuiz = () => {
-    this.setCurrentQuestion(1)
+    this.setState({ currentQuestion: 1, backupStep: BackupStep.quiz })
   }
 
   onCancel = async () => {
@@ -116,9 +131,10 @@ export class Backup extends React.Component<Props, State> {
   }
 
   render() {
-    const { mnemonic, currentQuestion, wordsForBackupQuiz } = this.state
+    const { mnemonic, currentQuestion, wordsForBackupQuiz, backupStep } = this.state
     const { backupCompleted, backupDelayedTime, backupTooLate } = this.props
 
+    // if backup is completed before this component is mounted, different from BackupStep.complete
     if (backupCompleted) {
       return (
         <BackupComplete
@@ -129,7 +145,7 @@ export class Backup extends React.Component<Props, State> {
       )
     }
 
-    if (currentQuestion === -1) {
+    if (backupStep === BackupStep.introduction) {
       return (
         <BackupIntroduction
           onPress={this.showBackupPhrase}
@@ -141,11 +157,11 @@ export class Backup extends React.Component<Props, State> {
       )
     }
 
-    if (currentQuestion === 0) {
+    if (backupStep === BackupStep.phrase) {
       return <BackupPhrase words={mnemonic} onPress={this.showQuiz} onCancel={this.onCancel} />
     }
 
-    if (currentQuestion <= NUMBER_OF_TEST_QUESTIONS) {
+    if (backupStep === BackupStep.quiz) {
       return (
         <BackupQuiz
           mnemonic={mnemonic}
@@ -153,11 +169,13 @@ export class Backup extends React.Component<Props, State> {
           currentQuestion={currentQuestion}
           onCancel={this.onCancel}
           setCurrentQuestion={this.setCurrentQuestion}
+          showBackupPhrase={this.showBackupPhrase}
         />
       )
     }
 
-    if (currentQuestion > NUMBER_OF_TEST_QUESTIONS) {
+    // backupComplete prop set after this screen
+    if (backupStep === BackupStep.complete) {
       return <BackupComplete onPress={this.onFinish} mnemonic={this.state.mnemonic} />
     }
 
