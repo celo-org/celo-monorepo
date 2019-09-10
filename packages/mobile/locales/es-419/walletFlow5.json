@@ -7,7 +7,7 @@
   "notifications": "Notificaciones",
   "getBackupKey": "Obtener clave de respaldo",
   "setBackupKey":
-    "Configure su clave de respaldo para mejorar la seguridad y habilitar la recuperación de la cuenta",
+    "Configure tu clave de respaldo para mejorar la seguridad y habilitar la recuperación de la cuenta",
   "activity": "Actividad",
   "wallet": "Monedero",
   "send": "Envío",
@@ -19,7 +19,7 @@
   "thanksForVerifying": "Gracias por completar la verificación",
   "earnCeloRewards": "Gana Recompensas Celo por verificar a otros",
   "earnCeloGold":
-    "Gane Celo Oro al permitir que la red envíe mensajes de verificación desde su teléfono",
+    "Gane Celo Oro al permitir que la red envíe mensajes de verificación desde tu teléfono",
   "startEarning": "Comenzar a ganar",
   "learnMore": "Saber más",
   "goldIsWhereYouSave": "Convierta sus {{CeloDollars}} en Celo Oro",
@@ -38,7 +38,7 @@
   "confirmingExchange": "Confirmando…",
   "paymentFailed": "Pago Falló",
   "exchangeFailed": "Intercambio Falló",
-  "loadingActivity": "Cargando su Actividad",
+  "loadingActivity": "Cargando tu Actividad",
   "errorLoadingActivity": {
     "0": "No se puede cargar tu actividad",
     "1": "Por favor inténtalo de nuevo más tarde"
