@@ -3,19 +3,19 @@
   "chooseLanguage": "Elegir idioma",
   "continue": "Continuar",
   "secureAsset":
-    "Celo mantiene su patrimonio seguro y le permite enviar capital a quien quiera y recibirlos de cualquier persona",
+    "Celo mantiene tu patrimonio seguro y le permite enviar capital a quien quiera y recibirlos de cualquier persona",
   "stableAsset":
     "Los {{CeloDollars}} constituyen un activo digital estable que está alineado con el valor del dólar estadounidense",
   "verifyNumber":
-    "Verifique su número de teléfono para conectarse con otros usuarios y recibir dinero",
+    "Verifique tu número de teléfono para conectarse con otros usuarios y recibir dinero",
   "syncNetwork": "Sincronizando con la red",
   "welcomeCelo": "Te damos la bienvenida a Celo",
   "chooseCountryCode": "Código de país",
   "chooseCountry": "País",
   "joinText": {
-    "0": "Celo Wallet le ayuda a enviar, recibir y guardar valor en la red de Celo.",
+    "0": "El Monedero Celo te ayuda a enviar, recibir y guardar valor en la red de Celo.",
     "1":
-      "Al unirte a esta red, nos das permiso para recopilar información anónima sobre cómo utilizas la aplicación. Adrmás, si verificas tu número de teléfono, se almacenará una copia ofuscada en la Red de Celo. Más información en ",
+      "Al unirte a esta red, nos das permiso para recopilar información anónima sobre cómo utilizas la aplicación. Además, si verificas tu número de teléfono, se almacenará una copia ofuscada en la Red de Celo. Más información en ",
     "2": "celo.org/terms"
   },
   "phoneNumber": "000 000 0000",
@@ -28,7 +28,7 @@
     "openMessages": {
       "message": "Abrir mensajes",
       "hint": {
-        "0": "Pista ",
+        "0": "Pista: ",
         "1": "Copia el mensaje SMS completo"
       }
     },
@@ -42,24 +42,24 @@
     },
     "inviteAccepted": "🎉 Invitación aceptada!",
     "askForInvite": {
-      "0": "Solicite una invitación de alguien con Celo Wallet o regístrese en Testnet en ",
+      "0": "Solicite una invitación de alguien con Celo Monedero o regístrese en Testnet en ",
       "1": "celo.org/build/wallet"
     }
   },
-  "enterFullName": "Ingrese su nombre y apellido",
+  "enterFullName": "Ingresa tu nombre y apellido",
   "fullName": "Nombre completo",
   "InvitationCode": "Código de invitación",
   "optIn": "Inscribirse",
   "submitting": "Enviando ...",
-  "importIt": "Importar billetera existente",
+  "importIt": "Importa tu monedero existente",
   "cancel": "Cancelar",
   "important": "Importante",
   "createPin": {
     "title": "Crear un código PIN de 6 dígitos",
-    "intro": "Cree un PIN para proteger su Monedero Celo.",
+    "intro": "Cree un PIN para proteger tu Monedero Celo.",
     "why": "En ciertos casos, necesitará este PIN para enviar {{CeloDollars}} a sus amigos.",
     "warn":
-      "escriba su código PIN de 6 dígitos en un papel y guárdelo en algún sitio seguro. Se lo solicitaremos más tarde para acceder a su monedero.",
+      "escribe tu código PIN de 6 dígitos en un papel y guárdelo en algún sitio seguro. Se lo solicitaremos más tarde para acceder a tu monedero.",
     "yourPin": "Su PIN"
   },
   "enableSecurity": "Habilitar seguridad",
@@ -72,7 +72,7 @@
     "submit": "Enviar"
   },
   "systemAuth": {
-    "title": "Asegure su Teléfono",
+    "title": "Asegura tu celular",
     "secure":
       "Agregar un PIN a tu teléfono ayuda a que tus fondos en Celo se mantengan seguros y protegidos.",
     "intro":
@@ -80,7 +80,7 @@
     "why":
       "Necesitamos este nivel de protección adicional para asegurar que el contenido de tu monedero se encuentra a salvo.",
     "summary":
-      "Celo requiere que los teléfonos estén protegidos con un PIN o huella digital. El bloqueo de su dispositivo ayuda a garantizar que los fondos en su billetera estén protegidos."
+      "Celo requiere que los teléfonos estén protegidos con un PIN o huella digital. Bloquear de tu dispositivo ayuda a garantizar que los fondos en tu billetera estén protegidos."
   },
   "goToSystemSecuritySettingsActionLabel": "Vaya a seguridad",
   "enableSystemScreenLockFailedMessage": "Error al intentar habilitar el bloqueo de pantalla",
@@ -91,7 +91,7 @@
   "importContactsPermission": {
     "title": "Importar contactos",
     "0":
-      "Conectar su libreta de direcciones facilita el envío y la solicitud de pagos con sus amigos. De lo contrario, deberá ingresar su información individualmente.",
+      "Conectar tu lista de contactos facilita el envío y la solicitud de pagos con tus amigos. De lo contrario, deberás ingresar tu información individualmente.",
     "1": "No se preocupe: la conexión no envía invitaciones a sus contactos.",
     "enable": "Habilitar acceso a contactos",
     "loading": "Encontrar amigos en Celo..."
