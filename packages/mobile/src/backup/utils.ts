@@ -46,15 +46,17 @@ export function getWordlist(language: string | null): string[] {
   }
 }
 
-function getPrefixWords(wordlist: string[], words: number): string[] {
-  // Use random words in sorted order for split phrase prefixes
+function getPrefixWords(wordlist: string[], numWords: number): string[] {
+  // Use random words in sorted order for split phrase prefixes. While BIP39
+  // does not avoid repeating words, the prefixes MUST be unique otherwise it is
+  // not possible to differentiate parts.
   const prefixes = _.chain(wordlist)
-    .sampleSize(words)
+    .sampleSize(numWords)
     .uniq()
     .value()
     .sort()
 
-  if (prefixes.length < words) {
+  if (prefixes.length < numWords) {
     throw new Error('Word list has duplicate words')
   }
 
