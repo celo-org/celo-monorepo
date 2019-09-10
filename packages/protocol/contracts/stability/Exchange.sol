@@ -98,8 +98,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       reserveFractionNumerator,
       reserveFractionDenominator
     );
-    updateFrequency = _updateFrequency;
-    minimumReports = _minimumReports;
+    setUpdateFrequency(_updateFrequency);
+    setMinimumReports(_minimumReports);
     _updateBucketsIfNecessary();
   }
 
@@ -238,7 +238,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     * @notice Allows owner to set the minimum number of reports required
     * @param newMininumReports The new update minimum number of reports required
     */
-  function setMinimumReports(uint256 newMininumReports) external onlyOwner {
+  function setMinimumReports(uint256 newMininumReports) public onlyOwner {
     minimumReports = newMininumReports;
     emit MinimumReportsSet(newMininumReports);
   }
@@ -295,7 +295,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    * @notice If conditions are met, updates the Uniswap bucket sizes to track
    * the price reported by the Oracle.
    */
-  function _updateBucketsIfNecessary() private nonReentrant {
+  function _updateBucketsIfNecessary() private {
     if (shouldUpdateBuckets()) {
       // solhint-disable-next-line not-rely-on-time
       lastBucketUpdate = now;
