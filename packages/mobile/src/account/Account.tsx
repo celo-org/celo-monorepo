@@ -10,6 +10,7 @@ import DeviceInfo from 'react-native-device-info'
 import { Sentry } from 'react-native-sentry'
 import { connect } from 'react-redux'
 import AccountInfo from 'src/account/AccountInfo'
+import { resetBackupState } from 'src/account/actions'
 import SettingsItem from 'src/account/SettingsItem'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -32,6 +33,7 @@ interface DispatchProps {
   setNumberVerified: typeof setNumberVerified
   resetAppOpenedState: typeof resetAppOpenedState
   setAnalyticsEnabled: typeof setAnalyticsEnabled
+  resetBackupState: typeof resetBackupState
 }
 
 interface StateProps {
@@ -61,6 +63,7 @@ const mapDispatchToProps = {
   setNumberVerified,
   resetAppOpenedState,
   setAnalyticsEnabled,
+  resetBackupState,
 }
 
 export class Account extends React.Component<Props, State> {
@@ -127,6 +130,10 @@ export class Account extends React.Component<Props, State> {
     this.props.revokeVerification()
   }
 
+  resetBackupState = () => {
+    this.props.resetBackupState()
+  }
+
   showDebugScreen = async () => {
     navigate(Screens.Debug)
   }
@@ -171,6 +178,11 @@ export class Account extends React.Component<Props, State> {
           <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={this.resetAppOpenedState}>
               <Text>Reset app opened state</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={style.devSettingsItem}>
+            <TouchableOpacity onPress={this.resetBackupState}>
+              <Text>Reset backup state</Text>
             </TouchableOpacity>
           </View>
           <View style={style.devSettingsItem}>

@@ -95,6 +95,12 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
         ...state,
         backupDelayedTime: getRemoteTime(),
       }
+    case Actions.RESET_BACKUP_STATE:
+      return {
+        ...state,
+        backupCompleted: false,
+        backupDelayedTime: 0,
+      }
     case Actions.UPDATE_PAYMENT_REQUESTS:
       return {
         ...state,

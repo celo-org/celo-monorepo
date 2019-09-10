@@ -21,6 +21,7 @@ export enum Actions {
   SET_ACCOUNT_CREATION_TIME_ACTION = 'ACCOUNT/SET_ACCOUNT_CREATION_TIME_ACTION',
   SET_BACKUP_COMPLETED_ACTION = 'ACCOUNT/SET_BACKUP_COMPLETED_ACTION',
   SET_BACKUP_DELAYED_ACTION = 'ACCOUNT/SET_BACKUP_DELAYED_ACTION',
+  RESET_BACKUP_STATE = 'ACCOUNT/RESET_BACKUP_STATE',
   UPDATE_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_PAYMENT_REQUESTS',
   DISMISS_EARN_REWARDS = 'ACCOUNT/DISMISS_EARN_REWARDS',
   DISMISS_INVITE_FRIENDS = 'ACCOUNT/DISMISS_INVITE_FRIENDS',
@@ -62,6 +63,10 @@ export interface SetBackupDelayedAction {
   type: Actions.SET_BACKUP_DELAYED_ACTION
 }
 
+export interface ResetBackupState {
+  type: Actions.RESET_BACKUP_STATE
+}
+
 export interface UpdatePaymentRequestsAction {
   type: Actions.UPDATE_PAYMENT_REQUESTS
   paymentRequests: PaymentRequest[]
@@ -90,6 +95,7 @@ export type ActionTypes =
   | SetAccountCreationAction
   | SetBackupCompletedAction
   | SetBackupDelayedAction
+  | ResetBackupState
   | UpdatePaymentRequestsAction
   | DismissEarnRewards
   | DismissInviteFriends
@@ -133,6 +139,10 @@ export const setBackupCompleted = (): SetBackupCompletedAction => ({
 
 export const setBackupDelayed = (): SetBackupDelayedAction => ({
   type: Actions.SET_BACKUP_DELAYED_ACTION,
+})
+
+export const resetBackupState = (): ResetBackupState => ({
+  type: Actions.RESET_BACKUP_STATE,
 })
 
 export const updatePaymentRequests = (
