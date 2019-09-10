@@ -8,7 +8,7 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
-import Button, { BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems, { hashNav } from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
@@ -95,7 +95,12 @@ class HomeSystems extends React.PureComponent<Props> {
                 </Text>
                 <Text style={[fonts.p, styles.foreground]}>{t('buildOnCeloCopy')}</Text>
                 <View style={standardStyles.elementalMargin}>
-                  <Button text={t('learnMore')} kind={BTN.NAKED} href={menuItems.BUILD.link} />
+                  <Button
+                    size={SIZE.normal}
+                    text={t('learnMore')}
+                    kind={BTN.NAKED}
+                    href={menuItems.BUILD.link}
+                  />
                 </View>
               </Cell>
               <Cell span={Spans.fourth}>

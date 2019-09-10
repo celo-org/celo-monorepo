@@ -1,4 +1,4 @@
-import { retryAsync } from '@celo/utils/src/async-helpers'
+import { retryAsync } from '@celo/utils/src/async'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import {
   getEscrowContract,
