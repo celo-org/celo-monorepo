@@ -1,12 +1,7 @@
 import { randomBytes } from 'crypto'
 import { ec as EC } from 'elliptic'
-import {
-  decompressPublicKey,
-  decryptComment,
-  deriveCEK,
-  encryptComment,
-} from '../src/commentEncryption'
-const assert = require('chai').assert
+import { decompressPublicKey, decryptComment, deriveCEK, encryptComment } from './commentEncryption'
+
 const ec = new EC('secp256k1')
 
 describe('Comment Encryption', () => {
@@ -22,46 +17,46 @@ describe('Comment Encryption', () => {
   describe('Encrypt', () => {
     it('should encrypt message without error', () => {
       const { comment: ciphertext, encrypted } = encryptComment(comment, recipPublic, selfPublic)
-      assert(ciphertext.length > 226 + 32)
-      assert(encrypted)
+      expect(ciphertext.length).toBeGreaterThan(226 + 32)
+      expect(encrypted).toBeTruthy()
     })
   })
   describe('roundtrip', () => {
     it('should return the same plaintext as sender', () => {
       const { comment: encryptedData } = encryptComment(comment, recipPublic, selfPublic)
       const { comment: plaintext, encrypted } = decryptComment(encryptedData, selfPriv, true)
-      assert.equal(plaintext, comment)
-      assert(encrypted)
+      expect(plaintext).toEqual(comment)
+      expect(encrypted).toBeTruthy()
     })
     it('should return the same plaintext as recipient', () => {
       const { comment: encryptedData } = encryptComment(comment, recipPublic, selfPublic)
       const { comment: plaintext, encrypted } = decryptComment(encryptedData, recipPriv, false)
-      assert.equal(plaintext, comment)
-      assert(encrypted)
+      expect(plaintext).toEqual(comment)
+      expect(encrypted).toBeTruthy()
     })
     it('should return the same plaintext as sender with emojis', () => {
       const { comment: encryptedData } = encryptComment(emojis, recipPublic, selfPublic)
       const { comment: plaintext, encrypted } = decryptComment(encryptedData, selfPriv, true)
-      assert.equal(plaintext, emojis)
-      assert(encrypted)
+      expect(plaintext).toEqual(emojis)
+      expect(encrypted).toBeTruthy()
     })
     it('should return the same plaintext as recipient with emojis', () => {
       const { comment: encryptedData } = encryptComment(emojis, recipPublic, selfPublic)
       const { comment: plaintext, encrypted } = decryptComment(encryptedData, recipPriv, false)
-      assert.equal(plaintext, emojis)
-      assert(encrypted)
+      expect(plaintext).toEqual(emojis)
+      expect(encrypted).toBeTruthy()
     })
   })
   describe('decrypt', () => {
     it('should return comment if comment is not encrypted', () => {
       const { comment: decrypted, encrypted } = decryptComment(comment, selfPriv, true)
-      assert.equal(decrypted, comment)
-      assert(!encrypted)
+      expect(decrypted).toEqual(comment)
+      expect(encrypted).toBeFalsy()
     })
     it('should return comment if comment is not encrypted with emojis', () => {
       const { comment: decrypted, encrypted } = decryptComment(emojis, selfPriv, true)
-      assert.equal(decrypted, emojis)
-      assert(!encrypted)
+      expect(decrypted).toEqual(emojis)
+      expect(encrypted).toBeFalsy()
     })
     it('should return comment with incorrect key', () => {
       const data =
@@ -77,8 +72,8 @@ describe('Comment Encryption', () => {
         'Pw9/M97SOo3Hn6QWqftiYgIksBKDhH5LMIRJbvMX6hZQjkvhbAquivjlf3Skhixsp6WC45acF+gkFZGG6w380+x' +
         'XZHcFj+EMJEW2VXtTgKe2IYOPKEb/+oYAA0+qcXmmkKRJsaHqRYVs90HCsNco='
       const { comment: decrypted, encrypted } = decryptComment(data, selfPriv, true)
-      assert.equal(decrypted, data)
-      assert(!encrypted)
+      expect(decrypted).toEqual(data)
+      expect(encrypted).toBeFalsy()
     })
   })
   describe('regression test', () => {
@@ -109,8 +104,8 @@ describe('Comment Encryption', () => {
         senderPriv,
         true
       )
-      assert.equal(decrypted, newComment)
-      assert(didDecrypt)
+      expect(decrypted).toEqual(newComment)
+      expect(didDecrypt).toBeTruthy()
     })
     it('should not regress for recipeient', () => {
       const { comment: decrypted, encrypted: didDecrypt } = decryptComment(
@@ -118,8 +113,8 @@ describe('Comment Encryption', () => {
         newRecipPriv,
         false
       )
-      assert.equal(decrypted, newComment)
-      assert(didDecrypt)
+      expect(decrypted).toEqual(newComment)
+      expect(didDecrypt).toBeTruthy()
     })
   })
 })
@@ -128,7 +123,7 @@ describe('deriveCEK', () => {
   it('should produce 32 bytes', () => {
     const input = randomBytes(32)
     const derived = deriveCEK(input.toString('hex'))
-    assert(derived.length === 32)
+    expect(derived).toHaveLength(32)
   })
   it('should not regress', () => {
     // Expected verified on a different HDKF implementation for input 0xdeadbeef
@@ -138,7 +133,7 @@ describe('deriveCEK', () => {
       'hex'
     )
     const derived = deriveCEK('deadbeef')
-    assert(derived.equals(expected))
+    expect(derived.equals(expected)).toBeTruthy()
   })
 })
 
@@ -148,14 +143,14 @@ describe('decompressPublicKey', () => {
     const publicKeyFull = Buffer.from(privateKey.getPublic(false, 'hex'), 'hex')
     const publicKeyCompressed = Buffer.from(privateKey.getPublic(true, 'hex'), 'hex')
     const decompressed = decompressPublicKey(publicKeyCompressed)
-    assert(Buffer.concat([Buffer.from('04', 'hex'), decompressed]).equals(publicKeyFull))
-    assert(decompressed.length === 64)
+    expect(Buffer.concat([Buffer.from('04', 'hex'), decompressed])).toEqual(publicKeyFull)
+    expect(decompressed).toHaveLength(64)
   })
   it('should work with long form input', () => {
     const privateKey = ec.keyFromPrivate(randomBytes(32))
     const publicKeyFull = Buffer.from(privateKey.getPublic(false, 'hex'), 'hex')
     const decompressed = decompressPublicKey(publicKeyFull)
-    assert(Buffer.concat([Buffer.from('04', 'hex'), decompressed]).equals(publicKeyFull))
-    assert(decompressed.length === 64)
+    expect(Buffer.concat([Buffer.from('04', 'hex'), decompressed])).toEqual(publicKeyFull)
+    expect(decompressed).toHaveLength(64)
   })
 })

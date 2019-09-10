@@ -52,6 +52,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               style={
                 Array [
                   Object {
+                    "color": "#2E3338",
                     "fontFamily": "Hind-Light",
                     "fontSize": 22,
                     "paddingBottom": 20,
@@ -668,6 +669,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               style={
                 Array [
                   Object {
+                    "color": "#2E3338",
                     "fontFamily": "Hind-Light",
                     "fontSize": 22,
                     "paddingBottom": 20,
@@ -1284,6 +1286,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               style={
                 Array [
                   Object {
+                    "color": "#2E3338",
                     "fontFamily": "Hind-Light",
                     "fontSize": 22,
                     "paddingBottom": 20,

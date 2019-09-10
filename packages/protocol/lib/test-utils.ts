@@ -12,6 +12,8 @@ import {
   StableTokenInstance,
   UsingRegistryInstance,
 } from 'types'
+const soliditySha3 = new (require('web3'))().utils.soliditySha3
+
 // tslint:disable-next-line: ordered-imports
 import BN = require('bn.js')
 import Web3 = require('web3')
@@ -145,7 +147,7 @@ export const assertContractsRegistered = async (getContract: any) => {
     const contract: Truffle.ContractInstance = await getContract(contractName, 'proxiedContract')
     assert.equal(
       contract.address.toLowerCase(),
-      (await registry.getAddressFor(contractName)).toLowerCase(),
+      (await registry.getAddressFor(soliditySha3(contractName))).toLowerCase(),
       'Registry does not have the correct information for ' + contractName
     )
   }

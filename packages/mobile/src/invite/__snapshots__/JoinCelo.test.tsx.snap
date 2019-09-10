@@ -74,75 +74,29 @@ exports[`JoinCeloScreen renders correctly 1`] = `
       </View>
       <Text
         style={
-          Array [
-            Object {
-              "fontFamily": "Hind-Light",
-              "fontSize": 22,
-              "paddingBottom": 20,
-              "textAlign": "center",
-            },
-            Object {
-              "textAlign": "center",
-            },
-          ]
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Light",
+            "fontSize": 22,
+            "paddingBottom": 20,
+            "textAlign": "center",
+          }
         }
         testID="InviteWallTitle"
       >
-         
         welcomeCelo
       </Text>
       <Text
         style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "flexDirection": "row",
-              "flexWrap": "wrap",
-              "fontWeight": "300",
-              "paddingBottom": 15,
-            },
-          ]
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          }
         }
       >
         joinText.0
-      </Text>
-      <Text
-        style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "flexDirection": "row",
-              "flexWrap": "wrap",
-              "fontWeight": "300",
-              "paddingBottom": 15,
-            },
-          ]
-        }
-      >
-        joinText.1
-        <Text
-          onPress={[Function]}
-          style={
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-Medium",
-              "fontSize": 14,
-              "lineHeight": 18,
-            }
-          }
-        >
-          joinText.2
-        </Text>
       </Text>
       <View
         style={
@@ -161,6 +115,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
               "color": "#D1D5D8",
               "height": 50,
               "marginBottom": 6,
+              "marginTop": 25,
               "paddingLeft": 9,
             },
           ]
@@ -448,6 +403,36 @@ exports[`JoinCeloScreen renders correctly 1`] = `
           </View>
         </View>
       </View>
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 12,
+              "lineHeight": 16,
+            },
+            Object {
+              "marginTop": 25,
+            },
+          ]
+        }
+      >
+        joinText.1
+        <Text
+          onPress={[Function]}
+          style={
+            Object {
+              "color": "#42D689",
+              "fontFamily": "Hind-Medium",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          joinText.2
+        </Text>
+      </Text>
     </View>
   </RCTScrollView>
   <View
@@ -598,75 +583,29 @@ exports[`JoinCeloScreen renders with an error 1`] = `
       </View>
       <Text
         style={
-          Array [
-            Object {
-              "fontFamily": "Hind-Light",
-              "fontSize": 22,
-              "paddingBottom": 20,
-              "textAlign": "center",
-            },
-            Object {
-              "textAlign": "center",
-            },
-          ]
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Light",
+            "fontSize": 22,
+            "paddingBottom": 20,
+            "textAlign": "center",
+          }
         }
         testID="InviteWallTitle"
       >
-         
         welcomeCelo
       </Text>
       <Text
         style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "flexDirection": "row",
-              "flexWrap": "wrap",
-              "fontWeight": "300",
-              "paddingBottom": 15,
-            },
-          ]
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          }
         }
       >
         joinText.0
-      </Text>
-      <Text
-        style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "flexDirection": "row",
-              "flexWrap": "wrap",
-              "fontWeight": "300",
-              "paddingBottom": 15,
-            },
-          ]
-        }
-      >
-        joinText.1
-        <Text
-          onPress={[Function]}
-          style={
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-Medium",
-              "fontSize": 14,
-              "lineHeight": 18,
-            }
-          }
-        >
-          joinText.2
-        </Text>
       </Text>
       <View
         style={
@@ -685,6 +624,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
               "color": "#D1D5D8",
               "height": 50,
               "marginBottom": 6,
+              "marginTop": 25,
               "paddingLeft": 9,
             },
           ]
@@ -972,6 +912,36 @@ exports[`JoinCeloScreen renders with an error 1`] = `
           </View>
         </View>
       </View>
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 12,
+              "lineHeight": 16,
+            },
+            Object {
+              "marginTop": 25,
+            },
+          ]
+        }
+      >
+        joinText.1
+        <Text
+          onPress={[Function]}
+          style={
+            Object {
+              "color": "#42D689",
+              "fontFamily": "Hind-Medium",
+              "fontSize": 14,
+              "lineHeight": 18,
+            }
+          }
+        >
+          joinText.2
+        </Text>
+      </Text>
     </View>
   </RCTScrollView>
   <View

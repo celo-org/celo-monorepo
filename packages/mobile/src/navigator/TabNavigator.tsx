@@ -100,7 +100,11 @@ export const TabNavigator = createBottomTabNavigator(
       screen: SendStack,
       navigationOptions: {
         tabBarButtonComponent: TabBarButtonComponent,
-        tabBarIcon: (props: any) => <PaymentsIcon color={props.tintColor} />,
+        tabBarIcon: (props: any) => (
+          <View style={styles.alignPaymentIcon}>
+            <PaymentsIcon color={props.tintColor} />
+          </View>
+        ),
         tabBarLabel: () => null,
         tabBarOnPress: () => {
           navigate(Stacks.SendStack)
@@ -155,6 +159,9 @@ const styles = StyleSheet.create({
   },
   alignWallet: {
     marginLeft: 3,
+  },
+  alignPaymentIcon: {
+    marginBottom: 15,
   },
 })
 
