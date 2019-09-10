@@ -22,3 +22,7 @@ export function useLocalAmountToDollars(amount: BigNumber.Value | null) {
 
   return convertedAmount.toString()
 }
+
+export function useExchangeRate() {
+  return useSelector(getLocalCurrencyExchangeRate)
+}

@@ -13,7 +13,7 @@ import { LOCAL_CURRENCY_SYMBOL } from 'src/config'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
-import { useDollarsToLocalAmount } from 'src/localCurrency/useLocalAmount'
+import { useDollarsToLocalAmount, useExchangeRate } from 'src/localCurrency/useLocalAmount'
 import { Recipient } from 'src/recipients/recipient'
 import FeeIcon from 'src/send/FeeIcon'
 import { TransactionTypes } from 'src/transactions/reducer'
@@ -48,6 +48,7 @@ function TransferReviewCard({
   feeError,
 }: OwnProps & WithNamespaces) {
   const localValue = useDollarsToLocalAmount(value)
+  const exchangeRate = new BigNumber(useExchangeRate() as number)
   const amountWithFees = value.plus(fee || 0)
   const adjustedFee =
     type === TransactionTypes.INVITE_SENT && fee
@@ -76,7 +77,7 @@ function TransferReviewCard({
                 />
                 <Text style={style.localValueHint}>
                   {t('localValueHint', {
-                    localValue: getMoneyDisplayValue(localValue),
+                    localValue: getMoneyDisplayValue(exchangeRate),
                     localCurrencySymbol: LOCAL_CURRENCY_SYMBOL,
                   })}
                 </Text>
