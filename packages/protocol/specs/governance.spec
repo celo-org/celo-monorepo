@@ -75,8 +75,6 @@ rule can_add_to_queue(method f) {
 	uint256 queueLength_ = sinvoke getQueueLength(e_);
 	
 	assert queueLength_ <= _queueLength, "Method can queue elements - should check separately that cannot queue proposal IDs equal 0";
-	// TODO: Check why UNSAT, even with propose?
-	assert false,"sanity";
 }
 
 rule proposal_count_monotonic_increasing(method f) {

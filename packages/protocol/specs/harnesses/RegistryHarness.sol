@@ -49,6 +49,8 @@ contract RegistryHarness is IRegistryExtended {
 	uint256 bondedDeposits_totalWeight;
 	mapping (address => uint256) bondedDeposits_accountWeight;
 	mapping (address => address) bondedDeposits_accountFromVoter;
+	mapping (address => address) bondedDeposits_voterFromAccount;
+	mapping (address => bool) bondedDeposits_isVotingFrozen;
 	
 	mapping (address => uint256) goldToken_balanceOf;
 		
@@ -75,7 +77,7 @@ contract RegistryHarness is IRegistryExtended {
 			return getRandomBool();
 		}
 	}
-	
+		
 	function getTotalWeight() external returns (uint256) {
 		if (true ||  whoami == iamBondedDeposits) {
 			return bondedDeposits_totalWeight;
@@ -97,6 +99,22 @@ contract RegistryHarness is IRegistryExtended {
 			return bondedDeposits_accountFromVoter[voter];
 		} else {
 			return getRandomAddress();
+		}
+	}
+	
+	function getVoterFromAccount(address account) external returns (address) {
+		if (true || whoami == iamBondedDeposits) {
+			return bondedDeposits_voterFromAccount[account];
+		} else {
+			return getRandomAddress();
+		}
+	}
+	
+	function isVotingFrozen(address account) external returns (bool) {
+		if (whoami == iamBondedDeposits) {
+			return bondedDeposits_isVotingFrozen[account];
+		} else {
+			return getRandomBool();
 		}
 	}
 	
