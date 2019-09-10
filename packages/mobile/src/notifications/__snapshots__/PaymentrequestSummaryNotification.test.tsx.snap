@@ -7,7 +7,7 @@ exports[`PaymentRequestSummaryNotification renders correctly 1`] = `
       Object {
         "flexDirection": "row",
         "justifyContent": "space-between",
-        "padding": 10,
+        "padding": 16,
         "width": "100%",
       },
       Object {
@@ -23,7 +23,7 @@ exports[`PaymentRequestSummaryNotification renders correctly 1`] = `
       Object {
         "alignItems": "center",
         "flexDirection": "column",
-        "paddingRight": 10,
+        "paddingRight": 16,
       }
     }
   >
@@ -179,7 +179,7 @@ exports[`PaymentRequestSummaryNotification renders correctly 1`] = `
             style={
               Object {
                 "justifyContent": "flex-end",
-                "paddingLeft": 10,
+                "paddingLeft": 16,
               }
             }
           >
@@ -264,7 +264,7 @@ exports[`PaymentRequestSummaryNotification when more 1 requests renders just it 
       Object {
         "flexDirection": "row",
         "justifyContent": "space-between",
-        "padding": 10,
+        "padding": 16,
         "width": "100%",
       },
       Object {
@@ -280,7 +280,7 @@ exports[`PaymentRequestSummaryNotification when more 1 requests renders just it 
       Object {
         "alignItems": "center",
         "flexDirection": "column",
-        "paddingRight": 10,
+        "paddingRight": 16,
       }
     }
   >
@@ -450,7 +450,7 @@ exports[`PaymentRequestSummaryNotification when more than 2 requests renders jus
       Object {
         "flexDirection": "row",
         "justifyContent": "space-between",
-        "padding": 10,
+        "padding": 16,
         "width": "100%",
       },
       Object {
@@ -466,7 +466,7 @@ exports[`PaymentRequestSummaryNotification when more than 2 requests renders jus
       Object {
         "alignItems": "center",
         "flexDirection": "column",
-        "paddingRight": 10,
+        "paddingRight": 16,
       }
     }
   >
@@ -622,7 +622,7 @@ exports[`PaymentRequestSummaryNotification when more than 2 requests renders jus
             style={
               Object {
                 "justifyContent": "flex-end",
-                "paddingLeft": 10,
+                "paddingLeft": 16,
               }
             }
           >

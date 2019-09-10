@@ -33,7 +33,8 @@ const mapStateToProps = (state: RootState) => {
   return {
     name: state.account.name,
     e164Number: state.account.e164PhoneNumber,
-    photosNUXClicked: state.account.photosNUXClicked,
+    // Disable education flow for now
+    photosNUXClicked: true, // state.account.photosNUXClicked,
     userContact: getUserContactDetails(state),
     devModeActive: state.account.devModeActive || false,
     defaultCountryCode: state.account.defaultCountryCode,

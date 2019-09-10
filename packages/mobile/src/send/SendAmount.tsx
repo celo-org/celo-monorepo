@@ -1,4 +1,3 @@
-import { Avatar } from '@celo/react-components/components/Avatar'
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import LoadingLabel from '@celo/react-components/components/LoadingLabel'
 import colors from '@celo/react-components/styles/colors'
@@ -18,6 +17,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import Avatar from 'src/components/Avatar'
 import { MAX_COMMENT_LENGTH, NUMBER_INPUT_MAX_DECIMALS } from 'src/config'
 import { FeeType } from 'src/fees/actions'
 import EstimateFee from 'src/fees/EstimateFee'
@@ -319,10 +319,9 @@ export class SendAmount extends React.Component<Props, State> {
           <DisconnectBanner />
           <Avatar
             name={recipient.displayName}
-            address={recipient.address}
+            recipient={recipient}
             e164Number={recipient.e164PhoneNumber}
-            defaultCountryCode={this.props.defaultCountryCode}
-            iconSize={40}
+            address={recipient.address}
           />
           <View style={style.inviteDescription}>
             <LoadingLabel

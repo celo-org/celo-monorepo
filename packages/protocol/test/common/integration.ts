@@ -123,8 +123,8 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
 
     it('should execute the proposal', async () => {
-      assert.equal(await registry.getAddressForOrDie('test1'), accounts[1])
-      assert.equal(await registry.getAddressForOrDie('test2'), accounts[2])
+      assert.equal(await registry.getAddressForOrDie(web3.utils.soliditySha3('test1')), accounts[1])
+      assert.equal(await registry.getAddressForOrDie(web3.utils.soliditySha3('test2')), accounts[2])
     })
   })
 })

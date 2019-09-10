@@ -39,7 +39,11 @@ exports[`ImportContacts Screen renders correctly 1`] = `
   <RCTScrollView
     contentContainerStyle={
       Object {
-        "marginHorizontal": 10,
+        "alignItems": "center",
+        "flex": 1,
+        "justifyContent": "center",
+        "padding": 20,
+        "paddingTop": 0,
       }
     }
   >
@@ -62,8 +66,8 @@ exports[`ImportContacts Screen renders correctly 1`] = `
           style={
             Array [
               Object {
-                "height": 70,
-                "width": 80,
+                "height": 50,
+                "width": 50,
               },
               Object {
                 "alignSelf": "center",
@@ -77,6 +81,7 @@ exports[`ImportContacts Screen renders correctly 1`] = `
           style={
             Array [
               Object {
+                "color": "#2E3338",
                 "fontFamily": "Hind-Light",
                 "fontSize": 22,
                 "paddingBottom": 20,
@@ -91,37 +96,37 @@ exports[`ImportContacts Screen renders correctly 1`] = `
         >
           importContactsPermission.title
         </Text>
-        <View
-          style={
-            Object {
-              "marginVertical": 10,
-            }
-          }
-        >
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              }
-            }
-          >
-            importContactsPermission.0
-          </Text>
-        </View>
         <Text
           style={
             Array [
               Object {
                 "color": "#2E3338",
                 "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
+                "fontSize": 17,
+                "lineHeight": 26,
               },
               Object {
-                "marginVertical": 10,
+                "textAlign": "center",
+              },
+            ]
+          }
+        >
+          importContactsPermission.0
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 17,
+                "lineHeight": 26,
+              },
+              Object {
+                "textAlign": "center",
+              },
+              Object {
+                "marginTop": 10,
               },
             ]
           }
