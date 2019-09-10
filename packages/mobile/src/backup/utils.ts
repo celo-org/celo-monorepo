@@ -49,7 +49,8 @@ export function getWordlist(language: string | null): string[] {
 function getPrefixWords(wordlist: string[], numWords: number): string[] {
   // Use random words in sorted order for split phrase prefixes. While BIP39
   // does not avoid repeating words, the prefixes MUST be unique otherwise it is
-  // not possible to differentiate parts.
+  // not possible to differentiate parts.  Prefixes are just used as a way to
+  // determine which mnemonic shard corresponds to which half
   const prefixes = _.chain(wordlist)
     .sampleSize(numWords)
     .uniq()
@@ -73,6 +74,8 @@ export function splitMnemonic(mnemonic: string, language: string | null): string
   return _.chunk(mnemonicWords, chunkSize).map((words, i) => [prefixes[i], ...words].join(' '))
 }
 
+// Sort function based on the first word in string arrays. Mnemonic prefixes are
+// the first word in each shard
 function sortStringArray(a: string[], b: string[]): number {
   // localeCompare is slower -- https://jsperf.com/operator-vs-localecompage/3
   if (a[0] < b[0]) {
