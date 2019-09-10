@@ -4,7 +4,8 @@ import FadeIn from 'react-lazyload-fadein'
 import { StyleSheet, View } from 'react-native'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Card from 'src/shared/Card'
-import { standardStyles } from 'src/styles'
+import Spinner from 'src/shared/Spinner'
+import { colors, standardStyles } from 'src/styles'
 
 interface OwnProps {
   loading: boolean
@@ -16,17 +17,11 @@ export default function Articles(props: Props & OwnProps) {
   const { articles, loading } = props
 
   if (loading) {
-    return (
-      <GridRow allStyle={standardStyles.centered}>
-        <Cell span={Spans.third} style={standardStyles.centered}>
-          {/* {} */}
-        </Cell>
-      </GridRow>
-    )
+    return <Placeholder />
   }
 
   return (
-    <FadeIn>
+    <FadeIn placeholder={<Placeholder />}>
       {(onImageLoad: voidFunc) => {
         return (
           <View>
@@ -46,6 +41,28 @@ export default function Articles(props: Props & OwnProps) {
   )
 }
 
+function Placeholder() {
+  return (
+    <GridRow allStyle={[styles.body, standardStyles.centered]}>
+      <Cell span={Spans.third} tabletSpan={Spans.half}>
+        <View style={[standardStyles.centered, styles.placeholder]}>
+          <Spinner color={colors.white} size={'medium'} />
+        </View>
+      </Cell>
+      <Cell span={Spans.third} tabletSpan={Spans.half}>
+        <View style={[standardStyles.centered, styles.placeholder]}>
+          <Spinner color={colors.white} size={'medium'} />
+        </View>
+      </Cell>
+      <Cell span={Spans.third} tabletSpan={Spans.half}>
+        <View style={[standardStyles.centered, styles.placeholder]}>
+          <Spinner color={colors.white} size={'medium'} />
+        </View>
+      </Cell>
+    </GridRow>
+  )
+}
+
 const styles = StyleSheet.create({
   body: {
     paddingHorizontal: 0,
@@ -55,5 +72,11 @@ const styles = StyleSheet.create({
   },
   cell: {
     justifyContent: 'space-between',
+  },
+  placeholder: {
+    marginTop: 15,
+    height: 500,
+    width: '100%',
+    backgroundColor: colors.light,
   },
 })

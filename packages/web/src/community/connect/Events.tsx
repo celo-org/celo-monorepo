@@ -9,7 +9,7 @@ import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import OvalCoin from 'src/shared/OvalCoin'
 import { colors, fonts, standardStyles } from 'src/styles'
 import { NoneFound, Radio, SectionHeader } from 'src/table/table'
-
+import Spinner from 'src/shared/Spinner'
 interface OwnProps {
   upcomingEvents?: EventProps[]
   pastEvents?: EventProps[]
@@ -62,7 +62,7 @@ class Events extends React.PureComponent<Props, State> {
 
   renderNotFound = () => {
     if (this.props.loading) {
-      return null
+      return <PlaceHolder />
     }
 
     return (
@@ -178,4 +178,15 @@ const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
   },
+  placeholder: {
+    height: '90vh',
+  },
 })
+
+function PlaceHolder() {
+  return (
+    <View style={[standardStyles.centered, styles.placeholder]}>
+      <Spinner color={colors.primary} size="medium" />
+    </View>
+  )
+}
