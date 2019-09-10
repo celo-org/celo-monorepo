@@ -2,7 +2,7 @@
   "getStarted": "Primeros pasos",
   "getBackupKey": "Obtener clave de respaldo",
   "setYourBackupKey":
-    "Cree su clave de respaldo para mejorar la seguridad y habilitar la recuperación de la cuenta",
+    "Crea tu clave de respaldo para mejorar la seguridad y habilitar la recuperación de la cuenta",
   "activity": "Actividad",
   "cancel": "Cancelar",
   "stableDollar":
@@ -11,12 +11,12 @@
   "sendCelo": "Enviar {{CeloDollars}} a cualquier persona con un celular",
   "backToWallet": "Volver a el Monedero",
   "celoLikeGold": "Celo Oro es como el oro real",
-  "goldFluctuates": "Hay una cantidad limitada de Celo Oro, y su valor puede aumentar o disminuir",
+  "goldFluctuates": "Hay una cantidad limitada de Celo Oro, y tu valor puede aumentar o disminuir",
   "exchange": "Cambie Oro a {{Dollars}} cuando quiera",
   "exchangeGold": "Cambiar a Oro",
   "addressPhotos": "Celo usa sus contactos para mostrar fotos",
   "changePhotos": "Puede cambiar una foto si actualiza los contactos",
-  "localPhotos": "Solo usted puede ver estas fotos desde su teléfono",
+  "localPhotos": "Solo usted puede ver estas fotos desde tu teléfono",
   "allowContactAccess": "Permita que el Monedero Celo tenga acceso a las fotos de sus contactos",
   "deny": "Denegar",
   "allow": "Permitir"
