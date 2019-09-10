@@ -35,7 +35,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     // Set up a LockedGold account with which we can vote.
     await lockedGold.createAccount()
     const noticePeriod = 60 * 60 * 24 // 1 day
-    const value = 1000
+    const value = new BigNumber('1000000000000000000')
     // @ts-ignore
     await lockedGold.newCommitment(noticePeriod, { value })
     weight = await lockedGold.getAccountWeight(accounts[0])
@@ -123,14 +123,14 @@ contract('Integration: Governance', (accounts: string[]) => {
     })
 
     it('should execute the proposal', async () => {
-      assert.equal(await registry.getAddressForOrDie('test1'), accounts[1])
-      assert.equal(await registry.getAddressForOrDie('test2'), accounts[2])
+      assert.equal(await registry.getAddressForOrDie(web3.utils.soliditySha3('test1')), accounts[1])
+      assert.equal(await registry.getAddressForOrDie(web3.utils.soliditySha3('test2')), accounts[2])
     })
   })
 })
 
 contract('Integration: Exchange', (accounts: string[]) => {
-  const sellAmount = 100
+  const sellAmount = new BigNumber('1000000000000000000')
   const minBuyAmount = 1
   let exchange: ExchangeInstance
   let reserve: ReserveInstance
