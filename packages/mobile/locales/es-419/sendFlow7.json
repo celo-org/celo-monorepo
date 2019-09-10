@@ -19,6 +19,8 @@
   "fee": "Comisión",
   "securityFee": "Comisión de seguridad",
   "inviteAndSecurityFee": "Comisión de Invitación",
+  "amountInCelloDollars": "Cantidad en Celo dólares",
+  "localValueHint": "@ {{localValue}} {{localCurrencySymbol}}",
   "feeEducation":
     "~Sending payments and making exchanges include a small fee for service security and maintenance.",
   "learnMore": "Saber más",

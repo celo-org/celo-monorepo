@@ -8,10 +8,11 @@ interface Props {
   symbol?: string
   sign?: string
   color?: string
+  code?: string
 }
 
 export function MoneyAmount(props: Props) {
-  const { sign, symbol, amount, color } = props
+  const { sign, symbol, amount, color, code } = props
   const colorStyle = { color: color || colors.darkSecondary }
   return (
     <View style={style.container}>
@@ -20,6 +21,7 @@ export function MoneyAmount(props: Props) {
       <Text style={[style.amount, colorStyle]} numberOfLines={1} ellipsizeMode="tail">
         {amount}
       </Text>
+      {!!code && <Text style={style.currencyCode}>{code}</Text>}
     </View>
   )
 }
@@ -46,5 +48,13 @@ const style = StyleSheet.create({
     textAlignVertical: 'top',
     fontSize: 24,
     color: colors.darkSecondary,
+  },
+  currencyCode: {
+    ...fontStyles.regular,
+    fontSize: 16,
+    lineHeight: 64,
+    color: '#BDBDBD',
+    marginLeft: 7,
+    alignSelf: 'flex-end',
   },
 })

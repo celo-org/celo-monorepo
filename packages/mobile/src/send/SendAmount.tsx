@@ -18,7 +18,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import Avatar from 'src/components/Avatar'
-import { MAX_COMMENT_LENGTH, NUMBER_INPUT_MAX_DECIMALS } from 'src/config'
+import { LOCAL_CURRENCY_SYMBOL, MAX_COMMENT_LENGTH, NUMBER_INPUT_MAX_DECIMALS } from 'src/config'
 import { FeeType } from 'src/fees/actions'
 import EstimateFee from 'src/fees/EstimateFee'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
@@ -27,6 +27,8 @@ import i18n, { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/contactMapping'
 import { E164NumberToAddressType } from 'src/identity/reducer'
+import { convertLocalAmountToDollars } from 'src/localCurrency/convert'
+import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -64,6 +66,7 @@ interface StateProps {
   defaultCountryCode: string
   e164NumberToAddress: E164NumberToAddressType
   feeType: FeeType | null
+  localCurrencyExchangeRate: number | null | undefined
 }
 
 interface DispatchProps {
@@ -115,6 +118,7 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
     defaultCountryCode: state.account.defaultCountryCode,
     e164NumberToAddress,
     feeType,
+    localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
   }
 }
 
@@ -151,9 +155,25 @@ export class SendAmount extends React.Component<Props, State> {
     this.props.fetchPhoneAddresses([recipient.e164PhoneNumber])
   }
 
+  getDollarsAmount = () => {
+    const parsedInputAmount = parseInputAmount(this.state.amount)
+
+    let dollarsAmount
+    if (LOCAL_CURRENCY_SYMBOL) {
+      const { localCurrencyExchangeRate } = this.props
+      dollarsAmount =
+        convertLocalAmountToDollars(parsedInputAmount, localCurrencyExchangeRate) ||
+        new BigNumber('')
+    } else {
+      dollarsAmount = parsedInputAmount
+    }
+
+    return dollarsAmount
+  }
+
   getNewAccountBalance = () => {
     return new BigNumber(this.props.dollarBalance)
-      .minus(parseInputAmount(this.state.amount))
+      .minus(this.getDollarsAmount())
       .minus(this.props.estimateFeeDollars || 0)
   }
 
@@ -174,14 +194,14 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   getConfirmationInput = (type: TransactionTypes) => {
-    const amount = parseInputAmount(this.state.amount)
+    const dollarsAmount = this.getDollarsAmount()
     const recipient = this.getRecipient()
     // TODO (Rossy) Remove address field from some recipient types.
     const recipientAddress = getAddressFromRecipient(recipient, this.props.e164NumberToAddress)
 
     const confirmationInput: ConfirmationInput = {
       recipient,
-      amount,
+      amount: new BigNumber(dollarsAmount.toPrecision(18, BigNumber.ROUND_UP)),
       reason: this.state.reason,
       recipientAddress,
       type,
@@ -337,7 +357,7 @@ export class SendAmount extends React.Component<Props, State> {
           </View>
           <LabeledTextInput
             keyboardType="numeric"
-            title={CURRENCIES[Tokens.DOLLAR].symbol}
+            title={LOCAL_CURRENCY_SYMBOL ? LOCAL_CURRENCY_SYMBOL : CURRENCIES[Tokens.DOLLAR].symbol}
             placeholder={t('amount')}
             labelStyle={style.amountLabel as TextStyle}
             placeholderTextColor={colors.celoGreenInactive}
