@@ -60,7 +60,8 @@
     "@types/fs-extra": "^8.0.0",
     "@types/node": "^10",
     "@types/web3": "^1.0.18",
-    "globby": "^8"
+    "globby": "^8",
+    "typescript": "^3.5.3"
   },
   "files": [
     "README.md",
