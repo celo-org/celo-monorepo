@@ -42,12 +42,14 @@ export class Countries {
       return EMPTY_COUNTRY
     }
 
+    countryName = countryName.toLowerCase().trim()
+
     // also ignoring EU and FX here, only two missing
     const country = this.localizedCountries.find(
       (c: LocalizedCountry) =>
         c.names !== undefined &&
         c.names[this.language] !== undefined &&
-        c.names[this.language].toLowerCase() === countryName.toLowerCase()
+        c.names[this.language].toLowerCase() === countryName
     )
 
     return country || EMPTY_COUNTRY
@@ -72,7 +74,7 @@ export class Countries {
   }
 
   getFilteredCountries(query: string): string[] {
-    query = query.toLowerCase()
+    query = query.toLowerCase().trim()
     // Return empty list if the query is empty or matches a country exactly
     // This is necessary to hide the autocomplete window on country select
     if (!query || !query.length) {
@@ -83,7 +85,7 @@ export class Countries {
 
     const exactMatch = this.localizedCountries.find(
       (c: LocalizedCountry) =>
-        c.names && c.names[lng] !== undefined && c.names[lng].toLowerCase() === query.toLowerCase()
+        c.names && c.names[lng] !== undefined && c.names[lng].toLowerCase() === query
     )
 
     // since we no longer have the country name as the map key, we have to
