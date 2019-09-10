@@ -36,7 +36,14 @@ exports[`Pincode renders correctly 1`] = `
          
     </Text>
   </View>
-  <RCTScrollView>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "padding": 20,
+        "paddingTop": 0,
+      }
+    }
+  >
     <View>
       <Image
         source={
@@ -68,6 +75,7 @@ exports[`Pincode renders correctly 1`] = `
           style={
             Array [
               Object {
+                "color": "#2E3338",
                 "fontFamily": "Hind-Light",
                 "fontSize": 22,
                 "paddingBottom": 20,
@@ -271,7 +279,14 @@ exports[`Pincode renders correctly 2`] = `
          
     </Text>
   </View>
-  <RCTScrollView>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "padding": 20,
+        "paddingTop": 0,
+      }
+    }
+  >
     <View>
       <Image
         source={
@@ -303,6 +318,7 @@ exports[`Pincode renders correctly 2`] = `
           style={
             Array [
               Object {
+                "color": "#2E3338",
                 "fontFamily": "Hind-Light",
                 "fontSize": 22,
                 "paddingBottom": 20,
@@ -477,7 +493,14 @@ exports[`Pincode renders correctly 3`] = `
          
     </Text>
   </View>
-  <RCTScrollView>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "padding": 20,
+        "paddingTop": 0,
+      }
+    }
+  >
     <View>
       <Image
         source={
@@ -509,6 +532,7 @@ exports[`Pincode renders correctly 3`] = `
           style={
             Array [
               Object {
+                "color": "#2E3338",
                 "fontFamily": "Hind-Light",
                 "fontSize": 22,
                 "paddingBottom": 20,
@@ -683,7 +707,14 @@ exports[`Pincode renders correctly 4`] = `
          
     </Text>
   </View>
-  <RCTScrollView>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "padding": 20,
+        "paddingTop": 0,
+      }
+    }
+  >
     <View>
       <Image
         source={
@@ -715,6 +746,7 @@ exports[`Pincode renders correctly 4`] = `
           style={
             Array [
               Object {
+                "color": "#2E3338",
                 "fontFamily": "Hind-Light",
                 "fontSize": 22,
                 "paddingBottom": 20,

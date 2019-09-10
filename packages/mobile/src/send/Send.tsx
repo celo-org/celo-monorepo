@@ -12,9 +12,10 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { estimateFee, FeeType } from 'src/fees/actions'
-import { Namespaces } from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
 import { importContacts } from 'src/identity/actions'
 import { E164NumberToAddressType } from 'src/identity/reducer'
+import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import {
@@ -97,6 +98,11 @@ const mapDispatchToProps = {
 type FilterType = (searchQuery: string) => Recipient[]
 
 class Send extends React.Component<Props, State> {
+  static navigationOptions = () => ({
+    ...headerWithCancelButton,
+    headerTitle: i18n.t('sendFlow7:sendOrRequest'),
+  })
+
   throttledSearch: (searchQuery: string) => void
   allRecipientsFilter: FilterType
   recentRecipientsFilter: FilterType
@@ -209,7 +215,6 @@ class Send extends React.Component<Props, State> {
 
     return (
       <View style={style.body}>
-        <Text style={[fontStyles.headerTitle, style.header]}>{t('sendOrRequest')}</Text>
         {loading ? (
           <View style={style.container}>
             <ActivityIndicator style={style.icon} size="large" color={colors.celoGreen} />
@@ -237,10 +242,6 @@ const style = StyleSheet.create({
   body: {
     flex: 1,
     backgroundColor: colors.background,
-  },
-  header: {
-    textAlign: 'center',
-    marginVertical: 10,
   },
   container: {
     flex: 1,

@@ -34,6 +34,7 @@ import PincodeConfirmation from 'src/pincode/PincodeConfirmation'
 import QRCode from 'src/qrcode/QRCode'
 import QRScanner from 'src/qrcode/QRScanner'
 import FeeEducation from 'src/send/FeeEducation'
+import Send from 'src/send/Send'
 import SendAmount from 'src/send/SendAmount'
 import SendConfirmation from 'src/send/SendConfirmation'
 import SetClock from 'src/set-clock/SetClock'
@@ -83,7 +84,7 @@ const NuxStack = createStackNavigator(
 
 const SendStack = createStackNavigator(
   {
-    // Note, Send isn't in this stack because it's part of the tab navigator
+    [Screens.Send]: { screen: Send },
     [Screens.SendAmount]: { screen: SendAmount },
     [Screens.SendConfirmation]: { screen: SendConfirmation },
     [Screens.FeeEducation]: { screen: FeeEducation },
@@ -94,7 +95,7 @@ const SendStack = createStackNavigator(
       header: null,
     },
     ...headerArea,
-    initialRouteName: Screens.SendAmount,
+    initialRouteName: Screens.Send,
   }
 )
 

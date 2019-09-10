@@ -18,6 +18,9 @@ import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'dappkit/DappKitAccountScreen'
 
+interface State {
+  dappName: string
+}
 interface OwnProps {
   errorMessage?: string
   navigation?: NavigationScreenProp<NavigationParams>
@@ -35,8 +38,24 @@ const mapStateToProps = (state: RootState): StateProps => ({
   phoneNumber: e164NumberSelector(state),
 })
 
-class DappKitAccountAuthScreen extends React.Component<Props> {
+class DappKitAccountAuthScreen extends React.Component<Props, State> {
   static navigationOptions = { header: null }
+
+  componentDidMount() {
+    if (!this.props.navigation) {
+      Logger.error(TAG, 'Missing navigation props')
+      return
+    }
+
+    const request: AccountAuthRequest = this.props.navigation.getParam('dappKitRequest', null)
+
+    if (!request) {
+      Logger.error(TAG, 'No request found in navigation props')
+      return
+    }
+
+    this.setState({ dappName: request.dappName })
+  }
 
   getErrorMessage() {
     return (
@@ -84,7 +103,9 @@ class DappKitAccountAuthScreen extends React.Component<Props> {
           <View style={styles.logo}>
             <DappkitExchangeIcon />
           </View>
-          <Text style={styles.header}>{t('connectToWallet')}</Text>
+          <Text style={styles.header}>
+            {t('connectToWallet', { dappname: this.state.dappName })}
+          </Text>
 
           <Text style={styles.share}>{t('shareInfo')}</Text>
 

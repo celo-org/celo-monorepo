@@ -40,7 +40,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & WithNamespaces
     } else {
       return (
         <Avatar
-          name={recipient ? recipient.displayName : undefined}
+          recipient={recipient}
           address={address}
           e164Number={e164PhoneNumber}
           iconSize={iconSize}

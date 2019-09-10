@@ -7,11 +7,11 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native'
 import { exchangeIcon, shinyDollar } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { Stacks } from 'src/navigator/Screens'
 import { FeedType } from 'src/transactions/TransactionFeed'
 
 const goToSend = () => {
-  navigate(Screens.Send)
+  navigate(Stacks.SendStack)
 }
 
 interface OwnProps {

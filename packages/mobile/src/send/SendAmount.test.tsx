@@ -108,7 +108,7 @@ describe('SendAmount', () => {
 
     it('handles commas', () => {
       numeral.locale('es')
-      const wrapper = getWrapper('es-AR')
+      const wrapper = getWrapper('es_419')
       const input = wrapper.getByPlaceholder(AMOUNT_PLACEHOLDER)
       fireEvent.changeText(input, '4,0')
       expect(wrapper.queryAllByDisplayValue('4,0')).toHaveLength(1)

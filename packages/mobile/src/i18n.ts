@@ -41,7 +41,8 @@ const languageDetector = {
 const currencyInterpolator = (text: string, value: any) => {
   const key = value[1]
   const translations = currencyTranslations[i18n.language]
-  if (key in translations) {
+
+  if (translations && key in translations) {
     return translations[key]
   } else {
     Logger.warn(
@@ -65,9 +66,9 @@ i18n
         common: en_US,
         ...locales.enUS,
       },
-      'es-AR': {
+      'es-419': {
         common: es_LA,
-        ...locales.esAR,
+        ...locales.es_419,
       },
     },
     ns: ['common', ...Object.keys(Namespaces)],
