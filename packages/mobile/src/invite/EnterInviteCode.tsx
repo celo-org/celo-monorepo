@@ -11,7 +11,6 @@ import {
   AppState,
   AppStateStatus,
   Clipboard,
-  Linking,
   ScrollView,
   StyleSheet,
   Text,
@@ -33,9 +32,9 @@ import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 
-function goToFaucet() {
-  Linking.openURL('https://celo.org/build/wallet')
-}
+// function goToFaucet() {
+//   Linking.openURL('https://celo.org/build/wallet')
+// }
 
 interface StateProps {
   error: ErrorMessages | null
