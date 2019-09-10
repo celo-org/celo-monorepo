@@ -12,7 +12,7 @@
   "chooseCountryCode": "Country Code",
   "chooseCountry": "Country",
   "joinText": {
-    "0": "The Celo Wallet helps you to  send, receive, and save value on the Celo Network.",
+    "0": "The Celo Wallet helps you to send, receive, and save value on the Celo Network.",
     "1":
       "By joining this network, you give us permission to collect anonymous information about how you use the app. Additionally, if you verify your phone number, an obfuscated copy of it will be stored on the Celo Network. Learn more at ",
     "2": "celo.org/terms"
