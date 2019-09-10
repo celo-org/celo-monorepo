@@ -56,11 +56,8 @@ class BackupPhrase extends React.Component<Props> {
             <Text style={[fontStyles.h1, styles.title]}>{t('socialBackup')}</Text>
             <Text style={styles.verifyText}>{t('socialBackupYourKey')}</Text>
             <Text style={styles.verifyText}>{t('easyToForget')}</Text>
-            <Text style={styles.verifyText}>{t('sendFirstHalf')}</Text>
-            <BackupPhraseContainer words={firstHalf} />
-
-            <Text style={styles.verifyText}>{t('sendSecondHalf')}</Text>
-            <BackupPhraseContainer words={secondHalf} />
+            <BackupPhraseContainer label={t('sendFirstHalf')} words={firstHalf} />
+            <BackupPhraseContainer label={t('sendSecondHalf')} words={secondHalf} />
           </View>
           <View>
             <Button
