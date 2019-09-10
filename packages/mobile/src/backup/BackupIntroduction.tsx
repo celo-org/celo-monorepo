@@ -23,7 +23,6 @@ type Props = {
 } & WithNamespaces
 
 interface State {
-  selectedAnswer: string | null
   visibleModal: boolean
 }
 
@@ -31,11 +30,8 @@ class BackupIntroduction extends React.Component<Props, State> {
   static navigationOptions = { header: null }
 
   state = {
-    selectedAnswer: null,
     visibleModal: false,
   }
-
-  onSelectAnswer = (word: string) => this.setState({ selectedAnswer: word })
 
   cancel = () => {
     CeloAnalytics.track(CustomEventNames.backup_cancel)

@@ -20,16 +20,8 @@ type Props = {
   onCancel: () => void
 } & WithNamespaces
 
-interface State {
-  selectedAnswer: string | null
-}
-
-class BackupPhrase extends React.Component<Props, State> {
+class BackupPhrase extends React.Component<Props> {
   static navigationOptions = { header: null }
-
-  state = {
-    selectedAnswer: null,
-  }
 
   componentDidMount() {
     FlagSecure.activate()
@@ -39,15 +31,13 @@ class BackupPhrase extends React.Component<Props, State> {
     FlagSecure.deactivate()
   }
 
-  onSelectAnswer = (word: string) => this.setState({ selectedAnswer: word })
-
   confirmBackup = () => {
     CeloAnalytics.track(CustomEventNames.confirm_backup_phrase)
     this.props.onPress()
   }
 
   render() {
-    const { t } = this.props
+    const { t, words } = this.props
     return (
       <View style={styles.container}>
         <View style={componentStyles.topBar}>
@@ -61,7 +51,7 @@ class BackupPhrase extends React.Component<Props, State> {
             <Text style={[fontStyles.h1, styles.title]}>{t('learnBackupKey')}</Text>
             <Text style={styles.verifyText}>{t('learnYourKey')}</Text>
             <Text style={styles.verifyText}>{t('keyWillBeVerified')}</Text>
-            <BackupPhraseContainer words={this.props.words} />
+            <BackupPhraseContainer words={words} />
           </View>
           <View>
             <Button
@@ -69,6 +59,12 @@ class BackupPhrase extends React.Component<Props, State> {
               text={t('continue')}
               standard={true}
               type={BtnTypes.PRIMARY}
+            />
+            <Button
+              onPress={this.confirmBackup}
+              text={t('continue')}
+              standard={true}
+              type={BtnTypes.SECONDARY}
             />
           </View>
         </KeyboardAwareScrollView>

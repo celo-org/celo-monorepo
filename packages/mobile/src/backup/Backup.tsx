@@ -6,8 +6,8 @@ import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
 import BackupComplete from 'src/backup/BackupComplete'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
 import BackupPhrase from 'src/backup/BackupPhrase'
-import BackupQuestion from 'src/backup/BackupQuestion'
-import { createQuizWordList, getStoredMnemonic, selectQuizWordOptions } from 'src/backup/utils'
+import BackupQuiz, { INDICES_TO_TEST } from 'src/backup/BackupQuiz'
+import { createQuizWordList, getStoredMnemonic } from 'src/backup/utils'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
@@ -16,8 +16,6 @@ import Logger from 'src/utils/Logger'
 export const DAYS_TO_BACKUP = 1
 export const DAYS_TO_DELAY = 1 / 24 // 1 hour delay
 
-const OPTIONS_PER_QUESTION = 4
-const INDICES_TO_TEST = [0, 2, 3, 6]
 const NUMBER_OF_TEST_QUESTIONS = INDICES_TO_TEST.length
 
 interface State {
@@ -91,20 +89,16 @@ export class Backup extends React.Component<Props, State> {
     }
   }
 
+  setCurrentQuestion = (currentQuestion: number) => {
+    this.setState({ currentQuestion })
+  }
+
   showBackupPhrase = () => {
-    this.setState({ currentQuestion: 0 })
+    this.setCurrentQuestion(0)
   }
 
   showQuiz = () => {
-    this.setState({ currentQuestion: 1 })
-  }
-
-  showNextQuestion = () => {
-    this.setState({ currentQuestion: this.state.currentQuestion + 1 })
-  }
-
-  returnToPhrase = () => {
-    this.setState({ currentQuestion: 0 })
+    this.setCurrentQuestion(1)
   }
 
   onCancel = async () => {
@@ -146,40 +140,28 @@ export class Backup extends React.Component<Props, State> {
         />
       )
     }
-    if (currentQuestion === 0) {
-      return (
-        <BackupPhrase
-          words={`${this.state.mnemonic}`}
-          onPress={this.showQuiz}
-          onCancel={this.onCancel}
-        />
-      )
-    }
-    if (mnemonic && currentQuestion > 0 && currentQuestion <= NUMBER_OF_TEST_QUESTIONS) {
-      const indexToTest = INDICES_TO_TEST[currentQuestion - 1]
-      const correctWord = mnemonic.split(' ')[indexToTest]
-      const wordOptions = selectQuizWordOptions(
-        correctWord,
-        wordsForBackupQuiz,
-        OPTIONS_PER_QUESTION
-      )
 
+    if (currentQuestion === 0) {
+      return <BackupPhrase words={mnemonic} onPress={this.showQuiz} onCancel={this.onCancel} />
+    }
+
+    if (currentQuestion <= NUMBER_OF_TEST_QUESTIONS) {
       return (
-        <BackupQuestion
-          questionNumber={currentQuestion}
-          testWordIndex={indexToTest}
-          words={wordOptions}
-          correctAnswer={correctWord}
-          onReturnToPhrase={this.returnToPhrase}
-          onCorrectSubmit={this.showNextQuestion}
-          onWrongSubmit={this.returnToPhrase}
+        <BackupQuiz
+          mnemonic={mnemonic}
+          wordsForBackupQuiz={wordsForBackupQuiz}
+          currentQuestion={currentQuestion}
           onCancel={this.onCancel}
+          setCurrentQuestion={this.setCurrentQuestion}
         />
       )
     }
+
     if (currentQuestion > NUMBER_OF_TEST_QUESTIONS) {
       return <BackupComplete onPress={this.onFinish} mnemonic={this.state.mnemonic} />
     }
+
+    // Mnemonic missing unhandled
   }
 }
 

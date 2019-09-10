@@ -19,18 +19,8 @@ type Props = {
   backupCompleted?: boolean
 } & WithNamespaces
 
-interface State {
-  selectedAnswer: string | null
-}
-
-class BackupComplete extends React.Component<Props, State> {
+class BackupComplete extends React.Component<Props> {
   static navigationOptions = { header: null }
-
-  state = {
-    selectedAnswer: null,
-  }
-
-  onSelectAnswer = (word: string) => this.setState({ selectedAnswer: word })
 
   onDone = () => {
     const { backupCompleted } = this.props
