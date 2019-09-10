@@ -1,4 +1,5 @@
 import debugFactory from 'debug'
+import Web3 from 'web3'
 import { Address, AllContracts, CeloContract, NULL_ADDRESS } from './base'
 import { newRegistry } from './generated/Registry'
 import { Registry } from './generated/types/Registry'
@@ -20,7 +21,8 @@ export class AddressRegistry {
 
   async addressFor(contract: CeloContract): Promise<Address> {
     if (!this.cache.has(contract)) {
-      const address = await this.registry.methods.getAddressFor(contract).call()
+      const hash = Web3.utils.soliditySha3({ type: 'string', value: contract })
+      const address = await this.registry.methods.getAddressFor(hash).call()
 
       if (!address || address === NULL_ADDRESS) {
         throw new Error(`Failed to get address for ${contract} from the Registry`)
