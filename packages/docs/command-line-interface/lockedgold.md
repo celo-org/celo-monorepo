@@ -16,7 +16,7 @@ EXAMPLE
   list 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
 
-_See code: [packages/cli/lib/commands/lockedgold/list.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/lockedgold/list.js)_
+_See code: [packages/cli/src/commands/lockedgold/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/list.ts)_
 
 ### Lockup
 
@@ -37,7 +37,7 @@ EXAMPLE
   lockup --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --noticePeriod 8640 --goldAmount 1000000000000000000
 ```
 
-_See code: [packages/cli/lib/commands/lockedgold/lockup.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/lockedgold/lockup.js)_
+_See code: [packages/cli/src/commands/lockedgold/lockup.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/lockup.ts)_
 
 ### Notify
 
@@ -58,7 +58,7 @@ EXAMPLE
   notify --noticePeriod=3600 --goldAmount=500
 ```
 
-_See code: [packages/cli/lib/commands/lockedgold/notify.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/lockedgold/notify.js)_
+_See code: [packages/cli/src/commands/lockedgold/notify.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/notify.ts)_
 
 ### Register
 
@@ -75,7 +75,7 @@ EXAMPLE
   register
 ```
 
-_See code: [packages/cli/lib/commands/lockedgold/register.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/lockedgold/register.js)_
+_See code: [packages/cli/src/commands/lockedgold/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/register.ts)_
 
 ### Rewards
 
@@ -95,7 +95,7 @@ EXAMPLES
   rewards --delegate=0x56e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
-_See code: [packages/cli/lib/commands/lockedgold/rewards.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/lockedgold/rewards.js)_
+_See code: [packages/cli/src/commands/lockedgold/rewards.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/rewards.ts)_
 
 ### Show
 
@@ -116,7 +116,7 @@ EXAMPLES
   show 0x5409ed021d9299bf6814279a6a1411a7e866a631 --availabilityTime=1562206887
 ```
 
-_See code: [packages/cli/lib/commands/lockedgold/show.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/lockedgold/show.js)_
+_See code: [packages/cli/src/commands/lockedgold/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/show.ts)_
 
 ### Withdraw
 
@@ -136,4 +136,4 @@ EXAMPLE
   withdraw 3600
 ```
 
-_See code: [packages/cli/lib/commands/lockedgold/withdraw.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/lockedgold/withdraw.js)_
+_See code: [packages/cli/src/commands/lockedgold/withdraw.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/withdraw.ts)_
