@@ -3,6 +3,7 @@
     "Modo de solo lectura: cree la clave de respaldo para seguir enviando y recibiendo {{CeloDollars}}",
   "getBackupKey": "Obtener clave de respaldo",
   "learnBackupKey": "Aprenda su clave de respaldo",
+  "socialBackup": "Respaldo Social",
   "editProfile": "Editar perfil",
   "backupKey": "Clave de respaldo",
   "delayBackup": "Despedir por una hora",
@@ -39,6 +40,11 @@
   "learnYourKey": "Escriba o memorice su clave de respaldo.",
   "keyWillBeVerified":
     "Una vez que haya terminado, verificaremos que conoce la clave correctamente.",
+  "socialBackupYourKey":
+    "La copia de seguridad social es una forma de proteger su cuenta con la ayuda de sus amigos",
+  "easyToForget": "Es fácil olvidar su clave de respaldo",
+  "sendFirstHalf": "Enviar la primera mitad a un contacto",
+  "sendSecondHalf": "Enviar la segunda mitad a otro contacto",
   "question": "Pregunta",
   "questionPhrase": {
     "0": "¿Cuál es la ",

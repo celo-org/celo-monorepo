@@ -2,6 +2,7 @@
   "readOnlyMode": "Read Only Mode Set Backup Key to continue sending and receiving {{CeloDollars}}",
   "getBackupKey": "Get Backup Key",
   "learnBackupKey": "Learn Your Backup Key",
+  "socialBackup": "Social Backup",
   "editProfile": "Edit Profile",
   "backupKey": "Backup Key",
   "delayBackup": "Dismiss for an hour",
@@ -36,6 +37,11 @@
   },
   "learnYourKey": "Write down or memorize your Backup Key.",
   "keyWillBeVerified": "Once you have finished, we will verify that you know the key correctly.",
+  "socialBackupYourKey":
+    "Social Backup is a way to secure your account with the help of your friends.",
+  "easyToForget": "It's easy to forget your backup key.",
+  "sendFirstHalf": "Send the first half to one contact",
+  "sendSecondHalf": "Send the second half to another contact",
   "question": "Question",
   "questionPhrase": {
     "0": "What is the ",

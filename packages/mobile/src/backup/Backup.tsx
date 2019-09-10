@@ -7,6 +7,7 @@ import BackupComplete from 'src/backup/BackupComplete'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
 import BackupPhrase from 'src/backup/BackupPhrase'
 import BackupQuiz, { INDICES_TO_TEST } from 'src/backup/BackupQuiz'
+import BackupSocial from 'src/backup/BackupSocial'
 import { createQuizWordList, getStoredMnemonic } from 'src/backup/utils'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
@@ -112,6 +113,10 @@ export class Backup extends React.Component<Props, State> {
     this.setState({ backupStep: BackupStep.phrase })
   }
 
+  socialBackup = () => {
+    this.setState({ backupStep: BackupStep.socialBackup })
+  }
+
   showQuiz = () => {
     this.setState({ currentQuestion: 1, backupStep: BackupStep.quiz })
   }
@@ -132,7 +137,7 @@ export class Backup extends React.Component<Props, State> {
 
   render() {
     const { mnemonic, currentQuestion, wordsForBackupQuiz, backupStep } = this.state
-    const { backupCompleted, backupDelayedTime, backupTooLate } = this.props
+    const { backupCompleted, backupDelayedTime, backupTooLate, language } = this.props
 
     // if backup is completed before this component is mounted, different from BackupStep.complete
     if (backupCompleted) {
@@ -158,7 +163,26 @@ export class Backup extends React.Component<Props, State> {
     }
 
     if (backupStep === BackupStep.phrase) {
-      return <BackupPhrase words={mnemonic} onPress={this.showQuiz} onCancel={this.onCancel} />
+      return (
+        <BackupPhrase
+          words={mnemonic}
+          onPressBackup={this.showQuiz}
+          onPressSocialBackup={this.socialBackup}
+          onCancel={this.onCancel}
+        />
+      )
+    }
+
+    if (backupStep === BackupStep.socialBackup) {
+      return (
+        <BackupSocial
+          words={mnemonic}
+          language={language}
+          onPressBackup={this.showQuiz}
+          onPressSocialBackup={this.socialBackup}
+          onCancel={this.onCancel}
+        />
+      )
     }
 
     if (backupStep === BackupStep.quiz) {

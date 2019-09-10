@@ -11,11 +11,13 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import BackupPhraseContainer from 'src/backup/BackupPhraseContainer'
+import { splitMnemonic } from 'src/backup/utils'
 import CancelButton from 'src/components/CancelButton'
 import { Namespaces } from 'src/i18n'
 
 type Props = {
   words: string
+  language: string | null
   onPressBackup: () => void
   onPressSocialBackup: () => void
   onCancel: () => void
@@ -37,13 +39,10 @@ class BackupPhrase extends React.Component<Props> {
     this.props.onPressBackup()
   }
 
-  continueSocialBackup = () => {
-    CeloAnalytics.track(CustomEventNames.social_backup_continue)
-    this.props.onPressSocialBackup()
-  }
-
   render() {
-    const { t, words } = this.props
+    const { t, words, language } = this.props
+    const [firstHalf, secondHalf] = splitMnemonic(words, language)
+
     return (
       <View style={styles.container}>
         <View style={componentStyles.topBar}>
@@ -54,10 +53,14 @@ class BackupPhrase extends React.Component<Props> {
           keyboardShouldPersistTaps="always"
         >
           <View>
-            <Text style={[fontStyles.h1, styles.title]}>{t('learnBackupKey')}</Text>
-            <Text style={styles.verifyText}>{t('learnYourKey')}</Text>
-            <Text style={styles.verifyText}>{t('keyWillBeVerified')}</Text>
-            <BackupPhraseContainer words={words} />
+            <Text style={[fontStyles.h1, styles.title]}>{t('socialBackup')}</Text>
+            <Text style={styles.verifyText}>{t('socialBackupYourKey')}</Text>
+            <Text style={styles.verifyText}>{t('easyToForget')}</Text>
+            <Text style={styles.verifyText}>{t('sendFirstHalf')}</Text>
+            <BackupPhraseContainer words={firstHalf} />
+
+            <Text style={styles.verifyText}>{t('sendSecondHalf')}</Text>
+            <BackupPhraseContainer words={secondHalf} />
           </View>
           <View>
             <Button
@@ -65,12 +68,6 @@ class BackupPhrase extends React.Component<Props> {
               text={t('continue')}
               standard={true}
               type={BtnTypes.PRIMARY}
-            />
-            <Button
-              onPress={this.continueSocialBackup}
-              text={t('backupWithFriends')}
-              standard={true}
-              type={BtnTypes.SECONDARY}
             />
           </View>
         </KeyboardAwareScrollView>
