@@ -12,6 +12,8 @@ import {
   StableTokenInstance,
   UsingRegistryInstance,
 } from 'types'
+const soliditySha3 = new (require('web3'))().utils.soliditySha3
+
 // tslint:disable-next-line: ordered-imports
 import BN = require('bn.js')
 import Web3 = require('web3')
@@ -145,7 +147,7 @@ export const assertContractsRegistered = async (getContract: any) => {
     const contract: Truffle.ContractInstance = await getContract(contractName, 'proxiedContract')
     assert.equal(
       contract.address.toLowerCase(),
-      (await registry.getAddressFor(contractName)).toLowerCase(),
+      (await registry.getAddressFor(soliditySha3(contractName))).toLowerCase(),
       'Registry does not have the correct information for ' + contractName
     )
   }
@@ -240,6 +242,18 @@ export function assertEqualBN(
   assert(
     web3.utils.toBN(value).eq(web3.utils.toBN(expected)),
     `expected ${expected.toString()} and got ${value.toString()}. ${msg || ''}`
+  )
+}
+
+export function assertGteBN(
+  value: number | BN | BigNumber,
+  expected: number | BN | BigNumber,
+  msg?: string
+) {
+  assert(
+    web3.utils.toBN(value).gte(web3.utils.toBN(expected)),
+    `expected ${value.toString()} to be greater than or equal to ${expected.toString()}. ${msg ||
+      ''}`
   )
 }
 

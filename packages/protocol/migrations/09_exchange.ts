@@ -1,5 +1,6 @@
 /* tslint:disable:no-console */
 
+import { toFixed } from '@celo/protocol/lib/fixidity'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,
@@ -16,10 +17,8 @@ const initializeArgs = async (): Promise<any[]> => {
   return [
     config.registry.predeployedProxyAddress,
     stableToken.address,
-    config.exchange.spreadNumerator,
-    config.exchange.spreadDenominator,
-    config.exchange.reserveFractionNumerator,
-    config.exchange.reserveFractionDenominator,
+    toFixed(config.exchange.spread).toString(),
+    toFixed(config.exchange.reserveFraction).toString(),
     config.exchange.updateFrequency,
     config.exchange.minimumReports,
   ]
