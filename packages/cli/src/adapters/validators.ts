@@ -132,7 +132,7 @@ export class ValidatorsAdapter {
     votedGroup: Address,
     voteWeight: BN
   ): Promise<{ lesser: Address; greater: Address }> {
-    const currentVotes = await this.getValidatorGroupsVotes()
+    const currentVotes = (await this.getValidatorGroupsVotes()).filter((g) => !g.votes.isZero())
 
     const selectedGroup = currentVotes.find((cv) => eqAddress(cv.address, votedGroup))
 
