@@ -5,6 +5,7 @@ import {
   isSameAddress,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
+import { fixed1, toFixed, fromFixed } from '@celo/protocol/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   ExchangeInstance,
@@ -46,8 +47,7 @@ contract('Exchange', (accounts: string[]) => {
 
   const owner = accounts[0]
 
-  const spreadNumerator = new BigNumber(3)
-  const spreadDenominator = new BigNumber(1000)
+  const spread = toFixed(3 / 1000)
 
   const updateFrequency = 60 * 60
   const minimumReports = 2
@@ -55,11 +55,10 @@ contract('Exchange', (accounts: string[]) => {
 
   const unit = new BigNumber(10).pow(decimals)
   const initialReserveBalance = new BigNumber(1000)
-  const reserveFractionNumerator = new BigNumber(5)
-  const reserveFractionDenominator = new BigNumber(100)
+  const reserveFraction = toFixed(5 / 100)
   const initialGoldBucket = initialReserveBalance
-    .times(reserveFractionNumerator)
-    .div(reserveFractionDenominator)
+    .times(fromFixed(reserveFraction))
+    .integerValue(BigNumber.ROUND_FLOOR)
   const stableAmountForRate = new BigNumber(2)
   const goldAmountForRate = new BigNumber(1)
   const initialStableBucket = initialGoldBucket.times(stableAmountForRate).div(goldAmountForRate)
@@ -67,11 +66,10 @@ contract('Exchange', (accounts: string[]) => {
     sellAmount: BigNumber,
     sellSupply: BigNumber,
     buySupply: BigNumber,
-    numerator: BigNumber = spreadNumerator,
-    denominator: BigNumber = spreadDenominator
+    _spread: BigNumber = spread
   ) {
     const alpha = new BigNumber(sellAmount).div(sellSupply)
-    const gamma = new BigNumber(1).minus(numerator.div(denominator))
+    const gamma = fromFixed(fixed1.minus(_spread))
     const res = alpha
       .times(gamma)
       .times(buySupply)
@@ -106,8 +104,7 @@ contract('Exchange', (accounts: string[]) => {
       'cUSD',
       decimals,
       registry.address,
-      1,
-      1,
+      fixed1,
       SECONDS_IN_A_WEEK
     )
 
@@ -127,10 +124,8 @@ contract('Exchange', (accounts: string[]) => {
     await exchange.initialize(
       registry.address,
       stableToken.address,
-      spreadNumerator,
-      spreadDenominator,
-      reserveFractionNumerator,
-      reserveFractionDenominator,
+      spread,
+      reserveFraction,
       updateFrequency,
       minimumReports
     )
@@ -149,10 +144,8 @@ contract('Exchange', (accounts: string[]) => {
         exchange.initialize(
           registry.address,
           stableToken.address,
-          spreadNumerator,
-          spreadDenominator,
-          reserveFractionNumerator,
-          reserveFractionDenominator,
+          spread,
+          reserveFraction,
           updateFrequency,
           minimumReports
         )

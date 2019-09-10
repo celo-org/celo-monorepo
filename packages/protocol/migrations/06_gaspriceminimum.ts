@@ -1,26 +1,17 @@
 /* tslint:disable:no-console */
+import { toFixed } from '@celo/protocol/lib/fixidity'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import {
-  deploymentForCoreContract,
-  getDeployedProxiedContract,
-} from '@celo/protocol/lib/web3-utils'
+import { deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { GasPriceMinimumInstance, RegistryInstance } from 'types'
+import { GasPriceMinimumInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
-  const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-    'Registry',
-    artifacts
-  )
   return [
-    registry.address,
+    config.registry.predeployedProxyAddress,
     config.gasPriceMinimum.initialMinimum,
-    config.gasPriceMinimum.targetDensity.numerator,
-    config.gasPriceMinimum.targetDensity.denominator,
-    config.gasPriceMinimum.adjustmentSpeed.numerator,
-    config.gasPriceMinimum.adjustmentSpeed.denominator,
-    config.gasPriceMinimum.infrastructureFraction.numerator,
-    config.gasPriceMinimum.infrastructureFraction.denominator,
+    toFixed(config.gasPriceMinimum.targetDensity).toString(),
+    toFixed(config.gasPriceMinimum.adjustmentSpeed).toString(),
+    toFixed(config.gasPriceMinimum.infrastructureFraction).toString(),
   ]
 }
 
