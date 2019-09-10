@@ -347,7 +347,7 @@ export class SendAmount extends React.Component<Props, State> {
             autoFocus={true}
             numberOfDecimals={NUMBER_INPUT_MAX_DECIMALS}
             validator={ValidatorKind.Decimal}
-            lng={this.props.lng}
+            lng={'en'}
           />
           <LabeledTextInput
             keyboardType="default"

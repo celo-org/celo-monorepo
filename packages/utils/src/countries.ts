@@ -41,6 +41,14 @@ function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
   return value !== null && value !== undefined
 }
 
+const matchCountry = (country: CountrySearch, query: string) => {
+  return (
+    country &&
+    ((country.displayName && country.displayName.startsWith(query)) ||
+      country.countryCode.startsWith('+' + query))
+  )
+}
+
 export class Countries {
   language: string
   countryMap: Map<string, LocalizedCountry>
@@ -61,15 +69,14 @@ export class Countries {
       return EMPTY_COUNTRY
     }
 
+    const query = removeDiacritics(countryName)
+
     // also ignoring EU and FX here, only two missing
-    const country = this.localizedCountries.find(
-      (c: LocalizedCountry) =>
-        c.names !== undefined &&
-        c.names[this.language] !== undefined &&
-        c.names[this.language].toLowerCase() === countryName.toLowerCase()
+    const countryIndex = this.countriesWithNoDiacritics.findIndex(
+      (country) => country.displayName === query
     )
 
-    return country || EMPTY_COUNTRY
+    return countryIndex !== -1 ? this.localizedCountries[countryIndex] : EMPTY_COUNTRY
   }
 
   getCountryByPhoneCountryCode(countryCode: string): LocalizedCountry {
@@ -112,11 +119,7 @@ export class Countries {
     // EU (European Union) and FX (France, Metropolitan) which don't seem to be used?
     return this.countriesWithNoDiacritics
       .map((country, index) => {
-        if (
-          country &&
-          ((country.displayName && country.displayName.startsWith(query)) ||
-            country.countryCode.startsWith('+' + query))
-        ) {
+        if (matchCountry(country, query)) {
           return index
         } else {
           return null
