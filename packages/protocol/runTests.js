@@ -14,6 +14,8 @@ async function startGanache() {
     network_id: network.network_id,
     mnemonic: network.mnemonic,
     gasPrice: network.gasPrice,
+    gasLimit: 7000000,
+    allowUnlimitedContractSize: true,
   })
 
   await new Promise((resolve, reject) => {
