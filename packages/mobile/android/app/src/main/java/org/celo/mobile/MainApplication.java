@@ -49,7 +49,7 @@ import com.rnrestartandroid.RNRestartAndroidPackage;
 import me.furtado.smsretriever.RNSmsRetrieverPackage;
 import cl.json.RNSharePackage;
 import cl.json.ShareApplication;
-import com.reactlibrary.RNInstallReferrerPackage;
+import com.rninstallreferrer.RNInstallReferrerPackage;
 import com.reactlibrary.securekeystore.RNSecureKeyStorePackage;
 
 import android.util.Log;
