@@ -15,10 +15,6 @@ import { TextInput } from 'src/forms/FormComponents'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { colors, standardStyles } from 'src/styles'
 import { RequestRecord, RequestType, subscribeRequest } from '../../server/FirebaseClient'
-function send(beneficiary: string, kind: RequestType, captchaToken: string) {
-  const route = kind === RequestType.Invite ? '/invite' : '/faucet'
-  return postForm(route, { captchaToken, beneficiary })
-}
 
 interface State {
   beneficiary: string
@@ -178,7 +174,10 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
   }
 }
 
-export default withNamespaces(NameSpaces.faucet)(RequestFunds)
+function send(beneficiary: string, kind: RequestType, captchaToken: string) {
+  const route = kind === RequestType.Invite ? '/invite' : '/faucet'
+  return postForm(route, { captchaToken, beneficiary })
+}
 
 const styles = StyleSheet.create({
   error: {
@@ -186,3 +185,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
 })
+
+export default withNamespaces(NameSpaces.faucet)(RequestFunds)

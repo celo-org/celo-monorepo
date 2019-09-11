@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-// import Autocomplete from 'react-native-autocomplete-input'
+import Autocomplete from 'react-native-autocomplete-input'
 import { TextInput } from 'src/forms/FormComponents'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
@@ -83,7 +83,7 @@ class PhoneInput extends React.PureComponent<Props, State> {
   render() {
     return (
       <>
-        {/* <Autocomplete
+        <Autocomplete
           autoCapitalize="none"
           autoCorrect={false}
           // listContainerStyle={style.autoCompleteDropDown}
@@ -96,7 +96,7 @@ class PhoneInput extends React.PureComponent<Props, State> {
           placeholder={'country'}
           renderItem={this.renderItem}
           renderTextInput={this.renderTextInput}
-        /> */}
+        />
         <View style={[standardStyles.row, styles.fakeInputBorder]}>
           <Text style={[fonts.legal, textStyles.invert, textStyles.center, styles.countryCode]}>
             {this.state.countryCallingCode}+00
