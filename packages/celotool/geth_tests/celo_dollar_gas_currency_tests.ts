@@ -233,6 +233,10 @@ describe('celo dollar gas currency tests', function(this: any) {
     })
   }
 
+  const convertCGToCD = (cGold: BigNumber) => {
+    return cGold.multipliedBy(cDollarToCGoldRate[0]).dividedBy(cDollarToCGoldRate[1])
+  }
+
   describe('Tx pool tests', () => {
     it('when tx pool gets full, ensure that celo gold gas denominated tx gets pruned', async () => {
       const fullInstance = {
@@ -331,9 +335,13 @@ describe('celo dollar gas currency tests', function(this: any) {
         DEF_FROM_ADDR,
         DEF_TO_ADDR2,
         DEF_AMOUNT,
-        { gasCurrency: stableTokenAddress, gasPrice: cDollarGasFee },
+        {
+          gasCurrency: stableTokenAddress,
+          gasPrice: convertCGToCD(new BigNumber(Web3.utils.toWei('1', 'gwei'))),
+        },
         'transactionHash'
       ).catch((err) => console.log(err))
+
       await transferCeloGold(
         DEF_FROM_ADDR,
         DEF_TO_ADDR3,
@@ -368,12 +376,12 @@ describe('celo dollar gas currency tests', function(this: any) {
         rpcport: 8545,
         privateKey: DEF_FROM_PK,
       }
+
       await restartGeth()
       await startGeth(hooks.gethBinaryPath, fullInstance)
       await sleep(2)
 
       web3 = new Web3('http://localhost:8545')
-
       await unlockAccount(DEF_FROM_ADDR)
 
       try {
@@ -430,6 +438,214 @@ describe('celo dollar gas currency tests', function(this: any) {
           'Returned error: insufficient funds for gas * price + value'
         )
       }
+    })
+  })
+
+  describe('Worker tests', () => {
+    let tx1Hash: any
+    let tx2Hash: any
+    let tx3Hash: any
+    let tx4Hash: any
+    let minedBlockNumber: number
+    let sender1InitialGoldBalance: BigNumber
+    let sender1InitialDollarBalance: BigNumber
+    let sender2InitialGoldBalance: BigNumber
+    let sender2InitialDollarBalance: BigNumber
+    let sender3InitialGoldBalance: BigNumber
+    let sender3InitialDollarBalance: BigNumber
+    let validatorInitialGoldBalance: BigNumber
+    let validatorInitialDollarBalance: BigNumber
+
+    let sender1: string
+    let sender2: string
+    let sender3: string
+
+    before(async function(this: any) {
+      const validatorInstance = {
+        name: 'validator',
+        validating: true,
+        syncmode: 'full',
+        port: 30303,
+        rpcport: 8545,
+      }
+
+      await restartGeth()
+      await startGeth(hooks.gethBinaryPath, validatorInstance)
+      await sleep(2)
+
+      web3 = new Web3('http://localhost:8545')
+      await unlockAccount(validatorAddress)
+
+      // Create sender accounts
+      sender1 = await web3.eth.personal.newAccount('')
+      await unlockAccount(sender1)
+      sender2 = await web3.eth.personal.newAccount('')
+      await unlockAccount(sender2)
+      sender3 = await web3.eth.personal.newAccount('')
+      await unlockAccount(sender3)
+
+      await transferCeloGold(validatorAddress, sender1, DEF_AMOUNT.multipliedBy(10))
+      await transferCeloGold(validatorAddress, sender2, DEF_AMOUNT.multipliedBy(10))
+      await transferCeloGold(validatorAddress, sender3, DEF_AMOUNT.multipliedBy(10))
+      await transferCeloDollars(validatorAddress, sender1, DEF_AMOUNT)
+      await transferCeloDollars(validatorAddress, sender3, DEF_AMOUNT)
+
+      // Let a few blocks get mined
+      await sleep(10)
+
+      // Turn off mining so that the submitted txns will be in one block when mining is turned on
+      setMining(hooks.gethBinaryPath, validatorInstance, false)
+
+      sender1InitialGoldBalance = new BigNumber(await web3.eth.getBalance(sender1))
+      sender1InitialDollarBalance = new BigNumber(
+        await stableToken.methods.balanceOf(sender1).call()
+      )
+      sender2InitialGoldBalance = new BigNumber(await web3.eth.getBalance(sender2))
+      sender2InitialDollarBalance = new BigNumber(
+        await stableToken.methods.balanceOf(sender2).call()
+      )
+      sender3InitialGoldBalance = new BigNumber(await web3.eth.getBalance(sender3))
+      sender3InitialDollarBalance = new BigNumber(
+        await stableToken.methods.balanceOf(sender3).call()
+      )
+      validatorInitialGoldBalance = new BigNumber(await web3.eth.getBalance(validatorAddress))
+      validatorInitialDollarBalance = new BigNumber(
+        await stableToken.methods.balanceOf(validatorAddress).call()
+      )
+
+      tx1Hash = await transferCeloGold(
+        sender1,
+        DEF_TO_ADDR1,
+        DEF_AMOUNT,
+        {
+          gasCurrency: stableTokenAddress,
+          gasPrice: convertCGToCD(new BigNumber(Web3.utils.toWei('1', 'gwei'))),
+          gas: 400000,
+          gasFeeRecipient: validatorAddress,
+        },
+        'transactionHash'
+      )
+
+      tx2Hash = await transferCeloGold(
+        sender2,
+        DEF_TO_ADDR2,
+        DEF_AMOUNT,
+        {
+          gasPrice: new BigNumber(Web3.utils.toWei('10', 'gwei')),
+          gas: 400000,
+          gasFeeRecipient: validatorAddress,
+        },
+        'transactionHash'
+      )
+
+      tx3Hash = await transferCeloGold(
+        sender3,
+        DEF_TO_ADDR3,
+        DEF_AMOUNT,
+        {
+          gasCurrency: stableTokenAddress,
+          gasPrice: convertCGToCD(new BigNumber(Web3.utils.toWei('2', 'gwei'))),
+          gas: 400000,
+          gasFeeRecipient: validatorAddress,
+        },
+        'transactionHash'
+      )
+
+      // This transaction should be mined after tx1, since it's from the same sender.
+      tx4Hash = await transferCeloGold(
+        sender1,
+        DEF_TO_ADDR1,
+        DEF_AMOUNT,
+        {
+          gasPrice: new BigNumber(Web3.utils.toWei('5', 'gwei')),
+          gas: 400000,
+          gasFeeRecipient: validatorAddress,
+        },
+        'transactionHash'
+      )
+
+      // Get the current block number
+      minedBlockNumber = (await web3.eth.getBlockNumber()) + 1
+
+      // Turn on mining
+      setMining(hooks.gethBinaryPath, validatorInstance, true)
+
+      // Wait for the block to be mined
+      await sleep(10)
+    })
+
+    it('when the worker creates a block proposal to mine, the txns within that block should be sorted by price desc (with the added contraint that for a given account, txns are sorted by nonce asc)', async () => {
+      var expectedMinedTxOrder = [tx2Hash, tx4Hash, tx3Hash, tx1Hash]
+      var minedBlock = await web3.eth.getBlock(minedBlockNumber)
+
+      // Verify that the ordering of the txns is [tx2Hash, tx3Hash, tx1Hash, tx4Hash]
+      assert.deepEqual(minedBlock.transactions, [tx2Hash, tx3Hash, tx1Hash, tx4Hash])
+    })
+
+    it('when the worker mines a block, the balances for the senders and validator should be adjusted accordingly', async () => {
+      let sender1FinalGoldBalance = sender1InitialGoldBalance
+      let sender1FinalDollarBalance = sender1InitialDollarBalance
+      let sender2FinalGoldBalance = sender2InitialGoldBalance
+      let sender2FinalDollarBalance = sender2InitialDollarBalance
+      let sender3FinalGoldBalance = sender3InitialGoldBalance
+      let sender3FinalDollarBalance = sender3InitialDollarBalance
+      let validatorFinalGoldBalance = validatorInitialGoldBalance
+      let validatorFinalDollarBalance = validatorInitialDollarBalance
+
+      // tx1 is a transfer of DEF_AMOUNT CG from sender1 to DEF_TO_ADDR1 paid using CD for tx fee
+      const tx1 = await web3.eth.getTransaction(tx1Hash)
+      const tx1Receipt = await web3.eth.getTransactionReceipt(tx1Hash)
+      const tx1Fee = new BigNumber(tx1.gasPrice).times(tx1Receipt.gasUsed)
+      sender1FinalDollarBalance = sender1FinalDollarBalance.minus(tx1Fee)
+      validatorFinalDollarBalance = validatorFinalDollarBalance.plus(tx1Fee)
+      sender1FinalGoldBalance = sender1FinalGoldBalance.minus(DEF_AMOUNT)
+
+      // tx2 is a transfer of DEF_AMOUNT CG from sender2 to DEF_TO_ADDR2 paid using CG for tx fee
+      const tx2 = await web3.eth.getTransaction(tx2Hash)
+      const tx2Receipt = await web3.eth.getTransactionReceipt(tx2Hash)
+      const tx2Fee = new BigNumber(tx2.gasPrice).times(tx2Receipt.gasUsed)
+      sender2FinalGoldBalance = sender2FinalGoldBalance.minus(DEF_AMOUNT.plus(tx2Fee))
+      validatorFinalGoldBalance = validatorFinalGoldBalance.plus(tx2Fee)
+
+      // tx3 is a transfer of DEF_AMOUNT CG from sender3 to DEF_TO_ADDR3 paid using CD for tx fee
+      const tx3 = await web3.eth.getTransaction(tx3Hash)
+      const tx3Receipt = await web3.eth.getTransactionReceipt(tx3Hash)
+      const tx3Fee = new BigNumber(tx3.gasPrice).times(tx3Receipt.gasUsed)
+      sender3FinalDollarBalance = sender3FinalDollarBalance.minus(tx3Fee)
+      validatorFinalDollarBalance = validatorFinalDollarBalance.plus(tx3Fee)
+      sender3FinalGoldBalance = sender3FinalGoldBalance.minus(DEF_AMOUNT)
+
+      // tx4 is a transfer of DEF_AMOUNT CG from sender1 to DEF_TO_ADDR1 paid using CG for tx fee
+      const tx4 = await web3.eth.getTransaction(tx4Hash)
+      const tx4Receipt = await web3.eth.getTransactionReceipt(tx4Hash)
+      const tx4Fee = new BigNumber(tx4.gasPrice).times(tx4Receipt.gasUsed)
+      sender1FinalGoldBalance = sender1FinalGoldBalance.minus(tx4Fee)
+      validatorFinalGoldBalance = validatorFinalGoldBalance.plus(tx4Fee)
+      sender1FinalGoldBalance = sender1FinalGoldBalance.minus(DEF_AMOUNT)
+
+      assert.deepEqual(
+        sender1FinalDollarBalance,
+        new BigNumber(await stableToken.methods.balanceOf(sender1).call())
+      )
+      assert.deepEqual(sender1FinalGoldBalance, new BigNumber(await web3.eth.getBalance(sender1)))
+      assert.deepEqual(
+        sender2FinalDollarBalance,
+        new BigNumber(await stableToken.methods.balanceOf(sender2).call())
+      )
+      assert.deepEqual(sender2FinalGoldBalance, new BigNumber(await web3.eth.getBalance(sender2)))
+      assert.deepEqual(
+        sender3FinalDollarBalance,
+        new BigNumber(await stableToken.methods.balanceOf(sender3).call())
+      )
+      assert.deepEqual(sender3FinalGoldBalance, new BigNumber(await web3.eth.getBalance(sender3)))
+      assert.deepEqual(
+        validatorFinalDollarBalance,
+        new BigNumber(await stableToken.methods.balanceOf(validatorAddress).call())
+      )
+      assert.deepEqual(
+        validatorFinalGoldBalance,
+        new BigNumber(await web3.eth.getBalance(validatorAddress))
+      )
     })
   })
 })
