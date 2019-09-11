@@ -93,7 +93,7 @@ spec:
           PING_IP_FROM_PACKET_FLAG=""
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"
           geth \
-            --bootnodesv4=enode://`cat /root/.celo/bootnodeEnode` \
+            --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
             --lightserv 90 \
             --lightpeers 1000 \
             --maxpeers 1100 \
