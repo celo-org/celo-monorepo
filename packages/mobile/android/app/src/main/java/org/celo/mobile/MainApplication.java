@@ -1,8 +1,7 @@
 package org.celo.mobile;
 
 import android.content.Context;
-import android.support.multidex.MultiDex;
-import android.support.multidex.MultiDexApplication;
+import android.app.Application;
 
 import org.reactnative.camera.RNCameraPackage;
 import com.chirag.RNMail.RNMail;
@@ -68,7 +67,7 @@ import ru.ivanarh.jndcrash.NDCrashUnwinder;
 // import com.instabug.library.invocation.InstabugInvocationEvent;
 // import com.instabug.reactlibrary.RNInstabugReactnativePackage;
 
-public class MainApplication extends MultiDexApplication implements ShareApplication, ReactApplication {
+public class MainApplication extends Application implements ShareApplication, ReactApplication {
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
     @Override
@@ -162,14 +161,6 @@ public class MainApplication extends MultiDexApplication implements ShareApplica
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
     initNdkCrashHandler();
-  }
-
-  @Override
-  protected void attachBaseContext(Context base) {
-    super.attachBaseContext(base);
-    if (BuildConfig.DEBUG) {
-      MultiDex.install(this);
-    }
   }
 
   @Override
