@@ -1,6 +1,6 @@
-import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import { fireEvent, render } from '@testing-library/react'
 import React from 'react'
-import { render, fireEvent } from '@testing-library/react'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 
 describe('ButtonPrimary', () => {
   describe('with href', () => {
