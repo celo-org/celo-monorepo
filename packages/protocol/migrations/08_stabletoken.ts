@@ -1,6 +1,7 @@
 /* tslint:disable:no-console */
 import Web3 = require('web3')
 
+import { toFixed } from '@celo/protocol/lib/fixidity'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   convertToContractDecimalsBN,
@@ -19,13 +20,14 @@ const truffle = require('@celo/protocol/truffle.js')
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 const initializeArgs = async (): Promise<any[]> => {
+  const rate = toFixed(config.stableToken.inflationRate)
+
   return [
     config.stableToken.tokenName,
     config.stableToken.tokenSymbol,
     config.stableToken.decimals,
     config.registry.predeployedProxyAddress,
-    config.stableToken.inflationRateNumerator,
-    config.stableToken.inflationRateDenominator,
+    rate.toString(),
     config.stableToken.inflationPeriod,
   ]
 }

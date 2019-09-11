@@ -22,7 +22,7 @@ exports[`PaymentRequestListItem renders correctly 1`] = `
         Object {
           "flexDirection": "row",
           "justifyContent": "space-between",
-          "padding": 10,
+          "padding": 16,
           "width": "100%",
         },
         false,
@@ -34,7 +34,7 @@ exports[`PaymentRequestListItem renders correctly 1`] = `
         Object {
           "alignItems": "center",
           "flexDirection": "column",
-          "paddingRight": 10,
+          "paddingRight": 16,
         }
       }
     >
@@ -127,7 +127,7 @@ exports[`PaymentRequestListItem renders correctly 1`] = `
                     "lineHeight": 20,
                   },
                   Object {
-                    "paddingTop": 10,
+                    "paddingTop": 16,
                   },
                 ]
               }
@@ -228,7 +228,7 @@ exports[`PaymentRequestListItem renders correctly 1`] = `
     <View
       style={
         Object {
-          "paddingLeft": 10,
+          "paddingLeft": 16,
         }
       }
     >

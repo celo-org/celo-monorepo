@@ -15,9 +15,6 @@ export interface EscrowedPayment {
   expirySeconds: BigNumber
 }
 
-// The number of seconds before the sender can reclaim the payment.
-export const EXPIRY_SECONDS = 432000 // 5 days in seconds
-
 export enum Actions {
   TRANSFER_PAYMENT = 'ESCROW/TRANSFER_PAYMENT',
   RECLAIM_PAYMENT = 'ESCROW/RECLAIM_PAYMENT',
@@ -28,84 +25,88 @@ export enum Actions {
   RECLAIM_PAYMENT_FAILURE = 'ESCROW/RECLAIM_PAYMENT_FAILURE',
 }
 
-export interface TransferPaymentAction {
+export interface EscrowTransferPaymentAction {
   type: Actions.TRANSFER_PAYMENT
   phoneHash: string
   amount: BigNumber
   tempWalletAddress: string
 }
-export interface ReclaimPaymentAction {
+export interface EscrowReclaimPaymentAction {
   type: Actions.RECLAIM_PAYMENT
   paymentID: string
 }
 
-export interface FetchSentPaymentsAction {
+export interface EscrowFetchSentPaymentsAction {
   type: Actions.FETCH_SENT_PAYMENTS
+  forceRefresh: boolean
 }
 
-export interface StoreSentPaymentsAction {
+export interface EscrowStoreSentPaymentsAction {
   type: Actions.STORE_SENT_PAYMENTS
   sentPayments: EscrowedPayment[]
 }
 
-export interface ResendPaymentAction {
+export interface EscrowResendPaymentAction {
   type: Actions.RESEND_PAYMENT
   paymentId: string
 }
 
-export interface ReclaimPaymentSuccessAction {
+export interface EscrowReclaimPaymentSuccessAction {
   type: Actions.RECLAIM_PAYMENT_SUCCESS
 }
 
-export interface ReclaimFailureAction {
+export interface EscrowReclaimFailureAction {
   type: Actions.RECLAIM_PAYMENT_FAILURE
   error: ErrorMessages
 }
 
 export type ActionTypes =
-  | TransferPaymentAction
-  | ReclaimPaymentAction
-  | FetchSentPaymentsAction
-  | StoreSentPaymentsAction
-  | ResendPaymentAction
-  | ReclaimPaymentSuccessAction
-  | ReclaimFailureAction
+  | EscrowTransferPaymentAction
+  | EscrowReclaimPaymentAction
+  | EscrowFetchSentPaymentsAction
+  | EscrowStoreSentPaymentsAction
+  | EscrowResendPaymentAction
+  | EscrowReclaimPaymentSuccessAction
+  | EscrowReclaimFailureAction
 
 export const transferEscrowedPayment = (
   phoneHash: string,
   amount: BigNumber,
   tempWalletAddress: string
-): TransferPaymentAction => ({
+): EscrowTransferPaymentAction => ({
   type: Actions.TRANSFER_PAYMENT,
   phoneHash,
   amount,
   tempWalletAddress,
 })
 
-export const reclaimPayment = (paymentID: string): ReclaimPaymentAction => ({
+export const reclaimEscrowPayment = (paymentID: string): EscrowReclaimPaymentAction => ({
   type: Actions.RECLAIM_PAYMENT,
   paymentID,
 })
 
-export const fetchSentPayments = (): FetchSentPaymentsAction => ({
+export const fetchSentEscrowPayments = (forceRefresh = false): EscrowFetchSentPaymentsAction => ({
   type: Actions.FETCH_SENT_PAYMENTS,
+  forceRefresh,
 })
 
-export const storeSentPayments = (sentPayments: EscrowedPayment[]): StoreSentPaymentsAction => ({
+export const storeSentEscrowPayments = (
+  sentPayments: EscrowedPayment[]
+): EscrowStoreSentPaymentsAction => ({
   type: Actions.STORE_SENT_PAYMENTS,
   sentPayments,
 })
 
-export const resendPayment = (paymentId: string): ResendPaymentAction => ({
+export const resendEscrowPayment = (paymentId: string): EscrowResendPaymentAction => ({
   type: Actions.RESEND_PAYMENT,
   paymentId,
 })
 
-export const reclaimPaymentSuccess = (): ReclaimPaymentSuccessAction => ({
+export const reclaimEscrowPaymentSuccess = (): EscrowReclaimPaymentSuccessAction => ({
   type: Actions.RECLAIM_PAYMENT_SUCCESS,
 })
 
-export const reclaimPaymentFailure = (error: ErrorMessages): ReclaimFailureAction => ({
+export const reclaimEscrowPaymentFailure = (error: ErrorMessages): EscrowReclaimFailureAction => ({
   type: Actions.RECLAIM_PAYMENT_FAILURE,
   error,
 })

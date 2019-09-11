@@ -43,6 +43,7 @@ exports[`InviteReview renders correctly 1`] = `
             style={
               Array [
                 Object {
+                  "color": "#2E3338",
                   "fontFamily": "Hind-Light",
                   "fontSize": 22,
                   "paddingBottom": 20,
@@ -142,7 +143,7 @@ exports[`InviteReview renders correctly 1`] = `
                     ]
                   }
                 >
-                  #
+                  J
                 </Text>
               </View>
             </View>
@@ -165,7 +166,7 @@ exports[`InviteReview renders correctly 1`] = `
                 ]
               }
             >
-              #000000000000000...
+              John Doe
             </Text>
             <View
               style={

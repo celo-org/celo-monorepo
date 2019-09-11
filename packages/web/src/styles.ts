@@ -185,6 +185,9 @@ export const textStyles = StyleSheet.create({
   invert: {
     color: colors.white,
   },
+  caption: {
+    paddingTop: 5,
+  },
 })
 
 const margins = {

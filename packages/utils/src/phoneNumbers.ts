@@ -165,12 +165,6 @@ function handleSpecialCasesForParsing(
     case 54:
       return prependToFormMobilePhoneNumber(parsedNumber, regionCode, '9')
 
-    // Mexico
-    // https://github.com/googlei18n/libphonenumber/blob/master/FAQ.md#why-is-this-number-from-argentina-ar-or-mexico-mx-not-identified-as-the-right-number-type
-    // https://en.wikipedia.org/wiki/Telephone_numbers_in_Mexico
-    case 52:
-      return prependToFormMobilePhoneNumber(parsedNumber, regionCode, '1')
-
     default:
       return parsedNumber
   }
