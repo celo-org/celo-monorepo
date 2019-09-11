@@ -35,7 +35,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     // Set up a LockedGold account with which we can vote.
     await lockedGold.createAccount()
     const noticePeriod = 60 * 60 * 24 // 1 day
-    const value = 1000
+    const value = new BigNumber('1000000000000000000')
     // @ts-ignore
     await lockedGold.newCommitment(noticePeriod, { value })
     weight = await lockedGold.getAccountWeight(accounts[0])
@@ -130,7 +130,7 @@ contract('Integration: Governance', (accounts: string[]) => {
 })
 
 contract('Integration: Exchange', (accounts: string[]) => {
-  const sellAmount = 100
+  const sellAmount = new BigNumber('1000000000000000000')
   const minBuyAmount = 1
   let exchange: ExchangeInstance
   let reserve: ReserveInstance

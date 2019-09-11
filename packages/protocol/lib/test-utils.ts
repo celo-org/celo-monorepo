@@ -245,6 +245,18 @@ export function assertEqualBN(
   )
 }
 
+export function assertGteBN(
+  value: number | BN | BigNumber,
+  expected: number | BN | BigNumber,
+  msg?: string
+) {
+  assert(
+    web3.utils.toBN(value).gte(web3.utils.toBN(expected)),
+    `expected ${value.toString()} to be greater than or equal to ${expected.toString()}. ${msg ||
+      ''}`
+  )
+}
+
 export const getReserveBalance = async (web3: Web3, getContract: any): Promise<string> => {
   const reserve: ReserveInstance = await getContract('Reserve', 'proxiedContract')
   return (await web3.eth.getBalance(reserve.address)).toString()
