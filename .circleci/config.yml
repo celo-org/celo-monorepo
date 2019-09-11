@@ -59,7 +59,7 @@ jobs:
           at: ~/app
 
       - restore_cache:
-          keys: 
+          keys:
             - yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
             - yarn-v2-{{ arch }}-{{ .Branch }}-
             - yarn-v2-{{ arch }}-
@@ -206,7 +206,14 @@ jobs:
       - run:
           name: test
           # Flaky tests - run them twice
-          command: yarn --cwd packages/protocol test || yarn --cwd packages/protocol test
+          command: yarn --cwd packages/protocol test:coverage || yarn --cwd packages/protocol test:coverage
+      - store_artifacts:
+          path: packages/protocol/coverage
+          destination: protocol/coverage
+      - run:
+          name: Upload to CodeCov
+          command: yarn codecov -F protocol
+
   contractkit-test:
     <<: *defaults
     steps:
