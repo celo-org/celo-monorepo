@@ -3,6 +3,7 @@ import Touchable from '@celo/react-components/components/Touchable'
 import RewardIcon from '@celo/react-components/icons/RewardIcon'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
+import variables from '@celo/react-components/styles/variables'
 import { decryptComment as decryptCommentRaw } from '@celo/utils/src/commentEncryption'
 import BigNumber from 'bignumber.js'
 import * as _ from 'lodash'
@@ -10,13 +11,14 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { HomeTransferFragment } from 'src/apollo/types'
-import { DEFAULT_TESTNET } from 'src/config'
+import { DEFAULT_TESTNET, LOCAL_CURRENCY_SYMBOL } from 'src/config'
 import { features } from 'src/flags'
 import { CURRENCIES, CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
-import { faucetIcon, inviteVerifyFee, unknownUserIcon } from 'src/images/Images'
+import { coinsIcon, unknownUserIcon } from 'src/images/Images'
 import { Invitees } from 'src/invite/actions'
+import useLocalAmount from 'src/localCurrency/useLocalAmount'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes, TransferStandby } from 'src/transactions/reducer'
@@ -52,32 +54,33 @@ export function getCurrencyStyles(currency: CURRENCY_ENUM, type: string): Curren
     return {
       color: colors.darkSecondary,
       symbol: CURRENCIES[currency].symbol,
-      direction: '',
+      direction: '-',
     }
   }
   if (
     type === TransactionTypes.RECEIVED ||
     type === TransactionTypes.FAUCET ||
     type === TransactionTypes.VERIFICATION_REWARD ||
-    type === TransactionTypes.INVITE_RECEIVED
+    type === TransactionTypes.INVITE_RECEIVED ||
+    type === TransactionTypes.PAY_REQUEST
   ) {
     if (currency === CURRENCY_ENUM.DOLLAR) {
       return {
-        color: colors.celoGreen,
+        color: colors.dark,
         symbol: CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol,
-        direction: '+',
+        direction: '',
       }
     }
     if (currency === CURRENCY_ENUM.GOLD) {
       return {
         color: colors.celoGold,
         symbol: CURRENCIES[CURRENCY_ENUM.GOLD].symbol,
-        direction: '+',
+        direction: '',
       }
     }
   }
 
-  Logger.error(TAG, `Unsupported transaction type: ${type}`)
+  Logger.warn(TAG, `Unsupported transaction type: ${type}`)
   return {
     color: colors.darkSecondary,
     symbol: '',
@@ -85,25 +88,28 @@ export function getCurrencyStyles(currency: CURRENCY_ENUM, type: string): Curren
   }
 }
 
-export class TransferFeedItem extends React.PureComponent<Props> {
-  decryptComment = (type: string) => {
-    return this.props.comment && this.props.commentKey && features.USE_COMMENT_ENCRYPTION
-      ? decryptCommentRaw(this.props.comment, this.props.commentKey, type === TransactionTypes.SENT)
-          .comment
-      : this.props.comment
+export function TransferFeedItem(props: Props) {
+  const {
+    t,
+    value,
+    address,
+    timestamp,
+    i18n,
+    type,
+    symbol,
+    status,
+    invitees,
+    addressToE164Number,
+    recipientCache,
+  } = props
+
+  const decryptComment = () => {
+    return props.comment && props.commentKey && features.USE_COMMENT_ENCRYPTION
+      ? decryptCommentRaw(props.comment, props.commentKey, type === TransactionTypes.SENT).comment
+      : props.comment
   }
 
-  navigateToTransactionReview = () => {
-    const {
-      address,
-      timestamp,
-      type,
-      symbol,
-      value,
-      addressToE164Number,
-      recipientCache,
-    } = this.props
-
+  const navigateToTransactionReview = () => {
     if (!Object.values(TransactionTypes).includes(type)) {
       Logger.error(TAG, 'Invalid transaction type')
       return
@@ -115,12 +121,15 @@ export class TransferFeedItem extends React.PureComponent<Props> {
       return
     }
 
-    const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
+    const recipient = getRecipientFromAddress(
+      address,
+      transactionType === TransactionTypes.INVITE_SENT ? invitees : addressToE164Number,
+      recipientCache
+    )
 
-    const comment = this.decryptComment(type)
     navigateToPaymentTransferReview(type, timestamp, {
       address,
-      comment,
+      comment: decryptComment(),
       currency: resolveCurrency(symbol),
       value: new BigNumber(value),
       recipient,
@@ -129,126 +138,123 @@ export class TransferFeedItem extends React.PureComponent<Props> {
     })
   }
 
-  renderRewardIcon() {
-    return (
+  const localValue = useLocalAmount(value)
+  let info: string | null = decryptComment()
+  const timeFormatted = formatFeedTime(timestamp, i18n)
+  const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
+  const currencyStyle = getCurrencyStyles(resolveCurrency(symbol), type)
+  const isPending = status === TransactionStatus.Pending
+
+  let icon, title
+
+  // TODO move this out to a seperate file, too much clutter here
+  if (type === TransactionTypes.VERIFICATION_FEE) {
+    icon = <Image source={coinsIcon} style={styles.image} />
+    title = t('feedItemVerificationFeeTitle')
+    info = t('feedItemVerificationFeeInfo')
+  } else if (type === TransactionTypes.VERIFICATION_REWARD) {
+    icon = (
       <View style={styles.image}>
         <RewardIcon height={38} />
       </View>
     )
-  }
+    title = t('feedItemVerificationRewardTitle')
+    info = t('feedItemVerificationRewardInfo')
+  } else if (type === TransactionTypes.FAUCET) {
+    icon = <Image source={coinsIcon} style={styles.image} />
+    title = t('feedItemFaucetTitle')
+    info = t('feedItemFaucetInfo', {
+      context: !DEFAULT_TESTNET ? 'missingTestnet' : null,
+      faucet: DEFAULT_TESTNET ? _.startCase(DEFAULT_TESTNET) : null,
+    })
+  } else if (type === TransactionTypes.INVITE_SENT) {
+    icon = <Image source={coinsIcon} style={styles.image} />
+    const inviteeE164Number = invitees[address]
+    const inviteeRecipient = recipientCache[inviteeE164Number]
+    title = t('feedItemInviteSentTitle')
+    info = t('feedItemInviteSentInfo', {
+      context: !inviteeE164Number ? 'missingInviteeDetails' : null,
+      nameOrNumber: inviteeRecipient ? inviteeRecipient.displayName : inviteeE164Number,
+    })
+  } else if (type === TransactionTypes.INVITE_RECEIVED) {
+    icon = <Image source={coinsIcon} style={styles.image} />
+    title = t('feedItemInviteReceivedTitle')
+    info = t('feedItemInviteReceivedInfo')
+  } else {
+    const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
+    const shortAddr = address.substring(0, 8)
 
-  render() {
-    const {
-      t,
-      address,
-      timestamp,
-      i18n,
-      type,
-      symbol,
-      status,
-      invitees,
-      addressToE164Number,
-      recipientCache,
-    } = this.props
-    let comment: string | null = this.decryptComment(type)
-    const timeFormatted = formatFeedTime(timestamp, i18n)
-    const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
-    const currencyStyle = getCurrencyStyles(resolveCurrency(symbol), type)
-    const isPending = status === TransactionStatus.Pending
-    const opacityStyle = { opacity: isPending ? 0.3 : 1 }
-
-    let contactImage, fullName
-
-    // TODO move this out to a seperate file, too much clutter here
-    if (type === TransactionTypes.VERIFICATION_FEE) {
-      contactImage = <Image source={faucetIcon} style={styles.image} />
-      fullName = t('verificationFee')
-      comment = null
-    } else if (type === TransactionTypes.VERIFICATION_REWARD) {
-      contactImage = this.renderRewardIcon()
-      fullName = t('verifierReward')
-      comment = null
-    } else if (type === TransactionTypes.FAUCET) {
-      contactImage = <Image source={faucetIcon} style={styles.image} />
-      fullName = DEFAULT_TESTNET ? `Celo ${_.startCase(DEFAULT_TESTNET)} Faucet` : 'Celo Faucet'
-      comment = null
-    } else if (type === TransactionTypes.INVITE_SENT) {
-      contactImage = <Image source={inviteVerifyFee} style={styles.image} />
-      const inviteeE164Number = invitees[address]
-      const inviteeRecipient = recipientCache[inviteeE164Number]
-      fullName = inviteeE164Number
-        ? `${t('invited')} ${inviteeRecipient ? inviteeRecipient.displayName : inviteeE164Number}`
-        : t('inviteFlow11:inviteSent')
-      comment = null
-    } else if (type === TransactionTypes.INVITE_RECEIVED) {
-      contactImage = <Image source={inviteVerifyFee} style={styles.image} />
-      fullName = t('inviteFlow11:inviteReceived')
-      comment = null
+    if (recipient) {
+      title = recipient.displayName
+    } else if (type === TransactionTypes.RECEIVED) {
+      title = t('feedItemReceivedTitle', { context: 'missingSenderDetails', address: shortAddr })
+    } else if (type === TransactionTypes.SENT) {
+      title = t('feedItemSentTitle', { context: 'missingReceiverDetails', address: shortAddr })
     } else {
-      const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
-      const shortAddr = address.substring(0, 8)
-
-      if (recipient) {
-        fullName = recipient.displayName
-      } else if (type === TransactionTypes.RECEIVED) {
-        fullName = t('receivedFrom', { address: shortAddr })
-      } else if (type === TransactionTypes.SENT) {
-        fullName = t('sentTo', { address: shortAddr })
-      } else {
-        // Fallback to just using the type
-        fullName = _.capitalize(t(_.camelCase(type)))
-      }
-      contactImage = (
-        <ContactCircle address={address} size={avatarSize}>
-          {!recipient ? <Image source={unknownUserIcon} style={styles.image} /> : null}
-        </ContactCircle>
-      )
+      // Fallback to just using the type
+      title = _.capitalize(t(_.camelCase(type)))
     }
-
-    return (
-      <Touchable onPress={this.navigateToTransactionReview}>
-        <View style={styles.container}>
-          <View style={[styles.iconContainer, opacityStyle]}>{contactImage}</View>
-          <View style={styles.contentContainer}>
-            <View style={styles.textContainer}>
-              <View style={opacityStyle}>
-                <Text style={fontStyles.bodySmallSemiBold}>{fullName}</Text>
-                {!!comment && (
-                  <Text style={[fontStyles.comment, styles.textComment]}>{comment}</Text>
-                )}
-              </View>
-              {isPending && (
-                <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
-                  <Text style={[fontStyles.bodySmallBold, styles.textPending]}>
-                    {t('confirmingPayment')}
-                  </Text>
-                  {' ' + timeFormatted}
-                </Text>
-              )}
-              {status === TransactionStatus.Complete && (
-                <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
-                  {dateTimeFormatted}
-                </Text>
-              )}
-              {status === TransactionStatus.Failed && (
-                <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
-                  <Text style={fontStyles.linkSmall}>{t('paymentFailed')}</Text>
-                  {' ' + timeFormatted}
-                </Text>
-              )}
-            </View>
-            <View style={[styles.amountContainer, opacityStyle]}>
-              <Text style={[fontStyles.activityCurrency, { color: currencyStyle.color }]}>
-                {currencyStyle.direction}
-                {currencyStyle.symbol}
-                {getMoneyDisplayValue(this.props.value)}
-              </Text>
-            </View>
-          </View>
-        </View>
-      </Touchable>
+    icon = (
+      <ContactCircle address={address} size={avatarSize}>
+        {!recipient ? <Image source={unknownUserIcon} style={styles.image} /> : null}
+      </ContactCircle>
     )
   }
+
+  return (
+    <Touchable onPress={navigateToTransactionReview}>
+      <View style={styles.container}>
+        <View style={styles.iconContainer}>{icon}</View>
+        <View style={styles.contentContainer}>
+          <View style={styles.titleContainer}>
+            <Text style={[fontStyles.semiBold, styles.title]}>{title}</Text>
+            <Text
+              style={[
+                currencyStyle.direction === '-'
+                  ? fontStyles.activityCurrencySent
+                  : fontStyles.activityCurrencyReceived,
+                styles.amount,
+              ]}
+            >
+              {currencyStyle.direction}
+              {getMoneyDisplayValue(props.value)}
+            </Text>
+          </View>
+          {!!info && <Text style={[fontStyles.comment, styles.textInfo]}>{info}</Text>}
+          <View style={[styles.statusContainer, !!info && styles.statusContainerUnderComment]}>
+            {isPending && (
+              <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
+                <Text style={[fontStyles.bodySmallBold, styles.textPending]}>
+                  {t('confirmingPayment')}
+                </Text>
+                {' ' + timeFormatted}
+              </Text>
+            )}
+            {status === TransactionStatus.Complete && (
+              <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
+                {dateTimeFormatted}
+              </Text>
+            )}
+            {status === TransactionStatus.Failed && (
+              <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
+                <Text style={fontStyles.linkSmall}>{t('paymentFailed')}</Text>
+                {' ' + timeFormatted}
+              </Text>
+            )}
+            {LOCAL_CURRENCY_SYMBOL &&
+              localValue && (
+                <Text style={[fontStyles.bodySmall, styles.localAmount]}>
+                  {t('localCurrencyValue', {
+                    localValue: `${currencyStyle.direction}${getMoneyDisplayValue(localValue)}`,
+                    localCurrencySymbol: LOCAL_CURRENCY_SYMBOL,
+                  })}
+                </Text>
+              )}
+          </View>
+        </View>
+      </View>
+    </Touchable>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -256,31 +262,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     flex: 1,
-    paddingTop: 20,
-    paddingLeft: 10,
+    padding: variables.contentPadding,
   },
   iconContainer: {
     flexDirection: 'column',
     alignItems: 'center',
-  },
-  contentContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginLeft: 10,
-    borderBottomWidth: 1,
-    borderColor: colors.listBorder,
-    paddingRight: 10,
-  },
-  amountContainer: {
-    alignSelf: 'flex-start',
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-  textContainer: {
-    flex: 1,
-    justifyContent: 'flex-start',
   },
   image: {
     height: avatarSize,
@@ -288,18 +274,48 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  contentContainer: {
+    flex: 1,
+    marginLeft: variables.contentPadding,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    marginTop: 3,
+  },
+  title: {
+    fontSize: 15,
+    lineHeight: 20,
+    color: colors.dark,
+  },
+  amount: {
+    marginLeft: 'auto',
+    paddingLeft: 10,
+  },
+  statusContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  statusContainerUnderComment: {
+    marginTop: 8,
+  },
   textPending: {
     fontSize: 13,
     lineHeight: 18,
+    color: colors.celoGreen,
   },
-  textComment: {
-    paddingTop: 10,
-  },
+  textInfo: {},
   transactionStatus: {
-    paddingTop: 25,
-    paddingBottom: 10,
+    color: '#BDBDBD',
+  },
+  localAmount: {
+    marginLeft: 'auto',
+    paddingLeft: 10,
+    fontSize: 14,
+    lineHeight: 18,
+    color: '#BDBDBD',
   },
 })
 
 // @ts-ignore
-export default withNamespaces(Namespaces.walletFlow5)(TransferFeedItem)
+export default withNamespaces(Namespaces.walletFlow5)(React.memo(TransferFeedItem))

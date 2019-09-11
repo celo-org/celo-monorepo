@@ -1,8 +1,8 @@
-import getConfig from 'next/config'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Chevron from 'src/icons/chevron'
 import { colors, fonts, textStyles } from 'src/styles'
+import Sentry from '../../fullstack/sentry'
 
 interface Props {
   link: string
@@ -12,11 +12,8 @@ interface Props {
 
 export class BlueBanner extends React.PureComponent<Props> {
   render() {
-    if (!this.props.isVisible) {
-      return null
-    }
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, styles.slideDown, this.props.isVisible && styles.isVisible]}>
         <View style={styles.insideContainer}>
           <Text
             accessibilityRole="link"
@@ -35,13 +32,9 @@ export class BlueBanner extends React.PureComponent<Props> {
   }
 }
 
-export function bannerVisible() {
-  return getConfig().publicRuntimeConfig.FLAGS.SDK
-}
-
 export const BANNER_HEIGHT = 50
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     // @ts-ignore-next-line
     position: 'fixed',
@@ -49,10 +42,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#3C9BF4',
     width: '100%',
     maxWidth: '100vw',
-    height: BANNER_HEIGHT,
+    height: 0,
     justifyContent: 'center',
     alignItems: 'center',
     flex: 1,
+  },
+  slideDown: {
+    transitionProperty: 'height, top',
+    transitionDuration: '300ms',
+  },
+  isVisible: {
+    height: BANNER_HEIGHT,
   },
   insideContainer: {
     width: '100%',
@@ -74,15 +74,43 @@ const styles = StyleSheet.create({
   },
 })
 
-// MAX length 75 characters
-export const TEXT = 'Introducing the Celo SDK: build mobile-first DeFi apps'
+interface State {
+  live: boolean
+  text: string
+  link: string
+}
 
-const LINK = 'https://medium.com/@celo.org/e6f85f2fe18c'
+interface AnnouncementProps {
+  onVisibilityChange: (visible: boolean) => void
+}
 
-export default function() {
-  return (
-    <BlueBanner isVisible={bannerVisible()} link={LINK}>
-      {TEXT}
-    </BlueBanner>
-  )
+export default class Announcement extends React.Component<AnnouncementProps, State> {
+  state: State = {
+    live: false,
+    text: '',
+    link: '',
+  }
+  componentDidMount = async () => {
+    try {
+      const response = await fetch('/announcement')
+      const announcements = await response.json()
+      const visible = announcements.length > 0
+
+      if (visible) {
+        this.setState(announcements[0])
+      }
+
+      this.props.onVisibilityChange(visible)
+    } catch (e) {
+      Sentry.captureException(e)
+    }
+  }
+
+  render() {
+    return (
+      <BlueBanner isVisible={this.state.live} link={this.state.link}>
+        {this.state.text}
+      </BlueBanner>
+    )
+  }
 }

@@ -9,14 +9,14 @@ import DisconnectBanner from 'src/shared/DisconnectBanner'
 export const nuxNavigationOptions = {
   headerStyle: {
     elevation: 0,
+    height: 45,
   },
-  headerLeftContainerStyle: { paddingHorizontal: 20 },
+  headerLeftContainerStyle: { paddingHorizontal: 10 },
   headerLeft: <BackButton />,
-  headerRightContainerStyle: { paddingHorizontal: 20 },
+  headerRightContainerStyle: { paddingHorizontal: 10 },
   headerRight: <View />,
   headerTitle: <DisconnectBanner />,
   headerTitleContainerStyle: {
-    paddingTop: 5,
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
@@ -39,5 +39,6 @@ export const headerWithBackButton = {
 // TODO(Rossy) align designs to consistently use back button
 export const headerWithCancelButton = {
   ...headerWithBackButton,
+  headerLeftContainerStyle: { paddingHorizontal: 0 },
   headerLeft: <CancelButton />,
 }

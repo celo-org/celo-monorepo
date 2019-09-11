@@ -1,9 +1,9 @@
 import { migrations } from 'src/redux/migrations'
-import { getLatestSchema } from 'test/schemas'
+import { getLatestSchema, v0Schema } from 'test/schemas'
 
 describe('Redux persist migrations', () => {
   it('work for v-1 to v0', () => {
-    const defaultSchema = getLatestSchema()
+    const defaultSchema = v0Schema
     const vNeg1Stub = {
       ...defaultSchema,
       app: {
@@ -17,5 +17,18 @@ describe('Redux persist migrations', () => {
     expect(migratedSchema.identity.startedVerification).toEqual(true)
     expect(migratedSchema.identity.askedContactsPermission).toEqual(true)
     expect(migratedSchema.identity.isLoadingImportContacts).toEqual(false)
+  })
+
+  it('work for v0 to v1', () => {
+    const defaultSchema = getLatestSchema()
+    const v0Stub = {
+      ...defaultSchema,
+      app: {
+        ...defaultSchema.app,
+        language: 'es-AR',
+      },
+    }
+    const migratedSchema = migrations[1](v0Stub)
+    expect(migratedSchema.app.language).toEqual('es-419')
   })
 })
