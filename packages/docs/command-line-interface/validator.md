@@ -22,7 +22,7 @@ EXAMPLES
   affiliation --unset --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
 ```
 
-_See code: [packages/cli/lib/commands/validator/affiliation.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/validator/affiliation.js)_
+_See code: [packages/cli/src/commands/validator/affiliation.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/affiliation.ts)_
 
 ### List
 
@@ -36,7 +36,7 @@ EXAMPLE
   list
 ```
 
-_See code: [packages/cli/lib/commands/validator/list.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/validator/list.js)_
+_See code: [packages/cli/src/commands/validator/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/list.ts)_
 
 ### Register
 
@@ -63,7 +63,7 @@ EXAMPLE
   96bad27bb1c0fd6080a75b0ec9f75b50298a2a8e04b02b2688c8104fca61fb00
 ```
 
-_See code: [packages/cli/lib/commands/validator/register.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/validator/register.js)_
+_See code: [packages/cli/src/commands/validator/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/register.ts)_
 
 ### Show
 
@@ -80,4 +80,4 @@ EXAMPLE
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3
 ```
 
-_See code: [packages/cli/lib/commands/validator/show.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/validator/show.js)_
+_See code: [packages/cli/src/commands/validator/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/show.ts)_

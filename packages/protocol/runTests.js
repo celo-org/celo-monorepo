@@ -12,11 +12,12 @@ const isCI = process.env.CI === 'true'
 
 async function startGanache() {
   const server = ganache.server({
-    default_balance_ether: 1000000,
-    gasPrice: 0,
-    mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
-    network_id: '1101',
-    gasLimit: 8000000,
+    default_balance_ether: network.defaultBalance,
+    network_id: network.network_id,
+    mnemonic: network.mnemonic,
+    gasPrice: network.gasPrice,
+    gasLimit: 7000000,
+    allowUnlimitedContractSize: true,
   })
 
   await new Promise((resolve, reject) => {

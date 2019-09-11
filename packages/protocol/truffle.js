@@ -35,12 +35,9 @@ let coverageProvider = null
 
 const networks = {
   development: {
-    host: '127.0.0.1',
-    port: 8545,
-    network_id: 1101,
+    ...defaultConfig,
     from: DEVELOPMENT_FROM,
     gasPrice: 0,
-    gas: 7000000,
     defaultBalance: 1000000,
     mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
   },
