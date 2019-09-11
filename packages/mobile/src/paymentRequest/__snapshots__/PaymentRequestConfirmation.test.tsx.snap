@@ -82,20 +82,13 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
         >
           <View
             style={
-              Array [
-                Object {
-                  "borderColor": "#EEEEEE",
-                  "borderRadius": 3,
-                  "borderWidth": 1,
-                },
-                Object {
-                  "flex": 1,
-                  "flexDirection": "column",
-                  "justifyContent": "flex-start",
-                  "paddingHorizontal": 40,
-                  "paddingVertical": 25,
-                },
-              ]
+              Object {
+                "flex": 1,
+                "flexDirection": "column",
+                "justifyContent": "flex-start",
+                "paddingHorizontal": 40,
+                "paddingVertical": 25,
+              }
             }
           >
             <View
@@ -374,7 +367,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                       }
                     }
                   >
-                    $10.00
+                    10.00
                   </Text>
                 </View>
               </View>

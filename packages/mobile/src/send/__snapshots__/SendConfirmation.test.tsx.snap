@@ -82,20 +82,13 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
         >
           <View
             style={
-              Array [
-                Object {
-                  "borderColor": "#EEEEEE",
-                  "borderRadius": 3,
-                  "borderWidth": 1,
-                },
-                Object {
-                  "flex": 1,
-                  "flexDirection": "column",
-                  "justifyContent": "flex-start",
-                  "paddingHorizontal": 40,
-                  "paddingVertical": 25,
-                },
-              ]
+              Object {
+                "flex": 1,
+                "flexDirection": "column",
+                "justifyContent": "flex-start",
+                "paddingBottom": 25,
+                "paddingHorizontal": 40,
+              }
             }
           >
             <View
@@ -448,7 +441,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                       }
                     }
                   >
-                    $10.00
+                    10.00
                   </Text>
                 </View>
               </View>
@@ -1052,20 +1045,13 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
         >
           <View
             style={
-              Array [
-                Object {
-                  "borderColor": "#EEEEEE",
-                  "borderRadius": 3,
-                  "borderWidth": 1,
-                },
-                Object {
-                  "flex": 1,
-                  "flexDirection": "column",
-                  "justifyContent": "flex-start",
-                  "paddingHorizontal": 40,
-                  "paddingVertical": 25,
-                },
-              ]
+              Object {
+                "flex": 1,
+                "flexDirection": "column",
+                "justifyContent": "flex-start",
+                "paddingBottom": 25,
+                "paddingHorizontal": 40,
+              }
             }
           >
             <View
@@ -1418,7 +1404,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                       }
                     }
                   >
-                    $10.00
+                    10.00
                   </Text>
                 </View>
               </View>
@@ -2022,20 +2008,13 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
         >
           <View
             style={
-              Array [
-                Object {
-                  "borderColor": "#EEEEEE",
-                  "borderRadius": 3,
-                  "borderWidth": 1,
-                },
-                Object {
-                  "flex": 1,
-                  "flexDirection": "column",
-                  "justifyContent": "flex-start",
-                  "paddingHorizontal": 40,
-                  "paddingVertical": 25,
-                },
-              ]
+              Object {
+                "flex": 1,
+                "flexDirection": "column",
+                "justifyContent": "flex-start",
+                "paddingBottom": 25,
+                "paddingHorizontal": 40,
+              }
             }
           >
             <View
@@ -2382,7 +2361,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                       }
                     }
                   >
-                    $10.00
+                    10.00
                   </Text>
                 </View>
               </View>
@@ -2986,20 +2965,13 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
         >
           <View
             style={
-              Array [
-                Object {
-                  "borderColor": "#EEEEEE",
-                  "borderRadius": 3,
-                  "borderWidth": 1,
-                },
-                Object {
-                  "flex": 1,
-                  "flexDirection": "column",
-                  "justifyContent": "flex-start",
-                  "paddingHorizontal": 40,
-                  "paddingVertical": 25,
-                },
-              ]
+              Object {
+                "flex": 1,
+                "flexDirection": "column",
+                "justifyContent": "flex-start",
+                "paddingBottom": 25,
+                "paddingHorizontal": 40,
+              }
             }
           >
             <View
@@ -3352,7 +3324,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                       }
                     }
                   >
-                    $10.00
+                    10.00
                   </Text>
                 </View>
               </View>
@@ -3956,20 +3928,13 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
         >
           <View
             style={
-              Array [
-                Object {
-                  "borderColor": "#EEEEEE",
-                  "borderRadius": 3,
-                  "borderWidth": 1,
-                },
-                Object {
-                  "flex": 1,
-                  "flexDirection": "column",
-                  "justifyContent": "flex-start",
-                  "paddingHorizontal": 40,
-                  "paddingVertical": 25,
-                },
-              ]
+              Object {
+                "flex": 1,
+                "flexDirection": "column",
+                "justifyContent": "flex-start",
+                "paddingBottom": 25,
+                "paddingHorizontal": 40,
+              }
             }
           >
             <View
@@ -4322,7 +4287,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       }
                     }
                   >
-                    $10.00
+                    10.00
                   </Text>
                 </View>
               </View>
@@ -4926,20 +4891,13 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
         >
           <View
             style={
-              Array [
-                Object {
-                  "borderColor": "#EEEEEE",
-                  "borderRadius": 3,
-                  "borderWidth": 1,
-                },
-                Object {
-                  "flex": 1,
-                  "flexDirection": "column",
-                  "justifyContent": "flex-start",
-                  "paddingHorizontal": 40,
-                  "paddingVertical": 25,
-                },
-              ]
+              Object {
+                "flex": 1,
+                "flexDirection": "column",
+                "justifyContent": "flex-start",
+                "paddingBottom": 25,
+                "paddingHorizontal": 40,
+              }
             }
           >
             <View
@@ -5286,7 +5244,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                       }
                     }
                   >
-                    $10.00
+                    10.00
                   </Text>
                 </View>
               </View>

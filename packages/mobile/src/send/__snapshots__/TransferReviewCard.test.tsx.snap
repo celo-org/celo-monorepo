@@ -3,20 +3,13 @@
 exports[`TransferReviewCard renders correctly for invite review 1`] = `
 <View
   style={
-    Array [
-      Object {
-        "borderColor": "#EEEEEE",
-        "borderRadius": 3,
-        "borderWidth": 1,
-      },
-      Object {
-        "flex": 1,
-        "flexDirection": "column",
-        "justifyContent": "flex-start",
-        "paddingHorizontal": 40,
-        "paddingVertical": 25,
-      },
-    ]
+    Object {
+      "flex": 1,
+      "flexDirection": "column",
+      "justifyContent": "flex-start",
+      "paddingBottom": 25,
+      "paddingHorizontal": 40,
+    }
   }
 >
   <View
@@ -243,7 +236,7 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
             }
           }
         >
-          $0.20
+          0.20
         </Text>
       </View>
       <View
@@ -357,7 +350,7 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
             }
           }
         >
-          $100.00
+          100.00
         </Text>
       </View>
     </View>
@@ -368,20 +361,13 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
 exports[`TransferReviewCard renders correctly for pay request review 1`] = `
 <View
   style={
-    Array [
-      Object {
-        "borderColor": "#EEEEEE",
-        "borderRadius": 3,
-        "borderWidth": 1,
-      },
-      Object {
-        "flex": 1,
-        "flexDirection": "column",
-        "justifyContent": "flex-start",
-        "paddingHorizontal": 40,
-        "paddingVertical": 25,
-      },
-    ]
+    Object {
+      "flex": 1,
+      "flexDirection": "column",
+      "justifyContent": "flex-start",
+      "paddingBottom": 25,
+      "paddingHorizontal": 40,
+    }
   }
 >
   <View
@@ -699,7 +685,7 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
             }
           }
         >
-          $100.00
+          100.00
         </Text>
       </View>
     </View>
@@ -710,20 +696,13 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
 exports[`TransferReviewCard renders correctly for send review 1`] = `
 <View
   style={
-    Array [
-      Object {
-        "borderColor": "#EEEEEE",
-        "borderRadius": 3,
-        "borderWidth": 1,
-      },
-      Object {
-        "flex": 1,
-        "flexDirection": "column",
-        "justifyContent": "flex-start",
-        "paddingHorizontal": 40,
-        "paddingVertical": 25,
-      },
-    ]
+    Object {
+      "flex": 1,
+      "flexDirection": "column",
+      "justifyContent": "flex-start",
+      "paddingBottom": 25,
+      "paddingHorizontal": 40,
+    }
   }
 >
   <View
@@ -1021,7 +1000,7 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
             }
           }
         >
-          $0.30
+          0.30
         </Text>
       </View>
     </View>

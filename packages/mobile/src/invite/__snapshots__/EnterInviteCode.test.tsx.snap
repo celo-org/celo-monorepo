@@ -263,49 +263,6 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
     </View>
   </RCTScrollView>
   <View>
-    <Text
-      style={
-        Array [
-          Object {
-            "alignSelf": "center",
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 14,
-            "lineHeight": 18,
-            "textAlign": "center",
-          },
-          Object {
-            "marginHorizontal": 20,
-            "marginVertical": 10,
-          },
-        ]
-      }
-    >
-      inviteCodeText.askForInvite.0
-      <Text
-        onPress={[Function]}
-        style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Bold",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-            },
-            Object {
-              "fontSize": 12,
-              "fontWeight": "300",
-            },
-          ]
-        }
-      >
-        inviteCodeText.askForInvite.1
-      </Text>
-    </Text>
     <View
       style={
         Array [
@@ -719,49 +676,6 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
     </View>
   </RCTScrollView>
   <View>
-    <Text
-      style={
-        Array [
-          Object {
-            "alignSelf": "center",
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 14,
-            "lineHeight": 18,
-            "textAlign": "center",
-          },
-          Object {
-            "marginHorizontal": 20,
-            "marginVertical": 10,
-          },
-        ]
-      }
-    >
-      inviteCodeText.askForInvite.0
-      <Text
-        onPress={[Function]}
-        style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Bold",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-            },
-            Object {
-              "fontSize": 12,
-              "fontWeight": "300",
-            },
-          ]
-        }
-      >
-        inviteCodeText.askForInvite.1
-      </Text>
-    </Text>
     <View
       style={
         Array [
