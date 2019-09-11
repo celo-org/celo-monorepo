@@ -4,7 +4,6 @@ import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-import "../common/FractionUtil.sol";
 import "./interfaces/IReserve.sol";
 import "./interfaces/ISortedOracles.sol";
 import "./interfaces/IStableToken.sol";
@@ -19,7 +18,6 @@ import "../common/interfaces/IERC20Token.sol";
  */
 contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyGuard {
 
-  using FractionUtil for FractionUtil.Fraction;
   using SafeMath for uint256;
 
   struct TobinTaxCache {

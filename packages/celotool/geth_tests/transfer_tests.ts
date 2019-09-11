@@ -6,6 +6,7 @@ import {
   initAndStartGeth,
   sleep,
 } from '@celo/celotool/geth_tests/src/lib/utils'
+import { toFixed } from '@celo/protocol/lib/fixidity'
 import { CURRENCY_ENUM } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
@@ -17,11 +18,7 @@ const stableTokenAbi = erc20Abi.concat([
     constant: false,
     inputs: [
       {
-        name: 'rateNumerator',
-        type: 'uint256',
-      },
-      {
-        name: 'rateDenominator',
+        name: 'rate',
         type: 'uint256',
       },
       {
@@ -40,14 +37,6 @@ const stableTokenAbi = erc20Abi.concat([
     inputs: [],
     name: 'getInflationParameters',
     outputs: [
-      {
-        name: '',
-        type: 'uint256',
-      },
-      {
-        name: '',
-        type: 'uint256',
-      },
       {
         name: '',
         type: 'uint256',
@@ -306,8 +295,7 @@ describe('transfer tests', function(this: any) {
     const _web3 = new Web3('http://localhost:8545')
     const _stableToken = new _web3.eth.Contract(stableTokenAbi, stableTokenAddress)
     const tx = _stableToken.methods.setInflationParameters(
-      rateNumerator,
-      rateDenominator,
+      toFixed(rateNumerator / rateDenominator).toString(),
       updatePeriod
     )
     const gas = await tx.estimateGas({ from: validatorAddress })
@@ -425,7 +413,7 @@ describe('transfer tests', function(this: any) {
     }
 
     if (!expectSuccess || transferToken !== feeToken) {
-      it(`should decrement the sender's ${transferToken} balance by the gas fee`, () => {
+      it(`should decrement the sender's ${feeToken} balance by the gas fee`, () => {
         assert.equal(
           initialBalances[feeToken][DEF_FROM_ADDR].minus(
             newBalances[feeToken][DEF_FROM_ADDR]
@@ -523,13 +511,14 @@ describe('transfer tests', function(this: any) {
         })
 
         describe('when paying for gas in Celo Dollars', () => {
-          const intrinsicGas = 156000
+          const intrinsicGas = 155000
           describe('when there is no demurrage', () => {
             describe('when setting a gas amount greater than the amount of gas necessary', () => {
               before(async function(this: any) {
                 await restartGeth(syncMode)
 
                 const expectedGasUsed = 164180
+                // const expectedGasUsed = 157511
                 ;[txSuccess, newBalances, expectedFees] = await runTestTransaction(
                   transferCeloGold(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
                     gasCurrency: stableTokenAddress,
@@ -587,7 +576,7 @@ describe('transfer tests', function(this: any) {
                 // plus a small amount as the new updatePeriod. We then wait to get pas that updatePeriod
                 // so that on transferCeloGold being called, demurrage of 50% is applied.
                 const inflationParams = await stableToken.methods.getInflationParameters().call()
-                const lastUpdated = new BigNumber(inflationParams[5])
+                const lastUpdated = new BigNumber(inflationParams[3])
                 const timeSinceLastUpdated = new BigNumber(Math.floor(Date.now() / 1000)).minus(
                   lastUpdated
                 )
@@ -595,6 +584,7 @@ describe('transfer tests', function(this: any) {
                 await setInflationParams(2, 1, timeSinceLastUpdated.toNumber())
 
                 const expectedGasUsed = 164180
+                // const expectedGasUsed = 157511
                 ;[txSuccess, newBalances, expectedFees] = await runTestTransaction(
                   transferCeloGold(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
                     gasCurrency: stableTokenAddress,
@@ -661,7 +651,7 @@ describe('transfer tests', function(this: any) {
                 // plus a small amount as the new updatePeriod. We then wait to get pas that updatePeriod
                 // so that on transferCeloGold being called, demurrage of 50% is applied.
                 const inflationParams = await stableToken.methods.getInflationParameters().call()
-                const lastUpdated = new BigNumber(inflationParams[5])
+                const lastUpdated = new BigNumber(inflationParams[3])
                 const timeSinceLastUpdated = new BigNumber(Math.floor(Date.now() / 1000)).minus(
                   lastUpdated
                 )
@@ -734,7 +724,7 @@ describe('transfer tests', function(this: any) {
                 // plus a small amount as the new updatePeriod. We then wait to get pas that updatePeriod
                 // so that on transferCeloGold being called, demurrage of 50% is applied.
                 const inflationParams = await stableToken.methods.getInflationParameters().call()
-                const lastUpdated = new BigNumber(inflationParams[5])
+                const lastUpdated = new BigNumber(inflationParams[3])
                 const timeSinceLastUpdated = new BigNumber(Math.floor(Date.now() / 1000)).minus(
                   lastUpdated
                 )
@@ -759,7 +749,7 @@ describe('transfer tests', function(this: any) {
           before(async function(this: any) {
             await restartGeth(syncMode)
 
-            const expectedGasUsed = 190740
+            const expectedGasUsed = 189456
             ;[txSuccess, newBalances, expectedFees] = await runTestTransaction(
               transferCeloDollars(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
                 gasCurrency: stableTokenAddress,
@@ -776,7 +766,7 @@ describe('transfer tests', function(this: any) {
           before(async function(this: any) {
             await restartGeth(syncMode)
 
-            const expectedGasUsed = 55740
+            const expectedGasUsed = 55456
             ;[txSuccess, newBalances, expectedFees] = await runTestTransaction(
               transferCeloDollars(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
                 gasFeeRecipient: feeRecipientAddress,

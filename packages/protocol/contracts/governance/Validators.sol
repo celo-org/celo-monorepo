@@ -8,7 +8,7 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "./UsingLockedGold.sol";
 import "./interfaces/IValidators.sol";
 import "../common/Initializable.sol";
-import "../common/FractionUtil.sol";
+import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 
@@ -18,10 +18,10 @@ import "../common/linkedlists/AddressSortedLinkedList.sol";
  */
 contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, UsingLockedGold {
 
+  using FixidityLib for FixidityLib.Fraction;
   using AddressLinkedList for LinkedList.List;
   using AddressSortedLinkedList for SortedLinkedList.List;
   using SafeMath for uint256;
-  using FractionUtil for FractionUtil.Fraction;
   using BytesLib for bytes;
 
   // TODO(asa): These strings should be modifiable
@@ -670,7 +670,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     while (totalNumMembersElected < maxElectableValidators && memberElectedInRound) {
       memberElectedInRound = false;
       uint256 groupIndex = 0;
-      FractionUtil.Fraction memory maxN = FractionUtil.Fraction(0, 1);
+      FixidityLib.Fraction memory maxN = FixidityLib.wrap(0);
       for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
         bool isWinningestGroupInRound = false;
         (maxN, isWinningestGroupInRound) = dHondt(maxN, electionGroups[i], numMembersElected[i]);
@@ -813,22 +813,21 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @return The new `maxN` and whether or not the group should win a seat in this round thus far.
    */
   function dHondt(
-    FractionUtil.Fraction memory maxN,
+    FixidityLib.Fraction memory maxN,
     address groupAddress,
     uint256 numMembersElected
   )
     private
     view
-    returns (FractionUtil.Fraction memory, bool)
+    returns (FixidityLib.Fraction memory, bool)
   {
     ValidatorGroup storage group = groups[groupAddress];
     // Only consider groups with members left to be elected.
     if (group.members.numElements > numMembersElected) {
-      FractionUtil.Fraction memory n = FractionUtil.Fraction(
-        votes.getValue(groupAddress),
-        numMembersElected.add(1)
+      FixidityLib.Fraction memory n = FixidityLib.newFixed(votes.getValue(groupAddress)).divide(
+        FixidityLib.newFixed(numMembersElected.add(1))
       );
-      if (n.isGreaterThan(maxN)) {
+      if (n.gt(maxN)) {
         return (n, true);
       }
     }
