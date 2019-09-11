@@ -52,7 +52,7 @@ describe('countries', () => {
         name: 'Taiwan',
         displayName: 'Taiwan',
         status: 'assigned',
-        names: { 'en-us': 'Taiwan', 'es-ar': 'Taiwán' },
+        names: { 'en-us': 'Taiwan', 'es-419': 'Taiwán' },
       }
 
       expect(country).toMatchObject(taiwan)
