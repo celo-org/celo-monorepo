@@ -100,6 +100,7 @@ export async function validateRequest(
       .call()
     return issuerFromSignature.toLowerCase() === issuer.toLowerCase()
   } catch (e) {
+    console.error('Error validating attestation', e)
     return false
   }
 }

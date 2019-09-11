@@ -59,7 +59,7 @@ jobs:
           at: ~/app
 
       - restore_cache:
-          keys: 
+          keys:
             - yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
             - yarn-v2-{{ arch }}-{{ .Branch }}-
             - yarn-v2-{{ arch }}-
@@ -206,16 +206,26 @@ jobs:
       - run:
           name: test
           # Flaky tests - run them twice
-          command: yarn --cwd packages/protocol test || yarn --cwd packages/protocol test
+          command: yarn --cwd packages/protocol test:coverage || yarn --cwd packages/protocol test:coverage
+      - store_artifacts:
+          path: packages/protocol/coverage
+          destination: protocol/coverage
+      - run:
+          name: Upload to CodeCov
+          command: yarn codecov -F protocol
+
   contractkit-test:
     <<: *defaults
     steps:
       - attach_workspace:
           at: ~/app
-      - run:
+      - run: 
+          name: Generate DevChain
           command: |
-            yarn --cwd=packages/contractkit test:prepare
-            yarn --cwd=packages/contractkit test
+            (cd packages/contractkit && yarn test:prepare)
+      - run:
+          name: Run Tests
+          command: yarn --cwd=packages/contractkit test
 
 
   walletkit-test:
@@ -448,7 +458,10 @@ jobs:
     steps:
       - run:
           name: Installing npm package - @celo/walletkit
-          command: yarn add @celo/walletkit
+          command: |
+            # Try one more time in case the first attempt fails
+            # to deal with scenarios like https://circleci.com/gh/celo-org/celo-monorepo/23329
+            yarn add @celo/walletkit || yarn add @celo/walletkit
 
   test-celocli-npm-package-install:
     working_directory: ~/app
