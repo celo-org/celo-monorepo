@@ -42,6 +42,14 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     address stable
   );
 
+  event SpreadSet(
+    uint256 spread
+  );
+
+  event ReserveFractionSet(
+    uint256 reserveFraction
+  );
+
   FixidityLib.Fraction public spread;
 
   // Fraction of the Reserve that is committed to the gold bucket when updating
@@ -94,8 +102,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setStableToken(stableToken);
-    spread = FixidityLib.wrap(_spread);
-    reserveFraction = FixidityLib.wrap(_reserveFraction);
+    setSpread(_spread);
+    setReserveFraction(_reserveFraction);
     setUpdateFrequency(_updateFrequency);
     setMinimumReports(_minimumReports);
     _updateBucketsIfNecessary();
@@ -249,6 +257,24 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   function setStableToken(address newStableToken) public onlyOwner {
     stable = newStableToken;
     emit StableTokenSet(newStableToken);
+  }
+
+  /**
+    * @notice Allows owner to set the spread
+    * @param newSpread The new value for the spread
+    */
+  function setSpread(uint256 newSpread) public onlyOwner {
+    spread = FixidityLib.wrap(newSpread);
+    emit SpreadSet(newSpread);
+  }
+
+  /**
+    * @notice Allows owner to set the Reserve Fraction
+    * @param newReserveFraction The new value for the reserve fraction
+    */
+  function setReserveFraction(uint256 newReserveFraction) public onlyOwner {
+    reserveFraction = FixidityLib.wrap(newReserveFraction);
+    emit ReserveFractionSet(newReserveFraction);
   }
 
   /**

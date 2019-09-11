@@ -1,3 +1,4 @@
+import { fixed1, fromFixed, toFixed } from '@celo/protocol/lib/fixidity'
 import {
   assertEqualBN,
   assertLogMatches2,
@@ -5,7 +6,6 @@ import {
   isSameAddress,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { fixed1, toFixed, fromFixed } from '@celo/protocol/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   ExchangeInstance,
@@ -211,6 +211,64 @@ contract('Exchange', (accounts: string[]) => {
     })
   })
 
+  describe('#setSpread', () => {
+    const newSpread = toFixed(6 / 1000)
+
+    it('should set the spread', async () => {
+      await exchange.setSpread(newSpread)
+
+      const actualSpread = await exchange.spread()
+
+      assert.isTrue(actualSpread.eq(newSpread))
+    })
+
+    it('should emit a SpreadSet event', async () => {
+      const tx = await exchange.setSpread(newSpread)
+      assert(tx.logs.length === 1, 'Did not receive event')
+
+      const log = tx.logs[0]
+      assertLogMatches2(log, {
+        event: 'SpreadSet',
+        args: {
+          spread: newSpread,
+        },
+      })
+    })
+
+    it('should not allow a non-owner not set the spread', async () => {
+      await assertRevert(exchange.setSpread(newSpread, { from: accounts[1] }))
+    })
+  })
+
+  describe('#setReserveFraction', () => {
+    const newReserveFraction = toFixed(3 / 100)
+
+    it('should set the reserve fraction', async () => {
+      await exchange.setReserveFraction(newReserveFraction)
+
+      const actualReserveFraction = await exchange.reserveFraction()
+
+      assert.isTrue(actualReserveFraction.eq(newReserveFraction))
+    })
+
+    it('should emit a ReserveFractionSet event', async () => {
+      const tx = await exchange.setReserveFraction(newReserveFraction)
+      assert(tx.logs.length === 1, 'Did not receive event')
+
+      const log = tx.logs[0]
+      assertLogMatches2(log, {
+        event: 'ReserveFractionSet',
+        args: {
+          reserveFraction: newReserveFraction,
+        },
+      })
+    })
+
+    it('should not allow a non-owner not set the minimum reports', async () => {
+      await assertRevert(exchange.setReserveFraction(newReserveFraction, { from: accounts[1] }))
+    })
+  })
+
   describe('#getBuyAndSellBuckets', () => {
     it('should return the correct amount of buy and sell token', async () => {
       const [buyBucketSize, sellBucketSize] = await exchange.getBuyAndSellBuckets(true)
@@ -332,6 +390,22 @@ contract('Exchange', (accounts: string[]) => {
           expectedGoldBalance = expectedGoldBalance.plus(blockReward)
         }
         assertEqualBN(actualGoldBalance, expectedGoldBalance)
+      })
+
+      it('should work even if buckets need updating', async () => {
+        await fundReserve()
+        await timeTravel(updateFrequency, web3)
+
+        await exchange.exchange(
+          goldTokenAmount,
+          expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
+          true,
+          {
+            from: user,
+          }
+        )
+        const newStableBalance = await stableToken.balanceOf(user)
+        assertEqualBN(newStableBalance, expectedStableBalance)
       })
 
       it(`should remove the user's allowance`, async () => {

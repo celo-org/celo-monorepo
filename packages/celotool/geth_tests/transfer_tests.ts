@@ -517,8 +517,7 @@ describe('transfer tests', function(this: any) {
               before(async function(this: any) {
                 await restartGeth(syncMode)
 
-                const expectedGasUsed = 164180
-                // const expectedGasUsed = 157511
+                const expectedGasUsed = 163180
                 ;[txSuccess, newBalances, expectedFees] = await runTestTransaction(
                   transferCeloGold(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
                     gasCurrency: stableTokenAddress,
@@ -583,8 +582,7 @@ describe('transfer tests', function(this: any) {
 
                 await setInflationParams(2, 1, timeSinceLastUpdated.toNumber())
 
-                const expectedGasUsed = 164180
-                // const expectedGasUsed = 157511
+                const expectedGasUsed = 163180
                 ;[txSuccess, newBalances, expectedFees] = await runTestTransaction(
                   transferCeloGold(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
                     gasCurrency: stableTokenAddress,
