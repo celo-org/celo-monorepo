@@ -16,7 +16,9 @@ import { Namespaces } from 'src/i18n'
 
 type Props = {
   words: string
+  backupCompleted: boolean
   onPressBackup: () => void
+  onPressBack: () => void
   onCancel: () => void
 } & WithNamespaces
 
@@ -37,29 +39,50 @@ class BackupPhrase extends React.Component<Props> {
   }
 
   render() {
-    const { t, words } = this.props
+    const { t, words, backupCompleted, onCancel, onPressBack } = this.props
     return (
       <View style={styles.container}>
         <View style={componentStyles.topBar}>
-          <CancelButton onCancel={this.props.onCancel} />
+          <CancelButton onCancel={onCancel} />
         </View>
         <KeyboardAwareScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="always"
         >
           <View>
-            <Text style={[fontStyles.h1, styles.title]}>{t('learnBackupKey')}</Text>
-            <Text style={styles.verifyText}>{t('learnYourKey')}</Text>
-            <Text style={styles.verifyText}>{t('keyWillBeVerified')}</Text>
+            <Text style={[fontStyles.h1, styles.title]}>{t('yourBackupKey')}</Text>
+            {!backupCompleted ? (
+              <>
+                <Text style={styles.verifyText}>{t('learnYourKey')}</Text>
+                <Text style={styles.verifyText}>{t('keyWillBeVerified')}</Text>
+              </>
+            ) : (
+              <>
+                <Text style={styles.verifyText}>{t('heresYourKey')}</Text>
+              </>
+            )}
             <BackupPhraseContainer words={words} />
+            <Text style={styles.verifyText}>
+              <Text style={[styles.verifyText, fontStyles.bold]}>{t('tip')}</Text>
+              {t('backupKeyImportance.2')}
+            </Text>
           </View>
           <View>
-            <Button
-              onPress={this.continueBackup}
-              text={t('continue')}
-              standard={true}
-              type={BtnTypes.PRIMARY}
-            />
+            {!backupCompleted ? (
+              <Button
+                onPress={this.continueBackup}
+                text={t('continue')}
+                standard={true}
+                type={BtnTypes.PRIMARY}
+              />
+            ) : (
+              <Button
+                onPress={onPressBack}
+                text={t('back')}
+                standard={true}
+                type={BtnTypes.PRIMARY}
+              />
+            )}
           </View>
         </KeyboardAwareScrollView>
       </View>

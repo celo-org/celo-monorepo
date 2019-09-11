@@ -21,6 +21,7 @@ export enum Actions {
   SET_ACCOUNT_CREATION_TIME_ACTION = 'ACCOUNT/SET_ACCOUNT_CREATION_TIME_ACTION',
   SET_BACKUP_COMPLETED_ACTION = 'ACCOUNT/SET_BACKUP_COMPLETED_ACTION',
   SET_BACKUP_DELAYED_ACTION = 'ACCOUNT/SET_BACKUP_DELAYED_ACTION',
+  SET_SOCIAL_BACKUP_COMPLETED_ACTION = 'ACCOUNT/SET_SOCIAL_BACKUP_COMPLETED_ACTION',
   RESET_BACKUP_STATE = 'ACCOUNT/RESET_BACKUP_STATE',
   UPDATE_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_PAYMENT_REQUESTS',
   DISMISS_EARN_REWARDS = 'ACCOUNT/DISMISS_EARN_REWARDS',
@@ -63,6 +64,10 @@ export interface SetBackupDelayedAction {
   type: Actions.SET_BACKUP_DELAYED_ACTION
 }
 
+export interface SetSocialBackupCompletedAction {
+  type: Actions.SET_SOCIAL_BACKUP_COMPLETED_ACTION
+}
+
 export interface ResetBackupState {
   type: Actions.RESET_BACKUP_STATE
 }
@@ -95,6 +100,7 @@ export type ActionTypes =
   | SetAccountCreationAction
   | SetBackupCompletedAction
   | SetBackupDelayedAction
+  | SetSocialBackupCompletedAction
   | ResetBackupState
   | UpdatePaymentRequestsAction
   | DismissEarnRewards
@@ -139,6 +145,10 @@ export const setBackupCompleted = (): SetBackupCompletedAction => ({
 
 export const setBackupDelayed = (): SetBackupDelayedAction => ({
   type: Actions.SET_BACKUP_DELAYED_ACTION,
+})
+
+export const setSocialBackupCompleted = (): SetSocialBackupCompletedAction => ({
+  type: Actions.SET_SOCIAL_BACKUP_COMPLETED_ACTION,
 })
 
 export const resetBackupState = (): ResetBackupState => ({

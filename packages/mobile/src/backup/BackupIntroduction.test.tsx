@@ -7,7 +7,42 @@ describe('BackupIntroduction', () => {
   it('renders correctly when backup is not too late', () => {
     const tree = renderer.create(
       <BackupIntroduction
-        onPress={jest.fn()}
+        onBackup={jest.fn()}
+        onSocialBackup={jest.fn()}
+        backupCompleted={false}
+        socialBackupCompleted={false}
+        onCancel={jest.fn()}
+        onDelay={jest.fn()}
+        backupDelayedTime={0}
+        backupTooLate={false}
+      />
+    )
+    expect(tree).toMatchSnapshot()
+  })
+
+  it('renders correctly when backup completed and social backup not completed', () => {
+    const tree = renderer.create(
+      <BackupIntroduction
+        onBackup={jest.fn()}
+        onSocialBackup={jest.fn()}
+        backupCompleted={true}
+        socialBackupCompleted={false}
+        onCancel={jest.fn()}
+        onDelay={jest.fn()}
+        backupDelayedTime={0}
+        backupTooLate={false}
+      />
+    )
+    expect(tree).toMatchSnapshot()
+  })
+
+  it('renders correctly when backup completed and social backup completed', () => {
+    const tree = renderer.create(
+      <BackupIntroduction
+        onBackup={jest.fn()}
+        onSocialBackup={jest.fn()}
+        backupCompleted={true}
+        socialBackupCompleted={true}
         onCancel={jest.fn()}
         onDelay={jest.fn()}
         backupDelayedTime={0}
@@ -20,7 +55,10 @@ describe('BackupIntroduction', () => {
   it('renders correctly when backup too late and no delay', () => {
     const tree = renderer.create(
       <BackupIntroduction
-        onPress={jest.fn()}
+        onBackup={jest.fn()}
+        onSocialBackup={jest.fn()}
+        backupCompleted={false}
+        socialBackupCompleted={false}
         onCancel={jest.fn()}
         onDelay={jest.fn()}
         backupDelayedTime={0}
@@ -33,7 +71,10 @@ describe('BackupIntroduction', () => {
   it('renders correctly when backup too late and delayed', () => {
     const tree = renderer.create(
       <BackupIntroduction
-        onPress={jest.fn()}
+        onBackup={jest.fn()}
+        onSocialBackup={jest.fn()}
+        backupCompleted={false}
+        socialBackupCompleted={false}
         onCancel={jest.fn()}
         onDelay={jest.fn()}
         backupDelayedTime={1}

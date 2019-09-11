@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { setBackupCompleted, setBackupDelayed } from 'src/account/actions'
+import { setBackupCompleted, setBackupDelayed, setSocialBackupCompleted } from 'src/account/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
 import BackupComplete from 'src/backup/BackupComplete'
@@ -35,12 +35,14 @@ interface State {
 interface StateProps {
   language: string | null
   backupCompleted: boolean
+  socialBackupCompleted: boolean
   backupTooLate: boolean
   backupDelayedTime: number
 }
 
 interface DispatchProps {
   setBackupCompleted: typeof setBackupCompleted
+  setSocialBackupCompleted: typeof setSocialBackupCompleted
   setBackupDelayed: typeof setBackupDelayed
   enterBackupFlow: typeof enterBackupFlow
   exitBackupFlow: typeof exitBackupFlow
@@ -52,6 +54,7 @@ const mapStateToProps = (state: RootState): StateProps => {
   return {
     language: state.app.language,
     backupCompleted: state.account.backupCompleted,
+    socialBackupCompleted: state.account.socialBackupCompleted,
     backupTooLate: isBackupTooLate(state),
     backupDelayedTime: state.account.backupDelayedTime,
   }
@@ -93,12 +96,26 @@ export class Backup extends React.Component<Props, State> {
     }
   }
 
-  showBackupPhraseVerification = () => {
-    this.setState({ backupStep: BackupStep.verification })
+  showBackupIntroduction = () => {
+    this.setState({ backupStep: BackupStep.introduction })
   }
 
   showBackupPhrase = () => {
     this.setState({ backupStep: BackupStep.phrase })
+  }
+
+  showBackupPhraseVerification = () => {
+    this.setState({ backupStep: BackupStep.verification })
+  }
+
+  completeBackup = () => {
+    this.props.setBackupCompleted()
+    this.showSocialBackup()
+  }
+
+  completeSocialBackup = () => {
+    this.props.setSocialBackupCompleted()
+    this.showBackupIntroduction()
   }
 
   showSocialBackup = () => {
@@ -125,9 +142,16 @@ export class Backup extends React.Component<Props, State> {
 
   render() {
     const { mnemonic, backupStep } = this.state
-    const { backupCompleted, backupDelayedTime, backupTooLate, language } = this.props
+    const {
+      backupCompleted,
+      socialBackupCompleted,
+      backupDelayedTime,
+      backupTooLate,
+      language,
+    } = this.props
 
     // if backup is completed before this component is mounted, different from BackupStep.complete
+    /*
     if (backupCompleted) {
       return (
         <BackupComplete
@@ -136,14 +160,17 @@ export class Backup extends React.Component<Props, State> {
           mnemonic={mnemonic}
         />
       )
-    }
+    }*/
 
     if (backupStep === BackupStep.introduction) {
       return (
         <BackupIntroduction
-          onPress={this.showBackupPhrase}
+          onBackup={this.showBackupPhrase}
+          onSocialBackup={this.showSocialBackup}
           onCancel={this.onCancel}
           onDelay={this.onDelay}
+          backupCompleted={backupCompleted}
+          socialBackupCompleted={socialBackupCompleted}
           backupTooLate={backupTooLate}
           backupDelayedTime={backupDelayedTime}
         />
@@ -152,7 +179,13 @@ export class Backup extends React.Component<Props, State> {
 
     if (backupStep === BackupStep.phrase) {
       return (
-        <BackupPhrase words={mnemonic} onPressBackup={this.showQuiz} onCancel={this.onCancel} />
+        <BackupPhrase
+          backupCompleted={backupCompleted}
+          words={mnemonic}
+          onPressBackup={this.showQuiz}
+          onPressBack={this.showBackupIntroduction}
+          onCancel={this.onCancel}
+        />
       )
     }
 
@@ -175,7 +208,7 @@ export class Backup extends React.Component<Props, State> {
           onCancel={this.onCancel}
           onWrongSubmit={this.showBackupPhrase}
           showBackupPhrase={this.showBackupPhrase}
-          onSuccess={this.showSocialBackup}
+          onSuccess={this.completeBackup}
         />
       )
     }
@@ -185,7 +218,7 @@ export class Backup extends React.Component<Props, State> {
         <BackupSocial
           words={mnemonic}
           language={language}
-          onPressBackup={this.showQuiz}
+          onSuccess={this.completeSocialBackup}
           onCancel={this.onCancel}
         />
       )
@@ -203,6 +236,12 @@ export class Backup extends React.Component<Props, State> {
 export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
-    { setBackupCompleted, setBackupDelayed, enterBackupFlow, exitBackupFlow }
+    {
+      setBackupCompleted,
+      setBackupDelayed,
+      setSocialBackupCompleted,
+      enterBackupFlow,
+      exitBackupFlow,
+    }
   )(Backup)
 )

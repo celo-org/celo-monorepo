@@ -18,12 +18,20 @@ import { Namespaces } from 'src/i18n'
 type Props = {
   words: string
   language: string | null
-  onPressBackup: () => void
+  onSuccess: () => void
   onCancel: () => void
 } & WithNamespaces
 
-class BackupPhrase extends React.Component<Props> {
+interface State {
+  backupStep: number
+}
+
+class BackupPhrase extends React.Component<Props, State> {
   static navigationOptions = { header: null }
+
+  state = {
+    backupStep: 0,
+  }
 
   componentDidMount() {
     FlagSecure.activate()
@@ -35,11 +43,19 @@ class BackupPhrase extends React.Component<Props> {
 
   continueBackup = () => {
     CeloAnalytics.track(CustomEventNames.backup_continue)
-    this.props.onPressBackup()
+    const { backupStep } = this.state
+
+    if (backupStep > 1) {
+      this.props.onSuccess()
+      return
+    }
+
+    this.setState({ backupStep: backupStep + 1 })
   }
 
   render() {
     const { t, words, language } = this.props
+    const { backupStep } = this.state
     const [firstHalf, secondHalf] = splitMnemonic(words, language)
 
     return (
@@ -53,15 +69,24 @@ class BackupPhrase extends React.Component<Props> {
         >
           <View>
             <Text style={[fontStyles.h1, styles.title]}>{t('socialBackup')}</Text>
-            <Text style={styles.verifyText}>{t('socialBackupYourKey')}</Text>
-            <Text style={styles.verifyText}>{t('easyToForget')}</Text>
-            <BackupPhraseContainer label={t('sendFirstHalf')} words={firstHalf} />
-            <BackupPhraseContainer label={t('sendSecondHalf')} words={secondHalf} />
+            {backupStep === 0 && (
+              <>
+                <Text style={styles.verifyText}>{t('socialBackupYourKey')}</Text>
+                <Text style={styles.verifyText}>{t('easyToForget')}</Text>
+                <BackupPhraseContainer label={t('sendFirstHalf')} words={firstHalf} />
+              </>
+            )}
+
+            {backupStep === 1 && (
+              <BackupPhraseContainer label={t('sendSecondHalf')} words={secondHalf} />
+            )}
+
+            {backupStep > 1 && <Text style={styles.verifyText}>{t('socialBackupSet')}</Text>}
           </View>
           <View>
             <Button
               onPress={this.continueBackup}
-              text={t('continue')}
+              text={t(backupStep < 2 ? 'continue' : 'done')}
               standard={true}
               type={BtnTypes.PRIMARY}
             />

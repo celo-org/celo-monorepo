@@ -15,9 +15,12 @@ import { Namespaces } from 'src/i18n'
 import backupIcon from 'src/images/backup-icon.png'
 
 type Props = {
+  backupCompleted: boolean
+  socialBackupCompleted: boolean
   backupDelayedTime: number
   backupTooLate: boolean
-  onPress: () => void
+  onBackup: () => void
+  onSocialBackup: () => void
   onCancel: () => void
   onDelay: () => void
 } & WithNamespaces
@@ -43,9 +46,24 @@ class BackupIntroduction extends React.Component<Props, State> {
     CeloAnalytics.track(CustomEventNames.skip_backup)
   }
 
+  onViewBackupKey = () => {
+    CeloAnalytics.track(CustomEventNames.view_backup_phrase)
+    this.props.onBackup()
+  }
+
+  onViewSocialBackup = () => {
+    CeloAnalytics.track(CustomEventNames.view_social_backup)
+    this.props.onSocialBackup()
+  }
+
   onBackup = () => {
     CeloAnalytics.track(CustomEventNames.set_backup_phrase)
-    this.props.onPress()
+    this.props.onBackup()
+  }
+
+  onSocialBackup = () => {
+    CeloAnalytics.track(CustomEventNames.set_social_backup)
+    this.props.onSocialBackup()
   }
 
   onDelay = () => {
@@ -60,7 +78,7 @@ class BackupIntroduction extends React.Component<Props, State> {
 
   onInsistBackup = () => {
     CeloAnalytics.track(CustomEventNames.insist_backup_phrase)
-    this.props.onPress()
+    this.props.onBackup()
   }
 
   skip = () => {
@@ -87,7 +105,13 @@ class BackupIntroduction extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, backupDelayedTime, backupTooLate } = this.props
+    const {
+      t,
+      backupDelayedTime,
+      backupTooLate,
+      backupCompleted,
+      socialBackupCompleted,
+    } = this.props
     return (
       <View style={styles.container}>
         <View style={componentStyles.topBar}>
@@ -106,12 +130,41 @@ class BackupIntroduction extends React.Component<Props, State> {
           <View style={styles.modalContainer}>
             <Modal isVisible={this.state.visibleModal === true}>{this.skip()}</Modal>
           </View>
-          <Button
-            onPress={this.onBackup}
-            text={t('getBackupKey')}
-            standard={false}
-            type={BtnTypes.PRIMARY}
-          />
+          {backupCompleted &&
+            !socialBackupCompleted && (
+              <Button
+                onPress={this.onSocialBackup}
+                text={t('setUpSocialBackup')}
+                standard={false}
+                type={BtnTypes.PRIMARY}
+              />
+            )}
+
+          {!backupCompleted ? (
+            <Button
+              onPress={this.onBackup}
+              text={t('getBackupKey')}
+              standard={false}
+              type={BtnTypes.PRIMARY}
+            />
+          ) : (
+            <Button
+              onPress={this.onViewBackupKey}
+              text={t('viewBackupKey')}
+              standard={false}
+              type={BtnTypes.TERTIARY}
+            />
+          )}
+
+          {socialBackupCompleted && (
+            <Button
+              onPress={this.onViewSocialBackup}
+              text={t('viewSocialBackup')}
+              standard={false}
+              type={BtnTypes.TERTIARY}
+            />
+          )}
+
           {backupTooLate &&
             !backupDelayedTime && (
               <Button
@@ -123,15 +176,16 @@ class BackupIntroduction extends React.Component<Props, State> {
               />
             )}
 
-          {!backupTooLate && (
-            <Button
-              onPress={this.onSkip}
-              style={styles.skipLink}
-              text={t('skip')}
-              standard={false}
-              type={BtnTypes.TERTIARY}
-            />
-          )}
+          {!backupTooLate &&
+            !backupCompleted && (
+              <Button
+                onPress={this.onSkip}
+                style={styles.skipLink}
+                text={t('skip')}
+                standard={false}
+                type={BtnTypes.TERTIARY}
+              />
+            )}
         </View>
       </View>
     )

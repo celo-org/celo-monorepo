@@ -1,10 +1,10 @@
 {
   "readOnlyMode": "Read Only Mode Set Backup Key to continue sending and receiving {{CeloDollars}}",
   "getBackupKey": "Get Backup Key",
-  "learnBackupKey": "Learn Your Backup Key",
   "socialBackup": "Social Backup",
   "editProfile": "Edit Profile",
   "backupKey": "Backup Key",
+  "yourBackupKey": "Your Backup Key",
   "delayBackup": "Dismiss for an hour",
   "inviteFriends": "Invite Friends",
   "verifierApp": "Verifier App",
@@ -33,13 +33,14 @@
   "sendWhatsApp": "Send with WhatsApp",
   "continue": "Continue",
   "backupWithFriends": "Backup with Friends",
-  "securityTips": "Security Tips",
+  "tip": "Tip ",
   "backupKeySummary": {
     "0": "Write this phrase down on a piece of paper and keep it somewhere safe.",
     "1": "Don’t show your phrase to anyone else. They can access your wallet if they see it."
   },
   "learnYourKey": "Write down or memorize your Backup Key.",
   "keyWillBeVerified": "Once you have finished, we will verify that you know the key correctly.",
+  "heresYourKey": "Here is your Backup Key. Remember, keep this safe.",
   "socialBackupYourKey":
     "Social Backup is a way to secure your account with the help of your friends.",
   "easyToForget": "It's easy to forget your backup key.",
