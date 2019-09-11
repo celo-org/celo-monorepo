@@ -74,6 +74,7 @@
   "devDependencies": {
     "@firebase/app-types": "^0.3.7",
     "@sentry/types": "^5.6.1",
+    "@testing-library/react": "^9.1.4",
     "@types/airtable": "^0.5.6",
     "@types/i18next": "^12.1.0",
     "@types/mailgun-js": "^0.16.3",
