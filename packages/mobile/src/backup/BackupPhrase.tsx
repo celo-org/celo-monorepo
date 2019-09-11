@@ -17,7 +17,6 @@ import { Namespaces } from 'src/i18n'
 type Props = {
   words: string
   onPressBackup: () => void
-  onPressSocialBackup: () => void
   onCancel: () => void
 } & WithNamespaces
 
@@ -35,11 +34,6 @@ class BackupPhrase extends React.Component<Props> {
   continueBackup = () => {
     CeloAnalytics.track(CustomEventNames.backup_continue)
     this.props.onPressBackup()
-  }
-
-  continueSocialBackup = () => {
-    CeloAnalytics.track(CustomEventNames.social_backup_continue)
-    this.props.onPressSocialBackup()
   }
 
   render() {
@@ -65,12 +59,6 @@ class BackupPhrase extends React.Component<Props> {
               text={t('continue')}
               standard={true}
               type={BtnTypes.PRIMARY}
-            />
-            <Button
-              onPress={this.continueSocialBackup}
-              text={t('backupWithFriends')}
-              standard={true}
-              type={BtnTypes.SECONDARY}
             />
           </View>
         </KeyboardAwareScrollView>

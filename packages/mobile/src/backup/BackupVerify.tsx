@@ -1,84 +1,87 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import Link from '@celo/react-components/components/Link'
-import SelectionOption from '@celo/react-components/components/SelectionOption'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import BackupModal from 'src/backup/BackupModal'
 import CancelButton from 'src/components/CancelButton'
 import { Namespaces } from 'src/i18n'
+import { formatBackupPhraseOnEdit, formatBackupPhraseOnSubmit } from 'src/import/ImportWallet'
 import Logger from 'src/utils/Logger'
 
-const TAG = 'Backup/BackupQuestion'
+const TAG = 'Backup/BackupVerify'
 
 type Props = {
-  words: string[]
-  correctAnswer: string
-  onReturnToPhrase: () => void
-  onCorrectSubmit: () => void
-  onWrongSubmit: () => void
+  mnemonic: string
+  showBackupPhrase: () => void
   onCancel: () => void
+  onWrongSubmit: () => void
+  onSuccess: () => void
 } & WithNamespaces
 
 interface State {
-  selectedAnswer: string | null
   visibleModal: boolean
+  pastedMnemonic: string
 }
 
-class BackupQuestion extends React.PureComponent<Props, State> {
+export class BackupVerify extends React.Component<Props, State> {
   state = {
-    selectedAnswer: null,
     visibleModal: false,
+    pastedMnemonic: '',
   }
 
   eventNames: { [key: string]: CustomEventNames } = {
-    cancel: CustomEventNames.question_cancel,
-    submit: CustomEventNames.question_submit,
-    select: CustomEventNames.question_select,
-    incorrect: CustomEventNames.question_incorrect,
+    paste: CustomEventNames.backup_paste,
+    cancel: CustomEventNames.backup_paste_cancel,
+    submit: CustomEventNames.backup_paste_submit,
+    incorrect: CustomEventNames.backup_paste_incorrect,
   }
 
-  trackAnalytics(name: string, data: object = {}) {
+  trackAnalytics = (name: string, data: object = {}) => {
     if (this.eventNames.hasOwnProperty(name)) {
       CeloAnalytics.track(this.eventNames[name], data)
     } else {
-      Logger.error(TAG, `Unexpected case for tracking Backup Question ${name}`)
+      Logger.error(TAG, `Unexpected case for tracking Backup Verify ${name}`)
     }
   }
 
-  cancel = () => {
-    this.trackAnalytics('cancel')
-    this.props.onCancel()
+  onEndEditing = () => {
+    this.trackAnalytics('paste')
   }
 
-  onSelectAnswer = (word: string) => {
-    this.setState({ selectedAnswer: word })
-    this.trackAnalytics('select')
+  setBackupPhrase = (input: string) => {
+    this.setState({
+      pastedMnemonic: formatBackupPhraseOnEdit(input),
+    })
+  }
+
+  onWrongSubmit = () => {
+    this.trackAnalytics('incorrect')
+    this.props.onWrongSubmit()
   }
 
   onSubmit = () => {
-    if (this.props.correctAnswer === this.state.selectedAnswer) {
+    const { pastedMnemonic } = this.state
+    const formattedPhrase = formatBackupPhraseOnSubmit(pastedMnemonic)
+
+    if (this.props.mnemonic === formattedPhrase) {
       this.trackAnalytics('submit', { isCorrect: true })
-      this.props.onCorrectSubmit()
+      this.props.onSuccess()
     } else {
       this.setState({ visibleModal: true })
       this.trackAnalytics('submit', { isCorrect: false })
     }
   }
 
-  onWrongSubmit = () => {
-    // PILOT_ONLY
-    this.trackAnalytics('incorrect')
-    this.props.onWrongSubmit()
-  }
-
   render() {
     const { t } = this.props
+    const { pastedMnemonic } = this.state
+
     return (
       <View style={styles.container}>
         <View style={componentStyles.topBar}>
@@ -87,31 +90,38 @@ class BackupQuestion extends React.PureComponent<Props, State> {
         <ScrollView keyboardShouldPersistTaps="always">
           <View style={styles.questionTextContainer}>
             <Text style={[fontStyles.body, styles.question]}>
-              {t('backupKeyFlow6:verifying', { count: 1, total: 2 })}
+              {t('backupKeyFlow6:verifying', { count: 2, total: 2 })}
             </Text>
-            <Text style={[fontStyles.h1, styles.questionPhrase]}>{t('questionPhrase')}</Text>
+            <Text style={[fontStyles.h1, styles.questionPhrase]}>{t('enterBackupKey')}</Text>
+            <Text style={[fontStyles.body, styles.body]}>{t('backupKeyConfirmation')}</Text>
           </View>
-          <View style={componentStyles.line} />
-          {this.props.words.map((word) => (
-            <SelectionOption
-              word={word}
-              key={word}
-              onSelectAnswer={this.onSelectAnswer}
-              selected={word === this.state.selectedAnswer}
-            />
-          ))}
           <BackupModal isVisible={this.state.visibleModal} onPress={this.onWrongSubmit} />
+          <View style={[componentStyles.row, styles.backupInput]}>
+            <TextInput
+              onChangeText={this.setBackupPhrase}
+              onEndEditing={this.onEndEditing}
+              value={pastedMnemonic}
+              style={componentStyles.input}
+              underlineColorAndroid="transparent"
+              placeholder={t('backupKeyPrompt')}
+              placeholderTextColor={colors.inactive}
+              enablesReturnKeyAutomatically={true}
+              multiline={true}
+              autoCorrect={false}
+              autoCapitalize={'none'}
+            />
+          </View>
         </ScrollView>
         <Button
           onPress={this.onSubmit}
-          text={t('submit')}
+          text={t('Finish')}
           standard={false}
           type={BtnTypes.PRIMARY}
-          disabled={this.state.selectedAnswer ? false : true}
+          disabled={this.state.pastedMnemonic ? false : true}
         />
         <View style={styles.forgotButtonContainer}>
           <Text style={fontStyles.bodySmall}>{t('dontKnow')} </Text>
-          <Link onPress={this.props.onReturnToPhrase}>{t('return')}</Link>
+          <Link onPress={this.props.showBackupPhrase}>{t('return')}</Link>
         </View>
       </View>
     )
@@ -124,6 +134,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     justifyContent: 'space-between',
   },
+  body: {
+    paddingBottom: 15,
+  },
   questionTextContainer: {
     paddingHorizontal: 30,
   },
@@ -135,6 +148,12 @@ const styles = StyleSheet.create({
     color: colors.darkSecondary,
     textAlign: 'left',
   },
+  backupInput: {
+    height: 124,
+  },
+  inputError: {
+    borderColor: colors.errorRed,
+  },
   forgotButtonContainer: {
     flexDirection: 'row',
     marginTop: 5,
@@ -143,4 +162,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.backupKeyFlow6)(BackupQuestion)
+export default withNamespaces(Namespaces.backupKeyFlow6)(BackupVerify)

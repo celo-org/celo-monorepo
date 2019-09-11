@@ -1,44 +1,53 @@
 import * as React from 'react'
 import BackupQuestion from 'src/backup/BackupQuestion'
-import { selectQuizWordOptions } from 'src/backup/utils'
+import { createQuizWordList, selectQuizWordOptions } from 'src/backup/utils'
 
 const OPTIONS_PER_QUESTION = 4
-export const INDICES_TO_TEST = [0, 2, 3, 6]
 
 interface Props {
-  currentQuestion: number
   mnemonic: string
-  wordsForBackupQuiz: string[]
-  setCurrentQuestion: (currentQuestion: number) => void
+  language: string | null
   showBackupPhrase: () => void
   onCancel: () => void
+  onSuccess: () => void
 }
 
-export default class BackupQuiz extends React.Component<Props> {
-  showNextQuestion = () => {
-    this.props.setCurrentQuestion(this.props.currentQuestion + 1)
+interface State {
+  wordsForBackupQuiz: string[]
+}
+
+export default class BackupQuiz extends React.Component<Props, State> {
+  state = {
+    wordsForBackupQuiz: [],
   }
 
-  returnToPhrase = () => {
-    this.props.setCurrentQuestion(0)
+  componentDidMount = () => {
+    this.getWords()
+  }
+
+  getWords = async () => {
+    const { mnemonic, language } = this.props
+    const wordsForBackupQuiz = await createQuizWordList(mnemonic, language)
+    this.setState({ wordsForBackupQuiz })
   }
 
   render() {
-    const { currentQuestion, mnemonic, wordsForBackupQuiz, showBackupPhrase, onCancel } = this.props
+    const { mnemonic, showBackupPhrase, onCancel, onSuccess } = this.props
+    const { wordsForBackupQuiz } = this.state
 
-    const indexToTest = INDICES_TO_TEST[currentQuestion - 1]
-    const correctWord = mnemonic.split(' ')[indexToTest]
-    const wordOptions = selectQuizWordOptions(correctWord, wordsForBackupQuiz, OPTIONS_PER_QUESTION)
+    const [correctWord, wordOptions] = selectQuizWordOptions(
+      mnemonic,
+      wordsForBackupQuiz,
+      OPTIONS_PER_QUESTION
+    )
 
     return (
       <BackupQuestion
-        questionNumber={currentQuestion}
-        testWordIndex={indexToTest}
         words={wordOptions}
         correctAnswer={correctWord}
         onReturnToPhrase={showBackupPhrase}
-        onCorrectSubmit={this.showNextQuestion}
-        onWrongSubmit={this.returnToPhrase}
+        onCorrectSubmit={onSuccess}
+        onWrongSubmit={showBackupPhrase}
         onCancel={onCancel}
       />
     )

@@ -40,16 +40,17 @@ describe('backup/utils', () => {
       global.Math.random = () => 0.5
 
       const wordList = await createQuizWordList(mockMnemonic, 'en')
-      const wordOptions = selectQuizWordOptions('crawl', wordList, 4)
+      const [correctWord, wordOptions] = selectQuizWordOptions(mockMnemonic, wordList, 4)
       expect(wordOptions.length).toBe(4)
-      expect(wordOptions[2]).toBe('crawl')
+      expect(mockMnemonic).toContain(correctWord)
     })
 
     it('does not have duplicates in word options', () => {
       global.Math = Math
       const wordList = ['a', 'b', 'c']
-      const wordOptions = selectQuizWordOptions('d', wordList, 4)
+      const [correctWord, wordOptions] = selectQuizWordOptions('d', wordList, 4)
       expect(wordOptions.length).toBe(4)
+      expect(correctWord).toBe('d')
       expect(wordOptions).toEqual(expect.arrayContaining(['a', 'b', 'c', 'd']))
     })
   })

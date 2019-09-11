@@ -11,28 +11,27 @@ export async function createQuizWordList(mnemonic: string, language: string | nu
   const disallowedWordSet = new Set(mnemonic.split(' '))
   const languageWordList = getWordlist(language)
   const wordOptions: string = await generateMnemonic(1000, null, languageWordList)
-  const quizWordList = new Set(
-    [...wordOptions.split(' ')].filter((word: string) => !disallowedWordSet.has(word))
-  )
-  return [...quizWordList]
+  return wordOptions.split(' ').filter((word: string) => !disallowedWordSet.has(word))
 }
 
-export function selectQuizWordOptions(correctWord: string, allWords: string[], numOptions: number) {
-  const wordOptions = []
-  const correctWordPosition = Math.floor(Math.random() * numOptions)
-  const randomWordIndexList = _.sampleSize([...Array(allWords.length).keys()], numOptions - 1)
-  let randomWordIndex: number = 0
+export function selectQuizWordOptions(
+  mnemonic: string,
+  allWords: string[],
+  numOptions: number
+): [string, string[]] {
+  const correctWord = _.sample(mnemonic.split(' '))
 
-  for (let i = 0; i < numOptions; i++) {
-    if (i === correctWordPosition) {
-      wordOptions.push(correctWord)
-      continue
-    }
-
-    wordOptions.push(allWords[randomWordIndexList[randomWordIndex]])
-    randomWordIndex += 1
+  if (!correctWord) {
+    throw new Error('Mnemonic cannot be empty')
   }
-  return wordOptions
+
+  const wordOptions = _.chain(allWords)
+    .sampleSize(numOptions - 1)
+    .push(correctWord)
+    .shuffle()
+    .value()
+
+  return [correctWord, wordOptions]
 }
 
 export function getWordlist(language: string | null): string[] {

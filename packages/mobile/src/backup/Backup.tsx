@@ -6,9 +6,10 @@ import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
 import BackupComplete from 'src/backup/BackupComplete'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
 import BackupPhrase from 'src/backup/BackupPhrase'
-import BackupQuiz, { INDICES_TO_TEST } from 'src/backup/BackupQuiz'
+import BackupQuiz from 'src/backup/BackupQuiz'
 import BackupSocial from 'src/backup/BackupSocial'
-import { createQuizWordList, getStoredMnemonic } from 'src/backup/utils'
+import BackupVerify from 'src/backup/BackupVerify'
+import { getStoredMnemonic } from 'src/backup/utils'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
@@ -17,20 +18,17 @@ import Logger from 'src/utils/Logger'
 export const DAYS_TO_BACKUP = 1
 export const DAYS_TO_DELAY = 1 / 24 // 1 hour delay
 
-const NUMBER_OF_TEST_QUESTIONS = INDICES_TO_TEST.length
-
 enum BackupStep {
   introduction,
   phrase,
-  socialBackup,
   quiz,
+  verification,
+  socialBackup,
   complete,
 }
 
 interface State {
   mnemonic: string
-  currentQuestion: number | null
-  wordsForBackupQuiz: string[]
   backupStep: BackupStep
 }
 
@@ -64,8 +62,6 @@ export class Backup extends React.Component<Props, State> {
 
   state = {
     mnemonic: '',
-    currentQuestion: -1,
-    wordsForBackupQuiz: [],
     backupStep: BackupStep.introduction,
   }
 
@@ -90,9 +86,6 @@ export class Backup extends React.Component<Props, State> {
         throw new Error('Mnemonic not stored in key store')
       }
       this.setState({ mnemonic })
-
-      const wordsForBackupQuiz = await createQuizWordList(mnemonic, this.props.language)
-      this.setState({ wordsForBackupQuiz })
     } catch (e) {
       Logger.error('backup/retrieveMnemonic', e)
       // TODO(Rossy): use error banner
@@ -100,25 +93,20 @@ export class Backup extends React.Component<Props, State> {
     }
   }
 
-  setCurrentQuestion = (currentQuestion: number) => {
-    if (currentQuestion > NUMBER_OF_TEST_QUESTIONS) {
-      this.setState({ backupStep: BackupStep.complete })
-      return
-    }
-
-    this.setState({ currentQuestion })
+  showBackupPhraseVerification = () => {
+    this.setState({ backupStep: BackupStep.verification })
   }
 
   showBackupPhrase = () => {
     this.setState({ backupStep: BackupStep.phrase })
   }
 
-  socialBackup = () => {
+  showSocialBackup = () => {
     this.setState({ backupStep: BackupStep.socialBackup })
   }
 
   showQuiz = () => {
-    this.setState({ currentQuestion: 1, backupStep: BackupStep.quiz })
+    this.setState({ backupStep: BackupStep.quiz })
   }
 
   onCancel = async () => {
@@ -136,7 +124,7 @@ export class Backup extends React.Component<Props, State> {
   }
 
   render() {
-    const { mnemonic, currentQuestion, wordsForBackupQuiz, backupStep } = this.state
+    const { mnemonic, backupStep } = this.state
     const { backupCompleted, backupDelayedTime, backupTooLate, language } = this.props
 
     // if backup is completed before this component is mounted, different from BackupStep.complete
@@ -164,11 +152,30 @@ export class Backup extends React.Component<Props, State> {
 
     if (backupStep === BackupStep.phrase) {
       return (
-        <BackupPhrase
-          words={mnemonic}
-          onPressBackup={this.showQuiz}
-          onPressSocialBackup={this.socialBackup}
+        <BackupPhrase words={mnemonic} onPressBackup={this.showQuiz} onCancel={this.onCancel} />
+      )
+    }
+
+    if (backupStep === BackupStep.quiz) {
+      return (
+        <BackupQuiz
+          mnemonic={mnemonic}
+          language={language}
           onCancel={this.onCancel}
+          showBackupPhrase={this.showBackupPhrase}
+          onSuccess={this.showBackupPhraseVerification}
+        />
+      )
+    }
+
+    if (backupStep === BackupStep.verification) {
+      return (
+        <BackupVerify
+          mnemonic={mnemonic}
+          onCancel={this.onCancel}
+          onWrongSubmit={this.showBackupPhrase}
+          showBackupPhrase={this.showBackupPhrase}
+          onSuccess={this.showSocialBackup}
         />
       )
     }
@@ -179,21 +186,7 @@ export class Backup extends React.Component<Props, State> {
           words={mnemonic}
           language={language}
           onPressBackup={this.showQuiz}
-          onPressSocialBackup={this.socialBackup}
           onCancel={this.onCancel}
-        />
-      )
-    }
-
-    if (backupStep === BackupStep.quiz) {
-      return (
-        <BackupQuiz
-          mnemonic={mnemonic}
-          wordsForBackupQuiz={wordsForBackupQuiz}
-          currentQuestion={currentQuestion}
-          onCancel={this.onCancel}
-          setCurrentQuestion={this.setCurrentQuestion}
-          showBackupPhrase={this.showBackupPhrase}
         />
       )
     }

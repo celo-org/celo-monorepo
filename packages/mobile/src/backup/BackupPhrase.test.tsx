@@ -8,7 +8,7 @@ const SAMPLE_PHRASE =
 
 it('renders correctly', () => {
   const tree = renderer.create(
-    <BackupPhrase words={SAMPLE_PHRASE} onPress={jest.fn()} onCancel={jest.fn()} />
+    <BackupPhrase words={SAMPLE_PHRASE} onPressBackup={jest.fn()} onCancel={jest.fn()} />
   )
   expect(tree).toMatchSnapshot()
 })

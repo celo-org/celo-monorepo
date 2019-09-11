@@ -19,7 +19,6 @@ type Props = {
   words: string
   language: string | null
   onPressBackup: () => void
-  onPressSocialBackup: () => void
   onCancel: () => void
 } & WithNamespaces
 

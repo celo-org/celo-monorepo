@@ -27,7 +27,7 @@ class BackupComplete extends React.Component<Props> {
 
     // Only track when going through backup flow, not viewing the backup again
     if (!backupCompleted) {
-      CeloAnalytics.track(CustomEventNames.questions_done)
+      CeloAnalytics.track(CustomEventNames.question_done)
     }
     this.props.onPress()
   }
