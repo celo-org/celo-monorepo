@@ -560,6 +560,7 @@ async function helmParameters(celoEnv: string) {
     `--set contracts.cron_jobs.enabled=${fetchEnv('CONTRACT_CRONJOBS_ENABLED')}`,
     `--set geth.account.secret="${fetchEnv('GETH_ACCOUNT_SECRET')}"`,
     `--set ethstats.webSocketSecret="${fetchEnv('ETHSTATS_WEBSOCKETSECRET')}"`,
+    `--set geth.ping_ip_from_packet=${fetchEnvOrFallback('PING_IP_FROM_PACKET', 'false')}`,
     ...productionTagOverrides,
     ...(await helmIPParameters(celoEnv)),
     ...gethAccountParameters,
