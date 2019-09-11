@@ -170,7 +170,9 @@ contract('SortedOracles', (accounts: string[]) => {
 
     describe('when a report has been made', () => {
       beforeEach(async () => {
-        await sortedOracles.report(aToken, 10, 1, NULL_ADDRESS, NULL_ADDRESS, { from: anOracle })
+        await sortedOracles.report(aToken, 10, 1, NULL_ADDRESS, NULL_ADDRESS, {
+          from: anOracle,
+        })
       })
 
       it('should decrease the number of rates', async () => {
@@ -180,9 +182,8 @@ contract('SortedOracles', (accounts: string[]) => {
 
       it('should reset the median rate', async () => {
         await sortedOracles.removeOracle(aToken, anOracle, 0)
-        const [actualNumerator, actualDenominator] = await sortedOracles.medianRate(aToken)
+        const [actualNumerator] = await sortedOracles.medianRate(aToken)
         assert.equal(actualNumerator.toNumber(), 0)
-        assert.equal(actualDenominator.toNumber(), 0)
       })
 
       it('should decrease the number of timestamps', async () => {
