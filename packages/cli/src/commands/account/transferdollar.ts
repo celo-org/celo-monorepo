@@ -35,7 +35,6 @@ export default class DollarTransfer extends BaseCommand {
     const goldBalanceFromBefore = await goldToken.balanceOf(from)
     const dollarBalanceFromBefore = await stableToken.balanceOf(from)
 
-    console.log('node is synced!')
     // Perform the transfer
     await displaySendTx('dollar.Transfer', stableToken.transfer(to, amountInWei.toString()))
 
