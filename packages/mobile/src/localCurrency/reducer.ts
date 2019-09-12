@@ -24,7 +24,8 @@ export const reducer = (
 
       // Make sure we don't use the persisted exchange rate if the symbol is now different
       if (persistedState && persistedState.symbol !== LOCAL_CURRENCY_SYMBOL) {
-        return initialState
+        // return a copy on purpose otherwise it's ignored
+        return { ...initialState }
       }
 
       // Ignore some persisted properties
