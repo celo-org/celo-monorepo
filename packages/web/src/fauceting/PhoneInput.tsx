@@ -41,7 +41,7 @@ class PhoneInput extends React.PureComponent<Props, State> {
 
   setNumber = (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
     // remove not phone number characters
-    const phone = event.nativeEvent.text.replace(/[^\d\(\)-\s]/g, '')
+    const phone = event.nativeEvent.text.replace(/[^\d\(\)-\s.]/g, '')
 
     const phoneInfo =
       phone.length && PhoneNumberUtils.parsePhoneNumber(phone, this.state.countryCallingCode)
@@ -96,6 +96,20 @@ class PhoneInput extends React.PureComponent<Props, State> {
 
   onInputChange = (_, { newValue }) => {
     this.onChangeCountryQuery(newValue)
+    setImmediate(() => {
+      const country = COUNTRIES.getCountry(newValue)
+      if (country.displayName) {
+        this.setState({
+          countryQuery: country.displayName,
+          // @ts-ignore
+          countryCallingCode: country.countryCallingCodes[0],
+        })
+      } else {
+        this.setState({
+          countryCallingCode: '',
+        })
+      }
+    })
   }
 
   onSuggestionSelected = (x) => {
