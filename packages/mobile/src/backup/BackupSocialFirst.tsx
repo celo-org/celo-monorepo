@@ -1,11 +1,14 @@
 import * as React from 'react'
 import { AndroidBackHandler } from 'react-navigation-backhandler'
 import BackupSocial from 'src/backup/BackupSocial'
+import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 
 export default class BackupSocialFirst extends React.Component {
-  static navigationOptions = { header: null }
+  static navigationOptions = () => ({
+    ...headerWithCancelButton,
+  })
 
   onBackButtonPressAndroid = () => {
     // Override back button to not go back to BackupVerify screen

@@ -7,6 +7,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackupQuestion from 'src/backup/BackupQuestion'
 import BackupVerify from 'src/backup/BackupVerify'
 import { createQuizWordList, getStoredMnemonic, selectQuizWordOptions } from 'src/backup/utils'
+import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -39,7 +40,9 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 export class BackupQuiz extends React.Component<Props, State> {
-  static navigationOptions = { header: null }
+  static navigationOptions = () => ({
+    ...headerWithCancelButton,
+  })
 
   state = {
     mnemonic: '',

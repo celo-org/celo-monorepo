@@ -1,6 +1,9 @@
 {
   "readOnlyMode": "Read Only Mode Set Backup Key to continue sending and receiving {{CeloDollars}}",
   "getBackupKey": "Get Backup Key",
+  "viewBackupKey": "View Backup Key",
+  "setUpSocialBackup": "Set Up Recovery Secrets",
+  "viewSocialBackup": "View Recovery Secrets",
   "failedFetchMnemonic": "Failed to fetch your Backup Key",
   "socialBackup": "Social Backup",
   "editProfile": "Edit Profile",

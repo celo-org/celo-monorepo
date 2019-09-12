@@ -11,6 +11,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { Namespaces } from 'src/i18n'
 import NuxLogo from 'src/icons/NuxLogo'
+import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -23,7 +24,9 @@ interface DispatchProps {
 type Props = DispatchProps & WithNamespaces
 
 class BackupComplete extends React.Component<Props> {
-  static navigationOptions = { header: null }
+  static navigationOptions = () => ({
+    ...nuxNavigationOptionsNoBackButton,
+  })
 
   onDone = () => {
     // This screen should be reachable when regular backup is already completed

@@ -15,6 +15,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackupPhraseContainer from 'src/backup/BackupPhraseContainer'
 import { getStoredMnemonic } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -42,7 +43,11 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 class BackupPhrase extends React.Component<Props, State> {
-  static navigationOptions = { header: null }
+  // TODO(Derrick): Show cancel if backup flow incomplete
+  static navigationOptions = () => ({
+    ...headerWithBackButton,
+  })
+
   state = {
     mnemonic: '',
   }

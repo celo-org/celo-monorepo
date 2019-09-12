@@ -14,6 +14,7 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import { enterBackupFlow } from 'src/app/actions'
 import { Namespaces } from 'src/i18n'
 import backupIcon from 'src/images/backup-icon.png'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -49,7 +50,9 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 class BackupIntroduction extends React.Component<Props, State> {
-  static navigationOptions = { header: null }
+  static navigationOptions = () => ({
+    ...headerWithBackButton,
+  })
 
   state = {
     visibleModal: false,
