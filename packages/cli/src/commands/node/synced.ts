@@ -1,4 +1,5 @@
 import { BaseCommand } from '../../base'
+import { nodeIsSynced } from '../../utils/helpers'
 
 export default class NodeSynced extends BaseCommand {
   static description = 'Check if the node is synced'
@@ -9,8 +10,6 @@ export default class NodeSynced extends BaseCommand {
 
   async run() {
     this.parse(NodeSynced)
-
-    const isSyncing = await this.web3.eth.isSyncing()
-    console.log(isSyncing === false)
+    console.log(await nodeIsSynced(this.web3))
   }
 }
