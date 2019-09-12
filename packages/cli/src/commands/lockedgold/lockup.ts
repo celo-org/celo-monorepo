@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
 import { displaySendTx, failWith } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { requireNodeIsSynced } from '../../utils/helpers'
 import { LockedGoldArgs } from '../../utils/lockedgold'
 
 export default class Commitment extends BaseCommand {
@@ -23,6 +24,7 @@ export default class Commitment extends BaseCommand {
   ]
 
   async run() {
+    await requireNodeIsSynced(this.web3)
     const res = this.parse(Commitment)
     const address: Address = res.flags.from
 

@@ -1,6 +1,7 @@
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { requireNodeIsSynced } from '../../utils/helpers'
 
 export default class Register extends BaseCommand {
   static description = 'Register an account for Locked Gold'
@@ -15,6 +16,7 @@ export default class Register extends BaseCommand {
   static examples = ['register']
 
   async run() {
+    await requireNodeIsSynced(this.web3)
     const res = this.parse(Register)
     this.kit.defaultAccount = res.flags.from
     const lockedGold = await this.kit.contracts.getLockedGold()

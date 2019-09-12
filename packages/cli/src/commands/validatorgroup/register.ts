@@ -2,6 +2,7 @@ import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { requireNodeIsSynced } from '../../utils/helpers'
 
 export default class ValidatorGroupRegister extends BaseCommand {
   static description = 'Register a new Validator Group'
@@ -22,6 +23,8 @@ export default class ValidatorGroupRegister extends BaseCommand {
     'register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --id myID --name myName --noticePeriod 5184000 --url "http://vgroup.com"',
   ]
   async run() {
+    await requireNodeIsSynced(this.web3)
+
     const res = this.parse(ValidatorGroupRegister)
 
     this.kit.defaultAccount = res.flags.from

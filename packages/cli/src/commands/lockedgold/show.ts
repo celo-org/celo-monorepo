@@ -4,6 +4,7 @@ import chalk from 'chalk'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 import { Args } from '../../utils/command'
+import { requireNodeIsSynced } from '../../utils/helpers'
 import { LockedGoldArgs } from '../../utils/lockedgold'
 
 export default class Show extends BaseCommand {
@@ -29,6 +30,8 @@ export default class Show extends BaseCommand {
   ]
 
   async run() {
+    await requireNodeIsSynced(this.web3)
+
     // tslint:disable-next-line
     const { flags, args } = this.parse(Show)
 

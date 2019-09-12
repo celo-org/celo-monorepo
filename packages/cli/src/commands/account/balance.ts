@@ -1,6 +1,7 @@
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 import { Args } from '../../utils/command'
+import { requireNodeIsSynced } from '../../utils/helpers'
 
 export default class Balance extends BaseCommand {
   static description = 'View Celo Dollar and Gold balances given account address'
@@ -14,6 +15,7 @@ export default class Balance extends BaseCommand {
   static examples = ['balance 0x5409ed021d9299bf6814279a6a1411a7e866a631']
 
   async run() {
+    await requireNodeIsSynced(this.web3)
     const { args } = this.parse(Balance)
 
     const goldToken = await this.kit.contracts.getGoldToken()

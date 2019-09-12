@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { requireNodeIsSynced } from '../../utils/helpers'
 
 export default class DollarTransfer extends BaseCommand {
   static description = 'Transfer Celo Dollars'
@@ -19,6 +20,7 @@ export default class DollarTransfer extends BaseCommand {
   ]
 
   async run() {
+    await requireNodeIsSynced(this.web3)
     const res = this.parse(DollarTransfer)
 
     const from: string = res.flags.from
@@ -28,12 +30,12 @@ export default class DollarTransfer extends BaseCommand {
     this.kit.defaultAccount = from
     const goldToken = await this.kit.contracts.getGoldToken()
     const stableToken = await this.kit.contracts.getStableToken()
-
     // Units of all balances are in wei, unless specified.
     // Check the balance before
     const goldBalanceFromBefore = await goldToken.balanceOf(from)
     const dollarBalanceFromBefore = await stableToken.balanceOf(from)
 
+    console.log('node is synced!')
     // Perform the transfer
     await displaySendTx('dollar.Transfer', stableToken.transfer(to, amountInWei.toString()))
 

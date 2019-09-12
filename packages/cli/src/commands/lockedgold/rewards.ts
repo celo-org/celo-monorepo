@@ -2,6 +2,7 @@ import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { requireNodeIsSynced } from '../../utils/helpers'
 
 export default class Rewards extends BaseCommand {
   static description = 'Manage rewards for Locked Gold account'
@@ -29,6 +30,7 @@ export default class Rewards extends BaseCommand {
   ]
 
   async run() {
+    await requireNodeIsSynced(this.web3)
     const res = this.parse(Rewards)
 
     if (!res.flags.redeem && !res.flags.delegate) {

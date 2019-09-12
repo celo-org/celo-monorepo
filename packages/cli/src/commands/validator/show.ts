@@ -2,6 +2,7 @@ import { IArg } from '@oclif/parser/lib/args'
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 import { Args } from '../../utils/command'
+import { requireNodeIsSynced } from '../../utils/helpers'
 
 export default class ValidatorShow extends BaseCommand {
   static description = 'Show information about an existing Validator'
@@ -15,6 +16,7 @@ export default class ValidatorShow extends BaseCommand {
   static examples = ['show 0x97f7333c51897469E8D98E7af8653aAb468050a3']
 
   async run() {
+    await requireNodeIsSynced(this.web3)
     const { args } = this.parse(ValidatorShow)
     const address = args.validatorAddress
     const validators = await this.kit.contracts.getValidators()

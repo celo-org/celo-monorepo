@@ -2,6 +2,7 @@ import chalk from 'chalk'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 import { Args } from '../../utils/command'
+import { requireNodeIsSynced } from '../../utils/helpers'
 
 export default class List extends BaseCommand {
   static description = "View information about all of the account's commitments"
@@ -15,6 +16,7 @@ export default class List extends BaseCommand {
   static examples = ['list 0x5409ed021d9299bf6814279a6a1411a7e866a631']
 
   async run() {
+    await requireNodeIsSynced(this.web3)
     const { args } = this.parse(List)
     cli.action.start('Fetching commitments...')
     const lockedGold = await this.kit.contracts.getLockedGold()

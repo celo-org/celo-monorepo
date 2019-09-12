@@ -3,6 +3,7 @@ import { IArg } from '@oclif/parser/lib/args'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Args, Flags } from '../../utils/command'
+import { requireNodeIsSynced } from '../../utils/helpers'
 
 export default class ValidatorGroupRegister extends BaseCommand {
   static description = 'Register a new Validator Group'
@@ -28,6 +29,8 @@ export default class ValidatorGroupRegister extends BaseCommand {
   ]
 
   async run() {
+    await requireNodeIsSynced(this.web3)
+
     const res = this.parse(ValidatorGroupRegister)
 
     if (!(res.flags.accept || res.flags.remove)) {

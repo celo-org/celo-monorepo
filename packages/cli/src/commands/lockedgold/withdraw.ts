@@ -1,6 +1,7 @@
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { requireNodeIsSynced } from '../../utils/helpers'
 import { LockedGoldArgs } from '../../utils/lockedgold'
 
 export default class Withdraw extends BaseCommand {
@@ -16,6 +17,8 @@ export default class Withdraw extends BaseCommand {
   static examples = ['withdraw 3600']
 
   async run() {
+    await requireNodeIsSynced(this.web3)
+
     // tslint:disable-next-line
     const { flags, args } = this.parse(Withdraw)
     this.kit.defaultAccount = flags.from

@@ -2,6 +2,7 @@ import { eqAddress } from '@celo/utils/lib/address'
 import ethjsutil from 'ethereumjs-util'
 import Web3 from 'web3'
 import { Block } from 'web3/eth/types'
+import { failWith } from './cli'
 
 import assert = require('assert')
 
@@ -52,6 +53,12 @@ export async function nodeIsSynced(web3: Web3): Promise<boolean> {
     console.log('An error occurred while trying to reach the node.')
     console.log(error)
     return false
+  }
+}
+
+export async function requireNodeIsSynced(web3: Web3) {
+  if (!(await nodeIsSynced(web3))) {
+    failWith('Node is not synced. Confirm the node is synced and try again. Run node:synced')
   }
 }
 
