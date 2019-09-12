@@ -81,6 +81,18 @@ class BackupSocial extends React.Component<Props, State> {
     }
   }
 
+  splitMnemonic = () => {
+    const { language } = this.props
+    const { mnemonic } = this.state
+    try {
+      return splitMnemonic(mnemonic, language)
+    } catch (e) {
+      Logger.error('backup/splitMnemonic', e)
+      this.props.showError(ErrorMessages.FAILED_FETCH_MNEMONIC)
+      return []
+    }
+  }
+
   continueBackup = () => {
     CeloAnalytics.track(CustomEventNames.backup_continue)
     let { partNumber } = this.props
@@ -94,9 +106,8 @@ class BackupSocial extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, language, partNumber } = this.props
-    const { mnemonic } = this.state
-    const [firstHalf, secondHalf] = splitMnemonic(mnemonic, language)
+    const { t, partNumber } = this.props
+    const [firstHalf, secondHalf] = this.splitMnemonic()
 
     return (
       <View style={styles.container}>
@@ -106,17 +117,19 @@ class BackupSocial extends React.Component<Props, State> {
         >
           <View>
             <Text style={[fontStyles.h1, styles.title]}>{t('socialBackup')}</Text>
-            {partNumber === 0 && (
-              <>
-                <Text style={styles.verifyText}>{t('socialBackupYourKey')}</Text>
-                <Text style={styles.verifyText}>{t('easyToForget')}</Text>
-                <BackupPhraseContainer label={t('sendFirstHalf')} words={firstHalf} />
-              </>
-            )}
+            {partNumber === 0 &&
+              firstHalf && (
+                <>
+                  <Text style={styles.verifyText}>{t('socialBackupYourKey')}</Text>
+                  <Text style={styles.verifyText}>{t('easyToForget')}</Text>
+                  <BackupPhraseContainer label={t('sendFirstHalf')} words={firstHalf} />
+                </>
+              )}
 
-            {partNumber === 1 && (
-              <BackupPhraseContainer label={t('sendSecondHalf')} words={secondHalf} />
-            )}
+            {partNumber === 1 &&
+              secondHalf && (
+                <BackupPhraseContainer label={t('sendSecondHalf')} words={secondHalf} />
+              )}
           </View>
           <View>
             <Button
