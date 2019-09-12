@@ -3,7 +3,7 @@ import abi, { ABIDefinition } from 'web3-eth-abi'
 import { Block, Transaction } from 'web3/eth/types'
 import { EventLog, Log, TransactionReceipt } from 'web3/types'
 import { ContractKit } from '../kit'
-import { ContractDetails, obtainKitContractDetails } from './base'
+import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
 
 export interface CallDetails {
   contract: string
@@ -31,9 +31,23 @@ export async function newLogExplorer(kit: ContractKit) {
 }
 
 export class LogExplorer {
-  private addressMapping: Map<Address, ContractMapping> = new Map()
+  private readonly addressMapping: Map<Address, ContractMapping>
 
   constructor(private kit: ContractKit, readonly contractDetails: ContractDetails[]) {
+    this.addressMapping = mapFromPairs(
+      contractDetails.map((cd) => [
+        cd.address,
+        {
+          details: cd,
+          logMapping: mapFromPairs(
+            (cd.jsonInterface as ABIDefinition[])
+              .filter((ad) => ad.type === 'event')
+              .map((ad) => [ad.signature, ad])
+          ),
+        },
+      ])
+    )
+
     for (const cd of contractDetails) {
       const fnMapping: Map<string, ABIDefinition> = new Map()
       for (const abiDef of cd.jsonInterface as ABIDefinition[]) {

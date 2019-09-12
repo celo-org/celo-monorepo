@@ -2,7 +2,7 @@ import { Address } from '@celo/utils/lib/address'
 import abi, { ABIDefinition } from 'web3-eth-abi'
 import { Block, Transaction } from 'web3/eth/types'
 import { ContractKit } from '../kit'
-import { ContractDetails, obtainKitContractDetails } from './base'
+import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
 
 export interface CallDetails {
   contract: string
@@ -30,23 +30,22 @@ export async function newBlockExplorer(kit: ContractKit) {
 }
 
 export class BlockExplorer {
-  private addressMapping: Map<Address, ContractMapping> = new Map()
+  private addressMapping: Map<Address, ContractMapping>
 
   constructor(private kit: ContractKit, readonly contractDetails: ContractDetails[]) {
-    for (const cd of contractDetails) {
-      const fnMapping: Map<string, ABIDefinition> = new Map()
-
-      for (const abiDef of cd.jsonInterface as ABIDefinition[]) {
-        if (abiDef.type === 'function') {
-          fnMapping.set(abiDef.signature, abiDef)
-        }
-      }
-
-      this.addressMapping.set(cd.address, {
-        details: cd,
-        fnMapping,
-      })
-    }
+    this.addressMapping = mapFromPairs(
+      contractDetails.map((cd) => [
+        cd.address,
+        {
+          details: cd,
+          fnMapping: mapFromPairs(
+            (cd.jsonInterface as ABIDefinition[])
+              .filter((ad) => ad.type === 'function')
+              .map((ad) => [ad.signature, ad])
+          ),
+        },
+      ])
+    )
   }
 
   async fetchBlockByHash(blockHash: string): Promise<Block> {

@@ -20,3 +20,11 @@ export async function obtainKitContractDetails(kit: ContractKit) {
     }
   })
 }
+
+export function mapFromPairs<A, B>(pairs: Array<[A, B]>): Map<A, B> {
+  const map = new Map<A, B>()
+  pairs.forEach(([k, v]) => {
+    map.set(k, v)
+  })
+  return map
+}
