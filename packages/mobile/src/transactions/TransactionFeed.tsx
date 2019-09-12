@@ -92,7 +92,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
           {...tx}
         />
       )
-    } else if (tx.type && tx.type === TransactionTypes.EXCHANGED) {
+    } else if (tx.type && tx.type === TransactionTypes.EXCHANGE) {
       // @ts-ignore
       return <ExchangeFeedItem showImage={kind === FeedType.HOME} {...tx} />
     } else if (tx.type) {

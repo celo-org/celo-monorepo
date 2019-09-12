@@ -19,7 +19,11 @@ import { AddressToE164NumberType } from 'src/identity/reducer'
 import { coinsIcon, unknownUserIcon } from 'src/images/Images'
 import { Invitees } from 'src/invite/actions'
 import useLocalAmount from 'src/localCurrency/useLocalAmount'
-import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
+import {
+  getRecipientFromAddress,
+  getRecipientThumbnail,
+  NumberToRecipient,
+} from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes, TransferStandby } from 'src/transactions/reducer'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
@@ -211,8 +215,12 @@ export function TransferFeedItem(props: Props) {
       title = _.capitalize(t(_.camelCase(type)))
     }
     icon = (
-      <ContactCircle address={address} size={avatarSize}>
-        {!recipient ? <Image source={unknownUserIcon} style={styles.image} /> : null}
+      <ContactCircle
+        address={address}
+        size={avatarSize}
+        thumbnailPath={getRecipientThumbnail(recipient)}
+      >
+        {<Image source={unknownUserIcon} style={styles.image} />}
       </ContactCircle>
     )
   }
@@ -236,7 +244,7 @@ export function TransferFeedItem(props: Props) {
               {getMoneyDisplayValue(props.value)}
             </Text>
           </View>
-          {!!info && <Text style={[fontStyles.comment, styles.textInfo]}>{info}</Text>}
+          {!!info && <Text style={fontStyles.comment}>{info}</Text>}
           <View style={[styles.statusContainer, !!info && styles.statusContainerUnderComment]}>
             {isPending && (
               <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
@@ -320,7 +328,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     color: colors.celoGreen,
   },
-  textInfo: {},
   transactionStatus: {
     color: '#BDBDBD',
   },

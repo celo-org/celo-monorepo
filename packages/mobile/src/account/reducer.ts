@@ -124,7 +124,8 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
 }
 
 export const devModeSelector = (state: RootState) => state.account.devModeActive
+export const nameSelector = (state: RootState) => state.account.name
 export const e164NumberSelector = (state: RootState) => state.account.e164PhoneNumber
 export const defaultCountryCodeSelector = (state: RootState) => state.account.defaultCountryCode
-export const getUserContactDetails = (state: RootState) => state.account.contactDetails
+export const userContactDetailsSelector = (state: RootState) => state.account.contactDetails
 export const pincodeSelector = (state: RootState) => state.account.pincodeSet
