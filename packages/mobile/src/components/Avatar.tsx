@@ -12,7 +12,7 @@ import { useSelector } from 'react-redux'
 import { defaultCountryCodeSelector } from 'src/account/reducer'
 import { Namespaces } from 'src/i18n'
 import { unknownUserIcon } from 'src/images/Images'
-import { getRecipientThumbnail, Recipient, RecipientKind } from 'src/recipients/recipient'
+import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 
 const DEFAULT_ICON_SIZE = 40
 
@@ -26,45 +26,34 @@ interface OwnProps {
 
 type Props = OwnProps & WithNamespaces
 
+function getDisplayName({ name, recipient, e164Number, address, t }: Props) {
+  if (name) {
+    return name
+  }
+  if (recipient && recipient.displayName) {
+    return recipient.displayName
+  }
+  if (e164Number) {
+    return t('mobileNumber')
+  }
+  if (address) {
+    return t('walletAddress')
+  }
+  throw new Error('Invalid avatar props, cannot determine display name')
+}
+
 export function Avatar(props: Props) {
   const defaultCountryCode = useSelector(defaultCountryCodeSelector)
-  const { t, recipient, address, e164Number, iconSize = DEFAULT_ICON_SIZE } = props
-  let { name } = props
-
-  if (!recipient && !name) {
-    // TransferFeedItem does not specify what kind of recipient was used, so
-    // here we assume if the address is missing, then it is a mobile # and
-    // if the phone number is missing, then it is an address.  Since
-    // blockchain-api responds only addresses and the recipient is fetched
-    // during navigation, then it (should) be only address & contact recipients
-    if (!address) {
-      name = t('mobileNumber')
-    }
-
-    if (!e164Number) {
-      name = t('walletAddress')
-    }
-  }
-
-  if (recipient && recipient.kind === RecipientKind.Contact && recipient.thumbnailPath) {
-    return (
-      <BaseAvatar
-        {...props}
-        defaultCountryCode={defaultCountryCode}
-        name={recipient.displayName}
-        thumbnailPath={getRecipientThumbnail(recipient)}
-        e164Number={recipient.e164PhoneNumber}
-        iconSize={iconSize}
-      />
-    )
-  }
+  const { recipient, e164Number, iconSize = DEFAULT_ICON_SIZE } = props
 
   return (
     <BaseAvatar
       {...props}
       defaultCountryCode={defaultCountryCode}
-      name={recipient ? recipient.displayName : name}
+      name={getDisplayName(props)}
+      e164Number={e164Number}
       iconSize={iconSize}
+      thumbnailPath={getRecipientThumbnail(recipient)}
     >
       <Image
         source={unknownUserIcon}
