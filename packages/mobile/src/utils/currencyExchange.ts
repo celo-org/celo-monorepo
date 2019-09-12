@@ -86,3 +86,7 @@ export function getNewGoldBalance(
     ? getNewMakerBalance(goldBalance, makerAmount)
     : getNewTakerBalance(goldBalance, takerAmount)
 }
+
+export function isValidExchange() {
+  return true
+}

@@ -62,3 +62,12 @@ export const LOCAL_CURRENCY_SYMBOL = Config.LOCAL_CURRENCY_SYMBOL || null
 
 // The number of seconds before the sender can reclaim the payment.
 export const ESCROW_PAYMENT_EXPIRY_SECONDS = 172800 // 2 days
+
+// The minimum allowed value for a transaction such as a transfer or exchange
+export const TRANSACTION_MIN_AMOUNT = 0.01
+
+// Number of decimals to show when displaying gold
+export const DOLLARS_NUM_DECIMALS = 2
+
+// Number of decimals to show when displaying gold
+export const GOLD_NUM_DECIMALS = 3
