@@ -34,7 +34,7 @@ export const reducer = (
         isLoading: false,
       }
     }
-    case Actions.FETCH_CURRENT_RATE_START:
+    case Actions.FETCH_CURRENT_RATE:
       return {
         ...state,
         isLoading: true,
