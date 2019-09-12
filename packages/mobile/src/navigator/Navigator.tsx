@@ -140,7 +140,7 @@ const BackupStack = createStackNavigator(
     [Screens.BackupQuiz]: { screen: BackupQuiz },
     [Screens.BackupSocialFirst]: { screen: BackupSocialFirst },
     [Screens.BackupSocialSecond]: { screen: BackupSocialSecond },
-    [Screens.BackupComplete]: { screen: BackupComplete }, // back button should still go to social second?
+    [Screens.BackupComplete]: { screen: BackupComplete },
   },
   {
     navigationOptions: {
