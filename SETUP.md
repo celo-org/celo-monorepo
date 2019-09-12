@@ -109,7 +109,7 @@ sdkmanager 'platforms;android-28'
 
 #### Genymotion
 
-Alternatively, you can install Genymotion, a nice emulator manager:
+Alternatively, you can install Genymotion, a nice emulator manager. It doesn't work with the e2e tests but could help during development:
 
 ```bash
 brew cask install genymotion
@@ -178,6 +178,8 @@ You can find the complete instructions about how to install the tools in Linux e
 
 
 #### Genymotion
+
+Alternatively, you can install Genymotion, a nice emulator manager. It doesn't work with the e2e tests but could help during development. 
 
 You can download the Linux version of Genymotion from the [fun zone!](https://www.genymotion.com/fun-zone/) (you need to sign in first). 
 
