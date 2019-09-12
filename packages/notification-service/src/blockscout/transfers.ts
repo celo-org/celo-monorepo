@@ -22,6 +22,7 @@ export async function query(path: string) {
     return json
   } catch (error) {
     console.error('Error querying blockscout', error)
+    throw error
   }
 }
 

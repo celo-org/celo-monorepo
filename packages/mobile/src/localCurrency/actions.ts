@@ -10,6 +10,7 @@ export interface FetchCurrentRateAction {
 export interface FetchCurrentRateSuccessAction {
   type: Actions.FETCH_CURRENT_RATE_SUCCESS
   exchangeRate: number
+  now: number
 }
 
 export interface FetchCurrentRateFailureAction {
@@ -25,9 +26,13 @@ export const fetchCurrentRate = (): FetchCurrentRateAction => ({
   type: Actions.FETCH_CURRENT_RATE,
 })
 
-export const fetchCurrentRateSuccess = (exchangeRate: number): FetchCurrentRateSuccessAction => ({
+export const fetchCurrentRateSuccess = (
+  exchangeRate: number,
+  now: number
+): FetchCurrentRateSuccessAction => ({
   type: Actions.FETCH_CURRENT_RATE_SUCCESS,
   exchangeRate,
+  now,
 })
 
 export const fetchCurrentRateFailure = (): FetchCurrentRateFailureAction => ({
