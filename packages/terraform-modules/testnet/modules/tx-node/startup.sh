@@ -59,7 +59,8 @@ docker run -p 8545:8545/tcp -p 8546:8546/tcp --name geth --net=host --entrypoint
   geth init /var/geth/genesis.json && \
   geth account import --password /root/.celo/account/accountSecret /root/.celo/pkey && \
   geth \
-    --bootnodes=enode://$BOOTNODE_ENODE \
+    --bootnodesv4=enode://$BOOTNODE_ENODE \
+    --bootnodesv5=enode://$BOOTNODE_ENODE \
     --lightserv 90 \
     --lightpeers 1000 \
     --maxpeers 1100 \
@@ -81,5 +82,4 @@ docker run -p 8545:8545/tcp -p 8546:8546/tcp --name geth --net=host --entrypoint
     --consoleoutput=stdout \
     --verbosity=${geth_verbosity} \
     --ethstats=${tx_node_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
-    --nat=extip:${ip_address} \
-    --ping-ip-from-packet"
+    --nat=extip:${ip_address}"

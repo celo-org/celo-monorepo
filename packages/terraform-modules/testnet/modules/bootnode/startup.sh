@@ -28,7 +28,7 @@ systemctl restart docker
 
 # ---- Set Up and Run Geth ----
 
-BOOTNODE_VERBOSITY=1
+BOOTNODE_VERBOSITY=6
 
 GETH_BOOTNODE_DOCKER_IMAGE=${geth_bootnode_docker_image_repository}:${geth_bootnode_docker_image_tag}
 
@@ -49,5 +49,7 @@ docker run -p 30301:30301/udp --name bootnode --net=host -d $GETH_BOOTNODE_DOCKE
   echo $NODE_KEY > /etc/bootnode/node.key && \
   /usr/local/bin/bootnode \
     --nat=extip:${ip_address} \
+    --networkid=${network_id} \
     --nodekey=/etc/bootnode/node.key \
-    --verbosity=$BOOTNODE_VERBOSITY"
+    --verbosity=$BOOTNODE_VERBOSITY \
+    --v5"

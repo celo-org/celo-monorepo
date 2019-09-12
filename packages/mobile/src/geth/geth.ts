@@ -66,7 +66,7 @@ async function createNewGeth(): Promise<typeof RNGeth> {
     // // enodes:
     // //   'enode://93dfb5cc7cf1fc9d60997427cca3d4c05a1705eae8b50393841267df3ea4d4eab6528137aa2d0d40b158c33555fb7b07c74882c60fb625423ac74c535db6c57e@35.185.215.79:30301',
     bootstrapEnodeUrls: [
-      `enode://93dfb5cc7cf1fc9d60997427cca3d4c05a1705eae8b50393841267df3ea4d4eab6528137aa2d0d40b158c33555fb7b07c74882c60fb625423ac74c535db6c57e@35.197.109.221:30301`,
+      `enode://93dfb5cc7cf1fc9d60997427cca3d4c05a1705eae8b50393841267df3ea4d4eab6528137aa2d0d40b158c33555fb7b07c74882c60fb625423ac74c535db6c57e@34.83.237.207:30301`,
     ],
   }
 
@@ -82,7 +82,7 @@ async function createNewGeth(): Promise<typeof RNGeth> {
   // The logcat logging mode remains unchanged.
   gethOptions.logFileLogLevel = LogLevel.INSANE
   Logger.debug('Geth@newGeth', 'Geth logs will be piped to ' + logFilePath)
-  Logger.debug('Geth@newGeth gethOptions:', gethOptions)
+  Logger.debug('Geth@newGeth gethOptions:', JSON.stringify(gethOptions))
 
   return new RNGeth(gethOptions)
 }

@@ -89,7 +89,8 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d
   ) && ( \
     geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey ; \
     geth \
-      --bootnodes=enode://$BOOTNODE_ENODE \
+      --bootnodesv4=enode://$BOOTNODE_ENODE \
+      --bootnodesv5=enode://$BOOTNODE_ENODE \
       --password=$DATA_DIR/account/accountSecret \
       --unlock=$ACCOUNT_ADDRESS \
       --mine \
@@ -114,5 +115,4 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d
       --istanbul.blockperiod=${block_time} \
       --maxpeers=${max_peers} \
       --nat=extip:${ip_address} \
-      --ping-ip-from-packet \
   )"

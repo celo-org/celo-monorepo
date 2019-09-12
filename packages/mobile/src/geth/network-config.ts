@@ -27,8 +27,8 @@ export default {
     peerDiscovery: false,
     syncMode: SYNC_MODE_ULTRALIGHT,
   },
-  trevor2: {
-    nodeDir: `.trevor2`,
+  trevor1: {
+    nodeDir: `.trevor1`,
     peerDiscovery: true,
     syncMode: SYNC_MODE_ULTRALIGHT,
   },
