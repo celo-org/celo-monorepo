@@ -1,3 +1,4 @@
+import debugFactory from 'debug'
 import { CeloContract } from './base'
 import { newAttestations } from './generated/Attestations'
 import { newEscrow } from './generated/Escrow'
@@ -14,6 +15,8 @@ import { newSortedOracles } from './generated/SortedOracles'
 import { newStableToken } from './generated/StableToken'
 import { newValidators } from './generated/Validators'
 import { ContractKit } from './kit'
+
+const debug = debugFactory('kit:web3-contract-cache')
 
 const ContractFactories = {
   [CeloContract.Attestations]: newAttestations,
@@ -83,8 +86,9 @@ export class Web3ContractCache {
     return this.getContract(CeloContract.Validators)
   }
 
-  async getContract<C extends CeloContract>(contract: C) {
+  async getContract<C extends keyof typeof ContractFactories>(contract: C) {
     if (this.cacheMap[contract] == null) {
+      debug('Initiating contract %s', contract)
       const createFn = ContractFactories[contract] as CFType[C]
       this.cacheMap[contract] = createFn(
         this.kit.web3,
