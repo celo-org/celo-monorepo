@@ -8,18 +8,19 @@
             * [Homebrew](#homebrew)
             * [Install Node, Yarn and friends](#install-node-yarn-and-friends)
             * [Java](#java)
+            * [Install Android Dev Tools](#install-android-dev-tools)
+            * [Genymotion](#genymotion)
          * [Linux](#linux)
             * [Install Node, Yarn and friends](#install-node-yarn-and-friends-1)
             * [Installing OpenJDK 8](#installing-openjdk-8)
+            * [Install Android Dev Tools](#install-android-dev-tools-1)
+            * [Genymotion](#genymotion-1)
          * [Some common stuff](#some-common-stuff)
             * [Optional: Install Rust](#optional-install-rust)
-            * [Install Android Dev Tools](#install-android-dev-tools)
-            * [(<em>Optional</em>) Install an Android Emulator](#optional-install-an-android-emulator)
-            * [Genymotion](#genymotion)
+            * [Optional: Install an Android Emulator](#optional-install-an-android-emulator)
          * [Building celo-monorepo](#building-celo-monorepo)
       * [Using an Android test device locally](#using-an-android-test-device-locally)
          * [Deploying the user app](#deploying-the-user-app)
-
 
 This is a living document! Please edit and update it as part of your onboarding process :-)
 
@@ -82,6 +83,48 @@ eval "$(jenv init -)"
 jenv add /Library/Java/JavaVirtualMachines/<java8 version here>/Contents/Home
 ```
 
+#### Install Android Dev Tools
+
+Install the Android SDK and platform tools:
+
+```bash
+brew cask install android-sdk
+brew cask install android-platform-tools
+```
+
+Next install [Android Studio][android studio] and add the [Android NDK][android ndk]
+
+Execute the following (and make sure the lines are in your `~/.bash_profile`):
+
+```bash
+export ANDROID_HOME=/usr/local/share/android-sdk
+export ANDROID_NDK=/usr/local/share/android-ndk
+```
+
+Then install the Android 28 platform:
+
+```bash
+sdkmanager 'platforms;android-28'
+```
+
+#### Genymotion
+
+Alternatively, you can install Genymotion, a nice emulator manager:
+
+```bash
+brew cask install genymotion
+```
+
+Under OSX High Sierra and later, you'll get a message that you need to
+[approve it in System Preferences > Security & Privacy > General][approve kernel extension].
+
+Do that, and then repeat the line above.
+
+Then make sure the ADB path is set correctly in Genymotion — set
+`Preferences > ADB > Use custom Android SDK tools` to
+`/usr/local/share/android-sdk` (same as `$ANDROID_HOME`)
+
+
 ### Linux
 
 #### Install Node, Yarn and friends
@@ -115,8 +158,37 @@ sudo apt-get update && sudo apt-get install yarn
 sudo apt install openjdk-8-jdk
 ```
 
-### Some common stuff
+#### Install Android Dev Tools
 
+You can download the complete Android Studio and SDK from the [Android Developer download site](https://developer.android.com/studio/#downloads).
+
+The steps are:
+
+1. Unpack the .zip file you downloaded to an appropriate location for your applications, such as within `/usr/local/` for your user profile, or `/opt/` for shared users.
+   
+   If you're using a 64-bit version of Linux, make sure you first install the [required libraries for 64-bit machines](https://developer.android.com/studio/install#64bit-libs).
+
+1. To launch Android Studio, open a terminal, navigate to the `android-studio/bin/` directory, and execute `studio.sh`.
+
+1. Select whether you want to import previous Android Studio settings or not, then click OK.
+
+1. The Android Studio Setup Wizard guides you through the rest of the setup, which includes downloading Android SDK components that are required for development.
+
+You can find the complete instructions about how to install the tools in Linux environments in the [Documentation page](https://developer.android.com/studio/install#linux).
+
+
+#### Genymotion
+
+You can download the Linux version of Genymotion from the [fun zone!](https://www.genymotion.com/fun-zone/) (you need to sign in first). 
+
+After having the binary you only need to run the installer:
+
+```
+sudo ./genymotion-3.0.2-linux_x64.bin
+```
+
+
+### Some common stuff
 
 #### Optional: Install Rust
 
@@ -149,31 +221,8 @@ export ANDROID_NDK=ndk_bundle/android-ndk-r19c
 and running `make ndk_bundle`. This will download the NDK for your platform.
 
 
-#### Install Android Dev Tools
 
-Install the Android SDK and platform tools:
-
-```bash
-brew cask install android-sdk
-brew cask install android-platform-tools
-```
-
-Next install [Android Studio][android studio] and add the [Android NDK][android ndk]
-
-Execute the following (and make sure the lines are in your `~/.bash_profile`):
-
-```bash
-export ANDROID_HOME=/usr/local/share/android-sdk
-export ANDROID_NDK=/usr/local/share/android-ndk
-```
-
-Then install the Android 28 platform:
-
-```bash
-sdkmanager 'platforms;android-28'
-```
-
-#### (_Optional_) Install an Android Emulator
+#### Optional: Install an Android Emulator
 
 Install the Android 28 system image and create an Android Virtual Device:
 
@@ -193,23 +242,6 @@ Run the emulator with:
 ```bash
 emulator -avd Nexus_5X_API_28
 ```
-
-#### Genymotion
-
-Alternatively, you can install Genymotion, a nice emulator manager:
-
-```bash
-brew cask install genymotion
-```
-
-Under OSX High Sierra and later, you'll get a message that you need to
-[approve it in System Preferences > Security & Privacy > General][approve kernel extension].
-
-Do that, and then repeat the line above.
-
-Then make sure the ADB path is set correctly in Genymotion — set
-`Preferences > ADB > Use custom Android SDK tools` to
-`/usr/local/share/android-sdk` (same as `$ANDROID_HOME`)
 
 ### Building celo-monorepo
 
