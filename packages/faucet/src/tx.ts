@@ -75,7 +75,7 @@ export class TransactionResult {
         this.receiptFuture.resolve(receipt)
       })
       .on('error', ((error: any, receipt: TransactionReceipt | false) => {
-        console.info('got a future error', error, receipt)
+        console.info('@TransactionResult error: %O %O', error, receipt)
         if (!receipt) {
           console.info('@TransactionResult no receipt')
           this.hashFuture.reject(error)

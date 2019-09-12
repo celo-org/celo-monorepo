@@ -2,7 +2,7 @@ import Web3 from 'web3'
 import { CeloAdapter } from '../src/celo-adapter'
 import { getAddress } from '../src/tx'
 
-// Obtained from `yarn cli config:get --alfajores
+// Obtained from `yarn cli config:get --net alfajores`
 const Config = {
   stable_token_address: '0xd4b4fcaCAc9e23225680e89308E0a4C41Dd9C6B4',
   node_url: 'http://35.185.236.10:8545',
