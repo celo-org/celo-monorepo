@@ -16,7 +16,11 @@
     "warning": "Warning ",
     "restoreInPrivate": "Restore your Wallet in private "
   },
-  "backupKeyPrompt": "Backup Key",
+  "backupKeyPlaceholder": "Backup Key",
+  "backupKeyPlaceholderHalves": {
+    "0": "First Recovery Secret",
+    "1": "Second Recovery Secret"
+  },
   "tip": "Tip ",
   "backupKeyTip":
     "Backup Keys are 24 words long, separated by a space.  If you have a Backup Key created outside the Celo Wallet, you may enter also enter it here.",
@@ -31,5 +35,5 @@
   },
   "continue": "Continue",
   "cancel": "Cancel",
-  "restoreWallet": "Restore Celo Wallet"
+  "restoreWallet": "Restore"
 }

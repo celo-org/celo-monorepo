@@ -234,7 +234,7 @@ export class ImportWallet extends React.Component<Props, State> {
                 value={backupPhrase}
                 style={componentStyles.input}
                 underlineColorAndroid="transparent"
-                placeholder={t('backupKeyPrompt')}
+                placeholder={t('backupKeyPlaceholder')}
                 placeholderTextColor={colors.inactive}
                 enablesReturnKeyAutomatically={true}
                 multiline={true}
@@ -258,7 +258,7 @@ export class ImportWallet extends React.Component<Props, State> {
                   value={socialBackupPhrase0}
                   style={componentStyles.input}
                   underlineColorAndroid="transparent"
-                  placeholder={t('backupKeyPromptHalfFirst')}
+                  placeholder={t('backupKeyPlaceholderHalves.0')}
                   placeholderTextColor={colors.inactive}
                   enablesReturnKeyAutomatically={true}
                   multiline={true}
@@ -280,7 +280,7 @@ export class ImportWallet extends React.Component<Props, State> {
                   value={socialBackupPhrase1}
                   style={componentStyles.input}
                   underlineColorAndroid="transparent"
-                  placeholder={t('backupKeyPromptHalfSecond')}
+                  placeholder={t('backupKeyPlaceholderHalves.1')}
                   placeholderTextColor={colors.inactive}
                   enablesReturnKeyAutomatically={true}
                   multiline={true}
@@ -291,7 +291,7 @@ export class ImportWallet extends React.Component<Props, State> {
               </View>
             </>
           )}
-          <Text style={[fontStyles.bodySmall, styles.body]}>
+          <Text style={[fontStyles.bodySmall, styles.body, styles.tip]}>
             <Text style={[fontStyles.bold]}>{t('tip')}</Text>
             {t(!isSocial ? 'backupKeyTip' : 'socialBackupKeyTip')}
           </Text>
@@ -347,6 +347,9 @@ const styles = StyleSheet.create({
   body: {
     paddingBottom: 15,
   },
+  tip: {
+    marginTop: 12,
+  },
   warning: {
     color: colors.errorRed,
   },
@@ -360,7 +363,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   socialBackupInput: {
-    height: 62,
+    height: 100,
   },
   loadingSpinnerContainer: {
     marginVertical: 30,
