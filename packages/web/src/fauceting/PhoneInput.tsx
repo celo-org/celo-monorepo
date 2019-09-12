@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native'
 import { TextInput } from 'src/forms/FormComponents'
+import { ScreenProps, withScreenSize } from 'src/layout/ScreenSize'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 interface Props {
@@ -24,7 +25,7 @@ interface State {
 
 const COUNTRIES = new Countries('en-us')
 
-class PhoneInput extends React.PureComponent<Props, State> {
+class PhoneInput extends React.PureComponent<Props & ScreenProps, State> {
   state: State = {
     countryQuery: '',
     countryCallingCode: '',
@@ -63,10 +64,12 @@ class PhoneInput extends React.PureComponent<Props, State> {
     this.onChangeCountryQuery(value)
   }
 
+  onCounryInputKeyPress = (event) => {}
+
   // TODO set the caling code if counry name is just typed
   //  TODO figure out what on Suggestion Selected is for and if we need it
 
-  onInputChange = (_, { newValue }) => {
+  onInputChange = (_, { newValue, method }) => {
     this.onChangeCountryQuery(newValue)
     setImmediate(() => {
       const country = COUNTRIES.getCountry(newValue)
@@ -84,26 +87,30 @@ class PhoneInput extends React.PureComponent<Props, State> {
     })
   }
 
-  renderSuggestionsContainer = ({ containerProps, children, query }) => {
-    console.log(query)
+  renderSuggestionsContainer = ({ containerProps, children }) => {
     const { className, ...otherProps } = containerProps
+    const isOpen = this.filteredCountries().length > 0
+
     return (
-      <View {...otherProps} style={[styles.suggestions]}>
+      <View {...otherProps} style={[styles.suggestions, isOpen && styles.suggestionsOpen]}>
         {children}
       </View>
     )
   }
 
-  renderTextInput = (props: any) => (
-    <TextInput
-      style={[standardStyles.input, standardStyles.inputDarkMode]}
-      focusStyle={standardStyles.inputDarkFocused}
-      {...props}
-      value={this.state.countryQuery}
-    />
-  )
+  renderTextInput = (props: any) => {
+    return (
+      <TextInput
+        style={[standardStyles.input, standardStyles.inputDarkMode]}
+        focusStyle={standardStyles.inputDarkFocused}
+        {...props}
+        value={this.state.countryQuery}
+        onKeyPress={this.onCounryInputKeyPress}
+      />
+    )
+  }
 
-  renderItem = (countryCode: string) => {
+  renderItem = (countryCode: string, { isHighlighted }) => {
     // @ts-ignore
     const { displayName, emoji, countryCallingCodes } = COUNTRIES.getCountryByCode(countryCode)
 
@@ -114,8 +121,10 @@ class PhoneInput extends React.PureComponent<Props, State> {
 
     return (
       <TouchableOpacity onPress={onPress}>
-        <View style={standardStyles.row}>
-          <Text>{emoji}</Text>
+        <View
+          style={[standardStyles.row, isHighlighted && { borderBottomColor: colors.primaryHover }]}
+        >
+          <Text>{emoji || `🏳`}</Text>
           <Text style={[fonts.p, textStyles.invert]}>{displayName}</Text>
         </View>
       </TouchableOpacity>
@@ -133,7 +142,7 @@ class PhoneInput extends React.PureComponent<Props, State> {
       <>
         <style>{`
           .react-autosuggest__suggestions-list {
-            margin-left: 0;
+            margin: 0;
             padding-left: 0;
           }
 
@@ -146,19 +155,28 @@ class PhoneInput extends React.PureComponent<Props, State> {
             border-width: 1
           }
         `}</style>
-        <Autosuggest
-          alwaysRenderSuggestions={true}
-          suggestions={this.filteredCountries()}
-          getSuggestionValue={getSuggestionValue}
-          onSuggestionsFetchRequested={this.updateSuggestions}
-          renderSuggestion={this.renderItem}
-          renderInputComponent={this.renderTextInput}
-          renderSuggestionsContainer={this.renderSuggestionsContainer}
-          inputProps={inputProps}
-          highlightFirstSuggestion={true}
-        />
+        <View style={styles.container}>
+          <Autosuggest
+            alwaysRenderSuggestions={true}
+            suggestions={this.filteredCountries()}
+            getSuggestionValue={getSuggestionValue}
+            onSuggestionsFetchRequested={this.updateSuggestions}
+            renderSuggestion={this.renderItem}
+            renderInputComponent={this.renderTextInput}
+            renderSuggestionsContainer={this.renderSuggestionsContainer}
+            inputProps={inputProps}
+            highlightFirstSuggestion={true}
+          />
+        </View>
         <View style={[standardStyles.row, styles.fakeInputBorder]}>
-          <Text style={[fonts.legal, textStyles.invert, textStyles.center, styles.countryCode]}>
+          <Text
+            style={[
+              fonts.legal,
+              this.state.countryCallingCode.length > 0 ? textStyles.invert : styles.ccplaceholder,
+              textStyles.center,
+              styles.countryCode,
+            ]}
+          >
             {this.state.countryCallingCode || '+00'}
           </Text>
           <View style={styles.line} />
@@ -210,11 +228,24 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   suggestions: {
+    width: '100%',
     backgroundColor: colors.dark,
     position: 'absolute',
     zIndex: 1000,
     borderRadius: 2,
   },
+  suggestionsOpen: {
+    marginBottom: 5,
+    borderColor: colors.light,
+    borderWidth: 1,
+    padding: 15,
+  },
+  ccplaceholder: {
+    color: colors.placeholderDarkMode,
+  },
+  container: {
+    zIndex: 3,
+  },
 })
 
-export default PhoneInput
+export default withScreenSize<Props>(PhoneInput)
