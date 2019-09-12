@@ -58,3 +58,8 @@ initializeFirebaseDb()
  */
 console.info('Starting Blockscout polling')
 notificationPolling.run()
+
+/**
+ * Start polling the Exchange contract
+ */
+console.info('Starting Exchange contract polling')
