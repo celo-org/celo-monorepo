@@ -105,7 +105,7 @@ class BackupPhrase extends React.Component<Props, State> {
                 <Text style={styles.verifyText}>{t('heresYourKey')}</Text>
               </>
             )}
-            <BackupPhraseContainer words={mnemonic} />
+            <BackupPhraseContainer words={mnemonic} showCopy={true} />
             <Text style={styles.verifyText}>
               <Text style={[styles.verifyText, fontStyles.bold]}>{t('tip')}</Text>
               {t('backupKeyImportance.2')}

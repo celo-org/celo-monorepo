@@ -37,7 +37,7 @@
   "sendWhatsApp": "Send with WhatsApp",
   "continue": "Continue",
   "backupWithFriends": "Backup with Friends",
-  "securityTips": "Tips",
+  "tip": "Tip ",
   "backupKeySummary": {
     "0": "Write this phrase down on a piece of paper and keep it somewhere safe.",
     "1": "Don’t show your phrase to anyone else. They can access your wallet if they see it."
@@ -71,6 +71,7 @@
     "Important: please keep this private. \n\nI'm sending you the Backup Phrase to my Celo Wallet: ",
   "backupPrompt":
     "For the security of your funds, your account is frozen until you get your Backup Key",
-  "copyToClipboard": "Copy To Clipboard",
-  "copiedToClipboard": "Copied To Clipboard"
+  "copy": "Copy",
+  "copied": "Copied to clipboard",
+  "failedCopy": "Failed to copy to clipboard"
 }

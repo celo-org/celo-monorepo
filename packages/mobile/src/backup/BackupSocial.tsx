@@ -122,13 +122,23 @@ class BackupSocial extends React.Component<Props, State> {
                 <>
                   <Text style={styles.verifyText}>{t('socialBackupYourKey')}</Text>
                   <Text style={styles.verifyText}>{t('easyToForget')}</Text>
-                  <BackupPhraseContainer label={t('sendFirstHalf')} words={firstHalf} />
+                  <BackupPhraseContainer
+                    label={t('sendFirstHalf')}
+                    words={firstHalf}
+                    showCopy={true}
+                    showWhatsApp={true}
+                  />
                 </>
               )}
 
             {partNumber === 1 &&
               secondHalf && (
-                <BackupPhraseContainer label={t('sendSecondHalf')} words={secondHalf} />
+                <BackupPhraseContainer
+                  label={t('sendSecondHalf')}
+                  words={secondHalf}
+                  showCopy={true}
+                  showWhatsApp={true}
+                />
               )}
           </View>
           <View>
