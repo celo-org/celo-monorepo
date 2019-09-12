@@ -1,14 +1,9 @@
-import {
-  CeloEnvArgv,
-  genericEnvFilePath,
-  isValidCeloEnv,
-  monorepoRoot,
-} from '@celo/celotool/src/lib/env-utils'
 import { parse } from 'dotenv'
 import { readFileSync, writeFileSync } from 'fs'
 import { map, merge, reduce } from 'lodash'
 import path from 'path'
 import * as yargs from 'yargs'
+import { CeloEnvArgv, genericEnvFilePath, isValidCeloEnv, monorepoRoot } from '../lib/env-utils'
 export const command = 'fork-env <newEnvName>'
 
 export const describe = 'command for forking an environment off the default .env file'

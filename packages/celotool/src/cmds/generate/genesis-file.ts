@@ -1,6 +1,6 @@
-import { addCeloEnvMiddleware, CeloEnvArgv } from '@celo/celotool/src/lib/env-utils'
 import { generateGenesisFromEnv } from 'src/lib/generate_utils'
 import * as yargs from 'yargs'
+import { addCeloEnvMiddleware, CeloEnvArgv } from '../../lib/env-utils'
 
 export const command = 'genesis-file'
 

@@ -1,10 +1,10 @@
 /* tslint:disable no-console */
-import { AccountArgv } from '@celo/celotool/src/cmds/account'
-import { downloadArtifacts } from '@celo/celotool/src/lib/artifacts'
-import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
-import { execCmd } from '@celo/celotool/src/lib/utils'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { Argv } from 'yargs'
+import { downloadArtifacts } from '../../lib/artifacts'
+import { portForwardAnd } from '../../lib/port_forward'
+import { execCmd } from '../../lib/utils'
+import { AccountArgv } from '../account'
 
 export const command = 'invite'
 

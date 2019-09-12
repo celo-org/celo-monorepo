@@ -6,6 +6,8 @@
   "author": "Celo",
   "license": "Apache-2.0",
   "dependencies": {
+    "@celo/verification-pool-api": "^1.0.0",
+    "@celo/utils": "^0.0.6-beta5",
     "@celo/walletkit": "^0.0.14",
     "@google-cloud/monitoring": "0.7.1",
     "@google-cloud/pubsub": "^0.28.1",
@@ -40,7 +42,7 @@
   "scripts": {
     "cli": "TS_NODE_FILES=true ts-node -r tsconfig-paths/register src/cli.ts",
     "lint": "tslint -c tslint.json --project tsconfig.json",
-    "build": "tsc -p tsconfig.json "
+    "build": "tsc -b ."
   },
   "private": true
 }

@@ -1,6 +1,6 @@
-import { GethArgv } from '@celo/celotool/src/cmds/geth'
-import { execCmdWithExitOnFailure } from '@celo/celotool/src/lib/utils'
 import * as yargs from 'yargs'
+import { execCmdWithExitOnFailure } from '../../lib/utils'
+import { GethArgv } from '../geth'
 
 export const command = 'build'
 

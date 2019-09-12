@@ -1,11 +1,7 @@
-import { GethArgv } from '@celo/celotool/src/cmds/geth'
-import { addCeloEnvMiddleware } from '@celo/celotool/src/lib/env-utils'
-import {
-  addCeloGethMiddleware,
-  ensure0x,
-  execCmdWithExitOnFailure,
-} from '@celo/celotool/src/lib/utils'
 import * as yargs from 'yargs'
+import { addCeloEnvMiddleware } from '../../lib/env-utils'
+import { addCeloGethMiddleware, ensure0x, execCmdWithExitOnFailure } from '../../lib/utils'
+import { GethArgv } from '../geth'
 
 export const command = 'get gold balance'
 

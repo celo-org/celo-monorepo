@@ -1,5 +1,3 @@
-import { AccountArgv } from '@celo/celotool/src/cmds/account'
-import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
 import { PhoneNumberUtils } from '@celo/utils'
 import {
   ActionableAttestation,
@@ -24,6 +22,8 @@ import prompts from 'prompts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { sendTransaction } from 'src/lib/transactions'
 import * as yargs from 'yargs'
+import { portForwardAnd } from '../../lib/port_forward'
+import { AccountArgv } from '../account'
 
 const Web3 = require('web3')
 

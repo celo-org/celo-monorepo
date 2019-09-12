@@ -1,9 +1,9 @@
-import { AccountArgv } from '@celo/celotool/src/cmds/account'
-import { downloadArtifacts } from '@celo/celotool/src/lib/artifacts'
-import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
-import { execCmd } from '@celo/celotool/src/lib/utils'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import * as yargs from 'yargs'
+import { downloadArtifacts } from '../../lib/artifacts'
+import { portForwardAnd } from '../../lib/port_forward'
+import { execCmd } from '../../lib/utils'
+import { AccountArgv } from '../account'
 export const command = 'revoke'
 
 export const describe = 'command for revoking verification of a phone number'

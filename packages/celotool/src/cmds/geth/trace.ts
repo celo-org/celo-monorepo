@@ -1,8 +1,8 @@
-import { GethArgv } from '@celo/celotool/src/cmds/geth'
-import { addCeloEnvMiddleware, CeloEnvArgv } from '@celo/celotool/src/lib/env-utils'
 import { getBlockscoutUrl } from 'src/lib/endpoints'
 import { checkGethStarted, getWeb3AndTokensContracts, traceTransactions } from 'src/lib/geth'
 import * as yargs from 'yargs'
+import { addCeloEnvMiddleware, CeloEnvArgv } from '../../lib/env-utils'
+import { GethArgv } from '../geth'
 
 export const command = 'trace <address1> <address2>'
 

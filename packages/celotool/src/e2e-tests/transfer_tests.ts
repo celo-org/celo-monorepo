@@ -1,17 +1,10 @@
-import {
-  erc20Abi,
-  getContractAddress,
-  getEnode,
-  getHooks,
-  initAndStartGeth,
-  sleep,
-} from '@celo/celotool/geth_tests/src/lib/utils'
-import { CURRENCY_ENUM } from '@celo/utils'
 import { toFixed } from '@celo/protocol/lib/fixidity'
+import { CURRENCY_ENUM } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
 import { Tx } from 'web3/eth/types'
+import { erc20Abi, getContractAddress, getEnode, getHooks, initAndStartGeth, sleep } from './utils'
 
 const stableTokenAbi = erc20Abi.concat([
   {

@@ -1,3 +1,7 @@
+import { assert } from 'chai'
+import { spawn, SpawnOptions } from 'child_process'
+import fs from 'fs'
+import { join as joinPath, resolve as resolvePath } from 'path'
 import {
   AccountType,
   ConsensusType,
@@ -6,13 +10,9 @@ import {
   getValidators,
   privateKeyToPublicKey,
   Validator,
-} from '@celo/celotool/src/lib/generate_utils'
-import { getEnodeAddress } from '@celo/celotool/src/lib/geth'
-import { ensure0x } from '@celo/celotool/src/lib/utils'
-import { assert } from 'chai'
-import { spawn, SpawnOptions } from 'child_process'
-import fs from 'fs'
-import { join as joinPath, resolve as resolvePath } from 'path'
+} from 'src/lib/generate_utils'
+import { getEnodeAddress } from 'src/lib/geth'
+import { ensure0x } from 'src/lib/utils'
 import { Admin } from 'web3-eth-admin'
 
 export interface GethInstanceConfig {
@@ -244,7 +244,7 @@ export function sleep(seconds: number) {
 }
 
 export async function getEnode(port: number, ws: boolean = false) {
-  let p = ws ? 'ws' : 'http'
+  const p = ws ? 'ws' : 'http'
   const admin = new Admin(`${p}://localhost:${port}`)
   return (await admin.getNodeInfo()).enode
 }

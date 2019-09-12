@@ -1,6 +1,6 @@
-import { execCmd, execCmdWithExitOnFailure } from '@celo/celotool/src/lib/utils'
 import { zip } from 'lodash'
 import * as yargs from 'yargs'
+import { execCmd, execCmdWithExitOnFailure } from '../../lib/utils'
 
 export const command = 'remove-leaked-forwarding-rules'
 
