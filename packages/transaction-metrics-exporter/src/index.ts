@@ -14,7 +14,10 @@ if (host === undefined) {
   throw new Error("so tsc doesn't complains")
 }
 
-metricExporterWithRestart(host)
+metricExporterWithRestart(host).catch((err) => {
+  console.error('Unknown Error: %O', err)
+  process.exit(1)
+})
 
 const app = express()
 const port = 3000
