@@ -42,7 +42,7 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps, State> {
 
   setNumber = (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
     // remove non phone number characters
-    const phone = event.nativeEvent.text.replace(/[^\d\(\)-\s.]/g, '')
+    const phone = event.nativeEvent.text.replace(/[^\d\(\)-\s.+]/g, '')
 
     const phoneInfo =
       phone.length && PhoneNumberUtils.parsePhoneNumber(phone, this.state.countryCallingCode)
