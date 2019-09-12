@@ -64,11 +64,11 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
         defaultCountryCode: action.countryCode,
       }
     case Actions.DEV_MODE_TRIGGER_CLICKED:
-      const newClickCount = (state.devModeClickCount + 1) % 10
+      const newClickCount = (state.devModeClickCount + 1) % 6
       return {
         ...state,
         devModeClickCount: newClickCount,
-        devModeActive: newClickCount >= 5,
+        devModeActive: newClickCount >= 3,
       }
     case Actions.PHOTOSNUX_CLICKED:
       return {

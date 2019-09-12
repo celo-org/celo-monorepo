@@ -75,7 +75,7 @@ export default class ContactCircle extends React.PureComponent<Props> {
             { backgroundColor: iconColor, height: size, width: size, borderRadius: size / 2 },
           ]}
         >
-          {children ? children : this.getContactCircleInner()}
+          {children || this.getContactCircleInner()}
         </View>
       </View>
     )
