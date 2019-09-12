@@ -5,7 +5,15 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { ActivityIndicator, Keyboard, StyleSheet, Text, TextInput, View } from 'react-native'
+import {
+  ActivityIndicator,
+  Keyboard,
+  Linking,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native'
 import { validateMnemonic } from 'react-native-bip39'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { AndroidBackHandler } from 'react-navigation-backhandler'
@@ -174,6 +182,10 @@ export class ImportWallet extends React.Component<Props, State> {
     }
   }
 
+  openFaq = () => {
+    Linking.openURL('https://celo.org/faq')
+  }
+
   render() {
     const {
       backupPhrase,
@@ -306,7 +318,7 @@ export class ImportWallet extends React.Component<Props, State> {
           ) : (
             <>
               <Text style={fontStyles.bodySmall}>{t('noPhrases.0')} </Text>
-              <Link onPress={this.useSocial}>{t('noPhrases.1')}</Link>
+              <Link onPress={this.openFaq}>{t('noPhrases.1')}</Link>
             </>
           )}
         </View>
