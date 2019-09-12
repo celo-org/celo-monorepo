@@ -1,0 +1,100 @@
+{
+  "selectCountry": "Seleccionar país",
+  "chooseLanguage": "Elegir idioma",
+  "continue": "Continuar",
+  "secureAsset":
+    "Celo mantiene tu patrimonio seguro y le permite enviar capital a quien quiera y recibirlos de cualquier persona",
+  "stableAsset":
+    "Los {{CeloDollars}} constituyen un activo digital estable que está alineado con el valor del dólar estadounidense",
+  "verifyNumber":
+    "Verifique tu número de teléfono para conectarse con otros usuarios y recibir dinero",
+  "syncNetwork": "Sincronizando con la red",
+  "welcomeCelo": "Te damos la bienvenida a Celo",
+  "chooseCountryCode": "Código de país",
+  "chooseCountry": "País",
+  "joinText": {
+    "0": "El Monedero Celo te ayuda a enviar, recibir y guardar valor en la red de Celo.",
+    "1":
+      "Al unirte a esta red, nos das permiso para recopilar información anónima sobre cómo utilizas la aplicación. Además, si verificas tu número de teléfono, se almacenará una copia ofuscada en la Red de Celo. Más información en ",
+    "2": "celo.org/terms"
+  },
+  "phoneNumber": "000 000 0000",
+  "inviteCodeText": {
+    "title": "Ingresa el código de invitación",
+    "copyInvite": {
+      "0": "Copia el código de invitación ",
+      "1": "desde la aplicación de mensajes y vuelve."
+    },
+    "openMessages": {
+      "message": "Abrir mensajes",
+      "hint": {
+        "0": "Pista: ",
+        "1": "Copia el mensaje SMS completo"
+      }
+    },
+    "pasteInviteCode": {
+      "message": "Pegar código de invitación!",
+      "hint": "Parece que has copiado un código"
+    },
+    "validating": {
+      "0": "Genial! ",
+      "1": "Validando el código de invitación copiado"
+    },
+    "inviteAccepted": "🎉 Invitación aceptada!",
+    "askForInvite": {
+      "0": "Solicite una invitación de alguien con Celo Monedero o regístrese en Testnet en ",
+      "1": "celo.org/build/wallet"
+    }
+  },
+  "enterFullName": "Ingresa tu nombre y apellido",
+  "fullName": "Nombre completo",
+  "InvitationCode": "Código de invitación",
+  "optIn": "Inscribirse",
+  "submitting": "Enviando ...",
+  "importIt": "Importa tu monedero existente",
+  "cancel": "Cancelar",
+  "important": "Importante",
+  "createPin": {
+    "title": "Crear un código PIN de 6 dígitos",
+    "intro": "Cree un PIN para proteger tu Monedero Celo.",
+    "why": "En ciertos casos, necesitará este PIN para enviar {{CeloDollars}} a sus amigos.",
+    "warn":
+      "escribe tu código PIN de 6 dígitos en un papel y guárdelo en algún sitio seguro. Se lo solicitaremos más tarde para acceder a tu monedero.",
+    "yourPin": "Su PIN"
+  },
+  "enableSecurity": "Habilitar seguridad",
+  "verifyPin": {
+    "title": "Repetir el código PIN de 6 dígitos",
+    "finalPin": "Crear PIN"
+  },
+  "confirmPin": {
+    "title": "Ingrese el código PIN de 6 dígitos",
+    "submit": "Enviar"
+  },
+  "systemAuth": {
+    "title": "Asegura tu celular",
+    "secure":
+      "Agregar un PIN a tu teléfono ayuda a que tus fondos en Celo se mantengan seguros y protegidos.",
+    "intro":
+      "Necesitaremos que ingreses el código de bloqueo de pantalla de tu dispositivo o tu huella, si el mismo lo soporta.",
+    "why":
+      "Necesitamos este nivel de protección adicional para asegurar que el contenido de tu monedero se encuentra a salvo.",
+    "summary":
+      "Celo requiere que los teléfonos estén protegidos con un PIN o huella digital. Bloquear de tu dispositivo ayuda a garantizar que los fondos en tu billetera estén protegidos."
+  },
+  "goToSystemSecuritySettingsActionLabel": "Vaya a seguridad",
+  "enableSystemScreenLockFailedMessage": "Error al intentar habilitar el bloqueo de pantalla",
+  "initKeystoreFailureMessage": "Error al recuperar la clave",
+  "pinLostForeverMessage": "Eliminaste el bloqueo de pantalla, el PIN se perdió",
+  "enableScreenLockMessage":
+    "Por favor habilitá el bloqueo de pantalla para usar Celo. Si deshabilitás el bloqueo de pantalla en el futuro, vas a necesitar tu clave de respaldo para acceder a tu cuenta",
+  "importContactsPermission": {
+    "title": "Importar contactos",
+    "0":
+      "Conectar tu lista de contactos facilita el envío y la solicitud de pagos con tus amigos. De lo contrario, deberás ingresar tu información individualmente.",
+    "1": "No se preocupe: la conexión no envía invitaciones a sus contactos.",
+    "enable": "Habilitar acceso a contactos",
+    "loading": "Encontrar amigos en Celo..."
+  },
+  "skip": "Saltar"
+}

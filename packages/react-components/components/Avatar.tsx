@@ -1,60 +1,67 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
 import PhoneNumberWithFlag from '@celo/react-components/components/PhoneNumberWithFlag'
 import { fontStyles } from '@celo/react-components/styles/fonts'
-import { getContactPhoneNumber } from '@celo/utils/src/contacts'
-import { getE164Number } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { MinimalContact } from 'react-native-contacts'
 
-interface Props {
+export interface Props {
   contact?: MinimalContact
   name?: string
   address?: string
   e164Number?: string
+  thumbnailPath?: string
   defaultCountryCode: string
   iconSize: number
 }
 
 export class Avatar extends React.PureComponent<Props> {
   render() {
-    const { contact, address, defaultCountryCode, iconSize, name } = this.props
-    let { e164Number } = this.props
-    let userName = contact ? contact.displayName : name ? name : address
-    if (!e164Number && contact) {
-      const phoneNumber = getContactPhoneNumber(contact)
-      if (phoneNumber) {
-        const possibleE164Number = getE164Number(phoneNumber, defaultCountryCode)
-        if (possibleE164Number) {
-          e164Number = possibleE164Number
-        }
-      }
-    }
-
-    if (userName && userName.startsWith('0x')) {
-      userName = '#' + userName.substring(2, 17) + '...'
-    }
+    const {
+      contact,
+      thumbnailPath,
+      address,
+      e164Number,
+      defaultCountryCode,
+      iconSize,
+      name,
+      children,
+    } = this.props
 
     return (
       <View style={style.container}>
         <ContactCircle
           style={style.contactCircle}
-          name={userName}
+          contact={contact}
+          thumbnailPath={thumbnailPath}
+          name={name}
           address={address}
           size={iconSize}
-        />
+        >
+          {children ? children : null}
+        </ContactCircle>
         <Text
           style={[fontStyles.bodySmallSemiBold, style.contactName]}
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          {userName}
+          {name}
         </Text>
         {e164Number ? (
           <PhoneNumberWithFlag
             e164PhoneNumber={e164Number || ''}
             defaultCountryCode={defaultCountryCode}
           />
+        ) : null}
+
+        {!e164Number && address ? (
+          <Text
+            style={[fontStyles.bodySmall, fontStyles.light, style.contactName]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {'#' + address.substring(2, 17) + '...'}
+          </Text>
         ) : null}
       </View>
     )

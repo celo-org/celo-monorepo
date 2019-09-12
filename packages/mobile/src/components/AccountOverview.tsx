@@ -39,8 +39,9 @@ type Props = StateProps & DispatchProps & WithNamespaces & OwnProps
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     exchangeRatePair: state.exchange.exchangeRatePair,
-    goldEducationCompleted: state.goldToken.educationCompleted,
-    stableEducationCompleted: state.stableToken.educationCompleted,
+    // Disable education for now
+    goldEducationCompleted: true, // state.goldToken.educationCompleted,
+    stableEducationCompleted: true, // state.stableToken.educationCompleted,
     goldBalance: state.goldToken.balance,
     dollarBalance: state.stableToken.balance,
   }

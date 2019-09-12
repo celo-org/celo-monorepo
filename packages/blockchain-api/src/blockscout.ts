@@ -29,7 +29,7 @@ const MODULE_ACTIONS = {
   },
 }
 
-interface BlockscoutTransaction {
+export interface BlockscoutTransaction {
   value: string
   txreceipt_status: string
   transactionIndex: string

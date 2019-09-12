@@ -31,6 +31,12 @@ export enum CustomEventNames {
   send_invite = 'send_invite',
   edit_send_invite = 'edit_send_invite',
 
+  // Send events, separate from button tracking above
+  send_dollar_transaction = 'send_dollar_transaction',
+  send_dollar_transaction_confirmed = 'send_dollar_transaction_confirmed',
+
+  fetch_balance = 'fetch_balance',
+
   // Verification event and sub-events
   verification = 'verification',
   verification_setup = 'verification_setup',
@@ -49,6 +55,11 @@ export enum CustomEventNames {
   verification_cancelled = 'verification_cancelled',
   verification_success = 'verification_success',
   verification_timed_out = 'verification_timed_out',
+
+  verification_actionable_attestation_start = 'verification_actionable_attestation_start',
+  verification_actionable_attestation_finish = 'verification_actionable_attestation_finish',
+  verification_validate_code_start = 'verification_validate_code_start',
+  verification_validate_code_finish = 'verification_validate_code_finish',
 
   redeem_invite_success = 'redeem_invite_success',
   redeem_invite_timed_out = 'redeem_invite_timed_out',
@@ -153,6 +164,12 @@ export enum CustomEventNames {
 
   // QR Code
   qrcode_main_screen_visit = 'qrcode_main_screen_visit',
+
+  // Performance
+  transaction_send_start = 'transaction_send_start',
+  transaction_send_gas_estimated = 'transaction_send_gas_estimated',
+  transaction_send_gas_hash_received = 'transaction_send_gas_hash_received',
+  transaction_send_gas_receipt = 'transaction_send_gas_receipt',
 }
 
 export enum CommonValues {
@@ -179,6 +196,7 @@ export const PROPERTY_PATH_WHITELIST = [
   'goldPendingBalance',
   'inviteCode',
   'isCorrect',
+  'issuer',
   'label',
   'language',
   'makerAmount',
@@ -209,6 +227,7 @@ export const PROPERTY_PATH_WHITELIST = [
   'testnet',
   'timeElapsed',
   'title',
+  'txId',
   'verificationIndex',
   'verificationsRemaining',
 ]

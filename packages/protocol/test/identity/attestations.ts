@@ -8,7 +8,7 @@ import {
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { SignatureUtils } from '@celo/utils'
-import { getPhoneHash } from '@celo/utils/lib/src/phoneNumbers'
+import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { uniq } from 'lodash'
 import {

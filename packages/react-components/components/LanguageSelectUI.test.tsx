@@ -12,6 +12,10 @@ describe('LanguageSelectUI', () => {
         isSubmitDisabled={false}
         currentSelected="en"
         t={jest.fn()}
+        languages={[
+          { name: 'English', code: 'en-US' },
+          { name: 'Español (América Latina)', code: 'es-419' },
+        ]}
       />
     )
     expect(tree).toMatchSnapshot()

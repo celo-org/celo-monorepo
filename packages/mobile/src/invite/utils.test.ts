@@ -49,7 +49,7 @@ describe(extractValidInviteCode, () => {
           'You can install the Celo application from the following link: https://celo.page.link/XYyu9Mi7sz4YNsiM7'
       )
     ).toBe('0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724')
-    // And now in ES-AR
+    // And now in es_419
     expect(
       extractValidInviteCode(
         'Hola Izzy! Me gustaría invitarte a que te unas a la red de pagos de Celo. ' +
