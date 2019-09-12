@@ -298,6 +298,27 @@ exports[`renders for error 1`] = `
                 </Text>
                  undefined
               </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                localCurrencyValue
+              </Text>
             </View>
           </View>
         </View>
@@ -494,6 +515,7 @@ exports[`renders for error 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
@@ -774,6 +796,27 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 </Text>
                  undefined
               </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                localCurrencyValue
+              </Text>
             </View>
           </View>
         </View>
@@ -997,6 +1040,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
@@ -1480,6 +1524,27 @@ exports[`renders for loading 1`] = `
                 </Text>
                  undefined
               </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                localCurrencyValue
+              </Text>
             </View>
           </View>
         </View>
@@ -1703,6 +1768,7 @@ exports[`renders for loading 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
@@ -1973,6 +2039,27 @@ exports[`renders for no transactions 1`] = `
                 </Text>
                  undefined
               </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                localCurrencyValue
+              </Text>
             </View>
           </View>
         </View>
@@ -2196,6 +2283,7 @@ exports[`renders for no transactions 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
@@ -2466,6 +2554,27 @@ exports[`renders for standbyTransactions 1`] = `
                 </Text>
                  undefined
               </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                localCurrencyValue
+              </Text>
             </View>
           </View>
         </View>
@@ -2689,6 +2798,7 @@ exports[`renders for standbyTransactions 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
