@@ -212,31 +212,32 @@ contract('Exchange', (accounts: string[]) => {
   })
 
   describe('#setStableToken', () => {
-    const newSpread = toFixed(6 / 1000)
+    const newStable = '0x0000000000000000000000000000000000077cfa'
 
-    it('should set the spread', async () => {
-      await exchange.setSpread(newSpread)
+    it('should set the stable token address', async () => {
+      await exchange.setStableToken(newStable)
 
-      const actualSpread = await exchange.spread()
-
-      assert.isTrue(actualSpread.eq(newSpread))
+      const actualStable = await exchange.stable()
+      console.info('actual stable:', actualStable)
+      console.info('gold address:', newStable)
+      assert.equal(actualStable, newStable)
     })
 
-    it('should emit a SpreadSet event', async () => {
-      const tx = await exchange.setSpread(newSpread)
+    it('should emit a StableTokenSet event', async () => {
+      const tx = await exchange.setStableToken(newStable)
       assert(tx.logs.length === 1, 'Did not receive event')
 
       const log = tx.logs[0]
       assertLogMatches2(log, {
-        event: 'SpreadSet',
+        event: 'StableTokenSet',
         args: {
-          spread: newSpread,
+          stable: newStable,
         },
       })
     })
 
     it('should not allow a non-owner not set the spread', async () => {
-      await assertRevert(exchange.setSpread(newSpread, { from: accounts[1] }))
+      await assertRevert(exchange.setStableToken(newStable, { from: accounts[1] }))
     })
   })
 
