@@ -1,0 +1,58 @@
+# https://stackoverflow.com/questions/27644586/how-to-set-up-travis-ci-with-multiple-languages
+matrix:
+  include:
+    # https://medium.com/@harmittaa/travis-ci-android-example-357f6e632fc4
+    # https://stackoverflow.com/a/28751112/434196
+    - name: "Run emulator"
+      language: android
+      sudo: false
+      jdk: oraclejdk8
+      env:
+        global:
+          - DX_HEAP_SIZE=2048
+          # 16 is the fastest as per
+          # https://medium.com/zendesk-engineering/speeding-up-android-builds-on-travis-ci-1bb4cdbd9c62
+          - ANDROID_API_LEVEL=24
+          - ANDROID_EMU_API_LEVEL=22
+          - ANDROID_BUILD_TOOLS=24.0.2
+          - ANDROID_ABI=armeabi-v7a
+          - QEMU_AUDIO_DRV=none  # Remove audio
+          - ADB_INSTALL_TIMEOUT=20  # minutes (2 minutes by default)
+      android:
+        components:
+          - build-tools-$ANDROID_BUILD_TOOLS
+          - tools
+          - platform-tools
+          - android-$ANDROID_API_LEVEL
+          - android-$ANDROID_EMU_API_LEVEL
+          # Specify at least one system image
+          - sys-img-$ANDROID_ABI-google_apis-$ANDROID_EMU_API_LEVEL
+        licenses:
+          - android-sdk-preview-license-.+
+          - android-sdk-license-.+
+          - google-gdk-license-.+
+          - build-tools
+          - platforms
+      before_script:
+        # Android setup
+        - echo no | android create avd --force -n Nexus_5X_API_28_x86 -t android-$ANDROID_EMU_API_LEVEL --abi google_apis/$ANDROID_ABI # change name and the arch
+        # # -noaudio is not supported by this version of the emulator
+        # - emulator -avd test -no-window -no-boot-anim &
+        # - android-wait-for-emulator
+        - sudo apt-get update
+        - curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+        - sudo apt-get install libssl-dev curl -y
+        - sudo apt-get install nodejs -y
+        - node -v
+        - sudo apt-get install node-gyp -y
+        - npm -v
+        - nvm install 8.13
+        - nvm use 8.13
+        - npm install --global yarn # upgrade yarn
+        - yarn
+        - yarn build
+        - cd packages/mobile
+        - yes | sdkmanager --licenses
+        - yarn test:dry-run-e2e
+      script:
+        - echo "instalation worked"
