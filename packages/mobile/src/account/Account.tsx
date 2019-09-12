@@ -85,7 +85,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   backupScreen() {
-    navigate(Screens.Backup)
+    navigate(Screens.BackupIntroduction)
   }
 
   goToInvite() {

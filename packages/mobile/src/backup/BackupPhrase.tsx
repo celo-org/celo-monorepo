@@ -1,50 +1,89 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import FlagSecure from 'react-native-flag-secure-android'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { connect } from 'react-redux'
+import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackupPhraseContainer from 'src/backup/BackupPhraseContainer'
-import CancelButton from 'src/components/CancelButton'
+import { getStoredMnemonic } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { RootState } from 'src/redux/reducers'
+import Logger from 'src/utils/Logger'
 
-type Props = {
-  words: string
+interface State {
+  mnemonic: string
+}
+
+interface StateProps {
   backupCompleted: boolean
-  onPressBackup: () => void
-  onPressBack: () => void
-  onCancel: () => void
-} & WithNamespaces
+}
 
-class BackupPhrase extends React.Component<Props> {
+interface DispatchProps {
+  showError: typeof showError
+  hideAlert: typeof hideAlert
+}
+
+type Props = StateProps & DispatchProps & WithNamespaces
+
+const mapStateToProps = (state: RootState): StateProps => {
+  return {
+    backupCompleted: state.account.backupCompleted,
+  }
+}
+
+class BackupPhrase extends React.Component<Props, State> {
   static navigationOptions = { header: null }
+  state = {
+    mnemonic: '',
+  }
 
   componentDidMount() {
     FlagSecure.activate()
+    this.retrieveMnemonic()
   }
 
   componentWillUnmount() {
     FlagSecure.deactivate()
+    this.props.hideAlert()
+  }
+
+  retrieveMnemonic = async () => {
+    if (this.state.mnemonic) {
+      return
+    }
+
+    try {
+      const mnemonic = await getStoredMnemonic()
+      if (!mnemonic) {
+        throw new Error('Mnemonic not stored in key store')
+      }
+      this.setState({ mnemonic })
+    } catch (e) {
+      Logger.error('backup/retrieveMnemonic', e)
+      this.props.showError(ErrorMessages.FAILED_FETCH_MNEMONIC)
+    }
   }
 
   continueBackup = () => {
     CeloAnalytics.track(CustomEventNames.backup_continue)
-    this.props.onPressBackup()
+    navigate(Screens.BackupQuiz)
   }
 
   render() {
-    const { t, words, backupCompleted, onCancel, onPressBack } = this.props
+    const { t, backupCompleted } = this.props
+    const { mnemonic } = this.state
     return (
       <View style={styles.container}>
-        <View style={componentStyles.topBar}>
-          <CancelButton onCancel={onCancel} />
-        </View>
         <KeyboardAwareScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="always"
@@ -61,24 +100,17 @@ class BackupPhrase extends React.Component<Props> {
                 <Text style={styles.verifyText}>{t('heresYourKey')}</Text>
               </>
             )}
-            <BackupPhraseContainer words={words} />
+            <BackupPhraseContainer words={mnemonic} />
             <Text style={styles.verifyText}>
               <Text style={[styles.verifyText, fontStyles.bold]}>{t('tip')}</Text>
               {t('backupKeyImportance.2')}
             </Text>
           </View>
           <View>
-            {!backupCompleted ? (
+            {!backupCompleted && (
               <Button
                 onPress={this.continueBackup}
                 text={t('continue')}
-                standard={true}
-                type={BtnTypes.PRIMARY}
-              />
-            ) : (
-              <Button
-                onPress={onPressBack}
-                text={t('back')}
                 standard={true}
                 type={BtnTypes.PRIMARY}
               />
@@ -133,4 +165,9 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withNamespaces(Namespaces.backupKeyFlow6)(BackupPhrase))
+export default componentWithAnalytics(
+  connect<StateProps, DispatchProps, {}, RootState>(
+    mapStateToProps,
+    { showError, hideAlert }
+  )(withNamespaces(Namespaces.backupKeyFlow6)(BackupPhrase))
+)

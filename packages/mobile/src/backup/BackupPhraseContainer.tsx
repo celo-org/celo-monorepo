@@ -12,9 +12,11 @@ export default function BackupPhraseContainer(props: Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.labelText}>{props.label}</Text>
-      <View style={styles.phraseContainer}>
-        <Text style={styles.phraseText}>{`${props.words}`}</Text>
-      </View>
+      {!!props.words && (
+        <View style={styles.phraseContainer}>
+          <Text style={styles.phraseText}>{`${props.words}`}</Text>
+        </View>
+      )}
     </View>
   )
 }

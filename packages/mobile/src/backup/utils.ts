@@ -18,11 +18,12 @@ export function selectQuizWordOptions(
   mnemonic: string,
   allWords: string[],
   numOptions: number
-): [string, string[]] {
+): [string, string[]] | [] {
   const correctWord = _.sample(mnemonic.split(' '))
 
   if (!correctWord) {
-    throw new Error('Mnemonic cannot be empty')
+    // mnemonic is empty
+    return []
   }
 
   const wordOptions = _.chain(allWords)

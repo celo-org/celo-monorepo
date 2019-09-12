@@ -1,61 +1,48 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import SmallButton from '@celo/react-components/components/SmallButton'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Clipboard, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
+import { connect } from 'react-redux'
+import { setBackupCompleted, setSocialBackupCompleted } from 'src/account/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import BackupPhraseContainer from 'src/backup/BackupPhraseContainer'
 import { Namespaces } from 'src/i18n'
 import NuxLogo from 'src/icons/NuxLogo'
-import Logger from 'src/utils/Logger'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { RootState } from 'src/redux/reducers'
 
-type Props = {
-  onPress: () => void
-  mnemonic: string | null
-  backupCompleted?: boolean
-} & WithNamespaces
+interface DispatchProps {
+  setBackupCompleted: typeof setBackupCompleted
+  setSocialBackupCompleted: typeof setSocialBackupCompleted
+}
+
+type Props = DispatchProps & WithNamespaces
 
 class BackupComplete extends React.Component<Props> {
   static navigationOptions = { header: null }
 
   onDone = () => {
-    const { backupCompleted } = this.props
+    // This screen should be reachable when regular backup is already completed
+    this.props.setBackupCompleted()
+    this.props.setSocialBackupCompleted()
 
-    // Only track when going through backup flow, not viewing the backup again
-    if (!backupCompleted) {
-      CeloAnalytics.track(CustomEventNames.question_done)
-    }
-    this.props.onPress()
-  }
+    CeloAnalytics.track(CustomEventNames.question_done)
 
-  copyToClipboard = () => {
-    const { t } = this.props
-    Clipboard.setString(this.props.mnemonic || '')
-    Logger.showMessage(t('copiedToClipboard'))
+    navigate(Screens.Account)
   }
 
   render() {
-    const { t, backupCompleted, mnemonic } = this.props
+    const { t } = this.props
     return (
       <View style={styles.container}>
         <View style={styles.questionTextContainer}>
           <NuxLogo />
-          <Text style={[fontStyles.h1, styles.h1]}>
-            {t(backupCompleted ? 'backupKey' : 'backupKeySet')}
-          </Text>
-          <Text style={fontStyles.body}>{t('dontLoseIt')}</Text>
-          {backupCompleted && <BackupPhraseContainer words={mnemonic} />}
-          <SmallButton
-            text={t('copyToClipboard')}
-            testID={'pasteMessageButton'}
-            onPress={this.copyToClipboard}
-            solid={false}
-            style={styles.copyToClipboardButton}
-          />
+          <Text style={[fontStyles.h1, styles.h1]}>{t('bothBackupsDone.0')}</Text>
+          <Text style={fontStyles.body}>{t('bothBackupsDone.1')}</Text>
         </View>
         <Button onPress={this.onDone} text={t('done')} standard={true} type={BtnTypes.PRIMARY} />
       </View>
@@ -86,4 +73,12 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withNamespaces(Namespaces.backupKeyFlow6)(BackupComplete))
+export default componentWithAnalytics(
+  connect<{}, DispatchProps, {}, RootState>(
+    null,
+    {
+      setBackupCompleted,
+      setSocialBackupCompleted,
+    }
+  )(withNamespaces(Namespaces.backupKeyFlow6)(BackupComplete))
+)

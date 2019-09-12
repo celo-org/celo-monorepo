@@ -1,32 +1,51 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Modal from 'react-native-modal'
+import { connect } from 'react-redux'
+import { setBackupDelayed } from 'src/account/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import CancelButton from 'src/components/CancelButton'
+import { enterBackupFlow } from 'src/app/actions'
 import { Namespaces } from 'src/i18n'
 import backupIcon from 'src/images/backup-icon.png'
-
-type Props = {
-  backupCompleted: boolean
-  socialBackupCompleted: boolean
-  backupDelayedTime: number
-  backupTooLate: boolean
-  onBackup: () => void
-  onSocialBackup: () => void
-  onCancel: () => void
-  onDelay: () => void
-} & WithNamespaces
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { RootState } from 'src/redux/reducers'
+import { isBackupTooLate } from 'src/redux/selectors'
 
 interface State {
   visibleModal: boolean
+}
+
+interface StateProps {
+  language: string | null
+  backupCompleted: boolean
+  socialBackupCompleted: boolean
+  backupTooLate: boolean
+  backupDelayedTime: number
+}
+
+interface DispatchProps {
+  setBackupDelayed: typeof setBackupDelayed
+  enterBackupFlow: typeof enterBackupFlow
+}
+
+type Props = WithNamespaces & StateProps & DispatchProps
+
+const mapStateToProps = (state: RootState): StateProps => {
+  return {
+    language: state.app.language,
+    backupCompleted: state.account.backupCompleted,
+    socialBackupCompleted: state.account.socialBackupCompleted,
+    backupTooLate: isBackupTooLate(state),
+    backupDelayedTime: state.account.backupDelayedTime,
+  }
 }
 
 class BackupIntroduction extends React.Component<Props, State> {
@@ -36,49 +55,65 @@ class BackupIntroduction extends React.Component<Props, State> {
     visibleModal: false,
   }
 
-  cancel = () => {
+  trackAnalytics = (event?: CustomEventNames) => {
+    if (!event) {
+      return
+    }
+
     CeloAnalytics.track(CustomEventNames.backup_cancel)
-    this.props.onCancel()
+  }
+
+  goBackup = (event?: CustomEventNames) => {
+    this.trackAnalytics(event)
+    navigate(Screens.BackupPhrase)
+  }
+
+  goSocialBackup = (event?: CustomEventNames) => {
+    this.trackAnalytics(event)
+    navigate(Screens.BackupSocialFirst)
+  }
+
+  goBack = (event?: CustomEventNames) => {
+    this.trackAnalytics(event)
+    navigateBack()
+  }
+
+  cancel = () => {
+    this.goBack(CustomEventNames.backup_cancel)
   }
 
   onSkip = () => {
     this.setState({ visibleModal: true })
-    CeloAnalytics.track(CustomEventNames.skip_backup)
+    this.trackAnalytics(CustomEventNames.skip_backup)
   }
 
   onViewBackupKey = () => {
-    CeloAnalytics.track(CustomEventNames.view_backup_phrase)
-    this.props.onBackup()
-  }
-
-  onViewSocialBackup = () => {
-    CeloAnalytics.track(CustomEventNames.view_social_backup)
-    this.props.onSocialBackup()
+    this.goBackup(CustomEventNames.view_backup_phrase)
   }
 
   onBackup = () => {
-    CeloAnalytics.track(CustomEventNames.set_backup_phrase)
-    this.props.onBackup()
+    this.goBackup(CustomEventNames.set_backup_phrase)
   }
 
   onSocialBackup = () => {
-    CeloAnalytics.track(CustomEventNames.set_social_backup)
-    this.props.onSocialBackup()
+    this.goSocialBackup(CustomEventNames.set_social_backup)
+  }
+
+  onViewSocialBackup = () => {
+    this.goSocialBackup(CustomEventNames.view_social_backup)
   }
 
   onDelay = () => {
-    CeloAnalytics.track(CustomEventNames.delay_backup)
-    this.props.onDelay()
+    this.props.setBackupDelayed()
+    this.goBack(CustomEventNames.delay_backup)
   }
 
   onInsistSkip = () => {
-    CeloAnalytics.track(CustomEventNames.insist_skip_backup)
-    this.props.onCancel()
+    this.goBack(CustomEventNames.insist_skip_backup)
   }
 
   onInsistBackup = () => {
-    CeloAnalytics.track(CustomEventNames.insist_backup_phrase)
-    this.props.onBackup()
+    this.goBackup(CustomEventNames.insist_backup_phrase)
   }
 
   skip = () => {
@@ -114,9 +149,6 @@ class BackupIntroduction extends React.Component<Props, State> {
     } = this.props
     return (
       <View style={styles.container}>
-        <View style={componentStyles.topBar}>
-          <CancelButton onCancel={this.props.onCancel} />
-        </View>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.center}>
             <Image source={backupIcon} style={styles.logo} />
@@ -260,4 +292,12 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withNamespaces(Namespaces.backupKeyFlow6)(BackupIntroduction))
+export default componentWithAnalytics(
+  connect<StateProps, DispatchProps, {}, RootState>(
+    mapStateToProps,
+    {
+      setBackupDelayed,
+      enterBackupFlow,
+    }
+  )(withNamespaces(Namespaces.backupKeyFlow6)(BackupIntroduction))
+)

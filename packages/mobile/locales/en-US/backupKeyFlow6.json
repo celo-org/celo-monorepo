@@ -1,6 +1,7 @@
 {
   "readOnlyMode": "Read Only Mode Set Backup Key to continue sending and receiving {{CeloDollars}}",
   "getBackupKey": "Get Backup Key",
+  "failedFetchMnemonic": "Failed to fetch your Backup Key",
   "socialBackup": "Social Backup",
   "editProfile": "Edit Profile",
   "backupKey": "Backup Key",
@@ -33,7 +34,7 @@
   "sendWhatsApp": "Send with WhatsApp",
   "continue": "Continue",
   "backupWithFriends": "Backup with Friends",
-  "tip": "Tip ",
+  "securityTips": "Tips",
   "backupKeySummary": {
     "0": "Write this phrase down on a piece of paper and keep it somewhere safe.",
     "1": "Don’t show your phrase to anyone else. They can access your wallet if they see it."
@@ -55,7 +56,11 @@
   "backToKey":
     "We will take you back to the screen with your backup key so that you ensure you wrote it down correctly.",
   "seeBackupKey": "See Backup Key",
-  "backupKeySet": "Backup Key Set",
+  "bothBackupsDone": {
+    "0": "Congratulations!",
+    "1":
+      "You're all done! If you would like to review your recovery secrets, you can always return here later."
+  },
   "dontLoseIt":
     "Please do not lose this key. It is critical that you maintain this in a safe place, as this is the only way to unlock your wallet should you lose your phone.",
   "done": "Done",

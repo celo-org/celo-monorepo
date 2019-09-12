@@ -9,7 +9,6 @@ import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import BackupModal from 'src/backup/BackupModal'
-import CancelButton from 'src/components/CancelButton'
 import { Namespaces } from 'src/i18n'
 import { formatBackupPhraseOnEdit, formatBackupPhraseOnSubmit } from 'src/import/ImportWallet'
 import Logger from 'src/utils/Logger'
@@ -30,6 +29,8 @@ interface State {
 }
 
 export class BackupVerify extends React.Component<Props, State> {
+  static navigationOptions = { header: null }
+
   state = {
     visibleModal: false,
     pastedMnemonic: '',
@@ -84,9 +85,6 @@ export class BackupVerify extends React.Component<Props, State> {
 
     return (
       <View style={styles.container}>
-        <View style={componentStyles.topBar}>
-          <CancelButton onCancel={this.props.onCancel} />
-        </View>
         <ScrollView keyboardShouldPersistTaps="always">
           <View style={styles.questionTextContainer}>
             <Text style={[fontStyles.body, styles.question]}>

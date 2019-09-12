@@ -1,75 +1,112 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import FlagSecure from 'react-native-flag-secure-android'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { connect } from 'react-redux'
+import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackupPhraseContainer from 'src/backup/BackupPhraseContainer'
-import { splitMnemonic } from 'src/backup/utils'
-import CancelButton from 'src/components/CancelButton'
+import { getStoredMnemonic, splitMnemonic } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
-
-type Props = {
-  words: string
-  language: string | null
-  onSuccess: () => void
-  onCancel: () => void
-} & WithNamespaces
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { RootState } from 'src/redux/reducers'
+import Logger from 'src/utils/Logger'
 
 interface State {
-  backupStep: number
+  mnemonic: string
 }
 
-class BackupPhrase extends React.Component<Props, State> {
-  static navigationOptions = { header: null }
+interface StateProps {
+  language: string | null
+}
 
-  state = {
-    backupStep: 0,
+interface DispatchProps {
+  showError: typeof showError
+  hideAlert: typeof hideAlert
+}
+
+interface OwnProps {
+  // Must be 0 index!
+  partNumber: number
+}
+
+type Props = OwnProps & WithNamespaces & StateProps & DispatchProps
+
+const mapStateToProps = (state: RootState): StateProps => {
+  return {
+    language: state.app.language,
   }
+}
+
+class BackupSocial extends React.Component<Props, State> {
+  static navigationOptions = { header: null }
+  state = {
+    mnemonic: '',
+  }
+
+  partScreens = [Screens.BackupSocialFirst, Screens.BackupSocialSecond, Screens.BackupComplete]
 
   componentDidMount() {
     FlagSecure.activate()
+    this.retrieveMnemonic()
   }
 
   componentWillUnmount() {
     FlagSecure.deactivate()
+    this.props.hideAlert()
+  }
+
+  retrieveMnemonic = async () => {
+    if (this.state.mnemonic) {
+      return
+    }
+
+    try {
+      const mnemonic = await getStoredMnemonic()
+      if (!mnemonic) {
+        throw new Error('Mnemonic not stored in key store')
+      }
+      this.setState({ mnemonic })
+    } catch (e) {
+      Logger.error('backup/retrieveMnemonic', e)
+      this.props.showError(ErrorMessages.FAILED_FETCH_MNEMONIC)
+    }
   }
 
   continueBackup = () => {
     CeloAnalytics.track(CustomEventNames.backup_continue)
-    const { backupStep } = this.state
+    let { partNumber } = this.props
+    partNumber++
 
-    if (backupStep > 1) {
-      this.props.onSuccess()
-      return
+    if (partNumber >= this.partScreens.length) {
+      throw new Error(`Invalid Social Backup part screen ${partNumber}`)
     }
 
-    this.setState({ backupStep: backupStep + 1 })
+    navigate(this.partScreens[partNumber])
   }
 
   render() {
-    const { t, words, language } = this.props
-    const { backupStep } = this.state
-    const [firstHalf, secondHalf] = splitMnemonic(words, language)
+    const { t, language, partNumber } = this.props
+    const { mnemonic } = this.state
+    const [firstHalf, secondHalf] = splitMnemonic(mnemonic, language)
 
     return (
       <View style={styles.container}>
-        <View style={componentStyles.topBar}>
-          <CancelButton onCancel={this.props.onCancel} />
-        </View>
         <KeyboardAwareScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="always"
         >
           <View>
             <Text style={[fontStyles.h1, styles.title]}>{t('socialBackup')}</Text>
-            {backupStep === 0 && (
+            {partNumber === 0 && (
               <>
                 <Text style={styles.verifyText}>{t('socialBackupYourKey')}</Text>
                 <Text style={styles.verifyText}>{t('easyToForget')}</Text>
@@ -77,16 +114,14 @@ class BackupPhrase extends React.Component<Props, State> {
               </>
             )}
 
-            {backupStep === 1 && (
+            {partNumber === 1 && (
               <BackupPhraseContainer label={t('sendSecondHalf')} words={secondHalf} />
             )}
-
-            {backupStep > 1 && <Text style={styles.verifyText}>{t('socialBackupSet')}</Text>}
           </View>
           <View>
             <Button
               onPress={this.continueBackup}
-              text={t(backupStep < 2 ? 'continue' : 'done')}
+              text={t('continue')}
               standard={true}
               type={BtnTypes.PRIMARY}
             />
@@ -112,32 +147,20 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     color: colors.dark,
   },
-  body: {
-    paddingBottom: 15,
-    color: colors.dark,
-  },
-  phraseContainer: {
-    position: 'relative',
-    backgroundColor: colors.altDarkBg,
-    alignContent: 'center',
-    justifyContent: 'center',
-    padding: 16,
-    marginTop: 30,
-  },
-  phraseText: {
-    ...fontStyles.h2,
-    textAlign: 'left',
-  },
   verifyText: {
     ...fontStyles.bodySmall,
     fontSize: 15,
     textAlign: 'left',
     paddingTop: 15,
   },
-  buttonSpacing: {
-    marginTop: 20,
-    marginLeft: 5,
-  },
 })
 
-export default componentWithAnalytics(withNamespaces(Namespaces.backupKeyFlow6)(BackupPhrase))
+export default componentWithAnalytics(
+  connect<StateProps, DispatchProps, {}, RootState>(
+    mapStateToProps,
+    {
+      showError,
+      hideAlert,
+    }
+  )(withNamespaces(Namespaces.backupKeyFlow6)(BackupSocial))
+)

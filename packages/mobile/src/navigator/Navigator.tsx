@@ -13,7 +13,12 @@ import AppLoading from 'src/app/AppLoading'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
 import UpgradeScreen from 'src/app/UpgradeScreen'
-import Backup from 'src/backup/Backup'
+import BackupComplete from 'src/backup/BackupComplete'
+import BackupIntroduction from 'src/backup/BackupIntroduction'
+import BackupPhrase from 'src/backup/BackupPhrase'
+import BackupQuiz from 'src/backup/BackupQuiz'
+import BackupSocialFirst from 'src/backup/BackupSocialFirst'
+import BackupSocialSecond from 'src/backup/BackupSocialSecond'
 import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
 import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
 import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
@@ -128,6 +133,24 @@ const RequestStack = createStackNavigator(
   }
 )
 
+const BackupStack = createStackNavigator(
+  {
+    [Screens.BackupIntroduction]: { screen: BackupIntroduction },
+    [Screens.BackupPhrase]: { screen: BackupPhrase },
+    [Screens.BackupQuiz]: { screen: BackupQuiz },
+    [Screens.BackupSocialFirst]: { screen: BackupSocialFirst },
+    [Screens.BackupSocialSecond]: { screen: BackupSocialSecond },
+    [Screens.BackupComplete]: { screen: BackupComplete }, // back button should still go to social second?
+  },
+  {
+    navigationOptions: {
+      header: null,
+    },
+    ...headerArea,
+    initialRouteName: Screens.BackupIntroduction,
+  }
+)
+
 const AppStack = createStackNavigator(
   {
     [Screens.TabNavigator]: { screen: TabNavigator },
@@ -140,6 +163,7 @@ const AppStack = createStackNavigator(
     [Screens.EditProfile]: { screen: EditProfile },
     [Screens.Profile]: { screen: Profile },
     [Screens.Account]: { screen: Account },
+    [Stacks.BackupStack]: { screen: BackupStack },
     [Screens.Invite]: { screen: Invite },
     [Screens.InviteReview]: { screen: InviteReview },
     [Screens.Licenses]: { screen: Licenses },
@@ -149,7 +173,6 @@ const AppStack = createStackNavigator(
     [Screens.QRCode]: { screen: QRCode },
     [Screens.QRScanner]: { screen: QRScanner },
     [Screens.GoldEducation]: { screen: GoldEducation },
-    [Screens.Backup]: { screen: Backup },
     [Screens.Pincode]: { screen: Pincode },
     [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
     [Screens.ReclaimPaymentConfirmationScreen]: { screen: ReclaimPaymentConfirmationScreen },
