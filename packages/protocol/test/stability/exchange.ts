@@ -54,7 +54,7 @@ contract('Exchange', (accounts: string[]) => {
   const SECONDS_IN_A_WEEK = 604800
 
   const unit = new BigNumber(10).pow(decimals)
-  const initialReserveBalance = new BigNumber(1000)
+  const initialReserveBalance = new BigNumber(10000000000000000000000)
   const reserveFraction = toFixed(5 / 100)
   const initialGoldBucket = initialReserveBalance
     .times(fromFixed(reserveFraction))
