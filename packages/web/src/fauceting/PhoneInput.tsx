@@ -55,34 +55,6 @@ class PhoneInput extends React.PureComponent<Props, State> {
     }
   }
 
-  renderTextInput = (props: any) => (
-    <TextInput
-      style={[standardStyles.input, standardStyles.inputDarkMode]}
-      focusStyle={standardStyles.inputDarkFocused}
-      {...props}
-      value={this.state.countryQuery}
-    />
-  )
-
-  renderItem = (countryCode: string) => {
-    // @ts-ignore
-    const { displayName, emoji, countryCallingCodes } = COUNTRIES.getCountryByCode(countryCode)
-
-    const onPress = () => {
-      this.setState({ countryCallingCode: countryCallingCodes[0] })
-      this.onChangeCountryQuery(displayName)
-    }
-
-    return (
-      <TouchableOpacity onPress={onPress}>
-        <View style={standardStyles.row}>
-          <Text>{emoji}</Text>
-          <Text style={fonts.p}>{displayName}</Text>
-        </View>
-      </TouchableOpacity>
-    )
-  }
-
   getPlaceholder = () => {
     return 'Phone number'
   }
@@ -112,20 +84,41 @@ class PhoneInput extends React.PureComponent<Props, State> {
     })
   }
 
-  onSuggestionSelected = (x) => {
-    debugger
-    console.log(x)
-  }
-
   renderSuggestionsContainer = ({ containerProps, children, query }) => {
+    console.log(query)
     const { className, ...otherProps } = containerProps
     return (
-      <View
-        {...otherProps}
-        style={{ backgroundColor: colors.white, position: 'absolute', zIndex: 100 }}
-      >
+      <View {...otherProps} style={[styles.suggestions]}>
         {children}
       </View>
+    )
+  }
+
+  renderTextInput = (props: any) => (
+    <TextInput
+      style={[standardStyles.input, standardStyles.inputDarkMode]}
+      focusStyle={standardStyles.inputDarkFocused}
+      {...props}
+      value={this.state.countryQuery}
+    />
+  )
+
+  renderItem = (countryCode: string) => {
+    // @ts-ignore
+    const { displayName, emoji, countryCallingCodes } = COUNTRIES.getCountryByCode(countryCode)
+
+    const onPress = () => {
+      this.setState({ countryCallingCode: countryCallingCodes[0] })
+      this.onChangeCountryQuery(displayName)
+    }
+
+    return (
+      <TouchableOpacity onPress={onPress}>
+        <View style={standardStyles.row}>
+          <Text>{emoji}</Text>
+          <Text style={[fonts.p, textStyles.invert]}>{displayName}</Text>
+        </View>
+      </TouchableOpacity>
     )
   }
 
@@ -138,12 +131,26 @@ class PhoneInput extends React.PureComponent<Props, State> {
 
     return (
       <>
+        <style>{`
+          .react-autosuggest__suggestions-list {
+            margin-left: 0;
+            padding-left: 0;
+          }
+
+          .react-autosuggest__suggestion {
+            list-style-type: none;
+          }
+          .react-autosuggest__container--open {
+            padding: 15;
+            border-color: ${colors.white},
+            border-width: 1
+          }
+        `}</style>
         <Autosuggest
           alwaysRenderSuggestions={true}
           suggestions={this.filteredCountries()}
           getSuggestionValue={getSuggestionValue}
           onSuggestionsFetchRequested={this.updateSuggestions}
-          onSuggestionSelected={this.onSuggestionSelected}
           renderSuggestion={this.renderItem}
           renderInputComponent={this.renderTextInput}
           renderSuggestionsContainer={this.renderSuggestionsContainer}
@@ -201,6 +208,12 @@ const styles = StyleSheet.create({
     borderColor: colors.gray,
     color: colors.white,
     width: '100%',
+  },
+  suggestions: {
+    backgroundColor: colors.dark,
+    position: 'absolute',
+    zIndex: 1000,
+    borderRadius: 2,
   },
 })
 
