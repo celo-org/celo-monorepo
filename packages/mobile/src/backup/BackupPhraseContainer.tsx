@@ -37,7 +37,7 @@ export class BackupPhraseContainer extends React.Component<Props> {
     }
 
     const msg = encodeURIComponent(t('whatsappMessage') + words)
-    Linking.openURL(`https://wa.me/?text=${msg}`)
+    Linking.openURL(`https://api.whatsapp.com/send?phone=&text=${msg}`)
   }
 
   render() {
