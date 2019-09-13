@@ -54,22 +54,21 @@ exports[`RecipientItem renders correctly 1`] = `
           ]
         }
       >
-        <Text
-          style={
-            Array [
-              Object {
-                "color": "#FFFFFF",
-                "fontFamily": "Hind-Medium",
-                "fontSize": 16,
-              },
-              Object {
-                "fontSize": 20,
-              },
-            ]
+        <Image
+          source={
+            Object {
+              "testUri": "../../../src/images/unknown-user-icon.png",
+            }
           }
-        >
-          J
-        </Text>
+          style={
+            Object {
+              "alignItems": "center",
+              "height": 40,
+              "justifyContent": "center",
+              "width": 40,
+            }
+          }
+        />
       </View>
     </View>
     <View

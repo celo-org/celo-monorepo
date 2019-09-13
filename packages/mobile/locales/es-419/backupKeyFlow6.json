@@ -47,7 +47,7 @@
     "No tome una captura de pantalla ni la guarde en las notas de su teléfono. Mantenga su Clave de respaldo en algún lugar al que pueda acceder si pierde su teléfono",
   "backupKeySummary": {
     "0": "Escriba esta frase en un papel y guárdela en algún sitio seguro.",
-    "1": "No le muestre la frase a nadie. Si alguien la sabe, podrá acceder a su monedero."
+    "1": "No le muestre la frase a nadie. Si alguien la sabe, podrá acceder a tu monedero."
   },
   "heresYourKey": "Aquí está su clave de respaldo. Recuerde, mantenga esto a salvo",
   "socialBackupYourKey":
@@ -61,7 +61,7 @@
   "return": "Vuelva a la clave de respaldo",
   "tryAgain": "Reintentar",
   "backToKey":
-    "Le llevaremos a la pantalla con su clave de respaldo para que verifique que la escribió correctamente.",
+    "Le llevaremos a la pantalla con tu clave de respaldo para que verifique que la escribió correctamente.",
   "seeBackupKey": "Ver clave de respaldo",
   "bothBackupsDone": {
     "0": "¡Felicidades!",
@@ -69,7 +69,7 @@
       "¡Ya terminaste! Si quieres revisar tus secretos de recuperación, siempre puedes volver aquí más tarde"
   },
   "dontLoseIt":
-    "No pierda esta clave. Es de suma importancia que la mantenga en un lugar seguro, ya que es la única forma de desbloquear su monedero si pierde su celular.",
+    "No pierda esta clave. Es de suma importancia que la mantenga en un lugar seguro, ya que es la única forma de desbloquear tu monedero si pierde tu celular.",
   "done": "Listo",
   "whatsappMessage":
     "Importante: por favor mantenga esto privado. \n\nTe estoy enviando la frase de respaldo a mi Monedero Celo: ",

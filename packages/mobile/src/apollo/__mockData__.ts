@@ -5,12 +5,13 @@ import {
   UserTransactionsData,
 } from 'src/apollo/types'
 import { SENTINEL_INVITE_COMMENT } from 'src/invite/actions'
+import { TransactionTypes } from 'src/transactions/reducer'
 
 export const invitedAddress = '0x1b173'
 
 const exchangeDollar: HomeExchangeFragment = {
   __typename: EventTypeNames.Exchange,
-  type: 'Exchange',
+  type: 'EXCHANGE' as TransactionTypes,
   hash: '1',
   inValue: 19080,
   timestamp: Date.now(),
@@ -21,7 +22,7 @@ const exchangeDollar: HomeExchangeFragment = {
 
 const exchangeGold: HomeExchangeFragment = {
   __typename: EventTypeNames.Exchange,
-  type: 'Exchange',
+  type: 'EXCHANGE' as TransactionTypes,
   hash: '1',
   inValue: 190,
   timestamp: Date.now(),
@@ -32,7 +33,7 @@ const exchangeGold: HomeExchangeFragment = {
 
 const sent: HomeTransferFragment = {
   __typename: EventTypeNames.Transfer,
-  type: 'SENT',
+  type: 'SENT' as TransactionTypes,
   value: 987161,
   symbol: 'Celo Gold',
   timestamp: Date.now(),
@@ -43,7 +44,7 @@ const sent: HomeTransferFragment = {
 
 const sentInvite: HomeTransferFragment = {
   __typename: EventTypeNames.Transfer,
-  type: 'SENT',
+  type: 'SENT' as TransactionTypes,
   value: 0.33,
   symbol: 'Celo Dollar',
   timestamp: Date.now(),
@@ -54,7 +55,7 @@ const sentInvite: HomeTransferFragment = {
 
 const recieved: HomeTransferFragment = {
   __typename: EventTypeNames.Transfer,
-  type: 'RECEIVED',
+  type: 'RECEIVED' as TransactionTypes,
   value: 587161,
   symbol: 'Celo Gold',
   timestamp: Date.now(),
@@ -64,7 +65,7 @@ const recieved: HomeTransferFragment = {
 }
 const faucet: HomeTransferFragment = {
   __typename: EventTypeNames.Transfer,
-  type: 'FAUCET',
+  type: 'FAUCET' as TransactionTypes,
   value: 387161,
   symbol: 'Celo Dollar',
   timestamp: Date.now(),
@@ -74,7 +75,7 @@ const faucet: HomeTransferFragment = {
 }
 const verificationFee: HomeTransferFragment = {
   __typename: EventTypeNames.Transfer,
-  type: 'VERIFICATION_FEE',
+  type: 'VERIFICATION_FEE' as TransactionTypes,
   value: 0.3,
   symbol: 'Celo Gold',
   timestamp: Date.now(),
@@ -84,7 +85,7 @@ const verificationFee: HomeTransferFragment = {
 }
 const verificationReward: HomeTransferFragment = {
   __typename: EventTypeNames.Transfer,
-  type: 'VERIFICATION_REWARD',
+  type: 'VERIFICATION_REWARD' as TransactionTypes,
   value: 9371,
   symbol: 'Celo Dollar',
   timestamp: Date.now(),

@@ -10,12 +10,14 @@ import "./interfaces/IValidators.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
+import "../common/FixidityLib.sol";
 import "../common/interfaces/IERC20Token.sol";
 import "../common/Signatures.sol";
 import "../common/FractionUtil.sol";
 
 contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry {
 
+  using FixidityLib for FixidityLib.Fraction;
   using FractionUtil for FractionUtil.Fraction;
   using SafeMath for uint256;
 
@@ -57,7 +59,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   // Maps voting, rewards, and validating delegates to the account that delegated these rights.
   mapping(address => address) public delegations;
   // Maps a block number to the cumulative reward for an account with weight 1 since genesis.
-  mapping(uint256 => FractionUtil.Fraction) public cumulativeRewardWeights;
+  mapping(uint256 => FixidityLib.Fraction) public cumulativeRewardWeights;
 
   event MaxNoticePeriodSet(
     uint256 maxNoticePeriod
@@ -564,22 +566,22 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   function _redeemRewards(address _account) private returns (uint256) {
     Account storage account = accounts[_account];
     uint256 rewardBlockNumber = block.number.sub(1);
-    FractionUtil.Fraction storage previousCumulativeRewardWeight = cumulativeRewardWeights[
+    FixidityLib.Fraction memory previousCumulativeRewardWeight = cumulativeRewardWeights[
       account.rewardsLastRedeemed
     ];
-    FractionUtil.Fraction storage cumulativeRewardWeight = cumulativeRewardWeights[
+    FixidityLib.Fraction memory cumulativeRewardWeight = cumulativeRewardWeights[
       rewardBlockNumber
     ];
     // We should never get here except in testing, where cumulativeRewardWeight will not be set.
-    if (!previousCumulativeRewardWeight.exists() || !cumulativeRewardWeight.exists()) {
+    if (previousCumulativeRewardWeight.unwrap() == 0 || cumulativeRewardWeight.unwrap() == 0) {
       return 0;
     }
 
-    FractionUtil.Fraction memory rewardWeight = cumulativeRewardWeight.sub(
+    FixidityLib.Fraction memory rewardWeight = cumulativeRewardWeight.subtract(
       previousCumulativeRewardWeight
     );
-    require(rewardWeight.exists(), "Rewards weight does not exist");
-    uint256 value = rewardWeight.mul(account.weight);
+    require(rewardWeight.unwrap() != 0, "Rewards weight does not exist");
+    uint256 value = rewardWeight.multiply(FixidityLib.wrap(account.weight)).fromFixed();
     account.rewardsLastRedeemed = uint96(rewardBlockNumber);
     if (value > 0) {
       address recipient = getDelegateFromAccountAndRole(_account, DelegateRole.Rewards);
@@ -740,6 +742,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     return (!validators.isValidating(validator));
   }
 
+  // TODO: consider using Fixidity's roots
   /**
    * @notice Approxmiates the square root of x using the Bablyonian method.
    * @param x The number to take the square root of.
