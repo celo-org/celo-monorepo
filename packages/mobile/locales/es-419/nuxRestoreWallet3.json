@@ -9,14 +9,30 @@
   "restoreWallet": "Restaurar",
   "restoreYourWallet": {
     "title": "Restaurar su Monedero Celo",
-    "userYourBackupKey":
-      "¿Ya tiene un Monedero Celo? Use su clave de respaldo segura para restaurar su monedero a este teléfono.",
+    "socialTitle": "Secretos de recuperación",
+    "description":
+      "¿Ya tiene una billetera Celo? Ingrese su clave de respaldo para restaurarla en este teléfono",
+    "socialDescription":
+      "Cuando resguardaste tu clave de respaldo, enviaste secretos de recuperación a dos amigos para permitir que tu clave sea recuperada. Pega los secretos de recuperación aquí (en cualquier orden) para recuperar el acceso a tus fondos",
     "warning": "¡Cuidado! ",
     "restoreInPrivate": "Hágalo en privado"
   },
-  "backupKeyPrompt": "Clave de respaldo",
+  "backupKeyPlaceholder": "Clave de respaldo",
+  "backupKeyPlaceholderHalves": {
+    "0": "Primer secreto de recuperación",
+    "1": "Segundo secreto de recuperación"
+  },
   "tip": "Consejo: ",
   "backupKeyTip": "las palabras de la clave de respaldo están separadas por un espacio",
+  "socialBackupKeyTip": "Las frases secretas son listas de 13 palabras separadas por espacios",
+  "lostYourKey": {
+    "0": "¿Perdió su clave?",
+    "1": "Ingrese los secretos de recuperación"
+  },
+  "noPhrases": {
+    "0": "¿No tienes estas frases?",
+    "1": "Visita las preguntas frecuentes"
+  },
   "continue": "Continuar",
   "cancel": "Cancelar"
 }

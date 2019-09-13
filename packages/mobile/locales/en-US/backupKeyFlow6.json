@@ -46,8 +46,6 @@
     "0": "Write this phrase down on a piece of paper and keep it somewhere safe.",
     "1": "Don’t show your phrase to anyone else. They can access your wallet if they see it."
   },
-  "learnYourKey": "Write down or memorize your Backup Key.",
-  "keyWillBeVerified": "Once you have finished, we will verify that you know the key correctly.",
   "heresYourKey": "Here is your Backup Key. Remember, keep this safe.",
   "socialBackupYourKey":
     "Recovery Secrets allow you to recover your account with the help of two friends. If you lose your Backup Key, you will need to contact your friends and enter both Recovery Secrets.",

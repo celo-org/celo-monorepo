@@ -2,10 +2,14 @@
   "readOnlyMode":
     "Modo de solo lectura: cree la clave de respaldo para seguir enviando y recibiendo {{CeloDollars}}",
   "getBackupKey": "Obtener clave de respaldo",
-  "learnBackupKey": "Aprenda su clave de respaldo",
+  "viewBackupKey": "Ver clave de copia de seguridad",
+  "setUpSocialBackup": "Configurar secretos de recuperación",
+  "viewSocialBackup": "Ver secretos de recuperación",
+  "failedFetchMnemonic": "Error al recuperar su clave de copia de seguridad",
   "socialBackup": "Respaldo Social",
   "editProfile": "Editar perfil",
   "backupKey": "Clave de respaldo",
+  "yourBackupKey": "Su clave de respaldo",
   "delayBackup": "Despedir por una hora",
   "inviteFriends": "Invitar a amigos",
   "verifierApp": "Apli del verificador",
@@ -13,12 +17,15 @@
   "cancel": "Cancelar",
   "backupKeyImportance": {
     "0":
-      "Si pierde su teléfono o elimina la aplicación de Celo, perderá todo el oro y los {{dollars}} de su monedero.",
+      "Su clave de respaldo controla el acceso a su billetera Celo. Es muy importante mantener segura esta clave",
     "1":
-      "Puede hacer un respaldo del monedero si escribe una clave de respaldo en un papel y la guarda en algún sitio seguro. Así, podrá restaurar el monedero en el futuro de ser necesario.",
-    "2":
-      "No haga una captura de pantalla ni la guarde en las notas de su teléfono. Asegúrese de escribir la clave de respaldo a mano y mantenerla segura."
+      "Si pierde su teléfono o elimina la aplicación Celo, perderá el acceso a su Celo {{dollars}} y Gold"
   },
+  "toDo": "Para asegurarse de que sus fondos se mantengan seguros, deberá hacer lo siguiente:",
+  "allDone":
+    "¡Has hecho una copia de seguridad de tu clave con éxito! Vuelve aquí para verla en cualquier momento",
+  "writeDownKey": "- Escriba su clave de respaldo",
+  "shareSocialBackup": "- Compartir secretos de recuperación",
   "setBackupKey": "Crear clave de respaldo",
   "enterBackupKey": "Ingrese su clave de respaldo",
   "backupKeyConfirmation":
@@ -36,16 +43,15 @@
   "continue": "Continuar",
   "backupWithFriends": "Respaldo con Amigos",
   "tip": "Consejo ",
+  "securityTip":
+    "No tome una captura de pantalla ni la guarde en las notas de su teléfono. Mantenga su Clave de respaldo en algún lugar al que pueda acceder si pierde su teléfono",
   "backupKeySummary": {
     "0": "Escriba esta frase en un papel y guárdela en algún sitio seguro.",
     "1": "No le muestre la frase a nadie. Si alguien la sabe, podrá acceder a su monedero."
   },
-  "learnYourKey": "Escriba o memorice su clave de respaldo.",
-  "keyWillBeVerified":
-    "Una vez que haya terminado, verificaremos que conoce la clave correctamente.",
+  "heresYourKey": "Aquí está su clave de respaldo. Recuerde, mantenga esto a salvo",
   "socialBackupYourKey":
     "La copia de seguridad social es una forma de proteger su cuenta con la ayuda de sus amigos",
-  "easyToForget": "Es fácil olvidar su clave de respaldo",
   "sendFirstHalf": "Enviar la primera mitad a un contacto",
   "sendSecondHalf": "Enviar la segunda mitad a otro contacto",
   "verifying": "Verificación ({{count}} de {{total}})",
@@ -57,7 +63,11 @@
   "backToKey":
     "Le llevaremos a la pantalla con su clave de respaldo para que verifique que la escribió correctamente.",
   "seeBackupKey": "Ver clave de respaldo",
-  "backupKeySet": "Clave de respaldo creada",
+  "bothBackupsDone": {
+    "0": "¡Felicidades!",
+    "1":
+      "¡Ya terminaste! Si quieres revisar tus secretos de recuperación, siempre puedes volver aquí más tarde"
+  },
   "dontLoseIt":
     "No pierda esta clave. Es de suma importancia que la mantenga en un lugar seguro, ya que es la única forma de desbloquear su monedero si pierde su celular.",
   "done": "Listo",
@@ -65,6 +75,8 @@
     "Importante: por favor mantenga esto privado. \n\nTe estoy enviando la frase de respaldo a mi Monedero Celo: ",
   "backupPrompt":
     "Para la seguridad de sus fondos, su cuenta está congelada hasta que obtenga su clave de respaldo",
-  "copyToClipboard": "Copiar al portapapeles",
-  "copiedToClipboard": "Copiada al portapapeles"
+  "copy": "Copiar",
+  "copied": "Copiada al portapapeles",
+  "clipboardCleared": "Portapapeles borrado",
+  "failedCopy": "Error al copiar al portapapeles"
 }
