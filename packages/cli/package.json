@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "0.0.18",
+  "version": "0.0.20",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -28,7 +28,7 @@
     "test": "export TZ=UTC && jest --ci --silent"
   },
   "dependencies": {
-    "@celo/walletkit": "^0.0.14",
+    "@celo/walletkit": "^0.0.15",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
