@@ -579,6 +579,33 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
           >
             0.00
           </Text>
+          <Text
+            style={
+              Array [
+                Object {
+                  "fontFamily": "Hind-Light",
+                },
+                Object {
+                  "color": "#B0B5B9",
+                  "fontSize": 18,
+                },
+              ]
+            }
+          >
+            Equal to
+             
+            <Text
+              style={
+                Object {
+                  "fontFamily": "Hind-SemiBold",
+                }
+              }
+            >
+              0.00
+               
+              MXN
+            </Text>
+          </Text>
         </View>
       </View>
       <View
