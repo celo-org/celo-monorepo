@@ -1,10 +1,15 @@
 import { ensureAuthenticatedGcloudAccount } from '@celo/celotool/src/lib/gcloud_utils'
 import { generateGenesisFromEnv } from '@celo/celotool/src/lib/generate_utils'
-import { getEnodesWithExternalIPAddresses, sleep } from '@celo/celotool/src/lib/geth'
-import { StaticNodeUtils } from '@celo/walletkit'
+import {
+  getBootnodeEnodes,
+  getEnodesWithExternalIPAddresses,
+  sleep,
+} from '@celo/celotool/src/lib/geth'
+import { BootnodeUtils, StaticNodeUtils } from '@celo/walletkit'
 import { Storage } from '@google-cloud/storage'
 import { writeFileSync } from 'fs'
 
+const bootnodesBucketName = BootnodeUtils.getBootnodesGoogleStorageBucketName()
 const genesisBlocksBucketName = 'genesis_blocks'
 const staticNodesBucketName = StaticNodeUtils.getStaticNodesGoogleStorageBucketName()
 
@@ -22,22 +27,10 @@ export async function uploadStaticNodesToGoogleStorage(networkName: string) {
   console.info(`\nUploading static nodes for ${networkName} to Google cloud storage...`)
   // Get node json file
   let nodesJsonData: string | null = null
-  const numAttempts = 100
-  for (let i = 1; i <= numAttempts; i++) {
-    try {
-      nodesJsonData = JSON.stringify(await getEnodesWithExternalIPAddresses(networkName))
-      break
-    } catch (error) {
-      const sleepTimeBasisInMs = 1000
-      const sleepTimeInMs = sleepTimeBasisInMs * Math.pow(2, i)
-      console.warn(
-        `${new Date().toLocaleTimeString()} Failed to get static nodes information, attempt: ${i}/${numAttempts}, ` +
-          `retry after sleeping for ${sleepTimeInMs} milli-seconds`,
-        error
-      )
-      await sleep(sleepTimeInMs)
-    }
-  }
+  nodesJsonData = await tryNTimes(
+    async () => JSON.stringify(await getEnodesWithExternalIPAddresses(networkName)),
+    100
+  )
   if (nodesJsonData === null) {
     throw new Error('Fail to get static nodes information')
   }
@@ -45,6 +38,41 @@ export async function uploadStaticNodesToGoogleStorage(networkName: string) {
   const localTmpFilePath = `/tmp/${networkName}_static-nodes`
   writeFileSync(localTmpFilePath, nodesJsonData)
   await uploadFileToGoogleStorage(localTmpFilePath, staticNodesBucketName, networkName, true)
+}
+
+// only intended to be used for VM testnets because non-VM testnets do not support
+// discovery v5 due to udp IP issues
+export async function uploadBootnodesToGoogleStorage(celoEnv: string) {
+  console.info(`\nUploading bootnodes for ${celoEnv} to Google cloud storage...`)
+  const bootnodeEnodesJson = await tryNTimes(
+    async () => JSON.stringify(await getBootnodeEnodes(celoEnv)),
+    100
+  )
+  if (!bootnodeEnodesJson) {
+    throw new Error('Failed to get bootnode enodes')
+  }
+  console.debug('Bootnode enodes are ' + bootnodeEnodesJson + '\n')
+  const localTmpFilePath = `/tmp/${celoEnv}_bootnodes`
+  writeFileSync(localTmpFilePath, bootnodeEnodesJson)
+  await uploadFileToGoogleStorage(localTmpFilePath, bootnodesBucketName, celoEnv, true)
+}
+
+async function tryNTimes(action: () => Promise<any>, attempts: number) {
+  for (let i = 1; i <= attempts; i++) {
+    try {
+      const result = await action()
+      return result
+    } catch (error) {
+      const sleepTimeBasisInMs = 1000
+      const sleepTimeInMs = sleepTimeBasisInMs * Math.pow(2, i)
+      console.warn(
+        `${new Date().toLocaleTimeString()} Action failed, attempt: ${i}/${attempts}, ` +
+          `retry after sleeping for ${sleepTimeInMs} milli-seconds`,
+        error
+      )
+      await sleep(sleepTimeInMs)
+    }
+  }
 }
 
 // TODO(yerdua): make this communicate or handle auth issues reasonably. Ideally,

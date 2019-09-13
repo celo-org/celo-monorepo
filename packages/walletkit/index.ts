@@ -1,3 +1,4 @@
+import BootnodeUtils from './src/bootnode-utils'
 import ContractUtils from './src/contract-utils-v2'
 import GenesisBlockUtils from './src/genesis-block-utils'
 import GoogleStorageUtils from './src/google-storage-utils'
@@ -90,6 +91,7 @@ export {
   transferToken,
   transferTokenWithComment,
 } from './src/erc20-utils'
+export { BootnodeUtils }
 export { ContractUtils }
 export { GenesisBlockUtils }
 export { GoogleStorageUtils }

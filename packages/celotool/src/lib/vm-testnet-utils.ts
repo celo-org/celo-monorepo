@@ -24,6 +24,7 @@ import {
   untaintTerraformModuleResource,
 } from '@celo/celotool/src/lib/terraform'
 import {
+  uploadBootnodesToGoogleStorage,
   uploadFileToGoogleStorage,
   uploadGenesisBlockToGoogleStorage,
   uploadStaticNodesToGoogleStorage,
@@ -76,6 +77,7 @@ export async function deploy(celoEnv: string, onConfirmFailed?: () => Promise<vo
 
   await uploadGenesisBlockToGoogleStorage(celoEnv)
   await uploadStaticNodesToGoogleStorage(celoEnv)
+  await uploadBootnodesToGoogleStorage(celoEnv)
 }
 
 async function deployModule(

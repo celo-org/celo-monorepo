@@ -33,6 +33,7 @@ const DEFAULT_TRANSFER_AMOUNT = new BigNumber('0.00000000000001')
 
 const GETH_IPC = 'geth.ipc'
 const DISCOVERY_PORT = 30303
+const BOOTNODE_DISCOVERY_PORT = 30301
 
 const BLOCKSCOUT_TIMEOUT = 12000 // ~ 12 seconds needed to see the transaction in the blockscout
 
@@ -79,8 +80,8 @@ const getExternalEnodeAddresses = async (namespace: string) => {
   return getEnodesWithIpAddresses(namespace, true)
 }
 
-export const getBootnodeEnode = async (namespace: string) => {
-  const ip = await retrieveIPAddress(`${namespace}-bootnode`)
+export const getBootnodeEnodes = async (namespace: string) => {
+  const ip = await getBootnodeIPAddress(namespace)
   // We couldn't use our updated docker image, so for now the bootnodes id is based upon the load_testing account
   const privateKey = generatePrivateKey(
     fetchEnv(envVar.MNEMONIC),
@@ -88,7 +89,16 @@ export const getBootnodeEnode = async (namespace: string) => {
     0
   )
   const nodeId = privateKeyToPublicKey(privateKey)
-  return [getEnodeAddress(nodeId, ip, DISCOVERY_PORT)]
+  return [getEnodeAddress(nodeId, ip, BOOTNODE_DISCOVERY_PORT)]
+}
+
+export const getBootnodeIPAddress = async (celoEnv: string) => {
+  if (isVmBased()) {
+    const outputs = await getTestnetOutputs(celoEnv)
+    return outputs.bootnode_ip_address.value
+  } else {
+    return retrieveIPAddress(`${celoEnv}-bootnode`)
+  }
 }
 
 const retrieveTxNodeAddresses = async (namespace: string, txNodesNum: number) => {

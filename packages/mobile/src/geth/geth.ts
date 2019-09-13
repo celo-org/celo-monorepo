@@ -56,6 +56,9 @@ async function createNewGeth(): Promise<typeof RNGeth> {
   Logger.debug('Geth@newGeth', `Network ID is ${networkID}`)
 
   const gethOptions: any = {
+    bootnodeEnodes: [
+      `enode://93dfb5cc7cf1fc9d60997427cca3d4c05a1705eae8b50393841267df3ea4d4eab6528137aa2d0d40b158c33555fb7b07c74882c60fb625423ac74c535db6c57e@34.83.237.207:30301`,
+    ],
     nodeDir,
     networkID,
     genesis,
@@ -63,11 +66,6 @@ async function createNewGeth(): Promise<typeof RNGeth> {
     syncMode,
     useLightweightKDF: true,
     maxPeers: 25,
-    // // enodes:
-    // //   'enode://93dfb5cc7cf1fc9d60997427cca3d4c05a1705eae8b50393841267df3ea4d4eab6528137aa2d0d40b158c33555fb7b07c74882c60fb625423ac74c535db6c57e@35.185.215.79:30301',
-    bootstrapEnodeUrls: [
-      `enode://93dfb5cc7cf1fc9d60997427cca3d4c05a1705eae8b50393841267df3ea4d4eab6528137aa2d0d40b158c33555fb7b07c74882c60fb625423ac74c535db6c57e@34.83.237.207:30301`,
-    ],
   }
 
   Logger.debug('Geth@newGeth gethOptions:', gethOptions)
