@@ -64,11 +64,11 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
         defaultCountryCode: action.countryCode,
       }
     case Actions.DEV_MODE_TRIGGER_CLICKED:
-      const newClickCount = (state.devModeClickCount + 1) % 10
+      const newClickCount = (state.devModeClickCount + 1) % 6
       return {
         ...state,
         devModeClickCount: newClickCount,
-        devModeActive: newClickCount >= 5,
+        devModeActive: newClickCount >= 3,
       }
     case Actions.PHOTOSNUX_CLICKED:
       return {
@@ -124,7 +124,8 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
 }
 
 export const devModeSelector = (state: RootState) => state.account.devModeActive
+export const nameSelector = (state: RootState) => state.account.name
 export const e164NumberSelector = (state: RootState) => state.account.e164PhoneNumber
 export const defaultCountryCodeSelector = (state: RootState) => state.account.defaultCountryCode
-export const getUserContactDetails = (state: RootState) => state.account.contactDetails
+export const userContactDetailsSelector = (state: RootState) => state.account.contactDetails
 export const pincodeSelector = (state: RootState) => state.account.pincodeSet
