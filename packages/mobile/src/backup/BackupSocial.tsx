@@ -98,6 +98,7 @@ class BackupSocial extends React.Component<Props, State> {
     const { mnemonic } = this.state
     const [firstHalf, secondHalf] = splitMnemonic(mnemonic, language)
 
+    // TODO(Derrick): Disable continue button until user taps copy / send
     return (
       <View style={styles.container}>
         <KeyboardAwareScrollView
