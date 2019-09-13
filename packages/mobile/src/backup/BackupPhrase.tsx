@@ -3,7 +3,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { Clipboard, StyleSheet, Text, View } from 'react-native'
 import FlagSecure from 'react-native-flag-secure-android'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { connect } from 'react-redux'
@@ -80,7 +80,12 @@ class BackupPhrase extends React.Component<Props, State> {
   }
 
   continueBackup = () => {
+    const { t } = this.props
     CeloAnalytics.track(CustomEventNames.backup_continue)
+    // Clear clipboard so that users won't just copy here and paste it directly
+    // in the verification step.  Hopefully makes users paste it somewhere else at least.
+    Clipboard.setString('')
+    Logger.showMessage(t('clipboardCleared'))
     navigate(Screens.BackupQuiz)
   }
 

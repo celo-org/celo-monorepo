@@ -76,5 +76,6 @@
     "For the security of your funds, your account is frozen until you get your Backup Key",
   "copy": "Copy",
   "copied": "Copied to clipboard",
+  "clipboardCleared": "Clipboard cleared",
   "failedCopy": "Failed to copy to clipboard"
 }
