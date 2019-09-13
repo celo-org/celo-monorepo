@@ -138,22 +138,25 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                     ]
                   }
                 >
-                  <Text
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../src/images/unknown-user-icon.png",
+                      }
+                    }
                     style={
                       Array [
                         Object {
-                          "color": "#FFFFFF",
-                          "fontFamily": "Hind-Medium",
-                          "fontSize": 16,
+                          "alignSelf": "center",
+                          "margin": "auto",
                         },
                         Object {
-                          "fontSize": 20,
+                          "height": 40,
+                          "width": 40,
                         },
                       ]
                     }
-                  >
-                    J
-                  </Text>
+                  />
                 </View>
               </View>
               <Text
