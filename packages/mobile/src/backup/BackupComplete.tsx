@@ -28,9 +28,11 @@ class BackupComplete extends React.Component<Props> {
     ...nuxNavigationOptionsNoBackButton,
   })
 
+  // Todo(Derrick): Handle back button on this screen to go back to Screens.Account
+  // instead of previous BackupSocialSecond screen
+
   onDone = () => {
-    // This screen should be reachable when regular backup is already completed
-    this.props.setBackupCompleted()
+    // This screen is only reachable when regular backup is already completed
     this.props.setSocialBackupCompleted()
 
     CeloAnalytics.track(CustomEventNames.question_done)
