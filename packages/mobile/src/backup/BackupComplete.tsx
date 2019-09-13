@@ -3,14 +3,14 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { setBackupCompleted, setSocialBackupCompleted } from 'src/account/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { Namespaces } from 'src/i18n'
-import NuxLogo from 'src/icons/NuxLogo'
+import { shinyGold } from 'src/images/Images'
 import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -43,7 +43,9 @@ class BackupComplete extends React.Component<Props> {
     return (
       <View style={styles.container}>
         <View style={styles.questionTextContainer}>
-          <NuxLogo />
+          <View>
+            <Image source={shinyGold} style={styles.logo} />
+          </View>
           <Text style={[fontStyles.h1, styles.h1]}>{t('bothBackupsDone.0')}</Text>
           <Text style={fontStyles.body}>{t('bothBackupsDone.1')}</Text>
         </View>
@@ -54,25 +56,28 @@ class BackupComplete extends React.Component<Props> {
 }
 
 const styles = StyleSheet.create({
+  logo: {
+    alignItems: 'center',
+    width: 75,
+    height: 75,
+    marginBottom: 20,
+  },
   container: {
     flex: 1,
     backgroundColor: 'white',
-    justifyContent: 'space-between',
     flexDirection: 'column',
     paddingHorizontal: 20,
   },
   questionTextContainer: {
-    paddingTop: 40,
+    flex: 1,
+    paddingBottom: 40,
+    justifyContent: 'center',
     alignItems: 'center',
+    flexDirection: 'column',
   },
   h1: {
     color: colors.dark,
     paddingTop: 25,
-  },
-  copyToClipboardButton: {
-    marginTop: 50,
-    alignSelf: 'center',
-    fontSize: 14,
   },
 })
 

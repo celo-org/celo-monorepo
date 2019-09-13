@@ -68,7 +68,7 @@
     "Please do not lose this key. It is critical that you maintain this in a safe place, as this is the only way to unlock your wallet should you lose your phone.",
   "done": "Done",
   "whatsappMessage":
-    "Important: please keep this private. \n\nI'm sending you the Backup Phrase to my Celo Wallet: ",
+    "Important: please keep this private. \n\nI'm sending you the Backup Phrase to my Celo Wallet: \n\n",
   "backupPrompt":
     "For the security of your funds, your account is frozen until you get your Backup Key",
   "copy": "Copy",
