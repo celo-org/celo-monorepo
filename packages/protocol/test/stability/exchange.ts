@@ -422,22 +422,6 @@ contract('Exchange', (accounts: string[]) => {
         assertEqualBN(actualGoldBalance, expectedGoldBalance)
       })
 
-      it('should work even if buckets need updating', async () => {
-        await fundReserve()
-        await timeTravel(updateFrequency, web3)
-
-        await exchange.exchange(
-          goldTokenAmount,
-          expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
-          true,
-          {
-            from: user,
-          }
-        )
-        const newStableBalance = await stableToken.balanceOf(user)
-        assertEqualBN(newStableBalance, expectedStableBalance)
-      })
-
       it(`should remove the user's allowance`, async () => {
         await exchange.exchange(
           goldTokenAmount,
@@ -541,6 +525,49 @@ contract('Exchange', (accounts: string[]) => {
             }
           )
         )
+      })
+
+      describe.only('when buckets need updating', () => {
+        beforeEach(async () => {
+          await fundReserve()
+          await timeTravel(updateFrequency, web3)
+          await mockSortedOracles.setMedianTimestampToNow(stableToken.address)
+        })
+
+        it('the exchange should succeed', async () => {
+          await exchange.exchange(
+            goldTokenAmount,
+            expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
+            true,
+            {
+              from: user,
+            }
+          )
+          const newStableBalance = await stableToken.balanceOf(user)
+          // TODO: HALP! I don't know what this is actually supposed to be :(
+          assertEqualBN(newStableBalance, expectedStableBalance)
+        })
+
+        it('should update the buckets', async () => {
+          await exchange.exchange(
+            goldTokenAmount,
+            expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
+            true,
+            {
+              from: user,
+            }
+          )
+          const newGoldBucket = await exchange.goldBucket()
+          const newStableBucket = await exchange.stableBucket()
+
+          // .times(2) => fundReserve will double the initial amount in the bucket
+          // .minus(goldTokenAmount) => add the amount expected to be paid to the reserve
+          const expectedGoldBucket = initialGoldBucket.times(2).plus(goldTokenAmount)
+          assertEqualBN(newGoldBucket, expectedGoldBucket)
+
+          // TODO: HALP! I don't know what this is actually supposed to be :(
+          assertEqualBN(newStableBucket, initialStableBucket)
+        })
       })
     })
 
