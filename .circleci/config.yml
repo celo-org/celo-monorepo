@@ -310,7 +310,7 @@ jobs:
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_transfers.sh checkout m-chrzan/validators-list
+            ./ci_test_transfers.sh checkout master
 
   end-to-end-geth-governance-test:
     <<: *defaults
@@ -351,7 +351,7 @@ jobs:
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_governance.sh checkout m-chrzan/validators-list
+            ./ci_test_governance.sh checkout master
 
   end-to-end-geth-sync-test:
     <<: *defaults
@@ -391,7 +391,7 @@ jobs:
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_sync.sh checkout m-chrzan/validators-list
+            ./ci_test_sync.sh checkout master
 
   end-to-end-geth-integration-sync-test:
     <<: *defaults
@@ -424,7 +424,7 @@ jobs:
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_sync_with_network.sh checkout m-chrzan/validators-list
+            ./ci_test_sync_with_network.sh checkout master
 
   web:
     working_directory: ~/app
