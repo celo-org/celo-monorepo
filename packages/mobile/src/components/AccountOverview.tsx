@@ -1,6 +1,7 @@
 import colors from '@celo/react-components/styles/colors'
 import fontStyles, { estimateFontSize } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
+import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
@@ -90,7 +91,7 @@ export class AccountOverview extends React.Component<Props> {
                 style={[style.education, !this.props.stableEducationCompleted && style.dotOffset]}
               >
                 <CurrencyDisplay
-                  amount={dollarBalance}
+                  amount={new BigNumber(dollarBalance || 0)}
                   size={this.getFontSize(dollarBalance, !this.props.stableEducationCompleted)}
                   type={Tokens.DOLLAR}
                 />
@@ -107,7 +108,7 @@ export class AccountOverview extends React.Component<Props> {
                 style={[style.education, !this.props.goldEducationCompleted && style.dotOffset]}
               >
                 <CurrencyDisplay
-                  amount={goldBalance}
+                  amount={new BigNumber(goldBalance || 0)}
                   size={this.getFontSize(goldBalance, !this.props.goldEducationCompleted)}
                   type={Tokens.GOLD}
                 />

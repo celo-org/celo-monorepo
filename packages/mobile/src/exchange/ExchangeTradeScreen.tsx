@@ -17,11 +17,11 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { GOLD_NUM_DECIMALS, TRANSACTION_MIN_AMOUNT } from 'src/config'
+import { TRANSACTION_MIN_AMOUNT } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import ExchangeRate from 'src/exchange/ExchangeRate'
 import { ExchangeRatePair } from 'src/exchange/reducer'
-import { CURRENCIES, CURRENCY_ENUM as Token } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM as Tokens } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
@@ -37,7 +37,7 @@ import {
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 interface State {
-  makerToken: Token
+  makerToken: Tokens
   makerTokenAmount: string
 }
 
@@ -70,7 +70,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   })
 
   state = {
-    makerToken: Token.DOLLAR,
+    makerToken: Tokens.DOLLAR,
     makerTokenAmount: '',
   }
 
@@ -79,16 +79,16 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 
   switchTokens = () => {
-    const makerToken = this.state.makerToken === Token.DOLLAR ? Token.GOLD : Token.DOLLAR
+    const makerToken = this.state.makerToken === Tokens.DOLLAR ? Tokens.GOLD : Tokens.DOLLAR
     this.setState({ makerToken }, () => {
       this.updateError(this.state.makerTokenAmount)
     })
     CeloAnalytics.track(CustomEventNames.currency_swap)
   }
 
-  setExchangeAmount = (amount: string) => {
+  onChangeExchangeAmount = (amount: string) => {
     // remove $ we inserted for display purposes
-    const currencySymbol = new RegExp('\\' + CURRENCIES[Token.DOLLAR].symbol, 'g')
+    const currencySymbol = new RegExp('\\' + CURRENCIES[Tokens.DOLLAR].symbol, 'g')
     amount = amount.replace(currencySymbol, '')
 
     this.setState({ makerTokenAmount: amount }, () => {
@@ -108,7 +108,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   onEndEditing = () => {
     CeloAnalytics.track(
-      this.state.makerToken === Token.DOLLAR
+      this.state.makerToken === Tokens.DOLLAR
         ? CustomEventNames.exchange_dollar_input
         : CustomEventNames.exchange_gold_input,
       { exchangeInputAmount: this.state.makerTokenAmount }
@@ -131,15 +131,15 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     const { makerToken, makerTokenAmount } = this.state
     CeloAnalytics.track(CustomEventNames.exchange_continue)
     navigate(Screens.ExchangeReview, {
-      exchangeInfo: { makerToken, makerAmount: parseInputAmount(makerTokenAmount) },
+      confirmationInput: { makerToken, makerAmount: parseInputAmount(makerTokenAmount) },
     })
   }
 
-  newBalance = (takerTokenAmount: BigNumber) => {
+  getNewTakerBalance = (takerTokenAmount: BigNumber) => {
     const { dollarBalance, goldBalance } = this.props
     return this.isDollarToGold()
       ? getNewTakerBalance(goldBalance, takerTokenAmount)
-      : CURRENCIES[Token.DOLLAR].symbol + getNewTakerBalance(dollarBalance, takerTokenAmount)
+      : getNewTakerBalance(dollarBalance, takerTokenAmount)
   }
 
   hasError = () => {
@@ -153,10 +153,11 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
       amount.isGreaterThan(makerBalance) || amount.isLessThan(TRANSACTION_MIN_AMOUNT)
     const exchangeRate = getRateForMakerToken(this.props.exchangeRatePair, this.state.makerToken)
     const exchangeRateIsInvalid = exchangeRate.isLessThanOrEqualTo(0)
+    const takerToken = this.isDollarToGold() ? Tokens.GOLD : Tokens.DOLLAR
     const takerAmountIsInvalid = getTakerAmount(
       amount,
       exchangeRate,
-      GOLD_NUM_DECIMALS
+      CURRENCIES[takerToken].displayDecimals
     ).isLessThanOrEqualTo(0)
 
     return amountIsInvalid || exchangeRateIsInvalid || takerAmountIsInvalid || this.hasError()
@@ -169,7 +170,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 
   isDollarToGold = () => {
-    return this.state.makerToken === Token.DOLLAR
+    return this.state.makerToken === Tokens.DOLLAR
   }
 
   getInputValue = () => {
@@ -183,16 +184,16 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   getMakerTakerProps = () => {
     const { t } = this.props
     const dollarProps = {
-      token: Token.DOLLAR,
+      token: Tokens.DOLLAR,
       tokenText: t('global:celoDollars') + ' (cUSD)',
       style: styles.green,
-      symbol: CURRENCIES[Token.DOLLAR].symbol,
+      symbol: CURRENCIES[Tokens.DOLLAR].symbol,
     }
     const goldProps = {
-      token: Token.GOLD,
+      token: Tokens.GOLD,
       tokenText: t('global:celoGold') + ' (cGLD)',
       style: styles.gold,
-      symbol: CURRENCIES[Token.DOLLAR].symbol,
+      symbol: CURRENCIES[Tokens.GOLD].symbol,
     }
 
     if (this.isDollarToGold()) {
@@ -215,9 +216,10 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     const { t } = this.props
 
     const { maker, taker, placeholderColor } = this.getMakerTakerProps()
-    const balance = this.getMakerBalance()
+    const makerBalance = this.getMakerBalance()
     const exchangeRate = getRateForMakerToken(this.props.exchangeRatePair, maker.token)
     const takerTokenAmount = getTakerAmount(parseInputAmount(makerTokenAmount), exchangeRate)
+    const newTakerBalance = this.getNewTakerBalance(takerTokenAmount)
 
     const borderStyle = { borderColor: this.hasError() ? colors.errorRed : colors.dark }
 
@@ -236,7 +238,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
                 caretHidden={false}
                 maxLength={11}
                 keyboardType={'decimal-pad'}
-                onChangeText={this.setExchangeAmount}
+                onChangeText={this.onChangeExchangeAmount}
                 onEndEditing={this.onEndEditing}
                 onFocus={this.recordFocus}
                 value={this.getInputValue()}
@@ -255,7 +257,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               <View style={styles.transferMeta}>
                 <Text style={fontStyles.bodySmall}>{t('available')} </Text>
                 <Text numberOfLines={1} style={[fontStyles.bodySmallBold, maker.style]}>
-                  {maker.symbol + getMoneyDisplayValue(balance, maker.token)}
+                  {getMoneyDisplayValue(makerBalance, maker.token, true)}
                 </Text>
               </View>
             </View>
@@ -272,7 +274,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               <View style={[styles.outputBox, styles.ioBox]}>
                 <View style={styles.outputText}>
                   <Text numberOfLines={1} style={[styles.input, fontStyles.regular, taker.style]}>
-                    {getMoneyDisplayValue(takerTokenAmount, taker.token)}
+                    {getMoneyDisplayValue(takerTokenAmount, taker.token, true)}
                   </Text>
                   <Text style={[styles.input, fontStyles.regular, taker.style, styles.superscript]}>
                     *
@@ -282,7 +284,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               <View style={styles.transferMeta}>
                 <Text style={fontStyles.bodySmall}>{t('newBalance')} </Text>
                 <Text numberOfLines={1} style={[fontStyles.bodySmallBold, taker.style]}>
-                  {this.newBalance(takerTokenAmount)}
+                  {getMoneyDisplayValue(newTakerBalance, taker.token, true)}
                 </Text>
               </View>
             </View>
@@ -300,7 +302,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
             accessibilityLabel={t('continue')}
             standard={false}
             disabled={this.isExchangeInvalid()}
-            type={BtnTypes.SECONDARY}
+            type={BtnTypes.PRIMARY}
           />
         </View>
       </View>

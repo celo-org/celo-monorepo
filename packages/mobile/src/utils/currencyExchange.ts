@@ -2,7 +2,6 @@
 import BigNumber from 'bignumber.js'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM as Tokens } from 'src/geth/consts'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 const TAG = 'utils/currencyExchange'
 
@@ -58,11 +57,11 @@ export function getTakerAmount(makerAmount: numberT, exchangeRate: numberT, deci
 }
 
 export function getNewMakerBalance(previousBalance: string | null, delta: BigNumber) {
-  return getMoneyDisplayValue(new BigNumber(previousBalance || 0).minus(delta))
+  return new BigNumber(previousBalance || 0).minus(delta)
 }
 
 export function getNewTakerBalance(previousBalance: string | null, delta: BigNumber) {
-  return getMoneyDisplayValue(new BigNumber(previousBalance || 0).plus(delta))
+  return new BigNumber(previousBalance || 0).plus(delta)
 }
 
 export function getNewDollarBalance(
@@ -85,8 +84,4 @@ export function getNewGoldBalance(
   return makerToken === Tokens.GOLD
     ? getNewMakerBalance(goldBalance, makerAmount)
     : getNewTakerBalance(goldBalance, takerAmount)
-}
-
-export function isValidExchange() {
-  return true
 }
