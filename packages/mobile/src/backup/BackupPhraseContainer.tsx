@@ -48,19 +48,21 @@ export class BackupPhraseContainer extends React.Component<Props> {
         {!!words && (
           <View style={styles.phraseContainer}>
             <Text style={styles.phraseText}>{`${words}`}</Text>
-            <View>
+            <View style={styles.buttonsContainer}>
               {showCopy && (
                 <Button
                   onPress={this.copy}
                   text={t('copy')}
+                  style={styles.button}
                   standard={true}
                   type={BtnTypes.QUATERNARY}
                 />
               )}
               {showWhatsApp && (
                 <Button
-                  onPress={this.copy}
+                  onPress={this.sendWhatsapp}
                   text={t('sendWhatsApp')}
+                  style={styles.button}
                   standard={true}
                   type={BtnTypes.PRIMARY}
                 />
@@ -79,16 +81,20 @@ const styles = StyleSheet.create({
   },
   phraseContainer: {
     position: 'relative',
-    backgroundColor: colors.altDarkBg,
+    backgroundColor: colors.darkLightest,
+    borderRadius: 4,
     alignContent: 'center',
     justifyContent: 'center',
     padding: 16,
     marginTop: 4,
   },
   buttonsContainer: {
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  button: {
+    alignSelf: 'center',
+    flex: 0.48,
   },
   phraseText: {
     ...fontStyles.h2,
