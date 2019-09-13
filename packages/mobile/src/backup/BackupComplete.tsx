@@ -42,38 +42,39 @@ class BackupComplete extends React.Component<Props> {
     const { t } = this.props
     return (
       <View style={styles.container}>
-        <View style={styles.questionTextContainer}>
+        <View style={styles.textContainer}>
           <View>
             <Image source={shinyGold} style={styles.logo} />
           </View>
           <Text style={[fontStyles.h1, styles.h1]}>{t('bothBackupsDone.0')}</Text>
           <Text style={fontStyles.body}>{t('bothBackupsDone.1')}</Text>
         </View>
-        <Button onPress={this.onDone} text={t('done')} standard={true} type={BtnTypes.PRIMARY} />
+        <Button onPress={this.onDone} text={t('done')} standard={false} type={BtnTypes.PRIMARY} />
       </View>
     )
   }
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  textContainer: {
+    flex: 1,
+    paddingBottom: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column',
+    paddingHorizontal: 20,
+  },
   logo: {
     alignItems: 'center',
     width: 75,
     height: 75,
     marginBottom: 20,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-    flexDirection: 'column',
-    paddingHorizontal: 20,
-  },
-  questionTextContainer: {
-    flex: 1,
-    paddingBottom: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'column',
   },
   h1: {
     color: colors.dark,

@@ -42,6 +42,7 @@ export class BackupPhraseContainer extends React.Component<Props> {
 
   render() {
     const { t, label, words, showCopy, showWhatsApp } = this.props
+
     return (
       <View style={styles.container}>
         <Text style={styles.labelText}>{label}</Text>
@@ -53,7 +54,7 @@ export class BackupPhraseContainer extends React.Component<Props> {
                 <Button
                   onPress={this.copy}
                   text={t('copy')}
-                  style={styles.button}
+                  style={[styles.button, !showWhatsApp && styles.fullWidthButton]}
                   standard={true}
                   type={BtnTypes.QUATERNARY}
                 />
@@ -62,7 +63,7 @@ export class BackupPhraseContainer extends React.Component<Props> {
                 <Button
                   onPress={this.sendWhatsapp}
                   text={t('sendWhatsApp')}
-                  style={styles.button}
+                  style={[styles.button, !showCopy && styles.fullWidthButton]}
                   standard={true}
                   type={BtnTypes.PRIMARY}
                 />
@@ -95,6 +96,9 @@ const styles = StyleSheet.create({
   button: {
     alignSelf: 'center',
     flex: 0.48,
+  },
+  fullWidthButton: {
+    flex: 1,
   },
   phraseText: {
     ...fontStyles.h2,

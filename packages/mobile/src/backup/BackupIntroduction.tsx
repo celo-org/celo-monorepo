@@ -157,9 +157,21 @@ class BackupIntroduction extends React.Component<Props, State> {
             <Image source={backupIcon} style={styles.logo} />
           </View>
           <Text style={[fontStyles.h1, styles.h1]}>{t('backupKey')}</Text>
-          <Text style={[fontStyles.body, styles.body]}>{t('backupKeyImportance.0')}</Text>
-          <Text style={[fontStyles.body, styles.body]}>{t('backupKeyImportance.1')}</Text>
-          <Text style={[fontStyles.body, styles.body]}>{t('backupKeyImportance.2')}</Text>
+          <Text style={[fontStyles.body, styles.body]}>
+            {t('backupKeyImportance.0')}
+            <Text style={[fontStyles.bold]}>{t('backupKeyImportance.1')}</Text>
+          </Text>
+          {!backupCompleted || !socialBackupCompleted ? (
+            <Text style={[fontStyles.body, styles.body]}>{t('toDo')}</Text>
+          ) : (
+            <Text style={[fontStyles.body, styles.body]}>{t('allDone')}</Text>
+          )}
+          {!backupCompleted && (
+            <Text style={[fontStyles.body, styles.body]}>{t('writeDownKey')}</Text>
+          )}
+          {!socialBackupCompleted && (
+            <Text style={[fontStyles.body, styles.body]}>{t('shareSocialBackup')}</Text>
+          )}
         </ScrollView>
         <View>
           <View style={styles.modalContainer}>
@@ -238,7 +250,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     flexDirection: 'column',
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   center: {
     alignItems: 'center',

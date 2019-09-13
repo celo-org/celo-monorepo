@@ -111,17 +111,17 @@ class BackupPhrase extends React.Component<Props, State> {
               {t('backupKeyImportance.2')}
             </Text>
           </View>
-          <View>
-            {!backupCompleted && (
-              <Button
-                onPress={this.continueBackup}
-                text={t('continue')}
-                standard={true}
-                type={BtnTypes.PRIMARY}
-              />
-            )}
-          </View>
         </KeyboardAwareScrollView>
+        <View>
+          {!backupCompleted && (
+            <Button
+              onPress={this.continueBackup}
+              text={t('continue')}
+              standard={false}
+              type={BtnTypes.PRIMARY}
+            />
+          )}
+        </View>
       </View>
     )
   }

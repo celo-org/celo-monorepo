@@ -141,15 +141,15 @@ class BackupSocial extends React.Component<Props, State> {
                 />
               )}
           </View>
-          <View>
-            <Button
-              onPress={this.continueBackup}
-              text={t('continue')}
-              standard={true}
-              type={BtnTypes.PRIMARY}
-            />
-          </View>
         </KeyboardAwareScrollView>
+        <View>
+          <Button
+            onPress={this.continueBackup}
+            text={t('continue')}
+            standard={false}
+            type={BtnTypes.PRIMARY}
+          />
+        </View>
       </View>
     )
   }
@@ -165,6 +165,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     flex: 1,
     justifyContent: 'space-between',
+    flexDirection: 'column',
   },
   title: {
     marginVertical: 10,

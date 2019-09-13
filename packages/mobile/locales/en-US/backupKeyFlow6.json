@@ -16,12 +16,14 @@
   "cancel": "Cancel",
   "backupKeyImportance": {
     "0":
-      "If you lose your phone or delete the Celo app, you will lose all of the gold and {{dollars}} in your wallet.",
+      "Your Backup Key controls access ot your Celo Wallet. It is very important to keep this Key safe. ",
     "1":
-      "You can back up your wallet by writing down a Backup Key on a piece of paper and storing it securely. This allows you to restore your wallet in the future if you need to.",
-    "2":
-      "Don’t take a screenshot or save it in your phone notes. Make sure to write the Backup Key down and keep it safe."
+      "If you lose your phone or delete the Celo app, you will lose access to your Celo {{dollars}} and Gold."
   },
+  "toDo": "To make sure your funds stay safe, you'll need to do the following:",
+  "allDone": "You've successfully backed up your Key! Check back here to view it at any time.",
+  "writeDownKey": "- Write down your Backup Key",
+  "shareSocialBackup": "- Share Recovery Secrets",
   "setBackupKey": "Set Backup Key",
   "enterBackupKey": "Enter your Backup Key",
   "backupKeyConfirmation":
