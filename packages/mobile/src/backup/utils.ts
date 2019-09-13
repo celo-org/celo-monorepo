@@ -5,6 +5,9 @@ import { getKey, setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'Backup/utils'
+
+export const DAYS_TO_BACKUP = 1
+export const DAYS_TO_DELAY = 1 / 24 // 1 hour delay
 const MNEMONIC_SPLITS = 2
 
 export async function createQuizWordList(mnemonic: string, language: string | null) {

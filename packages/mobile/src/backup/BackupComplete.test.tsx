@@ -1,17 +1,16 @@
 import * as React from 'react'
 import 'react-native'
+import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import BackupComplete from 'src/backup/BackupComplete'
+import { createMockStore } from 'test/utils'
 
 describe('BackupComplete', () => {
-  it('renders correctly if backup not completed', () => {
-    const tree = renderer.create(<BackupComplete mnemonic={'foo bar'} onPress={jest.fn()} />)
-    expect(tree).toMatchSnapshot()
-  })
-
-  it('renders correctly if backup completed', () => {
+  it('renders correctly', () => {
     const tree = renderer.create(
-      <BackupComplete mnemonic={'foo bar'} onPress={jest.fn()} backupCompleted={true} />
+      <Provider store={createMockStore()}>
+        <BackupComplete />
+      </Provider>
     )
     expect(tree).toMatchSnapshot()
   })

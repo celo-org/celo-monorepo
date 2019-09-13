@@ -5,9 +5,11 @@ exports[`renders correctly 1`] = `
   style={
     Object {
       "alignContent": "center",
-      "backgroundColor": "#F8F8F8",
+      "backgroundColor": "#EEEEEE",
+      "borderRadius": 4,
       "justifyContent": "center",
-      "marginTop": 30,
+      "marginBottom": 18,
+      "marginTop": 18,
       "padding": 16,
       "position": "relative",
     }
@@ -25,5 +27,13 @@ exports[`renders correctly 1`] = `
   >
     tuna assault reward enjoy quit trash eyebrow spatial core south pilot wall sample swim humor over garlic charge mix radio sudden transfer mirror wide
   </Text>
+  <View
+    style={
+      Object {
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+      }
+    }
+  />
 </View>
 `;

@@ -1,4 +1,4 @@
-import { DAYS_TO_BACKUP, DAYS_TO_DELAY } from 'src/backup/Backup'
+import { DAYS_TO_BACKUP, DAYS_TO_DELAY } from 'src/backup/utils'
 import { disabledDueToNoBackup } from 'src/redux/selectors'
 
 const DAYS_TO_MS = 24 * 60 * 60 * 1000

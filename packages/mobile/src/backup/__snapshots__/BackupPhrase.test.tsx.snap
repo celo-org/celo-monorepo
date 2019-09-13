@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`renders correctly 1`] = `
+exports[`renders correctly with backup completed 1`] = `
 <View
   style={
     Object {
@@ -10,51 +10,14 @@ exports[`renders correctly 1`] = `
     }
   }
 >
-  <View
-    style={
-      Object {
-        "height": 56,
-      }
-    }
-  >
-    <View
-      accessible={true}
-      isTVSelectable={true}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      style={
-        Object {
-          "opacity": 1,
-          "paddingHorizontal": 20,
-          "paddingVertical": 10,
-        }
-      }
-      testID="CancelButton"
-    >
-      <Text
-        style={
-          Object {
-            "color": "#42D689",
-            "fontFamily": "Hind-SemiBold",
-            "fontSize": 14,
-            "lineHeight": 22,
-          }
-        }
-      >
-        cancel
-      </Text>
-    </View>
-  </View>
   <RCTScrollView
     automaticallyAdjustContentInsets={false}
     contentContainerStyle={
       Object {
         "flex": 1,
-        "justifyContent": "space-between",
+        "flexDirection": "column",
+        "justifyContent": "center",
+        "paddingBottom": 60,
         "paddingHorizontal": 20,
       }
     }
@@ -99,12 +62,12 @@ exports[`renders correctly 1`] = `
               },
               Object {
                 "color": "#2E3338",
-                "marginVertical": 10,
+                "paddingBottom": 10,
               },
             ]
           }
         >
-          learnBackupKey
+          yourBackupKey
         </Text>
         <Text
           style={
@@ -118,127 +81,266 @@ exports[`renders correctly 1`] = `
             }
           }
         >
-          learnYourKey
-        </Text>
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 15,
-              "lineHeight": 18,
-              "paddingTop": 15,
-              "textAlign": "left",
-            }
-          }
-        >
-          keyWillBeVerified
+          heresYourKey
         </Text>
         <View
           style={
             Object {
               "alignContent": "center",
-              "backgroundColor": "#F8F8F8",
+              "backgroundColor": "#EEEEEE",
+              "borderRadius": 4,
               "justifyContent": "center",
-              "marginTop": 30,
+              "marginBottom": 18,
+              "marginTop": 18,
               "padding": 16,
               "position": "relative",
+            }
+          }
+        />
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 15,
+              "lineHeight": 18,
+              "paddingTop": 15,
+              "textAlign": "left",
             }
           }
         >
           <Text
             style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Light",
-                "fontSize": 18,
-                "textAlign": "left",
-              }
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 18,
+                  "paddingTop": 15,
+                  "textAlign": "left",
+                },
+                Object {
+                  "fontFamily": "Hind-Bold",
+                },
+              ]
             }
           >
-            prosper winner find donate tape history measure umbrella agent patrol want rhythm old unable wash wrong need fluid hammer coach reveal plastic trust lake
+            tip
           </Text>
-        </View>
+          securityTip
+        </Text>
       </View>
+    </View>
+  </RCTScrollView>
+  <View />
+</View>
+`;
+
+exports[`renders correctly with backup not completed 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "white",
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <RCTScrollView
+    automaticallyAdjustContentInsets={false}
+    contentContainerStyle={
+      Object {
+        "flex": 1,
+        "flexDirection": "column",
+        "justifyContent": "center",
+        "paddingBottom": 60,
+        "paddingHorizontal": 20,
+      }
+    }
+    contentInset={
+      Object {
+        "bottom": 0,
+      }
+    }
+    enableAutomaticScroll={true}
+    enableResetScrollToCoords={true}
+    extraHeight={75}
+    extraScrollHeight={0}
+    getScrollResponder={[Function]}
+    handleOnScroll={[Function]}
+    keyboardDismissMode="interactive"
+    keyboardOpeningTime={250}
+    keyboardShouldPersistTaps="always"
+    keyboardSpace={0}
+    onScroll={[Function]}
+    resetKeyboardSpace={[Function]}
+    scrollEventThrottle={1}
+    scrollForExtraHeightOnAndroid={[Function]}
+    scrollIntoView={[Function]}
+    scrollToEnd={[Function]}
+    scrollToFocusedInput={[Function]}
+    scrollToPosition={[Function]}
+    showsVerticalScrollIndicator={true}
+    update={[Function]}
+    viewIsInsideTabBar={false}
+  >
+    <View>
       <View>
-        <View
+        <Text
           style={
             Array [
               Object {
-                "alignItems": "center",
-                "borderRadius": 3,
-                "flexDirection": "row",
+                "color": "#2E3338",
+                "fontFamily": "Hind-Light",
+                "fontSize": 22,
+                "paddingBottom": 20,
+                "textAlign": "center",
               },
               Object {
-                "marginVertical": 10,
-              },
-              Object {
-                "marginBottom": 10,
-              },
-              undefined,
-              Object {
-                "backgroundColor": "#42D689",
+                "color": "#2E3338",
+                "paddingBottom": 10,
               },
             ]
           }
         >
-          <View
-            accessible={true}
-            isTVSelectable={true}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
+          yourBackupKey
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 15,
+              "lineHeight": 18,
+              "paddingTop": 15,
+              "textAlign": "left",
+            }
+          }
+        >
+          backupKeySummary.0
+        </Text>
+        <View
+          style={
+            Object {
+              "alignContent": "center",
+              "backgroundColor": "#EEEEEE",
+              "borderRadius": 4,
+              "justifyContent": "center",
+              "marginBottom": 18,
+              "marginTop": 18,
+              "padding": 16,
+              "position": "relative",
+            }
+          }
+        />
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 15,
+              "lineHeight": 18,
+              "paddingTop": 15,
+              "textAlign": "left",
+            }
+          }
+        >
+          <Text
             style={
-              Object {
-                "alignItems": "center",
-                "backgroundColor": "#42D689",
-                "borderColor": "#42D689",
-                "borderRadius": 3,
-                "borderWidth": 2,
-                "flex": 1,
-                "height": 50,
-                "justifyContent": "center",
-                "opacity": 1,
-              }
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 18,
+                  "paddingTop": 15,
+                  "textAlign": "left",
+                },
+                Object {
+                  "fontFamily": "Hind-Bold",
+                },
+              ]
             }
           >
-            <View
-              style={
-                Object {
-                  "alignItems": "center",
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                }
-              }
-            >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 16,
-                    },
-                    Object {
-                      "color": "#FFFFFF",
-                    },
-                    Object {
-                      "paddingLeft": 5,
-                      "paddingRight": 5,
-                    },
-                  ]
-                }
-              >
-                continue
-              </Text>
-            </View>
-          </View>
-        </View>
+            tip
+          </Text>
+          securityTip
+        </Text>
       </View>
     </View>
   </RCTScrollView>
+  <View>
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "borderRadius": 3,
+            "flexDirection": "row",
+          },
+          null,
+          null,
+          undefined,
+          Object {
+            "backgroundColor": "#42D689",
+          },
+        ]
+      }
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "#42D689",
+            "borderWidth": 0,
+            "flex": 1,
+            "height": 50,
+            "justifyContent": "center",
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 16,
+                },
+                Object {
+                  "color": "#FFFFFF",
+                },
+                Object {
+                  "paddingLeft": 5,
+                  "paddingRight": 5,
+                },
+              ]
+            }
+          >
+            continue
+          </Text>
+        </View>
+      </View>
+    </View>
+  </View>
 </View>
 `;

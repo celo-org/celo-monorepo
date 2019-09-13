@@ -1826,6 +1826,34 @@ exports[`Account when dev mode active renders correctly 1`] = `
           }
         >
           <Text>
+            Reset backup state
+          </Text>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "alignSelf": "stretch",
+            "margin": 4,
+          }
+        }
+      >
+        <View
+          accessible={true}
+          isTVSelectable={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "opacity": 1,
+            }
+          }
+        >
+          <Text>
             Show Debug Screen
           </Text>
         </View>

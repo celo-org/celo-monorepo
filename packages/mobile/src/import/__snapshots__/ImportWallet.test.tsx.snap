@@ -106,24 +106,7 @@ exports[`ImportWallet renders correctly 1`] = `
           ]
         }
       >
-        restoreYourWallet.userYourBackupKey
-      </Text>
-      <Text
-        style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "paddingBottom": 15,
-            },
-          ]
-        }
-      >
-        backupKeyTip
+        restoreYourWallet.description
       </Text>
       <Text
         style={
@@ -184,7 +167,7 @@ exports[`ImportWallet renders correctly 1`] = `
           multiline={true}
           onChangeText={[Function]}
           onEndEditing={[Function]}
-          placeholder="backupKeyPrompt"
+          placeholder="backupKeyPlaceholder"
           placeholderTextColor="#D1D5D8"
           rejectResponderTermination={true}
           style={
@@ -201,6 +184,37 @@ exports[`ImportWallet renders correctly 1`] = `
           value=""
         />
       </View>
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "paddingBottom": 15,
+            },
+            Object {
+              "marginTop": 12,
+            },
+          ]
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-Bold",
+              },
+            ]
+          }
+        >
+          tip
+        </Text>
+        backupKeyTip
+      </Text>
     </View>
   </RCTScrollView>
   <View
@@ -272,6 +286,67 @@ exports[`ImportWallet renders correctly 1`] = `
           restoreWallet
         </Text>
       </View>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "flexDirection": "row",
+        "justifyContent": "center",
+        "marginTop": 5,
+        "paddingVertical": 20,
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 14,
+          "lineHeight": 18,
+        }
+      }
+    >
+      lostYourKey.0
+       
+    </Text>
+    <View
+      accessible={true}
+      isTVSelectable={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "opacity": 1,
+        }
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "color": "#42D689",
+              "fontFamily": "Hind-Medium",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            undefined,
+          ]
+        }
+      >
+        lostYourKey.1
+      </Text>
     </View>
   </View>
 </View>
@@ -383,24 +458,7 @@ exports[`ImportWallet renders with an error 1`] = `
           ]
         }
       >
-        restoreYourWallet.userYourBackupKey
-      </Text>
-      <Text
-        style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "paddingBottom": 15,
-            },
-          ]
-        }
-      >
-        backupKeyTip
+        restoreYourWallet.description
       </Text>
       <Text
         style={
@@ -463,7 +521,7 @@ exports[`ImportWallet renders with an error 1`] = `
           multiline={true}
           onChangeText={[Function]}
           onEndEditing={[Function]}
-          placeholder="backupKeyPrompt"
+          placeholder="backupKeyPlaceholder"
           placeholderTextColor="#D1D5D8"
           rejectResponderTermination={true}
           style={
@@ -480,6 +538,37 @@ exports[`ImportWallet renders with an error 1`] = `
           value=""
         />
       </View>
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "paddingBottom": 15,
+            },
+            Object {
+              "marginTop": 12,
+            },
+          ]
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-Bold",
+              },
+            ]
+          }
+        >
+          tip
+        </Text>
+        backupKeyTip
+      </Text>
     </View>
   </RCTScrollView>
   <View
@@ -551,6 +640,67 @@ exports[`ImportWallet renders with an error 1`] = `
           restoreWallet
         </Text>
       </View>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "flexDirection": "row",
+        "justifyContent": "center",
+        "marginTop": 5,
+        "paddingVertical": 20,
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 14,
+          "lineHeight": 18,
+        }
+      }
+    >
+      lostYourKey.0
+       
+    </Text>
+    <View
+      accessible={true}
+      isTVSelectable={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "opacity": 1,
+        }
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "color": "#42D689",
+              "fontFamily": "Hind-Medium",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            undefined,
+          ]
+        }
+      >
+        lostYourKey.1
+      </Text>
     </View>
   </View>
 </View>
