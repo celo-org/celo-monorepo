@@ -5,7 +5,7 @@
   "setUpSocialBackup": "Set Up Recovery Secrets",
   "viewSocialBackup": "View Recovery Secrets",
   "failedFetchMnemonic": "Failed to fetch your Backup Key",
-  "socialBackup": "Social Backup",
+  "socialBackup": "Backup with Friends",
   "editProfile": "Edit Profile",
   "backupKey": "Backup Key",
   "yourBackupKey": "Your Backup Key",
@@ -40,6 +40,8 @@
   "continue": "Continue",
   "backupWithFriends": "Backup with Friends",
   "tip": "Tip ",
+  "securityTip":
+    "Please do not take a screenshot or save it in your phone's notes. Keep your Backup Key somewhere you can access if you lose your phone.",
   "backupKeySummary": {
     "0": "Write this phrase down on a piece of paper and keep it somewhere safe.",
     "1": "Don’t show your phrase to anyone else. They can access your wallet if they see it."
@@ -48,10 +50,9 @@
   "keyWillBeVerified": "Once you have finished, we will verify that you know the key correctly.",
   "heresYourKey": "Here is your Backup Key. Remember, keep this safe.",
   "socialBackupYourKey":
-    "Social Backup is a way to secure your account with the help of your friends.",
-  "easyToForget": "It's easy to forget your backup key.",
-  "sendFirstHalf": "Send the first half to one contact",
-  "sendSecondHalf": "Send the second half to another contact",
+    "Recovery Secrets allow you to recover your account with the help of two friends. If you lose your Backup Key, you will need to contact your friends and enter both Recovery Secrets.",
+  "sendFirstHalf": "First, send this recovery secret to one contact:",
+  "sendSecondHalf": "Now, send this second recovery secret to another contact:",
   "verifying": "Verifying ({{count}} of {{total}})",
   "questionPhrase": "Which of these words is in your Backup Key?",
   "submit": "Submit",

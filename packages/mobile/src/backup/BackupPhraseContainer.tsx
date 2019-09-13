@@ -13,7 +13,6 @@ type Props = {
   words: string | null
   showCopy?: boolean
   showWhatsApp?: boolean
-  label?: string
 } & WithNamespaces
 
 export class BackupPhraseContainer extends React.Component<Props> {
@@ -41,13 +40,12 @@ export class BackupPhraseContainer extends React.Component<Props> {
   }
 
   render() {
-    const { t, label, words, showCopy, showWhatsApp } = this.props
+    const { t, words, showCopy, showWhatsApp } = this.props
 
     return (
-      <View style={styles.container}>
-        <Text style={styles.labelText}>{label}</Text>
+      <View style={styles.phraseContainer}>
         {!!words && (
-          <View style={styles.phraseContainer}>
+          <>
             <Text style={styles.phraseText}>{`${words}`}</Text>
             <View style={styles.buttonsContainer}>
               {showCopy && (
@@ -69,7 +67,7 @@ export class BackupPhraseContainer extends React.Component<Props> {
                 />
               )}
             </View>
-          </View>
+          </>
         )}
       </View>
     )
@@ -77,9 +75,6 @@ export class BackupPhraseContainer extends React.Component<Props> {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 30,
-  },
   phraseContainer: {
     position: 'relative',
     backgroundColor: colors.darkLightest,
@@ -87,7 +82,8 @@ const styles = StyleSheet.create({
     alignContent: 'center',
     justifyContent: 'center',
     padding: 16,
-    marginTop: 4,
+    marginTop: 18,
+    marginBottom: 18,
   },
   buttonsContainer: {
     flexDirection: 'row',

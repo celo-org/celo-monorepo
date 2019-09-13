@@ -96,19 +96,14 @@ class BackupPhrase extends React.Component<Props, State> {
           <View>
             <Text style={[fontStyles.h1, styles.title]}>{t('yourBackupKey')}</Text>
             {!backupCompleted ? (
-              <>
-                <Text style={styles.verifyText}>{t('learnYourKey')}</Text>
-                <Text style={styles.verifyText}>{t('keyWillBeVerified')}</Text>
-              </>
+              <Text style={styles.verifyText}>{t('backupKeySummary.0')}</Text>
             ) : (
-              <>
-                <Text style={styles.verifyText}>{t('heresYourKey')}</Text>
-              </>
+              <Text style={styles.verifyText}>{t('heresYourKey')}</Text>
             )}
             <BackupPhraseContainer words={mnemonic} showCopy={true} />
             <Text style={styles.verifyText}>
               <Text style={[styles.verifyText, fontStyles.bold]}>{t('tip')}</Text>
-              {t('backupKeyImportance.2')}
+              {t('securityTip')}
             </Text>
           </View>
         </KeyboardAwareScrollView>
@@ -136,10 +131,12 @@ const styles = StyleSheet.create({
   scrollContainer: {
     paddingHorizontal: 20,
     flex: 1,
-    justifyContent: 'space-between',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    paddingBottom: 60,
   },
   title: {
-    marginVertical: 10,
+    paddingBottom: 10,
     color: colors.dark,
   },
   body: {

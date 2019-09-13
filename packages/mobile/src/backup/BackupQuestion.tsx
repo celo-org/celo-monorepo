@@ -85,7 +85,7 @@ class BackupQuestion extends React.PureComponent<Props, State> {
             <Text style={[fontStyles.body, styles.question]}>
               {t('backupKeyFlow6:verifying', { count: 1, total: 2 })}
             </Text>
-            <Text style={[fontStyles.h1, styles.questionPhrase]}>{t('questionPhrase')}</Text>
+            <Text style={[fontStyles.h1]}>{t('questionPhrase')}</Text>
           </View>
           <View style={componentStyles.line} />
           {this.props.words.map((word) => (
@@ -126,10 +126,6 @@ const styles = StyleSheet.create({
   question: {
     color: colors.dark,
     paddingVertical: 15,
-  },
-  questionPhrase: {
-    color: colors.darkSecondary,
-    textAlign: 'left',
   },
   forgotButtonContainer: {
     flexDirection: 'row',

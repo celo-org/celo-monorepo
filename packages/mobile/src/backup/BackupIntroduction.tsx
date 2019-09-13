@@ -248,8 +248,8 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     paddingHorizontal: 20,
-    flexDirection: 'column',
     flex: 1,
+    flexDirection: 'column',
     justifyContent: 'center',
   },
   center: {

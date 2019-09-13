@@ -121,24 +121,17 @@ class BackupSocial extends React.Component<Props, State> {
               firstHalf && (
                 <>
                   <Text style={styles.verifyText}>{t('socialBackupYourKey')}</Text>
-                  <Text style={styles.verifyText}>{t('easyToForget')}</Text>
-                  <BackupPhraseContainer
-                    label={t('sendFirstHalf')}
-                    words={firstHalf}
-                    showCopy={true}
-                    showWhatsApp={true}
-                  />
+                  <Text style={styles.verifyText}>{t('sendFirstHalf')}</Text>
+                  <BackupPhraseContainer words={firstHalf} showCopy={true} showWhatsApp={true} />
                 </>
               )}
 
             {partNumber === 1 &&
               secondHalf && (
-                <BackupPhraseContainer
-                  label={t('sendSecondHalf')}
-                  words={secondHalf}
-                  showCopy={true}
-                  showWhatsApp={true}
-                />
+                <>
+                  <Text style={styles.verifyText}>{t('sendSecondHalf')}</Text>
+                  <BackupPhraseContainer words={secondHalf} showCopy={true} showWhatsApp={true} />
+                </>
               )}
           </View>
         </KeyboardAwareScrollView>
@@ -163,12 +156,13 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     paddingHorizontal: 20,
+    paddingBottom: 60,
     flex: 1,
-    justifyContent: 'space-between',
     flexDirection: 'column',
+    justifyContent: 'center',
   },
   title: {
-    marginVertical: 10,
+    paddingBottom: 10,
     color: colors.dark,
   },
   verifyText: {

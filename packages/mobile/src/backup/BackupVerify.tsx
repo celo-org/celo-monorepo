@@ -88,27 +88,27 @@ export class BackupVerify extends React.Component<Props, State> {
         <ScrollView keyboardShouldPersistTaps="always">
           <View style={styles.questionTextContainer}>
             <Text style={[fontStyles.body, styles.question]}>
-              {t('backupKeyFlow6:verifying', { count: 2, total: 2 })}
+              {t('verifying', { count: 2, total: 2 })}
             </Text>
-            <Text style={[fontStyles.h1, styles.questionPhrase]}>{t('enterBackupKey')}</Text>
+            <Text style={[fontStyles.h1]}>{t('enterBackupKey')}</Text>
             <Text style={[fontStyles.body, styles.body]}>{t('backupKeyConfirmation')}</Text>
+            <View style={[componentStyles.row, styles.backupInput]}>
+              <TextInput
+                onChangeText={this.setBackupPhrase}
+                onEndEditing={this.onEndEditing}
+                value={pastedMnemonic}
+                style={componentStyles.input}
+                underlineColorAndroid="transparent"
+                placeholder={t('backupKey')}
+                placeholderTextColor={colors.inactive}
+                enablesReturnKeyAutomatically={true}
+                multiline={true}
+                autoCorrect={false}
+                autoCapitalize={'none'}
+              />
+            </View>
           </View>
           <BackupModal isVisible={this.state.visibleModal} onPress={this.onWrongSubmit} />
-          <View style={[componentStyles.row, styles.backupInput]}>
-            <TextInput
-              onChangeText={this.setBackupPhrase}
-              onEndEditing={this.onEndEditing}
-              value={pastedMnemonic}
-              style={componentStyles.input}
-              underlineColorAndroid="transparent"
-              placeholder={t('backupKeyPrompt')}
-              placeholderTextColor={colors.inactive}
-              enablesReturnKeyAutomatically={true}
-              multiline={true}
-              autoCorrect={false}
-              autoCapitalize={'none'}
-            />
-          </View>
         </ScrollView>
         <Button
           onPress={this.onSubmit}
