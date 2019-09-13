@@ -37,7 +37,8 @@ export interface GethTestConfig {
 
 const TEST_DIR = '/tmp/e2e'
 const GENESIS_PATH = `${TEST_DIR}/genesis.json`
-const networkid = 1101
+const NetworkId = 1101
+const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
 
 export function spawnWithLog(cmd: string, args: string[], logsFilepath: string) {
   try {
@@ -148,8 +149,6 @@ export const erc20Abi = [
   },
 ]
 
-export const monorepoRoot = resolvePath(process.cwd(), './../..')
-
 async function checkoutGethRepo(branch: string, path: string) {
   await execCmdWithExitOnFailure('rm', ['-rf', path])
   await execCmdWithExitOnFailure('git', [
@@ -182,7 +181,7 @@ function writeGenesis(validators: Validator[], path: string) {
     ['0x000000000000000000000000000000000000ce10'],
     blockTime,
     epochLength,
-    networkid
+    NetworkId
   )
   fs.writeFileSync(path, genesis)
 }
@@ -266,7 +265,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     '--nodiscover',
     '--rpcvhosts=*',
     '--networkid',
-    networkid.toString(),
+    NetworkId.toString(),
     '--verbosity',
     '4',
     '--consoleoutput=stdout', // Send all logs to stdout
@@ -325,7 +324,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
 export async function migrateContracts(validatorPrivateKeys: string[], to: number = 1000) {
   const args = [
     '--cwd',
-    `${monorepoRoot}/packages/protocol`,
+    `${MonorepoRoot}/packages/protocol`,
     'init-network',
     '-n',
     'testing',
@@ -340,9 +339,9 @@ export async function migrateContracts(validatorPrivateKeys: string[], to: numbe
 }
 
 export function getContractAddress(contractName: string) {
-  const filePath = `${monorepoRoot}/packages/protocol/build/testing/contracts/${contractName}.json`
+  const filePath = `${MonorepoRoot}/packages/protocol/build/testing/contracts/${contractName}.json`
   const contractData = JSON.parse(fs.readFileSync(filePath, 'utf8'))
-  return contractData.networks[networkid].address
+  return contractData.networks[NetworkId].address
 }
 
 export async function snapshotDatadir(instance: GethInstanceConfig) {
@@ -412,16 +411,12 @@ export function getHooks(gethConfig: GethTestConfig) {
     let validatorIndex = 0
     for (const instance of gethConfig.instances) {
       if (instance.validating) {
-        if (!instance.peers) {
-          instance.peers = []
-        }
         // Automatically connect validator nodes to eachother.
-        instance.peers = instance.peers.concat(
-          validatorEnodes.filter((_: string, i: number) => i !== validatorIndex)
+        const otherValidators = validatorEnodes.filter(
+          (_: string, i: number) => i !== validatorIndex
         )
-        if (!instance.privateKey) {
-          instance.privateKey = validatorPrivateKeys[validatorIndex]
-        }
+        instance.peers = (instance.peers || []).concat(otherValidators)
+        instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
         validatorIndex++
       }
       await initAndStartGeth(gethBinaryPath, instance)

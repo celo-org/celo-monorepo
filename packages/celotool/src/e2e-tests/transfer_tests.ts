@@ -323,7 +323,7 @@ describe('transfer tests', function(this: any) {
     gasCurrency?: string
   ): Promise<[boolean, any, any]> => {
     const minGasPrice = await getGasPriceMinimum(gasCurrency)
-    assert.isAbove(minGasPrice, 0)
+    assert.isAbove(parseInt(minGasPrice, 10), 0)
     const receipt = await txPromise
     const balances = await getBalances()
     const tx = await web3.eth.getTransaction(receipt.transactionHash)
