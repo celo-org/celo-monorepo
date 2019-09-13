@@ -5,6 +5,7 @@ import { envVar, fetchEnv } from 'src/lib/env-utils'
 import {
   AccountType,
   generatePrivateKey,
+  getAddressesFor,
   getPrivateKeysFor,
   privateKeyToAddress,
 } from 'src/lib/generate_utils'
@@ -46,19 +47,25 @@ export const handler = async (argv: InitialArgv) => {
 
   console.log(`Deploying smart contracts to ${argv.celoEnv}`)
   const cb = async () => {
-    const migrationOverrides = {
+    const mnemonic = fetchEnv(envVar.MNEMONIC)
+
+    const migrationOverrides = JSON.stringify({
       validators: {
         validatorKeys: getValidatorKeys(),
       },
-    }
-    const truffleOverrides = {
+      stableToken: {
+        initialAccounts: getAddressesFor(AccountType.FAUCET, mnemonic, 2),
+      },
+    })
+
+    const truffleOverrides = JSON.stringify({
       from: minerForEnv(),
-    }
+    })
 
     await execCmd(
-      `yarn --cwd ../protocol run init-network -n ${argv.celoEnv} -c '${JSON.stringify(
-        truffleOverrides
-      )}' -m '${JSON.stringify(migrationOverrides)}'`
+      `yarn --cwd ../protocol run init-network -n ${
+        argv.celoEnv
+      } -c '${truffleOverrides}' -m '${migrationOverrides}'`
     )
   }
 
