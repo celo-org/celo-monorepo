@@ -46,10 +46,19 @@ export const handler = async (argv: InitialArgv) => {
 
   console.log(`Deploying smart contracts to ${argv.celoEnv}`)
   const cb = async () => {
+    const migrationOverrides = {
+      validators: {
+        validatorKeys: getValidatorKeys(),
+      },
+    }
+    const truffleOverrides = {
+      from: minerForEnv(),
+    }
+
     await execCmd(
-      `yarn --cwd ../protocol run init-network -n ${
-        argv.celoEnv
-      } -c '{ "from" : "${minerForEnv()}" }' -k ${getValidatorKeys()}`
+      `yarn --cwd ../protocol run init-network -n ${argv.celoEnv} -c '${JSON.stringify(
+        truffleOverrides
+      )}' -m '${JSON.stringify(migrationOverrides)}'`
     )
   }
 

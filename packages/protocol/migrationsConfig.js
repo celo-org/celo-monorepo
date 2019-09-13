@@ -84,13 +84,11 @@ const linkedLibraries = {
 }
 
 const argv = minimist(process.argv.slice(2), {
-  string: ['migration_override', 'keys', 'build_directory'],
+  string: ['migration_override', 'build_directory'],
   default: {
-    keys: '',
     build_directory: path.join(__dirname, 'build'),
   },
 })
-const validatorKeys = argv.keys ? argv.keys.split(',') : []
 
 const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
 const config = {}
@@ -98,8 +96,6 @@ const config = {}
 for (const key of Object.keys(DefaultConfig)) {
   config[key] = { ...DefaultConfig[key], ...migrationOverride[key] }
 }
-
-config.validators.validatorKeys = validatorKeys
 
 module.exports = {
   build_directory: argv.build_directory,
