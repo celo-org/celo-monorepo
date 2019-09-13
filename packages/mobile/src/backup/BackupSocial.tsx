@@ -22,6 +22,7 @@ import Logger from 'src/utils/Logger'
 
 interface State {
   mnemonic: string
+  mnemonicParts: string[]
   hasShared: boolean
 }
 
@@ -51,14 +52,17 @@ class BackupSocial extends React.Component<Props, State> {
   static navigationOptions = { header: null }
   state = {
     mnemonic: '',
+    mnemonicParts: [],
     hasShared: false,
   }
 
   partScreens = [Screens.BackupSocialFirst, Screens.BackupSocialSecond, Screens.BackupComplete]
 
-  componentDidMount() {
+  async componentDidMount() {
     FlagSecure.activate()
-    this.retrieveMnemonic()
+    await this.retrieveMnemonic()
+
+    this.setState({ mnemonicParts: splitMnemonic(this.state.mnemonic, this.props.language) })
   }
 
   componentWillUnmount() {
@@ -101,9 +105,11 @@ class BackupSocial extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, partNumber, language } = this.props
-    const { mnemonic, hasShared } = this.state
-    const [firstHalf, secondHalf] = splitMnemonic(mnemonic, language)
+    const { t, partNumber } = this.props
+    const {
+      hasShared,
+      mnemonicParts: [firstHalf, secondHalf],
+    } = this.state
 
     return (
       <View style={styles.container}>
