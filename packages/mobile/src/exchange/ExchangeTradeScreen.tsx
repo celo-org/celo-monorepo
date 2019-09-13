@@ -78,7 +78,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     this.props.fetchExchangeRate()
   }
 
-  switchTokens = () => {
+  onPressSwapIcon = () => {
     const makerToken = this.state.makerToken === Tokens.DOLLAR ? Tokens.GOLD : Tokens.DOLLAR
     this.setState({ makerToken }, () => {
       this.updateError(this.state.makerTokenAmount)
@@ -115,7 +115,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     )
   }
 
-  recordFocus = () => {
+  onInputFocus = () => {
     CeloAnalytics.track(DefaultEventNames.fieldFocused, {
       ...this.props,
       label: 'Exchange Amount',
@@ -240,13 +240,13 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
                 keyboardType={'decimal-pad'}
                 onChangeText={this.onChangeExchangeAmount}
                 onEndEditing={this.onEndEditing}
-                onFocus={this.recordFocus}
+                onFocus={this.onInputFocus}
                 value={this.getInputValue()}
                 placeholderTextColor={placeholderColor}
                 placeholder={maker.symbol + '0'}
                 underlineColorAndroid={'transparent'}
                 style={[
-                  styles.input,
+                  styles.amountText,
                   fontStyles.regular,
                   maker.style,
                   styles.ioBox,
@@ -264,19 +264,24 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
             <Touchable
               style={styles.exchangeButtonBackground}
               borderless={true}
-              onPress={this.switchTokens}
+              onPress={this.onPressSwapIcon}
               hitSlop={iconHitslop}
             >
               <SwapIcon size={50} />
             </Touchable>
             <View style={styles.transferInfo}>
               <Text style={[styles.currencyLabel, fontStyles.bodySmall]}>{taker.tokenText}</Text>
-              <View style={[styles.outputBox, styles.ioBox]}>
+              <View style={styles.ioBox}>
                 <View style={styles.outputText}>
-                  <Text numberOfLines={1} style={[styles.input, fontStyles.regular, taker.style]}>
+                  <Text
+                    numberOfLines={1}
+                    style={[styles.amountText, fontStyles.regular, taker.style]}
+                  >
                     {getMoneyDisplayValue(takerTokenAmount, taker.token, true)}
                   </Text>
-                  <Text style={[styles.input, fontStyles.regular, taker.style, styles.superscript]}>
+                  <Text
+                    style={[styles.amountText, fontStyles.regular, taker.style, styles.superscript]}
+                  >
                     *
                   </Text>
                 </View>
@@ -354,29 +359,27 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     marginVertical: 15 + 18,
   },
-  input: {
+  amountText: {
     fontSize: 22,
-    lineHeight: 28,
   },
   ioBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignContent: 'center',
     justifyContent: 'center',
     textAlign: 'center',
     width: '100%',
     marginHorizontal: 15,
     marginVertical: 10,
     paddingHorizontal: 15,
+    paddingTop: 10,
+    paddingBottom: 22,
   },
   inputBox: {
     borderWidth: 1,
     borderRadius: 3,
     paddingTop: 15,
-    paddingBottom: 12,
-  },
-  outputBox: {
-    paddingVertical: 18,
+    paddingBottom: 10,
+    height: 54, // setting height manually b.c. of bug causing text to jump
   },
   outputText: {
     paddingTop: 2,

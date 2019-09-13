@@ -18,7 +18,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import Avatar from 'src/components/Avatar'
-import { MAX_COMMENT_LENGTH, NUMBER_INPUT_MAX_DECIMALS } from 'src/config'
+import { MAX_COMMENT_LENGTH, NUMBER_INPUT_MAX_DECIMALS, TRANSACTION_MIN_AMOUNT } from 'src/config'
 import { FeeType } from 'src/fees/actions'
 import EstimateFee from 'src/fees/EstimateFee'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
@@ -158,7 +158,7 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   isAmountValid = () => {
-    const isAmountValid = parseInputAmount(this.state.amount).isGreaterThan(0)
+    const isAmountValid = parseInputAmount(this.state.amount).isGreaterThan(TRANSACTION_MIN_AMOUNT)
     return {
       isAmountValid,
       isDollarBalanceSufficient: isAmountValid && this.getNewAccountBalance().isGreaterThan(0),

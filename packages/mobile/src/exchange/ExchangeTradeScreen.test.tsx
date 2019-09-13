@@ -41,7 +41,6 @@ describe(ExchangeTradeScreen, () => {
   })
   describe('methods:', () => {
     it('setExchangeAmount updates Errors', () => {
-      // const { component, mockShowError, mockhideAlert } = setup()
       const mockShowError = jest.fn()
       const mockhideAlert = jest.fn()
       const component = renderer.create(
@@ -57,11 +56,11 @@ describe(ExchangeTradeScreen, () => {
         />
       )
 
-      component.root.instance.setExchangeAmount('500')
+      component.root.instance.onChangeExchangeAmount('500')
       expect(mockShowError).toBeCalledWith(ErrorMessages.NSF_DOLLARS)
-      component.root.instance.switchTokens()
+      component.root.instance.onPressSwapIcon()
       expect(mockShowError).toBeCalledWith(ErrorMessages.NSF_GOLD)
-      component.root.instance.setExchangeAmount('5')
+      component.root.instance.onChangeExchangeAmount('5')
       expect(mockhideAlert).toBeCalled()
     })
   })

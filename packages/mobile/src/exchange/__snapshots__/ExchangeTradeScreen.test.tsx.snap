@@ -95,7 +95,6 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
               Array [
                 Object {
                   "fontSize": 22,
-                  "lineHeight": 28,
                 },
                 Object {
                   "fontFamily": "Hind-Regular",
@@ -104,20 +103,22 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
                   "color": "#42D689",
                 },
                 Object {
-                  "alignContent": "center",
                   "alignItems": "center",
                   "flexDirection": "row",
                   "justifyContent": "center",
                   "marginHorizontal": 15,
                   "marginVertical": 10,
+                  "paddingBottom": 22,
                   "paddingHorizontal": 15,
+                  "paddingTop": 10,
                   "textAlign": "center",
                   "width": "100%",
                 },
                 Object {
                   "borderRadius": 3,
                   "borderWidth": 1,
-                  "paddingBottom": 12,
+                  "height": 54,
+                  "paddingBottom": 10,
                   "paddingTop": 15,
                 },
                 Object {
@@ -248,22 +249,18 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
           </Text>
           <View
             style={
-              Array [
-                Object {
-                  "paddingVertical": 18,
-                },
-                Object {
-                  "alignContent": "center",
-                  "alignItems": "center",
-                  "flexDirection": "row",
-                  "justifyContent": "center",
-                  "marginHorizontal": 15,
-                  "marginVertical": 10,
-                  "paddingHorizontal": 15,
-                  "textAlign": "center",
-                  "width": "100%",
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "center",
+                "marginHorizontal": 15,
+                "marginVertical": 10,
+                "paddingBottom": 22,
+                "paddingHorizontal": 15,
+                "paddingTop": 10,
+                "textAlign": "center",
+                "width": "100%",
+              }
             }
           >
             <View
@@ -282,7 +279,6 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
                   Array [
                     Object {
                       "fontSize": 22,
-                      "lineHeight": 28,
                     },
                     Object {
                       "fontFamily": "Hind-Regular",
@@ -293,14 +289,13 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
                   ]
                 }
               >
-                0.00
+                0.000
               </Text>
               <Text
                 style={
                   Array [
                     Object {
                       "fontSize": 22,
-                      "lineHeight": 28,
                     },
                     Object {
                       "fontFamily": "Hind-Regular",
@@ -355,7 +350,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
                 ]
               }
             >
-              100.00
+              100.000
             </Text>
           </View>
         </View>
@@ -429,7 +424,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
           null,
           undefined,
           Object {
-            "backgroundColor": "transparent",
+            "backgroundColor": "#A3EBC6",
           },
         ]
       }
@@ -446,7 +441,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
         style={
           Object {
             "alignItems": "center",
-            "backgroundColor": "transparent",
+            "backgroundColor": "#A3EBC6",
             "borderWidth": 0,
             "flex": 1,
             "height": 50,
@@ -474,7 +469,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
                   "fontSize": 16,
                 },
                 Object {
-                  "color": "#42D689",
+                  "color": "#FFFFFF",
                 },
                 Object {
                   "paddingLeft": 5,
