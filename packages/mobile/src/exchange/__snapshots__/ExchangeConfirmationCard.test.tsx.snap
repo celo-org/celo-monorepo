@@ -270,11 +270,10 @@ exports[`renders correctly with giant numbers 1`] = `
         style={
           Array [
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
               "fontSize": 16,
-              "letterSpacing": -0.75,
-              "lineHeight": 20,
+              "lineHeight": 24,
             },
             Object {
               "color": "#42D689",
@@ -314,11 +313,10 @@ exports[`renders correctly with giant numbers 1`] = `
         style={
           Array [
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
               "fontSize": 16,
-              "letterSpacing": -0.75,
-              "lineHeight": 20,
+              "lineHeight": 24,
             },
             Object {
               "color": "#FBCC5C",
@@ -603,11 +601,10 @@ exports[`renders correctly with no exchange rate 1`] = `
         style={
           Array [
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
               "fontSize": 16,
-              "letterSpacing": -0.75,
-              "lineHeight": 20,
+              "lineHeight": 24,
             },
             Object {
               "color": "#42D689",
@@ -647,11 +644,10 @@ exports[`renders correctly with no exchange rate 1`] = `
         style={
           Array [
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
               "fontSize": 16,
-              "letterSpacing": -0.75,
-              "lineHeight": 20,
+              "lineHeight": 24,
             },
             Object {
               "color": "#FBCC5C",

@@ -53,14 +53,14 @@ class ExchangeConfirmationCard extends React.PureComponent<Props> {
         </View>
         <View style={styles.tabular}>
           <Text style={fontStyles.bodySecondary}>{t('global:celoDollars')}</Text>
-          <Text numberOfLines={1} style={[fontStyles.currency, styles.dollar]}>
+          <Text numberOfLines={1} style={[fontStyles.body, styles.dollar]}>
             {getMoneyDisplayValue(newDollarBalance, Tokens.DOLLAR, true)}
           </Text>
         </View>
 
         <View style={styles.tabular}>
           <Text style={fontStyles.bodySecondary}>{t('global:celoGold')}</Text>
-          <Text numberOfLines={1} style={[fontStyles.currency, styles.gold]}>
+          <Text numberOfLines={1} style={[fontStyles.body, styles.gold]}>
             {getMoneyDisplayValue(newGoldBalance, Tokens.GOLD, true)}
           </Text>
         </View>
