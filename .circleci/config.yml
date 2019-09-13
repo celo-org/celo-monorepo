@@ -206,6 +206,22 @@ jobs:
       - run:
           name: test
           # Flaky tests - run them twice
+          command: yarn --cwd packages/protocol test || yarn --cwd packages/protocol test
+
+  # Slow and flaky compared to protocol-test which runs without coverage
+  protocol-test-with-code-coverage:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            FILES_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+      - run:
+          name: test
+          # Flaky tests - run them twice
           command: yarn --cwd packages/protocol test:coverage || yarn --cwd packages/protocol test:coverage
       - store_artifacts:
           path: packages/protocol/coverage
@@ -509,6 +525,10 @@ workflows:
           requires:
             - lint-checks
       - protocol-test:
+          requires:
+            - lint-checks
+            - walletkit-test
+      - protocol-test-with-code-coverage:
           requires:
             - lint-checks
             - walletkit-test
