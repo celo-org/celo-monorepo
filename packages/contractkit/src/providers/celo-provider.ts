@@ -1,37 +1,35 @@
-import { JSONRPCRequestPayload, JSONRPCResponsePayload, Web3ProviderEngine } from '@0x/subproviders'
+import { JSONRPCRequestPayload, Web3ProviderEngine } from '@0x/subproviders'
 import debugFactory from 'debug'
-import { Provider } from 'web3/providers'
+import { JsonRPCResponse, Provider } from 'web3/providers'
+import { Callback } from 'web3/types'
 import { CeloPrivateKeysWalletProvider } from './celo-private-keys-subprovider'
 import { WrappingSubprovider } from './wrapping-subprovider'
 
 const debug = debugFactory('kit:provider:celo-provider')
 
+type OnFn = (event: string, handler: () => void) => void
 export class CeloProvider implements Provider {
-  public readonly on: null | any
-  private web3ProviderEngine: Web3ProviderEngine
-  private localSigningProvider: CeloPrivateKeysWalletProvider
+  public readonly on: null | OnFn = null
+  private readonly providerEngine: Web3ProviderEngine
+  private readonly localSigningProvider: CeloPrivateKeysWalletProvider
 
   constructor(readonly existingProvider: Provider, readonly privateKey: string) {
     debug('Setting up providers...')
-    this.localSigningProvider = new CeloPrivateKeysWalletProvider(privateKey)
     // Create a Web3 Provider Engine
-    const providerEngine = new Web3ProviderEngine()
+    this.providerEngine = new Web3ProviderEngine()
     // Compose our Providers, order matters
     // First add provider for signing
-    providerEngine.addProvider(this.localSigningProvider)
+    this.localSigningProvider = new CeloPrivateKeysWalletProvider(privateKey)
+    this.providerEngine.addProvider(this.localSigningProvider)
     // Use the existing provider to route all other requests
     const wrappingSubprovider = new WrappingSubprovider(existingProvider)
-    providerEngine.addProvider(wrappingSubprovider)
-    this.web3ProviderEngine = providerEngine
+    this.providerEngine.addProvider(wrappingSubprovider)
 
     // Initializer "on" conditionally.
     if (existingProvider.hasOwnProperty('on')) {
-      const func = (event: string, handler: () => void): void => {
-        this.web3ProviderEngine.on(event, handler)
+      this.on = (event: string, handler: () => void): void => {
+        this.providerEngine.on(event, handler)
       }
-      this.on = func
-    } else {
-      this.on = null
     }
   }
 
@@ -40,22 +38,23 @@ export class CeloProvider implements Provider {
     return this
   }
 
-  send(payload: JSONRPCRequestPayload): void {
-    this.web3ProviderEngine.send(payload)
+  /**
+   * Send method as expected by web3.js
+   */
+  send(payload: JSONRPCRequestPayload, callback: Callback<JsonRPCResponse>): void {
+    this.sendAsync(payload, callback)
   }
 
-  sendAsync(
-    payload: JSONRPCRequestPayload,
-    callback: (error: null | Error, response: JSONRPCResponsePayload) => void
-  ): void {
-    this.web3ProviderEngine.sendAsync(payload, callback)
+  sendAsync(payload: JSONRPCRequestPayload, callback: Callback<JsonRPCResponse>): void {
+    // callback typing from Web3ProviderEngine are wrong
+    this.providerEngine.sendAsync(payload, callback as any)
   }
 
   start(callback?: () => void): void {
-    this.web3ProviderEngine.start(callback)
+    this.providerEngine.start(callback)
   }
 
   stop() {
-    this.web3ProviderEngine.stop()
+    this.providerEngine.stop()
   }
 }

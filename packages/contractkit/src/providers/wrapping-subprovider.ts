@@ -5,11 +5,8 @@ import { JsonRPCResponse, Provider } from 'web3/providers'
 const debug = debugFactory('kit:web3:providers:wrapping-subprovider')
 
 export class WrappingSubprovider extends Subprovider {
-  private _provider: Provider
-
   constructor(readonly provider: Provider) {
     super()
-    this._provider = provider
   }
   /**
    * @param payload JSON RPC request payload
@@ -21,11 +18,11 @@ export class WrappingSubprovider extends Subprovider {
     _next: Callback,
     end: ErrorCallback
   ): Promise<void> {
-    debug('WrappingSubprovider@handleRequest: %o', payload)
+    debug('handleRequest: %o', payload)
     // Inspired from https://github.com/MetaMask/web3-provider-engine/pull/19/
-    return this._provider.send(payload, (err: null | Error, response?: JsonRPCResponse) => {
+    return this.provider.send(payload, (err: null | Error, response?: JsonRPCResponse) => {
       if (err != null) {
-        debug('WrappingSubprovider@response is error: %s', err)
+        debug('response is error: %s', err)
         end(err)
         return
       }
@@ -34,11 +31,11 @@ export class WrappingSubprovider extends Subprovider {
         return
       }
       if (response.error != null) {
-        debug('WrappingSubprovider@response includes error: %o', response)
+        debug('response includes error: %o', response)
         end(new Error(response.error))
         return
       }
-      debug('WrappingSubprovider@response: %o', response)
+      debug('response: %o', response)
       end(null, response.result)
     })
   }

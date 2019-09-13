@@ -11,10 +11,6 @@ function getPrivateKeyWithout0xPrefix(privateKey: string) {
   return privateKey.toLowerCase().startsWith('0x') ? privateKey.substring(2) : privateKey
 }
 
-function isNullOrUndefined(value: any): boolean {
-  return value === null || value === undefined
-}
-
 export function generateAccountAddressFromPrivateKey(privateKey: string): string {
   if (!privateKey.toLowerCase().startsWith('0x')) {
     privateKey = '0x' + privateKey
@@ -43,7 +39,7 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
     // Prefix 0x here or else the signed transaction produces dramatically different signer!!!
     privateKey = '0x' + getPrivateKeyWithout0xPrefix(privateKey)
     const accountAddress = generateAccountAddressFromPrivateKey(privateKey).toLowerCase()
-    if (this.getAccounts().includes(accountAddress)) {
+    if (this.accountAddressToPrivateKey.has(accountAddress)) {
       debug('Accounts %o is already added', accountAddress)
       return
     }
@@ -96,17 +92,17 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
     } else {
       debug(`Signer is ${txParams.from} and is one  of ${this.getAccounts()}`)
     }
-    if (isNullOrUndefined(txParams.chainId)) {
+    if (txParams.chainId == null) {
       txParams.chainId = await this.getChainId()
     }
 
-    if (isNullOrUndefined(txParams.nonce)) {
+    if (txParams.nonce == null) {
       txParams.nonce = await this.getNonce(txParams.from)
     }
 
-    if (isNullOrUndefined(txParams.gasFeeRecipient)) {
+    if (txParams.gasFeeRecipient == null) {
       txParams.gasFeeRecipient = await this.getCoinbase()
-      if (isNullOrUndefined(txParams.gasFeeRecipient)) {
+      if (txParams.gasFeeRecipient == null) {
         // Fail early. The validator nodes will reject a transaction missing
         // gas fee recipient anyways.
         throw new Error(
@@ -116,7 +112,7 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
       }
     }
 
-    if (isNullOrUndefined(txParams.gasPrice)) {
+    if (txParams.gasPrice == null) {
       txParams.gasPrice = await this.getGasPrice()
     }
 
@@ -126,16 +122,15 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
   }
 
   private canSign(from: string): boolean {
-    return this.getAccounts().includes(from.toLocaleLowerCase())
+    return this.accountAddressToPrivateKey.has(from.toLocaleLowerCase())
   }
 
   private getPrivateKeyFor(account: string): string {
-    account = account.toLowerCase()
-    if (this.accountAddressToPrivateKey.has(account)) {
-      return this.accountAddressToPrivateKey.get(account)!
-    } else {
+    const maybePk = this.accountAddressToPrivateKey.get(account.toLowerCase())
+    if (maybePk == null) {
       throw new Error(`tx-signing@getPrivateKey: ForPrivate key not found for ${account}`)
     }
+    return maybePk
   }
 
   private async getChainId(): Promise<number> {
