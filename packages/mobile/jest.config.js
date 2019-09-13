@@ -21,6 +21,6 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/jest_setup.ts'],
   snapshotSerializers: ['enzyme-to-json/serializer'],
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|react-native-(.*)|@react-navigation|redux-persist|date-fns|@celo/react-native-sms-retriever)/)',
+    'node_modules/(?!(@celo/)?react-native|@react-navigation|redux-persist|date-fns)',
   ],
 }

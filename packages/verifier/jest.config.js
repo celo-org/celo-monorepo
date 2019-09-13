@@ -20,5 +20,5 @@ module.exports = {
     '\\.(ts|tsx)$': 'ts-jest',
     '^.+\\.(js)$': 'babel-jest',
   },
-  transformIgnorePatterns: ['node_modules/(?!(react-native|react-native-(.*))/)'],
+  transformIgnorePatterns: ['node_modules/(?!(@celo/)?react-native|@react-navigation)'],
 }
