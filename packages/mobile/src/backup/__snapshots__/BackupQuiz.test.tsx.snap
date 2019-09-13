@@ -1,0 +1,356 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BackupQuiz renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "white",
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <RCTScrollView
+    keyboardShouldPersistTaps="always"
+  >
+    <View>
+      <View
+        style={
+          Object {
+            "paddingHorizontal": 30,
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 16,
+                "lineHeight": 24,
+              },
+              Object {
+                "color": "#2E3338",
+                "paddingVertical": 15,
+              },
+            ]
+          }
+        >
+          backupKeyFlow6:verifying
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Light",
+                "fontSize": 22,
+                "paddingBottom": 20,
+                "textAlign": "center",
+              },
+            ]
+          }
+        >
+          questionPhrase
+        </Text>
+      </View>
+      <View
+        style={
+          Object {
+            "borderBottomWidth": 1,
+            "borderColor": "#EEEEEE",
+            "height": 5,
+          }
+        }
+      />
+      <View
+        style={
+          Object {
+            "alignItems": "flex-start",
+            "flex": 1,
+            "justifyContent": "flex-start",
+          }
+        }
+      >
+        <Modal
+          animationType="none"
+          hardwareAccelerated={false}
+          hideModalContentWhileAnimating={false}
+          onModalHide={[Function]}
+          onRequestClose={[Function]}
+          scrollOffset={0}
+          scrollOffsetMax={0}
+          scrollTo={null}
+          swipeThreshold={100}
+          transparent={true}
+          visible={false}
+        >
+          <View
+            accessible={true}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "backgroundColor": "black",
+                "bottom": 0,
+                "height": 1334,
+                "left": 0,
+                "opacity": 0,
+                "position": "absolute",
+                "right": 0,
+                "top": 0,
+                "width": 750,
+              }
+            }
+          />
+          <View
+            hideModalContentWhileAnimating={false}
+            onModalHide={[Function]}
+            pointerEvents="box-none"
+            scrollOffset={0}
+            scrollOffsetMax={0}
+            scrollTo={null}
+            style={
+              Object {
+                "flex": 1,
+                "justifyContent": "center",
+                "margin": 37.5,
+                "transform": Array [
+                  Object {
+                    "translateY": 0,
+                  },
+                ],
+              }
+            }
+            swipeThreshold={100}
+          >
+            <View
+              style={
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "borderColor": "rgba(0, 0, 0, 0.1)",
+                  "borderRadius": 3,
+                  "width": 250,
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontSize": 18,
+                      "marginTop": 20,
+                      "paddingHorizontal": 30,
+                    },
+                    Object {
+                      "fontFamily": "Hind-Medium",
+                    },
+                  ]
+                }
+              >
+                tryAgain
+              </Text>
+              <Text
+                style={
+                  Object {
+                    "color": "#81868B",
+                    "fontSize": 16,
+                    "marginTop": 20,
+                    "paddingHorizontal": 30,
+                  }
+                }
+              >
+                <Text>
+                  backToKey
+                </Text>
+              </Text>
+              <View
+                style={
+                  Array [
+                    Object {
+                      "flexDirection": "row",
+                      "justifyContent": "space-around",
+                      "marginLeft": 40,
+                    },
+                    Object {
+                      "alignItems": "flex-end",
+                      "justifyContent": "flex-end",
+                    },
+                  ]
+                }
+              >
+                <View
+                  accessible={true}
+                  isTVSelectable={true}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                  style={
+                    Object {
+                      "opacity": 1,
+                      "padding": 20,
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      Object {
+                        "color": "#42D689",
+                        "fontFamily": "Hind-Medium",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      }
+                    }
+                  >
+                    seeBackupKey
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </View>
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "borderRadius": 3,
+          "flexDirection": "row",
+        },
+        null,
+        null,
+        undefined,
+        Object {
+          "backgroundColor": "#A3EBC6",
+        },
+      ]
+    }
+  >
+    <View
+      accessible={true}
+      isTVSelectable={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#A3EBC6",
+          "borderWidth": 0,
+          "flex": 1,
+          "height": 50,
+          "justifyContent": "center",
+          "opacity": 1,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 16,
+              },
+              Object {
+                "color": "#FFFFFF",
+              },
+              Object {
+                "paddingLeft": 5,
+                "paddingRight": 5,
+              },
+            ]
+          }
+        >
+          submit
+        </Text>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "flexDirection": "row",
+        "justifyContent": "center",
+        "marginTop": 5,
+        "paddingVertical": 20,
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 14,
+          "lineHeight": 18,
+        }
+      }
+    >
+      dontKnow
+       
+    </Text>
+    <View
+      accessible={true}
+      isTVSelectable={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "opacity": 1,
+        }
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "color": "#42D689",
+              "fontFamily": "Hind-Medium",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            undefined,
+          ]
+        }
+      >
+        return
+      </Text>
+    </View>
+  </View>
+</View>
+`;
