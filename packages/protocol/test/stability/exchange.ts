@@ -5,7 +5,7 @@ import {
   isSameAddress,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { fixed1, toFixed, fromFixed } from '@celo/protocol/lib/fixidity'
+import { fixed1, toFixed, fromFixed, multiply } from '@celo/protocol/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   ExchangeInstance,
@@ -68,14 +68,10 @@ contract('Exchange', (accounts: string[]) => {
     buySupply: BigNumber,
     _spread: BigNumber = spread
   ) {
-    const alpha = new BigNumber(sellAmount).div(sellSupply)
-    const gamma = fromFixed(fixed1.minus(_spread))
-    const res = alpha
-      .times(gamma)
-      .times(buySupply)
-      .div(alpha.times(gamma).plus(1))
-      .integerValue(BigNumber.ROUND_FLOOR)
-    return res
+    const reducedSellAmount = multiply(fixed1.minus(_spread), toFixed(sellAmount))
+    const numerator = multiply(reducedSellAmount, toFixed(buySupply))
+    const denominator = toFixed(sellSupply).plus(reducedSellAmount)
+    return numerator.idiv(denominator)
   }
 
   async function fundReserve() {
