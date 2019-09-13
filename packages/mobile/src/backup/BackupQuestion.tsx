@@ -73,7 +73,7 @@ class BackupQuestion extends React.PureComponent<Props, State> {
   onWrongSubmit = () => {
     // PILOT_ONLY
     this.trackAnalytics('incorrect')
-    this.props.onWrongSubmit()
+    this.setState({ visibleModal: false }, () => this.props.onWrongSubmit())
   }
 
   render() {
@@ -96,7 +96,14 @@ class BackupQuestion extends React.PureComponent<Props, State> {
               selected={word === this.state.selectedAnswer}
             />
           ))}
-          <BackupModal isVisible={this.state.visibleModal} onPress={this.onWrongSubmit} />
+          <BackupModal
+            isVisible={this.state.visibleModal}
+            title={t('tryAgain')}
+            buttonText1={t('seeBackupKey')}
+            onPress1={this.onWrongSubmit}
+          >
+            <Text>{t('backToKey')}</Text>
+          </BackupModal>
         </ScrollView>
         <Button
           onPress={this.onSubmit}

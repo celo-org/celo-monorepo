@@ -63,7 +63,7 @@ export class BackupVerify extends React.Component<Props, State> {
 
   onWrongSubmit = () => {
     this.trackAnalytics('incorrect')
-    this.props.onWrongSubmit()
+    this.setState({ visibleModal: false }, () => this.props.onWrongSubmit())
   }
 
   onSubmit = () => {
@@ -108,7 +108,14 @@ export class BackupVerify extends React.Component<Props, State> {
               />
             </View>
           </View>
-          <BackupModal isVisible={this.state.visibleModal} onPress={this.onWrongSubmit} />
+          <BackupModal
+            isVisible={this.state.visibleModal}
+            title={t('tryAgain')}
+            buttonText1={t('seeBackupKey')}
+            onPress1={this.onWrongSubmit}
+          >
+            <Text>{t('backToKey')}</Text>
+          </BackupModal>
         </ScrollView>
         <Button
           onPress={this.onSubmit}

@@ -1,17 +1,16 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
-import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import Modal from 'react-native-modal'
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { setBackupDelayed } from 'src/account/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { enterBackupFlow } from 'src/app/actions'
+import BackupModal from 'src/backup/BackupModal'
 import { Namespaces } from 'src/i18n'
 import backupIcon from 'src/images/backup-icon.png'
 import { headerWithBackButton } from 'src/navigator/Headers'
@@ -112,33 +111,12 @@ class BackupIntroduction extends React.Component<Props, State> {
   }
 
   onInsistSkip = () => {
-    this.goBack(CustomEventNames.insist_skip_backup)
+    this.setState({ visibleModal: false }, () => this.goBack(CustomEventNames.insist_skip_backup))
   }
 
   onInsistBackup = () => {
-    this.goBackup(CustomEventNames.insist_backup_phrase)
-  }
-
-  skip = () => {
-    const { t } = this.props
-    return (
-      <View style={styles.modalContent}>
-        <Text style={[fontStyles.bold, styles.modalTitleText]}>{t('areYouSure')}</Text>
-        <Text style={styles.modalContentText}>
-          {t('backupSkipText.0')}
-          <Text style={fontStyles.bold}>{t('backupSkipText.1')}</Text>
-        </Text>
-        <View style={styles.modalOptionsContainer}>
-          <TouchableOpacity onPress={this.onInsistSkip}>
-            <Text style={[styles.modalOptions, fontStyles.semiBold]}>{t('skip')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={this.onInsistBackup}>
-            <Text style={[styles.modalOptions, fontStyles.semiBold, { color: colors.celoGreen }]}>
-              {t('getBackupKey')}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+    this.setState({ visibleModal: false }, () =>
+      this.goBackup(CustomEventNames.insist_backup_phrase)
     )
   }
 
@@ -174,9 +152,19 @@ class BackupIntroduction extends React.Component<Props, State> {
           )}
         </ScrollView>
         <View>
-          <View style={styles.modalContainer}>
-            <Modal isVisible={this.state.visibleModal === true}>{this.skip()}</Modal>
-          </View>
+          <BackupModal
+            title={t('areYouSure')}
+            isVisible={this.state.visibleModal}
+            buttonText0={t('skip')}
+            onPress0={this.onInsistSkip}
+            buttonText1={t('getBackupKey')}
+            onPress1={this.onInsistBackup}
+          >
+            <Text>
+              {t('backupSkipText.0')}
+              <Text style={fontStyles.bold}>{t('backupSkipText.1')}</Text>
+            </Text>
+          </BackupModal>
           {backupCompleted &&
             !socialBackupCompleted && (
               <Button
@@ -267,40 +255,6 @@ const styles = StyleSheet.create({
   },
   body: {
     paddingBottom: 15,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    width: variables.width - 200,
-  },
-  modalContent: {
-    backgroundColor: colors.background,
-    borderColor: 'rgba(0, 0, 0, 0.1)',
-    borderRadius: 3,
-  },
-  modalOptionsContainer: {
-    paddingVertical: 20,
-    marginLeft: 40,
-    justifyContent: 'space-around',
-    flexDirection: 'row',
-  },
-  modalTitleText: {
-    marginTop: 22,
-    marginBottom: 20,
-    color: colors.dark,
-    fontSize: 18,
-    paddingHorizontal: 30,
-  },
-  modalContentText: {
-    marginBottom: 10,
-    color: colors.darkSecondary,
-    fontSize: 14,
-    paddingHorizontal: 30,
-  },
-  modalOptions: {
-    fontSize: 14,
-    color: colors.dark,
   },
   skipLink: {
     textAlign: 'center',
