@@ -4,6 +4,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
+import { AndroidBackHandler } from 'react-navigation-backhandler'
 import { connect } from 'react-redux'
 import { setBackupCompleted, setSocialBackupCompleted } from 'src/account/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -28,8 +29,12 @@ class BackupComplete extends React.Component<Props> {
     ...nuxNavigationOptionsNoBackButton,
   })
 
-  // Todo(Derrick): Handle back button on this screen to go back to Screens.Account
-  // instead of previous BackupSocialSecond screen
+  onBackButtonPressAndroid = () => {
+    // Override back button to not go back to BackupVerify screen
+    navigate(Screens.Account)
+
+    return true
+  }
 
   onDone = () => {
     // This screen is only reachable when regular backup is already completed
@@ -44,6 +49,7 @@ class BackupComplete extends React.Component<Props> {
     const { t } = this.props
     return (
       <View style={styles.container}>
+        <AndroidBackHandler onBackPress={this.onBackButtonPressAndroid} />
         <View style={styles.textContainer}>
           <View>
             <Image source={shinyGold} style={styles.logo} />
