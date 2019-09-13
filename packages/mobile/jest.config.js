@@ -4,6 +4,11 @@ module.exports = {
   ...defaultConfig,
   globals: {
     navigator: true,
+    'ts-jest': {
+      // Disables type-check when running tests as it takes valuable time
+      // and is redundant with the tsc build step
+      isolatedModules: true,
+    },
     window: true,
   },
   moduleNameMapper: {
