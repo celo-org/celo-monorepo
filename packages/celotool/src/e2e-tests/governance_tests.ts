@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
-import { strip0x } from 'src/lib/utils'
 import Web3 from 'web3'
+import { strip0x } from '../lib/utils'
 import {
   erc20Abi,
   getContractAddress,

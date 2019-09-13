@@ -2,6 +2,7 @@ import { assert } from 'chai'
 import { spawn, SpawnOptions } from 'child_process'
 import fs from 'fs'
 import { join as joinPath, resolve as resolvePath } from 'path'
+import { Admin } from 'web3-eth-admin'
 import {
   AccountType,
   ConsensusType,
@@ -10,10 +11,9 @@ import {
   getValidators,
   privateKeyToPublicKey,
   Validator,
-} from 'src/lib/generate_utils'
-import { getEnodeAddress } from 'src/lib/geth'
-import { ensure0x } from 'src/lib/utils'
-import { Admin } from 'web3-eth-admin'
+} from '../lib/generate_utils'
+import { getEnodeAddress } from '../lib/geth'
+import { ensure0x } from '../lib/utils'
 
 export interface GethInstanceConfig {
   name: string
