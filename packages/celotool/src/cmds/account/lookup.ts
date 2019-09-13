@@ -3,8 +3,8 @@ import { PhoneNumberUtils } from '@celo/utils'
 // @ts-ignore
 import { Attestations, lookupPhoneNumbers } from '@celo/walletkit'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { portForwardAnd } from 'src/lib/port_forward'
 import { Argv } from 'yargs'
-import { portForwardAnd } from '../../lib/port_forward'
 import { AccountArgv } from '../account'
 
 const Web3 = require('web3')

@@ -1,8 +1,8 @@
 /* tslint:disable no-console */
 import fetch from 'node-fetch'
+import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { getBlockscoutUrl } from 'src/lib/endpoints'
 import { Argv } from 'yargs'
-import { switchToClusterFromEnv } from '../../lib/cluster'
 import { AccountArgv } from '../account'
 
 export const command = 'list'

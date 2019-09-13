@@ -1,5 +1,5 @@
+import { CeloEnvArgv } from 'src/lib/env-utils'
 import { deleteMetric, getMetrics } from 'src/lib/monitoring'
-import { CeloEnvArgv } from '../../lib/env-utils'
 export const command = 'delete'
 
 export const describe = 'delete metrics'

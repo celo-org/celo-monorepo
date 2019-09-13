@@ -1,13 +1,7 @@
 import { entries, flatMap, range } from 'lodash'
 import sleep from 'sleep-promise'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
-import {
-  EnvTypes,
-  envVar,
-  fetchEnv,
-  fetchEnvOrFallback,
-  isProduction,
-} from './env-utils'
+import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import { OG_ACCOUNTS } from './genesis_constants'

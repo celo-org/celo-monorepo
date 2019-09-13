@@ -1,5 +1,4 @@
 import { getBlockchainApiUrl, getBlockscoutUrl, getEthstatsUrl } from 'src/lib/endpoints'
-import { Arguments, Argv } from 'yargs'
 import {
   addCeloEnvMiddleware,
   CeloEnvArgv,
@@ -7,8 +6,9 @@ import {
   fetchEnv,
   fetchEnvOrFallback,
   getEnvFile,
-} from '../lib/env-utils'
-import { execCmdWithExitOnFailure } from '../lib/utils'
+} from 'src/lib/env-utils'
+import { execCmdWithExitOnFailure } from 'src/lib/utils'
+import { Arguments, Argv } from 'yargs'
 
 export const command = 'links <resource>'
 export const describe = 'commands for various useful links'

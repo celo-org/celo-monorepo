@@ -20,9 +20,9 @@ import { Attestations as AttestationsType } from '@celo/walletkit/lib/types/Atte
 import { StableToken as StableTokenType } from '@celo/walletkit/lib/types/StableToken'
 import prompts from 'prompts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { portForwardAnd } from 'src/lib/port_forward'
 import { sendTransaction } from 'src/lib/transactions'
 import * as yargs from 'yargs'
-import { portForwardAnd } from '../../lib/port_forward'
 import { AccountArgv } from '../account'
 
 const Web3 = require('web3')

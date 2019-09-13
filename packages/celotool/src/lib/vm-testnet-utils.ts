@@ -1,10 +1,5 @@
 import { writeFileSync } from 'fs'
-import {
-  confirmAction,
-  envVar,
-  fetchEnv,
-  fetchEnvOrFallback,
-} from './env-utils'
+import { confirmAction, envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,
   generateGenesisFromEnv,
@@ -23,10 +18,7 @@ import {
   TerraformVars,
   untaintTerraformModuleResource,
 } from './terraform'
-import {
-  uploadFileToGoogleStorage,
-  uploadGenesisBlockToGoogleStorage,
-} from './testnet-utils'
+import { uploadFileToGoogleStorage, uploadGenesisBlockToGoogleStorage } from './testnet-utils'
 
 const secretsBucketName = 'celo-testnet-secrets'
 const testnetTerraformModule = 'testnet'

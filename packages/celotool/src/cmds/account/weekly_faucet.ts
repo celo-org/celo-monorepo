@@ -1,10 +1,10 @@
 /* tslint:disable no-console */
+import { downloadArtifacts } from 'src/lib/artifacts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { getBlockchainApiUrl } from 'src/lib/endpoints'
+import { portForwardAnd } from 'src/lib/port_forward'
+import { execCmd } from 'src/lib/utils'
 import * as yargs from 'yargs'
-import { downloadArtifacts } from '../../lib/artifacts'
-import { getBlockchainApiUrl } from '../../lib/endpoints'
-import { portForwardAnd } from '../../lib/port_forward'
-import { execCmd } from '../../lib/utils'
 import { AccountArgv } from '../account'
 
 export const command = 'weekly-faucet'

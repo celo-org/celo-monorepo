@@ -1,13 +1,13 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import * as yargs from 'yargs'
 import {
   addCeloEnvMiddleware,
   CeloEnvArgv,
   envVar,
   fetchEnv,
   validateAndSwitchToEnv,
-} from '../lib/env-utils'
-import { deleteOtherPolicies, downloadPolicies, uploadPolicies } from '../lib/policies'
+} from 'src/lib/env-utils'
+import { deleteOtherPolicies, downloadPolicies, uploadPolicies } from 'src/lib/policies'
+import * as yargs from 'yargs'
 
 export const command = 'copy-policies'
 

@@ -1,10 +1,5 @@
 import sleep from 'sleep-promise'
-import {
-  doCheckOrPromptIfStagingOrProduction,
-  EnvTypes,
-  envVar,
-  fetchEnv,
-} from './env-utils'
+import { doCheckOrPromptIfStagingOrProduction, EnvTypes, envVar, fetchEnv } from './env-utils'
 import {
   createAndUploadBackupSecretIfNotExists,
   createServiceAccountIfNotExists,
@@ -15,12 +10,7 @@ import {
   redeployTiller,
   uploadStorageClass,
 } from './helm_deploy'
-import {
-  execCmd,
-  execCmdWithExitOnFailure,
-  outputIncludes,
-  switchToProjectFromEnv,
-} from './utils'
+import { execCmd, execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
 import { networkName } from './vm-testnet-utils'
 
 const SYSTEM_HELM_RELEASES = ['nginx-ingress-release', 'kube-lego-release']

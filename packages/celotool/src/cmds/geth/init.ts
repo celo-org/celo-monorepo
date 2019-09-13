@@ -1,10 +1,10 @@
 import fs from 'fs'
 import path from 'path'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
 import { getEnodesAddresses, writeStaticNodes } from 'src/lib/geth'
+import { addCeloGethMiddleware, execCmdWithExitOnFailure } from 'src/lib/utils'
 import * as yargs from 'yargs'
-import { addCeloEnvMiddleware, CeloEnvArgv } from '../../lib/env-utils'
-import { addCeloGethMiddleware, execCmdWithExitOnFailure } from '../../lib/utils'
 import { GethArgv } from '../geth'
 
 const STATIC_NODES_FILE_NAME = 'static-nodes.json'

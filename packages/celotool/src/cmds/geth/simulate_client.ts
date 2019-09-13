@@ -1,9 +1,9 @@
 import fs from 'fs'
 import { getBlockscoutClusterInternalUrl } from 'src/lib/endpoints'
+import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
 import { privateKeyToAddress } from 'src/lib/generate_utils'
 import { checkGethStarted, getWeb3AndTokensContracts, simulateClient, sleep } from 'src/lib/geth'
 import * as yargs from 'yargs'
-import { addCeloEnvMiddleware, CeloEnvArgv } from '../../lib/env-utils'
 import { GethArgv } from '../geth'
 
 export const command = 'simulate-client'
