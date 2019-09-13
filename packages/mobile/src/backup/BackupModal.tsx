@@ -2,12 +2,10 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Modal from 'react-native-modal'
-import { Namespaces } from 'src/i18n'
 
-type Props = {
+interface BackupModalProps {
   isVisible: boolean
   title: string
   buttonText0?: string
@@ -15,10 +13,10 @@ type Props = {
   onPress0?: () => void
   onPress1?: () => void
   children?: React.ReactChild
-} & WithNamespaces
+}
 
-const BackupModal = (props: Props) => {
-  const { t, isVisible, title, onPress0, onPress1, buttonText0, buttonText1, children } = props
+const BackupModal = (props: BackupModalProps) => {
+  const { isVisible, title, onPress0, onPress1, buttonText0, buttonText1, children } = props
   const singleButton = (onPress0 && !!buttonText0) !== (onPress1 && !!buttonText1)
 
   return (
@@ -93,4 +91,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.backupKeyFlow6)(BackupModal)
+export default BackupModal
