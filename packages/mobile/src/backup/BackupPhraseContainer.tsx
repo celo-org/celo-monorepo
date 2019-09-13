@@ -24,7 +24,7 @@ export class BackupPhraseContainer extends React.Component<Props> {
     }
   }
   copy = () => {
-    const { words, t, onShare } = this.props
+    const { words, t } = this.props
     if (!words) {
       Logger.showMessage(t('failedCopy'))
       Logger.error(TAG, 'Failed to copy mnemonic')
