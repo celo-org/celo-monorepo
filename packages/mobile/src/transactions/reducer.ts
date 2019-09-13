@@ -4,7 +4,7 @@ import { Actions, ActionTypes } from 'src/transactions/actions'
 
 export interface ExchangeStandby {
   id: string
-  type: TransactionTypes.EXCHANGED
+  type: TransactionTypes.EXCHANGE
   status: TransactionStatus
   inSymbol: CURRENCY_ENUM
   inValue: string
@@ -33,8 +33,9 @@ export enum TransactionStatus {
   Failed = 'Failed',
 }
 
+// Should correspond to EventTypes enum in blockchain api
 export enum TransactionTypes {
-  EXCHANGED = 'EXCHANGED',
+  EXCHANGE = 'EXCHANGE',
   RECEIVED = 'RECEIVED',
   SENT = 'SENT',
   FAUCET = 'FAUCET',

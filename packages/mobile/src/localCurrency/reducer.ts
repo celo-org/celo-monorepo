@@ -6,6 +6,7 @@ export interface State {
   isLoading: boolean
   symbol: string | null
   exchangeRate?: number | null
+  lastSuccessfulUpdate?: number
 }
 
 const initialState = {
@@ -23,7 +24,8 @@ export const reducer = (
 
       // Make sure we don't use the persisted exchange rate if the symbol is now different
       if (persistedState && persistedState.symbol !== LOCAL_CURRENCY_SYMBOL) {
-        return initialState
+        // return a copy on purpose otherwise it's ignored
+        return { ...initialState }
       }
 
       // Ignore some persisted properties
@@ -43,6 +45,7 @@ export const reducer = (
         ...state,
         isLoading: false,
         exchangeRate: action.exchangeRate,
+        lastSuccessfulUpdate: action.now,
       }
     case Actions.FETCH_CURRENT_RATE_FAILURE:
       return {

@@ -13,7 +13,6 @@ interface Props {
   size: number
   preferNameInitial?: boolean
   thumbnailPath?: string | null
-  displayInitials?: string | null
 }
 
 export const contactIconColors = [colors.teal, colors.orange, colors.purple]
@@ -36,8 +35,9 @@ export default class ContactCircle extends React.PureComponent<Props> {
   }
 
   getContactCircleInner = () => {
-    const { contact, size, thumbnailPath, displayInitials } = this.props
+    const { contact, size, thumbnailPath, children } = this.props
     const resolvedThumbnail = thumbnailPath || (contact && contact.thumbnailPath)
+
     if (resolvedThumbnail) {
       return (
         <Image
@@ -47,21 +47,20 @@ export default class ContactCircle extends React.PureComponent<Props> {
         />
       )
     }
-    const fontSize = size / 2.0
-    const textStyle = [fontStyles.iconText, { fontSize }]
 
-    if (displayInitials) {
-      return <Text style={textStyle}>{displayInitials}</Text>
+    // If children components (i.e. a default image) has been provided, use that
+    if (children) {
+      return children
     }
 
-    // Initial conditional check in render(), must be valid here
+    const fontSize = size / 2.0
+    const textStyle = [fontStyles.iconText, { fontSize }]
     const initials = this.getInitials()
-
     return <Text style={textStyle}>{initials.toLocaleUpperCase()}</Text>
   }
 
   render() {
-    const { address, contact, size, children } = this.props
+    const { address, contact, size } = this.props
     const iconColor =
       (contact && getContactColor(contact)) ||
       (address && getAddressColor(address)) ||
@@ -75,7 +74,7 @@ export default class ContactCircle extends React.PureComponent<Props> {
             { backgroundColor: iconColor, height: size, width: size, borderRadius: size / 2 },
           ]}
         >
-          {children ? children : this.getContactCircleInner()}
+          {this.getContactCircleInner()}
         </View>
       </View>
     )
