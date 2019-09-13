@@ -30,6 +30,7 @@ const removeDiacritics = (word: string) =>
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
+    .trim()
 
 interface CountrySearch {
   displayName: string
