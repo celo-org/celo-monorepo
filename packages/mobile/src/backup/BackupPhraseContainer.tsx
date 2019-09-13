@@ -13,30 +13,41 @@ type Props = {
   words: string | null
   showCopy?: boolean
   showWhatsApp?: boolean
+  onShare?: () => void
 } & WithNamespaces
 
 export class BackupPhraseContainer extends React.Component<Props> {
+  onShare = () => {
+    const { onShare } = this.props
+    if (onShare) {
+      onShare()
+    }
+  }
   copy = () => {
-    const { words, t } = this.props
+    const { words, t, onShare } = this.props
     if (!words) {
       Logger.showMessage(t('failedCopy'))
       Logger.error(TAG, 'Failed to copy mnemonic')
+      this.onShare()
       return
     }
 
     Clipboard.setString(words)
     Logger.showMessage(t('copied'))
+    this.onShare()
   }
 
   sendWhatsapp = () => {
     // TODO(Derrick): Analytics here and copy
     const { words, t } = this.props
     if (!words) {
+      this.onShare()
       return
     }
 
     const msg = encodeURIComponent(t('whatsappMessage') + words)
     Linking.openURL(`https://api.whatsapp.com/send?phone=&text=${msg}`)
+    this.onShare()
   }
 
   render() {

@@ -22,6 +22,7 @@ import Logger from 'src/utils/Logger'
 
 interface State {
   mnemonic: string
+  hasShared: boolean
 }
 
 interface StateProps {
@@ -50,6 +51,7 @@ class BackupSocial extends React.Component<Props, State> {
   static navigationOptions = { header: null }
   state = {
     mnemonic: '',
+    hasShared: false,
   }
 
   partScreens = [Screens.BackupSocialFirst, Screens.BackupSocialSecond, Screens.BackupComplete]
@@ -90,15 +92,19 @@ class BackupSocial extends React.Component<Props, State> {
       throw new Error(`Invalid Social Backup part screen ${partNumber}`)
     }
 
+    this.setState({ hasShared: false })
     navigate(this.partScreens[partNumber])
+  }
+
+  onShare = () => {
+    this.setState({ hasShared: true })
   }
 
   render() {
     const { t, partNumber, language } = this.props
-    const { mnemonic } = this.state
+    const { mnemonic, hasShared } = this.state
     const [firstHalf, secondHalf] = splitMnemonic(mnemonic, language)
 
-    // TODO(Derrick): Disable continue button until user taps copy / send
     return (
       <View style={styles.container}>
         <KeyboardAwareScrollView
@@ -112,7 +118,12 @@ class BackupSocial extends React.Component<Props, State> {
                 <>
                   <Text style={styles.verifyText}>{t('socialBackupYourKey')}</Text>
                   <Text style={styles.verifyText}>{t('sendFirstHalf')}</Text>
-                  <BackupPhraseContainer words={firstHalf} showCopy={true} showWhatsApp={true} />
+                  <BackupPhraseContainer
+                    words={firstHalf}
+                    showCopy={true}
+                    showWhatsApp={true}
+                    onShare={this.onShare}
+                  />
                 </>
               )}
 
@@ -120,7 +131,12 @@ class BackupSocial extends React.Component<Props, State> {
               secondHalf && (
                 <>
                   <Text style={styles.verifyText}>{t('sendSecondHalf')}</Text>
-                  <BackupPhraseContainer words={secondHalf} showCopy={true} showWhatsApp={true} />
+                  <BackupPhraseContainer
+                    words={secondHalf}
+                    showCopy={true}
+                    showWhatsApp={true}
+                    onShare={this.onShare}
+                  />
                 </>
               )}
           </View>
@@ -130,6 +146,7 @@ class BackupSocial extends React.Component<Props, State> {
             onPress={this.continueBackup}
             text={t('continue')}
             standard={false}
+            disabled={!hasShared}
             type={BtnTypes.PRIMARY}
           />
         </View>
