@@ -1,4 +1,4 @@
-import { GenesisBlockUtils, StaticNodeUtils } from '@celo/walletkit'
+import { BootnodeUtils, GenesisBlockUtils, StaticNodeUtils } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
@@ -52,13 +52,12 @@ async function createNewGeth(): Promise<typeof RNGeth> {
   const { nodeDir, peerDiscovery, syncMode } = currentConfig
   const genesis: string = await readGenesisBlockFile(nodeDir)
   const networkID: number = GenesisBlockUtils.getChainIdFromGenesis(genesis)
+  const bootnodeEnodes = await getBootnodeEnodes()
 
   Logger.debug('Geth@newGeth', `Network ID is ${networkID}`)
 
   const gethOptions: any = {
-    bootnodeEnodes: [
-      `enode://93dfb5cc7cf1fc9d60997427cca3d4c05a1705eae8b50393841267df3ea4d4eab6528137aa2d0d40b158c33555fb7b07c74882c60fb625423ac74c535db6c57e@34.83.237.207:30301`,
-    ],
+    bootnodeEnodes,
     nodeDir,
     networkID,
     genesis,
@@ -184,6 +183,16 @@ async function stop() {
   } catch (e) {
     Logger.error('Geth@stop', 'Error stopping Geth', e)
     throw e
+  }
+}
+
+// Parses the JSON containing bootnode enode info, returns [] if there are issues
+async function getBootnodeEnodes() {
+  try {
+    return JSON.parse(await BootnodeUtils.getBootnodesAsync(currentNetworkName))
+  } catch (error) {
+    Logger.error(`Failed to get the bootnode enodes for network ${currentNetworkName}`, error)
+    return []
   }
 }
 
