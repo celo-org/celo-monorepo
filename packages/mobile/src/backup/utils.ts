@@ -46,19 +46,30 @@ export function getWordlist(language: string | null): string[] {
   }
 }
 
+// Fallback prefixes that are used in case something goes wrong, must be of size
+// at least equal to number of backup shards
+const FALLBACK_PREFIXES = ['prosper', 'magic']
+
 function getPrefixWords(wordlist: string[], numWords: number): string[] {
-  // Use random words in sorted order for split phrase prefixes. While BIP39
-  // does not avoid repeating words, the prefixes MUST be unique otherwise it is
-  // not possible to differentiate parts.  Prefixes are just used as a way to
-  // determine which mnemonic shard corresponds to which half
+  // Use random words in sorted order for split phrase prefixes from their
+  // corresponding word list chunk. For example: 2 shards = word list split in
+  // half, first shard gets random word in first half, second gets random word
+  // in second half.  This provides random words but also allows mixed shards
+  // that were created at different times.
+
+  // While BIP39 does not avoid repeating words, the prefixes MUST be unique
+  // otherwise it is not possible to differentiate parts.  Prefixes are just
+  // used as a way to determine which mnemonic shard corresponds to which half.
   const prefixes = _.chain(wordlist)
-    .sampleSize(numWords)
+    .chunk(wordlist.length / numWords)
+    .flatMap((chunk, i) => _.sample(chunk) || FALLBACK_PREFIXES[i])
     .uniq()
     .value()
     .sort()
 
   if (prefixes.length < numWords) {
-    throw new Error('Word list has duplicate words')
+    Logger.error(TAG, 'Word list has duplicate words')
+    return FALLBACK_PREFIXES
   }
 
   return prefixes

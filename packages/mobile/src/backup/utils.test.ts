@@ -1,3 +1,5 @@
+import * as _ from 'lodash'
+import { wordlists } from 'react-native-bip39'
 import {
   createQuizWordList,
   joinMnemonic,
@@ -41,7 +43,8 @@ describe('backup/utils', () => {
 
       const wordList = await createQuizWordList(mockMnemonic, 'en')
       const [correctWord, wordOptions] = selectQuizWordOptions(mockMnemonic, wordList, 4)
-      expect(wordOptions.length).toBe(4)
+      expect(wordOptions).not.toBeUndefined()
+      expect(wordOptions!.length).toBe(4)
       expect(mockMnemonic).toContain(correctWord)
     })
 
@@ -49,24 +52,38 @@ describe('backup/utils', () => {
       global.Math = Math
       const wordList = ['a', 'b', 'c']
       const [correctWord, wordOptions] = selectQuizWordOptions('d', wordList, 4)
-      expect(wordOptions.length).toBe(4)
+      expect(wordOptions).not.toBeUndefined()
+      expect(wordOptions!.length).toBe(4)
       expect(correctWord).toBe('d')
       expect(wordOptions).toEqual(expect.arrayContaining(['a', 'b', 'c', 'd']))
     })
   })
 
   describe('splitMnemonic', () => {
-    it('splits mnemonic with prefixes', () => {
-      const shards = splitMnemonic(mockMnemonic, 'en')
-      const shard0 = shards[0].split(' ')
-      const shard1 = shards[1].split(' ')
+    const shards = splitMnemonic(mockMnemonic, 'en')
+    const shard0 = shards[0].split(' ')
+    const shard1 = shards[1].split(' ')
 
+    const wordList = wordlists.EN
+    const wordListChunks = _.chunk(wordList, wordList.length / 2)
+
+    it('splits mnemonic with prefixes', () => {
       expect(shards.length).toBe(2)
 
       expect(shard0.length).toBe(13)
       expect(shard1.length).toBe(13)
+    })
 
+    it('uses different prefixes in correct parts of the word list', () => {
       expect(shard0[0]).not.toBe(shard1[0])
+
+      expect(wordListChunks[0]).toContain(shard0[0])
+      expect(wordListChunks[1]).toContain(shard1[0])
+    })
+
+    it('does not use fallback prefixes', () => {
+      expect(shard0[0]).not.toBe('prosper')
+      expect(shard1[0]).not.toBe('magic')
     })
   })
 

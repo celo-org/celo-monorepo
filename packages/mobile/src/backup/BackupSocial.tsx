@@ -81,18 +81,6 @@ class BackupSocial extends React.Component<Props, State> {
     }
   }
 
-  splitMnemonic = () => {
-    const { language } = this.props
-    const { mnemonic } = this.state
-    try {
-      return splitMnemonic(mnemonic, language)
-    } catch (e) {
-      Logger.error('backup/splitMnemonic', e)
-      this.props.showError(ErrorMessages.FAILED_FETCH_MNEMONIC)
-      return []
-    }
-  }
-
   continueBackup = () => {
     CeloAnalytics.track(CustomEventNames.backup_continue)
     let { partNumber } = this.props
@@ -106,8 +94,9 @@ class BackupSocial extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, partNumber } = this.props
-    const [firstHalf, secondHalf] = this.splitMnemonic()
+    const { t, partNumber, language } = this.props
+    const { mnemonic } = this.state
+    const [firstHalf, secondHalf] = splitMnemonic(mnemonic, language)
 
     return (
       <View style={styles.container}>
