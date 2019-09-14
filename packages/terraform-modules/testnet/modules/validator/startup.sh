@@ -89,8 +89,9 @@ docker run -v $DATA_DIR:$DATA_DIR --name geth --net=host --entrypoint /bin/sh -d
   ) && ( \
     geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey ; \
     geth \
-      --bootnodesv4=enode://$BOOTNODE_ENODE \
-      --bootnodesv5=enode://$BOOTNODE_ENODE \
+      --bootnodes=enode://$BOOTNODE_ENODE \
+      --lightpeers=0 \
+      --lightserv=0 \
       --password=$DATA_DIR/account/accountSecret \
       --unlock=$ACCOUNT_ADDRESS \
       --mine \

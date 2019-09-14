@@ -35,7 +35,6 @@ enum LogLevel {
   INFO = 3,
   DEBUG = 4,
   TRACE = 5,
-  INSANE = 6,
 }
 
 // The logs will be uploaded only if they are larger than this size
@@ -64,10 +63,7 @@ async function createNewGeth(): Promise<typeof RNGeth> {
     peerDiscovery,
     syncMode,
     useLightweightKDF: true,
-    maxPeers: 25,
   }
-
-  Logger.debug('Geth@newGeth gethOptions:', gethOptions)
 
   // Setup Logging
   const logFilePath = Logger.getGethLogFilePath()
@@ -77,9 +73,9 @@ async function createNewGeth(): Promise<typeof RNGeth> {
   gethOptions.logFile = logFilePath
   // Only log info and above to the log file.
   // The logcat logging mode remains unchanged.
-  gethOptions.logFileLogLevel = LogLevel.INSANE
+  gethOptions.logFileLogLevel = LogLevel.INFO
   Logger.debug('Geth@newGeth', 'Geth logs will be piped to ' + logFilePath)
-  Logger.debug('Geth@newGeth gethOptions:', JSON.stringify(gethOptions))
+  Logger.debug('Geth@newGeth', 'gethOptions: ' + JSON.stringify(gethOptions))
 
   return new RNGeth(gethOptions)
 }
@@ -94,12 +90,10 @@ async function initGeth() {
   gethLock = true
 
   try {
-    Logger.info('Geth@init', 'A')
     if (gethInstance) {
       Logger.debug('Geth@init', 'Geth already exists, trying to stop it.')
       await stop()
     }
-    Logger.info('Geth@init', 'B')
     if (!(await ensureGenesisBlockWritten())) {
       throw FailedToFetchGenesisBlockError
     }
@@ -109,12 +103,10 @@ async function initGeth() {
     const geth = await createNewGeth()
 
     try {
-      Logger.info('Geth@init', 'C reeeeee')
       await geth.start()
       gethInstance = geth
       geth.subscribeNewHead()
     } catch (e) {
-      Logger.info('Geth@init', 'D')
       const errorType = getGethErrorType(e)
       if (errorType === ErrorType.GethAlreadyRunning) {
         // Geth is already running, this is most likely RN restart.
@@ -133,7 +125,6 @@ async function initGeth() {
     }
   } finally {
     gethLock = false
-    Logger.info('Geth@init', 'E')
   }
 }
 
@@ -142,7 +133,6 @@ export async function getGeth(): Promise<typeof gethInstance> {
   if (!gethInstance) {
     await initGeth()
   }
-  console.log('reeee')
   return gethInstance
 }
 
@@ -156,9 +146,6 @@ async function ensureStaticNodesInitialized(): Promise<boolean> {
     let enodes: string | null = null
     try {
       enodes = await StaticNodeUtils.getStaticNodesAsync(currentNetworkName)
-      Logger.debug('----- trevor -----\ninside ensureStaticNodesInitialized!')
-      enodes = `[]`
-      // enodes = `["enode://04ab809f886edbec3a5840f98de53bc7e6da18beeef8f977a373718e8a7bdf8814cab05a5ecfefb6595b0e592428ee6d62756bc8b274d8c72af9982641fd299e@35.247.89.129:30301"]`
     } catch (error) {
       Logger.error(
         `Failed to get static nodes for network ${currentNetworkName},` +

@@ -28,7 +28,7 @@ systemctl restart docker
 
 # ---- Set Up and Run Geth ----
 
-BOOTNODE_VERBOSITY=6
+BOOTNODE_VERBOSITY=1
 
 GETH_BOOTNODE_DOCKER_IMAGE=${geth_bootnode_docker_image_repository}:${geth_bootnode_docker_image_tag}
 
