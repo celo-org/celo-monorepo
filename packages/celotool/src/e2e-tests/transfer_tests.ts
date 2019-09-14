@@ -1,5 +1,5 @@
-import { toFixed } from '@celo/protocol/lib/fixidity'
 import { CURRENCY_ENUM } from '@celo/utils'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
