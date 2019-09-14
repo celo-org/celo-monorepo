@@ -1,8 +1,8 @@
-import { UpgradeArgv } from '@celo/celotool/src/cmds/deploy/upgrade'
-import { downloadArtifacts, uploadArtifacts } from '@celo/celotool/src/lib/artifacts'
-import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
-import { execCmd } from '@celo/celotool/src/lib/utils'
+import { downloadArtifacts, uploadArtifacts } from 'src/lib/artifacts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { portForwardAnd } from 'src/lib/port_forward'
+import { execCmd } from 'src/lib/utils'
+import { UpgradeArgv } from '../../deploy/upgrade'
 
 export const command = 'contracts'
 

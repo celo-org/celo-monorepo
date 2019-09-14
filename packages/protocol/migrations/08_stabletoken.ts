@@ -1,7 +1,6 @@
 /* tslint:disable:no-console */
 import Web3 = require('web3')
 
-import { toFixed } from '@celo/protocol/lib/fixidity'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   convertToContractDecimalsBN,
@@ -9,6 +8,7 @@ import {
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import {
   GasCurrencyWhitelistInstance,
   ReserveInstance,

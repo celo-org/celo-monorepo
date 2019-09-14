@@ -20,6 +20,7 @@ COPY packages/utils /celo-monorepo/packages/utils
 COPY packages/typescript /celo-monorepo/packages/typescript
 COPY packages/walletkit /celo-monorepo/packages/walletkit
 COPY packages/celotool /celo-monorepo/packages/celotool
+COPY packages/verification-pool-api /celo-monorepo/packages/verification-pool-api
 COPY packages/transaction-metrics-exporter /celo-monorepo/packages/transaction-metrics-exporter
 
 WORKDIR /celo-monorepo
