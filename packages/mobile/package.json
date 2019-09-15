@@ -53,6 +53,7 @@
     "@react-native-community/netinfo": "^2.0.4",
     "@segment/analytics-react-native": "^1.1.0-beta.1",
     "@segment/analytics-react-native-firebase": "^1.1.0-beta.1",
+    "@types/uuid": "^3.4.5",
     "@ungap/url-search-params": "^0.1.2",
     "Base64": "^1.0.1",
     "apollo-boost": "^0.3.1",

@@ -2,12 +2,14 @@ import { isValidAddress } from '@celo/utils/src/signatureUtils'
 import { isEmpty } from 'lodash'
 import * as RNFS from 'react-native-fs'
 import Share from 'react-native-share'
-import { put } from 'redux-saga/effects'
+import { all, put } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { setRecipientCache } from 'src/recipients/actions'
 import {
   getRecipientFromAddress,
   NumberToRecipient,
@@ -16,7 +18,7 @@ import {
 } from 'src/recipients/recipient'
 import { QrCode, storeLatestInRecents, SVG } from 'src/send/actions'
 import Logger from 'src/utils/Logger'
-
+import uuidv1 from 'uuid'
 const TAG = 'QR/utils'
 
 export enum BarcodeTypes {
@@ -95,7 +97,20 @@ export function* handleBarcode(
         displayId: data.e164PhoneNumber,
       }
 
-  yield put(storeLatestInRecents(recipient))
+  // add number to the cache
+  // TODO things in the QR should be encrypted so noone can create an arbitrary QR with any phone and address convination
+  recipientCache[data.e164PhoneNumber] = {
+    ...recipient,
+    kind: RecipientKind.Contact,
+    contactId: recipient.contactId ? recipient.contactId : uuidv1(),
+  }
+  addressToE164Number[data.address] = data.e164PhoneNumber
+
+  yield all([
+    put(setRecipientCache(recipientCache)),
+    put(storeLatestInRecents(recipient)),
+    put(updateE164PhoneNumberAddresses({}, addressToE164Number)),
+  ])
 
   navigate(Screens.SendAmount, { recipient })
 }
