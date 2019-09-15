@@ -1,6 +1,6 @@
-import { UpgradeArgv } from '@celo/celotool/src/cmds/deploy/upgrade'
-import { deploy, taintTestnet, untaintTestnet } from '@celo/celotool/src/lib/vm-testnet-utils'
+import { deploy, taintTestnet, untaintTestnet } from 'src/lib/vm-testnet-utils'
 import yargs from 'yargs'
+import { UpgradeArgv } from '../../deploy/upgrade'
 
 export const command = 'vm-testnet'
 export const describe = 'upgrade a testnet on a VM'

@@ -1,8 +1,8 @@
-import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
-import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
-import { execCmd } from '@celo/celotool/src/lib/utils'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { envVar, fetchEnv } from 'src/lib/env-utils'
+import { execCmd } from 'src/lib/utils'
 import * as yargs from 'yargs'
+import { InitialArgv } from '../../deploy/initial'
 export const command = 'blockchain-api'
 
 export const describe = 'command for upgrading blockchain-api'

@@ -94,6 +94,7 @@ jobs:
           name: Build packages
           command: |
             # separate build to avoid ENOMEN in CI :(
+            yarn build --scope @celo/utils
             yarn build --scope @celo/protocol
             yarn build --scope docs
             yarn build --scope @celo/walletkit
