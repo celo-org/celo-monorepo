@@ -97,8 +97,8 @@ export function* handleBarcode(
         displayId: data.e164PhoneNumber,
       }
 
-  // add number to the cache
-  // TODO things in the QR should be encrypted so noone can create an arbitrary QR with any phone and address convination
+  // TODO data in the QR should be encrypted so noone can create an arbitrary QR with any phone and address combination
+  // add phone number to the recipientCache
   recipientCache[data.e164PhoneNumber] = {
     ...recipient,
     kind: RecipientKind.Contact,
