@@ -143,7 +143,9 @@ contract Proxy {
 
   /**
    * @dev isContract detect whether the address is 
-   *      a contract address or externally owned account
+   *      a contract address or externally owned account (EOA)
+   * WARNING: Calling this function from a constructor will return 0
+  *           independently if the address given as parameter is a contract or EOA
    * @return true if it is a contract address
    */
   function isContract(address addr) public view returns (bool) {
