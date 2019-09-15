@@ -66,7 +66,7 @@ function paymentObjectToNotification(po: PaymentRequest): { [key: string]: strin
 export function initializeDb() {
   database = admin.database()
   registrationsRef = database.ref('/registrations')
-  lastBlockRef = database.ref('/lastBlockNotified')
+  lastBlockRef = database.ref('/lastBlockNotifiedPilot')
   pendingRequestsRef = database.ref('/pendingRequests')
 
   // Attach to the registration ref to keep local registrations mapping up to date
