@@ -1,4 +1,4 @@
-// import { confirmAction } from '@celo/celotool/src/lib/utils'
+// import { confirmAction } from './utils'
 import { config } from 'dotenv'
 import { existsSync } from 'fs'
 import path from 'path'

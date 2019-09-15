@@ -1,10 +1,7 @@
-import debugFactory from 'debug'
 import * as admin from 'firebase-admin'
 import * as functions from 'firebase-functions'
 import { getNetworkConfig } from './config'
 import { AccountPool, processRequest } from './database-helper'
-
-debugFactory.enabled('*')
 
 const PROCESSOR_RUNTIME_OPTS: functions.RuntimeOptions = {
   // When changing this, check that actionTimeoutMS is less than this number

@@ -8,81 +8,59 @@ import { Avatar as BaseAvatar } from '@celo/react-components/components/Avatar'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Image, StyleSheet } from 'react-native'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
+import { defaultCountryCodeSelector } from 'src/account/reducer'
 import { Namespaces } from 'src/i18n'
 import { unknownUserIcon } from 'src/images/Images'
-import { getRecipientThumbnail, Recipient, RecipientKind } from 'src/recipients/recipient'
-import { RootState } from 'src/redux/reducers'
+import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 
 const DEFAULT_ICON_SIZE = 40
 
-interface Props {
+interface OwnProps {
   recipient?: Recipient
   e164Number?: string
   name?: string
   address?: string
-  defaultCountryCode: string
   iconSize?: number
 }
 
-interface StateProps {
-  defaultCountryCode: string
+type Props = OwnProps & WithNamespaces
+
+function getDisplayName({ name, recipient, e164Number, address, t }: Props) {
+  if (name) {
+    return name
+  }
+  if (recipient && recipient.displayName) {
+    return recipient.displayName
+  }
+  if (e164Number) {
+    return t('mobileNumber')
+  }
+  if (address) {
+    return t('walletAddress')
+  }
+  throw new Error('Invalid avatar props, cannot determine display name')
 }
 
-const mapStateToProps = (state: RootState): StateProps => {
-  return {
-    defaultCountryCode: state.account.defaultCountryCode,
-  }
-}
+export function Avatar(props: Props) {
+  const defaultCountryCode = useSelector(defaultCountryCodeSelector)
+  const { recipient, e164Number, iconSize = DEFAULT_ICON_SIZE } = props
 
-type AvatarProps = Props & StateProps & WithNamespaces
-
-export class Avatar extends React.PureComponent<AvatarProps> {
-  render() {
-    const { t, recipient, address, e164Number, iconSize = DEFAULT_ICON_SIZE } = this.props
-
-    let { name } = this.props
-
-    if (!recipient && !name) {
-      // TransferFeedItem does not specify what kind of recipient was used, so
-      // here we assume if the address is missing, then it is a mobile # and
-      // if the phone number is missing, then it is an address.  Since
-      // blockchain-api responds only addresses and the recipient is fetched
-      // during navigation, then it (should) be only address & contact recipients
-      if (!address) {
-        name = t('mobileNumber')
-      }
-
-      if (!e164Number) {
-        name = t('walletAddress')
-      }
-    }
-
-    if (recipient && recipient.kind === RecipientKind.Contact) {
-      return (
-        <BaseAvatar
-          {...this.props}
-          name={recipient.displayName}
-          thumbnailPath={getRecipientThumbnail(recipient)}
-          e164Number={recipient.e164PhoneNumber}
-          iconSize={iconSize}
-        />
-      )
-    }
-
-    return (
-      <BaseAvatar
-        {...this.props}
-        name={recipient ? recipient.displayName : name}
-        iconSize={iconSize}
-      >
-        <Image
-          source={unknownUserIcon}
-          style={[style.defaultIcon, { height: iconSize, width: iconSize }]}
-        />
-      </BaseAvatar>
-    )
-  }
+  return (
+    <BaseAvatar
+      {...props}
+      defaultCountryCode={defaultCountryCode}
+      name={getDisplayName(props)}
+      e164Number={e164Number}
+      iconSize={iconSize}
+      thumbnailPath={getRecipientThumbnail(recipient)}
+    >
+      <Image
+        source={unknownUserIcon}
+        style={[style.defaultIcon, { height: iconSize, width: iconSize }]}
+      />
+    </BaseAvatar>
+  )
 }
 
 const style = StyleSheet.create({
@@ -92,7 +70,4 @@ const style = StyleSheet.create({
   },
 })
 
-// TODO(Rossy + Jean) simplify this file with useSelector
-export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-  withNamespaces(Namespaces.sendFlow7)(Avatar)
-)
+export default withNamespaces(Namespaces.sendFlow7)(Avatar)

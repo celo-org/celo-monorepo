@@ -266,7 +266,7 @@ function* createStandbyTx(
   yield put(
     addStandbyTransaction({
       id: txId,
-      type: TransactionTypes.EXCHANGED,
+      type: TransactionTypes.EXCHANGE,
       status: TransactionStatus.Pending,
       inSymbol: makerToken,
       inValue: makerAmount.toString(),

@@ -119,7 +119,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     votedGroup: Address,
     voteWeight: BigNumber
   ): Promise<{ lesser: Address; greater: Address }> {
-    const currentVotes = await this.getValidatorGroupsVotes()
+    const currentVotes = (await this.getValidatorGroupsVotes()).filter((g) => !g.votes.isZero())
 
     const selectedGroup = currentVotes.find((cv) => eqAddress(cv.address, votedGroup))
 

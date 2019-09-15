@@ -1,5 +1,10 @@
-import { blsPrivateKeyToProcessedPrivateKey } from '@celo/celotool/src/lib/bls_utils'
-import { envVar, fetchEnv, fetchEnvOrFallback } from '@celo/celotool/src/lib/env-utils'
+import * as bls12377js from 'bls12377js'
+import { ec as EC } from 'elliptic'
+import { range, repeat } from 'lodash'
+import rlp from 'rlp'
+import Web3 from 'web3'
+import { blsPrivateKeyToProcessedPrivateKey } from './bls_utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   CONTRACT_ADDRESSES,
   CONTRACT_OWNER_STORAGE_LOCATION,
@@ -8,13 +13,8 @@ import {
   OG_ACCOUNTS,
   PROXY_CONTRACT_CODE,
   TEMPLATE,
-} from '@celo/celotool/src/lib/genesis_constants'
-import { ensure0x, strip0x } from '@celo/celotool/src/lib/utils'
-import * as bls12377js from 'bls12377js'
-import { ec as EC } from 'elliptic'
-import { range, repeat } from 'lodash'
-import rlp from 'rlp'
-import Web3 from 'web3'
+} from './genesis_constants'
+import { ensure0x, strip0x } from './utils'
 
 import bip32 = require('bip32')
 import bip39 = require('bip39')
