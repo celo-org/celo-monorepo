@@ -177,7 +177,7 @@ export class ImportWallet extends React.Component<Props, State> {
           </View>
         )}
         <GethAwareButton
-          disabled={isSubmitting || !this.state.backupPhrase}
+          disabled={isSubmitting || this.state.backupPhrase.trim().split(/\s+/g).length < 12}
           onPress={this.onSubmit}
           text={t('restoreWallet')}
           standard={false}
