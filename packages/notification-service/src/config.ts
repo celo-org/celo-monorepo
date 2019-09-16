@@ -34,6 +34,8 @@ export const STABLE_TOKEN_ADDRESS = (process.env.STABLE_TOKEN_ADDRESS || '').toL
 export const GOLD_TOKEN_ADDRESS = (process.env.GOLD_TOKEN_ADDRESS || '').toLowerCase()
 export const DEFAULT_LOCALE = process.env.DEFAULT_LOCALE
 export const POLLING_INTERVAL = Number(process.env.POLLING_INTERVAL) || 1000
+export const EXCHANGE_POLLING_INTERVAL =
+  Number(process.env.EXCHANGE_POLLING_INTERVAL) || 30 * 60 * 1000 // 30 minutes in milliseconds
 export const NOTIFICATIONS_TTL_MS = Number(process.env.NOTIFICATION_TTL_MS) || 3600 * 1000 * 24 * 7 // 1 week in milliseconds
 
 export enum NotificationTypes {
