@@ -1,3 +1,7 @@
+import BigNumber from 'bignumber.js'
+import { assert } from 'chai'
+import Web3 from 'web3'
+import { strip0x } from '../lib/utils'
 import {
   erc20Abi,
   getContractAddress,
@@ -7,11 +11,7 @@ import {
   initAndStartGeth,
   sleep,
   assertRevert,
-} from '@celo/celotool/geth_tests/src/lib/utils'
-import BigNumber from 'bignumber.js'
-import { strip0x } from '../src/lib/utils'
-const assert = require('chai').assert
-const Web3 = require('web3')
+} from './utils'
 
 // TODO(asa): Use the contract kit here instead
 const lockedGoldAbi = [
@@ -236,9 +236,9 @@ describe('governance tests', () => {
     validators = new web3.eth.Contract(validatorsAbi, await getContractAddress('ValidatorsProxy'))
   }
 
-  const unlockAccount = async (address: string, web3: any) => {
+  const unlockAccount = async (address: string, theWeb3: any) => {
     // Assuming empty password
-    await web3.eth.personal.unlockAccount(address, '', 1000)
+    await theWeb3.eth.personal.unlockAccount(address, '', 1000)
   }
 
   const getParsedSignatureOfAddress = async (address: string, signer: string, signerWeb3: any) => {
@@ -282,7 +282,7 @@ describe('governance tests', () => {
     if (!gas) {
       gas = await tx.estimateGas({ ...txOptions })
     }
-    return await tx.send({ from: group, ...txOptions, gas })
+    return tx.send({ from: group, ...txOptions, gas })
   }
 
   const addMember = async (groupWeb3: any, group: string, member: string, txOptions: any = {}) => {
@@ -292,7 +292,7 @@ describe('governance tests', () => {
     if (!gas) {
       gas = await tx.estimateGas({ ...txOptions })
     }
-    return await tx.send({ from: group, ...txOptions, gas })
+    return tx.send({ from: group, ...txOptions, gas })
   }
 
   const delegateRewards = async (account: string, delegate: string, txOptions: any = {}) => {
@@ -308,7 +308,7 @@ describe('governance tests', () => {
     if (!gas) {
       gas = 2 * (await tx.estimateGas({ ...txOptions }))
     }
-    return await tx.send({ from: account, ...txOptions, gas })
+    return tx.send({ from: account, ...txOptions, gas })
   }
 
   const redeemRewards = async (account: string, txOptions: any = {}) => {
@@ -320,7 +320,7 @@ describe('governance tests', () => {
     if (!gas) {
       gas = 2 * (await tx.estimateGas({ ...txOptions }))
     }
-    return await tx.send({ from: account, ...txOptions, gas })
+    return tx.send({ from: account, ...txOptions, gas })
   }
 
   describe('Validators.numberValidatorsInCurrentSet()', () => {
@@ -496,9 +496,9 @@ describe('governance tests', () => {
 
       const changeValidatorSet = async (header: any) => {
         // At the start of epoch N, swap members so the validator set is different for epoch N + 1.
-        if (header.number % epoch == 0) {
-          const members = await getValidatorGroupMembers()
-          const direction = members.includes(membersToSwap[0])
+        if (header.number % epoch === 0) {
+          const groupMembers = await getValidatorGroupMembers()
+          const direction = groupMembers.includes(membersToSwap[0])
           const removedMember = direction ? membersToSwap[0] : membersToSwap[1]
           const addedMember = direction ? membersToSwap[1] : membersToSwap[0]
           expectedEpochMembership.set(header.number / epoch, [removedMember, addedMember])
@@ -510,10 +510,11 @@ describe('governance tests', () => {
         }
       }
 
-      const subscription = groupWeb3.eth.subscribe('newBlockHeaders').on('data', changeValidatorSet)
+      const subscription = await groupWeb3.eth.subscribe('newBlockHeaders')
+      subscription.on('data', changeValidatorSet)
       // Wait for a few epochs while changing the validator set.
       await sleep(epoch * 3)
-      subscription.unsubscribe()
+      ;(subscription as any).unsubscribe()
       // Wait for the current epoch to complete.
       await sleep(epoch)
     })
@@ -521,14 +522,15 @@ describe('governance tests', () => {
     it('should have produced blocks with the correct validator set', async function(this: any) {
       this.timeout(0) // Disable test timeout
       assert.equal(expectedEpochMembership.size, 3)
+      // tslint:disable-next-line: no-console
       console.log(expectedEpochMembership)
-      for (let [epochNumber, membership] of expectedEpochMembership) {
+      for (const [epochNumber, membership] of expectedEpochMembership) {
         let containsExpectedMember = false
         for (let i = epochNumber * epoch + 1; i < (epochNumber + 1) * epoch + 1; i++) {
           const block = await web3.eth.getBlock(i)
           assert.notEqual(block.miner.toLowerCase(), membership[1].toLowerCase())
           containsExpectedMember =
-            containsExpectedMember || block.miner.toLowerCase() == membership[0].toLowerCase()
+            containsExpectedMember || block.miner.toLowerCase() === membership[0].toLowerCase()
         }
         assert.isTrue(containsExpectedMember)
       }
@@ -566,16 +568,16 @@ describe('governance tests', () => {
 
   describe('when adding any block', () => {
     let goldGenesisSupply: any
-    let addressesWithBalance: string[] = []
+    const addressesWithBalance: string[] = []
     beforeEach(async function(this: any) {
       this.timeout(0) // Disable test timeout
       await restart()
       const genesis = await importGenesis()
       goldGenesisSupply = new BigNumber(0)
-      for (let validator in genesis.alloc) {
+      Object.keys(genesis.alloc).forEach((validator) => {
         addressesWithBalance.push(validator)
         goldGenesisSupply = goldGenesisSupply.plus(genesis.alloc[validator].balance)
-      }
+      })
       // Block rewards are paid to governance and Locked Gold.
       // Governance also receives a portion of transaction fees.
       addressesWithBalance.push(await getContractAddress('GovernanceProxy'))
@@ -601,7 +603,7 @@ describe('governance tests', () => {
       const expectedGoldTotalSupply = balances.reduce((total: BigNumber, b: BigNumber) =>
         b.plus(total)
       )
-      assert.isAtLeast(expectedGoldTotalSupply, goldGenesisSupply)
+      assert.isAtLeast(expectedGoldTotalSupply.toNumber(), goldGenesisSupply.toNumber())
       assert.equal(goldTotalSupply.toString(), expectedGoldTotalSupply.toString())
     })
   })
