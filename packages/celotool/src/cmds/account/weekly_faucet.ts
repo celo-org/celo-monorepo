@@ -1,11 +1,11 @@
 /* tslint:disable no-console */
-import { AccountArgv } from '@celo/celotool/src/cmds/account'
-import { downloadArtifacts } from '@celo/celotool/src/lib/artifacts'
-import { getBlockchainApiUrl } from '@celo/celotool/src/lib/endpoints'
-import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
-import { execCmd } from '@celo/celotool/src/lib/utils'
+import { downloadArtifacts } from 'src/lib/artifacts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { getBlockchainApiUrl } from 'src/lib/endpoints'
+import { portForwardAnd } from 'src/lib/port_forward'
+import { execCmd } from 'src/lib/utils'
 import * as yargs from 'yargs'
+import { AccountArgv } from '../account'
 
 export const command = 'weekly-faucet'
 
