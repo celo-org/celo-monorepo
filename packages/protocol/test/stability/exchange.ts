@@ -1,4 +1,3 @@
-import { fixed1, fromFixed, toFixed } from '@celo/protocol/lib/fixidity'
 import {
   assertEqualBN,
   assertLogMatches2,

@@ -1,10 +1,7 @@
 /* tslint:disable no-console */
-import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
-import { uploadArtifacts } from '@celo/celotool/src/lib/artifacts'
-import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
-import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
-import { ensure0x, execCmd } from '@celo/celotool/src/lib/utils'
+import { uploadArtifacts } from 'src/lib/artifacts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { envVar, fetchEnv } from 'src/lib/env-utils'
 import {
   AccountType,
   generatePrivateKey,
@@ -12,6 +9,9 @@ import {
   privateKeyToAddress,
 } from 'src/lib/generate_utils'
 import { OG_ACCOUNTS } from 'src/lib/genesis_constants'
+import { portForwardAnd } from 'src/lib/port_forward'
+import { ensure0x, execCmd } from 'src/lib/utils'
+import { InitialArgv } from '../../deploy/initial'
 
 export const command = 'contracts'
 

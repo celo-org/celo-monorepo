@@ -1,11 +1,11 @@
-import { UpgradeArgv } from '@celo/celotool/src/cmds/deploy/upgrade'
-import { fetchEnvOrFallback } from '@celo/celotool/src/lib/env-utils'
 import sleep from 'sleep-promise'
 import { installHelmChart, removeHelmRelease, upgradeHelmChart } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { fetchEnvOrFallback } from 'src/lib/env-utils'
 import { resetCloudSQLInstance, retrieveCloudSQLConnectionInfo } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import * as yargs from 'yargs'
+import { UpgradeArgv } from '../../deploy/upgrade'
 
 export const command = 'blockscout'
 export const describe = 'upgrade an existing deploy of the blockscout package'
