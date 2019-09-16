@@ -1,6 +1,6 @@
 import AsyncPolling from 'async-polling'
 import { handleTransferNotifications } from './blockscout/transfers'
-import { POLLING_INTERVAL } from './config'
+import { EXCHANGE_POLLING_INTERVAL, POLLING_INTERVAL } from './config'
 import { getWeb3Instance, makeExchangeQuery } from './exchange/exchangeQuery'
 import { handlePaymentRequests } from './handlers'
 
@@ -24,4 +24,4 @@ export const exchangePolling = AsyncPolling(async (end) => {
   } finally {
     end()
   }
-}, 100) // EXCHANGE_POLLING_INTERVAL)
+}, EXCHANGE_POLLING_INTERVAL)

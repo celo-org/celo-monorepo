@@ -2,12 +2,11 @@ import { CURRENCY_ENUM } from '@celo/utils'
 import { ContractUtils } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
+import { WEB3_PROVIDER_URL } from '../config'
 import { writeExchangeRatePair } from '../firebase'
 
 const DOLLAR_SELL_AMOUNT_IN_WEI = new BigNumber(100 * 1000000000000000000) // 100 dollars
 const GOLD_SELL_AMOUNT_IN_WEI = new BigNumber(10 * 1000000000000000000) // 10 gold
-
-const PROVIDER_URL = 'http://34.83.137.48:8545'
 
 export interface ExchangeRatePair {
   goldMaker: string // Number of dollarTokens received for one goldToken
@@ -43,7 +42,7 @@ export function getWeb3Instance(): Web3 {
       return web3
     }
   }
-  const httpProvider = new Web3.providers.HttpProvider(PROVIDER_URL)
+  const httpProvider = new Web3.providers.HttpProvider(WEB3_PROVIDER_URL)
   web3 = new Web3(httpProvider)
   return web3
 }
