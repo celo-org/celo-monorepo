@@ -25,6 +25,7 @@ spec:
   - metadata:
       name: data
     spec:
+      storageClassName: ssd
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
