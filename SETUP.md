@@ -8,15 +8,16 @@
       - [Install Node, Yarn and friends](#install-node-yarn-and-friends)
       - [Java](#java)
       - [Install Android Dev Tools](#install-android-dev-tools)
-      - [Genymotion](#genymotion)
     - [Linux](#linux)
       - [Install Node, Yarn and friends](#install-node-yarn-and-friends-1)
       - [Installing OpenJDK 8](#installing-openjdk-8)
       - [Install Android Dev Tools](#install-android-dev-tools-1)
-      - [Genymotion](#genymotion-1)
     - [Some common stuff](#some-common-stuff)
       - [Optional: Install Rust](#optional-install-rust)
       - [Optional: Install an Android Emulator](#optional-install-an-android-emulator)
+      - [Optional: Genymotion](#optional-genymotion)
+        - [MacOS](#macos-1)
+        - [Linux](#linux-1)
     - [Building celo-monorepo](#building-celo-monorepo)
   - [Using an Android test device locally](#using-an-android-test-device-locally)
     - [Deploying the user app](#deploying-the-user-app)
@@ -105,23 +106,6 @@ Then install the Android 28 platform:
 sdkmanager 'platforms;android-28'
 ```
 
-#### Genymotion
-
-Alternatively, you can install Genymotion, a nice emulator manager. It doesn't work with the e2e tests but could help during development:
-
-```bash
-brew cask install genymotion
-```
-
-Under OSX High Sierra and later, you'll get a message that you need to
-[approve it in System Preferences > Security & Privacy > General][approve kernel extension].
-
-Do that, and then repeat the line above.
-
-Then make sure the ADB path is set correctly in Genymotion — set
-`Preferences > ADB > Use custom Android SDK tools` to
-`/usr/local/share/android-sdk` (same as `$ANDROID_HOME`)
-
 ### Linux
 
 #### Install Node, Yarn and friends
@@ -172,18 +156,6 @@ The steps are:
 1.  The Android Studio Setup Wizard guides you through the rest of the setup, which includes downloading Android SDK components that are required for development.
 
 You can find the complete instructions about how to install the tools in Linux environments in the [Documentation page](https://developer.android.com/studio/install#linux).
-
-#### Genymotion
-
-Alternatively, you can install Genymotion, a nice emulator manager. It doesn't work with the e2e tests but could help during development.
-
-You can download the Linux version of Genymotion from the [fun zone!](https://www.genymotion.com/fun-zone/) (you need to sign in first).
-
-After having the binary you only need to run the installer:
-
-```
-sudo ./genymotion-3.0.2-linux_x64.bin
-```
 
 ### Some common stuff
 
@@ -237,6 +209,35 @@ Run the emulator with:
 
 ```bash
 emulator -avd Nexus_5X_API_28
+```
+
+#### Optional: Genymotion
+
+Optionally, as alternative to other emulators you can install Genymotion, a nice emulator manager:
+
+##### MacOS
+
+```bash
+brew cask install genymotion
+```
+
+Under OSX High Sierra and later, you'll get a message that you need to
+[approve it in System Preferences > Security & Privacy > General][approve kernel extension].
+
+Do that, and then repeat the line above.
+
+Then make sure the ADB path is set correctly in Genymotion — set
+`Preferences > ADB > Use custom Android SDK tools` to
+`/usr/local/share/android-sdk` (same as `$ANDROID_HOME`)
+
+##### Linux
+
+You can download the Linux version of Genymotion from the [fun zone!](https://www.genymotion.com/fun-zone/) (you need to sign in first).
+
+After having the binary you only need to run the installer:
+
+```
+sudo ./genymotion-3.0.2-linux_x64.bin
 ```
 
 ### Building celo-monorepo
