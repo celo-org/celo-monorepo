@@ -8,11 +8,6 @@ import { writeExchangeRatePair } from '../firebase'
 const DOLLAR_SELL_AMOUNT_IN_WEI = new BigNumber(100 * 1000000000000000000) // 100 dollars
 const GOLD_SELL_AMOUNT_IN_WEI = new BigNumber(10 * 1000000000000000000) // 10 gold
 
-export interface ExchangeRatePair {
-  goldMaker: string // Number of dollarTokens received for one goldToken
-  dollarMaker: string // Number of goldTokens received for one dollarToken
-}
-
 export async function makeExchangeQuery(web3Instance: Web3) {
   const dollarMakerExchangeRate: BigNumber = await ContractUtils.getExchangeRate(
     web3Instance,
