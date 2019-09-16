@@ -1,3 +1,4 @@
+import { CURRENCY_ENUM } from '@celo/utils'
 import * as admin from 'firebase-admin'
 import i18next from 'i18next'
 import { ExchangeRatePair } from 'src/exchange/exchangeQuery'
@@ -8,6 +9,7 @@ let database: admin.database.Database
 let registrationsRef: admin.database.Reference
 let lastBlockRef: admin.database.Reference
 let pendingRequestsRef: admin.database.Reference
+let exchangeRatesRef: admin.database.Reference
 
 export interface Registrations {
   [address: string]:
@@ -42,9 +44,20 @@ interface PendingRequests {
   [uid: string]: PaymentRequest
 }
 
+interface ExchangeRateObject {
+  makerToken: CURRENCY_ENUM
+  rate: string
+  timestamp: string
+}
+
+interface ExchangeRates {
+  [uid: string]: ExchangeRateObject
+}
+
 let registrations: Registrations = {}
 let lastBlockNotified: number = -1
 let pendingRequests: PendingRequests = {}
+let exchangeRates: ExchangeRates = {}
 
 export function _setTestRegistrations(testRegistrations: Registrations) {
   registrations = testRegistrations
@@ -69,6 +82,7 @@ export function initializeDb() {
   registrationsRef = database.ref('/registrations')
   lastBlockRef = database.ref('/lastBlockNotified')
   pendingRequestsRef = database.ref('/pendingRequests')
+  exchangeRatesRef = database.ref('/exchangeRates')
 
   // Attach to the registration ref to keep local registrations mapping up to date
   registrationsRef.on(
@@ -102,6 +116,17 @@ export function initializeDb() {
     },
     (errorObject: any) => {
       console.error('Latest payment requests data read failed:', errorObject.code)
+    }
+  )
+
+  exchangeRatesRef.on(
+    'value',
+    (snapshot) => {
+      console.debug('Latest exchange rate updated: ', snapshot && snapshot.val())
+      exchangeRates = (snapshot && snapshot.val()) || {}
+    },
+    (errorObject: any) => {
+      console.error('Latest exchange rate data read failed:', errorObject.code)
     }
   )
 }
