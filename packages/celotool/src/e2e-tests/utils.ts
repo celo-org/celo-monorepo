@@ -5,7 +5,6 @@ import { join as joinPath, resolve as resolvePath } from 'path'
 import { Admin } from 'web3-eth-admin'
 import {
   AccountType,
-  ConsensusType,
   generateGenesis,
   getPrivateKeysFor,
   getValidators,
@@ -173,16 +172,12 @@ async function setupTestDir(testDir: string) {
 }
 
 function writeGenesis(validators: Validator[], path: string) {
-  const blockTime = 0
-  const epochLength = 10
-  const genesis = generateGenesis(
+  const genesis = generateGenesis({
     validators,
-    ConsensusType.ISTANBUL,
-    ['0x000000000000000000000000000000000000ce10'],
-    blockTime,
-    epochLength,
-    NetworkId
-  )
+    blockTime: 0,
+    epoch: 10,
+    chainId: NetworkId,
+  })
   fs.writeFileSync(path, genesis)
 }
 
@@ -322,16 +317,20 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
 }
 
 export async function migrateContracts(validatorPrivateKeys: string[], to: number = 1000) {
+  const migrationOverrides = {
+    validators: {
+      minElectableValidators: '1',
+      validatorKeys: validatorPrivateKeys.map(ensure0x),
+    },
+  }
   const args = [
     '--cwd',
     `${MonorepoRoot}/packages/protocol`,
     'init-network',
     '-n',
     'testing',
-    '-k',
-    validatorPrivateKeys.map(ensure0x).join(','),
     '-m',
-    '{ "validators": { "minElectableValidators": "1" } }',
+    JSON.stringify(migrationOverrides),
     '-t',
     to.toString(),
   ]
