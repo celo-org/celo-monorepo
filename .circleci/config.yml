@@ -529,10 +529,6 @@ workflows:
           requires:
             - lint-checks
             - walletkit-test
-      - protocol-test-with-code-coverage:
-          requires:
-            - lint-checks
-            - walletkit-test
       - end-to-end-geth-transfer-test:
           requires:
             - lint-checks
@@ -549,7 +545,7 @@ workflows:
           requires:
             - lint-checks
             - walletkit-test
-  nightly:
+  npm-install-testing-cron-workflow:
     triggers:
       - schedule:
           # 7 PM in UTC = noon in PDT.
@@ -564,3 +560,25 @@ workflows:
       - test-utils-npm-package-install
       - test-walletkit-npm-package-install
       - test-celocli-npm-package-install
+  protocol-testing-with-code-coverage-cron-workflow:
+    triggers:
+      - schedule:
+          # 1 PM in UTC = 6 AM in PDT.
+          # Best for this slow test (~3 hours) to run during SF early morning.
+          cron: "0 13 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - install_dependencies
+      - lint-checks:
+          requires:
+            - install_dependencies
+      - walletkit-test:
+          requires:
+            - install_dependencies
+      - protocol-test-with-code-coverage:
+          requires:
+            - lint-checks
+            - walletkit-test
