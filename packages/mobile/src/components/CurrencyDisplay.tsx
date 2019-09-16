@@ -30,12 +30,8 @@ export default class CurrencyDisplay extends React.PureComponent<Props> {
     }
   }
 
-  getAmount() {
-    return this.props.amount == null ? '0.00' : getMoneyDisplayValue(this.props.amount || 0)
-  }
-
   render() {
-    const { size, type } = this.props
+    const { size, type, amount } = this.props
     const fontSize = size
     const dollarStyle = { fontSize, lineHeight: Math.round(fontSize * 1.3), color: this.color() }
     const currencySymbol = CURRENCIES[type].symbol
@@ -45,7 +41,7 @@ export default class CurrencyDisplay extends React.PureComponent<Props> {
           {currencySymbol}
         </Text>
         <Text numberOfLines={1} style={[styles.currency, fontStyles.regular, dollarStyle]}>
-          {this.getAmount()}
+          {getMoneyDisplayValue(amount)}
         </Text>
       </View>
     )

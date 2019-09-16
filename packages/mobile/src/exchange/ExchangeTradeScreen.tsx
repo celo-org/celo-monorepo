@@ -21,7 +21,7 @@ import { TRANSACTION_MIN_AMOUNT } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import ExchangeRate from 'src/exchange/ExchangeRate'
 import { ExchangeRatePair } from 'src/exchange/reducer'
-import { CURRENCIES, CURRENCY_ENUM as Tokens } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
@@ -37,7 +37,7 @@ import {
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 interface State {
-  makerToken: Tokens
+  makerToken: CURRENCY_ENUM
   makerTokenAmount: string
 }
 
@@ -70,7 +70,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   })
 
   state = {
-    makerToken: Tokens.DOLLAR,
+    makerToken: CURRENCY_ENUM.DOLLAR,
     makerTokenAmount: '',
   }
 
@@ -79,7 +79,8 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 
   onPressSwapIcon = () => {
-    const makerToken = this.state.makerToken === Tokens.DOLLAR ? Tokens.GOLD : Tokens.DOLLAR
+    const makerToken =
+      this.state.makerToken === CURRENCY_ENUM.DOLLAR ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
     this.setState({ makerToken }, () => {
       this.updateError(this.state.makerTokenAmount)
     })
@@ -88,7 +89,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   onChangeExchangeAmount = (amount: string) => {
     // remove $ we inserted for display purposes
-    const currencySymbol = new RegExp('\\' + CURRENCIES[Tokens.DOLLAR].symbol, 'g')
+    const currencySymbol = new RegExp('\\' + CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol, 'g')
     amount = amount.replace(currencySymbol, '')
 
     this.setState({ makerTokenAmount: amount }, () => {
@@ -108,7 +109,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   onEndEditing = () => {
     CeloAnalytics.track(
-      this.state.makerToken === Tokens.DOLLAR
+      this.state.makerToken === CURRENCY_ENUM.DOLLAR
         ? CustomEventNames.exchange_dollar_input
         : CustomEventNames.exchange_gold_input,
       { exchangeInputAmount: this.state.makerTokenAmount }
@@ -153,7 +154,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
       amount.isGreaterThan(makerBalance) || amount.isLessThan(TRANSACTION_MIN_AMOUNT)
     const exchangeRate = getRateForMakerToken(this.props.exchangeRatePair, this.state.makerToken)
     const exchangeRateIsInvalid = exchangeRate.isLessThanOrEqualTo(0)
-    const takerToken = this.isDollarToGold() ? Tokens.GOLD : Tokens.DOLLAR
+    const takerToken = this.isDollarToGold() ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
     const takerAmountIsInvalid = getTakerAmount(
       amount,
       exchangeRate,
@@ -170,7 +171,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 
   isDollarToGold = () => {
-    return this.state.makerToken === Tokens.DOLLAR
+    return this.state.makerToken === CURRENCY_ENUM.DOLLAR
   }
 
   getInputValue = () => {
@@ -184,16 +185,16 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   getMakerTakerProps = () => {
     const { t } = this.props
     const dollarProps = {
-      token: Tokens.DOLLAR,
+      token: CURRENCY_ENUM.DOLLAR,
       tokenText: t('global:celoDollars') + ' (cUSD)',
       style: styles.green,
-      symbol: CURRENCIES[Tokens.DOLLAR].symbol,
+      symbol: CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol,
     }
     const goldProps = {
-      token: Tokens.GOLD,
+      token: CURRENCY_ENUM.GOLD,
       tokenText: t('global:celoGold') + ' (cGLD)',
       style: styles.gold,
-      symbol: CURRENCIES[Tokens.GOLD].symbol,
+      symbol: CURRENCIES[CURRENCY_ENUM.GOLD].symbol,
     }
 
     if (this.isDollarToGold()) {

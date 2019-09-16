@@ -1,7 +1,7 @@
 /* Helper functions for converting between stable and gold currencies */
 import BigNumber from 'bignumber.js'
 import { ExchangeRatePair } from 'src/exchange/reducer'
-import { CURRENCY_ENUM as Tokens } from 'src/geth/consts'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import Logger from 'src/utils/Logger'
 const TAG = 'utils/currencyExchange'
 
@@ -9,7 +9,7 @@ type numberT = number | string | BigNumber | null
 
 export function getRateForMakerToken(
   exchangeRatePair: ExchangeRatePair | null,
-  makerToken: Tokens
+  makerToken: CURRENCY_ENUM
 ) {
   if (!exchangeRatePair) {
     Logger.warn(TAG, `Rate for token ${makerToken} is NaN`)
@@ -17,9 +17,9 @@ export function getRateForMakerToken(
   }
 
   let rateBN: BigNumber
-  if (makerToken === Tokens.DOLLAR) {
+  if (makerToken === CURRENCY_ENUM.DOLLAR) {
     rateBN = new BigNumber(exchangeRatePair.dollarMaker)
-  } else if (makerToken === Tokens.GOLD) {
+  } else if (makerToken === CURRENCY_ENUM.GOLD) {
     rateBN = new BigNumber(exchangeRatePair.goldMaker)
   } else {
     Logger.warn(TAG, `Unexpected token ${makerToken}`)
@@ -66,22 +66,22 @@ export function getNewTakerBalance(previousBalance: string | null, delta: BigNum
 
 export function getNewDollarBalance(
   dollarBalance: string | null,
-  makerToken: Tokens,
+  makerToken: CURRENCY_ENUM,
   makerAmount: BigNumber,
   takerAmount: BigNumber
 ) {
-  return makerToken === Tokens.DOLLAR
+  return makerToken === CURRENCY_ENUM.DOLLAR
     ? getNewMakerBalance(dollarBalance, makerAmount)
     : getNewTakerBalance(dollarBalance, takerAmount)
 }
 
 export function getNewGoldBalance(
   goldBalance: string | null,
-  makerToken: Tokens,
+  makerToken: CURRENCY_ENUM,
   makerAmount: BigNumber,
   takerAmount: BigNumber
 ) {
-  return makerToken === Tokens.GOLD
+  return makerToken === CURRENCY_ENUM.GOLD
     ? getNewMakerBalance(goldBalance, makerAmount)
     : getNewTakerBalance(goldBalance, takerAmount)
 }

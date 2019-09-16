@@ -6,7 +6,7 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import ExchangeRate from 'src/exchange/ExchangeRate'
-import { CURRENCY_ENUM, CURRENCY_ENUM as Tokens } from 'src/geth/consts'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import RoundedArrow from 'src/shared/RoundedArrow'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
@@ -54,14 +54,14 @@ class ExchangeConfirmationCard extends React.PureComponent<Props> {
         <View style={styles.tabular}>
           <Text style={fontStyles.bodySecondary}>{t('global:celoDollars')}</Text>
           <Text numberOfLines={1} style={[fontStyles.body, styles.dollar]}>
-            {getMoneyDisplayValue(newDollarBalance, Tokens.DOLLAR, true)}
+            {getMoneyDisplayValue(newDollarBalance, CURRENCY_ENUM.DOLLAR, true)}
           </Text>
         </View>
 
         <View style={styles.tabular}>
           <Text style={fontStyles.bodySecondary}>{t('global:celoGold')}</Text>
           <Text numberOfLines={1} style={[fontStyles.body, styles.gold]}>
-            {getMoneyDisplayValue(newGoldBalance, Tokens.GOLD, true)}
+            {getMoneyDisplayValue(newGoldBalance, CURRENCY_ENUM.GOLD, true)}
           </Text>
         </View>
       </View>
@@ -91,8 +91,8 @@ class ExchangeConfirmationCard extends React.PureComponent<Props> {
           <ExchangeRate rate={this.getExchangeRate()} makerToken={token} />
         </View>
 
-        {!!newDollarBalance &&
-          !!newGoldBalance &&
+        {newDollarBalance &&
+          newGoldBalance &&
           this.renderNewBalances(newDollarBalance, newGoldBalance)}
       </View>
     )
