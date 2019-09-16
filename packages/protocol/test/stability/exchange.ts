@@ -5,6 +5,7 @@ import {
   isSameAddress,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
+import { fixed1, fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   ExchangeInstance,
@@ -526,7 +527,20 @@ contract('Exchange', (accounts: string[]) => {
         )
       })
 
-      describe.only('when buckets need updating', () => {
+      describe('when buckets need updating', () => {
+        // fundReserve() will double the amount in the gold bucket
+        const updatedGoldBucket = initialGoldBucket.times(2)
+
+        const updatedStableBucket = updatedGoldBucket
+          .times(stableAmountForRate)
+          .div(goldAmountForRate)
+
+        const expectedStableAmount = getBuyTokenAmount(
+          goldTokenAmount,
+          updatedGoldBucket,
+          updatedStableBucket
+        )
+
         beforeEach(async () => {
           await fundReserve()
           await timeTravel(updateFrequency, web3)
@@ -536,15 +550,14 @@ contract('Exchange', (accounts: string[]) => {
         it('the exchange should succeed', async () => {
           await exchange.exchange(
             goldTokenAmount,
-            expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
+            expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
             true,
             {
               from: user,
             }
           )
           const newStableBalance = await stableToken.balanceOf(user)
-          // TODO: HALP! I don't know what this is actually supposed to be :(
-          assertEqualBN(newStableBalance, expectedStableBalance)
+          assertEqualBN(newStableBalance, expectedStableAmount)
         })
 
         it('should update the buckets', async () => {
@@ -559,13 +572,14 @@ contract('Exchange', (accounts: string[]) => {
           const newGoldBucket = await exchange.goldBucket()
           const newStableBucket = await exchange.stableBucket()
 
-          // .times(2) => fundReserve will double the initial amount in the bucket
-          // .minus(goldTokenAmount) => add the amount expected to be paid to the reserve
-          const expectedGoldBucket = initialGoldBucket.times(2).plus(goldTokenAmount)
-          assertEqualBN(newGoldBucket, expectedGoldBucket)
+          // The new value should be the updatedGoldBucket value, which is 2x the
+          // initial amount after fundReserve() is called, plus the amount of gold
+          // that was paid in the exchange.
+          assertEqualBN(newGoldBucket, updatedGoldBucket.plus(goldTokenAmount))
 
-          // TODO: HALP! I don't know what this is actually supposed to be :(
-          assertEqualBN(newStableBucket, initialStableBucket)
+          // The new value should be the updatedStableBucket (derived from the new
+          // Gold Bucket value), minus the amount purchased during the exchange
+          assertEqualBN(newStableBucket, updatedStableBucket.minus(expectedStableAmount))
         })
       })
     })
@@ -726,6 +740,62 @@ contract('Exchange', (accounts: string[]) => {
             }
           )
         )
+      })
+
+      describe('when buckets need updating', () => {
+        // fundReserve() will double the amount in the gold bucket
+        const updatedGoldBucket = initialGoldBucket.times(2)
+
+        const updatedStableBucket = updatedGoldBucket
+          .times(stableAmountForRate)
+          .div(goldAmountForRate)
+
+        const expectedGoldAmount = getBuyTokenAmount(
+          stableTokenBalance,
+          updatedStableBucket,
+          updatedGoldBucket
+        )
+
+        beforeEach(async () => {
+          await fundReserve()
+          await timeTravel(updateFrequency, web3)
+          await mockSortedOracles.setMedianTimestampToNow(stableToken.address)
+        })
+
+        it('the exchange should succeed', async () => {
+          await exchange.exchange(
+            stableTokenBalance,
+            expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
+            false,
+            {
+              from: user,
+            }
+          )
+          const newGoldBalance = await goldToken.balanceOf(user)
+          assertEqualBN(newGoldBalance, oldGoldBalance.plus(expectedGoldAmount))
+        })
+
+        it('should update the buckets', async () => {
+          await exchange.exchange(
+            stableTokenBalance,
+            expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
+            false,
+            {
+              from: user,
+            }
+          )
+          const newGoldBucket = await exchange.goldBucket()
+          const newStableBucket = await exchange.stableBucket()
+
+          // The new value should be the updatedGoldBucket value, which is 2x the
+          // initial amount after fundReserve() is called, plus the amount of gold
+          // that was paid in the exchange.
+          assertEqualBN(newGoldBucket, updatedGoldBucket.minus(expectedGoldAmount))
+
+          // The new value should be the updatedStableBucket (derived from the new
+          // Gold Bucket value), minus the amount purchased during the exchange
+          assertEqualBN(newStableBucket, updatedStableBucket.plus(stableTokenBalance))
+        })
       })
     })
   })
