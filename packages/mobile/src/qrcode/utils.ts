@@ -19,6 +19,7 @@ import {
 import { QrCode, storeLatestInRecents, SVG } from 'src/send/actions'
 import Logger from 'src/utils/Logger'
 import uuidv1 from 'uuid'
+
 const TAG = 'QR/utils'
 
 export enum BarcodeTypes {
@@ -97,7 +98,7 @@ export function* handleBarcode(
         displayId: data.e164PhoneNumber,
       }
 
-  // TODO data in the QR should be encrypted so noone can create an arbitrary QR with any phone and address combination
+  // TODO data in the QR should be encrypted so no one can create an arbitrary QR with any phone and address combination
   // add phone number to the recipientCache
   recipientCache[data.e164PhoneNumber] = {
     ...recipient,
