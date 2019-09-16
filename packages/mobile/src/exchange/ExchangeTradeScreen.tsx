@@ -17,7 +17,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { TRANSACTION_MIN_AMOUNT } from 'src/config'
+import { DOLLAR_TRANSACTION_MIN_AMOUNT, GOLD_TRANSACTION_MIN_AMOUNT } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import ExchangeRate from 'src/exchange/ExchangeRate'
 import { ExchangeRatePair } from 'src/exchange/reducer'
@@ -151,7 +151,10 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     const makerBalance = this.getMakerBalance()
     const amount = parseInputAmount(this.state.makerTokenAmount)
     const amountIsInvalid =
-      amount.isGreaterThan(makerBalance) || amount.isLessThan(TRANSACTION_MIN_AMOUNT)
+      amount.isGreaterThan(makerBalance) ||
+      amount.isLessThan(
+        this.isDollarToGold() ? DOLLAR_TRANSACTION_MIN_AMOUNT : GOLD_TRANSACTION_MIN_AMOUNT
+      )
     const exchangeRate = getRateForMakerToken(this.props.exchangeRatePair, this.state.makerToken)
     const exchangeRateIsInvalid = exchangeRate.isLessThanOrEqualTo(0)
     const takerToken = this.isDollarToGold() ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR

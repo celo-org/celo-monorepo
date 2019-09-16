@@ -63,5 +63,27 @@ describe(ExchangeTradeScreen, () => {
       component.root.instance.onChangeExchangeAmount('5')
       expect(mockhideAlert).toBeCalled()
     })
+
+    it.only('validates amount', () => {
+      const component = renderer.create(
+        <ExchangeTradeScreen
+          dollarBalance={'1'}
+          goldBalance={'0.5'}
+          error={null}
+          fetchExchangeRate={jest.fn()}
+          showError={jest.fn()}
+          hideAlert={jest.fn()}
+          exchangeRatePair={exchangeRatePair}
+          {...getMockI18nProps()}
+        />
+      )
+
+      component.root.instance.onChangeExchangeAmount('500')
+      expect(component.root.instance.isExchangeInvalid()).toBe(true)
+      component.root.instance.onChangeExchangeAmount('0.0001')
+      expect(component.root.instance.isExchangeInvalid()).toBe(true)
+      component.root.instance.onChangeExchangeAmount('0.01')
+      expect(component.root.instance.isExchangeInvalid()).toBe(false)
+    })
   })
 })
