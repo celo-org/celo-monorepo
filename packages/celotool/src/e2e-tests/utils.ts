@@ -317,16 +317,20 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
 }
 
 export async function migrateContracts(validatorPrivateKeys: string[], to: number = 1000) {
+  const migrationOverrides = {
+    validators: {
+      minElectableValidators: '1',
+      validatorKeys: validatorPrivateKeys.map(ensure0x),
+    },
+  }
   const args = [
     '--cwd',
     `${MonorepoRoot}/packages/protocol`,
     'init-network',
     '-n',
     'testing',
-    '-k',
-    validatorPrivateKeys.map(ensure0x).join(','),
     '-m',
-    '{ "validators": { "minElectableValidators": "1" } }',
+    JSON.stringify(migrationOverrides),
     '-t',
     to.toString(),
   ]

@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions'
+import Nexmo from 'nexmo'
 import twilio from 'twilio'
 import Web3 from 'web3'
 import Contract from 'web3/eth/contract'
@@ -24,6 +25,8 @@ export const smsAckTimeout = functionConfig[CELO_ENV]['sms-ack-timeout'] || 5000
 export const web3 = new Web3(`http://${hostIP}:${hostPort}`)
 
 let twilioClient: any
+let nexmoClient: any
+
 // Given Node.js single thread model, there shouldn't be any locks required here.
 export function getTwilioClient() {
   if (twilioClient == null) {
@@ -33,6 +36,38 @@ export function getTwilioClient() {
     )
   }
   return twilioClient
+}
+
+export function getNexmoClient() {
+  if (nexmoClient == null) {
+    nexmoClient = new Nexmo({
+      apiKey: functionConfig.shared['nexmo-key'],
+      apiSecret: functionConfig.shared['nexmo-secret'],
+    })
+  }
+  return nexmoClient
+}
+
+export async function sendSmsWithNexmo(countryCode: string, phoneNumber: string, message: string) {
+  const client = getNexmoClient()
+  return new Promise((resolve, reject) => {
+    client.message.sendSms(
+      functionConfig.shared['nexmo-from-' + countryCode.toLowerCase()],
+      phoneNumber,
+      message,
+      (err: Error, responseData: any) => {
+        if (err) {
+          reject(err)
+        } else {
+          if (responseData.messages[0].status === '0') {
+            resolve(responseData.messages[0])
+          } else {
+            reject(responseData.messages[0]['error-text'])
+          }
+        }
+      }
+    )
+  })
 }
 
 let attestations: Contract
