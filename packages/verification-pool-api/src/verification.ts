@@ -52,7 +52,7 @@ export async function sendSmsCode(address: string, phoneNumber: string, message:
     console.info('Message was sent by verifier.')
     return messageId
   } else {
-    console.info('SMS timeout reached and message was not yet sent. Sending via Twilio')
+    console.info('SMS timeout reached and message was not yet sent. Sending via Text provider')
     await deleteMessage(messageId)
     await sendViaTextProvider(phoneNumber, message)
     return 'Twilio'
