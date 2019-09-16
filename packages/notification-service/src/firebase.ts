@@ -1,5 +1,6 @@
 import * as admin from 'firebase-admin'
 import i18next from 'i18next'
+import { ExchangeRatePair } from 'src/exchange/exchangeQuery'
 import { Currencies } from './blockscout/transfers'
 import { NOTIFICATIONS_DISABLED, NOTIFICATIONS_TTL_MS, NotificationTypes } from './config'
 
@@ -137,6 +138,11 @@ export function getPendingRequests() {
 
 export function setPaymentRequestNotified(uid: string): Promise<void> {
   return database.ref(`/pendingRequests/${uid}`).update({ notified: true })
+}
+
+export function writeExchangeRatePair(exchangeRatePair: ExchangeRatePair, timestamp: number) {
+  console.debug('Recording', exchangeRatePair, timestamp)
+  // TODO add to firebase database
 }
 
 export function setLastBlockNotified(newBlock: number): Promise<void> | undefined {
