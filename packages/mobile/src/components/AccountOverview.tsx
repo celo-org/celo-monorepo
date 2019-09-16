@@ -1,6 +1,7 @@
 import colors from '@celo/react-components/styles/colors'
 import fontStyles, { estimateFontSize } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
+import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
@@ -9,7 +10,7 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import Styles from 'src/components/Styles'
 import { ExchangeRatePair } from 'src/exchange/reducer'
-import { CURRENCIES, CURRENCY_ENUM as Tokens } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { startBalanceAutorefresh, stopBalanceAutorefresh } from 'src/home/actions'
 import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
@@ -82,7 +83,7 @@ export class AccountOverview extends React.Component<Props> {
           <View style={style.currencyContainer}>
             <View style={[style.currencyArea, Styles.center]} testID={`${testID}/dollarBalance`}>
               <Text style={[style.currencyLabel, fontStyles.bodySmall]}>
-                {t('global:celoDollars') + ' ' + CURRENCIES[Tokens.DOLLAR].code}
+                {t('global:celoDollars') + ' ' + CURRENCIES[CURRENCY_ENUM.DOLLAR].code}
               </Text>
               <TouchableOpacity
                 onPress={this.goToStableTokenEducation}
@@ -90,16 +91,16 @@ export class AccountOverview extends React.Component<Props> {
                 style={[style.education, !this.props.stableEducationCompleted && style.dotOffset]}
               >
                 <CurrencyDisplay
-                  amount={dollarBalance}
+                  amount={new BigNumber(dollarBalance || 0)}
                   size={this.getFontSize(dollarBalance, !this.props.stableEducationCompleted)}
-                  type={Tokens.DOLLAR}
+                  type={CURRENCY_ENUM.DOLLAR}
                 />
               </TouchableOpacity>
             </View>
             <View style={style.line} />
             <View style={[style.currencyArea]} testID={`${testID}/goldBalance`}>
               <Text style={[style.currencyLabel, fontStyles.bodySmall]}>
-                {t('global:celoGold') + ' ' + CURRENCIES[Tokens.GOLD].code}
+                {t('global:celoGold') + ' ' + CURRENCIES[CURRENCY_ENUM.GOLD].code}
               </Text>
               <TouchableOpacity
                 onPress={this.goToGoldTokenEducation}
@@ -107,9 +108,9 @@ export class AccountOverview extends React.Component<Props> {
                 style={[style.education, !this.props.goldEducationCompleted && style.dotOffset]}
               >
                 <CurrencyDisplay
-                  amount={goldBalance}
+                  amount={new BigNumber(goldBalance || 0)}
                   size={this.getFontSize(goldBalance, !this.props.goldEducationCompleted)}
-                  type={Tokens.GOLD}
+                  type={CURRENCY_ENUM.GOLD}
                 />
               </TouchableOpacity>
             </View>
