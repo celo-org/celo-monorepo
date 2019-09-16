@@ -1,15 +1,11 @@
-import { getKubernetesClusterRegion, switchToClusterFromEnv } from '@celo/celotool/src/lib/cluster'
-import {
-  EnvTypes,
-  envVar,
-  fetchEnv,
-  fetchEnvOrFallback,
-  isProduction,
-} from '@celo/celotool/src/lib/env-utils'
-import { ensureAuthenticatedGcloudAccount } from '@celo/celotool/src/lib/gcloud_utils'
-import { generateGenesisFromEnv } from '@celo/celotool/src/lib/generate_utils'
-import { OG_ACCOUNTS } from '@celo/celotool/src/lib/genesis_constants'
-import { getStatefulSetReplicas, scaleResource } from '@celo/celotool/src/lib/kubernetes'
+import { entries, flatMap, range } from 'lodash'
+import sleep from 'sleep-promise'
+import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
+import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
+import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
+import { generateGenesisFromEnv } from './generate_utils'
+import { OG_ACCOUNTS } from './genesis_constants'
+import { getStatefulSetReplicas, scaleResource } from './kubernetes'
 import {
   execCmd,
   execCmdWithExitOnFailure,
@@ -17,9 +13,7 @@ import {
   getVerificationPoolSMSURL,
   outputIncludes,
   switchToProjectFromEnv,
-} from '@celo/celotool/src/lib/utils'
-import { entries, flatMap, range } from 'lodash'
-import sleep from 'sleep-promise'
+} from './utils'
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'

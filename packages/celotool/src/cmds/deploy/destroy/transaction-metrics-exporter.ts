@@ -1,6 +1,6 @@
-import { DestroyArgv } from '@celo/celotool/src/cmds/deploy/destroy'
-import { switchToClusterFromEnv } from '@celo/celotool/src/lib/cluster'
+import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { removeHelmRelease } from 'src/lib/transaction-metrics-exporter'
+import { DestroyArgv } from '../../deploy/destroy'
 
 export const command = 'transaction-metrics-exporter'
 

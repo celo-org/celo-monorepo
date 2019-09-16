@@ -1,13 +1,13 @@
+import { assert } from 'chai'
+import Web3 from 'web3'
 import {
   getEnode,
-  getHooks,
   GethInstanceConfig,
+  getHooks,
   initAndStartGeth,
   killInstance,
   sleep,
-} from '@celo/celotool/geth_tests/src/lib/utils'
-import { assert } from 'chai'
-import Web3 from 'web3'
+} from './utils'
 
 describe('sync tests', function(this: any) {
   this.timeout(0)
@@ -62,9 +62,7 @@ describe('sync tests', function(this: any) {
         await initAndStartGeth(hooks.gethBinaryPath, syncInstance)
       })
 
-      afterEach(() => {
-        killInstance(syncInstance)
-      })
+      afterEach(() => killInstance(syncInstance))
 
       it('should sync the latest block', async () => {
         const validatingWeb3 = new Web3(`http://localhost:8545`)
@@ -99,7 +97,7 @@ describe('sync tests', function(this: any) {
       const address = (await web3.eth.getAccounts())[0]
       const currentBlock = await web3.eth.getBlock('latest')
       for (let i = 0; i < gethConfig.instances.length; i++) {
-        if ((await web3.eth.getBlock(currentBlock.number - i)).miner == address) {
+        if ((await web3.eth.getBlock(currentBlock.number - i)).miner === address) {
           return // A block proposed by validator who lost randomness was found, hence randomness was recovered
         }
       }
