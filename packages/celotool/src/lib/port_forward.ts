@@ -1,7 +1,7 @@
 /* tslint:disable: no-console */
-import { envVar, fetchEnv, isVmBased } from '@celo/celotool/src/lib/env-utils'
-import { execBackgroundCmd, execCmd } from '@celo/celotool/src/lib/utils'
 import { ChildProcess, spawnSync } from 'child_process'
+import { envVar, fetchEnv, isVmBased } from './env-utils'
+import { execBackgroundCmd, execCmd } from './utils'
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))

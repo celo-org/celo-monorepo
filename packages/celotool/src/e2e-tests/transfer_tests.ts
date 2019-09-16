@@ -1,17 +1,10 @@
-import {
-  erc20Abi,
-  getContractAddress,
-  getEnode,
-  getHooks,
-  initAndStartGeth,
-  sleep,
-} from '@celo/celotool/geth_tests/src/lib/utils'
 import { CURRENCY_ENUM } from '@celo/utils'
-import { toFixed } from '@celo/protocol/lib/fixidity'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
 import { Tx } from 'web3/eth/types'
+import { erc20Abi, getContractAddress, getEnode, getHooks, initAndStartGeth, sleep } from './utils'
 
 const stableTokenAbi = erc20Abi.concat([
   {
@@ -330,7 +323,7 @@ describe('transfer tests', function(this: any) {
     gasCurrency?: string
   ): Promise<[boolean, any, any]> => {
     const minGasPrice = await getGasPriceMinimum(gasCurrency)
-    assert.isAbove(minGasPrice, 0)
+    assert.isAbove(parseInt(minGasPrice, 10), 0)
     const receipt = await txPromise
     const balances = await getBalances()
     const tx = await web3.eth.getTransaction(receipt.transactionHash)

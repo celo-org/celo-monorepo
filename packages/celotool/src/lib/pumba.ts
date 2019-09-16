@@ -1,5 +1,5 @@
-import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
 import { makeHelmParameters } from 'src/lib/helm_deploy'
+import { envVar, fetchEnv } from './env-utils'
 
 export function helmReleaseName(celoEnv: string) {
   return celoEnv + '-pumba'
