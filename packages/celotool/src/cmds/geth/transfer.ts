@@ -1,7 +1,7 @@
-import { GethArgv } from '@celo/celotool/src/cmds/geth'
 import BigNumber from 'bignumber.js'
 import { checkGethStarted, getWeb3AndTokensContracts, transferERC20Token } from 'src/lib/geth'
 import * as yargs from 'yargs'
+import { GethArgv } from '../geth'
 
 export const command = 'transfer <senderAddress> <receiverAddress> <token> <amount>'
 

@@ -1,7 +1,7 @@
 /* tslint:disable no-console */
-import { CeloEnvArgv } from '@celo/celotool/src/lib/env-utils'
 import { spawnSync } from 'child_process'
 import path from 'path'
+import { CeloEnvArgv } from 'src/lib/env-utils'
 
 export const command = 'faucet-multiple'
 
