@@ -112,19 +112,6 @@ export function initializeDb() {
       console.error('Latest payment requests data read failed:', errorObject.code)
     }
   )
-
-  /*
-  exchangeRatesRef.on(
-    'value',
-    (snapshot) => {
-      console.debug('Latest exchange rate updated: ', snapshot && snapshot.val())
-      exchangeRates = (snapshot && snapshot.val()) || {}
-    },
-    (errorObject: any) => {
-      console.error('Latest exchange rate data read failed:', errorObject.code)
-    }
-  )
-  */
 }
 
 export function getTokenFromAddress(address: string) {
