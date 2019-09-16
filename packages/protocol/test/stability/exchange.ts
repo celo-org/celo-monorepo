@@ -218,8 +218,6 @@ contract('Exchange', (accounts: string[]) => {
       await exchange.setStableToken(newStable)
 
       const actualStable = await exchange.stable()
-      console.info('actual stable:', actualStable)
-      console.info('gold address:', newStable)
       assert.equal(actualStable, newStable)
     })
 
