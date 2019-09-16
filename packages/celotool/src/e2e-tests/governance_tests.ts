@@ -3,14 +3,14 @@ import { assert } from 'chai'
 import Web3 from 'web3'
 import { strip0x } from '../lib/utils'
 import {
+  assertRevert,
   erc20Abi,
+  getContext,
   getContractAddress,
   getEnode,
-  getContext,
   importGenesis,
   initAndStartGeth,
   sleep,
-  assertRevert,
 } from './utils'
 
 // TODO(asa): Use the contract kit here instead
