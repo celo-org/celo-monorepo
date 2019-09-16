@@ -10,6 +10,7 @@ interface Props {
   color?: string
 }
 
+// TODO(Rossy) This is mostly duped by CurrencyDisplay, converge the two
 export function MoneyAmount(props: Props) {
   const { sign, symbol, amount, color } = props
   const colorStyle = { color: color || colors.darkSecondary }
