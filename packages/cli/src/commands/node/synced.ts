@@ -8,6 +8,8 @@ export default class NodeSynced extends BaseCommand {
     ...BaseCommand.flags,
   }
 
+  requireSynced = false
+
   async run() {
     this.parse(NodeSynced)
     console.log(await nodeIsSynced(this.web3))

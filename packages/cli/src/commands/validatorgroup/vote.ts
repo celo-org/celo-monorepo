@@ -2,7 +2,6 @@ import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { displaySendTx, printValueMap } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { requireNodeIsSynced } from '../../utils/helpers'
 
 export default class ValidatorGroupVote extends BaseCommand {
   static description = 'Vote for a Validator Group'
@@ -30,8 +29,6 @@ export default class ValidatorGroupVote extends BaseCommand {
     'vote --from 0x4443d0349e8b3075cba511a0a87796597602a0f1 --current',
   ]
   async run() {
-    await requireNodeIsSynced(this.web3)
-
     const res = this.parse(ValidatorGroupVote)
 
     this.kit.defaultAccount = res.flags.from

@@ -2,7 +2,6 @@ import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { swapArguments } from '../../utils/exchange'
-import { requireNodeIsSynced } from '../../utils/helpers'
 
 export default class SellGold extends BaseCommand {
   static description = 'Sell Celo gold for Celo dollars on the exchange'
@@ -12,7 +11,6 @@ export default class SellGold extends BaseCommand {
   static examples = ['sellgold 100 300 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d']
 
   async run() {
-    await requireNodeIsSynced(this.web3)
     const { args } = this.parse(SellGold)
     const sellAmount = new BigNumber(args.sellAmount)
     const minBuyAmount = new BigNumber(args.minBuyAmount)

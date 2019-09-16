@@ -1,7 +1,6 @@
 import { flags } from '@oclif/command'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
-import { requireNodeIsSynced } from '../../utils/helpers'
 
 export default class List extends BaseCommand {
   static description = 'List information about tokens on the exchange (all amounts in wei)'
@@ -19,7 +18,6 @@ export default class List extends BaseCommand {
   static examples = ['list']
 
   async run() {
-    await requireNodeIsSynced(this.web3)
     const { flags: parsedFlags } = this.parse(List)
 
     cli.action.start('Fetching exchange rates...')

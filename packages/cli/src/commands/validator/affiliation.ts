@@ -2,7 +2,6 @@ import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { requireNodeIsSynced } from '../../utils/helpers'
 
 export default class ValidatorAffiliate extends BaseCommand {
   static description = 'Manage affiliation to a ValidatorGroup'
@@ -23,8 +22,6 @@ export default class ValidatorAffiliate extends BaseCommand {
   ]
 
   async run() {
-    await requireNodeIsSynced(this.web3)
-
     const res = this.parse(ValidatorAffiliate)
 
     this.kit.defaultAccount = res.flags.from

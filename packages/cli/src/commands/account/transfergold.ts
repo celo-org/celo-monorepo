@@ -3,7 +3,6 @@ import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { requireNodeIsSynced } from '../../utils/helpers'
 
 export default class GoldTransfer extends BaseCommand {
   static description = 'Transfer gold'
@@ -20,7 +19,6 @@ export default class GoldTransfer extends BaseCommand {
   ]
 
   async run() {
-    await requireNodeIsSynced(this.web3)
     const res = this.parse(GoldTransfer)
 
     const from: string = res.flags.from

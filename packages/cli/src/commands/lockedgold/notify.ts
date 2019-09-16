@@ -2,7 +2,6 @@ import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { requireNodeIsSynced } from '../../utils/helpers'
 import { LockedGoldArgs } from '../../utils/lockedgold'
 
 export default class Notify extends BaseCommand {
@@ -20,7 +19,6 @@ export default class Notify extends BaseCommand {
   static examples = ['notify --noticePeriod=3600 --goldAmount=500']
 
   async run() {
-    await requireNodeIsSynced(this.web3)
     const res = this.parse(Notify)
     this.kit.defaultAccount = res.flags.from
     const lockedgold = await this.kit.contracts.getLockedGold()

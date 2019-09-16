@@ -1,6 +1,5 @@
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
-import { requireNodeIsSynced } from '../../utils/helpers'
 
 export default class ValidatorList extends BaseCommand {
   static description = 'List existing Validators'
@@ -12,7 +11,6 @@ export default class ValidatorList extends BaseCommand {
   static examples = ['list']
 
   async run() {
-    await requireNodeIsSynced(this.web3)
     this.parse(ValidatorList)
 
     cli.action.start('Fetching Validators')
