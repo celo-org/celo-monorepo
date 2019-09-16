@@ -7,7 +7,7 @@ import Web3 from 'web3'
 const DOLLAR_SELL_AMOUNT_IN_WEI = new BigNumber(100 * 1000000000000000000) // 100 dollars
 const GOLD_SELL_AMOUNT_IN_WEI = new BigNumber(10 * 1000000000000000000) // 10 gold
 
-const PROVIDER_URL = 'http://35.247.50.59:8545'
+const PROVIDER_URL = 'http://34.83.137.48:8545'
 
 export interface ExchangeRatePair {
   goldMaker: string // Number of dollarTokens received for one goldToken
