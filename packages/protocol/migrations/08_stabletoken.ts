@@ -47,7 +47,12 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       `Minting ${minerAddress} ${config.stableToken.minerDollarBalance.toString()} StableToken`
     )
     await stableToken.setMinter(minerAddress)
-    await stableToken.mint(minerAddress, web3.utils.toBN(minerStartBalance))
+
+    const initialBalance = web3.utils.toBN(minerStartBalance)
+    await stableToken.mint(minerAddress, initialBalance)
+    for (const address of config.stableToken.initialAccounts) {
+      await stableToken.mint(address, initialBalance)
+    }
 
     console.log('Setting GoldToken/USD exchange rate')
     const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract<
