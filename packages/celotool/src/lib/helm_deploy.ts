@@ -554,6 +554,7 @@ async function helmParameters(celoEnv: string) {
     `--set geth.faultyValidators="${fetchEnvOrFallback('FAULTY_VALIDATORS', '0')}"`,
     `--set geth.faultyValidatorType="${fetchEnvOrFallback('FAULTY_VALIDATOR_TYPE', '0')}"`,
     `--set geth.tx_nodes="${fetchEnv('TX_NODES')}"`,
+    `--set geth.ssd_disks="${fetchEnvOrFallback(envVar.GETH_NODES_SSD_DISKS, 'true')}"`,
     `--set geth.admin_rpc_enabled=${fetchEnvOrFallback('ADMIN_RPC_ENABLED', 'false')}`,
     `--set mnemonic="${fetchEnv('MNEMONIC')}"`,
     `--set contracts.cron_jobs.enabled=${fetchEnv('CONTRACT_CRONJOBS_ENABLED')}`,
