@@ -49,14 +49,9 @@ interface ExchangeRateObject {
   timestamp: string
 }
 
-interface ExchangeRates {
-  [uid: string]: ExchangeRateObject
-}
-
 let registrations: Registrations = {}
 let lastBlockNotified: number = -1
 let pendingRequests: PendingRequests = {}
-let exchangeRates: ExchangeRates = {}
 
 export function _setTestRegistrations(testRegistrations: Registrations) {
   registrations = testRegistrations
@@ -118,6 +113,7 @@ export function initializeDb() {
     }
   )
 
+  /*
   exchangeRatesRef.on(
     'value',
     (snapshot) => {
@@ -128,6 +124,7 @@ export function initializeDb() {
       console.error('Latest exchange rate data read failed:', errorObject.code)
     }
   )
+  */
 }
 
 export function getTokenFromAddress(address: string) {

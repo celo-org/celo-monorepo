@@ -1,8 +1,8 @@
 import { CURRENCY_ENUM } from '@celo/utils'
 import { ContractUtils } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
-import { writeExchangeRatePair } from 'src/firebase'
 import Web3 from 'web3'
+import { writeExchangeRatePair } from '../firebase'
 
 const DOLLAR_SELL_AMOUNT_IN_WEI = new BigNumber(100 * 1000000000000000000) // 100 dollars
 const GOLD_SELL_AMOUNT_IN_WEI = new BigNumber(10 * 1000000000000000000) // 10 gold
@@ -37,12 +37,13 @@ export async function makeExchangeQuery(web3Instance: Web3) {
 
 let web3: Web3
 export function getWeb3Instance(): Web3 {
-  if (web3.eth.net.isListening()) {
-    // Already connected
-    return web3
-  } else {
-    const httpProvider = new Web3.providers.HttpProvider(PROVIDER_URL)
-    web3 = new Web3(httpProvider)
-    return web3
+  if (web3) {
+    if (web3.eth.net.isListening()) {
+      // Already connected
+      return web3
+    }
   }
+  const httpProvider = new Web3.providers.HttpProvider(PROVIDER_URL)
+  web3 = new Web3(httpProvider)
+  return web3
 }
