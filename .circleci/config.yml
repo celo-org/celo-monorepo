@@ -206,7 +206,6 @@ jobs:
             ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
       - run:
           name: test
-          no_output_timeout: 20m
           # Flaky tests - run them twice
           command: yarn --cwd packages/protocol test:coverage || yarn --cwd packages/protocol test:coverage
       - store_artifacts:
