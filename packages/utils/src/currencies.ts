@@ -6,6 +6,7 @@ export enum CURRENCY_ENUM {
 interface Currency {
   symbol: string
   code: string
+  displayDecimals: number
 }
 
 type CurrencyObject = { [key in CURRENCY_ENUM]: Currency }
@@ -14,10 +15,12 @@ export const CURRENCIES: CurrencyObject = {
   [CURRENCY_ENUM.GOLD]: {
     symbol: '',
     code: 'cGLD',
+    displayDecimals: 3,
   },
   [CURRENCY_ENUM.DOLLAR]: {
     symbol: '$',
     code: 'cUSD',
+    displayDecimals: 2,
   },
 }
 

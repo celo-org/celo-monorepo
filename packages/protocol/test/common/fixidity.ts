@@ -1,7 +1,7 @@
-import { assertEqualBN, assertRevert, assertGteBN } from '@celo/protocol/lib/test-utils'
-import { FixidityTestInstance } from 'types'
-import { toFixed, fixed1 } from '@celo/protocol/lib/fixidity'
+import { assertEqualBN, assertGteBN, assertRevert } from '@celo/protocol/lib/test-utils'
+import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
+import { FixidityTestInstance } from 'types'
 
 BigNumber.config({ EXPONENTIAL_AT: 1e9 })
 
