@@ -10,7 +10,7 @@ import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import LineItemRow from 'src/components/LineItemRow'
-import { CURRENCIES, CURRENCY_ENUM as Tokens } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import Logo from 'src/icons/Logo'
 import { RecipientWithContact } from 'src/recipients/recipient'
@@ -25,7 +25,7 @@ export interface OwnProps {
   fee?: BigNumber
   isLoadingFee?: boolean
   feeError?: Error
-  currency: Tokens
+  currency: CURRENCY_ENUM
 }
 
 interface StateProps {

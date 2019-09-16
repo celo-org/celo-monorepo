@@ -27,7 +27,7 @@ const standbyTransactions: StandbyTransaction[] = [
   },
   {
     id: '0112',
-    type: TransactionTypes.EXCHANGED,
+    type: TransactionTypes.EXCHANGE,
     status: TransactionStatus.Pending,
     inSymbol: CURRENCY_ENUM.DOLLAR,
     inValue: '20',
@@ -39,7 +39,7 @@ const standbyTransactions: StandbyTransaction[] = [
 
 const failedExchange: StandbyTransaction[] = [
   {
-    type: TransactionTypes.EXCHANGED,
+    type: TransactionTypes.EXCHANGE,
     status: TransactionStatus.Failed,
     inSymbol: CURRENCY_ENUM.DOLLAR,
     inValue: '20',
@@ -53,7 +53,7 @@ const failedExchange: StandbyTransaction[] = [
 const exchangeEvents: HomeExchangeFragment[] = [
   {
     __typename: EventTypeNames.Exchange,
-    type: TransactionTypes.EXCHANGED,
+    type: TransactionTypes.EXCHANGE,
     inValue: 30,
     outValue: 200,
     outSymbol: CURRENCY_ENUM.GOLD,

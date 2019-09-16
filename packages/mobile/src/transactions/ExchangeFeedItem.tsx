@@ -25,15 +25,10 @@ export function ExchangeFeedItem(props: Props) {
   const { showImage, t, inSymbol, inValue, status, outValue, outSymbol, timestamp, i18n } = props
 
   const onPress = () => {
-    // TODO get missing values from HomeExchange.Fragment
     navigateToExchangeReview(timestamp, {
-      token: resolveCurrency(inSymbol),
-      newDollarBalance: '',
-      newGoldBalance: '',
-      leftCurrencyAmount: new BigNumber(inValue),
-      rightCurrencyAmount: new BigNumber(outValue),
-      exchangeRate: '',
-      fee: '',
+      makerToken: resolveCurrency(inSymbol),
+      makerAmount: new BigNumber(inValue),
+      takerAmount: new BigNumber(outValue),
     })
   }
 
@@ -180,6 +175,7 @@ const styles = StyleSheet.create({
   textPending: {
     fontSize: 13,
     lineHeight: 18,
+    color: colors.celoGreen,
   },
   transactionStatus: {
     color: '#BDBDBD',
@@ -193,5 +189,4 @@ const styles = StyleSheet.create({
   },
 })
 
-// @ts-ignore
 export default withNamespaces(Namespaces.walletFlow5)(React.memo(ExchangeFeedItem))
