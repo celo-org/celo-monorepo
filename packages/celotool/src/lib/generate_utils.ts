@@ -6,12 +6,12 @@ import Web3 from 'web3'
 import { blsPrivateKeyToProcessedPrivateKey } from './bls_utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
-  CONTRACT_ADDRESSES,
   CONTRACT_OWNER_STORAGE_LOCATION,
   GETH_CONFIG_OLD,
   ISTANBUL_MIX_HASH,
   OG_ACCOUNTS,
   PROXY_CONTRACT_CODE,
+  REGISTRY_ADDRESS,
   TEMPLATE,
 } from './genesis_constants'
 import { ensure0x, strip0x } from './utils'
@@ -117,23 +117,10 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
         })
       : getValidators(fetchEnv(envVar.MNEMONIC), parseInt(validatorEnv, 10))
 
-  // @ts-ignore
-  if (![ConsensusType.CLIQUE, ConsensusType.ISTANBUL].includes(fetchEnv(envVar.CONSENSUS_TYPE))) {
+  const consensusType = fetchEnv(envVar.CONSENSUS_TYPE) as ConsensusType
+
+  if (![ConsensusType.CLIQUE, ConsensusType.ISTANBUL].includes(consensusType)) {
     console.error('Unsupported CONSENSUS_TYPE')
-    process.exit(1)
-  }
-
-  // @ts-ignore
-  const consensusType: ConsensusType = fetchEnv(envVar.CONSENSUS_TYPE)
-
-  const contracts: string[] = fetchEnv(envVar.PREDEPLOYED_CONTRACTS)
-    .split(',')
-    // @ts-ignore
-    .map((contract) => CONTRACT_ADDRESSES[contract])
-
-  // @ts-ignore
-  if (contracts.includes(undefined)) {
-    console.error('Unsupported PREDEPLOYED_CONTRACTS value')
     process.exit(1)
   }
 
@@ -141,15 +128,14 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const epoch = parseInt(fetchEnvOrFallback(envVar.EPOCH, '30000'), 10)
   const chainId = parseInt(fetchEnv(envVar.NETWORK_ID), 10)
 
-  return generateGenesis(
+  return generateGenesis({
     validators,
     consensusType,
-    contracts,
     blockTime,
     epoch,
     chainId,
-    enablePetersburg
-  )
+    enablePetersburg,
+  })
 }
 
 const generateIstanbulExtraData = (validators: Validator[]) => {
@@ -174,15 +160,21 @@ const generateIstanbulExtraData = (validators: Validator[]) => {
   )
 }
 
-export const generateGenesis = (
-  validators: Validator[],
-  consensusType: ConsensusType,
-  contracts: string[],
-  blockTime: number,
-  epoch: number,
-  chainId: number,
-  enablePetersburg: boolean = true
-) => {
+export const generateGenesis = ({
+  validators,
+  consensusType = ConsensusType.ISTANBUL,
+  blockTime,
+  epoch,
+  chainId,
+  enablePetersburg = true,
+}: {
+  validators: Validator[]
+  consensusType?: ConsensusType
+  blockTime: number
+  epoch: number
+  chainId: number
+  enablePetersburg?: boolean
+}) => {
   const genesis: any = { ...TEMPLATE }
 
   if (!enablePetersburg) {
@@ -212,6 +204,7 @@ export const generateGenesis = (
     }
   }
 
+  const contracts = [REGISTRY_ADDRESS]
   for (const contract of contracts) {
     genesis.alloc[contract] = {
       code: PROXY_CONTRACT_CODE,
