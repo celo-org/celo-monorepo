@@ -22,6 +22,14 @@ metadata:
 {{ include "standard.labels" .  | indent 4 }}
     component: tx_nodes
 spec:
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
   podManagementPolicy: Parallel
   replicas: {{ .Values.geth.tx_nodes }}
   serviceName: tx-nodes

@@ -449,6 +449,11 @@ export async function deletePersistentVolumeClaims(celoEnv: string) {
       `kubectl delete pvc --selector='component=validators' --namespace ${celoEnv}`
     )
     console.info(output)
+
+    const [outputTx] = await execCmd(
+      `kubectl delete pvc --selector='component=tx_nodes' --namespace ${celoEnv}`
+    )
+    console.info(outputTx)
   } catch (error) {
     console.error(error)
     if (!error.toString().includes('not found')) {
