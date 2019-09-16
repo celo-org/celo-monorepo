@@ -1,9 +1,9 @@
-import { GethArgv } from '@celo/celotool/src/cmds/geth'
 import { spawnSync } from 'child_process'
 import fs from 'fs'
 import path from 'path'
 import { addCeloGethMiddleware, ensure0x, validateAccountAddress } from 'src/lib/utils'
 import * as yargs from 'yargs'
+import { GethArgv } from '../geth'
 
 const STATIC_NODES_FILE_NAME = 'static-nodes.json'
 

@@ -1,4 +1,3 @@
-import { UpgradeArgv } from '@celo/celotool/src/cmds/deploy/upgrade'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { resetAndUpgradeHelmChart, upgradeHelmChart, upgradeStaticIPs } from 'src/lib/helm_deploy'
 import {
@@ -6,6 +5,7 @@ import {
   uploadStaticNodesToGoogleStorage,
 } from 'src/lib/testnet-utils'
 import * as yargs from 'yargs'
+import { UpgradeArgv } from '../../deploy/upgrade'
 
 export const command = 'testnet'
 export const describe = 'upgrade an existing deploy of the testnet package'

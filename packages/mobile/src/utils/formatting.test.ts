@@ -1,3 +1,4 @@
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import {
   getCentAwareMoneyDisplay,
   getMoneyDisplayValue,
@@ -8,10 +9,35 @@ import {
 describe('utils->formatting', () => {
   describe('getMoneyDisplayValue', () => {
     const UNROUNDED_NUMBER = 5.239895
-    const ROUNDED_NUMBER = '5.23'
+    const ROUNDED_NUMBER_2_DECIMALS = '5.23'
+    const ROUNDED_NUMBER_3_DECIMALS = '5.239'
 
-    it('rounds down correctly', () => {
-      expect(getMoneyDisplayValue(UNROUNDED_NUMBER)).toBe(ROUNDED_NUMBER)
+    it('formats correctly for default case', () => {
+      expect(getMoneyDisplayValue(UNROUNDED_NUMBER)).toBe(ROUNDED_NUMBER_2_DECIMALS)
+    })
+
+    it('formats correctly for dollars', () => {
+      expect(getMoneyDisplayValue(UNROUNDED_NUMBER, CURRENCY_ENUM.DOLLAR)).toBe(
+        ROUNDED_NUMBER_2_DECIMALS
+      )
+    })
+
+    it('formats correctly for dollars', () => {
+      expect(getMoneyDisplayValue(UNROUNDED_NUMBER, CURRENCY_ENUM.GOLD)).toBe(
+        ROUNDED_NUMBER_3_DECIMALS
+      )
+    })
+
+    it('includes dollar symbol', () => {
+      expect(getMoneyDisplayValue(UNROUNDED_NUMBER, CURRENCY_ENUM.DOLLAR, true)).toBe(
+        '$' + ROUNDED_NUMBER_2_DECIMALS
+      )
+    })
+
+    it('includes gold symbol (which is nothing)', () => {
+      expect(getMoneyDisplayValue(UNROUNDED_NUMBER, CURRENCY_ENUM.GOLD, true)).toBe(
+        ROUNDED_NUMBER_3_DECIMALS
+      )
     })
   })
 

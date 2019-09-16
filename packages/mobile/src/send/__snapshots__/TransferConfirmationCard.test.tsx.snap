@@ -199,7 +199,9 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
           },
         ]
       }
-    />
+    >
+      mobileNumber
+    </Text>
     <View
       style={
         Object {
@@ -395,7 +397,9 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
           },
         ]
       }
-    />
+    >
+      mobileNumber
+    </Text>
     <View
       style={
         Object {
