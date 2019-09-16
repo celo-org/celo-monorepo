@@ -17,7 +17,6 @@ export const notificationPolling = AsyncPolling(async (end) => {
 
 export const exchangePolling = AsyncPolling(async (end) => {
   try {
-    // TODO only create web3 instance upon initialization?
     const web3 = await getWeb3Instance()
     await makeExchangeQuery(web3)
   } catch (e) {

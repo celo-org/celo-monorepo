@@ -1,7 +1,6 @@
 import { CURRENCY_ENUM } from '@celo/utils'
 import * as admin from 'firebase-admin'
 import i18next from 'i18next'
-import { ExchangeRatePair } from 'src/exchange/exchangeQuery'
 import { Currencies } from './blockscout/transfers'
 import { NOTIFICATIONS_DISABLED, NOTIFICATIONS_TTL_MS, NotificationTypes } from './config'
 
@@ -46,7 +45,7 @@ interface PendingRequests {
 
 interface ExchangeRateObject {
   makerToken: CURRENCY_ENUM
-  rate: string
+  exchangeRate: string
   timestamp: string
 }
 
@@ -165,9 +164,14 @@ export function setPaymentRequestNotified(uid: string): Promise<void> {
   return database.ref(`/pendingRequests/${uid}`).update({ notified: true })
 }
 
-export function writeExchangeRatePair(exchangeRatePair: ExchangeRatePair, timestamp: number) {
-  console.debug('Recording', exchangeRatePair, timestamp)
-  // TODO add to firebase database
+export function writeExchangeRatePair(
+  makerToken: CURRENCY_ENUM,
+  exchangeRate: string,
+  timestamp: string
+) {
+  const exchangeRateRecord: ExchangeRateObject = { makerToken, exchangeRate, timestamp }
+  exchangeRatesRef.push(exchangeRateRecord)
+  console.debug('Recorded exchange rate ', exchangeRateRecord)
 }
 
 export function setLastBlockNotified(newBlock: number): Promise<void> | undefined {
