@@ -36,7 +36,6 @@ describe('ExchangeFeedItem', () => {
           outSymbol={CURRENCY_ENUM.GOLD}
           inSymbol={CURRENCY_ENUM.DOLLAR}
           timestamp={1}
-          showImage={false}
           {...getMockI18nProps()}
         />
       </Provider>

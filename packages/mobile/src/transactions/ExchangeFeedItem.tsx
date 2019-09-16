@@ -17,12 +17,22 @@ import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
 type Props = (HomeExchangeFragment | ExchangeStandby) &
   WithNamespaces & {
-    showImage: boolean
     status?: TransactionStatus
+    showGoldAmount: boolean
   }
 
 export function ExchangeFeedItem(props: Props) {
-  const { showImage, t, inSymbol, inValue, status, outValue, outSymbol, timestamp, i18n } = props
+  const {
+    showGoldAmount,
+    t,
+    inSymbol,
+    inValue,
+    status,
+    outValue,
+    outSymbol,
+    timestamp,
+    i18n,
+  } = props
 
   const onPress = () => {
     // TODO get missing values from HomeExchange.Fragment
@@ -41,6 +51,10 @@ export function ExchangeFeedItem(props: Props) {
   const outCurrency = resolveCurrency(outSymbol)
   const dollarAmount = inCurrency === CURRENCY_ENUM.DOLLAR ? inValue : outValue
   const dollarDirection = inCurrency === CURRENCY_ENUM.DOLLAR ? '-' : ''
+  const goldAmount = inCurrency === CURRENCY_ENUM.GOLD ? inValue : outValue
+  const goldDirection = inCurrency === CURRENCY_ENUM.GOLD ? '-' : ''
+  const amount = showGoldAmount ? goldAmount : dollarAmount
+  const amountDirection = showGoldAmount ? goldDirection : dollarDirection
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
   const isPending = status === TransactionStatus.Pending
@@ -64,32 +78,33 @@ export function ExchangeFeedItem(props: Props) {
   return (
     <Touchable onPress={onPress}>
       <View style={styles.container}>
-        {showImage && (
-          <View style={styles.imageContainer}>
-            <Image
-              source={
-                inCurrency === CURRENCY_ENUM.DOLLAR
-                  ? require(`src/transactions/ExchangeGreenGold.png`)
-                  : require(`src/transactions/ExchangeGoldGreen.png`)
-              }
-              style={styles.image}
-              resizeMode="contain"
-            />
-          </View>
-        )}
-        <View style={[styles.contentContainer, showImage && styles.contentContainerWithImage]}>
+        <View style={styles.imageContainer}>
+          <Image
+            source={
+              inCurrency === CURRENCY_ENUM.DOLLAR
+                ? require(`src/transactions/ExchangeGreenGold.png`)
+                : require(`src/transactions/ExchangeGoldGreen.png`)
+            }
+            style={styles.image}
+            resizeMode="contain"
+          />
+        </View>
+        <View style={styles.contentContainer}>
           <View style={styles.titleContainer}>
             <Text style={fontStyles.bodySmallSemiBold}>{t('exchange')}</Text>
             <Text
               style={[
-                dollarDirection === '-'
+                amountDirection === '-'
                   ? fontStyles.activityCurrencySent
-                  : fontStyles.activityCurrencyReceived,
+                  : {
+                      ...fontStyles.activityCurrencyReceived,
+                      color: showGoldAmount ? colors.celoGold : colors.celoGreen,
+                    },
                 styles.amount,
               ]}
             >
-              {dollarDirection}
-              {getMoneyDisplayValue(dollarAmount)}
+              {amountDirection}
+              {getMoneyDisplayValue(amount)}
             </Text>
           </View>
           <View style={styles.exchangeContainer}>
@@ -153,8 +168,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-  },
-  contentContainerWithImage: {
     marginLeft: variables.contentPadding,
   },
   titleContainer: {
