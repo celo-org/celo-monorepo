@@ -877,6 +877,11 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     if (yesNoVotes == 0) {
       return false;
     }
+    // We use FractionUtil fractions instead of Fixidity because we would need
+    // to use FixidityLib.divide here, and yesNoVotes could easily be greater
+    // than maxFixedDivisor.
+    // This fraction does not have any additional arithmetic done to it, so we
+    // don't need to worry about overflow of non-simplified fractions.
     FractionUtil.Fraction memory yesRatio = FractionUtil.Fraction(
       proposal.votes.yes,
       yesNoVotes
