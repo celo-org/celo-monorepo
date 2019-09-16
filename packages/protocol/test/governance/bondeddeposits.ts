@@ -79,6 +79,17 @@ contract('LockedGold', (accounts: string[]) => {
     await lockedGold.createAccount()
   })
 
+  describe('#existsAccount()', () => {
+    it('created account should exist', async () => {
+      const b = await lockedGold.existsAccount(account)
+      assert.equal(b, true)
+    })
+    it('account that was not created should not exist', async () => {
+      const b = await lockedGold.existsAccount(accounts[2])
+      assert.equal(b, false)
+    })
+  })
+
   describe('#initialize()', () => {
     it('should set the owner', async () => {
       const owner: string = await lockedGold.owner()
@@ -145,6 +156,7 @@ contract('LockedGold', (accounts: string[]) => {
       it('should set the role delegate', async () => {
         await lockedGold.delegateRole(role, delegate, sig.v, sig.r, sig.s)
         assert.equal(await lockedGold.delegations(delegate), account)
+        assert.equal(await lockedGold.existsDelegate(delegate), true)
         assert.equal(await lockedGold.getDelegateFromAccountAndRole(account, role), delegate)
         assert.equal(await lockedGold.getAccountFromDelegateAndRole(delegate, role), account)
       })

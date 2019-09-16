@@ -721,6 +721,24 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     list.length = lastIndex;
   }
 
+  /**
+   * @notice Check if an account already exists.
+   * @param account The address of the account
+   * @return Returns `true` if account exists. Returns `false` otherwise. In particular it will return `false` if a delegate with given address exists.
+   */
+  function existsAccount(address account) external view returns (bool) {
+    return isAccount(account);
+  }
+
+  /**
+   * @notice Check if a delegate already exists.
+   * @param account The address of the delegate
+   * @return Returns `true` if delegate exists. Returns `false` otherwise.
+   */
+  function existsDelegate(address account) external view returns (bool) {
+    return (delegations[account] != address(0));
+  }
+
   function isAccount(address account) internal view returns (bool) {
     return (accounts[account].exists);
   }
