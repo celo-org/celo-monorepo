@@ -41,7 +41,6 @@ contract Proxy {
     require(_isContract(implementationAddress), "Invalid contract address");
 
     assembly {
-      //let implementationAddress := sload(implementationPosition)
       let newCallDataPosition := mload(0x40)
       mstore(0x40, add(newCallDataPosition, calldatasize))
 
@@ -152,11 +151,11 @@ contract Proxy {
   /**
    * @dev _isContract detect whether the address is 
    *      a contract address or externally owned account (EOA)
-   * WARNING: Calling this function from a constructor will return 0
-  *           independently if the address given as parameter is a contract or EOA
+   * WARNING: Calling this function from a constructor will return false
+   *          independently if the address given as parameter is a contract or EOA
    * @return true if it is a contract address
    */
-  function _isContract(address addr) public view returns (bool) {
+  function _isContract(address addr) internal view returns (bool) {
     uint256 size;
     /* solium-disable-next-line security/no-inline-assembly */
     assembly { size := extcodesize(addr) }
