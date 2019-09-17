@@ -26,6 +26,7 @@ export default class DollarTransfer extends BaseCommand {
     const amountInWei = new BigNumber(res.flags.amountInWei)
 
     this.kit.defaultAccount = from
+
     const goldToken = await this.kit.contracts.getGoldToken()
     const stableToken = await this.kit.contracts.getStableToken()
     // Units of all balances are in wei, unless specified.
