@@ -12,7 +12,7 @@ import { call, put, select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ExchangeRatePair } from 'src/exchange/reducer'
-import { CURRENCY_ENUM as Tokens } from 'src/geth/consts'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import { RootState } from 'src/redux/reducers'
 import {
   addStandbyTransaction,
@@ -39,7 +39,7 @@ export enum Actions {
   EXCHANGE_TOKENS = 'EXCHANGE/EXCHANGE_TOKENS',
 }
 
-export const fetchExchangeRate = (makerAmount?: BigNumber, makerToken?: Tokens) => ({
+export const fetchExchangeRate = (makerAmount?: BigNumber, makerToken?: CURRENCY_ENUM) => ({
   type: Actions.FETCH_EXCHANGE_RATE,
   makerAmount,
   makerToken,
@@ -57,12 +57,12 @@ export const setExchangeRate = (exchangeRatePair: ExchangeRatePair): SetExchange
 
 export interface ExchangeTokensAction {
   type: Actions.EXCHANGE_TOKENS
-  makerToken: Tokens
+  makerToken: CURRENCY_ENUM
   makerAmount: BigNumber
 }
 
 export const exchangeTokens = (
-  makerToken: Tokens,
+  makerToken: CURRENCY_ENUM,
   makerAmount: BigNumber
 ): ExchangeTokensAction => ({
   type: Actions.EXCHANGE_TOKENS,
@@ -72,15 +72,15 @@ export const exchangeTokens = (
 
 export type ActionTypes = SetExchangeRateAction | ExchangeTokensAction
 
-export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: Tokens) {
+export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: CURRENCY_ENUM) {
   Logger.debug(TAG, 'Calling @doFetchExchangeRate')
 
   let dollarMakerAmount: BigNumber
   let goldMakerAmount: BigNumber
-  if (makerAmount && makerToken === Tokens.GOLD) {
+  if (makerAmount && makerToken === CURRENCY_ENUM.GOLD) {
     dollarMakerAmount = LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
     goldMakerAmount = makerAmount
-  } else if (makerAmount && makerToken === Tokens.DOLLAR) {
+  } else if (makerAmount && makerToken === CURRENCY_ENUM.DOLLAR) {
     dollarMakerAmount = makerAmount
     goldMakerAmount = LARGE_GOLD_SELL_AMOUNT_IN_WEI
   } else {
@@ -100,13 +100,13 @@ export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: Token
     const dollarMakerExchangeRate: BigNumber = yield call(
       ContractUtils.getExchangeRate,
       web3,
-      Tokens.DOLLAR,
+      CURRENCY_ENUM.DOLLAR,
       new BigNumber(dollarMakerAmount)
     )
     const goldMakerExchangeRate: BigNumber = yield call(
       ContractUtils.getExchangeRate,
       web3,
-      Tokens.GOLD,
+      CURRENCY_ENUM.GOLD,
       new BigNumber(goldMakerAmount)
     )
 
@@ -135,9 +135,9 @@ export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: Token
 }
 
 export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
-  Logger.debug(`${TAG}@exchangeGoldAndStableTokens`, 'Exchanging gold and stable tokens')
+  Logger.debug(`${TAG}@exchangeGoldAndStableTokens`, 'Exchanging gold and stable CURRENCY_ENUM')
   const { makerToken, makerAmount } = action
-  Logger.debug(TAG, `Exchanging ${makerAmount.toString()} of Tokens ${makerToken}`)
+  Logger.debug(TAG, `Exchanging ${makerAmount.toString()} of CURRENCY_ENUM ${makerToken}`)
   let txId: string | null = null
   try {
     const account: string = yield call(getConnectedUnlockedAccount)
@@ -161,14 +161,14 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     const exchangeContract: ExchangeType = yield call(getExchangeContract, web3)
 
     const makerTokenContract =
-      makerToken === Tokens.DOLLAR ? stableTokenContract : goldTokenContract
+      makerToken === CURRENCY_ENUM.DOLLAR ? stableTokenContract : goldTokenContract
 
     const convertedMakerAmount: BigNumber = yield call(
       convertToContractDecimals,
       makerAmount,
       makerTokenContract
     )
-    const sellGold = makerToken === Tokens.GOLD
+    const sellGold = makerToken === CURRENCY_ENUM.GOLD
 
     const updatedExchangeRate: BigNumber = yield call(
       // Updating with actual makerAmount, rather than conservative estimate displayed
@@ -179,7 +179,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     )
 
     const exceedsExpectedSize =
-      makerToken === Tokens.GOLD
+      makerToken === CURRENCY_ENUM.GOLD
         ? convertedMakerAmount.isGreaterThan(LARGE_GOLD_SELL_AMOUNT_IN_WEI)
         : convertedMakerAmount.isGreaterThan(LARGE_DOLLARS_SELL_AMOUNT_IN_WEI)
 
@@ -206,7 +206,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     }
 
     const takerTokenContract =
-      makerToken === Tokens.DOLLAR ? goldTokenContract : stableTokenContract
+      makerToken === CURRENCY_ENUM.DOLLAR ? goldTokenContract : stableTokenContract
     const convertedTakerAmount: BigNumber = roundDown(
       yield call(convertToContractDecimals, minimumTakerAmount, takerTokenContract),
       0
@@ -218,12 +218,12 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     )
 
     let approveTx
-    if (makerToken === Tokens.GOLD) {
+    if (makerToken === CURRENCY_ENUM.GOLD) {
       approveTx = goldTokenContract.methods.approve(
         exchangeContract._address,
         convertedMakerAmount.toString()
       )
-    } else if (makerToken === Tokens.DOLLAR) {
+    } else if (makerToken === CURRENCY_ENUM.DOLLAR) {
       approveTx = stableTokenContract.methods.approve(
         exchangeContract._address,
         convertedMakerAmount.toString()
@@ -256,7 +256,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 }
 
 function* createStandbyTx(
-  makerToken: Tokens,
+  makerToken: CURRENCY_ENUM,
   makerAmount: BigNumber,
   exchangeRate: BigNumber,
   account: string
@@ -266,11 +266,11 @@ function* createStandbyTx(
   yield put(
     addStandbyTransaction({
       id: txId,
-      type: TransactionTypes.EXCHANGED,
+      type: TransactionTypes.EXCHANGE,
       status: TransactionStatus.Pending,
       inSymbol: makerToken,
       inValue: makerAmount.toString(),
-      outSymbol: makerToken === Tokens.DOLLAR ? Tokens.GOLD : Tokens.DOLLAR,
+      outSymbol: makerToken === CURRENCY_ENUM.DOLLAR ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR,
       outValue: takerAmount.toString(),
       timestamp: Math.floor(Date.now() / 1000),
     })
