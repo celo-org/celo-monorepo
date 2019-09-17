@@ -21,7 +21,7 @@ export default class IsValidator extends BaseCommand {
 
     for (let i = 0; i < numberValidators; i++) {
       const validatorAddress = await validators.validatorAddressFromCurrentSet(i)
-      if (validatorAddress.toLowerCase() == args.address.toLowerCase()) {
+      if (validatorAddress.toLowerCase() === args.address.toLowerCase()) {
         console.log(`${args.address} is in the current validator set`)
         return
       }
