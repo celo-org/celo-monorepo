@@ -258,10 +258,10 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     stageDurations.approval = approvalStageDuration;
     stageDurations.referendum = referendumStageDuration;
     stageDurations.execution = executionStageDuration;
-    participationParameters.baseline = FixidityLib.newFixed(participationBaseline);
-    participationParameters.floor = FixidityLib.newFixed(participationFloor);
-    participationParameters.baselineUpdateFactor = FixidityLib.newFixed(baselineUpdateFactor);
-    participationParameters.baselineQuorumFactor = FixidityLib.newFixed(baselineQuorumFactor);
+    participationParameters.baseline = FixidityLib.wrap(participationBaseline);
+    participationParameters.floor = FixidityLib.wrap(participationFloor);
+    participationParameters.baselineUpdateFactor = FixidityLib.wrap(baselineUpdateFactor);
+    participationParameters.baselineQuorumFactor = FixidityLib.wrap(baselineQuorumFactor);
     // solhint-disable-next-line not-rely-on-time
     lastDequeue = now;
   }
@@ -354,7 +354,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    */
   function setParticipationFloor(uint256 participationFloor) external onlyOwner {
     require(participationFloor != participationParameters.floor.unwrap() && isFraction(participationFloor));
-    participationParameters.floor = FixidityLib.newFixed(participationFloor);
+    participationParameters.floor = FixidityLib.wrap(participationFloor);
     emit ParticipationFloorSet(participationFloor);
   }
 
@@ -367,7 +367,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       baselineUpdateFactor != participationParameters.baselineUpdateFactor.unwrap() &&
       isFraction(baselineUpdateFactor)
     );
-    participationParameters.baselineUpdateFactor = FixidityLib.newFixed(baselineUpdateFactor);
+    participationParameters.baselineUpdateFactor = FixidityLib.wrap(baselineUpdateFactor);
     emit BaselineUpdateFactorSet(baselineUpdateFactor);
   }
 
@@ -380,7 +380,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       baselineQuorumFactor != participationParameters.baselineQuorumFactor.unwrap() &&
       isFraction(baselineQuorumFactor)
     );
-    participationParameters.baselineQuorumFactor = FixidityLib.newFixed(baselineQuorumFactor);
+    participationParameters.baselineQuorumFactor = FixidityLib.wrap(baselineQuorumFactor);
     emit BaselineQuorumFactorSet(baselineQuorumFactor);
   }
 
