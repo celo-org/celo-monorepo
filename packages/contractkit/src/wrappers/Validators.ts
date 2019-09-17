@@ -20,7 +20,6 @@ export interface ValidatorGroup {
   name: string
   url: string
   members: Address[]
-  affiliates?: Address[]
 }
 
 export interface ValidatorGroupVote {

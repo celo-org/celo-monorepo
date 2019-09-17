@@ -16,16 +16,21 @@ export default class ValidatorGroupShow extends BaseCommand {
 
   static args: IArg[] = [Args.address('groupAddress', { description: "ValidatorGroup's address" })]
 
-  static examples = ['show 0x97f7333c51897469E8D98E7af8653aAb468050a3']
+  static examples = [
+    'show 0x97f7333c51897469E8D98E7af8653aAb468050a3',
+    'show 0x97f7333c51897469E8D98E7af8653aAb468050a3 --affiliates',
+  ]
 
   async run() {
     const res = this.parse(ValidatorGroupShow)
     const validators = await this.kit.contracts.getValidators()
-    const validatorGroup = await validators.getValidatorGroup(res.args.groupAddress)
+    const validatorGroup: Array<
+      ValidatorGroup & { affiliates?: Address[] }
+    > = await validators.getValidatorGroup(res.args.groupAddress)
     if (res.flags.affiliates) {
       const registered = await validators.getRegisteredValidators()
       const affiliated = registered.filter((v) => v.affiliation == args.groupAddress)
-      validatorGroup['affiliates'] = affiliated.map((v) => v.address)
+      validatorGroup.affiliates = affiliated.map((v) => v.address)
     }
     printValueMap(validatorGroup)
   }
