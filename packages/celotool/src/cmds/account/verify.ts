@@ -3,7 +3,6 @@ import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
 import { CeloTransactionObject, newKit } from '@celo/contractkit'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
-import { PhoneNumberUtils } from '@celo/utils'
 import { ActionableAttestation, decodeAttestationCode } from '@celo/walletkit'
 import prompts from 'prompts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
@@ -132,7 +131,7 @@ async function verifyCode(
 ) {
   const code = decodeAttestationCode(base64Code)
   const matchingIssuer = attestations.findMatchingIssuer(
-    PhoneNumberUtils.getPhoneHash(phoneNumber),
+    phoneNumber,
     account,
     code,
     attestationsToComplete.map((a) => a.issuer)

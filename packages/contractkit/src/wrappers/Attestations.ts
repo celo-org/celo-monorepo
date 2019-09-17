@@ -1,19 +1,15 @@
 import { ECIES, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
+import { zip3 } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
-import { zip } from 'lodash'
 import * as Web3Utils from 'web3-utils'
+import { CeloToken } from '../base'
 import { Attestations } from '../generated/types/Attestations'
 import { BaseWrapper, proxyCall, proxySend, toNumber, tupleParser, wrapSend } from './BaseWrapper'
-import { CeloToken } from './TokenWrapper'
 const parseSignature = SignatureUtils.parseSignature
 
 export interface AttestationStat {
   completed: number
   total: number
-}
-
-export interface IssuerAttestationState {
-  [issuer: string]: {}
 }
 
 export enum AttestationState {
@@ -43,37 +39,74 @@ function attestationMessageToSign(phoneHash: string, account: string) {
 }
 
 export class AttestationsWrapper extends BaseWrapper<Attestations> {
+  /**
+   *  Returns the time an attestation can be completable before it is considered expired
+   */
   attestationExpirySeconds = proxyCall(
     this.contract.methods.attestationExpirySeconds,
     undefined,
     toNumber
   )
 
+  /**
+   * Returns the attestation stats of a phone number/account pair
+   * @param {string} phoneNumber Phone Number
+   * @param {string} account Account
+   */
   getAttestationStat = proxyCall(
     this.contract.methods.getAttestationStats,
     tupleParser(PhoneNumberUtils.getPhoneHash, (x: string) => x),
     (stat) => ({ completed: toNumber(stat[0]), total: toNumber(stat[1]) })
   )
 
+  /**
+   * Returns the set wallet address for the account
+   * @param {string} account Account
+   */
   getWalletAddress = proxyCall(this.contract.methods.getWalletAddress)
 
+  /**
+   * Sets the data encryption of the account
+   * @param {string} encryptionKey The key to set
+   */
   setAccountDataEncryptionKey = proxySend(
     this.kit,
     this.contract.methods.setAccountDataEncryptionKey
   )
 
+  /**
+   * Sets the wallet address for the account
+   * @param {string} address The address to set
+   */
   setWalletAddress = proxySend(this.kit, this.contract.methods.setWalletAddress)
 
+  /**
+   * Calculates the amount of CeloToken to request Attestations
+   * @param {CeloToken} token The token to pay for attestations for
+   * @param {number} attestationsRequested The number of attestations to request
+   */
   async approveAttestationFee(token: CeloToken, attestationsRequested: number) {
-    const fee = await this.attestationFeeRequired(token.address, attestationsRequested)
-    return token.approve(this.address, fee.toString())
+    const tokenContract = await this.kit.contracts.getContract(token)
+    const fee = await this.attestationFeeRequired(token, attestationsRequested)
+    return tokenContract.approve(this.address, fee.toString())
   }
 
-  async attestationFeeRequired(tokenAddress: string, attestationsRequested: number) {
+  /**
+   * Approves the transfer of CeloToken to request Attestations
+   * @param {CeloToken} token  The token to pay for attestations for
+   * @param {number} attestationsRequested  The number of attestations to request
+   */
+  async attestationFeeRequired(token: CeloToken, attestationsRequested: number) {
+    const tokenAddress = await this.kit.registry.addressFor(token)
     const attestationFee = await this.contract.methods.getAttestationRequestFee(tokenAddress).call()
     return new BigNumber(attestationFee).times(attestationsRequested)
   }
 
+  /**
+   * Returns an array of attestations that can be completed, along with the issuers public key
+   * @param {string} phoneNumber
+   * @param {string} account
+   */
   async getActionableAttestations(
     phoneNumber: string,
     account: string
@@ -84,30 +117,45 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
     const issuers = await this.contract.methods.getAttestationIssuers(phoneHash, account).call()
     const issuerState = Promise.all(
-      issuers.map((issuer: any) =>
+      issuers.map((issuer) =>
         this.contract.methods
           .getAttestationState(phoneHash, account, issuer)
           .call()
           .then(parseAttestationInfo)
       )
     )
-    const publicKeys = Promise.all(
+
+    // Typechain is not properly typing getDataEncryptionKey
+    // @ts-ignore
+    const publicKeys: Promise<string[]> = Promise.all(
       issuers.map((issuer) => this.contract.methods.getDataEncryptionKey(issuer).call())
     )
 
-    return ((zip(issuers, await issuerState, await publicKeys) as unknown) as Array<
-      [string, { attestationState: number; time: number }, string]
-    >)
+    const isIncomplete = (status: AttestationState) => status === AttestationState.Incomplete
+    const hasNotExpired = (time: number) => nowInUnixSeconds < time + expirySeconds
+    const isValidKey = (key: string) => key !== null && key !== '0x0'
+
+    return zip3(issuers, await issuerState, await publicKeys)
       .filter(
         ([_issuer, attestation, publicKey]) =>
-          attestation.attestationState === AttestationState.Incomplete &&
-          nowInUnixSeconds < attestation.time + expirySeconds &&
-          publicKey !== null &&
-          publicKey !== '0x0'
+          isIncomplete(attestation.attestationState) &&
+          hasNotExpired(attestation.time) &&
+          isValidKey(publicKey)
       )
-      .map(([issuer, attestation, publicKey]) => ({ ...attestation, issuer, publicKey }))
+      .map(([issuer, attestation, publicKey]) => ({
+        ...attestation,
+        issuer,
+        publicKey: publicKey.toString(),
+      }))
   }
 
+  /**
+   * Completes an attestation with the corresponding code
+   * @param {string} phoneNumber The phone number of the attestation
+   * @param {string} account The account of the attestation
+   * @param {string} issuer The issuer of the attestation
+   * @param {string} code The code received by the validator
+   */
   complete(phoneNumber: string, account: string, issuer: string, code: string) {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
     const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
@@ -115,12 +163,20 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return wrapSend(this.kit, this.contract.methods.complete(phoneHash, v, r, s))
   }
 
+  /**
+   * Given a list of issuers, finds the matching issuer for a given code
+   * @param {string} phoneNumber The phone number of the attestation
+   * @param {string} account The account of the attestation
+   * @param {string} code The code received by the validator
+   * @param {string[]} issuers The list of potential issuers
+   */
   findMatchingIssuer(
-    phoneHash: string,
+    phoneNumber: string,
     account: string,
     code: string,
     issuers: string[]
   ): string | null {
+    const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
     for (const issuer of issuers) {
       const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
       try {
@@ -134,6 +190,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return null
   }
 
+  /**
+   * Lookup mapped walleet addresses for a given list of hashes of phone numbers
+   * @param {string[]} phoneNumberHashes The hashes of phone numbers to lookup
+   */
   async lookupPhoneNumbers(
     phoneNumberHashes: string[]
   ): Promise<Record<string, Record<string, AttestationStat>>> {
@@ -173,14 +233,26 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return result
   }
 
+  /**
+   * Requests attestations for a phone number
+   * @param {string} phoneNumber The phone number for which to request attestations for
+   * @param {number} attestationsRequested The number of attestations to request
+   * @param {string} token The token with which to pay for the attestation fee
+   */
   async request(phoneNumber: string, attestationsRequested: number, token: CeloToken) {
     const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
+    const tokenAddress = await this.kit.registry.addressFor(token)
     return wrapSend(
       this.kit,
-      this.contract.methods.request(phoneHash, attestationsRequested, token.address)
+      this.contract.methods.request(phoneHash, attestationsRequested, tokenAddress)
     )
   }
 
+  /**
+   * Reveals the phone number to the issuer of the attestation on-chain
+   * @param {string} phoneNumber The phone number which requested attestation
+   * @param {string} issuer The address of issuer of the attestation
+   */
   async reveal(phoneNumber: string, issuer: string) {
     const publicKey = await this.contract.methods.getDataEncryptionKey(issuer).call()
 
@@ -207,6 +279,13 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     )
   }
 
+  /**
+   * Validates a given code by the issuer on-chain
+   * @param {string} phoneNumber The phone number which requested attestation
+   * @param {string} account The account which requested attestation
+   * @param {string} issuer The address of the issuer of the attestation
+   * @param {string} code The code send by the issuer
+   */
   async validateAttestationCode(
     phoneNumber: string,
     account: string,
