@@ -1,6 +1,8 @@
 import { stringToBoolean } from '@celo/utils/src/parsing'
 import { Platform } from 'react-native'
 import Config from 'react-native-config'
+import config from 'src/geth/network-config'
+import { Testnets } from 'src/web3/testnets'
 // if I use @celo/utils breaks all the tests for some reason
 // tslint:disable-next-line
 import * as secretsFile from '../secrets.json'
@@ -48,8 +50,10 @@ export const DEV_SETTINGS_ACTIVE_INITIALLY = stringToBoolean(
 
 export const FIREBASE_ENABLED = stringToBoolean(Config.FIREBASE_ENABLED || 'true')
 
-export const DEFAULT_TESTNET = Config.DEFAULT_TESTNET
-export const BLOCKCHAIN_API_URL = Config.BLOCKCHAIN_API_URL
+// We need to fallback to `integration` for testing under jest where
+// react-native-config is undefined.
+export const DEFAULT_TESTNET: Testnets = Config.DEFAULT_TESTNET || 'integration'
+export const BLOCKCHAIN_API_URL = config[DEFAULT_TESTNET].blockchainApiUrl
 
 export const SEGMENT_API_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SEGMENT_API_KEY')
 export const FIREBASE_WEB_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'FIREBASE_WEB_KEY')
