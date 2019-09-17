@@ -21,18 +21,50 @@ type Props = (HomeExchangeFragment | ExchangeStandby) &
     showGoldAmount: boolean
   }
 
+type ExchangeProps = ReturnType<typeof getDollarExchangeProps>
+
+function getDollarExchangeProps({ inValue, outValue }: Props) {
+  return {
+    icon: require('src/transactions/ExchangeGreenGold.png'),
+    dollarAmount: inValue,
+    dollarDirection: '-',
+    goldAmount: outValue,
+    goldDirection: '',
+    inColor: colors.celoGreen,
+    outColor: colors.celoGold,
+  }
+}
+
+function getGoldExchangeProps({ inValue, outValue }: Props) {
+  return {
+    icon: require('src/transactions/ExchangeGoldGreen.png'),
+    dollarAmount: outValue,
+    dollarDirection: '',
+    goldAmount: inValue,
+    goldDirection: '-',
+    inColor: colors.celoGold,
+    outColor: colors.celoGreen,
+  }
+}
+
+function getGoldAmountProps({ goldAmount, goldDirection }: ExchangeProps) {
+  return {
+    amount: goldAmount,
+    amountDirection: goldDirection,
+    amountColor: colors.celoGold,
+  }
+}
+
+function getDollarAmountProps({ dollarAmount, dollarDirection }: ExchangeProps) {
+  return {
+    amount: dollarAmount,
+    amountDirection: dollarDirection,
+    amountColor: colors.celoGreen,
+  }
+}
+
 export function ExchangeFeedItem(props: Props) {
-  const {
-    showGoldAmount,
-    t,
-    inSymbol,
-    inValue,
-    status,
-    outValue,
-    outSymbol,
-    timestamp,
-    i18n,
-  } = props
+  const { showGoldAmount, inSymbol, inValue, outValue, status, timestamp, t, i18n } = props
 
   const onPress = () => {
     navigateToExchangeReview(timestamp, {
@@ -43,46 +75,27 @@ export function ExchangeFeedItem(props: Props) {
   }
 
   const inCurrency = resolveCurrency(inSymbol)
-  const outCurrency = resolveCurrency(outSymbol)
-  const dollarAmount = inCurrency === CURRENCY_ENUM.DOLLAR ? inValue : outValue
-  const dollarDirection = inCurrency === CURRENCY_ENUM.DOLLAR ? '-' : ''
-  const goldAmount = inCurrency === CURRENCY_ENUM.GOLD ? inValue : outValue
-  const goldDirection = inCurrency === CURRENCY_ENUM.GOLD ? '-' : ''
-  const amount = showGoldAmount ? goldAmount : dollarAmount
-  const amountDirection = showGoldAmount ? goldDirection : dollarDirection
+  const exchangeProps =
+    inCurrency === CURRENCY_ENUM.DOLLAR
+      ? getDollarExchangeProps(props)
+      : getGoldExchangeProps(props)
+  const { amount, amountDirection, amountColor } = showGoldAmount
+    ? getGoldAmountProps(exchangeProps)
+    : getDollarAmountProps(exchangeProps)
+
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
   const isPending = status === TransactionStatus.Pending
 
-  const inStyle = {
-    color: isPending
-      ? colors.gray
-      : inCurrency === CURRENCY_ENUM.DOLLAR
-        ? colors.celoGreen
-        : colors.celoGold,
-  }
-
-  const outStyle = {
-    color: isPending
-      ? colors.gray
-      : outCurrency === CURRENCY_ENUM.DOLLAR
-        ? colors.celoGreen
-        : colors.celoGold,
-  }
+  const { inColor, outColor, icon } = exchangeProps
+  const inStyle = { color: isPending ? colors.gray : inColor }
+  const outStyle = { color: isPending ? colors.gray : outColor }
 
   return (
     <Touchable onPress={onPress}>
       <View style={styles.container}>
         <View style={styles.imageContainer}>
-          <Image
-            source={
-              inCurrency === CURRENCY_ENUM.DOLLAR
-                ? require(`src/transactions/ExchangeGreenGold.png`)
-                : require(`src/transactions/ExchangeGoldGreen.png`)
-            }
-            style={styles.image}
-            resizeMode="contain"
-          />
+          <Image source={icon} style={styles.image} resizeMode="contain" />
         </View>
         <View style={styles.contentContainer}>
           <View style={styles.titleContainer}>
@@ -93,7 +106,7 @@ export function ExchangeFeedItem(props: Props) {
                   ? fontStyles.activityCurrencySent
                   : {
                       ...fontStyles.activityCurrencyReceived,
-                      color: showGoldAmount ? colors.celoGold : colors.celoGreen,
+                      color: amountColor,
                     },
                 styles.amount,
               ]}
