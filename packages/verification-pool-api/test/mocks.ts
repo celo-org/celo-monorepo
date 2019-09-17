@@ -62,6 +62,22 @@ jest.mock('twilio', () =>
   }))
 )
 
+jest.mock('nexmo', () =>
+  jest.fn(() => ({
+    message: {
+      sendSms: jest.fn((_a, _b, _c, callback) => {
+        callback(null, {
+          messages: [
+            {
+              status: '0',
+            },
+          ],
+        })
+      }),
+    },
+  }))
+)
+
 export const mockVerifierId = 'mockVerifierId'
 export const mockMessageId = 'mockMessageId'
 export const verifiersDbPath = 'mobileVerifiers'

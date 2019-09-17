@@ -375,6 +375,12 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
 
     (updatedInflationFactor, ) = getUpdatedInflationFactor();
 
+    // We're ok using FixidityLib.divide here because updatedInflationFactor is
+    // not going to surpass maxFixedDivisor any time soon.
+    // Quick upper-bound estimation: if annual inflation were 5% (an order of
+    // magnitude more than the initial proposal of 0.5%), in 500 years, the
+    // inflation factor would be on the order of 10**10, which is still a safe
+    // divisor.
     return FixidityLib.newFixed(units).divide(updatedInflationFactor).fromFixed();
   }
 
