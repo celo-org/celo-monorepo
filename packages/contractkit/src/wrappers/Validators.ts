@@ -34,6 +34,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   removeMember = proxySend(this.kit, this.contract.methods.removeMember)
   registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
   registerValidatorGroup = proxySend(this.kit, this.contract.methods.registerValidatorGroup)
+  validatorAddressFromCurrentSet = proxyCall(this.contract.methods.validatorAddressFromCurrentSet)
+  numberValidatorsInCurrentSet = proxyCall(this.contract.methods.numberValidatorsInCurrentSet)
+
   getVoteFrom: (validatorAddress: Address) => Promise<Address | null> = proxyCall(
     this.contract.methods.voters
   )
