@@ -1,4 +1,5 @@
 import { Countries, PhoneNumberUtils } from '@celo/utils'
+import memoizeOne from 'memoize-one'
 import * as React from 'react'
 import Autosuggest from 'react-autosuggest'
 import {
@@ -25,6 +26,8 @@ interface State {
 
 const COUNTRIES = new Countries('en-us')
 
+const getCountries = memoizeOne((search: string) => COUNTRIES.getFilteredCountries(search))
+
 class PhoneInput extends React.PureComponent<Props & ScreenProps, State> {
   state: State = {
     countryQuery: '',
@@ -33,25 +36,29 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps, State> {
   }
 
   filteredCountries = () => {
-    return COUNTRIES.getFilteredCountries(this.state.countryQuery)
+    return getCountries(this.state.countryQuery)
   }
 
   onChangeCountryQuery = (countryQuery: string) => {
     this.setState({ countryQuery })
   }
 
-  setNumber = (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
+  onNumberInput = (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
     // remove non phone number characters
     const phone = event.nativeEvent.text.replace(/[^\d\(\)-\s.+]/g, '')
 
+    this.setNumber(phone, this.state.countryCallingCode)
+  }
+
+  setNumber = (rawPhone: string, countryCallingCode: string) => {
     const phoneInfo =
-      phone.length && PhoneNumberUtils.parsePhoneNumber(phone, this.state.countryCallingCode)
+      rawPhone.length && PhoneNumberUtils.parsePhoneNumber(rawPhone, countryCallingCode)
 
     if (phoneInfo) {
       this.setState({ phoneNumber: phoneInfo.displayNumber })
       this.props.onChangeNumber(phoneInfo.e164Number)
     } else {
-      this.setState({ phoneNumber: phone })
+      this.setState({ phoneNumber: rawPhone })
       this.props.onChangeNumber('')
     }
   }
@@ -64,25 +71,26 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps, State> {
     this.onChangeCountryQuery(value)
   }
 
-  onCounryInputKeyPress = (event) => {}
-
-  // TODO set the caling code if counry name is just typed
-  //  TODO figure out what on Suggestion Selected is for and if we need it
-
-  onInputChange = (_, { newValue, method }) => {
+  onInputChange = (_, { newValue }) => {
     this.onChangeCountryQuery(newValue)
+
+    // use Set Immediate to avoid typing lag
     setImmediate(() => {
       const country = COUNTRIES.getCountry(newValue)
       if (country.displayName) {
+        // @ts-ignore
+        const callingcode = country.countryCallingCodes[0]
+
         this.setState({
           countryQuery: country.displayName,
-          // @ts-ignore
-          countryCallingCode: country.countryCallingCodes[0],
+          countryCallingCode: callingcode,
         })
       } else {
         this.setState({
           countryCallingCode: '',
+          phoneNumber: '',
         })
+        this.props.onChangeNumber('')
       }
     })
   }
@@ -105,7 +113,6 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps, State> {
         focusStyle={standardStyles.inputDarkFocused}
         {...props}
         value={this.state.countryQuery}
-        onKeyPress={this.onCounryInputKeyPress}
       />
     )
   }
@@ -115,7 +122,7 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps, State> {
     const { displayName, emoji, countryCallingCodes } = COUNTRIES.getCountryByCode(countryCode)
 
     const onPress = () => {
-      this.setState({ countryCallingCode: countryCallingCodes[0] })
+      this.setState({ countryCallingCode: countryCallingCodes[0], phoneNumber: '' })
       this.onChangeCountryQuery(displayName)
     }
 
@@ -186,9 +193,9 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps, State> {
             focusStyle={standardStyles.inputDarkFocused}
             name="phone"
             placeholder={this.getPlaceholder()}
-            onChange={this.setNumber}
+            onChange={this.onNumberInput}
             value={this.state.phoneNumber}
-            // disabled={this.state.countryCallingCode.length === 0}
+            editable={this.state.countryCallingCode.length > 0}
           />
         </View>
       </>

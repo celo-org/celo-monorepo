@@ -4,7 +4,6 @@ import { StyleSheet, View } from 'react-native'
 import { ButtonWithFeedback, ContextualInfo, HashingStatus } from 'src/fauceting/MicroComponents'
 import PhoneInput from 'src/fauceting/PhoneInput'
 import {
-  formatNumber,
   getCaptchaKey,
   RequestState,
   requestStatusToState,
@@ -38,11 +37,10 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
 
   recaptchaRef = React.createRef<ReCAPTCHA>()
 
-  setBeneficiary = ({ currentTarget }: React.SyntheticEvent<HTMLInputElement>) => {
+  setAddress = ({ currentTarget }: React.SyntheticEvent<HTMLInputElement>) => {
     const { value } = currentTarget
-    const beneficiary = this.props.kind === RequestType.Invite ? formatNumber(value) : value
     this.setState({
-      beneficiary,
+      beneficiary: value,
       requestState:
         this.state.requestState !== RequestState.Working
           ? RequestState.Initial
@@ -116,10 +114,6 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
     return this.props.kind === RequestType.Faucet
   }
 
-  getPlaceholder = () => {
-    return this.isFaucet() ? this.props.t('testnetAddress') : '+1 555 555 5555'
-  }
-
   render() {
     const { requestState, dollarTxHash, goldTxHash, escrowTxHash } = this.state
     const isInvalid = requestState === RequestState.Invalid
@@ -134,11 +128,11 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
             focusStyle={standardStyles.inputFocused}
             name="beneficiary"
             style={[standardStyles.input, isInvalid && styles.error]}
-            placeholder={this.getPlaceholder()}
+            placeholder={this.props.t('testnetAddress')}
             // TODO: is it normal that setBeneficiary is using React.SyntheticEvent<HTMLInputElement>
             // and not NativeSyntheticEvent<TextInputChangeEventData> ?
             // @ts-ignore
-            onChange={this.setBeneficiary}
+            onChange={this.setAddress}
             value={this.state.beneficiary}
           />
         ) : (
@@ -156,6 +150,7 @@ class RequestFunds extends React.PureComponent<Props & I18nProps, State> {
             isFaucet={this.isFaucet()}
             captchaOK={this.state.captchaOK}
             onSubmit={this.onSubmit}
+            disabled={this.state.beneficiary.length === 0}
             t={this.props.t}
           />
           <View>

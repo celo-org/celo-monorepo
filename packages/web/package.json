@@ -47,6 +47,7 @@
     "lodash.throttle": "^4.1.1",
     "lottie-web": "^5.5.7",
     "mailgun-js": "^0.22.0",
+    "memoize-one": "^5.1.1",
     "mobile-detect": "^1.4.2",
     "net": "^1.0.2",
     "next": "^8.0.3",
