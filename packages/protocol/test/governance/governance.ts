@@ -525,12 +525,12 @@ contract('Governance', (accounts: string[]) => {
       assertEqualBN(actualBaselineUpdateFactor, differentBaselineUpdateFactor)
     })
 
-    it('should emit the BaselineUpdateFactorSet event', async () => {
+    it('should emit the ParticipationBaselineUpdateFactorSet event', async () => {
       const resp = await governance.setBaselineUpdateFactor(differentBaselineUpdateFactor)
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertLogMatches2(log, {
-        event: 'BaselineUpdateFactorSet',
+        event: 'ParticipationBaselineUpdateFactorSet',
         args: {
           baselineUpdateFactor: differentBaselineUpdateFactor,
         },
@@ -563,12 +563,12 @@ contract('Governance', (accounts: string[]) => {
       assertEqualBN(actualBaselineQuorumFactor, differentBaselineQuorumFactor)
     })
 
-    it('should emit the BaselineQuorumFactorSet event', async () => {
+    it('should emit the ParticipationBaselineQuorumFactorSet event', async () => {
       const resp = await governance.setBaselineQuorumFactor(differentBaselineQuorumFactor)
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertLogMatches2(log, {
-        event: 'BaselineQuorumFactorSet',
+        event: 'ParticipationBaselineQuorumFactorSet',
         args: {
           baselineQuorumFactor: differentBaselineQuorumFactor,
         },

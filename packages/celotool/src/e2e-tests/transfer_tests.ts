@@ -32,11 +32,19 @@ const stableTokenAbi = erc20Abi.concat([
     outputs: [
       {
         name: '',
-        type: 'int256',
+        type: 'uint256',
       },
       {
         name: '',
-        type: 'int256',
+        type: 'uint256',
+      },
+      {
+        name: '',
+        type: 'uint256',
+      },
+      {
+        name: '',
+        type: 'uint256',
       },
     ],
     payable: false,

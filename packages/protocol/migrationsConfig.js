@@ -32,9 +32,9 @@ const DefaultConfig = {
     queueExpiry: 7 * 24 * 60 * 60, // 1 week
     referendumStageDuration: 15 * 60, // 15 minutes
     participationBaseline: 8 / 10,
-    participationFloor: 5 / 100,
-    updateCoefficient: 1 / 5,
-    criticalBaselineLevel: 1,
+    participationBaselineFloor: 5 / 100,
+    participationBaselineUpdateFactor: 1 / 5,
+    participationBaselineQuorumFactor: 1,
   },
   gasPriceMinimum: {
     initialMinimum: 10000,

@@ -172,7 +172,6 @@ library Proposals {
     }
     uint256 noVotes = proposal.votes.no;
     uint256 totalVotes = yesVotes.add(noVotes).add(proposal.votes.abstain);
-    // TODO(yorke): double check
     uint256 requiredVotes = quorum.multiply(FixidityLib.newFixed(proposal.networkWeight)).fromFixed();
     if (requiredVotes > totalVotes) {
       noVotes = noVotes.add(requiredVotes.sub(totalVotes));

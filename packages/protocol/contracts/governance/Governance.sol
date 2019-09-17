@@ -71,7 +71,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     // The average network participation in governance, weighted toward recent proposals.
     FixidityLib.Fraction baseline;
     // The lower bound on the participation baseline.
-    FixidityLib.Fraction floor;
+    FixidityLib.Fraction baselineFloor;
     // The weight of the most recent proposal's participation on the baseline.
     FixidityLib.Fraction baselineUpdateFactor;
     // The proportion of the baseline that constitutes quorum.
@@ -185,11 +185,11 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     uint256 participationFloor
   );
 
-  event BaselineUpdateFactorSet(
+  event ParticipationBaselineUpdateFactorSet(
     uint256 baselineUpdateFactor
   );
 
-  event BaselineQuorumFactorSet(
+  event ParticipationBaselineQuorumFactorSet(
     uint256 baselineQuorumFactor
   );
 
@@ -259,7 +259,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     stageDurations.referendum = referendumStageDuration;
     stageDurations.execution = executionStageDuration;
     participationParameters.baseline = FixidityLib.wrap(participationBaseline);
-    participationParameters.floor = FixidityLib.wrap(participationFloor);
+    participationParameters.baselineFloor = FixidityLib.wrap(participationFloor);
     participationParameters.baselineUpdateFactor = FixidityLib.wrap(baselineUpdateFactor);
     participationParameters.baselineQuorumFactor = FixidityLib.wrap(baselineQuorumFactor);
     // solhint-disable-next-line not-rely-on-time
@@ -353,8 +353,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @param participationFloor The value at which the baseline is floored.
    */
   function setParticipationFloor(uint256 participationFloor) external onlyOwner {
-    require(participationFloor != participationParameters.floor.unwrap() && isFraction(participationFloor));
-    participationParameters.floor = FixidityLib.wrap(participationFloor);
+    require(participationFloor != participationParameters.baselineFloor.unwrap() && isFraction(participationFloor));
+    participationParameters.baselineFloor = FixidityLib.wrap(participationFloor);
     emit ParticipationFloorSet(participationFloor);
   }
 
@@ -651,7 +651,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   function getParticipationParameters() external view returns (uint256, uint256, uint256, uint256) {
     return (
       participationParameters.baseline.unwrap(),
-      participationParameters.floor.unwrap(),
+      participationParameters.baselineFloor.unwrap(),
       participationParameters.baselineUpdateFactor.unwrap(),
       participationParameters.baselineQuorumFactor.unwrap()
     );
@@ -976,8 +976,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       FixidityLib.fixed1().subtract(participationParameters.baselineUpdateFactor)
     );
     participationParameters.baseline = participationComponent.add(baselineComponent);
-    if (participationParameters.baseline.lt(participationParameters.floor)) {
-      participationParameters.baseline = participationParameters.floor;
+    if (participationParameters.baseline.lt(participationParameters.baselineFloor)) {
+      participationParameters.baseline = participationParameters.baselineFloor;
     }
     emit ParticipationBaselineUpdated(participationParameters.baseline.unwrap());
   }
