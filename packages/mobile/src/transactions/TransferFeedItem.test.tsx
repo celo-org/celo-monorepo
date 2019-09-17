@@ -43,6 +43,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -65,6 +66,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={mockPrivateDEK}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -87,6 +89,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={mockPrivateDEK2}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -109,6 +112,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -131,6 +135,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -153,6 +158,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -175,6 +181,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -197,6 +204,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -219,6 +227,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -241,6 +250,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={mockAddressToE164Number}
           recipientCache={mockRecipientCache}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -263,6 +273,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -285,6 +296,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={mockAddressToE164Number}
           recipientCache={mockRecipientCache}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
