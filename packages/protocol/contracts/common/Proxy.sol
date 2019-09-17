@@ -32,8 +32,16 @@ contract Proxy {
   function () external payable {
     bytes32 implementationPosition = IMPLEMENTATION_POSITION;
 
+    address implementationAddress;
+
     assembly {
-      let implementationAddress := sload(implementationPosition)
+      implementationAddress := sload(implementationPosition)
+    }
+
+    require(_isContract(implementationAddress), "Invalid contract address");
+
+    assembly {
+      //let implementationAddress := sload(implementationPosition)
       let newCallDataPosition := mload(0x40)
       mstore(0x40, add(newCallDataPosition, calldatasize))
 
@@ -88,7 +96,7 @@ contract Proxy {
     payable
     onlyOwner
   {
-    require(isContract(implementation), "Invalid contract address");
+    require(_isContract(implementation), "Invalid contract address");
     _setImplementation(implementation);
     bool success;
     bytes memory returnValue;
@@ -142,14 +150,14 @@ contract Proxy {
 
 
   /**
-   * @dev isContract detect whether the address is 
+   * @dev _isContract detect whether the address is 
    *      a contract address or externally owned account (EOA)
    * WARNING: Calling this function from a constructor will return 0
   *           independently if the address given as parameter is a contract or EOA
    * @return true if it is a contract address
    */
-  function isContract(address addr) public view returns (bool) {
-    uint size;
+  function _isContract(address addr) public view returns (bool) {
+    uint256 size;
     /* solium-disable-next-line security/no-inline-assembly */
     assembly { size := extcodesize(addr) }
     return size > 0;
