@@ -1,14 +1,14 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
-import "./UsingBondedDeposits.sol";
+import "./UsingLockedGold.sol";
 import "./interfaces/IValidators.sol";
 import "../common/Initializable.sol";
-import "../common/FractionUtil.sol";
+import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 
@@ -16,13 +16,16 @@ import "../common/linkedlists/AddressSortedLinkedList.sol";
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
  */
-contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, UsingBondedDeposits {
+contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, UsingLockedGold {
 
+  using FixidityLib for FixidityLib.Fraction;
   using AddressLinkedList for LinkedList.List;
   using AddressSortedLinkedList for SortedLinkedList.List;
   using SafeMath for uint256;
-  using FractionUtil for FractionUtil.Fraction;
   using BytesLib for bytes;
+
+  // Address of the getValidator precompiled contract
+  address constant public GET_VALIDATOR_ADDRESS = address(0xfa);
 
   // TODO(asa): These strings should be modifiable
   struct ValidatorGroup {
@@ -41,7 +44,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     address affiliation;
   }
 
-  struct BondedDeposit {
+  struct LockedGoldCommitment {
     uint256 noticePeriod;
     uint256 value;
   }
@@ -54,7 +57,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   address[] private _validators;
   SortedLinkedList.List private votes;
   // TODO(asa): Support different requirements for groups vs. validators.
-  BondedDeposit private registrationRequirement;
+  LockedGoldCommitment private registrationRequirement;
   uint256 public minElectableValidators;
   uint256 public maxElectableValidators;
 
@@ -142,9 +145,10 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param registryAddress The address of the registry contract.
    * @param _minElectableValidators The minimum number of validators that can be elected.
    * @param _maxElectableValidators The maximum number of validators that can be elected.
-   * @param requirementValue The minimum bonded deposit value to register a group or validator.
-   * @param requirementNoticePeriod The minimum bonded deposit notice period to register a group or
-   *   validator.
+   * @param requirementValue The minimum Locked Gold commitment value to register a group or
+       validator.
+   * @param requirementNoticePeriod The minimum Locked Gold commitment notice period to register
+   *    a group or validator.
    * @dev Should be called only once.
    */
   function initialize(
@@ -211,8 +215,9 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
   /**
    * @notice Updates the minimum bonding requirements to register a validator group or validator.
-   * @param value The minimum bonded deposit value to register a group or validator.
-   * @param noticePeriod The minimum bonded deposit notice period to register a group or validator.
+   * @param value The minimum Locked Gold commitment value to register a group or validator.
+   * @param noticePeriod The minimum Locked Gold commitment notice period to register a group or
+   *   validator.
    * @return True upon success.
    * @dev The new requirement is only enforced for future validator or group registrations.
    */
@@ -239,8 +244,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param identifier An identifier for this validator.
    * @param name A name for the validator.
    * @param url A URL for the validator.
-   * @param noticePeriod The notice period of the bonded deposit that meets the requirements for
-   *   validator registration.
+   * @param noticePeriod The notice period of the Locked Gold commitment that meets the
+   *   requirements for validator registration.
    * @param publicKeysData Comprised of three tightly-packed elements:
    *    - publicKey - The public key that the validator is using for consensus, should match
    *      msg.sender. 64 bytes.
@@ -350,8 +355,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param identifier A identifier for this validator group.
    * @param name A name for the validator group.
    * @param url A URL for the validator group.
-   * @param noticePeriod The notice period of the bonded deposit that meets the requirements for
-   *   validator registration.
+   * @param noticePeriod The notice period of the Locked Gold commitment that meets the
+   *   requirements for validator registration.
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient weight.
@@ -541,6 +546,45 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     return true;
   }
 
+  function validatorAddressFromCurrentSet(uint256 index) external view returns (address) {
+    address validatorAddress;
+    assembly {
+      let newCallDataPosition := mload(0x40)
+      mstore(newCallDataPosition, index)
+      let success := staticcall(
+        5000,
+        0xfa,
+        newCallDataPosition,
+        32,
+        0,
+        0
+      )
+      returndatacopy(add(newCallDataPosition, 64), 0, 32)
+      validatorAddress := mload(add(newCallDataPosition, 64))
+    }
+
+    return validatorAddress;
+  }
+
+  function numberValidatorsInCurrentSet() external view returns (uint256) {
+    uint256 numberValidators;
+    assembly {
+      let success := staticcall(
+        5000,
+        0xf9,
+        0,
+        0,
+        0,
+        0
+      )
+      let returnData := mload(0x40)
+      returndatacopy(returnData, 0, 32)
+      numberValidators := mload(returnData)
+    }
+
+    return numberValidators;
+  }
+
   /**
    * @notice Returns validator information.
    * @param account The account that registered the validator.
@@ -605,8 +649,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   }
 
   /**
-   * @notice Returns the bonded deposit requirements to register a validator or group.
-   * @return The minimum value and notice period for the bonded deposit.
+   * @notice Returns the Locked Gold commitment requirements to register a validator or group.
+   * @return The minimum value and notice period for the Locked Gold commitment.
    */
   function getRegistrationRequirement() external view returns (uint256, uint256) {
     return (registrationRequirement.value, registrationRequirement.noticePeriod);
@@ -668,7 +712,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     while (totalNumMembersElected < maxElectableValidators && memberElectedInRound) {
       memberElectedInRound = false;
       uint256 groupIndex = 0;
-      FractionUtil.Fraction memory maxN = FractionUtil.Fraction(0, 1);
+      FixidityLib.Fraction memory maxN = FixidityLib.wrap(0);
       for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
         bool isWinningestGroupInRound = false;
         (maxN, isWinningestGroupInRound) = dHondt(maxN, electionGroups[i], numMembersElected[i]);
@@ -722,7 +766,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   /**
    * @notice Returns whether an account meets the requirements to register a validator or group.
    * @param account The account.
-   * @param noticePeriod The notice period of the bonded deposit that meets the requirements.
+   * @param noticePeriod The notice period of the Locked Gold commitment that meets the
+   *   requirements.
    * @return Whether an account meets the requirements to register a validator or group.
    */
   function meetsRegistrationRequirements(
@@ -733,7 +778,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     view
     returns (bool)
   {
-    uint256 value = getBondedDepositValue(account, noticePeriod);
+    uint256 value = getLockedCommitmentValue(account, noticePeriod);
     return (
       value >= registrationRequirement.value &&
       noticePeriod >= registrationRequirement.noticePeriod
@@ -781,7 +826,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   /**
    * @notice De-affiliates a validator, removing it from the group for which it is a member.
    * @param validator The validator to deaffiliate from their affiliated validator group.
-   * @param validatorAccount The BondedDeposits account of the validator.
+   * @param validatorAccount The LockedGold account of the validator.
    * @return True upon success.
    */
   function _deaffiliate(
@@ -810,22 +855,21 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @return The new `maxN` and whether or not the group should win a seat in this round thus far.
    */
   function dHondt(
-    FractionUtil.Fraction memory maxN,
+    FixidityLib.Fraction memory maxN,
     address groupAddress,
     uint256 numMembersElected
   )
     private
     view
-    returns (FractionUtil.Fraction memory, bool)
+    returns (FixidityLib.Fraction memory, bool)
   {
     ValidatorGroup storage group = groups[groupAddress];
     // Only consider groups with members left to be elected.
     if (group.members.numElements > numMembersElected) {
-      FractionUtil.Fraction memory n = FractionUtil.Fraction(
-        votes.getValue(groupAddress),
-        numMembersElected.add(1)
+      FixidityLib.Fraction memory n = FixidityLib.newFixed(votes.getValue(groupAddress)).divide(
+        FixidityLib.newFixed(numMembersElected.add(1))
       );
-      if (n.isGreaterThan(maxN)) {
+      if (n.gt(maxN)) {
         return (n, true);
       }
     }

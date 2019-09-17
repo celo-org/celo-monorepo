@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -6,10 +6,11 @@ import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
-import "./UsingBondedDeposits.sol";
+import "./UsingLockedGold.sol";
 import "./interfaces/IGovernance.sol";
-import "../common/FractionUtil.sol";
 import "../common/Initializable.sol";
+import "../common/FixidityLib.sol";
+import "../common/FractionUtil.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 
 
@@ -17,11 +18,14 @@ import "../common/linkedlists/IntegerSortedLinkedList.sol";
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
  */
-contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits, ReentrancyGuard {
-  using SafeMath for uint256;
+contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, ReentrancyGuard {
+  using FixidityLib for FixidityLib.Fraction;
   using FractionUtil for FractionUtil.Fraction;
+  using SafeMath for uint256;
   using IntegerSortedLinkedList for SortedLinkedList.List;
   using BytesLib for bytes;
+
+  uint256 constant private FIXED_HALF = 500000000000000000000000;
 
   // TODO(asa): Consider a delay stage.
   enum ProposalStage {
@@ -76,10 +80,10 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   }
 
   struct ContractConstitution {
-    FractionUtil.Fraction defaultThreshold;
+    FixidityLib.Fraction defaultThreshold;
     // Maps a function ID to a corresponding passing function, overriding the
     // default.
-    mapping(bytes4 => FractionUtil.Fraction) functionThresholds;
+    mapping(bytes4 => FixidityLib.Fraction) functionThresholds;
   }
 
   struct StageDurations {
@@ -139,8 +143,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   event ConstitutionSet(
     address indexed destination,
     bytes4 indexed functionId,
-    uint256 numerator,
-    uint256 denominator
+    uint256 threshold
   );
 
   event ProposalQueued(
@@ -331,31 +334,28 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
    * @param destination The destination of proposals for which this threshold should apply.
    * @param functionId The function ID of proposals for which this threshold should apply. Zero
    *   will set the default.
-   * @param numerator The numerator of the threshold.
-   * @param denominator The denominator of the threshold.
+   * @param threshold The threshold.
    * @dev If no constitution is explicitly set the default is a simple majority, i.e. 1:2.
    */
   function setConstitution(
     address destination,
     bytes4 functionId,
-    uint256 numerator,
-    uint256 denominator
+    uint256 threshold
   )
     external
     onlyOwner
   {
     // TODO(asa): https://github.com/celo-org/celo-monorepo/pull/3414#discussion_r283588332
-    require(destination != address(0) && numerator > 0 && denominator > 0);
-    FractionUtil.Fraction memory threshold = FractionUtil.Fraction(numerator, denominator);
-    FractionUtil.Fraction memory majority = FractionUtil.Fraction(1, 2);
-    FractionUtil.Fraction memory unanimous = FractionUtil.Fraction(1, 1);
-    require(threshold.isGreaterThan(majority) && threshold.isLessThanOrEqualTo(unanimous));
+    require(destination != address(0));
+    // Threshold has to be greater than majority and not greater than unaninimty
+    require(threshold > FIXED_HALF && threshold <= FixidityLib.fixed1().unwrap());
     if (functionId == 0) {
-      constitution[destination].defaultThreshold = threshold;
+      constitution[destination].defaultThreshold = FixidityLib.wrap(threshold);
     } else {
-      constitution[destination].functionThresholds[functionId] = threshold;
+      constitution[destination].functionThresholds[functionId] =
+        FixidityLib.wrap(threshold);
     }
-    emit ConstitutionSet(destination, functionId, numerator, denominator);
+    emit ConstitutionSet(destination, functionId, threshold);
   }
 
   /**
@@ -537,6 +537,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     VoteValue value
   )
     external
+    nonReentrant
     returns (bool)
   {
     address account = getAccountFromVoter(msg.sender);
@@ -627,7 +628,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   }
 
   /**
-   * @notice Withdraws refunded Celo Gold deposits.
+   * @notice Withdraws refunded Celo Gold commitments.
    * @return Whether or not the withdraw was successful.
    */
   function withdraw() external nonReentrant returns (bool) {
@@ -660,25 +661,6 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
    */
   function getExecutionStageDuration() external view returns (uint256) {
     return stageDurations.execution;
-  }
-
-  /**
-   * @notice Returns the constitution for a particular destination and function ID.
-   * @param destination The destination address to get the constitution for.
-   * @param functionId The function ID to get the constitution for, zero for the destination
-   *   default.
-   * @return The ratio of yes:no votes needed in order to pass the proposal.
-   */
-  function getConstitution(
-    address destination,
-    bytes4 functionId
-  )
-    external
-    view
-    returns (uint256, uint256)
-  {
-    FractionUtil.Fraction memory threshold = _getConstitution(destination, functionId);
-    return (threshold.numerator, threshold.denominator);
   }
 
   /**
@@ -891,17 +873,29 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
    */
   function isProposalPassing(uint256 proposalId) public view returns (bool) {
     Proposal storage proposal = proposals[proposalId];
-    // yesRatio can be undefined, which is not a problem for isGreaterThan
+
+    uint256 yesNoVotes = proposal.votes.yes.add(proposal.votes.no);
+    if (yesNoVotes == 0) {
+      return false;
+    }
+    // We use FractionUtil fractions instead of Fixidity because we would need
+    // to use FixidityLib.divide here, and yesNoVotes could easily be greater
+    // than maxFixedDivisor.
+    // This fraction does not have any additional arithmetic done to it, so we
+    // don't need to worry about overflow of non-simplified fractions.
     FractionUtil.Fraction memory yesRatio = FractionUtil.Fraction(
       proposal.votes.yes,
-      proposal.votes.yes.add(proposal.votes.no)
+      yesNoVotes
     );
 
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
       bytes4 functionId = extractFunctionSignature(proposal.transactions[i].data);
-      FractionUtil.Fraction memory threshold = _getConstitution(
+      FixidityLib.Fraction memory thresholdFixed = _getConstitution(
         proposal.transactions[i].destination,
         functionId
+      );
+      FractionUtil.Fraction memory threshold = FractionUtil.Fraction(
+        thresholdFixed.unwrap(), FixidityLib.fixed1().unwrap()
       );
       if (yesRatio.isLessThanOrEqualTo(threshold)) {
         return false;
@@ -1012,6 +1006,17 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
     return proposal.timestamp > 0;
   }
 
+  function getConstitution(
+    address destination,
+    bytes4 functionId
+  )
+    external
+    view
+    returns (uint256)
+  {
+    return _getConstitution(destination, functionId).unwrap();
+  }
+
   /**
    * @notice Returns the constitution for a particular destination and function ID.
    * @param destination The destination address to get the constitution for.
@@ -1025,13 +1030,13 @@ contract Governance is IGovernance, Ownable, Initializable, UsingBondedDeposits,
   )
     private
     view
-    returns (FractionUtil.Fraction memory)
+    returns (FixidityLib.Fraction memory)
   {
     // Default to a simple majority.
-    FractionUtil.Fraction memory threshold = FractionUtil.Fraction(1, 2);
-    if (constitution[destination].functionThresholds[functionId].exists()) {
+    FixidityLib.Fraction memory threshold = FixidityLib.wrap(FIXED_HALF);
+    if (constitution[destination].functionThresholds[functionId].unwrap() != 0) {
       threshold = constitution[destination].functionThresholds[functionId];
-    } else if (constitution[destination].defaultThreshold.exists()) {
+    } else if (constitution[destination].defaultThreshold.unwrap() != 0) {
       threshold = constitution[destination].defaultThreshold;
     }
     return threshold;

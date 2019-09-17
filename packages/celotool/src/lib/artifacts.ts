@@ -1,13 +1,8 @@
 /* tslint:disable: no-console */
-import {
-  doCheckOrPromptIfStagingOrProduction,
-  envVar,
-  execCmd,
-  fetchEnv,
-  isProduction,
-} from '@celo/celotool/src/lib/utils'
 import { existsSync, mkdirSync, readFileSync, writeFile } from 'fs'
 import { promisify } from 'util'
+import { doCheckOrPromptIfStagingOrProduction, envVar, fetchEnv, isProduction } from './env-utils'
+import { execCmd } from './utils'
 
 export const CONTRACTS_TO_COPY = [
   'Attestations',

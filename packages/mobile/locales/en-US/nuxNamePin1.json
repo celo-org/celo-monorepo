@@ -5,14 +5,14 @@
   "secureAsset":
     "Celo keeps your assets secure and enables you to send and receive value with anyone",
   "stableAsset":
-    "Celo Dollars are a stable digital asset that tracks to the value of the US Dollar",
+    "{{CeloDollars}} are a stable digital asset that tracks to the value of the US {{Dollar}}",
   "verifyNumber": "Verify your phone number so other Celo users can find you and send you value",
   "syncNetwork": "Syncing with Network",
   "welcomeCelo": "Welcome to Celo Wallet",
   "chooseCountryCode": "Country Code",
+  "chooseCountry": "Country",
   "joinText": {
-    "0":
-      "Welcome to Celo Wallet, a digital wallet that allows you to easily send, receive, and save value.",
+    "0": "The Celo Wallet helps you to send, receive, and save value on the Celo Network.",
     "1":
       "By joining this network, you give us permission to collect anonymous information about how you use the app. Additionally, if you verify your phone number, an obfuscated copy of it will be stored on the Celo Network. Learn more at ",
     "2": "celo.org/terms"
@@ -41,9 +41,8 @@
     },
     "inviteAccepted": "🎉 Invite Accepted!",
     "askForInvite": {
-      "0": "Don't have a code? ",
-      "1": "Ask someone with Celo Wallet for an invite or sign up for an account at ",
-      "2": "celo.org/build/wallet"
+      "0": "Request an invite from someone with Celo Wallet or sign up for the Testnet at ",
+      "1": "celo.org/build/wallet"
     }
   },
   "enterFullName": "Please enter your first and last name",
@@ -51,14 +50,14 @@
   "InvitationCode": "Invitation Code",
   "optIn": "Opt In",
   "submitting": "Submitting ...",
-  "haveWallet": "Already have a Celo wallet? ",
-  "importIt": "Import it",
+  "importIt": "Import Existing Wallet",
   "cancel": "Cancel",
   "important": "Important",
   "createPin": {
     "title": "Create 6 digit PIN Code",
     "intro": "Create a PIN to secure your Celo Wallet.",
-    "why": "You'll need this PIN occasionally when you want to send Celo Dollars to your friends.",
+    "why":
+      "You'll need this PIN occasionally when you want to send {{CeloDollars}} to your friends.",
     "warn":
       "Write down your 6 digit PIN code & secure it somewhere safe. You will be asked for this later to access your wallet.",
     "yourPin": "Your PIN"
@@ -73,12 +72,14 @@
     "submit": "Submit"
   },
   "systemAuth": {
-    "title": "Set up Security",
+    "title": "Secure Your Phone",
     "secure": "Adding a PIN to your phone helps to keep your funds in Celo safe and secure.",
     "intro":
       "We will need you to input your device's lockscreen PIN or thumbprint, if your device supports it.",
     "why":
-      "We need this additional level of protection to ensure that the value in your wallet stays secure."
+      "We need this additional level of protection to ensure that the value in your wallet stays secure.",
+    "summary":
+      "Celo requires phones to be secured with a PIN or fingerprint. Your device’s lock helps ensure that the funds in your wallet are protected."
   },
   "goToSystemSecuritySettingsActionLabel": "Go to security",
   "enableSystemScreenLockFailedMessage": "Failed to enable screen lock",
@@ -88,9 +89,9 @@
     "Please enable lockscreen to use Celo. If you disable lock-screen in the future, you will need your backup key to access your account.",
   "importContactsPermission": {
     "title": "Import Contacts",
-    "0": "Celo is better with others.",
-    "1":
-      "Importing your contacts allows you to easily send and request payments from your community and see who is already using Celo.",
+    "0":
+      "Connecting your address book makes it easy to send and request payments with your friends. Otherwise, you’ll have to enter their info individually.",
+    "1": "Don’t worry—connecting does not send invites to your contacts.",
     "enable": "Enable Contact Access",
     "loading": "Finding friends on Celo..."
   },

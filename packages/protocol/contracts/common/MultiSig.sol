@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 /* solhint-disable no-inline-assembly, avoid-low-level-calls, func-name-mixedcase, func-order */
 
 import "./Initializable.sol";
@@ -108,10 +108,10 @@ contract MultiSig is Initializable {
   /// @param _owners List of initial owners.
   /// @param _required Number of required confirmations.
   function initialize(
-    address[] memory _owners,
+    address[] calldata _owners,
     uint256 _required
   )
-    public
+    external
     initializer
     validRequirement(_owners.length, _required)
   {
@@ -129,7 +129,7 @@ contract MultiSig is Initializable {
   /// @dev Allows to add a new owner. Transaction has to be sent by wallet.
   /// @param owner Address of new owner.
   function addOwner(address owner)
-    public
+    external
     onlyWallet
     ownerDoesNotExist(owner)
     notNull(owner)
@@ -143,7 +143,7 @@ contract MultiSig is Initializable {
   /// @dev Allows to remove an owner. Transaction has to be sent by wallet.
   /// @param owner Address of owner.
   function removeOwner(address owner)
-    public
+    external
     onlyWallet
     ownerExists(owner)
   {
@@ -163,7 +163,7 @@ contract MultiSig is Initializable {
   /// @param owner Address of owner to be replaced.
   /// @param newOwner Address of new owner.
   function replaceOwner(address owner, address newOwner)
-    public
+    external
     onlyWallet
     ownerExists(owner)
     ownerDoesNotExist(newOwner)
@@ -196,8 +196,8 @@ contract MultiSig is Initializable {
   /// @param value Transaction ether value.
   /// @param data Transaction data payload.
   /// @return Returns transaction ID.
-  function submitTransaction(address destination, uint value, bytes memory data)
-    public
+  function submitTransaction(address destination, uint value, bytes calldata data)
+    external
     returns (uint transactionId)
   {
     transactionId = addTransaction(destination, value, data);
@@ -220,7 +220,7 @@ contract MultiSig is Initializable {
   /// @dev Allows an owner to revoke a confirmation for a transaction.
   /// @param transactionId Transaction ID.
   function revokeConfirmation(uint transactionId)
-    public
+    external
     ownerExists(msg.sender)
     confirmed(transactionId, msg.sender)
     notExecuted(transactionId)
@@ -329,7 +329,7 @@ contract MultiSig is Initializable {
   /// @param transactionId Transaction ID.
   /// @return Number of confirmations.
   function getConfirmationCount(uint transactionId)
-    public
+    external
     view
     returns (uint count)
   {
@@ -343,7 +343,7 @@ contract MultiSig is Initializable {
   /// @param executed Include executed transactions.
   /// @return Total number of transactions after filters are applied.
   function getTransactionCount(bool pending, bool executed)
-    public
+    external
     view
     returns (uint count)
   {
@@ -356,7 +356,7 @@ contract MultiSig is Initializable {
   /// @dev Returns list of owners.
   /// @return List of owner addresses.
   function getOwners()
-    public
+    external
     view
     returns (address[] memory)
   {
@@ -367,7 +367,7 @@ contract MultiSig is Initializable {
   /// @param transactionId Transaction ID.
   /// @return Returns array of owner addresses.
   function getConfirmations(uint transactionId)
-    public
+    external
     view
     returns (address[] memory _confirmations)
   {
@@ -391,7 +391,7 @@ contract MultiSig is Initializable {
   /// @param executed Include executed transactions.
   /// @return Returns array of transaction IDs.
   function getTransactionIds(uint from, uint to, bool pending, bool executed)
-    public
+    external
     view
     returns (uint[] memory _transactionIds)
   {

@@ -22,7 +22,7 @@ export async function deploy(CELO_ENV: string) {
     'firebase',
     'deploy',
     '--only',
-    `database,hosting,functions:handleVerificationRequest${CELO_ENV}`,
+    `database,functions:handleVerificationRequest${CELO_ENV}`,
   ])
 }
 
@@ -73,8 +73,8 @@ export async function deleteDeployment(CELO_ENV: string) {
 async function exec(command: string, args: string[]) {
   return new Promise((resolve, reject) => {
     const proc = spawn(command, args, {
-      stdio: [process.stdout, process.stderr],
       cwd: __dirname,
+      shell: true,
     })
     proc.on('error', (error: any) => {
       reject(error)
@@ -86,5 +86,13 @@ async function exec(command: string, args: string[]) {
         resolve()
       }
     })
+    proc.stdout.on('data', (data: any) => {
+      console.log(data)
+    })
+    proc.stderr.on('data', (data: any) => {
+      console.error(data)
+    })
+  }).catch((data) => {
+    console.error(data)
   })
 }

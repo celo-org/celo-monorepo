@@ -1,4 +1,10 @@
-import { createInviteCode, extractValidInviteCode, isValidPrivateKey } from 'src/invite/utils'
+import RNInstallReferrer from 'react-native-install-referrer'
+import {
+  createInviteCode,
+  extractValidInviteCode,
+  getInviteCodeFromReferrerData,
+  isValidPrivateKey,
+} from 'src/invite/utils'
 
 export const VALID_INVITE =
   'Something something pFCr5NAAf/vUcWypJiQFnF6DHI+6vCGxMhhShki07ow= another thing else'
@@ -43,7 +49,7 @@ describe(extractValidInviteCode, () => {
           'You can install the Celo application from the following link: https://celo.page.link/XYyu9Mi7sz4YNsiM7'
       )
     ).toBe('0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724')
-    // And now in ES-AR
+    // And now in es_419
     expect(
       extractValidInviteCode(
         'Hola Izzy! Me gustaría invitarte a que te unas a la red de pagos de Celo. ' +
@@ -79,5 +85,48 @@ describe(isValidPrivateKey, () => {
     expect(
       isValidPrivateKey('121129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724')
     ).toBe(false)
+  })
+})
+
+const referrerData = {
+  clickTimestamp: '0',
+  installTimestamp: '0',
+}
+
+describe(getInviteCodeFromReferrerData, () => {
+  it('returns null with invalid data', async () => {
+    RNInstallReferrer.getReferrer.mockResolvedValue({ ...referrerData, installReferrer: '' })
+    expect(await getInviteCodeFromReferrerData()).toBeNull()
+
+    RNInstallReferrer.getReferrer.mockResolvedValue({ ...referrerData, installReferrer: 'x=a' })
+    expect(await getInviteCodeFromReferrerData()).toBeNull()
+  })
+
+  it('gets a valid code from referrer data', async () => {
+    RNInstallReferrer.getReferrer.mockResolvedValue({
+      ...referrerData,
+      installReferrer:
+        'invite-code=0xa450abe4d0007ffbd4716ca92624059c5e831c8fbabc21b13218528648b4ee8c',
+    })
+    expect(await getInviteCodeFromReferrerData()).toBe(
+      '0xa450abe4d0007ffbd4716ca92624059c5e831c8fbabc21b13218528648b4ee8c'
+    )
+
+    RNInstallReferrer.getReferrer.mockResolvedValue({
+      ...referrerData,
+      installReferrer:
+        'invite-code%3D0xa450abe4d0007ffbd4716ca92624059c5e831c8fbabc21b13218528648b4ee8c',
+    })
+    expect(await getInviteCodeFromReferrerData()).toBe(
+      '0xa450abe4d0007ffbd4716ca92624059c5e831c8fbabc21b13218528648b4ee8c'
+    )
+
+    RNInstallReferrer.getReferrer.mockResolvedValue({
+      ...referrerData,
+      installReferrer: 'invite-code%3D0ZdSckCiUkiUy5cQMuEv7DucMR%2BEewMx7fmyDd3rm4U%3D',
+    })
+    expect(await getInviteCodeFromReferrerData()).toBe(
+      '0ZdSckCiUkiUy5cQMuEv7DucMR+EewMx7fmyDd3rm4U='
+    )
   })
 })

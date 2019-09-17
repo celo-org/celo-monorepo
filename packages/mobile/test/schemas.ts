@@ -8,7 +8,7 @@ const vNeg1Schema = {
     numberVerified: false,
     error: null,
     dismissErrorAfter: null,
-    language: null,
+    language: 'es-AR',
     doingBackupFlow: false,
     message: null,
     dismissMessageAfter: null,
@@ -79,6 +79,7 @@ const vNeg1Schema = {
     paymentRequests: [],
     showFakeData: false,
     backupCompleted: false,
+    backupDelayedTime: 0,
     dismissedEarnRewards: false,
     dismissedInviteFriends: false,
   },
@@ -94,7 +95,7 @@ const vNeg1Schema = {
   },
 }
 
-const v0Schema = {
+export const v0Schema = {
   ...vNeg1Schema,
   identity: {
     ...vNeg1Schema.identity,
@@ -115,8 +116,29 @@ const v0Schema = {
   recipients: {
     recipientCache: {},
   },
+  web3: {
+    ...vNeg1Schema.web3,
+    syncProgress: {
+      startingBlock: 0,
+      currentBlock: 0,
+      highestBlock: 0,
+    },
+  },
+  localCurrency: {
+    isLoading: false,
+    symbol: 'MXN',
+    exchangeRate: 1.33,
+  },
+}
+
+const v1Schema = {
+  ...v0Schema,
+  app: {
+    ...v0Schema.app,
+    language: 'es-419',
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
-  return v0Schema as Partial<RootState>
+  return v1Schema as Partial<RootState>
 }

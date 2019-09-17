@@ -69,9 +69,6 @@ android/app/celo-release-key.keystore
 
 .vscode/
 
-# geth user configs
-src/geth/additionalNetworks.ts
-
 # End to end tests
 e2e/tmp/
 e2e_run.log
@@ -83,6 +80,7 @@ android/app/src/staging/google-services.json
 android/app/src/integration/google-services.json
 android/app/src/alfajores/google-services.json
 android/app/src/debug/google-services.json
+android/app/src/pilot/google-services.json
 secrets.json
 android/sentry.properties
 ios/sentry.properties

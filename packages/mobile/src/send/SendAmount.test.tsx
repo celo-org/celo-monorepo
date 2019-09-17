@@ -69,8 +69,8 @@ describe('SendAmount', () => {
             showError={jest.fn()}
             hideAlert={jest.fn()}
             fetchPhoneAddresses={fetchPhoneAddresses}
-            dollarBalance={new BigNumber(1)}
-            suggestedFeeDollars={new BigNumber(1)}
+            dollarBalance={'1'}
+            estimateFeeDollars={new BigNumber(1)}
             e164NumberToAddress={{ [mockE164Number2]: mockAccount2 }}
             defaultCountryCode={'+1'}
             feeType={FeeType.SEND}
@@ -108,7 +108,7 @@ describe('SendAmount', () => {
 
     it('handles commas', () => {
       numeral.locale('es')
-      const wrapper = getWrapper('es-AR')
+      const wrapper = getWrapper('es_419')
       const input = wrapper.getByPlaceholder(AMOUNT_PLACEHOLDER)
       fireEvent.changeText(input, '4,0')
       expect(wrapper.queryAllByDisplayValue('4,0')).toHaveLength(1)

@@ -10,7 +10,7 @@ This approach, which is based on [EIP-1559](https://eips.ethereum.org/EIPS/eip-1
 
 The minimum gas price is calculated as follows:
 
-$$MinGasPrice_1 = MinGasPrice_0 ∗ ( 1 + ( BlockDensity_0 − TargetDensity ) \* AdjustementSpeed )$$
+$$MinGasPrice_1 = MinGasPrice_0 \times ( 1 + ( BlockDensity_0 − TargetDensity ) \times AdjustementSpeed )$$
 
 With:
 

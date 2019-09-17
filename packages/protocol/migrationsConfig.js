@@ -1,22 +1,25 @@
+const BigNumber = require('bignumber.js')
 const minimist = require('minimist')
 const path = require('path')
+
+// Almost never use exponential notation in toString
+// http://mikemcl.github.io/bignumber.js/#exponential-at
+BigNumber.config({ EXPONENTIAL_AT: 1e9 })
 
 const DefaultConfig = {
   attestations: {
     attestationExpirySeconds: 60 * 60, // 1 hour,
     attestationRequestFeeInDollars: 0.05,
   },
-  bondedDeposits: {
+  lockedGold: {
     maxNoticePeriod: 60 * 60 * 24 * 365 * 3, // 3 years
   },
   oracles: {
     reportExpiry: 60 * 60, // 1 hour
   },
   exchange: {
-    spreadNumerator: 5,
-    spreadDenominator: 1000,
-    reserveFractionNumerator: 1,
-    reserveFractionDenominator: 1,
+    spread: 5 / 1000,
+    reserveFraction: 1,
     updateFrequency: 3600,
     minimumReports: 1,
   },
@@ -31,18 +34,9 @@ const DefaultConfig = {
   },
   gasPriceMinimum: {
     initialMinimum: 10000,
-    targetDensity: {
-      numerator: 1,
-      denominator: 2,
-    },
-    adjustmentSpeed: {
-      numerator: 1,
-      denominator: 2,
-    },
-    infrastructureFraction: {
-      numerator: 1,
-      denominator: 2,
-    },
+    targetDensity: 1 / 2,
+    adjustmentSpeed: 1 / 2,
+    infrastructureFraction: 1 / 2,
   },
   registry: {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
@@ -58,15 +52,15 @@ const DefaultConfig = {
     tokenName: 'Celo Dollar',
     tokenSymbol: 'cUSD',
     // 52nd root of 1.005, equivalent to 0.5% annual inflation
-    inflationRateNumerator: 100009591886,
-    inflationRateDenominator: 100000000000,
+    inflationRate: 1.00009591886,
     inflationPeriod: 7 * 24 * 60 * 60, // 1 week
+    initialAccounts: [],
   },
   validators: {
     minElectableValidators: '10',
     maxElectableValidators: '100',
-    minBondedDepositValue: '1000000000000000000', // 1 gold
-    minBondedDepositNoticePeriod: 60 * 24 * 60 * 60, // 60 days
+    minLockedGoldValue: '1000000000000000000', // 1 gold
+    minLockedGoldNoticePeriod: 60 * 24 * 60 * 60, // 60 days
 
     validatorKeys: [],
     // We register a single validator group during the migration.
@@ -76,7 +70,7 @@ const DefaultConfig = {
 }
 
 const linkedLibraries = {
-  LinkedList: ['AddressLinkedList', 'SortedLinkedList'],
+  LinkedList: ['AddressLinkedList', 'SortedLinkedList', 'LinkedListTest'],
   SortedLinkedList: [
     'AddressSortedLinkedList',
     'IntegerSortedLinkedList',
@@ -87,17 +81,15 @@ const linkedLibraries = {
   AddressSortedLinkedList: ['Validators'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
-  Signatures: ['BondedDeposits', 'Escrow'],
+  Signatures: ['LockedGold', 'Escrow'],
 }
 
 const argv = minimist(process.argv.slice(2), {
-  string: ['migration_override', 'keys', 'build_directory'],
+  string: ['migration_override', 'build_directory'],
   default: {
-    keys: '',
     build_directory: path.join(__dirname, 'build'),
   },
 })
-const validatorKeys = argv.keys ? argv.keys.split(',') : []
 
 const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
 const config = {}
@@ -105,8 +97,6 @@ const config = {}
 for (const key of Object.keys(DefaultConfig)) {
   config[key] = { ...DefaultConfig[key], ...migrationOverride[key] }
 }
-
-config.validators.validatorKeys = validatorKeys
 
 module.exports = {
   build_directory: argv.build_directory,

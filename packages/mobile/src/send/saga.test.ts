@@ -2,7 +2,6 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { Screens } from 'src/navigator/Screens'
 import { BarcodeTypes } from 'src/qrcode/utils'
@@ -101,7 +100,7 @@ describe(watchQrCodeDetections, () => {
     await expectSaga(watchQrCodeDetections)
       .provide([[select(addressToE164NumberSelector), {}], [select(recipientCacheSelector), {}]])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
-      .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS, ALERT_BANNER_DURATION))
+      .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
       .silentRun()
     expect(navigate).not.toHaveBeenCalled()
   })
@@ -113,7 +112,7 @@ describe(watchQrCodeDetections, () => {
     await expectSaga(watchQrCodeDetections)
       .provide([[select(addressToE164NumberSelector), {}], [select(recipientCacheSelector), {}]])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
-      .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS, ALERT_BANNER_DURATION))
+      .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
       .silentRun()
     expect(navigate).not.toHaveBeenCalled()
   })
@@ -126,7 +125,7 @@ describe(watchQrCodeDetections, () => {
     await expectSaga(watchQrCodeDetections)
       .provide([[select(addressToE164NumberSelector), {}], [select(recipientCacheSelector), {}]])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
-      .put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS, ALERT_BANNER_DURATION))
+      .put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
       .silentRun()
     expect(navigate).not.toHaveBeenCalled()
   })

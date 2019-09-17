@@ -233,8 +233,10 @@ export async function requestAndRetrieveAttestations(
       account
     )
 
+    CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_start)
     // Check if we have a sufficient set now by fetching the new total set
     attestations = await getActionableAttestations(attestationsContract, e164NumberHash, account)
+    CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_finish)
   }
 
   return attestations
@@ -360,6 +362,7 @@ function attestationCodeReceiver(
 
       Logger.debug(TAG + '@attestationCodeReceiver', `Received code for issuer ${issuer}`)
 
+      CeloAnalytics.track(CustomEventNames.verification_validate_code_start, { issuer })
       const isValidRequest = yield call(
         validateAttestationCode,
         attestationsContract,
@@ -368,6 +371,8 @@ function attestationCodeReceiver(
         issuer,
         code
       )
+      CeloAnalytics.track(CustomEventNames.verification_validate_code_finish, { issuer })
+
       if (isValidRequest === NULL_ADDRESS) {
         throw new Error('Code is not valid')
       }

@@ -86,6 +86,7 @@ class LanguageScreen extends React.Component<Props, State> {
         onSubmit={this.onSubmit}
         isSubmitDisabled={!this.state.selectedAnswer}
         currentSelected={this.state.selectedAnswer}
+        languages={[{ name: 'English', code: 'en-US' }, { name: 'Español (AR)', code: 'es-AR' }]}
         t={this.props.t}
       />
     )

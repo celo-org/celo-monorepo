@@ -7,6 +7,7 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import { pincodeSet, setPin } from 'src/account/actions'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -14,7 +15,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
-import { ALERT_BANNER_DURATION, SUPPORTS_KEYSTORE } from 'src/config'
+import { SUPPORTS_KEYSTORE } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import BackupIcon from 'src/icons/BackupIcon'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
@@ -43,12 +44,18 @@ interface State {
 
 type Props = DispatchProps & WithNamespaces
 
-const mapDispatchToProps = {
-  showError,
-  hideAlert,
-  pincodeSet,
-  setPin,
-}
+// Use bindActionCreators to workaround a typescript error with the shorthand syntax with redux-thunk actions
+// see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37369
+const mapDispatchToProps = (dispatch: any) =>
+  bindActionCreators(
+    {
+      showError,
+      hideAlert,
+      pincodeSet,
+      setPin,
+    },
+    dispatch
+  )
 
 export class Pincode extends React.Component<Props, State> {
   static navigationOptions = nuxNavigationOptions
@@ -104,7 +111,7 @@ export class Pincode extends React.Component<Props, State> {
       this.props.pincodeSet()
       navigate(Screens.EnterInviteCode)
     } else {
-      this.props.showError(ErrorMessages.INCORRECT_PIN, ALERT_BANNER_DURATION)
+      this.props.showError(ErrorMessages.INCORRECT_PIN)
     }
   }
 
@@ -196,6 +203,7 @@ export class Pincode extends React.Component<Props, State> {
       case Steps.PIN_REENTER:
         return (
           <Button
+            testID="Pincode-ReEnter"
             text={t('verifyPin.finalPin')}
             style={style.button}
             standard={true}
@@ -207,6 +215,7 @@ export class Pincode extends React.Component<Props, State> {
       case Steps.PIN_ENTER:
         return (
           <Button
+            testID="Pincode-Enter"
             text={t('continue')}
             style={style.button}
             onPress={this.stepForward}
@@ -218,6 +227,7 @@ export class Pincode extends React.Component<Props, State> {
       default:
         return (
           <Button
+            testID="Pincode-Education"
             text={t('continue')}
             style={style.button}
             onPress={this.onPressEducation}
@@ -234,9 +244,9 @@ export class Pincode extends React.Component<Props, State> {
     }
 
     return (
-      <View style={style.pincodeContainer}>
+      <View style={style.container}>
         <DevSkipButton nextScreen={Screens.EnterInviteCode} />
-        <ScrollView>
+        <ScrollView contentContainerStyle={style.scrollContainer}>
           <BackupIcon style={style.pincodeLogo} />
           {this.renderStep()}
         </ScrollView>
@@ -247,10 +257,14 @@ export class Pincode extends React.Component<Props, State> {
 }
 
 const style = StyleSheet.create({
-  pincodeContainer: {
+  container: {
     flex: 1,
     backgroundColor: 'white',
     justifyContent: 'space-between',
+  },
+  scrollContainer: {
+    padding: 20,
+    paddingTop: 0,
   },
   pincodeLogo: {
     alignSelf: 'center',

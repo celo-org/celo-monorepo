@@ -56,6 +56,7 @@ export enum CeloLinks {
   nodeDocs = 'https://docs.celo.org/getting-started/running-a-full-node',
   gettingStarted = 'https://docs.celo.org/getting-started/alfajores-testnet',
   gitHub = 'https://github.com/celo-org',
+  linkedIn = 'https://www.linkedin.com/company/celohq/',
   monorepo = 'https://github.com/celo-org/celo-monorepo',
   blockChainRepo = 'https://github.com/celo-org/celo-blockchain',
   playStoreWallet = 'https://play.google.com/store/apps/details?id=org.celo.mobile.alfajores',

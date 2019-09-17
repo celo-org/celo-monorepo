@@ -39,8 +39,8 @@ export interface RecipientWithMobileNumber extends IRecipient {
 
 export interface RecipientWithContact extends IRecipient {
   kind: RecipientKind.Contact
-  phoneNumberLabel: string
   contactId: string
+  phoneNumberLabel?: string
   thumbnailPath?: string
 }
 
@@ -186,8 +186,8 @@ export function getRecipientVerificationStatus(
   return getVerificationStatusFromPhoneNumber(recipient.e164PhoneNumber, e164NumberToAddress)
 }
 
-export function getRecipientThumbnail(recipient: Recipient) {
-  return recipient.kind === RecipientKind.Contact ? recipient.thumbnailPath : undefined
+export function getRecipientThumbnail(recipient?: Recipient) {
+  return recipient && recipient.kind === RecipientKind.Contact ? recipient.thumbnailPath : undefined
 }
 
 type PreparedRecipient = Recipient & {
