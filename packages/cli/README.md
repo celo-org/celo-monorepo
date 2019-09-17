@@ -35,7 +35,8 @@ This error implies that the `truffle` project is not initialized.
 Navigate to `celo-monorepo/packages/protocol` and initialize the truffle project.
 Make sure you do NOT overwrite any existing contracts, migrations or tests.
 
-```
+```bash
+> npm i -g truffle
 > truffle init
 This directory is non-empty...
 ? Proceed anyway? Yes
@@ -58,8 +59,14 @@ After doing this you should be able to continue the build process
 When running the `cli` against a full node, this can mean that the contract artifacts are out of date.
 Solution: switch to the `alfajores` branch and build the `celo-monorepo`.
 
+Go to the `celo-monorepo` root directory and
+
 ```bash
 > git checkout alfajores
+> yarn
 > yarn build
 > git checkout master
+> yarn
+> cd packages/cli
+> ./bin/run account:balance $CELO_ACCOUNT_ADDRESS
 ```
