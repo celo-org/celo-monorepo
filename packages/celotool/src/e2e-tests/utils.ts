@@ -317,16 +317,20 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
 }
 
 export async function migrateContracts(validatorPrivateKeys: string[], to: number = 1000) {
+  const migrationOverrides = {
+    validators: {
+      minElectableValidators: '1',
+      validatorKeys: validatorPrivateKeys.map(ensure0x),
+    },
+  }
   const args = [
     '--cwd',
     `${MonorepoRoot}/packages/protocol`,
     'init-network',
     '-n',
     'testing',
-    '-k',
-    validatorPrivateKeys.map(ensure0x).join(','),
     '-m',
-    '{ "validators": { "minElectableValidators": "1" } }',
+    JSON.stringify(migrationOverrides),
     '-t',
     to.toString(),
   ]
@@ -381,7 +385,7 @@ export async function initAndStartGeth(gethBinaryPath: string, instance: GethIns
   return startGeth(gethBinaryPath, instance)
 }
 
-export function getHooks(gethConfig: GethTestConfig) {
+export function getContext(gethConfig: GethTestConfig) {
   const mnemonic =
     'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
@@ -445,7 +449,14 @@ export function getHooks(gethConfig: GethTestConfig) {
 
   const after = () => killGeth()
 
-  return { before, after, restart, gethBinaryPath }
+  return {
+    validators,
+    hooks: { before, after, restart, gethBinaryPath },
+  }
+}
+
+export function getHooks(gethConfig: GethTestConfig) {
+  return getContext(gethConfig).hooks
 }
 
 export async function assertRevert(promise: any, errorMessage: string = '') {

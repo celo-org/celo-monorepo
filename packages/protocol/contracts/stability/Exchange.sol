@@ -167,7 +167,11 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     FixidityLib.Fraction memory denominator =
       FixidityLib.newFixed(sellTokenBucket).add(reducedSellAmount);
 
-    return numerator.divide(denominator).fromFixed();
+    // Can't use FixidityLib.divide because denominator can easily be greater
+    // than maxFixedDivisor.
+    // Fortunately, we expect an integer result, so integer division gives us as
+    // much precision as we could hope for.
+    return numerator.unwrap() / denominator.unwrap();
   }
 
   /**
@@ -193,7 +197,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     FixidityLib.Fraction memory denominator = FixidityLib.newFixed(buyTokenBucket.sub(buyAmount))
       .multiply(FixidityLib.fixed1().subtract(spread));
 
-    return numerator.divide(denominator).fromFixed();
+    // See comment in getBuyTokenAmount
+    return numerator.unwrap() / denominator.unwrap();
   }
 
   /**
@@ -273,7 +278,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     FixidityLib.Fraction memory denominator =
       FixidityLib.newFixed(sellTokenBucket).add(reducedSellAmount);
 
-    return numerator.divide(denominator).fromFixed();
+    // See comment in getBuyTokenAmount
+    return numerator.unwrap() / denominator.unwrap();
   }
 
   function getUpdatedBuckets() private view returns (uint256, uint256) {
