@@ -1,4 +1,3 @@
-import { TransactionsArgv } from '@celo/celotool/src/cmds/transactions'
 import {
   constructFunctionABICache,
   getContracts,
@@ -8,6 +7,7 @@ import {
 import { getWeb3Client } from 'src/lib/blockchain'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import * as yargs from 'yargs'
+import { TransactionsArgv } from '../transactions'
 
 export const command = 'describe <transactionHash>'
 

@@ -28,14 +28,12 @@ testWithGanache('Exchange Wrapper', (web3) => {
     expect(sellBucket.toNumber()).toBeGreaterThan(0)
   })
 
-  // TODO: fix, broken until Exchange.sol is fixed
-  test.skip('SBAT quoteUsdSell', () => expect(exchange.quoteUsdSell(ONE)).resolves.toBeBigNumber())
+  test('SBAT quoteUsdSell', () => expect(exchange.quoteUsdSell(ONE)).resolves.toBeBigNumber())
   test('SBAT quoteGoldSell', () => expect(exchange.quoteGoldSell(ONE)).resolves.toBeBigNumber())
   test('SBAT quoteUsdBuy', () => expect(exchange.quoteUsdBuy(ONE)).resolves.toBeBigNumber())
   test('SBAT quoteGoldBuy', () => expect(exchange.quoteGoldBuy(ONE)).resolves.toBeBigNumber())
 
-  // TODO: fix, broken until Exchange.sol is fixed
-  test.skip('SBAT sellDollar', async () => {
+  test('SBAT sellDollar', async () => {
     const goldAmount = await exchange.quoteUsdSell(ONE)
 
     const stableToken = await kit.contracts.getStableToken()

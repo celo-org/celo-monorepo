@@ -296,6 +296,9 @@ library FixidityLib {
    * might overflow. You can use multiply(x,reciprocal(y)) instead.
    * There is a loss of precision on division for the lower mulPrecision() decimals.
    * @dev
+   * NOTE: reverts if the dividend is greater than maxFixedDivisor (10**24,
+   * internally represented with 10**48). 10**6 * 10**18 (so a million units of
+   * a token in wei) is already too large.
    * Test divide(fixed1(),0) fails
    * Test divide(maxFixedDividend(),1) = maxFixedDividend()*(10^digits())
    * Test divide(maxFixedDividend()+1,1) throws
