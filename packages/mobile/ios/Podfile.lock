@@ -341,7 +341,7 @@ SPEC CHECKSUMS:
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
   react-native-camera: b322bc25f47536219473c6d00c666d221f7f2695
-  react-native-config: 55548054279d92e0e4566ea15a8b9b81028ec342
+  react-native-config: 8f6b2b9e017f6a5e92a97353c768e19e67294bb1
   react-native-contacts: 348958bb7da4399040b1eb45bfb7f6af08e61412
   react-native-keep-awake: abcf6d09d0cc5fe45df4a56a9382e25d10cff8b6
   react-native-mail: 021d8ee60e374609f5689ef354dc8e36839a9ba6
@@ -364,6 +364,6 @@ SPEC CHECKSUMS:
   SentryReactNative: 014e5b1684c30c31e6514a57e51eff26cf2b99f7
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: a1ad4a529579afc1541846c1593a0676c3f882ea
+PODFILE CHECKSUM: 5511c0e7a64e657a61367671d3ac425bf93d8673
 
 COCOAPODS: 1.7.5

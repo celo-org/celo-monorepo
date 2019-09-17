@@ -87,7 +87,7 @@
     "react-native-bip39": "git://github.com/celo-org/react-native-bip39#1488fa1",
     "react-native-camera": "^1.9.1",
     "react-native-clock-sync": "^1.0.0",
-    "react-native-config": "^0.11.7",
+    "react-native-config": "https://github.com/luggit/react-native-config#89a602b",
     "react-native-confirm-device-credentials": "^2.0.0",
     "react-native-contacts": "git://github.com/celo-org/react-native-contacts#4989b0b",
     "react-native-device-info": "^2.1.0",

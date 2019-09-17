@@ -24473,10 +24473,9 @@ react-native-clock-sync@^1.0.0:
   dependencies:
     react-native-ntp-client "0.5.5"
 
-react-native-config@^0.11.7:
+"react-native-config@https://github.com/luggit/react-native-config#89a602b":
   version "0.11.7"
-  resolved "https://registry.yarnpkg.com/react-native-config/-/react-native-config-0.11.7.tgz#a2b323f2ecd76a4df88cbb6bc86eaa2ef9febee7"
-  integrity sha512-dn5s+zhwLyE25vRT/vaEtLk/j8ZL1UZKvejORNDWakSwpOnLmFurFeaZV83IqkPlfWHXHFdsYe2IRYG1WN4WkQ==
+  resolved "https://github.com/luggit/react-native-config#89a602bf8be3808838403a97afaf915caeec76c2"
 
 react-native-confirm-device-credentials@^2.0.0:
   version "2.0.0"
