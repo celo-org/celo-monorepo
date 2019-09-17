@@ -12,11 +12,14 @@ const SELL_AMOUNTS = {
 }
 
 export async function handleExchangeQuery(web3Instance: Web3) {
-  const dollarMakerRate = await getExchangeRate(CURRENCY_ENUM.DOLLAR, web3Instance)
-  writeExchangeRatePair(CURRENCY_ENUM.DOLLAR, dollarMakerRate.toString(), Date.now().toString())
+  const fetchTime = Date.now().toString()
+  const [dollarMakerRate, goldMakerRate] = await Promise.all([
+    getExchangeRate(CURRENCY_ENUM.DOLLAR, web3Instance),
+    getExchangeRate(CURRENCY_ENUM.GOLD, web3Instance),
+  ])
 
-  const goldMakerRate = await getExchangeRate(CURRENCY_ENUM.GOLD, web3Instance)
-  writeExchangeRatePair(CURRENCY_ENUM.GOLD, goldMakerRate.toString(), Date.now().toString())
+  writeExchangeRatePair(CURRENCY_ENUM.DOLLAR, dollarMakerRate.toString(), fetchTime)
+  writeExchangeRatePair(CURRENCY_ENUM.GOLD, goldMakerRate.toString(), fetchTime)
 }
 
 export async function getExchangeRate(makerToken: CURRENCY_ENUM, web3Instance: Web3) {
