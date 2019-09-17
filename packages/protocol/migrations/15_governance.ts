@@ -25,9 +25,9 @@ const initializeArgs = async (networkName: string): Promise<any[]> => {
     config.governance.referendumStageDuration,
     config.governance.executionStageDuration,
     toFixed(config.governance.participationBaseline).toString(),
-    toFixed(config.governance.participationFloor).toString(),
-    toFixed(config.governance.updateCoefficient).toString(),
-    toFixed(config.governance.criticalBaselineLevel).toString(),
+    toFixed(config.governance.participationBaselineFloor).toString(),
+    toFixed(config.governance.participationBaselineUpdateFactor).toString(),
+    toFixed(config.governance.participationBaselineQuorumFactor).toString(),
   ]
 }
 
