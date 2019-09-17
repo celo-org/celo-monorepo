@@ -368,7 +368,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       isFraction(baselineUpdateFactor)
     );
     participationParameters.baselineUpdateFactor = FixidityLib.wrap(baselineUpdateFactor);
-    emit BaselineUpdateFactorSet(baselineUpdateFactor);
+    emit ParticipationBaselineUpdateFactorSet(baselineUpdateFactor);
   }
 
   /**
@@ -381,7 +381,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       isFraction(baselineQuorumFactor)
     );
     participationParameters.baselineQuorumFactor = FixidityLib.wrap(baselineQuorumFactor);
-    emit BaselineQuorumFactorSet(baselineQuorumFactor);
+    emit ParticipationBaselineQuorumFactorSet(baselineQuorumFactor);
   }
 
   /**
@@ -968,7 +968,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @param proposal The proposal struct.
    */
   function updateParticipationBaseline(Proposals.Proposal storage proposal) private {
-    FixidityLib.Fraction memory participation = FixidityLib.wrap(proposal.getParticipation());
+    FixidityLib.Fraction memory participation = proposal.getParticipation();
     FixidityLib.Fraction memory participationComponent = participation.multiply(
       participationParameters.baselineUpdateFactor
     );

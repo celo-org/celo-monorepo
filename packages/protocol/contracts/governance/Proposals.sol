@@ -214,25 +214,15 @@ library Proposals {
     return Stage.Approval;
   }
 
-    /**
-   * @notice Returns the number of votes cast on the proposal over the total number
-   *   of votes in the network as a fraction.
-   * @param proposal The proposal struct.
-   * @return The participation of the proposal.
-   */
-  function getParticipation(Proposal storage proposal) public view returns (uint256) {
-    return _getParticipation(proposal).unwrap();
-  }
-
   /**
    * @notice Returns the number of votes cast on the proposal over the total number
    *   of votes in the network as a fraction.
    * @param proposal The proposal struct.
    * @return The participation of the proposal.
    */
-  function _getParticipation(Proposal storage proposal) internal view returns (FixidityLib.Fraction memory) {
+  function getParticipation(Proposal storage proposal) internal view returns (FixidityLib.Fraction memory) {
     uint256 totalVotes = proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain);
-    return FixidityLib.newFixed(totalVotes).divide(FixidityLib.newFixed(proposal.networkWeight));
+    return FixidityLib.newFixedFraction(totalVotes, proposal.networkWeight);
   }
 
   /**
