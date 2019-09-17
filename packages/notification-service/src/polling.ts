@@ -1,7 +1,7 @@
 import AsyncPolling from 'async-polling'
 import { handleTransferNotifications } from './blockscout/transfers'
 import { EXCHANGE_POLLING_INTERVAL, POLLING_INTERVAL } from './config'
-import { getWeb3Instance, makeExchangeQuery } from './exchange/exchangeQuery'
+import { getWeb3Instance, handleExchangeQuery } from './exchange/exchangeQuery'
 import { handlePaymentRequests } from './handlers'
 
 export const notificationPolling = AsyncPolling(async (end) => {
@@ -18,7 +18,7 @@ export const notificationPolling = AsyncPolling(async (end) => {
 export const exchangePolling = AsyncPolling(async (end) => {
   try {
     const web3 = await getWeb3Instance()
-    await makeExchangeQuery(web3)
+    await handleExchangeQuery(web3)
   } catch (e) {
     console.error('Exchange polling failed', e)
   } finally {

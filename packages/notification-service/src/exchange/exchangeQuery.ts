@@ -6,28 +6,26 @@ import { WEB3_PROVIDER_URL } from '../config'
 import { writeExchangeRatePair } from '../firebase'
 
 // Amounts to estimate the exchange rate, as the rate varies based on transaction size
-const DOLLAR_SELL_AMOUNT_IN_WEI = new BigNumber(10000 * 1000000000000000000) // 100 dollars
-const GOLD_SELL_AMOUNT_IN_WEI = new BigNumber(10 * 1000000000000000000) // 10 gold
+const SELL_AMOUNTS = {
+  [CURRENCY_ENUM.DOLLAR]: new BigNumber(10000 * 1000000000000000000), // 100 dollars
+  [CURRENCY_ENUM.GOLD]: new BigNumber(10 * 1000000000000000000), // 10 gold
+}
 
-export async function makeExchangeQuery(web3Instance: Web3) {
-  const dollarMakerExchangeRate = await ContractUtils.getExchangeRate(
-    web3Instance,
-    CURRENCY_ENUM.DOLLAR,
-    new BigNumber(DOLLAR_SELL_AMOUNT_IN_WEI)
-  )
-  const goldMakerExchangeRate = await ContractUtils.getExchangeRate(
-    web3Instance,
-    CURRENCY_ENUM.GOLD,
-    new BigNumber(GOLD_SELL_AMOUNT_IN_WEI)
-  )
+export async function handleExchangeQuery(web3Instance: Web3) {
+  const dollarMakerRate = await getExchangeRate(CURRENCY_ENUM.DOLLAR, web3Instance)
+  writeExchangeRatePair(CURRENCY_ENUM.DOLLAR, dollarMakerRate.toString(), Date.now().toString())
 
-  const fetchTime = Date.now()
-  writeExchangeRatePair(
-    CURRENCY_ENUM.DOLLAR,
-    dollarMakerExchangeRate.toString(),
-    fetchTime.toString()
+  const goldMakerRate = await getExchangeRate(CURRENCY_ENUM.GOLD, web3Instance)
+  writeExchangeRatePair(CURRENCY_ENUM.GOLD, goldMakerRate.toString(), Date.now().toString())
+}
+
+export async function getExchangeRate(makerToken: CURRENCY_ENUM, web3Instance: Web3) {
+  const rate = await ContractUtils.getExchangeRate(
+    web3Instance,
+    makerToken,
+    SELL_AMOUNTS[makerToken]
   )
-  writeExchangeRatePair(CURRENCY_ENUM.GOLD, goldMakerExchangeRate.toString(), fetchTime.toString())
+  return rate
 }
 
 let web3: Web3
