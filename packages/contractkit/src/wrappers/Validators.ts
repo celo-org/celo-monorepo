@@ -3,7 +3,14 @@ import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
-import { BaseWrapper, CeloTransactionObject, proxyCall, proxySend, wrapSend } from './BaseWrapper'
+import {
+  BaseWrapper,
+  CeloTransactionObject,
+  proxyCall,
+  proxySend,
+  toNumber,
+  wrapSend,
+} from './BaseWrapper'
 
 export interface Validator {
   address: Address
@@ -35,7 +42,11 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
   registerValidatorGroup = proxySend(this.kit, this.contract.methods.registerValidatorGroup)
   validatorAddressFromCurrentSet = proxyCall(this.contract.methods.validatorAddressFromCurrentSet)
-  numberValidatorsInCurrentSet = proxyCall(this.contract.methods.numberValidatorsInCurrentSet)
+  numberValidatorsInCurrentSet = proxyCall(
+    this.contract.methods.numberValidatorsInCurrentSet,
+    undefined,
+    toNumber
+  )
 
   getVoteFrom: (validatorAddress: Address) => Promise<Address | null> = proxyCall(
     this.contract.methods.voters
