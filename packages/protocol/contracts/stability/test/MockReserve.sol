@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 // solhint-disable no-unused-vars
 
 import "../../common/interfaces/IERC20Token.sol";
