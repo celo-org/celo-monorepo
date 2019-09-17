@@ -727,8 +727,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return Returns `true` if account exists. Returns `false` otherwise.
    *         In particular it will return `false` if a delegate with given address exists.
    */
-  function existsAccount(address account) external view returns (bool) {
-    return isAccount(account);
+  function isAccount(address account) public view returns (bool) {
+    return (accounts[account].exists);
   }
 
   /**
@@ -736,13 +736,10 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param account The address of the delegate
    * @return Returns `true` if delegate exists. Returns `false` otherwise.
    */
-  function existsDelegate(address account) external view returns (bool) {
+  function isDelegate(address account) external view returns (bool) {
     return (delegations[account] != address(0));
   }
 
-  function isAccount(address account) internal view returns (bool) {
-    return (accounts[account].exists);
-  }
 
   function isNotAccount(address account) internal view returns (bool) {
     return (!accounts[account].exists);
