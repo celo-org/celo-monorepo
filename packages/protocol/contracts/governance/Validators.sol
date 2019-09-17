@@ -60,11 +60,16 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   LockedGoldCommitment private registrationRequirement;
   uint256 public minElectableValidators;
   uint256 public maxElectableValidators;
+  uint256 public electionThreshold; // Actually a fraction
 
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
 
   event MinElectableValidatorsSet(
     uint256 minElectableValidators
+  );
+
+  event ElectionThresholdSet(
+    uint256 electionThreshold
   );
 
   event MaxElectableValidatorsSet(
@@ -236,6 +241,27 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     registrationRequirement.value = value;
     registrationRequirement.noticePeriod = noticePeriod;
     emit RegistrationRequirementSet(value, noticePeriod);
+    return true;
+  }
+
+  /**
+   * @notice Sets the election threshold as a fraction.
+   * @param nominator Nominator of the election threshold.
+   * @param denominator Denominator of the election threshold.
+   * @return True uopn success.
+   */
+  function setElectionThreshold(
+    uint256 nominator,
+    uint256 denominator
+  )
+    external
+    onlyOwner
+    returns (bool)
+  {
+    FixidityLib.Fraction memory threshold = FixidityLib.newFixedFraction(nominator, denominator);
+    require(FixidityLib.lt(threshold, FixidityLib.newFixed(1)), "Election threshold must be lower than 100%");
+    electionThreshold = FixidityLib.unwrap(threshold);
+    emit ElectionThresholdSet(electionThreshold);
     return true;
   }
 
@@ -708,6 +734,11 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     uint256[] memory numMembersElected = new uint256[](electionGroups.length);
     uint256 totalNumMembersElected = 0;
     bool memberElectedInRound = true;
+
+    uint256 votesTotal = 0;
+    for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
+      votesTotal = votesTotal.add(votes.getValue(electionGroups[i]));
+    }
     // Assign a number of seats to each validator group.
     while (totalNumMembersElected < maxElectableValidators && memberElectedInRound) {
       memberElectedInRound = false;
@@ -715,6 +746,9 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       FixidityLib.Fraction memory maxN = FixidityLib.wrap(0);
       for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
         bool isWinningestGroupInRound = false;
+        uint256 numVotes = votes.getValue(electionGroups[i]);
+        FixidityLib.Fraction memory percentVotes = FixidityLib.newFixedFraction(numVotes, votesTotal);
+        if (FixidityLib.lt(percentVotes, FixidityLib.wrap(electionThreshold))) break;
         (maxN, isWinningestGroupInRound) = dHondt(maxN, electionGroups[i], numMembersElected[i]);
         if (isWinningestGroupInRound) {
           memberElectedInRound = true;
@@ -742,6 +776,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       }
     }
     return electedValidators;
+//    return new address[](10);
   }
   /* solhint-enable code-complexity */
 

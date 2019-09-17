@@ -153,6 +153,18 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
+  describe('#setElectionThreshold', () => {
+    it('should set the election threshold', async () => {
+      await validators.setElectionThreshold(1, 10)
+      const result = await validators.electionThreshold()
+      console.log(result.toString(10))
+      assertEqualBN(result, new BigNumber('1e+23'))
+    })
+    it('should revert when the threshold is larger than 100%', async () => {
+      await assertRevert(validators.setElectionThreshold(2, 1))
+    })
+  })
+
   describe('#setMinElectableValidators', () => {
     const newMinElectableValidators = minElectableValidators.plus(1)
     it('should set the minimum deposit', async () => {
@@ -1374,6 +1386,26 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(validators.getValidators())
+      })
+    })
+
+    describe('when election threshold is set to 20%', () => {
+      beforeEach(async () => {
+        await validators.setElectionThreshold(2, 10)
+        await validators.vote(group1, NULL_ADDRESS, NULL_ADDRESS, { from: voter1.address })
+        await validators.vote(group2, NULL_ADDRESS, group1, { from: voter2.address })
+        await validators.vote(group3, NULL_ADDRESS, group2, { from: voter3.address })
+      })
+
+      it('should return the elected validators from two largest parties', async () => {
+        assertAddressesEqual(await validators.getValidators(), [
+          validator1,
+          validator2,
+          validator3,
+          validator4,
+          validator5,
+          validator6,
+        ])
       })
     })
   })
