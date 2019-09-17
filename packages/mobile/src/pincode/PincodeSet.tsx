@@ -8,20 +8,18 @@ import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { pincodeSet, setPin } from 'src/account/actions'
+import { setPin, setPincodeSuccess } from 'src/account/actions'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
-import { SUPPORTS_KEYSTORE } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import BackupIcon from 'src/icons/BackupIcon'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import SystemAuth from 'src/pincode/SystemAuth'
 
 enum Steps {
   EDUCATION = 0,
@@ -32,7 +30,7 @@ enum Steps {
 interface DispatchProps {
   showError: typeof showError
   hideAlert: typeof hideAlert
-  pincodeSet: typeof pincodeSet
+  pincodeSet: typeof setPincodeSuccess
   setPin: typeof setPin
 }
 
@@ -51,13 +49,13 @@ const mapDispatchToProps = (dispatch: any) =>
     {
       showError,
       hideAlert,
-      pincodeSet,
+      pincodeSet: setPincodeSuccess,
       setPin,
     },
     dispatch
   )
 
-export class Pincode extends React.Component<Props, State> {
+export class PincodeSet extends React.Component<Props, State> {
   static navigationOptions = nuxNavigationOptions
 
   state = {
@@ -239,10 +237,6 @@ export class Pincode extends React.Component<Props, State> {
   }
 
   render() {
-    if (SUPPORTS_KEYSTORE) {
-      return <SystemAuth />
-    }
-
     return (
       <View style={style.container}>
         <DevSkipButton nextScreen={Screens.EnterInviteCode} />
@@ -318,5 +312,5 @@ export default componentWithAnalytics(
   connect<{}, DispatchProps>(
     null,
     mapDispatchToProps
-  )(withNamespaces(Namespaces.nuxNamePin1)(Pincode))
+  )(withNamespaces(Namespaces.nuxNamePin1)(PincodeSet))
 )

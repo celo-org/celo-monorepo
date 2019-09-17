@@ -1,5 +1,5 @@
+import { Platform } from 'react-native'
 import ConfirmDeviceCredentials from 'react-native-confirm-device-credentials'
-import { SUPPORTS_KEYSTORE } from 'src/config'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import Logger from 'src/utils/Logger'
@@ -7,10 +7,13 @@ import Logger from 'src/utils/Logger'
 // Any key name works.
 const keyName: string = 'celo_key_name'
 
-// Both setPin and getPin should be invoked only on API 23 and above.
+export function isPhoneAuthSupported() {
+  // only support on API 23 and above.
+  return Platform.Version >= 23
+}
 
 export const setPin = async (pin: string) => {
-  if (!SUPPORTS_KEYSTORE) {
+  if (!isPhoneAuthSupported) {
     throw Error('Keystore not supported on this device')
   }
   const humanReadableMessage: string = i18n.t('nuxNamePin1:enableScreenLockMessage')
@@ -53,7 +56,7 @@ export const setPin = async (pin: string) => {
 }
 
 export const getPin = async () => {
-  if (!SUPPORTS_KEYSTORE) {
+  if (!isPhoneAuthSupported) {
     throw Error('Keystore not supported on this device')
   }
   const isDeviceSecure: boolean = await ConfirmDeviceCredentials.isDeviceSecure()

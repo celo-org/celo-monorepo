@@ -62,7 +62,6 @@
       "Write down your 6 digit PIN code & secure it somewhere safe. You will be asked for this later to access your wallet.",
     "yourPin": "Your PIN"
   },
-  "enableSecurity": "Enable Security",
   "verifyPin": {
     "title": "Re-enter your PIN",
     "finalPin": "Create PIN"
@@ -71,15 +70,13 @@
     "title": "Enter 6 digit PIN Code",
     "submit": "Submit"
   },
-  "systemAuth": {
-    "title": "Secure Your Phone",
-    "secure": "Adding a PIN to your phone helps to keep your funds in Celo safe and secure.",
-    "intro":
-      "We will need you to input your device's lockscreen PIN or thumbprint, if your device supports it.",
-    "why":
-      "We need this additional level of protection to ensure that the value in your wallet stays secure.",
+  "pincodeEducation": {
+    "title": "Secure Your Wallet",
+    "intro": "To protect your account, The Celo Wallet requires a PIN.",
     "summary":
-      "Celo requires phones to be secured with a PIN or fingerprint. Your device’s lock helps ensure that the funds in your wallet are protected."
+      "You can use your phone’s existing authentication or create a new PIN for this application.",
+    "usePhoneAuth": "Use Phone Authentication",
+    "createNewPin": "UCreate New PIN"
   },
   "goToSystemSecuritySettingsActionLabel": "Go to security",
   "enableSystemScreenLockFailedMessage": "Failed to enable screen lock",

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import Pincode from 'src/pincode/Pincode'
+import Pincode from 'src/pincode/PincodeSet'
 import { createMockStore } from 'test/utils'
 
 describe('Pincode', () => {

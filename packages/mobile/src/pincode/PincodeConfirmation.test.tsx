@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import PincodeConfirmation from 'src/pincode/PincodeConfirmation'
+import PincodeConfirmation from 'src/pincode/PincodeConfirmationScreen'
 import { createMockNavigationProp, createMockStore } from 'test/utils'
 
 describe('PincodeConfirmation', () => {

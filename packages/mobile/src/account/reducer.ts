@@ -75,10 +75,15 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
         ...state,
         photosNUXClicked: true,
       }
-    case Actions.PINCODE_SET:
+    case Actions.SET_PINCODE_SUCCESS:
       return {
         ...state,
         pincodeSet: true,
+      }
+    case Actions.SET_PINCODE_FAILURE:
+      return {
+        ...state,
+        pincodeSet: false,
       }
     case Actions.SET_ACCOUNT_CREATION_TIME_ACTION:
       return {
