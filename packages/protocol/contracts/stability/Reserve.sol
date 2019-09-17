@@ -132,16 +132,6 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   /**
-   * @notice Burns all tokens held by the Reserve.
-   * @param token The address of the token to burn.
-   */
-  function burnToken(address token) external isStableToken(token) returns (bool) {
-    IStableToken stableToken = IStableToken(token);
-    require(stableToken.burn(stableToken.balanceOf(address(this))), "reserve token burn failed");
-    return true;
-  }
-
-  /**
    * @notice Transfer gold.
    * @param to The address that will receive the gold.
    * @param value The amount of gold to transfer.

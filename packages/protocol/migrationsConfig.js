@@ -85,7 +85,7 @@ const linkedLibraries = {
     'Validators',
   ],
   Proposals: ['Governance', 'ProposalsTest'],
-  LinkedList: ['AddressLinkedList', 'SortedLinkedList'],
+  LinkedList: ['AddressLinkedList', 'SortedLinkedList', 'LinkedListTest'],
   SortedLinkedList: [
     'AddressSortedLinkedList',
     'IntegerSortedLinkedList',
