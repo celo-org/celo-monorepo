@@ -5,16 +5,17 @@ import Web3 from 'web3'
 import { WEB3_PROVIDER_URL } from '../config'
 import { writeExchangeRatePair } from '../firebase'
 
-const DOLLAR_SELL_AMOUNT_IN_WEI = new BigNumber(100 * 1000000000000000000) // 100 dollars
+// Amounts to estimate the exchange rate, as the rate varies based on transaction size
+const DOLLAR_SELL_AMOUNT_IN_WEI = new BigNumber(10000 * 1000000000000000000) // 100 dollars
 const GOLD_SELL_AMOUNT_IN_WEI = new BigNumber(10 * 1000000000000000000) // 10 gold
 
 export async function makeExchangeQuery(web3Instance: Web3) {
-  const dollarMakerExchangeRate: BigNumber = await ContractUtils.getExchangeRate(
+  const dollarMakerExchangeRate = await ContractUtils.getExchangeRate(
     web3Instance,
     CURRENCY_ENUM.DOLLAR,
     new BigNumber(DOLLAR_SELL_AMOUNT_IN_WEI)
   )
-  const goldMakerExchangeRate: BigNumber = await ContractUtils.getExchangeRate(
+  const goldMakerExchangeRate = await ContractUtils.getExchangeRate(
     web3Instance,
     CURRENCY_ENUM.GOLD,
     new BigNumber(GOLD_SELL_AMOUNT_IN_WEI)
