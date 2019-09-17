@@ -65,8 +65,6 @@ Go to the `celo-monorepo` root directory and
 > git checkout alfajores
 > yarn
 > yarn build
-> git checkout master
-> yarn
 > cd packages/cli
 > ./bin/run account:balance $CELO_ACCOUNT_ADDRESS
 ```
