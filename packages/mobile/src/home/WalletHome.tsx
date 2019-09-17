@@ -22,7 +22,7 @@ import { bindActionCreators } from 'redux'
 import { hideAlert, showMessage } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { exitBackupFlow } from 'src/app/actions'
-import { ALERT_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION, SHOW_TESTNET_BANNER } from 'src/config'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
 import CeloDollarsOverview from 'src/home/CeloDollarsOverview'
 import HeaderButton from 'src/home/HeaderButton'
@@ -143,8 +143,10 @@ export class WalletHome extends React.Component<Props> {
   componentDidMount() {
     this.props.resetStandbyTransactions()
     this.props.initializeSentryUserContext()
-    this.showTestnetBanner()
     this.importContactsIfNeeded()
+    if (SHOW_TESTNET_BANNER) {
+      this.showTestnetBanner()
+    }
   }
 
   renderSection = ({ section: { title, bubbleText } }: { section: SectionListData<any> }) => {

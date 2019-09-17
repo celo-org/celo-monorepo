@@ -1,7 +1,6 @@
-import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
-import { fetchEnvOrFallback } from '@celo/celotool/src/lib/env-utils'
 import { installHelmChart } from 'src/lib/blockscout'
 import { createClusterIfNotExists, setupCluster, switchToClusterFromEnv } from 'src/lib/cluster'
+import { fetchEnvOrFallback } from 'src/lib/env-utils'
 import {
   createAndUploadCloudSQLSecretIfNotExists,
   createCloudSQLInstance,
@@ -10,6 +9,7 @@ import {
   grantRoles,
 } from 'src/lib/helm_deploy'
 import yargs from 'yargs'
+import { InitialArgv } from '../../deploy/initial'
 
 export const command = 'blockscout'
 

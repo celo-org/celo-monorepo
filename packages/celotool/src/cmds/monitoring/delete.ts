@@ -1,4 +1,4 @@
-import { CeloEnvArgv } from '@celo/celotool/src/lib/env-utils'
+import { CeloEnvArgv } from 'src/lib/env-utils'
 import { deleteMetric, getMetrics } from 'src/lib/monitoring'
 export const command = 'delete'
 
