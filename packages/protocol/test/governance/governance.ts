@@ -80,7 +80,6 @@ contract('Governance', (accounts: string[]) => {
   const participationFloor = new BigNumber(5).div(new BigNumber(100))
   const baselineUpdateFactor = new BigNumber(1).div(new BigNumber(5))
   const baselineQuorumFactor = 1
-  const defaultThreshold = new BigNumber(50).div(new BigNumber(100))
   const weight = 100
   const participation = 1
   const expectedParticipationBaseline = baselineUpdateFactor
@@ -109,13 +108,9 @@ contract('Governance', (accounts: string[]) => {
       toFixed(baselineUpdateFactor),
       toFixed(baselineQuorumFactor)
     )
-<<<<<<< HEAD
-    await registry.setAddressFor(bondedDepositsRegistryId, mockBondedDeposits.address)
-    await mockBondedDeposits.setWeight(account, weight)
-    await mockBondedDeposits.setTotalWeight(weight)
-=======
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
+    await mockLockedGold.setWeight(account, weight)
+    await mockLockedGold.setTotalWeight(weight)
     transactionSuccess1 = {
       value: 0,
       destination: testTransactions.address,
@@ -178,11 +173,9 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should have set stageDurations', async () => {
-      const [
-        actualApprovalStageDuration,
-        actualReferendumStageDuration,
-        actualExecutionStageDuration,
-      ] = await governance.getStageDurations()
+      const actualApprovalStageDuration = await governance.getApprovalStageDuration()
+      const actualReferendumStageDuration = await governance.getReferendumStageDuration()
+      const actualExecutionStageDuration = await governance.getExecutionStageDuration()
       assertEqualBN(actualApprovalStageDuration, approvalStageDuration)
       assertEqualBN(actualReferendumStageDuration, referendumStageDuration)
       assertEqualBN(actualExecutionStageDuration, executionStageDuration)
@@ -385,7 +378,7 @@ contract('Governance', (accounts: string[]) => {
     const newApprovalStageDuration = 2
     it('should set the approval stage duration', async () => {
       await governance.setApprovalStageDuration(newApprovalStageDuration)
-      const [actualApprovalStageDuration, ,] = await governance.getStageDurations()
+      const actualApprovalStageDuration = await governance.getApprovalStageDuration()
       assert.equal(actualApprovalStageDuration.toNumber(), newApprovalStageDuration)
     })
 
@@ -420,7 +413,7 @@ contract('Governance', (accounts: string[]) => {
     const newReferendumStageDuration = 2
     it('should set the referendum stage duration', async () => {
       await governance.setReferendumStageDuration(newReferendumStageDuration)
-      const [, actualReferendumStageDuration] = await governance.getStageDurations()
+      const actualReferendumStageDuration = await governance.getReferendumStageDuration()
       assert.equal(actualReferendumStageDuration.toNumber(), newReferendumStageDuration)
     })
 
@@ -455,7 +448,7 @@ contract('Governance', (accounts: string[]) => {
     const newExecutionStageDuration = 2
     it('should set the execution stage duration', async () => {
       await governance.setExecutionStageDuration(newExecutionStageDuration)
-      const [, , actualExecutionStageDuration] = await governance.getStageDurations()
+      const actualExecutionStageDuration = await governance.getExecutionStageDuration()
       assert.equal(actualExecutionStageDuration.toNumber(), newExecutionStageDuration)
     })
 
@@ -600,11 +593,7 @@ contract('Governance', (accounts: string[]) => {
 
   // TODO(asa): Verify that when we set the constitution for a function ID then the proper constitution is applied to a proposal.
   describe('#setConstitution', () => {
-<<<<<<< HEAD
-    const threshold = new BigNumber(60).div(new BigNumber(100))
-=======
     const threshold = toFixed(2 / 3)
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
     let functionId
     let differentFunctionId
     let destination
@@ -620,15 +609,6 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should set the default threshold', async () => {
-<<<<<<< HEAD
-        await governance.setConstitution(destination, functionId, toFixed(threshold))
-        const actualThreshold = await governance.getConstitution(destination, differentFunctionId)
-        assertEqualBN(actualThreshold, toFixed(threshold))
-      })
-
-      it('should emit the ConstitutionSet event', async () => {
-        const resp = await governance.setConstitution(destination, functionId, toFixed(threshold))
-=======
         await governance.setConstitution(destination, functionId, threshold)
         const differentThreshold = await governance.getConstitution(
           destination,
@@ -639,7 +619,6 @@ contract('Governance', (accounts: string[]) => {
 
       it('should emit the ConstitutionSet event', async () => {
         const resp = await governance.setConstitution(destination, functionId, threshold)
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
         assertLogMatches2(log, {
@@ -647,11 +626,7 @@ contract('Governance', (accounts: string[]) => {
           args: {
             destination,
             functionId: web3.utils.padRight(functionId, 64),
-<<<<<<< HEAD
-            threshold: toFixed(threshold),
-=======
             threshold: threshold,
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
           },
         })
       })
@@ -664,21 +639,6 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should set the function threshold', async () => {
-<<<<<<< HEAD
-        await governance.setConstitution(destination, functionId, toFixed(threshold))
-        const actualThreshold = await governance.getConstitution(destination, functionId)
-        assertEqualBN(actualThreshold, toFixed(threshold))
-      })
-
-      it('should not set the default threshold', async () => {
-        await governance.setConstitution(destination, functionId, toFixed(threshold))
-        const actualThreshold = await governance.getConstitution(destination, differentFunctionId)
-        assertEqualBN(actualThreshold, toFixed(defaultThreshold))
-      })
-
-      it('should emit the ConstitutionSet event', async () => {
-        const resp = await governance.setConstitution(destination, functionId, toFixed(threshold))
-=======
         await governance.setConstitution(destination, functionId, threshold)
         const actualThreshold = await governance.getConstitution(destination, functionId)
         assert.isTrue(actualThreshold.eq(threshold))
@@ -692,7 +652,6 @@ contract('Governance', (accounts: string[]) => {
 
       it('should emit the ConstitutionSet event', async () => {
         const resp = await governance.setConstitution(destination, functionId, threshold)
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
         assertLogMatches2(log, {
@@ -700,38 +659,18 @@ contract('Governance', (accounts: string[]) => {
           args: {
             destination,
             functionId: web3.utils.padRight(functionId, 64),
-<<<<<<< HEAD
-            threshold: toFixed(threshold),
-=======
             threshold: threshold,
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
           },
         })
       })
     })
 
     it('should revert when the destination is the null address', async () => {
-<<<<<<< HEAD
-      await assertRevert(
-        governance.setConstitution(NULL_ADDRESS, nullFunctionId, toFixed(threshold))
-      )
-=======
       await assertRevert(governance.setConstitution(NULL_ADDRESS, nullFunctionId, threshold))
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
     })
 
     it('should revert when the threshold is zero', async () => {
       await assertRevert(governance.setConstitution(destination, nullFunctionId, 0))
-<<<<<<< HEAD
-    })
-
-    it('should revert when the threshold is less than a majority', async () => {
-      await assertRevert(governance.setConstitution(destination, nullFunctionId, toFixed(49 / 100)))
-    })
-
-    it('should revert when the threshold is at least 100%', async () => {
-      await assertRevert(governance.setConstitution(destination, nullFunctionId, toFixed(1)))
-=======
     })
 
     it('should revert when the threshold is not greater than a majority', async () => {
@@ -742,16 +681,11 @@ contract('Governance', (accounts: string[]) => {
       await assertRevert(
         governance.setConstitution(destination, nullFunctionId, toFixed(101 / 100))
       )
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
     })
 
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(
-<<<<<<< HEAD
-        governance.setConstitution(destination, nullFunctionId, toFixed(threshold), {
-=======
         governance.setConstitution(destination, nullFunctionId, threshold, {
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
           from: nonOwner,
         })
       )
@@ -998,10 +932,7 @@ contract('Governance', (accounts: string[]) => {
   describe('#upvote()', () => {
     const proposalId = new BigNumber(1)
     beforeEach(async () => {
-<<<<<<< HEAD
-=======
       await mockLockedGold.setWeight(account, weight)
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
@@ -1089,13 +1020,9 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
-<<<<<<< HEAD
-        await mockBondedDeposits.setWeight(otherAccount, weight)
-        await mockBondedDeposits.setTotalWeight(weight * 2)
-=======
         const otherAccount = accounts[1]
         await mockLockedGold.setWeight(otherAccount, weight)
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
+        await mockLockedGold.setTotalWeight(weight * 2)
         await governance.upvote(otherProposalId, proposalId, 0, { from: otherAccount })
         await timeTravel(queueExpiry, web3)
       })
@@ -1159,10 +1086,7 @@ contract('Governance', (accounts: string[]) => {
   describe('#revokeUpvote()', () => {
     const proposalId = new BigNumber(1)
     beforeEach(async () => {
-<<<<<<< HEAD
-=======
       await mockLockedGold.setWeight(account, weight)
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
@@ -1447,10 +1371,7 @@ contract('Governance', (accounts: string[]) => {
       await timeTravel(dequeueFrequency, web3)
       await governance.approve(proposalId, index)
       await timeTravel(approvalStageDuration, web3)
-<<<<<<< HEAD
-=======
       await mockLockedGold.setWeight(account, weight)
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
     })
 
     it('should return true', async () => {
@@ -1643,10 +1564,7 @@ contract('Governance', (accounts: string[]) => {
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
           await timeTravel(approvalStageDuration, web3)
-<<<<<<< HEAD
-=======
           await mockLockedGold.setWeight(account, weight)
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -1710,10 +1628,7 @@ contract('Governance', (accounts: string[]) => {
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
           await timeTravel(approvalStageDuration, web3)
-<<<<<<< HEAD
-=======
           await mockLockedGold.setWeight(account, weight)
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -1739,10 +1654,7 @@ contract('Governance', (accounts: string[]) => {
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
           await timeTravel(approvalStageDuration, web3)
-<<<<<<< HEAD
-=======
           await mockLockedGold.setWeight(account, weight)
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -1809,10 +1721,7 @@ contract('Governance', (accounts: string[]) => {
             await timeTravel(dequeueFrequency, web3)
             await governance.approve(proposalId, index)
             await timeTravel(approvalStageDuration, web3)
-<<<<<<< HEAD
-=======
             await mockLockedGold.setWeight(account, weight)
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
           })
@@ -1836,10 +1745,7 @@ contract('Governance', (accounts: string[]) => {
             await timeTravel(dequeueFrequency, web3)
             await governance.approve(proposalId, index)
             await timeTravel(approvalStageDuration, web3)
-<<<<<<< HEAD
-=======
             await mockLockedGold.setWeight(account, weight)
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
           })
@@ -1864,10 +1770,7 @@ contract('Governance', (accounts: string[]) => {
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
         await timeTravel(approvalStageDuration, web3)
-<<<<<<< HEAD
-=======
         await mockLockedGold.setWeight(account, weight)
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
         await governance.vote(proposalId, index, value)
         await timeTravel(referendumStageDuration, web3)
         await timeTravel(executionStageDuration, web3)
@@ -1925,10 +1828,7 @@ contract('Governance', (accounts: string[]) => {
     describe('when the account has upvoted a proposal', () => {
       const proposalId = 1
       beforeEach(async () => {
-<<<<<<< HEAD
-=======
         await mockLockedGold.setWeight(account, weight)
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
@@ -1981,10 +1881,7 @@ contract('Governance', (accounts: string[]) => {
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
         await timeTravel(approvalStageDuration, web3)
-<<<<<<< HEAD
-=======
         await mockLockedGold.setWeight(account, weight)
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
         await governance.vote(proposalId, index, value)
       })
 
@@ -2023,8 +1920,8 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when the adjusted support is greater than threshold', () => {
       beforeEach(async () => {
-        await mockBondedDeposits.setWeight(account, (weight * 51) / 100)
-        await mockBondedDeposits.setWeight(otherAccount, (weight * 49) / 100)
+        await mockLockedGold.setWeight(account, (weight * 51) / 100)
+        await mockLockedGold.setWeight(otherAccount, (weight * 49) / 100)
         await governance.vote(proposalId, index, VoteValue.Yes)
         await governance.vote(proposalId, index, VoteValue.No, { from: otherAccount })
       })
@@ -2037,8 +1934,8 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when the adjusted support is less than or equal to threshold', () => {
       beforeEach(async () => {
-        await mockBondedDeposits.setWeight(account, (weight * 50) / 100)
-        await mockBondedDeposits.setWeight(otherAccount, (weight * 50) / 100)
+        await mockLockedGold.setWeight(account, (weight * 50) / 100)
+        await mockLockedGold.setWeight(otherAccount, (weight * 50) / 100)
         await governance.vote(proposalId, index, VoteValue.Yes)
         await governance.vote(proposalId, index, VoteValue.No, { from: otherAccount })
       })

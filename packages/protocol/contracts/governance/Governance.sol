@@ -644,14 +644,6 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   }
 
   /**
-   * @notice Returns the number of seconds proposals stay in each stage.
-   * @return The number of seconds proposals stay in each stage.
-   */
-  function getStageDurations() external view returns (uint256, uint256, uint256) {
-    return (stageDurations.approval, stageDurations.referendum, stageDurations.execution);
-  }
-
-  /**
    * @notice Returns the participation parameters.
    * @return The participation parameters.
    */
@@ -664,6 +656,18 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     );
   }
 
+  /**
+   * @notice Returns the number of seconds proposals stay in the approval stage.
+   * @return The number of seconds proposals stay in the execution stage.
+   */
+  function getApprovalStageDuration() external view returns (uint256) {
+    return stageDurations.approval;
+  }
+
+  /**
+   * @notice Returns the number of seconds proposals stay in the referendum stage.
+   * @return The number of seconds proposals stay in the execution stage.
+   */
   function getReferendumStageDuration() external view returns (uint256) {
     return stageDurations.referendum;
   }

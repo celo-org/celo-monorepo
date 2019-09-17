@@ -44,6 +44,10 @@ contract MockLockedGold is ILockedGold {
     weights[account] = weight;
   }
 
+  function setTotalWeight(uint256 weight) external {
+    totalWeight = weight;
+  }
+
   function setLockedCommitment(address account, uint256 noticePeriod, uint256 value) external {
     locked[account][noticePeriod] = value;
   }

@@ -1,5 +1,5 @@
 import { assertEqualBN } from '@celo/protocol/lib/test-utils'
-import { toFixed } from '@celo/protocol/lib/fixidity'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { ProposalsTestContract, ProposalsTestInstance } from 'types'
 

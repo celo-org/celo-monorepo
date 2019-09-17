@@ -75,7 +75,7 @@ const DefaultConfig = {
 
 const linkedLibraries = {
   FixidityLib: [
-    'BondedDeposits',
+    'LockedGold',
     'Exchange',
     'GasPriceMinimum',
     'Governance',

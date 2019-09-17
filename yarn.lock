@@ -14178,18 +14178,16 @@ firebase@^6.2.4:
     "@firebase/storage" "0.3.4"
     "@firebase/util" "0.2.20"
 
-<<<<<<< HEAD
 "fixidity@https://github.com/CementDAO/Fixidity":
   version "0.1.0"
   resolved "https://github.com/CementDAO/Fixidity#3547a290825d7e255ca2a4226b3ace5301f0f262"
   dependencies:
     bignumber.js "8.1.1"
-=======
+
 flagged-respawn@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/flagged-respawn/-/flagged-respawn-1.0.1.tgz#e7de6f1279ddd9ca9aac8a5971d618606b3aab41"
   integrity sha512-lNaHNVymajmk0OJMBn8fVUAU1BtDeKIqKoVhk4xAALB57aALg6b4W0MfJ/cUE0g9YBXy5XhSlPIpYIJ7HaY/3Q==
->>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
 
 flat-arguments@^1.0.0:
   version "1.0.2"
@@ -32290,7 +32288,6 @@ websocket@^1.0.28:
   dependencies:
     debug "^2.2.0"
     es5-ext "^0.10.50"
-    gulp "^4.0.2"
     nan "^2.14.0"
     typedarray-to-buffer "^3.1.5"
     yaeti "^0.0.6"
