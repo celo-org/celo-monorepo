@@ -1,11 +1,7 @@
-import { UpgradeArgv } from '@celo/celotool/src/cmds/deploy/upgrade'
-import { createClusterIfNotExists, switchToClusterFromEnv } from '@celo/celotool/src/lib/cluster'
-import {
-  installHelmChart,
-  removeHelmRelease,
-  upgradeHelmChart,
-} from '@celo/celotool/src/lib/ethstats'
+import { createClusterIfNotExists, switchToClusterFromEnv } from 'src/lib/cluster'
+import { installHelmChart, removeHelmRelease, upgradeHelmChart } from 'src/lib/ethstats'
 import yargs from 'yargs'
+import { UpgradeArgv } from '../../deploy/upgrade'
 
 export const command = 'ethstats'
 
