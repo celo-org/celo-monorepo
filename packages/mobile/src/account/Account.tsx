@@ -9,11 +9,12 @@ import { Clipboard, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 
 import DeviceInfo from 'react-native-device-info'
 import { Sentry } from 'react-native-sentry'
 import { connect } from 'react-redux'
-import AccountInfo from 'src/account/AccountInfo'
+import { devModeTriggerClicked } from 'src/account/actions'
 import SettingsItem from 'src/account/SettingsItem'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { resetAppOpenedState, setAnalyticsEnabled, setNumberVerified } from 'src/app/actions'
+import { AvatarSelf } from 'src/components/AvatarSelf'
 import { FAQ_LINK, TOS_LINK } from 'src/config'
 import { features } from 'src/flags'
 import { Namespaces } from 'src/i18n'
@@ -32,6 +33,7 @@ interface DispatchProps {
   setNumberVerified: typeof setNumberVerified
   resetAppOpenedState: typeof resetAppOpenedState
   setAnalyticsEnabled: typeof setAnalyticsEnabled
+  devModeTriggerClicked: typeof devModeTriggerClicked
 }
 
 interface StateProps {
@@ -61,6 +63,7 @@ const mapDispatchToProps = {
   setNumberVerified,
   resetAppOpenedState,
   setAnalyticsEnabled,
+  devModeTriggerClicked,
 }
 
 export class Account extends React.Component<Props, State> {
@@ -137,13 +140,17 @@ export class Account extends React.Component<Props, State> {
     }
   }
 
-  onCopyAddressClick = () => {
+  onPressAddress = () => {
     const { account, t } = this.props
     if (!account) {
       return
     }
     Clipboard.setString(account)
     Logger.showMessage(t('addressCopied'))
+  }
+
+  onPressAvatar = () => {
+    this.props.devModeTriggerClicked()
   }
 
   getDevSettingsComp() {
@@ -195,9 +202,11 @@ export class Account extends React.Component<Props, State> {
       <ScrollView style={style.scrollView}>
         <DisconnectBanner />
         <View style={style.accountProfile}>
-          <AccountInfo />
+          <TouchableOpacity onPress={this.onPressAvatar}>
+            <AvatarSelf />
+          </TouchableOpacity>
           <View>
-            <TouchableOpacity onPress={this.onCopyAddressClick}>
+            <TouchableOpacity onPress={this.onPressAddress}>
               <Text numberOfLines={1} ellipsizeMode={'tail'} style={style.addressText}>
                 {account}
               </Text>

@@ -1,5 +1,5 @@
-import { addCeloEnvMiddleware, CeloEnvArgv } from '@celo/celotool/src/lib/env-utils'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
 import { getEnodesWithExternalIPAddresses, writeStaticNodes } from 'src/lib/geth'
 import * as yargs from 'yargs'
 

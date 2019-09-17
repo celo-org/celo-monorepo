@@ -121,7 +121,7 @@ export const navigateToExchangeReview = (
 ) => {
   navigate(Screens.TransactionReview, {
     reviewProps: {
-      type: TransactionTypes.EXCHANGED,
+      type: TransactionTypes.EXCHANGE,
       timestamp,
       header: i18n.t('exchangeFlow9:exchange'),
     },

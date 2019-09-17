@@ -1,18 +1,17 @@
-import { UpgradeArgv } from '@celo/celotool/src/cmds/deploy/upgrade'
-import { downloadArtifacts } from '@celo/celotool/src/lib/artifacts'
-import { addCeloEnvMiddleware, getEnvFile } from '@celo/celotool/src/lib/env-utils'
-import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
-import { execCmd } from '@celo/celotool/src/lib/utils'
 import { execSync } from 'child_process'
 import { config } from 'dotenv'
-import { getContractAddresses } from 'src/lib/artifacts'
+import { downloadArtifacts, getContractAddresses } from 'src/lib/artifacts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { addCeloEnvMiddleware, getEnvFile } from 'src/lib/env-utils'
 import {
   coerceMnemonicAccountType,
   generatePrivateKey,
   privateKeyToAddress,
 } from 'src/lib/generate_utils'
+import { portForwardAnd } from 'src/lib/port_forward'
+import { execCmd } from 'src/lib/utils'
 import * as yargs from 'yargs'
+import { UpgradeArgv } from '../../deploy/upgrade'
 
 export const command = 'faucet'
 

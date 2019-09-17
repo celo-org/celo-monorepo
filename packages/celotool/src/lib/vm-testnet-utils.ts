@@ -1,16 +1,12 @@
-import {
-  confirmAction,
-  envVar,
-  fetchEnv,
-  fetchEnvOrFallback,
-} from '@celo/celotool/src/lib/env-utils'
+import { writeFileSync } from 'fs'
+import { confirmAction, envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,
   generateGenesisFromEnv,
   generatePrivateKey,
   privateKeyToAddress,
   privateKeyToPublicKey,
-} from '@celo/celotool/src/lib/generate_utils'
+} from './generate_utils'
 import {
   applyTerraformModule,
   destroyTerraformModule,
@@ -21,12 +17,8 @@ import {
   taintTerraformModuleResource,
   TerraformVars,
   untaintTerraformModuleResource,
-} from '@celo/celotool/src/lib/terraform'
-import {
-  uploadFileToGoogleStorage,
-  uploadGenesisBlockToGoogleStorage,
-} from '@celo/celotool/src/lib/testnet-utils'
-import { writeFileSync } from 'fs'
+} from './terraform'
+import { uploadFileToGoogleStorage, uploadGenesisBlockToGoogleStorage } from './testnet-utils'
 
 const secretsBucketName = 'celo-testnet-secrets'
 const testnetTerraformModule = 'testnet'

@@ -63,7 +63,7 @@ class TransactionReviewScreen extends React.PureComponent<Props> {
 
   renderCard = (type: TransactionTypes, confirmationProps: any) => {
     switch (type) {
-      case TransactionTypes.EXCHANGED:
+      case TransactionTypes.EXCHANGE:
         return <ExchangeConfirmationCard {...confirmationProps} />
       default:
         return <TransferConfirmationCard {...confirmationProps} />
