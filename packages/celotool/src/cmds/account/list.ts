@@ -1,9 +1,9 @@
 /* tslint:disable no-console */
-import { AccountArgv } from '@celo/celotool/src/cmds/account'
-import { switchToClusterFromEnv } from '@celo/celotool/src/lib/cluster'
 import fetch from 'node-fetch'
+import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { getBlockscoutUrl } from 'src/lib/endpoints'
 import { Argv } from 'yargs'
+import { AccountArgv } from '../account'
 
 export const command = 'list'
 export const describe = 'Command for listing users'

@@ -1,29 +1,18 @@
 {
+  "extends": "../typescript/tsconfig.library.json",
   "compilerOptions": {
-    "plugins": [
-      {
-        "name": "typescript-tslint-plugin"
-      }
-    ],
+    "outDir": "lib",
+    "rootDir": "src",
     "baseUrl": ".",
     "lib": ["es7", "es2017"],
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "skipLibCheck": true,
-    "noImplicitAny": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "resolveJsonModule": true,
-    "strict": true,
-    "noEmit": true,
     "target": "es6",
+    "resolveJsonModule": true,
+    "noEmit": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "paths": {
-      "eth-lib": ["types/eth-lib"],
       "@google-cloud/monitoring": ["types/monitoring"]
     }
   },
-  "include": ["src/**/*", "lib/**/*", "index.d.ts"],
-  "exclude": ["./node_modules/**/*"]
+  "include": ["src/"],
+  "exclude": ["node_modules/"]
 }

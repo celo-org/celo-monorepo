@@ -1,9 +1,9 @@
-import { switchToClusterFromEnv } from '@celo/celotool/src/lib/cluster'
-import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
-import { retrieveIPAddress } from '@celo/celotool/src/lib/helm_deploy'
 import { exec } from 'child_process'
 // import prompts from 'prompts'
 import yargs from 'yargs'
+import { switchToClusterFromEnv } from './cluster'
+import { envVar, fetchEnv } from './env-utils'
+import { retrieveIPAddress } from './helm_deploy'
 
 export function execCmd(
   cmd: string,

@@ -1,6 +1,6 @@
-import { UpgradeArgv } from '@celo/celotool/src/cmds/deploy/upgrade'
-import { switchToClusterFromEnv } from '@celo/celotool/src/lib/cluster'
+import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { upgradeHelmChart } from 'src/lib/transaction-metrics-exporter'
+import { UpgradeArgv } from '../../deploy/upgrade'
 
 export const command = 'transaction-metrics-exporter'
 
