@@ -1,6 +1,13 @@
 import express from 'express'
 import * as admin from 'firebase-admin'
-import { ENVIRONMENT, FIREBASE_DB, getFirebaseAdminCreds, PORT, VERSION } from './config'
+import {
+  ENVIRONMENT,
+  FIREBASE_DB,
+  getFirebaseAdminCreds,
+  PORT,
+  VERSION,
+  WEB3_PROVIDER_URL,
+} from './config'
 import { getLastBlockNotified, initializeDb as initializeFirebaseDb } from './firebase'
 import { exchangePolling, notificationPolling } from './polling'
 
@@ -59,8 +66,12 @@ initializeFirebaseDb()
 console.info('Starting Blockscout polling')
 notificationPolling.run()
 
-/**
- * Start polling the Exchange contract
- */
-console.info('Starting Exchange contract polling')
-exchangePolling.run()
+if (!WEB3_PROVIDER_URL) {
+  console.info('No Web3 provider found. Skipping exchange polling.')
+} else {
+  /**
+   * Start polling the Exchange contract
+   */
+  console.info('Starting Exchange contract polling')
+  exchangePolling.run()
+}

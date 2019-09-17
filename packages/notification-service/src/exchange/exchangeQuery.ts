@@ -11,7 +11,9 @@ const SELL_AMOUNTS = {
   [CURRENCY_ENUM.GOLD]: new BigNumber(10 * 1000000000000000000), // 10 gold
 }
 
-export async function handleExchangeQuery(web3Instance: Web3) {
+export async function handleExchangeQuery() {
+  const web3Instance = await getWeb3Instance()
+
   const fetchTime = Date.now().toString()
   const [dollarMakerRate, goldMakerRate] = await Promise.all([
     getExchangeRate(CURRENCY_ENUM.DOLLAR, web3Instance),

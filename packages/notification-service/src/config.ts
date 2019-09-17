@@ -38,7 +38,7 @@ export const NOTIFICATIONS_TTL_MS = Number(process.env.NOTIFICATION_TTL_MS) || 3
 
 export const EXCHANGE_POLLING_INTERVAL =
   Number(process.env.EXCHANGE_POLLING_INTERVAL) || 30 * 60 * 1000 // 30 minutes in milliseconds
-export const WEB3_PROVIDER_URL = process.env.WEB3_PROVIDER_URL || 'http://34.83.137.48:8545' // Default to integration transaction node
+export const WEB3_PROVIDER_URL = process.env.WEB3_PROVIDER_URL
 
 export enum NotificationTypes {
   PAYMENT_RECEIVED = 'PAYMENT_RECEIVED',
