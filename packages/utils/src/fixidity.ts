@@ -11,3 +11,12 @@ export const toFixed = (n: number | BigNumber) => {
 export const fromFixed = (f: BigNumber) => {
   return f.div(fixed1)
 }
+
+// Returns an integer
+export const fixedToInt = (f: BigNumber) => {
+  return f.idiv(fixed1)
+}
+
+export const multiply = (a: BigNumber, b: BigNumber) => {
+  return a.times(b).idiv(fixed1)
+}
