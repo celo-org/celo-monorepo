@@ -27,9 +27,10 @@
     "ethereumjs-util": "^5.2.0",
     "express": "^4.16.4",
     "firebase-admin": "^7.0.0",
-    "firebase-functions": "^2.2.0",
-    "google-libphonenumber": "^3.2.1",
+    "firebase-functions": "^2.3.1",
+    "google-libphonenumber": "^3.2.4",
     "lodash": "^4.17.14",
+    "nexmo": "2.4.2",
     "sleep-promise": "^8.0.1",
     "twilio": "^3.23.2",
     "web3": "1.0.0-beta.37",
@@ -39,18 +40,14 @@
   "devDependencies": {
     "@types/express": "^4.16.1",
     "@types/google-libphonenumber": "^7.4.17",
-    "@types/jest": "^24.0.17",
     "@types/minimist": "^1.2.0",
     "@types/supertest": "^2.0.7",
     "@types/web3": "^1.0.18",
     "firebase-bolt": "^0.8.3",
     "firebase-functions-test": "^0.1.6",
-    "firebase-tools": "^6.3.1",
-    "jest": "^24.8.0",
+    "firebase-tools": "^7.3.0",
     "minimist": "^1.2.0",
-    "supertest": "^3.4.2",
-    "ts-jest": "^24.0.0",
-    "typescript": "^3.3.3"
+    "supertest": "^3.4.2"
   },
   "engines": {
     "node": "8"

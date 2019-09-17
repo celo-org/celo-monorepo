@@ -12,7 +12,7 @@ interface IStableToken {
     string calldata,
     uint8,
     address,
-    int256,
+    uint256,
     uint256
   ) external;
 
@@ -22,7 +22,7 @@ interface IStableToken {
   function burn(uint256) external returns (bool);
   function debitFrom(address, uint256) external;
   function creditTo(address, uint256) external;
-  function setInflationParameters(int256, uint256) external;
+  function setInflationParameters(uint256, uint256) external;
 
   function fractionMulExp(
     uint256,
@@ -41,7 +41,7 @@ interface IStableToken {
   function getInflationParameters()
     external
     view
-    returns (int256, int256, uint256, uint256);
+    returns (uint256, uint256, uint256, uint256);
 
   // NOTE: duplicated with IERC20.sol, remove once interface inheritance is supported.
   function balanceOf(address) external view returns (uint256);

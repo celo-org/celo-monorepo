@@ -90,6 +90,8 @@ spec:
           ACCOUNT_ADDRESS=`cat /root/.celo/address`
           NAT_FLAG=""
           [[ "$STATIC_IPS_FOR_GETH_NODES" == "true" ]] && NAT_FLAG="--nat=extip:`cat /root/.celo/ipAddress`"
+          PING_IP_FROM_PACKET_FLAG=""
+          [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"
           geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
             --lightserv 90 \
@@ -114,7 +116,9 @@ spec:
             --consoleformat=json \
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
-            --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC}
+            --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
+            --metrics \
+            ${PING_IP_FROM_PACKET_FLAG}
         env:
         - name: ETHSTATS_SVC
           value: {{ template "ethereum.fullname" . }}-ethstats.{{ .Release.Namespace }}
@@ -132,6 +136,8 @@ spec:
           value: {{ .Values.geth.miner.verificationpool }}
         - name: STATIC_IPS_FOR_GETH_NODES
           value: "{{ default "false" .Values.geth.static_ips }}"
+        - name: PING_IP_FROM_PACKET
+          value: "{{ default "false" .Values.geth.ping_ip_from_packet }}"
         ports:
         - name: discovery-udp
           containerPort: 30303
@@ -152,6 +158,8 @@ spec:
         - name: account
           mountPath: /root/.celo/account
           readOnly: true
+{{ include "celo.geth-exporter-container" .  | indent 6 }}
+{{ include "celo.prom-to-sd-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "geth" "metricsPort" "9200" "metricsPath" "filteredmetrics" "containerNameLabel" "tx-nodes" )  | indent 6 }}
       volumes:
       - name: data
         emptyDir: {}

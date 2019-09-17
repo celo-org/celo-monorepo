@@ -1,23 +1,19 @@
-import { getKubernetesClusterRegion, switchToClusterFromEnv } from '@celo/celotool/src/lib/cluster'
-import { ensureAuthenticatedGcloudAccount } from '@celo/celotool/src/lib/gcloud_utils'
-import { generateGenesisFromEnv } from '@celo/celotool/src/lib/generate_utils'
-import { OG_ACCOUNTS } from '@celo/celotool/src/lib/genesis_constants'
-import { getStatefulSetReplicas, scaleResource } from '@celo/celotool/src/lib/kubernetes'
-import {
-  EnvTypes,
-  envVar,
-  execCmd,
-  execCmdWithExitOnFailure,
-  fetchEnv,
-  fetchEnvOrFallback,
-  getVerificationPoolRewardsURL,
-  getVerificationPoolSMSURL,
-  isProduction,
-  outputIncludes,
-  switchToProjectFromEnv,
-} from '@celo/celotool/src/lib/utils'
 import { entries, flatMap, range } from 'lodash'
 import sleep from 'sleep-promise'
+import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
+import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
+import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
+import { generateGenesisFromEnv } from './generate_utils'
+import { OG_ACCOUNTS } from './genesis_constants'
+import { getStatefulSetReplicas, scaleResource } from './kubernetes'
+import {
+  execCmd,
+  execCmdWithExitOnFailure,
+  getVerificationPoolRewardsURL,
+  getVerificationPoolSMSURL,
+  outputIncludes,
+  switchToProjectFromEnv,
+} from './utils'
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
@@ -558,6 +554,7 @@ async function helmParameters(celoEnv: string) {
     `--set contracts.cron_jobs.enabled=${fetchEnv('CONTRACT_CRONJOBS_ENABLED')}`,
     `--set geth.account.secret="${fetchEnv('GETH_ACCOUNT_SECRET')}"`,
     `--set ethstats.webSocketSecret="${fetchEnv('ETHSTATS_WEBSOCKETSECRET')}"`,
+    `--set geth.ping_ip_from_packet=${fetchEnvOrFallback('PING_IP_FROM_PACKET', 'false')}`,
     ...productionTagOverrides,
     ...(await helmIPParameters(celoEnv)),
     ...gethAccountParameters,

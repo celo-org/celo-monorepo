@@ -95,8 +95,7 @@ exports[`Verifying process renders the fully verified state correctly 1`] = `
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
             Object {},
           ]
@@ -112,8 +111,8 @@ exports[`Verifying process renders the fully verified state correctly 1`] = `
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -611,8 +610,7 @@ exports[`Verifying process renders the initial verifying state correctly 1`] = `
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
             Object {},
           ]
@@ -628,8 +626,8 @@ exports[`Verifying process renders the initial verifying state correctly 1`] = `
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -1091,8 +1089,7 @@ exports[`Verifying process renders the partially verified state correctly 1`] = 
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
             Object {},
           ]
@@ -1108,8 +1105,8 @@ exports[`Verifying process renders the partially verified state correctly 1`] = 
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -1553,8 +1550,7 @@ exports[`Verifying process renders the verification error state correctly 1`] = 
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
             Object {},
           ]
@@ -1570,8 +1566,8 @@ exports[`Verifying process renders the verification error state correctly 1`] = 
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -1903,52 +1899,53 @@ exports[`renders the Education step correctly 1`] = `
       "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
-      "paddingTop": 20,
     }
   }
 >
-  <View
-    style={
-      Object {
-        "height": 35,
-        "paddingRight": 10,
-        "paddingTop": 10,
-        "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "width": 70,
-        "zIndex": 100,
-      }
-    }
-  >
-    <Text
-      accessible={true}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-    >
-         
-    </Text>
-  </View>
   <RCTScrollView
-    style={
+    contentContainerStyle={
       Object {
+        "alignItems": "center",
         "flex": 1,
-        "paddingHorizontal": 20,
+        "justifyContent": "center",
+        "padding": 30,
+        "paddingTop": 0,
       }
     }
   >
     <View>
       <View
         style={
+          Object {
+            "height": 35,
+            "paddingRight": 10,
+            "paddingTop": 10,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+            "width": 70,
+            "zIndex": 100,
+          }
+        }
+      >
+        <Text
+          accessible={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+        >
+             
+        </Text>
+      </View>
+      <View
+        style={
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
             Object {},
           ]
@@ -1964,8 +1961,8 @@ exports[`renders the Education step correctly 1`] = `
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -1973,6 +1970,7 @@ exports[`renders the Education step correctly 1`] = `
       <Text
         style={
           Object {
+            "color": "#2E3338",
             "fontFamily": "Hind-Light",
             "fontSize": 22,
             "paddingBottom": 20,
@@ -1990,10 +1988,10 @@ exports[`renders the Education step correctly 1`] = `
               "alignItems": "center",
               "flexDirection": "row",
               "flexWrap": "nowrap",
-              "marginTop": 30,
+              "marginTop": 20,
             },
             Object {
-              "marginTop": 20,
+              "marginTop": 10,
             },
           ]
         }
@@ -2007,11 +2005,12 @@ exports[`renders the Education step correctly 1`] = `
           style={
             Array [
               Object {
-                "height": 70,
-                "width": 80,
+                "height": 50,
+                "width": 50,
               },
               Object {
                 "flex": 0,
+                "marginLeft": 10,
                 "marginRight": 20,
               },
             ]
@@ -2041,7 +2040,7 @@ exports[`renders the Education step correctly 1`] = `
             "alignItems": "center",
             "flexDirection": "row",
             "flexWrap": "nowrap",
-            "marginTop": 30,
+            "marginTop": 20,
           }
         }
       >
@@ -2054,11 +2053,12 @@ exports[`renders the Education step correctly 1`] = `
           style={
             Array [
               Object {
-                "height": 70,
-                "width": 80,
+                "height": 50,
+                "width": 50,
               },
               Object {
                 "flex": 0,
+                "marginLeft": 10,
                 "marginRight": 20,
               },
             ]
@@ -2088,7 +2088,7 @@ exports[`renders the Education step correctly 1`] = `
             "alignItems": "center",
             "flexDirection": "row",
             "flexWrap": "nowrap",
-            "marginTop": 30,
+            "marginTop": 20,
           }
         }
       >
@@ -2101,11 +2101,12 @@ exports[`renders the Education step correctly 1`] = `
           style={
             Array [
               Object {
-                "height": 70,
-                "width": 80,
+                "height": 50,
+                "width": 50,
               },
               Object {
                 "flex": 0,
+                "marginLeft": 10,
                 "marginRight": 20,
               },
             ]
@@ -2259,8 +2260,7 @@ exports[`renders the Input step correctly 1`] = `
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
             Object {},
           ]
@@ -2276,8 +2276,8 @@ exports[`renders the Input step correctly 1`] = `
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -2286,6 +2286,7 @@ exports[`renders the Input step correctly 1`] = `
         style={
           Array [
             Object {
+              "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 22,
               "paddingBottom": 20,
@@ -2688,8 +2689,7 @@ exports[`renders the Verified step correctly 1`] = `
       Array [
         Object {
           "alignItems": "center",
-          "marginBottom": 25,
-          "marginTop": 25,
+          "marginBottom": 20,
         },
         Object {},
       ]
@@ -2705,8 +2705,8 @@ exports[`renders the Verified step correctly 1`] = `
       }
       style={
         Object {
-          "height": 50,
-          "width": 50,
+          "height": 35,
+          "width": 35,
         }
       }
     />
@@ -2715,6 +2715,7 @@ exports[`renders the Verified step correctly 1`] = `
     style={
       Array [
         Object {
+          "color": "#2E3338",
           "fontFamily": "Hind-Light",
           "fontSize": 22,
           "paddingBottom": 20,

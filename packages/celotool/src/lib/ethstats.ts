@@ -1,5 +1,6 @@
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
-import { envVar, execCmdWithExitOnFailure, fetchEnv } from 'src/lib/utils'
+import { execCmdWithExitOnFailure } from 'src/lib/utils'
+import { envVar, fetchEnv } from './env-utils'
 
 const helmChartPath = '../helm-charts/ethstats'
 

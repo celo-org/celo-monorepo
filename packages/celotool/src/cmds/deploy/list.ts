@@ -1,4 +1,3 @@
-import { DeployArgv } from '@celo/celotool/src/cmds/deploy'
 import { forEach, groupBy } from 'lodash'
 import {
   getNonSystemHelmReleases,
@@ -6,6 +5,7 @@ import {
   HelmRelease,
   switchToClusterFromEnv,
 } from 'src/lib/cluster'
+import { DeployArgv } from '../deploy'
 
 export const command = 'list'
 

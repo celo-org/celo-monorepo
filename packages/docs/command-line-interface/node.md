@@ -13,4 +13,4 @@ USAGE
   $ celocli node:accounts
 ```
 
-_See code: [packages/cli/src/src/commands/node/accounts.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/node/accounts.ts)_
+_See code: [packages/cli/src/commands/node/accounts.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/node/accounts.ts)_

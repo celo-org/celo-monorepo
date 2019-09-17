@@ -13,7 +13,7 @@ USAGE
   $ celocli config:get
 ```
 
-_See code: [packages/cli/src/src/commands/config/get.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/config/get.ts)_
+_See code: [packages/cli/src/commands/config/get.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/config/get.ts)_
 
 ### Set
 
@@ -27,4 +27,4 @@ OPTIONS
   --node=node  (required) [default: ws://localhost:8546] Node URL
 ```
 
-_See code: [packages/cli/src/src/commands/config/set.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/config/set.ts)_
+_See code: [packages/cli/src/commands/config/set.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/config/set.ts)_

@@ -1,4 +1,5 @@
-import { envVar, execCmdWithExitOnFailure, fetchEnv } from 'src/lib/utils'
+import { execCmdWithExitOnFailure } from 'src/lib/utils'
+import { envVar, fetchEnv } from './env-utils'
 
 export async function installHelmChart(celoEnv: string) {
   console.info(`Installing helm release ${celoEnv}-transaction-metrics-exporter`)

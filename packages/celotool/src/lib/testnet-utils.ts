@@ -1,9 +1,9 @@
-import { ensureAuthenticatedGcloudAccount } from '@celo/celotool/src/lib/gcloud_utils'
 import { StaticNodeUtils } from '@celo/walletkit'
 import { Storage } from '@google-cloud/storage'
 import { writeFileSync } from 'fs'
-import { generateGenesisFromEnv } from 'src/lib/generate_utils'
-import { getEnodesWithExternalIPAddresses, sleep } from 'src/lib/geth'
+import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
+import { generateGenesisFromEnv } from './generate_utils'
+import { getEnodesWithExternalIPAddresses, sleep } from './geth'
 
 const genesisBlocksBucketName = 'genesis_blocks'
 const staticNodesBucketName = StaticNodeUtils.getStaticNodesGoogleStorageBucketName()

@@ -1,26 +1,21 @@
 /* tslint:disable:no-console */
 
-import { toFixed } from '@celo/protocol/lib/fixidity'
-import { governanceRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
-  deployProxyAndImplementation,
+  deploymentForCoreContract,
   getDeployedProxiedContract,
   transferOwnershipOfProxy,
   transferOwnershipOfProxyAndImplementation,
 } from '@celo/protocol/lib/web3-utils'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import { config } from '@celo/protocol/migrationsConfig'
-import { GovernanceInstance, RegistryInstance, ReserveInstance } from 'types'
+import { GovernanceInstance, ReserveInstance } from 'types'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
   const approver = require('@celo/protocol/truffle.js').networks[networkName].from
 
-  const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-    'Registry',
-    artifacts
-  )
-
   return [
-    registry.address,
+    config.registry.predeployedProxyAddress,
     approver,
     config.governance.concurrentProposals,
     web3.utils.toWei(config.governance.minDeposit.toString(), 'ether'),
@@ -36,18 +31,12 @@ const initializeArgs = async (networkName: string): Promise<any[]> => {
   ]
 }
 
-module.exports = deployProxyAndImplementation<GovernanceInstance>(
+module.exports = deploymentForCoreContract<GovernanceInstance>(
   web3,
   artifacts,
-  'Governance',
+  CeloContractName.Governance,
   initializeArgs,
   async (governance: GovernanceInstance) => {
-    const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-      'Registry',
-      artifacts
-    )
-    await registry.setAddressFor(governanceRegistryId, governance.address)
-
     console.log('Setting Governance as a Reserve spender')
     const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
       'Reserve',
@@ -56,13 +45,15 @@ module.exports = deployProxyAndImplementation<GovernanceInstance>(
     await reserve.addSpender(governance.address)
 
     const proxyOwnedByGovernance = ['GoldToken', 'Random']
-    for (const contractName of proxyOwnedByGovernance) {
-      await transferOwnershipOfProxy(contractName, governance.address, artifacts)
-    }
+    await Promise.all(
+      proxyOwnedByGovernance.map((contractName) =>
+        transferOwnershipOfProxy(contractName, governance.address, artifacts)
+      )
+    )
 
     const proxyAndImplementationOwnedByGovernance = [
       'Attestations',
-      'BondedDeposits',
+      'LockedGold',
       'Escrow',
       'Exchange',
       'GasCurrencyWhitelist',
@@ -74,8 +65,11 @@ module.exports = deployProxyAndImplementation<GovernanceInstance>(
       'StableToken',
       'Validators',
     ]
-    for (const contractName of proxyAndImplementationOwnedByGovernance) {
-      await transferOwnershipOfProxyAndImplementation(contractName, governance.address, artifacts)
-    }
+
+    await Promise.all(
+      proxyAndImplementationOwnedByGovernance.map((contractName) =>
+        transferOwnershipOfProxyAndImplementation(contractName, governance.address, artifacts)
+      )
+    )
   }
 )

@@ -14,15 +14,17 @@ contract UsingRegistry is Ownable {
   event RegistrySet(address indexed registryAddress);
 
   // solhint-disable state-visibility
-  string constant ATTESTATIONS_REGISTRY_ID = "Attestations";
-  string constant BONDED_DEPOSITS_REGISTRY_ID = "BondedDeposits";
-  string constant GAS_CURRENCY_WHITELIST_REGISTRY_ID = "GasCurrencyWhitelist";
-  string constant GOLD_TOKEN_REGISTRY_ID = "GoldToken";
-  string constant GOVERNANCE_REGISTRY_ID = "Governance";
-  string constant RESERVE_REGISTRY_ID = "Reserve";
-  string constant RANDOM_REGISTRY_ID = "Random";
-  string constant SORTED_ORACLES_REGISTRY_ID = "SortedOracles";
-  string constant VALIDATORS_REGISTRY_ID = "Validators";
+  bytes32 constant ATTESTATIONS_REGISTRY_ID = keccak256(abi.encodePacked("Attestations"));
+  bytes32 constant LOCKED_GOLD_REGISTRY_ID = keccak256(abi.encodePacked("LockedGold"));
+  bytes32 constant GAS_CURRENCY_WHITELIST_REGISTRY_ID = keccak256(
+    abi.encodePacked("GasCurrencyWhitelist")
+  );
+  bytes32 constant GOLD_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("GoldToken"));
+  bytes32 constant GOVERNANCE_REGISTRY_ID = keccak256(abi.encodePacked("Governance"));
+  bytes32 constant RESERVE_REGISTRY_ID = keccak256(abi.encodePacked("Reserve"));
+  bytes32 constant RANDOM_REGISTRY_ID = keccak256(abi.encodePacked("Random"));
+  bytes32 constant SORTED_ORACLES_REGISTRY_ID = keccak256(abi.encodePacked("SortedOracles"));
+  bytes32 constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
   // solhint-enable state-visibility
 
   IRegistry public registry;

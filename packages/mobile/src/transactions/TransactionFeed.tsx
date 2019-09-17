@@ -1,3 +1,4 @@
+import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import { ApolloError } from 'apollo-boost'
 import * as React from 'react'
 import { FlatList } from 'react-native'
@@ -14,6 +15,8 @@ import { StandbyTransaction, TransactionStatus, TransactionTypes } from 'src/tra
 import TransferFeedItem from 'src/transactions/TransferFeedItem'
 import Logger from 'src/utils/Logger'
 import { privateCommentKeySelector } from 'src/web3/selectors'
+
+const TAG = 'transactions/TransactionFeed'
 
 export enum FeedType {
   HOME = 'home',
@@ -46,12 +49,14 @@ const mapStateToProps = (state: RootState): StateProps => ({
 })
 
 export class TransactionFeed extends React.PureComponent<Props> {
-  renderItem = ({ item, index }: { item: Event | StandbyTransaction; index: number }) => {
-    // TODO(cmcewen): Clean this up. Standby txs should have the same data shape
-
+  // TODO(cmcewen): Clean this up. Standby txs should have the same data shape
+  renderItem = (commentKeyBuffer: Buffer | null) => ({
+    item: tx,
+  }: {
+    item: Event | StandbyTransaction
+    index: number
+  }) => {
     const { kind, addressToE164Number, invitees, recipientCache } = this.props
-    const tx = item
-    const commentKey = this.props.commentKey ? Buffer.from(this.props.commentKey, 'hex') : null
 
     if (tx.hasOwnProperty('comment')) {
       // @ts-ignore
@@ -73,7 +78,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
           invitees={invitees}
           addressToE164Number={addressToE164Number}
           recipientCache={recipientCache}
-          commentKey={commentKey}
+          commentKey={commentKeyBuffer}
           {...tx}
         />
       )
@@ -87,7 +92,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
           {...tx}
         />
       )
-    } else if (tx.type && tx.type === TransactionTypes.EXCHANGED) {
+    } else if (tx.type && tx.type === TransactionTypes.EXCHANGE) {
       // @ts-ignore
       return <ExchangeFeedItem showImage={kind === FeedType.HOME} {...tx} />
     } else if (tx.type) {
@@ -97,7 +102,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
           recipientCache={recipientCache}
           addressToE164Number={addressToE164Number}
           invitees={invitees}
-          commentKey={commentKey}
+          commentKey={commentKeyBuffer}
           {...tx}
         />
       )
@@ -111,12 +116,23 @@ export class TransactionFeed extends React.PureComponent<Props> {
   }
 
   render() {
-    const { kind, loading, error, data, standbyTransactions, standbyTransactionFilter } = this.props
-    const events = (data && data.events) || []
+    const {
+      kind,
+      loading,
+      error,
+      data,
+      standbyTransactions,
+      standbyTransactionFilter,
+      commentKey,
+    } = this.props
 
     if (error) {
-      Logger.error('TransactionFeed', 'Failure while loading transaction feed', error)
+      Logger.error(TAG, 'Failure while loading transaction feed', error)
+      return <NoActivity kind={kind} loading={loading} error={error} />
     }
+
+    const events = (data && data.events) || []
+    const commentKeyBuffer = commentKey ? Buffer.from(commentKey, 'hex') : null
 
     const queryDataTxIDs = new Set(events.map((event: Event) => event.hash))
     const notInQueryTxs = (tx: StandbyTransaction) =>
@@ -135,7 +151,12 @@ export class TransactionFeed extends React.PureComponent<Props> {
 
     if (txData.length > 0) {
       return (
-        <FlatList data={txData} keyExtractor={this.keyExtractor} renderItem={this.renderItem} />
+        <FlatList
+          data={txData}
+          keyExtractor={this.keyExtractor}
+          ItemSeparatorComponent={ItemSeparator}
+          renderItem={this.renderItem(commentKeyBuffer)}
+        />
       )
     } else {
       return <NoActivity kind={kind} loading={loading} error={error} />

@@ -1,11 +1,11 @@
 /* tslint:disable no-console */
-import { AccountArgv } from '@celo/celotool/src/cmds/account'
-import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
 import { PhoneNumberUtils } from '@celo/utils'
 // @ts-ignore
 import { Attestations, lookupPhoneNumbers } from '@celo/walletkit'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { portForwardAnd } from 'src/lib/port_forward'
 import { Argv } from 'yargs'
+import { AccountArgv } from '../account'
 
 const Web3 = require('web3')
 

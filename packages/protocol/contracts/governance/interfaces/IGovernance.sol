@@ -13,7 +13,7 @@ interface IGovernance {
   function setParticipationFloor(int256) external;
   function setBaselineUpdateFactor(int256) external;
   function setBaselineQuorumFactor(int256) external;
-  function setConstitution(address, bytes4, int256) external;
+  function setConstitution(address, bytes4, uint256) external;
 
   function propose(
     uint256[] calldata,
@@ -28,9 +28,16 @@ interface IGovernance {
   function execute(uint256, uint256) external returns (bool);
   function withdraw() external returns (bool);
   function dequeueProposalsIfReady() external;
+<<<<<<< HEAD
   function getStageDurations() external view returns (uint256, uint256, uint256);
   function getParticipationParameters() external view returns (int256, int256, int256, int256);
   function getConstitution(address, bytes4) external view returns (int256);
+=======
+  function getApprovalStageDuration() external view returns (uint256);
+  function getReferendumStageDuration() external view returns (uint256);
+  function getExecutionStageDuration() external view returns (uint256);
+  function getConstitution(address, bytes4) external view returns (uint256);
+>>>>>>> 833a0beebe4b969a44aa735a763a458f12b4ab59
   function proposalExists(uint256) external view returns (bool);
   function getProposal(uint256) external view returns (address, uint256, uint256, uint256);
 

@@ -15,7 +15,6 @@ export enum Actions {
   SET_BLOCK_NUMBER = 'WEB3/SET_BLOCK_NUMBER',
   REQUEST_SYNC_PROGRESS = 'WEB3/REQUEST_SYNC_PROGRESS',
   UPDATE_WEB3_SYNC_PROGRESS = 'WEB3/UPDATE_WEB3_SYNC_PROGRESS',
-  SET_GAS_PRICE = 'WEB3/SET_GAS_PRICE',
 }
 
 export interface SetAccountAction {
@@ -33,13 +32,6 @@ export interface SetLatestBlockNumberAction {
   latestBlockNumber: number
 }
 
-export interface SetProgressAction {
-  type: Actions.SET_PROGRESS
-  payload: {
-    syncProgress: number
-  }
-}
-
 export interface UpdateWeb3SyncProgressAction {
   type: Actions.UPDATE_WEB3_SYNC_PROGRESS
   payload: {
@@ -49,19 +41,11 @@ export interface UpdateWeb3SyncProgressAction {
   }
 }
 
-export interface SetGasPriceAction {
-  type: Actions.SET_GAS_PRICE
-  gasPrice: number
-  gasPriceLastUpdated: number
-}
-
 export type ActionTypes =
   | SetAccountAction
   | SetCommentKeyAction
-  | SetProgressAction
   | SetLatestBlockNumberAction
   | UpdateWeb3SyncProgressAction
-  | SetGasPriceAction
 
 export const setAccount = (address: string): SetAccountAction => {
   CeloAnalytics.track(DefaultEventNames.accountSet, { address })
@@ -81,19 +65,6 @@ export const setPrivateCommentKey = (commentKey: string): SetCommentKeyAction =>
 export const setLatestBlockNumber = (latestBlockNumber: number): SetLatestBlockNumberAction => ({
   type: Actions.SET_BLOCK_NUMBER,
   latestBlockNumber,
-})
-
-export const setSyncProgress = (syncProgress: number) => ({
-  type: Actions.SET_PROGRESS,
-  payload: {
-    syncProgress,
-  },
-})
-
-export const setGasPrice = (gasPrice: number): SetGasPriceAction => ({
-  type: Actions.SET_GAS_PRICE,
-  gasPrice,
-  gasPriceLastUpdated: Date.now(),
 })
 
 // TODO: Remove duplicaiton with SetProgress action (this is currently unused)

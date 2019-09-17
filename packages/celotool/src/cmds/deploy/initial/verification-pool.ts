@@ -1,6 +1,7 @@
-import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
 import * as deployUtil from '@celo/verification-pool-api/deployment/deployment-utils'
-import { envVar, fetchEnvOrFallback, getVerificationPoolConfig } from 'src/lib/utils'
+import { envVar, fetchEnvOrFallback } from 'src/lib/env-utils'
+import { getVerificationPoolConfig } from 'src/lib/utils'
+import { InitialArgv } from '../../deploy/initial'
 
 export const command = 'verification-pool'
 export const describe = 'Intialize a new deploy of the verification pool package'

@@ -10,7 +10,7 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Rings from 'src/logos/RingsLight'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import menuItems from 'src/shared/menu-items'
+import menuItems, { hashNav } from 'src/shared/menu-items'
 import Navigation from 'src/shared/navigation'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import {
@@ -43,6 +43,7 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
     const { t, screen } = this.props
     return (
       <GridRow
+        nativeID={hashNav.connect.fund}
         desktopStyle={[standardStyles.sectionMarginTop]}
         tabletStyle={[standardStyles.sectionMarginTopTablet]}
         mobileStyle={[standardStyles.sectionMarginTopMobile]}
@@ -260,7 +261,6 @@ const styles = StyleSheet.create({
   },
   button: {
     marginVertical: 15,
-    fontSize: 18,
   },
   partners: {
     justifyContent: 'space-between',

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`renders correctly 1`] = `
+exports[`BackupComplete renders correctly if backup completed 1`] = `
 <View
   style={
     Object {
@@ -25,8 +25,7 @@ exports[`renders correctly 1`] = `
         Array [
           Object {
             "alignItems": "center",
-            "marginBottom": 25,
-            "marginTop": 25,
+            "marginBottom": 20,
           },
           Object {},
         ]
@@ -41,8 +40,8 @@ exports[`renders correctly 1`] = `
         }
         style={
           Object {
-            "height": 50,
-            "width": 50,
+            "height": 35,
+            "width": 35,
           }
         }
       />
@@ -51,6 +50,7 @@ exports[`renders correctly 1`] = `
       style={
         Array [
           Object {
+            "color": "#2E3338",
             "fontFamily": "Hind-Light",
             "fontSize": 22,
             "paddingBottom": 20,
@@ -58,7 +58,247 @@ exports[`renders correctly 1`] = `
           },
           Object {
             "color": "#2E3338",
-            "paddingTop": 35,
+            "paddingTop": 25,
+          },
+        ]
+      }
+    >
+      backupKey
+    </Text>
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 16,
+          "lineHeight": 24,
+        }
+      }
+    >
+      dontLoseIt
+    </Text>
+    <View
+      style={
+        Object {
+          "alignContent": "center",
+          "backgroundColor": "#F8F8F8",
+          "justifyContent": "center",
+          "marginTop": 30,
+          "padding": 16,
+          "position": "relative",
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Light",
+            "fontSize": 18,
+            "textAlign": "left",
+          }
+        }
+      >
+        foo bar
+      </Text>
+    </View>
+    <View
+      accessible={true}
+      hitSlop={
+        Object {
+          "bottom": 7,
+          "left": 7,
+          "right": 7,
+          "top": 7,
+        }
+      }
+      isTVSelectable={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "alignItems": "center",
+          "alignSelf": "center",
+          "backgroundColor": "transparent",
+          "borderColor": "#42D689",
+          "borderRadius": 2,
+          "borderWidth": 2,
+          "fontSize": 14,
+          "marginTop": 50,
+          "minWidth": 160,
+          "opacity": 1,
+          "paddingHorizontal": 16,
+          "paddingVertical": 6,
+          "textAlign": "center",
+        }
+      }
+      testID="pasteMessageButton"
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#81868B",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 13,
+              "lineHeight": 17,
+            },
+            Object {
+              "lineHeight": 20,
+            },
+            Object {
+              "color": "#42D689",
+            },
+            undefined,
+          ]
+        }
+      >
+        copyToClipboard
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "borderRadius": 3,
+          "flexDirection": "row",
+        },
+        Object {
+          "marginVertical": 10,
+        },
+        Object {
+          "marginBottom": 10,
+        },
+        undefined,
+        Object {
+          "backgroundColor": "#42D689",
+        },
+      ]
+    }
+  >
+    <View
+      accessible={true}
+      isTVSelectable={true}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#42D689",
+          "borderColor": "#42D689",
+          "borderRadius": 3,
+          "borderWidth": 2,
+          "flex": 1,
+          "height": 50,
+          "justifyContent": "center",
+          "opacity": 1,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 16,
+              },
+              Object {
+                "color": "#FFFFFF",
+              },
+              Object {
+                "paddingLeft": 5,
+                "paddingRight": 5,
+              },
+            ]
+          }
+        >
+          done
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`BackupComplete renders correctly if backup not completed 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "white",
+      "flex": 1,
+      "flexDirection": "column",
+      "justifyContent": "space-between",
+      "paddingHorizontal": 20,
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "paddingTop": 40,
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "marginBottom": 20,
+          },
+          Object {},
+        ]
+      }
+    >
+      <Image
+        resizeMode="contain"
+        source={
+          Object {
+            "testUri": "../../../src/images/coins-logo.png",
+          }
+        }
+        style={
+          Object {
+            "height": 35,
+            "width": 35,
+          }
+        }
+      />
+    </View>
+    <Text
+      style={
+        Array [
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Light",
+            "fontSize": 22,
+            "paddingBottom": 20,
+            "textAlign": "center",
+          },
+          Object {
+            "color": "#2E3338",
+            "paddingTop": 25,
           },
         ]
       }
