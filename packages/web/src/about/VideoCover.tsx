@@ -3,11 +3,11 @@ import { createElement, Image, StyleSheet, View, ViewStyle } from 'react-native'
 import { BeautifulMoneyPreview } from 'src/about/images/index'
 import { H1, H3 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Hoverable from 'src/shared/Hoverable'
 import { PlayCircle2 } from 'src/shared/PlayCircle'
 import VideoModal from 'src/shared/VideoModal'
 import { standardStyles, textStyles } from 'src/styles'
-import { withScreenSize, ScreenSizes, ScreenProps } from 'src/layout/ScreenSize'
 interface State {
   isHovering: boolean
 }

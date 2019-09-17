@@ -3,6 +3,7 @@ import { Image, StyleSheet, View } from 'react-native'
 import Backers from 'src/about/Backers'
 import { mintPlaza, teamHero } from 'src/about/images'
 import Team from 'src/about/Team'
+import VideoCover from 'src/about/VideoCover'
 import { H1, H4 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import MissionText from 'src/home/MissionText'
@@ -14,7 +15,6 @@ import menuItems from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { Colors, HEADER_HEIGHT, MENU_MAX_WIDTH } from 'src/shared/Styles'
 import { standardStyles } from 'src/styles'
-import VideoCover from 'src/about/VideoCover'
 
 const IMAGE_HEIGHT = 938
 const IMAGE_WIDTH = 835
