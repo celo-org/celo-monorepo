@@ -24,7 +24,6 @@ const menuItems = [menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.COMMUNITY]
 const DARK_PAGES = new Set([
   menu.HOME.link,
   menu.COMMUNITY.link,
-  menu.ABOUT_US.link,
   menu.BUILD.link,
   CeloLinks.faucet,
   CeloLinks.walletApp,
@@ -156,7 +155,10 @@ export class Header extends React.Component<Props, State> {
   }
 
   isDarkMode = () => {
-    return DARK_PAGES.has(this.props.router.pathname)
+    return (
+      DARK_PAGES.has(this.props.router.pathname) ||
+      (this.props.router.pathname === menu.ABOUT_US.link && !this.state.belowFoldUpScroll)
+    )
   }
 
   isTranslucent = () => {
@@ -218,7 +220,10 @@ export class Header extends React.Component<Props, State> {
                     <>
                       <Animated.View style={[{ opacity: this.state.menuFade }]}>
                         {this.isDarkMode() ? (
-                          <LogoDarkBg height={30} allWhite={this.isTranslucent()} />
+                          <LogoDarkBg
+                            height={30}
+                            allWhite={this.isTranslucent() && !this.state.belowFoldUpScroll}
+                          />
                         ) : (
                           <LogoLightBg height={30} />
                         )}
@@ -240,10 +245,7 @@ export class Header extends React.Component<Props, State> {
                       />
                       {this.props.router.pathname === item.link && (
                         <View style={styles.activeTab}>
-                          <OvalCoin
-                            color={this.isTranslucent() ? colors.white : colors.primary}
-                            size={10}
-                          />
+                          <OvalCoin color={colors.primary} size={10} />
                         </View>
                       )}
                     </View>

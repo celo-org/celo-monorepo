@@ -1,5 +1,5 @@
-import React from 'react'
-import { createElement, Image, StyleSheet, View } from 'react-native'
+import * as React from 'react'
+import { createElement, Image, StyleSheet, View, ViewStyle } from 'react-native'
 import { BeautifulMoneyPreview } from 'src/about/images/index'
 import { H1, H3 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
@@ -7,34 +7,42 @@ import Hoverable from 'src/shared/Hoverable'
 import { PlayCircle2 } from 'src/shared/PlayCircle'
 import VideoModal from 'src/shared/VideoModal'
 import { standardStyles, textStyles } from 'src/styles'
-
+import { withScreenSize, ScreenSizes, ScreenProps } from 'src/layout/ScreenSize'
 interface State {
-  hovering: boolean
+  isHovering: boolean
 }
 
-function Video(props) {
+interface VideoProps {
+  style?: ViewStyle | ViewStyle[]
+  autoPlay?: boolean
+  muted?: boolean
+  loop?: boolean
+  children: React.ReactNode
+}
+
+function Video(props: VideoProps) {
   return createElement('video', props)
 }
 
-class VideoCover extends React.Component<I18nProps, State> {
+class VideoCover extends React.PureComponent<I18nProps & ScreenProps, State> {
   state: State = {
-    hovering: false,
+    isHovering: false,
   }
 
   onHoverStart = () => {
-    this.setState({ hovering: true })
+    this.setState({ isHovering: true })
   }
   onHoverEnd = () => {
-    this.setState({ hovering: false })
+    this.setState({ isHovering: false })
   }
 
   render() {
-    const { t } = this.props
+    const { t, screen } = this.props
     return (
       <View style={[styles.cover]}>
         <View style={styles.background}>
           <Video
-            style={[styles.video, this.state.hovering && styles.videoHover]}
+            style={[styles.video, this.state.isHovering && styles.videoHover]}
             muted={true}
             autoPlay={true}
             loop={true}
@@ -55,13 +63,20 @@ class VideoCover extends React.Component<I18nProps, State> {
                   style={[
                     standardStyles.centered,
                     styles.interactive,
-                    this.state.hovering && styles.hover,
+                    this.state.isHovering && styles.hover,
                   ]}
                 >
                   <H1
-                    style={[textStyles.invert, styles.title, standardStyles.elementalMarginBottom]}
+                    style={[
+                      textStyles.invert,
+                      styles.title,
+                      textStyles.center,
+                      standardStyles.elementalMarginBottom,
+                    ]}
                   >
-                    {t('prosperityForAll')}
+                    {screen === ScreenSizes.MOBILE
+                      ? t('prosperityForAllMobile')
+                      : t('prosperityForAll')}
                   </H1>
                   <View
                     style={[
@@ -71,7 +86,9 @@ class VideoCover extends React.Component<I18nProps, State> {
                     ]}
                   >
                     <PlayCircle2 height={40} />
-                    <H3 style={[textStyles.invert, styles.subtitle]}>{t('whatIfMoney')}</H3>
+                    <H3 style={[textStyles.invert, textStyles.center, styles.subtitle]}>
+                      {t('whatIfMoney')}
+                    </H3>
                   </View>
                 </View>
               </Hoverable>
@@ -83,19 +100,21 @@ class VideoCover extends React.Component<I18nProps, State> {
   }
 }
 
-export default withNamespaces(NameSpaces.about)(VideoCover)
+export default withNamespaces(NameSpaces.about)(withScreenSize(VideoCover))
 
 const styles = StyleSheet.create({
   title: {
     fontSize: 64,
+    lineHeight: 72,
   },
   subtitle: {
-    marginLeft: 15,
+    marginLeft: 10,
   },
   interactive: {
     cursor: 'pointer',
     transitionProperty: 'transform',
     transitionDuration: '500ms',
+    padding: 15,
   },
   hover: {
     transform: [{ scale: 1.015 }],
@@ -116,7 +135,7 @@ const styles = StyleSheet.create({
   video: {
     objectFit: 'cover',
     height: '100%',
-    filter: 'saturate(0.6) brightness(0.75)',
+    filter: 'saturate(0.6) brightness(0.70)',
     transitionProperty: 'filter',
     transitionDuration: '400ms',
   },
