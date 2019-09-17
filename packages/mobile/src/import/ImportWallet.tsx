@@ -126,6 +126,10 @@ export class ImportWallet extends React.Component<Props, State> {
     }
   }
 
+  isBackupPhraseValid() {
+    return this.state.backupPhrase.trim().split(/\s+/g).length >= 12
+  }
+
   render() {
     const { backupPhrase, isSubmitting } = this.state
     const { t, error } = this.props
@@ -177,7 +181,7 @@ export class ImportWallet extends React.Component<Props, State> {
           </View>
         )}
         <GethAwareButton
-          disabled={isSubmitting || !this.state.backupPhrase}
+          disabled={isSubmitting || !this.isBackupPhraseValid()}
           onPress={this.onSubmit}
           text={t('restoreWallet')}
           standard={false}
