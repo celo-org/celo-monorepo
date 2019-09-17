@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -570,6 +570,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     Proposals.VoteValue value
   )
     external
+    nonReentrant
     returns (bool)
   {
     address account = getAccountFromVoter(msg.sender);
