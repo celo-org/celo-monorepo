@@ -2,14 +2,14 @@ import { CeloContract } from './base'
 import { ContractKit } from './kit'
 import { AttestationsWrapper } from './wrappers/Attestations'
 import { ExchangeWrapper } from './wrappers/Exchange'
+import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
+import { GovernanceWrapper } from './wrappers/Governance'
 import { LockedGoldWrapper } from './wrappers/LockedGold'
+import { ReserveWrapper } from './wrappers/Reserve'
+import { SortedOraclesWrapper } from './wrappers/SortedOracles'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
 import { ValidatorsWrapper } from './wrappers/Validators'
-import { SortedOraclesWrapper } from './wrappers/SortedOracles'
-import { ReserveWrapper } from './wrappers/Reserve'
-import { GovernanceWrapper } from './wrappers/Governance'
-import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
 
 const WrapperFactories = {
   [CeloContract.Attestations]: AttestationsWrapper,

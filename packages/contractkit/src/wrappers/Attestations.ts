@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { Attestations } from '../generated/types/Attestations'
-import { BaseWrapper, proxySend, proxyCall, toBigNumber } from './BaseWrapper'
+import { BaseWrapper, proxyCall, proxySend, toBigNumber } from './BaseWrapper'
 
 export interface AttestationStat {
   completed: number

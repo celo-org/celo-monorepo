@@ -17,6 +17,11 @@ import {
  * using a Constant Product Market Maker Model
  */
 export class ExchangeWrapper extends BaseWrapper<Exchange> {
+  spread = proxyCall(this.contract.methods.spread, undefined, toBigNumber)
+  reserveFraction = proxyCall(this.contract.methods.reserveFraction, undefined, toBigNumber)
+  updateFrequency = proxyCall(this.contract.methods.updateFrequency, undefined, toBigNumber)
+  minimumReports = proxyCall(this.contract.methods.minimumReports, undefined, toBigNumber)
+
   /**
    * @dev Returns the amount of buyToken a user would get for sellAmount of sellToken
    * @param sellAmount The amount of sellToken the user is selling to the exchange
@@ -123,9 +128,4 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @return The corresponding cUsd amount.
    */
   quoteGoldBuy = (buyAmount: NumberLike) => this.getSellTokenAmount(buyAmount, true)
-
-  spread = proxyCall(this.contract.methods.spread, undefined, toBigNumber)
-  reserveFraction = proxyCall(this.contract.methods.reserveFraction, undefined, toBigNumber)
-  updateFrequency = proxyCall(this.contract.methods.updateFrequency, undefined, toBigNumber)
-  minimumReports = proxyCall(this.contract.methods.minimumReports, undefined, toBigNumber)
 }

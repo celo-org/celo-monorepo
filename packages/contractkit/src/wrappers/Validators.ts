@@ -8,8 +8,8 @@ import {
   CeloTransactionObject,
   proxyCall,
   proxySend,
-  wrapSend,
   toBigNumber,
+  wrapSend,
 } from './BaseWrapper'
 
 export interface Validator {
