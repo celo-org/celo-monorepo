@@ -42,6 +42,7 @@
     "@0x/sol-profiler": "^3.0.0",
     "@0x/sol-trace": "^2.0.16",
     "@0x/subproviders": "^5.0.0",
+    "@celo/utils": "^0.0.6-beta5",
     "apollo-client": "^2.4.13",
     "bls12377js": "https://github.com/celo-org/bls12377js#4f596cabb659c4f8969ae4b617f185f2bc74cbbb",
     "chai-subset": "^1.6.0",
