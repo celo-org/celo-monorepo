@@ -1,215 +1,174 @@
-import {
-  CeloContract,
-  CeloFunctionCall,
-  constructFunctionABICache,
-  Contracts,
-  FunctionABICache,
-  getContracts,
-  getFunctionSignatureFromInput,
-  parseFunctionCall,
-  parseLog,
-} from '@celo/walletkit'
-import { find } from 'lodash'
-import {
-  blockheaderCounter,
-  parsedTransactionCounter,
-  transactionCounter,
-  transactionGasUsed,
-  transactionLogsCounter,
-  transactionParsedLogsCounter,
-} from 'src/metrics'
-import Web3 from 'web3'
-import { Block, Transaction } from 'web3/eth/types'
-import { Log, TransactionReceipt } from 'web3/types'
-
-type Context = {
-  contracts: Contracts
-  functionABICache: FunctionABICache
-  web3: Web3
-}
+import { ContractKit, newKit } from '@celo/contractkit'
+import { newBlockExplorer, ParsedTx } from '@celo/contractkit/lib/explorer/block-explorer'
+import { newLogExplorer, ParsedBlock } from '@celo/contractkit/lib/explorer/log-explorer'
+import { Future } from '@celo/utils/lib/future'
+import { consoleLogger } from '@celo/utils/lib/logger'
+import { conditionWatcher, tryObtainValueWithRetries } from '@celo/utils/lib/task'
+import { Block, BlockHeader } from 'web3/eth/types'
+import { WebsocketProvider } from 'web3/providers'
+import { Counters } from './metrics'
 
 const EMPTY_INPUT = 'empty_input'
 const NO_METHOD_ID = 'no_method_id'
 const NOT_WHITELISTED_ADDRESS = 'not_whitelisted_address'
 const UNKNOWN_METHOD = 'unknown_method'
 
-async function instrumentLog(
-  log: Log,
-  parsedTransaction: CeloFunctionCall,
-  transactionContract: CeloContract,
-  web3: Web3
-) {
-  const parsedLog = parseLog(parsedTransaction, log, transactionContract, web3)
+export async function metricExporterWithRestart(providerUrl: string) {
+  try {
+    console.log('MetricExporter: Start')
+    let kit = newKit(providerUrl)
+    while (true) {
+      console.log('MetricExporter: Run Start')
+      const reason = await runMetricExporter(kit)
 
-  if (parsedLog === null) {
-    return
-  }
-
-  transactionParsedLogsCounter.inc({
-    contract: parsedTransaction.contractName,
-    function: parsedTransaction.functionName,
-    log: parsedLog.logName,
-  })
-
-  console.info(
-    JSON.stringify({
-      event: 'RECEIVED_PARSED_LOG',
-      ...parsedLog,
-    })
-  )
-}
-
-async function instrumentTransaction(transactionHash: string, context: Context) {
-  const transaction = await context.web3.eth.getTransaction(transactionHash)
-  const receipt = await context.web3.eth.getTransactionReceipt(transactionHash)
-  console.log(JSON.stringify({ event: 'RECEIVED_TRANSACTION', ...transaction }))
-  console.log(JSON.stringify({ event: 'RECEIVED_TRANSACTION_RECEIPT', ...receipt }))
-
-  const metricLabels = getTransactionLabels(transaction, receipt, context)
-  transactionCounter.inc(metricLabels)
-  transactionGasUsed.observe(metricLabels, receipt.gasUsed)
-  transactionLogsCounter.inc(metricLabels, receipt.logs.length)
-
-  const [parsedTransaction, transactionContract] = parseFunctionCall(
-    transaction,
-    context.functionABICache,
-    context.web3
-  )
-
-  if (parsedTransaction === null) {
-    return
-  }
-
-  parsedTransactionCounter.inc({
-    contract: parsedTransaction.contractName,
-    function: parsedTransaction.functionName,
-  })
-
-  console.info(
-    JSON.stringify({
-      event: 'RECEIVED_PARSED_TRANSACTION',
-      ...parsedTransaction,
-    })
-  )
-
-  receipt.logs &&
-    receipt.logs.forEach((log) => {
-      instrumentLog(log, parsedTransaction, transactionContract, context.web3)
-    })
-}
-
-async function instrumentTransactions(blockHash: string, context: Context) {
-  // @ts-ignore Types are wrong about using the hash to get block
-  const block: Block = await context.web3.eth.getBlock(blockHash)
-  const previousBlock: Block = await context.web3.eth.getBlock(block.number - 1)
-  const blockTime = block.timestamp - previousBlock.timestamp
-  console.log(JSON.stringify({ event: 'RECEIVED_BLOCK', ...block, blockTime }))
-
-  block.transactions.forEach(async function(transactionHash) {
-    // @ts-ignore Wrong type
-    instrumentTransaction(transactionHash, context)
-  })
-}
-
-function contractForTransaction(transaction: Transaction, context: Context) {
-  return find(context.contracts, (contract) => contract.options.address == transaction.to)
-}
-
-function whitelistAddress(transaction: Transaction, context: Context) {
-  return contractForTransaction(transaction, context) ? transaction.to : NOT_WHITELISTED_ADDRESS
-}
-
-function getTransactionLabels(
-  transaction: Transaction,
-  receipt: TransactionReceipt,
-  context: Context
-) {
-  return {
-    to: whitelistAddress(transaction, context),
-    methodId: getMethodId(transaction, context),
-    status: receipt.status.toString(),
-  }
-}
-
-function getMethodId(transaction: Transaction, context: Context) {
-  if (transaction.input === '0x') {
-    return EMPTY_INPUT
-  }
-  if (transaction.input.startsWith('0x')) {
-    const method = getFunctionSignatureFromInput(transaction, context.functionABICache)
-    return method ? transaction.input.substring(0, 10) : UNKNOWN_METHOD
-  }
-  // pretty much should never get here
-  return NO_METHOD_ID
-}
-
-export async function getContext(web3: Web3): Promise<Context> {
-  const contracts = await getContracts(web3)
-  return {
-    contracts,
-    web3,
-    functionABICache: constructFunctionABICache(Object.values(contracts), web3),
-  }
-}
-
-export async function pollBlockchain(provider: string) {
-  const web3: Web3 = new Web3(provider)
-  const context = await getContext(web3)
-  const web3Provider = web3.currentProvider
-
-  // @ts-ignore
-  web3Provider.on('error', function(error: any) {
-    console.error('Error from web3 provider')
-    console.error(error)
-    process.exit(1)
-  })
-
-  // @ts-ignore
-  web3Provider.on('close', function(error: any) {
-    console.error('Connection from web3 provider closed')
-    console.error(error)
-    process.exit(1)
-  })
-
-  async function reconnect(retries: number) {
-    console.log(`Retry with ${retries} left`)
-    if (retries <= 0) {
-      console.error('Reconnection attempts failed, exiting')
-      process.exit(1)
+      if (reason.reason === 'not-listening') {
+        console.error('MetricExporter: Web3 Not listening... retrying')
+        const maybeKit = await newListeningKit(providerUrl)
+        if (maybeKit != null) {
+          kit = maybeKit
+        } else {
+          console.error('MetricExporter: Retry failed. Exiting')
+        }
+      } else {
+        console.error('MetricExporter: Error %s', reason.reason)
+        console.error(reason.error)
+        process.exit(1)
+      }
     }
+  } catch (err) {
+    console.error('MetricExporter: Unexpected error %s', err.message)
+    console.error(err)
+    process.exit(1)
+  }
+}
 
-    // @ts-ignore
-    web3.setProvider(provider)
-    try {
-      await web3.eth.net.isListening()
-      console.info('Reconnection successful')
-      pollBlockchain(provider)
-    } catch (error) {
-      setTimeout(reconnect.bind(this, retries - 1), 5000)
-    }
+type EndReason =
+  | { reason: 'connection-error'; error: any }
+  | { reason: 'subscription-error'; error: any }
+  | { reason: 'not-listening' }
+
+export async function runMetricExporter(kit: ContractKit): Promise<EndReason> {
+  const blockProcessor = await newBlockHeaderProcessor(kit)
+  const provider = kit.web3.currentProvider as WebsocketProvider
+  const subscription = await kit.web3.eth.subscribe('newBlockHeaders')
+  subscription.on('data', blockProcessor)
+
+  const listeningWatcher = conditionWatcher({
+    name: 'check:kit:isListening',
+    logger: consoleLogger,
+    timeInBetweenMS: 5000,
+    initialDelayMS: 5000,
+    pollCondition: async () => !(await kit.isListening()),
+    onSuccess: () => endExporter({ reason: 'not-listening' }),
+  })
+
+  provider.on('error', ((error: any) => endExporter({ reason: 'connection-error', error })) as any)
+  subscription.on('error', (error: any) => endExporter({ reason: 'subscription-error', error }))
+
+  // Future that is resolved on error (see dispose)
+  const endReason = new Future<EndReason>()
+  const endExporter = (reason: EndReason) => {
+    listeningWatcher.stop()
+    ;(subscription as any).unsubscribe()
+    provider.removeAllListeners('error')
+    ;(provider as any).disconnect()
+    endReason.resolve(reason)
   }
 
-  async function pollConnectionStatus() {
-    try {
-      await web3.eth.net.isListening()
-      setTimeout(pollConnectionStatus, 10000)
-    } catch (error) {
-      console.error('Web3 reported disconnection')
-      setTimeout(reconnect.bind(this, 10), 5000)
+  return endReason.asPromise()
+}
+
+async function newListeningKit(providerUrl: string): Promise<null | ContractKit> {
+  try {
+    return tryObtainValueWithRetries({
+      name: 'createValidKit',
+      logger: consoleLogger,
+      maxAttemps: 10,
+      timeInBetweenMS: 5000,
+      tryGetValue: () => {
+        const kit = newKit(providerUrl)
+        return kit.isListening().then((isOk) => (isOk ? kit : null))
+      },
+    }).onValue()
+  } catch {
+    return null
+  }
+}
+
+const logEvent = (name: string, details: object) =>
+  console.log(JSON.stringify({ event: name, ...details }))
+
+async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockHeader) => void> {
+  const blockExplorer = await newBlockExplorer(kit)
+  const logExplorer = await newLogExplorer(kit)
+  function toMethodId(txInput: string, isKnownCall: boolean): string {
+    let methodId: string
+    if (txInput === '0x') {
+      methodId = EMPTY_INPUT
+    } else if (txInput.startsWith('0x')) {
+      methodId = isKnownCall ? txInput.slice(0, 10) : UNKNOWN_METHOD
+    } else {
+      // pretty much should never get here
+      methodId = NO_METHOD_ID
+    }
+    return methodId
+  }
+
+  function toTxMap(parsedBlock: ParsedBlock): Map<string, ParsedTx> {
+    const parsedTxMap: Map<string, ParsedTx> = new Map()
+    parsedBlock.parsedTx.forEach((ptx) => {
+      parsedTxMap.set(ptx.tx.hash, ptx)
+    })
+    return parsedTxMap
+  }
+
+  return async (header: BlockHeader) => {
+    Counters.blockheader.inc({ miner: header.miner })
+
+    const block = await blockExplorer.fetchBlock(header.number)
+    const previousBlock: Block = await blockExplorer.fetchBlock(header.number - 1)
+
+    const blockTime = block.timestamp - previousBlock.timestamp
+    logEvent('RECEIVED_BLOCK', { ...block, blockTime })
+
+    const parsedBlock = blockExplorer.parseBlock(block)
+    const parsedTxMap = toTxMap(parsedBlock)
+
+    for (const tx of parsedBlock.block.transactions) {
+      const parsedTx: ParsedTx | undefined = parsedTxMap.get(tx.hash)
+
+      logEvent('RECEIVED_TRANSACTION', tx)
+      const receipt = await kit.web3.eth.getTransactionReceipt(tx.hash)
+      logEvent('RECEIVED_TRANSACTION_RECEIPT', receipt)
+
+      const labels = {
+        to: parsedTx ? tx.to : NOT_WHITELISTED_ADDRESS,
+        methodId: toMethodId(tx.input, parsedTx != null),
+        status: receipt.status.toString(),
+      }
+
+      Counters.transaction.inc(labels)
+      Counters.transactionGasUsed.observe(labels, receipt.gasUsed)
+      Counters.transactionLogs.inc(labels, (receipt.logs || []).length)
+
+      if (parsedTx) {
+        Counters.parsedTransaction.inc({
+          contract: parsedTx.callDetails.contract,
+          function: parsedTx.callDetails.function,
+        })
+
+        logEvent('RECEIVED_PARSED_TRANSACTION', { ...parsedTx.callDetails, hash: tx.hash })
+
+        for (const event of logExplorer.getKnownLogs(receipt)) {
+          Counters.transactionParsedLogs.inc({
+            contract: parsedTx.callDetails.contract,
+            function: parsedTx.callDetails.function,
+            log: event.event,
+          })
+
+          logEvent('RECEIVED_PARSED_LOG', event)
+        }
+      }
     }
   }
-
-  pollConnectionStatus()
-
-  const subscription = await web3.eth.subscribe('newBlockHeaders')
-  subscription.on('data', function(header: Block) {
-    console.log(JSON.stringify({ event: 'RECEIVED_BLOCK_HEADER', ...header }))
-    blockheaderCounter.inc({ miner: header.miner })
-    instrumentTransactions(header.hash, context)
-  })
-  subscription.on('error', function(error: any) {
-    console.error('Error occurred during listening')
-    console.error(error)
-    process.exit(1)
-  })
 }

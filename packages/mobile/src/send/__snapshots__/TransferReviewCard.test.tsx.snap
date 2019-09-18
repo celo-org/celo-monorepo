@@ -463,7 +463,9 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
           },
         ]
       }
-    />
+    >
+      mobileNumber
+    </Text>
     <View
       style={
         Object {

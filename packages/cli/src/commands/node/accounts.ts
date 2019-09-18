@@ -7,6 +7,8 @@ export default class NodeAccounts extends BaseCommand {
     ...BaseCommand.flags,
   }
 
+  requireSynced = false
+
   async run() {
     this.parse(NodeAccounts)
 

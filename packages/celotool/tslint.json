@@ -4,7 +4,7 @@
     "exclude": ["**/__mocks__/**", "**/lcov-report/**"]
   },
   "rules": {
-    "no-relative-imports": true,
+    "no-relative-imports": false,
     "max-classes-per-file": [true, 2],
     "no-global-arrow-functions": false,
     "no-floating-promises": true

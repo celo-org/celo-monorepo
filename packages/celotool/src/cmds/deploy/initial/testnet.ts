@@ -1,4 +1,3 @@
-import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
 import { createClusterIfNotExists, setupCluster, switchToClusterFromEnv } from 'src/lib/cluster'
 import { createStaticIPs, installHelmChart, pollForBootnodeLoadBalancer } from 'src/lib/helm_deploy'
 import {
@@ -6,6 +5,7 @@ import {
   uploadStaticNodesToGoogleStorage,
 } from 'src/lib/testnet-utils'
 import yargs from 'yargs'
+import { InitialArgv } from '../../deploy/initial'
 
 export const command = 'testnet'
 
