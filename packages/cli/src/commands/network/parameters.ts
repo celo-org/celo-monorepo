@@ -47,10 +47,21 @@ export default class Parameters extends BaseCommand {
     console.log('exchange.updateFrequency', (await exchange.updateFrequency()).toString())
     console.log('exchange.minimumReports', (await exchange.minimumReports()).toString())
 
-    // governance wrapper doesn't exist
-    // const governance = await this.kit.contracts.getGovernance()
+    const governance = await this.kit.contracts.getGovernance()
+    console.log(
+      'governance.concurrentProposals',
+      (await governance.concurrentProposals()).toString()
+    )
+    console.log('governance.dequeueFrequency', (await governance.dequeueFrequency()).toString())
+    console.log('governance.minDeposit', (await governance.minDeposit()).toString())
+    console.log('governance.queueExpiry', (await governance.queueExpiry()).toString())
+    const durations = await governance.stageDurations()
+    console.log('governance.approvalStageDuration', durations[0])
+    console.log('governance.referendumStageDuration', durations[1])
+    console.log('governance.executionStageDuration', durations[2])
 
-    // reserve wrapper
+    // min gas wrapper?
+
     const reserve = await this.kit.contracts.getReserve()
     console.log(
       'reserve.tobinTaxStalenessThreshold',
@@ -59,11 +70,12 @@ export default class Parameters extends BaseCommand {
 
     console.log('stableToken.decimals', (await stableToken.decimals()).toString())
     console.log('stableToken.name', (await stableToken.name()).toString())
-    const res = await stableToken.getInflationParameters()
-    console.log('stableToken.rate', res[0])
-    console.log('stableToken.factor', res[1])
-    console.log('stableToken.updatePeriod', res[2])
-    console.log('stableToken.factorLastUpdated', res[3])
+    console.log('stableToken.symbol', (await stableToken.symbol()).toString())
+    const inflation = await stableToken.getInflationParameters()
+    console.log('stableToken.rate', inflation[0])
+    console.log('stableToken.factor', inflation[1])
+    console.log('stableToken.updatePeriod', inflation[2])
+    console.log('stableToken.factorLastUpdated', inflation[3])
 
     const validators = await this.kit.contracts.getValidators()
     console.log(
@@ -75,8 +87,8 @@ export default class Parameters extends BaseCommand {
       (await validators.maxElectableValidators()).toString()
     )
     console.log('validators.electionThreshold', (await validators.electionThreshold()).toString())
-    const res2 = await validators.getRegistrationRequirement()
-    console.log('validators.minLockedGoldValue', res2[0])
-    console.log('validators.minLockedGoldNoticePeriod', res2[1])
+    const req = await validators.getRegistrationRequirement()
+    console.log('validators.minLockedGoldValue', req[0])
+    console.log('validators.minLockedGoldNoticePeriod', req[1])
   }
 }
