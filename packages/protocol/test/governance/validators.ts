@@ -14,7 +14,7 @@ import {
   ValidatorsContract,
   ValidatorsInstance,
 } from 'types'
-import { toFixed, fixed1 } from '@celo/protocol/lib/fixidity'
+import { toFixed, fixed1 } from '@celo/utils/lib/fixidity'
 
 const Validators: ValidatorsContract = artifacts.require('Validators')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
