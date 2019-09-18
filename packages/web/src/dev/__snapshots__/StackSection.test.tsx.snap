@@ -222,6 +222,7 @@ exports[`StackSection renders with typical props 1`] = `
                 "width": "max-content",
               }
             }
+            target="blank"
           >
             test
           </a>
@@ -311,6 +312,7 @@ exports[`StackSection renders with typical props 1`] = `
                   "width": "max-content",
                 }
               }
+              target="blank"
             >
               test
             </a>

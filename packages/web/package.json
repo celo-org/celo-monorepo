@@ -89,6 +89,7 @@
     "babel-plugin-react-css-modules": "^5.0.0",
     "babel-plugin-react-native-web": "^0.11.2",
     "cross-env": "^5.1.6",
+    "jest-canvas-mock": "^2.1.1",
     "node-sass": "^4.11.0",
     "nodemon": "^1.18.8",
     "postcss-scss": "^1.0.5",

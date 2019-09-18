@@ -39,8 +39,9 @@ type NakedProps = {
 } & AllButtonProps
 
 type PrimaryProps = {
-  size?: SIZE
   kind: BTN.PRIMARY | BTN.SECONDARY | BTN.TERTIARY
+  size?: SIZE
+  style?: TextStyle | TextStyle[]
 } & AllButtonProps
 
 type InlineProps = {
