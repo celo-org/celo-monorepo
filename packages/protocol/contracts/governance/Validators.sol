@@ -170,6 +170,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     maxElectableValidators = _maxElectableValidators;
     registrationRequirement.value = requirementValue;
     registrationRequirement.noticePeriod = requirementNoticePeriod;
+    maxGroupSize = 10;
   }
 
   /**
