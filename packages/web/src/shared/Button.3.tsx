@@ -394,7 +394,6 @@ const primaryStyles = StyleSheet.create({
   },
 })
 
-// TODO Remove color from here as it is throwing a prop type warning, move to Text
 const secondaryStyles = StyleSheet.create({
   normal: {
     backgroundColor: 'transparent',
