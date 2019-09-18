@@ -1,16 +1,17 @@
+import BigNumber from 'bignumber.js'
+import { assert } from 'chai'
+import Web3 from 'web3'
+import { strip0x } from '../lib/utils'
 import {
+  assertRevert,
   erc20Abi,
+  getContext,
   getContractAddress,
   getEnode,
-  getHooks,
   importGenesis,
   initAndStartGeth,
   sleep,
-} from '@celo/celotool/geth_tests/src/lib/utils'
-import BigNumber from 'bignumber.js'
-import { strip0x } from '../src/lib/utils'
-const assert = require('chai').assert
-const Web3 = require('web3')
+} from './utils'
 
 // TODO(asa): Use the contract kit here instead
 const lockedGoldAbi = [
@@ -167,6 +168,39 @@ const validatorsAbi = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
+  {
+    constant: true,
+    inputs: [
+      {
+        name: 'index',
+        type: 'uint256',
+      },
+    ],
+    name: 'validatorAddressFromCurrentSet',
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'numberValidatorsInCurrentSet',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
 ]
 
 describe('governance tests', () => {
@@ -181,7 +215,7 @@ describe('governance tests', () => {
     ],
   }
 
-  const hooks: any = getHooks(gethConfig)
+  const context: any = getContext(gethConfig)
   let web3: any
   let lockedGold: any
   let validators: any
@@ -189,22 +223,22 @@ describe('governance tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
-    await hooks.before()
+    await context.hooks.before()
   })
 
-  after(hooks.after)
+  after(context.hooks.after)
 
   const restart = async () => {
-    await hooks.restart()
+    await context.hooks.restart()
     web3 = new Web3('http://localhost:8545')
     lockedGold = new web3.eth.Contract(lockedGoldAbi, await getContractAddress('LockedGoldProxy'))
     goldToken = new web3.eth.Contract(erc20Abi, await getContractAddress('GoldTokenProxy'))
     validators = new web3.eth.Contract(validatorsAbi, await getContractAddress('ValidatorsProxy'))
   }
 
-  const unlockAccount = async (address: string, web3: any) => {
+  const unlockAccount = async (address: string, theWeb3: any) => {
     // Assuming empty password
-    await web3.eth.personal.unlockAccount(address, '', 1000)
+    await theWeb3.eth.personal.unlockAccount(address, '', 1000)
   }
 
   const getParsedSignatureOfAddress = async (address: string, signer: string, signerWeb3: any) => {
@@ -248,7 +282,7 @@ describe('governance tests', () => {
     if (!gas) {
       gas = await tx.estimateGas({ ...txOptions })
     }
-    return await tx.send({ from: group, ...txOptions, gas })
+    return tx.send({ from: group, ...txOptions, gas })
   }
 
   const addMember = async (groupWeb3: any, group: string, member: string, txOptions: any = {}) => {
@@ -258,7 +292,7 @@ describe('governance tests', () => {
     if (!gas) {
       gas = await tx.estimateGas({ ...txOptions })
     }
-    return await tx.send({ from: group, ...txOptions, gas })
+    return tx.send({ from: group, ...txOptions, gas })
   }
 
   const delegateRewards = async (account: string, delegate: string, txOptions: any = {}) => {
@@ -274,7 +308,7 @@ describe('governance tests', () => {
     if (!gas) {
       gas = 2 * (await tx.estimateGas({ ...txOptions }))
     }
-    return await tx.send({ from: account, ...txOptions, gas })
+    return tx.send({ from: account, ...txOptions, gas })
   }
 
   const redeemRewards = async (account: string, txOptions: any = {}) => {
@@ -286,8 +320,149 @@ describe('governance tests', () => {
     if (!gas) {
       gas = 2 * (await tx.estimateGas({ ...txOptions }))
     }
-    return await tx.send({ from: account, ...txOptions, gas })
+    return tx.send({ from: account, ...txOptions, gas })
   }
+
+  describe('Validators.numberValidatorsInCurrentSet()', () => {
+    before(async function() {
+      this.timeout(0)
+      await restart()
+      validators = new web3.eth.Contract(validatorsAbi, await getContractAddress('ValidatorsProxy'))
+    })
+
+    it('should return the validator set size', async () => {
+      const numberValidators = await validators.methods.numberValidatorsInCurrentSet().call()
+
+      assert.equal(numberValidators, 5)
+    })
+
+    describe('after the validator set changes', () => {
+      before(async function() {
+        this.timeout(0)
+        await restart()
+        const [groupAddress, groupPrivateKey] = await getValidatorGroupKeys()
+        const epoch = 10
+
+        const groupInstance = {
+          name: 'validatorGroup',
+          validating: false,
+          syncmode: 'full',
+          port: 30325,
+          wsport: 8567,
+          privateKey: groupPrivateKey.slice(2),
+          peers: [await getEnode(8545)],
+        }
+        await initAndStartGeth(context.hooks.gethBinaryPath, groupInstance)
+        const groupWeb3 = new Web3('ws://localhost:8567')
+        validators = new groupWeb3.eth.Contract(
+          validatorsAbi,
+          await getContractAddress('ValidatorsProxy')
+        )
+        // Give the node time to sync.
+        await sleep(15)
+        const members = await getValidatorGroupMembers()
+        await removeMember(groupWeb3, groupAddress, members[0])
+        await sleep(epoch * 2)
+      })
+
+      it('should return the reduced validator set size', async () => {
+        const numberValidators = await validators.methods.numberValidatorsInCurrentSet().call()
+
+        assert.equal(numberValidators, 4)
+      })
+    })
+  })
+
+  describe('Validators.validatorAddressFromCurrentSet()', () => {
+    before(async function() {
+      this.timeout(0)
+      await restart()
+      validators = new web3.eth.Contract(validatorsAbi, await getContractAddress('ValidatorsProxy'))
+    })
+
+    it('should return the first validator', async () => {
+      const resultAddress = await validators.methods.validatorAddressFromCurrentSet(0).call()
+
+      assert.equal(strip0x(resultAddress), context.validators[0].address)
+    })
+
+    it('should return the third validator', async () => {
+      const resultAddress = await validators.methods.validatorAddressFromCurrentSet(2).call()
+
+      assert.equal(strip0x(resultAddress), context.validators[2].address)
+    })
+
+    it('should return the fifth validator', async () => {
+      const resultAddress = await validators.methods.validatorAddressFromCurrentSet(4).call()
+
+      assert.equal(strip0x(resultAddress), context.validators[4].address)
+    })
+
+    it('should revert when asked for an out of bounds validator', async function(this: any) {
+      this.timeout(0) // Disable test timeout
+      await assertRevert(
+        validators.methods.validatorAddressFromCurrentSet(5).send({
+          from: `0x${context.validators[0].address}`,
+        })
+      )
+    })
+
+    describe('after the validator set changes', () => {
+      before(async function() {
+        this.timeout(0)
+        await restart()
+        const [groupAddress, groupPrivateKey] = await getValidatorGroupKeys()
+        const epoch = 10
+
+        const groupInstance = {
+          name: 'validatorGroup',
+          validating: false,
+          syncmode: 'full',
+          port: 30325,
+          wsport: 8567,
+          privateKey: groupPrivateKey.slice(2),
+          peers: [await getEnode(8545)],
+        }
+        await initAndStartGeth(context.hooks.gethBinaryPath, groupInstance)
+        const groupWeb3 = new Web3('ws://localhost:8567')
+        validators = new groupWeb3.eth.Contract(
+          validatorsAbi,
+          await getContractAddress('ValidatorsProxy')
+        )
+        // Give the node time to sync.
+        await sleep(15)
+        const members = await getValidatorGroupMembers()
+        await removeMember(groupWeb3, groupAddress, members[0])
+        await sleep(epoch * 2)
+
+        validators = new web3.eth.Contract(
+          validatorsAbi,
+          await getContractAddress('ValidatorsProxy')
+        )
+      })
+
+      it('should return the second validator in the first place', async () => {
+        const resultAddress = await validators.methods.validatorAddressFromCurrentSet(0).call()
+
+        assert.equal(strip0x(resultAddress), context.validators[1].address)
+      })
+
+      it('should return the last validator in the fourth place', async () => {
+        const resultAddress = await validators.methods.validatorAddressFromCurrentSet(3).call()
+
+        assert.equal(strip0x(resultAddress), context.validators[4].address)
+      })
+
+      it('should revert when asked for an out of bounds validator', async function(this: any) {
+        this.timeout(0)
+        await assertRevert(
+          validators.methods.validatorAddressFromCurrentSet(4).send({
+            from: `0x${context.validators[0].address}`,
+          })
+        )
+      })
+    })
+  })
 
   describe('when the validator set is changing', () => {
     const epoch = 10
@@ -306,7 +481,7 @@ describe('governance tests', () => {
         privateKey: groupPrivateKey.slice(2),
         peers: [await getEnode(8545)],
       }
-      await initAndStartGeth(hooks.gethBinaryPath, groupInstance)
+      await initAndStartGeth(context.hooks.gethBinaryPath, groupInstance)
       const groupWeb3 = new Web3('ws://localhost:8567')
       validators = new groupWeb3.eth.Contract(
         validatorsAbi,
@@ -321,9 +496,9 @@ describe('governance tests', () => {
 
       const changeValidatorSet = async (header: any) => {
         // At the start of epoch N, swap members so the validator set is different for epoch N + 1.
-        if (header.number % epoch == 0) {
-          const members = await getValidatorGroupMembers()
-          const direction = members.includes(membersToSwap[0])
+        if (header.number % epoch === 0) {
+          const groupMembers = await getValidatorGroupMembers()
+          const direction = groupMembers.includes(membersToSwap[0])
           const removedMember = direction ? membersToSwap[0] : membersToSwap[1]
           const addedMember = direction ? membersToSwap[1] : membersToSwap[0]
           expectedEpochMembership.set(header.number / epoch, [removedMember, addedMember])
@@ -335,10 +510,11 @@ describe('governance tests', () => {
         }
       }
 
-      const subscription = groupWeb3.eth.subscribe('newBlockHeaders').on('data', changeValidatorSet)
+      const subscription = await groupWeb3.eth.subscribe('newBlockHeaders')
+      subscription.on('data', changeValidatorSet)
       // Wait for a few epochs while changing the validator set.
       await sleep(epoch * 3)
-      subscription.unsubscribe()
+      ;(subscription as any).unsubscribe()
       // Wait for the current epoch to complete.
       await sleep(epoch)
     })
@@ -346,14 +522,15 @@ describe('governance tests', () => {
     it('should have produced blocks with the correct validator set', async function(this: any) {
       this.timeout(0) // Disable test timeout
       assert.equal(expectedEpochMembership.size, 3)
+      // tslint:disable-next-line: no-console
       console.log(expectedEpochMembership)
-      for (let [epochNumber, membership] of expectedEpochMembership) {
+      for (const [epochNumber, membership] of expectedEpochMembership) {
         let containsExpectedMember = false
         for (let i = epochNumber * epoch + 1; i < (epochNumber + 1) * epoch + 1; i++) {
           const block = await web3.eth.getBlock(i)
           assert.notEqual(block.miner.toLowerCase(), membership[1].toLowerCase())
           containsExpectedMember =
-            containsExpectedMember || block.miner.toLowerCase() == membership[0].toLowerCase()
+            containsExpectedMember || block.miner.toLowerCase() === membership[0].toLowerCase()
         }
         assert.isTrue(containsExpectedMember)
       }
@@ -375,7 +552,7 @@ describe('governance tests', () => {
         rpcport: 8567,
         privateKey: 'f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d',
       }
-      await initAndStartGeth(hooks.gethBinaryPath, delegateInstance)
+      await initAndStartGeth(context.hooks.gethBinaryPath, delegateInstance)
       // Note that we don't need to create an account or make a commitment as this has already been
       // done in the migration.
       await delegateRewards(account, delegate)
@@ -391,16 +568,16 @@ describe('governance tests', () => {
 
   describe('when adding any block', () => {
     let goldGenesisSupply: any
-    let addressesWithBalance: string[] = []
+    const addressesWithBalance: string[] = []
     beforeEach(async function(this: any) {
       this.timeout(0) // Disable test timeout
       await restart()
       const genesis = await importGenesis()
       goldGenesisSupply = new BigNumber(0)
-      for (let validator in genesis.alloc) {
+      Object.keys(genesis.alloc).forEach((validator) => {
         addressesWithBalance.push(validator)
         goldGenesisSupply = goldGenesisSupply.plus(genesis.alloc[validator].balance)
-      }
+      })
       // Block rewards are paid to governance and Locked Gold.
       // Governance also receives a portion of transaction fees.
       addressesWithBalance.push(await getContractAddress('GovernanceProxy'))
@@ -426,7 +603,7 @@ describe('governance tests', () => {
       const expectedGoldTotalSupply = balances.reduce((total: BigNumber, b: BigNumber) =>
         b.plus(total)
       )
-      assert.isAtLeast(expectedGoldTotalSupply, goldGenesisSupply)
+      assert.isAtLeast(expectedGoldTotalSupply.toNumber(), goldGenesisSupply.toNumber())
       assert.equal(goldTotalSupply.toString(), expectedGoldTotalSupply.toString())
     })
   })

@@ -1,8 +1,7 @@
 import { AccountArgv } from '@celo/celotool/src/cmds/account'
 import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
-import { CeloTransactionObject, newKit } from '@celo/contractkit'
+import { CeloContract, CeloTransactionObject, newKit } from '@celo/contractkit'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
-import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import { ActionableAttestation, decodeAttestationCode } from '@celo/walletkit'
 import prompts from 'prompts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
@@ -50,7 +49,6 @@ async function verifyCmd(argv: VerifyArgv) {
   kit.defaultAccount = account
 
   const attestations = await kit.contracts.getAttestations()
-  const stableToken = await kit.contracts.getStableToken()
   await printCurrentCompletedAttestations(attestations, argv.phone, account)
 
   let attestationsToComplete = await attestations.getActionableAttestations(argv.phone, account)
@@ -60,7 +58,6 @@ async function verifyCmd(argv: VerifyArgv) {
     console.info(`Requesting ${argv.num - attestationsToComplete.length} attestations`)
     await requestMoreAttestations(
       attestations,
-      stableToken,
       argv.phone,
       argv.num - attestationsToComplete.length
     )
@@ -102,12 +99,11 @@ async function send(obj: Promise<CeloTransactionObject<any>>) {
 }
 async function requestMoreAttestations(
   attestations: AttestationsWrapper,
-  stableToken: StableTokenWrapper,
   phoneNumber: string,
   attestationsRequested: number
 ) {
-  await send(attestations.approveAttestationFee(stableToken, attestationsRequested))
-  await send(attestations.request(phoneNumber, attestationsRequested, stableToken))
+  await send(attestations.approveAttestationFee(CeloContract.StableToken, attestationsRequested))
+  await send(attestations.request(phoneNumber, attestationsRequested, CeloContract.StableToken))
 }
 
 async function revealAttestations(

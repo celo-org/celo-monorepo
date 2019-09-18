@@ -1,5 +1,5 @@
-import { DestroyArgv } from '@celo/celotool/src/cmds/deploy/destroy'
-import { destroy } from '@celo/celotool/src/lib/vm-testnet-utils'
+import { destroy } from 'src/lib/vm-testnet-utils'
+import { DestroyArgv } from '../../deploy/destroy'
 
 export const command = 'vm-testnet'
 export const describe = 'destroy an existing VM-based testnet'

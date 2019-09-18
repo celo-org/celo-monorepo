@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -10,6 +10,7 @@ import "./UsingLockedGold.sol";
 import "./interfaces/IGovernance.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
+import "../common/FractionUtil.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 
 
@@ -19,6 +20,7 @@ import "../common/linkedlists/IntegerSortedLinkedList.sol";
  */
 contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, ReentrancyGuard {
   using FixidityLib for FixidityLib.Fraction;
+  using FractionUtil for FractionUtil.Fraction;
   using SafeMath for uint256;
   using IntegerSortedLinkedList for SortedLinkedList.List;
   using BytesLib for bytes;
@@ -535,6 +537,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     VoteValue value
   )
     external
+    nonReentrant
     returns (bool)
   {
     address account = getAccountFromVoter(msg.sender);
@@ -875,17 +878,26 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     if (yesNoVotes == 0) {
       return false;
     }
-    FixidityLib.Fraction memory yesRatio = FixidityLib.newFixed(proposal.votes.yes).divide(
-      FixidityLib.newFixed(yesNoVotes)
+    // We use FractionUtil fractions instead of Fixidity because we would need
+    // to use FixidityLib.divide here, and yesNoVotes could easily be greater
+    // than maxFixedDivisor.
+    // This fraction does not have any additional arithmetic done to it, so we
+    // don't need to worry about overflow of non-simplified fractions.
+    FractionUtil.Fraction memory yesRatio = FractionUtil.Fraction(
+      proposal.votes.yes,
+      yesNoVotes
     );
 
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
       bytes4 functionId = extractFunctionSignature(proposal.transactions[i].data);
-      FixidityLib.Fraction memory threshold = _getConstitution(
+      FixidityLib.Fraction memory thresholdFixed = _getConstitution(
         proposal.transactions[i].destination,
         functionId
       );
-      if (yesRatio.lte(threshold)) {
+      FractionUtil.Fraction memory threshold = FractionUtil.Fraction(
+        thresholdFixed.unwrap(), FixidityLib.fixed1().unwrap()
+      );
+      if (yesRatio.isLessThanOrEqualTo(threshold)) {
         return false;
       }
     }

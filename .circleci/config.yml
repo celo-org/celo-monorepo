@@ -59,7 +59,7 @@ jobs:
           at: ~/app
 
       - restore_cache:
-          keys: 
+          keys:
             - yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
             - yarn-v2-{{ arch }}-{{ .Branch }}-
             - yarn-v2-{{ arch }}-
@@ -94,6 +94,7 @@ jobs:
           name: Build packages
           command: |
             # separate build to avoid ENOMEN in CI :(
+            yarn build --scope @celo/utils
             yarn build --scope @celo/protocol
             yarn build --scope docs
             yarn build --scope @celo/walletkit
@@ -207,6 +208,29 @@ jobs:
           name: test
           # Flaky tests - run them twice
           command: yarn --cwd packages/protocol test || yarn --cwd packages/protocol test
+
+  # Slow and flaky compared to protocol-test which runs without coverage
+  protocol-test-with-code-coverage:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            FILES_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+      - run:
+          name: test
+          # Flaky tests - run them twice
+          command: yarn --cwd packages/protocol test:coverage || yarn --cwd packages/protocol test:coverage
+      - store_artifacts:
+          path: packages/protocol/coverage
+          destination: protocol/coverage
+      - run:
+          name: Upload to CodeCov
+          command: yarn codecov -F protocol
+
   contractkit-test:
     <<: *defaults
     steps:
@@ -260,7 +284,11 @@ jobs:
               git --no-pager diff packages/docs/command-line-interface
               echo "There are git differences after generating CLI docs"
               exit 1
-            fi            
+            fi
+      - run:
+          name: Verify that a new account can be created
+          command: |
+            yarn --cwd=packages/cli run celocli account:new
 
   end-to-end-geth-transfer-test:
     <<: *defaults
@@ -517,7 +545,7 @@ workflows:
           requires:
             - lint-checks
             - walletkit-test
-  nightly:
+  npm-install-testing-cron-workflow:
     triggers:
       - schedule:
           # 7 PM in UTC = noon in PDT.
@@ -532,3 +560,25 @@ workflows:
       - test-utils-npm-package-install
       - test-walletkit-npm-package-install
       - test-celocli-npm-package-install
+  protocol-testing-with-code-coverage-cron-workflow:
+    triggers:
+      - schedule:
+          # 1 PM in UTC = 6 AM in PDT.
+          # Best for this slow test (~3 hours) to run during SF early morning.
+          cron: "0 13 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - install_dependencies
+      - lint-checks:
+          requires:
+            - install_dependencies
+      - walletkit-test:
+          requires:
+            - install_dependencies
+      - protocol-test-with-code-coverage:
+          requires:
+            - lint-checks
+            - walletkit-test

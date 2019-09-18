@@ -1,5 +1,6 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
+import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
@@ -15,7 +16,7 @@ import "../common/interfaces/IERC20Token.sol";
 /**
  * @title Ensures price stability of StableTokens with respect to their pegs
  */
-contract Reserve is IReserve, Ownable, Initializable, UsingRegistry {
+contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyGuard {
 
   using SafeMath for uint256;
 
@@ -70,7 +71,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry {
    * @notice Add a token that the reserve will stablize.
    * @param token The address of the token being stabilized.
    */
-  function addToken(address token) external onlyOwner returns (bool) {
+  function addToken(address token) external onlyOwner nonReentrant returns (bool) {
     require(!isToken[token], "token addr already registered");
     // Require an exchange rate between the new token and Gold exists.
     address sortedOraclesAddress = registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID);
@@ -100,7 +101,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry {
     returns (bool)
   {
     require(
-      index < _tokens.length && _tokens[index] == token, 
+      index < _tokens.length && _tokens[index] == token,
       "index into tokens list not mapped to token"
     );
     isToken[token] = false;
@@ -131,16 +132,6 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry {
   }
 
   /**
-   * @notice Burns all tokens held by the Reserve.
-   * @param token The address of the token to burn.
-   */
-  function burnToken(address token) external isStableToken(token) returns (bool) {
-    IStableToken stableToken = IStableToken(token);
-    require(stableToken.burn(stableToken.balanceOf(address(this))), "reserve token burn failed");
-    return true;
-  }
-
-  /**
    * @notice Transfer gold.
    * @param to The address that will receive the gold.
    * @param value The amount of gold to transfer.
@@ -162,7 +153,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry {
    * @notice Returns the tobin tax, recomputing it if it's stale.
    * @return The tobin tax amount as a fraction.
    */
-  function getOrComputeTobinTax() external returns (uint256, uint256) {
+  function getOrComputeTobinTax() external nonReentrant returns (uint256, uint256) {
     // solhint-disable-next-line not-rely-on-time
     if (now.sub(tobinTaxCache.timestamp) > tobinTaxStalenessThreshold) {
       tobinTaxCache.numerator = uint128(computeTobinTax());

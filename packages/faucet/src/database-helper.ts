@@ -54,6 +54,7 @@ export async function processRequest(snap: DataSnapshot, pool: AccountPool, conf
     const success = await pool.doWithAccount(requestHandler)
     await snap.ref.update({ status: success ? RequestStatus.Done : RequestStatus.Failed })
   } catch (err) {
+    console.error(`req(${snap.key}): ERROR proccessRequest`, err)
     await snap.ref.update({ status: RequestStatus.Failed })
     throw err
   }

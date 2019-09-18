@@ -1,10 +1,11 @@
 /* tslint:disable no-console */
-import { AccountArgv } from '@celo/celotool/src/cmds/account'
-import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
+
 import { newKit } from '@celo/contractkit'
 import { PhoneNumberUtils } from '@celo/utils'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { portForwardAnd } from 'src/lib/port_forward'
 import { Argv } from 'yargs'
+import { AccountArgv } from '../account'
 
 export const command = 'lookup'
 

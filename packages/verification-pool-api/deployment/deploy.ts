@@ -12,7 +12,7 @@ async function main() {
   try {
     await util.deploy(envArg)
   } catch (e) {
-    console.log(e)
+    console.error(e)
   }
 }
 
