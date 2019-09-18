@@ -114,7 +114,7 @@ const networks = {
 
   alfajoresstaging: {
     ...defaultConfig,
-    from: ALFAJORESSTAGING_FROM,
+    from: ALFAJORESSTAING_FROM,
   },
 
   alfajores: {
