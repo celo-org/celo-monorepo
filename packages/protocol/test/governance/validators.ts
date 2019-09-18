@@ -958,6 +958,14 @@ contract('Validators', (accounts: string[]) => {
       await assertRevert(validators.addMember(accounts[2]))
     })
 
+    it('should revert when trying to add too many members to group', async () => {
+      await validators.setMaxGroupSize(1)
+      await validators.addMember(validator)
+      await registerValidator(accounts[2])
+      await validators.affiliate(group, { from: accounts[2] })
+      await assertRevert(validators.addMember(accounts[2]))
+    })
+
     describe('when the validator has not affiliated themselves with the group', () => {
       beforeEach(async () => {
         await validators.deaffiliate({ from: validator })
