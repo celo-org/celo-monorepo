@@ -8,7 +8,7 @@ import {
   getEnode,
   getContractAddress,
   getTxpoolContents,
-} from '@celo/celotool/geth_tests/src/lib/utils'
+} from './utils'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { Tx } from 'web3/eth/types'
