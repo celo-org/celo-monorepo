@@ -123,6 +123,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @dev Called by the EVM at the end of the block.
    */
   function setCumulativeRewardWeight(uint256 blockReward) external {
+    require(blockReward > 0, "placeholder to suppress warning");
     return;
     // TODO(asa): Modify ganache to set cumulativeRewardWeights.
     // TODO(asa): Make inheritable `onlyVm` modifier.
