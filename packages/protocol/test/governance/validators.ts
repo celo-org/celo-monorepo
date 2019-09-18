@@ -14,6 +14,7 @@ import {
   ValidatorsContract,
   ValidatorsInstance,
 } from 'types'
+import { toFixed, fixed1 } from '@celo/protocol/lib/fixidity'
 
 const Validators: ValidatorsContract = artifacts.require('Validators')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
@@ -60,6 +61,7 @@ contract('Validators', (accounts: string[]) => {
   const minElectableValidators = new BigNumber(4)
   const maxElectableValidators = new BigNumber(6)
   const registrationRequirement = { value: new BigNumber(100), noticePeriod: new BigNumber(60) }
+  const electionThreshold = new BigNumber(0)
   const identifier = 'test-identifier'
   const name = 'test-name'
   const url = 'test-url'
@@ -73,7 +75,8 @@ contract('Validators', (accounts: string[]) => {
       minElectableValidators,
       maxElectableValidators,
       registrationRequirement.value,
-      registrationRequirement.noticePeriod
+      registrationRequirement.noticePeriod,
+      electionThreshold
     )
   })
 
@@ -147,7 +150,8 @@ contract('Validators', (accounts: string[]) => {
           minElectableValidators,
           maxElectableValidators,
           registrationRequirement.value,
-          registrationRequirement.noticePeriod
+          registrationRequirement.noticePeriod,
+          electionThreshold
         )
       )
     })
@@ -155,13 +159,15 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#setElectionThreshold', () => {
     it('should set the election threshold', async () => {
-      await validators.setElectionThreshold(1, 10)
-      const result = await validators.electionThreshold()
-      console.log(result.toString(10))
-      assertEqualBN(result, new BigNumber('1e+23'))
+      const threshold = fixed1.div(new BigNumber('10'))
+      await validators.setElectionThreshold(threshold)
+      const result = await validators.getElectionThreshold()
+      assertEqualBN(result, threshold)
     })
+
     it('should revert when the threshold is larger than 100%', async () => {
-      await assertRevert(validators.setElectionThreshold(2, 1))
+      const threshold = toFixed(new BigNumber('2'))
+      await assertRevert(validators.setElectionThreshold(threshold))
     })
   })
 
@@ -1391,7 +1397,8 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when election threshold is set to 20%', () => {
       beforeEach(async () => {
-        await validators.setElectionThreshold(2, 10)
+        const threshold = fixed1.div(new BigNumber('5'))
+        await validators.setElectionThreshold(threshold)
         await validators.vote(group1, NULL_ADDRESS, NULL_ADDRESS, { from: voter1.address })
         await validators.vote(group2, NULL_ADDRESS, group1, { from: voter2.address })
         await validators.vote(group3, NULL_ADDRESS, group2, { from: voter3.address })
