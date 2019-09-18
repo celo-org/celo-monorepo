@@ -172,7 +172,9 @@ library Proposals {
     }
     uint256 noVotes = proposal.votes.no;
     uint256 totalVotes = yesVotes.add(noVotes).add(proposal.votes.abstain);
-    uint256 requiredVotes = quorum.multiply(FixidityLib.newFixed(proposal.networkWeight)).fromFixed();
+    uint256 requiredVotes = quorum.multiply(
+        FixidityLib.newFixed(proposal.networkWeight)
+    ).fromFixed();
     if (requiredVotes > totalVotes) {
       noVotes = noVotes.add(requiredVotes.sub(totalVotes));
     }
@@ -220,7 +222,13 @@ library Proposals {
    * @param proposal The proposal struct.
    * @return The participation of the proposal.
    */
-  function getParticipation(Proposal storage proposal) internal view returns (FixidityLib.Fraction memory) {
+  function getParticipation(
+    Proposal storage proposal
+  ) 
+    internal 
+    view 
+    returns (FixidityLib.Fraction memory) 
+  {
     uint256 totalVotes = proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain);
     return FixidityLib.newFixedFraction(totalVotes, proposal.networkWeight);
   }

@@ -353,7 +353,10 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @param participationFloor The value at which the baseline is floored.
    */
   function setParticipationFloor(uint256 participationFloor) external onlyOwner {
-    require(participationFloor != participationParameters.baselineFloor.unwrap() && isFraction(participationFloor));
+    require(
+      participationFloor != participationParameters.baselineFloor.unwrap() &&
+      isFraction(participationFloor)
+    );
     participationParameters.baselineFloor = FixidityLib.wrap(participationFloor);
     emit ParticipationFloorSet(participationFloor);
   }
@@ -891,7 +894,9 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     );
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
       bytes4 functionId = extractFunctionSignature(proposal.transactions[i].data);
-      FixidityLib.Fraction memory threshold = _getConstitution(proposal.transactions[i].destination, functionId);
+      FixidityLib.Fraction memory threshold = _getConstitution(
+        proposal.transactions[i].destination, functionId
+      );
       if (support.lte(threshold)) {
         return false;
       }
