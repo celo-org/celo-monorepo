@@ -25,6 +25,9 @@ spec:
   - metadata:
       name: data
     spec:
+      {{ {{- if .Values.geth.ssd_disks -}}
+      storageClassName: ssd
+      {{- end -}}}}}
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
@@ -122,6 +125,8 @@ spec:
           ACCOUNT_ADDRESS=`cat /root/.celo/address`
           RID=`cat /root/.celo/replica_id`
           FAULTY_NODE_FLAGS=`if [ "$RID" -lt "$FAULTY_NODES" ]; then echo -n "--istanbul.faultymode $FAULTY_NODE_TYPE"; fi`
+          PING_IP_FROM_PACKET_FLAG=""
+          [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"
           geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
             --password=/root/.celo/account/accountSecret \
@@ -151,7 +156,7 @@ spec:
             --maxpeers={{ mul 2 (add .Values.geth.validators .Values.geth.tx_nodes) }} \
             --nat=extip:`cat /root/.celo/ipAddress` \
             --metrics \
-            --ping-ip-from-packet
+            ${PING_IP_FROM_PACKET_FLAG}
         env:
         - name: POD_IP
           valueFrom:
@@ -178,6 +183,8 @@ spec:
           value: {{ .Values.geth.faultyValidatorType | quote }}
         - name: STATIC_IPS_FOR_GETH_NODES
           value: "{{ default false .Values.geth.static_ips }}"
+        - name: PING_IP_FROM_PACKET
+          value: "{{ default false .Values.geth.ping_ip_from_packet }}"
         ports:
         - name: discovery-udp
           containerPort: 30303

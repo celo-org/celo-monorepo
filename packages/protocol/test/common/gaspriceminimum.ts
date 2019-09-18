@@ -4,14 +4,14 @@ import {
   assertRevert,
   NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
-import { toFixed, fromFixed } from '@celo/protocol/lib/fixidity'
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
+import BigNumber from 'bignumber.js'
 import {
   GasPriceMinimumContract,
   GasPriceMinimumInstance,
   RegistryContract,
   RegistryInstance,
 } from 'types'
-import BigNumber from 'bignumber.js'
 
 const Registry: RegistryContract = artifacts.require('Registry')
 const GasPriceMinimum: GasPriceMinimumContract = artifacts.require('GasPriceMinimum')

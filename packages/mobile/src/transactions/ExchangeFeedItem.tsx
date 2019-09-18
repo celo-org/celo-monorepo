@@ -17,79 +17,102 @@ import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
 type Props = (HomeExchangeFragment | ExchangeStandby) &
   WithNamespaces & {
-    showImage: boolean
     status?: TransactionStatus
+    showGoldAmount: boolean
   }
 
+type ExchangeProps = ReturnType<typeof getDollarExchangeProps>
+
+function getDollarExchangeProps({ inValue, outValue }: Props) {
+  return {
+    icon: require('src/transactions/ExchangeGreenGold.png'),
+    dollarAmount: inValue,
+    dollarDirection: '-',
+    goldAmount: outValue,
+    goldDirection: '',
+    inColor: colors.celoGreen,
+    outColor: colors.celoGold,
+  }
+}
+
+function getGoldExchangeProps({ inValue, outValue }: Props) {
+  return {
+    icon: require('src/transactions/ExchangeGoldGreen.png'),
+    dollarAmount: outValue,
+    dollarDirection: '',
+    goldAmount: inValue,
+    goldDirection: '-',
+    inColor: colors.celoGold,
+    outColor: colors.celoGreen,
+  }
+}
+
+function getGoldAmountProps({ goldAmount, goldDirection }: ExchangeProps) {
+  return {
+    amount: goldAmount,
+    amountDirection: goldDirection,
+    amountColor: colors.celoGold,
+  }
+}
+
+function getDollarAmountProps({ dollarAmount, dollarDirection }: ExchangeProps) {
+  return {
+    amount: dollarAmount,
+    amountDirection: dollarDirection,
+    amountColor: colors.celoGreen,
+  }
+}
+
 export function ExchangeFeedItem(props: Props) {
-  const { showImage, t, inSymbol, inValue, status, outValue, outSymbol, timestamp, i18n } = props
+  const { showGoldAmount, inSymbol, inValue, outValue, status, timestamp, t, i18n } = props
 
   const onPress = () => {
-    // TODO get missing values from HomeExchange.Fragment
     navigateToExchangeReview(timestamp, {
-      token: resolveCurrency(inSymbol),
-      newDollarBalance: '',
-      newGoldBalance: '',
-      leftCurrencyAmount: new BigNumber(inValue),
-      rightCurrencyAmount: new BigNumber(outValue),
-      exchangeRate: '',
-      fee: '',
+      makerToken: resolveCurrency(inSymbol),
+      makerAmount: new BigNumber(inValue),
+      takerAmount: new BigNumber(outValue),
     })
   }
 
   const inCurrency = resolveCurrency(inSymbol)
-  const outCurrency = resolveCurrency(outSymbol)
-  const dollarAmount = inCurrency === CURRENCY_ENUM.DOLLAR ? inValue : outValue
-  const dollarDirection = inCurrency === CURRENCY_ENUM.DOLLAR ? '-' : ''
+  const exchangeProps =
+    inCurrency === CURRENCY_ENUM.DOLLAR
+      ? getDollarExchangeProps(props)
+      : getGoldExchangeProps(props)
+  const { amount, amountDirection, amountColor } = showGoldAmount
+    ? getGoldAmountProps(exchangeProps)
+    : getDollarAmountProps(exchangeProps)
+
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
   const isPending = status === TransactionStatus.Pending
 
-  const inStyle = {
-    color: isPending
-      ? colors.gray
-      : inCurrency === CURRENCY_ENUM.DOLLAR
-        ? colors.celoGreen
-        : colors.celoGold,
-  }
-
-  const outStyle = {
-    color: isPending
-      ? colors.gray
-      : outCurrency === CURRENCY_ENUM.DOLLAR
-        ? colors.celoGreen
-        : colors.celoGold,
-  }
+  const { inColor, outColor, icon } = exchangeProps
+  const inStyle = { color: isPending ? colors.gray : inColor }
+  const outStyle = { color: isPending ? colors.gray : outColor }
 
   return (
     <Touchable onPress={onPress}>
       <View style={styles.container}>
-        {showImage && (
-          <View style={styles.imageContainer}>
-            <Image
-              source={
-                inCurrency === CURRENCY_ENUM.DOLLAR
-                  ? require(`src/transactions/ExchangeGreenGold.png`)
-                  : require(`src/transactions/ExchangeGoldGreen.png`)
-              }
-              style={styles.image}
-              resizeMode="contain"
-            />
-          </View>
-        )}
-        <View style={[styles.contentContainer, showImage && styles.contentContainerWithImage]}>
+        <View style={styles.imageContainer}>
+          <Image source={icon} style={styles.image} resizeMode="contain" />
+        </View>
+        <View style={styles.contentContainer}>
           <View style={styles.titleContainer}>
             <Text style={fontStyles.bodySmallSemiBold}>{t('exchange')}</Text>
             <Text
               style={[
-                dollarDirection === '-'
+                amountDirection === '-'
                   ? fontStyles.activityCurrencySent
-                  : fontStyles.activityCurrencyReceived,
+                  : {
+                      ...fontStyles.activityCurrencyReceived,
+                      color: amountColor,
+                    },
                 styles.amount,
               ]}
             >
-              {dollarDirection}
-              {getMoneyDisplayValue(dollarAmount)}
+              {amountDirection}
+              {getMoneyDisplayValue(amount)}
             </Text>
           </View>
           <View style={styles.exchangeContainer}>
@@ -153,8 +176,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-  },
-  contentContainerWithImage: {
     marginLeft: variables.contentPadding,
   },
   titleContainer: {
@@ -180,6 +201,7 @@ const styles = StyleSheet.create({
   textPending: {
     fontSize: 13,
     lineHeight: 18,
+    color: colors.celoGreen,
   },
   transactionStatus: {
     color: '#BDBDBD',
@@ -193,5 +215,4 @@ const styles = StyleSheet.create({
   },
 })
 
-// @ts-ignore
 export default withNamespaces(Namespaces.walletFlow5)(React.memo(ExchangeFeedItem))

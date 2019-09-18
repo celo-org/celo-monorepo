@@ -22,6 +22,17 @@ metadata:
 {{ include "standard.labels" .  | indent 4 }}
     component: tx_nodes
 spec:
+  {{ {{- if .Values.geth.ssd_disks -}}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      storageClassName: ssd
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
+  {{- end -}}}}}
   podManagementPolicy: Parallel
   replicas: {{ .Values.geth.tx_nodes }}
   serviceName: tx-nodes
@@ -90,6 +101,8 @@ spec:
           ACCOUNT_ADDRESS=`cat /root/.celo/address`
           NAT_FLAG=""
           [[ "$STATIC_IPS_FOR_GETH_NODES" == "true" ]] && NAT_FLAG="--nat=extip:`cat /root/.celo/ipAddress`"
+          PING_IP_FROM_PACKET_FLAG=""
+          [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"
           geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
             --lightserv 90 \
@@ -116,7 +129,7 @@ spec:
             --verbosity={{ .Values.geth.verbosity }} \
             --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
             --metrics \
-            --ping-ip-from-packet
+            ${PING_IP_FROM_PACKET_FLAG}
         env:
         - name: ETHSTATS_SVC
           value: {{ template "ethereum.fullname" . }}-ethstats.{{ .Release.Namespace }}
@@ -134,6 +147,8 @@ spec:
           value: {{ .Values.geth.miner.verificationpool }}
         - name: STATIC_IPS_FOR_GETH_NODES
           value: "{{ default "false" .Values.geth.static_ips }}"
+        - name: PING_IP_FROM_PACKET
+          value: "{{ default "false" .Values.geth.ping_ip_from_packet }}"
         ports:
         - name: discovery-udp
           containerPort: 30303
