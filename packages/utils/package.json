@@ -26,7 +26,10 @@
     "futoin-hkdf": "^1.0.3",
     "google-libphonenumber": "^3.2.4",
     "lodash": "^4.17.14",
-    "web3-utils": "1.0.0-beta.37"
+    "web3-utils": "1.0.0-beta.37",
+    "keccak256": "^1.0.0",
+    "buffer-reverse": "^1.0.1",
+    "bigi": "^1.1.0"    
   },
   "devDependencies": {
     "@celo/typescript": "0.0.1",
