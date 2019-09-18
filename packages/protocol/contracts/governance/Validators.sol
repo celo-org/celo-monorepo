@@ -63,6 +63,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
 
+  uint256 constant MAX_GROUP_SIZE = 10;
+
   event MinElectableValidatorsSet(
     uint256 minElectableValidators
   );
@@ -411,6 +413,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(isValidatorGroup(account) && isValidator(validator));
     ValidatorGroup storage group = groups[account];
     require(validators[validator].affiliation == account && !group.members.contains(validator));
+    require(group.members.numElements < MAX_GROUP_SIZE, "Maximum group size exceeded");
     group.members.push(validator);
     emit ValidatorGroupMemberAdded(account, validator);
     return true;
