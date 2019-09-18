@@ -86,7 +86,7 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
           style={
             Array [
               Object {
-                "color": "#2E3338",
+                "color": "#42D689",
                 "fontFamily": "Hind-SemiBold",
                 "fontSize": 15,
                 "lineHeight": 20,
@@ -271,7 +271,7 @@ exports[`transfer feed item renders correctly for known received 1`] = `
           style={
             Array [
               Object {
-                "color": "#2E3338",
+                "color": "#42D689",
                 "fontFamily": "Hind-SemiBold",
                 "fontSize": 15,
                 "lineHeight": 20,
@@ -613,7 +613,7 @@ exports[`transfer feed item renders correctly for received 1`] = `
           style={
             Array [
               Object {
-                "color": "#2E3338",
+                "color": "#42D689",
                 "fontFamily": "Hind-SemiBold",
                 "fontSize": 15,
                 "lineHeight": 20,
@@ -754,7 +754,7 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
           style={
             Array [
               Object {
-                "color": "#2E3338",
+                "color": "#42D689",
                 "fontFamily": "Hind-SemiBold",
                 "fontSize": 15,
                 "lineHeight": 20,
@@ -939,7 +939,7 @@ exports[`transfer feed item renders correctly for received with encrypted commen
           style={
             Array [
               Object {
-                "color": "#2E3338",
+                "color": "#42D689",
                 "fontFamily": "Hind-SemiBold",
                 "fontSize": 15,
                 "lineHeight": 20,
@@ -1964,7 +1964,7 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
           style={
             Array [
               Object {
-                "color": "#2E3338",
+                "color": "#42D689",
                 "fontFamily": "Hind-SemiBold",
                 "fontSize": 15,
                 "lineHeight": 20,
