@@ -1,4 +1,5 @@
 import { Query } from 'react-apollo'
+import { TransactionTypes } from 'src/transactions/reducer'
 
 export interface UserTransactionsVariables {
   address: string
@@ -11,7 +12,7 @@ export enum EventTypeNames {
 
 export interface HomeExchangeFragment {
   __typename: EventTypeNames.Exchange
-  type: string
+  type: TransactionTypes
   hash: string
   inValue: number
   outValue: number
@@ -22,7 +23,7 @@ export interface HomeExchangeFragment {
 
 export interface HomeTransferFragment {
   __typename: EventTypeNames.Transfer
-  type: string
+  type: TransactionTypes
   hash: string
   value: number
   symbol: string

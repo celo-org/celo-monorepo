@@ -14,7 +14,6 @@ import { Namespaces } from 'src/i18n'
 import { faucetIcon } from 'src/images/Images'
 import { Recipient } from 'src/recipients/recipient'
 import { TransactionTypes } from 'src/transactions/reducer'
-import { getCurrencyStyles } from 'src/transactions/TransferFeedItem'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 const iconSize = 40
@@ -61,7 +60,6 @@ class TransferConfirmationCard extends React.Component<OwnProps & WithNamespaces
 
   renderBottomSection = () => {
     const { t, currency, comment, type, value } = this.props
-    const currencyStyle = getCurrencyStyles(currency, type)
 
     if (type === TransactionTypes.VERIFICATION_FEE) {
       return <Text style={style.pSmall}>{t('receiveFlow8:verificationMessage')}</Text>
@@ -69,7 +67,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & WithNamespaces
       return (
         <Text style={style.pSmall}>
           {t('receiveFlow8:receivedAmountFromCelo.0')}
-          {currencyStyle.symbol}
+          {CURRENCIES[currency].symbol}
           {getMoneyDisplayValue(this.props.value)}
           {t('receiveFlow8:receivedAmountFromCelo.1')}
         </Text>

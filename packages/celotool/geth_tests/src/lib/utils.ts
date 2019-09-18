@@ -252,19 +252,42 @@ export async function getEnode(port: number, ws: boolean = false) {
 
 // TODO(kevjue): Be less hacky!  Get this working with web3-eth-txpool module.
 export function getTxpoolContents(gethBinaryPath: string, instance: GethInstanceConfig) {
-  return new Promise((resolve, reject) => {
-	        var command = spawn(gethBinaryPath, ['--datadir', getDatadir(instance), 'attach', '--exec', 'console.log(JSON.stringify(txpool.content))'])
-		var result = ''
-		command.stdout.on('data', function(data) {
-		      result += data.toString()
-		})
-		command.on('close', function(_) {
-		      result = result.replace("undefined", "")
-		      result = result.trim()
-		      resolve(result)
-		})
-		command.on('error', function(err) { reject(err) })
+  return new Promise<string>((resolve, reject) => {
+    var command = spawn(gethBinaryPath, [
+      '--datadir',
+      getDatadir(instance),
+      'attach',
+      '--exec',
+      'console.log(JSON.stringify(txpool.content))',
+    ])
+    var result: string = ''
+    command.stdout.on('data', function(data) {
+      result += data.toString()
+    })
+    command.on('close', function(_) {
+      result = result.replace('undefined', '')
+      result = result.trim()
+      resolve(result)
+    })
+    command.on('error', function(err) {
+      reject(err)
+    })
   })
+}
+
+// TODO(kevjue):  Be less hacky!  Get this working with web3-eth-miner module.
+export async function setMining(
+  gethBinaryPath: string,
+  instance: GethInstanceConfig,
+  mining: boolean
+) {
+  var rpcCall: string
+  if (mining) {
+    rpcCall = 'miner.start(1)'
+  } else {
+    rpcCall = 'miner.stop()'
+  }
+  await execCmd(gethBinaryPath, ['--datadir', getDatadir(instance), 'attach', '--exec', rpcCall])
 }
 
 export async function startGeth(gethBinaryPath: string, instance: GethInstanceConfig) {
@@ -330,7 +353,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     gethArgs.push(`--txpool.globalqueue=${maxtxpoolsize}`)
     gethArgs.push(`--txpool.nolocals`)
   }
-  
+
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`)
   instance.pid = gethProcess.pid
 
