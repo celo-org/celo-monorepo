@@ -5,6 +5,7 @@ module.exports = {
   globals: {
     navigator: true,
     'ts-jest': {
+      isolatedModules: true,
       tsConfig: 'tsconfig.test.json',
     },
     window: true,
@@ -22,5 +23,5 @@ module.exports = {
   setupFiles: ['jest-canvas-mock'],
   setupFilesAfterEnv: ['<rootDir>/jest_setup.ts'],
   testEnvironment: 'jsdom',
-  transformIgnorePatterns: ['node_modules/(?!react-native|react-navigation|)'],
+  transformIgnorePatterns: ['node_modules/(?!(@celo/)?react-native|date-fns)'],
 }
