@@ -1,6 +1,6 @@
-import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
-import { switchToClusterFromEnv } from '@celo/celotool/src/lib/cluster'
+import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { installHelmChart } from 'src/lib/transaction-metrics-exporter'
+import { InitialArgv } from '../../deploy/initial'
 
 export const command = 'transaction-metrics-exporter'
 

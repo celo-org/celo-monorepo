@@ -1,14 +1,14 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 
 contract GetSetV0 {
   uint256 public x;
 
-  function get() public view returns (uint256) {
+  function get() external view returns (uint256) {
     return x;
   }
 
-  function set(uint256 _x) public {
+  function set(uint256 _x) external {
     x = _x;
   }
 }
