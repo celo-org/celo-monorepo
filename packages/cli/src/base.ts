@@ -3,12 +3,20 @@ import { Command, flags } from '@oclif/command'
 import Web3 from 'web3'
 import { getNodeUrl } from './utils/config'
 import { injectDebugProvider } from './utils/eth-debug-provider'
+import { requireNodeIsSynced } from './utils/helpers'
 
 export abstract class BaseCommand extends Command {
   static flags = {
     logLevel: flags.string({ char: 'l', hidden: true }),
     help: flags.help({ char: 'h', hidden: true }),
   }
+
+  // This specifies whether the node needs to be synced before the command
+  // can be run. In most cases, this should be `true`, so that's the default.
+  // For commands that don't require the node is synced, add the following line
+  // to its definition:
+  //   requireSynced = false
+  public requireSynced: boolean = true
 
   private _web3: Web3 | null = null
   private _kit: ContractKit | null = null
@@ -31,6 +39,12 @@ export abstract class BaseCommand extends Command {
       this._kit = newKitFromWeb3(this.web3)
     }
     return this._kit
+  }
+
+  async init() {
+    if (this.requireSynced) {
+      await requireNodeIsSynced(this.web3)
+    }
   }
 
   // TODO(yorke): implement log(msg) switch on logLevel with chalk colored output
