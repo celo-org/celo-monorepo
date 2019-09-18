@@ -2,24 +2,23 @@
   "name": "@celo/transaction-metrics-exporter",
   "version": "1.0.0",
   "description": "Service to subscribe to transactions and export them as prometheus metrics",
-  "main": "index.js",
+  "main": "lib/index.js",
   "author": "Celo",
   "license": "Apache-2.0",
   "private": true,
   "dependencies": {
-    "@celo/walletkit": "^0.0.14",
+    "@celo/contractkit": "^0.1.1",
+    "@celo/utils": "0.0.6-beta5",    
     "express": "4.16.4",
-    "lodash": "^4.17.14",
-    "prom-client": "11.2.0",
-    "web3": "1.0.0-beta.37"
+    "prom-client": "11.2.0"
   },
   "devDependencies": {
-    "@types/web3": "^1.0.18",
     "@types/express": "4.17.0"
   },
   "scripts": {
-    "start": "ts-node -r tsconfig-paths/register src/index.ts",
-    "lint": "tsc -p tsconfig.json --outDir /tmp",
-    "setup-sdk-environment": "build-sdk"
+    "dev": "ts-node src/index.ts",
+    "build": "tsc -b .",
+    "clean": "tsc -b . --clean",
+    "lint": "tslint -c tslint.json --project ."
   }
 }

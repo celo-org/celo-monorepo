@@ -25,9 +25,7 @@ spec:
   - metadata:
       name: data
     spec:
-      {{ {{- if .Values.geth.ssd_disks -}}
-      storageClassName: ssd
-      {{- end -}}}}}
+      {{ if .Values.geth.ssd_disks }}storageClassName: ssd{{ end }}
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
