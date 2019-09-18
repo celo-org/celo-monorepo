@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import _QRCode from 'qrcode'
 import React, { PureComponent } from 'react'
 import Svg, { Path, Rect } from 'react-native-svg'
@@ -26,8 +25,6 @@ function calculateMatrix(props: any) {
     return {
       cellSize,
       path: transformMatrixIntoPath(cellSize, matrix),
-      reducedSize,
-      value,
     }
   } catch (error) {
     if (onError && typeof onError === 'function') {
@@ -66,30 +63,25 @@ function transformMatrixIntoPath(cellSize: number, matrix: any) {
   return d
 }
 
+interface QRProps {
+  value: string
+  size: number
+  color: string
+  backgroundColor: string
+  getRef: any
+  ecl: string
+  onError: any
+}
+
+interface QRState {
+  cellSize?: number | undefined
+  path?: string | undefined
+}
+
 /**
  * A simple component for displaying QR Code using svg
  */
-export default class QRCode extends PureComponent {
-  static propTypes = {
-    /* what the qr code stands for */
-    value: PropTypes.string,
-    /* the whole component size */
-    size: PropTypes.number,
-    /* the color of the cell */
-    color: PropTypes.string,
-    /* the color of the background */
-    backgroundColor: PropTypes.string,
-    /* get svg ref for further usage */
-    getRef: PropTypes.func,
-    /* error correction level */
-    ecl: PropTypes.oneOf(['L', 'M', 'Q', 'H']),
-    /* Callback function that's called in case if any errors
-     * appeared during the process of code generating.
-     * Error object is passed to the callback.
-     */
-    onError: PropTypes.func,
-  }
-
+export default class QRCode extends PureComponent<QRProps, QRState> {
   static defaultProps = {
     value: 'This is a QR Code.',
     size: 100,
