@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -8,7 +8,7 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "./UsingLockedGold.sol";
 import "./interfaces/IValidators.sol";
 import "../common/Initializable.sol";
-import "../common/FractionUtil.sol";
+import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 
@@ -18,11 +18,14 @@ import "../common/linkedlists/AddressSortedLinkedList.sol";
  */
 contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, UsingLockedGold {
 
+  using FixidityLib for FixidityLib.Fraction;
   using AddressLinkedList for LinkedList.List;
   using AddressSortedLinkedList for SortedLinkedList.List;
   using SafeMath for uint256;
-  using FractionUtil for FractionUtil.Fraction;
   using BytesLib for bytes;
+
+  // Address of the getValidator precompiled contract
+  address constant public GET_VALIDATOR_ADDRESS = address(0xfa);
 
   // TODO(asa): These strings should be modifiable
   struct ValidatorGroup {
@@ -142,7 +145,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param registryAddress The address of the registry contract.
    * @param _minElectableValidators The minimum number of validators that can be elected.
    * @param _maxElectableValidators The maximum number of validators that can be elected.
-   * @param requirementValue The minimum Locked Gold commitment value to register a group or 
+   * @param requirementValue The minimum Locked Gold commitment value to register a group or
        validator.
    * @param requirementNoticePeriod The minimum Locked Gold commitment notice period to register
    *    a group or validator.
@@ -352,7 +355,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param identifier A identifier for this validator group.
    * @param name A name for the validator group.
    * @param url A URL for the validator group.
-   * @param noticePeriod The notice period of the Locked Gold commitment that meets the 
+   * @param noticePeriod The notice period of the Locked Gold commitment that meets the
    *   requirements for validator registration.
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
@@ -543,6 +546,45 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     return true;
   }
 
+  function validatorAddressFromCurrentSet(uint256 index) external view returns (address) {
+    address validatorAddress;
+    assembly {
+      let newCallDataPosition := mload(0x40)
+      mstore(newCallDataPosition, index)
+      let success := staticcall(
+        5000,
+        0xfa,
+        newCallDataPosition,
+        32,
+        0,
+        0
+      )
+      returndatacopy(add(newCallDataPosition, 64), 0, 32)
+      validatorAddress := mload(add(newCallDataPosition, 64))
+    }
+
+    return validatorAddress;
+  }
+
+  function numberValidatorsInCurrentSet() external view returns (uint256) {
+    uint256 numberValidators;
+    assembly {
+      let success := staticcall(
+        5000,
+        0xf9,
+        0,
+        0,
+        0,
+        0
+      )
+      let returnData := mload(0x40)
+      returndatacopy(returnData, 0, 32)
+      numberValidators := mload(returnData)
+    }
+
+    return numberValidators;
+  }
+
   /**
    * @notice Returns validator information.
    * @param account The account that registered the validator.
@@ -670,7 +712,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     while (totalNumMembersElected < maxElectableValidators && memberElectedInRound) {
       memberElectedInRound = false;
       uint256 groupIndex = 0;
-      FractionUtil.Fraction memory maxN = FractionUtil.Fraction(0, 1);
+      FixidityLib.Fraction memory maxN = FixidityLib.wrap(0);
       for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
         bool isWinningestGroupInRound = false;
         (maxN, isWinningestGroupInRound) = dHondt(maxN, electionGroups[i], numMembersElected[i]);
@@ -813,22 +855,21 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @return The new `maxN` and whether or not the group should win a seat in this round thus far.
    */
   function dHondt(
-    FractionUtil.Fraction memory maxN,
+    FixidityLib.Fraction memory maxN,
     address groupAddress,
     uint256 numMembersElected
   )
     private
     view
-    returns (FractionUtil.Fraction memory, bool)
+    returns (FixidityLib.Fraction memory, bool)
   {
     ValidatorGroup storage group = groups[groupAddress];
     // Only consider groups with members left to be elected.
     if (group.members.numElements > numMembersElected) {
-      FractionUtil.Fraction memory n = FractionUtil.Fraction(
-        votes.getValue(groupAddress),
-        numMembersElected.add(1)
+      FixidityLib.Fraction memory n = FixidityLib.newFixed(votes.getValue(groupAddress)).divide(
+        FixidityLib.newFixed(numMembersElected.add(1))
       );
-      if (n.isGreaterThan(maxN)) {
+      if (n.gt(maxN)) {
         return (n, true);
       }
     }

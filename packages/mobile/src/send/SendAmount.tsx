@@ -1,4 +1,3 @@
-import { Avatar } from '@celo/react-components/components/Avatar'
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import LoadingLabel from '@celo/react-components/components/LoadingLabel'
 import colors from '@celo/react-components/styles/colors'
@@ -18,11 +17,16 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { MAX_COMMENT_LENGTH, NUMBER_INPUT_MAX_DECIMALS } from 'src/config'
+import Avatar from 'src/components/Avatar'
+import {
+  DOLLAR_TRANSACTION_MIN_AMOUNT,
+  MAX_COMMENT_LENGTH,
+  NUMBER_INPUT_MAX_DECIMALS,
+} from 'src/config'
 import { FeeType } from 'src/fees/actions'
 import EstimateFee from 'src/fees/EstimateFee'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
-import { CURRENCIES, CURRENCY_ENUM as Tokens } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/contactMapping'
@@ -121,7 +125,7 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
 export class SendAmount extends React.Component<Props, State> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
-    headerTitle: i18n.t('sendFlow7:send_or_request'),
+    headerTitle: i18n.t('sendFlow7:sendOrRequest'),
   })
 
   state: State = {
@@ -158,7 +162,9 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   isAmountValid = () => {
-    const isAmountValid = parseInputAmount(this.state.amount).isGreaterThan(0)
+    const isAmountValid = parseInputAmount(this.state.amount).isGreaterThan(
+      DOLLAR_TRANSACTION_MIN_AMOUNT
+    )
     return {
       isAmountValid,
       isDollarBalanceSufficient: isAmountValid && this.getNewAccountBalance().isGreaterThan(0),
@@ -173,7 +179,7 @@ export class SendAmount extends React.Component<Props, State> {
     return getVerificationStatus(this.props.navigation, this.props.e164NumberToAddress)
   }
 
-  getConfirmationInput = () => {
+  getConfirmationInput = (type: TransactionTypes) => {
     const amount = parseInputAmount(this.state.amount)
     const recipient = this.getRecipient()
     // TODO (Rossy) Remove address field from some recipient types.
@@ -184,7 +190,7 @@ export class SendAmount extends React.Component<Props, State> {
       amount,
       reason: this.state.reason,
       recipientAddress,
-      type: recipientAddress ? TransactionTypes.SENT : TransactionTypes.INVITE_SENT,
+      type,
     }
     return confirmationInput
   }
@@ -207,13 +213,15 @@ export class SendAmount extends React.Component<Props, State> {
 
   onSend = () => {
     const verificationStatus = this.getVerificationStatus()
-    const confirmationInput = this.getConfirmationInput()
+    let confirmationInput: ConfirmationInput
 
     if (verificationStatus === VerificationStatus.VERIFIED) {
+      confirmationInput = this.getConfirmationInput(TransactionTypes.SENT)
       CeloAnalytics.track(CustomEventNames.transaction_details, {
         recipientAddress: confirmationInput.recipientAddress,
       })
     } else {
+      confirmationInput = this.getConfirmationInput(TransactionTypes.INVITE_SENT)
       CeloAnalytics.track(CustomEventNames.send_invite_details)
     }
 
@@ -224,12 +232,8 @@ export class SendAmount extends React.Component<Props, State> {
 
   onRequest = () => {
     CeloAnalytics.track(CustomEventNames.request_payment_continue)
-    const confirmationInput = this.getConfirmationInput()
-
-    CeloAnalytics.track(CustomEventNames.send_invite_details, {
-      requesteeAddress: confirmationInput.recipientAddress,
-    })
-    navigate(Screens.RequestConfirmation, { confirmationInput })
+    const confirmationInput = this.getConfirmationInput(TransactionTypes.PAY_REQUEST)
+    navigate(Screens.PaymentRequestConfirmation, { confirmationInput })
   }
 
   renderButtons = (isAmountValid: boolean, isDollarBalanceSufficient: boolean) => {
@@ -321,10 +325,9 @@ export class SendAmount extends React.Component<Props, State> {
           <DisconnectBanner />
           <Avatar
             name={recipient.displayName}
-            address={recipient.address}
+            recipient={recipient}
             e164Number={recipient.e164PhoneNumber}
-            defaultCountryCode={this.props.defaultCountryCode}
-            iconSize={40}
+            address={recipient.address}
           />
           <View style={style.inviteDescription}>
             <LoadingLabel
@@ -340,7 +343,7 @@ export class SendAmount extends React.Component<Props, State> {
           </View>
           <LabeledTextInput
             keyboardType="numeric"
-            title={CURRENCIES[Tokens.DOLLAR].symbol}
+            title={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
             placeholder={t('amount')}
             labelStyle={style.amountLabel as TextStyle}
             placeholderTextColor={colors.celoGreenInactive}

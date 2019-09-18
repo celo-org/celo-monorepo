@@ -6,7 +6,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { sendBetweenPhones, sendFee, stabilityScale } from 'src/images/Images'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { Stacks } from 'src/navigator/Screens'
 import { setEducationCompleted } from 'src/stableToken/actions'
 
 interface DispatchProps {
@@ -21,7 +21,7 @@ export class DollarEducation extends React.Component<Props> {
   goToSend = () => {
     this.props.setEducationCompleted()
     CeloAnalytics.track(CustomEventNames.send_dollar_nux)
-    navigate(Screens.Send)
+    navigate(Stacks.SendStack)
   }
 
   goToWalletHome = () => {

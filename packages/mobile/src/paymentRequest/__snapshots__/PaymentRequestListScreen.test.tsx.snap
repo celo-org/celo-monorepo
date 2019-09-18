@@ -15,7 +15,7 @@ exports[`PaymentRequestListScreen renders correctly with no requests 1`] = `
         "alignItems": "center",
         "flex": 0,
         "flexDirection": "row",
-        "padding": 10,
+        "padding": 16,
       }
     }
   >
@@ -39,7 +39,7 @@ exports[`PaymentRequestListScreen renders correctly with no requests 1`] = `
           "flex": 1,
           "flexDirection": "row",
           "justifyContent": "space-between",
-          "paddingStart": 10,
+          "paddingStart": 16,
         }
       }
     >
@@ -135,7 +135,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
         "alignItems": "center",
         "flex": 0,
         "flexDirection": "row",
-        "padding": 10,
+        "padding": 16,
       }
     }
   >
@@ -159,7 +159,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
           "flex": 1,
           "flexDirection": "row",
           "justifyContent": "space-between",
-          "paddingStart": 10,
+          "paddingStart": 16,
         }
       }
     >
@@ -230,7 +230,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
               "borderWidth": 1,
             },
             Object {
-              "margin": 10,
+              "margin": 16,
             },
           ]
         }
@@ -257,7 +257,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                   Object {
                     "flexDirection": "row",
                     "justifyContent": "space-between",
-                    "padding": 10,
+                    "padding": 16,
                     "width": "100%",
                   },
                   false,
@@ -269,7 +269,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                   Object {
                     "alignItems": "center",
                     "flexDirection": "column",
-                    "paddingRight": 10,
+                    "paddingRight": 16,
                   }
                 }
               >
@@ -377,7 +377,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                               "lineHeight": 20,
                             },
                             Object {
-                              "paddingTop": 10,
+                              "paddingTop": 16,
                             },
                           ]
                         }
@@ -478,7 +478,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
               <View
                 style={
                   Object {
-                    "paddingLeft": 10,
+                    "paddingLeft": 16,
                   }
                 }
               >
@@ -536,7 +536,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                   Object {
                     "flexDirection": "row",
                     "justifyContent": "space-between",
-                    "padding": 10,
+                    "padding": 16,
                     "width": "100%",
                   },
                   false,
@@ -548,7 +548,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                   Object {
                     "alignItems": "center",
                     "flexDirection": "column",
-                    "paddingRight": 10,
+                    "paddingRight": 16,
                   }
                 }
               >
@@ -656,7 +656,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                               "lineHeight": 20,
                             },
                             Object {
-                              "paddingTop": 10,
+                              "paddingTop": 16,
                             },
                           ]
                         }
@@ -757,7 +757,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
               <View
                 style={
                   Object {
-                    "paddingLeft": 10,
+                    "paddingLeft": 16,
                   }
                 }
               >
@@ -815,7 +815,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                   Object {
                     "flexDirection": "row",
                     "justifyContent": "space-between",
-                    "padding": 10,
+                    "padding": 16,
                     "width": "100%",
                   },
                   false,
@@ -827,7 +827,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                   Object {
                     "alignItems": "center",
                     "flexDirection": "column",
-                    "paddingRight": 10,
+                    "paddingRight": 16,
                   }
                 }
               >
@@ -935,7 +935,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
                               "lineHeight": 20,
                             },
                             Object {
-                              "paddingTop": 10,
+                              "paddingTop": 16,
                             },
                           ]
                         }
@@ -1036,7 +1036,7 @@ exports[`PaymentRequestListScreen renders correctly with requests 1`] = `
               <View
                 style={
                   Object {
-                    "paddingLeft": 10,
+                    "paddingLeft": 16,
                   }
                 }
               >

@@ -1,5 +1,5 @@
-import { eqAddress } from '@celo/utils/lib/src/address'
-import { zip } from '@celo/utils/lib/src/collections'
+import { eqAddress } from '@celo/utils/lib/address'
+import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
@@ -119,7 +119,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     votedGroup: Address,
     voteWeight: BigNumber
   ): Promise<{ lesser: Address; greater: Address }> {
-    const currentVotes = await this.getValidatorGroupsVotes()
+    const currentVotes = (await this.getValidatorGroupsVotes()).filter((g) => !g.votes.isZero())
 
     const selectedGroup = currentVotes.find((cv) => eqAddress(cv.address, votedGroup))
 

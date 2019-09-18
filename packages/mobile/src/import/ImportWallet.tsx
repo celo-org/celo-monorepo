@@ -126,6 +126,10 @@ export class ImportWallet extends React.Component<Props, State> {
     }
   }
 
+  isBackupPhraseValid() {
+    return this.state.backupPhrase.trim().split(/\s+/g).length >= 12
+  }
+
   render() {
     const { backupPhrase, isSubmitting } = this.state
     const { t, error } = this.props
@@ -136,7 +140,7 @@ export class ImportWallet extends React.Component<Props, State> {
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="always"
         >
-          <NuxLogo style={styles.logo} />
+          <NuxLogo />
           <Text style={[fontStyles.h1, styles.h1]}>{t('restoreYourWallet.title')}</Text>
           <Text style={[fontStyles.bodySmall, styles.body]}>
             {t('restoreYourWallet.userYourBackupKey')}
@@ -177,7 +181,7 @@ export class ImportWallet extends React.Component<Props, State> {
           </View>
         )}
         <GethAwareButton
-          disabled={isSubmitting || !this.state.backupPhrase}
+          disabled={isSubmitting || !this.isBackupPhraseValid()}
           onPress={this.onSubmit}
           text={t('restoreWallet')}
           standard={false}
@@ -195,14 +199,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
-  logo: {
-    marginTop: 0,
-  },
   cancel: {
     alignItems: 'flex-start',
   },
   scrollContainer: {
-    paddingHorizontal: 10,
+    padding: 20,
+    paddingTop: 0,
   },
   h1: {
     textAlign: 'center',

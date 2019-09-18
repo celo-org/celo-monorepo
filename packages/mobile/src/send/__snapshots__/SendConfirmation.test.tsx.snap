@@ -52,6 +52,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
               style={
                 Array [
                   Object {
+                    "color": "#2E3338",
                     "fontFamily": "Hind-Light",
                     "fontSize": 22,
                     "paddingBottom": 20,
@@ -92,7 +93,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                   "flexDirection": "column",
                   "justifyContent": "flex-start",
                   "paddingHorizontal": 40,
-                  "paddingVertical": 20,
+                  "paddingVertical": 25,
                 },
               ]
             }
@@ -100,17 +101,25 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
             <View
               style={
                 Object {
-                  "marginTop": 5,
+                  "flexDirection": "column",
+                  "justifyContent": "center",
+                  "marginBottom": 10,
                 }
               }
             >
               <View
                 style={
-                  Object {
-                    "flexDirection": "column",
-                    "justifyContent": "center",
-                    "marginBottom": 10,
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "alignSelf": "center",
+                      "margin": "auto",
+                    },
+                  ]
                 }
               >
                 <View
@@ -118,117 +127,104 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                     Array [
                       Object {
                         "alignItems": "center",
-                        "flexDirection": "row",
                         "justifyContent": "center",
                       },
                       Object {
-                        "alignSelf": "center",
-                        "margin": "auto",
+                        "backgroundColor": "#7AD6FE",
+                        "borderRadius": 20,
+                        "height": 40,
+                        "width": 40,
                       },
                     ]
                   }
                 >
-                  <View
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../src/images/unknown-user-icon.png",
+                      }
+                    }
                     style={
                       Array [
                         Object {
-                          "alignItems": "center",
-                          "justifyContent": "center",
+                          "alignSelf": "center",
+                          "margin": "auto",
                         },
                         Object {
-                          "backgroundColor": "#7AD6FE",
-                          "borderRadius": 20,
                           "height": 40,
                           "width": 40,
                         },
                       ]
                     }
-                  >
-                    <Text
-                      style={
-                        Array [
-                          Object {
-                            "color": "#FFFFFF",
-                            "fontFamily": "Hind-Medium",
-                            "fontSize": 16,
-                          },
-                          Object {
-                            "fontSize": 20,
-                          },
-                        ]
-                      }
-                    >
-                      J
-                    </Text>
-                  </View>
+                  />
                 </View>
+              </View>
+              <Text
+                ellipsizeMode="tail"
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "marginHorizontal": 20,
+                      "paddingTop": 6,
+                      "textAlign": "center",
+                    },
+                  ]
+                }
+              >
+                John Doe
+              </Text>
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  }
+                }
+              >
                 <Text
-                  ellipsizeMode="tail"
-                  numberOfLines={1}
                   style={
                     Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "marginHorizontal": 20,
-                        "paddingTop": 6,
-                        "textAlign": "center",
-                      },
-                    ]
-                  }
-                >
-                  John Doe
-                </Text>
-                <View
-                  style={
-                    Object {
-                      "alignItems": "center",
-                      "alignSelf": "center",
-                      "flexDirection": "row",
-                      "justifyContent": "center",
-                    }
-                  }
-                >
-                  <Text
-                    style={
-                      Array [
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-Light",
-                          "fontSize": 14,
-                          "textAlignVertical": "center",
-                        },
-                        Object {
-                          "alignItems": "center",
-                          "backgroundColor": "#EEEEEE",
-                          "borderRadius": 3,
-                          "justifyContent": "center",
-                          "marginRight": 5,
-                          "paddingLeft": 6,
-                          "paddingRight": 3,
-                        },
-                      ]
-                    }
-                  >
-                     +1
-                  </Text>
-                  <Text
-                    style={
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Hind-Light",
                         "fontSize": 14,
                         "textAlignVertical": "center",
-                      }
+                      },
+                      Object {
+                        "alignItems": "center",
+                        "backgroundColor": "#EEEEEE",
+                        "borderRadius": 3,
+                        "justifyContent": "center",
+                        "marginRight": 5,
+                        "paddingLeft": 6,
+                        "paddingRight": 3,
+                      },
+                    ]
+                  }
+                >
+                   +1
+                </Text>
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Light",
+                      "fontSize": 14,
+                      "textAlignVertical": "center",
                     }
-                  >
-                    (415) 555-0000
-                  </Text>
-                </View>
+                  }
+                >
+                  (415) 555-0000
+                </Text>
               </View>
             </View>
             <View
@@ -245,21 +241,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                 style={
                   Array [
                     Object {
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 34,
-                    },
-                    Object {
-                      "color": "#81868B",
-                    },
-                  ]
-                }
-              >
-                
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
                       "color": "#81868B",
                       "fontFamily": "Hind-Regular",
                       "fontSize": 24,
@@ -271,7 +252,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                   ]
                 }
               >
-                
+                $
               </Text>
               <Text
                 ellipsizeMode="tail"
@@ -1044,6 +1025,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
               style={
                 Array [
                   Object {
+                    "color": "#2E3338",
                     "fontFamily": "Hind-Light",
                     "fontSize": 22,
                     "paddingBottom": 20,
@@ -1084,7 +1066,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                   "flexDirection": "column",
                   "justifyContent": "flex-start",
                   "paddingHorizontal": 40,
-                  "paddingVertical": 20,
+                  "paddingVertical": 25,
                 },
               ]
             }
@@ -1092,17 +1074,25 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
             <View
               style={
                 Object {
-                  "marginTop": 5,
+                  "flexDirection": "column",
+                  "justifyContent": "center",
+                  "marginBottom": 10,
                 }
               }
             >
               <View
                 style={
-                  Object {
-                    "flexDirection": "column",
-                    "justifyContent": "center",
-                    "marginBottom": 10,
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "alignSelf": "center",
+                      "margin": "auto",
+                    },
+                  ]
                 }
               >
                 <View
@@ -1110,117 +1100,104 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                     Array [
                       Object {
                         "alignItems": "center",
-                        "flexDirection": "row",
                         "justifyContent": "center",
                       },
                       Object {
-                        "alignSelf": "center",
-                        "margin": "auto",
+                        "backgroundColor": "#7AD6FE",
+                        "borderRadius": 20,
+                        "height": 40,
+                        "width": 40,
                       },
                     ]
                   }
                 >
-                  <View
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../src/images/unknown-user-icon.png",
+                      }
+                    }
                     style={
                       Array [
                         Object {
-                          "alignItems": "center",
-                          "justifyContent": "center",
+                          "alignSelf": "center",
+                          "margin": "auto",
                         },
                         Object {
-                          "backgroundColor": "#7AD6FE",
-                          "borderRadius": 20,
                           "height": 40,
                           "width": 40,
                         },
                       ]
                     }
-                  >
-                    <Text
-                      style={
-                        Array [
-                          Object {
-                            "color": "#FFFFFF",
-                            "fontFamily": "Hind-Medium",
-                            "fontSize": 16,
-                          },
-                          Object {
-                            "fontSize": 20,
-                          },
-                        ]
-                      }
-                    >
-                      J
-                    </Text>
-                  </View>
+                  />
                 </View>
+              </View>
+              <Text
+                ellipsizeMode="tail"
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "marginHorizontal": 20,
+                      "paddingTop": 6,
+                      "textAlign": "center",
+                    },
+                  ]
+                }
+              >
+                John Doe
+              </Text>
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  }
+                }
+              >
                 <Text
-                  ellipsizeMode="tail"
-                  numberOfLines={1}
                   style={
                     Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "marginHorizontal": 20,
-                        "paddingTop": 6,
-                        "textAlign": "center",
-                      },
-                    ]
-                  }
-                >
-                  John Doe
-                </Text>
-                <View
-                  style={
-                    Object {
-                      "alignItems": "center",
-                      "alignSelf": "center",
-                      "flexDirection": "row",
-                      "justifyContent": "center",
-                    }
-                  }
-                >
-                  <Text
-                    style={
-                      Array [
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-Light",
-                          "fontSize": 14,
-                          "textAlignVertical": "center",
-                        },
-                        Object {
-                          "alignItems": "center",
-                          "backgroundColor": "#EEEEEE",
-                          "borderRadius": 3,
-                          "justifyContent": "center",
-                          "marginRight": 5,
-                          "paddingLeft": 6,
-                          "paddingRight": 3,
-                        },
-                      ]
-                    }
-                  >
-                     +1
-                  </Text>
-                  <Text
-                    style={
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Hind-Light",
                         "fontSize": 14,
                         "textAlignVertical": "center",
-                      }
+                      },
+                      Object {
+                        "alignItems": "center",
+                        "backgroundColor": "#EEEEEE",
+                        "borderRadius": 3,
+                        "justifyContent": "center",
+                        "marginRight": 5,
+                        "paddingLeft": 6,
+                        "paddingRight": 3,
+                      },
+                    ]
+                  }
+                >
+                   +1
+                </Text>
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Light",
+                      "fontSize": 14,
+                      "textAlignVertical": "center",
                     }
-                  >
-                    (415) 555-0000
-                  </Text>
-                </View>
+                  }
+                >
+                  (415) 555-0000
+                </Text>
               </View>
             </View>
             <View
@@ -1237,21 +1214,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                 style={
                   Array [
                     Object {
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 34,
-                    },
-                    Object {
-                      "color": "#81868B",
-                    },
-                  ]
-                }
-              >
-                
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
                       "color": "#81868B",
                       "fontFamily": "Hind-Regular",
                       "fontSize": 24,
@@ -1263,7 +1225,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                   ]
                 }
               >
-                
+                $
               </Text>
               <Text
                 ellipsizeMode="tail"
@@ -2036,6 +1998,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
               style={
                 Array [
                   Object {
+                    "color": "#2E3338",
                     "fontFamily": "Hind-Light",
                     "fontSize": 22,
                     "paddingBottom": 20,
@@ -2076,7 +2039,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                   "flexDirection": "column",
                   "justifyContent": "flex-start",
                   "paddingHorizontal": 40,
-                  "paddingVertical": 20,
+                  "paddingVertical": 25,
                 },
               ]
             }
@@ -2084,17 +2047,25 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
             <View
               style={
                 Object {
-                  "marginTop": 5,
+                  "flexDirection": "column",
+                  "justifyContent": "center",
+                  "marginBottom": 10,
                 }
               }
             >
               <View
                 style={
-                  Object {
-                    "flexDirection": "column",
-                    "justifyContent": "center",
-                    "marginBottom": 10,
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "alignSelf": "center",
+                      "margin": "auto",
+                    },
+                  ]
                 }
               >
                 <View
@@ -2102,117 +2073,104 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                     Array [
                       Object {
                         "alignItems": "center",
-                        "flexDirection": "row",
                         "justifyContent": "center",
                       },
                       Object {
-                        "alignSelf": "center",
-                        "margin": "auto",
+                        "backgroundColor": "#7AD6FE",
+                        "borderRadius": 20,
+                        "height": 40,
+                        "width": 40,
                       },
                     ]
                   }
                 >
-                  <View
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../src/images/unknown-user-icon.png",
+                      }
+                    }
                     style={
                       Array [
                         Object {
-                          "alignItems": "center",
-                          "justifyContent": "center",
+                          "alignSelf": "center",
+                          "margin": "auto",
                         },
                         Object {
-                          "backgroundColor": "#7AD6FE",
-                          "borderRadius": 20,
                           "height": 40,
                           "width": 40,
                         },
                       ]
                     }
-                  >
-                    <Text
-                      style={
-                        Array [
-                          Object {
-                            "color": "#FFFFFF",
-                            "fontFamily": "Hind-Medium",
-                            "fontSize": 16,
-                          },
-                          Object {
-                            "fontSize": 20,
-                          },
-                        ]
-                      }
-                    >
-                      J
-                    </Text>
-                  </View>
+                  />
                 </View>
+              </View>
+              <Text
+                ellipsizeMode="tail"
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "marginHorizontal": 20,
+                      "paddingTop": 6,
+                      "textAlign": "center",
+                    },
+                  ]
+                }
+              >
+                John Doe
+              </Text>
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  }
+                }
+              >
                 <Text
-                  ellipsizeMode="tail"
-                  numberOfLines={1}
                   style={
                     Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "marginHorizontal": 20,
-                        "paddingTop": 6,
-                        "textAlign": "center",
-                      },
-                    ]
-                  }
-                >
-                  John Doe
-                </Text>
-                <View
-                  style={
-                    Object {
-                      "alignItems": "center",
-                      "alignSelf": "center",
-                      "flexDirection": "row",
-                      "justifyContent": "center",
-                    }
-                  }
-                >
-                  <Text
-                    style={
-                      Array [
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-Light",
-                          "fontSize": 14,
-                          "textAlignVertical": "center",
-                        },
-                        Object {
-                          "alignItems": "center",
-                          "backgroundColor": "#EEEEEE",
-                          "borderRadius": 3,
-                          "justifyContent": "center",
-                          "marginRight": 5,
-                          "paddingLeft": 6,
-                          "paddingRight": 3,
-                        },
-                      ]
-                    }
-                  >
-                     +1
-                  </Text>
-                  <Text
-                    style={
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Hind-Light",
                         "fontSize": 14,
                         "textAlignVertical": "center",
-                      }
+                      },
+                      Object {
+                        "alignItems": "center",
+                        "backgroundColor": "#EEEEEE",
+                        "borderRadius": 3,
+                        "justifyContent": "center",
+                        "marginRight": 5,
+                        "paddingLeft": 6,
+                        "paddingRight": 3,
+                      },
+                    ]
+                  }
+                >
+                   +1
+                </Text>
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Light",
+                      "fontSize": 14,
+                      "textAlignVertical": "center",
                     }
-                  >
-                    (415) 555-0000
-                  </Text>
-                </View>
+                  }
+                >
+                  (415) 555-0000
+                </Text>
               </View>
             </View>
             <View
@@ -2229,21 +2187,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                 style={
                   Array [
                     Object {
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 34,
-                    },
-                    Object {
-                      "color": "#81868B",
-                    },
-                  ]
-                }
-              >
-                
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
                       "color": "#81868B",
                       "fontFamily": "Hind-Regular",
                       "fontSize": 24,
@@ -2255,7 +2198,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                   ]
                 }
               >
-                
+                $
               </Text>
               <Text
                 ellipsizeMode="tail"
@@ -3022,6 +2965,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
               style={
                 Array [
                   Object {
+                    "color": "#2E3338",
                     "fontFamily": "Hind-Light",
                     "fontSize": 22,
                     "paddingBottom": 20,
@@ -3062,7 +3006,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                   "flexDirection": "column",
                   "justifyContent": "flex-start",
                   "paddingHorizontal": 40,
-                  "paddingVertical": 20,
+                  "paddingVertical": 25,
                 },
               ]
             }
@@ -3070,17 +3014,25 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             <View
               style={
                 Object {
-                  "marginTop": 5,
+                  "flexDirection": "column",
+                  "justifyContent": "center",
+                  "marginBottom": 10,
                 }
               }
             >
               <View
                 style={
-                  Object {
-                    "flexDirection": "column",
-                    "justifyContent": "center",
-                    "marginBottom": 10,
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "alignSelf": "center",
+                      "margin": "auto",
+                    },
+                  ]
                 }
               >
                 <View
@@ -3088,117 +3040,104 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                     Array [
                       Object {
                         "alignItems": "center",
-                        "flexDirection": "row",
                         "justifyContent": "center",
                       },
                       Object {
-                        "alignSelf": "center",
-                        "margin": "auto",
+                        "backgroundColor": "#7AD6FE",
+                        "borderRadius": 20,
+                        "height": 40,
+                        "width": 40,
                       },
                     ]
                   }
                 >
-                  <View
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../src/images/unknown-user-icon.png",
+                      }
+                    }
                     style={
                       Array [
                         Object {
-                          "alignItems": "center",
-                          "justifyContent": "center",
+                          "alignSelf": "center",
+                          "margin": "auto",
                         },
                         Object {
-                          "backgroundColor": "#7AD6FE",
-                          "borderRadius": 20,
                           "height": 40,
                           "width": 40,
                         },
                       ]
                     }
-                  >
-                    <Text
-                      style={
-                        Array [
-                          Object {
-                            "color": "#FFFFFF",
-                            "fontFamily": "Hind-Medium",
-                            "fontSize": 16,
-                          },
-                          Object {
-                            "fontSize": 20,
-                          },
-                        ]
-                      }
-                    >
-                      J
-                    </Text>
-                  </View>
+                  />
                 </View>
+              </View>
+              <Text
+                ellipsizeMode="tail"
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "marginHorizontal": 20,
+                      "paddingTop": 6,
+                      "textAlign": "center",
+                    },
+                  ]
+                }
+              >
+                John Doe
+              </Text>
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  }
+                }
+              >
                 <Text
-                  ellipsizeMode="tail"
-                  numberOfLines={1}
                   style={
                     Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "marginHorizontal": 20,
-                        "paddingTop": 6,
-                        "textAlign": "center",
-                      },
-                    ]
-                  }
-                >
-                  John Doe
-                </Text>
-                <View
-                  style={
-                    Object {
-                      "alignItems": "center",
-                      "alignSelf": "center",
-                      "flexDirection": "row",
-                      "justifyContent": "center",
-                    }
-                  }
-                >
-                  <Text
-                    style={
-                      Array [
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-Light",
-                          "fontSize": 14,
-                          "textAlignVertical": "center",
-                        },
-                        Object {
-                          "alignItems": "center",
-                          "backgroundColor": "#EEEEEE",
-                          "borderRadius": 3,
-                          "justifyContent": "center",
-                          "marginRight": 5,
-                          "paddingLeft": 6,
-                          "paddingRight": 3,
-                        },
-                      ]
-                    }
-                  >
-                     +1
-                  </Text>
-                  <Text
-                    style={
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Hind-Light",
                         "fontSize": 14,
                         "textAlignVertical": "center",
-                      }
+                      },
+                      Object {
+                        "alignItems": "center",
+                        "backgroundColor": "#EEEEEE",
+                        "borderRadius": 3,
+                        "justifyContent": "center",
+                        "marginRight": 5,
+                        "paddingLeft": 6,
+                        "paddingRight": 3,
+                      },
+                    ]
+                  }
+                >
+                   +1
+                </Text>
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Light",
+                      "fontSize": 14,
+                      "textAlignVertical": "center",
                     }
-                  >
-                    (415) 555-0000
-                  </Text>
-                </View>
+                  }
+                >
+                  (415) 555-0000
+                </Text>
               </View>
             </View>
             <View
@@ -3215,21 +3154,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                 style={
                   Array [
                     Object {
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 34,
-                    },
-                    Object {
-                      "color": "#81868B",
-                    },
-                  ]
-                }
-              >
-                
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
                       "color": "#81868B",
                       "fontFamily": "Hind-Regular",
                       "fontSize": 24,
@@ -3241,7 +3165,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                   ]
                 }
               >
-                
+                $
               </Text>
               <Text
                 ellipsizeMode="tail"
@@ -4014,6 +3938,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               style={
                 Array [
                   Object {
+                    "color": "#2E3338",
                     "fontFamily": "Hind-Light",
                     "fontSize": 22,
                     "paddingBottom": 20,
@@ -4054,7 +3979,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   "flexDirection": "column",
                   "justifyContent": "flex-start",
                   "paddingHorizontal": 40,
-                  "paddingVertical": 20,
+                  "paddingVertical": 25,
                 },
               ]
             }
@@ -4062,17 +3987,25 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             <View
               style={
                 Object {
-                  "marginTop": 5,
+                  "flexDirection": "column",
+                  "justifyContent": "center",
+                  "marginBottom": 10,
                 }
               }
             >
               <View
                 style={
-                  Object {
-                    "flexDirection": "column",
-                    "justifyContent": "center",
-                    "marginBottom": 10,
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "alignSelf": "center",
+                      "margin": "auto",
+                    },
+                  ]
                 }
               >
                 <View
@@ -4080,117 +4013,104 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     Array [
                       Object {
                         "alignItems": "center",
-                        "flexDirection": "row",
                         "justifyContent": "center",
                       },
                       Object {
-                        "alignSelf": "center",
-                        "margin": "auto",
+                        "backgroundColor": "#7AD6FE",
+                        "borderRadius": 20,
+                        "height": 40,
+                        "width": 40,
                       },
                     ]
                   }
                 >
-                  <View
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../src/images/unknown-user-icon.png",
+                      }
+                    }
                     style={
                       Array [
                         Object {
-                          "alignItems": "center",
-                          "justifyContent": "center",
+                          "alignSelf": "center",
+                          "margin": "auto",
                         },
                         Object {
-                          "backgroundColor": "#7AD6FE",
-                          "borderRadius": 20,
                           "height": 40,
                           "width": 40,
                         },
                       ]
                     }
-                  >
-                    <Text
-                      style={
-                        Array [
-                          Object {
-                            "color": "#FFFFFF",
-                            "fontFamily": "Hind-Medium",
-                            "fontSize": 16,
-                          },
-                          Object {
-                            "fontSize": 20,
-                          },
-                        ]
-                      }
-                    >
-                      J
-                    </Text>
-                  </View>
+                  />
                 </View>
+              </View>
+              <Text
+                ellipsizeMode="tail"
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "marginHorizontal": 20,
+                      "paddingTop": 6,
+                      "textAlign": "center",
+                    },
+                  ]
+                }
+              >
+                John Doe
+              </Text>
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  }
+                }
+              >
                 <Text
-                  ellipsizeMode="tail"
-                  numberOfLines={1}
                   style={
                     Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "marginHorizontal": 20,
-                        "paddingTop": 6,
-                        "textAlign": "center",
-                      },
-                    ]
-                  }
-                >
-                  John Doe
-                </Text>
-                <View
-                  style={
-                    Object {
-                      "alignItems": "center",
-                      "alignSelf": "center",
-                      "flexDirection": "row",
-                      "justifyContent": "center",
-                    }
-                  }
-                >
-                  <Text
-                    style={
-                      Array [
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-Light",
-                          "fontSize": 14,
-                          "textAlignVertical": "center",
-                        },
-                        Object {
-                          "alignItems": "center",
-                          "backgroundColor": "#EEEEEE",
-                          "borderRadius": 3,
-                          "justifyContent": "center",
-                          "marginRight": 5,
-                          "paddingLeft": 6,
-                          "paddingRight": 3,
-                        },
-                      ]
-                    }
-                  >
-                     +1
-                  </Text>
-                  <Text
-                    style={
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Hind-Light",
                         "fontSize": 14,
                         "textAlignVertical": "center",
-                      }
+                      },
+                      Object {
+                        "alignItems": "center",
+                        "backgroundColor": "#EEEEEE",
+                        "borderRadius": 3,
+                        "justifyContent": "center",
+                        "marginRight": 5,
+                        "paddingLeft": 6,
+                        "paddingRight": 3,
+                      },
+                    ]
+                  }
+                >
+                   +1
+                </Text>
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Light",
+                      "fontSize": 14,
+                      "textAlignVertical": "center",
                     }
-                  >
-                    (415) 555-0000
-                  </Text>
-                </View>
+                  }
+                >
+                  (415) 555-0000
+                </Text>
               </View>
             </View>
             <View
@@ -4207,21 +4127,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                 style={
                   Array [
                     Object {
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 34,
-                    },
-                    Object {
-                      "color": "#81868B",
-                    },
-                  ]
-                }
-              >
-                
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
                       "color": "#81868B",
                       "fontFamily": "Hind-Regular",
                       "fontSize": 24,
@@ -4233,7 +4138,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   ]
                 }
               >
-                
+                $
               </Text>
               <Text
                 ellipsizeMode="tail"
@@ -5006,6 +4911,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               style={
                 Array [
                   Object {
+                    "color": "#2E3338",
                     "fontFamily": "Hind-Light",
                     "fontSize": 22,
                     "paddingBottom": 20,
@@ -5046,7 +4952,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   "flexDirection": "column",
                   "justifyContent": "flex-start",
                   "paddingHorizontal": 40,
-                  "paddingVertical": 20,
+                  "paddingVertical": 25,
                 },
               ]
             }
@@ -5054,17 +4960,25 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             <View
               style={
                 Object {
-                  "marginTop": 5,
+                  "flexDirection": "column",
+                  "justifyContent": "center",
+                  "marginBottom": 10,
                 }
               }
             >
               <View
                 style={
-                  Object {
-                    "flexDirection": "column",
-                    "justifyContent": "center",
-                    "marginBottom": 10,
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "alignSelf": "center",
+                      "margin": "auto",
+                    },
+                  ]
                 }
               >
                 <View
@@ -5072,117 +4986,104 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     Array [
                       Object {
                         "alignItems": "center",
-                        "flexDirection": "row",
                         "justifyContent": "center",
                       },
                       Object {
-                        "alignSelf": "center",
-                        "margin": "auto",
+                        "backgroundColor": "#7AD6FE",
+                        "borderRadius": 20,
+                        "height": 40,
+                        "width": 40,
                       },
                     ]
                   }
                 >
-                  <View
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../src/images/unknown-user-icon.png",
+                      }
+                    }
                     style={
                       Array [
                         Object {
-                          "alignItems": "center",
-                          "justifyContent": "center",
+                          "alignSelf": "center",
+                          "margin": "auto",
                         },
                         Object {
-                          "backgroundColor": "#7AD6FE",
-                          "borderRadius": 20,
                           "height": 40,
                           "width": 40,
                         },
                       ]
                     }
-                  >
-                    <Text
-                      style={
-                        Array [
-                          Object {
-                            "color": "#FFFFFF",
-                            "fontFamily": "Hind-Medium",
-                            "fontSize": 16,
-                          },
-                          Object {
-                            "fontSize": 20,
-                          },
-                        ]
-                      }
-                    >
-                      J
-                    </Text>
-                  </View>
+                  />
                 </View>
+              </View>
+              <Text
+                ellipsizeMode="tail"
+                numberOfLines={1}
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "marginHorizontal": 20,
+                      "paddingTop": 6,
+                      "textAlign": "center",
+                    },
+                  ]
+                }
+              >
+                John Doe
+              </Text>
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "alignSelf": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  }
+                }
+              >
                 <Text
-                  ellipsizeMode="tail"
-                  numberOfLines={1}
                   style={
                     Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "marginHorizontal": 20,
-                        "paddingTop": 6,
-                        "textAlign": "center",
-                      },
-                    ]
-                  }
-                >
-                  John Doe
-                </Text>
-                <View
-                  style={
-                    Object {
-                      "alignItems": "center",
-                      "alignSelf": "center",
-                      "flexDirection": "row",
-                      "justifyContent": "center",
-                    }
-                  }
-                >
-                  <Text
-                    style={
-                      Array [
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-Light",
-                          "fontSize": 14,
-                          "textAlignVertical": "center",
-                        },
-                        Object {
-                          "alignItems": "center",
-                          "backgroundColor": "#EEEEEE",
-                          "borderRadius": 3,
-                          "justifyContent": "center",
-                          "marginRight": 5,
-                          "paddingLeft": 6,
-                          "paddingRight": 3,
-                        },
-                      ]
-                    }
-                  >
-                     +1
-                  </Text>
-                  <Text
-                    style={
                       Object {
                         "color": "#2E3338",
                         "fontFamily": "Hind-Light",
                         "fontSize": 14,
                         "textAlignVertical": "center",
-                      }
+                      },
+                      Object {
+                        "alignItems": "center",
+                        "backgroundColor": "#EEEEEE",
+                        "borderRadius": 3,
+                        "justifyContent": "center",
+                        "marginRight": 5,
+                        "paddingLeft": 6,
+                        "paddingRight": 3,
+                      },
+                    ]
+                  }
+                >
+                   +1
+                </Text>
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Light",
+                      "fontSize": 14,
+                      "textAlignVertical": "center",
                     }
-                  >
-                    (415) 555-0000
-                  </Text>
-                </View>
+                  }
+                >
+                  (415) 555-0000
+                </Text>
               </View>
             </View>
             <View
@@ -5199,21 +5100,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                 style={
                   Array [
                     Object {
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 34,
-                    },
-                    Object {
-                      "color": "#81868B",
-                    },
-                  ]
-                }
-              >
-                
-              </Text>
-              <Text
-                style={
-                  Array [
-                    Object {
                       "color": "#81868B",
                       "fontFamily": "Hind-Regular",
                       "fontSize": 24,
@@ -5225,7 +5111,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   ]
                 }
               >
-                
+                $
               </Text>
               <Text
                 ellipsizeMode="tail"

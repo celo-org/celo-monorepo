@@ -9,6 +9,7 @@ import {
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   GovernanceContract,
@@ -459,8 +460,7 @@ contract('Governance', (accounts: string[]) => {
 
   // TODO(asa): Verify that when we set the constitution for a function ID then the proper constitution is applied to a proposal.
   describe('#setConstitution', () => {
-    const numerator = 2
-    const denominator = 3
+    const threshold = toFixed(2 / 3)
     let functionId
     let differentFunctionId
     let destination
@@ -476,19 +476,16 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should set the default threshold', async () => {
-        await governance.setConstitution(destination, functionId, numerator, denominator)
-        const [num, denom] = await governance.getConstitution(destination, differentFunctionId)
-        assert.equal(num.toNumber(), numerator)
-        assert.equal(denom.toNumber(), denominator)
+        await governance.setConstitution(destination, functionId, threshold)
+        const differentThreshold = await governance.getConstitution(
+          destination,
+          differentFunctionId
+        )
+        assert.isTrue(differentThreshold.eq(threshold))
       })
 
       it('should emit the ConstitutionSet event', async () => {
-        const resp = await governance.setConstitution(
-          destination,
-          functionId,
-          numerator,
-          denominator
-        )
+        const resp = await governance.setConstitution(destination, functionId, threshold)
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
         assertLogMatches2(log, {
@@ -496,8 +493,7 @@ contract('Governance', (accounts: string[]) => {
           args: {
             destination,
             functionId: web3.utils.padRight(functionId, 64),
-            numerator: new BigNumber(numerator),
-            denominator: new BigNumber(denominator),
+            threshold: threshold,
           },
         })
       })
@@ -510,26 +506,19 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should set the function threshold', async () => {
-        await governance.setConstitution(destination, functionId, numerator, denominator)
-        const [num, denom] = await governance.getConstitution(destination, functionId)
-        assert.equal(num.toNumber(), numerator)
-        assert.equal(denom.toNumber(), denominator)
+        await governance.setConstitution(destination, functionId, threshold)
+        const actualThreshold = await governance.getConstitution(destination, functionId)
+        assert.isTrue(actualThreshold.eq(threshold))
       })
 
       it('should not set the default threshold', async () => {
-        await governance.setConstitution(destination, functionId, numerator, denominator)
-        const [num, denom] = await governance.getConstitution(destination, differentFunctionId)
-        assert.equal(num.toNumber(), 1)
-        assert.equal(denom.toNumber(), 2)
+        await governance.setConstitution(destination, functionId, threshold)
+        const actualThreshold = await governance.getConstitution(destination, differentFunctionId)
+        assert.isTrue(actualThreshold.eq(toFixed(1 / 2)))
       })
 
       it('should emit the ConstitutionSet event', async () => {
-        const resp = await governance.setConstitution(
-          destination,
-          functionId,
-          numerator,
-          denominator
-        )
+        const resp = await governance.setConstitution(destination, functionId, threshold)
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
         assertLogMatches2(log, {
@@ -537,38 +526,33 @@ contract('Governance', (accounts: string[]) => {
           args: {
             destination,
             functionId: web3.utils.padRight(functionId, 64),
-            numerator: new BigNumber(numerator),
-            denominator: new BigNumber(denominator),
+            threshold: threshold,
           },
         })
       })
     })
 
     it('should revert when the destination is the null address', async () => {
-      await assertRevert(
-        governance.setConstitution(NULL_ADDRESS, nullFunctionId, numerator, denominator)
-      )
+      await assertRevert(governance.setConstitution(NULL_ADDRESS, nullFunctionId, threshold))
     })
 
-    it('should revert when the numerator is zero', async () => {
-      await assertRevert(governance.setConstitution(destination, nullFunctionId, 0, denominator))
-    })
-
-    it('should revert when the denominator is zero', async () => {
-      await assertRevert(governance.setConstitution(destination, nullFunctionId, numerator, 0))
+    it('should revert when the threshold is zero', async () => {
+      await assertRevert(governance.setConstitution(destination, nullFunctionId, 0))
     })
 
     it('should revert when the threshold is not greater than a majority', async () => {
-      await assertRevert(governance.setConstitution(destination, nullFunctionId, 1, 2))
+      await assertRevert(governance.setConstitution(destination, nullFunctionId, toFixed(1 / 2)))
     })
 
     it('should revert when the threshold is greater than 100%', async () => {
-      await assertRevert(governance.setConstitution(destination, nullFunctionId, 101, 100))
+      await assertRevert(
+        governance.setConstitution(destination, nullFunctionId, toFixed(101 / 100))
+      )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(
-        governance.setConstitution(destination, nullFunctionId, numerator, denominator, {
+        governance.setConstitution(destination, nullFunctionId, threshold, {
           from: nonOwner,
         })
       )

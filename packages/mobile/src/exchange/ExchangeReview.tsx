@@ -36,7 +36,7 @@ interface StateProps {
   appConnected: boolean
 }
 
-interface ExchangeInfo {
+interface ConfirmationInput {
   makerAmount: BigNumber
   makerToken: Token
 }
@@ -59,42 +59,42 @@ const mapStateToProps = (state: RootState): StateProps => ({
 class ExchangeReview extends React.Component<Props> {
   static navigationOptions = { header: null }
 
-  confirm = () => {
-    const exchangeProps = this.getExchangeProps()
-    this.props.exchangeTokens(exchangeProps.makerToken, exchangeProps.makerAmount)
+  onPressConfirm = () => {
+    const confirmationInput = this.getConfirmationInput()
+    this.props.exchangeTokens(confirmationInput.makerToken, confirmationInput.makerAmount)
     CeloAnalytics.track(CustomEventNames.exchange_confirm, {
-      makerToken: exchangeProps.makerToken,
-      makerAmount: exchangeProps.makerAmount,
+      makerToken: confirmationInput.makerToken,
+      makerAmount: confirmationInput.makerAmount,
     })
     navigate(Screens.ExchangeHomeScreen)
   }
 
-  editExchange = () => {
+  onPressEdit = () => {
     CeloAnalytics.track(CustomEventNames.exchange_edit)
     navigateBack()
   }
 
-  getExchangeProps(): ExchangeInfo {
-    const info = this.props.navigation.getParam('exchangeInfo', '')
+  getConfirmationInput(): ConfirmationInput {
+    const confirmationInput = this.props.navigation.getParam('confirmationInput', '')
 
-    if (info === '') {
+    if (confirmationInput === '') {
       throw new Error('Expected exchangeInfo ')
     }
-    return info
+    return confirmationInput
+  }
+
+  componentDidMount() {
+    const { makerToken, makerAmount } = this.getConfirmationInput()
+    this.props.fetchExchangeRate(makerAmount, makerToken)
   }
 
   renderHeader = () => {
     return <ReviewHeader title={this.props.t('reviewExchange')} />
   }
 
-  componentDidMount() {
-    const { makerToken, makerAmount } = this.getExchangeProps()
-    this.props.fetchExchangeRate(makerAmount, makerToken)
-  }
-
   render() {
     const { exchangeRatePair, fee, t, appConnected, dollarBalance, goldBalance } = this.props
-    const { makerToken, makerAmount } = this.getExchangeProps()
+    const { makerToken, makerAmount } = this.getConfirmationInput()
     const rate = getRateForMakerToken(exchangeRatePair, makerToken)
     const takerAmount = getTakerAmount(makerAmount, rate)
     const newGoldBalance = getNewGoldBalance(goldBalance, makerToken, makerAmount, takerAmount)
@@ -111,19 +111,19 @@ class ExchangeReview extends React.Component<Props> {
         <ReviewFrame
           HeaderComponent={this.renderHeader}
           confirmButton={{
-            action: this.confirm,
+            action: this.onPressConfirm,
             text: t('exchange'),
             disabled: !appConnected || rate.isZero(),
           }}
-          modifyButton={{ action: this.editExchange, text: t('edit') }}
+          modifyButton={{ action: this.onPressEdit, text: t('edit') }}
         >
           <ExchangeConfirmationCard
-            token={makerToken}
+            makerToken={makerToken}
             newDollarBalance={newDollarBalance}
             newGoldBalance={newGoldBalance}
-            leftCurrencyAmount={makerAmount}
-            rightCurrencyAmount={takerAmount}
-            exchangeRate={rate.toString()}
+            makerAmount={makerAmount}
+            takerAmount={takerAmount}
+            exchangeRate={rate}
             fee={fee}
           />
         </ReviewFrame>

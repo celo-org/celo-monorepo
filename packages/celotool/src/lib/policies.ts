@@ -1,5 +1,5 @@
-import { execCmd } from '@celo/celotool/src/lib/utils'
 import path from 'path'
+import { execCmd } from './utils'
 const yaml = require('js-yaml')
 const fs = require('fs')
 const { promisify } = require('util')
