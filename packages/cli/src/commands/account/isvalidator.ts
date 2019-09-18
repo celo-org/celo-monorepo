@@ -1,3 +1,4 @@
+import { eqAddress } from '@celo/utils/lib/address'
 import { BaseCommand } from '../../base'
 import { Args } from '../../utils/command'
 
@@ -21,7 +22,7 @@ export default class IsValidator extends BaseCommand {
 
     for (let i = 0; i < numberValidators; i++) {
       const validatorAddress = await validators.validatorAddressFromCurrentSet(i)
-      if (validatorAddress.toLowerCase() === args.address.toLowerCase()) {
+      if (eqAddress(validatorAddress, args.address)) {
         console.log(`${args.address} is in the current validator set`)
         return
       }
