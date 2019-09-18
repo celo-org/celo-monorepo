@@ -1,16 +1,9 @@
-// ---------------------------------------------------------
-// Source: https://github.com/awesomejerry/react-native-qrcode-svg
-// ---------------------------------------------------------
-import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import Svg, { Rect, Path } from 'react-native-svg'
-
-const DEFAULT_SIZE = 100
-const DEFAULT_BG_COLOR = 'white'
-
 import _QRCode from 'qrcode'
+import React, { PureComponent } from 'react'
+import Svg, { Path, Rect } from 'react-native-svg'
 
-const genMatrix = (value, errorCorrectionLevel) => {
+const genMatrix = (value: any, errorCorrectionLevel: string) => {
   const arr = Array.prototype.slice.call(
     _QRCode.create(value, { errorCorrectionLevel }).modules.data,
     0
@@ -24,7 +17,7 @@ const genMatrix = (value, errorCorrectionLevel) => {
 }
 
 /* calculate the size of the cell and draw the path */
-function calculateMatrix(props) {
+function calculateMatrix(props: any) {
   const { value, size, ecl, onError } = props
   try {
     const reducedSize = size - 20
@@ -48,12 +41,12 @@ function calculateMatrix(props) {
 }
 
 /* project the matrix into path draw */
-function transformMatrixIntoPath(cellSize, matrix) {
+function transformMatrixIntoPath(cellSize: number, matrix: any) {
   // adjust origin
   let d = ''
-  matrix.forEach((row, i) => {
+  matrix.forEach((row: any, i: number) => {
     let needDraw = false
-    row.forEach((column, j) => {
+    row.forEach((column: any, j: number) => {
       if (column) {
         if (!needDraw) {
           d += `M${cellSize * j + 10} ${cellSize / 2 + cellSize * i + 10} `
@@ -99,19 +92,14 @@ export default class QRCode extends PureComponent {
 
   static defaultProps = {
     value: 'This is a QR Code.',
-    size: DEFAULT_SIZE,
+    size: 100,
     color: 'black',
-    backgroundColor: DEFAULT_BG_COLOR,
+    backgroundColor: 'white',
     ecl: 'M',
     onError: undefined,
   }
 
-  constructor(props) {
-    super(props)
-    this.state = calculateMatrix(props)
-  }
-
-  static getDerivedStateFromProps(props, state) {
+  static getDerivedStateFromProps(props: any, state: any) {
     // if value has changed, re-calculateMatrix
     if (props.value !== state.value || props.size !== state.size) {
       return calculateMatrix(props)
@@ -119,11 +107,14 @@ export default class QRCode extends PureComponent {
     return null
   }
 
+  constructor(props: any) {
+    super(props)
+    this.state = calculateMatrix(props)
+  }
+
   render() {
     const { getRef, size, color, backgroundColor } = this.props
-
     const { cellSize, path } = this.state
-
     return (
       <Svg ref={getRef} width={size} height={size}>
         <Rect width={size} height={size} fill={backgroundColor} />
