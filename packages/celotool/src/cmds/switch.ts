@@ -1,5 +1,5 @@
-import { addCeloEnvMiddleware } from '@celo/celotool/src/lib/env-utils'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { addCeloEnvMiddleware } from 'src/lib/env-utils'
 import * as yargs from 'yargs'
 
 export const command = 'switch'

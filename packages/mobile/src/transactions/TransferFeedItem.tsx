@@ -19,7 +19,11 @@ import { AddressToE164NumberType } from 'src/identity/reducer'
 import { coinsIcon, unknownUserIcon } from 'src/images/Images'
 import { Invitees } from 'src/invite/actions'
 import useLocalAmount from 'src/localCurrency/useLocalAmount'
-import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
+import {
+  getRecipientFromAddress,
+  getRecipientThumbnail,
+  NumberToRecipient,
+} from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes, TransferStandby } from 'src/transactions/reducer'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
@@ -32,11 +36,13 @@ const avatarSize = 40
 
 type Props = (HomeTransferFragment | TransferStandby) &
   WithNamespaces & {
+    type: TransactionTypes
     status?: TransactionStatus
     invitees: Invitees
     addressToE164Number: AddressToE164NumberType
     recipientCache: NumberToRecipient
     commentKey: Buffer | null
+    showLocalCurrency: boolean
   }
 
 interface CurrencySymbolProps {
@@ -45,7 +51,7 @@ interface CurrencySymbolProps {
   direction: string
 }
 
-export function getCurrencyStyles(currency: CURRENCY_ENUM, type: string): CurrencySymbolProps {
+function getCurrencyStyles(currency: CURRENCY_ENUM, type: string): CurrencySymbolProps {
   if (
     type === TransactionTypes.SENT ||
     type === TransactionTypes.VERIFICATION_FEE ||
@@ -88,7 +94,55 @@ export function getCurrencyStyles(currency: CURRENCY_ENUM, type: string): Curren
   }
 }
 
+function decryptComment(
+  comment: string | undefined,
+  commentKey: Buffer | null,
+  type: TransactionTypes
+) {
+  return comment && commentKey && features.USE_COMMENT_ENCRYPTION
+    ? decryptCommentRaw(comment, commentKey, type === TransactionTypes.SENT).comment
+    : comment
+}
+
+function navigateToTransactionReview({
+  address,
+  type,
+  comment,
+  commentKey,
+  timestamp,
+  value,
+  symbol,
+  invitees,
+  addressToE164Number,
+  recipientCache,
+}: Props) {
+  // TODO: remove this when verification reward drilldown is supported
+  if (type === TransactionTypes.VERIFICATION_REWARD) {
+    return
+  }
+
+  const recipient = getRecipientFromAddress(
+    address,
+    type === TransactionTypes.INVITE_SENT ? invitees : addressToE164Number,
+    recipientCache
+  )
+
+  navigateToPaymentTransferReview(type, timestamp, {
+    address,
+    comment: decryptComment(comment, commentKey, type),
+    currency: resolveCurrency(symbol),
+    value: new BigNumber(value),
+    recipient,
+    type,
+    // fee TODO: add fee here.
+  })
+}
+
 export function TransferFeedItem(props: Props) {
+  const onItemPress = () => {
+    navigateToTransactionReview(props)
+  }
+
   const {
     t,
     value,
@@ -96,53 +150,22 @@ export function TransferFeedItem(props: Props) {
     timestamp,
     i18n,
     type,
+    comment,
+    commentKey,
     symbol,
     status,
     invitees,
     addressToE164Number,
     recipientCache,
+    showLocalCurrency,
   } = props
 
-  const decryptComment = () => {
-    return props.comment && props.commentKey && features.USE_COMMENT_ENCRYPTION
-      ? decryptCommentRaw(props.comment, props.commentKey, type === TransactionTypes.SENT).comment
-      : props.comment
-  }
-
-  const navigateToTransactionReview = () => {
-    if (!Object.values(TransactionTypes).includes(type)) {
-      Logger.error(TAG, 'Invalid transaction type')
-      return
-    }
-    const transactionType: TransactionTypes = type as TransactionTypes
-
-    // TODO: remove this when verification reward drilldown is supported
-    if (transactionType === TransactionTypes.VERIFICATION_REWARD) {
-      return
-    }
-
-    const recipient = getRecipientFromAddress(
-      address,
-      transactionType === TransactionTypes.INVITE_SENT ? invitees : addressToE164Number,
-      recipientCache
-    )
-
-    navigateToPaymentTransferReview(type, timestamp, {
-      address,
-      comment: decryptComment(),
-      currency: resolveCurrency(symbol),
-      value: new BigNumber(value),
-      recipient,
-      type: transactionType,
-      // fee TODO: add fee here.
-    })
-  }
-
   const localValue = useLocalAmount(value)
-  let info: string | null = decryptComment()
+  let info = decryptComment(comment, commentKey, type)
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
-  const currencyStyle = getCurrencyStyles(resolveCurrency(symbol), type)
+  const currency = resolveCurrency(symbol)
+  const currencyStyle = getCurrencyStyles(currency, type)
   const isPending = status === TransactionStatus.Pending
 
   let icon, title
@@ -195,14 +218,18 @@ export function TransferFeedItem(props: Props) {
       title = _.capitalize(t(_.camelCase(type)))
     }
     icon = (
-      <ContactCircle address={address} size={avatarSize}>
-        {!recipient ? <Image source={unknownUserIcon} style={styles.image} /> : null}
+      <ContactCircle
+        address={address}
+        size={avatarSize}
+        thumbnailPath={getRecipientThumbnail(recipient)}
+      >
+        {<Image source={unknownUserIcon} style={styles.image} />}
       </ContactCircle>
     )
   }
 
   return (
-    <Touchable onPress={navigateToTransactionReview}>
+    <Touchable onPress={onItemPress}>
       <View style={styles.container}>
         <View style={styles.iconContainer}>{icon}</View>
         <View style={styles.contentContainer}>
@@ -212,7 +239,10 @@ export function TransferFeedItem(props: Props) {
               style={[
                 currencyStyle.direction === '-'
                   ? fontStyles.activityCurrencySent
-                  : fontStyles.activityCurrencyReceived,
+                  : {
+                      ...fontStyles.activityCurrencyReceived,
+                      color: currency === CURRENCY_ENUM.GOLD ? colors.celoGold : colors.celoGreen,
+                    },
                 styles.amount,
               ]}
             >
@@ -220,7 +250,7 @@ export function TransferFeedItem(props: Props) {
               {getMoneyDisplayValue(props.value)}
             </Text>
           </View>
-          {!!info && <Text style={[fontStyles.comment, styles.textInfo]}>{info}</Text>}
+          {!!info && <Text style={fontStyles.comment}>{info}</Text>}
           <View style={[styles.statusContainer, !!info && styles.statusContainerUnderComment]}>
             {isPending && (
               <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
@@ -241,7 +271,8 @@ export function TransferFeedItem(props: Props) {
                 {' ' + timeFormatted}
               </Text>
             )}
-            {LOCAL_CURRENCY_SYMBOL &&
+            {showLocalCurrency &&
+              LOCAL_CURRENCY_SYMBOL &&
               localValue && (
                 <Text style={[fontStyles.bodySmall, styles.localAmount]}>
                   {t('localCurrencyValue', {
@@ -304,7 +335,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     color: colors.celoGreen,
   },
-  textInfo: {},
   transactionStatus: {
     color: '#BDBDBD',
   },
@@ -317,5 +347,4 @@ const styles = StyleSheet.create({
   },
 })
 
-// @ts-ignore
 export default withNamespaces(Namespaces.walletFlow5)(React.memo(TransferFeedItem))

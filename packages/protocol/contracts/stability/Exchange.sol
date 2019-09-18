@@ -1,5 +1,6 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
+import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/IExchange.sol";
@@ -17,7 +18,7 @@ import "../common/interfaces/IERC20Token.sol";
  * @title Contract that allows to exchange StableToken for GoldToken and vice versa
  * using a Constant Product Market Maker Model
  */
-contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
+contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, ReentrancyGuard {
   using SafeMath for uint256;
   using FractionUtil for FractionUtil.Fraction;
   using FixidityLib for FixidityLib.Fraction;
@@ -37,7 +38,20 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     uint256 minimumReports
   );
 
+  event StableTokenSet(
+    address stable
+  );
+
+  event SpreadSet(
+    uint256 spread
+  );
+
+  event ReserveFractionSet(
+    uint256 reserveFraction
+  );
+
   FixidityLib.Fraction public spread;
+
   // Fraction of the Reserve that is committed to the gold bucket when updating
   // buckets.
   FixidityLib.Fraction public reserveFraction;
@@ -87,11 +101,11 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
   {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    stable = stableToken;
-    spread = FixidityLib.wrap(_spread);
-    reserveFraction = FixidityLib.wrap(_reserveFraction);
-    updateFrequency = _updateFrequency;
-    minimumReports = _minimumReports;
+    setStableToken(stableToken);
+    setSpread(_spread);
+    setReserveFraction(_reserveFraction);
+    setUpdateFrequency(_updateFrequency);
+    setMinimumReports(_minimumReports);
     _updateBucketsIfNecessary();
   }
 
@@ -111,6 +125,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
   )
     external
     updateBucketsIfNecessary
+    nonReentrant
     returns (uint256)
   {
     uint256 buyAmount = _getBuyTokenAmount(sellAmount, sellGold);
@@ -167,7 +182,11 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     FixidityLib.Fraction memory denominator =
       FixidityLib.newFixed(sellTokenBucket).add(reducedSellAmount);
 
-    return numerator.divide(denominator).fromFixed();
+    // Can't use FixidityLib.divide because denominator can easily be greater
+    // than maxFixedDivisor.
+    // Fortunately, we expect an integer result, so integer division gives us as
+    // much precision as we could hope for.
+    return numerator.unwrap() / denominator.unwrap();
   }
 
   /**
@@ -193,7 +212,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     FixidityLib.Fraction memory denominator = FixidityLib.newFixed(buyTokenBucket.sub(buyAmount))
       .multiply(FixidityLib.fixed1().subtract(spread));
 
-    return numerator.divide(denominator).fromFixed();
+    // See comment in getBuyTokenAmount
+    return numerator.unwrap() / denominator.unwrap();
   }
 
   /**
@@ -236,6 +256,33 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
   }
 
   /**
+    * @notice Allows owner to set the Stable Token address
+    * @param newStableToken The new address for Stable Token
+    */
+  function setStableToken(address newStableToken) public onlyOwner {
+    stable = newStableToken;
+    emit StableTokenSet(newStableToken);
+  }
+
+  /**
+    * @notice Allows owner to set the spread
+    * @param newSpread The new value for the spread
+    */
+  function setSpread(uint256 newSpread) public onlyOwner {
+    spread = FixidityLib.wrap(newSpread);
+    emit SpreadSet(newSpread);
+  }
+
+  /**
+    * @notice Allows owner to set the Reserve Fraction
+    * @param newReserveFraction The new value for the reserve fraction
+    */
+  function setReserveFraction(uint256 newReserveFraction) public onlyOwner {
+    reserveFraction = FixidityLib.wrap(newReserveFraction);
+    emit ReserveFractionSet(newReserveFraction);
+  }
+
+  /**
    * @notice Returns the sell token and buy token bucket sizes, in order. The ratio of
    * the two also represents the exchange rate between the two.
    * @param sellGold `true` if gold is the sell token
@@ -273,7 +320,8 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry {
     FixidityLib.Fraction memory denominator =
       FixidityLib.newFixed(sellTokenBucket).add(reducedSellAmount);
 
-    return numerator.divide(denominator).fromFixed();
+    // See comment in getBuyTokenAmount
+    return numerator.unwrap() / denominator.unwrap();
   }
 
   function getUpdatedBuckets() private view returns (uint256, uint256) {

@@ -1,16 +1,12 @@
 /* tslint:disable no-console */
-import { GethArgv } from '@celo/celotool/src/cmds/geth'
-import { addCeloEnvMiddleware, CeloEnvArgv } from '@celo/celotool/src/lib/env-utils'
-import {
-  addCeloGethMiddleware,
-  execCmd,
-  execCmdWithExitOnFailure,
-} from '@celo/celotool/src/lib/utils'
 import fs from 'fs'
 import path from 'path'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
 import { fetchPassword } from 'src/lib/geth'
+import { addCeloGethMiddleware, execCmd, execCmdWithExitOnFailure } from 'src/lib/utils'
 import * as yargs from 'yargs'
+import { GethArgv } from '../geth'
 
 export const command = 'create-account'
 

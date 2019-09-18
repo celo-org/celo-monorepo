@@ -1,16 +1,16 @@
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { CURRENCIES, CURRENCY_ENUM as Tokens } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { getExchangeRateDisplayValue } from 'src/utils/formatting'
 
 interface ExchangeRateProps {
   showFinePrint?: boolean
-  makerToken: Tokens
+  makerToken: CURRENCY_ENUM
   rate: BigNumber
 }
 
@@ -20,7 +20,8 @@ export class ExchangeRate extends React.PureComponent<Props> {
   render() {
     const { t, rate, showFinePrint } = this.props
     const isRateValid = !rate.isZero() && rate.isFinite()
-    const takerToken = this.props.makerToken === Tokens.DOLLAR ? Tokens.GOLD : Tokens.DOLLAR
+    const takerToken =
+      this.props.makerToken === CURRENCY_ENUM.DOLLAR ? CURRENCY_ENUM.GOLD : CURRENCY_ENUM.DOLLAR
 
     const makerTokenCode = CURRENCIES[this.props.makerToken].code
     const takerTokenCode = CURRENCIES[takerToken].code

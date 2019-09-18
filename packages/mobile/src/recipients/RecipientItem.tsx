@@ -33,9 +33,7 @@ class RecipientItem extends React.PureComponent<Props> {
             address={recipient.address}
             size={40}
           >
-            {this.isUnknown(recipient.kind) ? (
-              <Image source={unknownUserIcon} style={style.image} />
-            ) : null}
+            <Image source={unknownUserIcon} style={style.image} />
           </ContactCircle>
           <View style={style.nameContainer}>
             <Text
