@@ -123,4 +123,9 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @return The corresponding cUsd amount.
    */
   quoteGoldBuy = (buyAmount: NumberLike) => this.getSellTokenAmount(buyAmount, true)
+
+  spread = proxyCall(this.contract.methods.spread, undefined, toBigNumber)
+  reserveFraction = proxyCall(this.contract.methods.reserveFraction, undefined, toBigNumber)
+  updateFrequency = proxyCall(this.contract.methods.updateFrequency, undefined, toBigNumber)
+  minimumReports = proxyCall(this.contract.methods.minimumReports, undefined, toBigNumber)
 }

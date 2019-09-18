@@ -10,7 +10,7 @@ export async function displaySendTx<A>(name: string, txObj: CeloTransactionObjec
 
   const txHash = await txResult.getHash()
 
-  console.log(chalk`SendTrasaction: {red.bold ${name}}`)
+  console.log(chalk`SendTransaction: {red.bold ${name}}`)
   printValueMap({ txHash })
 
   await txResult.waitReceipt()

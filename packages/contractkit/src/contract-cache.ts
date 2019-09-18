@@ -6,6 +6,8 @@ import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
 import { LockedGoldWrapper } from './wrappers/LockedGold'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
 import { ValidatorsWrapper } from './wrappers/Validators'
+import { SortedOraclesWrapper } from './wrappers/SortedOracles'
+import { ReserveWrapper } from './wrappers/Reserve'
 
 const WrapperFactories = {
   [CeloContract.Attestations]: AttestationsWrapper,
@@ -19,8 +21,8 @@ const WrapperFactories = {
   // [CeloContract.MultiSig]: MultiSigWrapper,
   // [CeloContract.Random]: RandomWrapper,
   // [CeloContract.Registry]: RegistryWrapper,
-  // [CeloContract.Reserve]: ReserveWrapper,
-  // [CeloContract.SortedOracles]: SortedOraclesWrapper,
+  [CeloContract.Reserve]: ReserveWrapper,
+  [CeloContract.SortedOracles]: SortedOraclesWrapper,
   [CeloContract.StableToken]: StableTokenWrapper,
   [CeloContract.Validators]: ValidatorsWrapper,
 }
@@ -40,8 +42,8 @@ interface WrapperCacheMap {
   // [CeloContract.MultiSig]?: MultiSigWrapper,
   // [CeloContract.Random]?: RandomWrapper,
   // [CeloContract.Registry]?: RegistryWrapper,
-  // [CeloContract.Reserve]?: ReserveWrapper,
-  // [CeloContract.SortedOracles]?: SortedOraclesWrapper,
+  [CeloContract.Reserve]?: ReserveWrapper
+  [CeloContract.SortedOracles]?: SortedOraclesWrapper
   [CeloContract.StableToken]?: StableTokenWrapper
   [CeloContract.Validators]?: ValidatorsWrapper
 }
@@ -82,12 +84,12 @@ export class WrapperCache {
   // getRegistry() {
   //   return this.getWrapper(CeloContract.Registry, newRegistry)
   // }
-  // getReserve() {
-  //   return this.getWrapper(CeloContract.Reserve, newReserve)
-  // }
-  // getSortedOracles() {
-  //   return this.getWrapper(CeloContract.SortedOracles, newSortedOracles)
-  // }
+  getReserve() {
+    return this.getContract(CeloContract.Reserve)
+  }
+  getSortedOracles() {
+    return this.getContract(CeloContract.SortedOracles)
+  }
   getStableToken() {
     return this.getContract(CeloContract.StableToken)
   }
