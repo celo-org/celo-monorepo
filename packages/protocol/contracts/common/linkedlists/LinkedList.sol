@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
@@ -40,6 +40,10 @@ library LinkedList {
   {
     require(key != bytes32(0), "Key must be defined");
     require(!contains(list, key), "Can't insert an existing element");
+    require(
+      previousKey != key && nextKey != key,
+      "Key cannot be the same as previousKey or nextKey"
+    );
 
     Element storage element = list.elements[key];
     element.exists = true;

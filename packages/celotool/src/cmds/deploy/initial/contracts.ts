@@ -1,17 +1,18 @@
 /* tslint:disable no-console */
-import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
-import { uploadArtifacts } from '@celo/celotool/src/lib/artifacts'
-import { envVar, fetchEnv } from '@celo/celotool/src/lib/env-utils'
-import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
-import { ensure0x, execCmd } from '@celo/celotool/src/lib/utils'
+import { uploadArtifacts } from 'src/lib/artifacts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { envVar, fetchEnv } from 'src/lib/env-utils'
 import {
   AccountType,
   generatePrivateKey,
+  getAddressesFor,
   getPrivateKeysFor,
   privateKeyToAddress,
 } from 'src/lib/generate_utils'
 import { OG_ACCOUNTS } from 'src/lib/genesis_constants'
+import { portForwardAnd } from 'src/lib/port_forward'
+import { ensure0x, execCmd } from 'src/lib/utils'
+import { InitialArgv } from '../../deploy/initial'
 
 export const command = 'contracts'
 
@@ -46,10 +47,25 @@ export const handler = async (argv: InitialArgv) => {
 
   console.log(`Deploying smart contracts to ${argv.celoEnv}`)
   const cb = async () => {
+    const mnemonic = fetchEnv(envVar.MNEMONIC)
+
+    const migrationOverrides = JSON.stringify({
+      validators: {
+        validatorKeys: getValidatorKeys(),
+      },
+      stableToken: {
+        initialAccounts: getAddressesFor(AccountType.FAUCET, mnemonic, 2),
+      },
+    })
+
+    const truffleOverrides = JSON.stringify({
+      from: minerForEnv(),
+    })
+
     await execCmd(
       `yarn --cwd ../protocol run init-network -n ${
         argv.celoEnv
-      } -c '{ "from" : "${minerForEnv()}" }' -k ${getValidatorKeys()}`
+      } -c '${truffleOverrides}' -m '${migrationOverrides}'`
     )
   }
 

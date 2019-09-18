@@ -81,6 +81,8 @@ project.ext.react = [
         devDisabledInStaging: true,
         bundleInAlfajores: true,
         devDisabledInAlfajores: true,
+        bundleInPilot: true,
+        devDisabledInPilot: true,
 ]
 
 project.ext.envConfigFiles = [
@@ -89,6 +91,7 @@ project.ext.envConfigFiles = [
     staging: ".env.staging",
     release: ".env.production",
     alfajores: ".env.alfajores",
+    pilot: ".env.pilot",
 ]
 
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
@@ -184,6 +187,14 @@ android {
 
         alfajores {
             applicationIdSuffix ".alfajores"
+            minifyEnabled enableProguardInReleaseBuilds
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
+            matchingFallbacks = ['release']
+        }
+
+        pilot {
+            applicationIdSuffix ".pilot"
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release

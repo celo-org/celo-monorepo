@@ -1,7 +1,6 @@
 /* tslint:disable:no-console */
 import Web3 = require('web3')
 
-import { toFixed } from '@celo/protocol/lib/fixidity'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   convertToContractDecimalsBN,
@@ -9,6 +8,7 @@ import {
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import {
   GasCurrencyWhitelistInstance,
   ReserveInstance,
@@ -47,7 +47,12 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       `Minting ${minerAddress} ${config.stableToken.minerDollarBalance.toString()} StableToken`
     )
     await stableToken.setMinter(minerAddress)
-    await stableToken.mint(minerAddress, web3.utils.toBN(minerStartBalance))
+
+    const initialBalance = web3.utils.toBN(minerStartBalance)
+    await stableToken.mint(minerAddress, initialBalance)
+    for (const address of config.stableToken.initialAccounts) {
+      await stableToken.mint(address, initialBalance)
+    }
 
     console.log('Setting GoldToken/USD exchange rate')
     const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract<
