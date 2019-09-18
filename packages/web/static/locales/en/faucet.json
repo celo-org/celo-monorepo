@@ -38,5 +38,7 @@
   "inviteError": "Unable to complete",
   "cUSDsent": "cUSD Sent",
   "cGLDsent": "cGLD Sent",
-  "walletBuilt": "Wallet Built"
+  "walletBuilt": "Wallet Built",
+  "countryPlaceholder": "Country or Overseas Territory",
+  "phonePlaceholder": "Phone Number"
 }

@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native'
 import { TextInput } from 'src/forms/FormComponents'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { ScreenProps, withScreenSize } from 'src/layout/ScreenSize'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
@@ -28,7 +29,7 @@ const COUNTRIES = new Countries('en-us')
 
 const getCountries = memoizeOne((search: string) => COUNTRIES.getFilteredCountries(search))
 
-class PhoneInput extends React.PureComponent<Props & ScreenProps, State> {
+class PhoneInput extends React.PureComponent<Props & ScreenProps & I18nProps, State> {
   state: State = {
     countryQuery: '',
     countryCallingCode: '',
@@ -61,10 +62,6 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps, State> {
       this.setState({ phoneNumber: rawPhone })
       this.props.onChangeNumber('')
     }
-  }
-
-  getPlaceholder = () => {
-    return 'Phone number'
   }
 
   updateSuggestions = ({ value }) => {
@@ -140,7 +137,7 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps, State> {
 
   render() {
     const inputProps = {
-      placeholder: 'Country',
+      placeholder: this.props.t('countryPlaceholder'),
       value: this.state.countryQuery,
       onChange: this.onInputChange,
     }
@@ -192,7 +189,7 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps, State> {
             style={[standardStyles.input, standardStyles.inputDarkMode, styles.input]}
             focusStyle={standardStyles.inputDarkFocused}
             name="phone"
-            placeholder={this.getPlaceholder()}
+            placeholder={this.props.t('phonePlaceholder')}
             onChange={this.onNumberInput}
             value={this.state.phoneNumber}
             editable={this.state.countryCallingCode.length > 0}
@@ -255,4 +252,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withScreenSize<Props>(PhoneInput)
+export default withNamespaces(NameSpaces.faucet)(withScreenSize<Props>(PhoneInput))
