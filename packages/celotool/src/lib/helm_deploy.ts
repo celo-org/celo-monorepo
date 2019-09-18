@@ -546,6 +546,10 @@ async function helmParameters(celoEnv: string) {
     `--set geth.consensus_type=${fetchEnv('CONSENSUS_TYPE')}`,
     `--set geth.blocktime=${fetchEnv('BLOCK_TIME')}`,
     `--set geth.validators="${fetchEnv('VALIDATORS')}"`,
+    `--set geth.istanbulrequesttimeout=${fetchEnvOrFallback(
+      'ISTANBUL_REQUEST_TIMEOUT_MS',
+      '3000'
+    )}`,
     `--set geth.faultyValidators="${fetchEnvOrFallback('FAULTY_VALIDATORS', '0')}"`,
     `--set geth.faultyValidatorType="${fetchEnvOrFallback('FAULTY_VALIDATOR_TYPE', '0')}"`,
     `--set geth.tx_nodes="${fetchEnv('TX_NODES')}"`,
