@@ -1,5 +1,4 @@
 import { BaseCommand } from '../../base'
-// import { Args } from '../../utils/command'
 
 export default class Parameters extends BaseCommand {
   static description = 'View network parameters'
@@ -60,7 +59,20 @@ export default class Parameters extends BaseCommand {
     console.log('governance.referendumStageDuration', durations[1])
     console.log('governance.executionStageDuration', durations[2])
 
-    // min gas wrapper?
+    const gasPriceMinimum = await this.kit.contracts.getGasPriceMinimum()
+    console.log(
+      'gasPriceMinimum.gasPriceMinimum',
+      (await gasPriceMinimum.gasPriceMinimum()).toString()
+    )
+    console.log('gasPriceMinimum.targetDensity', (await gasPriceMinimum.targetDensity()).toString())
+    console.log(
+      'gasPriceMinimum.adjustmentSpeed',
+      (await gasPriceMinimum.adjustmentSpeed()).toString()
+    )
+    console.log(
+      'gasPriceMinimum.infrastructureFraction',
+      (await gasPriceMinimum.infrastructureFraction()).toString()
+    )
 
     const reserve = await this.kit.contracts.getReserve()
     console.log(

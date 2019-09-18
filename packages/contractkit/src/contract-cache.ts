@@ -9,6 +9,7 @@ import { ValidatorsWrapper } from './wrappers/Validators'
 import { SortedOraclesWrapper } from './wrappers/SortedOracles'
 import { ReserveWrapper } from './wrappers/Reserve'
 import { GovernanceWrapper } from './wrappers/Governance'
+import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
 
 const WrapperFactories = {
   [CeloContract.Attestations]: AttestationsWrapper,
@@ -16,7 +17,7 @@ const WrapperFactories = {
   // [CeloContract.Escrow]: EscrowWrapper,
   [CeloContract.Exchange]: ExchangeWrapper,
   // [CeloContract.GasCurrencyWhitelist]: GasCurrencyWhitelistWrapper,
-  // [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
+  [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
   [CeloContract.GoldToken]: GoldTokenWrapper,
   [CeloContract.Governance]: GovernanceWrapper,
   // [CeloContract.MultiSig]: MultiSigWrapper,
@@ -37,7 +38,7 @@ interface WrapperCacheMap {
   // [CeloContract.Escrow]?: EscrowWrapper,
   [CeloContract.Exchange]?: ExchangeWrapper
   // [CeloContract.GasCurrencyWhitelist]?: GasCurrencyWhitelistWrapper,
-  // [CeloContract.GasPriceMinimum]?: GasPriceMinimumWrapper,
+  [CeloContract.GasPriceMinimum]?: GasPriceMinimumWrapper
   [CeloContract.GoldToken]?: GoldTokenWrapper
   [CeloContract.Governance]?: GovernanceWrapper
   // [CeloContract.MultiSig]?: MultiSigWrapper,
@@ -70,9 +71,9 @@ export class WrapperCache {
   // getGasCurrencyWhitelist() {
   //   return this.getWrapper(CeloContract.GasCurrencyWhitelist, newGasCurrencyWhitelist)
   // }
-  // getGasPriceMinimum() {
-  //   return this.getWrapper(CeloContract.GasPriceMinimum, newGasPriceMinimum)
-  // }
+  getGasPriceMinimum() {
+    return this.getContract(CeloContract.GasPriceMinimum)
+  }
   getGoldToken() {
     return this.getContract(CeloContract.GoldToken)
   }
