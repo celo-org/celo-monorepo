@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -151,7 +151,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param registryAddress The address of the registry contract.
    * @param _minElectableValidators The minimum number of validators that can be elected.
    * @param _maxElectableValidators The maximum number of validators that can be elected.
-   * @param requirementValue The minimum Locked Gold commitment value to register a group or 
+   * @param requirementValue The minimum Locked Gold commitment value to register a group or
        validator.
    * @param requirementNoticePeriod The minimum Locked Gold commitment notice period to register
    *    a group or validator.
@@ -392,7 +392,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param identifier A identifier for this validator group.
    * @param name A name for the validator group.
    * @param url A URL for the validator group.
-   * @param noticePeriod The notice period of the Locked Gold commitment that meets the 
+   * @param noticePeriod The notice period of the Locked Gold commitment that meets the
    *   requirements for validator registration.
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.

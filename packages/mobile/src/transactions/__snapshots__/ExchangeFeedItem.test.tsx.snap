@@ -28,12 +28,35 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
   >
     <View
       style={
-        Array [
+        Object {
+          "alignItems": "center",
+          "flexDirection": "column",
+          "height": 40,
+          "justifyContent": "center",
+          "width": 40,
+        }
+      }
+    >
+      <Image
+        resizeMode="contain"
+        source={
           Object {
-            "flex": 1,
-          },
-          false,
-        ]
+            "testUri": "../../../src/transactions/ExchangeGreenGold.png",
+          }
+        }
+        style={
+          Object {
+            "width": 40,
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        Object {
+          "flex": 1,
+          "marginLeft": 16,
+        }
       }
     >
       <View
@@ -60,8 +83,8 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
           style={
             Array [
               Object {
-                "color": "#81868B",
-                "fontFamily": "Hind-Regular",
+                "color": "#FBCC5C",
+                "fontFamily": "Hind-SemiBold",
                 "fontSize": 15,
                 "lineHeight": 20,
               },
@@ -72,8 +95,8 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
             ]
           }
         >
-          -
-          1.00
+          
+          10.00
         </Text>
       </View>
       <View
