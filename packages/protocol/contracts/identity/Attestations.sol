@@ -1,5 +1,6 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
+import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
@@ -15,7 +16,7 @@ import "../common/UsingRegistry.sol";
 /**
  * @title Contract mapping identifiers to accounts
  */
-contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
+contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, ReentrancyGuard {
 
 
   using SafeMath for uint256;
@@ -155,6 +156,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
     address attestationRequestFeeToken
   )
     external
+    nonReentrant
   {
     require(
       attestationRequestFees[attestationRequestFeeToken] > 0,
@@ -494,7 +496,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
    * @param account The address of the account to get the key for
    * @return dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
    */
-  function getDataEncryptionKey(address account) public view returns (bytes memory) {
+  function getDataEncryptionKey(address account) external view returns (bytes memory) {
     return accounts[account].dataEncryptionKey;
   }
 
@@ -512,7 +514,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
    * @param account The address of the account to get the wallet address for
    * @return Wallet address
    */
-  function getWalletAddress(address account) public view returns (address) {
+  function getWalletAddress(address account) external view returns (address) {
     return accounts[account].walletAddress;
   }
 
@@ -556,7 +558,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
   function lookupAccountsForIdentifier(
     bytes32 identifier
   )
-    public
+    external
     view
     returns (address[] memory)
   {

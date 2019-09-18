@@ -1,12 +1,22 @@
 import colors from '@celo/react-components/styles/colors'
 import BigNumber from 'bignumber.js'
-import { CURRENCY_ENUM, WEI_PER_CELO } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM, WEI_PER_CELO } from 'src/geth/consts'
 
 const numeral = require('numeral')
 
-// Returns a localized string that represents the number with two decimal points. The input value is parsed without consideration for the current numeral locale, i.e. it uses `.` for the decimal separator as JS usually does
-export const getMoneyDisplayValue = (value: BigNumber.Value, decimals: number = 2): string => {
-  return numeral(roundDown(value, decimals).toNumber()).format('0,0.' + '0'.repeat(decimals))
+// Returns a localized string that represents the number with the right decimal points.
+// The input value is parsed without consideration for the current numeral locale, i.e. it uses `.` for the decimal separator as JS usually does
+export const getMoneyDisplayValue = (
+  value: BigNumber.Value,
+  currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR,
+  includeSymbol: boolean = false
+): string => {
+  const decimals = CURRENCIES[currency].displayDecimals
+  const symbol = CURRENCIES[currency].symbol
+  const formattedValue = numeral(roundDown(value, decimals).toNumber()).format(
+    '0,0.' + '0'.repeat(decimals)
+  )
+  return includeSymbol ? symbol + formattedValue : formattedValue
 }
 
 // like getMoneyDisplayValue but only returns cents if they are sigificant

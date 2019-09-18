@@ -4,7 +4,7 @@ import { SingletonRouter as Router, withRouter } from 'next/router'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Animated, Dimensions, Easing, StyleSheet, View } from 'react-native'
-import BlueBanner, { BANNER_HEIGHT, bannerVisible } from 'src/header/BlueBanner'
+import BlueBanner, { BANNER_HEIGHT, styles as bannerStyle } from 'src/header/BlueBanner'
 import cssStyles from 'src/header/Header.3.scss'
 import MediumLogo from 'src/icons/MediumLogo'
 import Octocat from 'src/icons/Octocat'
@@ -44,6 +44,7 @@ interface State {
   menuFade: Animated.Value
   menuFaded: boolean
   belowFoldUpScroll: boolean
+  isBannerShowing: boolean
 }
 
 function scrollOffset() {
@@ -117,6 +118,7 @@ export class Header extends React.Component<Props, State> {
       menuFaded: false,
       mobileMenuActive: false,
       belowFoldUpScroll: false,
+      isBannerShowing: false,
     }
   }
 
@@ -175,6 +177,10 @@ export class Header extends React.Component<Props, State> {
     return this.isDarkMode() ? colors.dark : colors.white
   }
 
+  toggleBanner = (isBannerShowing: boolean) => {
+    this.setState({ isBannerShowing })
+  }
+
   render() {
     const { t } = this.props
     const foreground = this.getForegroundColor()
@@ -186,7 +192,8 @@ export class Header extends React.Component<Props, State> {
       <View
         style={[
           styles.container,
-          { top: isHomePage && bannerVisible() ? BANNER_HEIGHT : 0 },
+          bannerStyle.slideDown,
+          { top: isHomePage && this.state.isBannerShowing ? BANNER_HEIGHT : 0 },
           this.state.mobileMenuActive && styles.mobileMenuActive,
         ]}
       >
@@ -197,7 +204,7 @@ export class Header extends React.Component<Props, State> {
             background-color: ${hamburger} !important;
           }
         `}</style>
-        {isHomePage && <BlueBanner />}
+        {isHomePage && <BlueBanner onVisibilityChange={this.toggleBanner} />}
         {this.state.menuFaded || (
           <Animated.View
             style={[
@@ -255,7 +262,7 @@ export class Header extends React.Component<Props, State> {
                       kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
                       href={'https://medium.com/CeloHQ'}
                       text={t('blog')}
-                      target={'_new_tab'}
+                      target={'_blank'}
                       iconRight={<MediumLogo height={20} color={foreground} wrapWithLink={false} />}
                     />
                   </View>
@@ -264,7 +271,7 @@ export class Header extends React.Component<Props, State> {
                       kind={this.isDarkMode() ? BTN.DARKNAV : BTN.NAV}
                       href={CeloLinks.gitHub}
                       text={t('github')}
-                      target={'_new_tab'}
+                      target={'_blank'}
                       iconRight={
                         <Octocat size={22} color={this.isDarkMode() ? colors.white : colors.dark} />
                       }

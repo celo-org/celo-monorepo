@@ -1,5 +1,5 @@
 import ScrollContainer from '@celo/react-components/components/ScrollContainer'
-import SectionHead from '@celo/react-components/components/SectionHead'
+import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
 import SmallButton from '@celo/react-components/components/SmallButton'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
@@ -68,7 +68,7 @@ export class ExchangeHomeScreen extends React.Component<Props> {
               />
             </View>
           </View>
-          <SectionHead text={t('activity')} />
+          <SectionHeadNew text={t('goldActivity')} />
           <View style={styles.activity}>
             <Activity />
           </View>

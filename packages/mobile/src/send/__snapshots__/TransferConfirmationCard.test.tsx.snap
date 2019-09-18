@@ -160,22 +160,25 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
           ]
         }
       >
-        <Text
+        <Image
+          source={
+            Object {
+              "testUri": "../../../src/images/unknown-user-icon.png",
+            }
+          }
           style={
             Array [
               Object {
-                "color": "#FFFFFF",
-                "fontFamily": "Hind-Medium",
-                "fontSize": 16,
+                "alignSelf": "center",
+                "margin": "auto",
               },
               Object {
-                "fontSize": 20,
+                "height": 40,
+                "width": 40,
               },
             ]
           }
-        >
-          #
-        </Text>
+        />
       </View>
     </View>
     <Text
@@ -197,7 +200,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
         ]
       }
     >
-      #000000000000000...
+      mobileNumber
     </Text>
     <View
       style={
@@ -355,22 +358,25 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
           ]
         }
       >
-        <Text
+        <Image
+          source={
+            Object {
+              "testUri": "../../../src/images/unknown-user-icon.png",
+            }
+          }
           style={
             Array [
               Object {
-                "color": "#FFFFFF",
-                "fontFamily": "Hind-Medium",
-                "fontSize": 16,
+                "alignSelf": "center",
+                "margin": "auto",
               },
               Object {
-                "fontSize": 20,
+                "height": 40,
+                "width": 40,
               },
             ]
           }
-        >
-          #
-        </Text>
+        />
       </View>
     </View>
     <Text
@@ -392,7 +398,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
         ]
       }
     >
-      #000000000000000...
+      mobileNumber
     </Text>
     <View
       style={

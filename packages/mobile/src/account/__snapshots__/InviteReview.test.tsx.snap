@@ -43,6 +43,7 @@ exports[`InviteReview renders correctly 1`] = `
             style={
               Array [
                 Object {
+                  "color": "#2E3338",
                   "fontFamily": "Hind-Light",
                   "fontSize": 22,
                   "paddingBottom": 20,
@@ -128,22 +129,25 @@ exports[`InviteReview renders correctly 1`] = `
                   ]
                 }
               >
-                <Text
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../src/images/unknown-user-icon.png",
+                    }
+                  }
                   style={
                     Array [
                       Object {
-                        "color": "#FFFFFF",
-                        "fontFamily": "Hind-Medium",
-                        "fontSize": 16,
+                        "alignSelf": "center",
+                        "margin": "auto",
                       },
                       Object {
-                        "fontSize": 20,
+                        "height": 40,
+                        "width": 40,
                       },
                     ]
                   }
-                >
-                  #
-                </Text>
+                />
               </View>
             </View>
             <Text
@@ -165,7 +169,7 @@ exports[`InviteReview renders correctly 1`] = `
                 ]
               }
             >
-              #000000000000000...
+              John Doe
             </Text>
             <View
               style={

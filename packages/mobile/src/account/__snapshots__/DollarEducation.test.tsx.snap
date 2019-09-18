@@ -133,6 +133,7 @@ exports[`DollarEducation renders correctly 1`] = `
           style={
             Array [
               Object {
+                "color": "#2E3338",
                 "fontFamily": "Hind-Light",
                 "fontSize": 22,
                 "paddingBottom": 20,
@@ -177,6 +178,7 @@ exports[`DollarEducation renders correctly 1`] = `
           style={
             Array [
               Object {
+                "color": "#2E3338",
                 "fontFamily": "Hind-Light",
                 "fontSize": 22,
                 "paddingBottom": 20,
@@ -221,6 +223,7 @@ exports[`DollarEducation renders correctly 1`] = `
           style={
             Array [
               Object {
+                "color": "#2E3338",
                 "fontFamily": "Hind-Light",
                 "fontSize": 22,
                 "paddingBottom": 20,

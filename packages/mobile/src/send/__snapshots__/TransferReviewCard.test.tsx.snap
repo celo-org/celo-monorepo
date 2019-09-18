@@ -59,22 +59,25 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
           ]
         }
       >
-        <Text
+        <Image
+          source={
+            Object {
+              "testUri": "../../../src/images/unknown-user-icon.png",
+            }
+          }
           style={
             Array [
               Object {
-                "color": "#FFFFFF",
-                "fontFamily": "Hind-Medium",
-                "fontSize": 16,
+                "alignSelf": "center",
+                "margin": "auto",
               },
               Object {
-                "fontSize": 20,
+                "height": 40,
+                "width": 40,
               },
             ]
           }
-        >
-          #
-        </Text>
+        />
       </View>
     </View>
     <Text
@@ -87,6 +90,30 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
             "fontFamily": "Hind-SemiBold",
             "fontSize": 14,
             "lineHeight": 18,
+          },
+          Object {
+            "marginHorizontal": 20,
+            "paddingTop": 6,
+            "textAlign": "center",
+          },
+        ]
+      }
+    >
+      walletAddress
+    </Text>
+    <Text
+      ellipsizeMode="tail"
+      numberOfLines={1}
+      style={
+        Array [
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          },
+          Object {
+            "fontFamily": "Hind-Light",
           },
           Object {
             "marginHorizontal": 20,
@@ -397,22 +424,25 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
           ]
         }
       >
-        <Text
+        <Image
+          source={
+            Object {
+              "testUri": "../../../src/images/unknown-user-icon.png",
+            }
+          }
           style={
             Array [
               Object {
-                "color": "#FFFFFF",
-                "fontFamily": "Hind-Medium",
-                "fontSize": 16,
+                "alignSelf": "center",
+                "margin": "auto",
               },
               Object {
-                "fontSize": 20,
+                "height": 40,
+                "width": 40,
               },
             ]
           }
-        >
-          #
-        </Text>
+        />
       </View>
     </View>
     <Text
@@ -434,7 +464,7 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
         ]
       }
     >
-      #000000000000000...
+      mobileNumber
     </Text>
     <View
       style={
@@ -738,22 +768,25 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
           ]
         }
       >
-        <Text
+        <Image
+          source={
+            Object {
+              "testUri": "../../../src/images/unknown-user-icon.png",
+            }
+          }
           style={
             Array [
               Object {
-                "color": "#FFFFFF",
-                "fontFamily": "Hind-Medium",
-                "fontSize": 16,
+                "alignSelf": "center",
+                "margin": "auto",
               },
               Object {
-                "fontSize": 20,
+                "height": 40,
+                "width": 40,
               },
             ]
           }
-        >
-          #
-        </Text>
+        />
       </View>
     </View>
     <Text
@@ -766,6 +799,30 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
             "fontFamily": "Hind-SemiBold",
             "fontSize": 14,
             "lineHeight": 18,
+          },
+          Object {
+            "marginHorizontal": 20,
+            "paddingTop": 6,
+            "textAlign": "center",
+          },
+        ]
+      }
+    >
+      walletAddress
+    </Text>
+    <Text
+      ellipsizeMode="tail"
+      numberOfLines={1}
+      style={
+        Array [
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          },
+          Object {
+            "fontFamily": "Hind-Light",
           },
           Object {
             "marginHorizontal": 20,

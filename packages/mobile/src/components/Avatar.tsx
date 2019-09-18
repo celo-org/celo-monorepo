@@ -1,34 +1,73 @@
+/**
+ * Essentially the same as @celo/react-components/components/Avatar but
+ * retrieves the defaultCountryCode from redux and a fallback to an unknown user
+ * icon.  Must be in mobile since redux & images are in the mobile package.
+ */
+
 import { Avatar as BaseAvatar } from '@celo/react-components/components/Avatar'
 import * as React from 'react'
-import { MinimalContact } from 'react-native-contacts'
-import { connect } from 'react-redux'
-import { RootState } from 'src/redux/reducers'
+import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { Image, StyleSheet } from 'react-native'
+import { useSelector } from 'react-redux'
+import { defaultCountryCodeSelector } from 'src/account/reducer'
+import { Namespaces } from 'src/i18n'
+import { unknownUserIcon } from 'src/images/Images'
+import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 
 const DEFAULT_ICON_SIZE = 40
 
-interface Props {
-  contact?: MinimalContact
+interface OwnProps {
+  recipient?: Recipient
+  e164Number?: string
   name?: string
   address?: string
-  e164Number?: string
-  defaultCountryCode: string
   iconSize?: number
 }
 
-interface StateProps {
-  defaultCountryCode: string
-}
+type Props = OwnProps & WithNamespaces
 
-const mapStateToProps = (state: RootState): StateProps => {
-  return {
-    defaultCountryCode: state.account.defaultCountryCode,
+function getDisplayName({ name, recipient, e164Number, address, t }: Props) {
+  if (name) {
+    return name
   }
+  if (recipient && recipient.displayName) {
+    return recipient.displayName
+  }
+  if (e164Number) {
+    return t('mobileNumber')
+  }
+  if (address) {
+    return t('walletAddress')
+  }
+  throw new Error('Invalid avatar props, cannot determine display name')
 }
 
-// Just a wrapper for convinience which retrieves the defaultCountryCode from redux
-function Avatar(props: Props & StateProps) {
-  return <BaseAvatar {...props} iconSize={props.iconSize || DEFAULT_ICON_SIZE} />
+export function Avatar(props: Props) {
+  const defaultCountryCode = useSelector(defaultCountryCodeSelector)
+  const { recipient, e164Number, iconSize = DEFAULT_ICON_SIZE } = props
+
+  return (
+    <BaseAvatar
+      {...props}
+      defaultCountryCode={defaultCountryCode}
+      name={getDisplayName(props)}
+      e164Number={e164Number}
+      iconSize={iconSize}
+      thumbnailPath={getRecipientThumbnail(recipient)}
+    >
+      <Image
+        source={unknownUserIcon}
+        style={[style.defaultIcon, { height: iconSize, width: iconSize }]}
+      />
+    </BaseAvatar>
+  )
 }
 
-// TODO(Rossy + Jean) simplify this file with useSelector
-export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(Avatar)
+const style = StyleSheet.create({
+  defaultIcon: {
+    alignSelf: 'center',
+    margin: 'auto',
+  },
+})
+
+export default withNamespaces(Namespaces.sendFlow7)(Avatar)

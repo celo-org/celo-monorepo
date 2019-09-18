@@ -244,9 +244,9 @@ export class Pincode extends React.Component<Props, State> {
     }
 
     return (
-      <View style={style.pincodeContainer}>
+      <View style={style.container}>
         <DevSkipButton nextScreen={Screens.EnterInviteCode} />
-        <ScrollView>
+        <ScrollView contentContainerStyle={style.scrollContainer}>
           <BackupIcon style={style.pincodeLogo} />
           {this.renderStep()}
         </ScrollView>
@@ -257,10 +257,14 @@ export class Pincode extends React.Component<Props, State> {
 }
 
 const style = StyleSheet.create({
-  pincodeContainer: {
+  container: {
     flex: 1,
     backgroundColor: 'white',
     justifyContent: 'space-between',
+  },
+  scrollContainer: {
+    padding: 20,
+    paddingTop: 0,
   },
   pincodeLogo: {
     alignSelf: 'center',

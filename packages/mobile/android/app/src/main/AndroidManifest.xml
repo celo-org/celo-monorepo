@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" 
   xmlns:tools="http://schemas.android.com/tools" package="org.celo.mobile" android:versionCode="1" android:versionName="1.0">
 
   <uses-permission android:name="android.permission.INTERNET" />
@@ -22,8 +22,7 @@
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
-        <data android:scheme="celo"
-              android:host="wallet" />
+        <data android:scheme="celo" android:host="wallet" />
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
@@ -43,12 +42,6 @@
      See README(https://goo.gl/l4GJaQ) for more. -->
     <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/ic_stat_rings" />
     <meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/celo_notification" />
-
-    <receiver android:name="com.androidbroadcastreceiverforreferrer.ReferrerBroadcastReceiver" android:enabled="true" android:exported="true">
-      <intent-filter>
-        <action android:name="com.android.vending.INSTALL_REFERRER"/>
-      </intent-filter>
-    </receiver>
     <provider android:name="android.support.v4.content.FileProvider" android:authorities="${applicationId}.provider" android:grantUriPermissions="true" android:exported="false">
       <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/filepaths" />
     </provider>
