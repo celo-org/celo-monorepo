@@ -1,36 +1,36 @@
-import { takeLeading } from 'redux-saga/effects'
-import { Actions, SetPincodeAction } from 'src/account/actions'
-// import { randomBytes } from 'react-native-randombytes'
+import { randomBytes } from 'react-native-randombytes'
+import { call, put, takeLeading } from 'redux-saga/effects'
+import {
+  Actions,
+  SetPincodeAction,
+  setPincodeFailure,
+  setPincodeSuccess,
+} from 'src/account/actions'
+import { showError } from 'src/alert/actions'
+import { ErrorMessages } from 'src/app/ErrorMessages'
+// @ts-ignore TS doesn't understand the RN's platform specific file imports
+import { setPin } from 'src/pincode/PincodeUtils'
+import Logger from 'src/utils/Logger'
 
-export function* setPincode({ useSystemAuth, pin }: SetPincodeAction) {
-  // const pin = randomBytes(10).toString('hex')
-  // let success
-  // if (state.account.pincodeSet) {
-  //   Logger.debug(TAG + '@setPin', 'Pincode has already been set')
-  //   throw Error('Can not set PIN twice')
-  // }
-  // if (!pin) {
-  //   Logger.debug(TAG + '@setPin', 'setpin got falsy pin: ' + pin)
-  //   throw Error('Can not set falsy PIN')
-  // }
-  // if (SUPPORTS_KEYSTORE) {
-  //   Logger.info(TAG + '@setPin', 'supports keystore')
-  //   try {
-  //     success = await setPinCred(pin)
-  //   } catch (e) {
-  //     Logger.debug(TAG + '@setPin', 'setpin failed with:' + e)
-  //     success = false
-  //   }
-  //   Logger.info(TAG + '@setPin', 'keystore setpin: ' + success)
-  // }
-  // if (success) {
-  //   await dispatch(pincodeSet())
-  //   Logger.info(TAG + '@setPin', 'pincode set')
-  //   return true
-  // } else {
-  //   dispatch(showError(ErrorMessages.SET_PIN_FAILED))
-  //   return false
-  // }
+const TAG = 'account/saga'
+
+export function* setPincode({ useSystemAuth }: SetPincodeAction) {
+  try {
+    if (useSystemAuth) {
+      Logger.debug(TAG + '@setPincode', `Setting pincode with using system auth`)
+      const pin = randomBytes(10).toString('hex')
+      yield call(setPin, pin)
+    } else {
+      Logger.debug(TAG + '@setPincode', `Pincode set using user provided pin`)
+    }
+
+    yield put(setPincodeSuccess())
+    Logger.info(TAG + '@setPincode', 'Pincode set successfully')
+  } catch (error) {
+    Logger.error(TAG + '@setPincode', 'Failed to set pincode', error)
+    yield put(showError(ErrorMessages.SET_PIN_FAILED))
+    yield put(setPincodeFailure())
+  }
 }
 
 export function* accountSaga() {

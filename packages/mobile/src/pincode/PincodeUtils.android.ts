@@ -4,8 +4,8 @@ import { UNLOCK_DURATION } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import Logger from 'src/utils/Logger'
 
-// Any key name works.
-const keyName: string = 'celo_key_name'
+const TAG = 'pincode/PincodeUtils'
+const keyName = 'celo_key_name'
 
 export function isPhoneAuthSupported() {
   // only support on API 23 and above.
@@ -13,7 +13,9 @@ export function isPhoneAuthSupported() {
 }
 
 export const setPin = async (pin: string) => {
-  if (!isPhoneAuthSupported) {
+  Logger.debug(TAG + '@setPin', 'Setting pin in phone keystore')
+
+  if (!isPhoneAuthSupported()) {
     throw Error('Keystore not supported on this device')
   }
   const humanReadableMessage: string = i18n.t('nuxNamePin1:enableScreenLockMessage')
@@ -24,15 +26,14 @@ export const setPin = async (pin: string) => {
   const isDeviceSecure: boolean = await ConfirmDeviceCredentials.isDeviceSecure()
 
   if (!isDeviceSecure) {
-    while (!(await ConfirmDeviceCredentials.isDeviceSecure())) {
-      try {
-        await ConfirmDeviceCredentials.makeDeviceSecure(
-          humanReadableMessage,
-          securitySettingsButtonLabel
-        )
-      } catch (e) {
-        Logger.showError(i18n.t('nuxNamePin1:EnableSystemScreenLockFailed') + ' ' + e)
-      }
+    try {
+      await ConfirmDeviceCredentials.makeDeviceSecure(
+        humanReadableMessage,
+        securitySettingsButtonLabel
+      )
+    } catch (e) {
+      Logger.showError(i18n.t('nuxNamePin1:EnableSystemScreenLockFailed'))
+      throw e
     }
   }
 
@@ -43,26 +44,29 @@ export const setPin = async (pin: string) => {
   )
   if (!keystoreInitResult) {
     Logger.showError(i18n.t('nuxNamePin1:initKeystoreFailureMessage'))
-    throw Error('PincodeViaAndroidKeystore/Failed to initialize keystore')
+    throw Error('Failed to initialize keystore')
   }
-  let storePinResult: boolean = false
+
   try {
-    storePinResult = await ConfirmDeviceCredentials.storePin(keyName, pin)
+    await ConfirmDeviceCredentials.storePin(keyName, pin)
+    Logger.debug(TAG + '@setPin', 'Pin set in phone keystore')
   } catch (e) {
-    Logger.debug('PincodeViaAndroidKeystore@setPin', 'setpin failed with:' + e)
-    storePinResult = false
+    Logger.error(TAG + '@setPin', 'Failed to set pin in keystore', e)
+    throw e
   }
-  return storePinResult
 }
 
 export const getPin = async () => {
-  if (!isPhoneAuthSupported) {
+  Logger.debug(TAG + '@getPin', 'Getting pin from phone keystore')
+
+  if (!isPhoneAuthSupported()) {
     throw Error('Keystore not supported on this device')
   }
+
   const isDeviceSecure: boolean = await ConfirmDeviceCredentials.isDeviceSecure()
   if (!isDeviceSecure) {
-    Logger.showError(i18n.t('nuxNamePin1:pinLostForeverMessage'))
-    return null
+    throw Error('No pin found, phone is not secured')
   }
+
   return ConfirmDeviceCredentials.retrievePin(keyName)
 }

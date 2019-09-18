@@ -1,12 +1,6 @@
 import { PaymentRequest } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
-import { getPin as getPinCred } from 'src/pincode/PincodeUtils.android'
-import Logger from 'src/utils/Logger'
-
-const TAG = 'account/actions'
 
 export enum Actions {
   SET_NAME = 'ACCOUNT/SET_NAME',
@@ -178,28 +172,29 @@ export const setUserContactDetails = (
   thumbnailPath,
 })
 
+//TODO move this?
 export const getPincode = async () => {
-  let pin
-  // If used phone auth
-  if (SUPPORTS_KEYSTORE) {
-    Logger.info(TAG + '@getPincode', 'using keystore')
-    pin = await getPinCred()
-  } else {
-    Logger.debug(TAG + '@getPincode', 'NOT using keystore')
-    const pincodeEntered = new Promise((resolve, reject) => {
-      navigate(Screens.PincodeConfirmation, { resolve, reject })
-    })
-    pin = await pincodeEntered
-  }
-
-  if (!pin) {
-    Logger.debug(TAG + '@getPincode', 'pin seems to be falsy')
-    Logger.showMessage(
-      'PIN might be corrupted, please get backup key, wipe app data, update the app and recover from backup key'
-    )
-    return
-  } else {
-    Logger.debug(TAG + '@getPincode', 'get keystore pincode')
-  }
-  return pin
+  return 'yes'
+  // let pin
+  // // If used phone auth
+  // if (SUPPORTS_KEYSTORE) {
+  //   Logger.info(TAG + '@getPincode', 'using keystore')
+  //   pin = await getPinCred()
+  // } else {
+  //   Logger.debug(TAG + '@getPincode', 'NOT using keystore')
+  //   const pincodeEntered = new Promise((resolve, reject) => {
+  //     navigate(Screens.PincodeConfirmation, { resolve, reject })
+  //   })
+  //   pin = await pincodeEntered
+  // }
+  // if (!pin) {
+  //   Logger.debug(TAG + '@getPincode', 'pin seems to be falsy')
+  //   Logger.showMessage(
+  //     'PIN might be corrupted, please get backup key, wipe app data, update the app and recover from backup key'
+  //   )
+  //   return
+  // } else {
+  //   Logger.debug(TAG + '@getPincode', 'get keystore pincode')
+  // }
+  // return pin
 }

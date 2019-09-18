@@ -1,14 +1,13 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import ValidatedTextInput from '@celo/react-components/components/ValidatedTextInput'
-import colors from '@celo/react-components/styles/colors'
+import HorizontalLine from '@celo/react-components/components/HorizontalLine'
+import NumberKeypad from '@celo/react-components/components/NumberKeypad'
 import { fontStyles } from '@celo/react-components/styles/fonts'
-import { ValidatorKind } from '@celo/utils/src/inputValidation'
+import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import { setPin, setPincodeSuccess } from 'src/account/actions'
+import { setPincode } from 'src/account/actions'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -16,74 +15,38 @@ import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces } from 'src/i18n'
-import BackupIcon from 'src/icons/BackupIcon'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-
-enum Steps {
-  EDUCATION = 0,
-  PIN_ENTER = 1,
-  PIN_REENTER = 2,
-}
+import PincodeTextbox from 'src/pincode/PincodeTextbox'
 
 interface DispatchProps {
   showError: typeof showError
   hideAlert: typeof hideAlert
-  pincodeSet: typeof setPincodeSuccess
-  setPin: typeof setPin
+  setPincode: typeof setPincode
 }
 
 interface State {
-  step: Steps
+  isPin1Inputted: boolean
   pin1: string
   pin2: string
 }
 
 type Props = DispatchProps & WithNamespaces
 
-// Use bindActionCreators to workaround a typescript error with the shorthand syntax with redux-thunk actions
-// see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37369
-const mapDispatchToProps = (dispatch: any) =>
-  bindActionCreators(
-    {
-      showError,
-      hideAlert,
-      pincodeSet: setPincodeSuccess,
-      setPin,
-    },
-    dispatch
-  )
+const mapDispatchToProps = {
+  showError,
+  hideAlert,
+  setPincode,
+}
 
 export class PincodeSet extends React.Component<Props, State> {
   static navigationOptions = nuxNavigationOptions
 
   state = {
-    step: Steps.EDUCATION,
+    isPin1Inputted: false,
     pin1: '',
     pin2: '',
-  }
-
-  goBack = () => {
-    navigateBack()
-  }
-
-  stepForward = () => {
-    const newStep = (this.state.step + 1) % 3
-    this.setState({
-      step: newStep,
-    })
-  }
-
-  stepBack = () => {
-    const { step } = this.state
-    if (step < 1) {
-      navigateBack()
-    } else {
-      this.setState({
-        step: (step - 1) % 3,
-      })
-    }
   }
 
   onChangePin1 = (pin1: string) => {
@@ -94,157 +57,111 @@ export class PincodeSet extends React.Component<Props, State> {
     this.setState({ pin2 })
   }
 
-  pin1IsValid = () => {
+  isPin1Valid = () => {
     return this.state.pin1.length === 6
   }
 
-  pin2IsValid = () => {
+  isPin2Valid = () => {
     return this.state.pin1 === this.state.pin2
   }
 
-  createPin = () => {
+  onPressPin1Continue = () => {
+    CeloAnalytics.track(CustomEventNames.pin_value)
+    this.setState({
+      isPin1Inputted: true,
+    })
+  }
+
+  onPressPin2Continue = () => {
     CeloAnalytics.track(CustomEventNames.pin_create_button)
-    const { pin1, pin2 } = this.state
-    if (pin1 === pin2) {
-      this.props.pincodeSet()
+    if (this.isPin1Valid() && this.isPin2Valid()) {
+      this.props.setPincode(false)
       navigate(Screens.EnterInviteCode)
     } else {
       this.props.showError(ErrorMessages.INCORRECT_PIN)
     }
   }
 
-  onSubmitPin1 = () => {
-    CeloAnalytics.track(CustomEventNames.pin_value)
-    this.stepForward()
-  }
-
-  onPressEducation = () => {
-    CeloAnalytics.track(CustomEventNames.pin_continue)
-    this.stepForward()
-  }
-
-  onCancel = () => {
-    if (this.state.pin1 !== '') {
-      CeloAnalytics.track(CustomEventNames.pin_value)
-    }
-    this.stepBack()
-  }
-
-  renderStep() {
-    const { t } = this.props
-    switch (this.state.step) {
-      case Steps.EDUCATION:
-        return (
-          <View style={style.pincodeContent}>
-            <Text style={[fontStyles.h1, style.h1]} testID="PincodeTitle">
-              {t('createPin.title')}
-            </Text>
-            <View style={style.explanation}>
-              <Text style={fontStyles.bodySmall}>
-                {t('createPin.intro') + ' ' + t('createPin.why')}
-              </Text>
-            </View>
-            <View style={[style.explanation]}>
-              <Text style={fontStyles.bodySmall}>
-                {<Text style={[fontStyles.bodySmallBold]}>{t('important')} </Text>}
-                {t('createPin.warn')}
-              </Text>
-            </View>
-          </View>
-        )
-      case Steps.PIN_ENTER:
-        return (
-          <View style={style.pincodeContent}>
-            <Text style={[fontStyles.h1, style.h1]}>{t('createPin.title')}</Text>
-            <ValidatedTextInput
-              value={this.state.pin1}
-              validator={ValidatorKind.Integer}
-              onChangeText={this.onChangePin1}
-              onSubmitEditing={this.onSubmitPin1}
-              autoFocus={true}
-              keyboardType="numeric"
-              maxLength={6}
-              placeholder={t('createPin.yourPin')}
-              secureTextEntry={true}
-              style={style.numberInput}
-              textContentType="password"
-              nativeInput={true}
-            />
-          </View>
-        )
-      case Steps.PIN_REENTER:
-        return (
-          <View style={style.pincodeContent}>
-            <Text style={[fontStyles.h1, style.h1]}>{t('verifyPin.title')}</Text>
-            <ValidatedTextInput
-              value={this.state.pin2}
-              validator={ValidatorKind.Integer}
-              onChangeText={this.onChangePin2}
-              onSubmitEditing={this.createPin}
-              autoFocus={true}
-              keyboardType="numeric"
-              maxLength={6}
-              placeholder={t('createPin.yourPin')}
-              secureTextEntry={true}
-              style={style.numberInput}
-              textContentType="password"
-              nativeInput={true}
-            />
-          </View>
-        )
+  onDigitPress = (digit: number) => {
+    const { pin1, pin2, isPin1Inputted } = this.state
+    console.log('DIGIT:', digit)
+    if (!isPin1Inputted) {
+      this.setState({
+        pin1: (pin1 + digit).substr(0, 6),
+      })
+    } else {
+      this.setState({
+        pin2: (pin2 + digit).substr(0, 6),
+      })
     }
   }
 
-  renderStepButton() {
-    const { t } = this.props
-    switch (this.state.step) {
-      case Steps.PIN_REENTER:
-        return (
-          <Button
-            testID="Pincode-ReEnter"
-            text={t('verifyPin.finalPin')}
-            style={style.button}
-            standard={true}
-            type={BtnTypes.PRIMARY}
-            onPress={this.createPin}
-            disabled={!this.pin2IsValid()}
-          />
-        )
-      case Steps.PIN_ENTER:
-        return (
-          <Button
-            testID="Pincode-Enter"
-            text={t('continue')}
-            style={style.button}
-            onPress={this.stepForward}
-            disabled={!this.pin1IsValid()}
-            standard={true}
-            type={BtnTypes.PRIMARY}
-          />
-        )
-      default:
-        return (
-          <Button
-            testID="Pincode-Education"
-            text={t('continue')}
-            style={style.button}
-            onPress={this.onPressEducation}
-            standard={true}
-            type={BtnTypes.SECONDARY}
-          />
-        )
+  onBackspacePress = () => {
+    console.log('backspace')
+    const { pin1, pin2, isPin1Inputted } = this.state
+    if (!isPin1Inputted) {
+      this.setState({
+        pin1: pin1.substr(0, pin1.length - 1),
+      })
+    } else {
+      this.setState({
+        pin2: pin2.substr(0, pin2.length - 1),
+      })
     }
   }
 
   render() {
+    const { t } = this.props
+    const { isPin1Inputted, pin1, pin2 } = this.state
+
     return (
       <View style={style.container}>
         <DevSkipButton nextScreen={Screens.EnterInviteCode} />
         <ScrollView contentContainerStyle={style.scrollContainer}>
-          <BackupIcon style={style.pincodeLogo} />
-          {this.renderStep()}
+          <View>
+            <Text style={[fontStyles.h1, componentStyles.marginTop15]}>
+              {isPin1Inputted ? t('verifyPin.title') : t('createPin.title')}
+            </Text>
+            <View style={style.pincodeContainer}>
+              <PincodeTextbox
+                pin={isPin1Inputted ? pin2 : pin1}
+                placeholder={t('createPin.yourPin')}
+              />
+            </View>
+          </View>
+          <View>
+            <HorizontalLine />
+            <View style={style.keypadContainer}>
+              <NumberKeypad
+                showDecimal={true}
+                onDigitPress={this.onDigitPress}
+                onBackspacePress={this.onBackspacePress}
+              />
+            </View>
+          </View>
         </ScrollView>
-        <View style={style.pincodeFooter}>{this.renderStepButton()}</View>
+        {!isPin1Inputted && (
+          <Button
+            testID="Pincode-Enter"
+            text={t('global:continue')}
+            style={style.button}
+            standard={true}
+            type={BtnTypes.PRIMARY}
+            onPress={this.onPressPin1Continue}
+            disabled={!this.isPin1Valid()}
+          />
+        )}
+        {isPin1Inputted && (
+          <Button
+            testID="Pincode-ReEnter"
+            text={t('global:save')}
+            style={style.button}
+            standard={true}
+            type={BtnTypes.PRIMARY}
+            onPress={this.onPressPin2Continue}
+            disabled={!this.isPin2Valid()}
+          />
+        )}
       </View>
     )
   }
@@ -257,54 +174,22 @@ const style = StyleSheet.create({
     justifyContent: 'space-between',
   },
   scrollContainer: {
+    flex: 1,
+    justifyContent: 'space-between',
     padding: 20,
     paddingTop: 0,
   },
-  pincodeLogo: {
-    alignSelf: 'center',
-  },
-  pincodeContent: {
-    flex: 1,
-    paddingHorizontal: 10,
-  },
-  explanation: {
-    marginVertical: 10,
-  },
-  pincodeFooter: {
+  pincodeContainer: {
+    marginBottom: 20,
     alignItems: 'center',
   },
-  pincodeFooterText: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingBottom: 35,
-  },
-  numberInput: {
-    borderWidth: 1,
-    borderColor: colors.inputBorder,
-    borderRadius: 3,
-    padding: 7,
-    fontSize: 24,
-    marginHorizontal: 60,
+  keypadContainer: {
     marginVertical: 15,
-    textAlign: 'center',
-    backgroundColor: '#FFFFFF',
-  },
-  h1: {
-    textAlign: 'center',
-    color: colors.dark,
-    padding: 25,
+    paddingHorizontal: 20,
   },
   button: {
     paddingHorizontal: 20,
     paddingVertical: 5,
-  },
-  header: {
-    padding: 10,
-    flexDirection: 'row',
-  },
-  goBack: {
-    flex: 1,
-    paddingBottom: 21,
   },
 })
 

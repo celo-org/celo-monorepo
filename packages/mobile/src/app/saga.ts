@@ -93,7 +93,7 @@ export function* navigateToProperScreen() {
   } else if (!e164Number) {
     navigate(Screens.JoinCelo)
   } else if (!pincodeSet) {
-    navigate(Screens.Pincode)
+    navigate(Screens.PincodeEducation)
   } else if (!redeemComplete) {
     navigate(Screens.EnterInviteCode)
   } else if (!askedContactsPermission) {

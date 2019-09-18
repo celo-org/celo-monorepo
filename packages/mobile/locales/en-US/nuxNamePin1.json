@@ -54,21 +54,11 @@
   "cancel": "Cancel",
   "important": "Important",
   "createPin": {
-    "title": "Create 6 digit PIN Code",
-    "intro": "Create a PIN to secure your Celo Wallet.",
-    "why":
-      "You'll need this PIN occasionally when you want to send {{CeloDollars}} to your friends.",
-    "warn":
-      "Write down your 6 digit PIN code & secure it somewhere safe. You will be asked for this later to access your wallet.",
+    "title": "Set a 6 digit PIN",
     "yourPin": "Your PIN"
   },
   "verifyPin": {
-    "title": "Re-enter your PIN",
-    "finalPin": "Create PIN"
-  },
-  "confirmPin": {
-    "title": "Enter 6 digit PIN Code",
-    "submit": "Submit"
+    "title": "Re-Enter PIN"
   },
   "pincodeEducation": {
     "title": "Secure Your Wallet",
@@ -76,7 +66,7 @@
     "summary":
       "You can use your phone’s existing authentication or create a new PIN for this application.",
     "usePhoneAuth": "Use Phone Authentication",
-    "createNewPin": "UCreate New PIN"
+    "createNewPin": "Create New PIN"
   },
   "goToSystemSecuritySettingsActionLabel": "Go to security",
   "enableSystemScreenLockFailedMessage": "Failed to enable screen lock",

@@ -9,6 +9,7 @@ import { componentWithAnalytics } from 'src/analytics/wrapper'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces } from 'src/i18n'
 import BackupIcon from 'src/icons/BackupIcon'
+import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { isPhoneAuthSupported } from 'src/pincode/PincodeUtils.android'
@@ -34,6 +35,8 @@ const mapDispatchToProps: DispatchProps = {
 }
 
 class PincodeEducation extends React.Component<Props> {
+  static navigationOptions = nuxNavigationOptions
+
   state = {
     isSettingPin: false,
   }
@@ -86,7 +89,7 @@ class PincodeEducation extends React.Component<Props> {
             )}
           </View>
         </ScrollView>
-        <View style={style.pincodeFooter}>
+        <View>
           {phoneAuth && (
             <>
               <Button
@@ -143,9 +146,6 @@ const style = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 15,
     marginBottom: 20,
-  },
-  pincodeFooter: {
-    // alignItems: 'flex-end',
   },
   h1: {
     marginTop: 20,
