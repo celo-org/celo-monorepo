@@ -7,7 +7,6 @@ export default function airtableInit(baseID: string) {
   const { serverRuntimeConfig } = getConfig()
 
   if (!airTableSingleton) {
-    // tslint:disable-next-line
     airTableSingleton = new Airtable({ apiKey: serverRuntimeConfig.AIRTABLE_API_KEY })
   }
   return airTableSingleton.base(baseID)
