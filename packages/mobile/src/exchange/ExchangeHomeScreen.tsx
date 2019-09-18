@@ -68,7 +68,7 @@ export class ExchangeHomeScreen extends React.Component<Props> {
               />
             </View>
           </View>
-          <SectionHeadNew text={t('activity')} />
+          <SectionHeadNew text={t('goldActivity')} />
           <View style={styles.activity}>
             <Activity />
           </View>
