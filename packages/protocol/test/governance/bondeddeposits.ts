@@ -90,6 +90,26 @@ contract('LockedGold', (accounts: string[]) => {
     })
   })
 
+  describe('#isDelegate()', () => {
+    const delegate = accounts[1]
+    let sig
+
+    beforeEach(async () => {
+      sig = await getParsedSignatureOfAddress(account, delegate)
+      await lockedGold.delegateRole(roles.voting, delegate, sig.v, sig.r, sig.s)
+    })
+
+    it('should return true for delegate', async () => {
+      assert.equal(await lockedGold.isDelegate(delegate), true)
+    })
+    it('should return false for account', async () => {
+      assert.equal(await lockedGold.isDelegate(account), false)
+    })
+    it('should return false for others', async () => {
+      assert.equal(await lockedGold.isDelegate(accounts[4]), false)
+    })
+  })
+
   describe('#initialize()', () => {
     it('should set the owner', async () => {
       const owner: string = await lockedGold.owner()
