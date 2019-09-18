@@ -72,6 +72,7 @@ export class ConnectPage extends React.Component<Props> {
           <EventData />
           <ArticleData />
           <Contribute />
+          <EcoFund />
           <FellowSection />
           <View style={styles.darkBackground} nativeID={hashNav.connect.newsletter}>
             <GridRow
