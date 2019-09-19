@@ -130,8 +130,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    registrationRequirement.group = groupRequirement;
-    registrationRequirement.validator = validatorRequirement;
+    registrationRequirements.group = groupRequirement;
+    registrationRequirements.validator = validatorRequirement;
     maxGroupSize = _maxGroupSize;
   }
 
@@ -210,7 +210,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     Validator memory validator = Validator(name, url, publicKeysData, address(0));
     validators[account] = validator;
     _validators.push(account);
-    setAccountMustMaintain(account, requirements.validator, MAX_INT);
+    getLockedGold().setAccountMustMaintain(account, registrationRequirements.validator, MAX_INT);
     emit ValidatorRegistered(account, name, url, publicKeysData);
     return true;
   }
@@ -241,7 +241,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     }
     delete validators[account];
     deleteElement(_validators, account, index);
-    setAccountMustMaintain(account, requirements.validator, now.add(deregisterPeriods.validator));
+    getLockedGold().setAccountMustMaintain(account, registrationRequirements.validator, now.add(deregisterPeriods.validator));
     emit ValidatorDeregistered(account);
     return true;
   }
@@ -311,7 +311,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       group.addMember(members[i]);
     }
     _groups.push(account);
-    setAccountMustMaintain(account, requirements.group, MAX_INT);
+    getLockedGold().setAccountMustMaintain(account, requirements.group, MAX_INT);
     emit ValidatorGroupRegistered(account, name, url);
     return true;
   }
@@ -328,7 +328,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(isValidatorGroup(account) && groups[account].members.numElements == 0);
     delete groups[account];
     deleteElement(_groups, account, index);
-    setAccountMustMaintain(account, requirements.group, now.add(deregisterPeriods.group));
+    getLockedGold().setAccountMustMaintain(account, requirements.group, now.add(deregisterPeriods.group));
     emit ValidatorGroupDeregistered(account);
     return true;
   }
@@ -438,7 +438,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     return groups[account].members.numElements;
   }
 
-  function getTopValidatorsFromGroup(address account, uint256 n) external view returns (address[]) {
+  function getTopValidatorsFromGroup(address account, uint256 n) external view returns (address[] memory) {
     address[] memory topAccounts = groups[account].members.list.headN(n);
     address[] memory topValidators = new address[](n);
     for (uint256 i = 0; i < n; i = i.add(1)) {
@@ -447,7 +447,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     return topValidators;
   }
 
-  function getNumGroupMembers(address[] accounts) external view returns (uint256) {
+  function getNumGroupMembers(address[] calldata accounts) external view returns (uint256) {
     uint256[] memory numMembers = new uint256[](accounts.length);
     for (uint256 i = 0; i < accounts.length; i = i.add(1)) {
       numMembers[i] = getNumGroupMembers(accounts[i]);

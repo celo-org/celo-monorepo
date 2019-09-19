@@ -54,7 +54,7 @@ contract UsingLockedGold is UsingRegistry {
     return getLockedGold().decrementNonvotingAccountBalance(account, value);
   }
 
-  function getLockedGold() private view returns(ILockedGold) {
+  function getLockedGold() internal view returns(ILockedGold) {
     return ILockedGold(registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
   }
 }

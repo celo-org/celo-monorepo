@@ -5,13 +5,14 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/ILockedGold.sol";
+import "./UsingElection.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/IERC20Token.sol";
 import "../common/Signatures.sol";
 
-contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry {
+contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry, UsingElection {
 
   // TODO(asa): How do adjust for updated requirements?
   // Have a refreshRequirements function validators and groups can call
@@ -50,11 +51,15 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   mapping(address => Account) public accounts;
   // Maps voting and validating keys to the account that provided the authorization.
   mapping(address => address) public authorizations;
-  uint256 public nonvotingTotal;
+  uint256 public totalNonvoting;
   uint256 public unlockingPeriod;
 
   event VoterAuthorized(address indexed account, address voter);
   event ValidatorAuthorized(address indexed account, address validator);
+  event GoldLocked(address indexed account, uint256 value);
+  event GoldUnlocked(address indexed account, uint256 value, uint256 available);
+  event GoldWithdrawn(address indexed account, uint256 value);
+  event AccountMustMaintainSet(address indexed account, uint256 value, uint256 timestamp);
 
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
@@ -126,7 +131,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     totalNonvoting = totalNonvoting.add(value);
   }
 
-  function decrementNonvotingAccountBalance(address account, uint256 value) private {
+  function _decrementNonvotingAccountBalance(address account, uint256 value) private {
     accounts[account].gold.nonvoting = accounts[account].gold.nonvoting.sub(value);
     totalNonvoting = totalNonvoting.sub(value);
   }
@@ -140,7 +145,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
       now >= requirement.timestamp ||
       getAccountTotalLockedGold(msg.sender).sub(value) >= requirement.value
     );
-    decrementNonvotingAccountBalance(msg.sender, value);
+    _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
     account.balances.pendingWithdrawals.push(PendingWithdrawal(value, available));
     emit GoldUnlocked(msg.sender, value, available);
@@ -192,7 +197,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return The associated account.
    */
   function getAccountFromVoter(address accountOrVoter) public view returns (address) {
-    address authorizingAccount = authorizations[voter];
+    address authorizingAccount = authorizations[accountOrVoter];
     if (authorizingAccount != address(0)) {
       require(accounts[authorizingAccount].authorizations.voter == accountOrVoter);
       return authorizingAccount;
@@ -203,12 +208,12 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   function getTotalLockedGold() public view returns (uint256) {
-    return nonvotingTotal.add(getTotalVotes());
+    return totalNonvoting.add(getElection().totalVotes());
   }
 
   function getAccountTotalLockedGold(address account) public view returns (uint256) {
     uint256 total = accounts[account].balances.nonvoting;
-    return total.add(getAccountTotalVotes(account));
+    return total.add(getElection().getAccountTotalVotes(account));
   }
 
   /**
@@ -218,13 +223,13 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return The associated account.
    */
   function getAccountFromValidator(address accountOrValidator) public view returns (address) {
-    address authorizingAccount = authorizations[validator];
+    address authorizingAccount = authorizations[accountOrValidator];
     if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].authorizations.validator == accountOrVoter);
+      require(accounts[authorizingAccount].authorizations.validator == accountOrValidator);
       return authorizingAccount;
     } else {
-      require(isAccount(accountOrVoter));
-      return accountOrVoter;
+      require(isAccount(accountOrValidator));
+      return accountOrValidator;
     }
   }
 
