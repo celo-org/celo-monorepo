@@ -1,6 +1,6 @@
+import BigNumber from 'bignumber.js'
 import { Reserve } from '../generated/types/Reserve'
 import { BaseWrapper, proxyCall, toBigNumber } from './BaseWrapper'
-import BigNumber from 'bignumber.js'
 
 export interface ReserveConfig {
   tobinTaxStalenessThreshold: BigNumber

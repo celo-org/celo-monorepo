@@ -1,6 +1,6 @@
+import BigNumber from 'bignumber.js'
 import { GasPriceMinimum } from '../generated/types/GasPriceMinimum'
 import { BaseWrapper, proxyCall, toBigNumber } from './BaseWrapper'
-import BigNumber from 'bignumber.js'
 
 export interface GasPriceMinimumConfig {
   gasPriceMinimum: BigNumber

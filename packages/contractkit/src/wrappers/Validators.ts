@@ -68,6 +68,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   )
   electionThreshold = proxyCall(this.contract.methods.getElectionThreshold, undefined, toBigNumber)
 
+  getVoteFrom: (validatorAddress: Address) => Promise<Address | null> = proxyCall(
+    this.contract.methods.voters
+  )
+
   async getRegistrationRequirement(): Promise<RegistrationRequirement> {
     const res = await this.contract.methods.getRegistrationRequirement().call()
     return {
@@ -90,10 +94,6 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       registrationRequirement: res[3],
     }
   }
-
-  getVoteFrom: (validatorAddress: Address) => Promise<Address | null> = proxyCall(
-    this.contract.methods.voters
-  )
 
   async getRegisteredValidators(): Promise<Validator[]> {
     const vgAddresses = await this.contract.methods.getRegisteredValidators().call()

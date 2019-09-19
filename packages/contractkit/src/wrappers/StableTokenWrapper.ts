@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { StableToken } from '../generated/types/StableToken'
 import {
   BaseWrapper,
@@ -8,7 +9,6 @@ import {
   toNumber,
   tupleParser,
 } from './BaseWrapper'
-import BigNumber from 'bignumber.js'
 
 export interface InflationParameters {
   rate: BigNumber

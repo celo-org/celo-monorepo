@@ -42,14 +42,15 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     const tokens: string[] = []
     evs.forEach((el) => {
       const res: string = el.returnValues.token
-      if (tokenMap[res]) return
+      if (tokenMap[res]) {
+        return
+      }
       tokenMap[res] = true
       tokens.push(res)
     })
-    const self = this
     const fees = await Promise.all(
       tokens.map(async (token) => {
-        const fee = await self.attestationRequestFees(token)
+        const fee = await this.attestationRequestFees(token)
         return { fee, address: token }
       })
     )

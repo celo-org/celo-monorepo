@@ -1,6 +1,6 @@
+import BigNumber from 'bignumber.js'
 import { SortedOracles } from '../generated/types/SortedOracles'
 import { BaseWrapper, proxyCall, toBigNumber } from './BaseWrapper'
-import BigNumber from 'bignumber.js'
 
 export interface SortedOraclesConfig {
   reportExpirySeconds: BigNumber

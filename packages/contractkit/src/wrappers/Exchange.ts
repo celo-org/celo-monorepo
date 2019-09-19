@@ -30,25 +30,6 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
   minimumReports = proxyCall(this.contract.methods.minimumReports, undefined, toBigNumber)
 
   /**
-   * @dev Returns the current configuration of the exchange contract
-   * @return ExchangeConfig object
-   */
-  async getConfig(): Promise<ExchangeConfig> {
-    const res = await Promise.all([
-      this.spread(),
-      this.reserveFraction(),
-      this.updateFrequency(),
-      this.minimumReports(),
-    ])
-    return {
-      spread: res[0],
-      reserveFraction: res[1],
-      updateFrequency: res[2],
-      minimumReports: res[3],
-    }
-  }
-
-  /**
    * @dev Returns the amount of buyToken a user would get for sellAmount of sellToken
    * @param sellAmount The amount of sellToken the user is selling to the exchange
    * @param sellGold `true` if gold is the sell token
@@ -154,4 +135,23 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @return The corresponding cUsd amount.
    */
   quoteGoldBuy = (buyAmount: NumberLike) => this.getSellTokenAmount(buyAmount, true)
+
+  /**
+   * @dev Returns the current configuration of the exchange contract
+   * @return ExchangeConfig object
+   */
+  async getConfig(): Promise<ExchangeConfig> {
+    const res = await Promise.all([
+      this.spread(),
+      this.reserveFraction(),
+      this.updateFrequency(),
+      this.minimumReports(),
+    ])
+    return {
+      spread: res[0],
+      reserveFraction: res[1],
+      updateFrequency: res[2],
+      minimumReports: res[3],
+    }
+  }
 }
