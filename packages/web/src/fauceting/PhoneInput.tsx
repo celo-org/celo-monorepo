@@ -176,7 +176,7 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps & I18nProps, St
 
     return (
       <TouchableOpacity onPress={onPress}>
-        <View style={[standardStyles.row, { marginVertical: 5 }]}>
+        <View style={[standardStyles.row, styles.item]}>
           <Text>{emoji || `🏳`}</Text>
           <Text style={[fonts.legal, textStyles.invert]}>{displayName}</Text>
         </View>
@@ -205,9 +205,18 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps & I18nProps, St
             list-style-type: none;
           }
           .react-autosuggest__container--open {
-            padding: 15;
+            padding: 0;
             border-color: ${colors.white},
             border-width: 1
+          }
+
+           .react-autosuggest__suggestion div[data-focusable] {
+            border-left: 0;
+            transition: border-left 200ms;
+          }
+          .react-autosuggest__suggestion div:focus {
+            outline-width: 0px;
+            border-left: 2px solid ${colors.primary};
           }
         `}
         </style>
@@ -297,7 +306,16 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     borderColor: colors.light,
     borderWidth: 1,
-    padding: 15,
+    paddingHorizontal: 1,
+    paddingVertical: 5,
+  },
+  item: {
+    marginVertical: 2,
+    padding: 5,
+    paddingLeft: 10,
+    marginHorizontal: 1,
+    transitionProperty: 'background',
+    transitionDuration: '100ms',
   },
   ccplaceholder: {
     color: colors.placeholderDarkMode,
