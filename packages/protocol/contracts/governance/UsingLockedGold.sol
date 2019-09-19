@@ -10,26 +10,23 @@ import "../common/UsingRegistry.sol";
  */
 contract UsingLockedGold is UsingRegistry {
   /**
-   * @notice Returns whether or not an account's voting power is frozen.
-   * @param account The address of the account.
-   * @return Whether or not the account's voting power is frozen.
-   * @dev Frozen accounts can retract existing votes but not make future votes.
+   * @notice Returns the account associated with `accountOrVoter`.
+   * @param accountOrVoter The address of the account or authorized voter.
+   * @dev Fails if the `accountOrVoter` is not an account or authorized voter.
+   * @return The associated account.
    */
-  function isVotingFrozen(address account) internal view returns (bool) {
-    return getLockedGold().isVotingFrozen(account);
+  function getAccountFromVoter(address accountOrVoter) internal view returns (address) {
+    return getLockedGold().getAccountFromVoter(accountOrVoter);
   }
 
   /**
-   * @notice Returns the account associated with the provided account or voting delegate.
-   * @param accountOrDelegate The address of the account or voting delegate.
-   * @dev Fails if the `accountOrDelegate` is a non-voting delegate.
+   * @notice Returns the account associated with `accountOrValidator`.
+   * @param accountOrValidator The address of the account or authorized validator.
+   * @dev Fails if the `accountOrValidator` is not an account or authorized validator.
    * @return The associated account.
    */
-  function getAccountFromVoter(address accountOrDelegate) internal view returns (address) {
-    return getLockedGold().getAccountFromDelegateAndRole(
-      accountOrDelegate,
-      ILockedGold.DelegateRole.Voting
-    );
+  function getAccountFromValidator(address accountOrValidator) internal view returns (address) {
+    return getLockedGold().getAccountFromValidator(accountOrValidator);
   }
 
   /**
@@ -38,51 +35,23 @@ contract UsingLockedGold is UsingRegistry {
    * @return The associated validator address.
    */
   function getValidatorFromAccount(address account) internal view returns (address) {
-    return getLockedGold().getDelegateFromAccountAndRole(
-      account,
-      ILockedGold.DelegateRole.Validating
-    );
+    return getLockedGold().getValidatorFromAccount(account);
   }
 
-  /**
-   * @notice Returns the account associated with the provided account or validating delegate.
-   * @param accountOrDelegate The address of the account or validating delegate.
-   * @dev Fails if the `accountOrDelegate` is a non-validating delegate.
-   * @return The associated account.
-   */
-  function getAccountFromValidator(address accountOrDelegate) internal view returns (address) {
-    return getLockedGold().getAccountFromDelegateAndRole(
-      accountOrDelegate,
-      ILockedGold.DelegateRole.Validating
-    );
+  function getTotalLockedGold() internal view returns (uint256) {
+    return getLockedGold().getTotalLockedGold();
   }
 
-  /**
-   * @notice Returns voting weight for a particular account.
-   * @param account The address of the account.
-   * @return The voting weight of `account`.
-   */
-  function getAccountWeight(address account) internal view returns (uint256) {
-    return getLockedGold().getAccountWeight(account);
+  function getAccountTotalLockedGold(address account) internal view returns (uint256) {
+    return getLockedGold().getAccountTotalLockedGold(account);
   }
 
-  /**
-   * @notice Returns the Locked Gold commitment value for particular account and notice period.
-   * @param account The address of the account.
-   * @param noticePeriod The notice period of the Locked Gold commitment.
-   * @return The value of the Locked Gold commitment.
-   */
-  function getLockedCommitmentValue(
-    address account,
-    uint256 noticePeriod
-  )
-    internal
-    view
-    returns (uint256)
-  {
-    uint256 value;
-    (value,) = getLockedGold().getLockedCommitment(account, noticePeriod);
-    return value;
+  function incrementNonvotingAccountBalance(address account, uint256 value) internal returns (bool) {
+    return getLockedGold().incrementNonvotingAccountBalance(account, value);
+  }
+
+  function decrementNonvotingAccountBalance(address account, uint256 value) internal returns (bool) {
+    return getLockedGold().decrementNonvotingAccountBalance(account, value);
   }
 
   function getLockedGold() private view returns(ILockedGold) {

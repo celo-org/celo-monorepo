@@ -5,15 +5,11 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/ILockedGold.sol";
-import "./interfaces/IGovernance.sol";
-import "./interfaces/IValidators.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
-import "../common/FixidityLib.sol";
 import "../common/interfaces/IERC20Token.sol";
 import "../common/Signatures.sol";
-import "../common/FractionUtil.sol";
 
 contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry {
 
@@ -81,6 +77,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint8 v,
     bytes32 r,
     bytes32 s
+  )
     external
     nonReentrant
   {
@@ -95,6 +92,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint8 v,
     bytes32 r,
     bytes32 s
+  )
     external
     nonReentrant
   {
@@ -111,19 +109,25 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   function lock(uint256 value) external nonReentrant {
     require(isAccount(msg.sender));
     require(msg.value == value && value > 0);
-    incrementNonvotingAccountBalance(msg.sender, value)
+    _incrementNonvotingAccountBalance(msg.sender, value);
     emit GoldLocked(msg.sender, value);
   }
 
-  function incrementNonvotingAccountBalance(address account, uint256 value) private {
-    Account storage account = accounts[account];
-    account.gold.nonvoting = account.gold.nonvoting.add(value);
+  function incrementNonvotingAccountBalance(address account, uint256 value) external onlyRegisteredContract('Election', msg.sender) {
+    _incrementNonvotingAccountBalance(account, value);
+  }
+
+  function decrementNonvotingAccountBalance(address account, uint256 value) external onlyRegisteredContract('Election', msg.sender) {
+    _decrementNonvotingAccountBalance(account, value);
+  }
+
+  function _incrementNonvotingAccountBalance(address account, uint256 value) private {
+    accounts[account].gold.nonvoting = accounts[account].gold.nonvoting.add(value);
     totalNonvoting = totalNonvoting.add(value);
   }
 
   function decrementNonvotingAccountBalance(address account, uint256 value) private {
-    Account storage account = accounts[account];
-    account.gold.nonvoting = account.gold.nonvoting.sub(value);
+    accounts[account].gold.nonvoting = accounts[account].gold.nonvoting.sub(value);
     totalNonvoting = totalNonvoting.sub(value);
   }
 
@@ -142,24 +146,25 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     emit GoldUnlocked(msg.sender, value, available);
   }
 
-  function relock(uint256 value, uint256 index) external nonReentrant {
+  // TODO(asa): Allow partial relock
+  function relock(uint256 index) external nonReentrant {
     require(isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
-    require(index < account.gold.unlocking.length);
-    uint256 value = account.gold.unlocking[index].value;
-    incrementNonvotingAccountBalance(msg.sender, value);
-    deletePendingWithdrawal(account.gold.unlocking, index);
+    require(index < account.balances.pendingWithdrawals.length);
+    uint256 value = account.balances.pendingWithdrawals[index].value;
+    _incrementNonvotingAccountBalance(msg.sender, value);
+    deletePendingWithdrawal(account.balances.pendingWithdrawals, index);
     emit GoldLocked(msg.sender, value);
   }
 
-  function withdraw(uint256 value, uint256 index) external nonReentrant {
+  function withdraw(uint256 index) external nonReentrant {
     require(isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
-    require(index < account.gold.unlocking.length);
-    PendingWithdrawal memory unlocking = account.gold.unlocking[index];
-    require(now >= unlocking.available);
-    uint256 value = unlocking.value;
-    deletePendingWithdrawal(account.gold.unlocking, index);
+    require(index < account.balances.pendingWithdrawals.length);
+    PendingWithdrawal memory pendingWithdrawal = account.balances.pendingWithdrawals[index];
+    require(now >= pendingWithdrawal.available);
+    uint256 value = pendingWithdrawal.value;
+    deletePendingWithdrawal(account.balances.pendingWithdrawals, index);
     IERC20Token goldToken = IERC20Token(registry.getAddressFor(GOLD_TOKEN_REGISTRY_ID));
     require(goldToken.transfer(msg.sender, value));
     emit GoldWithdrawn(msg.sender, value);
@@ -181,7 +186,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   // TODO(asa): Dedup
   /**
-   * @notice Returns the account associated with the `voter` address.
+   * @notice Returns the account associated with `accountOrVoter`.
    * @param accountOrVoter The address of the account or authorized voter.
    * @dev Fails if the `accountOrVoter` is not an account or authorized voter.
    * @return The associated account.
@@ -207,7 +212,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   /**
-   * @notice Returns the account associated with the `validator` address.
+   * @notice Returns the account associated with `accountOrValidator`.
    * @param accountOrValidator The address of the account or authorized validator.
    * @dev Fails if the `accountOrValidator` is not an account or authorized validator.
    * @return The associated account.

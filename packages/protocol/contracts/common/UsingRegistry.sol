@@ -15,12 +15,13 @@ contract UsingRegistry is Ownable {
 
   // solhint-disable state-visibility
   bytes32 constant ATTESTATIONS_REGISTRY_ID = keccak256(abi.encodePacked("Attestations"));
-  bytes32 constant LOCKED_GOLD_REGISTRY_ID = keccak256(abi.encodePacked("LockedGold"));
+  bytes32 constant ELECTION_REGISTRY_ID = keccak256(abi.encodePacked("Election"));
   bytes32 constant GAS_CURRENCY_WHITELIST_REGISTRY_ID = keccak256(
     abi.encodePacked("GasCurrencyWhitelist")
   );
   bytes32 constant GOLD_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("GoldToken"));
   bytes32 constant GOVERNANCE_REGISTRY_ID = keccak256(abi.encodePacked("Governance"));
+  bytes32 constant LOCKED_GOLD_REGISTRY_ID = keccak256(abi.encodePacked("LockedGold"));
   bytes32 constant RESERVE_REGISTRY_ID = keccak256(abi.encodePacked("Reserve"));
   bytes32 constant RANDOM_REGISTRY_ID = keccak256(abi.encodePacked("Random"));
   bytes32 constant SORTED_ORACLES_REGISTRY_ID = keccak256(abi.encodePacked("SortedOracles"));
@@ -29,6 +30,10 @@ contract UsingRegistry is Ownable {
 
   IRegistry public registry;
 
+  modifier onlyRegisteredContract(bytes32 identifierHash, address sender) {
+    require(registry.getAddressForOrDie(identifierHash) == sender);
+    _;
+  }
   /**
    * @notice Updates the address pointing to a Registry contract.
    * @param registryAddress The address of a registry contract for routing to other contracts.

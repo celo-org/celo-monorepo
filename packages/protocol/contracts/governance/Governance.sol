@@ -44,14 +44,20 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     Yes
   }
 
+  struct UpvoteRecord {
+    uint256 proposalId;
+    uint256 weight;
+  }
+
   struct VoteRecord {
     VoteValue value;
     uint256 proposalId;
+    uint256 weight;
   }
 
   struct Voter {
     // Key of the proposal voted for in the proposal queue
-    uint256 upvotedProposal;
+    UpvoteRecord upvote;
     uint256 mostRecentReferendumProposal;
     // Maps a `dequeued` index to a voter's vote record.
     mapping(uint256 => VoteRecord) referendumVotes;
@@ -423,7 +429,6 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     returns (bool)
   {
     address account = getAccountFromVoter(msg.sender);
-    require(!isVotingFrozen(account));
     // TODO(asa): When upvoting a proposal that will get dequeued, should we let the tx succeed
     // and return false?
     dequeueProposalsIfReady();
@@ -436,20 +441,20 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     }
     Voter storage voter = voters[account];
     // We can upvote a proposal in the queue if we're not already upvoting a proposal in the queue.
-    uint256 weight = getAccountWeight(account);
+    uint256 weight = getAccountTotalLockedGold(account);
     require(
       isQueued(proposalId) &&
-      (voter.upvotedProposal == 0 || !queue.contains(voter.upvotedProposal)) &&
+      (voter.upvote.proposalId == 0 || !queue.contains(voter.upvote.proposalId)) &&
       weight > 0
     );
-    uint256 upvotes = queue.getValue(proposalId).add(uint256(weight));
+    uint256 upvotes = queue.getValue(proposalId).add(weight);
     queue.update(
       proposalId,
       upvotes,
       lesser,
       greater
     );
-    voter.upvotedProposal = proposalId;
+    voter.upvote = UpvoteRecord(proposalId, weight);
     emit ProposalUpvoted(proposalId, account, weight);
     return true;
   }
@@ -474,7 +479,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     dequeueProposalsIfReady();
     address account = getAccountFromVoter(msg.sender);
     Voter storage voter = voters[account];
-    uint256 proposalId = voter.upvotedProposal;
+    uint256 proposalId = voter.upvote.proposalId;
     Proposal storage proposal = proposals[proposalId];
     require(_proposalExists(proposal));
     // If acting on an expired proposal, expire the proposal.
@@ -485,18 +490,16 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
         queue.remove(proposalId);
         emit ProposalExpired(proposalId);
       } else {
-        uint256 weight = getAccountWeight(account);
-        require(weight > 0);
         queue.update(
           proposalId,
-          queue.getValue(proposalId).sub(weight),
+          queue.getValue(proposalId).sub(voter.upvote.weight),
           lesser,
           greater
         );
-        emit ProposalUpvoteRevoked(proposalId, account, weight);
+        emit ProposalUpvoteRevoked(proposalId, account, voter.upvote.weight);
       }
     }
-    voter.upvotedProposal = 0;
+    voter.upvote = UpvoteRecord(0, 0);
     return true;
   }
 
@@ -541,7 +544,6 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     returns (bool)
   {
     address account = getAccountFromVoter(msg.sender);
-    require(!isVotingFrozen(account));
     dequeueProposalsIfReady();
     Proposal storage proposal = proposals[proposalId];
     require(_proposalExists(proposal) && dequeued[index] == proposalId);
@@ -551,7 +553,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     }
     ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
     Voter storage voter = voters[account];
-    uint256 weight = getAccountWeight(account);
+    uint256 weight = getAccountTotalLockedGold(account);
     require(
       proposal.approved &&
       stage == ProposalStage.Referendum &&
@@ -562,11 +564,11 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     // If we've already voted on this proposal, subtract the previous vote.
     if (voteRecord.proposalId == proposalId) {
       if (voteRecord.value == VoteValue.Abstain) {
-        proposal.votes.abstain = proposal.votes.abstain.sub(weight);
+        proposal.votes.abstain = proposal.votes.abstain.sub(voteRecord.weight);
       } else if (voteRecord.value == VoteValue.Yes) {
-        proposal.votes.yes = proposal.votes.yes.sub(weight);
+        proposal.votes.yes = proposal.votes.yes.sub(voteRecord.weight);
       } else if (voteRecord.value == VoteValue.No) {
-        proposal.votes.no = proposal.votes.no.sub(weight);
+        proposal.votes.no = proposal.votes.no.sub(voteRecord.weight);
       }
     }
 
@@ -578,8 +580,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     } else if (value == VoteValue.No) {
       proposal.votes.no = proposal.votes.no.add(weight);
     }
-    voteRecord.proposalId = proposalId;
-    voteRecord.value = value;
+    voteRecord = VoteRecord(value, proposalId, weight);
     if (proposal.timestamp > voter.mostRecentReferendumProposal) {
       voter.mostRecentReferendumProposal = proposalId;
     }

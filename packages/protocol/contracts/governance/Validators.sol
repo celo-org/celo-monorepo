@@ -10,7 +10,6 @@ import "./interfaces/IValidators.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
-import "../common/linkedlists/AddressSortedLinkedList.sol";
 
 
 /**
@@ -22,7 +21,6 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
   using FixidityLib for FixidityLib.Fraction;
   using AddressLinkedList for LinkedList.List;
-  using AddressSortedLinkedList for SortedLinkedList.List;
   using SafeMath for uint256;
   using BytesLib for bytes;
 
@@ -190,7 +188,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   function registerValidator(
     string calldata name,
     string calldata url,
-    bytes calldata publicKeysData,
+    bytes calldata publicKeysData
   )
     external
     nonReentrant
@@ -434,6 +432,31 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(isValidatorGroup(account));
     ValidatorGroup storage group = groups[account];
     return (group.name, group.url, group.members.getKeys());
+  }
+
+  function getNumGroupMembers(address account) public view returns (uint256) {
+    return groups[account].members.numElements;
+  }
+
+  function getTopValidatorsFromGroup(address account, uint256 n) external view returns (address[]) {
+    address[] memory topAccounts = groups[account].members.list.headN(n);
+    address[] memory topValidators = new address[](n);
+    for (uint256 i = 0; i < n; i = i.add(1)) {
+      topValidators[i] = getValidatorFromAccount(topAccounts[i]);
+    }
+    return topValidators;
+  }
+
+  function getNumGroupMembers(address[] accounts) external view returns (uint256) {
+    uint256[] memory numMembers = new uint256[](accounts.length);
+    for (uint256 i = 0; i < accounts.length; i = i.add(1)) {
+      numMembers[i] = getNumGroupMembers(accounts[i]);
+    }
+    return numMembers;
+  }
+
+  function getNumRegisteredValidators() external view returns (uint256) {
+    return _validators.length;
   }
 
   /**

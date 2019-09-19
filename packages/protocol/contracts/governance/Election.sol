@@ -1,22 +1,22 @@
 pragma solidity ^0.5.3;
 
+import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
-import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./UsingLockedGold.sol";
+import "./UsingValidators.sol";
 import "./interfaces/IValidators.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
-import "../common/linkedlists/AddressLinkedList.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 
 
-contract Election is Ownable, ReentrancyGuard, Initializable, UsingLockedGold {
+contract Election is Ownable, ReentrancyGuard, Initializable, UsingLockedGold, UsingValidators {
 
-  using FixidityLib for FixidityLib.Fraction;
   using AddressSortedLinkedList for SortedLinkedList.List;
+  using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
   // Pending votes are those for which no following elections have been held.
@@ -154,7 +154,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingLockedGold {
   function setMaxVotesPerAccount(uint256 _maxVotesPerAccount) external onlyOwner returns (bool) {
     require(_maxVotesPerAccount != maxVotesPerAccount);
     maxVotesPerAccount = _maxVotesPerAccount;
-    emit MaxVotesPerAccountSet(_maxVotePerAccount);
+    emit MaxVotesPerAccountSet(_maxVotesPerAccount);
     return true;
   }
 
@@ -240,7 +240,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingLockedGold {
     if (getAccountTotalVotesForGroup(group, account) == 0) {
       deleteElement(votes.lists[account], group, index);
     }
-    emit ValidatorGroupVoteRevoked(account, group, weight);
+    emit ValidatorGroupVoteRevoked(account, group, value);
     return true;
   }
 
@@ -276,7 +276,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingLockedGold {
     if (getAccountTotalVotesForGroup(group, account) == 0) {
       deleteElement(votes.lists[account], group, index);
     }
-    emit ValidatorGroupVoteRevoked(account, group, weight);
+    emit ValidatorGroupVoteRevoked(account, group, value);
     return true;
   }
 
@@ -289,18 +289,18 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingLockedGold {
     return total;
   }
 
-  function getAccountPendingVotesForGroup(address group, address account) external view returns (uint256) {
+  function getAccountPendingVotesForGroup(address group, address account) public view returns (uint256) {
     return votes.pending.values[group][account];
   }
 
-  function getAccountActiveVotesForGroup(address group, address account) external view returns (uint256) {
+  function getAccountActiveVotesForGroup(address group, address account) public view returns (uint256) {
     uint256 numerator = votes.active.numerators[group][account].mul(votes.total.getValue(group));
     uint256 denominator = votes.total.getValue(group);
     return numerator.div(denominator);
   }
 
-  function getAccountTotalVotesForGroup(address group, address account) external view returns (uint256) {
-    uint256 pending = getAccountPendingVotesForGroup(group, account)
+  function getAccountTotalVotesForGroup(address group, address account) public view returns (uint256) {
+    uint256 pending = getAccountPendingVotesForGroup(group, account);
     uint256 active = getAccountActiveVotesForGroup(group, account);
     return pending.add(active);
   }
@@ -392,7 +392,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingLockedGold {
   function getActiveVotesDelta(address group, address account, uint256 value) private {
     uint256 total = votes.totals.getValue(group);
     // Preserve delta * total = value * denominator
-    uint256 delta = value.mul(active.denominators[group]).div(total);
+    uint256 delta = value.mul(votes.active.denominators[group]).div(total);
   }
 
   /**
@@ -463,33 +463,26 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingLockedGold {
    * @return The list of elected validators.
    * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
    */
-  /* solhint-disable code-complexity */
   function electValidators() external view returns (address[] memory) {
     // Only members of these validator groups are eligible for election.
     uint256 maxNumElectionGroups = Math.min(maxElectableValidators, votes.totals.list.numElements);
     uint256 requiredVotes = electabilityThreshold.multiply(FixidityLib.newFixed(totalVotes)).fromFixed();
     address[] memory electionGroups = votes.totals.list.headN(maxNumElectionGroups, requiredVotes);
+    uint256[] memory numMembers = getNumGroupMembers(electionGroups);
     // Holds the number of members elected for each of the eligible validator groups.
     uint256[] memory numMembersElected = new uint256[](electionGroups.length);
     uint256 totalNumMembersElected = 0;
-    bool memberElectedInRound = true;
     // Assign a number of seats to each validator group.
-    while (totalNumMembersElected < maxElectableValidators && memberElectedInRound) {
-      memberElectedInRound = false;
+    while (totalNumMembersElected < maxElectableValidators) {
       uint256 groupIndex = 0;
-      FixidityLib.Fraction memory maxN = FixidityLib.wrap(0);
-      for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
-        bool isWinningestGroupInRound = false;
-        (maxN, isWinningestGroupInRound) = dHondt(maxN, electionGroups[i], numMembersElected[i]);
-        if (isWinningestGroupInRound) {
-          memberElectedInRound = true;
-          groupIndex = i;
-        }
-      }
+      bool memberElected = false;
+      (groupIndex, memberElected) = dHondt(electionGroups, numMembers, numMembersElected);
 
-      if (memberElectedInRound) {
+      if (memberElected) {
         numMembersElected[groupIndex] = numMembersElected[groupIndex].add(1);
         totalNumMembersElected = totalNumMembersElected.add(1);
+      } else {
+        break;
       }
     }
     require(totalNumMembersElected >= minElectableValidators);
@@ -497,46 +490,48 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingLockedGold {
     address[] memory electedValidators = new address[](totalNumMembersElected);
     totalNumMembersElected = 0;
     for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
-      address[] memory electedGroupMembers = groups[electionGroups[i]].members.headN(
+      // We use the validating delegate if one is set.
+      address[] memory electedGroupValidators = getTopValidatorsFromGroup(
+        electionGroups[i],
         numMembersElected[i]
       );
-      for (uint256 j = 0; j < electedGroupMembers.length; j = j.add(1)) {
-        // We use the validating delegate if one is set.
-        electedValidators[totalNumMembersElected] = getValidatorFromAccount(electedGroupMembers[j]);
+      for (uint256 j = 0; j < electedGroupValidators.length; j = j.add(1)) {
+        electedValidators[totalNumMembersElected] = electedGroupValidators[j];
         totalNumMembersElected = totalNumMembersElected.add(1);
       }
     }
     return electedValidators;
   }
-  /* solhint-enable code-complexity */
 
   /**
-   * @notice Runs D'Hondt for a validator group.
-   * @param maxN The maximum number of votes per elected seat for a group in this round.
-   * @param groupAddress The address of the validator group.
-   * @param numMembersElected The number of members elected so far for this group.
+   * @notice Runs a round of the D'Hondt algorithm.
+   * @param electionGroups The addresses of the validator groups in the election.
+   * @param numMembers The number of members in each group.
+   * @param numMembersElected The number of members elected in each group up to this point.
    * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
-   * @return The new `maxN` and whether or not the group should win a seat in this round thus far.
+   * @return Whether or not a group elected a member, and the index of the group if so.
    */
-  function dHondt(
-    FixidityLib.Fraction memory maxN,
-    address groupAddress,
-    uint256 numMembersElected
-  )
+  function dHondt(address[] memory electionGroups, uint256[] memory numMembers, uint256[] memory numMembersElected)
     private
     view
-    returns (FixidityLib.Fraction memory, bool)
+    returns (uint256, bool)
   {
-    ValidatorGroup storage group = groups[groupAddress];
-    // Only consider groups with members left to be elected.
-    if (group.members.numElements > numMembersElected) {
-      FixidityLib.Fraction memory n = FixidityLib.newFixed(votes.getValue(groupAddress)).divide(
-        FixidityLib.newFixed(numMembersElected.add(1))
-      );
-      if (n.gt(maxN)) {
-        return (n, true);
+    bool memberElected = false;
+    uint256 groupIndex = 0;
+    FixidityLib.Fraction memory maxN = FixidityLib.wrap(0);
+    for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
+      address group = electionGroups[i];
+      // Only consider groups with members left to be elected.
+      if (numMembers[i] > numMembersElected[i]) {
+        FixidityLib.Fraction memory n = FixidityLib.newFixed(votes.totals.getValue(group)).divide(
+          FixidityLib.newFixed(numMembersElected[i].add(1))
+        );
+        if (n.gt(maxN)) {
+          groupIndex = i;
+          memberElected = true;
+        }
       }
     }
-    return (maxN, false);
+    return (groupIndex, memberElected);
   }
 }
