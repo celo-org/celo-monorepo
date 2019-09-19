@@ -1,7 +1,7 @@
 import { Countries, PhoneNumberUtils } from '@celo/utils'
 import memoizeOne from 'memoize-one'
 import * as React from 'react'
-import Autosuggest from 'react-autosuggest'
+import * as Autosuggest from 'react-autosuggest'
 import {
   NativeSyntheticEvent,
   StyleSheet,
@@ -63,6 +63,11 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps & I18nProps, St
     phoneNumber: '',
   }
 
+  getEmoji = (): string => {
+    // @ts-ignore -- TS isnt recognizing that Localized country extends Country
+    return COUNTRIES.getCountryByCode(this.state.countryCode).emoji || ''
+  }
+
   getCallingCode = () => {
     const country = COUNTRIES.getCountryByCode(this.state.countryCode)
     // @ts-ignore -- TS isnt recognizing that Localized country extends Country\
@@ -96,7 +101,7 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps & I18nProps, St
       this.props.onChangeNumber('')
     }
   }
-  updateSuggestions = ({ value, reason }: { value: string; reason: UpdateReasons }) => {
+  updateSuggestions = ({ value }: { value: string; reason: UpdateReasons }) => {
     this.onChangeCountryQuery(value)
   }
 
@@ -122,12 +127,6 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps & I18nProps, St
       }
     })
   }
-
-  getEmoji = (): string => {
-    // @ts-ignore -- TS isnt recognizing that Localized country extends Country
-    return COUNTRIES.getCountryByCode(this.state.countryCode).emoji || ''
-  }
-
   renderSuggestionsContainer = ({ containerProps, children }: SuggestionContainerProps) => {
     const { className, id, ...otherProps } = containerProps
     const isOpen = this.filteredCountries().length > 0
@@ -145,20 +144,19 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps & I18nProps, St
 
   renderTextInput = (props: AutoSuggestInputProps) => {
     return (
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <View style={{ position: 'absolute', left: 15 }}>
+      <View style={styles.countryInputContainer}>
+        <View style={styles.emojiContainer}>
           <Text>{this.getEmoji()}</Text>
         </View>
         <TextInput
           style={[
             standardStyles.input,
             standardStyles.inputDarkMode,
-            { transitionProperty: 'padding', transitionDuration: '200ms' },
-            this.getEmoji().length && { paddingLeft: 40 },
+            styles.countryInput,
+            this.getEmoji().length && styles.countryInputWithEmoji,
           ]}
           focusStyle={standardStyles.inputDarkFocused}
           {...props}
-          // onKeyPress={props.onKeyDown}
           value={this.state.countryQuery}
         />
       </View>
@@ -166,7 +164,7 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps & I18nProps, St
   }
 
   renderItem = (countryCode: string) => {
-    // @ts-ignore
+    // @ts-ignore -- TS isnt recognizing that Localized country extends Country
     const { displayName, emoji } = COUNTRIES.getCountryByCode(countryCode)
 
     const onPress = () => {
@@ -285,6 +283,10 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     marginVertical: 0,
   },
+  countryInputContainer: { flexDirection: 'row', alignItems: 'center' },
+  countryInput: { transitionProperty: 'padding', transitionDuration: '200ms' },
+  countryInputWithEmoji: { paddingLeft: 40 },
+  emojiContainer: { position: 'absolute', left: 15 },
   fakeInputBorder: {
     alignContent: 'center',
     paddingVertical: 0,
