@@ -5,6 +5,7 @@ import { Address, CeloContract, CeloToken } from './base'
 import { WrapperCache } from './contract-cache'
 import { sendTransaction, TxOptions } from './utils/send-tx'
 import { toTxResult, TransactionResult } from './utils/tx-result'
+import { addLocalAccount } from './utils/web3-utils'
 import { Web3ContractCache } from './web3-contract-cache'
 
 export function newKit(url: string) {
@@ -34,6 +35,10 @@ export class ContractKit {
   async setGasCurrency(token: CeloToken) {
     this._defaultOptions.gasCurrency =
       token === CeloContract.GoldToken ? undefined : await this.registry.addressFor(token)
+  }
+
+  addAccount(privateKey: string) {
+    addLocalAccount(this.web3, privateKey)
   }
 
   set defaultAccount(address: Address) {
