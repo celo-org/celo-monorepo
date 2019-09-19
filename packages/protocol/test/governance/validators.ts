@@ -1281,8 +1281,8 @@ contract('Validators', (accounts: string[]) => {
     const voter1 = { address: accounts[0], weight: 80 }
     const voter2 = { address: accounts[1], weight: 50 }
     const voter3 = { address: accounts[2], weight: 30 }
-    const assertAddressesEqual = (actual: string[], expected: string[]) => {
-      assert.deepEqual(actual.map((x) => x.toLowerCase()), expected.map((x) => x.toLowerCase()))
+    const assertSameAddresses = (actual: string[], expected: string[]) => {
+      assert.sameMembers(actual.map((x) => x.toLowerCase()), expected.map((x) => x.toLowerCase()))
     }
 
     beforeEach(async () => {
@@ -1307,10 +1307,12 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it("should return that group's member list", async () => {
-        assertAddressesEqual(
-          (await validators.getValidators()).sort(),
-          [validator1, validator2, validator3, validator4].sort()
-        )
+        assertSameAddresses(await validators.getValidators(), [
+          validator1,
+          validator2,
+          validator3,
+          validator4,
+        ])
       })
     })
 
@@ -1322,10 +1324,14 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should return maxElectableValidators elected validators', async () => {
-        assertAddressesEqual(
-          (await validators.getValidators()).sort(),
-          [validator1, validator2, validator3, validator5, validator6, validator7].sort()
-        )
+        assertSameAddresses(await validators.getValidators(), [
+          validator1,
+          validator2,
+          validator3,
+          validator5,
+          validator6,
+          validator7,
+        ])
       })
     })
 
@@ -1355,10 +1361,14 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should elect only n members from that group', async () => {
-        assertAddressesEqual(
-          (await validators.getValidators()).sort(),
-          [validator7, validator1, validator2, validator3, validator5, validator6].sort()
-        )
+        assertSameAddresses(await validators.getValidators(), [
+          validator7,
+          validator1,
+          validator2,
+          validator3,
+          validator5,
+          validator6,
+        ])
       })
     })
 
@@ -1372,10 +1382,14 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should return the validating delegate in place of the account', async () => {
-        assertAddressesEqual(
-          (await validators.getValidators()).sort(),
-          [validator1, validator2, validatingDelegate, validator5, validator6, validator7].sort()
-        )
+        assertSameAddresses(await validators.getValidators(), [
+          validator1,
+          validator2,
+          validatingDelegate,
+          validator5,
+          validator6,
+          validator7,
+        ])
       })
     })
 
