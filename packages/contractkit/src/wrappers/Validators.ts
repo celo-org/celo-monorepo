@@ -48,6 +48,19 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     toNumber
   )
 
+  async validatorSetAddresses(): Promise<string[]> {
+    const numberValidators = await this.numberValidatorsInCurrentSet()
+
+    const validators = []
+
+    for (let i = 0; i < numberValidators; i++) {
+      const validatorAddress = await this.validatorAddressFromCurrentSet(i)
+      validators.push(validatorAddress)
+    }
+
+    return validators
+  }
+
   getVoteFrom: (validatorAddress: Address) => Promise<Address | null> = proxyCall(
     this.contract.methods.voters
   )

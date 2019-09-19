@@ -11,11 +11,8 @@ export default class ValidatorSet extends BaseCommand {
 
   async run() {
     const validators = await this.kit.contracts.getValidators()
-    const numberValidators = await validators.numberValidatorsInCurrentSet()
+    const validatorSet = await validators.validatorSetAddresses()
 
-    for (let i = 0; i < numberValidators; i++) {
-      const validatorAddress = await validators.validatorAddressFromCurrentSet(i)
-      console.log(validatorAddress)
-    }
+    validatorSet.forEach((validator: string) => console.log(validator))
   }
 }
