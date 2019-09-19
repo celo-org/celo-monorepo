@@ -20,7 +20,8 @@ def fastlane_supply(env, track, bundle_suffix)
     track: track,
     track_promote_to: track,
     package_name: get_bundle(bundle_suffix),
-    mapping: get_mapping_path(env)
+    mapping: get_mapping_path(env),
+    skip_upload_apk: true
   )
 end
 
@@ -74,6 +75,15 @@ platform :android do
   lane :alfajores do
     env = 'alfajores'
     sdkEnv = 'alfajores'
+    clean
+    build(environment: env, sdkEnv: sdkEnv)
+    fastlane_supply(env, 'internal', env)
+  end
+
+  desc 'Ship Pilot to Playstore Internal'
+  lane :pilotapp do
+    env = 'pilot'
+    sdkEnv = 'pilot'
     clean
     build(environment: env, sdkEnv: sdkEnv)
     fastlane_supply(env, 'internal', env)
