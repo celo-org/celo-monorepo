@@ -95,7 +95,6 @@ contract Proxy {
     payable
     onlyOwner
   {
-    require(_isContract(implementation), "Invalid contract address");
     _setImplementation(implementation);
     bool success;
     bytes memory returnValue;
@@ -121,6 +120,8 @@ contract Proxy {
    */
   function _setImplementation(address implementation) public onlyOwner {
     bytes32 implementationPosition = IMPLEMENTATION_POSITION;
+
+    require(_isContract(implementation), "Invalid contract address");
 
     assembly {
       sstore(implementationPosition, implementation)
