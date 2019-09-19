@@ -58,6 +58,18 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return Promise.all(vgAddresses.map((addr) => this.getValidator(addr)))
   }
 
+  async getValidatorSetAddresses(): Promise<string[]> {
+    const numberValidators = await this.numberValidatorsInCurrentSet()
+
+    const validatorAddressPromises = []
+
+    for (let i = 0; i < numberValidators; i++) {
+      validatorAddressPromises.push(this.validatorAddressFromCurrentSet(i))
+    }
+
+    return Promise.all(validatorAddressPromises)
+  }
+
   async getValidator(address: Address): Promise<Validator> {
     const res = await this.contract.methods.getValidator(address).call()
     return {
