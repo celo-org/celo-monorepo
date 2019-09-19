@@ -1,18 +1,18 @@
-import {
-  erc20Abi,
-  getHooks,
-  initAndStartGeth,
-  setMining,
-  startGeth,
-  sleep,
-  getEnode,
-  getContractAddress,
-  getTxpoolContents,
-} from './utils'
 import BigNumber from 'bignumber.js'
+import { assert } from 'chai'
 import Web3 from 'web3'
 import { Tx } from 'web3/eth/types'
-import { assert } from 'chai'
+import {
+  erc20Abi,
+  getContractAddress,
+  getEnode,
+  getHooks,
+  getTxpoolContents,
+  initAndStartGeth,
+  setMining,
+  sleep,
+  startGeth,
+} from './utils'
 
 const stableTokenAbi = erc20Abi.concat([
   {
@@ -273,7 +273,7 @@ describe('celo dollar gas currency tests', function(this: any) {
         DEF_AMOUNT,
         { gasPrice: new BigNumber(Web3.utils.toWei('2', 'gwei')) },
         'transactionHash'
-      ).catch((err) => console.log(err))
+      )
 
       await transferCeloGold(
         DEF_FROM_ADDR,
@@ -281,7 +281,7 @@ describe('celo dollar gas currency tests', function(this: any) {
         DEF_AMOUNT,
         { gasPrice: new BigNumber(Web3.utils.toWei('1', 'gwei')) },
         'transactionHash'
-      ).catch((err) => console.log(err))
+      )
 
       await transferCeloGold(
         DEF_FROM_ADDR,
@@ -289,10 +289,10 @@ describe('celo dollar gas currency tests', function(this: any) {
         DEF_AMOUNT,
         { gasPrice: new BigNumber(Web3.utils.toWei('3', 'gwei')) },
         'transactionHash'
-      ).catch((err) => console.log(err))
+      )
 
-      let txpoolContent: string = await getTxpoolContents(hooks.gethBinaryPath, fullInstance)
-      var txpoolContentJSON = JSON.parse(txpoolContent.toString())
+      const txpoolContent: string = await getTxpoolContents(hooks.gethBinaryPath, fullInstance)
+      const txpoolContentJSON = JSON.parse(txpoolContent.toString())
 
       // The first transaction (nonce == 0) should be the only pending transaction
       assert.equal(Object.keys(txpoolContentJSON.pending).length, 1)
@@ -333,7 +333,7 @@ describe('celo dollar gas currency tests', function(this: any) {
         DEF_AMOUNT,
         { gasPrice: new BigNumber(Web3.utils.toWei('2', 'gwei')) },
         'transactionHash'
-      ).catch((err) => console.log(err))
+      )
 
       await transferCeloGold(
         DEF_FROM_ADDR,
@@ -344,7 +344,7 @@ describe('celo dollar gas currency tests', function(this: any) {
           gasPrice: convertCGToCD(new BigNumber(Web3.utils.toWei('1', 'gwei'))),
         },
         'transactionHash'
-      ).catch((err) => console.log(err))
+      )
 
       await transferCeloGold(
         DEF_FROM_ADDR,
@@ -352,10 +352,10 @@ describe('celo dollar gas currency tests', function(this: any) {
         DEF_AMOUNT,
         { gasPrice: new BigNumber(Web3.utils.toWei('3', 'gwei')) },
         'transactionHash'
-      ).catch((err) => console.log(err))
+      )
 
-      let txpoolContent = await getTxpoolContents(hooks.gethBinaryPath, fullInstance)
-      var txpoolContentJSON = JSON.parse(txpoolContent.toString())
+      const txpoolContent = await getTxpoolContents(hooks.gethBinaryPath, fullInstance)
+      const txpoolContentJSON = JSON.parse(txpoolContent.toString())
 
       // The first transaction (nonce == 0) should be the only pending transaction
       assert.equal(Object.keys(txpoolContentJSON.pending).length, 1)
@@ -498,7 +498,7 @@ describe('celo dollar gas currency tests', function(this: any) {
       await sleep(10)
 
       // Turn off mining so that the submitted txns will be in one block when mining is turned on
-      setMining(hooks.gethBinaryPath, validatorInstance, false)
+      await setMining(hooks.gethBinaryPath, validatorInstance, false)
 
       sender1InitialGoldBalance = new BigNumber(await web3.eth.getBalance(sender1))
       sender1InitialDollarBalance = new BigNumber(
@@ -572,16 +572,14 @@ describe('celo dollar gas currency tests', function(this: any) {
       minedBlockNumber = (await web3.eth.getBlockNumber()) + 1
 
       // Turn on mining
-      setMining(hooks.gethBinaryPath, validatorInstance, true)
+      await setMining(hooks.gethBinaryPath, validatorInstance, true)
 
       // Wait for the block to be mined
       await sleep(10)
     })
 
     it('when the worker creates a block proposal to mine, the txns within that block should be sorted by price desc (with the added contraint that for a given account, txns are sorted by nonce asc)', async () => {
-      var minedBlock = await web3.eth.getBlock(minedBlockNumber)
-
-      console.log(minedBlock)
+      const minedBlock = await web3.eth.getBlock(minedBlockNumber)
 
       // Verify that the ordering of the txns is [tx2Hash, tx3Hash, tx1Hash, tx4Hash]
       assert.deepEqual(minedBlock.transactions, [tx2Hash, tx3Hash, tx1Hash, tx4Hash])
@@ -591,7 +589,7 @@ describe('celo dollar gas currency tests', function(this: any) {
       let sender1FinalGoldBalance = sender1InitialGoldBalance
       let sender1FinalDollarBalance = sender1InitialDollarBalance
       let sender2FinalGoldBalance = sender2InitialGoldBalance
-      let sender2FinalDollarBalance = sender2InitialDollarBalance
+      const sender2FinalDollarBalance = sender2InitialDollarBalance
       let sender3FinalGoldBalance = sender3InitialGoldBalance
       let sender3FinalDollarBalance = sender3InitialDollarBalance
       let validatorFinalGoldBalance = validatorInitialGoldBalance

@@ -247,23 +247,23 @@ export async function getEnode(port: number, ws: boolean = false) {
 // TODO(kevjue): Be less hacky!  Get this working with web3-eth-txpool module.
 export function getTxpoolContents(gethBinaryPath: string, instance: GethInstanceConfig) {
   return new Promise<string>((resolve, reject) => {
-    var command = spawn(gethBinaryPath, [
+    const command = spawn(gethBinaryPath, [
       '--datadir',
       getDatadir(instance),
       'attach',
       '--exec',
       'console.log(JSON.stringify(txpool.content))',
     ])
-    var result: string = ''
-    command.stdout.on('data', function(data) {
+    let result: string = ''
+    command.stdout.on('data', (data) => {
       result += data.toString()
     })
-    command.on('close', function(_) {
+    command.on('close', (_) => {
       result = result.replace('undefined', '')
       result = result.trim()
       resolve(result)
     })
-    command.on('error', function(err) {
+    command.on('error', (err) => {
       reject(err)
     })
   })
@@ -275,12 +275,7 @@ export async function setMining(
   instance: GethInstanceConfig,
   mining: boolean
 ) {
-  var rpcCall: string
-  if (mining) {
-    rpcCall = 'miner.start(1)'
-  } else {
-    rpcCall = 'miner.stop()'
-  }
+  const rpcCall: string = mining ? 'miner.start(1)' : 'miner.stop()'
   await execCmd(gethBinaryPath, ['--datadir', getDatadir(instance), 'attach', '--exec', rpcCall])
 }
 
