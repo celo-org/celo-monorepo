@@ -1269,8 +1269,9 @@ contract('Validators', (accounts: string[]) => {
     const validator5 = accounts[7]
     const validator6 = accounts[8]
     const validator7 = accounts[9]
-    const aHash = '0xa5b9d60f32436310afebcfda832817a68921beb782fabf7915cc0460b443116a'
-    const bHash = '0xa832817a68921b10afebcfd0460b443116aeb782fabf7915cca5b9d60f324363'
+
+    const hash1 = '0xa5b9d60f32436310afebcfda832817a68921beb782fabf7915cc0460b443116a'
+    const hash2 = '0xa832817a68921b10afebcfd0460b443116aeb782fabf7915cca5b9d60f324363'
 
     // If voterN votes for groupN:
     //   group1 gets 20 votes per member
@@ -1297,7 +1298,7 @@ contract('Validators', (accounts: string[]) => {
       for (const voter of [voter1, voter2, voter3]) {
         await mockLockedGold.setWeight(voter.address, voter.weight)
       }
-      await random.revealAndCommit(aHash, aHash, NULL_ADDRESS)
+      await random.revealAndCommit(hash1, hash1, NULL_ADDRESS)
     })
 
     describe('when a single group has >= minElectableValidators as members and received votes', () => {
@@ -1336,12 +1337,12 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should return different results', async () => {
-        await random.revealAndCommit(aHash, aHash, NULL_ADDRESS)
-        const aVals = await validators.getValidators()
-        await random.revealAndCommit(bHash, bHash, NULL_ADDRESS)
-        const bVals = await validators.getValidators()
-        assert.notDeepEqual(aVals.map((x) => x.toLowerCase()), bVals.map((x) => x.toLowerCase()))
-        assertAddressesEqual(aVals.sort(), bVals.sort())
+        await random.revealAndCommit(hash1, hash1, NULL_ADDRESS)
+        const valsWithHash1 = (await validators.getValidators()).map((x) => x.toLowerCase())
+        await random.revealAndCommit(hash2, hash2, NULL_ADDRESS)
+        const valsWithHash2 = (await validators.getValidators()).map((x) => x.toLowerCase())
+        assert.sameMembers(valsWithHash1, valsWithHash2)
+        assert.notDeepEqual(valsWithHash1, valsWithHash2)
       })
     })
 
