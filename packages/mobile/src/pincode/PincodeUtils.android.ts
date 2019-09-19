@@ -12,12 +12,13 @@ export function isPhoneAuthSupported() {
   return Platform.Version >= 23
 }
 
-export const setPin = async (pin: string) => {
-  Logger.debug(TAG + '@setPin', 'Setting pin in phone keystore')
+export const setPinInKeystore = async (pin: string) => {
+  Logger.debug(TAG + '@setPinInKeystore', 'Setting pin in phone keystore')
 
   if (!isPhoneAuthSupported()) {
     throw Error('Keystore not supported on this device')
   }
+
   const humanReadableMessage: string = i18n.t('nuxNamePin1:enableScreenLockMessage')
   const securitySettingsButtonLabel: string = i18n.t(
     'nuxNamePin1:goToSystemSecuritySettingsActionLabel'
@@ -49,15 +50,15 @@ export const setPin = async (pin: string) => {
 
   try {
     await ConfirmDeviceCredentials.storePin(keyName, pin)
-    Logger.debug(TAG + '@setPin', 'Pin set in phone keystore')
+    Logger.debug(TAG + '@setPinInKeystore', 'Pin set in phone keystore')
   } catch (e) {
-    Logger.error(TAG + '@setPin', 'Failed to set pin in keystore', e)
+    Logger.error(TAG + '@setPinInKeystore', 'Failed to set pin in keystore', e)
     throw e
   }
 }
 
-export const getPin = async () => {
-  Logger.debug(TAG + '@getPin', 'Getting pin from phone keystore')
+export const getPinFromKeystore = async () => {
+  Logger.debug(TAG + '@getPinFromKeystore', 'Getting pin from phone keystore')
 
   if (!isPhoneAuthSupported()) {
     throw Error('Keystore not supported on this device')
@@ -68,5 +69,7 @@ export const getPin = async () => {
     throw Error('No pin found, phone is not secured')
   }
 
-  return ConfirmDeviceCredentials.retrievePin(keyName)
+  const pin = await ConfirmDeviceCredentials.retrievePin(keyName)
+  Logger.debug(TAG + '@getPinFromKeystore', 'Pin from phone keystore')
+  return pin
 }

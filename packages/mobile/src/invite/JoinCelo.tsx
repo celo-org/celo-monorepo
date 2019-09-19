@@ -8,6 +8,7 @@ import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Linking, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { setName, setPhoneNumber } from 'src/account/actions'
+import { PincodeType } from 'src/account/reducer'
 import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
@@ -31,7 +32,7 @@ interface StateProps {
   cachedName: string
   cachedNumber: string
   cachedCountryCode: string
-  pincodeSet: boolean
+  pincodeType: PincodeType
 }
 
 interface DispatchProps {
@@ -67,7 +68,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     cachedName: state.account.name,
     cachedNumber: state.account.e164PhoneNumber,
     cachedCountryCode: state.account.defaultCountryCode,
-    pincodeSet: state.account.pincodeSet,
+    pincodeType: state.account.pincodeType,
   }
 }
 
@@ -130,7 +131,10 @@ export class JoinCelo extends React.Component<Props, State> {
   }
 
   nextScreen = () => {
-    const nextScreen = this.props.pincodeSet ? Screens.EnterInviteCode : Screens.PincodeEducation
+    const nextScreen =
+      this.props.pincodeType === PincodeType.Unset
+        ? Screens.PincodeEducation
+        : Screens.EnterInviteCode
     navigate(nextScreen)
   }
 

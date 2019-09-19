@@ -5,6 +5,7 @@ import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { setPincode } from 'src/account/actions'
+import { PincodeType } from 'src/account/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces } from 'src/i18n'
@@ -16,7 +17,8 @@ import { isPhoneAuthSupported } from 'src/pincode/PincodeUtils.android'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
-  pincodeSet: boolean
+  isSettingPin: boolean
+  pincodeType: PincodeType
 }
 
 interface DispatchProps {
@@ -27,7 +29,8 @@ type Props = StateProps & DispatchProps & WithNamespaces
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
-    pincodeSet: state.account.pincodeSet,
+    isSettingPin: state.account.isSettingPin,
+    pincodeType: state.account.pincodeType,
   }
 }
 const mapDispatchToProps: DispatchProps = {
@@ -37,13 +40,8 @@ const mapDispatchToProps: DispatchProps = {
 class PincodeEducation extends React.Component<Props> {
   static navigationOptions = nuxNavigationOptions
 
-  state = {
-    isSettingPin: false,
-  }
-
   onPressUsePhoneAuth = async () => {
-    this.setState({ isSettingPin: true })
-    this.props.setPincode(true)
+    this.props.setPincode(PincodeType.PhoneAuth)
   }
 
   onPressCreateNewPin = async () => {
@@ -51,13 +49,13 @@ class PincodeEducation extends React.Component<Props> {
   }
 
   componentDidMount() {
-    if (this.props.pincodeSet) {
+    if (this.props.pincodeType !== PincodeType.Unset) {
       this.navigateToNextScreen()
     }
   }
 
   componentDidUpdate() {
-    if (this.props.pincodeSet) {
+    if (this.props.pincodeType !== PincodeType.Unset) {
       this.navigateToNextScreen()
     }
   }
@@ -67,7 +65,7 @@ class PincodeEducation extends React.Component<Props> {
   }
 
   render() {
-    const { t } = this.props
+    const { t, isSettingPin } = this.props
     const phoneAuth = isPhoneAuthSupported()
 
     return (
@@ -97,7 +95,7 @@ class PincodeEducation extends React.Component<Props> {
                 onPress={this.onPressUsePhoneAuth}
                 standard={false}
                 type={BtnTypes.PRIMARY}
-                disabled={this.state.isSettingPin}
+                disabled={isSettingPin}
                 testID="SystemAuthContinue"
               />
               <Button
@@ -105,7 +103,7 @@ class PincodeEducation extends React.Component<Props> {
                 onPress={this.onPressCreateNewPin}
                 standard={false}
                 type={BtnTypes.SECONDARY}
-                disabled={this.state.isSettingPin}
+                disabled={isSettingPin}
                 testID="CustomPinContinue"
               />
             </>
@@ -116,7 +114,7 @@ class PincodeEducation extends React.Component<Props> {
               onPress={this.onPressCreateNewPin}
               standard={false}
               type={BtnTypes.PRIMARY}
-              disabled={this.state.isSettingPin}
+              disabled={isSettingPin}
               testID="SystemAuthContinue"
             />
           )}

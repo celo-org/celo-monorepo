@@ -1,3 +1,4 @@
+import { PincodeType } from 'src/account/reducer'
 import { PaymentRequest } from 'src/account/types'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
@@ -40,12 +41,13 @@ export interface PhotosNUXClickedAction {
 
 export interface SetPincodeAction {
   type: Actions.SET_PINCODE
-  useSystemAuth: boolean
+  pincodeType: PincodeType
   pin?: string
 }
 
 export interface SetPincodeSuccessAction {
   type: Actions.SET_PINCODE_SUCCESS
+  pincodeType: PincodeType
 }
 
 export interface SetPincodeFailureAction {
@@ -88,6 +90,7 @@ export type ActionTypes =
   | SetPhoneNumberAction
   | DevModeTriggerClickedAction
   | PhotosNUXClickedAction
+  | SetPincodeAction
   | SetPincodeSuccessAction
   | SetPincodeFailureAction
   | SetAccountCreationAction
@@ -122,14 +125,15 @@ export const photosNUXCompleted = (): PhotosNUXClickedAction => ({
   type: Actions.PHOTOSNUX_CLICKED,
 })
 
-export const setPincode = (useSystemAuth: boolean, pin?: string): SetPincodeAction => ({
+export const setPincode = (pincodeType: PincodeType, pin?: string): SetPincodeAction => ({
   type: Actions.SET_PINCODE,
-  useSystemAuth,
+  pincodeType,
   pin,
 })
 
-export const setPincodeSuccess = (): SetPincodeSuccessAction => ({
+export const setPincodeSuccess = (pincodeType: PincodeType): SetPincodeSuccessAction => ({
   type: Actions.SET_PINCODE_SUCCESS,
+  pincodeType,
 })
 
 export const setPincodeFailure = (): SetPincodeFailureAction => ({
@@ -171,30 +175,3 @@ export const setUserContactDetails = (
   contactId,
   thumbnailPath,
 })
-
-//TODO move this?
-export const getPincode = async () => {
-  return 'yes'
-  // let pin
-  // // If used phone auth
-  // if (SUPPORTS_KEYSTORE) {
-  //   Logger.info(TAG + '@getPincode', 'using keystore')
-  //   pin = await getPinCred()
-  // } else {
-  //   Logger.debug(TAG + '@getPincode', 'NOT using keystore')
-  //   const pincodeEntered = new Promise((resolve, reject) => {
-  //     navigate(Screens.PincodeConfirmation, { resolve, reject })
-  //   })
-  //   pin = await pincodeEntered
-  // }
-  // if (!pin) {
-  //   Logger.debug(TAG + '@getPincode', 'pin seems to be falsy')
-  //   Logger.showMessage(
-  //     'PIN might be corrupted, please get backup key, wipe app data, update the app and recover from backup key'
-  //   )
-  //   return
-  // } else {
-  //   Logger.debug(TAG + '@getPincode', 'get keystore pincode')
-  // }
-  // return pin
-}

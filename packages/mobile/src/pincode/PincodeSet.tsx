@@ -1,6 +1,7 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import NumberKeypad from '@celo/react-components/components/NumberKeypad'
+import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
@@ -8,6 +9,7 @@ import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { setPincode } from 'src/account/actions'
+import { PincodeType } from 'src/account/reducer'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -75,7 +77,7 @@ export class PincodeSet extends React.Component<Props, State> {
   onPressPin2Continue = () => {
     CeloAnalytics.track(CustomEventNames.pin_create_button)
     if (this.isPin1Valid() && this.isPin2Valid()) {
-      this.props.setPincode(false)
+      this.props.setPincode(PincodeType.CustomPin, this.state.pin1)
       navigate(Screens.EnterInviteCode)
     } else {
       this.props.showError(ErrorMessages.INCORRECT_PIN)
@@ -84,7 +86,6 @@ export class PincodeSet extends React.Component<Props, State> {
 
   onDigitPress = (digit: number) => {
     const { pin1, pin2, isPin1Inputted } = this.state
-    console.log('DIGIT:', digit)
     if (!isPin1Inputted) {
       this.setState({
         pin1: (pin1 + digit).substr(0, 6),
@@ -97,7 +98,6 @@ export class PincodeSet extends React.Component<Props, State> {
   }
 
   onBackspacePress = () => {
-    console.log('backspace')
     const { pin1, pin2, isPin1Inputted } = this.state
     if (!isPin1Inputted) {
       this.setState({
@@ -133,7 +133,7 @@ export class PincodeSet extends React.Component<Props, State> {
             <HorizontalLine />
             <View style={style.keypadContainer}>
               <NumberKeypad
-                showDecimal={true}
+                showDecimal={false}
                 onDigitPress={this.onDigitPress}
                 onBackspacePress={this.onBackspacePress}
               />
@@ -144,7 +144,6 @@ export class PincodeSet extends React.Component<Props, State> {
           <Button
             testID="Pincode-Enter"
             text={t('global:continue')}
-            style={style.button}
             standard={true}
             type={BtnTypes.PRIMARY}
             onPress={this.onPressPin1Continue}
@@ -155,7 +154,6 @@ export class PincodeSet extends React.Component<Props, State> {
           <Button
             testID="Pincode-ReEnter"
             text={t('global:save')}
-            style={style.button}
             standard={true}
             type={BtnTypes.PRIMARY}
             onPress={this.onPressPin2Continue}
@@ -170,7 +168,7 @@ export class PincodeSet extends React.Component<Props, State> {
 const style = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
   scrollContainer: {
@@ -186,10 +184,6 @@ const style = StyleSheet.create({
   keypadContainer: {
     marginVertical: 15,
     paddingHorizontal: 20,
-  },
-  button: {
-    paddingHorizontal: 20,
-    paddingVertical: 5,
   },
 })
 

@@ -60,9 +60,12 @@
   "verifyPin": {
     "title": "Re-Enter PIN"
   },
+  "confirmPin": {
+    "title": "Enter PIN"
+  },
   "pincodeEducation": {
     "title": "Secure Your Wallet",
-    "intro": "To protect your account, The Celo Wallet requires a PIN.",
+    "intro": "To protect your account, the Celo Wallet requires a PIN.",
     "summary":
       "You can use your phone’s existing authentication or create a new PIN for this application.",
     "usePhoneAuth": "Use Phone Authentication",
@@ -81,6 +84,5 @@
     "1": "Don’t worry—connecting does not send invites to your contacts.",
     "enable": "Enable Contact Access",
     "loading": "Finding friends on Celo..."
-  },
-  "skip": "Skip"
+  }
 }

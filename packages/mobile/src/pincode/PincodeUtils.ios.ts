@@ -3,10 +3,10 @@ export function isPhoneAuthSupported() {
   return true
 }
 
-export async function setPin() {
-  //TODO
+export async function setPinInKeystore() {
+  // TODO
 }
 
-export async function getPin() {
+export async function getPinFromKeystore() {
   // TODO
 }

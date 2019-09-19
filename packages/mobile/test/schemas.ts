@@ -1,3 +1,4 @@
+import { PincodeType } from 'src/account/reducer'
 import { RootState } from 'src/redux/reducers'
 
 // Default (version -1 schema)
@@ -139,6 +140,15 @@ const v1Schema = {
   },
 }
 
+const v2Schema = {
+  ...v1Schema,
+  account: {
+    ...v1Schema.account,
+    pincodeType: PincodeType.Unset,
+    isSettingPin: false,
+  },
+}
+
 export function getLatestSchema(): Partial<RootState> {
-  return v1Schema as Partial<RootState>
+  return v2Schema as Partial<RootState>
 }
