@@ -19,21 +19,54 @@ interface Props {
   onChangeNumber: (e164Number: string) => void
 }
 
-interface State {
-  countryQuery: string
-  countryCallingCode: string
-  phoneNumber: string
+interface InputProps {
+  value: string
+  onChange: (_: unknown, object: { newValue: string; method: string }) => void
+  type: string
+  placeholder: string
 }
+
+interface AutoSuggestInputProps {
+  type: 'text'
+  value: string
+  placeholder: string
+  onChange: () => void
+  onFocus: () => void
+  onBlur: () => void
+  onKeyDown: () => void
+}
+
+interface SuggestionContainerProps {
+  containerProps: { className: string; id: string; key: string }
+  children: React.ReactNode
+}
+
+type UpdateReasons =
+  | 'input-focused'
+  | 'escape-pressed'
+  | 'suggestions-revealed'
+  | 'suggestion-selected'
 
 const COUNTRIES = new Countries('en-us')
 
 const getCountries = memoizeOne((search: string) => COUNTRIES.getFilteredCountries(search))
 
+interface State {
+  countryQuery: string
+  countryCode: string
+  phoneNumber: string
+}
 class PhoneInput extends React.PureComponent<Props & ScreenProps & I18nProps, State> {
   state: State = {
     countryQuery: '',
-    countryCallingCode: '',
+    countryCode: '',
     phoneNumber: '',
+  }
+
+  getCallingCode = () => {
+    const country = COUNTRIES.getCountryByCode(this.state.countryCode)
+    // @ts-ignore -- TS isnt recognizing that Localized country extends Country\
+    return country ? country.countryCallingCodes[0] : ''
   }
 
   filteredCountries = () => {
@@ -48,7 +81,7 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps & I18nProps, St
     // remove non phone number characters
     const phone = event.nativeEvent.text.replace(/[^\d\(\)-\s.+]/g, '')
 
-    this.setNumber(phone, this.state.countryCallingCode)
+    this.setNumber(phone, this.getCallingCode())
   }
 
   setNumber = (rawPhone: string, countryCallingCode: string) => {
@@ -63,28 +96,26 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps & I18nProps, St
       this.props.onChangeNumber('')
     }
   }
-
-  updateSuggestions = ({ value }) => {
+  updateSuggestions = ({ value, reason }: { value: string; reason: UpdateReasons }) => {
     this.onChangeCountryQuery(value)
   }
 
-  onInputChange = (_, { newValue }) => {
+  onInputChange = (_, { newValue }: { newValue: string }) => {
     this.onChangeCountryQuery(newValue)
 
     // use Set Immediate to avoid typing lag
     setImmediate(() => {
       const country = COUNTRIES.getCountry(newValue)
       if (country.displayName) {
-        // @ts-ignore
-        const callingcode = country.countryCallingCodes[0]
-
+        // @ts-ignore -- TS isnt recognizing that Localized country extends Country\
+        const countryCode = country.alpha2
         this.setState({
           countryQuery: country.displayName,
-          countryCallingCode: callingcode,
+          countryCode,
         })
       } else {
         this.setState({
-          countryCallingCode: '',
+          countryCode: '',
           phoneNumber: '',
         })
         this.props.onChangeNumber('')
@@ -92,59 +123,79 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps & I18nProps, St
     })
   }
 
-  renderSuggestionsContainer = ({ containerProps, children }) => {
-    const { className, ...otherProps } = containerProps
+  getEmoji = (): string => {
+    // @ts-ignore -- TS isnt recognizing that Localized country extends Country
+    return COUNTRIES.getCountryByCode(this.state.countryCode).emoji || ''
+  }
+
+  renderSuggestionsContainer = ({ containerProps, children }: SuggestionContainerProps) => {
+    const { className, id, ...otherProps } = containerProps
     const isOpen = this.filteredCountries().length > 0
 
     return (
-      <View {...otherProps} style={[styles.suggestions, isOpen && styles.suggestionsOpen]}>
+      <View
+        {...otherProps}
+        nativeID={id}
+        style={[styles.suggestions, isOpen && styles.suggestionsOpen]}
+      >
         {children}
       </View>
     )
   }
 
-  renderTextInput = (props: any) => {
+  renderTextInput = (props: AutoSuggestInputProps) => {
     return (
-      <TextInput
-        style={[standardStyles.input, standardStyles.inputDarkMode]}
-        focusStyle={standardStyles.inputDarkFocused}
-        {...props}
-        value={this.state.countryQuery}
-      />
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ position: 'absolute', left: 15 }}>
+          <Text>{this.getEmoji()}</Text>
+        </View>
+        <TextInput
+          style={[
+            standardStyles.input,
+            standardStyles.inputDarkMode,
+            { transitionProperty: 'padding', transitionDuration: '200ms' },
+            this.getEmoji().length && { paddingLeft: 40 },
+          ]}
+          focusStyle={standardStyles.inputDarkFocused}
+          {...props}
+          // onKeyPress={props.onKeyDown}
+          value={this.state.countryQuery}
+        />
+      </View>
     )
   }
 
-  renderItem = (countryCode: string, { isHighlighted }) => {
+  renderItem = (countryCode: string) => {
     // @ts-ignore
-    const { displayName, emoji, countryCallingCodes } = COUNTRIES.getCountryByCode(countryCode)
+    const { displayName, emoji } = COUNTRIES.getCountryByCode(countryCode)
 
     const onPress = () => {
-      this.setState({ countryCallingCode: countryCallingCodes[0], phoneNumber: '' })
+      this.setState({ countryCode, phoneNumber: '' })
       this.onChangeCountryQuery(displayName)
     }
 
     return (
       <TouchableOpacity onPress={onPress}>
-        <View
-          style={[standardStyles.row, isHighlighted && { borderBottomColor: colors.primaryHover }]}
-        >
+        <View style={[standardStyles.row, { marginVertical: 5 }]}>
           <Text>{emoji || `🏳`}</Text>
-          <Text style={[fonts.p, textStyles.invert]}>{displayName}</Text>
+          <Text style={[fonts.legal, textStyles.invert]}>{displayName}</Text>
         </View>
       </TouchableOpacity>
     )
   }
 
   render() {
-    const inputProps = {
+    const inputProps: InputProps = {
       placeholder: this.props.t('countryPlaceholder'),
       value: this.state.countryQuery,
       onChange: this.onInputChange,
+      type: 'search',
     }
 
     return (
       <>
-        <style>{`
+        <style>
+          {`
           .react-autosuggest__suggestions-list {
             margin: 0;
             padding-left: 0;
@@ -158,7 +209,9 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps & I18nProps, St
             border-color: ${colors.white},
             border-width: 1
           }
-        `}</style>
+        `}
+        </style>
+
         <View style={styles.container}>
           <Autosuggest
             alwaysRenderSuggestions={true}
@@ -176,12 +229,12 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps & I18nProps, St
           <Text
             style={[
               fonts.legal,
-              this.state.countryCallingCode.length > 0 ? textStyles.invert : styles.ccplaceholder,
+              this.state.countryCode.length > 0 ? textStyles.invert : styles.ccplaceholder,
               textStyles.center,
               styles.countryCode,
             ]}
           >
-            {this.state.countryCallingCode || '+00'}
+            {this.getCallingCode() || '+00'}
           </Text>
           <View style={styles.line} />
           <TextInput
@@ -192,7 +245,7 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps & I18nProps, St
             placeholder={this.props.t('phonePlaceholder')}
             onChange={this.onNumberInput}
             value={this.state.phoneNumber}
-            editable={this.state.countryCallingCode.length > 0}
+            editable={this.state.countryCode.length > 0}
           />
         </View>
       </>
@@ -200,7 +253,9 @@ class PhoneInput extends React.PureComponent<Props & ScreenProps & I18nProps, St
   }
 }
 
-const getSuggestionValue = (suggestion) => suggestion
+const getSuggestionValue = (suggestion: string) => {
+  return suggestion
+}
 
 const styles = StyleSheet.create({
   line: {
