@@ -5,19 +5,17 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
-import "./UsingLockedGold.sol";
 import "./interfaces/IValidators.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
+import "../common/UsingRegistry.sol";
 
 
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
  */
-contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, UsingLockedGold {
-
-  // Votes live in the Election SC, votePortion, 
+contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, UsingRegistry {
 
   using FixidityLib for FixidityLib.Fraction;
   using AddressLinkedList for LinkedList.List;
@@ -25,8 +23,14 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   using BytesLib for bytes;
 
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
+  uint256 constant MAX_INT = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 
   struct RegistrationRequirements {
+    uint256 group;
+    uint256 validator;
+  }
+
+  struct DeregistrationLockups {
     uint256 group;
     uint256 validator;
   }
@@ -50,13 +54,19 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   address[] private _groups;
   address[] private _validators;
   RegistrationRequirements public registrationRequirements;
+  DeregistrationLockups public deregistrationLockups;
   uint256 public maxGroupSize;
 
   event MaxGroupSizeSet(
     uint256 size
   );
 
-  event RegistrationRequirementSet(
+  event RegistrationRequirementsSet(
+    uint256 group,
+    uint256 validator
+  );
+
+  event DeregistrationLockupsSet(
     uint256 group,
     uint256 validator
   );
@@ -107,22 +117,22 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     address indexed validator
   );
 
-  event ValidatorGroupEmptied(
-    address indexed group
-  );
-
   /**
    * @notice Initializes critical variables.
    * @param registryAddress The address of the registry contract.
    * @param groupRequirement The minimum locked gold needed to register a group.
    * @param validatorRequirement The minimum locked gold needed to register a validator. 
-   * @param size The maximum group size.
+   * @param groupLockup The duration the above gold remains locked after deregistration.
+   * @param validatorLockup The duration the above gold remains locked after deregistration.
+   * @param _maxGroupSize The maximum group size.
    * @dev Should be called only once.
    */
   function initialize(
     address registryAddress,
     uint256 groupRequirement,
     uint256 validatorRequirement,
+    uint256 groupLockup,
+    uint256 validatorLockup,
     uint256 _maxGroupSize
   )
     external
@@ -167,7 +177,31 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       validatorRequirement != registrationRequirements.validator
     );
     registrationRequirements = RegistrationRequirements(groupRequirement, validatorRequirement);
-    emit RegistrationRequirementSet(groupRequirement, validatorRequirement);
+    emit RegistrationRequirementsSet(groupRequirement, validatorRequirement);
+    return true;
+  }
+
+  /**
+   * @notice Updates the duration for which gold remains locked after deregistration.
+   * @param groupLockup The duration for groups.
+   * @param validatorLockup The duration for validators.
+   * @return True upon success.
+   * @dev The new requirement is only enforced for future validator or group deregistrations.
+   */
+  function setDeregistrationLockup(
+    uint256 groupLockup,
+    uint256 validatorLockup
+  )
+    external
+    onlyOwner
+    returns (bool)
+  {
+    require(
+      groupLockup != deregistrationLockups.group ||
+      validatorLockup != deregistrationLockups.validator
+    );
+    deregistrationLockups = DeregistrationLockups(groupLockup, validatorLockup);
+    emit DeregistrationLockupsSet(groupLockup, validatorLockup);
     return true;
   }
 
@@ -203,9 +237,9 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     bytes memory proofOfPossessionBytes = publicKeysData.slice(64, 48 + 96);
     require(checkProofOfPossession(proofOfPossessionBytes));
 
-    address account = getAccountFromValidator(msg.sender);
+    address account = getValidators().getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
-    require(meetsRegistrationRequirements(account));
+    require(meetsValidatorRegistrationRequirement(account));
 
     Validator memory validator = Validator(name, url, publicKeysData, address(0));
     validators[account] = validator;
@@ -227,13 +261,31 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   }
 
   /**
+   * @notice Returns whether an account meets the requirements to register a validator.
+   * @param account The account.
+   * @return Whether an account meets the requirements to register a validator.
+   */
+  function meetsValidatorRegistrationRequirement(address account) public returns (bool) {
+    getLockedGold().getAccountTotalLockedGold() >= registrationRequirements.validator;
+  }
+
+  /**
+   * @notice Returns whether an account meets the requirements to register a group.
+   * @param account The account.
+   * @return Whether an account meets the requirements to register a group.
+   */
+  function meetsValidatorGroupRegistrationRequirement(address account) public returns (bool) {
+    getLockedGold().getAccountTotalLockedGold() >= registrationRequirements.group;
+  }
+
+  /**
    * @notice De-registers a validator, removing it from the group for which it is a member.
    * @param index The index of this validator in the list of all validators.
    * @return True upon success.
    * @dev Fails if the account is not a validator.
    */
   function deregisterValidator(uint256 index) external nonReentrant returns (bool) {
-    address account = getAccountFromValidator(msg.sender);
+    address account = getValidators().getAccountFromValidator(msg.sender);
     require(isValidator(account));
     Validator storage validator = validators[account];
     if (validator.affiliation != address(0)) {
@@ -241,7 +293,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     }
     delete validators[account];
     deleteElement(_validators, account, index);
-    getLockedGold().setAccountMustMaintain(account, registrationRequirements.validator, now.add(deregisterPeriods.validator));
+    getLockedGold().setAccountMustMaintain(account, registrationRequirements.validator, now.add(deregistrationLockups.validator));
     emit ValidatorDeregistered(account);
     return true;
   }
@@ -253,7 +305,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @dev De-affiliates with the previously affiliated group if present.
    */
   function affiliate(address group) external nonReentrant returns (bool) {
-    address account = getAccountFromValidator(msg.sender);
+    address account = getValidators().getAccountFromValidator(msg.sender);
     require(isValidator(account) && isValidatorGroup(group));
     Validator storage validator = validators[account];
     if (validator.affiliation != address(0)) {
@@ -270,7 +322,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @dev Fails if the account is not a validator with non-zero affiliation.
    */
   function deaffiliate() external nonReentrant returns (bool) {
-    address account = getAccountFromValidator(msg.sender);
+    address account = getValidators().getAccountFromValidator(msg.sender);
     require(isValidator(account));
     Validator storage validator = validators[account];
     require(validator.affiliation != address(0));
@@ -298,20 +350,21 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   {
     require(bytes(name).length > 0);
     require(bytes(url).length > 0);
-    require(isFraction(commission));
+    // TODO(asa)
+    // require(isFraction(commission));
     require(members.length <= maxGroupSize);
-    address account = getAccountFromValidator(msg.sender);
+    address account = getValidators().getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
-    require(meetsRegistrationRequirements(account));
+    require(meetsValidatorGroupRegistrationRequirement(account));
 
-    ValdiatorGroup storage group = groups[account];
+    ValidatorGroup storage group = groups[account];
     group.name = name;
     group.url = url;
     for (uint256 i = 0; i < members.length; i = i.add(1)) {
       group.addMember(members[i]);
     }
     _groups.push(account);
-    getLockedGold().setAccountMustMaintain(account, requirements.group, MAX_INT);
+    getLockedGold().setAccountMustMaintain(account, registrationRequirements.group, MAX_INT);
     emit ValidatorGroupRegistered(account, name, url);
     return true;
   }
@@ -323,12 +376,12 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @dev Fails if the account is not a validator group with no members.
    */
   function deregisterValidatorGroup(uint256 index) external nonReentrant returns (bool) {
-    address account = getAccountFromValidator(msg.sender);
+    address account = getValidators().getAccountFromValidator(msg.sender);
     // Only empty Validator Groups can be deregistered.
     require(isValidatorGroup(account) && groups[account].members.numElements == 0);
     delete groups[account];
     deleteElement(_groups, account, index);
-    getLockedGold().setAccountMustMaintain(account, requirements.group, now.add(deregisterPeriods.group));
+    getLockedGold().setAccountMustMaintain(account, registrationRequirements.group, now.add(deregistrationLockups.group));
     emit ValidatorGroupDeregistered(account);
     return true;
   }
@@ -340,7 +393,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @dev Fails if `validator` has not set their affiliation to this account.
    */
   function addMember(address validator) external nonReentrant returns (bool) {
-    address account = getAccountFromValidator(msg.sender);
+    address account = getValidators().getAccountFromValidator(msg.sender);
     require(isValidatorGroup(account) && isValidator(validator));
     ValidatorGroup storage group = groups[account];
     require(group.members.length < maxGroupSize);
@@ -357,7 +410,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @dev Fails if `validator` is not a member of the account's group.
    */
   function removeMember(address validator) external nonReentrant returns (bool) {
-    address account = getAccountFromValidator(msg.sender);
+    address account = getValidators().getAccountFromValidator(msg.sender);
     require(isValidatorGroup(account) && isValidator(validator));
     return _removeMember(account, validator);
   }
@@ -381,7 +434,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     nonReentrant
     returns (bool)
   {
-    address account = getAccountFromValidator(msg.sender);
+    address account = getValidators().getAccountFromValidator(msg.sender);
     require(isValidatorGroup(account) && isValidator(validator));
     ValidatorGroup storage group = groups[account];
     require(group.members.contains(validator));
@@ -442,7 +495,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     address[] memory topAccounts = groups[account].members.list.headN(n);
     address[] memory topValidators = new address[](n);
     for (uint256 i = 0; i < n; i = i.add(1)) {
-      topValidators[i] = getValidatorFromAccount(topAccounts[i]);
+      topValidators[i] = getLockedGold().getValidatorFromAccount(topAccounts[i]);
     }
     return topValidators;
   }
@@ -464,7 +517,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @return The locked gold requirements to register a validator or group.
    */
   function getRegistrationRequirements() external view returns (uint256, uint256) {
-    return (registrationRequirements.group, registrationRequirement.validator);
+    return (registrationRequirements.group, registrationRequirements.validator);
   }
 
   /**
@@ -502,15 +555,6 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   }
 
   /**
-   * @notice Returns whether an account meets the requirements to register a validator or group.
-   * @param account The account.
-   * @return Whether an account meets the requirements to register a validator or group.
-   */
-  function meetsValidatorRegistrationRequirements(address account) public view returns (bool) {
-    // TODO
-  }
-
-  /**
    * @notice Deletes an element from a list of addresses.
    * @param list The list of addresses.
    * @param element The address to delete.
@@ -540,13 +584,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
     // Empty validator groups are not electable.
     if (groups[group].members.numElements == 0) {
-      if (votes.contains(group)) {
-        // TODO(asa): What needs to happen here????
-        // We need to remove from the linked list but preserve all other info...
-        // And probably add back in if it gets a member...
-        votes.remove(group);
-      }
-      emit ValidatorGroupEmptied(group);
+      getElection().markGroupUnelectable(group);
     }
     return true;
   }

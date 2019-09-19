@@ -5,14 +5,13 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/ILockedGold.sol";
-import "./UsingElection.sol";
 
 import "../common/Initializable.sol";
-import "../common/UsingRegistry.sol";
 import "../common/interfaces/IERC20Token.sol";
 import "../common/Signatures.sol";
+import "../common/UsingRegistry.sol";
 
-contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry, UsingElection {
+contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry {
 
   // TODO(asa): How do adjust for updated requirements?
   // Have a refreshRequirements function validators and groups can call
@@ -196,7 +195,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @dev Fails if the `accountOrVoter` is not an account or authorized voter.
    * @return The associated account.
    */
-  function getAccountFromVoter(address accountOrVoter) public view returns (address) {
+  function getAccountFromVoter(address accountOrVoter) external view returns (address) {
     address authorizingAccount = authorizations[accountOrVoter];
     if (authorizingAccount != address(0)) {
       require(accounts[authorizingAccount].authorizations.voter == accountOrVoter);
@@ -207,7 +206,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     }
   }
 
-  function getTotalLockedGold() public view returns (uint256) {
+  function getTotalLockedGold() external view returns (uint256) {
     return totalNonvoting.add(getElection().totalVotes());
   }
 

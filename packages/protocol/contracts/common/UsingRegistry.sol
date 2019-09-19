@@ -4,6 +4,10 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IRegistry.sol";
 
+import "../governance/interfaces/IElection.sol";
+import "../governance/interfaces/ILockedGold.sol";
+import "../governance/interfaces/IValidators.sol";
+
 // Ideally, UsingRegistry should inherit from Initializable and implement initialize() which calls
 // setRegistry(). TypeChain currently has problems resolving overloaded functions, so this is not
 // possible right now.
@@ -30,8 +34,8 @@ contract UsingRegistry is Ownable {
 
   IRegistry public registry;
 
-  modifier onlyRegisteredContract(bytes32 identifierHash, address sender) {
-    require(registry.getAddressForOrDie(identifierHash) == sender);
+  modifier onlyRegisteredContract(bytes32 identifierHash) {
+    require(registry.getAddressForOrDie(identifierHash) == msg.sender);
     _;
   }
   /**
@@ -41,5 +45,17 @@ contract UsingRegistry is Ownable {
   function setRegistry(address registryAddress) public onlyOwner {
     registry = IRegistry(registryAddress);
     emit RegistrySet(registryAddress);
+  }
+
+  function getElection() internal view returns (IElection) {
+    return IElection(registry.getAddressForOrDie(ELECTION_REGISTRY_ID));
+  }
+
+  function getLockedGold() internal view returns(ILockedGold) {
+    return ILockedGold(registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
+  }
+
+  function getValidators() internal view returns(IValidators) {
+    return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
   }
 }

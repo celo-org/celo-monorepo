@@ -566,17 +566,6 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   }
 
   /**
-   * @notice Returns the current validator set
-   * TODO: Should be replaced with a precompile
-   */
-  function getValidators() public view returns (address[] memory) {
-    IValidators validatorContract = IValidators(
-      registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID)
-    );
-    return validatorContract.getValidators();
-  }
-
-  /**
    * @notice Helper function for batchGetAttestationStats to calculate the
              total number of addresses that have >0 complete attestations for the identifiers
    * @param identifiersToLookup Array of n identifiers
@@ -618,7 +607,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     IRandom random = IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
 
     bytes32 seed = random.random();
-    address[] memory validators = getValidators();
+    address[] memory validators = getElection().electValidators();
 
     uint256 currentIndex = 0;
     address validator;

@@ -6,19 +6,19 @@ import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
-import "./UsingLockedGold.sol";
 import "./interfaces/IGovernance.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/FractionUtil.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
+import "../common/UsingRegistry.sol";
 
 
 // TODO(asa): Hardcode minimum times for queueExpiry, etc.
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
  */
-contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, ReentrancyGuard {
+contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, UsingRegistry {
   using FixidityLib for FixidityLib.Fraction;
   using FractionUtil for FractionUtil.Fraction;
   using SafeMath for uint256;
@@ -428,7 +428,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     nonReentrant
     returns (bool)
   {
-    address account = getAccountFromVoter(msg.sender);
+    address account = getLockedGold().getAccountFromVoter(msg.sender);
     // TODO(asa): When upvoting a proposal that will get dequeued, should we let the tx succeed
     // and return false?
     dequeueProposalsIfReady();
@@ -441,7 +441,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     }
     Voter storage voter = voters[account];
     // We can upvote a proposal in the queue if we're not already upvoting a proposal in the queue.
-    uint256 weight = getAccountTotalLockedGold(account);
+    uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
     require(
       isQueued(proposalId) &&
       (voter.upvote.proposalId == 0 || !queue.contains(voter.upvote.proposalId)) &&
@@ -477,7 +477,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     returns (bool)
   {
     dequeueProposalsIfReady();
-    address account = getAccountFromVoter(msg.sender);
+    address account = getLockedGold().getAccountFromVoter(msg.sender);
     Voter storage voter = voters[account];
     uint256 proposalId = voter.upvote.proposalId;
     Proposal storage proposal = proposals[proposalId];
@@ -543,7 +543,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     nonReentrant
     returns (bool)
   {
-    address account = getAccountFromVoter(msg.sender);
+    address account = getLockedGold().getAccountFromVoter(msg.sender);
     dequeueProposalsIfReady();
     Proposal storage proposal = proposals[proposalId];
     require(_proposalExists(proposal) && dequeued[index] == proposalId);
@@ -553,7 +553,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     }
     ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
     Voter storage voter = voters[account];
-    uint256 weight = getAccountTotalLockedGold(account);
+    uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
     require(
       proposal.approved &&
       stage == ProposalStage.Referendum &&
