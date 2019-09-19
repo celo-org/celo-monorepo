@@ -1,16 +1,8 @@
 {
+  "extends": "../typescript/tsconfig.library.json",
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "baseUrl": ".",
-    "lib": ["es7", "es2017"],
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "noImplicitAny": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "skipLibCheck": true,
-    "target": "es5"
+    "rootDir": "src",
+    "outDir": "lib"
   },
-  "exclude": ["node_modules"]
+  "include": ["src"]
 }
