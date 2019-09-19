@@ -1,9 +1,9 @@
+import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
 import * as bls12377js from 'bls12377js'
 import { ec as EC } from 'elliptic'
 import { range, repeat } from 'lodash'
 import rlp from 'rlp'
 import Web3 from 'web3'
-import { blsPrivateKeyToProcessedPrivateKey } from './bls_utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   CONTRACT_OWNER_STORAGE_LOCATION,
