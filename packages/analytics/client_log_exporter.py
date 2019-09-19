@@ -25,47 +25,31 @@ class ReadGCSNotifications(beam.PTransform):
 
 
   def parse_element(self, element):
-
-    if not self.gcs:
-      # These imports have to be nested (ugh) because the constructor and the 
-      # main pipeline get evaluated locally when deploying remotely from 
-      # the cmdline, and this class is only available when running on GCS
-      from apache_beam.io.gcp.gcsfilesystem import GCSFileSystem
-      self.gcs = GCSFileSystem(PipelineOptions(self.pipeline_args))
-      self.logger = stackdriver_logging.Client().logger(self.log_name)
-
     message = json.loads(element.data)
     bucket = message['bucket']
-
     # Only import from the bucket we are expecting.
     if bucket != self.bucket_name:
       return []
-    
     filepath = message['name']
     logging.info('Got file: %s, %s', bucket, filepath)
-
     logging.info('Got -: %s', message)
-
     logline_metadata = None
-
 #    try:
-    # Split path component. Expecting logs/bundleId/env/
+    # Split path component. Expecting logs/date/bundleId/env/
     path_comps = filepath.split('/')
-
-    if len(path_comps) < 3 or path_comps[2] != self.env:
+    if len(path_comps) < 3 or (path_comps[3] != self.env and self.env is not None):
       logging.info('Skipping %s', filepath)
-
       return [] 
-
     name = path_comps[len(path_comps)-1]
     if name.endswith('.txt'):
       name = name[0:len(name)-4]
     name_comps = name.split('_')
-    
+    self.env = path_comps[3]
+    self.log_name = 'client-logs-%s'%(self.env) if self.log_name is None else self.log_name
     logline_metadata = {
       'suffix' : name_comps[2], 
-      'bundleId': path_comps[1],
-      'env': path_comps[2],
+      'bundleId': path_comps[2],
+      'env': path_comps[3],
       'phone': urllib2.unquote(name_comps[0]).decode('utf8'),
       'filepath': filepath
     }
@@ -82,6 +66,14 @@ class ReadGCSNotifications(beam.PTransform):
       'WARN'  : 'WARNING',
       'CRIT'  : 'CRITICAL'
     }
+
+    if not self.gcs:
+      # These imports have to be nested (ugh) because the constructor and the 
+      # main pipeline get evaluated locally when deploying remotely from 
+      # the cmdline, and this class is only available when running on GCS
+      from apache_beam.io.gcp.gcsfilesystem import GCSFileSystem
+      self.gcs = GCSFileSystem(PipelineOptions(self.pipeline_args))
+      self.logger = stackdriver_logging.Client().logger(self.log_name)
 
     # Read the whole file (ugh) from GCS. Without SDoFns support in Python, that's the best
     # we can do in dataflow right now.
