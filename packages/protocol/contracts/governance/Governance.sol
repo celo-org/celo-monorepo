@@ -242,11 +242,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       _dequeueFrequency != 0 &&
       approvalStageDuration != 0 &&
       referendumStageDuration != 0 &&
-      executionStageDuration != 0 &&
-      isFraction(participationBaseline) &&
-      isFraction(participationFloor) &&
-      isFraction(baselineUpdateFactor) &&
-      isFraction(baselineQuorumFactor)
+      executionStageDuration != 0
     );
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -258,10 +254,10 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     stageDurations.approval = approvalStageDuration;
     stageDurations.referendum = referendumStageDuration;
     stageDurations.execution = executionStageDuration;
-    participationParameters.baseline = FixidityLib.wrap(participationBaseline);
-    participationParameters.baselineFloor = FixidityLib.wrap(participationFloor);
-    participationParameters.baselineUpdateFactor = FixidityLib.wrap(baselineUpdateFactor);
-    participationParameters.baselineQuorumFactor = FixidityLib.wrap(baselineQuorumFactor);
+    setParticipationBaseline(participationBaseline);
+    setParticipationFloor(participationFloor);
+    setBaselineUpdateFactor(baselineUpdateFactor);
+    setBaselineQuorumFactor(baselineQuorumFactor);
     // solhint-disable-next-line not-rely-on-time
     lastDequeue = now;
   }
@@ -349,15 +345,30 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   }
 
   /**
+   * @notice Updates the participation baseline.
+   * @param participationBaseline The value of the baseline.
+   */
+  function setParticipationBaseline(uint256 participationBaseline) public onlyOwner {
+    FixidityLib.Fraction memory participationBaselineFrac = FixidityLib.wrap(participationBaseline);
+    require(
+      FixidityLib.isProperFraction(participationBaselineFrac) &&
+      !participationBaselineFrac.equals(participationParameters.baseline)
+    );
+    participationParameters.baseline = participationBaselineFrac;
+    emit ParticipationBaselineUpdated(participationBaseline);
+  }
+
+  /**
    * @notice Updates the floor of the participation baseline.
    * @param participationFloor The value at which the baseline is floored.
    */
-  function setParticipationFloor(uint256 participationFloor) external onlyOwner {
+  function setParticipationFloor(uint256 participationFloor) public onlyOwner {
+    FixidityLib.Fraction memory participationFloorFrac = FixidityLib.wrap(participationFloor);
     require(
-      participationFloor != participationParameters.baselineFloor.unwrap() &&
-      isFraction(participationFloor)
+      FixidityLib.isProperFraction(participationFloorFrac) &&
+      !participationFloorFrac.equals(participationParameters.baselineFloor)
     );
-    participationParameters.baselineFloor = FixidityLib.wrap(participationFloor);
+    participationParameters.baselineFloor = participationFloorFrac;
     emit ParticipationFloorSet(participationFloor);
   }
 
@@ -365,12 +376,13 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @notice Updates the weight of the new participation in the baseline update rule.
    * @param baselineUpdateFactor The new baseline update factor.
    */
-  function setBaselineUpdateFactor(uint256 baselineUpdateFactor) external onlyOwner {
+  function setBaselineUpdateFactor(uint256 baselineUpdateFactor) public onlyOwner {
+    FixidityLib.Fraction memory baselineUpdateFactorFrac = FixidityLib.wrap(baselineUpdateFactor);
     require(
-      baselineUpdateFactor != participationParameters.baselineUpdateFactor.unwrap() &&
-      isFraction(baselineUpdateFactor)
+      FixidityLib.isProperFraction(baselineUpdateFactorFrac) &&
+      !baselineUpdateFactorFrac.equals(participationParameters.baselineUpdateFactor)
     );
-    participationParameters.baselineUpdateFactor = FixidityLib.wrap(baselineUpdateFactor);
+    participationParameters.baselineUpdateFactor = baselineUpdateFactorFrac;
     emit ParticipationBaselineUpdateFactorSet(baselineUpdateFactor);
   }
 
@@ -378,12 +390,13 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @notice Updates the proportion of the baseline that constitutes quorum.
    * @param baselineQuorumFactor The new baseline quorum factor.
    */
-  function setBaselineQuorumFactor(uint256 baselineQuorumFactor) external onlyOwner {
+  function setBaselineQuorumFactor(uint256 baselineQuorumFactor) public onlyOwner {
+    FixidityLib.Fraction memory baselineQuorumFactorFrac = FixidityLib.wrap(baselineQuorumFactor);
     require(
-      baselineQuorumFactor != participationParameters.baselineQuorumFactor.unwrap() &&
-      isFraction(baselineQuorumFactor)
+      FixidityLib.isProperFraction(baselineQuorumFactorFrac) &&
+      !baselineQuorumFactorFrac.equals(participationParameters.baselineQuorumFactor)
     );
-    participationParameters.baselineQuorumFactor = FixidityLib.wrap(baselineQuorumFactor);
+    participationParameters.baselineQuorumFactor = baselineQuorumFactorFrac;
     emit ParticipationBaselineQuorumFactorSet(baselineQuorumFactor);
   }
 
@@ -895,7 +908,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
       bytes4 functionId = extractFunctionSignature(proposal.transactions[i].data);
       FixidityLib.Fraction memory threshold = _getConstitution(
-        proposal.transactions[i].destination, functionId
+        proposal.transactions[i].destination, 
+        functionId
       );
       if (support.lte(threshold)) {
         return false;
@@ -1037,13 +1051,5 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       threshold = constitution[destination].defaultThreshold;
     }
     return threshold;
-  }
-
-  /**
-   * @notice Returns whether a Fixed value is between 0 and 1, inclusive.
-   * @param x The Fixed value.
-   */
-  function isFraction(uint256 x) private pure returns (bool) {
-    return x <= FixidityLib.fixed1().unwrap();
   }
 }

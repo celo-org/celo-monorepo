@@ -10,6 +10,7 @@ interface IGovernance {
   function setApprovalStageDuration(uint256) external;
   function setReferendumStageDuration(uint256) external;
   function setExecutionStageDuration(uint256) external;
+  function setParticipationBaseline(uint256) external;
   function setParticipationFloor(uint256) external;
   function setBaselineUpdateFactor(uint256) external;
   function setBaselineQuorumFactor(uint256) external;

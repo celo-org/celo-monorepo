@@ -5,7 +5,7 @@ import os
 
 buildPath = "./build/contracts"
 
-bytecodeLimit = 2**14 + 2**13
+bytecodeLimit = 2**15 + 2**14 # note: doubled from Ethereum's bytecode limit
 print("Limit: " + str(bytecodeLimit))
 
 for fileName in os.listdir(buildPath):

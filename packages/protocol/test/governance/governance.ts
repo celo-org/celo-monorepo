@@ -380,7 +380,7 @@ contract('Governance', (accounts: string[]) => {
     it('should set the approval stage duration', async () => {
       await governance.setApprovalStageDuration(newApprovalStageDuration)
       const actualApprovalStageDuration = await governance.getApprovalStageDuration()
-      assert.equal(actualApprovalStageDuration.toNumber(), newApprovalStageDuration)
+      assertEqualBN(actualApprovalStageDuration, newApprovalStageDuration)
     })
 
     it('should emit the ApprovalStageDurationSet event', async () => {
@@ -415,7 +415,7 @@ contract('Governance', (accounts: string[]) => {
     it('should set the referendum stage duration', async () => {
       await governance.setReferendumStageDuration(newReferendumStageDuration)
       const actualReferendumStageDuration = await governance.getReferendumStageDuration()
-      assert.equal(actualReferendumStageDuration.toNumber(), newReferendumStageDuration)
+      assertEqualBN(actualReferendumStageDuration, newReferendumStageDuration)
     })
 
     it('should emit the ReferendumStageDurationSet event', async () => {
@@ -450,7 +450,7 @@ contract('Governance', (accounts: string[]) => {
     it('should set the execution stage duration', async () => {
       await governance.setExecutionStageDuration(newExecutionStageDuration)
       const actualExecutionStageDuration = await governance.getExecutionStageDuration()
-      assert.equal(actualExecutionStageDuration.toNumber(), newExecutionStageDuration)
+      assertEqualBN(actualExecutionStageDuration, newExecutionStageDuration)
     })
 
     it('should emit the ExecutionStageDurationSet event', async () => {
@@ -501,10 +501,6 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    it('should revert if new participation floor is below 0', async () => {
-      await assertRevert(governance.setParticipationFloor(toFixed(-1 / 100)))
-    })
-
     it('should revert if new participation floor is above 1', async () => {
       await assertRevert(governance.setParticipationFloor(toFixed(101 / 100)))
     })
@@ -535,10 +531,6 @@ contract('Governance', (accounts: string[]) => {
           baselineUpdateFactor: differentBaselineUpdateFactor,
         },
       })
-    })
-
-    it('should revert if new update coefficient is below 0', async () => {
-      await assertRevert(governance.setBaselineUpdateFactor(toFixed(-1 / 100)))
     })
 
     it('should revert if new update coefficient is above 1', async () => {
@@ -573,10 +565,6 @@ contract('Governance', (accounts: string[]) => {
           baselineQuorumFactor: differentBaselineQuorumFactor,
         },
       })
-    })
-
-    it('should revert if new critical baseline level is below 0', async () => {
-      await assertRevert(governance.setBaselineQuorumFactor(toFixed(-1 / 100)))
     })
 
     it('should revert if new critical baseline level is above 1', async () => {
