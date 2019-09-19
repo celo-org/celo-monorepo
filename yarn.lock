@@ -25282,9 +25282,9 @@ react-native-gesture-handler@^1.1.0:
     invariant "^2.2.2"
     prop-types "^15.5.10"
 
-"react-native-geth@git+https://github.com/celo-org/react-native-geth#09c89f4":
+"react-native-geth@git+https://github.com/celo-org/react-native-geth#5bf0d05":
   version "0.1.0-development"
-  resolved "git+https://github.com/celo-org/react-native-geth#09c89f46b98228aeb25fdfa0ce7597404539d3ab"
+  resolved "git+https://github.com/celo-org/react-native-geth#5bf0d0550225b0ecd99aacd06a0b695bcac71936"
 
 "react-native-install-referrer@git://github.com/celo-org/react-native-install-referrer#343bf3d":
   version "2.0.0"
