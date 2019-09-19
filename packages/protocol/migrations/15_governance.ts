@@ -1,14 +1,16 @@
 /* tslint:disable:no-console */
 
-import { GovernanceInstance, ReserveInstance } from 'types';
+import { GovernanceInstance, ReserveInstance } from 'types'
 
-import { CeloContractName } from '@celo/protocol/lib/registry-utils';
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
-    deploymentForCoreContract, getDeployedProxiedContract, transferOwnershipOfProxy,
-    transferOwnershipOfProxyAndImplementation
-} from '@celo/protocol/lib/web3-utils';
-import { config } from '@celo/protocol/migrationsConfig';
-import { toFixed } from '@celo/utils/lib/fixidity';
+  deploymentForCoreContract,
+  getDeployedProxiedContract,
+  transferOwnershipOfProxy,
+  transferOwnershipOfProxyAndImplementation,
+} from '@celo/protocol/lib/web3-utils'
+import { config } from '@celo/protocol/migrationsConfig'
+import { toFixed } from '@celo/utils/lib/fixidity'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
   const approver = require('@celo/protocol/truffle.js').networks[networkName].from

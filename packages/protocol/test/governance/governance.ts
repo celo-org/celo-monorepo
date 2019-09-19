@@ -82,9 +82,9 @@ contract('Governance', (accounts: string[]) => {
   const baselineQuorumFactor = 1
   const weight = 100
   const participation = 1
-  const expectedParticipationBaseline = fromFixed(baselineUpdateFactor).multipliedBy(participation).plus(
-    ONE.minus(fromFixed(baselineUpdateFactor)).multipliedBy(fromFixed(participationBaseline))
-  )
+  const expectedParticipationBaseline = fromFixed(baselineUpdateFactor)
+    .multipliedBy(participation)
+    .plus(ONE.minus(fromFixed(baselineUpdateFactor)).multipliedBy(fromFixed(participationBaseline)))
 
   let transactionSuccess1
   let transactionSuccess2
