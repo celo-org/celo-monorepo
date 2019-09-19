@@ -192,7 +192,7 @@ PODS:
     - React
   - RNShare (1.1.3):
     - React
-  - RNSVG (9.3.6):
+  - RNSVG (9.8.4):
     - React
   - Sentry (3.12.4):
     - Sentry/Core (= 3.12.4)
@@ -359,7 +359,7 @@ SPEC CHECKSUMS:
   RNRandomBytes: ed3e5894ef983d1afd17a63349cc517b260138fa
   RNScreens: 720a9e6968beb73e8196239801e887d8401f86ed
   RNShare: 4f206fa36e384e95a0cbf79f2a92490647e93127
-  RNSVG: 172d33eda196063a6a94900d93a4a2cbb126bf33
+  RNSVG: a78b4c581e33a1bb72968997d167afabf72b05dc
   Sentry: 7d3ea7176e5184e9c35c12a5825905345807e8c1
   SentryReactNative: 014e5b1684c30c31e6514a57e51eff26cf2b99f7
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
