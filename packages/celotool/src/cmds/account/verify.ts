@@ -1,6 +1,6 @@
 import { AccountArgv } from '@celo/celotool/src/cmds/account'
 import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
-import { CeloContract, CeloTransactionObject, newKit } from '@celo/contractkit'
+import { CeloContract, newKit } from '@celo/contractkit'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { ActionableAttestation, decodeAttestationCode } from '@celo/walletkit'
 import prompts from 'prompts'
@@ -94,16 +94,17 @@ export async function printCurrentCompletedAttestations(
   )
 }
 
-async function send(obj: Promise<CeloTransactionObject<any>>) {
-  return obj.then((txo) => txo.send()).then((txo) => txo.waitReceipt())
-}
 async function requestMoreAttestations(
   attestations: AttestationsWrapper,
   phoneNumber: string,
   attestationsRequested: number
 ) {
-  await send(attestations.approveAttestationFee(CeloContract.StableToken, attestationsRequested))
-  await send(attestations.request(phoneNumber, attestationsRequested, CeloContract.StableToken))
+  await attestations
+    .approveAttestationFee(CeloContract.StableToken, attestationsRequested)
+    .then((txo) => txo.sendAndWaitForReceipt())
+  await attestations
+    .request(phoneNumber, attestationsRequested, CeloContract.StableToken)
+    .then((txo) => txo.sendAndWaitForReceipt())
 }
 
 async function revealAttestations(
@@ -113,7 +114,9 @@ async function revealAttestations(
 ) {
   return Promise.all(
     attestationsToReveal.map(async (attestation) =>
-      send(attestations.reveal(phoneNumber, attestation.issuer))
+      attestations
+        .reveal(phoneNumber, attestation.issuer)
+        .then((txo) => txo.sendAndWaitForReceipt())
     )
   )
 }
