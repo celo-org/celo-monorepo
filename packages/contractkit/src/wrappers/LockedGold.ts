@@ -2,7 +2,7 @@ import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
-import { Address } from '../base'
+import { Address, Roles } from '../base'
 import { LockedGold } from '../generated/types/LockedGold'
 import {
   BaseWrapper,
@@ -33,12 +33,6 @@ export interface Commitments {
   }
 }
 
-enum Roles {
-  validating,
-  voting,
-  rewards,
-}
-
 export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   notifyCommitment = proxySend(this.kit, this.contract.methods.notifyCommitment)
   createAccount = proxySend(this.kit, this.contract.methods.createAccount)
@@ -50,6 +44,13 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   maxNoticePeriod = proxyCall(this.contract.methods.maxNoticePeriod, undefined, toBigNumber)
 
   getAccountWeight = proxyCall(this.contract.methods.getAccountWeight, undefined, toBigNumber)
+  /**
+   * Get the delegate for a role.
+   * @param account Address of the active account.
+   * @param role one of Roles Enum ("validating", "voting", "rewards")
+   * @return Address of the delegate
+   */
+  getDelegateFromAccountAndRole = proxyCall(this.contract.methods.getDelegateFromAccountAndRole)
 
   async getVotingDetails(accountOrVoterAddress: Address): Promise<VotingDetails> {
     const accountAddress = await this.contract.methods
@@ -107,14 +108,56 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     }
   }
 
-  // FIXME this.contract.methods.delegateRewards does not exist
-  async delegateRewardsTx(account: string, delegate: string): Promise<CeloTransactionObject<void>> {
+  /**
+   * Delegate a Role to another account.
+   * @param account Address of the active account.
+   * @param delegate Address of the delegate
+   * @param role one of Roles Enum ("validating", "voting", "rewards")
+   * @return A CeloTransactionObject
+   */
+  async delegateRoleTx(
+    account: Address,
+    delegate: Address,
+    role: Roles
+  ): Promise<CeloTransactionObject<void>> {
     const sig = await this.getParsedSignatureOfAddress(account, delegate)
-
     return wrapSend(
       this.kit,
-      this.contract.methods.delegateRole(Roles.rewards, delegate, sig.v, sig.r, sig.s)
+      this.contract.methods.delegateRole(role, delegate, sig.v, sig.r, sig.s)
     )
+  }
+
+  /**
+   * Delegate a Rewards to another account.
+   * @param account Address of the active account.
+   * @param delegate Address of the delegate
+   * @return A CeloTransactionObject
+   */
+  async delegateRewards(account: Address, delegate: Address): Promise<CeloTransactionObject<void>> {
+    return this.delegateRoleTx(account, delegate, Roles.rewards)
+  }
+
+  /**
+   * Delegate a voting to another account.
+   * @param account Address of the active account.
+   * @param delegate Address of the delegate
+   * @return A CeloTransactionObject
+   */
+  async delegateVoting(account: Address, delegate: Address): Promise<CeloTransactionObject<void>> {
+    return this.delegateRoleTx(account, delegate, Roles.voting)
+  }
+
+  /**
+   * Delegate a validating to another account.
+   * @param account Address of the active account.
+   * @param delegate Address of the delegate
+   * @return A CeloTransactionObject
+   */
+  async delegateValidating(
+    account: Address,
+    delegate: Address
+  ): Promise<CeloTransactionObject<void>> {
+    return this.delegateRoleTx(account, delegate, Roles.validating)
   }
 
   private getValueFromCommitment(commitment: { 0: string; 1: string }) {
