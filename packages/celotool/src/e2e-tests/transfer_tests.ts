@@ -11,6 +11,9 @@ import { erc20Abi, getContractAddress, getEnode, getHooks, initAndStartGeth, sle
  * typically you can fix those tests adapting the new gas estimations with the output of the
  * `ci_test_transfers.sh` script.
  *
+ * E2E tests can be run in your local using the following command from the
+ * `$ ./ci_test_transfers.sh local /path/to/celo-blockchain/`
+ *
  * In the output of the script execution, look for the error messages similar to:
  * "AssertionError: expected '3804860' to equal '3789120'"
  * This error means an assertion was expecting a gas cost of 3789120 but 3804860 was found.
