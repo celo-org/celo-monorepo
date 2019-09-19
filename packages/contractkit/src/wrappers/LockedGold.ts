@@ -39,6 +39,13 @@ enum Roles {
   rewards,
 }
 
+export interface LockedGoldConfig {
+  maxNoticePeriod: BigNumber
+}
+
+/**
+ * Contract for handling deposits needed for voting.
+ */
 export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   notifyCommitment = proxySend(this.kit, this.contract.methods.notifyCommitment)
   createAccount = proxySend(this.kit, this.contract.methods.createAccount)
@@ -50,6 +57,12 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   maxNoticePeriod = proxyCall(this.contract.methods.maxNoticePeriod, undefined, toBigNumber)
 
   getAccountWeight = proxyCall(this.contract.methods.getAccountWeight, undefined, toBigNumber)
+
+  async getConfig(): Promise<LockedGoldConfig> {
+    return {
+      maxNoticePeriod: await this.maxNoticePeriod(),
+    }
+  }
 
   async getVotingDetails(accountOrVoterAddress: Address): Promise<VotingDetails> {
     const accountAddress = await this.contract.methods

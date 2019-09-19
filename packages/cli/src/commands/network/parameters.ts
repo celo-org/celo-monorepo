@@ -8,99 +8,73 @@ export default class Parameters extends BaseCommand {
   }
 
   async run() {
-    const goldToken = await this.kit.contracts.getGoldToken()
-    const stableToken = await this.kit.contracts.getStableToken()
-    const attestations = await this.kit.contracts.getAttestations()
+    const config = await this.kit.getNetworkConfig()
+
+    const attestations = config.attestations
     console.log(
       'attestations.attestationExpirySeconds',
-      (await attestations.attestationExpirySeconds()).toString(10),
+      attestations.attestationExpirySeconds.toString(10),
       'seconds'
     )
-    console.log(
-      'attestations.attestationExpiryFee (gold)',
-      (await attestations.attestationRequestFees(goldToken.address)).toString(10),
-      ''
-    )
-    console.log(
-      'attestations.attestationExpiryFee (stable)',
-      (await attestations.attestationRequestFees(stableToken.address)).toString(10),
-      ''
-    )
+    attestations.attestationRequestFees.forEach((el) => {
+      console.log('attestations.attestationExpiryFee', el.address, el.fee.toString())
+    })
 
-    const lockedGold = await this.kit.contracts.getLockedGold()
-    console.log(
-      'lockedGold.maxNoticePeriod',
-      (await lockedGold.maxNoticePeriod()).toString(10),
-      'seconds'
-    )
+    const lockedGold = config.lockedGold
+    console.log('lockedGold.maxNoticePeriod', lockedGold.maxNoticePeriod.toString(10), 'seconds')
 
-    const sortedOracles = await this.kit.contracts.getSortedOracles()
-    console.log(
-      'sortedOracles.reportExpirySeconds',
-      (await sortedOracles.reportExpirySeconds()).toString()
-    )
+    const sortedOracles = config.sortedOracles
+    console.log('sortedOracles.reportExpirySeconds', sortedOracles.reportExpirySeconds.toString())
 
-    const exchange = await this.kit.contracts.getExchange()
-    console.log('exchange.spread', (await exchange.spread()).toString())
-    console.log('exchange.reserveFraction', (await exchange.reserveFraction()).toString())
-    console.log('exchange.updateFrequency', (await exchange.updateFrequency()).toString())
-    console.log('exchange.minimumReports', (await exchange.minimumReports()).toString())
+    const exchange = config.exchange
+    console.log('exchange.spread', exchange.spread.toString())
+    console.log('exchange.reserveFraction', exchange.reserveFraction.toString())
+    console.log('exchange.updateFrequency', exchange.updateFrequency.toString())
+    console.log('exchange.minimumReports', exchange.minimumReports.toString())
 
-    const governance = await this.kit.contracts.getGovernance()
-    console.log(
-      'governance.concurrentProposals',
-      (await governance.concurrentProposals()).toString()
-    )
-    console.log('governance.dequeueFrequency', (await governance.dequeueFrequency()).toString())
-    console.log('governance.minDeposit', (await governance.minDeposit()).toString())
-    console.log('governance.queueExpiry', (await governance.queueExpiry()).toString())
-    const durations = await governance.stageDurations()
-    console.log('governance.approvalStageDuration', durations[0])
-    console.log('governance.referendumStageDuration', durations[1])
-    console.log('governance.executionStageDuration', durations[2])
+    const governance = config.governance
+    console.log('governance.concurrentProposals', governance.concurrentProposals.toString())
+    console.log('governance.dequeueFrequency', governance.dequeueFrequency.toString())
+    console.log('governance.minDeposit', governance.minDeposit.toString())
+    console.log('governance.queueExpiry', governance.queueExpiry.toString())
+    const durations = governance.stageDurations
+    console.log('governance.approvalStageDuration', durations.approval.toString())
+    console.log('governance.referendumStageDuration', durations.referendum.toString())
+    console.log('governance.executionStageDuration', durations.execution.toString())
 
-    const gasPriceMinimum = await this.kit.contracts.getGasPriceMinimum()
-    console.log(
-      'gasPriceMinimum.gasPriceMinimum',
-      (await gasPriceMinimum.gasPriceMinimum()).toString()
-    )
-    console.log('gasPriceMinimum.targetDensity', (await gasPriceMinimum.targetDensity()).toString())
-    console.log(
-      'gasPriceMinimum.adjustmentSpeed',
-      (await gasPriceMinimum.adjustmentSpeed()).toString()
-    )
+    const gasPriceMinimum = config.gasPriceMinimum
+    console.log('gasPriceMinimum.gasPriceMinimum', gasPriceMinimum.gasPriceMinimum.toString())
+    console.log('gasPriceMinimum.targetDensity', gasPriceMinimum.targetDensity.toString())
+    console.log('gasPriceMinimum.adjustmentSpeed', gasPriceMinimum.adjustmentSpeed.toString())
     console.log(
       'gasPriceMinimum.infrastructureFraction',
-      (await gasPriceMinimum.infrastructureFraction()).toString()
+      gasPriceMinimum.infrastructureFraction.toString()
     )
 
-    const reserve = await this.kit.contracts.getReserve()
-    console.log(
-      'reserve.tobinTaxStalenessThreshold',
-      (await reserve.tobinTaxStalenessThreshold()).toString()
-    )
+    const reserve = config.reserve
+    console.log('reserve.tobinTaxStalenessThreshold', reserve.tobinTaxStalenessThreshold.toString())
 
-    console.log('stableToken.decimals', (await stableToken.decimals()).toString())
-    console.log('stableToken.name', (await stableToken.name()).toString())
-    console.log('stableToken.symbol', (await stableToken.symbol()).toString())
-    const inflation = await stableToken.getInflationParameters()
-    console.log('stableToken.rate', inflation[0])
-    console.log('stableToken.factor', inflation[1])
-    console.log('stableToken.updatePeriod', inflation[2])
-    console.log('stableToken.factorLastUpdated', inflation[3])
+    const stableToken = config.stableToken
+    console.log('stableToken.decimals', stableToken.decimals.toString())
+    console.log('stableToken.name', stableToken.name.toString())
+    console.log('stableToken.symbol', stableToken.symbol.toString())
+    const inflation = stableToken.inflationParameters
+    console.log('stableToken.rate', inflation.rate.toString())
+    console.log('stableToken.factor', inflation.factor.toString())
+    console.log('stableToken.updatePeriod', inflation.updatePeriod.toString())
+    console.log('stableToken.factorLastUpdated', inflation.factorLastUpdated.toString())
 
-    const validators = await this.kit.contracts.getValidators()
+    const validators = config.validators
+    console.log('validators.minElectableValidators', validators.minElectableValidators.toString())
+    console.log('validators.maxElectableValidators', validators.maxElectableValidators.toString())
+    console.log('validators.electionThreshold', validators.electionThreshold.toString())
     console.log(
-      'validators.minElectableValidators',
-      (await validators.minElectableValidators()).toString()
+      'validators.minLockedGoldValue',
+      validators.registrationRequirement.minLockedGoldValue.toString()
     )
     console.log(
-      'validators.maxElectableValidators',
-      (await validators.maxElectableValidators()).toString()
+      'validators.minLockedGoldNoticePeriod',
+      validators.registrationRequirement.minLockedGoldNoticePeriod.toString()
     )
-    console.log('validators.electionThreshold', (await validators.electionThreshold()).toString())
-    const req = await validators.getRegistrationRequirement()
-    console.log('validators.minLockedGoldValue', req[0])
-    console.log('validators.minLockedGoldNoticePeriod', req[1])
   }
 }

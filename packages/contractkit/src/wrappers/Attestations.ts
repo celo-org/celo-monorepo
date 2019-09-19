@@ -7,6 +7,19 @@ export interface AttestationStat {
   total: number
 }
 
+export interface AttestationsToken {
+  address: string
+  fee: BigNumber
+}
+
+export interface AttestationsConfig {
+  attestationExpirySeconds: BigNumber
+  attestationRequestFees: AttestationsToken[]
+}
+
+/**
+ * Contract for managing identities
+ */
 export class AttestationsWrapper extends BaseWrapper<Attestations> {
   setAccountDataEncryptionKey = proxySend(
     this.kit,
@@ -22,6 +35,29 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     undefined,
     toBigNumber
   )
+
+  async getConfig(): Promise<AttestationsConfig> {
+    const evs = await this.contract.getPastEvents('AttestationRequestFeeSet', { fromBlock: 0 })
+    const tokenMap: any = {}
+    const tokens: string[] = []
+    evs.forEach((el) => {
+      const res: string = el.returnValues.token
+      if (tokenMap[res]) return
+      tokenMap[res] = true
+      tokens.push(res)
+    })
+    const self = this
+    const fees = await Promise.all(
+      tokens.map(async (token) => {
+        const fee = await self.attestationRequestFees(token)
+        return { fee, address: token }
+      })
+    )
+    return {
+      attestationExpirySeconds: await this.attestationExpirySeconds(),
+      attestationRequestFees: fees,
+    }
+  }
 
   async lookupPhoneNumbers(
     phoneNumberHashes: string[]

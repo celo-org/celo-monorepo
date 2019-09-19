@@ -2,6 +2,9 @@ import { Address } from '../base'
 import { GoldToken } from '../generated/types/GoldToken'
 import { BaseWrapper, proxyCall, proxySend, toBigNumber, toNumber } from './BaseWrapper'
 
+/**
+ * ERC-20 contract for Celo native currency.
+ */
 export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
   allowance = proxyCall(this.contract.methods.allowance, undefined, toBigNumber)
   name = proxyCall(this.contract.methods.name)

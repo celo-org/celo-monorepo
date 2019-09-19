@@ -34,6 +34,21 @@ export interface ValidatorGroupVote {
   votes: BigNumber
 }
 
+export interface RegistrationRequirement {
+  minLockedGoldValue: BigNumber
+  minLockedGoldNoticePeriod: BigNumber
+}
+
+export interface ValidatorConfig {
+  minElectableValidators: BigNumber
+  maxElectableValidators: BigNumber
+  electionThreshold: BigNumber
+  registrationRequirement: RegistrationRequirement
+}
+
+/**
+ * Contract for voting for validators and managing validator groups.
+ */
 export class ValidatorsWrapper extends BaseWrapper<Validators> {
   affiliate = proxySend(this.kit, this.contract.methods.affiliate)
   deaffiliate = proxySend(this.kit, this.contract.methods.deaffiliate)
@@ -52,7 +67,29 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     toBigNumber
   )
   electionThreshold = proxyCall(this.contract.methods.getElectionThreshold, undefined, toBigNumber)
-  getRegistrationRequirement = proxyCall(this.contract.methods.getRegistrationRequirement)
+
+  async getRegistrationRequirement(): Promise<RegistrationRequirement> {
+    const res = await this.contract.methods.getRegistrationRequirement().call()
+    return {
+      minLockedGoldValue: toBigNumber(res[0]),
+      minLockedGoldNoticePeriod: toBigNumber(res[0]),
+    }
+  }
+
+  async getConfig(): Promise<ValidatorConfig> {
+    const res = await Promise.all([
+      this.minElectableValidators(),
+      this.maxElectableValidators(),
+      this.electionThreshold(),
+      this.getRegistrationRequirement(),
+    ])
+    return {
+      minElectableValidators: res[0],
+      maxElectableValidators: res[1],
+      electionThreshold: res[2],
+      registrationRequirement: res[3],
+    }
+  }
 
   getVoteFrom: (validatorAddress: Address) => Promise<Address | null> = proxyCall(
     this.contract.methods.voters

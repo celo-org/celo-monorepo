@@ -6,6 +6,15 @@ import { WrapperCache } from './contract-cache'
 import { sendTransaction, TxOptions } from './utils/send-tx'
 import { toTxResult, TransactionResult } from './utils/tx-result'
 import { Web3ContractCache } from './web3-contract-cache'
+import { ExchangeConfig } from './wrappers/Exchange'
+import { AttestationsConfig } from './wrappers/Attestations'
+import { GovernanceConfig } from './wrappers/Governance'
+import { LockedGoldConfig } from './wrappers/LockedGold'
+import { SortedOraclesConfig } from './wrappers/SortedOracles'
+import { GasPriceMinimumConfig } from './wrappers/GasPriceMinimum'
+import { ReserveConfig } from './wrappers/Reserve'
+import { StableTokenConfig } from './wrappers/StableTokenWrapper'
+import { ValidatorConfig } from './wrappers/Validators'
 
 export function newKit(url: string) {
   return newKitFromWeb3(new Web3(url))
@@ -13,6 +22,18 @@ export function newKit(url: string) {
 
 export function newKitFromWeb3(web3: Web3) {
   return new ContractKit(web3)
+}
+
+export interface NetworkConfig {
+  exchange: ExchangeConfig
+  attestations: AttestationsConfig
+  governance: GovernanceConfig
+  lockedGold: LockedGoldConfig
+  sortedOracles: SortedOraclesConfig
+  gasPriceMinimum: GasPriceMinimumConfig
+  reserve: ReserveConfig
+  stableToken: StableTokenConfig
+  validators: ValidatorConfig
 }
 
 export class ContractKit {
@@ -29,6 +50,42 @@ export class ContractKit {
     this.registry = new AddressRegistry(this)
     this._web3Contracts = new Web3ContractCache(this)
     this.contracts = new WrapperCache(this)
+  }
+
+  async getNetworkConfig(): Promise<NetworkConfig> {
+    const contracts = await Promise.all([
+      this.contracts.getExchange(),
+      this.contracts.getAttestations(),
+      this.contracts.getGovernance(),
+      this.contracts.getLockedGold(),
+      this.contracts.getSortedOracles(),
+      this.contracts.getGasPriceMinimum(),
+      this.contracts.getReserve(),
+      this.contracts.getStableToken(),
+      this.contracts.getValidators(),
+    ])
+    const res = await Promise.all([
+      contracts[0].getConfig(),
+      contracts[1].getConfig(),
+      contracts[2].getConfig(),
+      contracts[3].getConfig(),
+      contracts[4].getConfig(),
+      contracts[5].getConfig(),
+      contracts[6].getConfig(),
+      contracts[7].getConfig(),
+      contracts[8].getConfig(),
+    ])
+    return {
+      exchange: res[0],
+      attestations: res[1],
+      governance: res[2],
+      lockedGold: res[3],
+      sortedOracles: res[4],
+      gasPriceMinimum: res[5],
+      reserve: res[6],
+      stableToken: res[7],
+      validators: res[8],
+    }
   }
 
   async setGasCurrency(token: CeloToken) {

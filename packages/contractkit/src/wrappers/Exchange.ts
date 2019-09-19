@@ -12,6 +12,13 @@ import {
   tupleParser,
 } from './BaseWrapper'
 
+export interface ExchangeConfig {
+  spread: BigNumber
+  reserveFraction: BigNumber
+  updateFrequency: BigNumber
+  minimumReports: BigNumber
+}
+
 /**
  * Contract that allows to exchange StableToken for GoldToken and vice versa
  * using a Constant Product Market Maker Model
@@ -21,6 +28,25 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
   reserveFraction = proxyCall(this.contract.methods.reserveFraction, undefined, toBigNumber)
   updateFrequency = proxyCall(this.contract.methods.updateFrequency, undefined, toBigNumber)
   minimumReports = proxyCall(this.contract.methods.minimumReports, undefined, toBigNumber)
+
+  /**
+   * @dev Returns the current configuration of the exchange contract
+   * @return ExchangeConfig object
+   */
+  async getConfig(): Promise<ExchangeConfig> {
+    const res = await Promise.all([
+      this.spread(),
+      this.reserveFraction(),
+      this.updateFrequency(),
+      this.minimumReports(),
+    ])
+    return {
+      spread: res[0],
+      reserveFraction: res[1],
+      updateFrequency: res[2],
+      minimumReports: res[3],
+    }
+  }
 
   /**
    * @dev Returns the amount of buyToken a user would get for sellAmount of sellToken
