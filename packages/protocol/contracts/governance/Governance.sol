@@ -12,6 +12,7 @@ import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/FractionUtil.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
+import "../common/libraries/AddressesHelper.sol";
 
 
 // TODO(asa): Hardcode minimum times for queueExpiry, etc.
@@ -1062,6 +1063,10 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     returns (bool)
   {
     bool result;
+
+    require(
+      AddressesHelper.isContract(destination), "Invalid contract address");
+
     /* solhint-disable no-inline-assembly */
     assembly {
       /* solhint-disable max-line-length */

@@ -1,6 +1,7 @@
 pragma solidity ^0.5.3;
 /* solhint-disable no-inline-assembly, no-complex-fallback, avoid-low-level-calls */
 
+import "./libraries/AddressesHelper.sol";
 
 /**
  * @title A Proxy utilizing the Unstructured Storage pattern.
@@ -38,7 +39,8 @@ contract Proxy {
       implementationAddress := sload(implementationPosition)
     }
 
-    require(_isContract(implementationAddress), "Invalid contract address");
+    require(
+      AddressesHelper.isContract(implementationAddress), "Invalid contract address");
 
     assembly {
       let newCallDataPosition := mload(0x40)
@@ -121,7 +123,8 @@ contract Proxy {
   function _setImplementation(address implementation) public onlyOwner {
     bytes32 implementationPosition = IMPLEMENTATION_POSITION;
 
-    require(_isContract(implementation), "Invalid contract address");
+    require(
+      AddressesHelper.isContract(implementation), "Invalid contract address");
 
     assembly {
       sstore(implementationPosition, implementation)
@@ -146,21 +149,6 @@ contract Proxy {
       sstore(position, newOwner)
     }
     emit OwnerSet(newOwner);
-  }
-
-
-  /**
-   * @dev _isContract detect whether the address is 
-   *      a contract address or externally owned account (EOA)
-   * WARNING: Calling this function from a constructor will return false
-   *          independently if the address given as parameter is a contract or EOA
-   * @return true if it is a contract address
-   */
-  function _isContract(address addr) internal view returns (bool) {
-    uint256 size;
-    /* solium-disable-next-line security/no-inline-assembly */
-    assembly { size := extcodesize(addr) }
-    return size > 0;
   }
 
 }
