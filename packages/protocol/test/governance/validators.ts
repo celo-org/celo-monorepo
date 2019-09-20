@@ -60,6 +60,7 @@ contract('Validators', (accounts: string[]) => {
   const minElectableValidators = new BigNumber(4)
   const maxElectableValidators = new BigNumber(6)
   const registrationRequirement = { value: new BigNumber(100), noticePeriod: new BigNumber(60) }
+  const maxGroupSize = 10
   const identifier = 'test-identifier'
   const name = 'test-name'
   const url = 'test-url'
@@ -73,7 +74,8 @@ contract('Validators', (accounts: string[]) => {
       minElectableValidators,
       maxElectableValidators,
       registrationRequirement.value,
-      registrationRequirement.noticePeriod
+      registrationRequirement.noticePeriod,
+      maxGroupSize
     )
   })
 
@@ -147,7 +149,8 @@ contract('Validators', (accounts: string[]) => {
           minElectableValidators,
           maxElectableValidators,
           registrationRequirement.value,
-          registrationRequirement.noticePeriod
+          registrationRequirement.noticePeriod,
+          maxGroupSize
         )
       )
     })
@@ -155,7 +158,7 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#setMinElectableValidators', () => {
     const newMinElectableValidators = minElectableValidators.plus(1)
-    it('should set the minimum deposit', async () => {
+    it('should set the minimum elected validators', async () => {
       await validators.setMinElectableValidators(newMinElectableValidators)
       assertEqualBN(await validators.minElectableValidators(), newMinElectableValidators)
     })
@@ -193,7 +196,7 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#setMaxElectableValidators', () => {
     const newMaxElectableValidators = maxElectableValidators.plus(1)
-    it('should set the minimum deposit', async () => {
+    it('should set the maximum elected validators', async () => {
       await validators.setMaxElectableValidators(newMaxElectableValidators)
       assertEqualBN(await validators.maxElectableValidators(), newMaxElectableValidators)
     })
@@ -222,6 +225,30 @@ contract('Validators', (accounts: string[]) => {
       await assertRevert(
         validators.setMaxElectableValidators(newMaxElectableValidators, { from: nonOwner })
       )
+    })
+  })
+
+  describe('#setMaxGroupSize', () => {
+    const newMaxGroupSize = 11
+    it('should set the maximum group size', async () => {
+      await validators.setMaxGroupSize(newMaxGroupSize)
+      assertEqualBN(await validators.maxGroupSize(), newMaxGroupSize)
+    })
+
+    it('should emit the MaxElectableValidatorsSet event', async () => {
+      const resp = await validators.setMaxGroupSize(newMaxGroupSize)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'MaxGroupSizeSet',
+        args: {
+          maxGroupSize: new BigNumber(newMaxGroupSize),
+        },
+      })
+    })
+
+    it('should revert when called by anyone other than the owner', async () => {
+      await assertRevert(validators.setMaxGroupSize(newMaxGroupSize, { from: nonOwner }))
     })
   })
 
