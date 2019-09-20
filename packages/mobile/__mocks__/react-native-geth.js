@@ -1,3 +1,3 @@
 import { NativeModules } from 'react-native'
 
-NativeModules.ReactNativeGeth = {}
+NativeModules.RNGeth = {}

@@ -12,8 +12,7 @@ import { navigateToError } from 'src/navigator/NavigationService'
 import { restartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
 
-const { ReactNativeGeth } = NativeModules
-const gethEmitter = new NativeEventEmitter(ReactNativeGeth)
+const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
 
 const TAG = 'geth/saga'
 const INIT_GETH_TIMEOUT = 15000

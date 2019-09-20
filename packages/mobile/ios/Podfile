@@ -39,7 +39,7 @@ target 'celo' do
   # pod 'RNFBDatabase', :path => '../node_modules/@react-native-firebase/database'
   pod 'RNFirebase', :path => '../../../node_modules/react-native-firebase/ios'
   pod 'RNFS', :path => '../../../node_modules/react-native-fs'
-  pod 'ReactNativeGeth', :path => '../../../node_modules/react-native-geth'
+  pod 'react-native-geth', :path => '../../../node_modules/react-native-geth'
   pod 'RNSVG', :path => '../../../node_modules/react-native-svg'
   pod 'RNAnalytics', :path => '../../../node_modules/@segment/analytics-react-native'
   # pod 'RNAnalyticsIntegration-Firebase', :path => '../../../node_modules/@segment/analytics-react-native-firebase'
