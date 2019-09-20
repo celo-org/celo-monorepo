@@ -108,7 +108,7 @@ function wwwRedirect(req, res, nextAction) {
     } catch (e) {
       Sentry.withScope((scope) => {
         scope.setTag('Service', 'Airtable')
-        Sentry.captureException(e)
+        Sentry.captureEvent(e)
       })
       res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
     }
