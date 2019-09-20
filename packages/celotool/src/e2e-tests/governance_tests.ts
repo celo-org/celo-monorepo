@@ -604,6 +604,7 @@ describe('governance tests', () => {
         b.plus(total)
       )
       assert.isAtLeast(expectedGoldTotalSupply.toNumber(), goldGenesisSupply.toNumber())
+      //
       assert.equal(goldTotalSupply.toString(), expectedGoldTotalSupply.toString())
     })
   })
