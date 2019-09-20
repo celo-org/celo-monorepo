@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 // solhint-disable no-unused-vars
 
 
@@ -7,7 +7,7 @@ pragma solidity ^0.5.8;
  */
 contract MockGoldToken {
 
-  uint8 public decimals = 18;
+  uint8 public constant decimals = 18;
 
   function transfer(address, uint256) external pure returns (bool) {
     return true;

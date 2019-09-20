@@ -5,6 +5,7 @@ import {
   alwaysUseTwilio,
   appSignature,
   getTwilioClient,
+  sendSmsWithNexmo,
   smsAckTimeout,
   twilioPhoneNum,
 } from './config'
@@ -31,14 +32,14 @@ export async function sendSmsCode(address: string, phoneNumber: string, message:
 
   if (alwaysUseTwilio) {
     console.info('Config set to always use Twilio')
-    await sendViaTwilio(phoneNumber, message)
+    await sendViaTextProvider(phoneNumber, message)
     return 'Twilio'
   }
 
   const verifiers = await getRandomActiveVerifiers(NUM_VERIFIERS_TO_WAKE, phoneNumber)
   if (verifiers === null || verifiers.length === 0) {
     console.info('No suitable verifiers found. Using Twilio')
-    await sendViaTwilio(phoneNumber, message)
+    await sendViaTextProvider(phoneNumber, message)
     return 'Twilio'
   }
 
@@ -51,9 +52,9 @@ export async function sendSmsCode(address: string, phoneNumber: string, message:
     console.info('Message was sent by verifier.')
     return messageId
   } else {
-    console.info('SMS timeout reached and message was not yet sent. Sending via Twilio')
+    console.info('SMS timeout reached and message was not yet sent. Sending via Text provider')
     await deleteMessage(messageId)
-    await sendViaTwilio(phoneNumber, message)
+    await sendViaTextProvider(phoneNumber, message)
     return 'Twilio'
   }
 }
@@ -70,18 +71,31 @@ function getFormattedMessage(message: string) {
   return message
 }
 
-async function sendViaTwilio(phoneNumber: string, messageText: string) {
+const NEXMO_COUNTRY_CODES = ['MX', 'US']
+
+async function sendViaTextProvider(phoneNumber: string, messageText: string) {
   try {
-    console.info('Sending message via Twilio')
-    await getTwilioClient().messages.create({
-      body: messageText,
-      from: twilioPhoneNum,
-      to: phoneNumber,
-    })
-    console.info('Message sent via Twilio')
+    console.info('Sending message via text provider')
+
+    const countryCode = phoneUtil.getRegionCodeForNumber(phoneUtil.parse(phoneNumber))
+    if (countryCode === undefined) {
+      throw new Error('Could not detect country code of ' + phoneNumber)
+    }
+
+    if (NEXMO_COUNTRY_CODES.indexOf(countryCode) === -1) {
+      await getTwilioClient().messages.create({
+        body: messageText,
+        from: twilioPhoneNum,
+        to: phoneNumber,
+      })
+      console.info('Message sent via Twilio')
+    } else {
+      await sendSmsWithNexmo(countryCode, phoneNumber, messageText)
+      console.info('Message sent via Nexmo')
+    }
   } catch (e) {
-    console.error('Failed to send twilio message', e)
-    throw new Error('Failed to send twilio message' + e)
+    console.error('Failed to send text message via txt provider', e)
+    throw new Error('Failed to send text message via txt provider' + e)
   }
 }
 

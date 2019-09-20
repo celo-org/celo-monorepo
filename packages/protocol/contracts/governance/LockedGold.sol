@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -412,7 +412,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     return account.rewardsLastRedeemed;
   }
 
-  function isValidating(address validator) public view returns (bool) {
+  function isValidating(address validator) external view returns (bool) {
     IValidators validators = IValidators(registry.getAddressFor(VALIDATORS_REGISTRY_ID));
     return validators.isValidating(validator);
   }

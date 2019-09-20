@@ -33,6 +33,8 @@ export default class NewAccount extends BaseCommand {
     return new Web3().eth.accounts.privateKeyToAccount(privateKey).address
   }
 
+  requireSynced = false
+
   async run() {
     // Generate a random mnemonic (uses crypto.randomBytes under the hood), defaults to 128-bits of entropy
     const mnemonic: string = NewAccount.getRandomMnemonic()
