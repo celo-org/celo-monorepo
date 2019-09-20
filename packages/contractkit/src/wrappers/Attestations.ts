@@ -37,11 +37,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   )
 
   async getConfig(): Promise<AttestationsConfig> {
-    const evs = await this.contract.getPastEvents('AttestationRequestFeeSet', { fromBlock: 0 })
+    const events = await this.contract.getPastEvents('AttestationRequestFeeSet', { fromBlock: 0 })
     const tokenMap: any = {}
     const tokens: string[] = []
-    evs.forEach((el) => {
-      const res: string = el.returnValues.token
+    events.forEach((event) => {
+      const res: string = event.returnValues.token
       if (tokenMap[res]) {
         return
       }
