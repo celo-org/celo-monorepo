@@ -88,7 +88,7 @@ export function* handleBarcode(
         kind: RecipientKind.QrCode,
         displayId: data.e164PhoneNumber,
       }
-  put(storeLatestInRecents(recipient))
+  yield put(storeLatestInRecents(recipient))
 
   navigate(Screens.SendAmount, { recipient })
 }

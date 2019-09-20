@@ -59,8 +59,9 @@ class QRScanner extends React.Component<Props> {
       rawData.barcodes.length !== 0 &&
       this.state.qrSubmitted === false
     ) {
-      this.setState({ qrSubmitted: true })
-      this.props.handleBarcodeDetected(rawData.barcodes[0])
+      this.setState({ qrSubmitted: true }, () => {
+        this.props.handleBarcodeDetected(rawData.barcodes[0])
+      })
     }
     return
   }
