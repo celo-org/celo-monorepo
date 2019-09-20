@@ -1,6 +1,6 @@
 import Web3 from 'web3'
 import * as Web3Utils from 'web3-utils'
-import { SignatureUtils } from './signatureUtils'
+import { Signature, SignatureUtils } from './signatureUtils'
 
 const privateKeyToAddress = (privateKey: string) => {
   // @ts-ignore
@@ -28,7 +28,11 @@ function attestationMessageToSign(identifier: string, account: string) {
   return messageHash
 }
 
-export function attestToIdentifier(identifier: string, account: string, privateKey: string) {
+export function attestToIdentifier(
+  identifier: string,
+  account: string,
+  privateKey: string
+): Signature {
   const issuer = privateKeyToAddress(privateKey)
   const { v, r, s } = SignatureUtils.signMessage(
     attestationMessageToSign(identifier, account),
