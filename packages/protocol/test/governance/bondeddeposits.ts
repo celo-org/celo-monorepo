@@ -92,10 +92,9 @@ contract('LockedGold', (accounts: string[]) => {
 
   describe('#isDelegate()', () => {
     const delegate = accounts[1]
-    let sig
 
     beforeEach(async () => {
-      sig = await getParsedSignatureOfAddress(account, delegate)
+      const sig = await getParsedSignatureOfAddress(account, delegate)
       await lockedGold.delegateRole(roles.voting, delegate, sig.v, sig.r, sig.s)
     })
 
