@@ -21,9 +21,12 @@ export default class List extends BaseCommand {
     const lockedGold = await this.kit.contracts.getLockedGold()
     const commitments = await lockedGold.getCommitments(args.account)
     const delegates = await Promise.all(
-      Object.values(Roles).map(async (role: string) => ({
-        role: Object.keys(Roles)[parseInt(role, 10)],
-        address: await lockedGold.getDelegateFromAccountAndRole(args.account, role),
+      Object.keys(Roles).map(async (role: string) => ({
+        role: role,
+        address: await lockedGold.getDelegateFromAccountAndRole(
+          args.account,
+          Roles[role as keyof typeof Roles]
+        ),
       }))
     )
     cli.action.stop()

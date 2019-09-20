@@ -50,11 +50,13 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    * @param role one of Roles Enum ("validating", "voting", "rewards")
    * @return Address of the delegate
    */
-  getDelegateFromAccountAndRole = proxyCall(this.contract.methods.getDelegateFromAccountAndRole)
+  getDelegateFromAccountAndRole: (account: string, role: Roles) => Promise<Address> = proxyCall(
+    this.contract.methods.getDelegateFromAccountAndRole
+  )
 
   async getVotingDetails(accountOrVoterAddress: Address): Promise<VotingDetails> {
     const accountAddress = await this.contract.methods
-      .getAccountFromDelegateAndRole(accountOrVoterAddress, Roles.voting)
+      .getAccountFromDelegateAndRole(accountOrVoterAddress, Roles.Voting)
       .call()
 
     return {
@@ -112,7 +114,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    * Delegate a Role to another account.
    * @param account Address of the active account.
    * @param delegate Address of the delegate
-   * @param role one of Roles Enum ("validating", "voting", "rewards")
+   * @param role one of Roles Enum ("Validating", "Voting", "Rewards")
    * @return A CeloTransactionObject
    */
   async delegateRoleTx(
@@ -134,7 +136,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    * @return A CeloTransactionObject
    */
   async delegateRewards(account: Address, delegate: Address): Promise<CeloTransactionObject<void>> {
-    return this.delegateRoleTx(account, delegate, Roles.rewards)
+    return this.delegateRoleTx(account, delegate, Roles.Rewards)
   }
 
   /**
@@ -144,7 +146,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    * @return A CeloTransactionObject
    */
   async delegateVoting(account: Address, delegate: Address): Promise<CeloTransactionObject<void>> {
-    return this.delegateRoleTx(account, delegate, Roles.voting)
+    return this.delegateRoleTx(account, delegate, Roles.Voting)
   }
 
   /**
@@ -157,7 +159,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     account: Address,
     delegate: Address
   ): Promise<CeloTransactionObject<void>> {
-    return this.delegateRoleTx(account, delegate, Roles.validating)
+    return this.delegateRoleTx(account, delegate, Roles.Validating)
   }
 
   private getValueFromCommitment(commitment: { 0: string; 1: string }) {

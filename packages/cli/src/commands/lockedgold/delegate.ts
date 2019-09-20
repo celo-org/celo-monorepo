@@ -20,7 +20,9 @@ export default class Delegate extends BaseCommand {
 
   static args = []
 
-  static examples = ['delegate --role voting --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d']
+  static examples = [
+    'delegate --from=0x5409ED021D9299bf6814279A6A1411A7e866A631 --role Voting --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d',
+  ]
 
   async run() {
     const res = this.parse(Delegate)
