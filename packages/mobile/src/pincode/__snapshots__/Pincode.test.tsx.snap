@@ -186,6 +186,12 @@ exports[`Pincode renders correctly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -193,17 +199,24 @@ exports[`Pincode renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderColor": "#42D689",
-            "borderRadius": 3,
-            "borderWidth": 2,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "transparent",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderColor": "#42D689",
+              "borderRadius": 3,
+              "borderWidth": 2,
+            },
+          ]
         }
         testID="Pincode-Education"
       >
@@ -400,6 +413,12 @@ exports[`Pincode renders correctly 2`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -407,17 +426,24 @@ exports[`Pincode renders correctly 2`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#A3EBC6",
-            "borderColor": "#A3EBC6",
-            "borderRadius": 3,
-            "borderWidth": 2,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#A3EBC6",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderColor": "#A3EBC6",
+              "borderRadius": 3,
+              "borderWidth": 2,
+            },
+          ]
         }
         testID="Pincode-Enter"
       >
@@ -614,6 +640,12 @@ exports[`Pincode renders correctly 3`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -621,17 +653,24 @@ exports[`Pincode renders correctly 3`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#42D689",
-            "borderColor": "#42D689",
-            "borderRadius": 3,
-            "borderWidth": 2,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#42D689",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderColor": "#42D689",
+              "borderRadius": 3,
+              "borderWidth": 2,
+            },
+          ]
         }
         testID="Pincode-ReEnter"
       >
@@ -828,6 +867,12 @@ exports[`Pincode renders correctly 4`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -835,17 +880,24 @@ exports[`Pincode renders correctly 4`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#42D689",
-            "borderColor": "#42D689",
-            "borderRadius": 3,
-            "borderWidth": 2,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#42D689",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderColor": "#42D689",
+              "borderRadius": 3,
+              "borderWidth": 2,
+            },
+          ]
         }
         testID="Pincode-ReEnter"
       >
