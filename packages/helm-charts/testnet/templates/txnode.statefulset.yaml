@@ -22,7 +22,7 @@ metadata:
 {{ include "standard.labels" .  | indent 4 }}
     component: tx_nodes
 spec:
-  {{ {{- if .Values.geth.ssd_disks -}}
+  {{ if .Values.geth.ssd_disks }}
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -32,7 +32,7 @@ spec:
       resources:
         requests:
           storage: 10Gi
-  {{- end -}}}}}
+  {{ end }}
   podManagementPolicy: Parallel
   replicas: {{ .Values.geth.tx_nodes }}
   serviceName: tx-nodes
