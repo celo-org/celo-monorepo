@@ -1,13 +1,11 @@
 /* tslint:disable no-console */
+
+import { newKit } from '@celo/contractkit'
 import { PhoneNumberUtils } from '@celo/utils'
-// @ts-ignore
-import { Attestations, lookupPhoneNumbers } from '@celo/walletkit'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { portForwardAnd } from 'src/lib/port_forward'
 import { Argv } from 'yargs'
 import { AccountArgv } from '../account'
-
-const Web3 = require('web3')
 
 export const command = 'lookup'
 
@@ -29,10 +27,10 @@ export const handler = async (argv: LookupArgv) => {
   await switchToClusterFromEnv(false)
   console.log(`Looking up addresses attested to ${argv.phone}`)
   const cb = async () => {
-    const web3 = new Web3('http://localhost:8545')
-    const attestations = await Attestations(web3)
+    const kit = newKit('http://localhost:8545')
     const phoneHash = PhoneNumberUtils.getPhoneHash(argv.phone)
-    const lookupResult = await lookupPhoneNumbers(attestations, [phoneHash])
+    const attestations = await kit.contracts.getAttestations()
+    const lookupResult = await attestations.lookupPhoneNumbers([phoneHash])
 
     const matchingAddresses = lookupResult[phoneHash]
 
