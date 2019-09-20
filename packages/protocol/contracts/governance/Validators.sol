@@ -63,7 +63,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
 
-  uint256 public maxGroupSize = 10;
+  uint256 public maxGroupSize;
 
   event MinElectableValidatorsSet(
     uint256 minElectableValidators
@@ -71,6 +71,10 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
   event MaxElectableValidatorsSet(
     uint256 maxElectableValidators
+  );
+
+  event MaxGroupSizeSet(
+    uint256 maxGroupSize
   );
 
   event RegistrationRequirementSet(
@@ -158,7 +162,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     uint256 _minElectableValidators,
     uint256 _maxElectableValidators,
     uint256 requirementValue,
-    uint256 requirementNoticePeriod
+    uint256 requirementNoticePeriod,
+    uint256 _maxGroupSize
   )
     external
     initializer
@@ -170,7 +175,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     maxElectableValidators = _maxElectableValidators;
     registrationRequirement.value = requirementValue;
     registrationRequirement.noticePeriod = requirementNoticePeriod;
-    maxGroupSize = 10;
+    setMaxGroupSize(_maxGroupSize);
   }
 
   /**
@@ -224,12 +229,14 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   function setMaxGroupSize(
     uint256 _maxGroupSize
   )
-    external
+    public
     onlyOwner
     returns (bool)
   {
     require(_maxGroupSize > 0);
     maxGroupSize = _maxGroupSize;
+    emit MaxGroupSizeSet(_maxGroupSize);
+    return true;
   }
 
   /**
