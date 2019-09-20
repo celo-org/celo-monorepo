@@ -105,4 +105,18 @@ library AddressSortedLinkedList {
     }
     return (keys, values);
   }
+
+  /**
+   * @notice Returns the N greatest elements of the list.
+   * @param n The number of elements to return.
+   * @return The keys of the greatest elements.
+   */
+  function headN(SortedLinkedList.List storage list, uint256 n) public view returns (address[] memory) {
+    bytes32[] memory byteKeys = list.headN(n);
+    address[] memory keys = new address[](n);
+    for (uint256 i = 0; i < n; i++) {
+      keys[i] = toAddress(byteKeys[i]);
+    }
+    return keys;
+  }
 }

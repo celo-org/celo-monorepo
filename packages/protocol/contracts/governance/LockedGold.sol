@@ -13,6 +13,8 @@ import "../common/UsingRegistry.sol";
 
 contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry {
 
+  using SafeMath for uint256;
+
   // TODO(asa): How do adjust for updated requirements?
   // Have a refreshRequirements function validators and groups can call
   struct MustMaintain {
@@ -47,7 +49,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     Balances balances;
   }
 
-  mapping(address => Account) public accounts;
+  mapping(address => Account) private accounts;
   // Maps voting and validating keys to the account that provided the authorization.
   mapping(address => address) public authorizations;
   uint256 public totalNonvoting;
@@ -60,9 +62,10 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   event GoldWithdrawn(address indexed account, uint256 value);
   event AccountMustMaintainSet(address indexed account, uint256 value, uint256 timestamp);
 
-  function initialize(address registryAddress) external initializer {
+  function initialize(address registryAddress, uint256 _unlockingPeriod) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
+    unlockingPeriod = _unlockingPeriod;
   }
 
   /**
@@ -110,28 +113,28 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @notice Locks gold to be used for voting.
    * @param value The amount of gold to be locked.
    */
-  function lock(uint256 value) external nonReentrant {
+  function lock(uint256 value) external payable nonReentrant {
     require(isAccount(msg.sender));
     require(msg.value == value && value > 0);
     _incrementNonvotingAccountBalance(msg.sender, value);
     emit GoldLocked(msg.sender, value);
   }
 
-  function incrementNonvotingAccountBalance(address account, uint256 value) external onlyRegisteredContract('Election', msg.sender) {
+  function incrementNonvotingAccountBalance(address account, uint256 value) external onlyRegisteredContract('Election') {
     _incrementNonvotingAccountBalance(account, value);
   }
 
-  function decrementNonvotingAccountBalance(address account, uint256 value) external onlyRegisteredContract('Election', msg.sender) {
+  function decrementNonvotingAccountBalance(address account, uint256 value) external onlyRegisteredContract('Election') {
     _decrementNonvotingAccountBalance(account, value);
   }
 
   function _incrementNonvotingAccountBalance(address account, uint256 value) private {
-    accounts[account].gold.nonvoting = accounts[account].gold.nonvoting.add(value);
+    accounts[account].balances.nonvoting = accounts[account].balances.nonvoting.add(value);
     totalNonvoting = totalNonvoting.add(value);
   }
 
   function _decrementNonvotingAccountBalance(address account, uint256 value) private {
-    accounts[account].gold.nonvoting = accounts[account].gold.nonvoting.sub(value);
+    accounts[account].balances.nonvoting = accounts[account].balances.nonvoting.sub(value);
     totalNonvoting = totalNonvoting.sub(value);
   }
 
@@ -139,7 +142,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   function unlock(uint256 value) external nonReentrant {
     require(isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
-    MustMaintain memory requirement = account.requirement;
+    MustMaintain memory requirement = account.balances.requirements;
     require(
       now >= requirement.timestamp ||
       getAccountTotalLockedGold(msg.sender).sub(value) >= requirement.value
@@ -166,7 +169,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     Account storage account = accounts[msg.sender];
     require(index < account.balances.pendingWithdrawals.length);
     PendingWithdrawal memory pendingWithdrawal = account.balances.pendingWithdrawals[index];
-    require(now >= pendingWithdrawal.available);
+    require(now >= pendingWithdrawal.timestamp);
     uint256 value = pendingWithdrawal.value;
     deletePendingWithdrawal(account.balances.pendingWithdrawals, index);
     IERC20Token goldToken = IERC20Token(registry.getAddressFor(GOLD_TOKEN_REGISTRY_ID));
@@ -180,11 +183,11 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 timestamp
   )
     public
-    onlyRegisteredContract('Election', msg.sender)
+    onlyRegisteredContract('Election')
     nonReentrant
     returns (bool)
   {
-    accounts[account].requirement = MustMaintain(value, timestamp);
+    accounts[account].balances.requirements = MustMaintain(value, timestamp);
     emit AccountMustMaintainSet(account, value, timestamp);
   }
 
@@ -198,7 +201,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   function getAccountFromVoter(address accountOrVoter) external view returns (address) {
     address authorizingAccount = authorizations[accountOrVoter];
     if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].authorizations.voter == accountOrVoter);
+      require(accounts[authorizingAccount].authorizations.voting == accountOrVoter);
       return authorizingAccount;
     } else {
       require(isAccount(accountOrVoter));
@@ -207,7 +210,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   function getTotalLockedGold() external view returns (uint256) {
-    return totalNonvoting.add(getElection().totalVotes());
+    return totalNonvoting.add(getElection().getTotalVotes());
   }
 
   function getAccountTotalLockedGold(address account) public view returns (uint256) {
@@ -224,7 +227,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   function getAccountFromValidator(address accountOrValidator) public view returns (address) {
     address authorizingAccount = authorizations[accountOrValidator];
     if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].authorizations.validator == accountOrValidator);
+      require(accounts[authorizingAccount].authorizations.validating == accountOrValidator);
       return authorizingAccount;
     } else {
       require(isAccount(accountOrValidator));
@@ -239,7 +242,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    */
   function getVoterFromAccount(address account) public view returns (address) {
     require(isAccount(account));
-    address voter = accounts[account].authorizations.voter;
+    address voter = accounts[account].authorizations.voting;
     return voter == address(0) ? account : voter;
   }
 
@@ -250,7 +253,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    */
   function getValidatorFromAccount(address account) public view returns (address) {
     require(isAccount(account));
-    address validator = accounts[account].authorizations.validator;
+    address validator = accounts[account].authorizations.validating;
     return validator == address(0) ? account : validator;
   }
 

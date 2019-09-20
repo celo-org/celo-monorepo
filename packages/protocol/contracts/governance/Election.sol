@@ -371,7 +371,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
 
   function markGroupEligible(address group, address lesser, address greater) external {
     require(!votes.total.eligible.contains(group));
-    require(getValidators().getNumGroupMembers(group) > 0);
+    require(getValidators().getGroupNumMembers(group) > 0);
     uint256 value = votes.pending.total[group].add(votes.active.total[group]);
     votes.total.eligible.insert(group, value, lesser, greater);
   }
@@ -409,7 +409,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     active.total[group] = active.total[group].sub(value);
   }
 
-  function getActiveVotesDelta(address group, uint256 value) private returns (uint256) {
+  function getActiveVotesDelta(address group, uint256 value) private view returns (uint256) {
     // Preserve delta * total = value * denominator
     return value.mul(votes.active.denominators[group]).div(votes.active.total[group]);
   }
@@ -429,9 +429,13 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
   }
 
   function getNumVotesReceivable(address group) public view returns (uint256) {
-    uint256 numerator = getValidators().getNumGroupMembers(group).add(1).mul(votes.total.total);
+    uint256 numerator = getValidators().getGroupNumMembers(group).add(1).mul(getLockedGold().getTotalLockedGold());
     uint256 denominator = Math.min(maxElectableValidators, getValidators().getNumRegisteredValidators());
     return numerator.div(denominator);
+  }
+
+  function getTotalVotes() external view returns (uint256) {
+    return votes.total.total;
   }
 
   function validatorAddressFromCurrentSet(uint256 index) external view returns (address) {
@@ -470,8 +474,8 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     uint256 maxNumElectionGroups = Math.min(maxElectableValidators, votes.total.eligible.list.numElements);
     // uint256 requiredVotes = electabilityThreshold.multiply(FixidityLib.newFixed(votes.total.total)).fromFixed();
     // TODO(asa): Filter by > requiredVotes
-    address[] memory electionGroups = votes.total.eligible.list.headN(maxNumElectionGroups);
-    uint256[] memory numMembers = getValidators().getNumGroupMembers(electionGroups);
+    address[] memory electionGroups = votes.total.eligible.headN(maxNumElectionGroups);
+    uint256[] memory numMembers = getValidators().getGroupsNumMembers(electionGroups);
     // Holds the number of members elected for each of the eligible validator groups.
     uint256[] memory numMembersElected = new uint256[](electionGroups.length);
     uint256 totalNumMembersElected = 0;

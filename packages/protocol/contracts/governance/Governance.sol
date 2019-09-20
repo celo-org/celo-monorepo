@@ -109,7 +109,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
   mapping(address => uint256) public refundedDeposits;
   mapping(address => ContractConstitution) private constitution;
   mapping(uint256 => Proposal) private proposals;
-  mapping(address => Voter) public voters;
+  mapping(address => Voter) private voters;
   SortedLinkedList.List private queue;
   uint256[] public dequeued;
   uint256[] public emptyIndices;
@@ -580,7 +580,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     } else if (value == VoteValue.No) {
       proposal.votes.no = proposal.votes.no.add(weight);
     }
-    voteRecord = VoteRecord(value, proposalId, weight);
+    voter.referendumVotes[index] = VoteRecord(value, proposalId, weight);
     if (proposal.timestamp > voter.mostRecentReferendumProposal) {
       voter.mostRecentReferendumProposal = proposalId;
     }
@@ -784,12 +784,13 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
   }
 
   /**
-   * @notice Returns the ID of the proposal upvoted by `account`.
+   * @notice Returns the ID of the proposal upvoted by `account` and the weight of that upvote.
    * @param account The address of the account.
-   * @return The ID of the proposal upvoted by `account`.
+   * @return The ID of the proposal upvoted by `account` and the weight of that upvote.
    */
-  function getUpvotedProposal(address account) external view returns (uint256) {
-    return voters[account].upvotedProposal;
+  function getUpvoteRecord(address account) external view returns (uint256, uint256) {
+    UpvoteRecord memory upvoteRecord = voters[account].upvote;
+    return (upvoteRecord.proposalId, upvoteRecord.weight);
   }
 
   /**
@@ -799,21 +800,6 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
    */
   function getMostRecentReferendumProposal(address account) external view returns (uint256) {
     return voters[account].mostRecentReferendumProposal;
-  }
-
-  /**
-   * @notice Returns whether or not a particular account is voting on proposals.
-   * @param account The address of the account.
-   * @return Whether or not the account is voting on proposals.
-   */
-  function isVoting(address account) external view returns (bool) {
-    Voter storage voter = voters[account];
-    bool isVotingQueue = voter.upvotedProposal != 0 && isQueued(voter.upvotedProposal);
-    Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
-    bool isVotingReferendum = (
-      _getDequeuedProposalStage(proposal.timestamp) == ProposalStage.Referendum
-    );
-    return isVotingQueue || isVotingReferendum;
   }
 
   /**

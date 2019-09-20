@@ -144,6 +144,16 @@ library SortedLinkedList {
     return list.list.getKeys();
   }
 
+  /**
+   * @notice Returns first N greatest elements of the list.
+   * @param n The number of elements to return.
+   * @return The keys of the first n elements.
+   */
+  function headN(List storage list, uint256 n) public view returns (bytes32[] memory) {
+    return list.list.headN(n);
+  }
+
+
   // TODO(asa): Gas optimizations by passing in elements to isValueBetween
   /**
    * @notice Returns the keys of the elements greaterKey than and less than the provided value.

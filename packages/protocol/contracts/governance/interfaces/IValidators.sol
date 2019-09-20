@@ -2,7 +2,8 @@ pragma solidity ^0.5.3;
 
 
 interface IValidators {
-  function electValidators() external view returns (address[] memory);
-  function getNumGroupMembers(address) external view returns (uint256);
+  function getGroupNumMembers(address) external view returns (uint256);
+  function getGroupsNumMembers(address[] calldata) external view returns (uint256[] memory);
   function getNumRegisteredValidators() external view returns (uint256);
+  function getTopValidatorsFromGroup(address, uint256) external view returns (address[] memory);
 }
