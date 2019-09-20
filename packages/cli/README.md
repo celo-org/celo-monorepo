@@ -29,27 +29,25 @@ Go to the `celo-monorepo` root directory and
 
 If all works well, navigate to `packages/cli`.
 
-> I'm getting the follow error during the above build: `lerna ERR! yarn run build exited 1 in '@celo/protocol'`.
-
-This error implies that the `truffle` project is not initialized.
-Navigate to `celo-monorepo/packages/protocol` and initialize the truffle project.
-Make sure you do NOT overwrite any existing contracts, migrations or tests.
+> I'm getting the follow output during above build:
 
 ```bash
-> npm i -g truffle
-> truffle init
-This directory is non-empty...
-? Proceed anyway? Yes
-✔ Preparing to download
-✔ Downloading
-contracts already exists in this directory...
-? Overwrite contracts? No
-migrations already exists in this directory...
-? Overwrite migrations? No
-test already exists in this directory...
-? Overwrite test? No
-✔ Cleaning up temporary files
-✔ Setting up box
+Compiling
+Warning: Both truffle-config.js and truffle.js were found. Using truffle-config.js.
+
+Compiling your contracts...
+===========================
+> Everything is up to date, there is nothing to compile.
+
+{ Error: ENOENT: no such file or directory, open '../packages/protocol/build/contracts/Proxy.json'
+```
+
+This error implies that the `truffle` finds (a faulty) `truffle-config.js`.
+
+Navigate to `celo-monorepo/packages/protocol` and:
+
+```bash
+> cp truffle.js truffle-config.js
 ```
 
 After doing this you should be able to continue the build process
