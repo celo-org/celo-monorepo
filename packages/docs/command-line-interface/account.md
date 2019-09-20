@@ -18,6 +18,20 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/account/balance.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/balance.ts)_
 
+### Isvalidator
+
+Check whether a given address is elected to be validating in the current epoch
+
+```
+USAGE
+  $ celocli account:isvalidator ADDRESS
+
+EXAMPLE
+  isvalidator 0x5409ed021d9299bf6814279a6a1411a7e866a631
+```
+
+_See code: [packages/cli/src/commands/account/isvalidator.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/isvalidator.ts)_
+
 ### New
 
 Creates a new account
