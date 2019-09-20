@@ -42,6 +42,7 @@ type Props = (HomeTransferFragment | TransferStandby) &
     addressToE164Number: AddressToE164NumberType
     recipientCache: NumberToRecipient
     commentKey: Buffer | null
+    showLocalCurrency: boolean
   }
 
 interface CurrencySymbolProps {
@@ -156,13 +157,15 @@ export function TransferFeedItem(props: Props) {
     invitees,
     addressToE164Number,
     recipientCache,
+    showLocalCurrency,
   } = props
 
   const localValue = useLocalAmount(value)
   let info = decryptComment(comment, commentKey, type)
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
-  const currencyStyle = getCurrencyStyles(resolveCurrency(symbol), type)
+  const currency = resolveCurrency(symbol)
+  const currencyStyle = getCurrencyStyles(currency, type)
   const isPending = status === TransactionStatus.Pending
 
   let icon, title
@@ -236,7 +239,10 @@ export function TransferFeedItem(props: Props) {
               style={[
                 currencyStyle.direction === '-'
                   ? fontStyles.activityCurrencySent
-                  : fontStyles.activityCurrencyReceived,
+                  : {
+                      ...fontStyles.activityCurrencyReceived,
+                      color: currency === CURRENCY_ENUM.GOLD ? colors.celoGold : colors.celoGreen,
+                    },
                 styles.amount,
               ]}
             >
@@ -265,7 +271,8 @@ export function TransferFeedItem(props: Props) {
                 {' ' + timeFormatted}
               </Text>
             )}
-            {LOCAL_CURRENCY_SYMBOL &&
+            {showLocalCurrency &&
+              LOCAL_CURRENCY_SYMBOL &&
               localValue && (
                 <Text style={[fontStyles.bodySmall, styles.localAmount]}>
                   {t('localCurrencyValue', {
