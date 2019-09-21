@@ -327,14 +327,14 @@ library FixidityLib {
   /**
    * @notice x == y
    */
-   function equals(Fraction memory x, Fraction memory y) internal pure returns (bool) {
-       return x.value == y.value;
-   }
+  function equals(Fraction memory x, Fraction memory y) internal pure returns (bool) {
+    return x.value == y.value;
+  }
 
-   /**
+  /**
    * @notice x <= 1
    */
-   function isProperFraction(Fraction memory x) internal pure returns (bool) {
-       return lte(x, fixed1());
-   }
+  function isProperFraction(Fraction memory x) internal pure returns (bool) {
+    return lte(x, fixed1());
+  }
 }
