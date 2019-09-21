@@ -153,7 +153,7 @@ function wwwRedirect(req, res, nextAction) {
     res.json(articlesdata)
   })
 
-  server.get('/proxy/events', async (_, res) => {
+  server.get('/proxy/events/', async (_, res) => {
     const events = await getFormattedEvents()
     res.json(events)
   })

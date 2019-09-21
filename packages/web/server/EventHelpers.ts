@@ -4,7 +4,7 @@ import airtableInit, { AirRecord } from '../server/airtable'
 
 import getConfig from 'next/config'
 import { EventProps } from '../fullstack/EventProps'
-import Sentry from 'fullstack/sentry'
+import Sentry from '../fullstack/sentry'
 
 // Intermediate step Event With all String Values
 interface IncomingEvent {
@@ -99,18 +99,9 @@ function convertKeys(rawEvent: RawAirTableEvent): IncomingEvent {
 }
 
 function parseDate(date: string) {
-  return fecha.parse(date, 'MM-DD-YY')
+  return fecha.parse(date, 'YYYY-MM-DD')
 }
 
-function convertValues(event: IncomingEvent): EventProps {
-  return {
-    ...event,
-    celoHosted: !!event.celoHosted,
-    celoSpeaking: !!event.celoSpeaking,
-    startDate: event.startDate,
-    endDate: event.endDate,
-  }
-}
 export function splitEvents(normalizedEvents: EventProps[]): State {
   const today = Date.now()
 
@@ -151,6 +142,14 @@ export function normalizeEvents(data: RawAirTableEvent[]): EventProps[] {
   return data
     .map(convertKeys)
     .filter(removeEmpty)
-    .map(convertValues)
+    .map(function convertValues(event: IncomingEvent): EventProps {
+      return {
+        ...event,
+        celoHosted: !!event.celoHosted,
+        celoSpeaking: !!event.celoSpeaking,
+        startDate: event.startDate,
+        endDate: event.endDate,
+      }
+    })
     .sort(orderByDate)
 }
