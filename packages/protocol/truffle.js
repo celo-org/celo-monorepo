@@ -24,7 +24,7 @@ const defaultConfig = {
   port: 8545,
   network_id: 1101,
   from: OG_FROM,
-  gas: 7000000,
+  gas: 7100000,
   gasPrice: 100000000000,
 }
 
@@ -38,7 +38,7 @@ const networks = {
     ...defaultConfig,
     from: DEVELOPMENT_FROM,
     gasPrice: 0,
-    gas: 7000000,
+    gas: 7100000,
     defaultBalance: 1000000,
     mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
   },
@@ -46,7 +46,7 @@ const networks = {
     host: 'localhost',
     network_id: '*',
     gasPrice: 0,
-    gas: 7000000,
+    gas: 7100000,
     from: DEVELOPMENT_FROM,
     provider: function() {
       if (coverageProvider == null) {
