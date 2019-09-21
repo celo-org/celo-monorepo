@@ -7,7 +7,6 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/ILockedGold.sol";
 
 import "../common/Initializable.sol";
-import "../common/interfaces/IERC20Token.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
 
@@ -51,7 +50,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   mapping(address => Account) private accounts;
   // Maps voting and validating keys to the account that provided the authorization.
-  mapping(address => address) public authorizations;
+  mapping(address => address) public authorizedBy;
   uint256 public totalNonvoting;
   uint256 public unlockingPeriod;
 
@@ -113,11 +112,11 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @notice Locks gold to be used for voting.
    * @param value The amount of gold to be locked.
    */
-  function lock(uint256 value) external payable nonReentrant {
+  function lock() external payable nonReentrant {
     require(isAccount(msg.sender));
-    require(msg.value == value && value > 0);
-    _incrementNonvotingAccountBalance(msg.sender, value);
-    emit GoldLocked(msg.sender, value);
+    require(msg.value > 0);
+    _incrementNonvotingAccountBalance(msg.sender, msg.value);
+    emit GoldLocked(msg.sender, msg.value);
   }
 
   function incrementNonvotingAccountBalance(address account, uint256 value) external onlyRegisteredContract('Election') {
@@ -172,8 +171,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     require(now >= pendingWithdrawal.timestamp);
     uint256 value = pendingWithdrawal.value;
     deletePendingWithdrawal(account.balances.pendingWithdrawals, index);
-    IERC20Token goldToken = IERC20Token(registry.getAddressFor(GOLD_TOKEN_REGISTRY_ID));
-    require(goldToken.transfer(msg.sender, value));
+    require(getGoldToken().transfer(msg.sender, value));
     emit GoldWithdrawn(msg.sender, value);
   }
 
@@ -199,7 +197,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return The associated account.
    */
   function getAccountFromVoter(address accountOrVoter) external view returns (address) {
-    address authorizingAccount = authorizations[accountOrVoter];
+    address authorizingAccount = authorizedBy[accountOrVoter];
     if (authorizingAccount != address(0)) {
       require(accounts[authorizingAccount].authorizations.voting == accountOrVoter);
       return authorizingAccount;
@@ -213,9 +211,17 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     return totalNonvoting.add(getElection().getTotalVotes());
   }
 
+  function getNonvotingLockedGold() external view returns (uint256) {
+    return totalNonvoting;
+  } 
+
   function getAccountTotalLockedGold(address account) public view returns (uint256) {
     uint256 total = accounts[account].balances.nonvoting;
     return total.add(getElection().getAccountTotalVotes(account));
+  }
+
+  function getAccountNonvotingLockedGold(address account) external view returns (uint256) {
+    return accounts[account].balances.nonvoting;
   }
 
   /**
@@ -225,7 +231,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return The associated account.
    */
   function getAccountFromValidator(address accountOrValidator) public view returns (address) {
-    address authorizingAccount = authorizations[accountOrValidator];
+    address authorizingAccount = authorizedBy[accountOrValidator];
     if (authorizingAccount != address(0)) {
       require(accounts[authorizingAccount].authorizations.validating == accountOrValidator);
       return authorizingAccount;
@@ -282,8 +288,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
     require(signer == current);
 
-    authorizations[previous] = address(0);
-    authorizations[current] = msg.sender;
+    authorizedBy[previous] = address(0);
+    authorizedBy[current] = msg.sender;
   }
 
   function isAccount(address account) internal view returns (bool) {
@@ -295,7 +301,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   function isNotAuthorized(address account) internal view returns (bool) {
-    return (authorizations[account] == address(0));
+    return (authorizedBy[account] == address(0));
   }
 
   function deletePendingWithdrawal(PendingWithdrawal[] storage list, uint256 index) private {

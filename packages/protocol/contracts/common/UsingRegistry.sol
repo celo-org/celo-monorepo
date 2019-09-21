@@ -2,6 +2,7 @@ pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
+import "./interfaces/IERC20Token.sol";
 import "./interfaces/IRegistry.sol";
 
 import "../governance/interfaces/IElection.sol";
@@ -49,6 +50,10 @@ contract UsingRegistry is Ownable {
 
   function getElection() internal view returns (IElection) {
     return IElection(registry.getAddressForOrDie(ELECTION_REGISTRY_ID));
+  }
+
+  function getGoldToken() internal view returns(IERC20Token) {
+    return IERC20Token(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
 
   function getLockedGold() internal view returns(ILockedGold) {

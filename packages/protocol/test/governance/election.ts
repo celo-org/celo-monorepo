@@ -44,7 +44,6 @@ const parseValidatorGroupParams = (groupParams: any) => {
 const HOUR = 60 * 60
 const DAY = 24 * HOUR
 const YEAR = 365 * DAY
-const MAX_UINT256 = new BigInt(2).pow(256).minus(1)
 
 contract('Validators', (accounts: string[]) => {
   let validators: ValidatorsInstance
@@ -142,220 +141,193 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe('#setRegistrationRequirements()', () => {
-    describe('when the requirements are different', () => {
-      describe('when called by the owner', () => {
-        let resp: any
-        const newRequirements = {
-          group: registrationRequirements.group.plus(1),
-          validator: registrationRequirements.validator.plus(1),
-        }
+  describe('#setMinElectableValidators', () => {
+    const newMinElectableValidators = minElectableValidators.plus(1)
+    it('should set the minimum deposit', async () => {
+      await validators.setMinElectableValidators(newMinElectableValidators)
+      assertEqualBN(await validators.minElectableValidators(), newMinElectableValidators)
+    })
 
-        before(async () => {
-          resp = await validators.setRegistrationRequirements(
-            newRequirements.group,
-            newRequirements.validator
-          )
-        })
-
-        it('should set the group and validator requirements', async () => {
-          const [group, validator] = await validators.getRegistrationRequirements()
-          assertEqualBN(group, newRequirements.group)
-          assertEqualBN(validator, newRequirements.validator)
-        })
-
-        it('should emit the RegistrationRequirementsSet event', async () => {
-          assert.equal(resp.logs.length, 1)
-          const log = resp.logs[0]
-          assertContainSubset(log, {
-            event: 'RegistrationRequirementsSet',
-            args: {
-              group: new BigNumber(newRequirements.group),
-              validator: new BigNumber(newRequirements.validator),
-            },
-          })
-        })
-      })
-
-      describe('when the requirements are the same', () => {
-        it('should revert', async () => {
-          await assertRevert(
-            validators.setRegistrationRequirements(
-              registrationRequirements.group,
-              registrationRequirements.validator
-            )
-          )
-        })
+    it('should emit the MinElectableValidatorsSet event', async () => {
+      const resp = await validators.setMinElectableValidators(newMinElectableValidators)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'MinElectableValidatorsSet',
+        args: {
+          minElectableValidators: new BigNumber(newMinElectableValidators),
+        },
       })
     })
 
-    describe('when called by a non-owner', () => {
-      it('should revert', async () => {
-        await assertRevert(
-          validators.setRegistrationRequirements(newRequirements.group, newRequirements.validator, {
-            from: nonOwner,
-          })
-        )
-      })
+    it('should revert when the minElectableValidators is zero', async () => {
+      await assertRevert(validators.setMinElectableValidators(0))
+    })
+
+    it('should revert when the minElectableValidators is greater than maxElectableValidators', async () => {
+      await assertRevert(validators.setMinElectableValidators(maxElectableValidators.plus(1)))
+    })
+
+    it('should revert when the minElectableValidators is unchanged', async () => {
+      await assertRevert(validators.setMinElectableValidators(minElectableValidators))
+    })
+
+    it('should revert when called by anyone other than the owner', async () => {
+      await assertRevert(
+        validators.setMinElectableValidators(newMinElectableValidators, { from: nonOwner })
+      )
     })
   })
 
-  describe('#setDeregistrationLockups()', () => {
-    describe('when the requirements are different', () => {
-      describe('when called by the owner', () => {
-        let resp: any
-        const newLockups = {
-          group: deregistrationLockups.group.plus(1),
-          validator: deregistrationLockups.validator.plus(1),
-        }
+  describe('#setMaxElectableValidators', () => {
+    const newMaxElectableValidators = maxElectableValidators.plus(1)
+    it('should set the minimum deposit', async () => {
+      await validators.setMaxElectableValidators(newMaxElectableValidators)
+      assertEqualBN(await validators.maxElectableValidators(), newMaxElectableValidators)
+    })
 
-        before(async () => {
-          resp = await validators.setDeregistrationLockups(newLockups.group, newLockups.validator)
-        })
-
-        it('should set the group and validator requirements', async () => {
-          const [group, validator] = await validators.getDeregistrationLockups()
-          assertEqualBN(group, newLockups.group)
-          assertEqualBN(validator, newLockups.validator)
-        })
-
-        it('should emit the DeregistrationLockupsSet event', async () => {
-          assert.equal(resp.logs.length, 1)
-          const log = resp.logs[0]
-          assertContainSubset(log, {
-            event: 'DeregistrationLockupsSet',
-            args: {
-              group: new BigNumber(newLockups.group),
-              validator: new BigNumber(newLockups.validator),
-            },
-          })
-        })
-      })
-
-      describe('when the requirements are the same', () => {
-        it('should revert', async () => {
-          await assertRevert(
-            validators.setDeregistrationLockups(
-              deregistrationLockups.group,
-              deregistrationLockups.validator
-            )
-          )
-        })
+    it('should emit the MaxElectableValidatorsSet event', async () => {
+      const resp = await validators.setMaxElectableValidators(newMaxElectableValidators)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'MaxElectableValidatorsSet',
+        args: {
+          maxElectableValidators: new BigNumber(newMaxElectableValidators),
+        },
       })
     })
 
-    describe('when called by a non-owner', () => {
-      it('should revert', async () => {
-        await assertRevert(
-          validators.setDeregistrationLockups(newLockups.group, newLockups.validator, {
-            from: nonOwner,
-          })
-        )
-      })
+    it('should revert when the maxElectableValidators is less than minElectableValidators', async () => {
+      await assertRevert(validators.setMaxElectableValidators(minElectableValidators.minus(1)))
+    })
+
+    it('should revert when the maxElectableValidators is unchanged', async () => {
+      await assertRevert(validators.setMaxElectableValidators(maxElectableValidators))
+    })
+
+    it('should revert when called by anyone other than the owner', async () => {
+      await assertRevert(
+        validators.setMaxElectableValidators(newMaxElectableValidators, { from: nonOwner })
+      )
     })
   })
 
-  describe('#setMaxGroupSize()', () => {
-    describe('when the size is different', () => {
-      describe('when called by the owner', () => {
-        let resp: any
-        const newSize = maxGroupSize.plus(1)
+  describe('#setRegistrationRequirement', () => {
+    const newValue = registrationRequirement.value.plus(1)
+    const newNoticePeriod = registrationRequirement.noticePeriod.plus(1)
 
-        before(async () => {
-          resp = await validators.setMaxGroupSize(newSize)
-        })
+    it('should set the value and notice period', async () => {
+      await validators.setRegistrationRequirement(newValue, newNoticePeriod)
+      const [value, noticePeriod] = await validators.getRegistrationRequirement()
+      assertEqualBN(value, newValue)
+      assertEqualBN(noticePeriod, newNoticePeriod)
+    })
 
-        it('should set the max group size', async () => {
-          const size = await validators.getMaxGroupSize()
-          assertEqualBN(size, newSize)
-        })
-
-        it('should emit the MaxGroupSizeSet event', async () => {
-          assert.equal(resp.logs.length, 1)
-          const log = resp.logs[0]
-          assertContainSubset(log, {
-            event: 'MaxGroupSizeSet',
-            args: {
-              maxGroupSize: new BigNumber(newSize),
-            },
-          })
-        })
-      })
-
-      describe('when the size is the same', () => {
-        it('should revert', async () => {
-          await assertRevert(validators.setMaxGroupSize(maxGroupSize))
-        })
+    it('should emit the RegistrationRequirementSet event', async () => {
+      const resp = await validators.setRegistrationRequirement(newValue, newNoticePeriod)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'RegistrationRequirementSet',
+        args: {
+          value: new BigNumber(newValue),
+          noticePeriod: new BigNumber(newNoticePeriod),
+        },
       })
     })
 
-    describe('when called by a non-owner', () => {
-      it('should revert', async () => {
-        await assertRevert(validators.setMaxGroupSize(maxGroupSize, { from: nonOwner }))
-      })
+    it('should revert when the requirement is unchanged', async () => {
+      await assertRevert(
+        validators.setRegistrationRequirement(
+          registrationRequirement.value,
+          registrationRequirement.noticePeriod
+        )
+      )
+    })
+
+    it('should revert when called by anyone other than the owner', async () => {
+      await assertRevert(
+        validators.setRegistrationRequirement(newValue, newNoticePeriod, { from: nonOwner })
+      )
     })
   })
 
   describe('#registerValidator', () => {
     const validator = accounts[0]
-    let resp: any
-    describe('when the account is not a registered validator', () => {
-      before(async () => {
-        await mockLockedGold.setAccountTotalLockedGold(
+    beforeEach(async () => {
+      await mockLockedGold.setLockedCommitment(
+        validator,
+        registrationRequirement.noticePeriod,
+        registrationRequirement.value
+      )
+    })
+
+    it('should mark the account as a validator', async () => {
+      await validators.registerValidator(
+        name,
+        url,
+        // @ts-ignore bytes type
+        publicKeysData,
+        registrationRequirement.noticePeriod
+      )
+      assert.isTrue(await validators.isValidator(validator))
+    })
+
+    it('should add the account to the list of validators', async () => {
+      await validators.registerValidator(
+        name,
+        url,
+        // @ts-ignore bytes type
+        publicKeysData,
+        registrationRequirement.noticePeriod
+      )
+      assert.deepEqual(await validators.getRegisteredValidators(), [validator])
+    })
+
+    it('should set the validator name, url, and public key', async () => {
+      await validators.registerValidator(
+        name,
+        url,
+        // @ts-ignore bytes type
+        publicKeysData,
+        registrationRequirement.noticePeriod
+      )
+      const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+      assert.equal(parsedValidator.name, name)
+      assert.equal(parsedValidator.url, url)
+      assert.equal(parsedValidator.publicKeysData, publicKeysData)
+    })
+
+    it('should emit the ValidatorRegistered event', async () => {
+      const resp = await validators.registerValidator(
+        name,
+        url,
+        // @ts-ignore bytes type
+        publicKeysData,
+        registrationRequirement.noticePeriod
+      )
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'ValidatorRegistered',
+        args: {
           validator,
-          registrationRequirements.validator
-        )
-        resp = await validators.registerValidator(
           name,
           url,
-          // @ts-ignore bytes type
-          publicKeysData
-        )
-      })
-
-      it('should mark the account as a validator', async () => {
-        assert.isTrue(await validators.isValidator(validator))
-      })
-
-      it('should add the account to the list of validators', async () => {
-        assert.deepEqual(await validators.getRegisteredValidators(), [validator])
-      })
-
-      it('should set the validator name, url, and public key', async () => {
-        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
-        assert.equal(parsedValidator.name, name)
-        assert.equal(parsedValidator.url, url)
-        assert.equal(parsedValidator.publicKeysData, publicKeysData)
-      })
-
-      it('should set account balance requirements on locked gold', async () => {
-        const [value, timestamp] = await mockLockedGold.getAccountMustMaintain(validator)
-        assert.equal(value, registrationRequirements.validator)
-        assert.equal(timestamp, MAX_UINT256)
-      })
-
-      it('should emit the ValidatorRegistered event', async () => {
-        assert.equal(resp.logs.length, 1)
-        const log = resp.logs[0]
-        assertContainSubset(log, {
-          event: 'ValidatorRegistered',
-          args: {
-            validator,
-            name,
-            url,
-            publicKeysData,
-          },
-        })
+          publicKeysData,
+        },
       })
     })
 
     describe('when the account is already a registered validator', () => {
-      before(async () => {
+      beforeEach(async () => {
         await validators.registerValidator(
           name,
           url,
           // @ts-ignore bytes type
-          publicKeysData
+          publicKeysData,
+          registrationRequirement.noticePeriod
         )
       })
 
@@ -365,7 +337,8 @@ contract('Validators', (accounts: string[]) => {
             name,
             url,
             // @ts-ignore bytes type
-            publicKeysData
+            publicKeysData,
+            registrationRequirement.noticePeriod
           )
         )
       })
@@ -373,7 +346,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the account is already a registered validator group', () => {
       beforeEach(async () => {
-        await validators.registerValidatorGroup(name, url, commission)
+        await validators.registerValidatorGroup(name, url, registrationRequirement.noticePeriod)
       })
 
       it('should revert', async () => {
@@ -382,7 +355,8 @@ contract('Validators', (accounts: string[]) => {
             name,
             url,
             // @ts-ignore bytes type
-            publicKeysData
+            publicKeysData,
+            registrationRequirement.noticePeriod
           )
         )
       })
@@ -390,9 +364,10 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the account does not meet the registration requirements', () => {
       beforeEach(async () => {
-        await mockLockedGold.setAccountTotalLockedGold(
+        await mockLockedGold.setLockedCommitment(
           validator,
-          registrationRequirements.validator.minus(1)
+          registrationRequirement.noticePeriod,
+          registrationRequirement.value.minus(1)
         )
       })
 
@@ -402,7 +377,8 @@ contract('Validators', (accounts: string[]) => {
             name,
             url,
             // @ts-ignore bytes type
-            publicKeysData
+            publicKeysData,
+            registrationRequirement.noticePeriod
           )
         )
       })
@@ -412,37 +388,29 @@ contract('Validators', (accounts: string[]) => {
   describe('#deregisterValidator', () => {
     const validator = accounts[0]
     const index = 0
-    let resp: any
-    describe('when the account is not a registered validator', () => {
-      before(async () => {
-        await registerValidator(validator)
-        resp = await validators.deregisterValidator(index)
-      })
+    beforeEach(async () => {
+      await registerValidator(validator)
+    })
 
-      it('should mark the account as not a validator', async () => {
-        assert.isFalse(await validators.isValidator(validator))
-      })
+    it('should mark the account as not a validator', async () => {
+      await validators.deregisterValidator(index)
+      assert.isFalse(await validators.isValidator(validator))
+    })
 
-      it('should remove the account from the list of validators', async () => {
-        assert.deepEqual(await validators.getRegisteredValidators(), [])
-      })
+    it('should remove the account from the list of validators', async () => {
+      await validators.deregisterValidator(index)
+      assert.deepEqual(await validators.getRegisteredValidators(), [])
+    })
 
-      it('should set account balance requirements on locked gold', async () => {
-        const latestTimestamp = (await web3.eth.getBlock('latest')).timestamp
-        const [value, timestamp] = await mockLockedGold.getAccountMustMaintain(validator)
-        assert.equal(value, registrationRequirements.validator)
-        assert.equal(timestamp, new BigNumber(timestamp).plus(deregistrationLockups.validator))
-      })
-
-      it('should emit the ValidatorDeregistered event', async () => {
-        assert.equal(resp.logs.length, 1)
-        const log = resp.logs[0]
-        assertContainSubset(log, {
-          event: 'ValidatorDeregistered',
-          args: {
-            validator,
-          },
-        })
+    it('should emit the ValidatorDeregistered event', async () => {
+      const resp = await validators.deregisterValidator(index)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'ValidatorDeregistered',
+        args: {
+          validator,
+        },
       })
     })
 
@@ -754,44 +722,46 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#registerValidatorGroup', () => {
     const group = accounts[0]
-    let resp: any
-    describe('when the account is not a registered validator group', () => {
-      before(async () => {
-        await mockLockedGold.setAccountTotalLockedGold(group, registrationRequirements.group)
-        resp = await validators.registerValidatorGroup(name, url, commission)
-        resp = await validators.registerValidator(
+    beforeEach(async () => {
+      await mockLockedGold.setLockedCommitment(
+        group,
+        registrationRequirement.noticePeriod,
+        registrationRequirement.value
+      )
+    })
+
+    it('should mark the account as a validator group', async () => {
+      await validators.registerValidatorGroup(name, url, registrationRequirement.noticePeriod)
+      assert.isTrue(await validators.isValidatorGroup(group))
+    })
+
+    it('should add the account to the list of validator groups', async () => {
+      await validators.registerValidatorGroup(name, url, registrationRequirement.noticePeriod)
+      assert.deepEqual(await validators.getRegisteredValidatorGroups(), [group])
+    })
+
+    it('should set the validator group name, and url', async () => {
+      await validators.registerValidatorGroup(name, url, registrationRequirement.noticePeriod)
+      const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
+      assert.equal(parsedGroup.name, name)
+      assert.equal(parsedGroup.url, url)
+    })
+
+    it('should emit the ValidatorGroupRegistered event', async () => {
+      const resp = await validators.registerValidatorGroup(
+        name,
+        url,
+        registrationRequirement.noticePeriod
+      )
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'ValidatorGroupRegistered',
+        args: {
+          group,
           name,
           url,
-          // @ts-ignore bytes type
-          publicKeysData
-        )
-      })
-
-      it('should mark the account as a validator group', async () => {
-        assert.isTrue(await validators.isValidatorGroup(group))
-      })
-
-      it('should add the account to the list of validator groups', async () => {
-        assert.deepEqual(await validators.getRegisteredValidatorGroups(), [group])
-      })
-
-      it('should set the validator group name and url', async () => {
-        const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
-        assert.equal(parsedGroup.name, name)
-        assert.equal(parsedGroup.url, url)
-      })
-
-      it('should emit the ValidatorGroupRegistered event', async () => {
-        assert.equal(resp.logs.length, 1)
-        const log = resp.logs[0]
-        assertContainSubset(log, {
-          event: 'ValidatorGroupRegistered',
-          args: {
-            group,
-            name,
-            url,
-          },
-        })
+        },
       })
     })
 
@@ -809,24 +779,29 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the account is already a registered validator group', () => {
       beforeEach(async () => {
-        await validators.registerValidatorGroup(name, url, commission)
+        await validators.registerValidatorGroup(name, url, registrationRequirement.noticePeriod)
       })
 
       it('should revert', async () => {
-        await assertRevert(validators.registerValidatorGroup(name, url, commission))
+        await assertRevert(
+          validators.registerValidatorGroup(name, url, registrationRequirement.noticePeriod)
+        )
       })
     })
 
     describe('when the account does not meet the registration requirements', () => {
       beforeEach(async () => {
-        await mockLockedGold.setAccountTotalLockedGold(
-          validator,
-          registrationRequirements.group.minus(1)
+        await mockLockedGold.setLockedCommitment(
+          group,
+          registrationRequirement.noticePeriod,
+          registrationRequirement.value.minus(1)
         )
       })
 
       it('should revert', async () => {
-        await assertRevert(validators.registerValidatorGroup(name, url, commission))
+        await assertRevert(
+          validators.registerValidatorGroup(name, url, registrationRequirement.noticePeriod)
+        )
       })
     })
   })
@@ -834,7 +809,6 @@ contract('Validators', (accounts: string[]) => {
   describe('#deregisterValidatorGroup', () => {
     const index = 0
     const group = accounts[0]
-    let resp: any
     beforeEach(async () => {
       await registerValidatorGroup(group)
     })
@@ -847,14 +821,6 @@ contract('Validators', (accounts: string[]) => {
     it('should remove the account from the list of validator groups', async () => {
       await validators.deregisterValidatorGroup(index)
       assert.deepEqual(await validators.getRegisteredValidatorGroups(), [])
-    })
-
-    it('should set account balance requirements on locked gold', async () => {
-      await validators.deregisterValidatorGroup(index)
-      const latestTimestamp = (await web3.eth.getBlock('latest')).timestamp
-      const [value, timestamp] = await mockLockedGold.getAccountMustMaintain(group)
-      assert.equal(value, registrationRequirements.group)
-      assert.equal(timestamp, new BigNumber(timestamp).plus(deregistrationLockups.group))
     })
 
     it('should emit the ValidatorGroupDeregistered event', async () => {
@@ -975,9 +941,31 @@ contract('Validators', (accounts: string[]) => {
     })
 
     describe('when the validator is the only member of the group', () => {
-      it('should mark the group ineligible', async () => {
-        await validators.removeMember(validator)
-        assert.isTrue(await mockElection.isIneligible(group))
+      it('should emit the ValidatorGroupEmptied event', async () => {
+        const resp = await validators.removeMember(validator)
+        assert.equal(resp.logs.length, 2)
+        const log = resp.logs[1]
+        assertContainSubset(log, {
+          event: 'ValidatorGroupEmptied',
+          args: {
+            group,
+          },
+        })
+      })
+
+      describe('when the group has received votes', () => {
+        beforeEach(async () => {
+          const voter = accounts[2]
+          const weight = 10
+          await mockLockedGold.setWeight(voter, weight)
+          await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS, { from: voter })
+        })
+
+        it('should remove the group from the list of electable groups with votes', async () => {
+          await validators.removeMember(validator)
+          const [groups] = await validators.getValidatorGroupVotes()
+          assert.deepEqual(groups, [])
+        })
       })
     })
 
@@ -1044,6 +1032,283 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(validators.reorderMember(validator2, validator1, NULL_ADDRESS))
+      })
+    })
+  })
+
+  describe('#vote', () => {
+    const weight = new BigNumber(5)
+    const voter = accounts[0]
+    const validator = accounts[1]
+    const group = accounts[2]
+    beforeEach(async () => {
+      await registerValidatorGroupWithMembers(group, [validator])
+      await mockLockedGold.setWeight(voter, weight)
+    })
+
+    it("should set the voter's vote", async () => {
+      await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS)
+      assert.isTrue(await validators.isVoting(voter))
+      assert.equal(await validators.voters(voter), group)
+    })
+
+    it('should add the group to the list of those receiving votes', async () => {
+      await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS)
+      const [groups] = await validators.getValidatorGroupVotes()
+      assert.deepEqual(groups, [group])
+    })
+
+    it("should increment the validator group's vote total", async () => {
+      await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS)
+      assertEqualBN(await validators.getVotesReceived(group), weight)
+    })
+
+    it('should emit the ValidatorGroupVoteCast event', async () => {
+      const resp = await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'ValidatorGroupVoteCast',
+        args: {
+          account: voter,
+          group,
+          weight: new BigNumber(weight),
+        },
+      })
+    })
+
+    describe('when the group had not previously received votes', () => {
+      it('should add the group to the list of electable groups with votes', async () => {
+        await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS)
+        const [groups] = await validators.getValidatorGroupVotes()
+        assert.deepEqual(groups, [group])
+      })
+    })
+
+    it('should revert when the group is not a registered validator group', async () => {
+      await assertRevert(validators.vote(accounts[3], NULL_ADDRESS, NULL_ADDRESS))
+    })
+
+    describe('when the group is empty', () => {
+      beforeEach(async () => {
+        await validators.removeMember(validator, { from: group })
+      })
+
+      it('should revert', async () => {
+        await assertRevert(validators.vote(group, NULL_ADDRESS, NULL_ADDRESS))
+      })
+    })
+
+    describe('when the account voting is frozen', () => {
+      beforeEach(async () => {
+        await mockLockedGold.setVotingFrozen(voter)
+      })
+
+      it('should revert', async () => {
+        await assertRevert(validators.vote(group, NULL_ADDRESS, NULL_ADDRESS))
+      })
+    })
+
+    describe('when the account has no weight', () => {
+      beforeEach(async () => {
+        await mockLockedGold.setWeight(voter, NULL_ADDRESS)
+      })
+
+      it('should revert', async () => {
+        await assertRevert(validators.vote(group, NULL_ADDRESS, NULL_ADDRESS))
+      })
+    })
+    describe('when the account has an outstanding vote', () => {
+      beforeEach(async () => {
+        await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS)
+      })
+
+      it('should revert', async () => {
+        await assertRevert(validators.vote(group, NULL_ADDRESS, NULL_ADDRESS))
+      })
+    })
+  })
+
+  describe('#revokeVote', () => {
+    const weight = 5
+    const voter = accounts[0]
+    const validator = accounts[1]
+    const group = accounts[2]
+    beforeEach(async () => {
+      await registerValidatorGroupWithMembers(group, [validator])
+      await mockLockedGold.setWeight(voter, weight)
+      await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS)
+    })
+
+    it("should clear the voter's vote", async () => {
+      await validators.revokeVote(NULL_ADDRESS, NULL_ADDRESS)
+      assert.isFalse(await validators.isVoting(voter))
+      assert.equal(await validators.voters(voter), NULL_ADDRESS)
+    })
+
+    it("should decrement the validator group's vote total", async () => {
+      await validators.revokeVote(NULL_ADDRESS, NULL_ADDRESS)
+      const [groups, votes] = await validators.getValidatorGroupVotes()
+      assert.deepEqual(groups, [])
+      assert.deepEqual(votes, [])
+    })
+
+    it('should emit the ValidatorGroupVoteRevoked event', async () => {
+      const resp = await validators.revokeVote(NULL_ADDRESS, NULL_ADDRESS)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'ValidatorGroupVoteRevoked',
+        args: {
+          account: voter,
+          group,
+          weight: new BigNumber(weight),
+        },
+      })
+    })
+
+    describe('when the group had not received other votes', () => {
+      it('should remove the group from the list of electable groups with votes', async () => {
+        await validators.revokeVote(NULL_ADDRESS, NULL_ADDRESS)
+        const [groups] = await validators.getValidatorGroupVotes()
+        assert.deepEqual(groups, [])
+      })
+    })
+
+    describe('when the account does not have an outstanding vote', () => {
+      beforeEach(async () => {
+        await validators.revokeVote(NULL_ADDRESS, NULL_ADDRESS)
+      })
+
+      it('should revert', async () => {
+        await assertRevert(validators.revokeVote(NULL_ADDRESS, NULL_ADDRESS))
+      })
+    })
+  })
+
+  describe('#getValidators', () => {
+    const group1 = accounts[0]
+    const group2 = accounts[1]
+    const group3 = accounts[2]
+    const validator1 = accounts[3]
+    const validator2 = accounts[4]
+    const validator3 = accounts[5]
+    const validator4 = accounts[6]
+    const validator5 = accounts[7]
+    const validator6 = accounts[8]
+    const validator7 = accounts[9]
+
+    // If voterN votes for groupN:
+    //   group1 gets 20 votes per member
+    //   group2 gets 25 votes per member
+    //   group3 gets 30 votes per member
+    // The ordering of the returned validators should be from group with most votes to group,
+    // with fewest votes, and within each group, members are elected from first to last.
+    const voter1 = { address: accounts[0], weight: 80 }
+    const voter2 = { address: accounts[1], weight: 50 }
+    const voter3 = { address: accounts[2], weight: 30 }
+    const assertAddressesEqual = (actual: string[], expected: string[]) => {
+      assert.deepEqual(actual.map((x) => x.toLowerCase()), expected.map((x) => x.toLowerCase()))
+    }
+
+    beforeEach(async () => {
+      await registerValidatorGroupWithMembers(group1, [
+        validator1,
+        validator2,
+        validator3,
+        validator4,
+      ])
+      await registerValidatorGroupWithMembers(group2, [validator5, validator6])
+      await registerValidatorGroupWithMembers(group3, [validator7])
+
+      for (const voter of [voter1, voter2, voter3]) {
+        await mockLockedGold.setWeight(voter.address, voter.weight)
+      }
+    })
+
+    describe('when a single group has >= minElectableValidators as members and received votes', () => {
+      beforeEach(async () => {
+        await validators.vote(group1, NULL_ADDRESS, NULL_ADDRESS, { from: voter1.address })
+      })
+
+      it("should return that group's member list", async () => {
+        assertAddressesEqual(await validators.getValidators(), [
+          validator1,
+          validator2,
+          validator3,
+          validator4,
+        ])
+      })
+    })
+
+    describe("when > maxElectableValidators members's groups receive votes", () => {
+      beforeEach(async () => {
+        await validators.vote(group1, NULL_ADDRESS, NULL_ADDRESS, { from: voter1.address })
+        await validators.vote(group2, NULL_ADDRESS, group1, { from: voter2.address })
+        await validators.vote(group3, NULL_ADDRESS, group2, { from: voter3.address })
+      })
+
+      it('should return maxElectableValidators elected validators', async () => {
+        assertAddressesEqual(await validators.getValidators(), [
+          validator1,
+          validator2,
+          validator3,
+          validator5,
+          validator6,
+          validator7,
+        ])
+      })
+    })
+
+    describe('when a group receives enough votes for > n seats but only has n members', () => {
+      beforeEach(async () => {
+        await mockLockedGold.setWeight(voter3.address, 1000)
+        await validators.vote(group3, NULL_ADDRESS, NULL_ADDRESS, { from: voter3.address })
+        await validators.vote(group1, NULL_ADDRESS, group3, { from: voter1.address })
+        await validators.vote(group2, NULL_ADDRESS, group1, { from: voter2.address })
+      })
+
+      it('should elect only n members from that group', async () => {
+        assertAddressesEqual(await validators.getValidators(), [
+          validator7,
+          validator1,
+          validator2,
+          validator3,
+          validator5,
+          validator6,
+        ])
+      })
+    })
+
+    describe('when an account has delegated validating to another address', () => {
+      const validatingDelegate = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
+      beforeEach(async () => {
+        await mockLockedGold.delegateValidating(validator3, validatingDelegate)
+        await validators.vote(group1, NULL_ADDRESS, NULL_ADDRESS, { from: voter1.address })
+        await validators.vote(group2, NULL_ADDRESS, group1, { from: voter2.address })
+        await validators.vote(group3, NULL_ADDRESS, group2, { from: voter3.address })
+      })
+
+      it('should return the validating delegate in place of the account', async () => {
+        assertAddressesEqual(await validators.getValidators(), [
+          validator1,
+          validator2,
+          validatingDelegate,
+          validator5,
+          validator6,
+          validator7,
+        ])
+      })
+    })
+
+    describe('when there are not enough electable validators', () => {
+      beforeEach(async () => {
+        await validators.vote(group2, NULL_ADDRESS, NULL_ADDRESS, { from: voter2.address })
+        await validators.vote(group3, NULL_ADDRESS, group2, { from: voter3.address })
+      })
+
+      it('should revert', async () => {
+        await assertRevert(validators.getValidators())
       })
     })
   })

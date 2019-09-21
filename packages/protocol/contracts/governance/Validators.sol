@@ -121,7 +121,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @notice Initializes critical variables.
    * @param registryAddress The address of the registry contract.
    * @param groupRequirement The minimum locked gold needed to register a group.
-   * @param validatorRequirement The minimum locked gold needed to register a validator. 
+   * @param validatorRequirement The minimum locked gold needed to register a validator.
    * @param groupLockup The duration the above gold remains locked after deregistration.
    * @param validatorLockup The duration the above gold remains locked after deregistration.
    * @param _maxGroupSize The maximum group size.
@@ -160,7 +160,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   /**
    * @notice Updates the minimum gold requirements to register a validator group or validator.
    * @param groupRequirement The minimum locked gold needed to register a group.
-   * @param validatorRequirement The minimum locked gold needed to register a validator. 
+   * @param validatorRequirement The minimum locked gold needed to register a validator.
    * @return True upon success.
    * @dev The new requirement is only enforced for future validator or group registrations.
    */
@@ -342,7 +342,6 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     string calldata name,
     string calldata url,
     uint256 commission,
-    address[] calldata members
   )
     external
     nonReentrant
@@ -352,7 +351,6 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(bytes(url).length > 0);
     // TODO(asa)
     // require(isFraction(commission));
-    require(members.length <= maxGroupSize);
     address account = getLockedGold().getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     require(meetsValidatorGroupRegistrationRequirement(account));
@@ -361,9 +359,6 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     group.name = name;
     group.url = url;
     group.commission = FixidityLib.wrap(commission);
-    for (uint256 i = 0; i < members.length; i = i.add(1)) {
-      _addMember(account, members[i]);
-    }
     _groups.push(account);
     getLockedGold().setAccountMustMaintain(account, registrationRequirements.group, MAX_INT);
     emit ValidatorGroupRegistered(account, name, url);
