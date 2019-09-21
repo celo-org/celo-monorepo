@@ -1449,7 +1449,7 @@ contract('Governance', (accounts: string[]) => {
         })
       })
 
-      describe('when the proposal cannot execute successfully because is not a contract address', () => {
+      describe('when the proposal cannot execute because it is not a contract address', () => {
         beforeEach(async () => {
           await governance.propose(
             [transactionSuccess1.value],

@@ -263,8 +263,7 @@ contract MultiSig is Initializable {
   {
     bool result;
 
-    require(
-      AddressesHelper.isContract(destination), "Invalid contract address");
+    require(AddressesHelper.isContract(destination), "Invalid contract address");
 
     /* solhint-disable max-line-length */
     assembly {

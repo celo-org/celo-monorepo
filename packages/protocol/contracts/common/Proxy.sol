@@ -39,8 +39,7 @@ contract Proxy {
       implementationAddress := sload(implementationPosition)
     }
 
-    require(
-      AddressesHelper.isContract(implementationAddress), "Invalid contract address");
+    require(AddressesHelper.isContract(implementationAddress), "Invalid contract address");
 
     assembly {
       let newCallDataPosition := mload(0x40)
@@ -123,8 +122,7 @@ contract Proxy {
   function _setImplementation(address implementation) public onlyOwner {
     bytes32 implementationPosition = IMPLEMENTATION_POSITION;
 
-    require(
-      AddressesHelper.isContract(implementation), "Invalid contract address");
+    require(AddressesHelper.isContract(implementation), "Invalid contract address");
 
     assembly {
       sstore(implementationPosition, implementation)
@@ -150,5 +148,4 @@ contract Proxy {
     }
     emit OwnerSet(newOwner);
   }
-
 }

@@ -18,5 +18,4 @@ library AddressesHelper {
     assembly { size := extcodesize(addr) }
     return size > 0;
   }
-
 }

@@ -1064,8 +1064,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   {
     bool result;
 
-    require(
-      AddressesHelper.isContract(destination), "Invalid contract address");
+    require(AddressesHelper.isContract(destination), "Invalid contract address");
 
     /* solhint-disable no-inline-assembly */
     assembly {
