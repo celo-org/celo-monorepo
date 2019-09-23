@@ -906,17 +906,11 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       participationParameters.baseline.multiply(participationParameters.baselineQuorumFactor)
     );
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
-<<<<<<< HEAD
       bytes4 functionId = ExtractFunctionSignature.extractFunctionSignature(
         proposal.transactions[i].data
       );
-      FixidityLib.Fraction memory thresholdFixed = _getConstitution(
-        proposal.transactions[i].destination,
-=======
-      bytes4 functionId = extractFunctionSignature(proposal.transactions[i].data);
       FixidityLib.Fraction memory threshold = _getConstitution(
-        proposal.transactions[i].destination, 
->>>>>>> 8dacf1eb43a914c8d3b612936ad73ed727d0417d
+        proposal.transactions[i].destination,
         functionId
       );
       if (support.lte(threshold)) {
@@ -989,35 +983,6 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     delete proposals[proposalId];
   }
 
-  // TODO(asa): Pass the proposal as an argument for gas optimization
-  /**
-   * @notice Returns whether or not a dequeued proposal has expired.
-   * @param proposalId The ID of the proposal to delete.
-   * @return Whether or not the dequeued proposal has expired.
-   */
-  function isDequeuedProposalExpired(uint256 proposalId) private view returns (bool) {
-    Proposal storage proposal = proposals[proposalId];
-    ProposalStage stage = _getDequeuedProposalStage(proposal.timestamp);
-    // The proposal is considered expired under the following conditions:
-    //   1. Past the approval stage and not approved.
-    //   2. Past the referendum stage and not passed.
-    //   3. Past the execution stage.
-    return (
-      (stage > ProposalStage.Execution) ||
-      (stage > ProposalStage.Referendum && !isProposalPassing(proposalId)) ||
-      (stage > ProposalStage.Approval && !proposal.approved)
-    );
-  }
-
-  /**
-   * @notice Returns whether or not a proposal exists.
-   * @param proposal The proposal.
-   * @return Whether or not the proposal exists.
-   */
-  function _proposalExists(Proposal storage proposal) private view returns (bool) {
-    return proposal.timestamp > 0;
-  }
-  
   /**
    * @notice Updates the participation baseline based on the proportion of BondedDeposit weight
    *   that participated in the proposal's Referendum stage.
