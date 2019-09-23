@@ -2,7 +2,7 @@ import { ContractKit, newKit } from '@celo/contractkit'
 import { Sequelize } from 'sequelize'
 import { fetchEnv } from './env'
 
-export let sequelize: Sequelize | undefined = undefined
+export let sequelize: Sequelize | undefined
 
 export function initializeDB() {
   if (sequelize === undefined) {
