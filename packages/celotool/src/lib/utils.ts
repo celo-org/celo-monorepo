@@ -1,10 +1,9 @@
-import { switchToClusterFromEnv } from '@celo/celotool/src/lib/cluster'
-import { envVar, fetchEnv, isVmBased } from '@celo/celotool/src/lib/env-utils'
-import { retrieveIPAddress } from '@celo/celotool/src/lib/helm_deploy'
-import { getTestnetOutputs } from '@celo/celotool/src/lib/vm-testnet-utils'
 import { exec } from 'child_process'
-// import prompts from 'prompts'
 import yargs from 'yargs'
+import { switchToClusterFromEnv } from './cluster'
+import { envVar, fetchEnv, isVmBased } from './env-utils'
+import { retrieveIPAddress } from './helm_deploy'
+import { getTestnetOutputs } from './vm-testnet-utils'
 
 export function execCmd(
   cmd: string,

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -412,7 +412,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     return account.rewardsLastRedeemed;
   }
 
-  function isValidating(address validator) public view returns (bool) {
+  function isValidating(address validator) external view returns (bool) {
     IValidators validators = IValidators(registry.getAddressFor(VALIDATORS_REGISTRY_ID));
     return validators.isValidating(validator);
   }
@@ -721,9 +721,25 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     list.length = lastIndex;
   }
 
-  function isAccount(address account) internal view returns (bool) {
+  /**
+   * @notice Check if an account already exists.
+   * @param account The address of the account
+   * @return Returns `true` if account exists. Returns `false` otherwise.
+   *         In particular it will return `false` if a delegate with given address exists.
+   */
+  function isAccount(address account) public view returns (bool) {
     return (accounts[account].exists);
   }
+
+  /**
+   * @notice Check if a delegate already exists.
+   * @param account The address of the delegate
+   * @return Returns `true` if delegate exists. Returns `false` otherwise.
+   */
+  function isDelegate(address account) external view returns (bool) {
+    return (delegations[account] != address(0));
+  }
+
 
   function isNotAccount(address account) internal view returns (bool) {
     return (!accounts[account].exists);

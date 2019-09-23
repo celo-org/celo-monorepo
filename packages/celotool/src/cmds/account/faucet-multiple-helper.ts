@@ -1,6 +1,6 @@
 // TODO: make this work with new contracts
 
-import { CeloEnvArgv } from '@celo/celotool/src/lib/env-utils'
+import { CeloEnvArgv } from 'src/lib/env-utils'
 
 export const command = 'faucet-multiple-helper'
 
