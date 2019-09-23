@@ -13,7 +13,6 @@ const SELL_AMOUNTS = {
 
 export async function handleExchangeQuery() {
   const web3Instance = await getWeb3Instance()
-
   const fetchTime = Date.now().toString()
   const [dollarMakerRate, goldMakerRate] = await Promise.all([
     getExchangeRate(CURRENCY_ENUM.DOLLAR, web3Instance),
@@ -35,13 +34,12 @@ export async function getExchangeRate(makerToken: CURRENCY_ENUM, web3Instance: W
 
 let web3: Web3
 export function getWeb3Instance(): Web3 {
-  if (web3) {
-    if (web3.eth.net.isListening()) {
-      // Already connected
-      return web3
-    }
+  if (web3 && web3.eth.net.isListening()) {
+    // Already connected
+    return web3
+  } else {
+    const httpProvider = new Web3.providers.HttpProvider(WEB3_PROVIDER_URL)
+    web3 = new Web3(httpProvider)
+    return web3
   }
-  const httpProvider = new Web3.providers.HttpProvider(WEB3_PROVIDER_URL)
-  web3 = new Web3(httpProvider)
-  return web3
 }
