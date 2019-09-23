@@ -1,5 +1,5 @@
 import { CURRENCY_ENUM } from '@celo/utils'
-import { ContractUtils } from '@celo/walletkit'
+import { ContractUtils } from '@celo/walletkit' // To be updated to contractkit when new version is published on npm
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { WEB3_PROVIDER_URL } from '../config'
