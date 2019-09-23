@@ -4,27 +4,27 @@ import { Testnets } from 'src/web3/testnets'
 export default {
   [Testnets.integration]: {
     nodeDir: `.${Testnets.integration}`,
-    peerDiscovery: false,
+    noDiscovery: true,
     syncMode: SYNC_MODE_ULTRALIGHT,
   },
   [Testnets.alfajoresstaging]: {
     nodeDir: `.${Testnets.alfajoresstaging}`,
-    peerDiscovery: false,
+    noDiscovery: true,
     syncMode: SYNC_MODE_ULTRALIGHT,
   },
   [Testnets.alfajores]: {
     nodeDir: `.${Testnets.alfajores}`,
-    peerDiscovery: false,
+    noDiscovery: true,
     syncMode: SYNC_MODE_ULTRALIGHT,
   },
   [Testnets.pilot]: {
     nodeDir: `.${Testnets.pilot}`,
-    peerDiscovery: false,
+    noDiscovery: true,
     syncMode: SYNC_MODE_ULTRALIGHT,
   },
   [Testnets.pilotstaging]: {
     nodeDir: `.${Testnets.pilotstaging}`,
-    peerDiscovery: false,
+    noDiscovery: true,
     syncMode: SYNC_MODE_ULTRALIGHT,
   },
 }

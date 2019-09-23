@@ -48,7 +48,7 @@ enum ErrorType {
 
 async function createNewGeth(): Promise<typeof RNGeth> {
   Logger.debug('Geth@newGeth', 'Configure and create new Geth')
-  const { nodeDir, peerDiscovery, syncMode } = currentConfig
+  const { nodeDir, noDiscovery, syncMode } = currentConfig
   const genesis: string = await readGenesisBlockFile(nodeDir)
   const networkID: number = GenesisBlockUtils.getChainIdFromGenesis(genesis)
   const bootnodeEnodes = await getBootnodeEnodes()
@@ -60,7 +60,7 @@ async function createNewGeth(): Promise<typeof RNGeth> {
     nodeDir,
     networkID,
     genesis,
-    peerDiscovery,
+    noDiscovery,
     syncMode,
     useLightweightKDF: true,
   }
