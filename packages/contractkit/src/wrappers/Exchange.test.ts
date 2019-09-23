@@ -52,4 +52,14 @@ testWithGanache('Exchange Wrapper', (web3) => {
     const sellTx = await exchange.sellGold(ONE, usdAmount).send()
     await sellTx.waitReceipt()
   })
+
+  test('SBAT getExchangeRate for selling gold', async () => {
+    const sellGoldRate = await exchange.getExchangeRate(true)
+    expect(sellGoldRate.toNumber()).toBeGreaterThan(0)
+  })
+
+  test('SBAT getExchangeRate for selling dollars', async () => {
+    const sellGoldRate = await exchange.getExchangeRate(false)
+    expect(sellGoldRate.toNumber()).toBeGreaterThan(0)
+  })
 })

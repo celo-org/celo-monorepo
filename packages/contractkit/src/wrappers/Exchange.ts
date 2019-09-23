@@ -123,4 +123,19 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @return The corresponding cUsd amount.
    */
   quoteGoldBuy = (buyAmount: NumberLike) => this.getSellTokenAmount(buyAmount, true)
+
+  /**
+   * Returns the exchange rate estimated at buyAmount.
+   * @param sellGold `true` if gold is the sell token
+   * @param buyAmount The amount of buyToken to estimate the exchange rate at (optional,
+   * defaults to large buyAmount to show worst case rate)
+   * @return The exchange rate (number of sellTokens received for one buyToken).
+   */
+  async getExchangeRate(
+    sellGold: boolean,
+    buyAmount: NumberLike = new BigNumber(1000 * 1000000000000000000) // in Wei
+  ): Promise<BigNumber> {
+    const takerAmount = new BigNumber(await this.getBuyTokenAmount(buyAmount, sellGold))
+    return new BigNumber(buyAmount).dividedBy(takerAmount) // Number of sellTokens received for one buyToken
+  }
 }
