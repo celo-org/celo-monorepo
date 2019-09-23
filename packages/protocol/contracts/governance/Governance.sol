@@ -6,6 +6,7 @@ import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./interfaces/IGovernance.sol";
+import "./interfaces/IValidators.sol";
 import "./Proposals.sol";
 import "./UsingLockedGold.sol";
 import "../common/Initializable.sol";
@@ -270,11 +271,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       _dequeueFrequency != 0 &&
       approvalStageDuration != 0 &&
       referendumStageDuration != 0 &&
-      executionStageDuration != 0 &&
-      isFraction(participationBaseline) &&
-      isFraction(participationFloor) &&
-      isFraction(baselineUpdateFactor) &&
-      isFraction(baselineQuorumFactor)
+      executionStageDuration != 0
     );
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -683,21 +680,13 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   /**
    * @notice Whitelists the hash of a hotfix.
    * @param txHash The hash of the hotfix to be whitelisted.
+   * @param validatorIndex The index in the validator set of the whitelisting validator.
    */
-  function whitelist(bytes32 txHash) external {
-    // TODO(brice): use m-chrzan's magical validator indexing to check inclusion
+  function whitelist(bytes32 txHash, uint256 validatorIndex) external {
     IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
-    address[] memory validatorSet = validators.getValidators();
-    bool isValidator = false;
-    for (uint256 i = 0; i < validatorSet.length; i = i.add(1)) {
-      if (msg.sender == validatorSet[i]) {
-        isValidator = true;
-        break;
-      }
-    }
-    require(isValidator);
-    // TODO(yorke): get epoch number in a better way
-    uint256 epoch = block.number.div(30000);
+    require(msg.sender == validators.validatorAddressFromCurrentSet(validatorIndex));
+    
+    uint256 epoch = getEpochNumber();
     if (epoch > hotfixRecord.tally[txHash].epoch) {
       hotfixRecord.tally[txHash].voteCount = 0;
     }
@@ -705,7 +694,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       hotfixRecord.whitelist[msg.sender].txHash != txHash ||
       hotfixRecord.whitelist[msg.sender].epoch != epoch
     ) {
-      hotfixRecord.whitelist[msg.sender] = HotfixVote(txHash, validatorSet.length, epoch);
+      hotfixRecord.whitelist[msg.sender] = HotfixVote(txHash, epoch);
       hotfixRecord.tally[txHash].voteCount = hotfixRecord.tally[txHash].voteCount.add(1);
       emit HotfixWhitelisted(msg.sender, txHash, epoch);
     }
@@ -728,8 +717,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     external
     nonReentrant
   {
-    // TODO(yorke): get epoch number in a better way
-    uint256 epoch = block.number.div(30000);
+    uint256 epoch = getEpochNumber();
     bytes32 txHash = keccak256(abi.encode(values, destinations, data, dataLengths));
     uint256 totalVotes = hotfixRecord.tally[txHash].totalVotes;
     require(
@@ -768,12 +756,12 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @notice Returns the participation parameters.
    * @return The participation parameters.
    */
-  function getParticipationParameters() external view returns (int256, int256, int256, int256) {
+  function getParticipationParameters() external view returns (uint256, uint256, uint256, uint256) {
     return (
-      participationParameters.baseline,
-      participationParameters.baselineFloor,
-      participationParameters.baselineUpdateFactor,
-      participationParameters.baselineQuorumFactor
+      participationParameters.baseline.unwrap(),
+      participationParameters.baselineFloor.unwrap(),
+      participationParameters.baselineUpdateFactor.unwrap(),
+      participationParameters.baselineQuorumFactor.unwrap()
     );
   }
 
@@ -1115,7 +1103,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    *   default.
    * @return The ratio of yes:no votes needed to exceed in order to pass the proposal.
    */
-  function getConstitution(
+  function _getConstitution(
     address destination,
     bytes4 functionId
   )
@@ -1131,5 +1119,10 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       threshold = constitution[destination].defaultThreshold;
     }
     return threshold;
+  }
+
+  function getEpochNumber() internal view returns (uint256) {
+    // TODO(yorke): more dynamic calculation
+    return block.number.div(3000);
   }
 }
