@@ -14,7 +14,7 @@ import {
   ValidatorsContract,
   ValidatorsInstance,
 } from 'types'
-import { toFixed, fixed1 } from '@celo/utils/lib/fixidity'
+import { toFixed } from '@celo/utils/lib/fixidity'
 
 const Validators: ValidatorsContract = artifacts.require('Validators')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
@@ -159,7 +159,7 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#setElectionThreshold', () => {
     it('should set the election threshold', async () => {
-      const threshold = fixed1.div(new BigNumber('10'))
+      const threshold = toFixed(1 / 10)
       await validators.setElectionThreshold(threshold)
       const result = await validators.getElectionThreshold()
       assertEqualBN(result, threshold)
@@ -1397,7 +1397,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when election threshold is set to 20%', () => {
       beforeEach(async () => {
-        const threshold = fixed1.div(new BigNumber('5'))
+        const threshold = toFixed(1 / 5)
         await validators.setElectionThreshold(threshold)
         await validators.vote(group1, NULL_ADDRESS, NULL_ADDRESS, { from: voter1.address })
         await validators.vote(group2, NULL_ADDRESS, group1, { from: voter2.address })

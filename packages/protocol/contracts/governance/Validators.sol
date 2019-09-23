@@ -260,7 +260,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   {
     electionThreshold = FixidityLib.wrap(threshold);
     require(
-      FixidityLib.lt(electionThreshold, FixidityLib.fixed1()),
+      electionThreshold.lt(FixidityLib.fixed1()),
       "Election threshold must be lower than 100%"
     );
     emit ElectionThresholdSet(threshold);
@@ -272,7 +272,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @return Threshold value as unwrapped fraction.
    */
   function getElectionThreshold() external view returns (uint256) {
-    return FixidityLib.unwrap(electionThreshold);
+    return electionThreshold.unwrap();
   }
 
 
@@ -761,7 +761,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
           numVotes,
           totalVotes
         );
-        if (FixidityLib.lt(percentVotes, electionThreshold)) break;
+        if (percentVotes.lt(electionThreshold)) break;
         (maxN, isWinningestGroupInRound) = dHondt(maxN, electionGroups[i], numMembersElected[i]);
         if (isWinningestGroupInRound) {
           memberElectedInRound = true;
