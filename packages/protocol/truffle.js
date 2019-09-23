@@ -152,14 +152,18 @@ module.exports = {
       version: SOLC_VERSION,
     },
   },
-
   networks,
 }
 
 if (process.argv.includes('--gas')) {
   module.exports = {
+    compilers: {
+      solc: {
+        version: '0.5.8',
+      },
+    },
     plugins: ['truffle-security'],
-
+    networks,
     reporter: 'eth-gas-reporter',
     reporterOptions: {
       currency: 'USD',

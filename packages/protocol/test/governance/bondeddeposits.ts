@@ -79,6 +79,36 @@ contract('LockedGold', (accounts: string[]) => {
     await lockedGold.createAccount()
   })
 
+  describe('#isAccount()', () => {
+    it('created account should exist', async () => {
+      const b = await lockedGold.isAccount(account)
+      assert.equal(b, true)
+    })
+    it('account that was not created should not exist', async () => {
+      const b = await lockedGold.isAccount(accounts[2])
+      assert.equal(b, false)
+    })
+  })
+
+  describe('#isDelegate()', () => {
+    const delegate = accounts[1]
+
+    beforeEach(async () => {
+      const sig = await getParsedSignatureOfAddress(account, delegate)
+      await lockedGold.delegateRole(roles.voting, delegate, sig.v, sig.r, sig.s)
+    })
+
+    it('should return true for delegate', async () => {
+      assert.equal(await lockedGold.isDelegate(delegate), true)
+    })
+    it('should return false for account', async () => {
+      assert.equal(await lockedGold.isDelegate(account), false)
+    })
+    it('should return false for others', async () => {
+      assert.equal(await lockedGold.isDelegate(accounts[4]), false)
+    })
+  })
+
   describe('#initialize()', () => {
     it('should set the owner', async () => {
       const owner: string = await lockedGold.owner()
@@ -145,6 +175,7 @@ contract('LockedGold', (accounts: string[]) => {
       it('should set the role delegate', async () => {
         await lockedGold.delegateRole(role, delegate, sig.v, sig.r, sig.s)
         assert.equal(await lockedGold.delegations(delegate), account)
+        assert.equal(await lockedGold.isDelegate(delegate), true)
         assert.equal(await lockedGold.getDelegateFromAccountAndRole(account, role), delegate)
         assert.equal(await lockedGold.getAccountFromDelegateAndRole(delegate, role), account)
       })
