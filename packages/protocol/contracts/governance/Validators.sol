@@ -7,6 +7,9 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./UsingLockedGold.sol";
 import "./interfaces/IValidators.sol";
+
+import "../identity/interfaces/IRandom.sol";
+
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
@@ -767,6 +770,14 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
         electedValidators[totalNumMembersElected] = getValidatorFromAccount(electedGroupMembers[j]);
         totalNumMembersElected = totalNumMembersElected.add(1);
       }
+    }
+    // Shuffle the validator set using validator-supplied entropy
+    IRandom random = IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
+    bytes32 r = random.random();
+    for (uint256 i = electedValidators.length - 1; i > 0; i = i.sub(1)) {
+      uint256 j = uint256(r) % (i + 1);
+      (electedValidators[i], electedValidators[j]) = (electedValidators[j], electedValidators[i]);
+      r = keccak256(abi.encodePacked(r));
     }
     return electedValidators;
   }
