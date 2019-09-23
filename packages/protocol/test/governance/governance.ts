@@ -9,7 +9,7 @@ import {
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { toFixed, fromFixed } from '@celo/utils/lib/fixidity'
+import { toFixed, fromFixed, fixed1 } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   GovernanceContract,
@@ -62,7 +62,7 @@ contract('Governance', (accounts: string[]) => {
   let mockLockedGold: MockLockedGoldInstance
   let testTransactions: TestTransactionsInstance
   let registry: RegistryInstance
-  let ONE = new BigNumber(1)
+  // let ONE = new BigNumber(1)
   const nullFunctionId = '0x00000000'
   const account = accounts[0]
   const approver = accounts[0]
@@ -82,9 +82,18 @@ contract('Governance', (accounts: string[]) => {
   const baselineQuorumFactor = 1
   const weight = 100
   const participation = 1
-  const expectedParticipationBaseline = fromFixed(baselineUpdateFactor)
+  /*  const expectedParticipationBaseline = fromFixed(baselineUpdateFactor)
     .multipliedBy(participation)
-    .plus(ONE.minus(fromFixed(baselineUpdateFactor)).multipliedBy(fromFixed(participationBaseline)))
+    .plus(ONE.minus(fromFixed(baselineUpdateFactor)).multipliedBy(fromFixed(participationBaseline))) */
+  const expectedParticipationBaseline = baselineUpdateFactor
+    .multipliedBy(participation)
+    .plus(fixed1.minus(baselineUpdateFactor).multipliedBy(fromFixed(participationBaseline)))
+
+  console.log(
+    'expected rate',
+    expectedParticipationBaseline,
+    expectedParticipationBaseline.toString(10)
+  )
 
   let transactionSuccess1
   let transactionSuccess2
@@ -1517,6 +1526,8 @@ contract('Governance', (accounts: string[]) => {
       it('should update the participation baseline', async () => {
         await governance.vote(proposalId, index, value)
         const [actualParticipationBaseline, , ,] = await governance.getParticipationParameters()
+        console.log('expected', expectedParticipationBaseline)
+        console.log(await governance.getParticipationParameters())
         assertEqualBN(actualParticipationBaseline, expectedParticipationBaseline)
       })
 
