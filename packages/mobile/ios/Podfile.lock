@@ -169,6 +169,11 @@ PODS:
   - RNAnalytics (1.1.0-beta.1):
     - Analytics
     - React
+  - RNAnalyticsIntegration-Firebase (1.1.0-beta.1):
+    - Analytics
+    - React
+    - RNAnalytics
+    - Segment-Firebase
   - RNDeviceInfo (2.1.0):
     - React
   - RNFirebase (5.5.4):
@@ -196,6 +201,13 @@ PODS:
     - React
   - RNSVG (9.8.4):
     - React
+  - Segment-Firebase (2.4.1):
+    - Analytics (~> 3.2)
+    - Firebase/Core (~> 5.0)
+    - Segment-Firebase/Core (= 2.4.1)
+  - Segment-Firebase/Core (2.4.1):
+    - Analytics (~> 3.2)
+    - Firebase/Core (~> 5.0)
   - Sentry (3.12.4):
     - Sentry/Core (= 3.12.4)
     - Sentry/KSCrash (= 3.12.4)
@@ -240,6 +252,7 @@ DEPENDENCIES:
   - React/RCTVibration (from `../node_modules/react-native`)
   - React/RCTWebSocket (from `../node_modules/react-native`)
   - "RNAnalytics (from `../../../node_modules/@segment/analytics-react-native`)"
+  - "RNAnalyticsIntegration-Firebase (from `../../../node_modules/@segment/analytics-react-native-firebase`)"
   - RNDeviceInfo (from `../../../node_modules/react-native-device-info`)
   - RNFirebase (from `../../../node_modules/react-native-firebase/ios`)
   - RNFS (from `../../../node_modules/react-native-fs`)
@@ -267,6 +280,7 @@ SPEC REPOS:
     - GoogleUtilities
     - KSCrash
     - nanopb
+    - Segment-Firebase
     - Sentry
 
 EXTERNAL SOURCES:
@@ -302,6 +316,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-version-check"
   RNAnalytics:
     :path: "../../../node_modules/@segment/analytics-react-native"
+  RNAnalyticsIntegration-Firebase:
+    :path: "../../../node_modules/@segment/analytics-react-native-firebase"
   RNDeviceInfo:
     :path: "../../../node_modules/react-native-device-info"
   RNFirebase:
@@ -356,6 +372,7 @@ SPEC CHECKSUMS:
   react-native-udp: 54a1aa9bf5c0824f930b1ba6dbfb3fd3e733bba9
   react-native-version-check: 901616b6d258b385628120441bd0b285b24c7be1
   RNAnalytics: 05243c1fa17186f07be3eae30514b43aeb2e0578
+  RNAnalyticsIntegration-Firebase: 82b879019b012d1aa1cbcb6dfc466acd7233bb97
   RNDeviceInfo: 2b4f76adc479657bf37bfc927bbfb027b17515d4
   RNFirebase: 7d4733713a0f436d55388b55ca3744385c70fd2d
   RNFS: 0f4d630b538e93e0e9e3519ff0b7b7b48760d8ed
@@ -366,10 +383,11 @@ SPEC CHECKSUMS:
   RNSecureKeyStore: f1ad870e53806453039f650720d2845c678d89c8
   RNShare: 4f206fa36e384e95a0cbf79f2a92490647e93127
   RNSVG: a78b4c581e33a1bb72968997d167afabf72b05dc
+  Segment-Firebase: 165b1be115ad2011a3e3f4312301e2c96f92ab38
   Sentry: 7d3ea7176e5184e9c35c12a5825905345807e8c1
   SentryReactNative: 014e5b1684c30c31e6514a57e51eff26cf2b99f7
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: de6351e6eb10cb2ac4058ae6d4fcec9b004877d6
+PODFILE CHECKSUM: 0dab41b91c19b738b580f15f41c639cfd0e07d72
 
 COCOAPODS: 1.7.5
