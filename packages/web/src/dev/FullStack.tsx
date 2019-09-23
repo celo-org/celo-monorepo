@@ -6,7 +6,7 @@ import Title from 'src/dev/Title'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
-import Button, { BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { hashNav } from 'src/shared/menu-items'
 import OvalCoin from 'src/shared/OvalCoin'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
@@ -157,7 +157,7 @@ const LevelSelection = withScreenSize<LevelSelectionProps & ScreenProps>(
             <Fade>
               <View>
                 <Text style={[fonts.legal, styles.microText]}>{text}</Text>
-                <Button text={btnText} kind={BTN.NAKED} onPress={onPressButton} />
+                <Button text={btnText} kind={BTN.NAKED} size={SIZE.small} onPress={onPressButton} />
               </View>
             </Fade>
           )}

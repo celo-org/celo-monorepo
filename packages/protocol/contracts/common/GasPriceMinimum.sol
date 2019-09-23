@@ -1,43 +1,44 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./Initializable.sol";
 import "./UsingRegistry.sol";
-import "./UsingFixidity.sol";
+import "./FixidityLib.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 
 /**
  * @title Stores and provides gas price minimum for various currencies.
  */
-contract GasPriceMinimum is Ownable, Initializable, UsingRegistry, UsingFixidity {
+contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
+  using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
   event TargetDensitySet(
-    int256 targetDensity
+    uint256 targetDensity
   );
 
   event AdjustmentSpeedSet(
-    int256 adjustmentSpeed
+    uint256 adjustmentSpeed
   );
 
   event InfrastructureFractionSet(
-    int256 infrastructureFraction
+    uint256 infrastructureFraction
   );
 
   uint256 public gasPriceMinimum;
 
   // Block congestion level targeted by the gas price minimum calculation.
-  int256 public targetDensity;
+  FixidityLib.Fraction public targetDensity;
 
   // Speed of gas price minimum adjustment due to congestion.
-  int256 public adjustmentSpeed;
+  FixidityLib.Fraction public adjustmentSpeed;
 
-  // Fraction of the gas price minimum allocated to the infrastructure fund.
-  int256 public infrastructureFraction;
+  // FixidityLib.Fraction of the gas price minimum allocated to the infrastructure fund.
+  FixidityLib.Fraction public infrastructureFraction;
 
   function infrastructureFraction_() external view returns (uint256, uint256) {
-    return (uint256(infrastructureFraction), uint256(FIXED1));
+    return (infrastructureFraction.unwrap(), FixidityLib.fixed1().unwrap());
   }
 
   modifier onlyVm() {
@@ -48,9 +49,9 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry, UsingFixidity
   function initialize(
     address _registryAddress,
     uint256 initialGas,
-    int256 _targetDensity,
-    int256 _adjustmentSpeed,
-    int256 _infrastructureFraction
+    uint256 _targetDensity,
+    uint256 _adjustmentSpeed,
+    uint256 _infrastructureFraction
   )
     external
     initializer
@@ -67,28 +68,30 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry, UsingFixidity
    * @notice Set a multiplier that impacts how quickly gas price minimum is adjusted.
    * @dev Value is expected to be < 1.
    */
-  function setAdjustmentSpeed(int256 _adjustmentSpeed) public onlyOwner {
-    require(_adjustmentSpeed < FIXED1);
-    adjustmentSpeed = _adjustmentSpeed;
+  function setAdjustmentSpeed(uint256 _adjustmentSpeed) public onlyOwner {
+    adjustmentSpeed = FixidityLib.wrap(_adjustmentSpeed);
+    require(adjustmentSpeed.lt(FixidityLib.fixed1()));
     emit AdjustmentSpeedSet(_adjustmentSpeed);
   }
 
   /**
    * @notice Set the block density targeted by the gas price minimum algorithm.
+   * @dev Value is expected to be < 1.
    */
-  function setTargetDensity(int256 _targetDensity) public onlyOwner {
-    require(_targetDensity < FIXED1);
-    targetDensity = _targetDensity;
+  function setTargetDensity(uint256 _targetDensity) public onlyOwner {
+    targetDensity = FixidityLib.wrap(_targetDensity);
+    require(targetDensity.lt(FixidityLib.fixed1()));
     emit TargetDensitySet(_targetDensity);
   }
 
   /**
    * @notice Set the fraction of the gas price minimum which is sent to
    * the infrastructure fund.
+   * @dev Value is expected to be < 1.
    */
-  function setInfrastructureFraction(int256 _infrastructureFraction) public onlyOwner {
-    require(_infrastructureFraction < FIXED1);
-    infrastructureFraction = _infrastructureFraction;
+  function setInfrastructureFraction(uint256 _infrastructureFraction) public onlyOwner {
+    infrastructureFraction = FixidityLib.wrap(_infrastructureFraction);
+    require(infrastructureFraction.lt(FixidityLib.fixed1()));
     emit InfrastructureFractionSet(_infrastructureFraction);
   }
 
@@ -151,17 +154,20 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry, UsingFixidity
     view
     returns (uint256)
   {
-    int256 blockDensity = toFixed(blockGasTotal).divide(
-      toFixed(blockGasLimit)
+    FixidityLib.Fraction memory blockDensity = FixidityLib.newFixedFraction(
+      blockGasTotal, blockGasLimit
     );
-    int256 adjustment = FIXED1.add(adjustmentSpeed.multiply(blockDensity.subtract(targetDensity))
-    );
+    bool densityGreaterThanTarget = blockDensity.gt(targetDensity);
+    FixidityLib.Fraction memory densityDelta = densityGreaterThanTarget ?
+      blockDensity.subtract(targetDensity) :
+      targetDensity.subtract(blockDensity);
+    FixidityLib.Fraction memory adjustment = densityGreaterThanTarget ?
+      FixidityLib.fixed1().add(adjustmentSpeed.multiply(densityDelta)) :
+      FixidityLib.fixed1().subtract(adjustmentSpeed.multiply(densityDelta));
 
-    return uint256(
-      adjustment
-        .multiply(toFixed(gasPriceMinimum))
-        .add(FIXED1)
-        .fromFixed()
-    );
+    return adjustment
+      .multiply(FixidityLib.newFixed(gasPriceMinimum))
+      .add(FixidityLib.fixed1())
+      .fromFixed();
   }
 }

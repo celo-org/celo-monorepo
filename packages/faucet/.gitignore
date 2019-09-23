@@ -1,5 +1,4 @@
 dist/
-tsconfig.tsbuildinfo
 
 # Firebase cache
 .firebase/

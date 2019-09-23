@@ -27,13 +27,14 @@ import JoinCelo from 'src/invite/JoinCelo'
 import Language from 'src/language/Language'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import TabNavigator from 'src/navigator/TabNavigator'
+import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
 import PaymentRequestListScreen from 'src/paymentRequest/PaymentRequestListScreen'
 import Pincode from 'src/pincode/Pincode'
 import PincodeConfirmation from 'src/pincode/PincodeConfirmation'
 import QRCode from 'src/qrcode/QRCode'
 import QRScanner from 'src/qrcode/QRScanner'
 import FeeEducation from 'src/send/FeeEducation'
-import RequestConfirmation from 'src/send/RequestConfirmation'
+import Send from 'src/send/Send'
 import SendAmount from 'src/send/SendAmount'
 import SendConfirmation from 'src/send/SendConfirmation'
 import SetClock from 'src/set-clock/SetClock'
@@ -83,18 +84,18 @@ const NuxStack = createStackNavigator(
 
 const SendStack = createStackNavigator(
   {
-    // Note, Send isn't in this stack because it's part of the tab navigator
+    [Screens.Send]: { screen: Send },
     [Screens.SendAmount]: { screen: SendAmount },
     [Screens.SendConfirmation]: { screen: SendConfirmation },
     [Screens.FeeEducation]: { screen: FeeEducation },
-    [Screens.RequestConfirmation]: { screen: RequestConfirmation },
+    [Screens.PaymentRequestConfirmation]: { screen: PaymentRequestConfirmation },
   },
   {
     navigationOptions: {
       header: null,
     },
     ...headerArea,
-    initialRouteName: Screens.SendAmount,
+    initialRouteName: Screens.Send,
   }
 )
 
@@ -113,11 +114,26 @@ const ExchangeStack = createStackNavigator(
   }
 )
 
+const RequestStack = createStackNavigator(
+  {
+    [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
+    [Screens.SendConfirmation]: { screen: SendConfirmation },
+  },
+  {
+    navigationOptions: {
+      header: null,
+    },
+    ...headerArea,
+    initialRouteName: Screens.PaymentRequestListScreen,
+  }
+)
+
 const AppStack = createStackNavigator(
   {
     [Screens.TabNavigator]: { screen: TabNavigator },
     [Stacks.SendStack]: { screen: SendStack },
     [Stacks.ExchangeStack]: { screen: ExchangeStack },
+    [Stacks.RequestStack]: { screen: RequestStack },
     [Screens.Language]: { screen: Language },
     [Screens.Analytics]: { screen: Analytics },
     [Screens.SetClock]: { screen: SetClock },

@@ -1,10 +1,12 @@
 import locales from '@celo/mobile/locales'
 import en_US from '@celo/mobile/locales/en.json'
 import es_LA from '@celo/mobile/locales/es.json'
+import { currencyTranslations } from '@celo/utils/src/currencies'
 // @ts-ignore
 import i18n from 'i18next'
 import { reactI18nextModule } from 'react-i18next'
 import RNLanguages from 'react-native-languages'
+import Logger from 'src/utils/Logger'
 
 export enum Namespaces {
   accountScreen10 = 'accountScreen10',
@@ -36,6 +38,21 @@ const languageDetector = {
   cacheUserLanguage: () => {},
 }
 
+const currencyInterpolator = (text: string, value: any) => {
+  const key = value[1]
+  const translations = currencyTranslations[i18n.language]
+
+  if (translations && key in translations) {
+    return translations[key]
+  } else {
+    Logger.warn(
+      '@currencyInterpolator',
+      `Unexpected currency interpolation: ${text} in ${i18n.language}`
+    )
+    return ''
+  }
+}
+
 i18n
   .use(languageDetector)
   .use(reactI18nextModule)
@@ -49,9 +66,9 @@ i18n
         common: en_US,
         ...locales.enUS,
       },
-      'es-AR': {
+      'es-419': {
         common: es_LA,
-        ...locales.esAR,
+        ...locales.es_419,
       },
     },
     ns: ['common', ...Object.keys(Namespaces)],
@@ -60,6 +77,7 @@ i18n
     interpolation: {
       escapeValue: false,
     },
+    missingInterpolationHandler: currencyInterpolator,
   })
 
 RNLanguages.addEventListener('change', ({ language }: { language: string }) => {

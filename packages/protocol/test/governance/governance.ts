@@ -1,30 +1,12 @@
-import { bondedDepositsRegistryId } from '@celo/protocol/lib/registry-utils'
-import {
-  assertBalance,
-  assertEqualBN,
-  assertLogMatches2,
-  assertRevert,
-  matchAny,
-  stripHexEncoding,
-  timeTravel,
-  NULL_ADDRESS,
-} from '@celo/protocol/lib/test-utils'
-import { toFixed } from '@celo/protocol/lib/fixidity'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { assertBalance, assertEqualBN, assertLogMatches2, assertRevert, matchAny, NULL_ADDRESS, stripHexEncoding, timeTravel } from '@celo/protocol/lib/test-utils'
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { keccak256 } from 'ethereumjs-util'
-import {
-  GovernanceContract,
-  GovernanceInstance,
-  MockBondedDepositsContract,
-  MockBondedDepositsInstance,
-  RegistryContract,
-  RegistryInstance,
-  TestTransactionsContract,
-  TestTransactionsInstance,
-} from 'types'
+import { GovernanceContract, GovernanceInstance, MockLockedGoldContract, MockLockedGoldInstance, RegistryContract, RegistryInstance, TestTransactionsContract, TestTransactionsInstance } from 'types'
 
 const Governance: GovernanceContract = artifacts.require('Governance')
-const MockBondedDeposits: MockBondedDepositsContract = artifacts.require('MockBondedDeposits')
+const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Registry: RegistryContract = artifacts.require('Registry')
 const TestTransactions: TestTransactionsContract = artifacts.require('TestTransactions')
 
@@ -60,7 +42,7 @@ enum VoteValue {
 // TODO(asa): Dequeue explicitly to make the gas cost of operations more clear
 contract('Governance', (accounts: string[]) => {
   let governance: GovernanceInstance
-  let mockBondedDeposits: MockBondedDepositsInstance
+  let mockLockedGold: MockLockedGoldInstance
   let testTransactions: TestTransactionsInstance
   let registry: RegistryInstance
   let ONE = new BigNumber(1)
@@ -78,23 +60,23 @@ contract('Governance', (accounts: string[]) => {
   const approvalStageDuration = 1 * 60 // 1 minute
   const referendumStageDuration = 5 * 60 // 5 minutes
   const executionStageDuration = 1 * 60 // 1 minute
-  const participationBaseline = new BigNumber(5).div(new BigNumber(10))
-  const participationFloor = new BigNumber(5).div(new BigNumber(100))
-  const baselineUpdateFactor = new BigNumber(1).div(new BigNumber(5))
+  const participationBaseline = toFixed(5 / 10)
+  const participationFloor = toFixed(5 / 100)
+  const baselineUpdateFactor = toFixed(1 / 5)
   const baselineQuorumFactor = 1
-  const defaultThreshold = new BigNumber(50).div(new BigNumber(100))
   const weight = 100
   const participation = 1
-  const expectedParticipationBaseline = baselineUpdateFactor
+  const expectedParticipationBaseline = fromFixed(baselineUpdateFactor)
     .multipliedBy(participation)
-    .plus(ONE.minus(baselineUpdateFactor).multipliedBy(participationBaseline))
+    .plus(ONE.minus(fromFixed(baselineUpdateFactor)).multipliedBy(fromFixed(participationBaseline)))
+
   let transactionSuccess1
   let transactionSuccess2
   let transactionFail
   let proposalHash
   beforeEach(async () => {
     governance = await Governance.new()
-    mockBondedDeposits = await MockBondedDeposits.new()
+    mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
     testTransactions = await TestTransactions.new()
     await governance.initialize(
@@ -108,14 +90,14 @@ contract('Governance', (accounts: string[]) => {
       approvalStageDuration,
       referendumStageDuration,
       executionStageDuration,
-      toFixed(participationBaseline),
-      toFixed(participationFloor),
-      toFixed(baselineUpdateFactor),
-      toFixed(baselineQuorumFactor)
+      participationBaseline,
+      participationFloor,
+      baselineUpdateFactor,
+      baselineQuorumFactor
     )
-    await registry.setAddressFor(bondedDepositsRegistryId, mockBondedDeposits.address)
-    await mockBondedDeposits.setWeight(account, weight)
-    await mockBondedDeposits.setTotalWeight(weight)
+    await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
+    await mockLockedGold.setWeight(account, weight)
+    await mockLockedGold.setTotalWeight(weight)
     transactionSuccess1 = {
       value: 0,
       destination: testTransactions.address,
@@ -189,11 +171,9 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should have set stageDurations', async () => {
-      const [
-        actualApprovalStageDuration,
-        actualReferendumStageDuration,
-        actualExecutionStageDuration,
-      ] = await governance.getStageDurations()
+      const actualApprovalStageDuration = await governance.getApprovalStageDuration()
+      const actualReferendumStageDuration = await governance.getReferendumStageDuration()
+      const actualExecutionStageDuration = await governance.getExecutionStageDuration()
       assertEqualBN(actualApprovalStageDuration, approvalStageDuration)
       assertEqualBN(actualReferendumStageDuration, referendumStageDuration)
       assertEqualBN(actualExecutionStageDuration, executionStageDuration)
@@ -206,10 +186,10 @@ contract('Governance', (accounts: string[]) => {
         actualBaselineUpdateFactor,
         actualBaselineQuorumFactor,
       ] = await governance.getParticipationParameters()
-      assertEqualBN(actualParticipationBaseline, toFixed(participationBaseline))
-      assertEqualBN(actualParticipationFloor, toFixed(participationFloor))
-      assertEqualBN(actualBaselineUpdateFactor, toFixed(baselineUpdateFactor))
-      assertEqualBN(actualBaselineQuorumFactor, toFixed(baselineQuorumFactor))
+      assertEqualBN(actualParticipationBaseline, participationBaseline)
+      assertEqualBN(actualParticipationFloor, participationFloor)
+      assertEqualBN(actualBaselineUpdateFactor, baselineUpdateFactor)
+      assertEqualBN(actualBaselineQuorumFactor, baselineQuorumFactor)
     })
 
     // TODO(asa): Consider testing reversion when 0 values provided
@@ -226,10 +206,10 @@ contract('Governance', (accounts: string[]) => {
           approvalStageDuration,
           referendumStageDuration,
           executionStageDuration,
-          toFixed(participationBaseline),
-          toFixed(participationFloor),
-          toFixed(baselineUpdateFactor),
-          toFixed(baselineQuorumFactor)
+          participationBaseline,
+          participationFloor,
+          baselineUpdateFactor,
+          baselineQuorumFactor
         )
       )
     })
@@ -429,8 +409,8 @@ contract('Governance', (accounts: string[]) => {
     const newApprovalStageDuration = 2
     it('should set the approval stage duration', async () => {
       await governance.setApprovalStageDuration(newApprovalStageDuration)
-      const [actualApprovalStageDuration, ,] = await governance.getStageDurations()
-      assert.equal(actualApprovalStageDuration.toNumber(), newApprovalStageDuration)
+      const actualApprovalStageDuration = await governance.getApprovalStageDuration()
+      assertEqualBN(actualApprovalStageDuration, newApprovalStageDuration)
     })
 
     it('should emit the ApprovalStageDurationSet event', async () => {
@@ -464,8 +444,8 @@ contract('Governance', (accounts: string[]) => {
     const newReferendumStageDuration = 2
     it('should set the referendum stage duration', async () => {
       await governance.setReferendumStageDuration(newReferendumStageDuration)
-      const [, actualReferendumStageDuration] = await governance.getStageDurations()
-      assert.equal(actualReferendumStageDuration.toNumber(), newReferendumStageDuration)
+      const actualReferendumStageDuration = await governance.getReferendumStageDuration()
+      assertEqualBN(actualReferendumStageDuration, newReferendumStageDuration)
     })
 
     it('should emit the ReferendumStageDurationSet event', async () => {
@@ -499,8 +479,8 @@ contract('Governance', (accounts: string[]) => {
     const newExecutionStageDuration = 2
     it('should set the execution stage duration', async () => {
       await governance.setExecutionStageDuration(newExecutionStageDuration)
-      const [, , actualExecutionStageDuration] = await governance.getStageDurations()
-      assert.equal(actualExecutionStageDuration.toNumber(), newExecutionStageDuration)
+      const actualExecutionStageDuration = await governance.getExecutionStageDuration()
+      assertEqualBN(actualExecutionStageDuration, newExecutionStageDuration)
     })
 
     it('should emit the ExecutionStageDurationSet event', async () => {
@@ -531,28 +511,24 @@ contract('Governance', (accounts: string[]) => {
   })
 
   describe('#setParticipationFloor', () => {
-    const differentParticipationFloor = new BigNumber(2).div(new BigNumber(100))
+    const differentParticipationFloor = toFixed(2 / 100)
 
     it('should set the participation floor', async () => {
-      await governance.setParticipationFloor(toFixed(differentParticipationFloor))
+      await governance.setParticipationFloor(differentParticipationFloor)
       const [, actualParticipationFloor, ,] = await governance.getParticipationParameters()
-      assertEqualBN(actualParticipationFloor, toFixed(differentParticipationFloor))
+      assertEqualBN(actualParticipationFloor, differentParticipationFloor)
     })
 
     it('should emit the ParticipationFloorSet event', async () => {
-      const resp = await governance.setParticipationFloor(toFixed(differentParticipationFloor))
+      const resp = await governance.setParticipationFloor(differentParticipationFloor)
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertLogMatches2(log, {
         event: 'ParticipationFloorSet',
         args: {
-          participationFloor: toFixed(differentParticipationFloor),
+          participationFloor: differentParticipationFloor,
         },
       })
-    })
-
-    it('should revert if new participation floor is below 0', async () => {
-      await assertRevert(governance.setParticipationFloor(toFixed(-1 / 100)))
     })
 
     it('should revert if new participation floor is above 1', async () => {
@@ -561,34 +537,30 @@ contract('Governance', (accounts: string[]) => {
 
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(
-        governance.setParticipationFloor(toFixed(differentParticipationFloor), { from: nonOwner })
+        governance.setParticipationFloor(differentParticipationFloor, { from: nonOwner })
       )
     })
   })
 
   describe('#setBaselineUpdateFactor', () => {
-    const differentBaselineUpdateFactor = new BigNumber(2).div(new BigNumber(5))
+    const differentBaselineUpdateFactor = toFixed(2 / 5)
 
     it('should set the participation update coefficient', async () => {
-      await governance.setBaselineUpdateFactor(toFixed(differentBaselineUpdateFactor))
+      await governance.setBaselineUpdateFactor(differentBaselineUpdateFactor)
       const [, , actualBaselineUpdateFactor] = await governance.getParticipationParameters()
-      assertEqualBN(actualBaselineUpdateFactor, toFixed(differentBaselineUpdateFactor))
+      assertEqualBN(actualBaselineUpdateFactor, differentBaselineUpdateFactor)
     })
 
-    it('should emit the BaselineUpdateFactorSet event', async () => {
-      const resp = await governance.setBaselineUpdateFactor(toFixed(differentBaselineUpdateFactor))
+    it('should emit the ParticipationBaselineUpdateFactorSet event', async () => {
+      const resp = await governance.setBaselineUpdateFactor(differentBaselineUpdateFactor)
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertLogMatches2(log, {
-        event: 'BaselineUpdateFactorSet',
+        event: 'ParticipationBaselineUpdateFactorSet',
         args: {
-          baselineUpdateFactor: toFixed(differentBaselineUpdateFactor),
+          baselineUpdateFactor: differentBaselineUpdateFactor,
         },
       })
-    })
-
-    it('should revert if new update coefficient is below 0', async () => {
-      await assertRevert(governance.setBaselineUpdateFactor(toFixed(-1 / 100)))
     })
 
     it('should revert if new update coefficient is above 1', async () => {
@@ -597,36 +569,30 @@ contract('Governance', (accounts: string[]) => {
 
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(
-        governance.setBaselineUpdateFactor(toFixed(differentBaselineUpdateFactor), {
-          from: nonOwner,
-        })
+        governance.setBaselineUpdateFactor(differentBaselineUpdateFactor, { from: nonOwner })
       )
     })
   })
 
   describe('#setBaselineQuorumFactor', () => {
-    const differentBaselineQuorumFactor = new BigNumber(8).div(new BigNumber(10))
+    const differentBaselineQuorumFactor = toFixed(8 / 10)
 
     it('should set the critical baseline level', async () => {
-      await governance.setBaselineQuorumFactor(toFixed(differentBaselineQuorumFactor))
+      await governance.setBaselineQuorumFactor(differentBaselineQuorumFactor)
       const [, , , actualBaselineQuorumFactor] = await governance.getParticipationParameters()
-      assertEqualBN(actualBaselineQuorumFactor, toFixed(differentBaselineQuorumFactor))
+      assertEqualBN(actualBaselineQuorumFactor, differentBaselineQuorumFactor)
     })
 
-    it('should emit the BaselineQuorumFactorSet event', async () => {
-      const resp = await governance.setBaselineQuorumFactor(toFixed(differentBaselineQuorumFactor))
+    it('should emit the ParticipationBaselineQuorumFactorSet event', async () => {
+      const resp = await governance.setBaselineQuorumFactor(differentBaselineQuorumFactor)
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertLogMatches2(log, {
-        event: 'BaselineQuorumFactorSet',
+        event: 'ParticipationBaselineQuorumFactorSet',
         args: {
-          baselineQuorumFactor: toFixed(differentBaselineQuorumFactor),
+          baselineQuorumFactor: differentBaselineQuorumFactor,
         },
       })
-    })
-
-    it('should revert if new critical baseline level is below 0', async () => {
-      await assertRevert(governance.setBaselineQuorumFactor(toFixed(-1 / 100)))
     })
 
     it('should revert if new critical baseline level is above 1', async () => {
@@ -635,16 +601,14 @@ contract('Governance', (accounts: string[]) => {
 
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(
-        governance.setBaselineQuorumFactor(toFixed(differentBaselineQuorumFactor), {
-          from: nonOwner,
-        })
+        governance.setBaselineQuorumFactor(differentBaselineQuorumFactor, { from: nonOwner })
       )
     })
   })
 
   // TODO(asa): Verify that when we set the constitution for a function ID then the proper constitution is applied to a proposal.
   describe('#setConstitution', () => {
-    const threshold = new BigNumber(60).div(new BigNumber(100))
+    const threshold = toFixed(2 / 3)
     let functionId
     let differentFunctionId
     let destination
@@ -660,13 +624,16 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should set the default threshold', async () => {
-        await governance.setConstitution(destination, functionId, toFixed(threshold))
-        const actualThreshold = await governance.getConstitution(destination, differentFunctionId)
-        assertEqualBN(actualThreshold, toFixed(threshold))
+        await governance.setConstitution(destination, functionId, threshold)
+        const differentThreshold = await governance.getConstitution(
+          destination,
+          differentFunctionId
+        )
+        assert.isTrue(differentThreshold.eq(threshold))
       })
 
       it('should emit the ConstitutionSet event', async () => {
-        const resp = await governance.setConstitution(destination, functionId, toFixed(threshold))
+        const resp = await governance.setConstitution(destination, functionId, threshold)
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
         assertLogMatches2(log, {
@@ -674,7 +641,7 @@ contract('Governance', (accounts: string[]) => {
           args: {
             destination,
             functionId: web3.utils.padRight(functionId, 64),
-            threshold: toFixed(threshold),
+            threshold: threshold,
           },
         })
       })
@@ -687,19 +654,19 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should set the function threshold', async () => {
-        await governance.setConstitution(destination, functionId, toFixed(threshold))
+        await governance.setConstitution(destination, functionId, threshold)
         const actualThreshold = await governance.getConstitution(destination, functionId)
-        assertEqualBN(actualThreshold, toFixed(threshold))
+        assert.isTrue(actualThreshold.eq(threshold))
       })
 
       it('should not set the default threshold', async () => {
-        await governance.setConstitution(destination, functionId, toFixed(threshold))
+        await governance.setConstitution(destination, functionId, threshold)
         const actualThreshold = await governance.getConstitution(destination, differentFunctionId)
-        assertEqualBN(actualThreshold, toFixed(defaultThreshold))
+        assert.isTrue(actualThreshold.eq(toFixed(1 / 2)))
       })
 
       it('should emit the ConstitutionSet event', async () => {
-        const resp = await governance.setConstitution(destination, functionId, toFixed(threshold))
+        const resp = await governance.setConstitution(destination, functionId, threshold)
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
         assertLogMatches2(log, {
@@ -707,33 +674,33 @@ contract('Governance', (accounts: string[]) => {
           args: {
             destination,
             functionId: web3.utils.padRight(functionId, 64),
-            threshold: toFixed(threshold),
+            threshold: threshold,
           },
         })
       })
     })
 
     it('should revert when the destination is the null address', async () => {
-      await assertRevert(
-        governance.setConstitution(NULL_ADDRESS, nullFunctionId, toFixed(threshold))
-      )
+      await assertRevert(governance.setConstitution(NULL_ADDRESS, nullFunctionId, threshold))
     })
 
     it('should revert when the threshold is zero', async () => {
       await assertRevert(governance.setConstitution(destination, nullFunctionId, 0))
     })
 
-    it('should revert when the threshold is less than a majority', async () => {
-      await assertRevert(governance.setConstitution(destination, nullFunctionId, toFixed(49 / 100)))
+    it('should revert when the threshold is not greater than a majority', async () => {
+      await assertRevert(governance.setConstitution(destination, nullFunctionId, toFixed(1 / 2)))
     })
 
-    it('should revert when the threshold is at least 100%', async () => {
-      await assertRevert(governance.setConstitution(destination, nullFunctionId, toFixed(1)))
+    it('should revert when the threshold is greater than 100%', async () => {
+      await assertRevert(
+        governance.setConstitution(destination, nullFunctionId, toFixed(101 / 100))
+      )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(
-        governance.setConstitution(destination, nullFunctionId, toFixed(threshold), {
+        governance.setConstitution(destination, nullFunctionId, threshold, {
           from: nonOwner,
         })
       )
@@ -980,6 +947,7 @@ contract('Governance', (accounts: string[]) => {
   describe('#upvote()', () => {
     const proposalId = new BigNumber(1)
     beforeEach(async () => {
+      await mockLockedGold.setWeight(account, weight)
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
@@ -1020,12 +988,12 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when the account is frozen', async () => {
-      await mockBondedDeposits.setVotingFrozen(account)
+      await mockLockedGold.setVotingFrozen(account)
       await assertRevert(governance.upvote(proposalId, 0, 0))
     })
 
     it('should revert when the account weight is 0', async () => {
-      await mockBondedDeposits.setWeight(account, 0)
+      await mockLockedGold.setWeight(account, 0)
       await assertRevert(governance.upvote(proposalId, 0, 0))
     })
 
@@ -1067,8 +1035,9 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
-        await mockBondedDeposits.setWeight(otherAccount, weight)
-        await mockBondedDeposits.setTotalWeight(weight * 2)
+        const otherAccount = accounts[1]
+        await mockLockedGold.setWeight(otherAccount, weight)
+        await mockLockedGold.setTotalWeight(weight * 2)
         await governance.upvote(otherProposalId, proposalId, 0, { from: otherAccount })
         await timeTravel(queueExpiry, web3)
       })
@@ -1132,6 +1101,7 @@ contract('Governance', (accounts: string[]) => {
   describe('#revokeUpvote()', () => {
     const proposalId = new BigNumber(1)
     beforeEach(async () => {
+      await mockLockedGold.setWeight(account, weight)
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
@@ -1159,7 +1129,7 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should succeed when the account is frozen', async () => {
-      await mockBondedDeposits.setVotingFrozen(account)
+      await mockLockedGold.setVotingFrozen(account)
       await governance.revokeUpvote(0, 0)
     })
 
@@ -1183,7 +1153,7 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when the account weight is 0', async () => {
-      await mockBondedDeposits.setWeight(account, 0)
+      await mockLockedGold.setWeight(account, 0)
       await assertRevert(governance.revokeUpvote(0, 0))
     })
 
@@ -1416,6 +1386,7 @@ contract('Governance', (accounts: string[]) => {
       await timeTravel(dequeueFrequency, web3)
       await governance.approve(proposalId, index)
       await timeTravel(approvalStageDuration, web3)
+      await mockLockedGold.setWeight(account, weight)
     })
 
     it('should return true', async () => {
@@ -1460,12 +1431,12 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when the account is frozen', async () => {
-      await mockBondedDeposits.setVotingFrozen(account)
+      await mockLockedGold.setVotingFrozen(account)
       await assertRevert(governance.vote(proposalId, index, value))
     })
 
     it('should revert when the account weight is 0', async () => {
-      await mockBondedDeposits.setWeight(account, 0)
+      await mockLockedGold.setWeight(account, 0)
       await assertRevert(governance.vote(proposalId, index, value))
     })
 
@@ -1572,7 +1543,7 @@ contract('Governance', (accounts: string[]) => {
       it('should update the participation baseline', async () => {
         await governance.vote(proposalId, index, value)
         const [actualParticipationBaseline, , ,] = await governance.getParticipationParameters()
-        assertEqualBN(actualParticipationBaseline, toFixed(expectedParticipationBaseline))
+        assertEqualBN(actualParticipationBaseline, expectedParticipationBaseline)
       })
 
       it('should emit the ParticipationBaselineUpdated event', async () => {
@@ -1582,7 +1553,7 @@ contract('Governance', (accounts: string[]) => {
         assertLogMatches2(log, {
           event: 'ParticipationBaselineUpdated',
           args: {
-            participationBaseline: toFixed(expectedParticipationBaseline),
+            participationBaseline: expectedParticipationBaseline,
           },
         })
       })
@@ -1608,6 +1579,7 @@ contract('Governance', (accounts: string[]) => {
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
           await timeTravel(approvalStageDuration, web3)
+          await mockLockedGold.setWeight(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -1630,7 +1602,7 @@ contract('Governance', (accounts: string[]) => {
         it('should update the participation baseline', async () => {
           await governance.execute(proposalId, index)
           const [actualParticipationBaseline, , ,] = await governance.getParticipationParameters()
-          assertEqualBN(actualParticipationBaseline, toFixed(expectedParticipationBaseline))
+          assertEqualBN(actualParticipationBaseline, expectedParticipationBaseline)
         })
 
         it('should emit the ProposalExecuted event', async () => {
@@ -1652,7 +1624,7 @@ contract('Governance', (accounts: string[]) => {
           assertLogMatches2(log, {
             event: 'ParticipationBaselineUpdated',
             args: {
-              participationBaseline: toFixed(expectedParticipationBaseline),
+              participationBaseline: expectedParticipationBaseline,
             },
           })
         })
@@ -1671,6 +1643,7 @@ contract('Governance', (accounts: string[]) => {
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
           await timeTravel(approvalStageDuration, web3)
+          await mockLockedGold.setWeight(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -1696,6 +1669,7 @@ contract('Governance', (accounts: string[]) => {
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
           await timeTravel(approvalStageDuration, web3)
+          await mockLockedGold.setWeight(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -1719,7 +1693,7 @@ contract('Governance', (accounts: string[]) => {
         it('should update the participation baseline', async () => {
           await governance.execute(proposalId, index)
           const [actualParticipationBaseline, , ,] = await governance.getParticipationParameters()
-          assertEqualBN(actualParticipationBaseline, toFixed(expectedParticipationBaseline))
+          assertEqualBN(actualParticipationBaseline, expectedParticipationBaseline)
         })
 
         it('should emit the ProposalExecuted event', async () => {
@@ -1741,7 +1715,7 @@ contract('Governance', (accounts: string[]) => {
           assertLogMatches2(log, {
             event: 'ParticipationBaselineUpdated',
             args: {
-              participationBaseline: toFixed(expectedParticipationBaseline),
+              participationBaseline: expectedParticipationBaseline,
             },
           })
         })
@@ -1762,6 +1736,7 @@ contract('Governance', (accounts: string[]) => {
             await timeTravel(dequeueFrequency, web3)
             await governance.approve(proposalId, index)
             await timeTravel(approvalStageDuration, web3)
+            await mockLockedGold.setWeight(account, weight)
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
           })
@@ -1785,6 +1760,7 @@ contract('Governance', (accounts: string[]) => {
             await timeTravel(dequeueFrequency, web3)
             await governance.approve(proposalId, index)
             await timeTravel(approvalStageDuration, web3)
+            await mockLockedGold.setWeight(account, weight)
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
           })
@@ -1809,6 +1785,7 @@ contract('Governance', (accounts: string[]) => {
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
         await timeTravel(approvalStageDuration, web3)
+        await mockLockedGold.setWeight(account, weight)
         await governance.vote(proposalId, index, value)
         await timeTravel(referendumStageDuration, web3)
         await timeTravel(executionStageDuration, web3)
@@ -1839,7 +1816,7 @@ contract('Governance', (accounts: string[]) => {
       it('should update the participation baseline', async () => {
         await governance.execute(proposalId, index)
         const [actualParticipationBaseline, , ,] = await governance.getParticipationParameters()
-        assertEqualBN(actualParticipationBaseline, toFixed(expectedParticipationBaseline))
+        assertEqualBN(actualParticipationBaseline, expectedParticipationBaseline)
       })
 
       it('should emit the ParticipationBaselineUpdated event', async () => {
@@ -1849,7 +1826,7 @@ contract('Governance', (accounts: string[]) => {
         assertLogMatches2(log, {
           event: 'ParticipationBaselineUpdated',
           args: {
-            participationBaseline: toFixed(expectedParticipationBaseline),
+            participationBaseline: expectedParticipationBaseline,
           },
         })
       })
@@ -1912,23 +1889,23 @@ contract('Governance', (accounts: string[]) => {
         )
       })
 
-      // TODO(brice): Uncomment when HotfixExecuted event is readded
-      // it('should emit the HotfixExecuted event', async () => {
-      //   const resp = await governance.hotfix(
-      //     [transactionSuccess1.value],
-      //     [transactionSuccess1.destination],
-      //     transactionSuccess1.data,
-      //     [transactionSuccess1.data.length]
-      //   )
-      //   assert.equal(resp.logs.length, 1)
-      //   const log = resp.logs[0]
-      //   assertLogMatches2(log, {
-      //     event: 'HotfixExecuted',
-      //     args: {
-      //       proposalHash: proposalHash
-      //     },
-      //   })
-      // })
+      // TODO(yorke): Uncomment when HotfixExecuted event is readded
+      it('should emit the HotfixExecuted event', async () => {
+        const resp = await governance.hotfix(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length]
+        )
+        assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        assertLogMatches2(log, {
+          event: 'HotfixExecuted',
+          args: {
+            txHash: 
+          },
+        })
+      })
 
       describe('when the approver changes', () => {
         beforeEach(async () => {
@@ -2010,6 +1987,7 @@ contract('Governance', (accounts: string[]) => {
     describe('when the account has upvoted a proposal', () => {
       const proposalId = 1
       beforeEach(async () => {
+        await mockLockedGold.setWeight(account, weight)
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
@@ -2062,6 +2040,7 @@ contract('Governance', (accounts: string[]) => {
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
         await timeTravel(approvalStageDuration, web3)
+        await mockLockedGold.setWeight(account, weight)
         await governance.vote(proposalId, index, value)
       })
 
@@ -2100,8 +2079,8 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when the adjusted support is greater than threshold', () => {
       beforeEach(async () => {
-        await mockBondedDeposits.setWeight(account, (weight * 51) / 100)
-        await mockBondedDeposits.setWeight(otherAccount, (weight * 49) / 100)
+        await mockLockedGold.setWeight(account, (weight * 51) / 100)
+        await mockLockedGold.setWeight(otherAccount, (weight * 49) / 100)
         await governance.vote(proposalId, index, VoteValue.Yes)
         await governance.vote(proposalId, index, VoteValue.No, { from: otherAccount })
       })
@@ -2114,8 +2093,8 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when the adjusted support is less than or equal to threshold', () => {
       beforeEach(async () => {
-        await mockBondedDeposits.setWeight(account, (weight * 50) / 100)
-        await mockBondedDeposits.setWeight(otherAccount, (weight * 50) / 100)
+        await mockLockedGold.setWeight(account, (weight * 50) / 100)
+        await mockLockedGold.setWeight(otherAccount, (weight * 50) / 100)
         await governance.vote(proposalId, index, VoteValue.Yes)
         await governance.vote(proposalId, index, VoteValue.No, { from: otherAccount })
       })

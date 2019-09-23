@@ -15,7 +15,7 @@
   "learnMore": "Learn More",
   "activity": "Activity",
   "history": "History",
-  "notEnoughDollarsError": "Not enough Celo Dollars to make exchange",
+  "notEnoughDollarsError": "Not enough {{CeloDollars}} to make exchange",
   "notEnoughGoldError": "Not enough Celo Gold to make exchange",
   "exchangeFailed": "Exchange failed, please retry",
   "transactionFailed": "Transaction failed, please retry",
@@ -23,10 +23,11 @@
   "edit": "Edit",
   "receivedPayment": "Received Payment",
   "getBackupKey": "Get Backup Key",
-  "readOnlyState": "Read Only Mode Set Backup Key to continue sending and receiving Celo Dollars",
+  "readOnlyState":
+    "Read Only Mode Set Backup Key to continue sending and receiving {{CeloDollars}}",
   "getStarted": "Get Started",
-  "manageCeloDollars": "Manage Celo Dollars",
-  "sendCeloDollars": "Send Celo Dollars",
+  "manageCeloDollars": "Manage {{CeloDollars}}",
+  "sendCeloDollars": "Send {{CeloDollars}}",
   "startEarning": "Start Earning",
   "backToWallet": "Back to Wallet",
   "exchangeForGold": "Exchange for Gold",
@@ -52,7 +53,7 @@
   "to": "To",
   "for": "For",
   "celoGold": "Celo Gold",
-  "celoDollars": "Celo Dollars",
+  "celoDollars": "{{CeloDollars}}",
   "oops": "Oops!",
   "somethingWrong": "Something went wrong.",
   "verifyFailed": "Failed to verify",
@@ -68,7 +69,7 @@
   "escrowTransferFailed": "Transfer to escrow failed",
   "escrowWithdrawalFailed": "Withdrawal from escrow failed",
   "reclaimingEscrowedPaymentFailed": "Payment could not be reclaimed",
-  "connectingToCelo": "Connecting to the Celo Network...",
+  "connectingToCelo": "Connecting to Celo…",
   "poorConnection": {
     "0": "Bad Connection",
     "1": "some features disabled"
@@ -85,5 +86,6 @@
   "corruptedChainDeleted": "Corrupted chain data has been deleted, please restart the app",
   "web3FailedToSync": "Failing to sync, check your network connection",
   "errorDuringSync": "Error occurred during sync, please try again later",
-  "calculateFeeFailed": "Could not calculate fee"
+  "calculateFeeFailed": "Could not calculate fee",
+  "gold": "Gold"
 }

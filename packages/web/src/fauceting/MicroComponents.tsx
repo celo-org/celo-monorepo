@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import { EXAMPLE_ADDRESS, RequestState } from 'src/fauceting/utils'
 import { I18nProps } from 'src/i18n'
 import Checkmark from 'src/icons/Checkmark'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import Spinner from 'src/shared/Spinner'
 import { colors, fonts, standardStyles as std, textStyles } from 'src/styles'
-
 interface InfoProps {
   requestState: RequestState
   t: I18nProps['t']
@@ -87,7 +87,7 @@ export function ButtonWithFeedback({
   const isInvalid = requestState === RequestState.Invalid
   const isStarted = requestState === RequestState.Working
   const isEnded = requestState === RequestState.Completed || requestState === RequestState.Failed
-  const icon = isStarted && <ActivityIndicator color={colors.primary} size={'small'} />
+  const icon = isStarted && <Spinner color={colors.primary} size="small" />
 
   return (
     <Button
@@ -97,6 +97,7 @@ export function ButtonWithFeedback({
       onPress={onSubmit}
       iconLeft={icon}
       align={'flex-start'}
+      style={!isFaucet && isEnded && [textStyles.invert, styles.message]}
       size={isFaucet ? SIZE.normal : SIZE.big}
     />
   )
@@ -117,7 +118,6 @@ function buttonText({ requestState, t }: TextFuncArgs) {
       return t('getStarted')
   }
 }
-
 function faucetText({ requestState, t }: TextFuncArgs) {
   return (
     {
@@ -154,5 +154,8 @@ const styles = StyleSheet.create({
   statusesContainerTicker: {
     alignContent: 'center',
     height: '100%',
+  },
+  message: {
+    lineHeight: 20,
   },
 })

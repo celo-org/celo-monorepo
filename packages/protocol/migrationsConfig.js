@@ -11,7 +11,7 @@ const DefaultConfig = {
     attestationExpirySeconds: 60 * 60, // 1 hour,
     attestationRequestFeeInDollars: 0.05,
   },
-  bondedDeposits: {
+  lockedGold: {
     maxNoticePeriod: 60 * 60 * 24 * 365 * 3, // 3 years
   },
   oracles: {
@@ -32,9 +32,9 @@ const DefaultConfig = {
     queueExpiry: 7 * 24 * 60 * 60, // 1 week
     referendumStageDuration: 15 * 60, // 15 minutes
     participationBaseline: 8 / 10,
-    participationFloor: 5 / 100,
-    updateCoefficient: 1 / 5,
-    criticalBaselineLevel: 1,
+    participationBaselineFloor: 5 / 100,
+    participationBaselineUpdateFactor: 1 / 5,
+    participationBaselineQuorumFactor: 1,
   },
   gasPriceMinimum: {
     initialMinimum: 10000,
@@ -56,15 +56,15 @@ const DefaultConfig = {
     tokenName: 'Celo Dollar',
     tokenSymbol: 'cUSD',
     // 52nd root of 1.005, equivalent to 0.5% annual inflation
-    inflationRateNumerator: BigNumber(100009591886),
-    inflationRateDenominator: BigNumber(100000000000),
+    inflationRate: 1.00009591886,
     inflationPeriod: 7 * 24 * 60 * 60, // 1 week
+    initialAccounts: [],
   },
   validators: {
     minElectableValidators: '10',
     maxElectableValidators: '100',
-    minBondedDepositValue: '1000000000000000000', // 1 gold
-    minBondedDepositNoticePeriod: 60 * 24 * 60 * 60, // 60 days
+    minLockedGoldValue: '1000000000000000000', // 1 gold
+    minLockedGoldNoticePeriod: 60 * 24 * 60 * 60, // 60 days
 
     validatorKeys: [],
     // We register a single validator group during the migration.
@@ -75,7 +75,7 @@ const DefaultConfig = {
 
 const linkedLibraries = {
   FixidityLib: [
-    'BondedDeposits',
+    'LockedGold',
     'Exchange',
     'GasPriceMinimum',
     'Governance',
@@ -85,7 +85,7 @@ const linkedLibraries = {
     'Validators',
   ],
   Proposals: ['Governance', 'ProposalsTest'],
-  LinkedList: ['AddressLinkedList', 'SortedLinkedList'],
+  LinkedList: ['AddressLinkedList', 'SortedLinkedList', 'LinkedListTest'],
   SortedLinkedList: [
     'AddressSortedLinkedList',
     'IntegerSortedLinkedList',
@@ -96,17 +96,15 @@ const linkedLibraries = {
   AddressSortedLinkedList: ['Validators'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
-  Signatures: ['BondedDeposits', 'Escrow'],
+  Signatures: ['LockedGold', 'Escrow'],
 }
 
 const argv = minimist(process.argv.slice(2), {
-  string: ['migration_override', 'keys', 'build_directory'],
+  string: ['migration_override', 'build_directory'],
   default: {
-    keys: '',
     build_directory: path.join(__dirname, 'build'),
   },
 })
-const validatorKeys = argv.keys ? argv.keys.split(',') : []
 
 const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
 const config = {}
@@ -114,8 +112,6 @@ const config = {}
 for (const key of Object.keys(DefaultConfig)) {
   config[key] = { ...DefaultConfig[key], ...migrationOverride[key] }
 }
-
-config.validators.validatorKeys = validatorKeys
 
 module.exports = {
   build_directory: argv.build_directory,

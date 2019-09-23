@@ -13,4 +13,13 @@ export const migrations = {
       },
     }
   },
+  1: (state: any) => {
+    return {
+      ...state,
+      app: {
+        ...state.app,
+        language: state.app.language === 'es-AR' ? 'es-419' : state.app.language,
+      },
+    }
+  },
 }

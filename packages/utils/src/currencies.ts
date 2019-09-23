@@ -4,26 +4,23 @@ export enum CURRENCY_ENUM {
 }
 
 interface Currency {
-  singleUnit: string
-  pluralUnit: string
   symbol: string
   code: string
+  displayDecimals: number
 }
 
 type CurrencyObject = { [key in CURRENCY_ENUM]: Currency }
 
 export const CURRENCIES: CurrencyObject = {
   [CURRENCY_ENUM.GOLD]: {
-    singleUnit: 'Celo gold',
-    pluralUnit: 'Celo gold',
     symbol: '',
     code: 'cGLD',
+    displayDecimals: 3,
   },
   [CURRENCY_ENUM.DOLLAR]: {
-    singleUnit: 'Celo dollar',
-    pluralUnit: 'Celo dollars',
     symbol: '$',
     code: 'cUSD',
+    displayDecimals: 2,
   },
 }
 
@@ -46,4 +43,23 @@ export enum SHORT_CURRENCIES {
 export const currencyToShortMap = {
   [CURRENCY_ENUM.DOLLAR]: SHORT_CURRENCIES.DOLLAR,
   [CURRENCY_ENUM.GOLD]: SHORT_CURRENCIES.GOLD,
+}
+
+const currencyTranslationsENUS: { [key: string]: string } = {
+  CeloDollars: 'Celo Dollars',
+  CeloDollar: 'Celo Dollar',
+  Dollar: 'Dollar',
+  Dollars: 'Dollars',
+  dollars: 'dollars',
+}
+const currencyTranslationsESAR: { [key: string]: string } = {
+  CeloDollars: 'Celo Dólares',
+  CeloDollar: 'Celo Dólar',
+  Dollar: 'Dólar',
+  Dollars: 'Dólares',
+  dollars: 'dólares',
+}
+export const currencyTranslations: { [key: string]: any } = {
+  ['en-US']: currencyTranslationsENUS,
+  ['es-419']: currencyTranslationsESAR,
 }

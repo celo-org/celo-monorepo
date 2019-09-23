@@ -1,6 +1,5 @@
 import { assertEqualBN } from '@celo/protocol/lib/test-utils'
-import { toFixed } from '@celo/protocol/lib/fixidity'
-import BigNumber from 'bignumber.js'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import { ProposalsTestContract, ProposalsTestInstance } from 'types'
 
 const ProposalsTest: ProposalsTestContract = artifacts.require('ProposalsTest')
@@ -14,7 +13,7 @@ contract('ProposalsTest', () => {
 
   describe('#getSupportWithQuorumPadding()', () => {
     const networkWeight = 100
-    const quorum = new BigNumber(5).div(new BigNumber(10))
+    const quorum = toFixed(5 / 10)
 
     beforeEach(async () => {
       proposalsTest = await ProposalsTest.new()
@@ -27,7 +26,7 @@ contract('ProposalsTest', () => {
       const abstain = 30
       const expected = toFixed(yes / (yes + no))
       await proposalsTest.setVotes(yes, no, abstain)
-      const support = await proposalsTest.getSupportWithQuorumPadding(toFixed(quorum))
+      const support = await proposalsTest.getSupportWithQuorumPadding(quorum)
       assertEqualBN(support, expected)
     })
 
@@ -39,7 +38,7 @@ contract('ProposalsTest', () => {
       const addedNo = 50 - yes - no - abstain
       const expected = toFixed(yes / (yes + no + addedNo))
       await proposalsTest.setVotes(yes, no, abstain)
-      const support = await proposalsTest.getSupportWithQuorumPadding(toFixed(quorum))
+      const support = await proposalsTest.getSupportWithQuorumPadding(quorum)
       assertEqualBN(support, expected)
     })
 
@@ -49,7 +48,7 @@ contract('ProposalsTest', () => {
       const abstain = 30
       const expected = toFixed(0)
       await proposalsTest.setVotes(yes, no, abstain)
-      const support = await proposalsTest.getSupportWithQuorumPadding(toFixed(quorum))
+      const support = await proposalsTest.getSupportWithQuorumPadding(quorum)
       assertEqualBN(support, expected)
     })
   })

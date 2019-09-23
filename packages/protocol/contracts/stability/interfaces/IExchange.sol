@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 
 interface IExchange {
@@ -6,8 +6,8 @@ interface IExchange {
   function initialize(
     address,
     address,
-    int256,
-    int256,
+    uint256,
+    uint256,
     uint256,
     uint256
   ) external;

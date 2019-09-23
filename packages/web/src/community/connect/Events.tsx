@@ -5,11 +5,11 @@ import Fade from 'react-reveal/Fade'
 import EventRow from 'src/community/connect/EventRow'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Button, { BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import OvalCoin from 'src/shared/OvalCoin'
+import Spinner from 'src/shared/Spinner'
 import { colors, fonts, standardStyles } from 'src/styles'
 import { NoneFound, Radio, SectionHeader } from 'src/table/table'
-
 interface OwnProps {
   upcomingEvents?: EventProps[]
   pastEvents?: EventProps[]
@@ -62,7 +62,7 @@ class Events extends React.PureComponent<Props, State> {
 
   renderNotFound = () => {
     if (this.props.loading) {
-      return null
+      return <PlaceHolder />
     }
 
     return (
@@ -135,6 +135,7 @@ class Events extends React.PureComponent<Props, State> {
             <View style={[standardStyles.centered, standardStyles.blockMarginTop]}>
               <Button
                 kind={BTN.DARKNAKED}
+                size={SIZE.normal}
                 text={t('events.pastEvents')}
                 href={'/past-events'}
                 target={'_new'}
@@ -177,4 +178,15 @@ const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
   },
+  placeholder: {
+    height: '90vh',
+  },
 })
+
+function PlaceHolder() {
+  return (
+    <View style={[standardStyles.centered, styles.placeholder]}>
+      <Spinner color={colors.primary} size="medium" />
+    </View>
+  )
+}

@@ -19,7 +19,7 @@ EXAMPLE
   list
 ```
 
-_See code: [packages/cli/src/src/commands/exchange/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/exchange/list.ts)_
+_See code: [packages/cli/src/commands/exchange/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/list.ts)_
 
 ### Selldollar
 
@@ -38,7 +38,7 @@ EXAMPLE
   selldollar 100 300 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
 ```
 
-_See code: [packages/cli/src/src/commands/exchange/selldollar.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/exchange/selldollar.ts)_
+_See code: [packages/cli/src/commands/exchange/selldollar.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/selldollar.ts)_
 
 ### Sellgold
 
@@ -57,4 +57,4 @@ EXAMPLE
   sellgold 100 300 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
 ```
 
-_See code: [packages/cli/src/src/commands/exchange/sellgold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/src/commands/exchange/sellgold.ts)_
+_See code: [packages/cli/src/commands/exchange/sellgold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/sellgold.ts)_

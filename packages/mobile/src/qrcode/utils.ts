@@ -5,7 +5,6 @@ import Share from 'react-native-share'
 import { put } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -63,11 +62,11 @@ export function* handleBarcode(
   }
 
   if (typeof data !== 'object' || isEmpty(data.address)) {
-    yield put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS, ALERT_BANNER_DURATION))
+    yield put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
     return
   }
   if (!isValidAddress(data.address)) {
-    yield put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS, ALERT_BANNER_DURATION))
+    yield put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
     return
   }
   if (typeof data.e164PhoneNumber !== 'string') {

@@ -1,17 +1,16 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-import "./Proposals.sol";
-import "./UsingBondedDeposits.sol";
 import "./interfaces/IGovernance.sol";
-import "./interfaces/IValidators.sol";
+import "./Proposals.sol";
+import "./UsingLockedGold.sol";
 import "../common/Initializable.sol";
-import "../common/UsingFixidity.sol";
-import "../common/UsingRegistry.sol";
+import "../common/FixidityLib.sol";
+import "../common/FractionUtil.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
 
 
@@ -19,11 +18,32 @@ import "../common/linkedlists/IntegerSortedLinkedList.sol";
 /**
  * @title A contract for making, passing, and executing on-chain governance proposals.
  */
-contract Governance is
-  IGovernance, Ownable, Initializable, UsingBondedDeposits, ReentrancyGuard, UsingFixidity {
+contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, ReentrancyGuard {
+  using Proposals for Proposals.Proposal;
+  using FixidityLib for FixidityLib.Fraction;
+  using FractionUtil for FractionUtil.Fraction;
   using SafeMath for uint256;
   using IntegerSortedLinkedList for SortedLinkedList.List;
-  using Proposals for Proposals.Proposal;
+  using BytesLib for bytes;
+
+  uint256 constant private FIXED_HALF = 500000000000000000000000;
+
+  // TODO(asa): Consider a delay stage.
+  enum ProposalStage {
+    None,
+    Queued,
+    Approval,
+    Referendum,
+    Execution,
+    Expiration
+  }
+
+  enum VoteValue {
+    None,
+    Abstain,
+    No,
+    Yes
+  }
 
   struct VoteRecord {
     Proposals.VoteValue value;
@@ -39,28 +59,13 @@ contract Governance is
   }
 
   struct ContractConstitution {
-    int256 defaultThreshold;
-    // Maps a function ID to a corresponding passing function, overriding the
-    // default.
-    mapping(bytes4 => int256) functionThresholds;
-  }
-
-  // All parameters are Fixidity fractions.
-  // The baseline is updated as
-  // max{floor, (1 - baselineUpdateFactor) * baseline + baselineUpdateFactor * participation}
-  struct ParticipationParameters {
-    // The average network participation in governance, weighted toward recent proposals.
-    int256 baseline;
-    // The lower bound on the participation baseline.
-    int256 floor;
-    // The weight of the most recent proposal's participation on the baseline.
-    int256 baselineUpdateFactor;
-    // The proportion of the baseline that constitutes quorum.
-    int256 baselineQuorumFactor;
+    FixidityLib.Fraction defaultThreshold;
+    // Maps a function ID to a corresponding passing function, overriding the default.
+    mapping(bytes4 => FixidityLib.Fraction) functionThresholds;
   }
 
   struct HotfixVote {
-    bytes32 hash;
+    bytes32 txHash;
     uint256 epoch;
   }
 
@@ -75,6 +80,19 @@ contract Governance is
     mapping(bytes32 => HotfixTally) tally;
     mapping(bytes32 => bool) completed;
     Proposals.Proposal proposal;
+  }
+
+  // The baseline is updated as
+  // max{floor, (1 - baselineUpdateFactor) * baseline + baselineUpdateFactor * participation}
+  struct ParticipationParameters {
+    // The average network participation in governance, weighted toward recent proposals.
+    FixidityLib.Fraction baseline;
+    // The lower bound on the participation baseline.
+    FixidityLib.Fraction baselineFloor;
+    // The weight of the most recent proposal's participation on the baseline.
+    FixidityLib.Fraction baselineUpdateFactor;
+    // The proportion of the baseline that constitutes quorum.
+    FixidityLib.Fraction baselineQuorumFactor;
   }
 
   Proposals.StageDurations public stageDurations;
@@ -130,7 +148,7 @@ contract Governance is
   event ConstitutionSet(
     address indexed destination,
     bytes4 indexed functionId,
-    int256 threshold
+    uint256 threshold
   );
 
   event ProposalQueued(
@@ -178,32 +196,30 @@ contract Governance is
   );
 
   event ParticipationBaselineUpdated(
-    int256 participationBaseline
+    uint256 participationBaseline
   );
 
   event ParticipationFloorSet(
-    int256 participationFloor
+    uint256 participationFloor
   );
 
-  event BaselineUpdateFactorSet(
-    int256 baselineUpdateFactor
+  event ParticipationBaselineUpdateFactorSet(
+    uint256 baselineUpdateFactor
   );
 
-  event BaselineQuorumFactorSet(
-    int256 baselineQuorumFactor
+  event ParticipationBaselineQuorumFactorSet(
+    uint256 baselineQuorumFactor
   );
 
-  // TODO(brice): Uncomment when bytecode limit not a problem
-  // event HotfixWhitelisted(
-  //   address whitelister,
-  //   bytes32 hash,
-  //   uint256 epoch
-  // );
+  event HotfixExecuted(
+    bytes32 txHash
+  );
 
-  // TODO(brice): Uncomment when bytecode limit not a problem
-  // event HotfixExecuted(
-  //   bytes32 hash
-  // );
+  event HotfixWhitelisted(
+    address whitelister,
+    bytes32 txHash,
+    uint256 epoch
+  );
 
   function() external payable {} // solhint-disable no-empty-blocks
 
@@ -238,10 +254,10 @@ contract Governance is
     uint256 approvalStageDuration,
     uint256 referendumStageDuration,
     uint256 executionStageDuration,
-    int256 participationBaseline,
-    int256 participationFloor,
-    int256 baselineUpdateFactor,
-    int256 baselineQuorumFactor
+    uint256 participationBaseline,
+    uint256 participationFloor,
+    uint256 baselineUpdateFactor,
+    uint256 baselineQuorumFactor
   )
     external
     initializer
@@ -270,10 +286,10 @@ contract Governance is
     stageDurations.approval = approvalStageDuration;
     stageDurations.referendum = referendumStageDuration;
     stageDurations.execution = executionStageDuration;
-    participationParameters.baseline = participationBaseline;
-    participationParameters.floor = participationFloor;
-    participationParameters.baselineUpdateFactor = baselineUpdateFactor;
-    participationParameters.baselineQuorumFactor = baselineQuorumFactor;
+    setParticipationBaseline(participationBaseline);
+    setParticipationFloor(participationFloor);
+    setBaselineUpdateFactor(baselineUpdateFactor);
+    setBaselineQuorumFactor(baselineQuorumFactor);
     // solhint-disable-next-line not-rely-on-time
     lastDequeue = now;
   }
@@ -361,12 +377,30 @@ contract Governance is
   }
 
   /**
+   * @notice Updates the participation baseline.
+   * @param participationBaseline The value of the baseline.
+   */
+  function setParticipationBaseline(uint256 participationBaseline) public onlyOwner {
+    FixidityLib.Fraction memory participationBaselineFrac = FixidityLib.wrap(participationBaseline);
+    require(
+      FixidityLib.isProperFraction(participationBaselineFrac) &&
+      !participationBaselineFrac.equals(participationParameters.baseline)
+    );
+    participationParameters.baseline = participationBaselineFrac;
+    emit ParticipationBaselineUpdated(participationBaseline);
+  }
+
+  /**
    * @notice Updates the floor of the participation baseline.
    * @param participationFloor The value at which the baseline is floored.
    */
-  function setParticipationFloor(int256 participationFloor) external onlyOwner {
-    require(participationFloor != participationParameters.floor && isFraction(participationFloor));
-    participationParameters.floor = participationFloor;
+  function setParticipationFloor(uint256 participationFloor) public onlyOwner {
+    FixidityLib.Fraction memory participationFloorFrac = FixidityLib.wrap(participationFloor);
+    require(
+      FixidityLib.isProperFraction(participationFloorFrac) &&
+      !participationFloorFrac.equals(participationParameters.baselineFloor)
+    );
+    participationParameters.baselineFloor = participationFloorFrac;
     emit ParticipationFloorSet(participationFloor);
   }
 
@@ -374,26 +408,28 @@ contract Governance is
    * @notice Updates the weight of the new participation in the baseline update rule.
    * @param baselineUpdateFactor The new baseline update factor.
    */
-  function setBaselineUpdateFactor(int256 baselineUpdateFactor) external onlyOwner {
+  function setBaselineUpdateFactor(uint256 baselineUpdateFactor) public onlyOwner {
+    FixidityLib.Fraction memory baselineUpdateFactorFrac = FixidityLib.wrap(baselineUpdateFactor);
     require(
-      baselineUpdateFactor != participationParameters.baselineUpdateFactor &&
-      isFraction(baselineUpdateFactor)
+      FixidityLib.isProperFraction(baselineUpdateFactorFrac) &&
+      !baselineUpdateFactorFrac.equals(participationParameters.baselineUpdateFactor)
     );
-    participationParameters.baselineUpdateFactor = baselineUpdateFactor;
-    emit BaselineUpdateFactorSet(baselineUpdateFactor);
+    participationParameters.baselineUpdateFactor = baselineUpdateFactorFrac;
+    emit ParticipationBaselineUpdateFactorSet(baselineUpdateFactor);
   }
 
   /**
    * @notice Updates the proportion of the baseline that constitutes quorum.
    * @param baselineQuorumFactor The new baseline quorum factor.
    */
-  function setBaselineQuorumFactor(int256 baselineQuorumFactor) external onlyOwner {
+  function setBaselineQuorumFactor(uint256 baselineQuorumFactor) public onlyOwner {
+    FixidityLib.Fraction memory baselineQuorumFactorFrac = FixidityLib.wrap(baselineQuorumFactor);
     require(
-      baselineQuorumFactor != participationParameters.baselineQuorumFactor &&
-      isFraction(baselineQuorumFactor)
+      FixidityLib.isProperFraction(baselineQuorumFactorFrac) &&
+      !baselineQuorumFactorFrac.equals(participationParameters.baselineQuorumFactor)
     );
-    participationParameters.baselineQuorumFactor = baselineQuorumFactor;
-    emit BaselineQuorumFactorSet(baselineQuorumFactor);
+    participationParameters.baselineQuorumFactor = baselineQuorumFactorFrac;
+    emit ParticipationBaselineQuorumFactorSet(baselineQuorumFactor);
   }
 
   /**
@@ -402,24 +438,25 @@ contract Governance is
    * @param functionId The function ID of proposals for which this threshold should apply. Zero
    *   will set the default.
    * @param threshold The threshold.
-   * @dev If no constitution is explicitly set the default is a simple majority.
+   * @dev If no constitution is explicitly set the default is a simple majority, i.e. 1:2.
    */
   function setConstitution(
     address destination,
     bytes4 functionId,
-    int256 threshold
+    uint256 threshold
   )
     external
     onlyOwner
   {
     // TODO(asa): https://github.com/celo-org/celo-monorepo/pull/3414#discussion_r283588332
     require(destination != address(0));
-    // Threshold has to be greater than or equal to a majority and less than unaninimty
-    require(threshold >= FIXED_HALF && threshold < FIXED1);
+    // Threshold has to be greater than majority and not greater than unaninimty
+    require(threshold > FIXED_HALF && threshold <= FixidityLib.fixed1().unwrap());
     if (functionId == 0) {
-      constitution[destination].defaultThreshold = threshold;
+      constitution[destination].defaultThreshold = FixidityLib.wrap(threshold);
     } else {
-      constitution[destination].functionThresholds[functionId] = threshold;
+      constitution[destination].functionThresholds[functionId] =
+        FixidityLib.wrap(threshold);
     }
     emit ConstitutionSet(destination, functionId, threshold);
   }
@@ -562,7 +599,7 @@ contract Governance is
     require(msg.sender == approver && !proposal.isApproved() && stage == Proposals.Stage.Approval);
     proposal.approved = true;
     // Ensures networkWeight is set by the end of the Referendum stage, even if 0 votes are cast.
-    proposal.networkWeight = totalWeight();
+    proposal.networkWeight = getTotalWeight();
     emit ProposalApproved(proposalId);
     return true;
   }
@@ -581,6 +618,7 @@ contract Governance is
     Proposals.VoteValue value
   )
     external
+    nonReentrant
     returns (bool)
   {
     address account = getAccountFromVoter(msg.sender);
@@ -607,7 +645,7 @@ contract Governance is
       (voteRecord.proposalId == proposalId) ? voteRecord.value : Proposals.VoteValue.None,
       value
     );
-    proposal.networkWeight = totalWeight();
+    proposal.networkWeight = getTotalWeight();
     voteRecord.proposalId = proposalId;
     voteRecord.value = value;
     if (proposal.timestamp > voter.mostRecentReferendumProposal) {
@@ -644,9 +682,9 @@ contract Governance is
 
   /**
    * @notice Whitelists the hash of a hotfix.
-   * @param hash The hash of the hotfix to be whitelisted.
+   * @param txHash The hash of the hotfix to be whitelisted.
    */
-  function whitelist(bytes32 hash) external {
+  function whitelist(bytes32 txHash) external {
     // TODO(brice): use m-chrzan's magical validator indexing to check inclusion
     IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
     address[] memory validatorSet = validators.getValidators();
@@ -658,19 +696,18 @@ contract Governance is
       }
     }
     require(isValidator);
-    // TODO(brice): get epoch number in a better way
+    // TODO(yorke): get epoch number in a better way
     uint256 epoch = block.number.div(30000);
-    if (epoch > hotfixRecord.tally[hash].epoch) {
-      hotfixRecord.tally[hash].voteCount = 0;
+    if (epoch > hotfixRecord.tally[txHash].epoch) {
+      hotfixRecord.tally[txHash].voteCount = 0;
     }
     if (
-      hotfixRecord.whitelist[msg.sender].hash != hash ||
+      hotfixRecord.whitelist[msg.sender].txHash != txHash ||
       hotfixRecord.whitelist[msg.sender].epoch != epoch
     ) {
-      hotfixRecord.whitelist[msg.sender] = HotfixVote(hash, validatorSet.length, epoch);
-      hotfixRecord.tally[hash].voteCount = hotfixRecord.tally[hash].voteCount.add(1);
-      // TODO(brice): Uncomment when bytecode limit not a problem
-      // emit HotfixWhitelisted(msg.sender, hash, epoch);
+      hotfixRecord.whitelist[msg.sender] = HotfixVote(txHash, validatorSet.length, epoch);
+      hotfixRecord.tally[txHash].voteCount = hotfixRecord.tally[txHash].voteCount.add(1);
+      emit HotfixWhitelisted(msg.sender, txHash, epoch);
     }
   }
 
@@ -691,19 +728,19 @@ contract Governance is
     external
     nonReentrant
   {
-    // TODO(brice): get epoch number in a better way
+    // TODO(yorke): get epoch number in a better way
     uint256 epoch = block.number.div(30000);
-    bytes32 hash = keccak256(abi.encode(values, destinations, data, dataLengths));
-    uint256 totalVotes = hotfixRecord.tally[hash].totalVotes;
+    bytes32 txHash = keccak256(abi.encode(values, destinations, data, dataLengths));
+    uint256 totalVotes = hotfixRecord.tally[txHash].totalVotes;
     require(
-      hotfixRecord.tally[hash].epoch == epoch &&
-      hotfixRecord.tally[hash].voteCount >= totalVotes.sub(totalVotes.sub(1).div(3))
+      hotfixRecord.tally[txHash].epoch == epoch &&
+      hotfixRecord.tally[txHash].voteCount >= totalVotes.sub(totalVotes.sub(1).div(3)) &&
+      hotfixRecord.completed[txHash] == false
     );
     hotfixRecord.proposal.make(values, destinations, data, dataLengths, msg.sender, 0);
     hotfixRecord.proposal.execute();
-    // TODO(brice): Uncomment when bytecode limit not a problem
-    // emit HotfixExecuted(hash);
-    hotfixRecord.completed[hash] = true;
+    emit HotfixExecuted(txHash);
+    hotfixRecord.completed[txHash] = true;
     delete hotfixRecord.proposal;
   }
 
@@ -734,7 +771,7 @@ contract Governance is
   function getParticipationParameters() external view returns (int256, int256, int256, int256) {
     return (
       participationParameters.baseline,
-      participationParameters.floor,
+      participationParameters.baselineFloor,
       participationParameters.baselineUpdateFactor,
       participationParameters.baselineQuorumFactor
     );
@@ -945,13 +982,16 @@ contract Governance is
    * @return Whether or not the proposal is passing.
    */
   function _isProposalPassing(Proposals.Proposal storage proposal) private view returns (bool) {
-    int256 support = proposal.getSupportWithQuorumPadding(
+    FixidityLib.Fraction memory support = proposal.getSupportWithQuorumPadding(
       participationParameters.baseline.multiply(participationParameters.baselineQuorumFactor)
     );
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
       bytes4 functionId = extractFunctionSignature(proposal.transactions[i].data);
-      int256 threshold = getConstitution(proposal.transactions[i].destination, functionId);
-      if (support <= threshold) {
+      FixidityLib.Fraction memory threshold = _getConstitution(
+        proposal.transactions[i].destination, 
+        functionId
+      );
+      if (support.lte(threshold)) {
         return false;
       }
     }
@@ -1027,17 +1067,18 @@ contract Governance is
    * @param proposal The proposal struct.
    */
   function updateParticipationBaseline(Proposals.Proposal storage proposal) private {
-    int256 participationComponent = proposal.getParticipation().multiply(
+    FixidityLib.Fraction memory participation = proposal.getParticipation();
+    FixidityLib.Fraction memory participationComponent = participation.multiply(
       participationParameters.baselineUpdateFactor
     );
-    int256 baselineComponent = participationParameters.baseline.multiply(
-      FIXED1.subtract(participationParameters.baselineUpdateFactor)
+    FixidityLib.Fraction memory baselineComponent = participationParameters.baseline.multiply(
+      FixidityLib.fixed1().subtract(participationParameters.baselineUpdateFactor)
     );
     participationParameters.baseline = participationComponent.add(baselineComponent);
-    if (participationParameters.baseline < participationParameters.floor) {
-      participationParameters.baseline = participationParameters.floor;
+    if (participationParameters.baseline.lt(participationParameters.baselineFloor)) {
+      participationParameters.baseline = participationParameters.baselineFloor;
     }
-    emit ParticipationBaselineUpdated(participationParameters.baseline);
+    emit ParticipationBaselineUpdated(participationParameters.baseline.unwrap());
   }
 
   /**
@@ -1056,6 +1097,17 @@ contract Governance is
     return output;
   }
 
+  function getConstitution(
+    address destination,
+    bytes4 functionId
+  )
+    external
+    view
+    returns (uint256)
+  {
+    return _getConstitution(destination, functionId).unwrap();
+  }
+
   /**
    * @notice Returns the constitution for a particular destination and function ID.
    * @param destination The destination address to get the constitution for.
@@ -1067,25 +1119,17 @@ contract Governance is
     address destination,
     bytes4 functionId
   )
-    public
+    internal
     view
-    returns (int256)
+    returns (FixidityLib.Fraction memory)
   {
     // Default to a simple majority.
-    int256 threshold = FIXED_HALF;
-    if (constitution[destination].functionThresholds[functionId] != 0) {
+    FixidityLib.Fraction memory threshold = FixidityLib.wrap(FIXED_HALF);
+    if (constitution[destination].functionThresholds[functionId].unwrap() != 0) {
       threshold = constitution[destination].functionThresholds[functionId];
-    } else if (constitution[destination].defaultThreshold != 0) {
+    } else if (constitution[destination].defaultThreshold.unwrap() != 0) {
       threshold = constitution[destination].defaultThreshold;
     }
     return threshold;
-  }
-
-  /**
-   * @notice Returns whether a Fixed value is between 0 and 1, inclusive.
-   * @param x The Fixed value.
-   */
-  function isFraction(int256 x) private pure returns (bool) {
-    return x >= 0 && x <= FIXED1;
   }
 }

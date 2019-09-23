@@ -1,6 +1,6 @@
 {
   "name": "@celo/contractkit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Celo's ContractKit to interact with Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -20,27 +20,28 @@
     "clean:all": "yarn clean && rm -rf src/generated",
     "build:gen": "yarn --cwd ../protocol build",
     "prepublishOnly": "yarn build:gen && yarn build",
-    "test": "jest",
-    "lint": "tslint -c tslint.json --project . && tslint -c tslint.json --project test"
+    "test:prepare": "yarn --cwd ../protocol devchain generate .devchain",
+    "test": "jest --runInBand",
+    "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
     "@celo/utils": "^0.0.6-beta5",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^7.2.0",
     "debug": "^4.1.1",
+    "eth-lib": "^0.2.8",
     "web3": "1.0.0-beta.37",
-    "web3-utils": "1.0.0-beta.37"
+    "web3-core-helpers": "1.0.0-beta.37",
+    "web3-utils": "1.0.0-beta.37",
+    "web3-eth-abi": "1.0.0-beta.37"
   },
   "devDependencies": {
+    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#98ad2ba",
     "@celo/protocol": "1.0.0",
     "@types/debug": "^4.1.5",
-    "@types/jest": "^24.0.17",
     "@types/web3": "^1.0.18"
   },
   "engines": {
     "node": ">=8.13.0"
-  },
-  "files": [
-    "lib/**/*"
-  ]
+  }
 }

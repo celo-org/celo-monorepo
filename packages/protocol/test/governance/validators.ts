@@ -1,4 +1,4 @@
-import { bondedDepositsRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertContainSubset,
   assertEqualBN,
@@ -7,8 +7,10 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
-  MockBondedDepositsContract,
-  MockBondedDepositsInstance,
+  MockLockedGoldContract,
+  MockLockedGoldInstance,
+  MockRandomContract,
+  MockRandomInstance,
   RegistryContract,
   RegistryInstance,
   ValidatorsContract,
@@ -16,8 +18,9 @@ import {
 } from 'types'
 
 const Validators: ValidatorsContract = artifacts.require('Validators')
-const MockBondedDeposits: MockBondedDepositsContract = artifacts.require('MockBondedDeposits')
+const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Registry: RegistryContract = artifacts.require('Registry')
+const Random: MockRandomContract = artifacts.require('MockRandom')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
@@ -45,7 +48,9 @@ const parseValidatorGroupParams = (groupParams: any) => {
 contract('Validators', (accounts: string[]) => {
   let validators: ValidatorsInstance
   let registry: RegistryInstance
-  let mockBondedDeposits: MockBondedDepositsInstance
+  let mockLockedGold: MockLockedGoldInstance
+  let random: MockRandomInstance
+
   // A random 64 byte hex string.
   const publicKey =
     'ea0733ad275e2b9e05541341a97ee82678c58932464fad26164657a111a7e37a9fa0300266fb90e2135a1f1512350cb4e985488a88809b14e3cbe415e76e82b2'
@@ -65,9 +70,11 @@ contract('Validators', (accounts: string[]) => {
   const url = 'test-url'
   beforeEach(async () => {
     validators = await Validators.new()
-    mockBondedDeposits = await MockBondedDeposits.new()
+    mockLockedGold = await MockLockedGold.new()
+    random = await Random.new()
     registry = await Registry.new()
-    await registry.setAddressFor(bondedDepositsRegistryId, mockBondedDeposits.address)
+    await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
+    await registry.setAddressFor(CeloContractName.Random, random.address)
     await validators.initialize(
       registry.address,
       minElectableValidators,
@@ -78,7 +85,7 @@ contract('Validators', (accounts: string[]) => {
   })
 
   const registerValidator = async (validator: string) => {
-    await mockBondedDeposits.setBondedDeposit(
+    await mockLockedGold.setLockedCommitment(
       validator,
       registrationRequirement.noticePeriod,
       registrationRequirement.value
@@ -95,7 +102,7 @@ contract('Validators', (accounts: string[]) => {
   }
 
   const registerValidatorGroup = async (group: string) => {
-    await mockBondedDeposits.setBondedDeposit(
+    await mockLockedGold.setLockedCommitment(
       group,
       registrationRequirement.noticePeriod,
       registrationRequirement.value
@@ -268,7 +275,7 @@ contract('Validators', (accounts: string[]) => {
   describe('#registerValidator', () => {
     const validator = accounts[0]
     beforeEach(async () => {
-      await mockBondedDeposits.setBondedDeposit(
+      await mockLockedGold.setLockedCommitment(
         validator,
         registrationRequirement.noticePeriod,
         registrationRequirement.value
@@ -390,7 +397,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the account does not meet the registration requirements', () => {
       beforeEach(async () => {
-        await mockBondedDeposits.setBondedDeposit(
+        await mockLockedGold.setLockedCommitment(
           validator,
           registrationRequirement.noticePeriod,
           registrationRequirement.value.minus(1)
@@ -502,7 +509,7 @@ contract('Validators', (accounts: string[]) => {
             beforeEach(async () => {
               const voter = accounts[2]
               const weight = 10
-              await mockBondedDeposits.setWeight(voter, weight)
+              await mockLockedGold.setWeight(voter, weight)
               await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS, { from: voter })
             })
 
@@ -632,7 +639,7 @@ contract('Validators', (accounts: string[]) => {
             beforeEach(async () => {
               const voter = accounts[2]
               const weight = 10
-              await mockBondedDeposits.setWeight(voter, weight)
+              await mockLockedGold.setWeight(voter, weight)
               await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS, { from: voter })
             })
 
@@ -724,7 +731,7 @@ contract('Validators', (accounts: string[]) => {
           beforeEach(async () => {
             const voter = accounts[2]
             const weight = 10
-            await mockBondedDeposits.setWeight(voter, weight)
+            await mockLockedGold.setWeight(voter, weight)
             await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS, { from: voter })
           })
 
@@ -750,7 +757,7 @@ contract('Validators', (accounts: string[]) => {
   describe('#registerValidatorGroup', () => {
     const group = accounts[0]
     beforeEach(async () => {
-      await mockBondedDeposits.setBondedDeposit(
+      await mockLockedGold.setLockedCommitment(
         group,
         registrationRequirement.noticePeriod,
         registrationRequirement.value
@@ -851,7 +858,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the account does not meet the registration requirements', () => {
       beforeEach(async () => {
-        await mockBondedDeposits.setBondedDeposit(
+        await mockLockedGold.setLockedCommitment(
           group,
           registrationRequirement.noticePeriod,
           registrationRequirement.value.minus(1)
@@ -1022,7 +1029,7 @@ contract('Validators', (accounts: string[]) => {
         beforeEach(async () => {
           const voter = accounts[2]
           const weight = 10
-          await mockBondedDeposits.setWeight(voter, weight)
+          await mockLockedGold.setWeight(voter, weight)
           await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS, { from: voter })
         })
 
@@ -1108,7 +1115,7 @@ contract('Validators', (accounts: string[]) => {
     const group = accounts[2]
     beforeEach(async () => {
       await registerValidatorGroupWithMembers(group, [validator])
-      await mockBondedDeposits.setWeight(voter, weight)
+      await mockLockedGold.setWeight(voter, weight)
     })
 
     it("should set the voter's vote", async () => {
@@ -1166,7 +1173,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the account voting is frozen', () => {
       beforeEach(async () => {
-        await mockBondedDeposits.setVotingFrozen(voter)
+        await mockLockedGold.setVotingFrozen(voter)
       })
 
       it('should revert', async () => {
@@ -1176,7 +1183,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the account has no weight', () => {
       beforeEach(async () => {
-        await mockBondedDeposits.setWeight(voter, NULL_ADDRESS)
+        await mockLockedGold.setWeight(voter, NULL_ADDRESS)
       })
 
       it('should revert', async () => {
@@ -1201,7 +1208,7 @@ contract('Validators', (accounts: string[]) => {
     const group = accounts[2]
     beforeEach(async () => {
       await registerValidatorGroupWithMembers(group, [validator])
-      await mockBondedDeposits.setWeight(voter, weight)
+      await mockLockedGold.setWeight(voter, weight)
       await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS)
     })
 
@@ -1263,17 +1270,19 @@ contract('Validators', (accounts: string[]) => {
     const validator6 = accounts[8]
     const validator7 = accounts[9]
 
+    const hash1 = '0xa5b9d60f32436310afebcfda832817a68921beb782fabf7915cc0460b443116a'
+    const hash2 = '0xa832817a68921b10afebcfd0460b443116aeb782fabf7915cca5b9d60f324363'
+
     // If voterN votes for groupN:
     //   group1 gets 20 votes per member
     //   group2 gets 25 votes per member
     //   group3 gets 30 votes per member
-    // The ordering of the returned validators should be from group with most votes to group,
-    // with fewest votes, and within each group, members are elected from first to last.
+    // We cannot make any guarantee with respect to their ordering.
     const voter1 = { address: accounts[0], weight: 80 }
     const voter2 = { address: accounts[1], weight: 50 }
     const voter3 = { address: accounts[2], weight: 30 }
-    const assertAddressesEqual = (actual: string[], expected: string[]) => {
-      assert.deepEqual(actual.map((x) => x.toLowerCase()), expected.map((x) => x.toLowerCase()))
+    const assertSameAddresses = (actual: string[], expected: string[]) => {
+      assert.sameMembers(actual.map((x) => x.toLowerCase()), expected.map((x) => x.toLowerCase()))
     }
 
     beforeEach(async () => {
@@ -1287,8 +1296,9 @@ contract('Validators', (accounts: string[]) => {
       await registerValidatorGroupWithMembers(group3, [validator7])
 
       for (const voter of [voter1, voter2, voter3]) {
-        await mockBondedDeposits.setWeight(voter.address, voter.weight)
+        await mockLockedGold.setWeight(voter.address, voter.weight)
       }
+      await random.revealAndCommit(hash1, hash1, NULL_ADDRESS)
     })
 
     describe('when a single group has >= minElectableValidators as members and received votes', () => {
@@ -1297,7 +1307,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it("should return that group's member list", async () => {
-        assertAddressesEqual(await validators.getValidators(), [
+        assertSameAddresses(await validators.getValidators(), [
           validator1,
           validator2,
           validator3,
@@ -1314,7 +1324,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should return maxElectableValidators elected validators', async () => {
-        assertAddressesEqual(await validators.getValidators(), [
+        assertSameAddresses(await validators.getValidators(), [
           validator1,
           validator2,
           validator3,
@@ -1325,16 +1335,33 @@ contract('Validators', (accounts: string[]) => {
       })
     })
 
+    describe('when different random values are provided', () => {
+      beforeEach(async () => {
+        await validators.vote(group1, NULL_ADDRESS, NULL_ADDRESS, { from: voter1.address })
+        await validators.vote(group2, NULL_ADDRESS, group1, { from: voter2.address })
+        await validators.vote(group3, NULL_ADDRESS, group2, { from: voter3.address })
+      })
+
+      it('should return different results', async () => {
+        await random.revealAndCommit(hash1, hash1, NULL_ADDRESS)
+        const valsWithHash1 = (await validators.getValidators()).map((x) => x.toLowerCase())
+        await random.revealAndCommit(hash2, hash2, NULL_ADDRESS)
+        const valsWithHash2 = (await validators.getValidators()).map((x) => x.toLowerCase())
+        assert.sameMembers(valsWithHash1, valsWithHash2)
+        assert.notDeepEqual(valsWithHash1, valsWithHash2)
+      })
+    })
+
     describe('when a group receives enough votes for > n seats but only has n members', () => {
       beforeEach(async () => {
-        await mockBondedDeposits.setWeight(voter3.address, 1000)
+        await mockLockedGold.setWeight(voter3.address, 1000)
         await validators.vote(group3, NULL_ADDRESS, NULL_ADDRESS, { from: voter3.address })
         await validators.vote(group1, NULL_ADDRESS, group3, { from: voter1.address })
         await validators.vote(group2, NULL_ADDRESS, group1, { from: voter2.address })
       })
 
       it('should elect only n members from that group', async () => {
-        assertAddressesEqual(await validators.getValidators(), [
+        assertSameAddresses(await validators.getValidators(), [
           validator7,
           validator1,
           validator2,
@@ -1348,14 +1375,14 @@ contract('Validators', (accounts: string[]) => {
     describe('when an account has delegated validating to another address', () => {
       const validatingDelegate = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
       beforeEach(async () => {
-        await mockBondedDeposits.delegateValidating(validator3, validatingDelegate)
+        await mockLockedGold.delegateValidating(validator3, validatingDelegate)
         await validators.vote(group1, NULL_ADDRESS, NULL_ADDRESS, { from: voter1.address })
         await validators.vote(group2, NULL_ADDRESS, group1, { from: voter2.address })
         await validators.vote(group3, NULL_ADDRESS, group2, { from: voter3.address })
       })
 
       it('should return the validating delegate in place of the account', async () => {
-        assertAddressesEqual(await validators.getValidators(), [
+        assertSameAddresses(await validators.getValidators(), [
           validator1,
           validator2,
           validatingDelegate,

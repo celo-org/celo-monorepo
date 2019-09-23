@@ -1,12 +1,5 @@
 /* tslint:disable: no-console */
 import {
-  AccountType,
-  generatePrivateKey,
-  privateKeyToPublicKey,
-} from '@celo/celotool/src/lib/generate_utils'
-import { retrieveIPAddress } from '@celo/celotool/src/lib/helm_deploy'
-import { envVar, execCmd, execCmdWithExitOnFailure, fetchEnv } from '@celo/celotool/src/lib/utils'
-import {
   convertToContractDecimals,
   GoldToken,
   sendTransaction,
@@ -22,6 +15,10 @@ import fetch from 'node-fetch'
 import path from 'path'
 import Web3Type from 'web3'
 import { TransactionReceipt } from 'web3/types'
+import { envVar, fetchEnv } from './env-utils'
+import { AccountType, generatePrivateKey, privateKeyToPublicKey } from './generate_utils'
+import { retrieveIPAddress } from './helm_deploy'
+import { execCmd, execCmdWithExitOnFailure } from './utils'
 
 type HandleErrorCallback = (isError: boolean, data: { location: string; error: string }) => void
 

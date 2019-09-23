@@ -1,16 +1,16 @@
 pragma solidity ^0.5.8;
 
-import "fixidity/contracts/FixidityLib.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
+import "../common/FixidityLib.sol";
 
 /**
  * @title A library operating on Celo Governance proposals.
  */
 library Proposals {
 
-  using FixidityLib for int256;
+  using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
   using BytesLib for bytes;
 
@@ -160,23 +160,25 @@ library Proposals {
    */
   function getSupportWithQuorumPadding(
     Proposal storage proposal,
-    int256 quorum
+    FixidityLib.Fraction memory quorum
   )
-    public
+    internal
     view
-    returns (int256)
+    returns (FixidityLib.Fraction memory)
   {
     uint256 yesVotes = proposal.votes.yes;
     if (yesVotes == 0) {
-      return 0;
+      return FixidityLib.newFixed(0);
     }
     uint256 noVotes = proposal.votes.no;
     uint256 totalVotes = yesVotes.add(noVotes).add(proposal.votes.abstain);
-    uint256 requiredVotes = fromFixed(quorum.multiply(toFixed(proposal.networkWeight)));
+    uint256 requiredVotes = quorum.multiply(
+        FixidityLib.newFixed(proposal.networkWeight)
+    ).fromFixed();
     if (requiredVotes > totalVotes) {
       noVotes = noVotes.add(requiredVotes.sub(totalVotes));
     }
-    return toFixed(yesVotes).divide(toFixed(yesVotes.add(noVotes)));
+    return FixidityLib.newFixedFraction(yesVotes, yesVotes.add(noVotes));
   }
 
   /**
@@ -220,9 +222,15 @@ library Proposals {
    * @param proposal The proposal struct.
    * @return The participation of the proposal.
    */
-  function getParticipation(Proposal storage proposal) public view returns (int256) {
+  function getParticipation(
+    Proposal storage proposal
+  ) 
+    internal 
+    view 
+    returns (FixidityLib.Fraction memory) 
+  {
     uint256 totalVotes = proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain);
-    return toFixed(totalVotes).divide(toFixed(proposal.networkWeight));
+    return FixidityLib.newFixedFraction(totalVotes, proposal.networkWeight);
   }
 
   /**
@@ -336,21 +344,5 @@ library Proposals {
     }
     /* solhint-enable no-inline-assembly */
     return result;
-  }
-
-  /**
-   * @notice Converts a uint256 to Fixed form. Mirrors toFixed() in UsingFixidity.
-   * @param n The value to be converted.
-   */
-  function toFixed(uint256 n) private pure returns (int256) {
-    return int256(n).newFixed();
-  }
-
-  /**
-   * @notice Converts a int256 in Fixed form to a uint256, truncating the decimal.
-   * @param n The value to be converted.
-   */
-  function fromFixed(int256 n) private pure returns (uint256) {
-    return uint256(n.fromFixed());
   }
 }

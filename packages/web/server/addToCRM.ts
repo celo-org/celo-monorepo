@@ -1,6 +1,6 @@
 import fetch from 'cross-fetch'
 import getConfig from 'next/config'
-
+import Sentry from '../fullstack/sentry'
 interface ActiveCampaignNewContact {
   email: string
   firstName: string
@@ -162,7 +162,10 @@ export default async function addToCRM({
 
     return contact
   } catch (e) {
-    console.error(e)
+    Sentry.withScope((scope) => {
+      scope.setTag('Service', 'ActiveCampaign')
+      Sentry.captureException(e)
+    })
     return { error: e }
   }
 }
