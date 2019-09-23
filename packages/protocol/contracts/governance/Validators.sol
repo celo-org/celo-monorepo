@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -7,6 +7,9 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./UsingLockedGold.sol";
 import "./interfaces/IValidators.sol";
+
+import "../identity/interfaces/IRandom.sol";
+
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
@@ -23,6 +26,9 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   using AddressSortedLinkedList for SortedLinkedList.List;
   using SafeMath for uint256;
   using BytesLib for bytes;
+
+  // Address of the getValidator precompiled contract
+  address constant public GET_VALIDATOR_ADDRESS = address(0xfa);
 
   // TODO(asa): These strings should be modifiable
   struct ValidatorGroup {
@@ -543,6 +549,45 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     return true;
   }
 
+  function validatorAddressFromCurrentSet(uint256 index) external view returns (address) {
+    address validatorAddress;
+    assembly {
+      let newCallDataPosition := mload(0x40)
+      mstore(newCallDataPosition, index)
+      let success := staticcall(
+        5000,
+        0xfa,
+        newCallDataPosition,
+        32,
+        0,
+        0
+      )
+      returndatacopy(add(newCallDataPosition, 64), 0, 32)
+      validatorAddress := mload(add(newCallDataPosition, 64))
+    }
+
+    return validatorAddress;
+  }
+
+  function numberValidatorsInCurrentSet() external view returns (uint256) {
+    uint256 numberValidators;
+    assembly {
+      let success := staticcall(
+        5000,
+        0xf9,
+        0,
+        0,
+        0,
+        0
+      )
+      let returnData := mload(0x40)
+      returndatacopy(returnData, 0, 32)
+      numberValidators := mload(returnData)
+    }
+
+    return numberValidators;
+  }
+
   /**
    * @notice Returns validator information.
    * @param account The account that registered the validator.
@@ -698,6 +743,14 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
         electedValidators[totalNumMembersElected] = getValidatorFromAccount(electedGroupMembers[j]);
         totalNumMembersElected = totalNumMembersElected.add(1);
       }
+    }
+    // Shuffle the validator set using validator-supplied entropy
+    IRandom random = IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
+    bytes32 r = random.random();
+    for (uint256 i = electedValidators.length - 1; i > 0; i = i.sub(1)) {
+      uint256 j = uint256(r) % (i + 1);
+      (electedValidators[i], electedValidators[j]) = (electedValidators[j], electedValidators[i]);
+      r = keccak256(abi.encodePacked(r));
     }
     return electedValidators;
   }

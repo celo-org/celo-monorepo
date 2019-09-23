@@ -1,19 +1,18 @@
-import {
-  AccountType,
-  ConsensusType,
-  generateGenesis,
-  getPrivateKeysFor,
-  getValidators,
-  privateKeyToPublicKey,
-  Validator,
-} from '@celo/celotool/src/lib/generate_utils'
-import { getEnodeAddress } from '@celo/celotool/src/lib/geth'
-import { ensure0x } from '@celo/celotool/src/lib/utils'
 import { assert } from 'chai'
 import { spawn, SpawnOptions } from 'child_process'
 import fs from 'fs'
 import { join as joinPath, resolve as resolvePath } from 'path'
 import { Admin } from 'web3-eth-admin'
+import {
+  AccountType,
+  generateGenesis,
+  getPrivateKeysFor,
+  getValidators,
+  privateKeyToPublicKey,
+  Validator,
+} from '../lib/generate_utils'
+import { getEnodeAddress } from '../lib/geth'
+import { ensure0x } from '../lib/utils'
 
 export interface GethInstanceConfig {
   name: string
@@ -37,7 +36,8 @@ export interface GethTestConfig {
 
 const TEST_DIR = '/tmp/e2e'
 const GENESIS_PATH = `${TEST_DIR}/genesis.json`
-const networkid = 1101
+const NetworkId = 1101
+const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
 
 export function spawnWithLog(cmd: string, args: string[], logsFilepath: string) {
   try {
@@ -148,8 +148,6 @@ export const erc20Abi = [
   },
 ]
 
-export const monorepoRoot = resolvePath(process.cwd(), './../..')
-
 async function checkoutGethRepo(branch: string, path: string) {
   await execCmdWithExitOnFailure('rm', ['-rf', path])
   await execCmdWithExitOnFailure('git', [
@@ -174,16 +172,12 @@ async function setupTestDir(testDir: string) {
 }
 
 function writeGenesis(validators: Validator[], path: string) {
-  const blockTime = 0
-  const epochLength = 10
-  const genesis = generateGenesis(
+  const genesis = generateGenesis({
     validators,
-    ConsensusType.ISTANBUL,
-    ['0x000000000000000000000000000000000000ce10'],
-    blockTime,
-    epochLength,
-    networkid
-  )
+    blockTime: 0,
+    epoch: 10,
+    chainId: NetworkId,
+  })
   fs.writeFileSync(path, genesis)
 }
 
@@ -244,7 +238,7 @@ export function sleep(seconds: number) {
 }
 
 export async function getEnode(port: number, ws: boolean = false) {
-  let p = ws ? 'ws' : 'http'
+  const p = ws ? 'ws' : 'http'
   const admin = new Admin(`${p}://localhost:${port}`)
   return (await admin.getNodeInfo()).enode
 }
@@ -266,7 +260,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     '--nodiscover',
     '--rpcvhosts=*',
     '--networkid',
-    networkid.toString(),
+    NetworkId.toString(),
     '--verbosity',
     '4',
     '--consoleoutput=stdout', // Send all logs to stdout
@@ -323,16 +317,20 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
 }
 
 export async function migrateContracts(validatorPrivateKeys: string[], to: number = 1000) {
+  const migrationOverrides = {
+    validators: {
+      minElectableValidators: '1',
+      validatorKeys: validatorPrivateKeys.map(ensure0x),
+    },
+  }
   const args = [
     '--cwd',
-    `${monorepoRoot}/packages/protocol`,
+    `${MonorepoRoot}/packages/protocol`,
     'init-network',
     '-n',
     'testing',
-    '-k',
-    validatorPrivateKeys.map(ensure0x).join(','),
     '-m',
-    '{ "validators": { "minElectableValidators": "1" } }',
+    JSON.stringify(migrationOverrides),
     '-t',
     to.toString(),
   ]
@@ -340,9 +338,9 @@ export async function migrateContracts(validatorPrivateKeys: string[], to: numbe
 }
 
 export function getContractAddress(contractName: string) {
-  const filePath = `${monorepoRoot}/packages/protocol/build/testing/contracts/${contractName}.json`
+  const filePath = `${MonorepoRoot}/packages/protocol/build/testing/contracts/${contractName}.json`
   const contractData = JSON.parse(fs.readFileSync(filePath, 'utf8'))
-  return contractData.networks[networkid].address
+  return contractData.networks[NetworkId].address
 }
 
 export async function snapshotDatadir(instance: GethInstanceConfig) {
@@ -387,7 +385,7 @@ export async function initAndStartGeth(gethBinaryPath: string, instance: GethIns
   return startGeth(gethBinaryPath, instance)
 }
 
-export function getHooks(gethConfig: GethTestConfig) {
+export function getContext(gethConfig: GethTestConfig) {
   const mnemonic =
     'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
@@ -412,16 +410,12 @@ export function getHooks(gethConfig: GethTestConfig) {
     let validatorIndex = 0
     for (const instance of gethConfig.instances) {
       if (instance.validating) {
-        if (!instance.peers) {
-          instance.peers = []
-        }
         // Automatically connect validator nodes to eachother.
-        instance.peers = instance.peers.concat(
-          validatorEnodes.filter((_: string, i: number) => i !== validatorIndex)
+        const otherValidators = validatorEnodes.filter(
+          (_: string, i: number) => i !== validatorIndex
         )
-        if (!instance.privateKey) {
-          instance.privateKey = validatorPrivateKeys[validatorIndex]
-        }
+        instance.peers = (instance.peers || []).concat(otherValidators)
+        instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
         validatorIndex++
       }
       await initAndStartGeth(gethBinaryPath, instance)
@@ -455,7 +449,14 @@ export function getHooks(gethConfig: GethTestConfig) {
 
   const after = () => killGeth()
 
-  return { before, after, restart, gethBinaryPath }
+  return {
+    validators,
+    hooks: { before, after, restart, gethBinaryPath },
+  }
+}
+
+export function getHooks(gethConfig: GethTestConfig) {
+  return getContext(gethConfig).hooks
 }
 
 export async function assertRevert(promise: any, errorMessage: string = '') {

@@ -1,5 +1,5 @@
-import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
-import { deploy } from '@celo/celotool/src/lib/vm-testnet-utils'
+import { deploy } from '../../../lib/vm-testnet-utils'
+import { InitialArgv } from '../../deploy/initial'
 
 export const command = 'vm-testnet'
 export const describe = 'upgrade a testnet on a VM'

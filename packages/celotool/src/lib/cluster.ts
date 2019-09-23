@@ -1,9 +1,5 @@
-import {
-  doCheckOrPromptIfStagingOrProduction,
-  EnvTypes,
-  envVar,
-  fetchEnv,
-} from '@celo/celotool/src/lib/env-utils'
+import sleep from 'sleep-promise'
+import { doCheckOrPromptIfStagingOrProduction, EnvTypes, envVar, fetchEnv } from './env-utils'
 import {
   createAndUploadBackupSecretIfNotExists,
   createServiceAccountIfNotExists,
@@ -13,15 +9,9 @@ import {
   installLegoAndNginx,
   redeployTiller,
   uploadStorageClass,
-} from '@celo/celotool/src/lib/helm_deploy'
-import {
-  execCmd,
-  execCmdWithExitOnFailure,
-  outputIncludes,
-  switchToProjectFromEnv,
-} from '@celo/celotool/src/lib/utils'
-import { networkName } from '@celo/celotool/src/lib/vm-testnet-utils'
-import sleep from 'sleep-promise'
+} from './helm_deploy'
+import { execCmd, execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
+import { networkName } from './vm-testnet-utils'
 
 const SYSTEM_HELM_RELEASES = ['nginx-ingress-release', 'kube-lego-release']
 const HELM_RELEASE_REGEX = new RegExp(/(.*)-\d+\.\d+\.\d+$/)

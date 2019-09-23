@@ -15,21 +15,17 @@ exports[`QRCode renders correctly 1`] = `
   <View
     style={
       Object {
-        "flex": 1,
-        "paddingTop": 25,
+        "marginVertical": 20,
       }
     }
   >
     <View
       style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "flexDirection": "row",
-            "justifyContent": "center",
-          },
-          undefined,
-        ]
+        Object {
+          "flexDirection": "column",
+          "justifyContent": "center",
+          "marginBottom": 10,
+        }
       }
     >
       <View
@@ -37,95 +33,73 @@ exports[`QRCode renders correctly 1`] = `
           Array [
             Object {
               "alignItems": "center",
+              "flexDirection": "row",
               "justifyContent": "center",
             },
             Object {
-              "backgroundColor": "#7AD6FE",
-              "borderRadius": 27.5,
-              "height": 55,
-              "width": 55,
+              "alignSelf": "center",
+              "margin": "auto",
             },
           ]
         }
       >
-        <Text
+        <View
           style={
             Array [
               Object {
-                "color": "#FFFFFF",
-                "fontFamily": "Hind-Medium",
-                "fontSize": 16,
+                "alignItems": "center",
+                "justifyContent": "center",
               },
               Object {
-                "fontSize": 27.5,
+                "backgroundColor": "#7AD6FE",
+                "borderRadius": 20,
+                "height": 40,
+                "width": 40,
               },
             ]
           }
         >
-          J
-        </Text>
+          <Image
+            source={
+              Object {
+                "testUri": "../../../src/images/unknown-user-icon.png",
+              }
+            }
+            style={
+              Array [
+                Object {
+                  "alignSelf": "center",
+                  "margin": "auto",
+                },
+                Object {
+                  "height": 40,
+                  "width": 40,
+                },
+              ]
+            }
+          />
+        </View>
       </View>
-    </View>
-    <Text
-      style={
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Hindi Siliguri",
-          "fontSize": 16,
-          "fontWeight": "500",
-          "paddingBottom": 5,
-          "paddingTop": 20,
-          "textAlign": "center",
-        }
-      }
-      suppressHighlighting={true}
-    >
-      John Doe
-    </Text>
-    <View
-      style={
-        Object {
-          "alignItems": "center",
-          "alignSelf": "center",
-          "flexDirection": "row",
-          "justifyContent": "center",
-        }
-      }
-    >
       <Text
+        ellipsizeMode="tail"
+        numberOfLines={1}
         style={
           Array [
             Object {
               "color": "#2E3338",
-              "fontFamily": "Hind-Light",
+              "fontFamily": "Hind-SemiBold",
               "fontSize": 14,
-              "textAlignVertical": "center",
+              "lineHeight": 18,
             },
             Object {
-              "alignItems": "center",
-              "backgroundColor": "#EEEEEE",
-              "borderRadius": 3,
-              "justifyContent": "center",
-              "marginRight": 5,
-              "paddingLeft": 6,
-              "paddingRight": 3,
+              "marginHorizontal": 20,
+              "paddingTop": 6,
+              "textAlign": "center",
             },
           ]
         }
       >
-         +1
-      </Text>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Light",
-            "fontSize": 14,
-            "textAlignVertical": "center",
-          }
-        }
-      >
-        (415) 555-6666
+        John Doe
       </Text>
     </View>
   </View>

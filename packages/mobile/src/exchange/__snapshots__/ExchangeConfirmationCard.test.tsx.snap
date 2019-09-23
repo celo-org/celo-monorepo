@@ -270,11 +270,10 @@ exports[`renders correctly with giant numbers 1`] = `
         style={
           Array [
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
               "fontSize": 16,
-              "letterSpacing": -0.75,
-              "lineHeight": 20,
+              "lineHeight": 24,
             },
             Object {
               "color": "#42D689",
@@ -282,8 +281,7 @@ exports[`renders correctly with giant numbers 1`] = `
           ]
         }
       >
-        $
-        10000000
+        $10,000,000.00
       </Text>
     </View>
     <View
@@ -315,11 +313,10 @@ exports[`renders correctly with giant numbers 1`] = `
         style={
           Array [
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
               "fontSize": 16,
-              "letterSpacing": -0.75,
-              "lineHeight": 20,
+              "lineHeight": 24,
             },
             Object {
               "color": "#FBCC5C",
@@ -327,7 +324,7 @@ exports[`renders correctly with giant numbers 1`] = `
           ]
         }
       >
-        10030000
+        10,030,000.000
       </Text>
     </View>
   </View>
@@ -604,11 +601,10 @@ exports[`renders correctly with no exchange rate 1`] = `
         style={
           Array [
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
               "fontSize": 16,
-              "letterSpacing": -0.75,
-              "lineHeight": 20,
+              "lineHeight": 24,
             },
             Object {
               "color": "#42D689",
@@ -616,8 +612,7 @@ exports[`renders correctly with no exchange rate 1`] = `
           ]
         }
       >
-        $
-        189.9
+        $189.90
       </Text>
     </View>
     <View
@@ -649,11 +644,10 @@ exports[`renders correctly with no exchange rate 1`] = `
         style={
           Array [
             Object {
-              "color": "#81868B",
+              "color": "#2E3338",
               "fontFamily": "Hind-Regular",
               "fontSize": 16,
-              "letterSpacing": -0.75,
-              "lineHeight": 20,
+              "lineHeight": 24,
             },
             Object {
               "color": "#FBCC5C",
@@ -661,7 +655,7 @@ exports[`renders correctly with no exchange rate 1`] = `
           ]
         }
       >
-        207.81
+        207.810
       </Text>
     </View>
   </View>
