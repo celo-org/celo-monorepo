@@ -126,6 +126,89 @@ jobs:
             mkdir -p test-results/jest
             yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/walletkit --ignore @celo/celocli run test
 
+  mobile-end-to-end-test:
+    working_directory: ~/app
+    docker:
+      - image: circleci/android:api-28
+    environment:
+      # packages/mobile is hard-coded to use this name.
+      AVD_NAME: Nexus_5X_API_28_x86
+    steps:
+      - attach_workspace:
+          at: ~/app
+
+      - run:
+          name: Setup Android emulator
+          command: |
+            set -euo pipefail
+            set -x
+            export DX_HEAP_SIZE=2048
+            export ANDROID_API_LEVEL=16
+            export ANDROID_EMU_API_LEVEL=22
+            export ANDROID_ABI=armeabi-v7a
+            export QEMU_AUDIO_DRV=none
+            export ADB_INSTALL_TIMEOUT=20
+
+            echo y | sdkmanager --install "tools" > /dev/null
+            echo y | sdkmanager --install "platform-tools" > /dev/null
+            echo y | sdkmanager --install "platforms;android-$ANDROID_API_LEVEL" > /dev/null
+            echo y | sdkmanager --install "system-images;android-$ANDROID_API_LEVEL;default;$ANDROID_ABI" > /dev/null
+            echo y | sdkmanager --install "system-images;android-$ANDROID_EMU_API_LEVEL;default;$ANDROID_ABI" > /dev/null
+            echo y | sdkmanager --licenses
+
+            echo "no" | avdmanager create avd -n $AVD_NAME -k "system-images;android-16;default;armeabi-v7a"
+            # Source: https://discuss.bitrise.io/t/emulator-with-name-nexus-6-api-26-has-a-corrupt-config-ini-file-try-fixing-it-by-recreating-an-emulator/8438/5
+            echo -e "hw.lcd.height=1280\nhw.lcd.width=800\nhw.lcd.density=120\nskin.name=240x426" >> $HOME/.android/avd/$AVD_NAME.avd/config.ini
+
+            sudo apt-get update
+            # Without this, emulator fails with
+            # "libpulse.so.0: cannot open shared object file: No such file or directory"
+            sudo apt-get -y install pulseaudio
+            touch $HOME/.emulator_console_auth_token
+      
+      - run:
+          name: Launch emulator
+          command: emulator -avd $AVD_NAME -noaudio -no-boot-anim -no-window -accel on -verbose
+          background: true
+
+      # While emulator is starting up, do more work
+      - run:
+          name: Setup node
+          command: |
+            set -eo pipefail
+            sudo apt-get update
+            curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+            node -v
+            npm -v
+            echo "Setting up nvm..."
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+            source $HOME/.nvm/nvm.sh || true # This loads nvm
+            nvm install 8.13
+            nvm use 8.13
+
+      - run:
+          name: Build mobile app
+          command: |
+            set -euo pipefail
+            sudo npm install --global yarn
+            yarn --cwd=packages/mobile build:sdk integration
+            cd packages/mobile/android  && ./gradlew assembleDebug && cd -
+
+      - run:
+          name: Wait for emulator
+          command: |
+            echo "Waiting for emulator to start"
+            circle-android wait-for-boot
+
+      - run:
+          name: Test app (debug version)
+          command: |
+            set -euo pipefail
+            ln -s $PWD/../../node_modules/jest/bin/jest.js node_modules/.bin/jest
+            yarn --cwd=packages/mobile start:bg
+            yarn --cwd=packages/mobile test:detox || yarn --cwd=packages/mobile test:detox
+
   mobile-test-build-app:
     working_directory: ~/app
     docker:
@@ -501,51 +584,59 @@ workflows:
   celo-monorepo-build:
     jobs:
       - install_dependencies
-      - lint-checks:
+      # - lint-checks:
+      #     requires:
+      #       - install_dependencies
+      # - general-test:
+      #     requires:
+      #       - install_dependencies
+      # - walletkit-test:
+      #     requires:
+      #       - install_dependencies
+      # - cli-test:
+      #     requires:
+      #       - install_dependencies
+      # - contractkit-test:
+      #     requires:
+      #       - install_dependencies
+      # - mobile-test:
+      #     requires:
+      #       - lint-checks
+      # - mobile-test-build-app:
+      #     requires:
+      #       - mobile-test
+      # - verification-pool-api:
+      #     requires:
+      #       - lint-checks
+      # - protocol-test:
+      #     requires:
+      #       - lint-checks
+      #       - walletkit-test
+      # - protocol-test-with-code-coverage:
+      #     requires:
+      #       - lint-checks
+      #       - walletkit-test
+      # - end-to-end-geth-transfer-test:
+      #     requires:
+      #       - lint-checks
+      #       - walletkit-test
+      # - end-to-end-geth-governance-test:
+      #     requires:
+      #       - lint-checks
+      #       - walletkit-test
+      # - end-to-end-geth-sync-test:
+      #     requires:
+      #       - lint-checks
+      #       - walletkit-test
+      # - end-to-end-geth-integration-sync-test:
+      #     requires:
+      #       - lint-checks
+            # - walletkit-test
+      - mobile-end-to-end-test:
           requires:
             - install_dependencies
-      - general-test:
-          requires:
-            - install_dependencies
-      - walletkit-test:
-          requires:
-            - install_dependencies
-      - cli-test:
-          requires:
-            - install_dependencies
-      - contractkit-test:
-          requires:
-            - install_dependencies      
-      - mobile-test:
-          requires:
-            - lint-checks
-      - mobile-test-build-app:
-          requires:
-            - mobile-test
-      - verification-pool-api:
-          requires:
-            - lint-checks
-      - protocol-test:
-          requires:
-            - lint-checks
-            - walletkit-test
-      - end-to-end-geth-transfer-test:
-          requires:
-            - lint-checks
-            - walletkit-test
-      - end-to-end-geth-governance-test:
-          requires:
-            - lint-checks
-            - walletkit-test
-      - end-to-end-geth-sync-test:
-          requires:
-            - lint-checks
-            - walletkit-test
-      - end-to-end-geth-integration-sync-test:
-          requires:
-            - lint-checks
-            - walletkit-test
-  npm-install-testing-cron-workflow:
+
+  nightly:
     triggers:
       - schedule:
           # 7 PM in UTC = noon in PDT.
@@ -560,25 +651,4 @@ workflows:
       - test-utils-npm-package-install
       - test-walletkit-npm-package-install
       - test-celocli-npm-package-install
-  protocol-testing-with-code-coverage-cron-workflow:
-    triggers:
-      - schedule:
-          # 1 PM in UTC = 6 AM in PDT.
-          # Best for this slow test (~3 hours) to run during SF early morning.
-          cron: "0 13 * * *"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - install_dependencies
-      - lint-checks:
-          requires:
-            - install_dependencies
-      - walletkit-test:
-          requires:
-            - install_dependencies
-      - protocol-test-with-code-coverage:
-          requires:
-            - lint-checks
-            - walletkit-test
+      
