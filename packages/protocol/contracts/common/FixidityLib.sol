@@ -114,16 +114,6 @@ library FixidityLib {
   }
 
   /**
-   * @notice Maximum value that can be safely used as a divisor.
-   * @dev Test maxFixedDivisor() equals fixed1()*fixed1()
-   * Test divide(maxFixedDivisor(),maxFixedDivisor()) equals 10*fixed1()
-   * Test divide(maxFixedDivisor(),maxFixedDivisor()+1) throws
-   */
-  function maxFixedDivisor() internal pure returns (uint256) {
-    return 1000000000000000000000000000000000000000000000000;
-  }
-
-  /**
    * @notice Converts a uint256 to fixed point Fraction
    * @dev Test newFixed(0) returns 0
    * Test newFixed(1) returns fixed1()
@@ -294,21 +284,16 @@ library FixidityLib {
   /**
    * @notice x/y. If the dividend is higher than maxFixedDividend() it
    * might overflow. You can use multiply(x,reciprocal(y)) instead.
-   * There is a loss of precision on division for the lower mulPrecision() decimals.
    * @dev
-   * NOTE: reverts if the dividend is greater than maxFixedDivisor (10**24,
-   * internally represented with 10**48). 10**6 * 10**18 (so a million units of
-   * a token in wei) is already too large.
    * Test divide(fixed1(),0) fails
    * Test divide(maxFixedDividend(),1) = maxFixedDividend()*(10^digits())
    * Test divide(maxFixedDividend()+1,1) throws
-   * Test divide(maxFixedDivisor(),maxFixedDivisor()) returns fixed1()
-   * Test divide(maxFixedDivisor(),maxFixedDivisor()+1) fails
    */
   function divide(Fraction memory x, Fraction memory y) internal pure returns (Fraction memory) {
-    if (y.value == FIXED1_UINT) return x;
-    require(y.value <= maxFixedDivisor());
-    return multiply(x, reciprocal(y)); // check for 0 done in reciprocal
+    require(y.value != 0);
+    uint256 X = x.value * FIXED1_UINT;
+    require(X / FIXED1_UINT == x.value);
+    return Fraction(X / y.value);
   }
 
   /**
@@ -337,5 +322,19 @@ library FixidityLib {
    */
   function lte(Fraction memory x, Fraction memory y) internal pure returns (bool) {
     return x.value <= y.value;
+  }
+
+  /**
+   * @notice x == y
+   */
+  function equals(Fraction memory x, Fraction memory y) internal pure returns (bool) {
+    return x.value == y.value;
+  }
+
+  /**
+   * @notice x <= 1
+   */
+  function isProperFraction(Fraction memory x) internal pure returns (bool) {
+    return lte(x, fixed1());
   }
 }
