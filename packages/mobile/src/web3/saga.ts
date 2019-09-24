@@ -2,9 +2,8 @@ import { deriveCEK } from '@celo/utils/src/commentEncryption'
 import { generateMnemonic, mnemonicToSeedHex } from 'react-native-bip39'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { call, delay, put, race, select, take } from 'redux-saga/effects'
-import { getPincode } from 'src/account'
 import { setAccountCreationTime } from 'src/account/actions'
-import { pincodeSelector } from 'src/account/reducer'
+import { getPincode } from 'src/account/saga'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -22,7 +21,6 @@ import {
   setAccount,
   setLatestBlockNumber,
   setPrivateCommentKey,
-  unlockAccount,
   updateWeb3SyncProgress,
 } from 'src/web3/actions'
 import { web3 } from 'src/web3/contracts'
@@ -116,10 +114,8 @@ export function* createNewAccount() {
     try {
       yield call(setKey, 'mnemonic', mnemonic)
     } catch (e) {
-      Logger.debug(TAG + '@createNewAccount', 'Failed to set mnemonic: ' + e)
-      Logger.error(TAG + '@createNewAccount', e)
+      Logger.error(TAG + '@createNewAccount', 'Failed to set mnemonic', e)
     }
-
     return accountAddress
   } else {
     return null
@@ -130,32 +126,27 @@ export function* assignAccountFromPrivateKey(key: string) {
   const currentAccount = yield select(currentAccountSelector)
 
   try {
-    const pincodeSet = yield select(pincodeSelector)
-    if (!pincodeSet) {
-      Logger.debug(TAG + '@assignAccountFromPrivateKey', 'PIN does not seem to be set')
-      throw Error('Cannot create account without having the pin set')
-    }
-
-    const password = yield call(getPincode)
-    if (!password) {
-      Logger.debug(TAG + '@assignAccountFromPrivateKey', 'Got falsy pin')
+    const pincode = yield call(getPincode)
+    if (!pincode) {
+      Logger.error(TAG + '@assignAccountFromPrivateKey', 'Got falsy pin')
       throw Error('Cannot create account without having the pin set')
     }
 
     let account: string
     try {
       // @ts-ignore
-      account = yield call(web3.eth.personal.importRawKey, String(key), password)
+      account = yield call(web3.eth.personal.importRawKey, String(key), pincode)
     } catch (e) {
       if (e.toString().includes('account already exists')) {
         account = currentAccount
-        Logger.debug(TAG + '@assignAccountFromPrivateKey', 'Importing same account as current one')
+        Logger.warn(TAG + '@assignAccountFromPrivateKey', 'Importing same account as current one')
       } else {
+        Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error importing raw key')
         throw e
       }
     }
 
-    yield call(web3.eth.personal.unlockAccount, account, password, UNLOCK_DURATION)
+    yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
     Logger.debug(
       TAG + '@assignAccountFromPrivateKey',
       `Created account from mnemonic and added to wallet: ${account}`
@@ -168,7 +159,11 @@ export function* assignAccountFromPrivateKey(key: string) {
     web3.eth.defaultAccount = account
     return account
   } catch (e) {
-    Logger.error(TAG, `@assignAccountFromPrivateKey: ${e}`)
+    Logger.error(
+      TAG + '@assignAccountFromPrivateKey',
+      'Error assigning account from private key',
+      e
+    )
     return null
   }
 }
@@ -195,6 +190,34 @@ export function* getAccount() {
       // account exists
       return action.address
     }
+  }
+}
+
+async function isLocked(address: string) {
+  try {
+    // Test account to see if it is unlocked
+    await web3.eth.sign('', address)
+  } catch (e) {
+    return true
+  }
+  return false
+}
+
+export function* unlockAccount(account: string) {
+  Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
+  try {
+    const isAccountLocked = yield call(isLocked, account)
+    if (!isAccountLocked) {
+      return true
+    }
+
+    const pincode = yield call(getPincode)
+    yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
+    Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
+    return true
+  } catch (error) {
+    Logger.error(TAG + '@unlockAccount', 'Web3 account unlock failed', error)
+    return false
   }
 }
 

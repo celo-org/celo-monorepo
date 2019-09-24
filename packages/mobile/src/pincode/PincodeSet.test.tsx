@@ -1,28 +1,22 @@
 import * as React from 'react'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import Pincode from 'src/pincode/Pincode'
+import PincodeSet from 'src/pincode/PincodeSet'
 import { createMockStore } from 'test/utils'
 
 describe('Pincode', () => {
   it('renders correctly', () => {
     const { toJSON, getByTestId } = render(
       <Provider store={createMockStore()}>
-        <Pincode />
+        <PincodeSet />
       </Provider>
     )
 
-    // initial - education
+    // initial render shows pin enter screen
     expect(toJSON()).toMatchSnapshot()
 
-    // Press continue
-    fireEvent.press(getByTestId('Pincode-Education'))
-    expect(toJSON()).toMatchSnapshot()
-
+    // second render shows pin re-enter set screen
     fireEvent.press(getByTestId('Pincode-Enter'))
-    expect(toJSON()).toMatchSnapshot()
-
-    fireEvent.press(getByTestId('Pincode-ReEnter'))
     expect(toJSON()).toMatchSnapshot()
   })
 })
