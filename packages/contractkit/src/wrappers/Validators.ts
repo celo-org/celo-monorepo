@@ -9,6 +9,7 @@ import {
   proxyCall,
   proxySend,
   toBigNumber,
+  toNumber,
   wrapSend,
 } from './BaseWrapper'
 
@@ -67,6 +68,12 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     toBigNumber
   )
   electionThreshold = proxyCall(this.contract.methods.getElectionThreshold, undefined, toBigNumber)
+  validatorAddressFromCurrentSet = proxyCall(this.contract.methods.validatorAddressFromCurrentSet)
+  numberValidatorsInCurrentSet = proxyCall(
+    this.contract.methods.numberValidatorsInCurrentSet,
+    undefined,
+    toNumber
+  )
 
   getVoteFrom: (validatorAddress: Address) => Promise<Address | null> = proxyCall(
     this.contract.methods.voters
@@ -99,6 +106,18 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const vgAddresses = await this.contract.methods.getRegisteredValidators().call()
 
     return Promise.all(vgAddresses.map((addr) => this.getValidator(addr)))
+  }
+
+  async getValidatorSetAddresses(): Promise<string[]> {
+    const numberValidators = await this.numberValidatorsInCurrentSet()
+
+    const validatorAddressPromises = []
+
+    for (let i = 0; i < numberValidators; i++) {
+      validatorAddressPromises.push(this.validatorAddressFromCurrentSet(i))
+    }
+
+    return Promise.all(validatorAddressPromises)
   }
 
   async getValidator(address: Address): Promise<Validator> {
