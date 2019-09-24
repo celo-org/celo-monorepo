@@ -36,7 +36,7 @@ const KEY_CONVERSION = Object.freeze({
   endDate: 'End Date',
 })
 
-interface RawAirTableEvent {
+export interface RawAirTableEvent {
   Title: string
   'Notes / Run Of Show': string
   Photos: object
@@ -53,6 +53,7 @@ interface RawAirTableEvent {
   'Social Media Links': string
   'Location (Format: City, Country)': string
   'Celo Team Member Speaking?': boolean
+  'Description of Event': string
 }
 
 export default async function getFormattedEvents() {
