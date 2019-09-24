@@ -282,7 +282,7 @@ exports[`ImportContacts Screen renders correctly 1`] = `
               ]
             }
           >
-            skip
+            global:skip
           </Text>
         </View>
       </View>
