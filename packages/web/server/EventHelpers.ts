@@ -68,7 +68,7 @@ function fetchEventsFromAirtable() {
       .select({
         filterByFormula:
           'OR(Process="Complete", Process="Scheduled", Process="Conference, Speaking", Process="This Week")',
-        // sort: [{ field: 'date', direction: 'desc' }],
+        sort: [{ field: 'Start Date', direction: 'desc' }],
       })
       .firstPage((error: unknown, records: Array<AirRecord<RawAirTableEvent>>) => {
         if (error) {
@@ -118,7 +118,17 @@ export function splitEvents(normalizedEvents: EventProps[]): State {
     }
   })
   // take first event of upcoming, if that is blank take first of past (prefer celo hosted)
-  const topEvent = upcomingEvents.sort(celoFirst).shift() || pastEvents.sort(celoFirst).shift()
+  const topEvent =
+    upcomingEvents
+      .slice(0)
+      .filter((e) => !!e.description)
+      .sort(celoFirst)
+      .shift() ||
+    pastEvents
+      .slice(0)
+      .filter((e) => !!e.description)
+      .sort(celoFirst)
+      .shift()
 
   return { pastEvents, upcomingEvents, topEvent }
 }
@@ -131,7 +141,7 @@ function removeEmpty(event: IncomingEvent): boolean {
 }
 
 function orderByDate(eventA: EventProps, eventB: EventProps) {
-  return parseDate(eventA.startDate).valueOf() > parseDate(eventB.startDate).valueOf() ? -1 : 1
+  return eventA.startDate > eventB.startDate ? -1 : 1
 }
 
 function celoFirst(eventA: EventProps, eventB: EventProps) {
@@ -147,8 +157,6 @@ export function normalizeEvents(data: RawAirTableEvent[]): EventProps[] {
         ...event,
         celoHosted: !!event.celoHosted,
         celoSpeaking: !!event.celoSpeaking,
-        startDate: event.startDate,
-        endDate: event.endDate,
       }
     })
     .sort(orderByDate)
