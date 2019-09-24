@@ -45,7 +45,7 @@ const longDataEncryptionKey =
   '0x04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111' +
   '02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
 
-contract('Attestations', (accounts: string[]) => {
+contract('Attestations', async (accounts: string[]) => {
   let attestations: AttestationsInstance
   let mockStableToken: MockStableTokenInstance
   let otherMockStableToken: MockStableTokenInstance
@@ -70,7 +70,7 @@ contract('Attestations', (accounts: string[]) => {
     '0x23cb7121166b9a2f93ae0b7c05bde02eae50d64449b2cbb42bc84e9d38d6cc89',
   ]
 
-  const phoneHash: string = getPhoneHash(phoneNumber)
+  const phoneHash: string = await getPhoneHash(phoneNumber)
 
   const attestationsRequested = 3
   const attestationExpirySeconds = 60

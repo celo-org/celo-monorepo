@@ -5,7 +5,7 @@ import {
   PhoneNumberType,
   PhoneNumberUtil,
 } from 'google-libphonenumber'
-import * as Web3Utils from 'web3-utils'
+import scrypt from 'scrypt-js'
 
 export interface ParsedPhoneNumber {
   e164Number: string
@@ -16,6 +16,13 @@ export interface ParsedPhoneNumber {
 
 const phoneUtil = PhoneNumberUtil.getInstance()
 const MIN_PHONE_LENGTH = 4
+export const SCRYPT_PARAMS = {
+  salt: 'nNWKc3l0a1fAj0r35BLGB8kn',
+  N: 512,
+  r: 16,
+  p: 1,
+  dkLen: 32,
+}
 
 export function getCountryEmoji(
   e164PhoneNumber: string,
@@ -38,11 +45,35 @@ export function getCountryEmoji(
   return (country ? country.emoji : '') + ` +${countryCode}`
 }
 
-export const getPhoneHash = (phoneNumber: string): string => {
+export function getPhoneHash(phoneNumber: string) {
   if (!phoneNumber || !isE164Number(phoneNumber)) {
     throw Error('Attempting to hash a non-e164 number: ' + phoneNumber)
   }
-  return Web3Utils.soliditySha3({ type: 'string', value: phoneNumber })
+  return new Promise<string>((resolve) => {
+    scrypt(
+      Buffer.from(phoneNumber.normalize('NFKC')),
+      Buffer.from(SCRYPT_PARAMS.salt.normalize('NFKC')),
+      SCRYPT_PARAMS.N,
+      SCRYPT_PARAMS.r,
+      SCRYPT_PARAMS.p,
+      SCRYPT_PARAMS.dkLen,
+      (error: any, progress: any, key: any) => {
+        if (error) {
+          throw Error(`Unable to hash ${phoneNumber}, error: ${error}`)
+        } else if (key) {
+          let hexHash = ''
+          for (const item of key) {
+            hexHash += item.toString(16)
+          }
+
+          // @ts-ignore
+          resolve('0x' + hexHash.padStart(64, '0'))
+        } else if (progress) {
+          // do nothing
+        }
+      }
+    )
+  })
 }
 
 export function getCountryCode(e164PhoneNumber: string) {
@@ -219,6 +250,7 @@ export function anonymizedPhone(phoneNumber: string) {
 }
 
 export const PhoneNumberUtils = {
+  SCRYPT_PARAMS,
   getPhoneHash,
   getCountryCode,
   getRegionCode,

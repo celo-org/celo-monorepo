@@ -58,6 +58,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     account: Address
   ) => Promise<AttestationStat> = proxyCall(
     this.contract.methods.getAttestationStats,
+    /*rohitdua*/
     tupleParser(PhoneNumberUtils.getPhoneHash, (x: string) => x),
     (stat) => ({ completed: toNumber(stat[0]), total: toNumber(stat[1]) })
   )
@@ -114,7 +115,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     phoneNumber: string,
     account: Address
   ): Promise<ActionableAttestation[]> {
-    const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
+    const phoneHash = await PhoneNumberUtils.getPhoneHash(phoneNumber)
     const expirySeconds = await this.attestationExpirySeconds()
     const nowInUnixSeconds = Math.floor(new Date().getTime() / 1000)
 
@@ -158,8 +159,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param issuer The issuer of the attestation
    * @param code The code received by the validator
    */
-  complete(phoneNumber: string, account: Address, issuer: Address, code: string) {
-    const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
+  async complete(phoneNumber: string, account: Address, issuer: Address, code: string) {
+    const phoneHash = await PhoneNumberUtils.getPhoneHash(phoneNumber)
     const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
     const { r, s, v } = parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
     return wrapSend(this.kit, this.contract.methods.complete(phoneHash, v, r, s))
@@ -172,13 +173,8 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param code The code received by the validator
    * @param issuers The list of potential issuers
    */
-  findMatchingIssuer(
-    phoneNumber: string,
-    account: Address,
-    code: string,
-    issuers: string[]
-  ): string | null {
-    const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
+  async findMatchingIssuer(phoneNumber: string, account: Address, code: string, issuers: string[]) {
+    const phoneHash = await PhoneNumberUtils.getPhoneHash(phoneNumber)
     for (const issuer of issuers) {
       const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
       try {
@@ -242,7 +238,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param token The token with which to pay for the attestation fee
    */
   async request(phoneNumber: string, attestationsRequested: number, token: CeloToken) {
-    const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
+    const phoneHash = await PhoneNumberUtils.getPhoneHash(phoneNumber)
     const tokenAddress = await this.kit.registry.addressFor(token)
     return wrapSend(
       this.kit,
@@ -274,7 +270,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return wrapSend(
       this.kit,
       this.contract.methods.reveal(
-        PhoneNumberUtils.getPhoneHash(phoneNumber),
+        await PhoneNumberUtils.getPhoneHash(phoneNumber),
         encryptedPhone,
         issuer,
         true
@@ -295,7 +291,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     issuer: Address,
     code: string
   ) {
-    const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
+    const phoneHash = await PhoneNumberUtils.getPhoneHash(phoneNumber)
     const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
     const { r, s, v } = parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
     return this.contract.methods.validateAttestationCode(phoneHash, account, v, r, s).call()

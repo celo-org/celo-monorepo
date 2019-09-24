@@ -1,5 +1,5 @@
 import { compressedPubKey } from '@celo/utils/src/commentEncryption'
-import { getPhoneHash, isE164Number } from '@celo/utils/src/phoneNumbers'
+import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import { areAddressesEqual } from '@celo/utils/src/signatureUtils'
 import {
   ActionableAttestation,
@@ -43,6 +43,7 @@ import { attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { RootState } from 'src/redux/reducers'
 import { sendTransaction, sendTransactionPromises } from 'src/transactions/send'
+import { getPhoneHashRN } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -195,10 +196,10 @@ export function* doVerificationFlow() {
 function* getE164NumberHash() {
   try {
     const e164Number: string = yield select(e164NumberSelector)
-    const e164NumberHash = getPhoneHash(e164Number)
+    const e164NumberHash: string = yield call(getPhoneHashRN, e164Number)
     return [e164Number, e164NumberHash]
   } catch (error) {
-    Logger.error(TAG, 'Error hasing e164Number', error)
+    Logger.error(TAG, 'Error hashing e164Number', error)
     throw new Error(ErrorMessages.INVALID_PHONE_NUMBER)
   }
 }
@@ -523,7 +524,7 @@ export async function lookupAddressFromPhoneNumber(e164Number: string) {
   Logger.debug(TAG + '@lookupPhoneNumberAddress', `Checking Phone Number Address`)
 
   try {
-    const phoneHash = getPhoneHash(e164Number)
+    const phoneHash = await getPhoneHashRN(e164Number)
     const attestationsContract = await getAttestationsContract(web3)
     const results = await lookupPhoneNumbers(attestationsContract, [phoneHash])
     if (!results || !results[phoneHash]) {

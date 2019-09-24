@@ -148,7 +148,7 @@ export function* sendInvite(
     // If this invitation has a payment attached to it, send the payment to the escrow.
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
       try {
-        const phoneHash = getPhoneHash(e164Number)
+        const phoneHash = yield getPhoneHash(e164Number)
         yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress))
       } catch (e) {
         Logger.error(TAG, 'Error sending payment to unverified user: ', e)

@@ -5043,6 +5043,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/scrypt-js@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@types/scrypt-js/-/scrypt-js-2.0.3.tgz#69dc2d3b41ab5611b759c19efe7f1553e41c7698"
+  integrity sha512-UNPQP74rdNzlP5ZVPQFTnGvyHkAvxwdCLwPsW9euo3WSmajIxP0mZMtWnHyqic0Dis7+vKlATi/yVlXB+/rpBg==
+  dependencies:
+    "@types/node" "*"
+
 "@types/serve-static@*":
   version "1.13.2"
   resolved "https://registry.yarnpkg.com/@types/serve-static/-/serve-static-1.13.2.tgz#f5ac4d7a6420a99a6a45af4719f4dcd8cd907a48"
@@ -8779,6 +8786,14 @@ buffer@^5.0.5, buffer@^5.0.6:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/buffer/-/buffer-5.1.0.tgz#c913e43678c7cb7c8bd16afbcddb6c5505e8f9fe"
   integrity sha512-YkIRgwsZwJWTnyQrsBTWefizHh+8GYj3kbL1BTiAQ/9pwpino0G7B2gp5tx/FUBqUlvtxV85KNR3mwfAtv15Yw==
+  dependencies:
+    base64-js "^1.0.2"
+    ieee754 "^1.1.4"
+
+buffer@^5.0.8:
+  version "5.4.3"
+  resolved "https://registry.yarnpkg.com/buffer/-/buffer-5.4.3.tgz#3fbc9c69eb713d323e3fc1a895eee0710c072115"
+  integrity sha512-zvj65TkFeIt3i6aj5bIvJDzjjQQGs4o/sNoezg1F1kYap9Nu2jcUdpwzRSJTHMMzG0H7bZkn4rNQpImhuxWX2A==
   dependencies:
     base64-js "^1.0.2"
     ieee754 "^1.1.4"
@@ -25270,6 +25285,14 @@ react-native-device-info@^2.1.0:
   resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-2.1.0.tgz#55eb82c1ba14c550cef6b71efc368d88b96b826a"
   integrity sha512-FdHFi0DtISiytXzE2KM16Qd4GPEGnbA8DjTP1vHjcUPFJCLBtm1P0/10Xn5x/kISjEvsz17grdtJxGrd83c6Pw==
 
+react-native-fast-crypto@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/react-native-fast-crypto/-/react-native-fast-crypto-1.8.1.tgz#9b59d7eb4bcb19f99c62695df9ea4f683bb1e52c"
+  integrity sha512-5Cym09wcYSDXS7+QFg5oWGuW4rz2DyaU09YTeGxn3Qc+rqc01VQ5T6ruW4dWv7bIULtyBcJ2ovTkXTtbsDl3uA==
+  dependencies:
+    buffer "^5.0.8"
+    rfc4648 "^1.0.0"
+
 react-native-firebase@5.3.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/react-native-firebase/-/react-native-firebase-5.3.0.tgz#3a5c31fa74c2edf9a1b82a62ae05b80dc976626e"
@@ -26919,6 +26942,11 @@ retry@^0.10.0, retry@~0.10.0, retry@~0.10.1:
   resolved "https://registry.yarnpkg.com/retry/-/retry-0.10.1.tgz#e76388d217992c252750241d3d3956fed98d8ff4"
   integrity sha1-52OI0heZLCUnUCQdPTlW/tmNj/Q=
 
+rfc4648@^1.0.0:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/rfc4648/-/rfc4648-1.2.1.tgz#3d05ae826df5a305ce6f45a19a7756ddf4e551d0"
+  integrity sha512-WtA5N+n7sYVszB4K4ETLoIhREBH4Q/DHpoB/xK8pFPPAmd9TZGLWvj+UTnT3Le1r9va2uj9KZ/79nC7IfeT7vA==
+
 right-align@^0.1.1:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/right-align/-/right-align-0.1.3.tgz#61339b722fe6a3515689210d24e14c96148613ef"
@@ -27279,7 +27307,7 @@ scrypt-js@2.0.3:
   resolved "https://registry.yarnpkg.com/scrypt-js/-/scrypt-js-2.0.3.tgz#bb0040be03043da9a012a2cea9fc9f852cfc87d4"
   integrity sha1-uwBAvgMEPamgEqLOqfyfhSz8h9Q=
 
-scrypt-js@2.0.4:
+scrypt-js@2.0.4, scrypt-js@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/scrypt-js/-/scrypt-js-2.0.4.tgz#32f8c5149f0797672e551c07e230f834b6af5f16"
   integrity sha512-4KsaGcPnuhtCZQCxFxN3GVYIhKFPTdLd8PLC552XwbMndtD0cjRFAhDuuydXQ0h08ZfPgzqe6EKHozpuH74iDw==

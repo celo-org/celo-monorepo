@@ -21,6 +21,7 @@ import io.sentry.RNSentryPackage;
 import com.bitgo.randombytes.RandomBytesPackage;
 import com.corbt.keepawake.KCKeepAwakePackage;
 import com.facebook.react.ReactApplication;
+import co.airbitz.fastcrypto.RNFastCryptoPackage;
 import com.burnweb.rnsendintent.RNSendIntentPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
@@ -80,6 +81,7 @@ public class MainApplication extends Application implements ShareApplication, Re
 
       ReactPackage basePackages[] = new ReactPackage[] {
               new MainReactPackage(),
+              new RNFastCryptoPackage(),
               new RNInstallReferrerPackage(),
               new RNSendIntentPackage(),
               new RNCWebViewPackage(),

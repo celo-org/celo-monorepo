@@ -28,7 +28,7 @@ export const handler = async (argv: LookupArgv) => {
   console.log(`Looking up addresses attested to ${argv.phone}`)
   const cb = async () => {
     const kit = newKit('http://localhost:8545')
-    const phoneHash = PhoneNumberUtils.getPhoneHash(argv.phone)
+    const phoneHash = await PhoneNumberUtils.getPhoneHash(argv.phone)
     const attestations = await kit.contracts.getAttestations()
     const lookupResult = await attestations.lookupPhoneNumbers([phoneHash])
 

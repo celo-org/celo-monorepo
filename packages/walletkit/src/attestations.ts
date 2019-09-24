@@ -93,7 +93,7 @@ export async function makeRevealTx(
       Buffer.from(phoneNumber, 'utf8')
     ).toString('hex')
   return attestations.methods.reveal(
-    PhoneNumberUtils.getPhoneHash(phoneNumber),
+    await PhoneNumberUtils.getPhoneHash(phoneNumber),
     encryptedPhone,
     issuer,
     true
