@@ -31,6 +31,10 @@ const DefaultConfig = {
     minDeposit: 1, // 1 cGLD
     queueExpiry: 7 * 24 * 60 * 60, // 1 week
     referendumStageDuration: 15 * 60, // 15 minutes
+    participationBaseline: 8 / 10,
+    participationBaselineFloor: 5 / 100,
+    participationBaselineUpdateFactor: 1 / 5,
+    participationBaselineQuorumFactor: 1,
   },
   gasPriceMinimum: {
     initialMinimum: 10000,
@@ -73,6 +77,17 @@ const DefaultConfig = {
 }
 
 const linkedLibraries = {
+  FixidityLib: [
+    'LockedGold',
+    'Exchange',
+    'GasPriceMinimum',
+    'Governance',
+    'Proposals',
+    'SortedOracles',
+    'StableToken',
+    'Validators',
+  ],
+  Proposals: ['Governance', 'ProposalsTest'],
   LinkedList: ['AddressLinkedList', 'SortedLinkedList', 'LinkedListTest'],
   SortedLinkedList: [
     'AddressSortedLinkedList',
