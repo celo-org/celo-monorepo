@@ -2,7 +2,7 @@ import { PincodeType } from 'src/account/reducer'
 import { RootState } from 'src/redux/reducers'
 
 // Default (version -1 schema)
-const vNeg1Schema = {
+export const vNeg1Schema = {
   app: {
     inviteCodeEntered: false,
     loggedIn: false,
@@ -132,7 +132,7 @@ export const v0Schema = {
   },
 }
 
-const v1Schema = {
+export const v1Schema = {
   ...v0Schema,
   app: {
     ...v0Schema.app,
@@ -140,7 +140,7 @@ const v1Schema = {
   },
 }
 
-const v2Schema = {
+export const v2Schema = {
   ...v1Schema,
   account: {
     ...v1Schema.account,

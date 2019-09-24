@@ -1,14 +1,13 @@
 import { PincodeType } from 'src/account/reducer'
 import { migrations } from 'src/redux/migrations'
-import { getLatestSchema, v0Schema } from 'test/schemas'
+import { v0Schema, v1Schema, vNeg1Schema } from 'test/schemas'
 
 describe('Redux persist migrations', () => {
   it('work for v-1 to v0', () => {
-    const defaultSchema = v0Schema
     const vNeg1Stub = {
-      ...defaultSchema,
+      ...vNeg1Schema,
       app: {
-        ...defaultSchema.app,
+        ...vNeg1Schema.app,
         numberVerified: true,
         inviteCodeEntered: true,
       },
@@ -21,11 +20,10 @@ describe('Redux persist migrations', () => {
   })
 
   it('work for v0 to v1', () => {
-    const defaultSchema = getLatestSchema()
     const v0Stub = {
-      ...defaultSchema,
+      ...v0Schema,
       app: {
-        ...defaultSchema.app,
+        ...v0Schema.app,
         language: 'es-AR',
       },
     }
@@ -34,11 +32,10 @@ describe('Redux persist migrations', () => {
   })
 
   it('work for v1 to v2', () => {
-    const defaultSchema = getLatestSchema()
     const v1Stub = {
-      ...defaultSchema,
+      ...v1Schema,
       account: {
-        ...defaultSchema.app,
+        ...v1Schema.app,
         pincodeSet: true,
       },
     }

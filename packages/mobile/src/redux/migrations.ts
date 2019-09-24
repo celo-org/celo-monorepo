@@ -30,6 +30,7 @@ export const migrations = {
       account: {
         ...state.account,
         pincodeType: state.account.pincodeSet ? PincodeType.PhoneAuth : PincodeType.Unset,
+        pincodeSet: undefined,
       },
     }
   },

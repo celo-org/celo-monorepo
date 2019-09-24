@@ -11,6 +11,7 @@ const pincodeCache: PincodeCache = {
 }
 
 export function getCachedPincode() {
+  // TODO(Rossy) use a  monotonic clock here
   if (
     pincodeCache.pincode &&
     pincodeCache.timestamp &&

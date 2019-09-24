@@ -44,8 +44,8 @@ export function* getPincode() {
   const pincodeType = yield select(pincodeTypeSelector)
 
   if (pincodeType === PincodeType.Unset) {
-    Logger.error(TAG + '@getPincode', 'PIN does not seem to be set')
-    throw Error('Cannot create account without having the pin set')
+    Logger.error(TAG + '@getPincode', 'Pin has never been set')
+    throw Error('Pin has never been set')
   }
 
   if (pincodeType === PincodeType.PhoneAuth) {

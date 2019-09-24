@@ -27,6 +27,7 @@ function DigitButton({
 }
 
 export default function NumberKeypad(props: Props) {
+  // TODO(Rossy) i18n the decimal
   return (
     <View style={style.container}>
       <View style={style.row}>
