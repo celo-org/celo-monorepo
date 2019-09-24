@@ -1,5 +1,5 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { fixed1, toFixed, fromFixed, multiply } from '@celo/utils/lib/fixidity'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import {
   assertContainSubset,
   assertEqualBN,
@@ -10,6 +10,8 @@ import BigNumber from 'bignumber.js'
 import {
   MockLockedGoldContract,
   MockLockedGoldInstance,
+  MockElectionContract,
+  MockElectionInstance,
   RegistryContract,
   RegistryInstance,
   ValidatorsContract,
@@ -18,6 +20,7 @@ import {
 
 const Validators: ValidatorsContract = artifacts.require('Validators')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
+const MockElection: MockElectionContract = artifacts.require('MockElection')
 const Registry: RegistryContract = artifacts.require('Registry')
 
 // @ts-ignore
@@ -26,30 +29,30 @@ Validators.numberFormat = 'BigNumber'
 
 const parseValidatorParams = (validatorParams: any) => {
   return {
-    name: validatorParams[1],
-    url: validatorParams[2],
-    publicKeysData: validatorParams[3],
-    affiliation: validatorParams[4],
+    name: validatorParams[0],
+    url: validatorParams[1],
+    publicKeysData: validatorParams[2],
+    affiliation: validatorParams[3],
   }
 }
 
 const parseValidatorGroupParams = (groupParams: any) => {
   return {
-    name: groupParams[1],
-    url: groupParams[2],
-    members: groupParams[3],
+    name: groupParams[0],
+    url: groupParams[1],
+    members: groupParams[2],
   }
 }
 
 const HOUR = 60 * 60
 const DAY = 24 * HOUR
-const YEAR = 365 * DAY
-const MAX_UINT256 = new BigInt(2).pow(256).minus(1)
+const MAX_UINT256 = new BigNumber(2).pow(256).minus(1)
 
 contract('Validators', (accounts: string[]) => {
   let validators: ValidatorsInstance
   let registry: RegistryInstance
   let mockLockedGold: MockLockedGoldInstance
+  let mockElection: MockElectionInstance
   // A random 64 byte hex string.
   const publicKey =
     'ea0733ad275e2b9e05541341a97ee82678c58932464fad26164657a111a7e37a9fa0300266fb90e2135a1f1512350cb4e985488a88809b14e3cbe415e76e82b2'
@@ -73,8 +76,10 @@ contract('Validators', (accounts: string[]) => {
   beforeEach(async () => {
     validators = await Validators.new()
     mockLockedGold = await MockLockedGold.new()
+    mockElection = await MockElection.new()
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
+    await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await validators.initialize(
       registry.address,
       registrationRequirements.group,
@@ -117,7 +122,7 @@ contract('Validators', (accounts: string[]) => {
     })
 
     it('should have set the registration requirements', async () => {
-      const [group, validator] = await validators.getRegistrationRequirement()
+      const [group, validator] = await validators.getRegistrationRequirements()
       assertEqualBN(group, registrationRequirements.group)
       assertEqualBN(validator, registrationRequirements.validator)
     })
@@ -144,14 +149,15 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#setRegistrationRequirements()', () => {
     describe('when the requirements are different', () => {
+      const newRequirements = {
+        group: registrationRequirements.group.plus(1),
+        validator: registrationRequirements.validator.plus(1),
+      }
+
       describe('when called by the owner', () => {
         let resp: any
-        const newRequirements = {
-          group: registrationRequirements.group.plus(1),
-          validator: registrationRequirements.validator.plus(1),
-        }
 
-        before(async () => {
+        beforeEach(async () => {
           resp = await validators.setRegistrationRequirements(
             newRequirements.group,
             newRequirements.validator
@@ -175,6 +181,20 @@ contract('Validators', (accounts: string[]) => {
             },
           })
         })
+
+        describe('when called by a non-owner', () => {
+          it('should revert', async () => {
+            await assertRevert(
+              validators.setRegistrationRequirements(
+                newRequirements.group,
+                newRequirements.validator,
+                {
+                  from: nonOwner,
+                }
+              )
+            )
+          })
+        })
       })
 
       describe('when the requirements are the same', () => {
@@ -188,28 +208,19 @@ contract('Validators', (accounts: string[]) => {
         })
       })
     })
-
-    describe('when called by a non-owner', () => {
-      it('should revert', async () => {
-        await assertRevert(
-          validators.setRegistrationRequirements(newRequirements.group, newRequirements.validator, {
-            from: nonOwner,
-          })
-        )
-      })
-    })
   })
 
   describe('#setDeregistrationLockups()', () => {
     describe('when the requirements are different', () => {
+      const newLockups = {
+        group: deregistrationLockups.group.plus(1),
+        validator: deregistrationLockups.validator.plus(1),
+      }
+
       describe('when called by the owner', () => {
         let resp: any
-        const newLockups = {
-          group: deregistrationLockups.group.plus(1),
-          validator: deregistrationLockups.validator.plus(1),
-        }
 
-        before(async () => {
+        beforeEach(async () => {
           resp = await validators.setDeregistrationLockups(newLockups.group, newLockups.validator)
         })
 
@@ -230,6 +241,16 @@ contract('Validators', (accounts: string[]) => {
             },
           })
         })
+
+        describe('when called by a non-owner', () => {
+          it('should revert', async () => {
+            await assertRevert(
+              validators.setDeregistrationLockups(newLockups.group, newLockups.validator, {
+                from: nonOwner,
+              })
+            )
+          })
+        })
       })
 
       describe('when the requirements are the same', () => {
@@ -243,25 +264,15 @@ contract('Validators', (accounts: string[]) => {
         })
       })
     })
-
-    describe('when called by a non-owner', () => {
-      it('should revert', async () => {
-        await assertRevert(
-          validators.setDeregistrationLockups(newLockups.group, newLockups.validator, {
-            from: nonOwner,
-          })
-        )
-      })
-    })
   })
 
   describe('#setMaxGroupSize()', () => {
     describe('when the size is different', () => {
       describe('when called by the owner', () => {
         let resp: any
-        const newSize = maxGroupSize.plus(1)
+        const newSize = maxGroupSize + 1
 
-        before(async () => {
+        beforeEach(async () => {
           resp = await validators.setMaxGroupSize(newSize)
         })
 
@@ -276,7 +287,7 @@ contract('Validators', (accounts: string[]) => {
           assertContainSubset(log, {
             event: 'MaxGroupSizeSet',
             args: {
-              maxGroupSize: new BigNumber(newSize),
+              size: new BigNumber(newSize),
             },
           })
         })
@@ -300,7 +311,7 @@ contract('Validators', (accounts: string[]) => {
     const validator = accounts[0]
     let resp: any
     describe('when the account is not a registered validator', () => {
-      before(async () => {
+      beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(
           validator,
           registrationRequirements.validator
@@ -330,8 +341,8 @@ contract('Validators', (accounts: string[]) => {
 
       it('should set account balance requirements on locked gold', async () => {
         const [value, timestamp] = await mockLockedGold.getAccountMustMaintain(validator)
-        assert.equal(value, registrationRequirements.validator)
-        assert.equal(timestamp, MAX_UINT256)
+        assertEqualBN(value, registrationRequirements.validator)
+        assertEqualBN(timestamp, MAX_UINT256)
       })
 
       it('should emit the ValidatorRegistered event', async () => {
@@ -350,7 +361,11 @@ contract('Validators', (accounts: string[]) => {
     })
 
     describe('when the account is already a registered validator', () => {
-      before(async () => {
+      beforeEach(async () => {
+        await mockLockedGold.setAccountTotalLockedGold(
+          validator,
+          registrationRequirements.validator
+        )
         await validators.registerValidator(
           name,
           url,
@@ -373,6 +388,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the account is already a registered validator group', () => {
       beforeEach(async () => {
+        await mockLockedGold.setAccountTotalLockedGold(validator, registrationRequirements.group)
         await validators.registerValidatorGroup(name, url, commission)
       })
 
@@ -414,7 +430,7 @@ contract('Validators', (accounts: string[]) => {
     const index = 0
     let resp: any
     describe('when the account is not a registered validator', () => {
-      before(async () => {
+      beforeEach(async () => {
         await registerValidator(validator)
         resp = await validators.deregisterValidator(index)
       })
@@ -430,8 +446,11 @@ contract('Validators', (accounts: string[]) => {
       it('should set account balance requirements on locked gold', async () => {
         const latestTimestamp = (await web3.eth.getBlock('latest')).timestamp
         const [value, timestamp] = await mockLockedGold.getAccountMustMaintain(validator)
-        assert.equal(value, registrationRequirements.validator)
-        assert.equal(timestamp, new BigNumber(timestamp).plus(deregistrationLockups.validator))
+        assertEqualBN(value, registrationRequirements.validator)
+        assertEqualBN(
+          timestamp,
+          new BigNumber(latestTimestamp).plus(deregistrationLockups.validator)
+        )
       })
 
       it('should emit the ValidatorDeregistered event', async () => {
@@ -449,6 +468,7 @@ contract('Validators', (accounts: string[]) => {
     describe('when the validator is affiliated with a validator group', () => {
       const group = accounts[1]
       beforeEach(async () => {
+        await registerValidator(validator)
         await registerValidatorGroup(group)
         await validators.affiliate(group)
       })
@@ -479,7 +499,7 @@ contract('Validators', (accounts: string[]) => {
 
         it('should emit the ValidatorGroupMemberRemoved event', async () => {
           const resp = await validators.deregisterValidator(index)
-          assert.equal(resp.logs.length, 4)
+          assert.equal(resp.logs.length, 3)
           const log = resp.logs[0]
           assertContainSubset(log, {
             event: 'ValidatorGroupMemberRemoved',
@@ -491,31 +511,9 @@ contract('Validators', (accounts: string[]) => {
         })
 
         describe('when the validator is the only member of that group', () => {
-          it('should emit the ValidatorGroupEmptied event', async () => {
-            const resp = await validators.deregisterValidator(index)
-            assert.equal(resp.logs.length, 4)
-            const log = resp.logs[1]
-            assertContainSubset(log, {
-              event: 'ValidatorGroupEmptied',
-              args: {
-                group,
-              },
-            })
-          })
-
-          describe('when that group has received votes', () => {
-            beforeEach(async () => {
-              const voter = accounts[2]
-              const weight = 10
-              await mockLockedGold.setWeight(voter, weight)
-              await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS, { from: voter })
-            })
-
-            it('should remove the group from the list of electable groups with votes', async () => {
-              await validators.deregisterValidator(index)
-              const [groups] = await validators.getValidatorGroupVotes()
-              assert.deepEqual(groups, [])
-            })
+          it('should should mark the group as ineligible for election', async () => {
+            await validators.deregisterValidator(index)
+            assert.isTrue(await mockElection.isIneligible(group))
           })
         })
       })
@@ -609,7 +607,7 @@ contract('Validators', (accounts: string[]) => {
 
         it('should emit the ValidatorGroupMemberRemoved event', async () => {
           const resp = await validators.affiliate(otherGroup)
-          assert.equal(resp.logs.length, 4)
+          assert.equal(resp.logs.length, 3)
           const log = resp.logs[0]
           assertContainSubset(log, {
             event: 'ValidatorGroupMemberRemoved',
@@ -621,31 +619,9 @@ contract('Validators', (accounts: string[]) => {
         })
 
         describe('when the validator is the only member of that group', () => {
-          it('should emit the ValidatorGroupEmptied event', async () => {
-            const resp = await validators.affiliate(otherGroup)
-            assert.equal(resp.logs.length, 4)
-            const log = resp.logs[1]
-            assertContainSubset(log, {
-              event: 'ValidatorGroupEmptied',
-              args: {
-                group,
-              },
-            })
-          })
-
-          describe('when that group has received votes', () => {
-            beforeEach(async () => {
-              const voter = accounts[2]
-              const weight = 10
-              await mockLockedGold.setWeight(voter, weight)
-              await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS, { from: voter })
-            })
-
-            it('should remove the group from the list of electable groups with votes', async () => {
-              await validators.affiliate(otherGroup)
-              const [groups] = await validators.getValidatorGroupVotes()
-              assert.deepEqual(groups, [])
-            })
+          it('should should mark the group as ineligible for election', async () => {
+            await validators.affiliate(otherGroup)
+            assert.isTrue(await mockElection.isIneligible(group))
           })
         })
       })
@@ -701,7 +677,7 @@ contract('Validators', (accounts: string[]) => {
 
       it('should emit the ValidatorGroupMemberRemoved event', async () => {
         const resp = await validators.deaffiliate()
-        assert.equal(resp.logs.length, 3)
+        assert.equal(resp.logs.length, 2)
         const log = resp.logs[0]
         assertContainSubset(log, {
           event: 'ValidatorGroupMemberRemoved',
@@ -713,31 +689,9 @@ contract('Validators', (accounts: string[]) => {
       })
 
       describe('when the validator is the only member of that group', () => {
-        it('should emit the ValidatorGroupEmptied event', async () => {
-          const resp = await validators.deaffiliate()
-          assert.equal(resp.logs.length, 3)
-          const log = resp.logs[1]
-          assertContainSubset(log, {
-            event: 'ValidatorGroupEmptied',
-            args: {
-              group,
-            },
-          })
-        })
-
-        describe('when that group has received votes', () => {
-          beforeEach(async () => {
-            const voter = accounts[2]
-            const weight = 10
-            await mockLockedGold.setWeight(voter, weight)
-            await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS, { from: voter })
-          })
-
-          it('should remove the group from the list of electable groups with votes', async () => {
-            await validators.deaffiliate()
-            const [groups] = await validators.getValidatorGroupVotes()
-            assert.deepEqual(groups, [])
-          })
+        it('should should mark the group as ineligible for election', async () => {
+          await validators.deaffiliate()
+          assert.isTrue(await mockElection.isIneligible(group))
         })
       })
     })
@@ -756,15 +710,9 @@ contract('Validators', (accounts: string[]) => {
     const group = accounts[0]
     let resp: any
     describe('when the account is not a registered validator group', () => {
-      before(async () => {
+      beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(group, registrationRequirements.group)
         resp = await validators.registerValidatorGroup(name, url, commission)
-        resp = await validators.registerValidator(
-          name,
-          url,
-          // @ts-ignore bytes type
-          publicKeysData
-        )
       })
 
       it('should mark the account as a validator group', async () => {
@@ -802,13 +750,14 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(
-          validators.registerValidatorGroup(name, url, registrationRequirement.noticePeriod)
+          validators.registerValidatorGroup(name, url, registrationRequirements.group)
         )
       })
     })
 
     describe('when the account is already a registered validator group', () => {
       beforeEach(async () => {
+        await mockLockedGold.setAccountTotalLockedGold(group, registrationRequirements.group)
         await validators.registerValidatorGroup(name, url, commission)
       })
 
@@ -820,7 +769,7 @@ contract('Validators', (accounts: string[]) => {
     describe('when the account does not meet the registration requirements', () => {
       beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(
-          validator,
+          group,
           registrationRequirements.group.minus(1)
         )
       })
@@ -837,28 +786,25 @@ contract('Validators', (accounts: string[]) => {
     let resp: any
     beforeEach(async () => {
       await registerValidatorGroup(group)
+      resp = await validators.deregisterValidatorGroup(index)
     })
 
     it('should mark the account as not a validator group', async () => {
-      await validators.deregisterValidatorGroup(index)
       assert.isFalse(await validators.isValidatorGroup(group))
     })
 
     it('should remove the account from the list of validator groups', async () => {
-      await validators.deregisterValidatorGroup(index)
       assert.deepEqual(await validators.getRegisteredValidatorGroups(), [])
     })
 
     it('should set account balance requirements on locked gold', async () => {
-      await validators.deregisterValidatorGroup(index)
       const latestTimestamp = (await web3.eth.getBlock('latest')).timestamp
       const [value, timestamp] = await mockLockedGold.getAccountMustMaintain(group)
-      assert.equal(value, registrationRequirements.group)
-      assert.equal(timestamp, new BigNumber(timestamp).plus(deregistrationLockups.group))
+      assertEqualBN(value, registrationRequirements.group)
+      assertEqualBN(timestamp, new BigNumber(latestTimestamp).plus(deregistrationLockups.group))
     })
 
     it('should emit the ValidatorGroupDeregistered event', async () => {
-      const resp = await validators.deregisterValidatorGroup(index)
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertContainSubset(log, {
@@ -880,6 +826,7 @@ contract('Validators', (accounts: string[]) => {
     describe('when the validator group is not empty', () => {
       const validator = accounts[1]
       beforeEach(async () => {
+        await registerValidatorGroup(group)
         await registerValidator(validator)
         await validators.affiliate(group, { from: validator })
         await validators.addMember(validator)
@@ -894,20 +841,20 @@ contract('Validators', (accounts: string[]) => {
   describe('#addMember', () => {
     const group = accounts[0]
     const validator = accounts[1]
+    let resp: any
     beforeEach(async () => {
       await registerValidator(validator)
       await registerValidatorGroup(group)
       await validators.affiliate(group, { from: validator })
+      resp = await validators.addMember(validator)
     })
 
     it('should add the member to the list of members', async () => {
-      await validators.addMember(validator)
       const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
       assert.deepEqual(parsedGroup.members, [validator])
     })
 
     it('should emit the ValidatorGroupMemberAdded event', async () => {
-      const resp = await validators.addMember(validator)
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertContainSubset(log, {
@@ -938,10 +885,6 @@ contract('Validators', (accounts: string[]) => {
     })
 
     describe('when the validator is already a member of the group', () => {
-      beforeEach(async () => {
-        await validators.addMember(validator)
-      })
-
       it('should revert', async () => {
         await assertRevert(validators.addMember(validator))
       })
@@ -963,7 +906,7 @@ contract('Validators', (accounts: string[]) => {
 
     it('should emit the ValidatorGroupMemberRemoved event', async () => {
       const resp = await validators.removeMember(validator)
-      assert.equal(resp.logs.length, 2)
+      assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertContainSubset(log, {
         event: 'ValidatorGroupMemberRemoved',
