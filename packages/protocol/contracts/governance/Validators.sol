@@ -7,6 +7,9 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./UsingLockedGold.sol";
 import "./interfaces/IValidators.sol";
+
+import "../identity/interfaces/IRandom.sol";
+
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
@@ -63,12 +66,18 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
 
+  uint256 public maxGroupSize;
+
   event MinElectableValidatorsSet(
     uint256 minElectableValidators
   );
 
   event MaxElectableValidatorsSet(
     uint256 maxElectableValidators
+  );
+
+  event MaxGroupSizeSet(
+    uint256 maxGroupSize
   );
 
   event RegistrationRequirementSet(
@@ -156,7 +165,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     uint256 _minElectableValidators,
     uint256 _maxElectableValidators,
     uint256 requirementValue,
-    uint256 requirementNoticePeriod
+    uint256 requirementNoticePeriod,
+    uint256 _maxGroupSize
   )
     external
     initializer
@@ -168,6 +178,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     maxElectableValidators = _maxElectableValidators;
     registrationRequirement.value = requirementValue;
     registrationRequirement.noticePeriod = requirementNoticePeriod;
+    setMaxGroupSize(_maxGroupSize);
   }
 
   /**
@@ -210,6 +221,24 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     );
     maxElectableValidators = _maxElectableValidators;
     emit MaxElectableValidatorsSet(_maxElectableValidators);
+    return true;
+  }
+
+  /**
+   * @notice Changes the maximum group size.
+   * @param _maxGroupSize The maximum number of validators for each group.
+   * @return True upon success.
+   */
+  function setMaxGroupSize(
+    uint256 _maxGroupSize
+  )
+    public
+    onlyOwner
+    returns (bool)
+  {
+    require(_maxGroupSize > 0);
+    maxGroupSize = _maxGroupSize;
+    emit MaxGroupSizeSet(_maxGroupSize);
     return true;
   }
 
@@ -411,6 +440,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(isValidatorGroup(account) && isValidator(validator));
     ValidatorGroup storage group = groups[account];
     require(validators[validator].affiliation == account && !group.members.contains(validator));
+    require(group.members.numElements < maxGroupSize, "Maximum group size exceeded");
     group.members.push(validator);
     emit ValidatorGroupMemberAdded(account, validator);
     return true;
@@ -740,6 +770,14 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
         electedValidators[totalNumMembersElected] = getValidatorFromAccount(electedGroupMembers[j]);
         totalNumMembersElected = totalNumMembersElected.add(1);
       }
+    }
+    // Shuffle the validator set using validator-supplied entropy
+    IRandom random = IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
+    bytes32 r = random.random();
+    for (uint256 i = electedValidators.length - 1; i > 0; i = i.sub(1)) {
+      uint256 j = uint256(r) % (i + 1);
+      (electedValidators[i], electedValidators[j]) = (electedValidators[j], electedValidators[i]);
+      r = keccak256(abi.encodePacked(r));
     }
     return electedValidators;
   }
