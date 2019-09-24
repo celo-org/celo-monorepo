@@ -1432,7 +1432,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should return the elected validators from two largest parties', async () => {
-        assertAddressesEqual(await validators.getValidators(), [
+        assertSameAddresses(await validators.getValidators(), [
           validator1,
           validator2,
           validator3,
