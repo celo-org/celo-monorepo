@@ -1,5 +1,3 @@
-// App crashes when these are imports instead of requires, now that the code is serverside
-const fecha = require('fecha')
 import airtableInit, { AirRecord } from '../server/airtable'
 
 import getConfig from 'next/config'
@@ -99,7 +97,7 @@ function convertKeys(rawEvent: RawAirTableEvent): IncomingEvent {
 }
 
 function parseDate(date: string) {
-  return fecha.parse(date, 'YYYY-MM-DD')
+  return new Date(date)
 }
 
 export function splitEvents(normalizedEvents: EventProps[]): State {
@@ -140,6 +138,14 @@ function removeEmpty(event: IncomingEvent): boolean {
   )
 }
 
+function convertValues(event: IncomingEvent): EventProps {
+  return {
+    ...event,
+    celoHosted: !!event.celoHosted,
+    celoSpeaking: !!event.celoSpeaking,
+  }
+}
+
 function orderByDate(eventA: EventProps, eventB: EventProps) {
   return eventA.startDate === eventB.startDate ? 0 : eventA.startDate > eventB.startDate ? -1 : 1
 }
@@ -160,16 +166,6 @@ export function normalizeEvents(data: RawAirTableEvent[]): EventProps[] {
   return data
     .map(convertKeys)
     .filter(removeEmpty)
-    .map(function convertValues(event: IncomingEvent): EventProps {
-      return {
-        ...event,
-        celoHosted: !!event.celoHosted,
-        celoSpeaking: !!event.celoSpeaking,
-      }
-    })
-    .map((e) => {
-      console.log(e)
-      return e
-    })
+    .map(convertValues)
     .sort(orderByDate)
 }
