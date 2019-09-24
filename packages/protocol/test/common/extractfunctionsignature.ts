@@ -4,7 +4,6 @@ import {
   TestTransactionsContract,
   TestTransactionsInstance,
 } from 'types'
-// import { stripHexEncoding } from '../../lib/test-utils'
 
 const ExtractFunctionSignatureTest: ExtractFunctionSignatureTestContract = artifacts.require(
   'ExtractFunctionSignatureTest'
