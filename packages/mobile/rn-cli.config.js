@@ -31,7 +31,6 @@ module.exports = {
       'react-native-screens': path.resolve(cwd, 'node_modules/react-native-screens'),
       'react-native-svg': path.resolve(cwd, 'node_modules/react-native-svg'),
       vm: require.resolve('vm-browserify'),
-      web3: path.resolve(cwd, 'node_modules/web3'),
     },
     sourceExts: isE2E ? ['e2e.ts', 'e2e.js'].concat(defaultSourceExts) : defaultSourceExts,
   },

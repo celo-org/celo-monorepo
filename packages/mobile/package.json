@@ -132,7 +132,7 @@
     "tslib": "^1.9.1",
     "utf8": "^3.0.0",
     "vm-browserify": "^1.0.1",
-    "web3": "1.0.0-beta.34"
+    "web3": "1.0.0-beta.37"
   },
   "devDependencies": {
     "@babel/core": "^7.4.3",
