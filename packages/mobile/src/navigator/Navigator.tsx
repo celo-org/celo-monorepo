@@ -29,8 +29,9 @@ import { Screens, Stacks } from 'src/navigator/Screens'
 import TabNavigator from 'src/navigator/TabNavigator'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
 import PaymentRequestListScreen from 'src/paymentRequest/PaymentRequestListScreen'
-import Pincode from 'src/pincode/Pincode'
 import PincodeConfirmation from 'src/pincode/PincodeConfirmation'
+import PincodeEducation from 'src/pincode/PincodeEducation'
+import PincodeSet from 'src/pincode/PincodeSet'
 import QRCode from 'src/qrcode/QRCode'
 import QRScanner from 'src/qrcode/QRScanner'
 import FeeEducation from 'src/send/FeeEducation'
@@ -66,7 +67,8 @@ const NuxStack = createStackNavigator(
   {
     [Screens.Language]: { screen: Language },
     [Screens.JoinCelo]: { screen: JoinCelo },
-    [Screens.Pincode]: { screen: Pincode },
+    [Screens.PincodeEducation]: { screen: PincodeEducation },
+    [Screens.PincodeSet]: { screen: PincodeSet },
     [Screens.EnterInviteCode]: { screen: EnterInviteCode },
     [Screens.ImportWallet]: { screen: ImportWallet },
     [Screens.ImportContacts]: { screen: ImportContacts },
@@ -150,7 +152,6 @@ const AppStack = createStackNavigator(
     [Screens.QRScanner]: { screen: QRScanner },
     [Screens.GoldEducation]: { screen: GoldEducation },
     [Screens.Backup]: { screen: Backup },
-    [Screens.Pincode]: { screen: Pincode },
     [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
     [Screens.ReclaimPaymentConfirmationScreen]: { screen: ReclaimPaymentConfirmationScreen },
     ...commonScreens,
