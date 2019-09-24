@@ -68,6 +68,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
 
+  uint256 public maxGroupSize;
+
   event MinElectableValidatorsSet(
     uint256 minElectableValidators
   );
@@ -78,6 +80,10 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
   event MaxElectableValidatorsSet(
     uint256 maxElectableValidators
+  );
+
+  event MaxGroupSizeSet(
+    uint256 maxGroupSize
   );
 
   event RegistrationRequirementSet(
@@ -158,7 +164,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
        validator.
    * @param requirementNoticePeriod The minimum Locked Gold commitment notice period to register
    *    a group or validator.
-   * @param threshold The minimum ratio of votes a group needs before it's members can be elected.
+   * @param threshold The minimum ratio of votes a group needs before its members can be elected.
    * @dev Should be called only once.
    */
   function initialize(
@@ -167,6 +173,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     uint256 _maxElectableValidators,
     uint256 requirementValue,
     uint256 requirementNoticePeriod,
+    uint256 _maxGroupSize,
     uint256 threshold
   )
     external
@@ -180,6 +187,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     maxElectableValidators = _maxElectableValidators;
     registrationRequirement.value = requirementValue;
     registrationRequirement.noticePeriod = requirementNoticePeriod;
+    setMaxGroupSize(_maxGroupSize);
   }
 
   /**
@@ -226,6 +234,24 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   }
 
   /**
+   * @notice Changes the maximum group size.
+   * @param _maxGroupSize The maximum number of validators for each group.
+   * @return True upon success.
+   */
+  function setMaxGroupSize(
+    uint256 _maxGroupSize
+  )
+    public
+    onlyOwner
+    returns (bool)
+  {
+    require(_maxGroupSize > 0);
+    maxGroupSize = _maxGroupSize;
+    emit MaxGroupSizeSet(_maxGroupSize);
+    return true;
+  }
+
+  /**
    * @notice Updates the minimum bonding requirements to register a validator group or validator.
    * @param value The minimum Locked Gold commitment value to register a group or validator.
    * @param noticePeriod The minimum Locked Gold commitment notice period to register a group or
@@ -263,7 +289,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   {
     electionThreshold = FixidityLib.wrap(threshold);
     require(
-      FixidityLib.lt(electionThreshold, FixidityLib.fixed1()),
+      electionThreshold.lt(FixidityLib.fixed1()),
       "Election threshold must be lower than 100%"
     );
     emit ElectionThresholdSet(threshold);
@@ -275,7 +301,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @return Threshold value as unwrapped fraction.
    */
   function getElectionThreshold() external view returns (uint256) {
-    return FixidityLib.unwrap(electionThreshold);
+    return electionThreshold.unwrap();
   }
 
 
@@ -451,6 +477,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(isValidatorGroup(account) && isValidator(validator));
     ValidatorGroup storage group = groups[account];
     require(validators[validator].affiliation == account && !group.members.contains(validator));
+    require(group.members.numElements < maxGroupSize, "Maximum group size exceeded");
     group.members.push(validator);
     emit ValidatorGroupMemberAdded(account, validator);
     return true;
@@ -764,7 +791,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
           numVotes,
           totalVotes
         );
-        if (FixidityLib.lt(percentVotes, electionThreshold)) break;
+        if (percentVotes.lt(electionThreshold)) break;
         (maxN, isWinningestGroupInRound) = dHondt(maxN, electionGroups[i], numMembersElected[i]);
         if (isWinningestGroupInRound) {
           memberElectedInRound = true;

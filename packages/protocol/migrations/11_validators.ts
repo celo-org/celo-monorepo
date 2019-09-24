@@ -10,6 +10,7 @@ const initializeArgs = async (): Promise<any[]> => {
     config.validators.maxElectableValidators,
     config.validators.minLockedGoldValue,
     config.validators.minLockedGoldNoticePeriod,
+    config.validators.maxGroupSize,
     config.validators.electionThreshold,
   ]
 }
