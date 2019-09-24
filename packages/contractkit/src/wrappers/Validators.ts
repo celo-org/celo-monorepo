@@ -57,16 +57,28 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   removeMember = proxySend(this.kit, this.contract.methods.removeMember)
   registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
   registerValidatorGroup = proxySend(this.kit, this.contract.methods.registerValidatorGroup)
+  /**
+   * Returns the minimum number of validators that can be elected.
+   * @returns The minimum number of validators that can be elected.
+   */
   minElectableValidators = proxyCall(
     this.contract.methods.minElectableValidators,
     undefined,
     toBigNumber
   )
+  /**
+   * Returns the maximum number of validators that can be elected.
+   * @returns The maximum number of validators that can be elected.
+   */
   maxElectableValidators = proxyCall(
     this.contract.methods.maxElectableValidators,
     undefined,
     toBigNumber
   )
+  /**
+   * Returns the current election threshold.
+   * @returns Election threshold.
+   */
   electionThreshold = proxyCall(this.contract.methods.getElectionThreshold, undefined, toBigNumber)
   validatorAddressFromCurrentSet = proxyCall(this.contract.methods.validatorAddressFromCurrentSet)
   numberValidatorsInCurrentSet = proxyCall(
@@ -79,6 +91,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     this.contract.methods.voters
   )
 
+  /**
+   * Returns the current registrations requirements.
+   * @returns Minimum deposit and notice period.
+   */
   async getRegistrationRequirement(): Promise<RegistrationRequirement> {
     const res = await this.contract.methods.getRegistrationRequirement().call()
     return {
@@ -87,6 +103,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     }
   }
 
+  /**
+   * Returns current configuration parameters.
+   */
   async getConfig(): Promise<ValidatorConfig> {
     const res = await Promise.all([
       this.minElectableValidators(),

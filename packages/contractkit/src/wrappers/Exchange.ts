@@ -24,9 +24,28 @@ export interface ExchangeConfig {
  * using a Constant Product Market Maker Model
  */
 export class ExchangeWrapper extends BaseWrapper<Exchange> {
+  /**
+   * Query spread parameter
+   * @returns Current spread charged on exchanges
+   */
   spread = proxyCall(this.contract.methods.spread, undefined, toBigNumber)
+  /**
+   * Query reserve fraction parameter
+   * @returns Current fraction to commit to the gold bucket
+   */
   reserveFraction = proxyCall(this.contract.methods.reserveFraction, undefined, toBigNumber)
+  /**
+   * Query update frequency parameter
+   * @returns The time period that needs to elapse between bucket
+   * updates
+   */
   updateFrequency = proxyCall(this.contract.methods.updateFrequency, undefined, toBigNumber)
+  /**
+   * Query minimum reports parameter
+   * @returns The minimum number of fresh reports that need to be
+   * present in the oracle to update buckets
+   * commit to the gold bucket
+   */
   minimumReports = proxyCall(this.contract.methods.minimumReports, undefined, toBigNumber)
 
   /**
@@ -154,7 +173,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
       minimumReports: res[3],
     }
   }
-  /*
+  /**
    * Returns the exchange rate estimated at buyAmount.
    * @param buyAmount The amount of buyToken in wei to estimate the exchange rate at
    * @param sellGold `true` if gold is the sell token

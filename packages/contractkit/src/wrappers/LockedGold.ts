@@ -54,9 +54,17 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   newCommitment = proxySend(this.kit, this.contract.methods.newCommitment)
   extendCommitment = proxySend(this.kit, this.contract.methods.extendCommitment)
   isVoting = proxyCall(this.contract.methods.isVoting)
+  /**
+   * Query maximum notice period.
+   * @returns Current maximum notice period.
+   */
   maxNoticePeriod = proxyCall(this.contract.methods.maxNoticePeriod, undefined, toBigNumber)
 
   getAccountWeight = proxyCall(this.contract.methods.getAccountWeight, undefined, toBigNumber)
+
+  /**
+   * Returns current configuration parameters.
+   */
 
   async getConfig(): Promise<LockedGoldConfig> {
     return {

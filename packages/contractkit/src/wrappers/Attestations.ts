@@ -97,6 +97,12 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     this.kit,
     this.contract.methods.setAccountDataEncryptionKey
   )
+
+  /**
+   * Returns the attestation request fee in a given currency.
+   * @param address Token address.
+   * @returns The fee as big number.
+   */
   attestationRequestFees = proxyCall(
     this.contract.methods.attestationRequestFees,
     undefined,
