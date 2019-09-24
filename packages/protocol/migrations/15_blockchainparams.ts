@@ -1,15 +1,16 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
-import { BlockchainParamsInstance } from 'types'
 import { config } from '@celo/protocol/migrationsConfig'
+import { BlockchainParametersInstance } from 'types'
 
 const initializeArgs = async (_: string): Promise<any[]> => {
-  return [config.blockchainParams.minimumClientVersion]
+  const version = config.blockchainParameters.minimumClientVersion
+  return [version.major, version.minor, version.patch]
 }
 
-module.exports = deploymentForCoreContract<BlockchainParamsInstance>(
+module.exports = deploymentForCoreContract<BlockchainParametersInstance>(
   web3,
   artifacts,
-  CeloContractName.BlockchainParams,
+  CeloContractName.BlockchainParameters,
   initializeArgs
 )

@@ -65,6 +65,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'SortedOracles',
       'StableToken',
       'Validators',
+      'BlockchainParameters',
     ]
 
     await Promise.all(
