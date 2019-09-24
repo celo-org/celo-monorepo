@@ -66,7 +66,7 @@ describe('@getPincode', () => {
         .provide([[select(pincodeTypeSelector), PincodeType.Unset]])
         .run()
     } catch (error) {
-      expect(error.message).toBe('Cannot create account without having the pin set')
+      expect(error.message).toBe('Pin has never been set')
     }
   })
 })
