@@ -8,6 +8,6 @@ yarn run ganache-cli \
   --mnemonic 'concert load couple harbor equip island argue ramp clarify fence smart topic' \
   --gasPrice 0 \
   --networkId 1101 \
-  --gasLimit 7000000 \
+  --gasLimit 8000000 \
   --defaultBalanceEther 1000000 \
   --allowUnlimitedContractSize

@@ -1,6 +1,7 @@
 import { AnyAction } from 'redux'
 import { call, select, spawn, takeEvery } from 'redux-saga/effects'
 import { devModeSelector } from 'src/account/reducer'
+import { accountSaga } from 'src/account/saga'
 import { appSaga, waitForRehydrate } from 'src/app/saga'
 import { dappKitSaga } from 'src/dappkit/dappkit'
 import { escrowSaga } from 'src/escrow/saga'
@@ -24,6 +25,7 @@ const loggerBlacklist = [
   'GETH_NEW_BLOCK',
   'APP/SET_GETH_CONNECTED',
   'ACCOUNT/SET_PHONE_NUMBER',
+  'ACCOUNT/SET_PINCODE',
   'SEND/SET_RECIPIENT_CACHE',
   'IMPORT/IMPORT_BACKUP_PHRASE',
   'WEB3/SET_COMMENT_KEY',
@@ -56,6 +58,7 @@ export function* rootSaga() {
   yield spawn(appSaga)
   yield spawn(networkInfoSaga)
   yield spawn(gethSaga)
+  yield spawn(accountSaga)
   yield spawn(identitySaga)
   yield spawn(goldTokenSaga)
   yield spawn(stableTokenSaga)

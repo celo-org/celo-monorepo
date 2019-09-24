@@ -1,5 +1,4 @@
 import { stringToBoolean } from '@celo/utils/src/parsing'
-import { Platform } from 'react-native'
 import Config from 'react-native-config'
 import config from 'src/geth/network-config'
 import { Testnets } from 'src/web3/testnets'
@@ -41,8 +40,6 @@ export const NUMBER_INPUT_MAX_DECIMALS = 2
 export const MAX_COMMENT_LENGTH = 70
 
 export const INPUT_DEBOUNCE_TIME = 1000 // milliseconds
-
-export const SUPPORTS_KEYSTORE = Platform.Version >= 23
 
 export const DEV_SETTINGS_ACTIVE_INITIALLY = stringToBoolean(
   Config.DEV_SETTINGS_ACTIVE_INITIALLY || 'false'

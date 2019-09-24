@@ -42,7 +42,7 @@ exports[`Debug renders correctly 1`] = `
       }
     }
   >
-    Pin Set: false
+    Pin Type: Unset
   </Text>
   <Text
     onPress={[Function]}
