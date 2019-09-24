@@ -54,6 +54,8 @@ export class ContractKit {
   }
 
   async getNetworkConfig(): Promise<NetworkConfig> {
+    const token1 = await this.contracts.getGoldToken()
+    const token2 = await this.contracts.getStableToken()
     const contracts = await Promise.all([
       this.contracts.getExchange(),
       this.contracts.getAttestations(),
@@ -67,7 +69,7 @@ export class ContractKit {
     ])
     const res = await Promise.all([
       contracts[0].getConfig(),
-      contracts[1].getConfig(),
+      contracts[1].getConfig([token1.address, token2.address]),
       contracts[2].getConfig(),
       contracts[3].getConfig(),
       contracts[4].getConfig(),
