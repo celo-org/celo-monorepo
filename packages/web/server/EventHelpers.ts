@@ -141,11 +141,19 @@ function removeEmpty(event: IncomingEvent): boolean {
 }
 
 function orderByDate(eventA: EventProps, eventB: EventProps) {
-  return eventA.startDate > eventB.startDate ? -1 : 1
+  return eventA.startDate === eventB.startDate ? 0 : eventA.startDate > eventB.startDate ? -1 : 1
 }
 
-function celoFirst(eventA: EventProps, eventB: EventProps) {
-  return eventA.celoHosted === eventB.celoHosted ? 0 : eventA.celoHosted ? -1 : 1
+export function celoFirst(eventA: EventProps, eventB: EventProps) {
+  if (eventA.celoHosted && eventB.celoHosted) {
+    return eventA.startDate > eventB.startDate ? 1 : -1
+  } else if (eventA.celoHosted) {
+    return -1
+  } else if (!eventA.celoHosted && !eventB.celoHosted) {
+    return 0
+  } else {
+    return 1
+  }
 }
 
 export function normalizeEvents(data: RawAirTableEvent[]): EventProps[] {
@@ -158,6 +166,10 @@ export function normalizeEvents(data: RawAirTableEvent[]): EventProps[] {
         celoHosted: !!event.celoHosted,
         celoSpeaking: !!event.celoSpeaking,
       }
+    })
+    .map((e) => {
+      console.log(e)
+      return e
     })
     .sort(orderByDate)
 }
