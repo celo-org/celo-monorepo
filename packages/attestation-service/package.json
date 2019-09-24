@@ -23,8 +23,6 @@
     "db:migrate": "sequelize db:migrate",
     "db:migrate:dev": "sequelize db:migrate",
     "dev": "CONFIG=config/.env.development nodemon",
-    "test:prepare": "yarn --cwd ../protocol devchain generate .devchain",
-    "test": "jest --runInBand",
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
