@@ -20,7 +20,6 @@ contract('FixidityLib', () => {
   const maxFixedMul = new BigNumber('340282366920938463463374607431768211455999999999999')
   const mulPrecision = new BigNumber('1000000000000')
   const maxFixedDividend = new BigNumber('115792089237316195423570985008687907853269984665640564')
-  const maxFixedDivisor = new BigNumber('1000000000000000000000000000000000000000000000000')
 
   beforeEach(async () => {
     fixidityTest = await FixidityTest.new()
@@ -68,13 +67,6 @@ contract('FixidityLib', () => {
     it('should create 1/fixed1', async () => {
       const expected = new BigNumber(1)
       const result = await fixidityTest.newFixedFraction(1, fixed1)
-
-      assertEqualBN(result, expected)
-    })
-
-    it('should create maxFixedDividend/1', async () => {
-      const expected = toFixed(maxFixedDividend)
-      const result = await fixidityTest.newFixedFraction(maxFixedDividend, 1)
 
       assertEqualBN(result, expected)
     })
@@ -246,22 +238,16 @@ contract('FixidityLib', () => {
       assertEqualBN(result, expected)
     })
 
-    it('should divide maxFixedDivisor by itself', async () => {
-      const result = await fixidityTest.divide(maxFixedDivisor, maxFixedDivisor)
-
-      assertEqualBN(result, fixed1)
-    })
-
     it('should fail to divide a number greater than maxFixedDividend by 1', async () => {
       await assertRevert(fixidityTest.divide(maxFixedDividend.plus(1), 1))
     })
 
-    it('should fail to divide by a number greater than maxFixedDivisor', async () => {
-      await assertRevert(fixidityTest.divide(maxFixedDivisor, maxFixedDivisor.plus(1)))
+    it('should fail to divide a number greater than maxFixedDividend', async () => {
+      await assertRevert(fixidityTest.divide(maxFixedDividend.plus(1), fixed1))
     })
 
     it('should fail to divide by 0', async () => {
-      await assertRevert(fixidityTest.divide(maxFixedDivisor, zero))
+      await assertRevert(fixidityTest.divide(maxFixedDividend, zero))
     })
   })
 
