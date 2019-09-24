@@ -1052,4 +1052,95 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     }
     return threshold;
   }
+<<<<<<< HEAD
+||||||| merged common ancestors
+<<<<<<<<< Temporary merge branch 1
+
+  // call has been separated into its own function in order to take advantage
+  // of the Solidity's code generator to produce a loop that copies tx.data into memory.
+  /**
+   * @notice Executes a function call.
+   * @param value The value of Celo Gold to be sent with the function call.
+   * @param destination The destination address of the function call.
+   * @param dataLength The length of the data to be included in the function call.
+   * @param data The data to be included in the function call.
+   */
+  function externalCall(
+    address destination,
+    uint value,
+    uint dataLength,
+    bytes memory data
+  )
+    private
+    nonReentrant
+    returns (bool)
+  {
+    bool result;
+
+    require(AddressesHelper.isContract(destination), "Invalid contract address");
+
+    /* solhint-disable no-inline-assembly */
+    assembly {
+      /* solhint-disable max-line-length */
+      let x := mload(0x40)   // "Allocate" memory for output (0x40 is where "free memory" pointer is stored by convention)
+      let d := add(data, 32) // First 32 bytes are the padded length of data, so exclude that
+      result := call(
+        sub(gas, 34710),   // 34710 is the value that solidity is currently emitting
+                           // It includes callGas (700) + callVeryLow (3, to pay for SUB) + callValueTransferGas (9000) +
+                           // callNewAccountGas (25000, in case the destination address does not exist and needs creating)
+        destination,
+        value,
+        d,
+        dataLength,        // Size of the input (in bytes) - this is what fixes the padding problem
+        x,
+        0                  // Output is ignored, therefore the output size is zero
+      )
+      /* solhint-enable max-line-length */
+    }
+    /* solhint-enable no-inline-assembly */
+    return result;
+  }
+||||||||| merged common ancestors
+
+  // call has been separated into its own function in order to take advantage
+  // of the Solidity's code generator to produce a loop that copies tx.data into memory.
+  /**
+   * @notice Executes a function call.
+   * @param value The value of Celo Gold to be sent with the function call.
+   * @param destination The destination address of the function call.
+   * @param dataLength The length of the data to be included in the function call.
+   * @param data The data to be included in the function call.
+   */
+  function externalCall(
+    address destination,
+    uint value,
+    uint dataLength,
+    bytes memory data
+  )
+    private
+    nonReentrant
+    returns (bool)
+  {
+    bool result;
+    /* solhint-disable no-inline-assembly */
+    assembly {
+      /* solhint-disable max-line-length */
+      let x := mload(0x40)   // "Allocate" memory for output (0x40 is where "free memory" pointer is stored by convention)
+      let d := add(data, 32) // First 32 bytes are the padded length of data, so exclude that
+      result := call(
+        sub(gas, 34710),   // 34710 is the value that solidity is currently emitting
+                           // It includes callGas (700) + callVeryLow (3, to pay for SUB) + callValueTransferGas (9000) +
+                           // callNewAccountGas (25000, in case the destination address does not exist and needs creating)
+        destination,
+        value,
+        d,
+        dataLength,        // Size of the input (in bytes) - this is what fixes the padding problem
+        x,
+        0                  // Output is ignored, therefore the output size is zero
+      )
+      /* solhint-enable max-line-length */
+    }
+    /* solhint-enable no-inline-assembly */
+    return result;
+  }
 }
