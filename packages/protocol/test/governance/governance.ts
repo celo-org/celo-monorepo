@@ -836,11 +836,6 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    it('should revert when the account weight is 0', async () => {
-      await mockLockedGold.setAccountTotalLockedGold(account, 0)
-      await assertRevert(governance.upvote(proposalId, 0, 0))
-    })
-
     it('should revert when upvoting a proposal that is not queued', async () => {
       await assertRevert(governance.upvote(proposalId.plus(1), 0, 0))
     })
