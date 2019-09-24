@@ -12,7 +12,6 @@ import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/FractionUtil.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
-import "../common/libraries/AddressesHelper.sol";
 
 
 // TODO(asa): Hardcode minimum times for queueExpiry, etc.
