@@ -99,6 +99,12 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   )
 
   /**
+   * Sets the wallet address for the account
+   * @param address The address to set
+   */
+  setWalletAddress = proxySend(this.kit, this.contract.methods.setWalletAddress)
+
+  /**
    * Returns the attestation request fee in a given currency.
    * @param address Token address.
    * @returns The fee as big number.
@@ -132,12 +138,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       attestationRequestFees: fees,
     }
   }
-
-  /**
-   * Sets the wallet address for the account
-   * @param address The address to set
-   */
-  setWalletAddress = proxySend(this.kit, this.contract.methods.setWalletAddress)
 
   /**
    * Calculates the amount of CeloToken to request Attestations
