@@ -12,4 +12,17 @@ contract MockElection is IElection {
   function markGroupIneligible(address account) external {
     isIneligible[account] = true;
   }
+
+  function getTotalVotes() external view returns (uint256) {
+    return 0;
+  }
+
+  function getAccountTotalVotes(address) external view returns (uint256) {
+    return 0;
+  }
+
+  function electValidators() external view returns (address[] memory) {
+    address[] memory r = new address[](0);
+    return r;
+  }
 }

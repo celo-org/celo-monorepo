@@ -7,5 +7,5 @@ module.exports = deploymentForCoreContract<LockedGoldInstance>(
   web3,
   artifacts,
   CeloContractName.LockedGold,
-  async () => [config.registry.predeployedProxyAddress, config.lockedGold.maxNoticePeriod]
+  async () => [config.registry.predeployedProxyAddress, config.lockedGold.unlockingPeriod]
 )

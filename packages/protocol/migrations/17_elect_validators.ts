@@ -11,7 +11,7 @@ import {
 import { config } from '@celo/protocol/migrationsConfig'
 import { BigNumber } from 'bignumber.js'
 import * as bls12377js from 'bls12377js'
-import { LockedGoldInstance, ValidatorsInstance } from 'types'
+import { ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'
 
 const Web3 = require('web3')
 
@@ -27,13 +27,11 @@ async function makeMinimumDeposit(lockedGold: LockedGoldInstance, privateKey: st
   })
 
   // @ts-ignore
-  const bondTx = lockedGold.contract.methods.newCommitment(
-    config.validators.minLockedGoldNoticePeriod
-  )
+  const lockTx = lockedGold.contract.methods.lock()
 
-  await sendTransactionWithPrivateKey(web3, bondTx, privateKey, {
+  await sendTransactionWithPrivateKey(web3, lockTx, privateKey, {
     to: lockedGold.address,
-    value: config.validators.minLockedGoldValue,
+    value: config.validators.registrationRequirements.validator,
   })
 }
 
@@ -131,6 +129,11 @@ module.exports = async (_deployer: any) => {
     artifacts
   )
 
+  const election: ElectionInstance = await getDeployedProxiedContract<ElectionInstance>(
+    'Election',
+    artifacts
+  )
+
   const valKeys: string[] = config.validators.validatorKeys
 
   if (valKeys.length === 0) {
@@ -168,11 +171,12 @@ module.exports = async (_deployer: any) => {
   console.info('  Voting for Validator Group ...')
   // Make another deposit so our vote has more weight.
   const minLockedGoldVotePerValidator = 10000
-  await lockedGold.newCommitment(0, {
+  const value = new BigNumber(valKeys.length)
+    .times(minLockedGoldVotePerValidator)
+    .times(web3.utils.toWei(1))
+  await lockedGold.lock({
     // @ts-ignore
-    value: new BigNumber(valKeys.length)
-      .times(minLockedGoldVotePerValidator)
-      .times(config.validators.minLockedGoldValue),
+    value,
   })
-  await validators.vote(account.address, NULL_ADDRESS, NULL_ADDRESS)
+  await election.vote(account.address, value, NULL_ADDRESS, NULL_ADDRESS)
 }

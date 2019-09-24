@@ -12,10 +12,15 @@ const DefaultConfig = {
     attestationRequestFeeInDollars: 0.05,
   },
   lockedGold: {
-    maxNoticePeriod: 60 * 60 * 24 * 365 * 3, // 3 years
+    unlockingPeriod: 60 * 60 * 24 * 3, // 3 days
   },
   oracles: {
     reportExpiry: 60 * 60, // 1 hour
+  },
+  election: {
+    minElectableValidators: '10',
+    maxElectableValidators: '100',
+    maxVotesPerAccount: 3,
   },
   exchange: {
     spread: 5 / 1000,
@@ -57,10 +62,15 @@ const DefaultConfig = {
     initialAccounts: [],
   },
   validators: {
-    minElectableValidators: '10',
-    maxElectableValidators: '100',
-    minLockedGoldValue: '1000000000000000000', // 1 gold
-    minLockedGoldNoticePeriod: 60 * 24 * 60 * 60, // 60 days
+    registrationRequirements: {
+      group: '1000000000000000000', // 1 gold
+      validator: '1000000000000000000', // 1 gold
+    },
+    deregistrationLockups: {
+      group: 60 * 24 * 60 * 60, // 60 days
+      validator: 60 * 24 * 60 * 60, // 60 days
+    },
+    maxGroupSize: 10,
 
     validatorKeys: [],
     // We register a single validator group during the migration.
@@ -78,7 +88,7 @@ const linkedLibraries = {
   ],
   SortedLinkedListWithMedian: ['AddressSortedLinkedListWithMedian'],
   AddressLinkedList: ['Validators'],
-  AddressSortedLinkedList: ['Validators'],
+  AddressSortedLinkedList: ['Election'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
   Signatures: ['LockedGold', 'Escrow'],

@@ -13,6 +13,7 @@ contract MockLockedGold is ILockedGold {
   }
 
   mapping(address => uint256) public totalLockedGold;
+  // TODO(asa): Rename to minimumBalance
   mapping(address => MustMaintain) public mustMaintain;
 
 
@@ -20,13 +21,14 @@ contract MockLockedGold is ILockedGold {
     return accountOrValidator;
   }
 
-  function setAccountMustMaintain(address account, uint256 value, uint256 timestamp) external {
+  function setAccountMustMaintain(address account, uint256 value, uint256 timestamp) external returns (bool) {
     mustMaintain[account] = MustMaintain(value, timestamp);
+    return true;
   }
 
   function getAccountMustMaintain(address account) external view returns (uint256, uint256) {
-    MustMaintain storage mustMaintain = mustMaintain[account];
-    return (mustMaintain.value, mustMaintain.timestamp);
+    MustMaintain storage m = mustMaintain[account];
+    return (m.value, m.timestamp);
   }
 
   function setAccountTotalLockedGold(address account, uint256 value) external {

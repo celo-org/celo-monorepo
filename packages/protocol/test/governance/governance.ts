@@ -794,7 +794,7 @@ contract('Governance', (accounts: string[]) => {
     const weight = new BigNumber(10)
     const proposalId = new BigNumber(1)
     beforeEach(async () => {
-      await mockLockedGold.setWeight(account, weight)
+      await mockLockedGold.setAccountTotalLockedGold(account, weight)
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
@@ -812,7 +812,9 @@ contract('Governance', (accounts: string[]) => {
 
     it('should mark the account as having upvoted the proposal', async () => {
       await governance.upvote(proposalId, 0, 0)
-      assertEqualBN(await governance.getUpvotedProposal(account), proposalId)
+      const [recordId, recordWeight] = await governance.getUpvoteRecord(account)
+      assertEqualBN(recordId, proposalId)
+      assertEqualBN(recordWeight, weight)
     })
 
     it('should return true', async () => {
@@ -834,13 +836,8 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    it('should revert when the account is frozen', async () => {
-      await mockLockedGold.setVotingFrozen(account)
-      await assertRevert(governance.upvote(proposalId, 0, 0))
-    })
-
     it('should revert when the account weight is 0', async () => {
-      await mockLockedGold.setWeight(account, 0)
+      await mockLockedGold.setAccountTotalLockedGold(account, 0)
       await assertRevert(governance.upvote(proposalId, 0, 0))
     })
 
@@ -883,7 +880,7 @@ contract('Governance', (accounts: string[]) => {
           { value: minDeposit }
         )
         const otherAccount = accounts[1]
-        await mockLockedGold.setWeight(otherAccount, weight)
+        await mockLockedGold.setAccountTotalLockedGold(otherAccount, weight)
         await governance.upvote(otherProposalId, proposalId, 0, { from: otherAccount })
         await timeTravel(queueExpiry, web3)
       })
@@ -948,7 +945,7 @@ contract('Governance', (accounts: string[]) => {
     const weight = new BigNumber(10)
     const proposalId = new BigNumber(1)
     beforeEach(async () => {
-      await mockLockedGold.setWeight(account, weight)
+      await mockLockedGold.setAccountTotalLockedGold(account, weight)
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
@@ -972,12 +969,9 @@ contract('Governance', (accounts: string[]) => {
 
     it('should mark the account as not having upvoted a proposal', async () => {
       await governance.revokeUpvote(0, 0)
-      assertEqualBN(await governance.getUpvotedProposal(account), 0)
-    })
-
-    it('should succeed when the account is frozen', async () => {
-      await mockLockedGold.setVotingFrozen(account)
-      await governance.revokeUpvote(0, 0)
+      const [recordId, recordWeight] = await governance.getUpvoteRecord(account)
+      assertEqualBN(recordId, 0)
+      assertEqualBN(recordWeight, 0)
     })
 
     it('should emit the ProposalUpvoteRevoked event', async () => {
@@ -1000,7 +994,7 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should revert when the account weight is 0', async () => {
-      await mockLockedGold.setWeight(account, 0)
+      await mockLockedGold.setAccountTotalLockedGold(account, 0)
       await assertRevert(governance.revokeUpvote(0, 0))
     })
 
@@ -1019,7 +1013,9 @@ contract('Governance', (accounts: string[]) => {
 
       it('should mark the account as not having upvoted a proposal', async () => {
         await governance.revokeUpvote(0, 0)
-        assertEqualBN(await governance.getUpvotedProposal(account), 0)
+        const [recordId, recordWeight] = await governance.getUpvoteRecord(account)
+        assertEqualBN(recordId, 0)
+        assertEqualBN(recordWeight, 0)
       })
 
       it('should emit the ProposalExpired event', async () => {
@@ -1049,7 +1045,9 @@ contract('Governance', (accounts: string[]) => {
 
       it('should mark the account as not having upvoted a proposal', async () => {
         await governance.revokeUpvote(0, 0)
-        assertEqualBN(await governance.getUpvotedProposal(account), 0)
+        const [recordId, recordWeight] = await governance.getUpvoteRecord(account)
+        assertEqualBN(recordId, 0)
+        assertEqualBN(recordWeight, 0)
       })
     })
   })
@@ -1229,7 +1227,7 @@ contract('Governance', (accounts: string[]) => {
       await timeTravel(dequeueFrequency, web3)
       await governance.approve(proposalId, index)
       await timeTravel(approvalStageDuration, web3)
-      await mockLockedGold.setWeight(account, weight)
+      await mockLockedGold.setAccountTotalLockedGold(account, weight)
     })
 
     it('should return true', async () => {
@@ -1273,13 +1271,8 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    it('should revert when the account is frozen', async () => {
-      await mockLockedGold.setVotingFrozen(account)
-      await assertRevert(governance.vote(proposalId, index, value))
-    })
-
     it('should revert when the account weight is 0', async () => {
-      await mockLockedGold.setWeight(account, 0)
+      await mockLockedGold.setAccountTotalLockedGold(account, 0)
       await assertRevert(governance.vote(proposalId, index, value))
     })
 
@@ -1393,7 +1386,7 @@ contract('Governance', (accounts: string[]) => {
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
           await timeTravel(approvalStageDuration, web3)
-          await mockLockedGold.setWeight(account, weight)
+          await mockLockedGold.setAccountTotalLockedGold(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -1439,7 +1432,7 @@ contract('Governance', (accounts: string[]) => {
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
           await timeTravel(approvalStageDuration, web3)
-          await mockLockedGold.setWeight(account, weight)
+          await mockLockedGold.setAccountTotalLockedGold(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -1465,7 +1458,7 @@ contract('Governance', (accounts: string[]) => {
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
           await timeTravel(approvalStageDuration, web3)
-          await mockLockedGold.setWeight(account, weight)
+          await mockLockedGold.setAccountTotalLockedGold(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
         })
@@ -1514,7 +1507,7 @@ contract('Governance', (accounts: string[]) => {
             await timeTravel(dequeueFrequency, web3)
             await governance.approve(proposalId, index)
             await timeTravel(approvalStageDuration, web3)
-            await mockLockedGold.setWeight(account, weight)
+            await mockLockedGold.setAccountTotalLockedGold(account, weight)
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
           })
@@ -1538,7 +1531,7 @@ contract('Governance', (accounts: string[]) => {
             await timeTravel(dequeueFrequency, web3)
             await governance.approve(proposalId, index)
             await timeTravel(approvalStageDuration, web3)
-            await mockLockedGold.setWeight(account, weight)
+            await mockLockedGold.setAccountTotalLockedGold(account, weight)
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
           })
@@ -1563,7 +1556,7 @@ contract('Governance', (accounts: string[]) => {
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
         await timeTravel(approvalStageDuration, web3)
-        await mockLockedGold.setWeight(account, weight)
+        await mockLockedGold.setAccountTotalLockedGold(account, weight)
         await governance.vote(proposalId, index, value)
         await timeTravel(referendumStageDuration, web3)
         await timeTravel(executionStageDuration, web3)
@@ -1586,6 +1579,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
+  /*
   describe('#isVoting()', () => {
     describe('when the account has never acted on a proposal', () => {
       it('should return false', async () => {
@@ -1597,7 +1591,7 @@ contract('Governance', (accounts: string[]) => {
       const weight = 10
       const proposalId = 1
       beforeEach(async () => {
-        await mockLockedGold.setWeight(account, weight)
+        await mockLockedGold.setAccountTotalLockedGold(account, weight)
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
@@ -1651,7 +1645,7 @@ contract('Governance', (accounts: string[]) => {
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
         await timeTravel(approvalStageDuration, web3)
-        await mockLockedGold.setWeight(account, weight)
+        await mockLockedGold.setAccountTotalLockedGold(account, weight)
         await governance.vote(proposalId, index, value)
       })
 
@@ -1670,4 +1664,5 @@ contract('Governance', (accounts: string[]) => {
       })
     })
   })
+  */
 })

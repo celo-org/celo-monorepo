@@ -110,7 +110,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   /**
    * @notice Locks gold to be used for voting.
-   * @param value The amount of gold to be locked.
    */
   function lock() external payable nonReentrant {
     require(isAccount(msg.sender));
@@ -119,11 +118,11 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     emit GoldLocked(msg.sender, msg.value);
   }
 
-  function incrementNonvotingAccountBalance(address account, uint256 value) external onlyRegisteredContract('Election') {
+  function incrementNonvotingAccountBalance(address account, uint256 value) external onlyRegisteredContract(ELECTION_REGISTRY_ID) {
     _incrementNonvotingAccountBalance(account, value);
   }
 
-  function decrementNonvotingAccountBalance(address account, uint256 value) external onlyRegisteredContract('Election') {
+  function decrementNonvotingAccountBalance(address account, uint256 value) external onlyRegisteredContract(ELECTION_REGISTRY_ID) {
     _decrementNonvotingAccountBalance(account, value);
   }
 
@@ -139,12 +138,12 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   // TODO: Can't unlock if voting in governance.
   function unlock(uint256 value) external nonReentrant {
-    require(isAccount(msg.sender));
+    require(isAccount(msg.sender), "not account");
     Account storage account = accounts[msg.sender];
     MustMaintain memory requirement = account.balances.requirements;
     require(
       now >= requirement.timestamp ||
-      getAccountTotalLockedGold(msg.sender).sub(value) >= requirement.value
+      getAccountTotalLockedGold(msg.sender).sub(value) >= requirement.value, "didn't meet mustmaintain requirements"
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
@@ -181,7 +180,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 timestamp
   )
     public
-    onlyRegisteredContract('Election')
+    onlyRegisteredContract(ELECTION_REGISTRY_ID)
     nonReentrant
     returns (bool)
   {
@@ -199,7 +198,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   function getAccountFromVoter(address accountOrVoter) external view returns (address) {
     address authorizingAccount = authorizedBy[accountOrVoter];
     if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].authorizations.voting == accountOrVoter);
+      require(accounts[authorizingAccount].authorizations.voting == accountOrVoter, 'failed first check');
       return authorizingAccount;
     } else {
       require(isAccount(accountOrVoter));
@@ -263,6 +262,19 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     return validator == address(0) ? account : validator;
   }
 
+  function getPendingWithdrawals(address account) public view returns (uint256[] memory, uint256[] memory) {
+    require(isAccount(account));
+    uint256 length = accounts[account].balances.pendingWithdrawals.length;
+    uint256[] memory values = new uint256[](length);
+    uint256[] memory timestamps = new uint256[](length);
+    for (uint256 i = 0; i < length; i++) {
+      PendingWithdrawal memory pendingWithdrawal = accounts[account].balances.pendingWithdrawals[i];
+      values[i] = pendingWithdrawal.value;
+      timestamps[i] = pendingWithdrawal.timestamp;
+    }
+    return (values, timestamps);
+  }
+
   /**
    * @notice Authorizes voting or validating power of `msg.sender`'s account to another address.
    * @param current The address to authorize.
@@ -281,12 +293,11 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     bytes32 s
   )
     private
-    nonReentrant
   {
-    require(isAccount(msg.sender) && isNotAccount(current) && isNotAuthorized(current));
+    require(isAccount(msg.sender) && isNotAccount(current) && isNotAuthorized(current), "Accounts");
 
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
-    require(signer == current);
+    require(signer == current, "Signature");
 
     authorizedBy[previous] = address(0);
     authorizedBy[current] = msg.sender;

@@ -12,10 +12,8 @@ import {
   LockedGoldInstance,
   MockGoldTokenContract,
   MockGoldTokenInstance,
-  MockGovernanceContract,
-  MockGovernanceInstance,
-  MockValidatorsContract,
-  MockValidatorsInstance,
+  MockElectionContract,
+  MockElectionInstance,
   RegistryContract,
   RegistryInstance,
 } from 'types'
@@ -23,8 +21,7 @@ import {
 const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
 const Registry: RegistryContract = artifacts.require('Registry')
 const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
-const MockGovernance: MockGovernanceContract = artifacts.require('MockGovernance')
-const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
+const MockElection: MockElectionContract = artifacts.require('MockElection')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
@@ -32,17 +29,19 @@ LockedGold.numberFormat = 'BigNumber'
 
 const HOUR = 60 * 60
 const DAY = 24 * HOUR
-const YEAR = 365 * DAY
+let authorizationTests = { voter: {}, validator: {} }
 
 contract('LockedGold', (accounts: string[]) => {
   let account = accounts[0]
   const nonOwner = accounts[1]
   const unlockingPeriod = 3 * DAY
-  let mockGoldToken: MockGoldTokenInstance
-  let mockGovernance: MockGovernanceInstance
-  let mockValidators: MockValidatorsInstance
   let lockedGold: LockedGoldInstance
   let registry: RegistryInstance
+  let mockElection: MockElectionInstance
+
+  const capitalize = (s: string) => {
+    return s.charAt(0).toUpperCase() + s.slice(1)
+  }
 
   const getParsedSignatureOfAddress = async (address: string, signer: string) => {
     // @ts-ignore
@@ -56,16 +55,25 @@ contract('LockedGold', (accounts: string[]) => {
   }
 
   beforeEach(async () => {
+    const mockGoldToken: MockGoldTokenInstance = await MockGoldToken.new()
+    mockElection = await MockElection.new()
     lockedGold = await LockedGold.new()
-    mockGoldToken = await MockGoldToken.new()
-    mockGovernance = await MockGovernance.new()
-    mockValidators = await MockValidators.new()
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
-    await registry.setAddressFor(CeloContractName.Governance, mockGovernance.address)
-    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+    await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await lockedGold.initialize(registry.address, unlockingPeriod)
     await lockedGold.createAccount()
+
+    authorizationTests.voter = {
+      fn: lockedGold.authorizeVoter,
+      getAuthorizedFromAccount: lockedGold.getVoterFromAccount,
+      getAccountFromAuthorized: lockedGold.getAccountFromVoter,
+    }
+    authorizationTests.validator = {
+      fn: lockedGold.authorizeValidator,
+      getAuthorizedFromAccount: lockedGold.getValidatorFromAccount,
+      getAccountFromAuthorized: lockedGold.getAccountFromValidator,
+    }
   })
 
   describe('#initialize()', () => {
@@ -80,8 +88,8 @@ contract('LockedGold', (accounts: string[]) => {
     })
 
     it('should set the unlocking period', async () => {
-      const period: string = await lockedGold.unlockingPeriod()
-      assert.equal(unlockingPeriod, period)
+      const period = await lockedGold.unlockingPeriod()
+      assertEqualBN(unlockingPeriod, period)
     })
 
     it('should revert if already initialized', async () => {
@@ -102,141 +110,135 @@ contract('LockedGold', (accounts: string[]) => {
     })
   })
 
-  const authorizationTests = [
-    {
-      name: 'Voter',
-      fn: lockedGold.authorizeVoter,
-      getFromAccount: lockedGold.getVoterFromAccount,
-      getAccount: lockedGold.getAccountFromVoter,
-    },
-    {
-      name: 'Validator',
-      fn: lockedGold.authorizeValidator,
-      getFromAccount: lockedGold.getValidatorFromAccount,
-      getAccount: lockedGold.getAccountFromValidator,
-    },
-  ]
-  for (const test in authorizationTests) {
-    describe(`#authorize${test.name}()`, () => {
-      const authorized = accounts[1]
-      let sig
-
+  Object.keys(authorizationTests).forEach((key) => {
+    describe('authorization tests:', () => {
+      let authorizationTest: any
       beforeEach(async () => {
-        sig = await getParsedSignatureOfAddress(account, authorized)
+        authorizationTest = authorizationTests[key]
       })
 
-      it(`should set the authorized ${test.name}`, async () => {
-        await test.fn(authorized, sig.v, sig.r, sig.s)
-        assert.equal(await lockedGold.authorizedBy(authorized), account)
-        assert.equal(await test.getFromAccount(account), authorized)
-        assert.equal(await test.getAccount(authorized), account)
-      })
+      describe(`#authorize${capitalize(key)}()`, () => {
+        const authorized = accounts[1]
+        let sig
 
-      it(`should emit a ${test.name}Authorized event`, async () => {
-        const resp = await test.fn(authorized, sig.v, sig.r, sig.s)
-        assert.equal(resp.logs.length, 1)
-        const log = resp.logs[0]
-        assertLogMatches(log, `${test.name}Authorized`, {
-          account,
-          authorized,
-        })
-      })
-
-      it(`should revert if the ${test.name} is an account`, async () => {
-        await lockedGold.createAccount({ from: authorized })
-        await assertRevert(test.fn(authorized, sig.v, sig.r, sig.s))
-      })
-
-      it(`should revert if the ${test.name} is already authorized`, async () => {
-        const otherAccount = accounts[2]
-        const otherSig = await getParsedSignatureOfAddress(otherAccount, authorized)
-        await lockedGold.createAccount({ from: otherAccount })
-        await test.fn(authorized, otherSig.v, otherSig.r, otherSig.s, {
-          from: otherAccount,
-        })
-        await assertRevert(test.fn(authorized, sig.v, sig.r, sig.s))
-      })
-
-      it('should revert if the signature is incorrect', async () => {
-        const nonVoter = accounts[3]
-        const incorrectSig = await getParsedSignatureOfAddress(account, nonVoter)
-        await assertRevert(test.fn(authorized, incorrectSig.v, incorrectSig.r, incorrectSig.s))
-      })
-
-      describe('when a previous authorization has been made', async () => {
-        const newAuthorized = accounts[2]
-        let newSig
         beforeEach(async () => {
-          await test.fn(authorized, sig.v, sig.r, sig.s)
-          newSig = await getParsedSignatureOfAddress(account, newAuthorized)
-          await test.fn(newAuthorized, newSig.v, newSig.r, newSig.s)
+          sig = await getParsedSignatureOfAddress(account, authorized)
         })
 
-        it(`should set the new authorized ${test.name}`, async () => {
-          assert.equal(await lockedGold.authorizedBy(newAuthorized), account)
-          assert.equal(await test.getFromAccount(account), newAuthorized)
-          assert.equal(await test.getAccount(newAuthorized), account)
+        it(`should set the authorized ${key}`, async () => {
+          await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+          assert.equal(await lockedGold.authorizedBy(authorized), account)
+          assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
+          assert.equal(await authorizationTest.getAccountFromAuthorized(authorized), account)
         })
 
-        it('should reset the previous authorization', async () => {
-          assert.equal(await lockedGold.authorizedBy(authorized), NULL_ADDRESS)
+        it(`should emit a ${capitalize(key)}Authorized event`, async () => {
+          const resp = await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          const expected = { account }
+          expected[key] = authorized
+          assertLogMatches(log, `${capitalize(key)}Authorized`, expected)
+        })
+
+        it(`should revert if the ${key} is an account`, async () => {
+          await lockedGold.createAccount({ from: authorized })
+          await assertRevert(authorizationTest.fn(authorized, sig.v, sig.r, sig.s))
+        })
+
+        it(`should revert if the ${key} is already authorized`, async () => {
+          const otherAccount = accounts[2]
+          const otherSig = await getParsedSignatureOfAddress(otherAccount, authorized)
+          await lockedGold.createAccount({ from: otherAccount })
+          await authorizationTest.fn(authorized, otherSig.v, otherSig.r, otherSig.s, {
+            from: otherAccount,
+          })
+          await assertRevert(authorizationTest.fn(authorized, sig.v, sig.r, sig.s))
+        })
+
+        it('should revert if the signature is incorrect', async () => {
+          const nonVoter = accounts[3]
+          const incorrectSig = await getParsedSignatureOfAddress(account, nonVoter)
+          await assertRevert(
+            authorizationTest.fn(authorized, incorrectSig.v, incorrectSig.r, incorrectSig.s)
+          )
+        })
+
+        describe('when a previous authorization has been made', async () => {
+          const newAuthorized = accounts[2]
+          let newSig
+          beforeEach(async () => {
+            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+            newSig = await getParsedSignatureOfAddress(account, newAuthorized)
+            await authorizationTest.fn(newAuthorized, newSig.v, newSig.r, newSig.s)
+          })
+
+          it(`should set the new authorized ${key}`, async () => {
+            assert.equal(await lockedGold.authorizedBy(newAuthorized), account)
+            assert.equal(await authorizationTest.getAuthorizedFromAccount(account), newAuthorized)
+            assert.equal(await authorizationTest.getAccountFromAuthorized(newAuthorized), account)
+          })
+
+          it('should reset the previous authorization', async () => {
+            assert.equal(await lockedGold.authorizedBy(authorized), NULL_ADDRESS)
+          })
+        })
+      })
+
+      describe(`#getAccountFrom${capitalize(key)}()`, () => {
+        describe(`when the account has not authorized a ${key}`, () => {
+          it('should return the account when passed the account', async () => {
+            assert.equal(await authorizationTest.getAccountFromAuthorized(account), account)
+          })
+
+          it('should revert when passed an address that is not an account', async () => {
+            await assertRevert(authorizationTest.getAccountFromAuthorized(accounts[1]))
+          })
+        })
+
+        describe(`when the account has authorized a ${key}`, () => {
+          const authorized = accounts[1]
+          beforeEach(async () => {
+            const sig = await getParsedSignatureOfAddress(account, authorized)
+            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+          })
+
+          it('should return the account when passed the account', async () => {
+            assert.equal(await authorizationTest.getAccountFromAuthorized(account), account)
+          })
+
+          it(`should return the account when passed the ${key}`, async () => {
+            assert.equal(await authorizationTest.getAccountFromAuthorized(authorized), account)
+          })
+        })
+      })
+
+      describe(`#get${capitalize(key)}FromAccount()`, () => {
+        describe(`when the account has not authorized a ${key}`, () => {
+          it('should return the account when passed the account', async () => {
+            assert.equal(await authorizationTest.getAuthorizedFromAccount(account), account)
+          })
+
+          it('should revert when not passed an account', async () => {
+            await assertRevert(authorizationTest.getAuthorizedFromAccount(accounts[1]), account)
+          })
+        })
+
+        describe(`when the account has authorized a ${key}`, () => {
+          const authorized = accounts[1]
+
+          beforeEach(async () => {
+            const sig = await getParsedSignatureOfAddress(account, authorized)
+            await authorizationTest.fn(authorized, sig.v, sig.r, sig.s)
+          })
+
+          it(`should return the ${key} when passed the account`, async () => {
+            assert.equal(await authorizationTest.getAuthorizedFromAccount(account), authorized)
+          })
         })
       })
     })
-
-    describe(`#getAccountFrom${test.name}()`, () => {
-      describe(`when the account has not authorized a ${test.name}`, () => {
-        it('should return the account when passed the account', async () => {
-          assert.equal(await test.getAccount(account), account)
-        })
-
-        it('should revert when passed an address that is not an account', async () => {
-          await assertRevert(test.getAccount(accounts[1]))
-        })
-      })
-
-      describe(`when the account has authorized a ${test.name}`, () => {
-        const authorized = accounts[1]
-        before(async () => {
-          const sig = await getParsedSignatureOfAddress(account, voter)
-          await test.fn(authorized, sig.v, sig.r, sig.s)
-        })
-
-        it('should return the account when passed the account', async () => {
-          assert.equal(await test.getAccount(account), account)
-        })
-
-        it(`should return the account when passed the ${test.name}`, async () => {
-          assert.equal(await test.getAccount(authorized), account)
-        })
-      })
-    })
-
-    describe(`#get${test.name}FromAccount()`, () => {
-      describe(`when the account has not authorized a ${test.name}`, () => {
-        it('should return the account when passed the account', async () => {
-          assert.equal(await test.getFromAccount(account), account)
-        })
-
-        it('should revert when not passed an account', async () => {
-          await assertRevert(test.getFromAccount(account), account)
-        })
-      })
-
-      describe(`when the account has authorized a ${test.name}`, () => {
-        const authorized = accounts[1]
-
-        before(async () => {
-          const sig = await getParsedSignatureOfAddress(account, authorized)
-          await test.fn(authorized, sig.v, sig.r, sig.s)
-        })
-
-        it(`should return the ${test.name} when passed the account`, async () => {
-          assert.equal(await test.getFromAccount(account), authorized)
-        })
-      })
-    })
-  }
+  })
 
   describe('#lock()', () => {
     const value = 1000
@@ -244,25 +246,25 @@ contract('LockedGold', (accounts: string[]) => {
     it("should increase the account's nonvoting locked gold balance", async () => {
       // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
       await lockedGold.lock({ value })
-      assert.equal(await lockedGold.getAccountNonvotingLockedGold(account), value)
+      assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), value)
     })
 
     it("should increase the account's total locked gold balance", async () => {
       // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
       await lockedGold.lock({ value })
-      assert.equal(await lockedGold.getAccountTotalLockedGold(account), value)
+      assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), value)
     })
 
     it('should increase the nonvoting locked gold balance', async () => {
       // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
       await lockedGold.lock({ value })
-      assert.equal(await lockedGold.getNonvotingLockedGold(), value)
+      assertEqualBN(await lockedGold.getNonvotingLockedGold(), value)
     })
 
     it('should increase the total locked gold balance', async () => {
       // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
       await lockedGold.lock({ value })
-      assert.equal(await lockedGold.getTotalLockedGold(), value)
+      assertEqualBN(await lockedGold.getTotalLockedGold(), value)
     })
 
     it('should emit a GoldLocked event', async () => {
@@ -277,6 +279,7 @@ contract('LockedGold', (accounts: string[]) => {
     })
 
     it('should revert when the specified value is 0', async () => {
+      // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
       await assertRevert(lockedGold.lock({ value: 0 }))
     })
 
@@ -290,7 +293,7 @@ contract('LockedGold', (accounts: string[]) => {
     let availabilityTime: BigNumber
     let resp: any
     describe('when there are no balance requirements', () => {
-      before(async () => {
+      beforeEach(async () => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         await lockedGold.lock({ value })
         resp = await lockedGold.unlock(value)
@@ -300,26 +303,27 @@ contract('LockedGold', (accounts: string[]) => {
       })
 
       it('should add a pending withdrawal', async () => {
-        const pendingWithdrawals = await lockedGold.getPendingWithdrawals(account)
-        assert.equal(pendingWithdrawals.length, 1)
-        assert.equal(pendingWithdrawals[0], value)
-        assert.equal(pendingWithdrawals[1], availabilityTime)
+        const [values, timestamps] = await lockedGold.getPendingWithdrawals(account)
+        assert.equal(values.length, 1)
+        assert.equal(timestamps.length, 1)
+        assertEqualBN(values[0], value)
+        assertEqualBN(timestamps[0], availabilityTime)
       })
 
       it("should decrease the account's nonvoting locked gold balance", async () => {
-        assert.equal(await lockedGold.getAccountNonvotingLockedGold(account), 0)
+        assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), 0)
       })
 
       it("should decrease the account's total locked gold balance", async () => {
-        assert.equal(await lockedGold.getAccountTotalLockedGold(account), 0)
+        assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), 0)
       })
 
       it('should decrease the nonvoting locked gold balance', async () => {
-        assert.equal(await lockedGold.getNonvotingLockedGold(), 0)
+        assertEqualBN(await lockedGold.getNonvotingLockedGold(), 0)
       })
 
       it('should decrease the total locked gold balance', async () => {
-        assert.equal(await lockedGold.getTotalLockedGold(), 0)
+        assertEqualBN(await lockedGold.getTotalLockedGold(), 0)
       })
 
       it('should emit a GoldUnlocked event', async () => {
@@ -328,21 +332,22 @@ contract('LockedGold', (accounts: string[]) => {
         assertLogMatches(log, 'GoldUnlocked', {
           account,
           value: new BigNumber(value),
-          available,
+          available: availabilityTime,
         })
       })
     })
 
     describe('when there are balance requirements', () => {
       let mustMaintain: any
-      before(async () => {
+      beforeEach(async () => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         await lockedGold.lock({ value })
         // Allow ourselves to call `setAccountMustMaintain()`
-        await registry.setAddressFor('Election', account)
+        await registry.setAddressFor(CeloContractName.Election, account)
         const timestamp = (await web3.eth.getBlock('latest')).timestamp
-        const mustMaintain = { value: 100, timestamp: timestamp + DAY }
+        mustMaintain = { value: 100, timestamp: timestamp + DAY }
         await lockedGold.setAccountMustMaintain(account, mustMaintain.value, mustMaintain.timestamp)
+        await registry.setAddressFor(CeloContractName.Election, mockElection.address)
       })
 
       describe('when unlocking would yield a locked gold balance less than the required value', () => {
@@ -354,7 +359,7 @@ contract('LockedGold', (accounts: string[]) => {
 
         describe('when the the current time is later than the requirement time', () => {
           it('should succeed', async () => {
-            await timeTravel(web3, DAY)
+            await timeTravel(DAY, web3)
             await lockedGold.unlock(value)
           })
         })
@@ -371,8 +376,9 @@ contract('LockedGold', (accounts: string[]) => {
   describe('#relock()', () => {
     const value = 1000
     const index = 0
+    let resp: any
     describe('when a pending withdrawal exists', () => {
-      before(async () => {
+      beforeEach(async () => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         await lockedGold.lock({ value })
         await lockedGold.unlock(value)
@@ -380,19 +386,19 @@ contract('LockedGold', (accounts: string[]) => {
       })
 
       it("should increase the account's nonvoting locked gold balance", async () => {
-        assert.equal(await lockedGold.getAccountNonvotingLockedGold(account), value)
+        assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), value)
       })
 
       it("should increase the account's total locked gold balance", async () => {
-        assert.equal(await lockedGold.getAccountTotalLockedGold(account), value)
+        assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), value)
       })
 
       it('should increase the nonvoting locked gold balance', async () => {
-        assert.equal(await lockedGold.getNonvotingLockedGold(), value)
+        assertEqualBN(await lockedGold.getNonvotingLockedGold(), value)
       })
 
       it('should increase the total locked gold balance', async () => {
-        assert.equal(await lockedGold.getTotalLockedGold(), value)
+        assertEqualBN(await lockedGold.getTotalLockedGold(), value)
       })
 
       it('should emit a GoldLocked event', async () => {
@@ -405,8 +411,9 @@ contract('LockedGold', (accounts: string[]) => {
       })
 
       it('should remove the pending withdrawal', async () => {
-        const pendingWithdrawals = await lockedGold.getPendingWithdrawals(account)
-        assert.equal(pendingWithdrawals.length, 0)
+        const [values, timestamps] = await lockedGold.getPendingWithdrawals(account)
+        assert.equal(values.length, 0)
+        assert.equal(timestamps.length, 0)
       })
     })
 
@@ -420,27 +427,24 @@ contract('LockedGold', (accounts: string[]) => {
   describe('#withdraw()', () => {
     const value = 1000
     const index = 0
-    let availabilityTime: BigNumber
     let resp: any
     describe('when a pending withdrawal exists', () => {
-      before(async () => {
+      beforeEach(async () => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         await lockedGold.lock({ value })
         resp = await lockedGold.unlock(value)
-        availabilityTime = new BigNumber(unlockingPeriod).plus(
-          (await web3.eth.getBlock('latest')).timestamp
-        )
       })
 
       describe('when it is after the availablity time', () => {
-        before(async () => {
-          await timeTravel(web3, unlockingPeriod)
+        beforeEach(async () => {
+          await timeTravel(unlockingPeriod, web3)
           resp = await lockedGold.withdraw(index)
         })
 
         it('should remove the pending withdrawal', async () => {
-          const pendingWithdrawals = await lockedGold.getPendingWithdrawals(account)
-          assert.equal(pendingWithdrawals.length, 0)
+          const [values, timestamps] = await lockedGold.getPendingWithdrawals(account)
+          assert.equal(values.length, 0)
+          assert.equal(timestamps.length, 0)
         })
 
         it('should emit a GoldWithdrawn event', async () => {

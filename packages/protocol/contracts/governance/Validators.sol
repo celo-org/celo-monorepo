@@ -341,7 +341,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   function registerValidatorGroup(
     string calldata name,
     string calldata url,
-    uint256 commission,
+    uint256 commission
   )
     external
     nonReentrant

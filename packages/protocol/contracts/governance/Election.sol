@@ -365,7 +365,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     votes.total.total = votes.total.total.add(value);
   }
 
-  function markGroupIneligible(address group) external onlyRegisteredContract('Validators') {
+  function markGroupIneligible(address group) external onlyRegisteredContract(VALIDATORS_REGISTRY_ID) {
     votes.total.eligible.remove(group);
   }
 
