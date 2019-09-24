@@ -164,7 +164,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
        validator.
    * @param requirementNoticePeriod The minimum Locked Gold commitment notice period to register
    *    a group or validator.
-   * @param threshold The minimum ratio of votes a group needs before it's members can be elected.
+   * @param threshold The minimum ratio of votes a group needs before its members can be elected.
    * @dev Should be called only once.
    */
   function initialize(
