@@ -24,9 +24,3 @@ export const AllContracts = Object.keys(CeloContract).map(
 ) as CeloContract[]
 
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000' as Address
-
-export enum Roles {
-  Validating = '0',
-  Voting = '1',
-  Rewards = '2',
-}

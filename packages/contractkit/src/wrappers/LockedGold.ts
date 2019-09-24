@@ -2,7 +2,7 @@ import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { TransactionObject } from 'web3/eth/types'
-import { Address, Roles } from '../base'
+import { Address } from '../base'
 import { LockedGold } from '../generated/types/LockedGold'
 import {
   BaseWrapper,
@@ -31,6 +31,12 @@ export interface Commitments {
     gold: BigNumber
     weight: BigNumber
   }
+}
+
+export enum Roles {
+  Validating = '0',
+  Voting = '1',
+  Rewards = '2',
 }
 
 export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
