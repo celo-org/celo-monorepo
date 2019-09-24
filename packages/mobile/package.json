@@ -116,7 +116,6 @@
     "react-native-splash-screen": "^3.1.1",
     "react-native-svg": "^9.8.4",
     "react-native-swiper": "^1.5.13",
-    "react-native-system-clock": "^1.0.0",
     "react-native-tcp": "git://github.com/cmcewen/react-native-tcp#08f03c2",
     "react-native-udp": "^2.6.1",
     "react-native-version-check": "^3.0.2",

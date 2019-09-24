@@ -25457,11 +25457,6 @@ react-native-swiper@^1.5.13:
   dependencies:
     prop-types "^15.5.10"
 
-react-native-system-clock@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/react-native-system-clock/-/react-native-system-clock-1.0.0.tgz#0470c81ebe5665f9a7501d66492e90ca45195b1d"
-  integrity sha512-svOO05iSrRcqZXXL8bgSVY6HD+LCKskDQTJgwqZRADxd1Bb6hTeR5koUr6XKAzJKTlA0rPKX2OmvwYqeH0JHxw==
-
 react-native-tab-view@^1.2.0, react-native-tab-view@^1.3.4:
   version "1.3.4"
   resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-1.3.4.tgz#63fc3eb09652651d0ea0e016cff0f3a5e535f4de"

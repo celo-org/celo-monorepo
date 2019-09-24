@@ -269,13 +269,13 @@ export const getDatetimeDisplayString = (
 }
 
 export const getRemoteTime = () => {
-  return new Date().getUTCSeconds()
+  return clock.getTime()
 }
 
 const DRIFT_THRESHOLD_IN_MS = 1000 * 4 // 4 seconds - Clique future block allowed time is 5 seconds
 
 export const clockInSync = async () => {
-  const localTime = new Date().getUTCSeconds()
+  const localTime = Date.now()
   const syncTime = getRemoteTime()
   const drift = localTime - syncTime // in milliseconds
   Logger.info(
