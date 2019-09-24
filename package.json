@@ -18,7 +18,7 @@
     "build": "yarn run lerna run build",
     "report-coverage": "yarn run lerna run test-coverage",
     "test:watch": "node node_modules/jest/bin/jest.js --watch",
-    "postinstall": "yarn run lerna run postinstall && patch-package && sh scripts/custom_patch_packages.sh && yarn keys:decrypt",
+    "postinstall": "yarn run lerna run postinstall && patch-package && yarn keys:decrypt",
     "preinstall": "bash scripts/create_key_templates.sh",
     "keys:decrypt": "bash scripts/key_placer.sh decrypt",
     "keys:encrypt": "bash scripts/key_placer.sh encrypt"
