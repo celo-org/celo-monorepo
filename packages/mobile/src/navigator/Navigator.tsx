@@ -87,7 +87,6 @@ const SendStack = createStackNavigator(
     [Screens.Send]: { screen: Send },
     [Screens.SendAmount]: { screen: SendAmount },
     [Screens.SendConfirmation]: { screen: SendConfirmation },
-    [Screens.FeeEducation]: { screen: FeeEducation },
     [Screens.PaymentRequestConfirmation]: { screen: PaymentRequestConfirmation },
   },
   {
@@ -153,6 +152,7 @@ const AppStack = createStackNavigator(
     [Screens.Pincode]: { screen: Pincode },
     [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
     [Screens.ReclaimPaymentConfirmationScreen]: { screen: ReclaimPaymentConfirmationScreen },
+    [Screens.FeeEducation]: { screen: FeeEducation },
     ...commonScreens,
   },
   {
