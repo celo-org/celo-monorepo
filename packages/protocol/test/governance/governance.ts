@@ -1516,8 +1516,6 @@ contract('Governance', (accounts: string[]) => {
       it('should update the participation baseline', async () => {
         await governance.vote(proposalId, index, value)
         const [actualParticipationBaseline, , ,] = await governance.getParticipationParameters()
-        console.log('expected', expectedParticipationBaseline)
-        console.log(await governance.getParticipationParameters())
         assertEqualBN(actualParticipationBaseline, expectedParticipationBaseline)
       })
 
