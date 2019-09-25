@@ -493,7 +493,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
    * @notice Setter for the metadata of an account.
    * @param metadataURL The URL to access the metadata.
    */
-  function setMetadataURL(string memory metadataURL) external {
+  function setMetadataURL(string calldata metadataURL) external {
     accounts[msg.sender].metadataURL = metadataURL;
     emit AccountMetadataURLSet(msg.sender, metadataURL);
   }
