@@ -178,7 +178,7 @@ exports[`Invite renders correctly with no recipients 1`] = `
       scrollEventThrottle={50}
       sections={Array []}
       stickyHeaderIndices={Array []}
-      stickySectionHeadersEnabled={true}
+      stickySectionHeadersEnabled={false}
       updateCellsBatchingPeriod={50}
       windowSize={21}
     >
@@ -432,12 +432,8 @@ exports[`Invite renders correctly with recipients 1`] = `
           },
         ]
       }
-      stickyHeaderIndices={
-        Array [
-          0,
-        ]
-      }
-      stickySectionHeadersEnabled={true}
+      stickyHeaderIndices={Array []}
+      stickySectionHeadersEnabled={false}
       updateCellsBatchingPeriod={50}
       windowSize={21}
     >
