@@ -126,7 +126,7 @@ spec:
           PING_IP_FROM_PACKET_FLAG=""
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"
           IN_MEMORY_DISCOVERY_TABLE_FLAG=""
-          [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
+          [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
           geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
             --password=/root/.celo/account/accountSecret \
