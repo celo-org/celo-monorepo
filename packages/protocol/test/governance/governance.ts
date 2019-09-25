@@ -3,10 +3,11 @@ import { assertBalance, assertEqualBN, assertLogMatches2, assertRevert, matchAny
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { keccak256 } from 'ethereumjs-util'
-import { GovernanceContract, GovernanceInstance, MockLockedGoldContract, MockLockedGoldInstance, RegistryContract, RegistryInstance, TestTransactionsContract, TestTransactionsInstance } from 'types'
+import { GovernanceContract, GovernanceInstance, MockLockedGoldContract, MockLockedGoldInstance, MockValidatorsContract, MockValidatorsInstance, RegistryContract, RegistryInstance, TestTransactionsContract, TestTransactionsInstance } from 'types'
 
 const Governance: GovernanceContract = artifacts.require('Governance')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
+const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
 const Registry: RegistryContract = artifacts.require('Registry')
 const TestTransactions: TestTransactionsContract = artifacts.require('TestTransactions')
 
@@ -43,13 +44,13 @@ enum VoteValue {
 contract('Governance', (accounts: string[]) => {
   let governance: GovernanceInstance
   let mockLockedGold: MockLockedGoldInstance
+  let mockValidators: MockValidatorsInstance
   let testTransactions: TestTransactionsInstance
   let registry: RegistryInstance
   let ONE = new BigNumber(1)
   const nullFunctionId = '0x00000000'
   const account = accounts[0]
   const approver = accounts[0]
-  const auditor = accounts[1]
   const otherAccount = accounts[1]
   const nonOwner = accounts[1]
   const nonApprover = accounts[1]
@@ -77,12 +78,12 @@ contract('Governance', (accounts: string[]) => {
   beforeEach(async () => {
     governance = await Governance.new()
     mockLockedGold = await MockLockedGold.new()
+    mockValidators = await MockValidators.new()
     registry = await Registry.new()
     testTransactions = await TestTransactions.new()
     await governance.initialize(
       registry.address,
       approver,
-      auditor,
       concurrentProposals,
       minDeposit,
       queueExpiry,
@@ -96,6 +97,7 @@ contract('Governance', (accounts: string[]) => {
       baselineQuorumFactor
     )
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
+    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await mockLockedGold.setWeight(account, weight)
     await mockLockedGold.setTotalWeight(weight)
     transactionSuccess1 = {
@@ -198,7 +200,6 @@ contract('Governance', (accounts: string[]) => {
         governance.initialize(
           registry.address,
           approver,
-          auditor,
           concurrentProposals,
           minDeposit,
           queueExpiry,
@@ -244,38 +245,6 @@ contract('Governance', (accounts: string[]) => {
 
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(governance.setApprover(newApprover, { from: nonOwner }))
-    })
-  })
-
-  describe('#setAuditor', () => {
-    const newAuditor = accounts[2]
-    it('should set the auditor', async () => {
-      await governance.setAuditor(newAuditor)
-      assert.equal(await governance.auditor(), newAuditor)
-    })
-
-    it('should emit the AuditorSet event', async () => {
-      const resp = await governance.setAuditor(newAuditor)
-      assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertLogMatches2(log, {
-        event: 'AuditorSet',
-        args: {
-          auditor: newAuditor,
-        },
-      })
-    })
-
-    it('should revert when auditor is the null address', async () => {
-      await assertRevert(governance.setAuditor(NULL_ADDRESS))
-    })
-
-    it('should revert when the auditor is unchanged', async () => {
-      await assertRevert(governance.setAuditor(auditor))
-    })
-
-    it('should revert when called by anyone other than the owner', async () => {
-      await assertRevert(governance.setAuditor(newAuditor, { from: nonOwner }))
     })
   })
 
@@ -1834,15 +1803,24 @@ contract('Governance', (accounts: string[]) => {
   })
 
   describe('#whitelist()', () => {
+    beforeEach(async () => {
+      await mockValidators.addValidator(accounts[2])
+      await mockValidators.addValidator(approver)
+    })
+
+    it('should revert if the validator address index does not match msg.sender', async () => {
+      await assertRevert(governance.whitelist(proposalHash, 0, { from: approver }))
+    })
+
     it('should emit the ProposalWhitelisted event', async () => {
-      const resp = await governance.whitelist(proposalHash, { from: auditor })
+      const resp = await governance.whitelist(proposalHash, 1, { from: approver })
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertLogMatches2(log, {
         event: 'ProposalWhitelisted',
         args: {
           proposalHash: matchAny,
-          whitelister: auditor,
+          whitelister: approver,
         },
       })
       assert.isTrue(
@@ -1850,16 +1828,16 @@ contract('Governance', (accounts: string[]) => {
       )
     })
 
-    it('should revert if called by anyone other than the approver or auditor', async () => {
-      await assertRevert(governance.whitelist(proposalHash, { from: accounts[2] }))
+    it('should revert if called by a non-validator, non-approver', async () => {
+      await assertRevert(governance.whitelist(proposalHash, 1, { from: accounts[3] }))
     })
   })
 
   describe('#hotfix()', () => {
     describe('when the proposal hash is whitelisted', () => {
       beforeEach(async () => {
-        governance.whitelist(proposalHash, { from: approver })
-        governance.whitelist(proposalHash, { from: auditor })
+        await mockValidators.addValidator(approver)
+        await governance.whitelist(proposalHash, 0, { from: approver })
       })
 
       it('should execute the proposal', async () => {
@@ -1889,7 +1867,6 @@ contract('Governance', (accounts: string[]) => {
         )
       })
 
-      // TODO(yorke): Uncomment when HotfixExecuted event is readded
       it('should emit the HotfixExecuted event', async () => {
         const resp = await governance.hotfix(
           [transactionSuccess1.value],
@@ -1923,45 +1900,11 @@ contract('Governance', (accounts: string[]) => {
           )
         })
       })
-
-      describe('when the auditor changes', () => {
-        beforeEach(async () => {
-          await governance.setAuditor(accounts[2])
-        })
-
-        it('should revert', async () => {
-          await assertRevert(
-            governance.hotfix(
-              [transactionSuccess1.value],
-              [transactionSuccess1.destination],
-              transactionSuccess1.data,
-              [transactionSuccess1.data.length]
-            )
-          )
-        })
-      })
     })
 
     describe('when the proposal hash is not whitelisted by the approver', () => {
       beforeEach(async () => {
-        governance.whitelist(proposalHash, { from: auditor })
-      })
-
-      it('should revert', async () => {
-        await assertRevert(
-          governance.hotfix(
-            [transactionSuccess1.value],
-            [transactionSuccess1.destination],
-            transactionSuccess1.data,
-            [transactionSuccess1.data.length]
-          )
-        )
-      })
-    })
-
-    describe('when the proposal hash is not whitelisted by the auditor', () => {
-      beforeEach(async () => {
-        governance.whitelist(proposalHash, { from: approver })
+        await mockValidators.addValidator(approver)
       })
 
       it('should revert', async () => {

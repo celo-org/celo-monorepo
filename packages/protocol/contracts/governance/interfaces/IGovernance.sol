@@ -3,7 +3,6 @@ pragma solidity ^0.5.3;
 
 interface IGovernance {
   function setApprover(address) external;
-  function setAuditor(address) external;
   function setConcurrentProposals(uint256) external;
   function setMinDeposit(uint256) external;
   function setQueueExpiry(uint256) external;
@@ -28,7 +27,7 @@ interface IGovernance {
   function revokeUpvote(uint256, uint256) external returns (bool);
   function approve(uint256, uint256) external returns (bool);
   function execute(uint256, uint256) external returns (bool);
-  function whitelist(bytes32) external;
+  function whitelist(bytes32, uint256) external;
 
   function hotfix(
     uint256[] calldata,
