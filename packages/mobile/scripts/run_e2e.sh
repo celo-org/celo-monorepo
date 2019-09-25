@@ -17,7 +17,7 @@ if [[ ! $(emulator -list-avds | grep ^$DEFAULT_AVD$) ]]; then
 fi
 
 # unlock device
-yarn dev:emulator
+# yarn dev:emulator
 
 # Just to be safe kill any process that listens on the port 'yarn start' is going to use
 lsof -t -i :8081 | xargs kill -9

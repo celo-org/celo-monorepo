@@ -199,9 +199,11 @@ jobs:
             # yarn --cwd=packages/mobile build:sdk integration
             source $HOME/.nvm/nvm.sh || true # This loads nvm
             nvm use 8.13 # not really sure why I have to run this again but it's required
-            cd packages/
-            yarn && yarn build
-            mobile/android  && ./gradlew assembleDebug && cd -
+            yarn --cwd=packages/mobile build:sdk alfajores
+            cd packages/mobile
+            yarn build
+            # cd android  && ./gradlew assembleDebug && cd -
+            yarn test:dry-run-e2e
 
       - run:
           name: Wait for emulator
