@@ -16,7 +16,10 @@ contract BlockchainParameters is Ownable, Initializable {
 
   ClientVersion minimumClientVersion;
 
+  uint256 public blockGasLimit;
+
   event MinimumClientVersionSet(uint256 major, uint256 minor, uint256 patch);
+  event BlockGasLimitSet(uint limit);
 
   /**
    * @notice Initializes critical variables.
@@ -26,11 +29,14 @@ contract BlockchainParameters is Ownable, Initializable {
    * minor version.
    * @param _minimumClientVersion3 Minimum client version that can be used in the chain,
    * patch level.
+   * @param gasLimit Block gas limit.
    */
   function initialize(
     uint256 _minimumClientVersion1,
     uint256 _minimumClientVersion2,
-    uint256 _minimumClientVersion3) external initializer
+    uint256 _minimumClientVersion3,
+    uint256 gasLimit
+  ) external initializer
   {
     _transferOwnership(msg.sender);
     setMinimumClientVersion(
@@ -38,6 +44,7 @@ contract BlockchainParameters is Ownable, Initializable {
       _minimumClientVersion2,
       _minimumClientVersion3
     );
+    setBlockGasLimit(gasLimit);
   }
 
   /**
@@ -53,6 +60,15 @@ contract BlockchainParameters is Ownable, Initializable {
     minimumClientVersion.minor = minor;
     minimumClientVersion.patch = patch;
     emit MinimumClientVersionSet(major, minor, patch);
+  }
+
+  /**
+   * @notice Sets the block gas limit.
+   * @param gasLimit New block gas limit.
+   */
+  function setBlockGasLimit(uint256 gasLimit) public onlyOwner {
+    blockGasLimit = gasLimit;
+    emit BlockGasLimitSet(gasLimit);
   }
 
   function getMinimumClientVersion() public view

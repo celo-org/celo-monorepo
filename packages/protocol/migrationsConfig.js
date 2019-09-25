@@ -79,6 +79,7 @@ const DefaultConfig = {
       minor: 8,
       patch: 23,
     },
+    blockGasLimit: 8000000,
   },
 }
 
