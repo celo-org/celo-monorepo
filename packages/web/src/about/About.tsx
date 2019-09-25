@@ -1,17 +1,17 @@
 import * as React from 'react'
-import { Image, StyleSheet, View, Text } from 'react-native'
+import { Image, ImageBackground, StyleSheet, Text, View } from 'react-native'
 import Backers from 'src/about/Backers'
-import { mintPlaza } from 'src/about/images'
+import { mintPlaza, sacredEconBack } from 'src/about/images'
+import PressMedia from 'src/about/PressMedia'
 import Team from 'src/about/Team'
 import { H1, H4 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, withNamespaces } from 'src/i18n'
+import SideTitledSection from 'src/layout/SideTitledSection'
 import AspectRatio from 'src/shared/AspectRatio'
 import menuItems from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
-import { Colors, HEADER_HEIGHT, MENU_MAX_WIDTH } from 'src/shared/Styles'
-import PressMedia from 'src/about/PressMedia'
-import SideTitledSection from 'src/layout/SideTitledSection'
+import { standardStyles, textStyles } from 'src/styles'
 
 const IMAGE_HEIGHT = 938
 const IMAGE_WIDTH = 835
@@ -69,6 +69,22 @@ export class About extends React.Component<Props & I18nProps> {
             <H1>{t('aboutMeaningText')}</H1>
             <Text>{t('aboutMeaningCopy')}</Text>
           </SideTitledSection>
+
+          <ImageBackground
+            source={sacredEconBack}
+            style={[{ width: '100%', height: 511 }, standardStyles.centered]}
+            resizeMode={'cover'}
+          >
+            <Text style={[textStyles.invert, textStyles.center]}>{t('beautifulLifeQuote')}</Text>
+            <Text style={textStyles.invert}>{t('beautifulLifeSource')}</Text>
+          </ImageBackground>
+          <SideTitledSection title={t('aboutSacredEconTitle')}>
+            <H1>{t('aboutSacredEconText')}</H1>
+          </SideTitledSection>
+          <SideTitledSection title={t('aboutValuesTile')}>
+            <H1>{t('aboutValuesText')}</H1>
+            <Text>{t('aboutValuesCopy')}</Text>
+          </SideTitledSection>
           <Team randomSeed={randomSeed} />
           <Backers />
           <PressMedia />
@@ -90,7 +106,6 @@ const styles = StyleSheet.create({
     height: 300,
   },
   background: {
-    backgroundColor: Colors.TAN,
     flexDirection: 'column',
     alignItems: 'flex-end',
     justifyContent: 'flex-end',
@@ -108,7 +123,6 @@ const styles = StyleSheet.create({
   },
   maxWidth: {
     flex: 1,
-    maxWidth: MENU_MAX_WIDTH,
     position: 'relative',
   },
   mintPlaza: {
@@ -119,20 +133,15 @@ const styles = StyleSheet.create({
     flex: 1,
     height: IMAGE_HEIGHT / 2,
     width: IMAGE_WIDTH / 2,
-    marginTop: HEADER_HEIGHT + 100,
   },
-  mediumMintPlaza: {
-    marginTop: HEADER_HEIGHT + 150,
-  },
+  mediumMintPlaza: {},
   largeMintPlaza: {
     height: IMAGE_HEIGHT,
     width: IMAGE_WIDTH,
-    marginTop: HEADER_HEIGHT + 25,
   },
   hero: {
     position: 'absolute',
     left: 20,
-    top: HEADER_HEIGHT + 30,
   },
   mediumHero: {
     position: 'absolute',
