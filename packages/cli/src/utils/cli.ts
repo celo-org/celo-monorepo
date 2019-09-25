@@ -1,9 +1,9 @@
 import { CeloTransactionObject } from '@celo/contractkit'
+import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import Table from 'cli-table'
 import { cli } from 'cli-ux'
 import { Tx } from 'web3/eth/types'
-import BigNumber from 'bignumber.js'
 
 export async function displaySendTx<A>(name: string, txObj: CeloTransactionObject<A>, tx?: Tx) {
   cli.action.start(`Sending Transaction: ${name}`)
@@ -32,7 +32,7 @@ export function printValueMapRecursive(valueMap: Record<string, any>) {
 
 function toStringValueMapRecursive(valueMap: Record<string, any>, prefix: string): string {
   const printValue = (v: any): string => {
-    if (typeof v == 'object') {
+    if (typeof v === 'object') {
       if (v instanceof BigNumber) return v.toString(10)
       return '\n' + toStringValueMapRecursive(v, prefix + '  ')
     }

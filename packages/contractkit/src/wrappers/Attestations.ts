@@ -21,7 +21,7 @@ export interface AttestationStat {
 }
 
 export interface AttestationsToken {
-  address: string
+  address: Address
   fee: BigNumber
 }
 

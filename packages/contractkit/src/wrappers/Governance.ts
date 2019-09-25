@@ -3,16 +3,16 @@ import { Governance } from '../generated/types/Governance'
 import { BaseWrapper, proxyCall, toBigNumber } from './BaseWrapper'
 
 export interface StageDurations {
-  approval: BigNumber
-  referendum: BigNumber
-  execution: BigNumber
+  approval: BigNumber // seconds
+  referendum: BigNumber // seconds
+  execution: BigNumber // seconds
 }
 
 export interface GovernanceConfig {
   concurrentProposals: BigNumber
-  dequeueFrequency: BigNumber
+  dequeueFrequency: BigNumber // seconds
   minDeposit: BigNumber
-  queueExpiry: BigNumber
+  queueExpiry: BigNumber // seconds
   stageDurations: StageDurations
 }
 
