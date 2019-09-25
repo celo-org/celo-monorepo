@@ -54,14 +54,14 @@ OPTIONS
   --id=id                                            (required)
   --name=name                                        (required)
 
-  --noticePeriod=noticePeriod                        (required) Notice Period that identifies the Locked Gold commitment
-                                                     to use
+  --noticePeriod=noticePeriod                        (required) Notice period of the Locked Gold commitment. Specify
+                                                     multiple notice periods to use the sum of the commitments.
 
   --url=url                                          (required)
 
 EXAMPLE
-  register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --id myID --name myName --noticePeriod 5184000 --url
-  "http://vgroup.com"
+  register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --id myID --name myName --noticePeriod 5184000
+  --noticePeriod 5184001 --url "http://vgroup.com"
 ```
 
 _See code: [packages/cli/src/commands/validatorgroup/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/register.ts)_
