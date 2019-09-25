@@ -38,7 +38,7 @@ export class Avatar extends React.PureComponent<Props> {
           address={address}
           size={iconSize}
         >
-          {children ? children : null}
+          {children || null}
         </ContactCircle>
         <Text
           style={[fontStyles.bodySmallSemiBold, style.contactName]}

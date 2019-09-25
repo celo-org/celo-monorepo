@@ -31,6 +31,10 @@ const DefaultConfig = {
     minDeposit: 1, // 1 cGLD
     queueExpiry: 7 * 24 * 60 * 60, // 1 week
     referendumStageDuration: 15 * 60, // 15 minutes
+    participationBaseline: 8 / 10,
+    participationBaselineFloor: 5 / 100,
+    participationBaselineUpdateFactor: 1 / 5,
+    participationBaselineQuorumFactor: 1,
   },
   gasPriceMinimum: {
     initialMinimum: 10000,
@@ -54,12 +58,15 @@ const DefaultConfig = {
     // 52nd root of 1.005, equivalent to 0.5% annual inflation
     inflationRate: 1.00009591886,
     inflationPeriod: 7 * 24 * 60 * 60, // 1 week
+    initialAccounts: [],
   },
   validators: {
     minElectableValidators: '10',
     maxElectableValidators: '100',
     minLockedGoldValue: '1000000000000000000', // 1 gold
     minLockedGoldNoticePeriod: 60 * 24 * 60 * 60, // 60 days
+    electionThreshold: '0', // no threshold
+    maxGroupSize: '10',
 
     validatorKeys: [],
     // We register a single validator group during the migration.
@@ -69,7 +76,18 @@ const DefaultConfig = {
 }
 
 const linkedLibraries = {
-  LinkedList: ['AddressLinkedList', 'SortedLinkedList'],
+  FixidityLib: [
+    'LockedGold',
+    'Exchange',
+    'GasPriceMinimum',
+    'Governance',
+    'Proposals',
+    'SortedOracles',
+    'StableToken',
+    'Validators',
+  ],
+  Proposals: ['Governance', 'ProposalsTest'],
+  LinkedList: ['AddressLinkedList', 'SortedLinkedList', 'LinkedListTest'],
   SortedLinkedList: [
     'AddressSortedLinkedList',
     'IntegerSortedLinkedList',
@@ -84,13 +102,11 @@ const linkedLibraries = {
 }
 
 const argv = minimist(process.argv.slice(2), {
-  string: ['migration_override', 'keys', 'build_directory'],
+  string: ['migration_override', 'build_directory'],
   default: {
-    keys: '',
     build_directory: path.join(__dirname, 'build'),
   },
 })
-const validatorKeys = argv.keys ? argv.keys.split(',') : []
 
 const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
 const config = {}
@@ -98,8 +114,6 @@ const config = {}
 for (const key of Object.keys(DefaultConfig)) {
   config[key] = { ...DefaultConfig[key], ...migrationOverride[key] }
 }
-
-config.validators.validatorKeys = validatorKeys
 
 module.exports = {
   build_directory: argv.build_directory,

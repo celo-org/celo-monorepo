@@ -5,7 +5,7 @@ import * as renderer from 'react-test-renderer'
 import { EventTypeNames } from 'src/apollo/types'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { ExchangeFeedItem } from 'src/transactions/ExchangeFeedItem'
-import { TransactionStatus } from 'src/transactions/reducer'
+import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 
 describe('ExchangeFeedItem', () => {
@@ -29,14 +29,14 @@ describe('ExchangeFeedItem', () => {
         <ExchangeFeedItem
           status={TransactionStatus.Complete}
           __typename={EventTypeNames.Exchange}
-          type={'EXCHANGE'}
+          type={'EXCHANGE' as TransactionTypes}
           hash={'0x'}
           inValue={1}
           outValue={10}
           outSymbol={CURRENCY_ENUM.GOLD}
           inSymbol={CURRENCY_ENUM.DOLLAR}
           timestamp={1}
-          showImage={false}
+          showGoldAmount={true}
           {...getMockI18nProps()}
         />
       </Provider>

@@ -1,5 +1,5 @@
-import { DeployArgv } from '@celo/celotool/src/cmds/deploy'
 import * as yargs from 'yargs'
+import { DeployArgv } from '../deploy'
 export const command = 'initial <deployPackage>'
 
 export const describe = 'create the initial deploy of a package in the monorepo'

@@ -1,5 +1,5 @@
-import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
-import { execCmd } from '@celo/celotool/src/lib/utils'
+import { execCmd } from 'src/lib/utils'
+import { InitialArgv } from '../../deploy/initial'
 
 export const command = 'notification-service'
 export const describe = 'command for deploying notification-service'

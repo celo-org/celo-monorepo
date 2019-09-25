@@ -1,6 +1,6 @@
-import { DestroyArgv } from '@celo/celotool/src/cmds/deploy/destroy'
-import { envVar, fetchEnvOrFallback } from '@celo/celotool/src/lib/env-utils'
 import * as deployUtil from '@celo/verification-pool-api/deployment/deployment-utils'
+import { envVar, fetchEnvOrFallback } from 'src/lib/env-utils'
+import { DestroyArgv } from '../../deploy/destroy'
 
 export const command = 'verification-pool'
 export const describe = 'Delete an existing deploy of the verification pool package'

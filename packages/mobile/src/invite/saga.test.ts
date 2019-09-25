@@ -19,6 +19,7 @@ import {
 import { watchRedeemInvite, watchSendInvite } from 'src/invite/saga'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { transactionConfirmed } from 'src/transactions/actions'
+import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 import { createMockContract, createMockStore } from 'test/utils'
 import { mockAccount, mockE164Number, mockName } from 'test/values'
@@ -74,7 +75,7 @@ describe(watchSendInvite, () => {
 
   it('sends an SMS invite as expected', async () => {
     await expectSaga(watchSendInvite)
-      .provide([[call(waitWeb3LastBlock), true]])
+      .provide([[call(waitWeb3LastBlock), true], [call(getConnectedUnlockedAccount), mockAccount]])
       .withState(state)
       .dispatch(sendInvite(mockName, mockE164Number, InviteBy.SMS))
       .dispatch(transactionConfirmed('a sha3 hash'))
@@ -86,7 +87,7 @@ describe(watchSendInvite, () => {
 
   it('sends a WhatsApp invite as expected', async () => {
     await expectSaga(watchSendInvite)
-      .provide([[call(waitWeb3LastBlock), true]])
+      .provide([[call(waitWeb3LastBlock), true], [call(getConnectedUnlockedAccount), mockAccount]])
       .withState(state)
       .dispatch(sendInvite(mockName, mockE164Number, InviteBy.WhatsApp))
       .put(storeInviteeData(KEY, mockE164Number))
