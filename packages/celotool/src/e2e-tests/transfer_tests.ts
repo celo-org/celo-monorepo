@@ -8,11 +8,11 @@ import { erc20Abi, getContractAddress, getEnode, getHooks, initAndStartGeth, sle
 
 /**
  * If after changing a Smart Contract implementation the e2e transfer tests are failing,
- * typically you can fix those tests adapting the new gas estimations with the output of the
+ * typically you can fix the tests adapting the new gas estimations with the output of the
  * `ci_test_transfers.sh` script.
  *
  * E2E tests can be run in your local using the following command from the
- * `$ ./ci_test_transfers.sh local /path/to/celo-blockchain/`
+ * `$ ./ci_test_transfers.sh local /full/path/to/celo-blockchain/`
  *
  * In the output of the script execution, look for the error messages similar to:
  * "AssertionError: expected '3804860' to equal '3789120'"
