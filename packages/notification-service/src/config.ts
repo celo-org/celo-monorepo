@@ -36,6 +36,10 @@ export const DEFAULT_LOCALE = process.env.DEFAULT_LOCALE
 export const POLLING_INTERVAL = Number(process.env.POLLING_INTERVAL) || 1000
 export const NOTIFICATIONS_TTL_MS = Number(process.env.NOTIFICATION_TTL_MS) || 3600 * 1000 * 24 * 7 // 1 week in milliseconds
 
+export const EXCHANGE_POLLING_INTERVAL =
+  Number(process.env.EXCHANGE_POLLING_INTERVAL) || 30 * 60 * 1000 // 30 minutes in milliseconds
+export const WEB3_PROVIDER_URL = process.env.WEB3_PROVIDER_URL || 'UNDEFINED'
+
 export enum NotificationTypes {
   PAYMENT_RECEIVED = 'PAYMENT_RECEIVED',
   PAYMENT_REQUESTED = 'PAYMENT_REQUESTED',
