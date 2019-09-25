@@ -165,7 +165,7 @@ jobs:
             # "libpulse.so.0: cannot open shared object file: No such file or directory"
             sudo apt-get -y install pulseaudio
             touch $HOME/.emulator_console_auth_token
-            sudo apt-get install libnss3 libxcursor1
+            sudo apt-get install libnss3 libxcomposite-dev libxcursor1
 
             # Without this, emulator fails with
             # error while loading shared libraries: libnss3.so: cannot open shared object file: No such file or directory
