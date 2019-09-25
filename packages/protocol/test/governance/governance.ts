@@ -9,7 +9,7 @@ import {
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { toFixed, fromFixed } from '@celo/utils/lib/fixidity'
+import { toFixed, multiply, fixed1 } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   GovernanceContract,
@@ -62,7 +62,6 @@ contract('Governance', (accounts: string[]) => {
   let mockLockedGold: MockLockedGoldInstance
   let testTransactions: TestTransactionsInstance
   let registry: RegistryInstance
-  let ONE = new BigNumber(1)
   const nullFunctionId = '0x00000000'
   const account = accounts[0]
   const approver = accounts[0]
@@ -79,12 +78,12 @@ contract('Governance', (accounts: string[]) => {
   const participationBaseline = toFixed(5 / 10)
   const participationFloor = toFixed(5 / 100)
   const baselineUpdateFactor = toFixed(1 / 5)
-  const baselineQuorumFactor = 1
+  const baselineQuorumFactor = toFixed(1)
   const weight = 100
-  const participation = 1
-  const expectedParticipationBaseline = fromFixed(baselineUpdateFactor)
-    .multipliedBy(participation)
-    .plus(ONE.minus(fromFixed(baselineUpdateFactor)).multipliedBy(fromFixed(participationBaseline)))
+  const participation = toFixed(1)
+  const expectedParticipationBaseline = multiply(baselineUpdateFactor, participation).plus(
+    multiply(fixed1.minus(baselineUpdateFactor), participationBaseline)
+  )
 
   let transactionSuccess1
   let transactionSuccess2

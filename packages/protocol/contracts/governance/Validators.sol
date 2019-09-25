@@ -63,15 +63,27 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   LockedGoldCommitment private registrationRequirement;
   uint256 public minElectableValidators;
   uint256 public maxElectableValidators;
+  FixidityLib.Fraction electionThreshold;
+  uint256 totalVotes; // keeps track of total weight of accounts that have active votes
 
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
+
+  uint256 public maxGroupSize;
 
   event MinElectableValidatorsSet(
     uint256 minElectableValidators
   );
 
+  event ElectionThresholdSet(
+    uint256 electionThreshold
+  );
+
   event MaxElectableValidatorsSet(
     uint256 maxElectableValidators
+  );
+
+  event MaxGroupSizeSet(
+    uint256 maxGroupSize
   );
 
   event RegistrationRequirementSet(
@@ -152,6 +164,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
        validator.
    * @param requirementNoticePeriod The minimum Locked Gold commitment notice period to register
    *    a group or validator.
+   * @param threshold The minimum ratio of votes a group needs before its members can be elected.
    * @dev Should be called only once.
    */
   function initialize(
@@ -159,7 +172,9 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     uint256 _minElectableValidators,
     uint256 _maxElectableValidators,
     uint256 requirementValue,
-    uint256 requirementNoticePeriod
+    uint256 requirementNoticePeriod,
+    uint256 _maxGroupSize,
+    uint256 threshold
   )
     external
     initializer
@@ -167,10 +182,12 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(_minElectableValidators > 0 && _maxElectableValidators >= _minElectableValidators);
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
+    setElectionThreshold(threshold);
     minElectableValidators = _minElectableValidators;
     maxElectableValidators = _maxElectableValidators;
     registrationRequirement.value = requirementValue;
     registrationRequirement.noticePeriod = requirementNoticePeriod;
+    setMaxGroupSize(_maxGroupSize);
   }
 
   /**
@@ -217,6 +234,24 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   }
 
   /**
+   * @notice Changes the maximum group size.
+   * @param _maxGroupSize The maximum number of validators for each group.
+   * @return True upon success.
+   */
+  function setMaxGroupSize(
+    uint256 _maxGroupSize
+  )
+    public
+    onlyOwner
+    returns (bool)
+  {
+    require(_maxGroupSize > 0);
+    maxGroupSize = _maxGroupSize;
+    emit MaxGroupSizeSet(_maxGroupSize);
+    return true;
+  }
+
+  /**
    * @notice Updates the minimum bonding requirements to register a validator group or validator.
    * @param value The minimum Locked Gold commitment value to register a group or validator.
    * @param noticePeriod The minimum Locked Gold commitment notice period to register a group or
@@ -241,6 +276,34 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     emit RegistrationRequirementSet(value, noticePeriod);
     return true;
   }
+
+  /**
+   * @notice Sets the election threshold.
+   * @param threshold Election threshold as unwrapped Fraction.
+   * @return True upon success.
+   */
+  function setElectionThreshold(uint256 threshold)
+    public
+    onlyOwner
+    returns (bool)
+  {
+    electionThreshold = FixidityLib.wrap(threshold);
+    require(
+      electionThreshold.lt(FixidityLib.fixed1()),
+      "Election threshold must be lower than 100%"
+    );
+    emit ElectionThresholdSet(threshold);
+    return true;
+  }
+
+  /**
+   * @notice Gets the election threshold.
+   * @return Threshold value as unwrapped fraction.
+   */
+  function getElectionThreshold() external view returns (uint256) {
+    return electionThreshold.unwrap();
+  }
+
 
   /**
    * @notice Registers a validator unaffiliated with any validator group.
@@ -414,6 +477,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(isValidatorGroup(account) && isValidator(validator));
     ValidatorGroup storage group = groups[account];
     require(validators[validator].affiliation == account && !group.members.contains(validator));
+    require(group.members.numElements < maxGroupSize, "Maximum group size exceeded");
     group.members.push(validator);
     emit ValidatorGroupMemberAdded(account, validator);
     return true;
@@ -486,6 +550,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(voters[account] == address(0));
     uint256 weight = getAccountWeight(account);
     require(weight > 0);
+    totalVotes = totalVotes.add(weight);
     if (votes.contains(group)) {
       votes.update(
         group,
@@ -527,6 +592,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     address group = voters[account];
     require(group != address(0));
     uint256 weight = getAccountWeight(account);
+    totalVotes = totalVotes.sub(weight);
     // If the group we had previously voted on removed all its members it is no longer eligible
     // to receive votes and we don't have to worry about removing our vote.
     if (votes.contains(group)) {
@@ -706,11 +772,13 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     if (numElectionGroups > votes.list.numElements) {
       numElectionGroups = votes.list.numElements;
     }
+    require(numElectionGroups > 0, "No votes have been cast");
     address[] memory electionGroups = votes.list.headN(numElectionGroups);
     // Holds the number of members elected for each of the eligible validator groups.
     uint256[] memory numMembersElected = new uint256[](electionGroups.length);
     uint256 totalNumMembersElected = 0;
     bool memberElectedInRound = true;
+
     // Assign a number of seats to each validator group.
     while (totalNumMembersElected < maxElectableValidators && memberElectedInRound) {
       memberElectedInRound = false;
@@ -718,6 +786,12 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       FixidityLib.Fraction memory maxN = FixidityLib.wrap(0);
       for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
         bool isWinningestGroupInRound = false;
+        uint256 numVotes = votes.getValue(electionGroups[i]);
+        FixidityLib.Fraction memory percentVotes = FixidityLib.newFixedFraction(
+          numVotes,
+          totalVotes
+        );
+        if (percentVotes.lt(electionThreshold)) break;
         (maxN, isWinningestGroupInRound) = dHondt(maxN, electionGroups[i], numMembersElected[i]);
         if (isWinningestGroupInRound) {
           memberElectedInRound = true;
