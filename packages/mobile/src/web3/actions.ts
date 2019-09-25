@@ -1,7 +1,5 @@
-import { getPincode } from 'src/account/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
-import { UNLOCK_DURATION } from 'src/geth/consts'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 
@@ -67,7 +65,6 @@ export const setLatestBlockNumber = (latestBlockNumber: number): SetLatestBlockN
   latestBlockNumber,
 })
 
-// TODO: Remove duplicaiton with SetProgress action (this is currently unused)
 export const updateWeb3SyncProgress = (payload: {
   startingBlock: number
   currentBlock: number
@@ -76,35 +73,6 @@ export const updateWeb3SyncProgress = (payload: {
   type: Actions.UPDATE_WEB3_SYNC_PROGRESS,
   payload,
 })
-
-async function isLocked(address: any) {
-  try {
-    // Test account to see if it is unlocked
-    await web3.eth.sign('', address)
-  } catch (e) {
-    return true
-  }
-  return false
-}
-
-export const unlockAccount = async (account: string) => {
-  const isAccountLocked = await isLocked(account)
-  let success = false
-  if (isAccountLocked) {
-    const password = await getPincode()
-    // @ts-ignore
-    success = await web3.eth.personal
-      .unlockAccount(account, password, UNLOCK_DURATION)
-      // @ts-ignore
-      .catch((error: Error) => {
-        Logger.error(TAG + '@unlockAccount', 'Web3 account unlock failed with' + error)
-        return false
-      })
-  } else {
-    success = true
-  }
-  return success
-}
 
 export const checkSyncProgress = () => ({ type: Actions.REQUEST_SYNC_PROGRESS })
 

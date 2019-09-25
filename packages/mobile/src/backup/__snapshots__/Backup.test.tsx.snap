@@ -549,7 +549,7 @@ exports[`Backup renders correctly if backup not completed 1`] = `
                     ]
                   }
                 >
-                  skip
+                  global:skip
                 </Text>
               </View>
               <View
