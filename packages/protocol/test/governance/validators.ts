@@ -9,15 +9,19 @@ import BigNumber from 'bignumber.js'
 import {
   MockLockedGoldContract,
   MockLockedGoldInstance,
+  MockRandomContract,
+  MockRandomInstance,
   RegistryContract,
   RegistryInstance,
   ValidatorsContract,
   ValidatorsInstance,
 } from 'types'
+import { toFixed } from '@celo/utils/lib/fixidity'
 
 const Validators: ValidatorsContract = artifacts.require('Validators')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Registry: RegistryContract = artifacts.require('Registry')
+const Random: MockRandomContract = artifacts.require('MockRandom')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
@@ -46,6 +50,8 @@ contract('Validators', (accounts: string[]) => {
   let validators: ValidatorsInstance
   let registry: RegistryInstance
   let mockLockedGold: MockLockedGoldInstance
+  let random: MockRandomInstance
+
   // A random 64 byte hex string.
   const publicKey =
     'ea0733ad275e2b9e05541341a97ee82678c58932464fad26164657a111a7e37a9fa0300266fb90e2135a1f1512350cb4e985488a88809b14e3cbe415e76e82b2'
@@ -60,20 +66,26 @@ contract('Validators', (accounts: string[]) => {
   const minElectableValidators = new BigNumber(4)
   const maxElectableValidators = new BigNumber(6)
   const registrationRequirement = { value: new BigNumber(100), noticePeriod: new BigNumber(60) }
+  const electionThreshold = new BigNumber(0)
+  const maxGroupSize = 10
   const identifier = 'test-identifier'
   const name = 'test-name'
   const url = 'test-url'
   beforeEach(async () => {
     validators = await Validators.new()
     mockLockedGold = await MockLockedGold.new()
+    random = await Random.new()
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
+    await registry.setAddressFor(CeloContractName.Random, random.address)
     await validators.initialize(
       registry.address,
       minElectableValidators,
       maxElectableValidators,
       registrationRequirement.value,
-      registrationRequirement.noticePeriod
+      registrationRequirement.noticePeriod,
+      maxGroupSize,
+      electionThreshold
     )
   })
 
@@ -147,15 +159,31 @@ contract('Validators', (accounts: string[]) => {
           minElectableValidators,
           maxElectableValidators,
           registrationRequirement.value,
-          registrationRequirement.noticePeriod
+          registrationRequirement.noticePeriod,
+          maxGroupSize,
+          electionThreshold
         )
       )
     })
   })
 
+  describe('#setElectionThreshold', () => {
+    it('should set the election threshold', async () => {
+      const threshold = toFixed(1 / 10)
+      await validators.setElectionThreshold(threshold)
+      const result = await validators.getElectionThreshold()
+      assertEqualBN(result, threshold)
+    })
+
+    it('should revert when the threshold is larger than 100%', async () => {
+      const threshold = toFixed(new BigNumber('2'))
+      await assertRevert(validators.setElectionThreshold(threshold))
+    })
+  })
+
   describe('#setMinElectableValidators', () => {
     const newMinElectableValidators = minElectableValidators.plus(1)
-    it('should set the minimum deposit', async () => {
+    it('should set the minimum elected validators', async () => {
       await validators.setMinElectableValidators(newMinElectableValidators)
       assertEqualBN(await validators.minElectableValidators(), newMinElectableValidators)
     })
@@ -193,7 +221,7 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#setMaxElectableValidators', () => {
     const newMaxElectableValidators = maxElectableValidators.plus(1)
-    it('should set the minimum deposit', async () => {
+    it('should set the maximum elected validators', async () => {
       await validators.setMaxElectableValidators(newMaxElectableValidators)
       assertEqualBN(await validators.maxElectableValidators(), newMaxElectableValidators)
     })
@@ -222,6 +250,30 @@ contract('Validators', (accounts: string[]) => {
       await assertRevert(
         validators.setMaxElectableValidators(newMaxElectableValidators, { from: nonOwner })
       )
+    })
+  })
+
+  describe('#setMaxGroupSize', () => {
+    const newMaxGroupSize = 11
+    it('should set the maximum group size', async () => {
+      await validators.setMaxGroupSize(newMaxGroupSize)
+      assertEqualBN(await validators.maxGroupSize(), newMaxGroupSize)
+    })
+
+    it('should emit the MaxElectableValidatorsSet event', async () => {
+      const resp = await validators.setMaxGroupSize(newMaxGroupSize)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'MaxGroupSizeSet',
+        args: {
+          maxGroupSize: new BigNumber(newMaxGroupSize),
+        },
+      })
+    })
+
+    it('should revert when called by anyone other than the owner', async () => {
+      await assertRevert(validators.setMaxGroupSize(newMaxGroupSize, { from: nonOwner }))
     })
   })
 
@@ -958,6 +1010,14 @@ contract('Validators', (accounts: string[]) => {
       await assertRevert(validators.addMember(accounts[2]))
     })
 
+    it('should revert when trying to add too many members to group', async () => {
+      await validators.setMaxGroupSize(1)
+      await validators.addMember(validator)
+      await registerValidator(accounts[2])
+      await validators.affiliate(group, { from: accounts[2] })
+      await assertRevert(validators.addMember(accounts[2]))
+    })
+
     describe('when the validator has not affiliated themselves with the group', () => {
       beforeEach(async () => {
         await validators.deaffiliate({ from: validator })
@@ -1263,17 +1323,19 @@ contract('Validators', (accounts: string[]) => {
     const validator6 = accounts[8]
     const validator7 = accounts[9]
 
+    const hash1 = '0xa5b9d60f32436310afebcfda832817a68921beb782fabf7915cc0460b443116a'
+    const hash2 = '0xa832817a68921b10afebcfd0460b443116aeb782fabf7915cca5b9d60f324363'
+
     // If voterN votes for groupN:
     //   group1 gets 20 votes per member
     //   group2 gets 25 votes per member
     //   group3 gets 30 votes per member
-    // The ordering of the returned validators should be from group with most votes to group,
-    // with fewest votes, and within each group, members are elected from first to last.
+    // We cannot make any guarantee with respect to their ordering.
     const voter1 = { address: accounts[0], weight: 80 }
     const voter2 = { address: accounts[1], weight: 50 }
     const voter3 = { address: accounts[2], weight: 30 }
-    const assertAddressesEqual = (actual: string[], expected: string[]) => {
-      assert.deepEqual(actual.map((x) => x.toLowerCase()), expected.map((x) => x.toLowerCase()))
+    const assertSameAddresses = (actual: string[], expected: string[]) => {
+      assert.sameMembers(actual.map((x) => x.toLowerCase()), expected.map((x) => x.toLowerCase()))
     }
 
     beforeEach(async () => {
@@ -1289,6 +1351,7 @@ contract('Validators', (accounts: string[]) => {
       for (const voter of [voter1, voter2, voter3]) {
         await mockLockedGold.setWeight(voter.address, voter.weight)
       }
+      await random.revealAndCommit(hash1, hash1, NULL_ADDRESS)
     })
 
     describe('when a single group has >= minElectableValidators as members and received votes', () => {
@@ -1297,7 +1360,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it("should return that group's member list", async () => {
-        assertAddressesEqual(await validators.getValidators(), [
+        assertSameAddresses(await validators.getValidators(), [
           validator1,
           validator2,
           validator3,
@@ -1314,7 +1377,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should return maxElectableValidators elected validators', async () => {
-        assertAddressesEqual(await validators.getValidators(), [
+        assertSameAddresses(await validators.getValidators(), [
           validator1,
           validator2,
           validator3,
@@ -1322,6 +1385,23 @@ contract('Validators', (accounts: string[]) => {
           validator6,
           validator7,
         ])
+      })
+    })
+
+    describe('when different random values are provided', () => {
+      beforeEach(async () => {
+        await validators.vote(group1, NULL_ADDRESS, NULL_ADDRESS, { from: voter1.address })
+        await validators.vote(group2, NULL_ADDRESS, group1, { from: voter2.address })
+        await validators.vote(group3, NULL_ADDRESS, group2, { from: voter3.address })
+      })
+
+      it('should return different results', async () => {
+        await random.revealAndCommit(hash1, hash1, NULL_ADDRESS)
+        const valsWithHash1 = (await validators.getValidators()).map((x) => x.toLowerCase())
+        await random.revealAndCommit(hash2, hash2, NULL_ADDRESS)
+        const valsWithHash2 = (await validators.getValidators()).map((x) => x.toLowerCase())
+        assert.sameMembers(valsWithHash1, valsWithHash2)
+        assert.notDeepEqual(valsWithHash1, valsWithHash2)
       })
     })
 
@@ -1334,7 +1414,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should elect only n members from that group', async () => {
-        assertAddressesEqual(await validators.getValidators(), [
+        assertSameAddresses(await validators.getValidators(), [
           validator7,
           validator1,
           validator2,
@@ -1355,7 +1435,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should return the validating delegate in place of the account', async () => {
-        assertAddressesEqual(await validators.getValidators(), [
+        assertSameAddresses(await validators.getValidators(), [
           validator1,
           validator2,
           validatingDelegate,
@@ -1374,6 +1454,27 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(validators.getValidators())
+      })
+    })
+
+    describe('when election threshold is set to 20%', () => {
+      beforeEach(async () => {
+        const threshold = toFixed(1 / 5)
+        await validators.setElectionThreshold(threshold)
+        await validators.vote(group1, NULL_ADDRESS, NULL_ADDRESS, { from: voter1.address })
+        await validators.vote(group2, NULL_ADDRESS, group1, { from: voter2.address })
+        await validators.vote(group3, NULL_ADDRESS, group2, { from: voter3.address })
+      })
+
+      it('should return the elected validators from two largest parties', async () => {
+        assertSameAddresses(await validators.getValidators(), [
+          validator1,
+          validator2,
+          validator3,
+          validator4,
+          validator5,
+          validator6,
+        ])
       })
     })
   })
