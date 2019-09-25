@@ -10,7 +10,7 @@ adb kill-server && adb start-server
 
 DEFAULT_AVD="Nexus_5X_API_28_x86"
 
-if [[ ! $($ANDROID_SDK_ROOT/emulator/emulator -list-avds | grep ^$DEFAULT_AVD$) ]]; then
+if [[ ! $(emulator -list-avds | grep ^$DEFAULT_AVD$) ]]; then
   echo "AVD $DEFAULT_AVD not installed. Pleas install it or change detox' configuration in package.json"
   echo "You can see the list of available installed devices with $ANDROID_SDK_ROOT/emulator/emulator -list-avds"
   exit 1

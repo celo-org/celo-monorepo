@@ -12,4 +12,4 @@ grep -qF -- "IS_E2E=1" $ENVFILE || printf "\nIS_E2E=1" >> $ENVFILE
 ENVFILE=$ENVFILE yarn detox build -c android.emu.debug
 
 # Remove the temp flag from file
-sed -i '' '/IS_E2E=1/d' $ENVFILE
+sed -i '/IS_E2E=1/d' $ENVFILE
