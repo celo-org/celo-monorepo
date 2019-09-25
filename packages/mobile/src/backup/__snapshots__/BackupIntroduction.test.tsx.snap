@@ -309,7 +309,7 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
                     ]
                   }
                 >
-                  skip
+                  global:skip
                 </Text>
               </View>
               <View
@@ -488,7 +488,7 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
               ]
             }
           >
-            skip
+            global:skip
           </Text>
         </View>
       </View>
@@ -806,7 +806,7 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
                     ]
                   }
                 >
-                  skip
+                  global:skip
                 </Text>
               </View>
               <View
@@ -1231,7 +1231,7 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
                     ]
                   }
                 >
-                  skip
+                  global:skip
                 </Text>
               </View>
               <View
