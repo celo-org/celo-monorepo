@@ -16,6 +16,7 @@ import {
   ValidatorsContract,
   ValidatorsInstance,
 } from 'types'
+import { toFixed } from '@celo/utils/lib/fixidity'
 
 const Validators: ValidatorsContract = artifacts.require('Validators')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
@@ -65,6 +66,8 @@ contract('Validators', (accounts: string[]) => {
   const minElectableValidators = new BigNumber(4)
   const maxElectableValidators = new BigNumber(6)
   const registrationRequirement = { value: new BigNumber(100), noticePeriod: new BigNumber(60) }
+  const electionThreshold = new BigNumber(0)
+  const maxGroupSize = 10
   const identifier = 'test-identifier'
   const name = 'test-name'
   const url = 'test-url'
@@ -80,7 +83,9 @@ contract('Validators', (accounts: string[]) => {
       minElectableValidators,
       maxElectableValidators,
       registrationRequirement.value,
-      registrationRequirement.noticePeriod
+      registrationRequirement.noticePeriod,
+      maxGroupSize,
+      electionThreshold
     )
   })
 
@@ -154,15 +159,31 @@ contract('Validators', (accounts: string[]) => {
           minElectableValidators,
           maxElectableValidators,
           registrationRequirement.value,
-          registrationRequirement.noticePeriod
+          registrationRequirement.noticePeriod,
+          maxGroupSize,
+          electionThreshold
         )
       )
     })
   })
 
+  describe('#setElectionThreshold', () => {
+    it('should set the election threshold', async () => {
+      const threshold = toFixed(1 / 10)
+      await validators.setElectionThreshold(threshold)
+      const result = await validators.getElectionThreshold()
+      assertEqualBN(result, threshold)
+    })
+
+    it('should revert when the threshold is larger than 100%', async () => {
+      const threshold = toFixed(new BigNumber('2'))
+      await assertRevert(validators.setElectionThreshold(threshold))
+    })
+  })
+
   describe('#setMinElectableValidators', () => {
     const newMinElectableValidators = minElectableValidators.plus(1)
-    it('should set minElectableValidators', async () => {
+    it('should set the minimum elected validators', async () => {
       await validators.setMinElectableValidators(newMinElectableValidators)
       assertEqualBN(await validators.minElectableValidators(), newMinElectableValidators)
     })
@@ -200,7 +221,7 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#setMaxElectableValidators', () => {
     const newMaxElectableValidators = maxElectableValidators.plus(1)
-    it('should set maxElectableValidators', async () => {
+    it('should set the maximum elected validators', async () => {
       await validators.setMaxElectableValidators(newMaxElectableValidators)
       assertEqualBN(await validators.maxElectableValidators(), newMaxElectableValidators)
     })
@@ -229,6 +250,30 @@ contract('Validators', (accounts: string[]) => {
       await assertRevert(
         validators.setMaxElectableValidators(newMaxElectableValidators, { from: nonOwner })
       )
+    })
+  })
+
+  describe('#setMaxGroupSize', () => {
+    const newMaxGroupSize = 11
+    it('should set the maximum group size', async () => {
+      await validators.setMaxGroupSize(newMaxGroupSize)
+      assertEqualBN(await validators.maxGroupSize(), newMaxGroupSize)
+    })
+
+    it('should emit the MaxElectableValidatorsSet event', async () => {
+      const resp = await validators.setMaxGroupSize(newMaxGroupSize)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'MaxGroupSizeSet',
+        args: {
+          maxGroupSize: new BigNumber(newMaxGroupSize),
+        },
+      })
+    })
+
+    it('should revert when called by anyone other than the owner', async () => {
+      await assertRevert(validators.setMaxGroupSize(newMaxGroupSize, { from: nonOwner }))
     })
   })
 
@@ -1011,6 +1056,14 @@ contract('Validators', (accounts: string[]) => {
       await assertRevert(validators.addMember(accounts[2]))
     })
 
+    it('should revert when trying to add too many members to group', async () => {
+      await validators.setMaxGroupSize(1)
+      await validators.addMember(validator)
+      await registerValidator(accounts[2])
+      await validators.affiliate(group, { from: accounts[2] })
+      await assertRevert(validators.addMember(accounts[2]))
+    })
+
     describe('when the validator has not affiliated themselves with the group', () => {
       beforeEach(async () => {
         await validators.deaffiliate({ from: validator })
@@ -1447,6 +1500,27 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(validators.getValidators())
+      })
+    })
+
+    describe('when election threshold is set to 20%', () => {
+      beforeEach(async () => {
+        const threshold = toFixed(1 / 5)
+        await validators.setElectionThreshold(threshold)
+        await validators.vote(group1, NULL_ADDRESS, NULL_ADDRESS, { from: voter1.address })
+        await validators.vote(group2, NULL_ADDRESS, group1, { from: voter2.address })
+        await validators.vote(group3, NULL_ADDRESS, group2, { from: voter3.address })
+      })
+
+      it('should return the elected validators from two largest parties', async () => {
+        assertSameAddresses(await validators.getValidators(), [
+          validator1,
+          validator2,
+          validator3,
+          validator4,
+          validator5,
+          validator6,
+        ])
       })
     })
   })
