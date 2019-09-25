@@ -51,6 +51,12 @@ exports[`BackupPrompt renders correctly 1`] = `
         }
       }
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -58,19 +64,26 @@ exports[`BackupPrompt renders correctly 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "alignSelf": "center",
-          "backgroundColor": "transparent",
-          "borderColor": "#FFFFFF",
-          "borderRadius": 2,
-          "borderWidth": 2,
-          "minWidth": 160,
-          "opacity": 1,
-          "paddingHorizontal": 16,
-          "paddingVertical": 6,
-          "textAlign": "center",
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "alignSelf": "flex-start",
+            "borderRadius": 2,
+            "minWidth": 160,
+            "paddingHorizontal": 16,
+            "paddingVertical": 6,
+            "textAlign": "center",
+          },
+          Object {
+            "backgroundColor": "transparent",
+            "borderColor": "#42D689",
+            "borderWidth": 2,
+          },
+          Object {
+            "alignSelf": "center",
+            "borderColor": "#FFFFFF",
+          },
+        ]
       }
     >
       <Text

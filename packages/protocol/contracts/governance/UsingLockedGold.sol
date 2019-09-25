@@ -67,6 +67,14 @@ contract UsingLockedGold is UsingRegistry {
   }
 
   /**
+  * @notice Returns the total weight.
+  * @return Total account weight.
+  */
+  function getTotalWeight() internal view returns (uint256) {
+    return getLockedGold().totalWeight();
+  }
+
+  /**
    * @notice Returns the Locked Gold commitment value for particular account and notice period.
    * @param account The address of the account.
    * @param noticePeriod The notice period of the Locked Gold commitment.

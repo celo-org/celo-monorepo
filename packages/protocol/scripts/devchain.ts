@@ -7,6 +7,8 @@ import * as yargs from 'yargs'
 
 const MNEMONIC = 'concert load couple harbor equip island argue ramp clarify fence smart topic'
 
+const gasLimit = 8000000
+
 const ProtocolRoot = path.normalize(path.join(__dirname, '../'))
 
 // Move to where the caller made the call So to have relative paths
@@ -63,7 +65,7 @@ async function startGanache(datadir: string, opts: { verbose?: boolean }) {
     network_id: 1101,
     db_path: datadir,
     mnemonic: MNEMONIC,
-    gasLimit: 7000000,
+    gasLimit,
     allowUnlimitedContractSize: true,
   })
 
