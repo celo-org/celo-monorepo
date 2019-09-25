@@ -1,7 +1,7 @@
 import BaseNotification from '@celo/react-components/components/BaseNotification'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Image, StyleSheet, View } from 'react-native'
+import { Image, Linking, Platform, StyleSheet, View } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -28,11 +28,14 @@ export class EscrowedPaymentReminderNotification extends React.PureComponent<Pro
       {
         text: this.props.t('sendMessage'),
         onPress: () => {
-          // TODO: move out of TSX file; business logic should be in .ts files
           CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_send_message)
           // TODO: open up whatsapp/text message slider with pre populated message
           try {
-            SendIntentAndroid.sendSms(recipientPhoneNumber, '')
+            if (Platform.OS === 'android') {
+              SendIntentAndroid.sendSms(recipientPhoneNumber, '')
+            } else {
+              Linking.openURL(`sms:${recipientPhoneNumber}`)
+            }
           } catch {
             Logger.showError(this.props.t('SMSError'))
             Logger.error(

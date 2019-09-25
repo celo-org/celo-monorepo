@@ -14,6 +14,7 @@ files=(
   "packages/mobile/android/app/src/integration/google-services.json"
   "packages/mobile/android/app/src/alfajores/google-services.json"
   "packages/mobile/android/app/src/debug/google-services.json"
+  "packages/mobile/android/app/src/pilot/google-services.json"
   "packages/mobile/android/sentry.properties"
   "packages/mobile/ios/sentry.properties"
   "packages/verifier/android/app/google-services.json"

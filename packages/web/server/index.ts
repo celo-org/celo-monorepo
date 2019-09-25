@@ -10,6 +10,7 @@ import Sentry, { initSentry } from '../fullstack/sentry'
 import addToCRM from '../server/addToCRM'
 import ecoFundSubmission from '../server/EcoFundApp'
 import nextI18next from '../src/i18n'
+import latestAnnouncements from './Announcement'
 import { faucetOrInviteController } from './controllers'
 import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
@@ -124,6 +125,15 @@ function wwwRedirect(req, res, nextAction) {
   server.post('/contacts', async (req, res) => {
     await addToCRM(req.body)
     res.status(204).send('ok')
+  })
+
+  server.get('/announcement', async (_, res) => {
+    try {
+      const annoucements = await latestAnnouncements()
+      res.json(annoucements)
+    } catch (e) {
+      res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
+    }
   })
 
   server.post('/partnerships-email', async (req, res) => {

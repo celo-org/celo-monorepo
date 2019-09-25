@@ -1,3 +1,4 @@
+import { Response as FetchResponseClass } from 'node-fetch'
 import { Log, Response, Transfer } from '../src/blockscout/blockscout'
 import {
   convertWeiValue,
@@ -13,30 +14,9 @@ export let getLastBlockNotifiedMock: any
 export let setLastBlockNotifiedMock: any
 export let decodeLogsMock: any
 
-const response: Response<Log> = {
-  status: '',
-  result: [
-    {
-      transactionIndex: '',
-      transactionHash: '',
-      topics: [''],
-      timeStamp: '',
-      logIndex: '',
-      gasUsed: '',
-      gasPrice: '',
-      data: '',
-      blockNumber: '',
-      address: '',
-    },
-  ],
-  message: '',
-}
-
-jest.mock('node-fetch', () => ({
-  ...jest.requireActual('node-fetch'),
-  __esModule: true,
-  default: jest.fn(() => ({ json: jest.fn(() => response) })),
-}))
+jest.mock('node-fetch')
+const fetchMock: jest.Mock = require('node-fetch')
+const FetchResponse: typeof FetchResponseClass = jest.requireActual('node-fetch').Response
 
 jest.mock('firebase-admin')
 
@@ -87,7 +67,32 @@ jest.mock('../src/blockscout/decode', () => {
   }
 })
 
+const defaultResponse: Response<Log> = {
+  status: '',
+  result: [
+    {
+      transactionIndex: '',
+      transactionHash: '',
+      topics: [''],
+      timeStamp: '',
+      logIndex: '',
+      gasUsed: '',
+      gasPrice: '',
+      data: '',
+      blockNumber: '',
+      address: '',
+    },
+  ],
+  message: '',
+}
+const defaultResponseJson = JSON.stringify(defaultResponse)
+
 describe('Transfers', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    fetchMock.mockImplementation(() => new FetchResponse(defaultResponseJson))
+  })
+
   it('should exclude exchanges', () => {
     const goldTransfers = new Map<string, Transfer>()
     const stableTransfers = new Map<string, Transfer>()
@@ -142,7 +147,6 @@ describe('Transfers', () => {
   })
 
   it('should skip for transfers older than last block notified', async () => {
-    jest.clearAllMocks()
     const transfers = [TRANSFER1, TRANSFER2]
     const lastBlockNotified = 130
     const returned = await notifyForNewTransfers(transfers, lastBlockNotified)
@@ -156,5 +160,15 @@ describe('Transfers', () => {
     expect(setLastBlockNotifiedMock).toBeCalledWith(
       Math.max(TRANSFER1.blockNumber, TRANSFER2.blockNumber)
     )
+  })
+
+  // This is so the polling loop can retry on the next iteration
+  // as we need both the gold and stable transfers fetch from blockscout to work
+  // in order to send the right push notifications
+  it('should propagate fetch errors', async () => {
+    fetchMock.mockRejectedValue(new Error('fetch error'))
+    await expect(handleTransferNotifications()).rejects.toThrow('fetch error')
+    expect(sendPaymentNotificationMock).not.toHaveBeenCalled()
+    expect(setLastBlockNotifiedMock).not.toHaveBeenCalled()
   })
 })

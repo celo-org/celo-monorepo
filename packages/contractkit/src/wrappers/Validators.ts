@@ -1,9 +1,16 @@
-import { eqAddress } from '@celo/utils/lib/src/address'
-import { zip } from '@celo/utils/lib/src/collections'
+import { eqAddress } from '@celo/utils/lib/address'
+import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import { Address, NULL_ADDRESS } from '../base'
 import { Validators } from '../generated/types/Validators'
-import { BaseWrapper, CeloTransactionObject, proxyCall, proxySend, wrapSend } from './BaseWrapper'
+import {
+  BaseWrapper,
+  CeloTransactionObject,
+  proxyCall,
+  proxySend,
+  toNumber,
+  wrapSend,
+} from './BaseWrapper'
 
 export interface Validator {
   address: Address
@@ -34,6 +41,13 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   removeMember = proxySend(this.kit, this.contract.methods.removeMember)
   registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
   registerValidatorGroup = proxySend(this.kit, this.contract.methods.registerValidatorGroup)
+  validatorAddressFromCurrentSet = proxyCall(this.contract.methods.validatorAddressFromCurrentSet)
+  numberValidatorsInCurrentSet = proxyCall(
+    this.contract.methods.numberValidatorsInCurrentSet,
+    undefined,
+    toNumber
+  )
+
   getVoteFrom: (validatorAddress: Address) => Promise<Address | null> = proxyCall(
     this.contract.methods.voters
   )
@@ -42,6 +56,18 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     const vgAddresses = await this.contract.methods.getRegisteredValidators().call()
 
     return Promise.all(vgAddresses.map((addr) => this.getValidator(addr)))
+  }
+
+  async getValidatorSetAddresses(): Promise<string[]> {
+    const numberValidators = await this.numberValidatorsInCurrentSet()
+
+    const validatorAddressPromises = []
+
+    for (let i = 0; i < numberValidators; i++) {
+      validatorAddressPromises.push(this.validatorAddressFromCurrentSet(i))
+    }
+
+    return Promise.all(validatorAddressPromises)
   }
 
   async getValidator(address: Address): Promise<Validator> {
@@ -119,7 +145,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     votedGroup: Address,
     voteWeight: BigNumber
   ): Promise<{ lesser: Address; greater: Address }> {
-    const currentVotes = await this.getValidatorGroupsVotes()
+    const currentVotes = (await this.getValidatorGroupsVotes()).filter((g) => !g.votes.isZero())
 
     const selectedGroup = currentVotes.find((cv) => eqAddress(cv.address, votedGroup))
 

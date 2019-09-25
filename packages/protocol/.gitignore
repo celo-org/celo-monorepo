@@ -16,7 +16,6 @@ test/**/*.js.map
 types/**/*.js
 types/**/*.js.map
 
-coverageEnv/
 scTopics
 
 build
@@ -26,3 +25,6 @@ twilio-config.js
 
 types/*.js
 types/contracts/*
+
+.0x-artifacts/*
+coverage/*

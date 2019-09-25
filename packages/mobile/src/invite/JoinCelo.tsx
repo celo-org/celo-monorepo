@@ -5,9 +5,10 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Linking, ScrollView, StyleSheet, Text, TextInput as RNTextInput, View } from 'react-native'
+import { Linking, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { setName, setPhoneNumber } from 'src/account/actions'
+import { PincodeType } from 'src/account/reducer'
 import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
@@ -31,7 +32,7 @@ interface StateProps {
   cachedName: string
   cachedNumber: string
   cachedCountryCode: string
-  pincodeSet: boolean
+  pincodeType: PincodeType
 }
 
 interface DispatchProps {
@@ -67,7 +68,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     cachedName: state.account.name,
     cachedNumber: state.account.e164PhoneNumber,
     cachedCountryCode: state.account.defaultCountryCode,
-    pincodeSet: state.account.pincodeSet,
+    pincodeType: state.account.pincodeType,
   }
 }
 
@@ -88,9 +89,6 @@ export class JoinCelo extends React.Component<Props, State> {
     }
     return null
   }
-
-  codeInput: any = React.createRef<RNTextInput>()
-  scrollView = React.createRef<ScrollView>()
 
   state: State = {
     name: this.props.cachedName,
@@ -133,7 +131,10 @@ export class JoinCelo extends React.Component<Props, State> {
   }
 
   nextScreen = () => {
-    const nextScreen = this.props.pincodeSet ? Screens.EnterInviteCode : Screens.Pincode
+    const nextScreen =
+      this.props.pincodeType === PincodeType.Unset
+        ? Screens.PincodeEducation
+        : Screens.EnterInviteCode
     navigate(nextScreen)
   }
 
@@ -160,53 +161,29 @@ export class JoinCelo extends React.Component<Props, State> {
     this.nextScreen()
   }
 
-  focusOnCode = () => {
-    if (this.codeInput.current) {
-      this.codeInput.current.focus()
-    }
-  }
-
-  scrollToEnd = () => {
-    setTimeout(() => {
-      if (this.scrollView && this.scrollView.current) {
-        this.scrollView.current.scrollToEnd()
-      }
-    }, 1000) // This timeout must long enough or it doesnt not work
-  }
-
   render() {
     const { t, language } = this.props
     const { name } = this.state
 
     return (
       <View style={styles.container}>
-        <DevSkipButton nextScreen={Screens.Pincode} />
+        <DevSkipButton nextScreen={Screens.PincodeEducation} />
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="always"
-          ref={this.scrollView}
         >
-          <NuxLogo style={styles.logo} />
-          <Text style={[fontStyles.h1, styles.center]} testID="InviteWallTitle">
-            {' '}
+          <NuxLogo />
+          <Text style={fontStyles.h1} testID="InviteWallTitle">
             {t('welcomeCelo')}
           </Text>
-          <Text style={[fontStyles.bodySmall, styles.body]}>{t('joinText.0')}</Text>
-          <Text style={[fontStyles.bodySmall, styles.body]}>
-            {t('joinText.1')}
-            <Text onPress={goToCeloSite} style={fontStyles.link}>
-              {t('joinText.2')}
-            </Text>
-          </Text>
+          <Text style={fontStyles.bodySmall}>{t('joinText.0')}</Text>
           <TextInput
-            onFocus={this.scrollToEnd}
             onChangeText={this.onChangeNameInput}
             value={name}
-            style={styles.box}
+            style={styles.nameInputField}
             placeholderTextColor={colors.inactive}
             underlineColorAndroid="transparent"
             enablesReturnKeyAutomatically={true}
-            onSubmitEditing={this.focusOnCode}
             placeholder={t('fullName')}
             testID={'NameEntry'}
           />
@@ -214,7 +191,6 @@ export class JoinCelo extends React.Component<Props, State> {
             setE164Number={this.setE164Number}
             setCountryCode={this.setCountryCode}
             setIsValidNumber={this.setIsValidNumber}
-            onInputFocus={this.scrollToEnd}
             onInputChange={this.onChangePhoneInput}
             inputCountryPlaceholder={t('chooseCountry')}
             inputPhonePlaceholder={t('phoneNumber')}
@@ -227,6 +203,12 @@ export class JoinCelo extends React.Component<Props, State> {
               this.props.cachedNumber !== '' ? this.props.cachedNumber : undefined
             }
           />
+          <Text style={[fontStyles.bodyXSmall, styles.disclaimer]}>
+            {t('joinText.1')}
+            <Text onPress={goToCeloSite} style={fontStyles.link}>
+              {t('joinText.2')}
+            </Text>
+          </Text>
         </ScrollView>
         <Button
           standard={false}
@@ -247,14 +229,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: colors.background,
   },
-  logo: {
-    marginTop: 0,
-  },
   scrollContainer: {
-    paddingHorizontal: 10,
-    paddingBottom: 10,
+    padding: 20,
+    paddingTop: 0,
   },
-  box: {
+  nameInputField: {
+    marginTop: 25,
     alignItems: 'center',
     borderColor: colors.inputBorder,
     borderRadius: 3,
@@ -264,14 +244,8 @@ const styles = StyleSheet.create({
     color: colors.inactive,
     height: 50,
   },
-  center: {
-    textAlign: 'center',
-  },
-  body: {
-    paddingBottom: 15,
-    fontWeight: '300',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  disclaimer: {
+    marginTop: 25,
   },
 })
 

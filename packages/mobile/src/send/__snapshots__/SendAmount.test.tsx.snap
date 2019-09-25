@@ -13,11 +13,6 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
 >
   <RCTScrollView
     automaticallyAdjustContentInsets={false}
-    contentContainerStyle={
-      Object {
-        "justifyContent": "space-between",
-      }
-    }
     contentInset={
       Object {
         "bottom": 0,
@@ -86,22 +81,25 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
               ]
             }
           >
-            <Text
+            <Image
+              source={
+                Object {
+                  "testUri": "../../../src/images/unknown-user-icon.png",
+                }
+              }
               style={
                 Array [
                   Object {
-                    "color": "#FFFFFF",
-                    "fontFamily": "Hind-Medium",
-                    "fontSize": 16,
+                    "alignSelf": "center",
+                    "margin": "auto",
                   },
                   Object {
-                    "fontSize": 20,
+                    "height": 40,
+                    "width": 40,
                   },
                 ]
               }
-            >
-              J
-            </Text>
+            />
           </View>
         </View>
         <Text
@@ -171,6 +169,25 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             (415) 555-0000
           </Text>
         </View>
+      </View>
+      <View
+        style={
+          Object {
+            "marginVertical": 2,
+            "paddingHorizontal": 65,
+            "textAlign": "center",
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "center",
+            }
+          }
+        />
       </View>
       <View
         style={
@@ -406,6 +423,100 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
           />
         </View>
       </View>
+      <View
+        style={
+          Object {
+            "marginTop": 15,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "center",
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                },
+                undefined,
+              ]
+            }
+          >
+            estimatedFee
+          </Text>
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                },
+                Object {
+                  "fontFamily": "Hind-SemiBold",
+                },
+              ]
+            }
+          >
+            0.001
+          </Text>
+        </View>
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "center",
+              "marginBottom": 15,
+              "marginTop": 7,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+              }
+            }
+          >
+            newAccountBalance
+          </Text>
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                },
+                Object {
+                  "fontFamily": "Hind-SemiBold",
+                },
+                Object {
+                  "color": "#FD785B",
+                },
+              ]
+            }
+          >
+            0.00
+          </Text>
+        </View>
+      </View>
     </View>
   </RCTScrollView>
   <View
@@ -456,6 +567,12 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
         <View
           accessible={true}
           isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -463,15 +580,22 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "#A3EBC6",
-              "borderWidth": 0,
-              "flex": 1,
-              "height": 50,
-              "justifyContent": "center",
-              "opacity": 1,
-            }
+            Array [
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "justifyContent": "center",
+              },
+              Object {
+                "backgroundColor": "#A3EBC6",
+              },
+              Object {
+                "height": 50,
+              },
+              Object {
+                "borderWidth": 0,
+              },
+            ]
           }
         >
           <View
@@ -564,6 +688,12 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
         <View
           accessible={true}
           isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -571,15 +701,22 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "#A3EBC6",
-              "borderWidth": 0,
-              "flex": 1,
-              "height": 50,
-              "justifyContent": "center",
-              "opacity": 1,
-            }
+            Array [
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "justifyContent": "center",
+              },
+              Object {
+                "backgroundColor": "#A3EBC6",
+              },
+              Object {
+                "height": 50,
+              },
+              Object {
+                "borderWidth": 0,
+              },
+            ]
           }
         >
           <View

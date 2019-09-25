@@ -1,5 +1,5 @@
-import { DeployArgv } from '@celo/celotool/src/cmds/deploy'
 import * as yargs from 'yargs'
+import { DeployArgv } from '../deploy'
 export const command = 'migrate <deployPackage>'
 
 export const describe = 'migrate an existing deploy'

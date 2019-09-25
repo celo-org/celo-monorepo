@@ -1,16 +1,12 @@
-import {
-  confirmAction,
-  envVar,
-  fetchEnv,
-  fetchEnvOrFallback,
-} from '@celo/celotool/src/lib/env-utils'
+import { writeFileSync } from 'fs'
+import { confirmAction, envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,
   generateGenesisFromEnv,
   generatePrivateKey,
   privateKeyToAddress,
   privateKeyToPublicKey,
-} from '@celo/celotool/src/lib/generate_utils'
+} from './generate_utils'
 import {
   applyTerraformModule,
   destroyTerraformModule,
@@ -21,12 +17,12 @@ import {
   taintTerraformModuleResource,
   TerraformVars,
   untaintTerraformModuleResource,
-} from '@celo/celotool/src/lib/terraform'
+} from './terraform'
 import {
+  uploadEnvFileToGoogleStorage,
   uploadFileToGoogleStorage,
   uploadGenesisBlockToGoogleStorage,
-} from '@celo/celotool/src/lib/testnet-utils'
-import { writeFileSync } from 'fs'
+} from './testnet-utils'
 
 const secretsBucketName = 'celo-testnet-secrets'
 const testnetTerraformModule = 'testnet'
@@ -72,6 +68,7 @@ export async function deploy(celoEnv: string, onConfirmFailed?: () => Promise<vo
   })
 
   await uploadGenesisBlockToGoogleStorage(celoEnv)
+  await uploadEnvFileToGoogleStorage(celoEnv)
 }
 
 async function deployModule(
@@ -342,7 +339,13 @@ function uploadSecrets(celoEnv: string, secrets: string, resourceName: string) {
   const localTmpFilePath = `/tmp/${celoEnv}-${resourceName}-secrets`
   writeFileSync(localTmpFilePath, secrets)
   const cloudStorageFileName = `${secretsBasePath(celoEnv)}/.env.${resourceName}`
-  return uploadFileToGoogleStorage(localTmpFilePath, secretsBucketName, cloudStorageFileName, false)
+  return uploadFileToGoogleStorage(
+    localTmpFilePath,
+    secretsBucketName,
+    cloudStorageFileName,
+    false,
+    'text/plain'
+  )
 }
 
 function generateBootnodeSecretEnvVars() {

@@ -120,8 +120,8 @@ async function getGasCurrencyContractAddress(
 export interface TxParams<T> {
   tx: TransactionObject<T>
   from: string
-  to: string
-  gasCurrency: GasCurrency
+  to?: string
+  gasCurrency?: GasCurrency
   estimatedGas?: number
   value?: string
 }
@@ -135,10 +135,8 @@ export async function requestTxSig<T>(
   const baseNonce = await kit.web3.eth.getTransactionCount(txParams[0].from)
   const txs: TxToSignParam[] = await Promise.all(
     txParams.map(async (txParam, index) => {
-      const gasCurrencyContractAddress = await getGasCurrencyContractAddress(
-        kit,
-        txParam.gasCurrency
-      )
+      const gasCurrency = txParam.gasCurrency ? txParam.gasCurrency : GasCurrency.cGLD
+      const gasCurrencyContractAddress = await getGasCurrencyContractAddress(kit, gasCurrency)
       const value = txParam.value === undefined ? '0' : txParam.value
 
       const estimatedTxParams = {

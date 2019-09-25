@@ -2,6 +2,7 @@ import { Linking } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { all, call, put, select, spawn, take } from 'redux-saga/effects'
+import { PincodeType } from 'src/account/reducer'
 import { setLanguage } from 'src/app/actions'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { getVersionInfo } from 'src/firebase/firebase'
@@ -23,8 +24,9 @@ interface PersistedStateProps {
   language: string | null
   e164Number: string
   numberVerified: boolean
-  pincodeSet: boolean
+  pincodeType: PincodeType
   redeemComplete: boolean
+  account: string | null
   startedVerification: boolean
   askedContactsPermission: boolean
 }
@@ -37,8 +39,9 @@ const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null 
     language: state.app.language,
     e164Number: state.account.e164PhoneNumber,
     numberVerified: state.app.numberVerified,
-    pincodeSet: state.account.pincodeSet,
+    pincodeType: state.account.pincodeType,
     redeemComplete: state.invite.redeemComplete,
+    account: state.web3.account,
     startedVerification: state.identity.startedVerification,
     askedContactsPermission: state.identity.askedContactsPermission,
   }
@@ -71,8 +74,9 @@ export function* navigateToProperScreen() {
     language,
     e164Number,
     numberVerified,
-    pincodeSet,
+    pincodeType,
     redeemComplete,
+    account,
     startedVerification,
     askedContactsPermission,
   } = mappedState
@@ -92,9 +96,9 @@ export function* navigateToProperScreen() {
     navigate(Screens.SetClock)
   } else if (!e164Number) {
     navigate(Screens.JoinCelo)
-  } else if (!pincodeSet) {
-    navigate(Screens.Pincode)
-  } else if (!redeemComplete) {
+  } else if (pincodeType === PincodeType.Unset) {
+    navigate(Screens.PincodeEducation)
+  } else if (!redeemComplete && !account) {
     navigate(Screens.EnterInviteCode)
   } else if (!askedContactsPermission) {
     navigate(Screens.ImportContacts)
