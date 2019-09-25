@@ -14,13 +14,19 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
   <View
     style={
       Object {
-        "height": 45,
+        "height": 56,
       }
     }
   >
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -29,7 +35,6 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "opacity": 1,
           "paddingHorizontal": 20,
           "paddingVertical": 10,
         }
@@ -87,6 +92,7 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
         style={
           Array [
             Object {
+              "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 22,
               "paddingBottom": 20,
@@ -308,7 +314,7 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
                     ]
                   }
                 >
-                  skip
+                  global:skip
                 </Text>
               </View>
               <View
@@ -370,6 +376,12 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -377,15 +389,22 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#42D689",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#42D689",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
       >
         <View
@@ -442,6 +461,12 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -449,15 +474,22 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "transparent",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
       >
         <View
@@ -487,7 +519,7 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
               ]
             }
           >
-            skip
+            global:skip
           </Text>
         </View>
       </View>
@@ -510,13 +542,19 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
   <View
     style={
       Object {
-        "height": 45,
+        "height": 56,
       }
     }
   >
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -525,7 +563,6 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "opacity": 1,
           "paddingHorizontal": 20,
           "paddingVertical": 10,
         }
@@ -583,6 +620,7 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
         style={
           Array [
             Object {
+              "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 22,
               "paddingBottom": 20,
@@ -804,7 +842,7 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
                     ]
                   }
                 >
-                  skip
+                  global:skip
                 </Text>
               </View>
               <View
@@ -866,6 +904,12 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -873,15 +917,22 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#42D689",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#42D689",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
       >
         <View
@@ -934,13 +985,19 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
   <View
     style={
       Object {
-        "height": 45,
+        "height": 56,
       }
     }
   >
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -949,7 +1006,6 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "opacity": 1,
           "paddingHorizontal": 20,
           "paddingVertical": 10,
         }
@@ -1007,6 +1063,7 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
         style={
           Array [
             Object {
+              "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 22,
               "paddingBottom": 20,
@@ -1228,7 +1285,7 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
                     ]
                   }
                 >
-                  skip
+                  global:skip
                 </Text>
               </View>
               <View
@@ -1290,6 +1347,12 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -1297,15 +1360,22 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#42D689",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#42D689",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
       >
         <View
@@ -1362,6 +1432,12 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -1369,15 +1445,22 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "transparent",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
       >
         <View

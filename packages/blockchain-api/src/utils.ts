@@ -35,3 +35,8 @@ export function formatCommentString(functionCallHex: string): string {
     return ''
   }
 }
+
+// Returns date string in YYYY-MM-DD
+export function formatDateString(date: Date) {
+  return date.toISOString().split('T')[0]
+}

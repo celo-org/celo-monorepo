@@ -3,7 +3,7 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, View } from 'react-native'
 import { connect } from 'react-redux'
-import { getUserContactDetails, UserContactDetails } from 'src/account/reducer'
+import { UserContactDetails, userContactDetailsSelector } from 'src/account/reducer'
 import SettingsItem from 'src/account/SettingsItem'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -26,7 +26,7 @@ type Props = OwnProps & StateProps & WithNamespaces
 const mapStateToProps = (state: RootState) => {
   return {
     name: state.account.name,
-    userContact: getUserContactDetails(state),
+    userContact: userContactDetailsSelector(state),
   }
 }
 
@@ -53,7 +53,11 @@ export class Profile extends React.Component<Props> {
           </View>
         </View>
         <View style={[style.container, style.underlinedBox]}>
-          <SettingsItem title={t('editName')} onPress={this.goToEditProfile} />
+          <SettingsItem
+            testID="ProfileEditName"
+            title={t('editName')}
+            onPress={this.goToEditProfile}
+          />
         </View>
       </ScrollView>
     )

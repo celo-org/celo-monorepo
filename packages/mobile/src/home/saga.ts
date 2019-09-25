@@ -9,9 +9,11 @@ import {
   take,
   takeLeading,
 } from 'redux-saga/effects'
-import { fetchSentPayments } from 'src/escrow/actions'
+import { fetchSentEscrowPayments } from 'src/escrow/actions'
 import { fetchGoldBalance } from 'src/goldToken/actions'
 import { Actions, refreshAllBalances, setLoading } from 'src/home/actions'
+import { fetchCurrentRate } from 'src/localCurrency/actions'
+import { shouldFetchCurrentRate } from 'src/localCurrency/selectors'
 import { withTimeout } from 'src/redux/sagas-helpers'
 import { shouldUpdateBalance } from 'src/redux/selectors'
 import { fetchDollarBalance } from 'src/stableToken/actions'
@@ -38,7 +40,7 @@ export function* refreshBalances() {
   yield call(getConnectedAccount)
   yield put(fetchDollarBalance())
   yield put(fetchGoldBalance())
-  yield put(fetchSentPayments())
+  yield put(fetchSentEscrowPayments())
 }
 
 export function* refreshBalancesWithLoadingSaga() {
@@ -50,10 +52,13 @@ export function* refreshBalancesWithLoadingSaga() {
 
 function* autoRefreshSaga() {
   while (true) {
-    yield delay(10 * 1000) // sleep 10 seconds
     if (yield select(shouldUpdateBalance)) {
-      put(refreshAllBalances())
+      yield put(refreshAllBalances())
     }
+    if (yield select(shouldFetchCurrentRate)) {
+      yield put(fetchCurrentRate())
+    }
+    yield delay(10 * 1000) // sleep 10 seconds
   }
 }
 
@@ -83,3 +88,4 @@ export function* homeSaga() {
 }
 
 export const _watchRefreshBalances = watchRefreshBalances
+export const _autoRefreshSaga = autoRefreshSaga

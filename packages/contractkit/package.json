@@ -32,10 +32,11 @@
     "eth-lib": "^0.2.8",
     "web3": "1.0.0-beta.37",
     "web3-core-helpers": "1.0.0-beta.37",
-    "web3-utils": "1.0.0-beta.37"
+    "web3-utils": "1.0.0-beta.37",
+    "web3-eth-abi": "1.0.0-beta.37"
   },
   "devDependencies": {
-    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#6bd058a",
+    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#98ad2ba",
     "@celo/protocol": "1.0.0",
     "@types/debug": "^4.1.5",
     "@types/web3": "^1.0.18"

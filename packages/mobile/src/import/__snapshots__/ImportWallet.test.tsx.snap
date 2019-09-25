@@ -14,7 +14,8 @@ exports[`ImportWallet renders correctly 1`] = `
     automaticallyAdjustContentInsets={false}
     contentContainerStyle={
       Object {
-        "paddingHorizontal": 10,
+        "padding": 20,
+        "paddingTop": 0,
       }
     }
     contentInset={
@@ -50,12 +51,9 @@ exports[`ImportWallet renders correctly 1`] = `
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
-            Object {
-              "marginTop": 0,
-            },
+            Object {},
           ]
         }
       >
@@ -68,8 +66,8 @@ exports[`ImportWallet renders correctly 1`] = `
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -78,6 +76,7 @@ exports[`ImportWallet renders correctly 1`] = `
         style={
           Array [
             Object {
+              "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 22,
               "paddingBottom": 20,
@@ -224,6 +223,12 @@ exports[`ImportWallet renders correctly 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -231,15 +236,22 @@ exports[`ImportWallet renders correctly 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#A3EBC6",
-          "borderWidth": 0,
-          "flex": 1,
-          "height": 50,
-          "justifyContent": "center",
-          "opacity": 1,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#A3EBC6",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
       }
       testID="ImportWalletButton"
     >
@@ -292,7 +304,8 @@ exports[`ImportWallet renders with an error 1`] = `
     automaticallyAdjustContentInsets={false}
     contentContainerStyle={
       Object {
-        "paddingHorizontal": 10,
+        "padding": 20,
+        "paddingTop": 0,
       }
     }
     contentInset={
@@ -328,12 +341,9 @@ exports[`ImportWallet renders with an error 1`] = `
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
-            Object {
-              "marginTop": 0,
-            },
+            Object {},
           ]
         }
       >
@@ -346,8 +356,8 @@ exports[`ImportWallet renders with an error 1`] = `
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -356,6 +366,7 @@ exports[`ImportWallet renders with an error 1`] = `
         style={
           Array [
             Object {
+              "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 22,
               "paddingBottom": 20,
@@ -504,6 +515,12 @@ exports[`ImportWallet renders with an error 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -511,15 +528,22 @@ exports[`ImportWallet renders with an error 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#A3EBC6",
-          "borderWidth": 0,
-          "flex": 1,
-          "height": 50,
-          "justifyContent": "center",
-          "opacity": 1,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#A3EBC6",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
       }
       testID="ImportWalletButton"
     >

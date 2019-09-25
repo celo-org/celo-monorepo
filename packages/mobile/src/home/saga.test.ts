@@ -1,10 +1,20 @@
 import { expectSaga } from 'redux-saga-test-plan'
-import { call, put } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
 import { fetchGoldBalance } from 'src/goldToken/actions'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
-import { _watchRefreshBalances, refreshBalances, withLoading } from 'src/home/saga'
+import {
+  _autoRefreshSaga,
+  _watchRefreshBalances,
+  refreshBalances,
+  withLoading,
+} from 'src/home/saga'
+import { fetchCurrentRate } from 'src/localCurrency/actions'
+import { shouldFetchCurrentRate } from 'src/localCurrency/selectors'
+import { shouldUpdateBalance } from 'src/redux/selectors'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { getConnectedAccount } from 'src/web3/saga'
+
+jest.useRealTimers()
 
 describe('refreshBalances', () => {
   test('ask for balance when geth and account are ready', () =>
@@ -17,7 +27,7 @@ describe('refreshBalances', () => {
 
 describe('watchRefreshBalances', () => {
   test('reacts on REFRESH_BALANCES', async () => {
-    const p = expectSaga(_watchRefreshBalances)
+    await expectSaga(_watchRefreshBalances)
       .put(setLoading(true))
       .put(setLoading(false))
       .provide([[call(getConnectedAccount), true]])
@@ -25,8 +35,6 @@ describe('watchRefreshBalances', () => {
       .put(fetchGoldBalance())
       .dispatch(refreshAllBalances())
       .run()
-    jest.runAllTimers()
-    await p
   })
 })
 
@@ -53,5 +61,30 @@ describe('withLoading Saga', () => {
         .put(setLoading(false))
         .run()
     ).rejects.toEqual(expect.any(Error))
+  })
+})
+
+describe('autoRefreshSaga', () => {
+  it('dispatches the appropriate actions', async () => {
+    let delayCallCount = 0
+    // Workaround redux-saga-test-plan not supporting the new `yield delay(x)` syntax
+    // @ts-ignore
+    const provideDelayOnce = ({ fn }, next) => {
+      if (fn.name === 'delayP' && delayCallCount < 1) {
+        delayCallCount += 1
+        return null
+      }
+      return next()
+    }
+
+    await expectSaga(_autoRefreshSaga)
+      .provide([
+        [select(shouldUpdateBalance), true],
+        [select(shouldFetchCurrentRate), true],
+        { call: provideDelayOnce },
+      ])
+      .put(refreshAllBalances())
+      .put(fetchCurrentRate())
+      .run()
   })
 })

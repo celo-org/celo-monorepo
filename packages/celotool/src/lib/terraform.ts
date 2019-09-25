@@ -1,6 +1,6 @@
-import { execCmd } from '@celo/celotool/src/lib/utils'
 import fs from 'fs'
 import path from 'path'
+import { execCmd } from './utils'
 
 const terraformModulesPath = path.join(__dirname, '../../../terraform-modules')
 

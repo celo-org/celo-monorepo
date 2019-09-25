@@ -11,7 +11,7 @@ interface Props {
 export default class NuxLogo extends React.PureComponent<Props> {
   static defaultProps = {
     style: {},
-    height: 50,
+    height: 35,
   }
 
   render() {
@@ -26,7 +26,6 @@ export default class NuxLogo extends React.PureComponent<Props> {
 const styles = StyleSheet.create({
   logo: {
     alignItems: 'center',
-    marginTop: 25,
-    marginBottom: 25,
+    marginBottom: 20,
   },
 })
