@@ -580,62 +580,62 @@ jobs:
 #           name: Minor test of celocli
 #           command: ./node_modules/.bin/celocli account:new  # Small test
 
-# workflows:
-#   version: 2
-#   celo-monorepo-build:
-#     jobs:
-#       - install_dependencies
-#       # - lint-checks:
-#       #     requires:
-#       #       - install_dependencies
-#       # - general-test:
-#       #     requires:
-#       #       - install_dependencies
-#       # - walletkit-test:
-#       #     requires:
-#       #       - install_dependencies
-#       # - cli-test:
-#       #     requires:
-#       #       - install_dependencies
-#       # - contractkit-test:
-#       #     requires:
-#       #       - install_dependencies
-#       # - mobile-test:
-#       #     requires:
-#       #       - lint-checks
-#       # - mobile-test-build-app:
-#       #     requires:
-#       #       - mobile-test
-#       # - verification-pool-api:
-#       #     requires:
-#       #       - lint-checks
-#       # - protocol-test:
-#       #     requires:
-#       #       - lint-checks
-#       #       - walletkit-test
-#       # - protocol-test-with-code-coverage:
-#       #     requires:
-#       #       - lint-checks
-#       #       - walletkit-test
-#       # - end-to-end-geth-transfer-test:
-#       #     requires:
-#       #       - lint-checks
-#       #       - walletkit-test
-#       # - end-to-end-geth-governance-test:
-#       #     requires:
-#       #       - lint-checks
-#       #       - walletkit-test
-#       # - end-to-end-geth-sync-test:
-#       #     requires:
-#       #       - lint-checks
-#       #       - walletkit-test
-#       # - end-to-end-geth-integration-sync-test:
-#       #     requires:
-#       #       - lint-checks
-#             # - walletkit-test
-#       - mobile-end-to-end-test:
-#           requires:
-#             - install_dependencies
+workflows:
+  version: 2
+  celo-monorepo-build:
+    jobs:
+      - install_dependencies
+      # - lint-checks:
+      #     requires:
+      #       - install_dependencies
+      # - general-test:
+      #     requires:
+      #       - install_dependencies
+      # - walletkit-test:
+      #     requires:
+      #       - install_dependencies
+      # - cli-test:
+      #     requires:
+      #       - install_dependencies
+      # - contractkit-test:
+      #     requires:
+      #       - install_dependencies
+      # - mobile-test:
+      #     requires:
+      #       - lint-checks
+      # - mobile-test-build-app:
+      #     requires:
+      #       - mobile-test
+      # - verification-pool-api:
+      #     requires:
+      #       - lint-checks
+      # - protocol-test:
+      #     requires:
+      #       - lint-checks
+      #       - walletkit-test
+      # - protocol-test-with-code-coverage:
+      #     requires:
+      #       - lint-checks
+      #       - walletkit-test
+      # - end-to-end-geth-transfer-test:
+      #     requires:
+      #       - lint-checks
+      #       - walletkit-test
+      # - end-to-end-geth-governance-test:
+      #     requires:
+      #       - lint-checks
+      #       - walletkit-test
+      # - end-to-end-geth-sync-test:
+      #     requires:
+      #       - lint-checks
+      #       - walletkit-test
+      # - end-to-end-geth-integration-sync-test:
+      #     requires:
+      #       - lint-checks
+            # - walletkit-test
+      - mobile-end-to-end-test:
+          requires:
+            - install_dependencies
 
 #   nightly:
 #     triggers:
