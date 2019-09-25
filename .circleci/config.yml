@@ -192,7 +192,8 @@ jobs:
           command: |
             set -euo pipefail
             sudo npm install --global yarn
-            yarn --cwd=packages/mobile build:sdk integration
+            # yarn --cwd=packages/mobile build:sdk integration
+            yarn build
             cd packages/mobile/android  && ./gradlew assembleDebug && cd -
 
       - run:
@@ -226,429 +227,429 @@ jobs:
             ENVFILE=.env.test ./gradlew assembleDebug
             cd -
 
-  mobile-test:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
+#   mobile-test:
+#     <<: *defaults
+#     steps:
+#       - attach_workspace:
+#           at: ~/app
 
-      - run:
-          name: Ensure translations are not missing
-          command: |
-            cd packages/mobile
-            ./scripts/verify_locales.sh
+#       - run:
+#           name: Ensure translations are not missing
+#           command: |
+#             cd packages/mobile
+#             ./scripts/verify_locales.sh
 
-      - run:
-          name: jest tests
-          command: |
-            mkdir -p test-results/jest
-            # Tests fail with https://stackoverflow.com/questions/38558989/node-js-heap-out-of-memory without this
-            NODE_OPTIONS="--max-old-space-size=4096" yarn --cwd packages/mobile test:ci
-          environment:
-            JEST_JUNIT_OUTPUT: test-results/jest/junit.xml
+#       - run:
+#           name: jest tests
+#           command: |
+#             mkdir -p test-results/jest
+#             # Tests fail with https://stackoverflow.com/questions/38558989/node-js-heap-out-of-memory without this
+#             NODE_OPTIONS="--max-old-space-size=4096" yarn --cwd packages/mobile test:ci
+#           environment:
+#             JEST_JUNIT_OUTPUT: test-results/jest/junit.xml
 
-      - store_test_results:
-          path: test-results
+#       - store_test_results:
+#           path: test-results
 
-      - store_artifacts:
-          path: packages/mobile/coverage
-          destination: mobile/coverage
+#       - store_artifacts:
+#           path: packages/mobile/coverage
+#           destination: mobile/coverage
 
-      - run:
-          name: copy
-          command: |
-            mkdir -p packages/mobile/mobile/coverage
-            cp -r packages/mobile/coverage packages/mobile/mobile/
-      - run:
-          name: Upload to CodeCov
-          command: yarn codecov -F mobile
+#       - run:
+#           name: copy
+#           command: |
+#             mkdir -p packages/mobile/mobile/coverage
+#             cp -r packages/mobile/coverage packages/mobile/mobile/
+#       - run:
+#           name: Upload to CodeCov
+#           command: yarn codecov -F mobile
 
-  verification-pool-api:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
+#   verification-pool-api:
+#     <<: *defaults
+#     steps:
+#       - attach_workspace:
+#           at: ~/app
 
-      - run:
-          name: jest tests
-          command: |
-            mkdir -p test-results/jest
-            yarn --cwd packages/verification-pool-api test
-          environment:
-            JEST_JUNIT_OUTPUT: test-results/jest/junit.xml
+#       - run:
+#           name: jest tests
+#           command: |
+#             mkdir -p test-results/jest
+#             yarn --cwd packages/verification-pool-api test
+#           environment:
+#             JEST_JUNIT_OUTPUT: test-results/jest/junit.xml
 
-  protocol-test:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Check if the test should run
-          command: |
-            FILES_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
-      - run:
-          name: test
-          # Flaky tests - run them twice
-          command: yarn --cwd packages/protocol test || yarn --cwd packages/protocol test
+#   protocol-test:
+#     <<: *defaults
+#     steps:
+#       - attach_workspace:
+#           at: ~/app
+#       - run:
+#           name: Check if the test should run
+#           command: |
+#             FILES_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils,${PWD}/.circleci/config.yml"
+#             ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+#       - run:
+#           name: test
+#           # Flaky tests - run them twice
+#           command: yarn --cwd packages/protocol test || yarn --cwd packages/protocol test
 
-  # Slow and flaky compared to protocol-test which runs without coverage
-  protocol-test-with-code-coverage:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Check if the test should run
-          command: |
-            FILES_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
-      - run:
-          name: test
-          # Flaky tests - run them twice
-          command: yarn --cwd packages/protocol test:coverage || yarn --cwd packages/protocol test:coverage
-      - store_artifacts:
-          path: packages/protocol/coverage
-          destination: protocol/coverage
-      - run:
-          name: Upload to CodeCov
-          command: yarn codecov -F protocol
+#   # Slow and flaky compared to protocol-test which runs without coverage
+#   protocol-test-with-code-coverage:
+#     <<: *defaults
+#     steps:
+#       - attach_workspace:
+#           at: ~/app
+#       - run:
+#           name: Check if the test should run
+#           command: |
+#             FILES_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils,${PWD}/.circleci/config.yml"
+#             ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+#       - run:
+#           name: test
+#           # Flaky tests - run them twice
+#           command: yarn --cwd packages/protocol test:coverage || yarn --cwd packages/protocol test:coverage
+#       - store_artifacts:
+#           path: packages/protocol/coverage
+#           destination: protocol/coverage
+#       - run:
+#           name: Upload to CodeCov
+#           command: yarn codecov -F protocol
 
-  contractkit-test:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run: 
-          name: Generate DevChain
-          command: |
-            (cd packages/contractkit && yarn test:prepare)
-      - run:
-          name: Run Tests
-          command: yarn --cwd=packages/contractkit test
+#   contractkit-test:
+#     <<: *defaults
+#     steps:
+#       - attach_workspace:
+#           at: ~/app
+#       - run: 
+#           name: Generate DevChain
+#           command: |
+#             (cd packages/contractkit && yarn test:prepare)
+#       - run:
+#           name: Run Tests
+#           command: yarn --cwd=packages/contractkit test
 
 
-  walletkit-test:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: test alphanet
-          command: |
-            # Test alphanet
-            set -euo pipefail
-            yarn --cwd=packages/walletkit build alfajores
-            yarn --cwd=packages/walletkit test
+#   walletkit-test:
+#     <<: *defaults
+#     steps:
+#       - attach_workspace:
+#           at: ~/app
+#       - run:
+#           name: test alphanet
+#           command: |
+#             # Test alphanet
+#             set -euo pipefail
+#             yarn --cwd=packages/walletkit build alfajores
+#             yarn --cwd=packages/walletkit test
 
-      - run:
-          name: test alphanet staging
-          command: |
-            # Test alphanet
-            set -euo pipefail
-            yarn --cwd=packages/walletkit build alfajoresstaging
-            yarn --cwd=packages/walletkit test
+#       - run:
+#           name: test alphanet staging
+#           command: |
+#             # Test alphanet
+#             set -euo pipefail
+#             yarn --cwd=packages/walletkit build alfajoresstaging
+#             yarn --cwd=packages/walletkit test
 
-  cli-test:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Test
-          command: |
-            set -euo pipefail
-            yarn --cwd=packages/cli test
-      - run:
-          name: Fail if someone forgot to commit CLI docs
-          command: |
-            yarn --cwd=packages/cli docs
-            if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
-              git --no-pager diff packages/docs/command-line-interface
-              echo "There are git differences after generating CLI docs"
-              exit 1
-            fi
-      - run:
-          name: Verify that a new account can be created
-          command: |
-            yarn --cwd=packages/cli run celocli account:new
+#   cli-test:
+#     <<: *defaults
+#     steps:
+#       - attach_workspace:
+#           at: ~/app
+#       - run:
+#           name: Test
+#           command: |
+#             set -euo pipefail
+#             yarn --cwd=packages/cli test
+#       - run:
+#           name: Fail if someone forgot to commit CLI docs
+#           command: |
+#             yarn --cwd=packages/cli docs
+#             if [[ $(git status packages/docs/command-line-interface --porcelain) ]]; then
+#               git --no-pager diff packages/docs/command-line-interface
+#               echo "There are git differences after generating CLI docs"
+#               exit 1
+#             fi
+#       - run:
+#           name: Verify that a new account can be created
+#           command: |
+#             yarn --cwd=packages/cli run celocli account:new
 
-  end-to-end-geth-transfer-test:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Check if the test should run
-          command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
-      - run:
-          name: Setup Go language
-          command: |
-            set -e
-            set -v
-            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
-            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
-            ls /tmp/go/bin/go
-            /tmp/go/bin/go version
-      - run:
-          name: Setup Rust language
-          command: |
-            set -e
-            set -v
-            curl https://sh.rustup.rs -sSf | sh -s -- -y
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            rustup install 1.36.0
-            rustup default 1.36.0
-      - run:
-          name: Run test
-          no_output_timeout: 20m
-          command: |
-            set -e
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            go version
-            cd packages/celotool
-            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_transfers.sh checkout master
+#   end-to-end-geth-transfer-test:
+#     <<: *defaults
+#     steps:
+#       - attach_workspace:
+#           at: ~/app
+#       - run:
+#           name: Check if the test should run
+#           command: |
+#             FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+#             ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+#       - run:
+#           name: Setup Go language
+#           command: |
+#             set -e
+#             set -v
+#             wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
+#             tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
+#             ls /tmp/go/bin/go
+#             /tmp/go/bin/go version
+#       - run:
+#           name: Setup Rust language
+#           command: |
+#             set -e
+#             set -v
+#             curl https://sh.rustup.rs -sSf | sh -s -- -y
+#             export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+#             rustup install 1.36.0
+#             rustup default 1.36.0
+#       - run:
+#           name: Run test
+#           no_output_timeout: 20m
+#           command: |
+#             set -e
+#             export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+#             go version
+#             cd packages/celotool
+#             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+#             ./ci_test_transfers.sh checkout master
 
-  end-to-end-geth-governance-test:
-    <<: *defaults
-    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
-    resource_class: medium+
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Check if the test should run
-          command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
-      - run:
-          name: Setup Go language
-          command: |
-            set -e
-            set -v
-            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
-            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
-            ls /tmp/go/bin/go
-            /tmp/go/bin/go version
-      - run:
-          name: Setup Rust language
-          command: |
-            set -e
-            set -v
-            curl https://sh.rustup.rs -sSf | sh -s -- -y
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            rustup install 1.36.0
-            rustup default 1.36.0
-      - run:
-          name: Run test
-          no_output_timeout: 20m
-          command: |
-            set -e
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            go version
-            cd packages/celotool
-            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_governance.sh checkout master
+#   end-to-end-geth-governance-test:
+#     <<: *defaults
+#     # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
+#     resource_class: medium+
+#     steps:
+#       - attach_workspace:
+#           at: ~/app
+#       - run:
+#           name: Check if the test should run
+#           command: |
+#             FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+#             ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+#       - run:
+#           name: Setup Go language
+#           command: |
+#             set -e
+#             set -v
+#             wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
+#             tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
+#             ls /tmp/go/bin/go
+#             /tmp/go/bin/go version
+#       - run:
+#           name: Setup Rust language
+#           command: |
+#             set -e
+#             set -v
+#             curl https://sh.rustup.rs -sSf | sh -s -- -y
+#             export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+#             rustup install 1.36.0
+#             rustup default 1.36.0
+#       - run:
+#           name: Run test
+#           no_output_timeout: 20m
+#           command: |
+#             set -e
+#             export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+#             go version
+#             cd packages/celotool
+#             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+#             ./ci_test_governance.sh checkout master
 
-  end-to-end-geth-sync-test:
-    <<: *defaults
-    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
-    resource_class: medium+
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Check if the test should run
-          command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
-      - run:
-          name: Setup Go language
-          command: |
-            set -e
-            set -v
-            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
-            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
-            ls /tmp/go/bin/go
-            /tmp/go/bin/go version
-      - run:
-          name: Setup Rust language
-          command: |
-            set -e
-            set -v
-            curl https://sh.rustup.rs -sSf | sh -s -- -y
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            rustup install 1.36.0
-            rustup default 1.36.0
-      - run:
-          name: Run test
-          command: |
-            set -e
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            go version
-            cd packages/celotool
-            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_sync.sh checkout master
+#   end-to-end-geth-sync-test:
+#     <<: *defaults
+#     # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
+#     resource_class: medium+
+#     steps:
+#       - attach_workspace:
+#           at: ~/app
+#       - run:
+#           name: Check if the test should run
+#           command: |
+#             FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+#             ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+#       - run:
+#           name: Setup Go language
+#           command: |
+#             set -e
+#             set -v
+#             wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
+#             tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
+#             ls /tmp/go/bin/go
+#             /tmp/go/bin/go version
+#       - run:
+#           name: Setup Rust language
+#           command: |
+#             set -e
+#             set -v
+#             curl https://sh.rustup.rs -sSf | sh -s -- -y
+#             export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+#             rustup install 1.36.0
+#             rustup default 1.36.0
+#       - run:
+#           name: Run test
+#           command: |
+#             set -e
+#             export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+#             go version
+#             cd packages/celotool
+#             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+#             ./ci_test_sync.sh checkout master
 
-  end-to-end-geth-integration-sync-test:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Check if the test should run
-          command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
-      - run:
-          name: Setup Go language
-          command: |
-            set -e
-            set -v
-            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
-            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
-            ls /tmp/go/bin/go
-            /tmp/go/bin/go version
-            curl https://sh.rustup.rs -sSf | sh -s -- -y
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            rustup install 1.36.0
-            rustup default 1.36.0
-      - run:
-          name: Run test
-          command: |
-            set -e
-            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
-            go version
-            cd packages/celotool
-            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_sync_with_network.sh checkout master
+#   end-to-end-geth-integration-sync-test:
+#     <<: *defaults
+#     steps:
+#       - attach_workspace:
+#           at: ~/app
+#       - run:
+#           name: Check if the test should run
+#           command: |
+#             FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+#             ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+#       - run:
+#           name: Setup Go language
+#           command: |
+#             set -e
+#             set -v
+#             wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
+#             tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
+#             ls /tmp/go/bin/go
+#             /tmp/go/bin/go version
+#             curl https://sh.rustup.rs -sSf | sh -s -- -y
+#             export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+#             rustup install 1.36.0
+#             rustup default 1.36.0
+#       - run:
+#           name: Run test
+#           command: |
+#             set -e
+#             export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+#             go version
+#             cd packages/celotool
+#             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+#             ./ci_test_sync_with_network.sh checkout master
 
-  web:
-    working_directory: ~/app
-    docker:
-      - image: celohq/node8:gcloud
-    steps:
-      - attach_workspace:
-          at: ~/app
+#   web:
+#     working_directory: ~/app
+#     docker:
+#       - image: celohq/node8:gcloud
+#     steps:
+#       - attach_workspace:
+#           at: ~/app
 
-      - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-      - run: cd packages/web && ./circle_deploy.sh
+#       - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+#       - run: cd packages/web && ./circle_deploy.sh
 
-  test-typescript-npm-package-install:
-    working_directory: ~/app
-    docker:
-      - image: celohq/node8:gcloud
-    steps:
-      - run:
-          name: Installing npm package - @celo/typescript
-          command: yarn add @celo/typescript
+#   test-typescript-npm-package-install:
+#     working_directory: ~/app
+#     docker:
+#       - image: celohq/node8:gcloud
+#     steps:
+#       - run:
+#           name: Installing npm package - @celo/typescript
+#           command: yarn add @celo/typescript
 
-  test-utils-npm-package-install:
-    working_directory: ~/app
-    docker:
-      - image: celohq/node8:gcloud
-    steps:
-      - run:
-          name: Installing npm package - @celo/utils
-          command: yarn add @celo/utils
+#   test-utils-npm-package-install:
+#     working_directory: ~/app
+#     docker:
+#       - image: celohq/node8:gcloud
+#     steps:
+#       - run:
+#           name: Installing npm package - @celo/utils
+#           command: yarn add @celo/utils
 
-  test-walletkit-npm-package-install:
-    working_directory: ~/app
-    docker:
-      - image: celohq/node8:gcloud
-    steps:
-      - run:
-          name: Installing npm package - @celo/walletkit
-          command: |
-            # Try one more time in case the first attempt fails
-            # to deal with scenarios like https://circleci.com/gh/celo-org/celo-monorepo/23329
-            yarn add @celo/walletkit || yarn add @celo/walletkit
+#   test-walletkit-npm-package-install:
+#     working_directory: ~/app
+#     docker:
+#       - image: celohq/node8:gcloud
+#     steps:
+#       - run:
+#           name: Installing npm package - @celo/walletkit
+#           command: |
+#             # Try one more time in case the first attempt fails
+#             # to deal with scenarios like https://circleci.com/gh/celo-org/celo-monorepo/23329
+#             yarn add @celo/walletkit || yarn add @celo/walletkit
 
-  test-celocli-npm-package-install:
-    working_directory: ~/app
-    docker:
-      - image: celohq/node8:gcloud
-    steps:
-      - run:
-          name: Installing npm package - @celo/celocli
-          command: npm install @celo/celocli
-      - run:
-          name: Minor test of celocli
-          command: ./node_modules/.bin/celocli account:new  # Small test
+#   test-celocli-npm-package-install:
+#     working_directory: ~/app
+#     docker:
+#       - image: celohq/node8:gcloud
+#     steps:
+#       - run:
+#           name: Installing npm package - @celo/celocli
+#           command: npm install @celo/celocli
+#       - run:
+#           name: Minor test of celocli
+#           command: ./node_modules/.bin/celocli account:new  # Small test
 
-workflows:
-  version: 2
-  celo-monorepo-build:
-    jobs:
-      - install_dependencies
-      # - lint-checks:
-      #     requires:
-      #       - install_dependencies
-      # - general-test:
-      #     requires:
-      #       - install_dependencies
-      # - walletkit-test:
-      #     requires:
-      #       - install_dependencies
-      # - cli-test:
-      #     requires:
-      #       - install_dependencies
-      # - contractkit-test:
-      #     requires:
-      #       - install_dependencies
-      # - mobile-test:
-      #     requires:
-      #       - lint-checks
-      # - mobile-test-build-app:
-      #     requires:
-      #       - mobile-test
-      # - verification-pool-api:
-      #     requires:
-      #       - lint-checks
-      # - protocol-test:
-      #     requires:
-      #       - lint-checks
-      #       - walletkit-test
-      # - protocol-test-with-code-coverage:
-      #     requires:
-      #       - lint-checks
-      #       - walletkit-test
-      # - end-to-end-geth-transfer-test:
-      #     requires:
-      #       - lint-checks
-      #       - walletkit-test
-      # - end-to-end-geth-governance-test:
-      #     requires:
-      #       - lint-checks
-      #       - walletkit-test
-      # - end-to-end-geth-sync-test:
-      #     requires:
-      #       - lint-checks
-      #       - walletkit-test
-      # - end-to-end-geth-integration-sync-test:
-      #     requires:
-      #       - lint-checks
-            # - walletkit-test
-      - mobile-end-to-end-test:
-          requires:
-            - install_dependencies
+# workflows:
+#   version: 2
+#   celo-monorepo-build:
+#     jobs:
+#       - install_dependencies
+#       # - lint-checks:
+#       #     requires:
+#       #       - install_dependencies
+#       # - general-test:
+#       #     requires:
+#       #       - install_dependencies
+#       # - walletkit-test:
+#       #     requires:
+#       #       - install_dependencies
+#       # - cli-test:
+#       #     requires:
+#       #       - install_dependencies
+#       # - contractkit-test:
+#       #     requires:
+#       #       - install_dependencies
+#       # - mobile-test:
+#       #     requires:
+#       #       - lint-checks
+#       # - mobile-test-build-app:
+#       #     requires:
+#       #       - mobile-test
+#       # - verification-pool-api:
+#       #     requires:
+#       #       - lint-checks
+#       # - protocol-test:
+#       #     requires:
+#       #       - lint-checks
+#       #       - walletkit-test
+#       # - protocol-test-with-code-coverage:
+#       #     requires:
+#       #       - lint-checks
+#       #       - walletkit-test
+#       # - end-to-end-geth-transfer-test:
+#       #     requires:
+#       #       - lint-checks
+#       #       - walletkit-test
+#       # - end-to-end-geth-governance-test:
+#       #     requires:
+#       #       - lint-checks
+#       #       - walletkit-test
+#       # - end-to-end-geth-sync-test:
+#       #     requires:
+#       #       - lint-checks
+#       #       - walletkit-test
+#       # - end-to-end-geth-integration-sync-test:
+#       #     requires:
+#       #       - lint-checks
+#             # - walletkit-test
+#       - mobile-end-to-end-test:
+#           requires:
+#             - install_dependencies
 
-  nightly:
-    triggers:
-      - schedule:
-          # 7 PM in UTC = noon in PDT.
-          # Best for test to fail during SF afternoon, so that, someone can fix it during the day time.
-          cron: "0 19 * * *"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - test-typescript-npm-package-install
-      - test-utils-npm-package-install
-      - test-walletkit-npm-package-install
-      - test-celocli-npm-package-install
+#   nightly:
+#     triggers:
+#       - schedule:
+#           # 7 PM in UTC = noon in PDT.
+#           # Best for test to fail during SF afternoon, so that, someone can fix it during the day time.
+#           cron: "0 19 * * *"
+#           filters:
+#             branches:
+#               only:
+#                 - master
+#     jobs:
+#       - test-typescript-npm-package-install
+#       - test-utils-npm-package-install
+#       - test-walletkit-npm-package-install
+#       - test-celocli-npm-package-install
       
