@@ -16,7 +16,7 @@ const genMatrix = (value: any, errorCorrectionLevel: string) => {
 }
 
 /* calculate the size of the cell and draw the path */
-function calculateMatrix(props: any) {
+export function calculateMatrix(props: any) {
   const { value, size, ecl, onError } = props
   try {
     const reducedSize = size - 20
