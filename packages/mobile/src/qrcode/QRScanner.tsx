@@ -49,8 +49,7 @@ class QRScanner extends React.Component<Props> {
       navigate(Screens.QRCode)
       return
     }
-    this.setState({ camera: true })
-    this.setState({ qrSubmitted: false })
+    this.setState({ camera: true, qrSubmitted: false })
   }
 
   onBardCodeDetected = (rawData: any) => {
@@ -63,7 +62,6 @@ class QRScanner extends React.Component<Props> {
         this.props.handleBarcodeDetected(rawData.barcodes[0])
       })
     }
-    return
   }
 
   render() {
