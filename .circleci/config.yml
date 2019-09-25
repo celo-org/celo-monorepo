@@ -199,7 +199,7 @@ jobs:
             # yarn --cwd=packages/mobile build:sdk integration
             source $HOME/.nvm/nvm.sh || true # This loads nvm
             nvm use 8.13 # not really sure why I have to run this again but it's required
-            yarn --cwd=packages/mobile build:sdk alfajores
+            yarn --cwd=packages/mobile build:sdk pilot
             cd packages/mobile
             yarn build
             # cd android  && ./gradlew assembleDebug && cd -
