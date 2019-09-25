@@ -1,5 +1,6 @@
 import { retryAsync } from '@celo/utils/src/async'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
+import { stripHexLeader } from '@celo/utils/src/signatureUtils'
 import {
   getEscrowContract,
   getGoldTokenContract,
@@ -11,7 +12,6 @@ import { Linking } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import VersionCheck from 'react-native-version-check'
 import { call, delay, put, race, select, spawn, takeLeading } from 'redux-saga/effects'
-import { setName } from 'src/account'
 import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -23,8 +23,8 @@ import i18n from 'src/i18n'
 import {
   Actions,
   InviteBy,
-  redeemComplete,
   RedeemInviteAction,
+  redeemInviteSuccess,
   SendInviteAction,
   sendInviteFailure,
   sendInviteSuccess,
@@ -44,7 +44,7 @@ import { sendTransaction } from 'src/transactions/send'
 import { dynamicLink } from 'src/utils/dynamicLink'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
-import { createNewAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
+import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'invite/saga'
@@ -190,64 +190,47 @@ export function* sendInviteSaga(action: SendInviteAction) {
   }
 }
 
-function* redeemSuccess(name: string, account: string) {
+function* redeemSuccess(account: string) {
   Logger.showMessage(i18n.t('inviteFlow11:redeemSuccess'))
   web3.eth.defaultAccount = account
-  // TODO(Rossy) Decouple setting of name from redeem complete, they are on diff screens now
-  yield put(setName(name))
-  yield put(redeemComplete(true))
+  yield put(redeemInviteSuccess())
 }
 
-export function* redeemInviteSaga(action: RedeemInviteAction) {
+export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
   Logger.debug(TAG, 'Starting Redeem Invite')
 
   const { result, timeout } = yield race({
-    result: call(doRedeemInvite, action),
+    result: call(doRedeemInvite, inviteCode),
     timeout: delay(REDEEM_INVITE_TIMEOUT),
   })
 
   if (result === true) {
-    CeloAnalytics.track(CustomEventNames.redeem_invite_success)
     Logger.debug(TAG, 'Redeem Invite completed successfully')
+    CeloAnalytics.track(CustomEventNames.redeem_invite_success)
   } else if (result === false) {
-    CeloAnalytics.track(CustomEventNames.redeem_invite_failed)
     Logger.debug(TAG, 'Redeem Invite failed')
+    CeloAnalytics.track(CustomEventNames.redeem_invite_failed)
+    yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED))
   } else if (timeout) {
-    CeloAnalytics.track(CustomEventNames.redeem_invite_timed_out)
     Logger.debug(TAG, 'Redeem Invite timed out')
+    CeloAnalytics.track(CustomEventNames.redeem_invite_timed_out)
     yield put(showError(ErrorMessages.REDEEM_INVITE_TIMEOUT))
   }
   Logger.debug(TAG, 'Done Redeem invite')
 }
 
-export function* doRedeemInvite(action: RedeemInviteAction) {
-  const { inviteCode, name } = action
-
+export function* doRedeemInvite(inviteCode: string) {
   yield call(waitWeb3LastBlock)
   try {
-    // Add temp wallet so we can send money from it
-    let tempAccount
-    try {
-      // @ts-ignore
-      tempAccount = yield call(web3.eth.personal.importRawKey, String(inviteCode).slice(2), TEMP_PW)
-    } catch (e) {
-      if (e.toString().includes('account already exists')) {
-        tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
-      } else {
-        throw e
-      }
-    }
-    Logger.debug(TAG + '@redeemInviteCode', 'Added temp account to wallet', tempAccount)
-
     // Check that the balance of the new account is not 0
     const StableToken = yield call(getStableTokenContract, web3)
-
-    // Try to get balance once + two retries before failing
     const stableBalance = new BigNumber(
       yield call(retryAsync, StableToken.methods.balanceOf(tempAccount).call, 2, [])
     )
 
     Logger.debug(TAG + '@redeemInviteCode', 'Temporary account balance: ' + stableBalance)
+
+    yield call(addTempAccountToWallet, inviteCode)
 
     if (stableBalance.isLessThan(1)) {
       // check if new user account has already been created
@@ -259,7 +242,7 @@ export function* doRedeemInvite(action: RedeemInviteAction) {
         )
         Logger.debug(TAG + '@redeemInviteCode', 'Existing account balance: ' + accountBalance)
         if (accountBalance.isGreaterThan(0)) {
-          yield redeemSuccess(name, account)
+          yield redeemSuccess(account)
           return
         }
       }
@@ -269,7 +252,7 @@ export function* doRedeemInvite(action: RedeemInviteAction) {
 
     // Create new local account
     Logger.debug(TAG + '@redeemInviteCode', 'Creating new account')
-    const newAccount = yield call(createNewAccount)
+    const newAccount = yield call(getOrCreateAccount)
     if (!newAccount) {
       throw Error('Unable to create your account')
     }
@@ -298,12 +281,30 @@ export function* doRedeemInvite(action: RedeemInviteAction) {
     if (newAccountBalance.isLessThan(1)) {
       throw Error('Transfer to new local account was not successful')
     }
-    yield redeemSuccess(name, newAccount)
+    yield redeemSuccess(newAccount)
     return true
   } catch (e) {
     Logger.error(TAG, 'Redeem invite error: ', e)
-    yield put(showError(ErrorMessages.REDEEM_INVITE_FAILED))
     return false
+  }
+}
+
+async function addTempAccountToWallet(inviteCode: string) {
+  Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
+  // Add temp wallet so we can send money from it
+  try {
+    // @ts-ignore
+    const tempAccount = await web3.eth.personal.importRawKey(stripHexLeader(inviteCode), TEMP_PW)
+    Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount)
+    return tempAccount
+  } catch (e) {
+    if (e.toString().includes('account already exists')) {
+      Logger.warn(TAG + '@addTempAccountToWallet', 'Account already exists, using it')
+      return web3.eth.accounts.privateKeyToAccount(inviteCode).address
+    }
+
+    Logger.error(TAG + '@addTempAccountToWallet', 'Failed to add account', e)
+    throw new Error('Failed to add temp account to wallet')
   }
 }
 

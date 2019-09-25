@@ -11,8 +11,8 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   InviteBy,
-  redeemComplete,
   redeemInvite,
+  redeemInviteSuccess,
   sendInvite,
   storeInviteeData,
 } from 'src/invite/actions'
@@ -118,7 +118,7 @@ describe(watchRedeemInvite, () => {
       .withState(state)
       .dispatch(redeemInvite(KEY, NAME))
       .put(setName(NAME))
-      .dispatch(redeemComplete(true))
+      .dispatch(redeemInviteSuccess(true))
       .run()
   })
 
@@ -169,7 +169,7 @@ describe(watchRedeemInvite, () => {
       .withState(state)
       .dispatch(redeemInvite(KEY, NAME))
       .put(setName(NAME))
-      .dispatch(redeemComplete(true))
+      .dispatch(redeemInviteSuccess(true))
       .run()
   })
 })

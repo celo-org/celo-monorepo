@@ -96,7 +96,7 @@ export function* waitForWeb3Sync() {
   }
 }
 
-export function* createNewAccount() {
+export function* getOrCreateAccount() {
   const account = yield select(currentAccountSelector)
   if (account) {
     Logger.debug(

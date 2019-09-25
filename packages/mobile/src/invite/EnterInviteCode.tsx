@@ -11,7 +11,6 @@ import {
   AppState,
   AppStateStatus,
   Clipboard,
-  Linking,
   ScrollView,
   StyleSheet,
   Text,
@@ -20,10 +19,10 @@ import {
 import SendIntentAndroid from 'react-native-send-intent'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
-import { errorSelector } from 'src/alert/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
+import { CELO_FAUCET_LINK } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import { redeemInvite } from 'src/invite/actions'
 import { extractValidInviteCode, getInviteCodeFromReferrerData } from 'src/invite/utils'
@@ -31,20 +30,15 @@ import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
+import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
 
-function goToFaucet() {
-  Linking.openURL('https://celo.org/build/wallet')
-}
-
 interface StateProps {
-  error: ErrorMessages | null
-  name: string
   redeemComplete: boolean
+  isRedeemingInvite: boolean
 }
 
 interface State {
-  isSubmitting: boolean
   appState: AppStateStatus
   validCode: string | null
 }
@@ -63,40 +57,22 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
-    error: errorSelector(state),
-    name: state.account.name,
     redeemComplete: state.invite.redeemComplete,
+    isRedeemingInvite: state.invite.isRedeemingInvite,
   }
 }
 
 type Props = StateProps & DispatchProps & WithNamespaces
 
-const displayedErrors = [ErrorMessages.INVALID_INVITATION, ErrorMessages.REDEEM_INVITE_FAILED]
-
-const hasDisplayedError = (error: ErrorMessages | null) => {
-  return error && displayedErrors.includes(error)
-}
-
 export class EnterInviteCode extends React.Component<Props, State> {
   static navigationOptions = nuxNavigationOptionsNoBackButton
 
-  static getDerivedStateFromProps(props: Props, state: State): State | null {
-    if (hasDisplayedError(props.error) && state.isSubmitting) {
-      return {
-        ...state,
-        isSubmitting: false,
-      }
-    }
-    return null
-  }
-
   state: State = {
-    isSubmitting: false,
     appState: AppState.currentState,
     validCode: null,
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     AppState.addEventListener('change', this.handleAppStateChange)
     this.checkForReferrerCode()
     this.checkIfValidCodeInClipboard()
@@ -104,10 +80,6 @@ export class EnterInviteCode extends React.Component<Props, State> {
 
   componentWillUnmount() {
     AppState.removeEventListener('change', this.handleAppStateChange)
-  }
-
-  openMessage = () => {
-    SendIntentAndroid.openSMSApp()
   }
 
   checkForReferrerCode = async () => {
@@ -132,59 +104,63 @@ export class EnterInviteCode extends React.Component<Props, State> {
     this.setState({ appState: nextAppState })
   }
 
-  onPaste = async () => {
-    this.setState({ isSubmitting: true })
-    try {
-      this.props.hideAlert()
-      const { validCode } = this.state
-
-      Logger.debug('Extracted invite code:', validCode || '')
-
-      if (!validCode) {
-        this.props.showError(ErrorMessages.INVALID_INVITATION)
-        return
-      }
-      this.props.redeemInvite(validCode, this.props.name)
-    } catch {
-      this.setState({ isSubmitting: false })
-      this.props.showError(ErrorMessages.REDEEM_INVITE_FAILED)
-    }
+  onPressOpenMessage = () => {
+    SendIntentAndroid.openSMSApp()
   }
 
-  onImportClick = async () => {
+  onPressPaste = async () => {
+    this.props.hideAlert()
+    const { validCode } = this.state
+
+    Logger.debug('Extracted invite code:', validCode || '')
+
+    if (!validCode) {
+      this.props.showError(ErrorMessages.INVALID_INVITATION)
+      return
+    }
+
+    this.props.redeemInvite(validCode)
+  }
+
+  onPressImportClick = async () => {
     navigate(Screens.ImportWallet)
   }
 
-  onContinue = () => {
+  onPressContinue = () => {
     navigate(Screens.ImportContacts)
   }
 
+  onPressGoToFaucet = () => {
+    navigateToURI(CELO_FAUCET_LINK)
+  }
+
   render() {
-    const { t } = this.props
+    const { t, isRedeemingInvite, redeemComplete } = this.props
+    const { validCode } = this.state
 
     return (
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <DevSkipButton nextScreen={Screens.ImportContacts} />
           <InviteCodeIcon />
-          <Text style={[fontStyles.h1, styles.h1]} testID={'InviteCodeTitle'}>
+          <Text style={styles.h1} testID={'InviteCodeTitle'}>
             {t('inviteCodeText.title')}
           </Text>
-          <View style={[componentStyles.roundedBorder, styles.inviteActionContainer]}>
+          <View style={styles.inviteActionContainer}>
             <Text style={styles.body}>
               <Text>{t('inviteCodeText.copyInvite.0')}</Text>
               {t('inviteCodeText.copyInvite.1')}
             </Text>
 
-            {this.props.redeemComplete ? (
+            {redeemComplete ? (
               <Text
                 style={[fontStyles.bodySmallBold, fontStyles.center, componentStyles.marginTop10]}
               >
                 {t('inviteCodeText.inviteAccepted')}
               </Text>
             ) : (
-              !this.state.isSubmitting &&
-              (!this.state.validCode ? (
+              !isRedeemingInvite &&
+              (!validCode ? (
                 <View>
                   <Text style={[styles.body, styles.hint]}>
                     <Text style={fontStyles.bodySmallSemiBold}>
@@ -195,7 +171,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
                   <SmallButton
                     text={t('inviteCodeText.openMessages.message')}
                     testID={'openMessageButton'}
-                    onPress={this.openMessage}
+                    onPress={this.onPressOpenMessage}
                     solid={true}
                     style={styles.button}
                   />
@@ -208,15 +184,15 @@ export class EnterInviteCode extends React.Component<Props, State> {
                   <SmallButton
                     text={t('inviteCodeText.pasteInviteCode.message')}
                     testID={'pasteMessageButton'}
-                    onPress={this.onPaste}
+                    onPress={this.onPressPaste}
                     solid={false}
                     style={styles.button}
                   />
                 </View>
               ))
             )}
-            {this.state.isSubmitting &&
-              !this.props.redeemComplete && (
+            {isRedeemingInvite &&
+              !redeemComplete && (
                 <View>
                   <Text style={[styles.body, styles.hint]}>
                     <Text style={fontStyles.bodySmallSemiBold}>
@@ -227,7 +203,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
                   <ActivityIndicator
                     size="large"
                     color={colors.celoGreen}
-                    style={styles.activity}
+                    style={componentStyles.marginTop10}
                   />
                 </View>
               )}
@@ -238,23 +214,23 @@ export class EnterInviteCode extends React.Component<Props, State> {
           <Text style={[styles.body, styles.askInviteContainer]}>
             {t('inviteCodeText.askForInvite.0')}
             <Text
-              onPress={goToFaucet}
+              onPress={this.onPressGoToFaucet}
               style={[fontStyles.bodySmallBold, fontStyles.linkInline, styles.askInvite]}
             >
               {t('inviteCodeText.askForInvite.1')}
             </Text>
           </Text>
           <Button
-            onPress={this.onContinue}
+            onPress={this.onPressContinue}
             text={t('continue')}
             standard={false}
             style={styles.continueButton}
             type={BtnTypes.PRIMARY}
-            disabled={!this.props.redeemComplete}
+            disabled={!redeemComplete}
             testID="ContinueInviteButton"
           />
           <Button
-            onPress={this.onImportClick}
+            onPress={this.onPressImportClick}
             text={t('importIt')}
             standard={false}
             style={styles.continueButton}
@@ -281,16 +257,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   inviteActionContainer: {
+    ...componentStyles.roundedBorder,
     padding: 30,
     marginVertical: 30,
     marginHorizontal: 20,
   },
   h1: {
+    ...fontStyles.h1,
     marginTop: 20,
   },
   body: {
     ...fontStyles.bodySmall,
-    color: colors.dark,
     textAlign: 'center',
     alignSelf: 'center',
   },
@@ -301,9 +278,6 @@ const styles = StyleSheet.create({
   askInvite: {
     fontSize: 12,
     fontWeight: '300',
-  },
-  activity: {
-    marginTop: 10,
   },
   hint: {
     marginVertical: 10,
