@@ -24,4 +24,5 @@ interface ILockedGold {
   function delegateRole(DelegateRole, address, uint8, bytes32, bytes32) external;
   function getAccountFromDelegateAndRole(address, DelegateRole) external view returns (address);
   function getDelegateFromAccountAndRole(address, DelegateRole) external view returns (address);
+  function totalWeight() external view returns (uint256);
 }

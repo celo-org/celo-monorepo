@@ -12,6 +12,7 @@ import {
   AppStateStatus,
   Clipboard,
   Linking,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -107,7 +108,11 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   openMessage = () => {
-    SendIntentAndroid.openSMSApp()
+    if (Platform.OS === 'android') {
+      SendIntentAndroid.openSMSApp()
+    } else {
+      Linking.openURL('sms:')
+    }
   }
 
   checkForReferrerCode = async () => {

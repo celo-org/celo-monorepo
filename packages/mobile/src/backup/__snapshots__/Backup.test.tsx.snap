@@ -113,6 +113,12 @@ exports[`Backup renders correctly if backup completed 1`] = `
         }
       }
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -120,21 +126,27 @@ exports[`Backup renders correctly if backup completed 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "alignSelf": "center",
-          "backgroundColor": "transparent",
-          "borderColor": "#42D689",
-          "borderRadius": 2,
-          "borderWidth": 2,
-          "fontSize": 14,
-          "marginTop": 50,
-          "minWidth": 160,
-          "opacity": 1,
-          "paddingHorizontal": 16,
-          "paddingVertical": 6,
-          "textAlign": "center",
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "alignSelf": "flex-start",
+            "borderRadius": 2,
+            "minWidth": 160,
+            "paddingHorizontal": 16,
+            "paddingVertical": 6,
+            "textAlign": "center",
+          },
+          Object {
+            "backgroundColor": "transparent",
+            "borderColor": "#42D689",
+            "borderWidth": 2,
+          },
+          Object {
+            "alignSelf": "center",
+            "fontSize": 14,
+            "marginTop": 50,
+          },
+        ]
       }
       testID="pasteMessageButton"
     >
@@ -185,6 +197,12 @@ exports[`Backup renders correctly if backup completed 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -192,17 +210,24 @@ exports[`Backup renders correctly if backup completed 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#42D689",
-          "borderColor": "#42D689",
-          "borderRadius": 3,
-          "borderWidth": 2,
-          "flex": 1,
-          "height": 50,
-          "justifyContent": "center",
-          "opacity": 1,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#42D689",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderColor": "#42D689",
+            "borderRadius": 3,
+            "borderWidth": 2,
+          },
+        ]
       }
     >
       <View
@@ -261,6 +286,12 @@ exports[`Backup renders correctly if backup not completed 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -269,7 +300,6 @@ exports[`Backup renders correctly if backup not completed 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "opacity": 1,
           "paddingHorizontal": 20,
           "paddingVertical": 10,
         }
@@ -549,7 +579,7 @@ exports[`Backup renders correctly if backup not completed 1`] = `
                     ]
                   }
                 >
-                  skip
+                  global:skip
                 </Text>
               </View>
               <View
@@ -611,6 +641,12 @@ exports[`Backup renders correctly if backup not completed 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -618,15 +654,22 @@ exports[`Backup renders correctly if backup not completed 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#42D689",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#42D689",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
       >
         <View
@@ -683,6 +726,12 @@ exports[`Backup renders correctly if backup not completed 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -690,15 +739,22 @@ exports[`Backup renders correctly if backup not completed 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "transparent",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
       >
         <View
