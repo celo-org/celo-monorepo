@@ -30,7 +30,7 @@ export default class ReactNativeLogger {
     }
   }
 
-  // TODO: remove this method from here and use our alert banner
+  // TODO: see what to do with this on iOS since there's not native toast
   showMessage = (message: string) => {
     if (Platform.OS === 'android') {
       ToastAndroid.showWithGravity(message, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
