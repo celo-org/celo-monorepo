@@ -1,18 +1,17 @@
 import * as React from 'react'
-import { Image, StyleSheet, View } from 'react-native'
+import { Image, StyleSheet, View, Text } from 'react-native'
 import Backers from 'src/about/Backers'
 import { mintPlaza } from 'src/about/images'
 import Team from 'src/about/Team'
 import { H1, H4 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
-import MissionText from 'src/home/MissionText'
 import { I18nProps, withNamespaces } from 'src/i18n'
-import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import AspectRatio from 'src/shared/AspectRatio'
 import menuItems from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { Colors, HEADER_HEIGHT, MENU_MAX_WIDTH } from 'src/shared/Styles'
 import PressMedia from 'src/about/PressMedia'
+import SideTitledSection from 'src/layout/SideTitledSection'
 
 const IMAGE_HEIGHT = 938
 const IMAGE_WIDTH = 835
@@ -61,9 +60,16 @@ export class About extends React.Component<Props & I18nProps> {
               </AspectRatio>
             </Responsive>
           </View>
-          {/* <MissionText /> */}
-          <Team randomSeed={randomSeed} />
 
+          {/* Below Fold */}
+          <SideTitledSection title={t('aboutMissionTitle')}>
+            <H1>{t('aboutMissionText')}</H1>
+          </SideTitledSection>
+          <SideTitledSection title={t('aboutMeaningTile')}>
+            <H1>{t('aboutMeaningText')}</H1>
+            <Text>{t('aboutMeaningCopy')}</Text>
+          </SideTitledSection>
+          <Team randomSeed={randomSeed} />
           <Backers />
           <PressMedia />
         </View>

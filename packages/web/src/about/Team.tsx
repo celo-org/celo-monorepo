@@ -3,57 +3,66 @@ import LazyLoad from 'react-lazyload'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import shuffleSeed from 'shuffle-seed'
 import teamList from 'src/about/team/team-list'
-import { H1, H4 } from 'src/fonts/Fonts'
+import { H3, H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
-import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import AspectRatio from 'src/shared/AspectRatio'
 import Responsive from 'src/shared/Responsive'
 import { MENU_MAX_WIDTH } from 'src/shared/Styles'
-import { fonts, standardStyles, textStyles } from 'src/styles'
+import { fonts } from 'src/styles'
+import SideTitledSection from 'src/layout/SideTitledSection'
+import { withScreenSize, ScreenSizes, ScreenProps } from 'src/layout/ScreenSize'
+import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 
 interface Props {
   randomSeed: number
 }
 
-export class Team extends React.Component<Props & I18nProps> {
+export class Team extends React.Component<Props & I18nProps & ScreenProps> {
   render() {
-    const { t, randomSeed } = this.props
+    const { t, randomSeed, screen } = this.props
     const shuffledTeamList = shuffleSeed.shuffle(teamList, randomSeed)
 
     return (
-      <View style={styles.container}>
-        <GridRow allStyle={standardStyles.centered}>
-          <Cell span={Spans.half}>
-            <H1 ariaLevel="2" style={[textStyles.center, standardStyles.elementalMarginBottom]}>
-              {t('coreContributors')}
-            </H1>
-            <H4 style={textStyles.center}>{t('InNoOrder')}</H4>
+      <>
+        <SideTitledSection title={t('teamTitle')}>
+          <H3>{t('teamAlternateTitle')}</H3>
+          <Text style={fonts.p}>{t('teamCopy')} </Text>
+        </SideTitledSection>
+        <GridRow desktopStyle={styles.backerContainer}>
+          <Cell span={Spans.full} tabletSpan={Spans.full}>
+            <View
+              style={[
+                styles.photoList,
+                screen === ScreenSizes.MOBILE && { justifyContent: 'center' },
+              ]}
+            >
+              {shuffledTeamList.map((person) => (
+                <Responsive
+                  key={person.name}
+                  medium={styles.mediumPerson}
+                  large={styles.largePerson}
+                >
+                  <View style={styles.person}>
+                    <LazyLoad height={200}>
+                      <AspectRatio style={styles.photoContainer} ratio={275 / 400}>
+                        <Image source={{ uri: person.photo }} style={styles.photo} />
+                      </AspectRatio>
+                    </LazyLoad>
+                    <H4>{person.name}</H4>
+                    <Text style={fonts.h5}>{(t(person.role) as string).toUpperCase()}</Text>
+                  </View>
+                </Responsive>
+              ))}
+              <Responsive medium={styles.mediumFiller} large={styles.largeFiller}>
+                <View style={styles.filler} />
+              </Responsive>
+              <Responsive medium={styles.mediumFiller} large={styles.largeFiller}>
+                <View style={styles.filler} />
+              </Responsive>
+            </View>
           </Cell>
         </GridRow>
-        <View style={styles.maxWidth}>
-          <View style={styles.photoList}>
-            {shuffledTeamList.map((person) => (
-              <Responsive key={person.name} medium={styles.mediumPerson} large={styles.largePerson}>
-                <View style={styles.person}>
-                  <LazyLoad height={200}>
-                    <AspectRatio style={styles.photoContainer} ratio={275 / 400}>
-                      <Image source={{ uri: person.photo }} style={styles.photo} />
-                    </AspectRatio>
-                  </LazyLoad>
-                  <H4>{person.name}</H4>
-                  <Text style={fonts.h5}>{(t(person.role) as string).toUpperCase()}</Text>
-                </View>
-              </Responsive>
-            ))}
-            <Responsive medium={styles.mediumFiller} large={styles.largeFiller}>
-              <View style={styles.filler} />
-            </Responsive>
-            <Responsive medium={styles.mediumFiller} large={styles.largeFiller}>
-              <View style={styles.filler} />
-            </Responsive>
-          </View>
-        </View>
-      </View>
+      </>
     )
   }
 }
@@ -75,19 +84,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 10,
-    maxWidth: 1025,
-  },
-  header: {
-    alignSelf: 'stretch',
-    paddingBottom: 10,
-    paddingLeft: 34,
-  },
-  maxWidth: {
-    maxWidth: MENU_MAX_WIDTH,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   person: {
     flexDirection: 'column',
@@ -97,13 +94,13 @@ const styles = StyleSheet.create({
   },
   mediumPerson: {
     flexDirection: 'column',
-    margin: 20,
+    marginVertical: 20,
     width: 210,
     minHeight: 420,
   },
   largePerson: {
     flexDirection: 'column',
-    margin: 30,
+    marginVertical: 30,
     width: 275,
   },
   filler: {
@@ -120,4 +117,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces('about')(Team)
+export default withScreenSize(withNamespaces('about')(Team))
