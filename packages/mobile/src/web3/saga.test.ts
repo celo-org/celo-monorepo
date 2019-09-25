@@ -1,6 +1,6 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import { call, delay, select } from 'redux-saga/effects'
-import { pincodeSelector } from 'src/account/reducer'
+import { pincodeTypeSelector } from 'src/account/reducer'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { setLatestBlockNumber, updateWeb3SyncProgress } from 'src/web3/actions'
 import {
@@ -55,7 +55,7 @@ describe(createNewAccount, () => {
     await expectSaga(createNewAccount)
       .withState(state)
       .provide([[select(currentAccountSelector), null]])
-      .provide([[select(pincodeSelector), '123']])
+      .provide([[select(pincodeTypeSelector), '123']])
       .returns('0x0000000000000000000000000000000000007E57')
       .run()
   })

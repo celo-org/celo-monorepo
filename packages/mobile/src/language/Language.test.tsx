@@ -7,12 +7,7 @@ import { getMockI18nProps } from 'test/utils'
 it('renders correctly', () => {
   const navigation: any = { getParam: jest.fn() }
   const tree = renderer.create(
-    <Language
-      setLanguage={jest.fn()}
-      navigation={navigation}
-      {...getMockI18nProps()}
-      pincodeSet={false}
-    />
+    <Language setLanguage={jest.fn()} navigation={navigation} {...getMockI18nProps()} />
   )
   expect(tree).toMatchSnapshot()
 })
