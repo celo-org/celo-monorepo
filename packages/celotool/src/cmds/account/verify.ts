@@ -1,31 +1,11 @@
-import { PhoneNumberUtils } from '@celo/utils'
-import {
-  ActionableAttestation,
-  // @ts-ignore
-  Attestations,
-  decodeAttestationCode,
-  findMatchingIssuer,
-  getActionableAttestations,
-  getWalletAddress,
-  makeApproveAttestationFeeTx,
-  makeCompleteTx,
-  makeRequestTx,
-  makeRevealTx,
-  makeSetWalletAddressTx,
-  StableToken,
-  validateAttestationCode,
-} from '@celo/walletkit'
-// @ts-ignore
-import { Attestations as AttestationsType } from '@celo/walletkit/lib/types/Attestations'
-import { StableToken as StableTokenType } from '@celo/walletkit/lib/types/StableToken'
+import { AccountArgv } from '@celo/celotool/src/cmds/account'
+import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
+import { CeloContract, newKit } from '@celo/contractkit'
+import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
+import { ActionableAttestation, decodeAttestationCode } from '@celo/walletkit'
 import prompts from 'prompts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { portForwardAnd } from 'src/lib/port_forward'
-import { sendTransaction } from 'src/lib/transactions'
 import * as yargs from 'yargs'
-import { AccountArgv } from '../account'
-
-const Web3 = require('web3')
 
 export const command = 'verify'
 export const describe = 'command for requesting attestations for a phone number'
@@ -64,36 +44,35 @@ export const handler = async (argv: VerifyArgv) => {
 }
 
 async function verifyCmd(argv: VerifyArgv) {
-  const web3 = new Web3('http://localhost:8545')
+  const kit = newKit('http://localhost:8545')
+  const account = (await kit.web3.eth.getAccounts())[0]
+  kit.defaultAccount = account
 
-  const account = (await web3.eth.getAccounts())[0]
-  const attestations = await Attestations(web3)
-  const stableToken = await StableToken(web3)
-  const phoneHash = PhoneNumberUtils.getPhoneHash(argv.phone)
+  const attestations = await kit.contracts.getAttestations()
   await printCurrentCompletedAttestations(attestations, argv.phone, account)
 
-  let attestationsToComplete = await getActionableAttestations(attestations, phoneHash, account)
+  let attestationsToComplete = await attestations.getActionableAttestations(argv.phone, account)
 
   // Request more attestations
   if (argv.num > attestationsToComplete.length) {
     console.info(`Requesting ${argv.num - attestationsToComplete.length} attestations`)
     await requestMoreAttestations(
       attestations,
-      stableToken,
-      phoneHash,
+      argv.phone,
       argv.num - attestationsToComplete.length
     )
   }
 
   // Set the wallet address if not already appropriate
-  const currentWalletAddress = await getWalletAddress(attestations, account)
+  const currentWalletAddress = await attestations.getWalletAddress(account)
 
   if (currentWalletAddress !== account) {
-    const setWalletAddressTx = makeSetWalletAddressTx(attestations, account)
-    await sendTransaction(setWalletAddressTx)
+    const setWalletAddressTx = await attestations.setWalletAddress(account)
+    const result = await setWalletAddressTx.send()
+    await result.waitReceipt()
   }
 
-  attestationsToComplete = await getActionableAttestations(attestations, phoneHash, account)
+  attestationsToComplete = await attestations.getActionableAttestations(argv.phone, account)
   // Find attestations we can reveal/verify
   console.info(`Revealing ${attestationsToComplete.length} attestations`)
   await revealAttestations(attestationsToComplete, attestations, argv.phone)
@@ -102,61 +81,56 @@ async function verifyCmd(argv: VerifyArgv) {
 }
 
 export async function printCurrentCompletedAttestations(
-  attestations: AttestationsType,
+  attestations: AttestationsWrapper,
   phoneNumber: string,
   account: string
 ) {
-  const attestationStat = await attestations.methods
-    .getAttestationStats(PhoneNumberUtils.getPhoneHash(phoneNumber), account)
-    .call()
+  const attestationStat = await attestations.getAttestationStat(phoneNumber, account)
 
   console.info(
     `Phone Number: ${phoneNumber} has completed ${
-      attestationStat[0]
-    } attestations out of a total of ${attestationStat[1]}`
+      attestationStat.completed
+    } attestations out of a total of ${attestationStat.total}`
   )
 }
 
 async function requestMoreAttestations(
-  attestations: AttestationsType,
-  stableToken: StableTokenType,
-  phoneHash: string,
+  attestations: AttestationsWrapper,
+  phoneNumber: string,
   attestationsRequested: number
 ) {
-  const approveTx = await makeApproveAttestationFeeTx(
-    attestations,
-    stableToken,
-    attestationsRequested
-  )
-  await sendTransaction(approveTx)
-
-  const requestTx = makeRequestTx(attestations, phoneHash, attestationsRequested, stableToken)
-  await sendTransaction(requestTx)
+  await attestations
+    .approveAttestationFee(CeloContract.StableToken, attestationsRequested)
+    .then((txo) => txo.sendAndWaitForReceipt())
+  await attestations
+    .request(phoneNumber, attestationsRequested, CeloContract.StableToken)
+    .then((txo) => txo.sendAndWaitForReceipt())
 }
 
 async function revealAttestations(
   attestationsToReveal: ActionableAttestation[],
-  attestations: AttestationsType,
+  attestations: AttestationsWrapper,
   phoneNumber: string
 ) {
   return Promise.all(
-    attestationsToReveal.map(async (attestation) => {
-      const tx = await makeRevealTx(attestations, phoneNumber, attestation.issuer)
-      return sendTransaction(tx)
-    })
+    attestationsToReveal.map(async (attestation) =>
+      attestations
+        .reveal(phoneNumber, attestation.issuer)
+        .then((txo) => txo.sendAndWaitForReceipt())
+    )
   )
 }
 
 async function verifyCode(
-  attestations: AttestationsType,
+  attestations: AttestationsWrapper,
   base64Code: string,
-  phoneHash: string,
+  phoneNumber: string,
   account: string,
   attestationsToComplete: ActionableAttestation[]
 ) {
   const code = decodeAttestationCode(base64Code)
-  const matchingIssuer = findMatchingIssuer(
-    phoneHash,
+  const matchingIssuer = attestations.findMatchingIssuer(
+    phoneNumber,
     account,
     code,
     attestationsToComplete.map((a) => a.issuer)
@@ -167,9 +141,8 @@ async function verifyCode(
     return
   }
 
-  const isValidRequest = await validateAttestationCode(
-    attestations,
-    phoneHash,
+  const isValidRequest = await attestations.validateAttestationCode(
+    phoneNumber,
     account,
     matchingIssuer,
     code
@@ -179,18 +152,20 @@ async function verifyCode(
     return
   }
 
-  const verifyTx = makeCompleteTx(attestations, phoneHash, account, matchingIssuer, code)
-  await sendTransaction(verifyTx)
+  const tx = await attestations.complete(phoneNumber, account, matchingIssuer, code).send()
+  return tx.waitReceipt()
 }
 
 async function promptForCodeAndVerify(
-  attestations: AttestationsType,
+  attestations: AttestationsWrapper,
   phoneNumber: string,
   account: string
 ) {
-  const phoneHash = PhoneNumberUtils.getPhoneHash(phoneNumber)
   while (true) {
-    const attestationsToComplete = await getActionableAttestations(attestations, phoneHash, account)
+    const attestationsToComplete = await attestations.getActionableAttestations(
+      phoneNumber,
+      account
+    )
 
     if (attestationsToComplete.length === 0) {
       console.info('No attestations left')
@@ -209,7 +184,7 @@ async function promptForCodeAndVerify(
       break
     }
 
-    await verifyCode(attestations, userResponse.code, phoneHash, account, attestationsToComplete)
+    await verifyCode(attestations, userResponse.code, phoneNumber, account, attestationsToComplete)
     await printCurrentCompletedAttestations(attestations, phoneNumber, account)
   }
 }
