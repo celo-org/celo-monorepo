@@ -1,10 +1,9 @@
-import Web3 from 'web3'
+import { privateToAddress } from 'ethereumjs-util'
 import * as Web3Utils from 'web3-utils'
 import { Signature, SignatureUtils } from './signatureUtils'
 
 const privateKeyToAddress = (privateKey: string) => {
-  // @ts-ignore
-  return new Web3.modules.Eth().accounts.privateKeyToAccount(privateKey).address
+  return '0x' + privateToAddress(Buffer.from(privateKey.slice(2), 'hex')).toString('hex')
 }
 
 enum IdentifierType {

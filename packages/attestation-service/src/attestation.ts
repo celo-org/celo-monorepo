@@ -25,8 +25,7 @@ export async function handleAttestationRequest(req: express.Request, res: expres
   // TODO: Should parse request appropriately
 
   // TODO: Should validate request here
-  // @ts-ignore
-  const attestations = await kit.contracts.getAttestations()
+  // const attestations = await kit.contracts.getAttestations()
 
   // Produce attestation
   const attestationCode = signAttestation(req.body.phoneNumber, req.body.account)

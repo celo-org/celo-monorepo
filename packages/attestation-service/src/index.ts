@@ -4,7 +4,7 @@ import { handleAttestationRequest } from './attestation'
 import { initializeDB, initializeKit } from './db'
 import { initializeSmsProviders } from './sms'
 
-async function setup() {
+async function init() {
   if (process.env.CONFIG) {
     dotenv.config({ path: process.env.CONFIG })
   }
@@ -21,7 +21,7 @@ async function setup() {
   app.post('/attestations', handleAttestationRequest)
 }
 
-setup().catch((err) => {
+init().catch((err) => {
   console.error(`Error occurred while running server, exiting ....`)
   console.error(err)
   process.exit(1)

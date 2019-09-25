@@ -15,10 +15,10 @@
   "scripts": {
     "build": "tsc -b .",
     "clean": "tsc -b . --clean",
-    "clean:all": "yarn clean && rm -rf src/generated",
+    "clean:all": "yarn clean && rm -rf lib",
     "build:gen": "yarn --cwd ../protocol build",
     "prepublishOnly": "yarn build:gen && yarn build",
-    "start": "TS_NODE_FILES=true ts-node src/server.ts",
+    "start": "TS_NODE_FILES=true ts-node src/index.ts",
     "db:create:dev": "mkdir -p db && touch db/dev.db",
     "db:migrate": "sequelize db:migrate",
     "db:migrate:dev": "sequelize db:migrate",
@@ -28,7 +28,6 @@
   "dependencies": {
     "@celo/contractkit": "0.1.1",
     "@celo/utils": "^0.0.6-beta5",
-    "@types/debug": "^4.1.5",
     "bignumber.js": "^7.2.0",
     "body-parser": "1.19.0",
     "debug": "^4.1.1",
@@ -36,10 +35,9 @@
     "eth-lib": "^0.2.8",
     "nexmo": "2.4.2",
     "web3": "1.0.0-beta.37",
-    "web3-core-helpers": "1.0.0-beta.37",
-    "web3-utils": "1.0.0-beta.37",
-    "web3-eth-abi": "1.0.0-beta.37",
     "express": "4.17.1",
+    "pg": "7.12.1",
+    "pg-hstore": "2.3.3",
     "sequelize": "5.13.1",
     "sequelize-cli": "5.5.0",
     "sqlite3": "4.0.9",
@@ -48,10 +46,13 @@
   "devDependencies": {
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#98ad2ba",
     "@celo/protocol": "1.0.0",
+    "@types/dotenv": "4.0.3",
     "@types/debug": "^4.1.5",
     "@types/web3": "^1.0.18",
     "ts-node": "8.3.0",
-    "nodemon": "1.19.1"
+    "nodemon": "1.19.1",
+    "webpack": "4.39.1",
+    "webpack-cli": "3.3.6"
   },
   "engines": {
     "node": ">=8.13.0"
