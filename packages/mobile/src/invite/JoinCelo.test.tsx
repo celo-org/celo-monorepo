@@ -3,6 +3,7 @@ import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
+import { PincodeType } from 'src/account/reducer'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import JoinCelo, { JoinCelo as JoinCeloClass } from 'src/invite/JoinCelo'
 import { createMockStore, getMockI18nProps } from 'test/utils'
@@ -41,7 +42,7 @@ describe('JoinCeloScreen', () => {
           cachedName={''}
           cachedNumber={''}
           cachedCountryCode={''}
-          pincodeSet={false}
+          pincodeType={PincodeType.Unset}
           redeemComplete={jest.fn()}
           {...getMockI18nProps()}
         />
@@ -65,7 +66,7 @@ describe('JoinCeloScreen', () => {
           cachedName={''}
           cachedNumber={''}
           cachedCountryCode={''}
-          pincodeSet={false}
+          pincodeType={PincodeType.Unset}
           redeemComplete={jest.fn()}
           {...getMockI18nProps()}
         />
