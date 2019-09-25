@@ -90,6 +90,6 @@ const styles = StyleSheet.create({
     maxWidth: '60vw',
   },
   zIndex: {
-    zIndex: 2,
+    zIndex: 20,
   },
 })

@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: colors.dark,
     position: 'absolute',
-    zIndex: 1000,
+    zIndex: 40,
     borderRadius: 2,
   },
   suggestionsOpen: {
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     color: colors.placeholderDarkMode,
   },
   container: {
-    zIndex: 3,
+    zIndex: 30,
   },
 })
 
