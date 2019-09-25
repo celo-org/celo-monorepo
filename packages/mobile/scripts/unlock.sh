@@ -42,3 +42,5 @@ until adb shell dumpsys wifi | grep "mNetworkInfo" |grep "state: CONNECTED"
 do
   sleep 10
 done
+
+echo "Device connected to Wifi"

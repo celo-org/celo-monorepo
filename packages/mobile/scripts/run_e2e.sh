@@ -43,6 +43,8 @@ pidcat -t "ReactNativeJS" > e2e_pidcat_run.log &
 # this prevents that
 bash ./scripts/unlock.sh
 
+ln ../../node_modules/.bin/jest node_modules/.bin/jest # Hotfix
+
 yarn test:detox
 STATUS=$?
 
