@@ -1,13 +1,13 @@
+import { PincodeType } from 'src/account/reducer'
 import { migrations } from 'src/redux/migrations'
-import { getLatestSchema, v0Schema } from 'test/schemas'
+import { v0Schema, v1Schema, vNeg1Schema } from 'test/schemas'
 
 describe('Redux persist migrations', () => {
   it('work for v-1 to v0', () => {
-    const defaultSchema = v0Schema
     const vNeg1Stub = {
-      ...defaultSchema,
+      ...vNeg1Schema,
       app: {
-        ...defaultSchema.app,
+        ...vNeg1Schema.app,
         numberVerified: true,
         inviteCodeEntered: true,
       },
@@ -20,15 +20,26 @@ describe('Redux persist migrations', () => {
   })
 
   it('work for v0 to v1', () => {
-    const defaultSchema = getLatestSchema()
     const v0Stub = {
-      ...defaultSchema,
+      ...v0Schema,
       app: {
-        ...defaultSchema.app,
+        ...v0Schema.app,
         language: 'es-AR',
       },
     }
     const migratedSchema = migrations[1](v0Stub)
     expect(migratedSchema.app.language).toEqual('es-419')
+  })
+
+  it('work for v1 to v2', () => {
+    const v1Stub = {
+      ...v1Schema,
+      account: {
+        ...v1Schema.app,
+        pincodeSet: true,
+      },
+    }
+    const migratedSchema = migrations[2](v1Stub)
+    expect(migratedSchema.account.pincodeType).toEqual(PincodeType.PhoneAuth)
   })
 })

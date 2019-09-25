@@ -2243,10 +2243,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo/client@288e163":
-  version "0.0.112"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.112.tgz#91fd0b2b6af60546ce37c022837d26be766fe9fa"
-  integrity sha512-0MuD+1gL+WEhXrVDG9hmGdJ++bqhRNYkWikimeYbkeXOlcsiBBk8aZ9DF3ARx/mhZLQWz+oXdQFgC6CLCgrfHw==
+"@celo/client@2d1d8ca":
+  version "0.0.107"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.107.tgz#3cb82455bd66868e126aeb605346514085b0dff0"
+  integrity sha512-s47vj2NYha1u3x5S0u/VhY4YHYb3KySmahKxWFZbWfojMe0vu/bZ3M72nIZf4LM34wEpv40nKe/foGH9Q9LOMw==
 
 "@celo/dev-cli@^2.0.3":
   version "2.0.3"
@@ -8572,13 +8572,6 @@ browserify-sign@^4.0.0, browserify-sign@^4.0.4:
     elliptic "^6.0.0"
     inherits "^2.0.1"
     parse-asn1 "^5.0.0"
-
-browserify-zlib@^0.1.4:
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/browserify-zlib/-/browserify-zlib-0.1.4.tgz#bb35f8a519f600e0fa6b8485241c979d0141fb2d"
-  integrity sha1-uzX4pRn2AOD6a4SFJByXnQFB+y0=
-  dependencies:
-    pako "~0.2.0"
 
 browserify-zlib@^0.2.0:
   version "0.2.0"
@@ -16695,11 +16688,6 @@ http-status@1.0.1:
   resolved "https://registry.yarnpkg.com/http-status/-/http-status-1.0.1.tgz#dc43001a8bfc50ac87d485a892f7578964bc94a2"
   integrity sha1-3EMAGov8UKyH1IWokvdXiWS8lKI=
 
-https-browserify@0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/https-browserify/-/https-browserify-0.0.1.tgz#3f91365cabe60b77ed0ebba24b454e3e09d95a82"
-  integrity sha1-P5E2XKvmC3ftDruiS0VOPgnZWoI=
-
 https-browserify@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/https-browserify/-/https-browserify-1.0.0.tgz#ec06c10e0a34c0f2faf199f7fd7fc78fffd03c73"
@@ -21872,38 +21860,10 @@ node-libs-browser@^2.0.0:
     util "^0.10.3"
     vm-browserify "0.0.4"
 
-node-libs-react-native@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/node-libs-react-native/-/node-libs-react-native-1.0.1.tgz#3ea47db38894cc0ec34750c3553d0782f202e66a"
-  integrity sha1-PqR9s4iUzA7DR1DDVT0HgvIC5mo=
-  dependencies:
-    assert "^1.4.1"
-    browserify-zlib "^0.1.4"
-    buffer "^5.0.6"
-    console-browserify "^1.1.0"
-    constants-browserify "^1.0.0"
-    domain-browser "^1.1.1"
-    events "^1.0.0"
-    https-browserify "0.0.1"
-    os-browserify "^0.2.0"
-    path-browserify "0.0.0"
-    process "^0.11.0"
-    punycode "^2.1.0"
-    querystring-es3 "^0.2.0"
-    react-native-crypto "^2.0.1"
-    react-native-randombytes "^2.2.0"
-    readable-stream "^2.2.9"
-    stream-http "^2.3.1"
-    string_decoder "^0.10.25"
-    timers-browserify "^2.0.2"
-    tty-browserify "0.0.0"
-    url "^0.11.0"
-    util "^0.10.3"
-
-node-libs-react-native@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/node-libs-react-native/-/node-libs-react-native-1.0.2.tgz#eab0fabfc44b7012491d3b149e61879a1fecc9b0"
-  integrity sha512-nbnRJADhGYR7b7QPJmdx+XWraoyw8NbrMbtyynNAbwTLIs4IVaoHplicORi0o1BHfoqzI8iAwIPxYx3EwBt3sg==
+node-libs-react-native@1.0.3, node-libs-react-native@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/node-libs-react-native/-/node-libs-react-native-1.0.3.tgz#442b89ae93ca308f6464ff2f79686848bca85988"
+  integrity sha512-2X/M/DMB4hij2L0tsnJOiDhYR2N0YtetIhb/eN5+5vksLxjXwaFgLbSXWT3XExnGJpISDn8dYuYz6yvdndjjkg==
   dependencies:
     assert "^1.4.1"
     browserify-zlib "^0.2.0"
@@ -21919,7 +21879,7 @@ node-libs-react-native@^1.0.2:
     punycode "^2.1.0"
     querystring-es3 "^0.2.0"
     react-native-crypto "^2.0.1"
-    react-native-randombytes "^2.2.0"
+    react-native-randombytes "^3.5.1"
     readable-stream "^2.2.9"
     stream-http "^2.3.1"
     string_decoder "^1.0.3"
@@ -23092,11 +23052,6 @@ original-require@1.0.1, original-require@^1.0.1:
   resolved "https://registry.yarnpkg.com/original-require/-/original-require-1.0.1.tgz#0f130471584cd33511c5ec38c8d59213f9ac5e20"
   integrity sha1-DxMEcVhM0zURxew4yNWSE/msXiA=
 
-os-browserify@^0.2.0:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/os-browserify/-/os-browserify-0.2.1.tgz#63fc4ccee5d2d7763d26bbf8601078e6c2e0044f"
-  integrity sha1-Y/xMzuXS13Y9Jrv4YBB45sLgBE8=
-
 os-browserify@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/os-browserify/-/os-browserify-0.3.0.tgz#854373c7f5c2315914fc9bfc6bd8238fdda1ec27"
@@ -23402,11 +23357,6 @@ pacote@~2.7.38:
     tar-stream "^1.5.4"
     unique-filename "^1.1.0"
     which "^1.2.12"
-
-pako@~0.2.0:
-  version "0.2.9"
-  resolved "https://registry.yarnpkg.com/pako/-/pako-0.2.9.tgz#f3f7522f4ef782348da8161bad9ecfd51bf83a75"
-  integrity sha1-8/dSL073gjSNqBYbrZ7P1Rv4OnU=
 
 pako@~1.0.5:
   version "1.0.6"
@@ -25226,10 +25176,9 @@ react-native-clock-sync@^1.0.0:
   dependencies:
     react-native-ntp-client "0.5.5"
 
-react-native-config@^0.11.7:
+"react-native-config@https://github.com/luggit/react-native-config#89a602b":
   version "0.11.7"
-  resolved "https://registry.yarnpkg.com/react-native-config/-/react-native-config-0.11.7.tgz#a2b323f2ecd76a4df88cbb6bc86eaa2ef9febee7"
-  integrity sha512-dn5s+zhwLyE25vRT/vaEtLk/j8ZL1UZKvejORNDWakSwpOnLmFurFeaZV83IqkPlfWHXHFdsYe2IRYG1WN4WkQ==
+  resolved "https://github.com/luggit/react-native-config#89a602bf8be3808838403a97afaf915caeec76c2"
 
 react-native-confirm-device-credentials@^2.0.0:
   version "2.0.0"
@@ -25270,13 +25219,13 @@ react-native-device-info@^2.1.0:
   resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-2.1.0.tgz#55eb82c1ba14c550cef6b71efc368d88b96b826a"
   integrity sha512-FdHFi0DtISiytXzE2KM16Qd4GPEGnbA8DjTP1vHjcUPFJCLBtm1P0/10Xn5x/kISjEvsz17grdtJxGrd83c6Pw==
 
-react-native-firebase@5.3.0:
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/react-native-firebase/-/react-native-firebase-5.3.0.tgz#3a5c31fa74c2edf9a1b82a62ae05b80dc976626e"
-  integrity sha512-bU0rDuqWTmaGThRj7dqS+fNZkqW2phq0euEqpQ4MICH40TeWZ3ek00e7yUS2142id/sAyUj184+UBWh3N0Iamg==
+react-native-firebase@5.5.4:
+  version "5.5.4"
+  resolved "https://registry.yarnpkg.com/react-native-firebase/-/react-native-firebase-5.5.4.tgz#1c71d2b21a11fdb5177f7e7c05c8bf3130fb88d7"
+  integrity sha512-D7eGeVb9M69se98Munziqmy6kQ+ymgNtHqFB6lrHRdVLnUd5v0caI6iQ/kY8zrqVUD+lU3Sui2+Lm9qHZUhbDw==
   dependencies:
     opencollective-postinstall "^2.0.0"
-    prop-types "^15.6.2"
+    prop-types "^15.7.2"
 
 "react-native-flag-secure-android@git://github.com/kristiansorens/react-native-flag-secure-android#e234251":
   version "1.0.0"
@@ -25299,9 +25248,9 @@ react-native-gesture-handler@^1.1.0:
     invariant "^2.2.2"
     prop-types "^15.5.10"
 
-"react-native-geth@git+https://github.com/celo-org/react-native-geth#51dc4f1":
+"react-native-geth@git+https://github.com/celo-org/react-native-geth#4d9ee15":
   version "0.1.0-development"
-  resolved "git+https://github.com/celo-org/react-native-geth#51dc4f1bb36bcf6280d19ff7ef2546d631a1eb32"
+  resolved "git+https://github.com/celo-org/react-native-geth#4d9ee15f212a32a1f865a6fd121117130ea71de9"
 
 "react-native-install-referrer@git://github.com/celo-org/react-native-install-referrer#343bf3d":
   version "2.0.0"
@@ -25355,13 +25304,12 @@ react-native-modal@^6.1.0:
     prop-types "^15.6.1"
     react-native-animatable "^1.2.4"
 
-react-native-ntp-client@0.5.5:
-  version "0.5.5"
-  resolved "https://registry.yarnpkg.com/react-native-ntp-client/-/react-native-ntp-client-0.5.5.tgz#185caaebaac2b70ad2360b8a06c859070b2750b1"
-  integrity sha512-k/49eIrNNTC3PDBA+AXzwaD0YlTdFuJOy/FUw2GMuyFnLLVWEPy3EneJidUVdM3n/rvi09leSQPsQxo9P/rtMQ==
+react-native-ntp-client@0.5.5, react-native-ntp-client@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-ntp-client/-/react-native-ntp-client-1.0.0.tgz#0a534faeef3372a6b0202f0078bed6997b70a651"
+  integrity sha512-ZlIKnMSTciIimeNQOjtMPtRewBQDFECtISnOIB31n8UKJ0SgQ0RSux8RuAIXqcA+LAFgGaa0dbuqeYS5WlviEA==
   dependencies:
-    node-libs-react-native "1.0.1"
-    react-native-udp "2.1.0"
+    node-libs-react-native "1.0.3"
 
 react-native-permissions@^1.1.1:
   version "1.1.1"
@@ -25388,10 +25336,10 @@ react-native-qrcode-svg@^5.1.2:
     prop-types "^15.5.10"
     qrcode "^1.2.0"
 
-react-native-randombytes@^2.2.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/react-native-randombytes/-/react-native-randombytes-2.3.0.tgz#3ed6f8a4a803c453d787961047f6b2650d7c7335"
-  integrity sha1-Ptb4pKgDxFPXh5YQR/ayZQ18czU=
+react-native-randombytes@^3.5.1:
+  version "3.5.3"
+  resolved "https://registry.yarnpkg.com/react-native-randombytes/-/react-native-randombytes-3.5.3.tgz#b3bdcd11473cce106551a586244b98855e443cd1"
+  integrity sha512-n/7QwMrRJxHr+/3mt2KxqqacGylM+ssW+FfBTgXGzvwq5KzSohooEWf6Z6MTSByuJ/izP9VbSPtwomPwzvupKQ==
   dependencies:
     buffer "^4.9.1"
     sjcl "^1.0.3"
@@ -25474,11 +25422,6 @@ react-native-swiper@^1.5.13:
   dependencies:
     prop-types "^15.5.10"
 
-react-native-system-clock@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/react-native-system-clock/-/react-native-system-clock-1.0.0.tgz#0470c81ebe5665f9a7501d66492e90ca45195b1d"
-  integrity sha512-svOO05iSrRcqZXXL8bgSVY6HD+LCKskDQTJgwqZRADxd1Bb6hTeR5koUr6XKAzJKTlA0rPKX2OmvwYqeH0JHxw==
-
 react-native-tab-view@^1.2.0, react-native-tab-view@^1.3.4:
   version "1.3.4"
   resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-1.3.4.tgz#63fc3eb09652651d0ea0e016cff0f3a5e535f4de"
@@ -25504,21 +25447,10 @@ react-native-testing-library@^1.9.1:
   dependencies:
     pretty-format "^24.0.0"
 
-react-native-udp@2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/react-native-udp/-/react-native-udp-2.1.0.tgz#d6704da39df280034e6a34be46c41b9b55bbfc23"
-  integrity sha1-1nBNo53ygANOajS+RsQbm1W7/CM=
-  dependencies:
-    base64-js "0.0.8"
-    events "^1.0.2"
-    inherits "^2.0.1"
-    ip-regex "^1.0.3"
-    util "^0.10.3"
-
-react-native-udp@^2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/react-native-udp/-/react-native-udp-2.3.1.tgz#88eb0f548ed8c7e35065392526ecf8ce2e2be91e"
-  integrity sha1-iOsPVI7Yx+NQZTklJuz4zi4r6R4=
+react-native-udp@^2.6.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/react-native-udp/-/react-native-udp-2.6.1.tgz#ce9f2479f8af6d1bb356cfee69c89cf92fdd50be"
+  integrity sha512-KctAXtfBjRe+rGLvms92C82MsrZUwUyODwGskY6mDPigMaDTmsKdNqLCXgWh0g6ZmB2UtOzFsbPphy36NyM3KA==
   dependencies:
     base64-js "0.0.8"
     events "^1.0.2"
@@ -28553,11 +28485,6 @@ string.prototype.trim@^1.1.2, string.prototype.trim@~1.1.2:
     es-abstract "^1.5.0"
     function-bind "^1.0.2"
 
-string_decoder@^0.10.25, string_decoder@~0.10.x:
-  version "0.10.31"
-  resolved "https://registry.yarnpkg.com/string_decoder/-/string_decoder-0.10.31.tgz#62e203bc41766c6c28c9fc84301dab1c5310fa94"
-  integrity sha1-YuIDvEF2bGwoyfyEMB2rHFMQ+pQ=
-
 string_decoder@^1.0.0, string_decoder@^1.0.3, string_decoder@~1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/string_decoder/-/string_decoder-1.1.1.tgz#9cf1611ba62685d7030ae9e4ba34149c3af03fc8"
@@ -28571,6 +28498,11 @@ string_decoder@^1.1.1:
   integrity sha512-6YqyX6ZWEYguAxgZzHGL7SsCeGx3V2TtOTqZz1xSTSWnqsbWwbptafNyvf/ACquZUXV3DANr5BDIwNYe1mN42w==
   dependencies:
     safe-buffer "~5.1.0"
+
+string_decoder@~0.10.x:
+  version "0.10.31"
+  resolved "https://registry.yarnpkg.com/string_decoder/-/string_decoder-0.10.31.tgz#62e203bc41766c6c28c9fc84301dab1c5310fa94"
+  integrity sha1-YuIDvEF2bGwoyfyEMB2rHFMQ+pQ=
 
 stringstream@~0.0.4:
   version "0.0.6"
@@ -32293,7 +32225,6 @@ websocket@^1.0.28:
   dependencies:
     debug "^2.2.0"
     es5-ext "^0.10.50"
-    gulp "^4.0.2"
     nan "^2.14.0"
     typedarray-to-buffer "^3.1.5"
     yaeti "^0.0.6"

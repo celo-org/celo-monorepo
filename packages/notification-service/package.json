@@ -19,6 +19,8 @@
     "deploy": "./deploy.sh"
   },
   "dependencies": {
+    "@celo/utils": "^0.0.6-beta5",
+    "@celo/walletkit": "^0.0.14",
     "async-polling": "^0.2.1",
     "bignumber.js": "^7.2.0",
     "dotenv": "^6.0.0",
@@ -27,6 +29,7 @@
     "i18next": "^12.1.0",
     "node-fetch": "^2.2.0",
     "utf8": "^3.0.0",
+    "web3": "1.0.0-beta.37",
     "web3-eth-abi": "1.0.0-beta.37",
     "web3-utils": "1.0.0-beta.37"
   },

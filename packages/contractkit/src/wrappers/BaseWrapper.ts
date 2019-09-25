@@ -35,7 +35,7 @@ export function toNumber(input: string) {
 }
 
 export function parseNumber(input: NumberLike) {
-  return new BigNumber(input).toString()
+  return new BigNumber(input).toString(10)
 }
 
 type Parser<A, B> = (input: A) => B
