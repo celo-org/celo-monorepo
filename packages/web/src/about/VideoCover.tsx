@@ -49,7 +49,10 @@ class VideoCover extends React.PureComponent<I18nProps & ScreenProps, State> {
             loop={true}
             poster="/static/AboutPreview.jpg"
           >
-            <source src="/static/AboutPreview.mp4" type="video/mp4" />
+            <source
+              src="https://storage.googleapis.com/celo_whitepapers/about-video.mp4"
+              type="video/mp4"
+            />
             <Image resizeMode="cover" source={BeautifulMoneyPreview} style={standardStyles.image} />
           </Video>
         </View>
