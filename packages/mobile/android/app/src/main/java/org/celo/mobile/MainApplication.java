@@ -44,7 +44,6 @@ import com.rt2zz.reactnativecontacts.ReactNativeContacts;
 import com.tradle.react.UdpSocketsModule;
 import org.celo.devicecredentials.RNConfirmDeviceCredentialsPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
-import com.reactmodule.RNSystemClockPackage;
 import com.rnrestartandroid.RNRestartAndroidPackage;
 import me.furtado.smsretriever.RNSmsRetrieverPackage;
 import cl.json.RNSharePackage;
@@ -111,7 +110,6 @@ public class MainApplication extends Application implements ShareApplication, Re
               new FlagSecurePackage(),
               new RNFirebaseStoragePackage(),
               new RNVersionCheckPackage(),
-              new RNSystemClockPackage(),
               new RNRestartAndroidPackage(),
               new RNSmsRetrieverPackage(),
               new RNSharePackage(),
