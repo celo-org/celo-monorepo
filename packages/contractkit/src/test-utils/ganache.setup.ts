@@ -20,6 +20,8 @@ export async function startGanache(datadir: string, opts: { verbose?: boolean } 
     network_id: 1101,
     db_path: datadir,
     mnemonic: MNEMONIC,
+    gasLimit: 7000000,
+    allowUnlimitedContractSize: true,
   })
 
   await new Promise((resolve, reject) => {
@@ -52,7 +54,7 @@ export default function setup() {
       ;(global as any).stopGanache = stopGanache
     })
     .catch((err) => {
-      console.error('Error starting ganache')
+      console.error('Error starting ganache, Doing `yarn test:prepare` might help')
       console.error(err)
       process.exit(1)
     })

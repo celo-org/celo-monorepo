@@ -5,18 +5,20 @@ import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { ESCROW_PAYMENT_EXPIRY_SECONDS } from 'src/config'
 import {
   Actions,
   EscrowedPayment,
-  EXPIRY_SECONDS,
-  fetchSentPayments,
-  ReclaimPaymentAction,
-  reclaimPaymentFailure,
-  reclaimPaymentSuccess,
-  storeSentPayments,
-  TransferPaymentAction,
+  EscrowFetchSentPaymentsAction,
+  EscrowReclaimPaymentAction,
+  EscrowTransferPaymentAction,
+  fetchSentEscrowPayments,
+  reclaimEscrowPaymentFailure,
+  reclaimEscrowPaymentSuccess,
+  storeSentEscrowPayments,
 } from 'src/escrow/actions'
 import { sentEscrowedPaymentsSelector } from 'src/escrow/reducer'
+import { calculateFee } from 'src/fees/saga'
 import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { Actions as IdentityActions, EndVerificationAction } from 'src/identity/actions'
@@ -35,12 +37,11 @@ import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
-import { fetchGasPrice } from 'src/web3/gas'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 
 const TAG = 'escrow/saga'
 
-function* transferStableTokenToEscrow(action: TransferPaymentAction) {
+function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
   Logger.debug(TAG + '@transferToEscrow', 'Begin transfer to escrow')
   try {
     const { phoneHash, amount, tempWalletAddress } = action
@@ -63,13 +64,13 @@ function* transferStableTokenToEscrow(action: TransferPaymentAction) {
       phoneHash,
       stableToken.options.address,
       convertedAmount,
-      EXPIRY_SECONDS,
+      ESCROW_PAYMENT_EXPIRY_SECONDS,
       tempWalletAddress,
       NUM_ATTESTATIONS_REQUIRED
     )
 
     yield call(sendAndMonitorTransaction, transferTxId, transferTx, account)
-    yield put(fetchSentPayments())
+    yield put(fetchSentEscrowPayments())
   } catch (e) {
     Logger.error(TAG + '@transferToEscrow', 'Error transfering to escrow', e)
     if (e.message === ErrorMessages.INCORRECT_PIN) {
@@ -158,37 +159,37 @@ async function createReclaimTransaction(paymentID: string) {
   return escrow.methods.revoke(paymentID)
 }
 
-export async function getReclaimEscrowFee(account: string, paymentID: string) {
-  // create mock transaction and get gas
+export async function getReclaimEscrowGas(account: string, paymentID: string) {
+  Logger.debug(`${TAG}/getReclaimEscrowGas`, 'Getting gas estimate for escrow reclaim tx')
   const tx = await createReclaimTransaction(paymentID)
   const txParams = {
     from: account,
     gasCurrency: (await getStableTokenContract(web3))._address,
   }
   const gas = new BigNumber(await tx.estimateGas(txParams))
-  const gasPrice = new BigNumber(await fetchGasPrice())
-  Logger.debug(`${TAG}/getReclaimEscrowFee`, `estimated gas: ${gas}`)
-  Logger.debug(`${TAG}/getReclaimEscrowFee`, `gas price: ${gasPrice}`)
-  const feeInWei = gas.multipliedBy(gasPrice)
-  Logger.debug(`${TAG}/getReclaimEscrowFee`, `New fee is: ${feeInWei}`)
-  return feeInWei
+  Logger.debug(`${TAG}/getReclaimEscrowGas`, `Estimated gas of ${gas.toString()}}`)
+  return gas
 }
 
-function* reclaimFromEscrow(action: ReclaimPaymentAction) {
+export async function getReclaimEscrowFee(account: string, paymentID: string) {
+  const gas = await getReclaimEscrowGas(account, paymentID)
+  return calculateFee(gas)
+}
+
+function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
   Logger.debug(TAG + '@reclaimFromEscrow', 'Reclaiming escrowed payment')
 
   try {
-    const { paymentID } = action
     const account = yield call(getConnectedUnlockedAccount)
 
     const reclaimTx = yield call(createReclaimTransaction, paymentID)
     yield call(sendTransaction, reclaimTx, account, TAG, 'escrow reclaim')
 
     yield put(fetchDollarBalance())
-    yield put(fetchSentPayments())
+    yield put(fetchSentEscrowPayments(true))
 
     yield call(navigate, Screens.WalletHome)
-    yield put(reclaimPaymentSuccess())
+    yield put(reclaimEscrowPaymentSuccess())
   } catch (e) {
     Logger.error(TAG + '@reclaimFromEscrow', 'Error reclaiming payment from escrow', e)
     if (e.message === ErrorMessages.INCORRECT_PIN) {
@@ -196,7 +197,8 @@ function* reclaimFromEscrow(action: ReclaimPaymentAction) {
     } else {
       yield put(showError(ErrorMessages.RECLAIMING_ESCROWED_PAYMENT_FAILED))
     }
-    yield put(reclaimPaymentFailure(e))
+    yield put(reclaimEscrowPaymentFailure(e))
+    yield put(fetchSentEscrowPayments(true))
   }
 }
 
@@ -212,7 +214,7 @@ async function getEscrowedPayment(escrow: Escrow, paymentID: string) {
   }
 }
 
-function* doFetchSentPayments() {
+function* doFetchSentPayments({ forceRefresh }: EscrowFetchSentPaymentsAction) {
   Logger.debug(TAG + '@doFetchSentPayments', 'Fetching valid sent escrowed payments')
 
   try {
@@ -221,25 +223,41 @@ function* doFetchSentPayments() {
     const existingPayments: EscrowedPayment[] = yield select(sentEscrowedPaymentsSelector)
     const existingPaymentsIds = new Set(existingPayments.map((p) => p.paymentID))
 
-    const sentPaymentIDs: string[] = yield escrow.methods.getSentPaymentIds(account).call() // Note: payment ids are currently temp wallet addresses
+    const sentPaymentIDs: string[] = yield call(escrow.methods.getSentPaymentIds(account).call) // Note: payment ids are currently temp wallet addresses
+    if (!sentPaymentIDs || !sentPaymentIDs.length) {
+      Logger.debug(TAG + '@doFetchSentPayments', 'No payments ids found, clearing stored payments')
+      yield put(storeSentEscrowPayments([]))
+      return
+    }
 
-    const newPaymentIds = sentPaymentIDs.filter((id) => !existingPaymentsIds.has(id.toLowerCase()))
-    if (!newPaymentIds.length) {
+    const paymentIdsToFetch = forceRefresh
+      ? sentPaymentIDs
+      : sentPaymentIDs.filter((id) => !existingPaymentsIds.has(id.toLowerCase()))
+    if (!paymentIdsToFetch.length) {
       Logger.debug(TAG + '@doFetchSentPayments', 'No new payments found')
       return
     }
 
-    const sentPayments = yield all(
-      newPaymentIds.map((paymentID) => call(getEscrowedPayment, escrow, paymentID))
+    Logger.debug(
+      TAG + '@doFetchSentPayments',
+      `Fetching data for ${paymentIdsToFetch.length} payments`
+    )
+    const sentPaymentsRaw = yield all(
+      paymentIdsToFetch.map((paymentID) => call(getEscrowedPayment, escrow, paymentID))
     )
 
     const tempAddresstoRecipientPhoneNumber: Invitees = yield select(inviteesSelector)
-    const sentPaymentsNotifications: EscrowedPayment[] = []
-    for (let i = 0; i < sentPayments.length; i++) {
+    const sentPayments: EscrowedPayment[] = []
+    for (let i = 0; i < sentPaymentsRaw.length; i++) {
       const id = sentPaymentIDs[i].toLowerCase()
-      const payment = sentPayments[i]
       const recipientPhoneNumber = tempAddresstoRecipientPhoneNumber[id]
-      const transformedPayment: EscrowedPayment = {
+
+      const payment = sentPaymentsRaw[i]
+      if (!payment) {
+        continue
+      }
+
+      const escrowPaymentWithRecipient: EscrowedPayment = {
         paymentID: id,
         senderAddress: payment[1],
         recipientPhone: recipientPhoneNumber,
@@ -248,12 +266,23 @@ function* doFetchSentPayments() {
         timestamp: payment[6],
         expirySeconds: payment[7],
       }
-      sentPaymentsNotifications.push(transformedPayment)
+      sentPayments.push(escrowPaymentWithRecipient)
     }
-    yield put(storeSentPayments([...existingPayments, ...sentPaymentsNotifications]))
+
+    yield put(
+      storeSentEscrowPayments(forceRefresh ? sentPayments : [...existingPayments, ...sentPayments])
+    )
   } catch (e) {
     Logger.error(TAG + '@doFetchSentPayments', 'Error fetching sent escrowed payments', e)
   }
+}
+
+export function getReclaimableEscrowPayments(allPayments: EscrowedPayment[]) {
+  const currUnixTime = Date.now() / 1000
+  return allPayments.filter((payment) => {
+    const paymentExpiryTime = +payment.timestamp + +payment.expirySeconds
+    return currUnixTime >= paymentExpiryTime
+  })
 }
 
 export function* watchTransferPayment() {

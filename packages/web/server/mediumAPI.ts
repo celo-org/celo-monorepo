@@ -1,6 +1,7 @@
 import { parse, validate } from 'fast-xml-parser'
 import { Articles } from 'fullstack/ArticleProps'
 import * as htmlToFormattedText from 'html-to-formatted-text'
+import Sentry from '../fullstack/sentry'
 import abortableFetch from '../src/utils/abortableFetch'
 interface JSONRSS {
   rss: {
@@ -47,7 +48,7 @@ function getGramaticallyCorrectExcerpt(htmlstring: string) {
 
   // ensure it is a reasonable length
   return plainText.length > approximateMaxChars
-    ? plainText.substring(0, plainText.indexOf('.') + 1)
+    ? plainText.substring(0, plainText.indexOf('. ') + 1)
     : plainText
 }
 
@@ -81,7 +82,11 @@ export async function getFormattedMediumArticles(): Promise<Articles> {
     const xmlString = await fetchMediumArticles()
     const articles = transform(parseXML(xmlString))
     return { articles }
-  } catch {
+  } catch (e) {
+    Sentry.withScope((scope) => {
+      scope.setTag('Service', 'Medium')
+      Sentry.captureException(e)
+    })
     return { articles: [] }
   }
 }

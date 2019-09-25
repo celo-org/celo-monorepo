@@ -68,6 +68,14 @@ fastlane android alfajores
 
 Ship Alfajores to Playstore Internal
 
+### android pilotapp
+
+```
+fastlane android pilotapp
+```
+
+Ship Pilot to Playstore Internal
+
 ---
 
 This README.md is auto-generated and will be re-generated every time [fastlane](https://fastlane.tools) is run.

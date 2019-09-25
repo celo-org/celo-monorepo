@@ -5,14 +5,14 @@ const FLAGS = {
     SDK: true,
   },
   production: {
-    ECOFUND: false,
+    ECOFUND: true,
     ENV: 'production',
-    SDK: false,
+    SDK: true,
   },
   staging: {
-    ECOFUND: false,
+    ECOFUND: true,
     ENV: 'staging',
-    SDK: false,
+    SDK: true,
   },
 }
 module.exports = FLAGS[process.env.DEPLOY_ENV]

@@ -1,13 +1,4 @@
 /* tslint:disable: no-console */
-import { envVar, fetchEnv, isVmBased } from '@celo/celotool/src/lib/env-utils'
-import {
-  AccountType,
-  generatePrivateKey,
-  privateKeyToPublicKey,
-} from '@celo/celotool/src/lib/generate_utils'
-import { retrieveIPAddress } from '@celo/celotool/src/lib/helm_deploy'
-import { execCmd, execCmdWithExitOnFailure } from '@celo/celotool/src/lib/utils'
-import { getTestnetOutputs } from '@celo/celotool/src/lib/vm-testnet-utils'
 import {
   convertToContractDecimals,
   GoldToken,
@@ -24,6 +15,11 @@ import fetch from 'node-fetch'
 import path from 'path'
 import Web3Type from 'web3'
 import { TransactionReceipt } from 'web3/types'
+import { envVar, fetchEnv, isVmBased } from './env-utils'
+import { AccountType, generatePrivateKey, privateKeyToPublicKey } from './generate_utils'
+import { retrieveIPAddress } from './helm_deploy'
+import { execCmd, execCmdWithExitOnFailure } from './utils'
+import { getTestnetOutputs } from './vm-testnet-utils'
 
 type HandleErrorCallback = (isError: boolean, data: { location: string; error: string }) => void
 

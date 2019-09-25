@@ -8,6 +8,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { setLanguage } from 'src/app/actions'
+import { AVAILABLE_LANGUAGES } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
 import logo from 'src/images/celo-logo.png'
 import { Screens } from 'src/navigator/Screens'
@@ -16,21 +17,11 @@ interface State {
   selectedAnswer: string | null
 }
 
-interface StateProps {
-  pincodeSet: boolean
-}
-
 interface DispatchProps {
   setLanguage: typeof setLanguage
 }
 
-type Props = DispatchProps & NavigationScreenProps & WithNamespaces & StateProps
-
-const mapStateToProps = (state: RootState): StateProps => {
-  return {
-    pincodeSet: state.account.pincodeSet,
-  }
-}
+type Props = DispatchProps & NavigationScreenProps & WithNamespaces
 
 export class Language extends React.Component<Props, State> {
   static navigationOptions = { header: null }
@@ -64,6 +55,7 @@ export class Language extends React.Component<Props, State> {
         onSubmit={this.onSubmit}
         isSubmitDisabled={!this.state.selectedAnswer}
         currentSelected={this.state.selectedAnswer}
+        languages={AVAILABLE_LANGUAGES}
         t={t}
       />
     )
@@ -71,8 +63,8 @@ export class Language extends React.Component<Props, State> {
 }
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
+  connect<any, DispatchProps, {}, RootState>(
+    null,
     { setLanguage }
   )(withNamespaces(Namespaces.accountScreen10)(Language))
 )

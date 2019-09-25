@@ -9,11 +9,12 @@ import { Clipboard, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 
 import DeviceInfo from 'react-native-device-info'
 import { Sentry } from 'react-native-sentry'
 import { connect } from 'react-redux'
-import AccountInfo from 'src/account/AccountInfo'
+import { devModeTriggerClicked } from 'src/account/actions'
 import SettingsItem from 'src/account/SettingsItem'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { resetAppOpenedState, setAnalyticsEnabled, setNumberVerified } from 'src/app/actions'
+import { AvatarSelf } from 'src/components/AvatarSelf'
 import { FAQ_LINK, TOS_LINK } from 'src/config'
 import { features } from 'src/flags'
 import { Namespaces } from 'src/i18n'
@@ -32,13 +33,13 @@ interface DispatchProps {
   setNumberVerified: typeof setNumberVerified
   resetAppOpenedState: typeof resetAppOpenedState
   setAnalyticsEnabled: typeof setAnalyticsEnabled
+  devModeTriggerClicked: typeof devModeTriggerClicked
 }
 
 interface StateProps {
   account: string | null
   e164PhoneNumber: string
   devModeActive: boolean
-  backupCompleted: boolean
   analyticsEnabled: boolean
 }
 
@@ -53,7 +54,6 @@ const mapStateToProps = (state: RootState): StateProps => {
     account: state.web3.account,
     devModeActive: state.account.devModeActive || false,
     e164PhoneNumber: state.account.e164PhoneNumber,
-    backupCompleted: state.account.backupCompleted,
     analyticsEnabled: state.app.analyticsEnabled,
   }
 }
@@ -63,6 +63,7 @@ const mapDispatchToProps = {
   setNumberVerified,
   resetAppOpenedState,
   setAnalyticsEnabled,
+  devModeTriggerClicked,
 }
 
 export class Account extends React.Component<Props, State> {
@@ -139,13 +140,17 @@ export class Account extends React.Component<Props, State> {
     }
   }
 
-  onCopyAddressClick = () => {
+  onPressAddress = () => {
     const { account, t } = this.props
     if (!account) {
       return
     }
     Clipboard.setString(account)
     Logger.showMessage(t('addressCopied'))
+  }
+
+  onPressAvatar = () => {
+    this.props.devModeTriggerClicked()
   }
 
   getDevSettingsComp() {
@@ -191,15 +196,17 @@ export class Account extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, backupCompleted, account } = this.props
+    const { t, account } = this.props
 
     return (
       <ScrollView style={style.scrollView}>
         <DisconnectBanner />
         <View style={style.accountProfile}>
-          <AccountInfo />
+          <TouchableOpacity onPress={this.onPressAvatar}>
+            <AvatarSelf />
+          </TouchableOpacity>
           <View>
-            <TouchableOpacity onPress={this.onCopyAddressClick}>
+            <TouchableOpacity onPress={this.onPressAddress}>
               <Text numberOfLines={1} ellipsizeMode={'tail'} style={style.addressText}>
                 {account}
               </Text>
@@ -214,9 +221,7 @@ export class Account extends React.Component<Props, State> {
           />
         </View>
         <View style={style.containerList}>
-          {!backupCompleted ? (
-            <SettingsItem title={t('backupKey')} onPress={this.backupScreen} />
-          ) : null}
+          <SettingsItem title={t('backupKey')} onPress={this.backupScreen} />
           <SettingsItem title={t('invite')} onPress={this.goToInvite} />
           {features.SHOW_SHOW_REWARDS_APP_LINK && (
             <SettingsItem title={t('celoRewards')} onPress={navigateToVerifierApp} />

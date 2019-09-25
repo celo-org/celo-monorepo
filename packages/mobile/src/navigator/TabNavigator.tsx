@@ -1,6 +1,6 @@
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
-import { fontFamily } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
@@ -9,11 +9,12 @@ import { connect } from 'react-redux'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
 import WalletHome from 'src/home/WalletHome'
 import { Namespaces } from 'src/i18n'
-import ExchangeIcon from 'src/icons/Exchange'
+import GoldTabIcon from 'src/icons/GoldTab'
 import PaymentsIcon from 'src/icons/PaymentsIcon'
 import WalletIcon from 'src/icons/Wallet'
-import { Screens } from 'src/navigator/Screens'
-import { TabBar } from 'src/navigator/TabBar'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens, Stacks } from 'src/navigator/Screens'
+import TabBar from 'src/navigator/TabBar'
 import { RootState } from 'src/redux/reducers'
 import { getTabBarActiveNotification } from 'src/redux/selectors'
 import Send from 'src/send/Send'
@@ -42,7 +43,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 class WalletIconWithCircle extends React.Component<Props> {
   render() {
     return (
-      <View>
+      <View style={styles.alignWallet}>
         {this.props.hasActiveNotifications && <View style={styles.circle} />}
         <WalletIcon color={this.props.tintColor} />
       </View>
@@ -98,9 +99,17 @@ export const TabNavigator = createBottomTabNavigator(
       screen: Send,
       navigationOptions: {
         tabBarButtonComponent: TabBarButtonComponent,
-        tabBarIcon: (props: any) => <PaymentsIcon color={props.tintColor} />,
-        tabBarLabel: ({ tintColor }: LabelProps) => {
-          return <MenuText testID="SendNavigator" transKey="payments" tintColor={tintColor} />
+        tabBarIcon: (props: any) => (
+          <View style={styles.alignPaymentIcon}>
+            <PaymentsIcon color={props.tintColor} />
+          </View>
+        ),
+        tabBarLabel: () => null,
+        tabBarOnPress: () => {
+          navigate(Stacks.SendStack)
+        },
+        tabBarOnLongPress: () => {
+          navigate(Stacks.SendStack)
         },
       },
     },
@@ -108,9 +117,9 @@ export const TabNavigator = createBottomTabNavigator(
       screen: ExchangeHomeScreen,
       navigationOptions: {
         tabBarButtonComponent: TabBarButtonComponent,
-        tabBarIcon: (props: any) => <ExchangeIcon color={props.tintColor} />,
+        tabBarIcon: (props: any) => <GoldTabIcon color={props.tintColor} />,
         tabBarLabel: ({ tintColor }: LabelProps) => {
-          return <MenuText testID="ExchangeNavigator" transKey="exchange" tintColor={tintColor} />
+          return <MenuText testID="ExchangeNavigator" transKey="gold" tintColor={tintColor} />
         },
       },
     },
@@ -121,14 +130,13 @@ export const TabNavigator = createBottomTabNavigator(
     tabBarComponent: TabBar as any,
     tabBarOptions: {
       activeTintColor: colors.celoGreen,
-      inactiveTintColor: colors.darkSecondary,
+      inactiveTintColor: colors.dark,
       style: {
         height: 60,
+        paddingBottom: 5,
+        paddingTop: 10,
         borderTopWidth: 1,
         borderTopColor: 'rgba(0, 0, 0, 0.05)',
-      },
-      tabStyle: {
-        margin: 5,
       },
     },
   }
@@ -137,8 +145,8 @@ export const TabNavigator = createBottomTabNavigator(
 const styles = StyleSheet.create({
   label: {
     alignSelf: 'center',
-    fontSize: 10,
-    fontFamily,
+    fontSize: 13,
+    ...fontStyles.semiBold,
   },
   circle: {
     position: 'absolute',
@@ -150,6 +158,12 @@ const styles = StyleSheet.create({
     height: 6,
     width: 6,
     backgroundColor: colors.messageBlue,
+  },
+  alignWallet: {
+    marginLeft: 3,
+  },
+  alignPaymentIcon: {
+    marginBottom: 15,
   },
 })
 

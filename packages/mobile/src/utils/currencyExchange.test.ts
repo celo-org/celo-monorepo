@@ -47,12 +47,12 @@ describe('getTakerAmount', () => {
 
 describe('getNewMakerBalance', () => {
   it('currently sums the amounts', () => {
-    expect(getNewMakerBalance('2000', new BigNumber(20))).toEqual('1,980.00')
+    expect(getNewMakerBalance('2000', new BigNumber(20)).toString()).toEqual('1980')
   })
 })
 
 describe('getNewTakerBalance', () => {
   it('currently sums the amounts', () => {
-    expect(getNewTakerBalance('2000', new BigNumber(20))).toEqual('2,020.00')
+    expect(getNewTakerBalance('2000', new BigNumber(20)).toString()).toEqual('2020')
   })
 })

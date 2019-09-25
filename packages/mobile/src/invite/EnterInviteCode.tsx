@@ -1,9 +1,9 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import Link from '@celo/react-components/components/Link'
 import SmallButton from '@celo/react-components/components/SmallButton'
 import InviteCodeIcon from '@celo/react-components/icons/InviteCodeIcon'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
+import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import {
@@ -12,6 +12,7 @@ import {
   AppStateStatus,
   Clipboard,
   Linking,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -26,7 +27,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces } from 'src/i18n'
 import { redeemInvite } from 'src/invite/actions'
-import { extractValidInviteCode } from 'src/invite/utils'
+import { extractValidInviteCode, getInviteCodeFromReferrerData } from 'src/invite/utils'
 import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -46,7 +47,7 @@ interface StateProps {
 interface State {
   isSubmitting: boolean
   appState: AppStateStatus
-  validCodeInClipboard: boolean
+  validCode: string | null
 }
 
 interface DispatchProps {
@@ -93,30 +94,43 @@ export class EnterInviteCode extends React.Component<Props, State> {
   state: State = {
     isSubmitting: false,
     appState: AppState.currentState,
-    validCodeInClipboard: false,
+    validCode: null,
   }
 
   async componentDidMount() {
-    AppState.addEventListener('change', this.handleValidCodeInClipboard)
+    AppState.addEventListener('change', this.handleAppStateChange)
+    this.checkForReferrerCode()
     this.checkIfValidCodeInClipboard()
   }
 
   componentWillUnmount() {
-    AppState.removeEventListener('change', this.handleValidCodeInClipboard)
+    AppState.removeEventListener('change', this.handleAppStateChange)
   }
 
   openMessage = () => {
-    SendIntentAndroid.openSMSApp()
+    if (Platform.OS === 'android') {
+      SendIntentAndroid.openSMSApp()
+    } else {
+      Linking.openURL('sms:')
+    }
+  }
+
+  checkForReferrerCode = async () => {
+    const validCode = await getInviteCodeFromReferrerData()
+    if (validCode) {
+      this.setState({ validCode })
+    }
   }
 
   checkIfValidCodeInClipboard = async () => {
     const message = await Clipboard.getString()
     const validCode = extractValidInviteCode(message)
-
-    this.setState({ validCodeInClipboard: validCode !== null })
+    if (validCode) {
+      this.setState({ validCode })
+    }
   }
 
-  handleValidCodeInClipboard = async (nextAppState: AppStateStatus) => {
+  handleAppStateChange = async (nextAppState: AppStateStatus) => {
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
       this.checkIfValidCodeInClipboard()
     }
@@ -127,8 +141,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
     this.setState({ isSubmitting: true })
     try {
       this.props.hideAlert()
-      const message = await Clipboard.getString()
-      const validCode = extractValidInviteCode(message)
+      const { validCode } = this.state
 
       Logger.debug('Extracted invite code:', validCode || '')
 
@@ -158,78 +171,82 @@ export class EnterInviteCode extends React.Component<Props, State> {
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <DevSkipButton nextScreen={Screens.ImportContacts} />
+          <InviteCodeIcon />
           <Text style={[fontStyles.h1, styles.h1]} testID={'InviteCodeTitle'}>
             {t('inviteCodeText.title')}
           </Text>
-          <View style={styles.image}>
-            <InviteCodeIcon />
-          </View>
-          <Text style={[styles.body, styles.copyInvite]}>
-            <Text style={[fontStyles.bodySmallBold]}>{t('inviteCodeText.copyInvite.0')}</Text>
-            {t('inviteCodeText.copyInvite.1')}
-          </Text>
+          <View style={[componentStyles.roundedBorder, styles.inviteActionContainer]}>
+            <Text style={styles.body}>
+              <Text>{t('inviteCodeText.copyInvite.0')}</Text>
+              {t('inviteCodeText.copyInvite.1')}
+            </Text>
 
-          <View style={styles.lineDivider} />
-          {this.props.redeemComplete ? (
-            <Text style={fontStyles.bodySmallBold}>{t('inviteCodeText.inviteAccepted')}</Text>
-          ) : (
-            !this.state.isSubmitting &&
-            (!this.state.validCodeInClipboard ? (
-              <View>
-                <Text style={[styles.body, styles.hint]}>
-                  <Text style={fontStyles.bodySmallSemiBold}>
-                    {t('inviteCodeText.openMessages.hint.0')}
-                  </Text>
-                  {t('inviteCodeText.openMessages.hint.1')}
-                </Text>
-                <SmallButton
-                  text={t('inviteCodeText.openMessages.message')}
-                  testID={'openMessageButton'}
-                  onPress={this.openMessage}
-                  solid={true}
-                  style={styles.button}
-                />
-              </View>
+            {this.props.redeemComplete ? (
+              <Text
+                style={[fontStyles.bodySmallBold, fontStyles.center, componentStyles.marginTop10]}
+              >
+                {t('inviteCodeText.inviteAccepted')}
+              </Text>
             ) : (
-              <View>
-                <Text style={[styles.body, styles.hint]}>
-                  {t('inviteCodeText.pasteInviteCode.hint')}
-                </Text>
-                <SmallButton
-                  text={t('inviteCodeText.pasteInviteCode.message')}
-                  testID={'pasteMessageButton'}
-                  onPress={this.onPaste}
-                  solid={false}
-                  style={styles.button}
-                />
-              </View>
-            ))
-          )}
-          {this.state.isSubmitting &&
-            !this.props.redeemComplete && (
-              <View>
-                <Text style={[styles.body, styles.hint]}>
-                  <Text style={fontStyles.bodySmallSemiBold}>
-                    {t('inviteCodeText.validating.0')}
+              !this.state.isSubmitting &&
+              (!this.state.validCode ? (
+                <View>
+                  <Text style={[styles.body, styles.hint]}>
+                    <Text style={fontStyles.bodySmallSemiBold}>
+                      {t('inviteCodeText.openMessages.hint.0')}
+                    </Text>
+                    {t('inviteCodeText.openMessages.hint.1')}
                   </Text>
-                  {t('inviteCodeText.validating.1')}
-                </Text>
-                <ActivityIndicator size="large" color={colors.celoGreen} style={styles.activity} />
-              </View>
+                  <SmallButton
+                    text={t('inviteCodeText.openMessages.message')}
+                    testID={'openMessageButton'}
+                    onPress={this.openMessage}
+                    solid={true}
+                    style={styles.button}
+                  />
+                </View>
+              ) : (
+                <View>
+                  <Text style={[styles.body, styles.hint]}>
+                    {t('inviteCodeText.pasteInviteCode.hint')}
+                  </Text>
+                  <SmallButton
+                    text={t('inviteCodeText.pasteInviteCode.message')}
+                    testID={'pasteMessageButton'}
+                    onPress={this.onPaste}
+                    solid={false}
+                    style={styles.button}
+                  />
+                </View>
+              ))
             )}
+            {this.state.isSubmitting &&
+              !this.props.redeemComplete && (
+                <View>
+                  <Text style={[styles.body, styles.hint]}>
+                    <Text style={fontStyles.bodySmallSemiBold}>
+                      {t('inviteCodeText.validating.0')}
+                    </Text>
+                    {t('inviteCodeText.validating.1')}
+                  </Text>
+                  <ActivityIndicator
+                    size="large"
+                    color={colors.celoGreen}
+                    style={styles.activity}
+                  />
+                </View>
+              )}
+          </View>
         </ScrollView>
 
         <View>
-          <Text style={[styles.body, styles.askInvite]}>
-            <Text style={[fontStyles.bodySmallBold, styles.askInvite]}>
-              {t('inviteCodeText.askForInvite.0')}
-            </Text>
-            {t('inviteCodeText.askForInvite.1')}
+          <Text style={[styles.body, styles.askInviteContainer]}>
+            {t('inviteCodeText.askForInvite.0')}
             <Text
               onPress={goToFaucet}
               style={[fontStyles.bodySmallBold, fontStyles.linkInline, styles.askInvite]}
             >
-              {t('inviteCodeText.askForInvite.2')}
+              {t('inviteCodeText.askForInvite.1')}
             </Text>
           </Text>
           <Button
@@ -241,19 +258,14 @@ export class EnterInviteCode extends React.Component<Props, State> {
             disabled={!this.props.redeemComplete}
             testID="ContinueInviteButton"
           />
-          <View style={styles.importWallet}>
-            <Text style={[fontStyles.bodySmall, styles.body, styles.importWalletText]}>
-              {t('haveWallet')}
-            </Text>
-            <Link
-              style={[fontStyles.linkInline, styles.importWalletText]}
-              onPress={this.onImportClick}
-              disabled={this.state.isSubmitting}
-              testID="ImportExistingUsingBackupKey"
-            >
-              {t('importIt')}
-            </Link>
-          </View>
+          <Button
+            onPress={this.onImportClick}
+            text={t('importIt')}
+            standard={false}
+            style={styles.continueButton}
+            type={BtnTypes.SECONDARY}
+            testID="ContinueInviteButton"
+          />
         </View>
       </View>
     )
@@ -267,12 +279,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   scrollContainer: {
-    marginHorizontal: 10,
+    flex: 1,
+    padding: 20,
+    paddingTop: 0,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inviteActionContainer: {
+    padding: 30,
+    marginVertical: 30,
+    marginHorizontal: 20,
   },
   h1: {
-    color: colors.dark,
-    paddingBottom: 63,
+    marginTop: 20,
   },
   body: {
     ...fontStyles.bodySmall,
@@ -280,49 +299,28 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     alignSelf: 'center',
   },
-  copyInvite: {
-    width: 208,
-  },
-  lineDivider: {
-    width: '80%',
-    borderTopWidth: 1,
-    borderColor: colors.inactive,
-    marginBottom: 26,
-    marginTop: 21,
+  askInviteContainer: {
+    marginVertical: 10,
+    marginHorizontal: 20,
   },
   askInvite: {
     fontSize: 12,
     fontWeight: '300',
-    width: 320,
-    marginBottom: 6,
   },
   activity: {
     marginTop: 10,
   },
   hint: {
+    marginVertical: 10,
     fontSize: 12,
-    width: 320,
-    height: 20,
   },
   button: {
     marginTop: 6,
     alignSelf: 'center',
     fontSize: 14,
   },
-  image: {
-    marginBottom: 20,
-  },
   continueButton: {
     width: '100%',
-  },
-  importWallet: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    marginVertical: 17,
-  },
-  importWalletText: {
-    fontSize: 13,
   },
 })
 

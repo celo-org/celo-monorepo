@@ -2,7 +2,6 @@ const withTypescript = require('@zeit/next-typescript')
 const withSass = require('@zeit/next-sass')
 const withImages = require('next-images')
 const webpack = require('webpack')
-
 const envConfig = require('./env-config')
 const serverEnvConfig = require('./server-env-config')
 
@@ -16,7 +15,8 @@ module.exports = withImages(
       cssModules: true,
       publicRuntimeConfig: envConfig,
       serverRuntimeConfig: serverEnvConfig,
-      webpack: (config, { dev }) => {
+      // options: {buildId, dev, isServer, defaultLoaders, webpack}   https://nextjs.org/docs#customizing-webpack-config
+      webpack: (config, { dev, isServer }) => {
         config.node = {
           fs: 'empty',
         }
@@ -24,6 +24,10 @@ module.exports = withImages(
           ...config.resolve.alias,
           'react-native$': 'react-native-web',
         }
+        if (!isServer) {
+          config.resolve.alias['@sentry/node'] = '@sentry/browser'
+        }
+
         return config
       },
     })

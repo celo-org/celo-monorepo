@@ -1,14 +1,12 @@
 package org.celo.mobile;
 
 import android.content.Context;
-import android.support.multidex.MultiDex;
-import android.support.multidex.MultiDexApplication;
+import android.app.Application;
 
 import org.reactnative.camera.RNCameraPackage;
 import com.chirag.RNMail.RNMail;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import io.xogus.reactnative.versioncheck.RNVersionCheckPackage;
-import com.androidbroadcastreceiverforreferrer.RNAndroidBroadcastReceiverForReferrerPackage;
 import com.levelasquez.androidopensettings.AndroidOpenSettingsPackage;
 import com.tradle.react.UdpSocketsModule;
 
@@ -44,13 +42,14 @@ import com.reactnativegeth.RNGethPackage;
 import com.rnfs.RNFSPackage;
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
 import com.tradle.react.UdpSocketsModule;
-import com.reactlibrary.RNConfirmDeviceCredentialsPackage;
+import org.celo.devicecredentials.RNConfirmDeviceCredentialsPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
-import com.reactmodule.RNSystemClockPackage;
 import com.rnrestartandroid.RNRestartAndroidPackage;
 import me.furtado.smsretriever.RNSmsRetrieverPackage;
 import cl.json.RNSharePackage;
 import cl.json.ShareApplication;
+import com.rninstallreferrer.RNInstallReferrerPackage;
+import com.reactlibrary.securekeystore.RNSecureKeyStorePackage;
 
 import android.util.Log;
 
@@ -67,7 +66,7 @@ import ru.ivanarh.jndcrash.NDCrashUnwinder;
 // import com.instabug.library.invocation.InstabugInvocationEvent;
 // import com.instabug.reactlibrary.RNInstabugReactnativePackage;
 
-public class MainApplication extends MultiDexApplication implements ShareApplication, ReactApplication {
+public class MainApplication extends Application implements ShareApplication, ReactApplication {
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
     @Override
@@ -80,6 +79,7 @@ public class MainApplication extends MultiDexApplication implements ShareApplica
 
       ReactPackage basePackages[] = new ReactPackage[] {
               new MainReactPackage(),
+              new RNInstallReferrerPackage(),
               new RNSendIntentPackage(),
               new RNCWebViewPackage(),
               new NetInfoPackage(),
@@ -89,7 +89,6 @@ public class MainApplication extends MultiDexApplication implements ShareApplica
               new RNCameraPackage(),
               new RNMail(),
               new SplashScreenReactPackage(),
-              new RNAndroidBroadcastReceiverForReferrerPackage(),
               new AndroidOpenSettingsPackage(),
               new UdpSocketsModule(),
               new RNLanguagesPackage(),
@@ -111,10 +110,10 @@ public class MainApplication extends MultiDexApplication implements ShareApplica
               new FlagSecurePackage(),
               new RNFirebaseStoragePackage(),
               new RNVersionCheckPackage(),
-              new RNSystemClockPackage(),
               new RNRestartAndroidPackage(),
               new RNSmsRetrieverPackage(),
-              new RNSharePackage()
+              new RNSharePackage(),
+              new RNSecureKeyStorePackage()
               // Disabled due to dex count
               // new RNScreensPackage(),
       };
@@ -160,14 +159,6 @@ public class MainApplication extends MultiDexApplication implements ShareApplica
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
     initNdkCrashHandler();
-  }
-
-  @Override
-  protected void attachBaseContext(Context base) {
-    super.attachBaseContext(base);
-    if (BuildConfig.DEBUG) {
-      MultiDex.install(this);
-    }
   }
 
   @Override

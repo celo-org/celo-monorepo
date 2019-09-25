@@ -1,4 +1,6 @@
 rootProject.name = 'celo'
+include ':react-native-install-referrer'
+project(':react-native-install-referrer').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-install-referrer/android')
 include ':react-native-send-intent'
 project(':react-native-send-intent').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-send-intent/android')
 include ':react-native-webview'
@@ -23,8 +25,6 @@ include ':react-native-splash-screen'
 project(':react-native-splash-screen').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-splash-screen/android')
 include ':react-native-version-check'
 project(':react-native-version-check').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-version-check/android')
-include ':react-native-android-broadcast-receiver-for-referrer'
-project(':react-native-android-broadcast-receiver-for-referrer').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-android-broadcast-receiver-for-referrer/android')
 include ':react-native-android-open-settings'
 project(':react-native-android-open-settings').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-android-open-settings/android')
 include ':react-native-udp'
@@ -57,12 +57,12 @@ include ':react-native-flag-secure-android'
 project(':react-native-flag-secure-android').projectDir = new File(rootProject.projectDir, 	'../../../node_modules/react-native-flag-secure-android/android')
 include ':react-native-confirm-device-credentials'
 project(':react-native-confirm-device-credentials').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-confirm-device-credentials/android')
-include ':react-native-system-clock'
-project(':react-native-system-clock').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-system-clock/android')
 include ':react-native-restart-android'
 project(':react-native-restart-android').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-restart-android/android')
 include ':react-native-sms-retriever'
 project(':react-native-sms-retriever').projectDir = new File(rootProject.projectDir, '../../../node_modules/@celo/react-native-sms-retriever/android')
 include ':react-native-share'
 project(':react-native-share').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-share/android')
+include ':react-native-secure-key-store'
+project(':react-native-secure-key-store').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-secure-key-store/android')
 include ':app'
