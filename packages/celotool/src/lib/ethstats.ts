@@ -1,6 +1,6 @@
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
-import { envVar, fetchEnv } from './env-utils'
+import { envVar, fetchEnv, isVmBased } from './env-utils'
 
 const helmChartPath = '../helm-charts/ethstats'
 
@@ -29,6 +29,7 @@ export async function upgradeHelmChart(celoEnv: string) {
 function helmParameters() {
   return [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
+    `--set ethstats.createSecret=${isVmBased()}`,
     `--set ethstats.webSocketSecret="${fetchEnv(envVar.ETHSTATS_WEBSOCKETSECRET)}"`,
   ]
 }
