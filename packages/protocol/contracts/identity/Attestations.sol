@@ -93,7 +93,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     // The ECDSA public key used to encrypt and decrypt data for this account
     bytes dataEncryptionKey;
 
-    // The URL under which an account add metadata and claims
+    // The URL under which an account adds metadata and claims
     string metadataURL;
   }
 
@@ -493,7 +493,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
    * @notice Setter for the metadata of an account.
    * @param metadataURL The URL to access the metadata.
    */
-  function setMetadataURL(string memory metadataURL) public {
+  function setMetadataURL(string memory metadataURL) external {
     accounts[msg.sender].metadataURL = metadataURL;
     emit AccountMetadataURLSet(msg.sender, metadataURL);
   }
