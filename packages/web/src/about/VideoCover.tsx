@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createElement, Image, StyleSheet, View, ViewStyle } from 'react-native'
+import { createElement, Image, StyleSheet, View, ViewStyle, NetInfo } from 'react-native'
 import { BeautifulMoneyPreview } from 'src/about/images/index'
 import { H1, H3 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
@@ -8,8 +8,11 @@ import Hoverable from 'src/shared/Hoverable'
 import { PlayCircle2 } from 'src/shared/PlayCircle'
 import VideoModal from 'src/shared/VideoModal'
 import { standardStyles, textStyles } from 'src/styles'
+
+import { getEffectiveConnection, SLOW_CONNECTIONS } from 'src/utils/utils'
 interface State {
   isHovering: boolean
+  supportsVideo: boolean
 }
 
 interface VideoProps {
@@ -28,6 +31,7 @@ function Video(props: VideoProps) {
 class VideoCover extends React.PureComponent<I18nProps & ScreenProps, State> {
   state: State = {
     isHovering: false,
+    supportsVideo: false,
   }
 
   onHoverStart = () => {
@@ -35,6 +39,14 @@ class VideoCover extends React.PureComponent<I18nProps & ScreenProps, State> {
   }
   onHoverEnd = () => {
     this.setState({ isHovering: false })
+  }
+
+  componentDidMount = () => {
+    const connectionType = getEffectiveConnection(window.navigator)
+    console.log(connectionType)
+    if (!SLOW_CONNECTIONS.has(connectionType)) {
+      this.setState({ supportsVideo: true })
+    }
   }
 
   render() {
@@ -49,11 +61,17 @@ class VideoCover extends React.PureComponent<I18nProps & ScreenProps, State> {
             loop={true}
             poster="/static/AboutPreview.jpg"
           >
-            <source
-              src="https://storage.googleapis.com/celo_whitepapers/about-video.mp4"
-              type="video/mp4"
+            {this.state.supportsVideo && (
+              <source
+                src="https://storage.googleapis.com/celo_whitepapers/about-video.mp4"
+                type="video/mp4"
+              />
+            )}}
+            <Image
+              resizeMode="cover"
+              source={{ uri: '/static/AboutPreview.jpg' }}
+              style={standardStyles.image}
             />
-            <Image resizeMode="cover" source={BeautifulMoneyPreview} style={standardStyles.image} />
           </Video>
         </View>
         <View style={[styles.overlay, standardStyles.centered]}>
