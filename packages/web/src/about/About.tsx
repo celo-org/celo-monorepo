@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Image, StyleSheet, View } from 'react-native'
 import Backers from 'src/about/Backers'
-import { mintPlaza, teamHero } from 'src/about/images'
+import { mintPlaza } from 'src/about/images'
 import Team from 'src/about/Team'
 import { H1, H4 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
@@ -9,11 +9,10 @@ import MissionText from 'src/home/MissionText'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import AspectRatio from 'src/shared/AspectRatio'
-import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { Colors, HEADER_HEIGHT, MENU_MAX_WIDTH } from 'src/shared/Styles'
-import { standardStyles } from 'src/styles'
+import PressMedia from 'src/about/PressMedia'
 
 const IMAGE_HEIGHT = 938
 const IMAGE_WIDTH = 835
@@ -62,29 +61,11 @@ export class About extends React.Component<Props & I18nProps> {
               </AspectRatio>
             </Responsive>
           </View>
-          <MissionText />
+          {/* <MissionText /> */}
           <Team randomSeed={randomSeed} />
-          <GridRow
-            desktopStyle={standardStyles.sectionMargin}
-            tabletStyle={standardStyles.sectionMarginTablet}
-            mobileStyle={standardStyles.sectionMarginMobile}
-          >
-            <Cell span={Spans.half}>
-              <AspectRatio style={styles.sacredEcon} ratio={505 / 366}>
-                <Image resizeMode={'contain'} source={{ uri: teamHero }} style={styles.mintPlaza} />
-              </AspectRatio>
-            </Cell>
-            <Cell span={Spans.half}>
-              <H4 style={standardStyles.elementalMarginBottom}>{t('joinUsText')}</H4>
-              <Button
-                size={SIZE.big}
-                kind={BTN.PRIMARY}
-                text={t('joinUsBtn')}
-                href={menuItems.JOBS.link}
-              />
-            </Cell>
-          </GridRow>
+
           <Backers />
+          <PressMedia />
         </View>
       </>
     )
