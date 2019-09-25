@@ -1,6 +1,7 @@
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { expectSaga } from 'redux-saga-test-plan'
 import { call } from 'redux-saga/effects'
+import { PincodeType } from 'src/account/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { checkAppDeprecation, navigateToProperScreen, waitForRehydrate } from 'src/app/saga'
 import { waitForFirebaseAuth } from 'src/firebase/saga'
@@ -46,7 +47,7 @@ const numberVerified = {
     syncProgress: 101,
   },
   account: {
-    pincodeSet: true,
+    pincodeType: PincodeType.PhoneAuth,
     e164PhoneNumber: '+1234',
   },
   invite: {

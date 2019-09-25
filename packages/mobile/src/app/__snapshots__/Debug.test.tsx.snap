@@ -42,7 +42,7 @@ exports[`Debug renders correctly 1`] = `
       }
     }
   >
-    Pin Set: false
+    Pin Type: Unset
   </Text>
   <Text
     onPress={[Function]}
@@ -159,6 +159,12 @@ exports[`Debug renders correctly 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -166,17 +172,24 @@ exports[`Debug renders correctly 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#42D689",
-          "borderColor": "#42D689",
-          "borderRadius": 3,
-          "borderWidth": 2,
-          "flex": 1,
-          "height": 50,
-          "justifyContent": "center",
-          "opacity": 1,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#42D689",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderColor": "#42D689",
+            "borderRadius": 3,
+            "borderWidth": 2,
+          },
+        ]
       }
     >
       <View

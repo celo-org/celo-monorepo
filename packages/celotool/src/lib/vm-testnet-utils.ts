@@ -18,7 +18,11 @@ import {
   TerraformVars,
   untaintTerraformModuleResource,
 } from './terraform'
-import { uploadFileToGoogleStorage, uploadGenesisBlockToGoogleStorage } from './testnet-utils'
+import {
+  uploadEnvFileToGoogleStorage,
+  uploadFileToGoogleStorage,
+  uploadGenesisBlockToGoogleStorage,
+} from './testnet-utils'
 
 const secretsBucketName = 'celo-testnet-secrets'
 const testnetTerraformModule = 'testnet'
@@ -64,6 +68,7 @@ export async function deploy(celoEnv: string, onConfirmFailed?: () => Promise<vo
   })
 
   await uploadGenesisBlockToGoogleStorage(celoEnv)
+  await uploadEnvFileToGoogleStorage(celoEnv)
 }
 
 async function deployModule(
@@ -292,7 +297,13 @@ function uploadSecrets(celoEnv: string, secrets: string, resourceName: string) {
   const localTmpFilePath = `/tmp/${celoEnv}-${resourceName}-secrets`
   writeFileSync(localTmpFilePath, secrets)
   const cloudStorageFileName = `${secretsBasePath(celoEnv)}/.env.${resourceName}`
-  return uploadFileToGoogleStorage(localTmpFilePath, secretsBucketName, cloudStorageFileName, false)
+  return uploadFileToGoogleStorage(
+    localTmpFilePath,
+    secretsBucketName,
+    cloudStorageFileName,
+    false,
+    'text/plain'
+  )
 }
 
 function generateBootnodeSecretEnvVars() {
