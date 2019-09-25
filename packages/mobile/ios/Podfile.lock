@@ -1,0 +1,393 @@
+PODS:
+  - Analytics (3.7.0)
+  - boost-for-react-native (1.63.0)
+  - CeloBlockchain (0.0.1)
+  - Crashlytics (3.13.4):
+    - Fabric (~> 1.10.2)
+  - DoubleConversion (1.1.6)
+  - Fabric (1.10.2)
+  - Firebase/Core (5.20.2):
+    - Firebase/CoreOnly
+    - FirebaseAnalytics (= 5.8.1)
+  - Firebase/CoreOnly (5.20.2):
+    - FirebaseCore (= 5.4.1)
+  - FirebaseAnalytics (5.8.1):
+    - FirebaseCore (~> 5.4)
+    - FirebaseInstanceID (~> 3.8)
+    - GoogleAppMeasurement (= 5.8.1)
+    - GoogleUtilities/AppDelegateSwizzler (~> 5.2)
+    - GoogleUtilities/MethodSwizzler (~> 5.2)
+    - GoogleUtilities/Network (~> 5.2)
+    - "GoogleUtilities/NSData+zlib (~> 5.2)"
+    - nanopb (~> 0.3)
+  - FirebaseCore (5.4.1):
+    - GoogleUtilities/Environment (~> 5.2)
+    - GoogleUtilities/Logger (~> 5.2)
+  - FirebaseInstanceID (3.8.1):
+    - FirebaseCore (~> 5.2)
+    - GoogleUtilities/Environment (~> 5.2)
+    - GoogleUtilities/UserDefaults (~> 5.2)
+  - Folly (2018.10.22.00):
+    - boost-for-react-native
+    - DoubleConversion
+    - glog
+  - glog (0.3.5)
+  - GoogleAppMeasurement (5.8.1):
+    - GoogleUtilities/AppDelegateSwizzler (~> 5.2)
+    - GoogleUtilities/MethodSwizzler (~> 5.2)
+    - GoogleUtilities/Network (~> 5.2)
+    - "GoogleUtilities/NSData+zlib (~> 5.2)"
+    - nanopb (~> 0.3)
+  - GoogleUtilities (5.3.7):
+    - GoogleUtilities/AppDelegateSwizzler (= 5.3.7)
+    - GoogleUtilities/Environment (= 5.3.7)
+    - GoogleUtilities/ISASwizzler (= 5.3.7)
+    - GoogleUtilities/Logger (= 5.3.7)
+    - GoogleUtilities/MethodSwizzler (= 5.3.7)
+    - GoogleUtilities/Network (= 5.3.7)
+    - "GoogleUtilities/NSData+zlib (= 5.3.7)"
+    - GoogleUtilities/Reachability (= 5.3.7)
+    - GoogleUtilities/SwizzlerTestHelpers (= 5.3.7)
+    - GoogleUtilities/UserDefaults (= 5.3.7)
+  - GoogleUtilities/AppDelegateSwizzler (5.3.7):
+    - GoogleUtilities/Environment
+    - GoogleUtilities/Logger
+    - GoogleUtilities/Network
+  - GoogleUtilities/Environment (5.3.7)
+  - GoogleUtilities/ISASwizzler (5.3.7)
+  - GoogleUtilities/Logger (5.3.7):
+    - GoogleUtilities/Environment
+  - GoogleUtilities/MethodSwizzler (5.3.7):
+    - GoogleUtilities/Logger
+  - GoogleUtilities/Network (5.3.7):
+    - GoogleUtilities/Logger
+    - "GoogleUtilities/NSData+zlib"
+    - GoogleUtilities/Reachability
+  - "GoogleUtilities/NSData+zlib (5.3.7)"
+  - GoogleUtilities/Reachability (5.3.7):
+    - GoogleUtilities/Logger
+  - GoogleUtilities/SwizzlerTestHelpers (5.3.7)
+  - GoogleUtilities/UserDefaults (5.3.7):
+    - GoogleUtilities/Logger
+  - KSCrash/Core (1.15.21):
+    - KSCrash/Reporting/Filters/Basic
+  - KSCrash/Recording (1.15.21):
+    - KSCrash/Recording/Tools (= 1.15.21)
+  - KSCrash/Recording/Tools (1.15.21)
+  - KSCrash/Reporting/Filters/Base (1.15.21):
+    - KSCrash/Recording
+  - KSCrash/Reporting/Filters/Basic (1.15.21):
+    - KSCrash/Recording
+    - KSCrash/Reporting/Filters/Base
+  - nanopb (0.3.901):
+    - nanopb/decode (= 0.3.901)
+    - nanopb/encode (= 0.3.901)
+  - nanopb/decode (0.3.901)
+  - nanopb/encode (0.3.901)
+  - React (0.59.10):
+    - React/Core (= 0.59.10)
+  - react-native-camera (1.13.1):
+    - React
+    - react-native-camera/RCT (= 1.13.1)
+    - react-native-camera/RN (= 1.13.1)
+  - react-native-camera/RCT (1.13.1):
+    - React
+  - react-native-camera/RN (1.13.1):
+    - React
+  - react-native-config (0.11.7):
+    - React
+  - react-native-contacts (4.0.2):
+    - React
+  - react-native-geth (0.1.0-development):
+    - CeloBlockchain
+    - React
+  - react-native-keep-awake (3.0.1):
+    - React
+  - react-native-mail (3.0.7):
+    - React
+  - react-native-netinfo (2.0.4):
+    - React
+  - react-native-splash-screen (3.1.1):
+    - React
+  - react-native-udp (2.6.1):
+    - React
+  - react-native-version-check (3.0.2):
+    - React
+  - React/Core (0.59.10):
+    - yoga (= 0.59.10.React)
+  - React/CxxBridge (0.59.10):
+    - Folly (= 2018.10.22.00)
+    - React/Core
+    - React/cxxreact
+    - React/jsiexecutor
+  - React/cxxreact (0.59.10):
+    - boost-for-react-native (= 1.63.0)
+    - DoubleConversion
+    - Folly (= 2018.10.22.00)
+    - glog
+    - React/jsinspector
+  - React/DevSupport (0.59.10):
+    - React/Core
+    - React/RCTWebSocket
+  - React/fishhook (0.59.10)
+  - React/jsi (0.59.10):
+    - DoubleConversion
+    - Folly (= 2018.10.22.00)
+    - glog
+  - React/jsiexecutor (0.59.10):
+    - DoubleConversion
+    - Folly (= 2018.10.22.00)
+    - glog
+    - React/cxxreact
+    - React/jsi
+  - React/jsinspector (0.59.10)
+  - React/RCTActionSheet (0.59.10):
+    - React/Core
+  - React/RCTAnimation (0.59.10):
+    - React/Core
+  - React/RCTBlob (0.59.10):
+    - React/Core
+  - React/RCTGeolocation (0.59.10):
+    - React/Core
+  - React/RCTImage (0.59.10):
+    - React/Core
+    - React/RCTNetwork
+  - React/RCTLinkingIOS (0.59.10):
+    - React/Core
+  - React/RCTNetwork (0.59.10):
+    - React/Core
+  - React/RCTSettings (0.59.10):
+    - React/Core
+  - React/RCTText (0.59.10):
+    - React/Core
+  - React/RCTVibration (0.59.10):
+    - React/Core
+  - React/RCTWebSocket (0.59.10):
+    - React/Core
+    - React/fishhook
+    - React/RCTBlob
+  - RNAnalytics (1.1.0-beta.1):
+    - Analytics
+    - React
+  - RNAnalyticsIntegration-Firebase (1.1.0-beta.1):
+    - Analytics
+    - React
+    - RNAnalytics
+    - Segment-Firebase
+  - RNDeviceInfo (2.1.0):
+    - React
+  - RNFirebase (5.5.4):
+    - Firebase/Core
+    - React
+    - RNFirebase/Crashlytics (= 5.5.4)
+  - RNFirebase/Crashlytics (5.5.4):
+    - Crashlytics
+    - Fabric
+    - Firebase/Core
+    - React
+  - RNFS (2.12.1):
+    - React
+  - RNGestureHandler (1.1.0):
+    - React
+  - RNLanguages (3.0.1):
+    - React
+  - RNRandomBytes (2.2.3):
+    - React
+  - RNScreens (1.0.0-alpha.22):
+    - React
+  - RNSecureKeyStore (1.0.0):
+    - React
+  - RNShare (1.1.3):
+    - React
+  - RNSVG (9.8.4):
+    - React
+  - Segment-Firebase (2.4.1):
+    - Analytics (~> 3.2)
+    - Firebase/Core (~> 5.0)
+    - Segment-Firebase/Core (= 2.4.1)
+  - Segment-Firebase/Core (2.4.1):
+    - Analytics (~> 3.2)
+    - Firebase/Core (~> 5.0)
+  - Sentry (3.12.4):
+    - Sentry/Core (= 3.12.4)
+    - Sentry/KSCrash (= 3.12.4)
+  - Sentry/Core (3.12.4)
+  - Sentry/KSCrash (3.12.4):
+    - KSCrash/Core (~> 1.15.12)
+  - SentryReactNative (0.38.3):
+    - React
+    - Sentry (~> 3.12.4)
+    - Sentry/KSCrash (~> 3.12.4)
+  - yoga (0.59.10.React)
+
+DEPENDENCIES:
+  - "CeloBlockchain (from `../../../node_modules/@celo/client/CeloBlockchain.podspec`)"
+  - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
+  - Firebase/Core (~> 5.20.2)
+  - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
+  - glog (from `../node_modules/react-native/third-party-podspecs/GLog.podspec`)
+  - GoogleUtilities (~> 5.3.7)
+  - react-native-camera (from `../../../node_modules/react-native-camera`)
+  - react-native-config (from `../../../node_modules/react-native-config`)
+  - react-native-contacts (from `../../../node_modules/react-native-contacts`)
+  - react-native-geth (from `../../../node_modules/react-native-geth`)
+  - react-native-keep-awake (from `../../../node_modules/react-native-keep-awake`)
+  - react-native-mail (from `../../../node_modules/react-native-mail`)
+  - "react-native-netinfo (from `../../../node_modules/@react-native-community/netinfo`)"
+  - react-native-splash-screen (from `../../../node_modules/react-native-splash-screen`)
+  - react-native-udp (from `../../../node_modules/react-native-udp`)
+  - react-native-version-check (from `../../../node_modules/react-native-version-check`)
+  - React/Core (from `../node_modules/react-native`)
+  - React/CxxBridge (from `../node_modules/react-native`)
+  - React/DevSupport (from `../node_modules/react-native`)
+  - React/RCTActionSheet (from `../node_modules/react-native`)
+  - React/RCTAnimation (from `../node_modules/react-native`)
+  - React/RCTBlob (from `../node_modules/react-native`)
+  - React/RCTGeolocation (from `../node_modules/react-native`)
+  - React/RCTImage (from `../node_modules/react-native`)
+  - React/RCTLinkingIOS (from `../node_modules/react-native`)
+  - React/RCTNetwork (from `../node_modules/react-native`)
+  - React/RCTSettings (from `../node_modules/react-native`)
+  - React/RCTText (from `../node_modules/react-native`)
+  - React/RCTVibration (from `../node_modules/react-native`)
+  - React/RCTWebSocket (from `../node_modules/react-native`)
+  - "RNAnalytics (from `../../../node_modules/@segment/analytics-react-native`)"
+  - "RNAnalyticsIntegration-Firebase (from `../../../node_modules/@segment/analytics-react-native-firebase`)"
+  - RNDeviceInfo (from `../../../node_modules/react-native-device-info`)
+  - RNFirebase (from `../../../node_modules/react-native-firebase/ios`)
+  - RNFS (from `../../../node_modules/react-native-fs`)
+  - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNLanguages (from `../../../node_modules/react-native-languages`)
+  - RNRandomBytes (from `../../../node_modules/react-native-secure-randombytes`)
+  - RNScreens (from `../../../node_modules/react-native-screens`)
+  - RNSecureKeyStore (from `../../../node_modules/react-native-secure-key-store/ios`)
+  - RNShare (from `../../../node_modules/react-native-share`)
+  - RNSVG (from `../../../node_modules/react-native-svg`)
+  - SentryReactNative (from `../../../node_modules/react-native-sentry`)
+  - yoga (from `../node_modules/react-native/ReactCommon/yoga/Yoga.podspec`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Analytics
+    - boost-for-react-native
+    - Crashlytics
+    - Fabric
+    - Firebase
+    - FirebaseAnalytics
+    - FirebaseCore
+    - FirebaseInstanceID
+    - GoogleAppMeasurement
+    - GoogleUtilities
+    - KSCrash
+    - nanopb
+    - Segment-Firebase
+    - Sentry
+
+EXTERNAL SOURCES:
+  CeloBlockchain:
+    :path: "../../../node_modules/@celo/client/CeloBlockchain.podspec"
+  DoubleConversion:
+    :podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
+  Folly:
+    :podspec: "../node_modules/react-native/third-party-podspecs/Folly.podspec"
+  glog:
+    :podspec: "../node_modules/react-native/third-party-podspecs/GLog.podspec"
+  React:
+    :path: "../node_modules/react-native"
+  react-native-camera:
+    :path: "../../../node_modules/react-native-camera"
+  react-native-config:
+    :path: "../../../node_modules/react-native-config"
+  react-native-contacts:
+    :path: "../../../node_modules/react-native-contacts"
+  react-native-geth:
+    :path: "../../../node_modules/react-native-geth"
+  react-native-keep-awake:
+    :path: "../../../node_modules/react-native-keep-awake"
+  react-native-mail:
+    :path: "../../../node_modules/react-native-mail"
+  react-native-netinfo:
+    :path: "../../../node_modules/@react-native-community/netinfo"
+  react-native-splash-screen:
+    :path: "../../../node_modules/react-native-splash-screen"
+  react-native-udp:
+    :path: "../../../node_modules/react-native-udp"
+  react-native-version-check:
+    :path: "../../../node_modules/react-native-version-check"
+  RNAnalytics:
+    :path: "../../../node_modules/@segment/analytics-react-native"
+  RNAnalyticsIntegration-Firebase:
+    :path: "../../../node_modules/@segment/analytics-react-native-firebase"
+  RNDeviceInfo:
+    :path: "../../../node_modules/react-native-device-info"
+  RNFirebase:
+    :path: "../../../node_modules/react-native-firebase/ios"
+  RNFS:
+    :path: "../../../node_modules/react-native-fs"
+  RNGestureHandler:
+    :path: "../node_modules/react-native-gesture-handler"
+  RNLanguages:
+    :path: "../../../node_modules/react-native-languages"
+  RNRandomBytes:
+    :path: "../../../node_modules/react-native-secure-randombytes"
+  RNScreens:
+    :path: "../../../node_modules/react-native-screens"
+  RNSecureKeyStore:
+    :path: "../../../node_modules/react-native-secure-key-store/ios"
+  RNShare:
+    :path: "../../../node_modules/react-native-share"
+  RNSVG:
+    :path: "../../../node_modules/react-native-svg"
+  SentryReactNative:
+    :path: "../../../node_modules/react-native-sentry"
+  yoga:
+    :path: "../node_modules/react-native/ReactCommon/yoga/Yoga.podspec"
+
+SPEC CHECKSUMS:
+  Analytics: 77fd5fb102a4a5eedafa2c2b0245ceb7b7c15e45
+  boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
+  CeloBlockchain: 4779210b5840c586b131de638694044ecb362bda
+  Crashlytics: 2dfd686bcb918dc10ee0e76f7f853fe42c7bd552
+  DoubleConversion: bb338842f62ab1d708ceb63ec3d999f0f3d98ecd
+  Fabric: 706c8b8098fff96c33c0db69cbf81f9c551d0d74
+  Firebase: 0c8cf33f266410c61ab3e2265cfa412200351d9c
+  FirebaseAnalytics: ece1aa57a4f43c64d53a648b5a5e05151aae947b
+  FirebaseCore: f1a9a8be1aee4bf71a2fc0f4096df6788bdfda61
+  FirebaseInstanceID: a122b0c258720cf250551bb2bedf48c699f80d90
+  Folly: de497beb10f102453a1afa9edbf8cf8a251890de
+  glog: aefd1eb5dda2ab95ba0938556f34b98e2da3a60d
+  GoogleAppMeasurement: ffe513e90551844a739e7bcbb1d2aca1c28a4338
+  GoogleUtilities: 111a012f4c3a29c9e7c954c082fafd6ee3c999c0
+  KSCrash: 47bc2f48bb5537f112432cfbea9a359aaf7a6cc5
+  nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
+  React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
+  react-native-camera: b322bc25f47536219473c6d00c666d221f7f2695
+  react-native-config: 8f6b2b9e017f6a5e92a97353c768e19e67294bb1
+  react-native-contacts: 348958bb7da4399040b1eb45bfb7f6af08e61412
+  react-native-geth: 8ec5ada8b9c69eea6a515fdfe784878a625c9b6e
+  react-native-keep-awake: abcf6d09d0cc5fe45df4a56a9382e25d10cff8b6
+  react-native-mail: 021d8ee60e374609f5689ef354dc8e36839a9ba6
+  react-native-netinfo: 1ea4efa22c02519ac8043ac3f000062a4e320795
+  react-native-splash-screen: 353334c5ae82d8c74501ea7cbb916cb7cb20c8bf
+  react-native-udp: 54a1aa9bf5c0824f930b1ba6dbfb3fd3e733bba9
+  react-native-version-check: 901616b6d258b385628120441bd0b285b24c7be1
+  RNAnalytics: 05243c1fa17186f07be3eae30514b43aeb2e0578
+  RNAnalyticsIntegration-Firebase: 82b879019b012d1aa1cbcb6dfc466acd7233bb97
+  RNDeviceInfo: 2b4f76adc479657bf37bfc927bbfb027b17515d4
+  RNFirebase: 7d4733713a0f436d55388b55ca3744385c70fd2d
+  RNFS: 0f4d630b538e93e0e9e3519ff0b7b7b48760d8ed
+  RNGestureHandler: b65d391f4f570178d657b99a16ec99d09b8656b0
+  RNLanguages: 69291ca9fea686ff96c66a519f92f7e5af1d08ae
+  RNRandomBytes: ed3e5894ef983d1afd17a63349cc517b260138fa
+  RNScreens: 720a9e6968beb73e8196239801e887d8401f86ed
+  RNSecureKeyStore: f1ad870e53806453039f650720d2845c678d89c8
+  RNShare: 4f206fa36e384e95a0cbf79f2a92490647e93127
+  RNSVG: a78b4c581e33a1bb72968997d167afabf72b05dc
+  Segment-Firebase: 165b1be115ad2011a3e3f4312301e2c96f92ab38
+  Sentry: 7d3ea7176e5184e9c35c12a5825905345807e8c1
+  SentryReactNative: 014e5b1684c30c31e6514a57e51eff26cf2b99f7
+  yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
+
+PODFILE CHECKSUM: 4685ed03314b9d51829f40dbedd326507098bd2e
+
+COCOAPODS: 1.7.5

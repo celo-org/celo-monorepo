@@ -326,6 +326,12 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
           }
         }
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -336,7 +342,6 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
           Object {
             "justifyContent": "flex-end",
             "margin": 12,
-            "opacity": 1,
           }
         }
       >
@@ -429,6 +434,12 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
           }
         }
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -439,7 +450,6 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
           Object {
             "justifyContent": "flex-end",
             "margin": 12,
-            "opacity": 1,
           }
         }
       >
