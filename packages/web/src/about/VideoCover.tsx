@@ -43,7 +43,6 @@ class VideoCover extends React.PureComponent<I18nProps & ScreenProps, State> {
 
   componentDidMount = () => {
     const connectionType = getEffectiveConnection(window.navigator)
-    console.log(connectionType)
     if (!SLOW_CONNECTIONS.has(connectionType)) {
       this.setState({ supportsVideo: true })
     }

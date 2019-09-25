@@ -15,7 +15,6 @@ export function scrollTo(elementID: string, position?: 'start' | 'center') {
 
 export function getEffectiveConnection(navigator): EffectiveTypes {
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection
-  console.log(connection)
   return (connection && connection.effectiveType) || 'unknown'
 }
 
