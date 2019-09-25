@@ -16,7 +16,6 @@
     "build": "tsc -b .",
     "clean": "tsc -b . --clean",
     "clean:all": "yarn clean && rm -rf lib",
-    "build:gen": "yarn --cwd ../protocol build",
     "prepublishOnly": "yarn build:gen && yarn build",
     "start": "TS_NODE_FILES=true ts-node src/index.ts",
     "db:create:dev": "mkdir -p db && touch db/dev.db",

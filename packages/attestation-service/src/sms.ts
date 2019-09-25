@@ -49,7 +49,7 @@ function getMatchingNumber(countryCode: string) {
 export async function sendSms(phoneNumber: string, message: string) {
   const countryCode = phoneUtil.getRegionCodeForNumber(phoneUtil.parse(phoneNumber))
 
-  if (countryCode === undefined) {
+  if (!countryCode) {
     throw new Error('could not extract country code')
   }
 
