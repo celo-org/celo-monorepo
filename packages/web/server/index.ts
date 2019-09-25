@@ -52,9 +52,9 @@ function wwwRedirect(req, res, nextAction) {
       res.redirect('/jobs')
     })
   })
-  ;['/about'].forEach((path) => {
+  ;['/about-us'].forEach((path) => {
     server.get(path, (_, res) => {
-      res.redirect('/about-us')
+      res.redirect('/about')
     })
   })
 
