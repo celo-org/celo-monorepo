@@ -44,7 +44,7 @@ export default class Rewards extends BaseCommand {
     }
 
     if (res.flags.delegate) {
-      const tx = await lockedGold.delegateRewardsTx(res.flags.from, res.flags.delegate)
+      const tx = await lockedGold.delegateRewards(res.flags.from, res.flags.delegate)
       await displaySendTx('delegateRewards', tx)
     }
   }

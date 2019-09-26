@@ -19,6 +19,7 @@
     "test-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'"
   },
   "dependencies": {
+    "@celo/utils": "^0.0.6-beta5",
     "@segment/in-eu": "^0.2.1",
     "@sentry/browser": "^5.6.2",
     "@sentry/node": "^5.6.2",
@@ -46,6 +47,7 @@
     "lodash.throttle": "^4.1.1",
     "lottie-web": "^5.5.7",
     "mailgun-js": "^0.22.0",
+    "memoize-one": "^5.1.1",
     "mobile-detect": "^1.4.2",
     "net": "^1.0.2",
     "next": "^8.0.3",
@@ -54,6 +56,7 @@
     "next-plugin-transpile-modules": "^2.0.0",
     "nuka-carousel": "git://github.com/cmcewen/nuka-carousel#fee86bf",
     "react": "^16.8.5",
+    "react-autosuggest": "^9.4.3",
     "react-debounce-input": "^3.2.0",
     "react-dom": "^16.8.5",
     "react-google-recaptcha": "^1.1.0",
@@ -68,7 +71,6 @@
     "shuffle-seed": "^1.1.6",
     "stickyfilljs": "^2.0.5",
     "svgs": "^4.1.0",
-    "tabletop": "^1.5.2",
     "tls": "^0.0.1"
   },
   "devDependencies": {
@@ -80,6 +82,7 @@
     "@types/next": "^8.0.3",
     "@types/node": "^10.12.18",
     "@types/react": "^16.8.19",
+    "@types/react-autosuggest": "^9.3.11",
     "@types/react-css-modules": "^4.6.1",
     "@types/react-google-recaptcha": "^1.0.0",
     "@types/react-native": "^0.57.41",

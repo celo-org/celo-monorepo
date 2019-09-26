@@ -555,12 +555,15 @@ async function helmParameters(celoEnv: string) {
     `--set geth.faultyValidatorType="${fetchEnvOrFallback('FAULTY_VALIDATOR_TYPE', '0')}"`,
     `--set geth.tx_nodes="${fetchEnv('TX_NODES')}"`,
     `--set geth.ssd_disks="${fetchEnvOrFallback(envVar.GETH_NODES_SSD_DISKS, 'true')}"`,
-    `--set geth.admin_rpc_enabled=${fetchEnvOrFallback('ADMIN_RPC_ENABLED', 'false')}`,
     `--set mnemonic="${fetchEnv('MNEMONIC')}"`,
     `--set contracts.cron_jobs.enabled=${fetchEnv('CONTRACT_CRONJOBS_ENABLED')}`,
     `--set geth.account.secret="${fetchEnv('GETH_ACCOUNT_SECRET')}"`,
     `--set ethstats.webSocketSecret="${fetchEnv('ETHSTATS_WEBSOCKETSECRET')}"`,
     `--set geth.ping_ip_from_packet=${fetchEnvOrFallback('PING_IP_FROM_PACKET', 'false')}`,
+    `--set geth.in_memory_discovery_table=${fetchEnvOrFallback(
+      'IN_MEMORY_DISCOVERY_TABLE',
+      'false'
+    )}`,
     ...productionTagOverrides,
     ...(await helmIPParameters(celoEnv)),
     ...gethAccountParameters,

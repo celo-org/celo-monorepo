@@ -1,4 +1,5 @@
 const defaultConfig = require('../../jest.config.js')
+const reactNativeJestPreset = require('react-native/jest-preset')
 
 module.exports = {
   ...defaultConfig,
@@ -10,6 +11,11 @@ module.exports = {
       isolatedModules: true,
     },
     window: true,
+  },
+  // Override default platform to android for now
+  haste: {
+    ...reactNativeJestPreset.haste,
+    defaultPlatform: 'android',
   },
   moduleNameMapper: {
     '@celo/mobile': '<rootDir>',
