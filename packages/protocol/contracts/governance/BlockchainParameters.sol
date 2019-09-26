@@ -16,11 +16,11 @@ contract BlockchainParameters is Ownable, Initializable {
 
   ClientVersion minimumClientVersion;
 
-  uint256 gasForDebitFromTransactions;
-  uint256 gasForCreditToTransactions;
-  uint256 gasToReadErc20Balance;
-  uint256 gasToReadTobinTax;
-  uint256 gasForNonGoldCurrencies;
+  uint256 public gasForDebitFromTransactions;
+  uint256 public gasForCreditToTransactions;
+  uint256 public gasToReadErc20Balance;
+  uint256 public gasToReadTobinTax;
+  uint256 public gasForNonGoldCurrencies;
 
   event MinimumClientVersionSet(uint256 major, uint256 minor, uint256 patch);
   event GasForDebitFromTransactionsSet(uint gas);
