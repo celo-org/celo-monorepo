@@ -1,4 +1,5 @@
 import getConfig from 'next/config'
+import Sentry from '../fullstack/sentry'
 import airtableInit from '../server/airtable'
 
 interface Fields {
@@ -22,6 +23,7 @@ export default function latestAnnouncements(): Promise<Fields[]> {
       })
       .firstPage((err: QueryError, records: Airtable.Response<Fields>) => {
         if (err) {
+          Sentry.captureEvent(err)
           reject(err)
           return
         }

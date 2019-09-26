@@ -1,5 +1,6 @@
 import { GenesisBlockUtils, StaticNodeUtils } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
+import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import RNGeth from 'react-native-geth'
@@ -44,6 +45,23 @@ enum ErrorType {
   Unknown,
   GethAlreadyRunning,
   CorruptChainData,
+}
+
+// Must match `clientIdentifier`
+// see https://github.com/celo-org/celo-blockchain/blob/d4b48f3e79b01e8cb7dcf8606b0ed1f666a37a2f/mobile/geth.go#L143
+// and https://github.com/celo-org/celo-blockchain/blob/d4b48f3e79b01e8cb7dcf8606b0ed1f666a37a2f/mobile/geth_android.go
+const INSTANCE_FOLDER = Platform.select({
+  ios: 'iGeth',
+  android: 'GethDroid',
+  default: 'GethMobile',
+})
+
+function getNodeInstancePath(nodeDir: string) {
+  return `${RNFS.DocumentDirectoryPath}/${nodeDir}/${INSTANCE_FOLDER}`
+}
+
+function getFolder(filePath: string) {
+  return filePath.substr(0, filePath.lastIndexOf('/'))
 }
 
 async function createNewGeth(): Promise<typeof RNGeth> {
@@ -192,8 +210,12 @@ async function ensureGenesisBlockWritten(): Promise<boolean> {
   }
 }
 
+function getGenesisBlockFile(nodeDir: string) {
+  return `${getNodeInstancePath(nodeDir)}/genesis.json`
+}
+
 async function genesisBlockAlreadyWritten(nodeDir: string): Promise<boolean> {
-  const genesisBlockFile = `${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/genesis.json`
+  const genesisBlockFile = getGenesisBlockFile(nodeDir)
   if (!(await RNFS.exists(genesisBlockFile))) {
     return false
   }
@@ -202,15 +224,19 @@ async function genesisBlockAlreadyWritten(nodeDir: string): Promise<boolean> {
 }
 
 async function readGenesisBlockFile(nodeDir: string): Promise<string> {
-  const genesisBlockFile = `${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/genesis.json`
+  const genesisBlockFile = getGenesisBlockFile(nodeDir)
   return RNFS.readFile(genesisBlockFile, { encoding: 'utf8' })
 }
 
 async function writeGenesisBlock(nodeDir: string, genesisBlock: string) {
   Logger.debug(`writeGenesisBlock genesis block is: "${genesisBlock}"`)
-  const genesisBlockFile = `${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/genesis.json`
-  await RNFS.mkdir(`${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid`)
+  const genesisBlockFile = getGenesisBlockFile(nodeDir)
+  await RNFS.mkdir(getFolder(genesisBlockFile))
   await RNFS.writeFile(genesisBlockFile, genesisBlock, 'utf8')
+}
+
+function getStaticNodesFile(nodeDir: string) {
+  return `${getNodeInstancePath(nodeDir)}/static-nodes.json`
 }
 
 /**
@@ -218,7 +244,7 @@ async function writeGenesisBlock(nodeDir: string, genesisBlock: string) {
  * @param nodeDir Geth data dir
  */
 async function staticNodesAlreadyInitialized(nodeDir: string): Promise<boolean> {
-  const staticNodesFile = `${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/static-nodes.json`
+  const staticNodesFile = getStaticNodesFile(nodeDir)
   if (!(await RNFS.exists(staticNodesFile))) {
     return false
   }
@@ -228,8 +254,8 @@ async function staticNodesAlreadyInitialized(nodeDir: string): Promise<boolean> 
 
 async function writeStaticNodes(nodeDir: string, enodes: string) {
   console.info(`writeStaticNodes enodes are "${enodes}"`)
-  const staticNodesFile = `${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/static-nodes.json`
-  await RNFS.mkdir(`${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/`)
+  const staticNodesFile = getStaticNodesFile(nodeDir)
+  await RNFS.mkdir(getFolder(staticNodesFile))
   await RNFS.writeFile(staticNodesFile, enodes, 'utf8')
 }
 
@@ -255,7 +281,7 @@ export async function deleteChainData() {
 
 async function deleteSingleChainData(syncMode: SyncMode) {
   const { nodeDir } = currentConfig
-  const chainDataDir = `${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/${syncMode}chaindata`
+  const chainDataDir = `${getNodeInstancePath(nodeDir)}/${syncMode}chaindata`
   Logger.debug('Geth@deleteSingleChainData', `Going to delete ${chainDataDir}`)
   return deleteFileIfExists(chainDataDir)
 }
@@ -263,7 +289,7 @@ async function deleteSingleChainData(syncMode: SyncMode) {
 async function deleteGethLockFile() {
   // Delete the .ipc file or the Geth will think that some other Geth node is using this datadir.
   const { nodeDir } = currentConfig
-  const gethLockFile = `${RNFS.DocumentDirectoryPath}/${nodeDir}/GethDroid/LOCK`
+  const gethLockFile = `${getNodeInstancePath(nodeDir)}/LOCK`
   Logger.info('Geth@deleteGethLockFile', `Deleting ${gethLockFile} for nodeDir ${nodeDir}`)
   return deleteFileIfExists(gethLockFile)
 }

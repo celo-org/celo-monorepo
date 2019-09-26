@@ -53,6 +53,7 @@ contract('Attestations', (accounts: string[]) => {
   let mockValidators: MockValidatorsInstance
   let registry: RegistryInstance
   const provider = new Web3.providers.HttpProvider('http://localhost:8545')
+  const metadataURL = 'https://www.celo.org'
   const web3: Web3 = new Web3(provider)
   const phoneNumber: string = '+18005551212'
   const caller: string = accounts[0]
@@ -771,6 +772,24 @@ contract('Attestations', (accounts: string[]) => {
       assert.lengthOf(addresses, 0)
       assert.lengthOf(completed, 0)
       assert.lengthOf(total, 0)
+    })
+  })
+
+  describe('#setMetadataURL', async () => {
+    it('should set the metadataURL', async () => {
+      await attestations.setMetadataURL(metadataURL)
+      const result = await attestations.getMetadataURL(caller)
+      assert.equal(result, metadataURL)
+    })
+
+    it('should emit the AccountMetadataURLSet event', async () => {
+      const response = await attestations.setMetadataURL(metadataURL)
+      assert.lengthOf(response.logs, 1)
+      const event = response.logs[0]
+      assertLogMatches2(event, {
+        event: 'AccountMetadataURLSet',
+        args: { account: caller, metadataURL },
+      })
     })
   })
 })
