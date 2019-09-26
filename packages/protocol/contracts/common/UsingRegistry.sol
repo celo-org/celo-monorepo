@@ -9,6 +9,8 @@ import "../governance/interfaces/IElection.sol";
 import "../governance/interfaces/ILockedGold.sol";
 import "../governance/interfaces/IValidators.sol";
 
+import "../identity/interfaces/IRandom.sol";
+
 // Ideally, UsingRegistry should inherit from Initializable and implement initialize() which calls
 // setRegistry(). TypeChain currently has problems resolving overloaded functions, so this is not
 // possible right now.
@@ -58,6 +60,10 @@ contract UsingRegistry is Ownable {
 
   function getLockedGold() internal view returns(ILockedGold) {
     return ILockedGold(registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
+  }
+
+  function getRandom() internal view returns(IRandom) {
+    return IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
   }
 
   function getValidators() internal view returns(IValidators) {

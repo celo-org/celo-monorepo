@@ -168,15 +168,24 @@ module.exports = async (_deployer: any) => {
     })
   }
 
+  console.info('  Marking Validator Group as eligible for election ...')
+  // @ts-ignore
+  const markTx = election.contract.methods.markGroupEligible(
+    account.address,
+    NULL_ADDRESS,
+    NULL_ADDRESS
+  )
+  await sendTransactionWithPrivateKey(web3, markTx, account.privateKey, {
+    to: election.address,
+  })
+
   console.info('  Voting for Validator Group ...')
   // Make another deposit so our vote has more weight.
   const minLockedGoldVotePerValidator = 10000
   const value = new BigNumber(valKeys.length)
     .times(minLockedGoldVotePerValidator)
     .times(web3.utils.toWei(1))
-  await lockedGold.lock({
-    // @ts-ignore
-    value,
-  })
+  // @ts-ignore
+  await lockedGold.lock({ value })
   await election.vote(account.address, value, NULL_ADDRESS, NULL_ADDRESS)
 }

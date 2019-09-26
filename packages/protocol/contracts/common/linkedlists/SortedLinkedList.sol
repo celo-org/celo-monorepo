@@ -33,10 +33,10 @@ library SortedLinkedList {
   )
     public
   {
-    require(key != bytes32(0) && key != lesserKey && key != greaterKey && !contains(list, key));
-    require((lesserKey != bytes32(0) || greaterKey != bytes32(0)) || list.list.numElements == 0);
-    require(contains(list, lesserKey) || lesserKey == bytes32(0));
-    require(contains(list, greaterKey) || greaterKey == bytes32(0));
+    require(key != bytes32(0) && key != lesserKey && key != greaterKey && !contains(list, key), "1");
+    require((lesserKey != bytes32(0) || greaterKey != bytes32(0)) || list.list.numElements == 0, "2");
+    require(contains(list, lesserKey) || lesserKey == bytes32(0), "3");
+    require(contains(list, greaterKey) || greaterKey == bytes32(0), "4"); 
     (lesserKey, greaterKey) = getLesserAndGreater(list, value, lesserKey, greaterKey);
     list.list.insert(key, lesserKey, greaterKey);
     list.values[key] = value;
@@ -183,10 +183,10 @@ library SortedLinkedList {
       greaterKey == bytes32(0) && isValueBetween(list, value, list.list.head, greaterKey)
     ) {
       return (list.list.head, greaterKey);
-    } else if (isValueBetween(list, value, lesserKey, list.list.elements[lesserKey].nextKey)) {
+    } else if (lesserKey != bytes32(0) && isValueBetween(list, value, lesserKey, list.list.elements[lesserKey].nextKey)) {
       return (lesserKey, list.list.elements[lesserKey].nextKey);
     } else if (
-      isValueBetween(list, value, list.list.elements[greaterKey].previousKey, greaterKey)
+      greaterKey != bytes32(0) && isValueBetween(list, value, list.list.elements[greaterKey].previousKey, greaterKey)
     ) {
       return (list.list.elements[greaterKey].previousKey, greaterKey);
     } else {

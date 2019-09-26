@@ -16,8 +16,8 @@ import {
   AttestationsInstance,
   MockStableTokenContract,
   MockStableTokenInstance,
-  MockValidatorsContract,
-  MockValidatorsInstance,
+  MockElectionContract,
+  MockElectionInstance,
   RandomContract,
   RandomInstance,
   RegistryContract,
@@ -35,7 +35,7 @@ function attestationMessageToSign(phoneHash: string, account: string) {
 
 const Attestations: AttestationsContract = artifacts.require('Attestations')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
-const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
+const MockElection: MockElectionContract = artifacts.require('MockElection')
 const Random: RandomContract = artifacts.require('Random')
 const Registry: RegistryContract = artifacts.require('Registry')
 
@@ -50,7 +50,7 @@ contract('Attestations', (accounts: string[]) => {
   let mockStableToken: MockStableTokenInstance
   let otherMockStableToken: MockStableTokenInstance
   let random: RandomInstance
-  let mockValidators: MockValidatorsInstance
+  let mockElection: MockElectionInstance
   let registry: RegistryInstance
   const provider = new Web3.providers.HttpProvider('http://localhost:8545')
   const web3: Web3 = new Web3(provider)
@@ -108,11 +108,11 @@ contract('Attestations', (accounts: string[]) => {
     otherMockStableToken = await MockStableToken.new()
     attestations = await Attestations.new()
     random = await Random.new()
-    mockValidators = await MockValidators.new()
-    await Promise.all(accounts.map((account) => mockValidators.addValidator(account)))
+    mockElection = await MockElection.new()
+    await mockElection.setElectedValidators(accounts)
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Random, random.address)
-    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+    await registry.setAddressFor(CeloContractName.Election, mockElection.address)
 
     await attestations.initialize(
       registry.address,

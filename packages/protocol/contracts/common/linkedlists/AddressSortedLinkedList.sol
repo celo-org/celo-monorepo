@@ -119,4 +119,12 @@ library AddressSortedLinkedList {
     }
     return keys;
   }
+
+  /**
+   * @notice Gets all element keys from the doubly linked list.
+   * @return All element keys from head to tail.
+   */
+  function getKeys(SortedLinkedList.List storage list) public view returns (address[] memory) {
+    return headN(list, list.list.numElements);
+  }
 }

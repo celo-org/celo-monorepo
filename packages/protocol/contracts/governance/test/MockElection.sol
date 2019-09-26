@@ -8,6 +8,7 @@ import "../interfaces/IElection.sol";
 contract MockElection is IElection {
 
   mapping(address => bool) public isIneligible;
+  address[] public electedValidators;
 
   function markGroupIneligible(address account) external {
     isIneligible[account] = true;
@@ -21,8 +22,11 @@ contract MockElection is IElection {
     return 0;
   }
 
+  function setElectedValidators(address[] calldata _electedValidators) external {
+    electedValidators = _electedValidators;
+  }
+
   function electValidators() external view returns (address[] memory) {
-    address[] memory r = new address[](0);
-    return r;
+    return electedValidators;
   }
 }
