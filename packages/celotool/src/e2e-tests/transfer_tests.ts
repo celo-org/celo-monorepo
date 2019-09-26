@@ -481,7 +481,9 @@ describe('transfer tests', function(this: any) {
       try {
         await setMinimumClientVersion(1, 8, 10)
         throw new Error('expected failure')
-      } catch (_) {}
+      } catch (_) {
+        return
+      }
     })
   })
 
