@@ -179,15 +179,41 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     external
     initializer
   {
-    require(_minElectableValidators > 0 && _maxElectableValidators >= _minElectableValidators);
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setElectionThreshold(threshold);
+    setMinMaxElectableValidators(_minElectableValidators,_maxElectableValidators);
+    setRegistrationRequirement(requirementValue, requirementNoticePeriod);
+    setMaxGroupSize(_maxGroupSize);
+  }
+
+  /**
+   * @notice Updates the minimum & maximum numbers of validators that can be elected.
+   * @param _minElectableValidators The minimum number of validators that can be elected.
+   * @param _maxElectableValidators The maximum number of validators that can be elected.
+   * @return True upon success.
+   */
+  function setMinMaxElectableValidators(
+    uint256 _minElectableValidators,
+    uint256 _maxElectableValidators
+  )
+    public
+    onlyOwner
+    returns (bool)
+  {
+    require(
+      _minElectableValidators > 0 &&
+      _minElectableValidators != minElectableValidators &&
+      _minElectableValidators <= _maxElectableValidators &&
+      _maxElectableValidators != maxElectableValidators
+    );
+
     minElectableValidators = _minElectableValidators;
     maxElectableValidators = _maxElectableValidators;
-    registrationRequirement.value = requirementValue;
-    registrationRequirement.noticePeriod = requirementNoticePeriod;
-    setMaxGroupSize(_maxGroupSize);
+
+    emit MinElectableValidatorsSet(_minElectableValidators);
+    emit MaxElectableValidatorsSet(_maxElectableValidators);
+    return true;
   }
 
   /**
@@ -198,7 +224,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   function setMinElectableValidators(
     uint256 _minElectableValidators
   )
-    external
+    public
     onlyOwner
     returns (bool)
   {
@@ -220,7 +246,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   function setMaxElectableValidators(
     uint256 _maxElectableValidators
   )
-    external
+    public
     onlyOwner
     returns (bool)
   {
@@ -263,7 +289,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     uint256 value,
     uint256 noticePeriod
   )
-    external
+    public
     onlyOwner
     returns (bool)
   {
