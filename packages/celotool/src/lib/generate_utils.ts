@@ -124,6 +124,10 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   }
 
   const blockTime = parseInt(fetchEnv(envVar.BLOCK_TIME), 10)
+  const requestTimeout = parseInt(
+    fetchEnvOrFallback(envVar.ISTANBUL_REQUEST_TIMEOUT_MS, '3000'),
+    10
+  )
   const epoch = parseInt(fetchEnvOrFallback(envVar.EPOCH, '30000'), 10)
   const chainId = parseInt(fetchEnv(envVar.NETWORK_ID), 10)
 
@@ -137,6 +141,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     initialAccounts: faucetAddresses,
     epoch,
     chainId,
+    requestTimeout,
     enablePetersburg,
   })
 }
@@ -170,6 +175,7 @@ export const generateGenesis = ({
   blockTime,
   epoch,
   chainId,
+  requestTimeout,
   enablePetersburg = true,
 }: {
   validators: Validator[]
@@ -178,6 +184,7 @@ export const generateGenesis = ({
   blockTime: number
   epoch: number
   chainId: number
+  requestTimeout: number
   enablePetersburg?: boolean
 }) => {
   const genesis: any = { ...TEMPLATE }
@@ -199,6 +206,8 @@ export const generateGenesis = ({
     genesis.extraData = generateIstanbulExtraData(validators)
     genesis.config.istanbul = {
       policy: 0,
+      period: blockTime,
+      requesttimeout: requestTimeout,
       epoch,
     }
   }
