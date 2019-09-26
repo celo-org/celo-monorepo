@@ -74,7 +74,7 @@ function paymentObjectToNotification(po: PaymentRequest): { [key: string]: strin
 export function initializeDb() {
   database = admin.database()
   registrationsRef = database.ref('/registrations')
-  lastBlockRef = database.ref('/lastBlockNotifiedPilot')
+  lastBlockRef = database.ref('/lastBlockNotified')
   pendingRequestsRef = database.ref('/pendingRequests')
   exchangeRatesRef = database.ref('/exchangeRates')
 
