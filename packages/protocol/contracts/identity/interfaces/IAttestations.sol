@@ -14,14 +14,14 @@ interface IAttestations {
 
   function setAttestationExpirySeconds(uint256) external;
 
-  // TODO: For some reason the compiler will complain about the next line
-  // function setAccountDataEncryptionKey(bytes) external;
+  function setAccountDataEncryptionKey(bytes calldata) external;
+  function setMetadataURL(string calldata) external;
   function setWalletAddress(address) external;
   function setAccount(bytes calldata, address) external;
 
   function getDataEncryptionKey(address) external view returns (bytes memory);
   function getWalletAddress(address) external view returns (address);
-
+  function getMetadataURL(address) external view returns (string memory);
 
   function getAttestationRequestFee(address) external view returns (uint256);
 

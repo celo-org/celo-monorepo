@@ -68,7 +68,6 @@
     "shuffle-seed": "^1.1.6",
     "stickyfilljs": "^2.0.5",
     "svgs": "^4.1.0",
-    "tabletop": "^1.5.2",
     "tls": "^0.0.1"
   },
   "devDependencies": {
