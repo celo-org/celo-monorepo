@@ -51,7 +51,7 @@ export function getWordlist(language: string | null): string[] {
 
 // Fallback prefixes that are used in case something goes wrong, must be of size
 // at least equal to number of backup shards
-const FALLBACK_PREFIXES = ['prosper', 'magic']
+const FALLBACK_PREFIXES = ['magic', 'prosper']
 
 function getPrefixWords(wordlist: string[], numWords: number): string[] {
   // Use random words in sorted order for split phrase prefixes from their
