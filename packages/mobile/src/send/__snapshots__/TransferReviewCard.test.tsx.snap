@@ -286,6 +286,12 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
               }
             }
             isTVSelectable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -296,7 +302,6 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
               Object {
                 "alignItems": "center",
                 "justifyContent": "flex-end",
-                "opacity": 1,
                 "paddingHorizontal": 5,
               }
             }
@@ -630,6 +635,12 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
               }
             }
             isTVSelectable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -640,7 +651,6 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
               Object {
                 "alignItems": "center",
                 "justifyContent": "flex-end",
-                "opacity": 1,
                 "paddingHorizontal": 5,
               }
             }
@@ -952,6 +962,12 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
               }
             }
             isTVSelectable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -962,7 +978,6 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
               Object {
                 "alignItems": "center",
                 "justifyContent": "flex-end",
-                "opacity": 1,
                 "paddingHorizontal": 5,
               }
             }

@@ -72,7 +72,7 @@ By default, `NAME` will be set as `RELEASE_NAME`, `NAMESPACE_NAME`, `TESTNET_NAM
 To test the smart contracts, run:
 
 ```bash
-yarn run test:local
+yarn run test
 ```
 
 Adding the optional `--gas` flag will print out a report of contract gas usage.
