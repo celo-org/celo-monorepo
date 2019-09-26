@@ -18,7 +18,6 @@
       "Don’t take a screenshot or save it in your phone notes. Make sure to write the Backup Key down and keep it safe."
   },
   "setBackupKey": "Set Backup Key",
-  "skip": "Skip",
   "areYouSure": "Are you sure?",
   "backupSkipText": {
     "0": "Without a Backup Key, you can lose access to your wallet ",

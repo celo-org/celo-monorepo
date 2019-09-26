@@ -371,6 +371,12 @@ exports[`InviteReview renders correctly 1`] = `
                       }
                     }
                     isTVSelectable={true}
+                    nativeBackgroundAndroid={
+                      Object {
+                        "attribute": "selectableItemBackgroundBorderless",
+                        "type": "ThemeAttrAndroid",
+                      }
+                    }
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -381,7 +387,6 @@ exports[`InviteReview renders correctly 1`] = `
                       Object {
                         "alignItems": "center",
                         "justifyContent": "flex-end",
-                        "opacity": 1,
                         "paddingHorizontal": 5,
                       }
                     }
@@ -484,6 +489,12 @@ exports[`InviteReview renders correctly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -491,15 +502,22 @@ exports[`InviteReview renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "transparent",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
       >
         <View
@@ -569,6 +587,12 @@ exports[`InviteReview renders correctly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -576,15 +600,22 @@ exports[`InviteReview renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "transparent",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
         testID="inviteWhatsApp"
       >
@@ -655,6 +686,12 @@ exports[`InviteReview renders correctly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -662,15 +699,22 @@ exports[`InviteReview renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "transparent",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
       >
         <View

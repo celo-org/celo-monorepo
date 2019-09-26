@@ -1,5 +1,6 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
+import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
@@ -15,7 +16,7 @@ import "../common/UsingRegistry.sol";
 /**
  * @title Contract mapping identifiers to accounts
  */
-contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
+contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, ReentrancyGuard {
 
 
   using SafeMath for uint256;
@@ -55,6 +56,11 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
     bytes dataEncryptionKey
   );
 
+  event AccountMetadataURLSet(
+    address indexed account,
+    string metadataURL
+  );
+
   event AccountWalletAddressSet(
     address indexed account,
     address walletAddress
@@ -86,6 +92,9 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
 
     // The ECDSA public key used to encrypt and decrypt data for this account
     bytes dataEncryptionKey;
+
+    // The URL under which an account adds metadata and claims
+    string metadataURL;
   }
 
   // Stores attestations state for a single (identifier, account address) pair.
@@ -155,6 +164,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
     address attestationRequestFeeToken
   )
     external
+    nonReentrant
   {
     require(
       attestationRequestFees[attestationRequestFeeToken] > 0,
@@ -479,6 +489,24 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
     emit AttestationExpirySecondsSet(_attestationExpirySeconds);
   }
 
+  /**
+   * @notice Setter for the metadata of an account.
+   * @param metadataURL The URL to access the metadata.
+   */
+  function setMetadataURL(string calldata metadataURL) external {
+    accounts[msg.sender].metadataURL = metadataURL;
+    emit AccountMetadataURLSet(msg.sender, metadataURL);
+  }
+
+  /**
+   * @notice Getter for the metadata of an account.
+   * @param account The address of the account to get the metadata for.
+   * @return metdataURL The URL to access the metadata.
+   */
+  function getMetadataURL(address account) external view returns (string memory) {
+    return accounts[account].metadataURL;
+  }
+
     /**
    * @notice Setter for the data encryption key and version.
    * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
@@ -494,7 +522,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
    * @param account The address of the account to get the key for
    * @return dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
    */
-  function getDataEncryptionKey(address account) public view returns (bytes memory) {
+  function getDataEncryptionKey(address account) external view returns (bytes memory) {
     return accounts[account].dataEncryptionKey;
   }
 
@@ -512,7 +540,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
    * @param account The address of the account to get the wallet address for
    * @return Wallet address
    */
-  function getWalletAddress(address account) public view returns (address) {
+  function getWalletAddress(address account) external view returns (address) {
     return accounts[account].walletAddress;
   }
 
@@ -556,7 +584,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry {
   function lookupAccountsForIdentifier(
     bytes32 identifier
   )
-    public
+    external
     view
     returns (address[] memory)
   {

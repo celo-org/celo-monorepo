@@ -7,7 +7,7 @@ exports[`QRCode renders correctly 1`] = `
       "alignItems": "center",
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "height": 1334,
+      "height": 1292,
       "justifyContent": "space-between",
     }
   }
@@ -148,6 +148,12 @@ exports[`QRCode renders correctly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -155,17 +161,24 @@ exports[`QRCode renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#42D689",
-            "borderColor": "#42D689",
-            "borderRadius": 3,
-            "borderWidth": 2,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#42D689",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderColor": "#42D689",
+              "borderRadius": 3,
+              "borderWidth": 2,
+            },
+          ]
         }
       >
         <View
@@ -253,6 +266,12 @@ exports[`QRCode renders correctly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -260,17 +279,24 @@ exports[`QRCode renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderColor": "#42D689",
-            "borderRadius": 3,
-            "borderWidth": 2,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "transparent",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderColor": "#42D689",
+              "borderRadius": 3,
+              "borderWidth": 2,
+            },
+          ]
         }
       >
         <View

@@ -279,6 +279,12 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             }
           }
           isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackgroundBorderless",
+              "type": "ThemeAttrAndroid",
+            }
+          }
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -289,7 +295,6 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             Object {
               "alignItems": "center",
               "justifyContent": "flex-end",
-              "opacity": 1,
               "paddingHorizontal": 5,
             }
           }

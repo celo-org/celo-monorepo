@@ -1,5 +1,7 @@
 /* tslint:disable:no-console */
 
+import { GovernanceInstance, ReserveInstance } from 'types'
+
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,
@@ -8,7 +10,7 @@ import {
   transferOwnershipOfProxyAndImplementation,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { GovernanceInstance, ReserveInstance } from 'types'
+import { toFixed } from '@celo/utils/lib/fixidity'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
   const approver = require('@celo/protocol/truffle.js').networks[networkName].from
@@ -23,6 +25,10 @@ const initializeArgs = async (networkName: string): Promise<any[]> => {
     config.governance.approvalStageDuration,
     config.governance.referendumStageDuration,
     config.governance.executionStageDuration,
+    toFixed(config.governance.participationBaseline).toString(),
+    toFixed(config.governance.participationBaselineFloor).toString(),
+    toFixed(config.governance.participationBaselineUpdateFactor).toString(),
+    toFixed(config.governance.participationBaselineQuorumFactor).toString(),
   ]
 }
 

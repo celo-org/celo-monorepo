@@ -10,6 +10,8 @@ TEST NOTES:
 testWithGanache('Exchange Wrapper', (web3) => {
   const ONE = web3.utils.toWei('1', 'ether')
 
+  const LARGE_BUY_AMOUNT = web3.utils.toWei('1000', 'ether')
+
   const kit = newKitFromWeb3(web3)
   let accounts: string[] = []
   let exchange: ExchangeWrapper
@@ -28,14 +30,12 @@ testWithGanache('Exchange Wrapper', (web3) => {
     expect(sellBucket.toNumber()).toBeGreaterThan(0)
   })
 
-  // TODO: fix, broken until Exchange.sol is fixed
-  test.skip('SBAT quoteUsdSell', () => expect(exchange.quoteUsdSell(ONE)).resolves.toBeBigNumber())
+  test('SBAT quoteUsdSell', () => expect(exchange.quoteUsdSell(ONE)).resolves.toBeBigNumber())
   test('SBAT quoteGoldSell', () => expect(exchange.quoteGoldSell(ONE)).resolves.toBeBigNumber())
   test('SBAT quoteUsdBuy', () => expect(exchange.quoteUsdBuy(ONE)).resolves.toBeBigNumber())
   test('SBAT quoteGoldBuy', () => expect(exchange.quoteGoldBuy(ONE)).resolves.toBeBigNumber())
 
-  // TODO: fix, broken until Exchange.sol is fixed
-  test.skip('SBAT sellDollar', async () => {
+  test('SBAT sellDollar', async () => {
     const goldAmount = await exchange.quoteUsdSell(ONE)
 
     const stableToken = await kit.contracts.getStableToken()
@@ -53,5 +53,15 @@ testWithGanache('Exchange Wrapper', (web3) => {
     const usdAmount = await exchange.quoteGoldSell(ONE)
     const sellTx = await exchange.sellGold(ONE, usdAmount).send()
     await sellTx.waitReceipt()
+  })
+
+  test('SBAT getExchangeRate for selling gold', async () => {
+    const sellGoldRate = await exchange.getExchangeRate(LARGE_BUY_AMOUNT, true)
+    expect(sellGoldRate.toNumber()).toBeGreaterThan(0)
+  })
+
+  test('SBAT getExchangeRate for selling dollars', async () => {
+    const sellGoldRate = await exchange.getUsdExchangeRate(LARGE_BUY_AMOUNT)
+    expect(sellGoldRate.toNumber()).toBeGreaterThan(0)
   })
 })
