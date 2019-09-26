@@ -2,7 +2,7 @@ import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 
-require('numeral')
+const numeral = require('numeral')
 require('numeral/locales/es')
 
 export enum Actions {
