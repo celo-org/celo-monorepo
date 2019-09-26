@@ -34,9 +34,9 @@ import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 
-// function goToFaucet() {
-//   Linking.openURL('https://celo.org/build/wallet')
-// }
+function goToFaucet() {
+  Linking.openURL('https://celo.org/build/wallet')
+}
 
 interface StateProps {
   error: ErrorMessages | null
@@ -240,7 +240,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
         </ScrollView>
 
         <View>
-          {/* <Text style={[styles.body, styles.askInviteContainer]}>
+          <Text style={[styles.body, styles.askInviteContainer]}>
             {t('inviteCodeText.askForInvite.0')}
             <Text
               onPress={goToFaucet}
@@ -248,7 +248,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
             >
               {t('inviteCodeText.askForInvite.1')}
             </Text>
-          </Text> */}
+          </Text>
           <Button
             onPress={this.onContinue}
             text={t('continue')}
