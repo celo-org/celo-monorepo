@@ -15,6 +15,11 @@ contract('BlockchainParameters', (accounts: string[]) => {
     minor: 8,
     patch: 2,
   }
+  const gasForDebitFromTransactions = 10000
+  const gasForCreditToTransactions = 20000
+  const gasToReadErc20Balance = 30000
+  const gasToReadTobinTax = 40000
+  const gasForNonGoldCurrencies = 50000
 
   beforeEach(async () => {
     blockchainParameters = await BlockchainParameters.new()
@@ -60,7 +65,16 @@ contract('BlockchainParameters', (accounts: string[]) => {
 
   describe('#initialize()', () => {
     it('should set the variables', async () => {
-      await blockchainParameters.initialize(version.major, version.minor, version.patch)
+      await blockchainParameters.initialize(
+        version.major,
+        version.minor,
+        version.patch,
+        gasForDebitFromTransactions,
+        gasForCreditToTransactions,
+        gasToReadErc20Balance,
+        gasToReadTobinTax,
+        gasForNonGoldCurrencies
+      )
       const versionQueried = await blockchainParameters.getMinimumClientVersion()
       assert.equal(version.major, versionQueried[0].toNumber())
       assert.equal(version.minor, versionQueried[1].toNumber())
@@ -70,9 +84,14 @@ contract('BlockchainParameters', (accounts: string[]) => {
       const resp = await blockchainParameters.initialize(
         version.major,
         version.minor,
-        version.patch
+        version.patch,
+        gasForDebitFromTransactions,
+        gasForCreditToTransactions,
+        gasToReadErc20Balance,
+        gasToReadTobinTax,
+        gasForNonGoldCurrencies
       )
-      assert.equal(resp.logs.length, 2)
+      assert.equal(resp.logs.length, 7)
       assertContainSubset(resp.logs[1], {
         event: 'MinimumClientVersionSet',
         args: {

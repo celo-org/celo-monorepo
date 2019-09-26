@@ -5,7 +5,16 @@ import { BlockchainParametersInstance } from 'types'
 
 const initializeArgs = async (_: string): Promise<any[]> => {
   const version = config.blockchainParameters.minimumClientVersion
-  return [version.major, version.minor, version.patch]
+  return [
+    version.major,
+    version.minor,
+    version.patch,
+    config.blockchainParameters.gasForDebitFromTransactions,
+    config.blockchainParameters.gasForCreditToTransactions,
+    config.blockchainParameters.gasToReadErc20Balance,
+    config.blockchainParameters.gasToReadTobinTax,
+    config.blockchainParameters.gasForNonGoldCurrencies,
+  ]
 }
 
 module.exports = deploymentForCoreContract<BlockchainParametersInstance>(

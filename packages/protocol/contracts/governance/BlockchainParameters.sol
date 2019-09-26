@@ -16,7 +16,18 @@ contract BlockchainParameters is Ownable, Initializable {
 
   ClientVersion minimumClientVersion;
 
+  uint256 gasForDebitFromTransactions;
+  uint256 gasForCreditToTransactions;
+  uint256 gasToReadErc20Balance;
+  uint256 gasToReadTobinTax;
+  uint256 gasForNonGoldCurrencies;
+
   event MinimumClientVersionSet(uint256 major, uint256 minor, uint256 patch);
+  event GasForDebitFromTransactionsSet(uint gas);
+  event GasForCreditToTransactionsSet(uint gas);
+  event GasToReadErc20BalanceSet(uint gas);
+  event GasToReadTobinTaxSet(uint gas);
+  event GasForNonGoldCurrenciesSet(uint gas);
 
   /**
    * @notice Initializes critical variables.
@@ -30,7 +41,13 @@ contract BlockchainParameters is Ownable, Initializable {
   function initialize(
     uint256 _minimumClientVersion1,
     uint256 _minimumClientVersion2,
-    uint256 _minimumClientVersion3) external initializer
+    uint256 _minimumClientVersion3,
+    uint256 _gasForDebitFromTransactions,
+    uint256 _gasForCreditToTransactions,
+    uint256 _gasToReadErc20Balance,
+    uint256 _gasToReadTobinTax,
+    uint256 _gasForNonGoldCurrencies
+  ) external initializer
   {
     _transferOwnership(msg.sender);
     setMinimumClientVersion(
@@ -38,6 +55,11 @@ contract BlockchainParameters is Ownable, Initializable {
       _minimumClientVersion2,
       _minimumClientVersion3
     );
+    setGasForDebitFromTransactions(_gasForDebitFromTransactions);
+    setGasForCreditToTransactions(_gasForCreditToTransactions);
+    setGasToReadErc20Balance(_gasToReadErc20Balance);
+    setGasToReadTobinTax(_gasToReadTobinTax);
+    setGasForNonGoldCurrencies(_gasForNonGoldCurrencies);
   }
 
   /**
@@ -53,6 +75,31 @@ contract BlockchainParameters is Ownable, Initializable {
     minimumClientVersion.minor = minor;
     minimumClientVersion.patch = patch;
     emit MinimumClientVersionSet(major, minor, patch);
+  }
+
+  function setGasForDebitFromTransactions(uint256 gas) public onlyOwner {
+    gasForDebitFromTransactions = gas;
+    emit GasForDebitFromTransactionsSet(gas);
+  }
+
+  function setGasForCreditToTransactions(uint256 gas) public onlyOwner {
+    gasForCreditToTransactions = gas;
+    emit GasForCreditToTransactionsSet(gas);
+  }
+
+  function setGasToReadErc20Balance(uint256 gas) public onlyOwner {
+    gasToReadErc20Balance = gas;
+    emit GasToReadErc20BalanceSet(gas);
+  }
+
+  function setGasToReadTobinTax(uint256 gas) public onlyOwner {
+    gasToReadTobinTax = gas;
+    emit GasToReadTobinTaxSet(gas);
+  }
+
+  function setGasForNonGoldCurrencies(uint256 gas) public onlyOwner {
+    gasForNonGoldCurrencies = gas;
+    emit GasForNonGoldCurrenciesSet(gas);
   }
 
   function getMinimumClientVersion() public view
