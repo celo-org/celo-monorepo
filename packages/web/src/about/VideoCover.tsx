@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { createElement, Image, StyleSheet, View, ViewStyle, NetInfo } from 'react-native'
+import { createElement, Image, NetInfo, StyleSheet, View, ViewStyle } from 'react-native'
 import { BeautifulMoneyPreview } from 'src/about/images/index'
 import { H1, H3 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
