@@ -17,7 +17,7 @@ import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recip
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes, TransferStandby } from 'src/transactions/reducer'
 import { decryptComment, getTransferFeedParams } from 'src/transactions/transferFeedHelpers'
-import { TransferFeedIcon } from 'src/transactions/TransferFeedIcon'
+import TransferFeedIcon from 'src/transactions/TransferFeedIcon'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
@@ -168,6 +168,7 @@ export function TransferFeedItem(props: Props) {
         <View style={styles.iconContainer}>
           <TransferFeedIcon type={type} recipient={recipient} address={address} />
         </View>
+
         <View style={styles.contentContainer}>
           <View style={styles.titleContainer}>
             <Text style={[fontStyles.semiBold, styles.title]}>{title}</Text>
