@@ -1,3 +1,4 @@
+import { Roles } from '@celo/contractkit'
 import chalk from 'chalk'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
@@ -16,10 +17,24 @@ export default class List extends BaseCommand {
 
   async run() {
     const { args } = this.parse(List)
-    cli.action.start('Fetching commitments...')
+    cli.action.start('Fetching commitments and delegates...')
     const lockedGold = await this.kit.contracts.getLockedGold()
     const commitments = await lockedGold.getCommitments(args.account)
+    const delegates = await Promise.all(
+      Object.keys(Roles).map(async (role: string) => ({
+        role: role,
+        address: await lockedGold.getDelegateFromAccountAndRole(
+          args.account,
+          Roles[role as keyof typeof Roles]
+        ),
+      }))
+    )
     cli.action.stop()
+
+    cli.table(delegates, {
+      role: { header: 'Role', get: (a) => a.role },
+      delegate: { get: (a) => a.address },
+    })
 
     cli.log(chalk.bold.yellow('Total Gold Locked \t') + commitments.total.gold)
     cli.log(chalk.bold.red('Total Account Weight \t') + commitments.total.weight)
