@@ -19,12 +19,14 @@ const ALFAJORES_FROM = '0x456f41406B32c45D59E539e4BBA3D7898c3584dA'
 const PILOT_FROM = '0x387bCb16Bfcd37AccEcF5c9eB2938E30d3aB8BF2'
 const PILOTSTAGING_FROM = '0x545DEBe3030B570731EDab192640804AC8Cf65CA'
 
+const gasLimit = 8000000
+
 const defaultConfig = {
   host: '127.0.0.1',
   port: 8545,
   network_id: 1101,
   from: OG_FROM,
-  gas: 7000000,
+  gas: gasLimit,
   gasPrice: 100000000000,
 }
 
@@ -38,7 +40,7 @@ const networks = {
     ...defaultConfig,
     from: DEVELOPMENT_FROM,
     gasPrice: 0,
-    gas: 7000000,
+    gas: gasLimit,
     defaultBalance: 1000000,
     mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
   },
@@ -46,7 +48,7 @@ const networks = {
     host: 'localhost',
     network_id: '*',
     gasPrice: 0,
-    gas: 7000000,
+    gas: gasLimit,
     from: DEVELOPMENT_FROM,
     provider: function() {
       if (coverageProvider == null) {
@@ -150,14 +152,18 @@ module.exports = {
       version: SOLC_VERSION,
     },
   },
-
   networks,
 }
 
 if (process.argv.includes('--gas')) {
   module.exports = {
+    compilers: {
+      solc: {
+        version: '0.5.8',
+      },
+    },
     plugins: ['truffle-security'],
-
+    networks,
     reporter: 'eth-gas-reporter',
     reporterOptions: {
       currency: 'USD',

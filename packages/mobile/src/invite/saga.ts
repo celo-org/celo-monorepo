@@ -7,7 +7,7 @@ import {
   parseFromContractDecimals,
 } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
-import { Linking } from 'react-native'
+import { Linking, Platform } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import VersionCheck from 'react-native-version-check'
 import { call, delay, put, race, select, spawn, takeLeading } from 'redux-saga/effects'
@@ -102,7 +102,12 @@ export async function generateLink(inviteCode: string, recipientName: string) {
 async function sendSms(toPhone: string, msg: string) {
   return new Promise((resolve, reject) => {
     try {
-      SendIntentAndroid.sendSms(toPhone, msg)
+      if (Platform.OS === 'android') {
+        SendIntentAndroid.sendSms(toPhone, msg)
+      } else {
+        // TODO
+        throw new Error('Implement sendSms using MFMessageComposeViewController on iOS')
+      }
       resolve()
     } catch (e) {
       reject(e)
