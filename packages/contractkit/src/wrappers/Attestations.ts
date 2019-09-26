@@ -116,30 +116,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   )
 
   /**
-   * Warning: might be inefficient.
-   */
-  async getAttestationRequestFees(): Promise<AttestationsToken[]> {
-    const events = await this.contract.getPastEvents('AttestationRequestFeeSet', { fromBlock: 0 })
-    const tokenMap: any = {}
-    const tokens: string[] = []
-    events.forEach((event) => {
-      const res: string = event.returnValues.token
-      if (tokenMap[res]) {
-        return
-      }
-      tokenMap[res] = true
-      tokens.push(res)
-    })
-    const fees = await Promise.all(
-      tokens.map(async (token) => {
-        const fee = await this.attestationRequestFees(token)
-        return { fee, address: token }
-      })
-    )
-    return fees
-  }
-
-  /**
    * Returns the current configuration parameters for the contract.
    * @param tokens List of tokens used for attestation fees.
    */
