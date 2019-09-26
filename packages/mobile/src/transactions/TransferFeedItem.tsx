@@ -2,15 +2,12 @@ import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
-import { decryptComment as decryptCommentRaw } from '@celo/utils/src/commentEncryption'
 import BigNumber from 'bignumber.js'
-import * as _ from 'lodash'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { HomeTransferFragment } from 'src/apollo/types'
-import { DEFAULT_TESTNET, LOCAL_CURRENCY_SYMBOL } from 'src/config'
-import { features } from 'src/flags'
+import { LOCAL_CURRENCY_SYMBOL } from 'src/config'
 import { CURRENCIES, CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
@@ -19,6 +16,7 @@ import useLocalAmount from 'src/localCurrency/useLocalAmount'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes, TransferStandby } from 'src/transactions/reducer'
+import { decryptComment, getTransferFeedParams } from 'src/transactions/transferFeedHelpers'
 import { TransferFeedIcon } from 'src/transactions/TransferFeedIcon'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
@@ -88,16 +86,6 @@ function getCurrencyStyles(currency: CURRENCY_ENUM, type: string): CurrencySymbo
   }
 }
 
-function decryptComment(
-  comment: string | undefined,
-  commentKey: Buffer | null,
-  type: TransactionTypes
-) {
-  return comment && commentKey && features.USE_COMMENT_ENCRYPTION
-    ? decryptCommentRaw(comment, commentKey, type === TransactionTypes.SENT).comment
-    : comment
-}
-
 function navigateToTransactionReview({
   address,
   type,
@@ -155,66 +143,23 @@ export function TransferFeedItem(props: Props) {
   } = props
 
   const localValue = useLocalAmount(value)
-  let info = decryptComment(comment, commentKey, type)
+
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
   const currency = resolveCurrency(symbol)
   const currencyStyle = getCurrencyStyles(currency, type)
   const isPending = status === TransactionStatus.Pending
 
-  let title, recipient
-
-  // TODO move this out to a seperate file, too much clutter here
-  switch (type) {
-    case TransactionTypes.VERIFICATION_FEE: {
-      title = t('feedItemVerificationFeeTitle')
-      info = t('feedItemVerificationFeeInfo')
-      break
-    }
-    case TransactionTypes.VERIFICATION_REWARD: {
-      title = t('feedItemVerificationRewardTitle')
-      info = t('feedItemVerificationRewardInfo')
-      break
-    }
-    case TransactionTypes.FAUCET: {
-      title = t('feedItemFaucetTitle')
-      info = t('feedItemFaucetInfo', {
-        context: !DEFAULT_TESTNET ? 'missingTestnet' : null,
-        faucet: DEFAULT_TESTNET ? _.startCase(DEFAULT_TESTNET) : null,
-      })
-      break
-    }
-    case TransactionTypes.INVITE_SENT: {
-      const inviteeE164Number = invitees[address]
-      const inviteeRecipient = recipientCache[inviteeE164Number]
-      title = t('feedItemInviteSentTitle')
-      info = t('feedItemInviteSentInfo', {
-        context: !inviteeE164Number ? 'missingInviteeDetails' : null,
-        nameOrNumber: inviteeRecipient ? inviteeRecipient.displayName : inviteeE164Number,
-      })
-      break
-    }
-    case TransactionTypes.INVITE_RECEIVED: {
-      title = t('feedItemInviteReceivedTitle')
-      info = t('feedItemInviteReceivedInfo')
-      break
-    }
-    default: {
-      recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
-      const shortAddr = address.substring(0, 8)
-
-      if (recipient) {
-        title = recipient.displayName
-      } else if (type === TransactionTypes.RECEIVED) {
-        title = t('feedItemReceivedTitle', { context: 'missingSenderDetails', address: shortAddr })
-      } else if (type === TransactionTypes.SENT) {
-        title = t('feedItemSentTitle', { context: 'missingReceiverDetails', address: shortAddr })
-      } else {
-        // Fallback to just using the type
-        title = _.capitalize(t(_.camelCase(type)))
-      }
-    }
-  }
+  const { title, info, recipient } = getTransferFeedParams(
+    type,
+    t,
+    invitees,
+    recipientCache,
+    address,
+    addressToE164Number,
+    comment,
+    commentKey
+  )
 
   return (
     <Touchable onPress={onItemPress}>

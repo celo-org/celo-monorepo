@@ -31,7 +31,7 @@ export default function TransferFeedIcon(props: Props) {
         </View>
       )
     }
-    case TransactionTypes.RECEIVED: // Explicitly RECEIVED and SENT cases for readability
+    case TransactionTypes.RECEIVED: // RECEIVED and SENT cases listed for readability
     case TransactionTypes.SENT:
     default: {
       return (
