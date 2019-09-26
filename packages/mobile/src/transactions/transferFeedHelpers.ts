@@ -8,7 +8,7 @@ import { Invitees } from 'src/invite/actions'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { TransactionTypes } from 'src/transactions/reducer'
 
-function decryptComment(
+export function decryptComment(
   comment: string | undefined,
   commentKey: Buffer | null,
   type: TransactionTypes
@@ -24,10 +24,12 @@ export function getTransferFeedParams(
   invitees: Invitees,
   recipientCache: NumberToRecipient,
   address: string,
-  addressToE164Number: AddressToE164NumberType
+  addressToE164Number: AddressToE164NumberType,
+  comment: string,
+  commentKey: Buffer | null
 ) {
   let info = decryptComment(comment, commentKey, type)
-  let title
+  let title, recipient
 
   switch (type) {
     case TransactionTypes.VERIFICATION_FEE: {
@@ -64,7 +66,7 @@ export function getTransferFeedParams(
       break
     }
     default: {
-      const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
+      recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
       const shortAddr = address.substring(0, 8)
 
       if (recipient) {
@@ -79,5 +81,5 @@ export function getTransferFeedParams(
       }
     }
   }
-  return { title, info }
+  return { title, info, recipient }
 }
