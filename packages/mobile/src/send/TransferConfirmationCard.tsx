@@ -72,6 +72,8 @@ class TransferConfirmationCard extends React.Component<OwnProps & WithNamespaces
           {t('receiveFlow8:receivedAmountFromCelo.1')}
         </Text>
       )
+    } else if (type === TransactionTypes.NETWORK_FEE) {
+      return <Text style={style.pSmall}>{t('walletFlow5:networkFeeExplanation')}</Text>
     } else if (type === TransactionTypes.INVITE_SENT || type === TransactionTypes.INVITE_RECEIVED) {
       return (
         <View style={style.bottomContainer}>
