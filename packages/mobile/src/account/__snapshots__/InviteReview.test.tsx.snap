@@ -195,7 +195,7 @@ exports[`InviteReview renders correctly 1`] = `
                   ]
                 }
               >
-                 +1
+                🇺🇸 +1
               </Text>
               <Text
                 style={

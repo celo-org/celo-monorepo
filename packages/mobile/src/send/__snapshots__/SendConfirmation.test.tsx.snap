@@ -204,7 +204,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                     ]
                   }
                 >
-                   +1
+                  🇺🇸 +1
                 </Text>
                 <Text
                   style={
@@ -1293,7 +1293,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                     ]
                   }
                 >
-                   +1
+                  🇺🇸 +1
                 </Text>
                 <Text
                   style={
@@ -2382,7 +2382,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                     ]
                   }
                 >
-                   +1
+                  🇺🇸 +1
                 </Text>
                 <Text
                   style={
@@ -3465,7 +3465,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                     ]
                   }
                 >
-                   +1
+                  🇺🇸 +1
                 </Text>
                 <Text
                   style={
@@ -4554,7 +4554,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     ]
                   }
                 >
-                   +1
+                  🇺🇸 +1
                 </Text>
                 <Text
                   style={
@@ -5643,7 +5643,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     ]
                   }
                 >
-                   +1
+                  🇺🇸 +1
                 </Text>
                 <Text
                   style={

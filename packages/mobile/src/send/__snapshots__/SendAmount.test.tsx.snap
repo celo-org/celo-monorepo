@@ -154,7 +154,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
               ]
             }
           >
-             +1
+            🇺🇸 +1
           </Text>
           <Text
             style={
@@ -281,7 +281,6 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
                 "color": "#42D689",
               }
             }
-            lng="en"
             numberOfDecimals={2}
             onBlur={[Function]}
             onChangeText={[Function]}

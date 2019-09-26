@@ -204,7 +204,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                     ]
                   }
                 >
-                   +1
+                  🇺🇸 +1
                 </Text>
                 <Text
                   style={

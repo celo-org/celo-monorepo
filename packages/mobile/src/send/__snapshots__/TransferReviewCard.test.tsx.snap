@@ -541,7 +541,7 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
           ]
         }
       >
-         +1
+        🇺🇸 +1
       </Text>
       <Text
         style={
