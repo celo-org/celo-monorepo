@@ -9,8 +9,10 @@
 
 #import "AppDelegate.h"
 
+#import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
+
 #if __has_include(<React/RNSentry.h>)
 #import <React/RNSentry.h> // This is used for versions of react >= 0.40
 #else
@@ -21,13 +23,10 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  NSURL *jsCodeLocation;
-
-  jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index.ios" fallbackResource:nil];
-RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
-                                                      moduleName:@"celo"
-                                               initialProperties:nil
-                                                   launchOptions:launchOptions];
+  RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
+  RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
+                                                   moduleName:@"celo"
+                                            initialProperties:nil];
 
   [RNSentry installWithRootView:rootView];
 
@@ -39,6 +38,15 @@ RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
   return YES;
+}
+
+- (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
+{
+#if DEBUG
+  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+#else
+  return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+#endif
 }
 
 @end

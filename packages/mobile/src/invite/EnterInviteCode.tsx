@@ -11,6 +11,7 @@ import {
   AppState,
   AppStateStatus,
   Clipboard,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -105,7 +106,11 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   onPressOpenMessage = () => {
-    SendIntentAndroid.openSMSApp()
+    if (Platform.OS === 'android') {
+      SendIntentAndroid.openSMSApp()
+    } else {
+      navigateToURI('sms:')
+    }
   }
 
   onPressPaste = async () => {
