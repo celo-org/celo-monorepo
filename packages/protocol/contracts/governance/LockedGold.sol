@@ -228,6 +228,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     external
     nonReentrant
   {
+    // TODO: split and add error messages for better dev feedback
     require(isAccount(msg.sender) && isNotAccount(delegate) && isNotDelegate(delegate));
 
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
