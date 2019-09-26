@@ -18,7 +18,10 @@ export default function TransferFeedIcon(props: Props) {
   const { recipient, address, type } = props
 
   switch (type) {
-    case TransactionTypes.VERIFICATION_FEE: {
+    case TransactionTypes.VERIFICATION_FEE:
+    case TransactionTypes.FAUCET:
+    case TransactionTypes.INVITE_SENT:
+    case TransactionTypes.INVITE_RECEIVED: {
       return <Image source={coinsIcon} style={styles.image} />
     }
     case TransactionTypes.VERIFICATION_REWARD: {
@@ -28,15 +31,8 @@ export default function TransferFeedIcon(props: Props) {
         </View>
       )
     }
-    case TransactionTypes.FAUCET: {
-      return <Image source={coinsIcon} style={styles.image} />
-    }
-    case TransactionTypes.INVITE_SENT: {
-      return <Image source={coinsIcon} style={styles.image} />
-    }
-    case TransactionTypes.INVITE_RECEIVED: {
-      return <Image source={coinsIcon} style={styles.image} />
-    }
+    case TransactionTypes.RECEIVED: // Explicitly RECEIVED and SENT cases for readability
+    case TransactionTypes.SENT:
     default: {
       return (
         <ContactCircle
