@@ -164,11 +164,9 @@ export function TransferFeedItem(props: Props) {
   return (
     <Touchable onPress={onItemPress}>
       <View style={styles.container}>
-        {/* TODO(anna) also move this view wrapper to tansfer feed icon*/}
         <View style={styles.iconContainer}>
           <TransferFeedIcon type={type} recipient={recipient} address={address} />
         </View>
-
         <View style={styles.contentContainer}>
           <View style={styles.titleContainer}>
             <Text style={[fontStyles.semiBold, styles.title]}>{title}</Text>
@@ -234,12 +232,6 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     flexDirection: 'column',
-    alignItems: 'center',
-  },
-  image: {
-    height: avatarSize,
-    width: avatarSize,
-    justifyContent: 'center',
     alignItems: 'center',
   },
   contentContainer: {
