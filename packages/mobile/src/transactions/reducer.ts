@@ -44,6 +44,7 @@ export enum TransactionTypes {
   INVITE_SENT = 'INVITE_SENT',
   INVITE_RECEIVED = 'INVITE_RECEIVED',
   PAY_REQUEST = 'PAY_REQUEST',
+  NETWORK_FEE = 'NETWORK_FEE',
 }
 
 type TransferTransactionTypes =

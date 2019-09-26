@@ -37,6 +37,11 @@ export function getTransferFeedParams(
       info = t('feedItemVerificationFeeInfo')
       break
     }
+    case TransactionTypes.NETWORK_FEE: {
+      title = t('feedItemNetworkFeeTitle')
+      info = t('feedItemNetworkFeeInfo')
+      break
+    }
     case TransactionTypes.VERIFICATION_REWARD: {
       title = t('feedItemVerificationRewardTitle')
       info = t('feedItemVerificationRewardInfo')

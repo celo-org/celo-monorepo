@@ -24,8 +24,6 @@ import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
 const TAG = 'transactions/TransferFeedItem.tsx'
 
-const avatarSize = 40
-
 type Props = (HomeTransferFragment | TransferStandby) &
   WithNamespaces & {
     type: TransactionTypes

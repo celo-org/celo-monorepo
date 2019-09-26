@@ -59,6 +59,8 @@
   "localCurrencyValue": "{{localValue}} {{localCurrencySymbol}}",
   "feedItemVerificationFeeTitle": "Celo",
   "feedItemVerificationFeeInfo": "$t(verificationFee)",
+  "feedItemNetworkFeeTitle": "Celo",
+  "feedItemNetworkFeeInfo": "Network Fee",
   "feedItemVerificationRewardTitle": "Celo",
   "feedItemVerificationRewardInfo": "Verifier Reward",
   "feedItemFaucetTitle": "Celo",
