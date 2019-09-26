@@ -170,14 +170,15 @@ jobs:
             # Without this, emulator fails with
             # error while loading shared libraries: libnss3.so: cannot open shared object file: No such file or directory
       
-      - run:
-          name: Launch emulator
-          command: emulator -avd $AVD_NAME -noaudio -no-boot-anim -no-window -accel on -verbose
-          background: true
+      # CI runs out of memory doing this while bulding source.
+      # - run:
+      #     name: Launch emulator
+      #     command: emulator -avd $AVD_NAME -noaudio -no-boot-anim -no-window -accel on -verbose
+      #     background: true
 
       # While emulator is starting up, do more work
       - run:
-          name: Setup node
+          name: Setup nodejs
           command: |
             set -eo pipefail
             sudo apt-get update
