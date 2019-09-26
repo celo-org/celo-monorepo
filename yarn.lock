@@ -22255,39 +22255,10 @@ node-libs-browser@^2.2.1:
     util "^0.11.0"
     vm-browserify "^1.0.1"
 
-node-libs-react-native@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/node-libs-react-native/-/node-libs-react-native-1.0.1.tgz#3ea47db38894cc0ec34750c3553d0782f202e66a"
-  integrity sha1-PqR9s4iUzA7DR1DDVT0HgvIC5mo=
-  dependencies:
-    assert "^1.4.1"
-    browserify-zlib "^0.1.4"
-    buffer "^5.0.6"
-    console-browserify "^1.1.0"
-    constants-browserify "^1.0.0"
-    domain-browser "^1.1.1"
-    events "^1.0.0"
-    https-browserify "0.0.1"
-    os-browserify "^0.2.0"
-    path-browserify "0.0.0"
-    process "^0.11.0"
-    punycode "^2.1.0"
-    querystring-es3 "^0.2.0"
-    react-native-crypto "^2.0.1"
-    react-native-randombytes "^2.2.0"
-    readable-stream "^2.2.9"
-    stream-http "^2.3.1"
-    string_decoder "^0.10.25"
-    timers-browserify "^2.0.2"
-    tty-browserify "0.0.0"
-    url "^0.11.0"
-    util "^0.10.3"
-
 node-libs-react-native@1.0.3, node-libs-react-native@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/node-libs-react-native/-/node-libs-react-native-1.0.3.tgz#442b89ae93ca308f6464ff2f79686848bca85988"
   integrity sha512-2X/M/DMB4hij2L0tsnJOiDhYR2N0YtetIhb/eN5+5vksLxjXwaFgLbSXWT3XExnGJpISDn8dYuYz6yvdndjjkg==
-
   dependencies:
     assert "^1.4.1"
     browserify-zlib "^0.2.0"
@@ -33010,6 +32981,7 @@ websocket@^1.0.28:
   dependencies:
     debug "^2.2.0"
     es5-ext "^0.10.50"
+    gulp "^4.0.2"
     nan "^2.14.0"
     typedarray-to-buffer "^3.1.5"
     yaeti "^0.0.6"
