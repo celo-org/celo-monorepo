@@ -36,5 +36,6 @@ const styles = StyleSheet.create({
   cover: {
     marginTop: HEADER_HEIGHT,
     backgroundColor: colors.dark,
+    zIndex: 10,
   },
 })
