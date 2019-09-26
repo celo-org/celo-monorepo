@@ -29,29 +29,6 @@ Go to the `celo-monorepo` root directory and
 
 If all works well, navigate to `packages/cli`.
 
-> I'm getting the follow output during above build:
-
-```bash
-Compiling
-Warning: Both truffle-config.js and truffle.js were found. Using truffle-config.js.
-
-Compiling your contracts...
-===========================
-> Everything is up to date, there is nothing to compile.
-
-{ Error: ENOENT: no such file or directory, open '../packages/protocol/build/contracts/Proxy.json'
-```
-
-This error implies that the `truffle` finds (a faulty) `truffle-config.js`.
-
-Navigate to `celo-monorepo/packages/protocol` and:
-
-```bash
-> cp truffle.js truffle-config.js
-```
-
-After doing this you should be able to continue the build process
-
 > I've got the cli built successfully but the running the `cli` yields: `Error: Returned values aren't valid, did it run Out of Gas?`.
 
 When running the `cli` against a full node, this can mean that the contract artifacts are out of date.
