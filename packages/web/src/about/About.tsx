@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Image, ImageBackground, StyleSheet, Text, View } from 'react-native'
 import Backers from 'src/about/Backers'
-import { mintPlaza, sacredEconBack } from 'src/about/images'
+import { mintPlaza, sacredEconBack, team } from 'src/about/images'
 import PressMedia from 'src/about/PressMedia'
 import Team from 'src/about/Team'
 import { H1, H4 } from 'src/fonts/Fonts'
@@ -69,7 +69,6 @@ export class About extends React.Component<Props & I18nProps> {
             <H1>{t('aboutMeaningText')}</H1>
             <Text>{t('aboutMeaningCopy')}</Text>
           </SideTitledSection>
-
           <ImageBackground
             source={sacredEconBack}
             style={[{ width: '100%', height: 511 }, standardStyles.centered]}
@@ -85,6 +84,7 @@ export class About extends React.Component<Props & I18nProps> {
             <H1>{t('aboutValuesText')}</H1>
             <Text>{t('aboutValuesCopy')}</Text>
           </SideTitledSection>
+          <Image source={team} style={[{ width: '100%', height: 649 }]} resizeMode={'cover'} />
           <Team randomSeed={randomSeed} />
           <Backers />
           <PressMedia />
