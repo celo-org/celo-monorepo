@@ -1,56 +1,81 @@
 import debugFactory from 'debug'
+import * as util from 'util'
 import Web3 from 'web3'
+import { Provider } from 'web3/providers'
+import { generateAccountAddressFromPrivateKey } from '../providers/celo-private-keys-subprovider'
+import { CeloProvider } from '../providers/celo-provider'
 import { testWithGanache } from '../test-utils/ganache-test'
 import { recoverTransaction } from './signing-utils'
-import { CeloTx, getRawTransaction } from './tx-signing'
+import { CeloTx } from './tx-signing'
 import { addLocalAccount } from './web3-utils'
-
-// Run this test with --forceExit on completion.
-// jest src/utils/tx-signing.test.ts --forceExit
 
 const debug = debugFactory('kit:txtest:sign')
 
-// A random private key
-const PRIVATE_KEY = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
-const accountAddress = generateAccountAddressFromPrivateKey(PRIVATE_KEY)
+// Random private keys
+const PRIVATE_KEY1 = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+const ACCOUNT_ADDRESS1 = generateAccountAddressFromPrivateKey(PRIVATE_KEY1)
+const PRIVATE_KEY2 = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890fdeccc'
+const ACCOUNT_ADDRESS2 = generateAccountAddressFromPrivateKey(PRIVATE_KEY2)
 
-function generateAccountAddressFromPrivateKey(privateKey: string): string {
-  if (!privateKey.toLowerCase().startsWith('0x')) {
-    privateKey = '0x' + privateKey
+debug(`Private key 1: ${PRIVATE_KEY1}`)
+debug(`Account Address 1: ${ACCOUNT_ADDRESS1}`)
+debug(`Private key 2: ${PRIVATE_KEY2}`)
+debug(`Account Address 2: ${ACCOUNT_ADDRESS2}`)
+
+async function verifyLocalSigning(web3: Web3, from: string, to: string): Promise<void> {
+  const amountInWei: string = Web3.utils.toWei('1', 'ether')
+  const gasFees: string = Web3.utils.toWei('1', 'mwei')
+  debug('Signer Testing using Account: %s', from)
+  const celoTransaction: CeloTx = {
+    from,
+    to,
+    value: amountInWei,
+    gas: gasFees,
   }
-  // @ts-ignore-next-line
-  return new Web3.modules.Eth().accounts.privateKeyToAccount(privateKey).address
+  const signedTransaction = await web3.eth.signTransaction(celoTransaction)
+  debug('Singer Testing: Signed transaction %o', signedTransaction)
+  const rawTransaction: string = signedTransaction.raw
+  const recoveredSigner = recoverTransaction(rawTransaction)
+  debug('Transaction was signed by "%s", recovered signer is "%s"', from, recoveredSigner)
+  expect(recoveredSigner).toEqual(from)
 }
 
 testWithGanache('Transaction Utils', (web3: Web3) => {
-  // describe('Transaction Utils', () => {
-  describe.skip('Signer Testing', () => {
-    it('should be able to sign and get the signer back', async () => {
-      jest.setTimeout(20 * 1000)
-      await addLocalAccount(web3, PRIVATE_KEY)
-      debug('Signer Testing using Account: %s', accountAddress)
-      const gasPrice = await web3.eth.getGasPrice()
-      debug('Signer Testing, gas price is %s', gasPrice)
-      const from = accountAddress
-      const to = accountAddress
-      const amountInWei: string = Web3.utils.toWei('1', 'ether')
-      const gasFees: string = Web3.utils.toWei('1', 'mwei')
-      debug('Signer Testing, getting nonce for %s...', from)
-      const nonce = await web3.eth.getTransactionCount(from)
-      debug('Signer Testing, nonce is %s', nonce)
+  let originalProvider: Provider
+  beforeEach(() => {
+    originalProvider = web3.currentProvider
+  })
+  afterEach(() => {
+    if (web3.currentProvider instanceof CeloProvider) {
+      ;(web3.currentProvider as CeloProvider).stop()
+    } else {
+      console.log(util.inspect(web3.currentProvider))
+    }
+    // Restore original provider
+    web3.currentProvider = originalProvider
+  })
 
-      const celoTransaction: CeloTx = {
-        nonce,
-        from,
-        to,
-        value: amountInWei,
-        gas: gasFees,
-        gasPrice: gasPrice.toString(),
-      }
-      const rawTransaction: string = await getRawTransaction(web3, celoTransaction)
-      const recoveredSigner = recoverTransaction(rawTransaction)
-      debug('Transaction was signed by "%s", recovered signer is "%s"', from, recoveredSigner)
-      expect(recoveredSigner).toEqual(from)
+  describe('Signer Testing with single local account', () => {
+    it('Test1 should be able to sign and get the signer back with single local account', async () => {
+      jest.setTimeout(20 * 1000)
+      addLocalAccount(web3, PRIVATE_KEY1)
+      await verifyLocalSigning(web3, ACCOUNT_ADDRESS1, ACCOUNT_ADDRESS2)
+    })
+  })
+
+  describe('Signer Testing with multiple local accounts', () => {
+    it('Test2 should be able to sign with first account and get the signer back with multiple local accounts', async () => {
+      jest.setTimeout(20 * 1000)
+      addLocalAccount(web3, PRIVATE_KEY1)
+      addLocalAccount(web3, PRIVATE_KEY2)
+      await verifyLocalSigning(web3, ACCOUNT_ADDRESS1, ACCOUNT_ADDRESS2)
+    })
+
+    it('Test3 should be able to sign with second account and get the signer back with multiple local accounts', async () => {
+      jest.setTimeout(20 * 1000)
+      addLocalAccount(web3, PRIVATE_KEY1)
+      addLocalAccount(web3, PRIVATE_KEY2)
+      await verifyLocalSigning(web3, ACCOUNT_ADDRESS2, ACCOUNT_ADDRESS1)
     })
   })
 })

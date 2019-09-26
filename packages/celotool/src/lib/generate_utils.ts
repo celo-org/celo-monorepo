@@ -1,9 +1,9 @@
+import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
 import * as bls12377js from 'bls12377js'
 import { ec as EC } from 'elliptic'
 import { range, repeat } from 'lodash'
 import rlp from 'rlp'
 import Web3 from 'web3'
-import { blsPrivateKeyToProcessedPrivateKey } from './bls_utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   CONTRACT_OWNER_STORAGE_LOCATION,
@@ -93,18 +93,17 @@ export const getStrippedAddressesFor = (accountType: AccountType, mnemonic: stri
   getAddressesFor(accountType, mnemonic, n).map(strip0x)
 
 export const getValidators = (mnemonic: string, n: number) => {
-  return range(0, n)
-    .map((i) => generatePrivateKey(mnemonic, AccountType.VALIDATOR, i))
-    .map((key) => {
-      const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(key)
-      return {
-        address: privateKeyToAddress(key).slice(2),
-        blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
-      }
-    })
+  return getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, n).map((key) => {
+    const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(key)
+    return {
+      address: strip0x(privateKeyToAddress(key)),
+      blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
+    }
+  })
 }
 
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
+  const mnemonic = fetchEnv(envVar.MNEMONIC)
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
   const validators =
     validatorEnv === VALIDATOR_OG_SOURCE
@@ -115,7 +114,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
             blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
           }
         })
-      : getValidators(fetchEnv(envVar.MNEMONIC), parseInt(validatorEnv, 10))
+      : getValidators(mnemonic, parseInt(validatorEnv, 10))
 
   const consensusType = fetchEnv(envVar.CONSENSUS_TYPE) as ConsensusType
 
@@ -132,10 +131,14 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const epoch = parseInt(fetchEnvOrFallback(envVar.EPOCH, '30000'), 10)
   const chainId = parseInt(fetchEnv(envVar.NETWORK_ID), 10)
 
+  // Assing DEFAULT ammount of gold to 2 faucet accounts
+  const faucetAddresses = getStrippedAddressesFor(AccountType.FAUCET, mnemonic, 2)
+
   return generateGenesis({
     validators,
     consensusType,
     blockTime,
+    initialAccounts: faucetAddresses,
     epoch,
     chainId,
     requestTimeout,
@@ -168,6 +171,7 @@ const generateIstanbulExtraData = (validators: Validator[]) => {
 export const generateGenesis = ({
   validators,
   consensusType = ConsensusType.ISTANBUL,
+  initialAccounts: otherAccounts = [],
   blockTime,
   epoch,
   chainId,
@@ -176,6 +180,7 @@ export const generateGenesis = ({
 }: {
   validators: Validator[]
   consensusType?: ConsensusType
+  initialAccounts?: string[]
   blockTime: number
   epoch: number
   chainId: number
@@ -209,6 +214,12 @@ export const generateGenesis = ({
 
   for (const validator of validators) {
     genesis.alloc[validator.address] = {
+      balance: DEFAULT_BALANCE,
+    }
+  }
+
+  for (const address of otherAccounts) {
+    genesis.alloc[address] = {
       balance: DEFAULT_BALANCE,
     }
   }
