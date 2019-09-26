@@ -17,7 +17,7 @@ const twilioConfig = require('@celo/protocol/twilio-config')
  * A simple script to send a payment and invite a user.
  *
  * Expects the following flags:
- * network: name of the network defined in truffle.js to deploy to
+ * network: name of the network defined in truffle-config.js to deploy to
  * stableValue: amount of stable token to transfer
  * goldValue: amount of gold transfer
  * phone: phone number of user to invite
