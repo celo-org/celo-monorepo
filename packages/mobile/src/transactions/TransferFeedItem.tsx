@@ -1,6 +1,4 @@
-import ContactCircle from '@celo/react-components/components/ContactCircle'
 import Touchable from '@celo/react-components/components/Touchable'
-import RewardIcon from '@celo/react-components/icons/RewardIcon'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
@@ -9,23 +7,19 @@ import BigNumber from 'bignumber.js'
 import * as _ from 'lodash'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { HomeTransferFragment } from 'src/apollo/types'
 import { DEFAULT_TESTNET, LOCAL_CURRENCY_SYMBOL } from 'src/config'
 import { features } from 'src/flags'
 import { CURRENCIES, CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
-import { coinsIcon, unknownUserIcon } from 'src/images/Images'
 import { Invitees } from 'src/invite/actions'
 import useLocalAmount from 'src/localCurrency/useLocalAmount'
-import {
-  getRecipientFromAddress,
-  getRecipientThumbnail,
-  NumberToRecipient,
-} from 'src/recipients/recipient'
+import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes, TransferStandby } from 'src/transactions/reducer'
+import { TransferFeedIcon } from 'src/transactions/TransferFeedIcon'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
@@ -168,70 +162,67 @@ export function TransferFeedItem(props: Props) {
   const currencyStyle = getCurrencyStyles(currency, type)
   const isPending = status === TransactionStatus.Pending
 
-  let icon, title
+  let title, recipient
 
   // TODO move this out to a seperate file, too much clutter here
-  if (type === TransactionTypes.VERIFICATION_FEE) {
-    icon = <Image source={coinsIcon} style={styles.image} />
-    title = t('feedItemVerificationFeeTitle')
-    info = t('feedItemVerificationFeeInfo')
-  } else if (type === TransactionTypes.VERIFICATION_REWARD) {
-    icon = (
-      <View style={styles.image}>
-        <RewardIcon height={38} />
-      </View>
-    )
-    title = t('feedItemVerificationRewardTitle')
-    info = t('feedItemVerificationRewardInfo')
-  } else if (type === TransactionTypes.FAUCET) {
-    icon = <Image source={coinsIcon} style={styles.image} />
-    title = t('feedItemFaucetTitle')
-    info = t('feedItemFaucetInfo', {
-      context: !DEFAULT_TESTNET ? 'missingTestnet' : null,
-      faucet: DEFAULT_TESTNET ? _.startCase(DEFAULT_TESTNET) : null,
-    })
-  } else if (type === TransactionTypes.INVITE_SENT) {
-    icon = <Image source={coinsIcon} style={styles.image} />
-    const inviteeE164Number = invitees[address]
-    const inviteeRecipient = recipientCache[inviteeE164Number]
-    title = t('feedItemInviteSentTitle')
-    info = t('feedItemInviteSentInfo', {
-      context: !inviteeE164Number ? 'missingInviteeDetails' : null,
-      nameOrNumber: inviteeRecipient ? inviteeRecipient.displayName : inviteeE164Number,
-    })
-  } else if (type === TransactionTypes.INVITE_RECEIVED) {
-    icon = <Image source={coinsIcon} style={styles.image} />
-    title = t('feedItemInviteReceivedTitle')
-    info = t('feedItemInviteReceivedInfo')
-  } else {
-    const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
-    const shortAddr = address.substring(0, 8)
-
-    if (recipient) {
-      title = recipient.displayName
-    } else if (type === TransactionTypes.RECEIVED) {
-      title = t('feedItemReceivedTitle', { context: 'missingSenderDetails', address: shortAddr })
-    } else if (type === TransactionTypes.SENT) {
-      title = t('feedItemSentTitle', { context: 'missingReceiverDetails', address: shortAddr })
-    } else {
-      // Fallback to just using the type
-      title = _.capitalize(t(_.camelCase(type)))
+  switch (type) {
+    case TransactionTypes.VERIFICATION_FEE: {
+      title = t('feedItemVerificationFeeTitle')
+      info = t('feedItemVerificationFeeInfo')
+      break
     }
-    icon = (
-      <ContactCircle
-        address={address}
-        size={avatarSize}
-        thumbnailPath={getRecipientThumbnail(recipient)}
-      >
-        {<Image source={unknownUserIcon} style={styles.image} />}
-      </ContactCircle>
-    )
+    case TransactionTypes.VERIFICATION_REWARD: {
+      title = t('feedItemVerificationRewardTitle')
+      info = t('feedItemVerificationRewardInfo')
+      break
+    }
+    case TransactionTypes.FAUCET: {
+      title = t('feedItemFaucetTitle')
+      info = t('feedItemFaucetInfo', {
+        context: !DEFAULT_TESTNET ? 'missingTestnet' : null,
+        faucet: DEFAULT_TESTNET ? _.startCase(DEFAULT_TESTNET) : null,
+      })
+      break
+    }
+    case TransactionTypes.INVITE_SENT: {
+      const inviteeE164Number = invitees[address]
+      const inviteeRecipient = recipientCache[inviteeE164Number]
+      title = t('feedItemInviteSentTitle')
+      info = t('feedItemInviteSentInfo', {
+        context: !inviteeE164Number ? 'missingInviteeDetails' : null,
+        nameOrNumber: inviteeRecipient ? inviteeRecipient.displayName : inviteeE164Number,
+      })
+      break
+    }
+    case TransactionTypes.INVITE_RECEIVED: {
+      title = t('feedItemInviteReceivedTitle')
+      info = t('feedItemInviteReceivedInfo')
+      break
+    }
+    default: {
+      recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
+      const shortAddr = address.substring(0, 8)
+
+      if (recipient) {
+        title = recipient.displayName
+      } else if (type === TransactionTypes.RECEIVED) {
+        title = t('feedItemReceivedTitle', { context: 'missingSenderDetails', address: shortAddr })
+      } else if (type === TransactionTypes.SENT) {
+        title = t('feedItemSentTitle', { context: 'missingReceiverDetails', address: shortAddr })
+      } else {
+        // Fallback to just using the type
+        title = _.capitalize(t(_.camelCase(type)))
+      }
+    }
   }
 
   return (
     <Touchable onPress={onItemPress}>
       <View style={styles.container}>
-        <View style={styles.iconContainer}>{icon}</View>
+        {/* TODO(anna) also move this view wrapper to tansfer feed icon*/}
+        <View style={styles.iconContainer}>
+          <TransferFeedIcon type={type} recipient={recipient} address={address} />
+        </View>
         <View style={styles.contentContainer}>
           <View style={styles.titleContainer}>
             <Text style={[fontStyles.semiBold, styles.title]}>{title}</Text>
