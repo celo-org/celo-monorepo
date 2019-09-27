@@ -1,3 +1,4 @@
+export * from './attestations'
 export { commentEncryption } from './commentEncryption'
 export * from './contacts'
 export * from './countries'

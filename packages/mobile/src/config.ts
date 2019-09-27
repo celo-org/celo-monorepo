@@ -24,6 +24,8 @@ export const AVAILABLE_LANGUAGES = [
 export const isE2EEnv = Config.IS_E2E || false
 export const CELO_VERIFIER_DOWNLOAD_LINK = 'https://celo.org/rewards'
 export const CELO_VERIFIER_START_MINING_LINK = 'celo://verifier/start'
+export const CELO_FAUCET_LINK = 'https://celo.org/build/wallet'
+export const CELO_TERMS_LINK = 'https://celo.org/terms'
 
 export const DEFAULT_COUNTRY = Config.DEFAULT_COUNTRY || null
 
