@@ -33,10 +33,12 @@ import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 interface StateProps {
   redeemComplete: boolean
   isRedeemingInvite: boolean
+  account: string | null
 }
 
 interface State {
@@ -60,6 +62,7 @@ const mapStateToProps = (state: RootState): StateProps => {
   return {
     redeemComplete: state.invite.redeemComplete,
     isRedeemingInvite: state.invite.isRedeemingInvite,
+    account: currentAccountSelector(state),
   }
 }
 
@@ -140,7 +143,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, isRedeemingInvite, redeemComplete } = this.props
+    const { t, isRedeemingInvite, redeemComplete, account } = this.props
     const { validCode } = this.state
 
     return (
@@ -158,16 +161,14 @@ export class EnterInviteCode extends React.Component<Props, State> {
             </Text>
 
             {redeemComplete ? (
-              <Text
-                style={[fontStyles.bodySmallBold, fontStyles.center, componentStyles.marginTop10]}
-              >
+              <Text style={[styles.body, componentStyles.marginTop10]}>
                 {t('inviteCodeText.inviteAccepted')}
               </Text>
             ) : (
               !isRedeemingInvite &&
               (!validCode ? (
                 <View>
-                  <Text style={[styles.body, styles.hint]}>
+                  <Text style={styles.hint}>
                     <Text style={fontStyles.bodySmallSemiBold}>
                       {t('inviteCodeText.openMessages.hint.0')}
                     </Text>
@@ -183,9 +184,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
                 </View>
               ) : (
                 <View>
-                  <Text style={[styles.body, styles.hint]}>
-                    {t('inviteCodeText.pasteInviteCode.hint')}
-                  </Text>
+                  <Text style={styles.hint}>{t('inviteCodeText.pasteInviteCode.hint')}</Text>
                   <SmallButton
                     text={t('inviteCodeText.pasteInviteCode.message')}
                     testID={'pasteMessageButton'}
@@ -199,12 +198,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
             {isRedeemingInvite &&
               !redeemComplete && (
                 <View>
-                  <Text style={[styles.body, styles.hint]}>
-                    <Text style={fontStyles.bodySmallSemiBold}>
-                      {t('inviteCodeText.validating.0')}
-                    </Text>
-                    {t('inviteCodeText.validating.1')}
-                  </Text>
+                  <Text style={styles.hint}>{t('inviteCodeText.validating')}</Text>
                   <ActivityIndicator
                     size="large"
                     color={colors.celoGreen}
@@ -218,24 +212,22 @@ export class EnterInviteCode extends React.Component<Props, State> {
         <View>
           <Text style={[styles.body, styles.askInviteContainer]}>
             {t('inviteCodeText.askForInvite.0')}
-            <Text
-              onPress={this.onPressGoToFaucet}
-              style={[fontStyles.bodySmallBold, fontStyles.linkInline, styles.askInvite]}
-            >
+            <Text onPress={this.onPressGoToFaucet} style={styles.askInvite}>
               {t('inviteCodeText.askForInvite.1')}
             </Text>
           </Text>
           <Button
             onPress={this.onPressContinue}
+            disabled={!redeemComplete && !account}
             text={t('continue')}
             standard={false}
             style={styles.continueButton}
             type={BtnTypes.PRIMARY}
-            disabled={!redeemComplete}
             testID="ContinueInviteButton"
           />
           <Button
             onPress={this.onPressImportClick}
+            disabled={redeemComplete || !!account}
             text={t('importIt')}
             standard={false}
             style={styles.continueButton}
@@ -281,12 +273,15 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   askInvite: {
+    ...fontStyles.bodySmallBold,
+    ...fontStyles.linkInline,
     fontSize: 12,
     fontWeight: '300',
   },
   hint: {
+    ...fontStyles.bodyXSmall,
+    textAlign: 'center',
     marginVertical: 10,
-    fontSize: 12,
   },
   button: {
     marginTop: 6,
