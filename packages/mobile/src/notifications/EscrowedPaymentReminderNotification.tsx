@@ -22,25 +22,25 @@ type Props = OwnProps & WithNamespaces
 
 export class EscrowedPaymentReminderNotification extends React.PureComponent<Props> {
   getCTA = () => {
-    const { payment } = this.props
+    const { payment, t } = this.props
     const recipientPhoneNumber = payment.recipientPhone
     return [
       {
-        text: this.props.t('sendMessage'),
+        text: t('sendMessage'),
         onPress: () => {
           CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_send_message)
           // TODO: open up whatsapp/text message slider with pre populated message
           try {
             if (Platform.OS === 'android') {
-              SendIntentAndroid.sendSms(recipientPhoneNumber, '')
+              SendIntentAndroid.sendSms(recipientPhoneNumber, t('escrowedPaymentReminderSms'))
             } else {
-              Linking.openURL(`sms:${recipientPhoneNumber}`)
+              Linking.openURL(`sms:${recipientPhoneNumber}&body=${t('escrowedPaymentReminderSms')}`)
             }
           } catch {
-            Logger.showError(this.props.t('SMSError'))
+            Logger.showError(t('SMSError'))
             Logger.error(
               'EscrowedPaymentReminderNotification/',
-              this.props.t('SMSErrorDetails', {
+              t('SMSErrorDetails', {
                 recipientNumber: recipientPhoneNumber,
               })
             )
