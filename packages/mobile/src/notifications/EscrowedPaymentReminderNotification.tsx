@@ -34,7 +34,8 @@ export class EscrowedPaymentReminderNotification extends React.PureComponent<Pro
             if (Platform.OS === 'android') {
               SendIntentAndroid.sendSms(recipientPhoneNumber, t('escrowedPaymentReminderSms'))
             } else {
-              Linking.openURL(`sms:${recipientPhoneNumber}&body=${t('escrowedPaymentReminderSms')}`)
+              // TODO look into using MFMessageComposeViewController to prefill the body for iOS
+              Linking.openURL(`sms:${recipientPhoneNumber}`)
             }
           } catch {
             Logger.showError(t('SMSError'))
