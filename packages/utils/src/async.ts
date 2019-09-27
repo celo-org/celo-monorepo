@@ -16,7 +16,7 @@ export const retryAsync = async (
   delay = 100
 ) => {
   let saveError
-  for (let i = 0; i < tries + 1; i++) {
+  for (let i = 0; i < tries; i++) {
     try {
       // it awaits otherwise it'd always do all the retries
       return await inFunction(...params)

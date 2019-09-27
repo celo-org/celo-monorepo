@@ -13,6 +13,7 @@ describe('invite/reducer', () => {
     it('stores the address-number object', () => {
       expect(reducer(initialState, storeInviteeData(mockAccount, mockE164Number))).toEqual({
         isSendingInvite: false,
+        isRedeemingInvite: false,
         invitees: {
           [mockAccount]: mockE164Number,
         },
