@@ -2248,6 +2248,21 @@
   resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.107.tgz#3cb82455bd66868e126aeb605346514085b0dff0"
   integrity sha512-s47vj2NYha1u3x5S0u/VhY4YHYb3KySmahKxWFZbWfojMe0vu/bZ3M72nIZf4LM34wEpv40nKe/foGH9Q9LOMw==
 
+"@celo/contractkit@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.1.2.tgz#bf557056d434dd9d5bc096dda3b528eeef16bd3b"
+  integrity sha512-j5Iq08Xxlho0wQChxmcZ1eiTwPAsZONKNFnwTDFsLtNYkzZ8Qegr4iwJEDSb172fFU4KxrkQNSV9wFrXYhv7lg==
+  dependencies:
+    "@celo/utils" "^0.0.6-beta5"
+    "@types/debug" "^4.1.5"
+    bignumber.js "^7.2.0"
+    debug "^4.1.1"
+    eth-lib "^0.2.8"
+    web3 "1.0.0-beta.37"
+    web3-core-helpers "1.0.0-beta.37"
+    web3-eth-abi "1.0.0-beta.37"
+    web3-utils "1.0.0-beta.37"
+
 "@celo/dev-cli@^2.0.3":
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@celo/dev-cli/-/dev-cli-2.0.3.tgz#67f61dfee373ad8b412925e386cf122aabada5f5"
