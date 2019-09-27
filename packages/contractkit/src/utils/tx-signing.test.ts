@@ -2,12 +2,12 @@ import debugFactory from 'debug'
 import * as util from 'util'
 import Web3 from 'web3'
 import { Provider } from 'web3/providers'
+import { ContractKit } from '../kit'
 import { generateAccountAddressFromPrivateKey } from '../providers/celo-private-keys-subprovider'
 import { CeloProvider } from '../providers/celo-provider'
 import { testWithGanache } from '../test-utils/ganache-test'
 import { recoverTransaction } from './signing-utils'
 import { CeloTx } from './tx-signing'
-import { addLocalAccount } from './web3-utils'
 
 const debug = debugFactory('kit:txtest:sign')
 
@@ -53,10 +53,10 @@ testWithGanache('Transaction Utils', (web3: Web3) => {
     web3.currentProvider = originalProvider
   })
 
-  describe('Signer Testing with single local account', () => {
+  describe('Signer Testing with single local account and pay gas in Celo Gold', () => {
     it('Test1 should be able to sign and get the signer back with single local account', async () => {
       jest.setTimeout(20 * 1000)
-      addLocalAccount(web3, PRIVATE_KEY1)
+      new ContractKit(web3).addAccount(PRIVATE_KEY1)
       await verifyLocalSigning(web3, ACCOUNT_ADDRESS1, ACCOUNT_ADDRESS2)
     })
   })
@@ -64,15 +64,15 @@ testWithGanache('Transaction Utils', (web3: Web3) => {
   describe('Signer Testing with multiple local accounts', () => {
     it('Test2 should be able to sign with first account and get the signer back with multiple local accounts', async () => {
       jest.setTimeout(20 * 1000)
-      addLocalAccount(web3, PRIVATE_KEY1)
-      addLocalAccount(web3, PRIVATE_KEY2)
+      new ContractKit(web3).addAccount(PRIVATE_KEY1)
+      new ContractKit(web3).addAccount(PRIVATE_KEY2)
       await verifyLocalSigning(web3, ACCOUNT_ADDRESS1, ACCOUNT_ADDRESS2)
     })
 
     it('Test3 should be able to sign with second account and get the signer back with multiple local accounts', async () => {
       jest.setTimeout(20 * 1000)
-      addLocalAccount(web3, PRIVATE_KEY1)
-      addLocalAccount(web3, PRIVATE_KEY2)
+      new ContractKit(web3).addAccount(PRIVATE_KEY1)
+      new ContractKit(web3).addAccount(PRIVATE_KEY2)
       await verifyLocalSigning(web3, ACCOUNT_ADDRESS2, ACCOUNT_ADDRESS1)
     })
   })

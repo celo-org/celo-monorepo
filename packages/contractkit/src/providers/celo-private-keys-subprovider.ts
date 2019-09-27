@@ -3,8 +3,10 @@ import debugFactory from 'debug'
 import { JSONRPCRequestPayload } from 'ethereum-types'
 import Web3 from 'web3'
 import { gasInflationFactor } from '../consts'
+import { GasPriceMinimum } from '../generated/types/GasPriceMinimum'
 import { signTransaction } from '../utils/signing-utils'
 import { CeloPartialTxParams } from '../utils/tx-signing'
+import { Web3ContractCache } from '../web3-contract-cache'
 
 const debug = debugFactory('kit:providers:celo-private-keys-subprovider')
 
@@ -36,14 +38,16 @@ function isEmpty(value: string | undefined) {
 export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
   // Account addresses are hex-encoded, lower case alphabets
   private readonly accountAddressToPrivateKey = new Map<string, string>()
+  private readonly contractsCache: Web3ContractCache
 
   private chainId: number | null = null
   private gasFeeRecipient: string | null = null
 
-  constructor(privateKey: string) {
+  constructor(readonly web3ContractsCache: Web3ContractCache, readonly privateKey: string) {
     // This won't accept a privateKey with 0x prefix and will call that an invalid key.
     super(getPrivateKeyWithout0xPrefix(privateKey))
     this.addAccount(privateKey)
+    this.contractsCache = web3ContractsCache
   }
 
   public addAccount(privateKey: string) {
@@ -113,7 +117,7 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
 
     if (isEmpty(txParams.gasFeeRecipient)) {
       txParams.gasFeeRecipient = await this.getCoinbase()
-      if (txParams.gasFeeRecipient === null) {
+      if (isEmpty(txParams.gasFeeRecipient)) {
         // Fail early. The validator nodes will reject a transaction missing
         // gas fee recipient anyways.
         throw new Error(
@@ -124,7 +128,9 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
     }
 
     if (isEmpty(txParams.gasPrice)) {
-      txParams.gasPrice = await this.getGasPrice()
+      // TODO(ashishb): For now, this will only work when gas payments are in Celo Gold
+      // It won't work when the gas payments are in C$.
+      txParams.gasPrice = await this.getGasPrice(this.contractsCache, txParams.gasCurrency)
     }
     debug('Gas price for the transaction is %s', txParams.gasPrice)
 
@@ -195,15 +201,29 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
     return this.gasFeeRecipient
   }
 
-  private async getGasPrice(): Promise<string> {
-    debug('getGasPrice fetching gas price...')
+  private async getGasPrice(
+    web3Contracts: Web3ContractCache,
+    gasCurrency: string | undefined
+  ): Promise<string | undefined> {
+    // Gold Token
+    if (gasCurrency === undefined) {
+      return this.getGasPriceInCeloGold()
+    }
+    const gasPriceMinimum: GasPriceMinimum = await web3Contracts.getGasPriceMinimum()
+    const gasPrice: string = await gasPriceMinimum.methods.getGasPriceMinimum(gasCurrency).call()
+    debug('getGasPrice gas price for currency %s is %s', gasCurrency, gasPrice)
+    return gasPrice
+  }
+
+  private async getGasPriceInCeloGold(): Promise<string> {
+    debug('getGasPriceInCeloGold fetching gas price...')
     // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_gasprice
     const result = await this.emitPayloadAsync({
       method: 'eth_gasPrice',
       params: [],
     })
     const gasPriceInHex = result.result.toString()
-    debug('getGasPrice gas price is %s', parseInt(gasPriceInHex.substr(2), 16))
+    debug('getGasPriceInCeloGold gas price is %s', parseInt(gasPriceInHex.substr(2), 16))
     return gasPriceInHex
   }
 

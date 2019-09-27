@@ -98,7 +98,7 @@ export class ContractKit {
   }
 
   addAccount(privateKey: string) {
-    addLocalAccount(this.web3, privateKey)
+    addLocalAccount(this.web3, this._web3Contracts, privateKey)
   }
 
   set defaultAccount(address: Address) {
