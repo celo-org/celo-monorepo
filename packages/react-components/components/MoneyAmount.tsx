@@ -51,8 +51,7 @@ const style = StyleSheet.create({
     color: colors.darkSecondary,
   },
   currencyCode: {
-    ...fontStyles.regular,
-    fontSize: 16,
+    ...fontStyles.body,
     lineHeight: 64,
     color: colors.lightGray,
     marginLeft: 7,
