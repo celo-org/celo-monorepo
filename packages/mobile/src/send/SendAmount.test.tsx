@@ -74,6 +74,7 @@ describe('SendAmount', () => {
             e164NumberToAddress={{ [mockE164Number2]: mockAccount2 }}
             defaultCountryCode={'+1'}
             feeType={FeeType.SEND}
+            localCurrencyExchangeRate={1.33}
           />
         </Provider>
       )

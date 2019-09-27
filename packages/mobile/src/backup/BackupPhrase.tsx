@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     paddingHorizontal: 20,
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'space-between',
   },
   title: {
