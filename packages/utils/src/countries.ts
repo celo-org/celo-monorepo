@@ -1,5 +1,6 @@
 const esData = require('@umpirsky/country-list/data/es/country.json')
 import countryData from 'country-data'
+import { notEmpty } from './collections'
 
 interface CountryNames {
   [name: string]: string
@@ -35,11 +36,6 @@ const removeDiacritics = (word: string) =>
 interface CountrySearch {
   displayName: string
   countryCode: string
-}
-
-// https://stackoverflow.com/questions/43118692/typescript-filter-out-nulls-from-an-array
-function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
-  return value !== null && value !== undefined
 }
 
 const matchCountry = (country: CountrySearch, query: string) => {
