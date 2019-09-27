@@ -105,15 +105,11 @@ export class Account extends React.Component<Props, State> {
   }
 
   goToFAQ() {
-    navigateToURI({
-      uri: FAQ_LINK,
-    })
+    navigateToURI(FAQ_LINK)
   }
 
   goToTerms() {
-    navigateToURI({
-      uri: TOS_LINK,
-    })
+    navigateToURI(TOS_LINK)
   }
 
   resetAppOpenedState = () => {

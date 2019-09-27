@@ -249,7 +249,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     ]
                   }
                 >
-                   +1
+                  🇺🇸 +1
                 </Text>
                 <Text
                   style={
@@ -315,7 +315,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     }
                   }
                 >
-                  $10
+                  10
                 </Text>
               </View>
               <View
@@ -452,7 +452,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     }
                   }
                 >
-                  $10.00
+                  10.00
                 </Text>
               </View>
             </View>
@@ -897,7 +897,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                   +1
+                  🇺🇸 +1
                 </Text>
                 <Text
                   style={
@@ -963,7 +963,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     }
                   }
                 >
-                  $10
+                  10
                 </Text>
               </View>
               <View
@@ -1100,7 +1100,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     }
                   }
                 >
-                  $10.00
+                  10.00
                 </Text>
               </View>
             </View>
@@ -1545,7 +1545,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                   +1
+                  🇺🇸 +1
                 </Text>
                 <Text
                   style={
@@ -1611,7 +1611,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     }
                   }
                 >
-                  $10
+                  10
                 </Text>
               </View>
               <View
@@ -1742,7 +1742,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     }
                   }
                 >
-                  $10.00
+                  10.00
                 </Text>
               </View>
             </View>
