@@ -1,7 +1,6 @@
 import { chain, Either, map } from 'fp-ts/lib/Either'
 import { pipe } from 'fp-ts/lib/pipeable'
 import { chain as andThen, fromEither, TaskEither } from 'fp-ts/lib/TaskEither'
-import { SignedClaim } from '../claims'
 import {
   asClassicPromise,
   asThrowable,
@@ -19,6 +18,7 @@ import {
   NameClaim,
   parseMetadata,
   serializeMetadata,
+  SignedClaim,
   validateMetadata,
   ValidationError,
 } from './types'
