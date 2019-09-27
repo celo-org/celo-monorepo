@@ -27,14 +27,8 @@ const now = () => Math.round(new Date().getTime() / 1000)
 export type MetadataError = NetworkError | ValidationError
 
 export class MetadataManager {
-  testnet: string | undefined
-
   emptyIdentityMetadata: IdentityMetadata = {
     claims: [],
-  }
-
-  constructor(testnet?: string) {
-    this.testnet = testnet
   }
 
   fetchMetadataTE = (url: string) =>
