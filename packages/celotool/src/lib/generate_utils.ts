@@ -1,6 +1,7 @@
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
 import * as bls12377js from 'bls12377js'
 import { ec as EC } from 'elliptic'
+import { readFileSync } from 'fs'
 import { range, repeat } from 'lodash'
 import rlp from 'rlp'
 import Web3 from 'web3'
@@ -10,7 +11,6 @@ import {
   GETH_CONFIG_OLD,
   ISTANBUL_MIX_HASH,
   OG_ACCOUNTS,
-  PROXY_CONTRACT_CODE,
   REGISTRY_ADDRESS,
   TEMPLATE,
 } from './genesis_constants'
@@ -218,7 +218,8 @@ export const generateGenesis = ({
   const contracts = [REGISTRY_ADDRESS]
   for (const contract of contracts) {
     genesis.alloc[contract] = {
-      code: PROXY_CONTRACT_CODE,
+      code: JSON.parse(readFileSync('../protocol/build/contracts/Proxy.json').toString())
+        .deployedBytecode,
       storage: {
         [CONTRACT_OWNER_STORAGE_LOCATION]: validators[0].address,
       },
