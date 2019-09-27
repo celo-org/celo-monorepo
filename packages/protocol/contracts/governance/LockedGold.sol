@@ -445,7 +445,23 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     Account storage account = accounts[_account];
     return account.commitments.noticePeriods;
   }
+  
+  /** 
+	Certora
+   */
+  function getNoticePeriodsLen(address _account) internal view returns (uint256) {
+    Account storage account = accounts[_account];
+    return account.commitments.noticePeriods.length;
+  }
 
+  /** 
+	Certora
+   */
+  function getFromNoticePeriods(address _account,uint256 index) internal view returns (uint256) {
+    Account storage account = accounts[_account];
+	return account.commitments.noticePeriods[index];
+  }
+  
   /**
    * @notice Returns the availability times of all notified commitments for an account.
    * @param _account The address of the account.
@@ -456,6 +472,22 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     return account.commitments.availabilityTimes;
   }
 
+  /** 
+	Certora
+   */
+  function getAvailabilityTimesLen(address _account) internal view returns (uint256) {
+    Account storage account = accounts[_account];
+    return account.commitments.availabilityTimes.length;
+  }
+  
+  /** 
+	Certora
+   */
+  function getFromAvailabilityTimes(address _account,uint256 index) internal view returns (uint256) {
+    Account storage account = accounts[_account];
+    return account.commitments.availabilityTimes[index];
+  }
+    
   /**
    * @notice Returns the value and index of a specified Locked Gold commitment.
    * @param _account The address of the account.

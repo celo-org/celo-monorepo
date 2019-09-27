@@ -14,8 +14,8 @@ rule account_empty_unless_created(method f, address account) {
 
 	env ePre;
 	bool _empty1 = (sinvoke _lenNoticePeriods(ePre,account) == 0) && (sinvoke _lenAvailabilityTimes(ePre,account) == 0);
-	bool _empty2 = (sinvoke _rewardsDelegate(ePre,account) == 0) && (sinvoke _rewardsLastRedeemed(ePre,account) == 0);
-	bool _empty3 = (sinvoke _votingDelegate(ePre,account) == 0) && (sinvoke _votingFrozen(ePre,account) == false);
+	bool _empty2 = (sinvoke _rewardsDelegate(ePre,account) == 0) && (sinvoke getRewardsLastRedeemed(ePre,account) == 0);
+	bool _empty3 = (sinvoke _votingDelegate(ePre,account) == 0) && (sinvoke isVotingFrozen(ePre,account) == false);
 	bool _empty4 = (sinvoke _validatingDelegate(ePre,account) == 0);
 	bool _empty5 = (sinvoke _weight(ePre,account) == 0);
 
@@ -29,8 +29,8 @@ rule account_empty_unless_created(method f, address account) {
  
 	env ePost;
 	bool empty1_ = (sinvoke _lenNoticePeriods(ePost,account) == 0) && (sinvoke _lenAvailabilityTimes(ePost,account) == 0);
-	bool empty2_ = (sinvoke _rewardsDelegate(ePost,account) == 0) && (sinvoke _rewardsLastRedeemed(ePost,account) == 0); 
-	bool empty3_ = (sinvoke _votingDelegate(ePost,account) == 0) && (sinvoke _votingFrozen(ePost,account) == false);
+	bool empty2_ = (sinvoke _rewardsDelegate(ePost,account) == 0) && (sinvoke getRewardsLastRedeemed(ePost,account) == 0); 
+	bool empty3_ = (sinvoke _votingDelegate(ePost,account) == 0) && (sinvoke isVotingFrozen(ePost,account) == false);
 	bool empty4_ = (sinvoke _validatingDelegate(ePost,account) == 0);
 	bool empty5_ = (sinvoke _weight(ePost,account) == 0);
 
@@ -304,9 +304,9 @@ rule modifying_deposits(address a, uint256 someNoticePeriod, uint256 someAvailab
 	uint256 _lenNoticePeriodsValue = sinvoke _lenNoticePeriods(_e,a);
 	uint256 _lenAvailabilityTimesValue = sinvoke _lenAvailabilityTimes(_e,a);
 	uint256 _someBondedValue; uint256 _someBondedIndex;
-	_someBondedValue, _someBondedIndex = sinvoke getBondedDeposit(_e,a,someNoticePeriod);
+	_someBondedValue, _someBondedIndex = sinvoke getLockedCommitment(_e,a,someNoticePeriod);
 	uint256 _someNotifiedValue; uint256 _someNotifiedIndex;
-	_someNotifiedValue, _someNotifiedIndex = sinvoke getNotifiedDeposit(_e,a,someAvailabilityTime);
+	_someNotifiedValue, _someNotifiedIndex = sinvoke getNotifiedCommitment(_e,a,someAvailabilityTime);
 	
 	env eF;
 	calldataarg arg;
@@ -316,9 +316,9 @@ rule modifying_deposits(address a, uint256 someNoticePeriod, uint256 someAvailab
 	uint256 lenNoticePeriodsValue_ = sinvoke _lenNoticePeriods(e_,a);
 	uint256 lenAvailabilityTimesValue_ = sinvoke _lenAvailabilityTimes(e_,a);
 	uint256 someBondedValue_; uint256 someBondedIndex_;
-	someBondedValue_, someBondedIndex_ = sinvoke getBondedDeposit(e_,a,someNoticePeriod);
+	someBondedValue_, someBondedIndex_ = sinvoke getLockedCommitment(e_,a,someNoticePeriod);
 	uint256 someNotifiedValue_; uint256 someNotifiedIndex_;
-	someNotifiedValue_, someNotifiedIndex_ = sinvoke getNotifiedDeposit(e_,a,someAvailabilityTime);
+	someNotifiedValue_, someNotifiedIndex_ = sinvoke getNotifiedCommitment(e_,a,someAvailabilityTime);
 	
 	assert _lenNoticePeriodsValue == lenNoticePeriodsValue_, "Method changed length of notice periods";
 	assert _lenAvailabilityTimesValue == lenAvailabilityTimesValue_, "Method changed length of availability times";
@@ -334,7 +334,7 @@ rule valid_notice_period_for_deposit(address a, uint256 someNoticePeriod, method
 	uint256 _maxNoticePeriodValue = sinvoke maxNoticePeriod(_e);
 	
 	uint256 _someBondedValue; uint256 _someBondedIndex;
-	_someBondedValue, _someBondedIndex = sinvoke getBondedDeposit(_e,a,someNoticePeriod);
+	_someBondedValue, _someBondedIndex = sinvoke getLockedCommitment(_e,a,someNoticePeriod);
 	require someNoticePeriod > _maxNoticePeriodValue => (_someBondedValue == 0 && _someBondedIndex == 0);
 	
 	env eF;
@@ -345,7 +345,7 @@ rule valid_notice_period_for_deposit(address a, uint256 someNoticePeriod, method
 	uint256 maxNoticePeriodValue_ = sinvoke maxNoticePeriod(e_);
 	
 	uint256 someBondedValue_; uint256 someBondedIndex_;
-	someBondedValue_, someBondedIndex_ = sinvoke getBondedDeposit(e_,a,someNoticePeriod);
+	someBondedValue_, someBondedIndex_ = sinvoke getLockedCommitment(e_,a,someNoticePeriod);
 	
 	assert someNoticePeriod > maxNoticePeriodValue_ => (someBondedValue_ == 0 && someBondedIndex_ == 0);
 }
@@ -359,9 +359,9 @@ rule cant_notify_an_unbonded_deposit(address a, uint256 someNoticePeriod, method
 	uint256 matchingAvailabilityTime = eF.block.timestamp+someNoticePeriod; // availability time is notify time + notice period set beforehand
 	
 	uint256 _someBondedValue; uint256 _someBondedIndex;
-	_someBondedValue, _someBondedIndex = sinvoke getBondedDeposit(_e,a,someNoticePeriod);
+	_someBondedValue, _someBondedIndex = sinvoke getLockedCommitment(_e,a,someNoticePeriod);
 	uint256 _someNotifiedValue; uint256 _someNotifiedIndex;
-	_someNotifiedValue, _someNotifiedIndex = sinvoke getNotifiedDeposit(_e,a,matchingAvailabilityTime);
+	_someNotifiedValue, _someNotifiedIndex = sinvoke getNotifiedCommitment(_e,a,matchingAvailabilityTime);
 	
 	// not notified before:
 	require _someNotifiedValue == 0 /*&& _someNotifiedIndex == 0*/;
@@ -370,9 +370,9 @@ rule cant_notify_an_unbonded_deposit(address a, uint256 someNoticePeriod, method
 	sinvoke f(eF,arg);
 	
 	/*uint256 someBondedValue_; uint256 someBondedIndex_;
-	someBondedValue_, someBondedIndex_ = sinvoke getBondedDeposit(e_,a,someNoticePeriod);*/
+	someBondedValue_, someBondedIndex_ = sinvoke getLockedCommitment(e_,a,someNoticePeriod);*/
 	uint256 someNotifiedValue_; uint256 someNotifiedIndex_;
-	someNotifiedValue_, someNotifiedIndex_ = sinvoke getNotifiedDeposit(e_,a,matchingAvailabilityTime); 
+	someNotifiedValue_, someNotifiedIndex_ = sinvoke getNotifiedCommitment(e_,a,matchingAvailabilityTime); 
 	// what happens if in withdraw we delete and matchingAvailabilityTime is the last index? then its index is updated
 	
 	// if now we notified, necessarily, it was bonded BEFORE
@@ -421,16 +421,16 @@ rule atomic_deposit_notification(uint256 someNoticePeriod, uint256 notifyValue) 
 	uint256 matchingAvailabilityTime = eF.block.timestamp+someNoticePeriod; // availability time is notify time + notice period set beforehand
 	
 	uint256 _someBondedValue; 
-	_someBondedValue, _ = sinvoke getBondedDeposit(_e,a,someNoticePeriod);
+	_someBondedValue, _ = sinvoke getLockedCommitment(_e,a,someNoticePeriod);
 	uint256 _someNotifiedValue; 
-	_someNotifiedValue, _ = sinvoke getNotifiedDeposit(_e,a,matchingAvailabilityTime);
+	_someNotifiedValue, _ = sinvoke getNotifiedCommitment(_e,a,matchingAvailabilityTime);
 	
-	sinvoke notify(eF, notifyValue, someNoticePeriod);
+	sinvoke notifyCommitment(eF, notifyValue, someNoticePeriod);
 	
 	uint256 someBondedValue_; 
-	someBondedValue_, _ = sinvoke getBondedDeposit(e_,a,someNoticePeriod);
+	someBondedValue_, _ = sinvoke getLockedCommitment(e_,a,someNoticePeriod);
 	uint256 someNotifiedValue_; 
-	someNotifiedValue_, _ = sinvoke getNotifiedDeposit(e_,a,matchingAvailabilityTime);
+	someNotifiedValue_, _ = sinvoke getNotifiedCommitment(e_,a,matchingAvailabilityTime);
 	
 	// some notified value should increase, some bonded value should decrease
 	assert someNotifiedValue_ - _someNotifiedValue == _someBondedValue - someBondedValue_, "Violated: Difference between new and old bonded value should be the same as difference of old and new notified value";
@@ -446,9 +446,9 @@ rule cant_rebond_non_notified(uint256 rebondValue, uint256 depositAvailabilityTi
 	
 	address a = eF.msg.sender; // our account will execute rebond()
 	uint256 _someNotifiedValue; 
-	_someNotifiedValue, _ = sinvoke getNotifiedDeposit(_e,a,depositAvailabilityTime);
+	_someNotifiedValue, _ = sinvoke getNotifiedCommitment(_e,a,depositAvailabilityTime);
 	
-	invoke rebond(eF, rebondValue, depositAvailabilityTime);
+	invoke extendCommitment(eF, rebondValue, depositAvailabilityTime);
 	
 	assert _someNotifiedValue < rebondValue => lastReverted, "Trying to rebond more deposits then there are notified ($rebondValue > ${_someNotifiedValue}), and did not revert rebond()";
 }
@@ -463,11 +463,11 @@ rule withdrawing_removes_notified_deposit(uint256 someNoticePeriod) {
 	address a = eF.msg.sender; // our account will execute withdraw()
 	uint256 matchingAvailabilityTime = eF.block.timestamp+someNoticePeriod; // availability time is notify time + notice period set beforehand
 		
-	invoke withdraw(eF, matchingAvailabilityTime);
+	invoke withdrawCommitment(eF, matchingAvailabilityTime);
 	bool withdrawSucceeded = !lastReverted;
 	
 	uint256 someNotifiedValue_; uint256 someNotifiedIndex_;
-	someNotifiedValue_, someNotifiedIndex_ = sinvoke getNotifiedDeposit(e_,a,matchingAvailabilityTime);
+	someNotifiedValue_, someNotifiedIndex_ = sinvoke getNotifiedCommitment(e_,a,matchingAvailabilityTime);
 	
 	assert withdrawSucceeded => (someNotifiedValue_ == 0 && someNotifiedIndex_ == 0), "Violated: withdraw succeeded but for deposit $someNoticePeriod with availability time $matchingAvailabilityTime we still have value: ${someNotifiedValue_} and index ${someBondedIndex_}";
 }
@@ -481,9 +481,9 @@ rule withdraw_precond(uint256 someAvailabilityTime) {
 	address a = eF.msg.sender; // our account will execute withdraw()
 	
 	uint256 _someNotifiedValue;
-	_someNotifiedValue, _ = sinvoke getNotifiedDeposit(_e,a,someAvailabilityTime);
+	_someNotifiedValue, _ = sinvoke getNotifiedCommitment(_e,a,someAvailabilityTime);
 	
-	invoke withdraw(eF, someAvailabilityTime);
+	invoke withdrawCommitment(eF, someAvailabilityTime);
 	bool withdrawSucceeded = !lastReverted;
 	
 	// TODO: Is it a strict, or non-strict inequality?
@@ -500,7 +500,7 @@ rule increase_notice_period_precond(uint256 someNoticePeriod) {
 	address a = eF.msg.sender; // our account will execute increaseNoticePeriod()
 	
 	uint256 _someBondedValue;
-	_someBondedValue, _ = sinvoke getBondedDeposit(_e,a,someNoticePeriod);
+	_someBondedValue, _ = sinvoke getLockedCommitment(_e,a,someNoticePeriod);
 	
 	uint256 value;
 	uint256 increase;
@@ -525,12 +525,12 @@ rule notify_only_updates_the_expected_deposit_availability_time(uint256 someNoti
 	uint256 notifyValue;
 	
 	uint256 _someNotifiedValue; uint256 _someNotifiedIndex;
-	_someNotifiedValue, _someNotifiedIndex = sinvoke getNotifiedDeposit(_e,a,randomTime);
+	_someNotifiedValue, _someNotifiedIndex = sinvoke getNotifiedCommitment(_e,a,randomTime);
 	
-	sinvoke notify(eF, notifyValue, someNoticePeriod);
+	sinvoke notifyCommitment(eF, notifyValue, someNoticePeriod);
 	
 	uint256 someNotifiedValue_; uint256 someNotifiedIndex_;
-	someNotifiedValue_, someNotifiedIndex_ = sinvoke getNotifiedDeposit(e_,a,randomTime);
+	someNotifiedValue_, someNotifiedIndex_ = sinvoke getNotifiedCommitment(e_,a,randomTime);
 	
 	assert _someNotifiedIndex == someNotifiedIndex_ && _someNotifiedValue == someNotifiedValue_, "Invocation of notify with notice period $someNoticePeriod and matching availability time $matchingAvailabilityTime should not have updated any entry in notified deposit of $randomTime";
 }
@@ -541,7 +541,7 @@ rule notify_only_updates_the_expected_deposit_availability_time(uint256 someNoti
 		forall i,np. (0 <= i && i < deposits.length) => (deposits[i] == np <=> (bonded[np].value != 0 && bonded[np].index == i))
 
 	Rule 2 - weights:
-		Changes account's weight and total weight by getDepositWeight(value=(value - bonded[np].value),np)
+		Changes account's weight and total weight by getCommitmentWeight(value=(value - bonded[np].value),np)
 	
 	Rule 3 - deletion:
 		If new value is 0, new index of np must be 0 too. (i.e. deleted from array and overwrite map's stored index).
@@ -561,7 +561,7 @@ rule check_update_bonded_deposit_inv123(address account, uint256 noticePeriod) {
 	// forall np. bonded[np].value != 0 => deposits[bonded[np].index] == np [also implies index is in range of deposits array]
 	// [distinct] forall np1,np2. (np1 != np2 && bonded[np1].value != 0 && bonded[np2].value != 0) => bonded[np1].index != bonded[np2].index
 	// [distinct array] forall i1,i2. i1 != i2 => deposits[i1] != deposits[i2]
-	// universe includes parameters to updateBondedDeposit: 
+	// universe includes parameters to updateLockedCommitment: 
 	// 	np universe is noticePeriod and arg_noticePeriod
 	// 	index universe is bonded[noticePeriod].index and bonded[arg_noticePeriod].index [if they do not exist, invariant 2 imply they are 0]
 	//		as well as _lenNoticePeriods-1 (case of deletion) and 0 (if len is at least 1)
@@ -575,10 +575,10 @@ rule check_update_bonded_deposit_inv123(address account, uint256 noticePeriod) {
 	uint256 _lenDeposits = sinvoke _lenNoticePeriods(_e,account);
 	
 	uint256 _bondValue; uint256 _bondIndex;
-	_bondValue,_bondIndex = sinvoke getBondedDeposit(_e,account,noticePeriod);
+	_bondValue,_bondIndex = sinvoke getLockedCommitment(_e,account,noticePeriod);
 	
 	uint256 _arg_bondValue; uint256 _arg_bondIndex;
-	_arg_bondValue, _arg_bondIndex = sinvoke getBondedDeposit(_e,arg_account,arg_noticePeriod);
+	_arg_bondValue, _arg_bondIndex = sinvoke getLockedCommitment(_e,arg_account,arg_noticePeriod);
 	
 	// invariant 2 assumption:
 	require _arg_bondValue == 0 => _arg_bondIndex == 0;
@@ -589,13 +589,13 @@ rule check_update_bonded_deposit_inv123(address account, uint256 noticePeriod) {
 	require (0 <= _arg_bondIndex && _arg_bondIndex < _lenDeposits);
 	
 	// invariant 1 assumption: depends on which indices are actually in the universe:
-	uint256 _element = sinvoke getFromNoticePeriods(_e,account,_bondIndex);
-	uint256 _arg_element = sinvoke getFromNoticePeriods(_e,arg_account,_arg_bondIndex);
-	uint256 _last_element = sinvoke getFromNoticePeriods(_e,arg_account,_lenDeposits-1);
-	uint256 _zero_element = sinvoke getFromNoticePeriods(_e,arg_account,0);
+	uint256 _element = sinvoke _getFromNoticePeriods(_e,account,_bondIndex);
+	uint256 _arg_element = sinvoke _getFromNoticePeriods(_e,arg_account,_arg_bondIndex);
+	uint256 _last_element = sinvoke _getFromNoticePeriods(_e,arg_account,_lenDeposits-1);
+	uint256 _zero_element = sinvoke _getFromNoticePeriods(_e,arg_account,0);
 	
 	uint256 _last_bondValue; uint256 _last_bondIndex; 
-	_last_bondValue, _last_bondIndex = sinvoke getBondedDeposit(_e,arg_account,_last_element);
+	_last_bondValue, _last_bondIndex = sinvoke getLockedCommitment(_e,arg_account,_last_element);
 	require _last_bondValue != 0; // can't store 0's in the array (another invariant...)
 	require _last_bondIndex == _lenDeposits-1; // because it's the index from which we started
 	require _lenDeposits > 0 => _zero_element != 0; // can't store 0's in the array (another invariant...)
@@ -619,20 +619,20 @@ rule check_update_bonded_deposit_inv123(address account, uint256 noticePeriod) {
 		require _bondIndex != 0 => noticePeriod != _zero_element;
 	}
 	
-	sinvoke ext_updateBondedDeposit(eF,arg_account,arg_value,arg_noticePeriod);
+	sinvoke ext_updateLockedCommitment(eF,arg_account,arg_value,arg_noticePeriod);
 		
 	// starting assertions
 	uint256 lenDeposits_ = sinvoke _lenNoticePeriods(e_,account);
 	
 	uint256 bondValue_; uint256 bondIndex_;
-	bondValue_,bondIndex_ = sinvoke getBondedDeposit(e_,account,noticePeriod);
+	bondValue_,bondIndex_ = sinvoke getLockedCommitment(e_,account,noticePeriod);
 	
 	uint256 arg_bondValue_; uint256 arg_bondIndex_;
-	arg_bondValue_, arg_bondIndex_ = sinvoke getBondedDeposit(e_,arg_account,arg_noticePeriod);
+	arg_bondValue_, arg_bondIndex_ = sinvoke getLockedCommitment(e_,arg_account,arg_noticePeriod);
 	
 	// these are valid only if the value is non zero
-	uint256 element_ = sinvoke getFromNoticePeriods(e_,account,bondIndex_);
-	uint256 arg_element_ = sinvoke getFromNoticePeriods(e_,arg_account,arg_bondIndex_);
+	uint256 element_ = sinvoke _getFromNoticePeriods(e_,account,bondIndex_);
+	uint256 arg_element_ = sinvoke _getFromNoticePeriods(e_,arg_account,arg_bondIndex_);
 	
 	// invariant 2 assertion
 	assert bondValue_ == 0 => bondIndex_ == 0, "Bonded map cannot store a zero valued bond unless the index is zero";
@@ -645,37 +645,37 @@ rule check_update_bonded_deposit_inv123(address account, uint256 noticePeriod) {
 }
 
 rule check_update_bonded_deposit_rule2_weights(address account, uint256 noticePeriod, uint256 value) {
-	// Changes account's weight and total weight by getDepositWeight(value=(value - bonded[np].value),np)
+	// Changes account's weight and total weight by getCommitmentWeight(value=(value - bonded[np].value),np)
 	env _e;
 	env eF;
 	env e_;
 	env ePure;
 
 	uint256 _bondValue; 
-	_bondValue, _ = sinvoke getBondedDeposit(_e,account,noticePeriod);
+	_bondValue, _ = sinvoke getLockedCommitment(_e,account,noticePeriod);
 	uint256 _accountWeight = sinvoke getAccountWeight(_e,account);
 	uint256 _totalWeight = sinvoke totalWeight(_e);
 	
-	uint expectedValueChange = value - _bondValue;
+	uint256 expectedValueChange = value - _bondValue;
 	
-	//uint256 expectedWeightChange = sinvoke getDepositWeight((value-_bondValue, ...
+	//uint256 expectedWeightChange = sinvoke getCommitmentWeight((value-_bondValue, ...
 	
-	sinvoke ext_updateBondedDeposit(eF,account,value,noticePeriod);
+	sinvoke ext_updateLockedCommitment(eF,account,value,noticePeriod);
 		
 	uint256 bondValue_;
-	bondValue_, _ = sinvoke getBondedDeposit(e_,account,noticePeriod);
+	bondValue_, _ = sinvoke getLockedCommitment(e_,account,noticePeriod);
 	uint256 accountWeight_ = sinvoke getAccountWeight(e_,account);
 	uint256 totalWeight_ = sinvoke totalWeight(e_);
 	
-	uint actualValueChange = bondValue_ - _bondValue;
+	uint256 actualValueChange = bondValue_ - _bondValue;
 	
-	uint256 weightOldBond = sinvoke getDepositWeight(ePure,_bondValue,noticePeriod);
-	uint256 weightNewBond = sinvoke getDepositWeight(ePure,value,noticePeriod);
+	uint256 weightOldBond = sinvoke getCommitmentWeight(ePure,_bondValue,noticePeriod);
+	uint256 weightNewBond = sinvoke getCommitmentWeight(ePure,value,noticePeriod);
 	
 	assert actualValueChange == expectedValueChange, "Unexpected change in value of bond in chosen notice period";
 	assert totalWeight_ - _totalWeight == accountWeight_ - _accountWeight, "Change in total weight and in account weight is not the same";
 	assert accountWeight_ == _accountWeight - weightOldBond + weightNewBond, "Unexepcted change in weight";	
-	// we're not using distributivity to compute the change because getDepositWeight works with uints and not with ints (and we don't want to encode all the inequalities to avoid negative values).
+	// we're not using distributivity to compute the change because getCommitmentWeight works with uints and not with ints (and we don't want to encode all the inequalities to avoid negative values).
 }
 
 
@@ -691,29 +691,29 @@ rule check_update_bonded_deposit_rule3_deletion(address account, uint256 noticeP
 	require value == 0; // deletion check
 	
 	uint256 _bondValue; uint256 _bondIndex;
-	_bondValue,_bondIndex = sinvoke getBondedDeposit(_e,account,noticePeriod);
+	_bondValue,_bondIndex = sinvoke getLockedCommitment(_e,account,noticePeriod);
 	uint256 _lenDeposits = sinvoke _lenNoticePeriods(_e,account);
 	
 	uint256 movedIndex = _lenDeposits - 1;
-	uint256 movedElement = sinvoke getFromNoticePeriods(_e, account, movedIndex);
+	uint256 movedElement = sinvoke _getFromNoticePeriods(_e, account, movedIndex);
 	require movedElement != noticePeriod; // no duplicates in noticePeriods array
 	
 	require 0 <= otherIndex && otherIndex < _lenDeposits-1 && otherIndex != _bondIndex;
-	uint256 _otherElement = sinvoke getFromNoticePeriods(_e,account,otherIndex);
+	uint256 _otherElement = sinvoke _getFromNoticePeriods(_e,account,otherIndex);
 	
-	sinvoke ext_updateBondedDeposit(eF,account,value,noticePeriod);
+	sinvoke ext_updateLockedCommitment(eF,account,value,noticePeriod);
 	
 	uint256 bondValue_; uint256 bondIndex_;
-	bondValue_,bondIndex_ = sinvoke getBondedDeposit(e_,account,noticePeriod);
+	bondValue_,bondIndex_ = sinvoke getLockedCommitment(e_,account,noticePeriod);
 	uint256 lenDeposits_ = sinvoke _lenNoticePeriods(e_,account);
 	
-	uint256 otherElement_ = sinvoke getFromNoticePeriods(e_,account,otherIndex);
+	uint256 otherElement_ = sinvoke _getFromNoticePeriods(e_,account,otherIndex);
 	
 	assert lenDeposits_ == _lenDeposits - 1, "Did not delete an element";
 	assert bondIndex_ == 0, "If deleting a bond, must overwrite all fields of bond in the bonded map";
 	
 	if (_bondIndex < _lenDeposits-1) {
-		uint256 newElementInDeletedLocation = sinvoke getFromNoticePeriods(e_,account,_bondIndex);
+		uint256 newElementInDeletedLocation = sinvoke _getFromNoticePeriods(e_,account,_bondIndex);
 		assert newElementInDeletedLocation == movedElement, "Unexpected hole in deleted index";
 	}
 	
@@ -731,15 +731,15 @@ rule check_update_bonded_deposit_rule4_insertion(address account, uint256 notice
 	env e_;
 
 	uint256 _bondValue; uint256 _bondIndex;
-	_bondValue,_bondIndex = sinvoke getBondedDeposit(_e,account,noticePeriod);
+	_bondValue,_bondIndex = sinvoke getLockedCommitment(_e,account,noticePeriod);
 	require _bondValue == 0;
 	
 	uint256 _lenDeposits = sinvoke _lenNoticePeriods(_e,account);
 	
-	sinvoke ext_updateBondedDeposit(eF,account,value,noticePeriod);
+	sinvoke ext_updateLockedCommitment(eF,account,value,noticePeriod);
 	
 	uint256 bondValue_; uint256 bondIndex_;
-	bondValue_,bondIndex_ = sinvoke getBondedDeposit(e_,account,noticePeriod);
+	bondValue_,bondIndex_ = sinvoke getLockedCommitment(e_,account,noticePeriod);
 	uint256 lenDeposits_ = sinvoke _lenNoticePeriods(e_,account);
 	
 	assert lenDeposits_ == _lenDeposits + 1, "Did not add an element";
@@ -754,7 +754,7 @@ rule check_update_notified_deposit_inv123(address account, uint256 availabilityT
 	// forall np. bonded[np].value != 0 => deposits[bonded[np].index] == np [also implies index is in range of deposits array]
 	// [distinct] forall np1,np2. (np1 != np2 && bonded[np1].value != 0 && bonded[np2].value != 0) => bonded[np1].index != bonded[np2].index
 	// [distinct array] forall i1,i2. i1 != i2 => deposits[i1] != deposits[i2]
-	// universe includes parameters to updateBondedDeposit: 
+	// universe includes parameters to updateLockedCommitment: 
 	// 	np universe is availabilityTime and arg_availabilityTime
 	// 	index universe is bonded[availabilityTime].index and bonded[arg_availabilityTime].index [if they do not exist, invariant 2 imply they are 0]
 	//		as well as _lenAvailabilityTimes-1 (case of deletion) and 0 (if len is at least 1)
@@ -768,10 +768,10 @@ rule check_update_notified_deposit_inv123(address account, uint256 availabilityT
 	uint256 _lenArray = sinvoke _lenAvailabilityTimes(_e,account);
 	
 	uint256 _bondValue; uint256 _bondIndex;
-	_bondValue,_bondIndex = sinvoke getNotifiedDeposit(_e,account,availabilityTime);
+	_bondValue,_bondIndex = sinvoke getNotifiedCommitment(_e,account,availabilityTime);
 	
 	uint256 _arg_bondValue; uint256 _arg_bondIndex;
-	_arg_bondValue, _arg_bondIndex = sinvoke getNotifiedDeposit(_e,arg_account,arg_availabilityTime);
+	_arg_bondValue, _arg_bondIndex = sinvoke getNotifiedCommitment(_e,arg_account,arg_availabilityTime);
 	
 	// invariant 2 assumption:
 	require _arg_bondValue == 0 => _arg_bondIndex == 0;
@@ -782,13 +782,13 @@ rule check_update_notified_deposit_inv123(address account, uint256 availabilityT
 	require (0 <= _arg_bondIndex && _arg_bondIndex < _lenArray);
 	
 	// invariant 1 assumption: depends on which indices are actually in the universe:
-	uint256 _element = sinvoke getFromAvailabilityTimes(_e,account,_bondIndex);
-	uint256 _arg_element = sinvoke getFromAvailabilityTimes(_e,arg_account,_arg_bondIndex);
-	uint256 _last_element = sinvoke getFromAvailabilityTimes(_e,arg_account,_lenArray-1);
-	uint256 _zero_element = sinvoke getFromAvailabilityTimes(_e,arg_account,0);
+	uint256 _element = sinvoke _getFromAvailabilityTimes(_e,account,_bondIndex);
+	uint256 _arg_element = sinvoke _getFromAvailabilityTimes(_e,arg_account,_arg_bondIndex);
+	uint256 _last_element = sinvoke _getFromAvailabilityTimes(_e,arg_account,_lenArray-1);
+	uint256 _zero_element = sinvoke _getFromAvailabilityTimes(_e,arg_account,0);
 	
 	uint256 _last_bondValue; uint256 _last_bondIndex; 
-	_last_bondValue, _last_bondIndex = sinvoke getNotifiedDeposit(_e,arg_account,_last_element);
+	_last_bondValue, _last_bondIndex = sinvoke getNotifiedCommitment(_e,arg_account,_last_element);
 	require _last_bondValue != 0; // can't store 0's in the array (another invariant...)
 	require _last_bondIndex == _lenArray-1; // because it's the index from which we started
 	require _lenArray > 0 => _zero_element != 0; // can't store 0's in the array (another invariant...)
@@ -818,14 +818,14 @@ rule check_update_notified_deposit_inv123(address account, uint256 availabilityT
 	uint256 lenArray_ = sinvoke _lenAvailabilityTimes(e_,account);
 	
 	uint256 bondValue_; uint256 bondIndex_;
-	bondValue_,bondIndex_ = sinvoke getNotifiedDeposit(e_,account,availabilityTime);
+	bondValue_,bondIndex_ = sinvoke getNotifiedCommitment(e_,account,availabilityTime);
 	
 	uint256 arg_bondValue_; uint256 arg_bondIndex_;
-	arg_bondValue_, arg_bondIndex_ = sinvoke getNotifiedDeposit(e_,arg_account,arg_availabilityTime);
+	arg_bondValue_, arg_bondIndex_ = sinvoke getNotifiedCommitment(e_,arg_account,arg_availabilityTime);
 	
 	// these are valid only if the value is non zero
-	uint256 element_ = sinvoke getFromAvailabilityTimes(e_,account,bondIndex_);
-	uint256 arg_element_ = sinvoke getFromAvailabilityTimes(e_,arg_account,arg_bondIndex_);
+	uint256 element_ = sinvoke _getFromAvailabilityTimes(e_,account,bondIndex_);
+	uint256 arg_element_ = sinvoke _getFromAvailabilityTimes(e_,arg_account,arg_bondIndex_);
 	
 	// invariant 2 assertion
 	assert bondValue_ == 0 => bondIndex_ == 0, "Bonded map cannot store a zero valued bond unless the index is zero";
@@ -838,32 +838,32 @@ rule check_update_notified_deposit_inv123(address account, uint256 availabilityT
 }
 
 rule check_update_notified_deposit_rule2_weights(address account, uint256 availabilityTime, uint256 value) {
-	// Changes account's weight and total weight by value //getDepositWeight(value=(value - bonded[np].value),np)
+	// Changes account's weight and total weight by value //getCommitmentWeight(value=(value - bonded[np].value),np)
 	env _e;
 	env eF;
 	env e_;
 	env ePure;
 
 	uint256 _bondValue; 
-	_bondValue, _ = sinvoke getNotifiedDeposit(_e,account,availabilityTime);
+	_bondValue, _ = sinvoke getNotifiedCommitment(_e,account,availabilityTime);
 	uint256 _accountWeight = sinvoke getAccountWeight(_e,account);
 	uint256 _totalWeight = sinvoke totalWeight(_e);
 	
-	uint expectedValueChange = value - _bondValue;
+	uint256 expectedValueChange = value - _bondValue;
 	
-	//uint256 expectedWeightChange = sinvoke getDepositWeight((value-_bondValue, ...
+	//uint256 expectedWeightChange = sinvoke getCommitmentWeight((value-_bondValue, ...
 	
 	sinvoke ext_updateNotifiedDeposit(eF,account,value,availabilityTime);
 		
 	uint256 bondValue_;
-	bondValue_, _ = sinvoke getNotifiedDeposit(e_,account,availabilityTime);
+	bondValue_, _ = sinvoke getNotifiedCommitment(e_,account,availabilityTime);
 	uint256 accountWeight_ = sinvoke getAccountWeight(e_,account);
 	uint256 totalWeight_ = sinvoke totalWeight(e_);
 	
-	uint actualValueChange = bondValue_ - _bondValue;
+	uint256 actualValueChange = bondValue_ - _bondValue;
 	
-	uint256 weightOldBond = _bondValue; // sinvoke getDepositWeight(ePure,_bondValue,noticePeriod);
-	uint256 weightNewBond = value; //sinvoke getDepositWeight(ePure,value,noticePeriod);
+	uint256 weightOldBond = _bondValue; // sinvoke getCommitmentWeight(ePure,_bondValue,noticePeriod);
+	uint256 weightNewBond = value; //sinvoke getCommitmentWeight(ePure,value,noticePeriod);
 	
 	assert actualValueChange == expectedValueChange, "Unexpected change in value of bond in chosen availability time";
 	assert totalWeight_ - _totalWeight == accountWeight_ - _accountWeight, "Change in total weight and in account weight is not the same";
@@ -883,29 +883,29 @@ rule check_update_notified_deposit_rule3_deletion(address account, uint256 avail
 	require value == 0; // deletion check
 	
 	uint256 _bondValue; uint256 _bondIndex;
-	_bondValue,_bondIndex = sinvoke getNotifiedDeposit(_e,account,availabilityTime);
+	_bondValue,_bondIndex = sinvoke getNotifiedCommitment(_e,account,availabilityTime);
 	uint256 _lengthAvailabilityTimes = sinvoke _lenAvailabilityTimes(_e,account);
 	
 	uint256 movedIndex = _lengthAvailabilityTimes - 1;
-	uint256 movedElement = sinvoke getFromAvailabilityTimes(_e, account, movedIndex);
+	uint256 movedElement = sinvoke _getFromAvailabilityTimes(_e, account, movedIndex);
 	require movedElement != availabilityTime; // no duplicates in availabilityTimes array
 	
 	require 0 <= otherIndex && otherIndex < _lengthAvailabilityTimes-1 && otherIndex != _bondIndex;
-	uint256 _otherElement = sinvoke getFromAvailabilityTimes(_e,account,otherIndex);
+	uint256 _otherElement = sinvoke _getFromAvailabilityTimes(_e,account,otherIndex);
 	
 	sinvoke ext_updateNotifiedDeposit(eF,account,value,availabilityTime);
 	
 	uint256 bondValue_; uint256 bondIndex_;
-	bondValue_,bondIndex_ = sinvoke getNotifiedDeposit(e_,account,availabilityTime);
+	bondValue_,bondIndex_ = sinvoke getNotifiedCommitment(e_,account,availabilityTime);
 	uint256 lengthAvailabilityTimes_ = sinvoke _lenAvailabilityTimes(e_,account);
 	
-	uint256 otherElement_ = sinvoke getFromAvailabilityTimes(e_,account,otherIndex);
+	uint256 otherElement_ = sinvoke _getFromAvailabilityTimes(e_,account,otherIndex);
 	
 	assert lengthAvailabilityTimes_ == _lengthAvailabilityTimes - 1, "Did not delete an element";
 	assert bondIndex_ == 0, "If deleting a notified bond, must overwrite all fields of bond in the notified map";
 	
 	if (_bondIndex < _lengthAvailabilityTimes-1) {
-		uint256 newElementInDeletedLocation = sinvoke getFromAvailabilityTimes(e_,account,_bondIndex);
+		uint256 newElementInDeletedLocation = sinvoke _getFromAvailabilityTimes(e_,account,_bondIndex);
 		assert newElementInDeletedLocation == movedElement, "Unexpected hole in deleted index";
 	}
 	
@@ -923,7 +923,7 @@ rule check_update_notified_deposit_rule4_insertion(address account, uint256 avai
 	env e_;
 
 	uint256 _bondValue; uint256 _bondIndex;
-	_bondValue,_bondIndex = sinvoke getNotifiedDeposit(_e,account,availabilityTime);
+	_bondValue,_bondIndex = sinvoke getNotifiedCommitment(_e,account,availabilityTime);
 	require _bondValue == 0;
 	
 	uint256 _lengthAvailabilityTimes = sinvoke _lenAvailabilityTimes(_e,account);
@@ -931,7 +931,7 @@ rule check_update_notified_deposit_rule4_insertion(address account, uint256 avai
 	sinvoke ext_updateNotifiedDeposit(eF,account,value,availabilityTime);
 	
 	uint256 bondValue_; uint256 bondIndex_;
-	bondValue_,bondIndex_ = sinvoke getNotifiedDeposit(e_,account,availabilityTime);
+	bondValue_,bondIndex_ = sinvoke getNotifiedCommitment(e_,account,availabilityTime);
 	uint256 lengthAvailabilityTimes_ = sinvoke _lenAvailabilityTimes(e_,account);
 	
 	assert lengthAvailabilityTimes_ == _lengthAvailabilityTimes + 1, "Did not add an element";
