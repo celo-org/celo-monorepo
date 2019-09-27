@@ -19,8 +19,8 @@
     "deploy": "./deploy.sh"
   },
   "dependencies": {
-    "@celo/contractkit": "0.1.2",
-    "@celo/utils": "^0.0.6-beta5",
+    "@celo/contractkit": "0.1.3",
+    "@celo/utils": "0.1.0",
     "async-polling": "^0.2.1",
     "bignumber.js": "^7.2.0",
     "dotenv": "^6.0.0",
