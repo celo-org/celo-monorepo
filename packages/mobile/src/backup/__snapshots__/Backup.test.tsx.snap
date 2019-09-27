@@ -4,7 +4,7 @@ exports[`Backup renders correctly if backup completed 1`] = `
 <View
   style={
     Object {
-      "backgroundColor": "white",
+      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }
@@ -14,7 +14,7 @@ exports[`Backup renders correctly if backup completed 1`] = `
     contentContainerStyle={
       Object {
         "alignItems": "center",
-        "backgroundColor": "white",
+        "backgroundColor": "#FFFFFF",
         "flexGrow": 1,
         "paddingHorizontal": 20,
         "paddingTop": 40,

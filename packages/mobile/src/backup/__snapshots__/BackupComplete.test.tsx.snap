@@ -4,7 +4,7 @@ exports[`BackupComplete renders correctly if backup completed 1`] = `
 <View
   style={
     Object {
-      "backgroundColor": "white",
+      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }
@@ -14,7 +14,7 @@ exports[`BackupComplete renders correctly if backup completed 1`] = `
     contentContainerStyle={
       Object {
         "alignItems": "center",
-        "backgroundColor": "white",
+        "backgroundColor": "#FFFFFF",
         "flexGrow": 1,
         "paddingHorizontal": 20,
         "paddingTop": 40,
@@ -277,7 +277,7 @@ exports[`BackupComplete renders correctly if backup not completed 1`] = `
 <View
   style={
     Object {
-      "backgroundColor": "white",
+      "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
     }
@@ -287,7 +287,7 @@ exports[`BackupComplete renders correctly if backup not completed 1`] = `
     contentContainerStyle={
       Object {
         "alignItems": "center",
-        "backgroundColor": "white",
+        "backgroundColor": "#FFFFFF",
         "flexGrow": 1,
         "paddingHorizontal": 20,
         "paddingTop": 40,
