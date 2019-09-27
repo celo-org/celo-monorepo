@@ -1,6 +1,5 @@
 runtime: nodejs8
 service: integration
-instance_class: F4
-automatic_scaling:
-  min_instances: 1
-  max_instances: 1
+instance_class: B4
+manual_scaling:
+  instances: 1
