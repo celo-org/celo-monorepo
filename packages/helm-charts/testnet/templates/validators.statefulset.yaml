@@ -153,6 +153,7 @@ spec:
             --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
             ${FAULTY_NODE_FLAGS} \
             --istanbul.blockperiod={{ .Values.geth.blocktime }} \
+            --istanbul.requesttimeout={{ .Values.geth.istanbulrequesttimeout }} \
             --maxpeers={{ mul 2 (add .Values.geth.validators .Values.geth.tx_nodes) }} \
             --nat=extip:`cat /root/.celo/ipAddress` \
             --metrics \

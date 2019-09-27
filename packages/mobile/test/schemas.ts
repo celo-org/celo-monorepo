@@ -147,6 +147,10 @@ export const v2Schema = {
     pincodeType: PincodeType.Unset,
     isSettingPin: false,
   },
+  invite: {
+    ...v1Schema.invite,
+    isRedeemingInvite: false,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
