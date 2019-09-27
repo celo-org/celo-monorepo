@@ -19,17 +19,6 @@ function validateNumber(number: string) {
   return E164RegEx.test(number)
 }
 
-export function formatNumber(number: string) {
-  if (number === '+') {
-    return ''
-  }
-  if (number.startsWith('+')) {
-    return number
-  } else {
-    return `+${number}`
-  }
-}
-
 export const EXAMPLE_ADDRESS = 'a0000aaa00a0000...a00a0a0000a00a00aa'
 
 // This is only a basic validation
