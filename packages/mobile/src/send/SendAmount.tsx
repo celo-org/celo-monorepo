@@ -163,17 +163,15 @@ export class SendAmount extends React.Component<Props, State> {
   getDollarsAmount = () => {
     const parsedInputAmount = parseInputAmount(this.state.amount)
 
-    let dollarsAmount
     if (LOCAL_CURRENCY_SYMBOL) {
       const { localCurrencyExchangeRate } = this.props
-      dollarsAmount =
+      return (
         convertLocalAmountToDollars(parsedInputAmount, localCurrencyExchangeRate) ||
         new BigNumber('')
+      )
     } else {
-      dollarsAmount = parsedInputAmount
+      return parsedInputAmount
     }
-
-    return dollarsAmount
   }
 
   getNewAccountBalance = () => {
