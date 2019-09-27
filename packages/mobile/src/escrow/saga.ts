@@ -9,7 +9,6 @@ import { ESCROW_PAYMENT_EXPIRY_SECONDS } from 'src/config'
 import {
   Actions,
   EscrowedPayment,
-  EscrowFetchSentPaymentsAction,
   EscrowReclaimPaymentAction,
   EscrowTransferPaymentAction,
   fetchSentEscrowPayments,
@@ -17,7 +16,6 @@ import {
   reclaimEscrowPaymentSuccess,
   storeSentEscrowPayments,
 } from 'src/escrow/actions'
-import { sentEscrowedPaymentsSelector } from 'src/escrow/reducer'
 import { calculateFee } from 'src/fees/saga'
 import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
 import i18n from 'src/i18n'
@@ -186,7 +184,7 @@ function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
     yield call(sendTransaction, reclaimTx, account, TAG, 'escrow reclaim')
 
     yield put(fetchDollarBalance())
-    yield put(fetchSentEscrowPayments(true))
+    yield put(fetchSentEscrowPayments())
 
     yield call(navigate, Screens.WalletHome)
     yield put(reclaimEscrowPaymentSuccess())
@@ -198,7 +196,7 @@ function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
       yield put(showError(ErrorMessages.RECLAIMING_ESCROWED_PAYMENT_FAILED))
     }
     yield put(reclaimEscrowPaymentFailure(e))
-    yield put(fetchSentEscrowPayments(true))
+    yield put(fetchSentEscrowPayments())
   }
 }
 
@@ -214,14 +212,12 @@ async function getEscrowedPayment(escrow: Escrow, paymentID: string) {
   }
 }
 
-function* doFetchSentPayments({ forceRefresh }: EscrowFetchSentPaymentsAction) {
+function* doFetchSentPayments() {
   Logger.debug(TAG + '@doFetchSentPayments', 'Fetching valid sent escrowed payments')
 
   try {
     const escrow: Escrow = yield call(getEscrowContract, web3)
     const account: string = yield call(getConnectedAccount)
-    const existingPayments: EscrowedPayment[] = yield select(sentEscrowedPaymentsSelector)
-    const existingPaymentsIds = new Set(existingPayments.map((p) => p.paymentID))
 
     const sentPaymentIDs: string[] = yield call(escrow.methods.getSentPaymentIds(account).call) // Note: payment ids are currently temp wallet addresses
     if (!sentPaymentIDs || !sentPaymentIDs.length) {
@@ -229,21 +225,12 @@ function* doFetchSentPayments({ forceRefresh }: EscrowFetchSentPaymentsAction) {
       yield put(storeSentEscrowPayments([]))
       return
     }
-
-    const paymentIdsToFetch = forceRefresh
-      ? sentPaymentIDs
-      : sentPaymentIDs.filter((id) => !existingPaymentsIds.has(id.toLowerCase()))
-    if (!paymentIdsToFetch.length) {
-      Logger.debug(TAG + '@doFetchSentPayments', 'No new payments found')
-      return
-    }
-
     Logger.debug(
       TAG + '@doFetchSentPayments',
-      `Fetching data for ${paymentIdsToFetch.length} payments`
+      `Fetching data for ${sentPaymentIDs.length} payments`
     )
     const sentPaymentsRaw = yield all(
-      paymentIdsToFetch.map((paymentID) => call(getEscrowedPayment, escrow, paymentID))
+      sentPaymentIDs.map((paymentID) => call(getEscrowedPayment, escrow, paymentID))
     )
 
     const tempAddresstoRecipientPhoneNumber: Invitees = yield select(inviteesSelector)
@@ -269,9 +256,7 @@ function* doFetchSentPayments({ forceRefresh }: EscrowFetchSentPaymentsAction) {
       sentPayments.push(escrowPaymentWithRecipient)
     }
 
-    yield put(
-      storeSentEscrowPayments(forceRefresh ? sentPayments : [...existingPayments, ...sentPayments])
-    )
+    yield put(storeSentEscrowPayments(sentPayments))
   } catch (e) {
     Logger.error(TAG + '@doFetchSentPayments', 'Error fetching sent escrowed payments', e)
   }

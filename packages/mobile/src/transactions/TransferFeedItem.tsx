@@ -12,7 +12,7 @@ import { CURRENCIES, CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { Invitees } from 'src/invite/actions'
-import useLocalAmount from 'src/localCurrency/useLocalAmount'
+import { useDollarsToLocalAmount } from 'src/localCurrency/hooks'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes, TransferStandby } from 'src/transactions/reducer'
@@ -140,8 +140,7 @@ export function TransferFeedItem(props: Props) {
     showLocalCurrency,
   } = props
 
-  const localValue = useLocalAmount(value)
-
+  const localValue = useDollarsToLocalAmount(value)
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
   const currency = resolveCurrency(symbol)
@@ -263,14 +262,14 @@ const styles = StyleSheet.create({
     color: colors.celoGreen,
   },
   transactionStatus: {
-    color: '#BDBDBD',
+    color: colors.lightGray,
   },
   localAmount: {
     marginLeft: 'auto',
     paddingLeft: 10,
     fontSize: 14,
     lineHeight: 18,
-    color: '#BDBDBD',
+    color: colors.lightGray,
   },
 })
 
