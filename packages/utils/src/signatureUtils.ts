@@ -18,6 +18,19 @@ export function signMessage(messageHash: string, privateKey: string, address: st
   return { v, r: ethjsutil.bufferToHex(r), s: ethjsutil.bufferToHex(s) }
 }
 
+export interface Signature {
+  v: number
+  r: string
+  s: string
+}
+
+export function serializeSignature(signature: Signature) {
+  const serializedV = signature.v.toString(16)
+  const serializedR = signature.r.slice(2)
+  const serializedS = signature.s.slice(2)
+  return serializedV + serializedR + serializedS
+}
+
 export function parseSignature(messageHash: string, signature: string, signer: string) {
   let { r, s, v } = parseSignatureAsRsv(signature.slice(2))
   if (isValidSignature(signer, messageHash, v, r, s)) {
@@ -100,6 +113,7 @@ export const SignatureUtils = {
   signMessage,
   parseSignature,
   stripHexLeader,
+  serializeSignature,
   isValidAddress,
   areAddressesEqual,
 }
