@@ -69,6 +69,7 @@
     "react-native-ntp-client": "^1.0.0",
     "**/codecov/**/js-yaml": "^3.13.1",
     "**/deep-extend": "^0.5.1",
-    "**/extend": "^3.0.2"
+    "**/extend": "^3.0.2",
+    "sha3": "1.2.3"
   }
 } 

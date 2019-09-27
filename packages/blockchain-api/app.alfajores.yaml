@@ -1,13 +1,13 @@
-runtime: nodejs8
+runtime: nodejs10
 service: alfajores
 env_variables:
-  NODE_ENV: 'production'
-  DEPLOY_ENV: 'alfajores'
-  EXCHANGE_RATES_API: 'https://api.exchangeratesapi.io'
-  BLOCKSCOUT_API: 'https://alfajores-blockscout.celo-testnet.org/api'
+  NODE_ENV: "production"
+  DEPLOY_ENV: "alfajores"
+  EXCHANGE_RATES_API: "https://api.exchangeratesapi.io"
+  BLOCKSCOUT_API: "https://alfajores-blockscout.celo-testnet.org/api"
   # Pull addresses from the build artifacts of the network in protocol/build
-  CELO_GOLD_ADDRESS: '0x11CD75C45638Ec9f41C0e8Df78fc756201E48ff2'
-  CELO_DOLLAR_ADDRESS: '0xd4b4fcaCAc9e23225680e89308E0a4C41Dd9C6B4'
-  FAUCET_ADDRESS: '0xCEa3eF8e187490A9d85A1849D98412E5D27D1Bb3'
-  VERIFICATION_REWARDS_ADDRESS: '0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5'
-  ATTESTATIONS_ADDRESS: '0x714f2879A4aa985508537f851FeBCfB26D7aF40D'
+  CELO_GOLD_ADDRESS: "0x11CD75C45638Ec9f41C0e8Df78fc756201E48ff2"
+  CELO_DOLLAR_ADDRESS: "0xd4b4fcaCAc9e23225680e89308E0a4C41Dd9C6B4"
+  FAUCET_ADDRESS: "0xCEa3eF8e187490A9d85A1849D98412E5D27D1Bb3"
+  VERIFICATION_REWARDS_ADDRESS: "0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5"
+  ATTESTATIONS_ADDRESS: "0x714f2879A4aa985508537f851FeBCfB26D7aF40D"

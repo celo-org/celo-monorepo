@@ -5,7 +5,6 @@ import getStableTokenInstance from './contracts/StableToken'
 import { Escrow } from './contracts/types/Escrow'
 import { GoldToken } from './contracts/types/GoldToken'
 import { StableToken } from './contracts/types/StableToken'
-import { injectDebugProvider } from './debug-provider'
 import { getAddress, sendTx } from './tx'
 
 export class CeloAdapter {
@@ -22,7 +21,8 @@ export class CeloAdapter {
     private readonly escrowAddress: string,
     private readonly goldTokenAddress: string
   ) {
-    injectDebugProvider(web3)
+    // To add more logging:
+    // injectDebugProvider(web3)
 
     this.privateKey = this.web3.utils.isHexStrict(pk) ? pk : '0x' + pk
     this.defaultAddress = getAddress(this.web3, this.privateKey)

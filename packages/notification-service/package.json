@@ -5,9 +5,6 @@
   "private": true,
   "author": "Celo",
   "license": "Apache-2.0",
-  "engines": {
-    "node": "8.x"
-  },
   "scripts": {
     "build": "tsc",
     "gcp-build": "npm run build",
@@ -43,5 +40,8 @@
     "@types/utf8": "^2.1.6",
     "@types/web3": "^1.0.18",
     "typescript": "^3.5.3"
+  },
+  "engines": {
+    "node": "10"
   }
 }
