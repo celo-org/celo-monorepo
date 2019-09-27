@@ -18,7 +18,7 @@ import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { coinsIcon, unknownUserIcon } from 'src/images/Images'
 import { Invitees } from 'src/invite/actions'
-import { useDollarsToLocalAmount } from 'src/localCurrency/useLocalAmount'
+import { useDollarsToLocalAmount } from 'src/localCurrency/hooks'
 import {
   getRecipientFromAddress,
   getRecipientThumbnail,
