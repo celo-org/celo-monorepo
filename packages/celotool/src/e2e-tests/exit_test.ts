@@ -26,7 +26,7 @@ const blockchainParametersAbi = [
   },
 ]
 
-describe('transfer tests', function(this: any) {
+describe('exit tests', function(this: any) {
   this.timeout(0)
 
   const gethConfig = {
