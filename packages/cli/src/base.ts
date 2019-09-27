@@ -1,4 +1,4 @@
-import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { ContractKit, MetadataManager, newKitFromWeb3 } from '@celo/contractkit'
 import { Command, flags } from '@oclif/command'
 import Web3 from 'web3'
 import { getNodeUrl } from './utils/config'
@@ -20,6 +20,8 @@ export abstract class BaseCommand extends Command {
 
   private _web3: Web3 | null = null
   private _kit: ContractKit | null = null
+  private _metadataManager: MetadataManager | null = null
+
   // This is required since we wrap the provider with a debug provider and
   // there is no way to unwrap the provider afterwards.
   // We need access to the original provider, so that, we can close it.
@@ -39,6 +41,13 @@ export abstract class BaseCommand extends Command {
       this._kit = newKitFromWeb3(this.web3)
     }
     return this._kit
+  }
+
+  get metadataManager() {
+    if (!this._metadataManager) {
+      this._metadataManager = new MetadataManager()
+    }
+    return this._metadataManager
   }
 
   async init() {
