@@ -1,6 +1,6 @@
-import { chain, map } from 'fp-ts/lib/Either'
+import { chain, Either, map } from 'fp-ts/lib/Either'
 import { pipe } from 'fp-ts/lib/pipeable'
-import { chain as andThen, fromEither } from 'fp-ts/lib/TaskEither'
+import { chain as andThen, fromEither, TaskEither } from 'fp-ts/lib/TaskEither'
 import { SignedClaim } from '../claims'
 import {
   asClassicPromise,
@@ -12,6 +12,7 @@ import {
 import {
   AttestationServiceURLClaim,
   Claim,
+  ClaimNotFoundError,
   ClaimTypes,
   findClaim,
   IdentityMetadata,
@@ -31,7 +32,7 @@ export class MetadataManager {
     claims: [],
   }
 
-  fetchMetadataTE = (url: string) =>
+  fetchMetadataTE = (url: string): TaskEither<MetadataError, IdentityMetadata> =>
     pipe(
       fetchAsTaskEither(url),
       andThen((body) =>
@@ -44,7 +45,7 @@ export class MetadataManager {
       )
     )
 
-  findAttestationServiceClaimE = (data: IdentityMetadata) => {
+  findAttestationServiceClaimE = (data: IdentityMetadata): Either<ClaimNotFoundError, string> => {
     return pipe(
       data,
       findClaim(ClaimTypes.ATTESTATION_SERVICE_URL),
