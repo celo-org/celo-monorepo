@@ -79,13 +79,13 @@ class BackupComplete extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
   scrollContainer: {
     // https://medium.com/@peterpme/taming-react-natives-scrollview-with-flex-144e6ff76c08
     flexGrow: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
     paddingHorizontal: 20,
     paddingTop: 40,
     alignItems: 'center',
