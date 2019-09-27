@@ -24,13 +24,11 @@ debug(`Account Address 2: ${ACCOUNT_ADDRESS2}`)
 
 async function verifyLocalSigning(web3: Web3, from: string, to: string): Promise<void> {
   const amountInWei: string = Web3.utils.toWei('1', 'ether')
-  const gasFees: string = Web3.utils.toWei('1', 'mwei')
   debug('Signer Testing using Account: %s', from)
   const celoTransaction: CeloTx = {
     from,
     to,
     value: amountInWei,
-    gas: gasFees,
   }
   const signedTransaction = await web3.eth.signTransaction(celoTransaction)
   debug('Singer Testing: Signed transaction %o', signedTransaction)

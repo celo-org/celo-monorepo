@@ -2,6 +2,7 @@ import { Callback, ErrorCallback, PrivateKeyWalletSubprovider } from '@0x/subpro
 import debugFactory from 'debug'
 import { JSONRPCRequestPayload } from 'ethereum-types'
 import Web3 from 'web3'
+import { gasInflationFactor } from '../consts'
 import { signTransaction } from '../utils/signing-utils'
 import { CeloPartialTxParams } from '../utils/tx-signing'
 
@@ -16,6 +17,16 @@ export function generateAccountAddressFromPrivateKey(privateKey: string): string
     privateKey = '0x' + privateKey
   }
   return new Web3().eth.accounts.privateKeyToAccount(privateKey).address
+}
+
+function isEmpty(value: string | undefined) {
+  return (
+    value === undefined ||
+    value === null ||
+    value === '0' ||
+    value.toLowerCase() === '0x' ||
+    value.toLowerCase() === '0x0'
+  )
 }
 
 /**
@@ -92,17 +103,17 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
     } else {
       debug(`Signer is ${txParams.from} and is one  of ${this.getAccounts()}`)
     }
-    if (txParams.chainId == null) {
+    if (txParams.chainId === undefined || txParams.chainId === null) {
       txParams.chainId = await this.getChainId()
     }
 
-    if (txParams.nonce == null) {
+    if (txParams.chainId === undefined || txParams.nonce === null) {
       txParams.nonce = await this.getNonce(txParams.from)
     }
 
-    if (txParams.gasFeeRecipient == null) {
+    if (isEmpty(txParams.gasFeeRecipient)) {
       txParams.gasFeeRecipient = await this.getCoinbase()
-      if (txParams.gasFeeRecipient == null) {
+      if (txParams.gasFeeRecipient === null) {
         // Fail early. The validator nodes will reject a transaction missing
         // gas fee recipient anyways.
         throw new Error(
@@ -112,9 +123,15 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
       }
     }
 
-    if (txParams.gasPrice == null) {
+    if (isEmpty(txParams.gasPrice)) {
       txParams.gasPrice = await this.getGasPrice()
     }
+    debug('Gas price for the transaction is %s', txParams.gasPrice)
+
+    if (isEmpty(txParams.gas)) {
+      txParams.gas = String(Math.round((await this.getGasEstimate(txParams)) * gasInflationFactor))
+    }
+    debug('Max gas fee for the transaction is %s', txParams.gas)
 
     const signedTx = await signTransaction(txParams, this.getPrivateKeyFor(txParams.from))
     const rawTransaction = signedTx.rawTransaction.toString('hex')
@@ -188,5 +205,18 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
     const gasPriceInHex = result.result.toString()
     debug('getGasPrice gas price is %s', parseInt(gasPriceInHex.substr(2), 16))
     return gasPriceInHex
+  }
+
+  private async getGasEstimate(txParams: CeloPartialTxParams): Promise<number> {
+    debug('getGasEstimate fetching gas estimate...')
+    // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_estimategas
+    const result = await this.emitPayloadAsync({
+      method: 'eth_estimateGas',
+      params: [txParams],
+    })
+    const gasEstimateInHex = result.result.toString()
+    const gasEstimate = parseInt(gasEstimateInHex.substr(2), 16)
+    debug('getGasEstimate gas estimate is %s', gasEstimate)
+    return gasEstimate
   }
 }
