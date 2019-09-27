@@ -33,7 +33,7 @@ Let's say the published package version number 0.0.15, verify that it is install
 /tmp/tmp1 $ npm install @celo/cli@0.0.20
 ```
 
-Add a tag with the git commit of the published version
+Add a tag with the most recent git commit of the published branch. 
 
 ```
 $ npm dist-tag add <package-name>@<version> [<tag>]
