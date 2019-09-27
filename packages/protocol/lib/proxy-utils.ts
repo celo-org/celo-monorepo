@@ -10,7 +10,5 @@ export function setAndInitializeImplementation(
   ...args: any[]
 ) {
   const callData = web3.eth.abi.encodeFunctionCall(initializerAbi, args)
-
-  // @ts-ignore
-  return proxy._setAndInitializeImplementation(implementationAddress, callData)
+  return proxy._setAndInitializeImplementation(implementationAddress, callData as any)
 }

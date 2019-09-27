@@ -1,6 +1,4 @@
 import { flags } from '@oclif/command'
-import { BondedDepositAdapter } from '../../adapters/bonded-deposit'
-import { ValidatorsAdapter } from '../../adapters/validators'
 import { BaseCommand } from '../../base'
 import { displaySendTx, printValueMap } from '../../utils/cli'
 import { Flags } from '../../utils/command'
@@ -32,22 +30,24 @@ export default class ValidatorGroupVote extends BaseCommand {
   ]
   async run() {
     const res = this.parse(ValidatorGroupVote)
-    const vUtils = new ValidatorsAdapter(this.web3, res.flags.from)
+
+    this.kit.defaultAccount = res.flags.from
+    const validators = await this.kit.contracts.getValidators()
 
     if (res.flags.current) {
-      const bdUtils = new BondedDepositAdapter(this.web3)
-      const details = await bdUtils.getVotingDetails(res.flags.from)
-      const myVote = await vUtils.getVoteFrom(details.accountAddress)
+      const lockedGold = await this.kit.contracts.getLockedGold()
+      const details = await lockedGold.getVotingDetails(res.flags.from)
+      const myVote = await validators.getVoteFrom(details.accountAddress)
 
       printValueMap({
         ...details,
         currentVote: myVote,
       })
     } else if (res.flags.revoke) {
-      const tx = await vUtils.revokeVote()
+      const tx = await validators.revokeVote()
       await displaySendTx('revokeVote', tx)
     } else if (res.flags.for) {
-      const tx = await vUtils.vote(res.flags.for)
+      const tx = await validators.vote(res.flags.for)
       await displaySendTx('vote', tx)
     } else {
       this.error('Use one of --for, --current, --revoke')

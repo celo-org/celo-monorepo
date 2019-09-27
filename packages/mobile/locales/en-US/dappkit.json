@@ -1,0 +1,15 @@
+{
+  "connectToWallet": "{{dappname}} would like to connect to Celo Wallet",
+  "connect": "Connect",
+  "cancel": "Cancel",
+  "allow": "Allow",
+  "address": "Address",
+  "transaction": {
+    "operation": "Operation",
+    "data": "Data",
+    "signTX": "Sign TX",
+    "details": "Show details"
+  },
+  "shareInfo": "Share the following info:",
+  "data": "Data"
+}

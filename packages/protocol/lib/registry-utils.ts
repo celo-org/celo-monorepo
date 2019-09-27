@@ -1,40 +1,36 @@
-export const attestationsRegistryId = 'Attestations'
-export const bondedDepositsRegistryId: string = 'BondedDeposits'
-export const exchangeRegistryId: string = 'Exchange'
-export const gasCurrencyWhitelistRegistryId: string = 'GasCurrencyWhitelist'
-export const gasPriceMinimumRegistryId: string = 'GasPriceMinimum'
-export const goldTokenRegistryId: string = 'GoldToken'
-export const governanceRegistryId: string = 'Governance'
-export const randomRegistryId = 'Random'
-export const reserveRegistryId: string = 'Reserve'
-export const sortedOraclesRegistryId: string = 'SortedOracles'
-export const validatorsRegistryId: string = 'Validators'
-
-// These do not actually appear in the registry, but they are here temporarily for usesRegistry
-const escrowRegistryId = 'Escrow'
-const stableTokenRegistryId = 'StableToken'
+export enum CeloContractName {
+  Attestations = 'Attestations',
+  LockedGold = 'LockedGold',
+  Escrow = 'Escrow',
+  Exchange = 'Exchange',
+  GasCurrencyWhitelist = 'GasCurrencyWhitelist',
+  GasPriceMinimum = 'GasPriceMinimum',
+  GoldToken = 'GoldToken',
+  Governance = 'Governance',
+  Random = 'Random',
+  Reserve = 'Reserve',
+  SortedOracles = 'SortedOracles',
+  StableToken = 'StableToken',
+  Validators = 'Validators',
+}
 
 // TODO(amy): Pull this list from the build artifacts instead
-export const usesRegistry = [escrowRegistryId, reserveRegistryId, stableTokenRegistryId]
+export const usesRegistry = [
+  CeloContractName.Escrow,
+  CeloContractName.Reserve,
+  CeloContractName.StableToken,
+]
 
 // TODO(amy): Find another way to create this list
 export const hasEntryInRegistry: string[] = [
-  attestationsRegistryId,
-  exchangeRegistryId,
-  goldTokenRegistryId,
-  gasCurrencyWhitelistRegistryId,
-  gasPriceMinimumRegistryId,
-  sortedOraclesRegistryId,
-  randomRegistryId,
-  reserveRegistryId,
+  CeloContractName.Attestations,
+  CeloContractName.Escrow,
+  CeloContractName.Exchange,
+  CeloContractName.GoldToken,
+  CeloContractName.GasCurrencyWhitelist,
+  CeloContractName.GasPriceMinimum,
+  CeloContractName.SortedOracles,
+  CeloContractName.StableToken,
+  CeloContractName.Random,
+  CeloContractName.Reserve,
 ]
-
-export default {
-  attestationsRegistryId,
-  exchangeRegistryId,
-  goldTokenRegistryId,
-  sortedOraclesRegistryId,
-  randomRegistryId,
-  reserveRegistryId,
-  gasPriceMinimumRegistryId,
-}

@@ -14,6 +14,9 @@ import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
 import UpgradeScreen from 'src/app/UpgradeScreen'
 import Backup from 'src/backup/Backup'
+import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
+import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
+import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
@@ -23,29 +26,24 @@ import EnterInviteCode from 'src/invite/EnterInviteCode'
 import JoinCelo from 'src/invite/JoinCelo'
 import Language from 'src/language/Language'
 import { Screens, Stacks } from 'src/navigator/Screens'
+import TabNavigator from 'src/navigator/TabNavigator'
+import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
 import PaymentRequestListScreen from 'src/paymentRequest/PaymentRequestListScreen'
-import Pincode from 'src/pincode/Pincode'
 import PincodeConfirmation from 'src/pincode/PincodeConfirmation'
+import PincodeEducation from 'src/pincode/PincodeEducation'
+import PincodeSet from 'src/pincode/PincodeSet'
 import QRCode from 'src/qrcode/QRCode'
 import QRScanner from 'src/qrcode/QRScanner'
 import FeeEducation from 'src/send/FeeEducation'
-import RequestConfirmation from 'src/send/RequestConfirmation'
 import Send from 'src/send/Send'
 import SendAmount from 'src/send/SendAmount'
 import SendConfirmation from 'src/send/SendConfirmation'
 import SetClock from 'src/set-clock/SetClock'
-import Sync from 'src/sync/Sync'
-import TabNavigator from 'src/tab/TabNavigator'
 import TransactionReviewScreen from 'src/transactions/TransactionReviewScreen'
-import VerifyEducation from 'src/verify/Education'
 import VerifyInput from 'src/verify/Input'
 import VerifyVerified from 'src/verify/Verified'
 import VerifyVerifying from 'src/verify/Verifying'
-export const navbarStyle: {
-  headerMode: 'none'
-} = {
-  headerMode: 'none',
-}
+import VerifyEducation from 'src/verify/VerifyPhoneEducation'
 
 export const headerArea = {
   defaultNavigationOptions: {
@@ -55,26 +53,29 @@ export const headerArea = {
   },
 }
 
-const commonScreens = {
+export const commonScreens = {
   [Screens.PincodeConfirmation]: { screen: PincodeConfirmation },
   [Screens.ErrorScreen]: { screen: ErrorScreen },
   [Screens.UpgradeScreen]: { screen: UpgradeScreen },
+  [Screens.DappKitAccountAuth]: { screen: DappKitAccountScreen },
+  [Screens.DappKitSignTxScreen]: { screen: DappKitSignTxScreen },
+  [Screens.DappKitTxDataScreen]: { screen: DappKitTxDataScreen },
+  [Screens.Debug]: { screen: Debug },
 }
 
 const NuxStack = createStackNavigator(
   {
-    [Screens.Debug]: { screen: Debug },
+    [Screens.Language]: { screen: Language },
+    [Screens.JoinCelo]: { screen: JoinCelo },
+    [Screens.PincodeEducation]: { screen: PincodeEducation },
+    [Screens.PincodeSet]: { screen: PincodeSet },
+    [Screens.EnterInviteCode]: { screen: EnterInviteCode },
+    [Screens.ImportWallet]: { screen: ImportWallet },
+    [Screens.ImportContacts]: { screen: ImportContacts },
     [Screens.VerifyEducation]: { screen: VerifyEducation },
     [Screens.VerifyInput]: { screen: VerifyInput },
     [Screens.VerifyVerifying]: { screen: VerifyVerifying },
     [Screens.VerifyVerified]: { screen: VerifyVerified },
-    [Screens.Sync]: { screen: Sync },
-    [Screens.Pincode]: { screen: Pincode },
-    [Screens.ImportWallet]: { screen: ImportWallet },
-    [Screens.Language]: { screen: Language },
-    [Screens.JoinCelo]: { screen: JoinCelo },
-    [Screens.EnterInviteCode]: { screen: EnterInviteCode },
-    [Screens.ImportContacts]: { screen: ImportContacts },
     ...commonScreens,
   },
   {
@@ -88,31 +89,52 @@ const SendStack = createStackNavigator(
     [Screens.Send]: { screen: Send },
     [Screens.SendAmount]: { screen: SendAmount },
     [Screens.SendConfirmation]: { screen: SendConfirmation },
-    [Screens.FeeEducation]: { screen: FeeEducation },
-    [Screens.RequestConfirmation]: { screen: RequestConfirmation },
-    [Screens.QRCode]: { screen: QRCode },
-    [Screens.QRScanner]: { screen: QRScanner },
-    ...commonScreens,
+    [Screens.PaymentRequestConfirmation]: { screen: PaymentRequestConfirmation },
   },
-  headerArea
+  {
+    navigationOptions: {
+      header: null,
+    },
+    ...headerArea,
+    initialRouteName: Screens.Send,
+  }
 )
 
 const ExchangeStack = createStackNavigator(
   {
+    // Note, ExchangeHomeScreen isn't in this stack because it's part of the tab navigator
     [Screens.ExchangeTradeScreen]: { screen: ExchangeTradeScreen },
     [Screens.ExchangeReview]: { screen: ExchangeReview },
-    ...commonScreens,
   },
-  headerArea
+  {
+    navigationOptions: {
+      header: null,
+    },
+    ...headerArea,
+    initialRouteName: Screens.ExchangeTradeScreen,
+  }
+)
+
+const RequestStack = createStackNavigator(
+  {
+    [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
+    [Screens.SendConfirmation]: { screen: SendConfirmation },
+  },
+  {
+    navigationOptions: {
+      header: null,
+    },
+    ...headerArea,
+    initialRouteName: Screens.PaymentRequestListScreen,
+  }
 )
 
 const AppStack = createStackNavigator(
   {
-    TabNavigator: {
-      screen: TabNavigator,
-      navigationOptions: { header: null },
-    },
-    [Screens.Debug]: { screen: Debug },
+    [Screens.TabNavigator]: { screen: TabNavigator },
+    [Stacks.SendStack]: { screen: SendStack },
+    [Stacks.ExchangeStack]: { screen: ExchangeStack },
+    [Stacks.RequestStack]: { screen: RequestStack },
     [Screens.Language]: { screen: Language },
     [Screens.Analytics]: { screen: Analytics },
     [Screens.SetClock]: { screen: SetClock },
@@ -129,21 +151,15 @@ const AppStack = createStackNavigator(
     [Screens.QRScanner]: { screen: QRScanner },
     [Screens.GoldEducation]: { screen: GoldEducation },
     [Screens.Backup]: { screen: Backup },
-    [Screens.Pincode]: { screen: Pincode },
-    [Screens.ImportWallet]: { screen: ImportWallet },
-    [Screens.SendStack]: {
-      screen: SendStack,
-      navigationOptions: { header: null },
-    },
-    [Screens.ExchangeStack]: {
-      screen: ExchangeStack,
-      navigationOptions: { header: null },
-    },
     [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
     [Screens.ReclaimPaymentConfirmationScreen]: { screen: ReclaimPaymentConfirmationScreen },
+    [Screens.FeeEducation]: { screen: FeeEducation },
     ...commonScreens,
   },
-  headerArea
+  {
+    ...headerArea,
+    initialRouteName: Screens.TabNavigator,
+  }
 )
 
 const AppNavigator = createSwitchNavigator(

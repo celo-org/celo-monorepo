@@ -1,8 +1,21 @@
-import { call, put, spawn, takeLeading } from 'redux-saga/effects'
-import { getSentPayments } from 'src/escrow/actions'
+import {
+  call,
+  cancel,
+  delay,
+  fork,
+  put,
+  select,
+  spawn,
+  take,
+  takeLeading,
+} from 'redux-saga/effects'
+import { fetchSentEscrowPayments } from 'src/escrow/actions'
 import { fetchGoldBalance } from 'src/goldToken/actions'
-import { Actions, setLoading } from 'src/home/actions'
+import { Actions, refreshAllBalances, setLoading } from 'src/home/actions'
+import { fetchCurrentRate } from 'src/localCurrency/actions'
+import { shouldFetchCurrentRate } from 'src/localCurrency/selectors'
 import { withTimeout } from 'src/redux/sagas-helpers'
+import { shouldUpdateBalance } from 'src/redux/selectors'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import Logger from 'src/utils/Logger'
 import { getConnectedAccount } from 'src/web3/saga'
@@ -27,7 +40,7 @@ export function* refreshBalances() {
   yield call(getConnectedAccount)
   yield put(fetchDollarBalance())
   yield put(fetchGoldBalance())
-  yield put(getSentPayments())
+  yield put(fetchSentEscrowPayments())
 }
 
 export function* refreshBalancesWithLoadingSaga() {
@@ -37,7 +50,28 @@ export function* refreshBalancesWithLoadingSaga() {
   )
 }
 
-export function* watchRefreshBalances() {
+function* autoRefreshSaga() {
+  while (true) {
+    if (yield select(shouldUpdateBalance)) {
+      yield put(refreshAllBalances())
+    }
+    if (yield select(shouldFetchCurrentRate)) {
+      yield put(fetchCurrentRate())
+    }
+    yield delay(10 * 1000) // sleep 10 seconds
+  }
+}
+
+function* autoRefreshWatcher() {
+  while (yield take(Actions.START_BALANCE_AUTOREFRESH)) {
+    // starts the task in the background
+    const autoRefresh = yield fork(autoRefreshSaga)
+    yield take(Actions.STOP_BALANCE_AUTOREFRESH)
+    yield cancel(autoRefresh)
+  }
+}
+
+function* watchRefreshBalances() {
   yield takeLeading(
     Actions.REFRESH_BALANCES,
     withLoading(withTimeout(REFRESH_TIMEOUT, refreshBalances))
@@ -46,8 +80,12 @@ export function* watchRefreshBalances() {
 
 export function* homeSaga() {
   yield spawn(watchRefreshBalances)
+  yield spawn(autoRefreshWatcher)
   // This has been disabled due to the saga interference bug
   // depending on timing, it can block the sync progress updates and
   // keep us stuck on sync screen
   // yield spawn(refreshBalancesWithLoadingSaga)
 }
+
+export const _watchRefreshBalances = watchRefreshBalances
+export const _autoRefreshSaga = autoRefreshSaga

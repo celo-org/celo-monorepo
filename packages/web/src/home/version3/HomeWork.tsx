@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import { H1 } from 'src/fonts/Fonts'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Button, { BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems from 'src/shared/menu-items'
 import { standardStyles, textStyles } from 'src/styles'
 
@@ -19,15 +19,20 @@ class HomeWork extends React.PureComponent<Props> {
         tabletStyle={[standardStyles.sectionMarginTablet]}
         desktopStyle={[standardStyles.sectionMargin]}
       >
-        <Cell span={Spans.half} style={{ alignItems: 'center' }}>
+        <Cell span={Spans.half} style={styles.alignCenter}>
           <Fade bottom={true} duration={750} distance="20px">
             <View>
-              <H1 accessibilityRole={'heading'} style={textStyles.center}>
+              <H1 ariaLevel="2" accessibilityRole={'heading'} style={textStyles.center}>
                 {this.props.t('workOnCelo')}
               </H1>
             </View>
             <View style={styles.spacer} />
-            <Button kind={BTN.NAKED} href={menuItems.JOBS.link} text={this.props.t('viewRoles')} />
+            <Button
+              kind={BTN.NAKED}
+              size={SIZE.normal}
+              href={menuItems.JOBS.link}
+              text={this.props.t('viewRoles')}
+            />
           </Fade>
         </Cell>
       </GridRow>
@@ -41,4 +46,5 @@ const styles = StyleSheet.create({
   spacer: {
     height: 30,
   },
+  alignCenter: { alignItems: 'center' },
 })

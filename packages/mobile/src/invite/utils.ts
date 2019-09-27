@@ -1,4 +1,7 @@
-import { sanitizeBase64 } from '@celo/contractkit'
+import { sanitizeBase64 } from '@celo/walletkit'
+import URLSearchParamsReal from '@ungap/url-search-params'
+import RNInstallReferrer from 'react-native-install-referrer'
+import Logger from 'src/utils/Logger'
 
 export const createInviteCode = (privateKey: string) => {
   // TODO(Rossy) we need some scheme to encrypt this PK
@@ -37,4 +40,32 @@ export function extractValidInviteCode(inviteFieldInput: string) {
   } else {
     return inviteCode
   }
+}
+
+interface ReferrerData {
+  clickTimestamp: string
+  installReferrer: string
+  installTimestamp: string
+}
+
+interface ReferrerDataError {
+  message: string
+}
+
+export const getInviteCodeFromReferrerData = async () => {
+  const referrerData: ReferrerData | ReferrerDataError = await RNInstallReferrer.getReferrer()
+  Logger.info(
+    'invite/utils/getInviteCodeFromReferrerData',
+    'Referrer Data: ' + JSON.stringify(referrerData)
+  )
+  if (referrerData && referrerData.hasOwnProperty('installReferrer')) {
+    const params = new URLSearchParamsReal(
+      decodeURIComponent((referrerData as ReferrerData).installReferrer)
+    )
+    const inviteCode = params.get('invite-code')
+    if (inviteCode) {
+      return inviteCode.replace(' ', '+')
+    }
+  }
+  return null
 }

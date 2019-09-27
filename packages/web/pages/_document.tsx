@@ -1,8 +1,9 @@
 import Document, { Head, Main, NextScript } from 'next/document'
 import * as React from 'react'
-import { AppRegistry, Dimensions, I18nManager } from 'react-native-web'
+import { AppRegistry, I18nManager } from 'react-native-web'
 import analytics from 'src/analytics/analytics'
-import { TABLET_BREAKPOINT } from 'src/shared/Styles'
+import { setDimensionsForScreen } from 'src/layout/ScreenSize'
+import Sentry from '../fullstack/sentry'
 import { isLocaleRTL } from '../server/i18nSetup'
 // @ts-ignore
 const a = analytics
@@ -20,16 +21,9 @@ interface NextInitalProps {
 export default class MyDocument extends Document {
   static async getInitialProps(context: NextInitalProps) {
     const locale = context.req.locale
-    // Doesn't work right now
-    // const userAgent = context.req.headers['user-agent']
-    // const md = new MobileDetect(userAgent)
+    const userAgent = context.req.headers['user-agent']
+    setDimensionsForScreen(userAgent)
 
-    if (!process.browser) {
-      Dimensions.set({
-        window: { width: TABLET_BREAKPOINT - 1 },
-        screen: { width: TABLET_BREAKPOINT - 1 },
-      })
-    }
     AppRegistry.registerComponent('Main', () => Main)
 
     // Use RTL layout for appropriate locales. Remember to do this client-side too.
@@ -44,6 +38,10 @@ export default class MyDocument extends Document {
       getStyleElement(),
     ])
 
+    if (context.err) {
+      Sentry.captureException(context.err)
+    }
+
     return { ...page, locale, styles: React.Children.toArray(styles), pathname: context.pathname }
   }
 
@@ -56,10 +54,6 @@ export default class MyDocument extends Document {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <link rel="stylesheet" href={'/static/normalize.css'} />
 
-          <link
-            href="https://fonts.googleapis.com/css?family=Hind+Siliguri:300,400,600"
-            rel="stylesheet"
-          />
           <link rel="preconnect" href="https://use.typekit.net" />
           <link rel="stylesheet" href="https://use.typekit.net/dki6jkb.css" />
 

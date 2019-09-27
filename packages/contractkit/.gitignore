@@ -1,5 +1,3 @@
-.artifacts/
-contracts/
-dist/
-types/
+src/generated
 lib/
+.devchain

@@ -1,14 +1,14 @@
 import Web3 = require('web3')
 
-import { randomRegistryId, validatorsRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertLogMatches2,
   assertRevert,
-  timeTravel,
   NULL_ADDRESS,
+  timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { SignatureUtils } from '@celo/utils'
-import { getPhoneHash } from '@celo/utils/lib/src/phoneNumbers'
+import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { uniq } from 'lodash'
 import {
@@ -53,6 +53,7 @@ contract('Attestations', (accounts: string[]) => {
   let mockValidators: MockValidatorsInstance
   let registry: RegistryInstance
   const provider = new Web3.providers.HttpProvider('http://localhost:8545')
+  const metadataURL = 'https://www.celo.org'
   const web3: Web3 = new Web3(provider)
   const phoneNumber: string = '+18005551212'
   const caller: string = accounts[0]
@@ -111,8 +112,8 @@ contract('Attestations', (accounts: string[]) => {
     mockValidators = await MockValidators.new()
     await Promise.all(accounts.map((account) => mockValidators.addValidator(account)))
     registry = await Registry.new()
-    await registry.setAddressFor(randomRegistryId, random.address)
-    await registry.setAddressFor(validatorsRegistryId, mockValidators.address)
+    await registry.setAddressFor(CeloContractName.Random, random.address)
+    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
 
     await attestations.initialize(
       registry.address,
@@ -771,6 +772,24 @@ contract('Attestations', (accounts: string[]) => {
       assert.lengthOf(addresses, 0)
       assert.lengthOf(completed, 0)
       assert.lengthOf(total, 0)
+    })
+  })
+
+  describe('#setMetadataURL', async () => {
+    it('should set the metadataURL', async () => {
+      await attestations.setMetadataURL(metadataURL)
+      const result = await attestations.getMetadataURL(caller)
+      assert.equal(result, metadataURL)
+    })
+
+    it('should emit the AccountMetadataURLSet event', async () => {
+      const response = await attestations.setMetadataURL(metadataURL)
+      assert.lengthOf(response.logs, 1)
+      const event = response.logs[0]
+      assertLogMatches2(event, {
+        event: 'AccountMetadataURLSet',
+        args: { account: caller, metadataURL },
+      })
     })
   })
 })

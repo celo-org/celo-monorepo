@@ -1,3 +1,4 @@
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertRevert, NULL_ADDRESS, timeTravel } from '@celo/protocol/lib/test-utils'
 import {
   EscrowContract,
@@ -9,7 +10,6 @@ import {
   RegistryContract,
   RegistryInstance,
 } from 'types'
-import { attestationsRegistryId } from '../../lib/registry-utils'
 
 // For reference:
 //    accounts[0] = owner
@@ -66,7 +66,7 @@ contract('Escrow', (accounts: string[]) => {
     escrow = await Escrow.new({ from: owner })
     await escrow.initialize(registry.address)
     mockAttestations = await MockAttestations.new({ from: owner })
-    await registry.setAddressFor(attestationsRegistryId, mockAttestations.address)
+    await registry.setAddressFor(CeloContractName.Attestations, mockAttestations.address)
   })
 
   describe('#initialize()', () => {
@@ -389,6 +389,8 @@ contract('Escrow', (accounts: string[]) => {
 
       it('should allow sender to redeem payment after payment has expired', async () => {
         await timeTravel(oneDayInSecs, web3)
+        const escrowedPaymentBefore = await getEscrowedPayment(uniquePaymentIDRevoke, escrow)
+
         await escrow.revoke(uniquePaymentIDRevoke, { from: sender })
 
         const sentPaymentsAfterRevoke = await escrow.getSentPaymentIds(sender)
@@ -404,6 +406,14 @@ contract('Escrow', (accounts: string[]) => {
           receivedPaymentsAfterRevoke,
           uniquePaymentIDRevoke,
           "Should have deleted this escrowed payment from receiver's receivedPaymentIds list after revoke"
+        )
+
+        const escrowedPaymentAfter = await getEscrowedPayment(uniquePaymentIDRevoke, escrow)
+
+        assert.notEqual(
+          escrowedPaymentBefore,
+          escrowedPaymentAfter,
+          'Should have zeroed this escrowed payments values after revoke'
         )
       })
 

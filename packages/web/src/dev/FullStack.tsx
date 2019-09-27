@@ -2,12 +2,12 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import LayersIllo from 'src/dev/LayersIllo'
-import { APPLICATIONS_ID, PROOF_ID, PROTOCOL_ID } from 'src/dev/sectionIDs'
 import Title from 'src/dev/Title'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
-import Button, { BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import { hashNav } from 'src/shared/menu-items'
 import OvalCoin from 'src/shared/OvalCoin'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import { scrollTo as jumpTo } from 'src/utils/utils'
@@ -97,14 +97,14 @@ class FullStack extends React.PureComponent<I18nProps, State> {
 }
 
 function jumpToProof() {
-  jumpTo(PROOF_ID, 'center')
+  jumpTo(hashNav.build.blockchain, 'center')
 }
 function jumpToProtocol() {
-  jumpTo(PROTOCOL_ID, 'center')
+  jumpTo(hashNav.build.contracts, 'center')
 }
 
 function jumpToMobile() {
-  jumpTo(APPLICATIONS_ID)
+  jumpTo(hashNav.build.applications)
 }
 
 interface LevelSelectionProps {
@@ -157,7 +157,7 @@ const LevelSelection = withScreenSize<LevelSelectionProps & ScreenProps>(
             <Fade>
               <View>
                 <Text style={[fonts.legal, styles.microText]}>{text}</Text>
-                <Button text={btnText} kind={BTN.NAKED} onPress={onPressButton} />
+                <Button text={btnText} kind={BTN.NAKED} size={SIZE.small} onPress={onPressButton} />
               </View>
             </Fade>
           )}

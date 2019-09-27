@@ -8,6 +8,7 @@ import { Clipboard, StyleSheet, Text, View } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import BackupPhraseContainer from 'src/backup/BackupPhraseContainer'
 import { Namespaces } from 'src/i18n'
 import NuxLogo from 'src/icons/NuxLogo'
 import Logger from 'src/utils/Logger'
@@ -15,6 +16,7 @@ import Logger from 'src/utils/Logger'
 type Props = {
   onPress: () => void
   mnemonic: string | null
+  backupCompleted?: boolean
 } & WithNamespaces
 
 interface State {
@@ -22,9 +24,7 @@ interface State {
 }
 
 class BackupComplete extends React.Component<Props, State> {
-  static navigationOptions = {
-    header: null,
-  }
+  static navigationOptions = { header: null }
 
   state = {
     selectedAnswer: null,
@@ -33,7 +33,12 @@ class BackupComplete extends React.Component<Props, State> {
   onSelectAnswer = (word: string) => this.setState({ selectedAnswer: word })
 
   onDone = () => {
-    CeloAnalytics.track(CustomEventNames.questions_done)
+    const { backupCompleted } = this.props
+
+    // Only track when going through backup flow, not viewing the backup again
+    if (!backupCompleted) {
+      CeloAnalytics.track(CustomEventNames.questions_done)
+    }
     this.props.onPress()
   }
 
@@ -44,13 +49,16 @@ class BackupComplete extends React.Component<Props, State> {
   }
 
   render() {
-    const { t } = this.props
+    const { t, backupCompleted, mnemonic } = this.props
     return (
       <View style={styles.container}>
         <View style={styles.questionTextContainer}>
           <NuxLogo />
-          <Text style={[fontStyles.h1, styles.h1]}>{t('backupKeySet')}</Text>
+          <Text style={[fontStyles.h1, styles.h1]}>
+            {t(backupCompleted ? 'backupKey' : 'backupKeySet')}
+          </Text>
           <Text style={fontStyles.body}>{t('dontLoseIt')}</Text>
+          {backupCompleted && <BackupPhraseContainer words={mnemonic} />}
           <SmallButton
             text={t('copyToClipboard')}
             testID={'pasteMessageButton'}
@@ -79,7 +87,7 @@ const styles = StyleSheet.create({
   },
   h1: {
     color: colors.dark,
-    paddingTop: 35,
+    paddingTop: 25,
   },
   copyToClipboardButton: {
     marginTop: 50,

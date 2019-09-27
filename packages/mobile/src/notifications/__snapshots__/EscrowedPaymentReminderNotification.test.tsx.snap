@@ -7,7 +7,7 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
       Object {
         "flexDirection": "row",
         "justifyContent": "space-between",
-        "padding": 10,
+        "padding": 16,
         "width": "100%",
       },
       Object {
@@ -23,7 +23,7 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
       Object {
         "alignItems": "center",
         "flexDirection": "column",
-        "paddingRight": 10,
+        "paddingRight": 16,
       }
     }
   >
@@ -107,8 +107,27 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
                   ]
                 }
               >
-                (209) 555-9790
+                +14155550000
                  - 
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "fontFamily": "Hind-SemiBold",
+                    },
+                  ]
+                }
+              >
+                 
+                $
+                0.00
               </Text>
             </Text>
           </View>

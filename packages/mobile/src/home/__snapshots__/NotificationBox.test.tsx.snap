@@ -19,8 +19,8 @@ exports[`NotificationBox Backup too late test 1`] = `
       <View
         style={
           Object {
-            "margin": 10,
-            "width": 730,
+            "margin": 16,
+            "width": 718,
           }
         }
       >
@@ -30,7 +30,7 @@ exports[`NotificationBox Backup too late test 1`] = `
               Object {
                 "flexDirection": "row",
                 "justifyContent": "space-between",
-                "padding": 10,
+                "padding": 16,
                 "width": "100%",
               },
               Object {
@@ -46,7 +46,7 @@ exports[`NotificationBox Backup too late test 1`] = `
               Object {
                 "alignItems": "center",
                 "flexDirection": "column",
-                "paddingRight": 10,
+                "paddingRight": 16,
               }
             }
           >
@@ -170,8 +170,8 @@ exports[`NotificationBox Backup too late test 1`] = `
       <View
         style={
           Object {
-            "margin": 10,
-            "width": 730,
+            "margin": 16,
+            "width": 718,
           }
         }
       >
@@ -181,7 +181,7 @@ exports[`NotificationBox Backup too late test 1`] = `
               Object {
                 "flexDirection": "row",
                 "justifyContent": "space-between",
-                "padding": 10,
+                "padding": 16,
                 "width": "100%",
               },
               Object {
@@ -197,7 +197,7 @@ exports[`NotificationBox Backup too late test 1`] = `
               Object {
                 "alignItems": "center",
                 "flexDirection": "column",
-                "paddingRight": 10,
+                "paddingRight": 16,
               }
             }
           >
@@ -366,7 +366,7 @@ exports[`NotificationBox Backup too late test 1`] = `
         "display": "flex",
         "flexDirection": "row",
         "justifyContent": "center",
-        "paddingBottom": 10,
+        "paddingBottom": 16,
       }
     }
   >
@@ -417,8 +417,8 @@ exports[`NotificationBox Educations not completed yet 1`] = `
       <View
         style={
           Object {
-            "margin": 10,
-            "width": 730,
+            "margin": 16,
+            "width": 718,
           }
         }
       >
@@ -428,7 +428,7 @@ exports[`NotificationBox Educations not completed yet 1`] = `
               Object {
                 "flexDirection": "row",
                 "justifyContent": "space-between",
-                "padding": 10,
+                "padding": 16,
                 "width": "100%",
               },
               Object {
@@ -444,7 +444,7 @@ exports[`NotificationBox Educations not completed yet 1`] = `
               Object {
                 "alignItems": "center",
                 "flexDirection": "column",
-                "paddingRight": 10,
+                "paddingRight": 16,
               }
             }
           >
@@ -481,7 +481,7 @@ exports[`NotificationBox Educations not completed yet 1`] = `
                 }
               }
             >
-              celoGold
+              global:celoGold
             </Text>
             <View>
               <View
@@ -628,8 +628,8 @@ exports[`NotificationBox Payment Requests exist 1`] = `
       <View
         style={
           Object {
-            "margin": 10,
-            "width": 730,
+            "margin": 16,
+            "width": 718,
           }
         }
       >
@@ -639,7 +639,7 @@ exports[`NotificationBox Payment Requests exist 1`] = `
               Object {
                 "flexDirection": "row",
                 "justifyContent": "space-between",
-                "padding": 10,
+                "padding": 16,
                 "width": "100%",
               },
               Object {
@@ -655,7 +655,7 @@ exports[`NotificationBox Payment Requests exist 1`] = `
               Object {
                 "alignItems": "center",
                 "flexDirection": "column",
-                "paddingRight": 10,
+                "paddingRight": 16,
               }
             }
           >
@@ -841,8 +841,8 @@ exports[`NotificationBox Simple test 1`] = `
       <View
         style={
           Object {
-            "margin": 10,
-            "width": 730,
+            "margin": 16,
+            "width": 718,
           }
         }
       >
@@ -852,7 +852,7 @@ exports[`NotificationBox Simple test 1`] = `
               Object {
                 "flexDirection": "row",
                 "justifyContent": "space-between",
-                "padding": 10,
+                "padding": 16,
                 "width": "100%",
               },
               Object {
@@ -868,7 +868,7 @@ exports[`NotificationBox Simple test 1`] = `
               Object {
                 "alignItems": "center",
                 "flexDirection": "column",
-                "paddingRight": 10,
+                "paddingRight": 16,
               }
             }
           >
@@ -992,8 +992,8 @@ exports[`NotificationBox Simple test 1`] = `
       <View
         style={
           Object {
-            "margin": 10,
-            "width": 730,
+            "margin": 16,
+            "width": 718,
           }
         }
       >
@@ -1003,7 +1003,7 @@ exports[`NotificationBox Simple test 1`] = `
               Object {
                 "flexDirection": "row",
                 "justifyContent": "space-between",
-                "padding": 10,
+                "padding": 16,
                 "width": "100%",
               },
               Object {
@@ -1019,7 +1019,7 @@ exports[`NotificationBox Simple test 1`] = `
               Object {
                 "alignItems": "center",
                 "flexDirection": "column",
-                "paddingRight": 10,
+                "paddingRight": 16,
               }
             }
           >
@@ -1188,7 +1188,7 @@ exports[`NotificationBox Simple test 1`] = `
         "display": "flex",
         "flexDirection": "row",
         "justifyContent": "center",
-        "paddingBottom": 10,
+        "paddingBottom": 16,
       }
     }
   >

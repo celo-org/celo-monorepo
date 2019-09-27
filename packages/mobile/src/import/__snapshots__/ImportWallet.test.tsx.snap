@@ -10,58 +10,12 @@ exports[`ImportWallet renders correctly 1`] = `
     }
   }
 >
-  <View
-    style={
-      Object {
-        "height": 45,
-      }
-    }
-  >
-    <View
-      style={
-        Object {
-          "alignItems": "flex-start",
-        }
-      }
-    >
-      <View
-        accessible={true}
-        isTVSelectable={true}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "opacity": 1,
-            "paddingHorizontal": 20,
-            "paddingVertical": 10,
-          }
-        }
-        testID="CancelButton"
-      >
-        <Text
-          style={
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 22,
-            }
-          }
-        >
-          cancel
-        </Text>
-      </View>
-    </View>
-  </View>
   <RCTScrollView
     automaticallyAdjustContentInsets={false}
     contentContainerStyle={
       Object {
-        "paddingHorizontal": 10,
+        "padding": 20,
+        "paddingTop": 0,
       }
     }
     contentInset={
@@ -97,8 +51,7 @@ exports[`ImportWallet renders correctly 1`] = `
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
             Object {},
           ]
@@ -113,8 +66,8 @@ exports[`ImportWallet renders correctly 1`] = `
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -123,6 +76,7 @@ exports[`ImportWallet renders correctly 1`] = `
         style={
           Array [
             Object {
+              "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 22,
               "paddingBottom": 20,
@@ -143,8 +97,8 @@ exports[`ImportWallet renders correctly 1`] = `
             Object {
               "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
+              "fontSize": 14,
+              "lineHeight": 18,
             },
             Object {
               "paddingBottom": 15,
@@ -160,8 +114,25 @@ exports[`ImportWallet renders correctly 1`] = `
             Object {
               "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "paddingBottom": 15,
+            },
+          ]
+        }
+      >
+        backupKeyTip
+      </Text>
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
             },
             Object {
               "paddingBottom": 15,
@@ -230,27 +201,6 @@ exports[`ImportWallet renders correctly 1`] = `
           value=""
         />
       </View>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 14,
-            "lineHeight": 18,
-          }
-        }
-      >
-        <Text
-          style={
-            Object {
-              "fontFamily": "Hind-Medium",
-            }
-          }
-        >
-          tip
-        </Text>
-        backupKeyTip
-      </Text>
     </View>
   </RCTScrollView>
   <View
@@ -273,6 +223,12 @@ exports[`ImportWallet renders correctly 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -280,15 +236,22 @@ exports[`ImportWallet renders correctly 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#A3EBC6",
-          "borderWidth": 0,
-          "flex": 1,
-          "height": 50,
-          "justifyContent": "center",
-          "opacity": 1,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#A3EBC6",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
       }
       testID="ImportWalletButton"
     >
@@ -337,58 +300,12 @@ exports[`ImportWallet renders with an error 1`] = `
     }
   }
 >
-  <View
-    style={
-      Object {
-        "height": 45,
-      }
-    }
-  >
-    <View
-      style={
-        Object {
-          "alignItems": "flex-start",
-        }
-      }
-    >
-      <View
-        accessible={true}
-        isTVSelectable={true}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "opacity": 1,
-            "paddingHorizontal": 20,
-            "paddingVertical": 10,
-          }
-        }
-        testID="CancelButton"
-      >
-        <Text
-          style={
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 22,
-            }
-          }
-        >
-          cancel
-        </Text>
-      </View>
-    </View>
-  </View>
   <RCTScrollView
     automaticallyAdjustContentInsets={false}
     contentContainerStyle={
       Object {
-        "paddingHorizontal": 10,
+        "padding": 20,
+        "paddingTop": 0,
       }
     }
     contentInset={
@@ -424,8 +341,7 @@ exports[`ImportWallet renders with an error 1`] = `
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
             Object {},
           ]
@@ -440,8 +356,8 @@ exports[`ImportWallet renders with an error 1`] = `
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -450,6 +366,7 @@ exports[`ImportWallet renders with an error 1`] = `
         style={
           Array [
             Object {
+              "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 22,
               "paddingBottom": 20,
@@ -470,8 +387,8 @@ exports[`ImportWallet renders with an error 1`] = `
             Object {
               "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
+              "fontSize": 14,
+              "lineHeight": 18,
             },
             Object {
               "paddingBottom": 15,
@@ -487,8 +404,25 @@ exports[`ImportWallet renders with an error 1`] = `
             Object {
               "color": "#2E3338",
               "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "paddingBottom": 15,
+            },
+          ]
+        }
+      >
+        backupKeyTip
+      </Text>
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
             },
             Object {
               "paddingBottom": 15,
@@ -559,27 +493,6 @@ exports[`ImportWallet renders with an error 1`] = `
           value=""
         />
       </View>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 14,
-            "lineHeight": 18,
-          }
-        }
-      >
-        <Text
-          style={
-            Object {
-              "fontFamily": "Hind-Medium",
-            }
-          }
-        >
-          tip
-        </Text>
-        backupKeyTip
-      </Text>
     </View>
   </RCTScrollView>
   <View
@@ -602,6 +515,12 @@ exports[`ImportWallet renders with an error 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -609,15 +528,22 @@ exports[`ImportWallet renders with an error 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#A3EBC6",
-          "borderWidth": 0,
-          "flex": 1,
-          "height": 50,
-          "justifyContent": "center",
-          "opacity": 1,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#A3EBC6",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
       }
       testID="ImportWalletButton"
     >

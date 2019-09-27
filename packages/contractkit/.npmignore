@@ -1,0 +1,14 @@
+/.devchain/
+/coverage/
+/node_modules/
+/src/
+
+/tslint.json
+/tsconfig.*
+/jest.config.*
+*.tgz
+
+/src
+
+/lib/**/*.test.*
+/lib/test-utils

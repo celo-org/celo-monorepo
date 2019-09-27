@@ -4,6 +4,7 @@ Faucet firebase function requires a few configuration variables to work:
 
 - nodeUrl: The url for the node the faucet server will use to send transactions
 - stableTokenAddress: The StableToken contract's address
+- goldTokenAddress: The GoldToken contract's address
 - faucetGoldAmount: The amount of gold to faucet on each request
 - faucetDollarAmount: The amount of dollars to faucet on each request
 
@@ -27,22 +28,22 @@ yarn cli config:set --net alfajores --goldAmount 5000000000000000000 --dollarAmo
 
 You can verify with `yarn cli config:get --net alfajores`
 
-### Setting StableToken Address
+### Setting StableToken and GoldToken Addresses
 
-To obtain the StableToken address on a given environment run:
+To obtain the StableToken and GoldToken addresses on a given environment run:
 
 ```bash
-celotooljs contract-addresses --e alfajores --contracts StableToken
+celotooljs contract-addresses --e alfajores --contracts StableToken,GoldToken
 ```
 
 Replace `alfajores` by proper environment
 
 To set the address for faucet, in directory: `packages/faucet`, run:
 
-Replace `net` and `stableTokenAddress` with proper values
+Replace `net`, `stableTokenAddress`, and `goldTokenAddress` with proper values
 
 ```bash
-yarn cli config:set --net alfajores --stableTokenAddress 0x299E74bdCD90d4E10f7957EF074ceE32d7e9089a
+yarn cli config:set --net alfajores --stableTokenAddress 0x299E74bdCD90d4E10f7957EF074ceE32d7e9089a --goldTokenAddress 0x4813BFD311E132ade22c70dFf7e5DB045d26D070
 ```
 
 You can verify with `yarn cli config:get --net alfajores`
@@ -131,3 +132,13 @@ And then run:
 ```bash
 celotooljs account faucet -e alfajores --account 0xCEa3eF8e187490A9d85A1849D98412E5D27D1Bb3
 ```
+
+### How to deploy to staging
+
+1.  `yarn firebase login`
+2.  `yarn deploy:staging`
+3.  Deployment can be seen at [https://console.firebase.google.com/project/celo-faucet-staging/overview](https://console.firebase.google.com/project/celo-faucet-staging/overview)
+4.  You can simulate the access at [https://console.firebase.google.com/project/celo-faucet-staging/database/celo-faucet-staging/rules](https://console.firebase.google.com/project/celo-faucet-staging/database/celo-faucet-staging/rules)
+
+`packages/web $ yarn run dev`
+Go to [http://localhost:3000/build/wallet](http://localhost:3000/build/wallet) and perform submit, verify that no failure appears in the logs.

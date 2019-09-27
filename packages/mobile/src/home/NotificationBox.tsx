@@ -11,6 +11,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { PROMOTE_REWARDS_APP } from 'src/config'
 import { EscrowedPayment } from 'src/escrow/actions'
+import { getReclaimableEscrowPayments } from 'src/escrow/saga'
 import { setEducationCompleted as setGoldEducationCompleted } from 'src/goldToken/actions'
 import i18n, { Namespaces } from 'src/i18n'
 import { backupIcon, homeIcon, inviteFriendsIcon, rewardsAppIcon } from 'src/images/Images'
@@ -30,7 +31,7 @@ interface StateProps {
   dismissedInviteFriends: boolean
   paymentRequests: PaymentRequest[]
   backupTooLate: boolean
-  sentPayments: EscrowedPayment[]
+  sentEscrowPayments: EscrowedPayment[]
 }
 
 interface DispatchProps {
@@ -48,7 +49,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   dismissedEarnRewards: state.account.dismissedEarnRewards,
   dismissedInviteFriends: state.account.dismissedInviteFriends,
   backupTooLate: isBackupTooLate(state),
-  sentPayments: state.escrow.sentEscrowedPayments,
+  sentEscrowPayments: state.escrow.sentEscrowedPayments,
 })
 
 const mapDispatchToProps = {
@@ -66,27 +67,10 @@ export class NotificationBox extends React.Component<Props, State> {
     currentIndex: 0,
   }
 
-  escrowedPaymentReminderNotification = (): Array<React.ReactElement<any>> => {
-    const activeSentPayments = this.filterValidPayments()
-    const activeSentPaymentNotifications: Array<React.ReactElement<any>> = activeSentPayments.map(
-      (payment, i) => (
-        <EscrowedPaymentReminderNotification key={payment.paymentID} payment={payment} />
-      )
-    )
-    return activeSentPaymentNotifications
-  }
-
-  filterValidPayments = (): EscrowedPayment[] => {
-    const { sentPayments } = this.props
-    const validSentPayments: EscrowedPayment[] = []
-    sentPayments.forEach((payment) => {
-      const paymentExpiryTime = +payment.timestamp + +payment.expirySeconds
-      const currUnixTime = Date.now()
-      if (currUnixTime >= paymentExpiryTime) {
-        validSentPayments.push(payment)
-      }
-    })
-    return validSentPayments
+  escrowedPaymentReminderNotification = () => {
+    return getReclaimableEscrowPayments(this.props.sentEscrowPayments).map((payment) => (
+      <EscrowedPaymentReminderNotification key={payment.paymentID} payment={payment} />
+    ))
   }
 
   paymentRequestsNotification = (): Array<React.ReactElement<any>> => {
@@ -151,7 +135,7 @@ export class NotificationBox extends React.Component<Props, State> {
 
     if (!goldEducationCompleted) {
       actions.push({
-        title: t('celoGold'),
+        title: t('global:celoGold'),
         text: i18n.t('exchangeFlow9:whatIsGold'),
         image: homeIcon,
         ctaList: [
@@ -227,7 +211,11 @@ export class NotificationBox extends React.Component<Props, State> {
   }
 
   render() {
-    const notifications = [...this.paymentRequestsNotification(), ...this.generalNotifications()]
+    const notifications = [
+      ...this.paymentRequestsNotification(),
+      ...this.escrowedPaymentReminderNotification(),
+      ...this.generalNotifications(),
+    ]
 
     if (!notifications || !notifications.length) {
       // No notifications, no slider

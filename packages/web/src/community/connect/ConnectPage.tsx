@@ -1,60 +1,44 @@
-import dynamic from 'next/dynamic'
 import * as React from 'react'
-import LazyLoad from 'react-lazyload'
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
-import { Props as ArticleProps } from 'src/community/Articles'
-import ArticlesSection from 'src/community/connect/ArticlesSection'
 import CodeOfConduct from 'src/community/connect/CodeOfConduct'
+import Contribute from 'src/community/connect/Contribute'
 import CoverArea from 'src/community/connect/CoverArea'
-import Events from 'src/community/connect/Events'
 import FellowSection from 'src/community/connect/FellowSection'
 import Tenets from 'src/community/connect/Tenets'
-import {
-  EventProps,
-  intializeTableTop,
-  normalizeEvents,
-  splitEvents,
-} from 'src/community/EventHelpers'
+import EcoFund from 'src/community/EcoFund'
 import { H2, H3 } from 'src/fonts/Fonts'
 import EmailForm, { After } from 'src/forms/EmailForm'
 import OpenGraph from 'src/header/OpenGraph'
-import { I18nProps, withNamespaces } from 'src/i18n'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import { getFormattedMediumArticles } from 'src/utils/mediumAPI'
+import ArticleData from './ArticleData'
+import EventData from './EventsData'
 
-// @ts-ignore
-const Sweep = dynamic(() => import('src/community/connect/Sweep'))
+import {
+  DiscordChannel,
+  ForumChannel,
+  GitHubChannel,
+  LinkedInChannel,
+  SocialLinks,
+  TwitterChannel,
+} from 'src/shared/SocialChannels'
 
 const preview = require('src/community/connect/preview.jpg')
 
-interface OwnProps {
-  upcomingEvents: EventProps[]
-  topEvent: EventProps | null
-}
-
-type Props = I18nProps & ArticleProps & OwnProps
+type Props = I18nProps
 
 // only send used translations to the client
 const NAME_SPACES = ['common', 'community']
 
 export class ConnectPage extends React.Component<Props> {
   // This is Next.js method that runs serverside. it is only available on page components
-  static getInitialProps = async () => {
-    let eventData, articleData
-    try {
-      ;[eventData, articleData] = await Promise.all([
-        intializeTableTop(),
-        getFormattedMediumArticles(),
-      ])
-    } catch {
-      eventData = []
-      articleData = { articles: [] }
+  static getInitialProps = () => {
+    return {
+      namespacesRequired: NAME_SPACES,
     }
-    const { upcomingEvents, topEvent } = splitEvents(normalizeEvents(eventData))
-    const { articles } = articleData
-    return { articles, upcomingEvents, topEvent, namespacesRequired: NAME_SPACES }
   }
 
   render() {
@@ -72,8 +56,10 @@ export class ConnectPage extends React.Component<Props> {
         <View>
           <CoverArea />
           <Tenets />
+
           <CodeOfConduct />
           <GridRow
+            nativeID={hashNav.connect.events}
             desktopStyle={standardStyles.sectionMarginTop}
             mobileStyle={standardStyles.sectionMarginTopMobile}
           >
@@ -83,41 +69,50 @@ export class ConnectPage extends React.Component<Props> {
               </Fade>
             </Cell>
           </GridRow>
-          <Events upcomingEvents={this.props.upcomingEvents} topEvent={this.props.topEvent} />
-          <ArticlesSection articles={this.props.articles} />
+          <EventData />
+          <ArticleData />
+          <Contribute />
+          <EcoFund />
           <FellowSection />
-          <View style={styles.darkBackground}>
+          <View style={styles.darkBackground} nativeID={hashNav.connect.newsletter}>
             <GridRow
-              desktopStyle={standardStyles.sectionMargin}
-              tabletStyle={standardStyles.sectionMarginTablet}
-              mobileStyle={standardStyles.blockMarginMobile}
+              desktopStyle={standardStyles.sectionMarginTop}
+              tabletStyle={standardStyles.sectionMarginTopTablet}
+              mobileStyle={standardStyles.blockMarginTopMobile}
             >
-              <Cell span={Spans.full}>
-                <LazyLoad unmountIfInvisible={true}>
-                  <Sweep>
-                    <View style={styles.sweeperForm}>
-                      <H3 style={[textStyles.invert, textStyles.center]}>{t('stayConnected')}</H3>
-                      <Text
-                        style={[
-                          fonts.p,
-                          textStyles.invert,
-                          textStyles.center,
-                          standardStyles.elementalMarginBottom,
-                        ]}
-                      >
-                        {t('receiveUpdates')}
-                      </Text>
-                      <EmailForm
-                        submitText={t('signUp')}
-                        route={'/contacts'}
-                        whenComplete={<After t={this.props.t} />}
-                        isDarkMode={true}
-                      />
-                    </View>
-                  </Sweep>
-                </LazyLoad>
+              <Cell span={Spans.full} style={standardStyles.centered}>
+                <Image
+                  source={{ uri: require('src/shared/Developer-news.png') }}
+                  style={styles.emailLogo}
+                />
+                <View style={styles.form}>
+                  <H3 style={[textStyles.invert, textStyles.center]}>{t('stayConnected')}</H3>
+                  <Text
+                    style={[
+                      fonts.p,
+                      textStyles.invert,
+                      textStyles.center,
+                      standardStyles.elementalMarginBottom,
+                    ]}
+                  >
+                    {t('receiveUpdates')}
+                  </Text>
+                  <EmailForm
+                    submitText={t('signUp')}
+                    route={'/contacts'}
+                    whenComplete={<After t={this.props.t} />}
+                    isDarkMode={true}
+                  />
+                </View>
               </Cell>
             </GridRow>
+            <SocialLinks>
+              <TwitterChannel isDarkMode={true} />
+              <GitHubChannel isDarkMode={true} />
+              <DiscordChannel isDarkMode={true} />
+              <ForumChannel isDarkMode={true} />
+              <LinkedInChannel isDarkMode={true} />
+            </SocialLinks>
           </View>
         </View>
       </>
@@ -129,10 +124,15 @@ const styles = StyleSheet.create({
   darkBackground: {
     backgroundColor: colors.dark,
   },
-  sweeperForm: {
+  form: {
     maxWidth: 372,
     paddingBottom: 30,
   },
+  emailLogo: {
+    height: 45,
+    width: 45,
+    marginBottom: 10,
+  },
 })
 
-export default withNamespaces('community')(ConnectPage)
+export default withNamespaces(NameSpaces.community)(ConnectPage)

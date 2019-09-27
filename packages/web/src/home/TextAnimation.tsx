@@ -106,9 +106,15 @@ interface Props {
   playing: boolean
 }
 
-class TextAnimation extends React.PureComponent<Props> {
+interface State {
+  currentWord: number
+  initial: boolean
+}
+
+class TextAnimation extends React.PureComponent<Props, State> {
   state = {
     currentWord: 0,
+    initial: true,
   }
 
   timeout: number
@@ -129,7 +135,7 @@ class TextAnimation extends React.PureComponent<Props> {
     const duration = timings[word].length + timings[word].pause
     this.timeout = setTimeout(() => {
       if (this.state.currentWord !== 4) {
-        this.setState({ currentWord: (this.state.currentWord + 1) % 5 })
+        this.setState({ currentWord: (this.state.currentWord + 1) % 5, initial: false })
         this.changeWord()
       }
     }, duration)
@@ -156,13 +162,19 @@ class TextAnimation extends React.PureComponent<Props> {
     return (
       <Responsive large={[styles.textContainer, styles.textContainerLarge]}>
         <View style={styles.textContainer}>
-          <H1 accessibilityRole={'heading'} style={[styles.white, styles.letsMake]}>
+          <H1 ariaLevel={'2'} accessibilityRole={'heading'} style={[styles.white, styles.letsMake]}>
             Let's make money{' '}
           </H1>
           <View>
-            <View style={[styles.mask, fadeOut]} key={`${this.state.currentWord}-mask1`} />
-            <View style={[styles.mask2, fadeIn]} key={`${this.state.currentWord}-mask2`} />
+            <>
+              <View style={[styles.mask, fadeOut]} key={`${this.state.currentWord}-mask1`} />
+              {!this.state.initial && (
+                <View style={[styles.mask2, fadeIn]} key={`${this.state.currentWord}-mask2`} />
+              )}
+            </>
+
             <H1
+              ariaLevel={'2'}
               accessibilityRole={'heading'}
               style={[styles.white, textStyles.heavy, textStyles.center]}
             >

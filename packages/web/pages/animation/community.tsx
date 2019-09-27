@@ -2,7 +2,7 @@ import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import FullCircle from 'src/community/connect/FullCircle'
 import OpenGraph from 'src/header/OpenGraph'
-import LogoCombinedColor from 'src/shared/LogoCombinedColor'
+import LogoCombinedColor from 'src/logos/LogoDarkBg'
 import { colors } from 'src/styles'
 const preview = require('src/community/connect/preview.jpg')
 export default class CommunityDemo extends React.PureComponent {
@@ -22,7 +22,7 @@ export default class CommunityDemo extends React.PureComponent {
           <FullCircle />
           <View style={styles.logo}>
             <a href={'/'}>
-              <LogoCombinedColor height={40} color={'white'} />
+              <LogoCombinedColor height={40} />
             </a>
           </View>
         </View>

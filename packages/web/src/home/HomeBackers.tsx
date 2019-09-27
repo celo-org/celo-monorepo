@@ -1,11 +1,10 @@
 import * as React from 'react'
 import { Image, StyleSheet, View } from 'react-native'
-import { BACKER_ID } from 'src/about/Backers'
 import { ah, coinbase, gc, lakestar, polychain, svAngel } from 'src/home/logos/logos'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Button, { BTN } from 'src/shared/Button.3'
-import menuItems from 'src/shared/menu-items'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import menuItems, { hashNav } from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { standardStyles } from 'src/styles'
 
@@ -41,7 +40,8 @@ const HomeBackers = ({ t }: I18nProps) => {
         <View style={[styles.linkContainer, standardStyles.elementalMarginTop]}>
           <Button
             kind={BTN.NAKED}
-            href={`${menuItems.ABOUT_US.link}#${BACKER_ID}`}
+            size={SIZE.normal}
+            href={`${menuItems.ABOUT_US.link}#${hashNav.about.backers}`}
             text={t('hero.backers')}
           />
         </View>

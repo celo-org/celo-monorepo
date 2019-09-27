@@ -1,9 +1,9 @@
-import { GethArgv } from '@celo/celotool/src/cmds/geth'
 import { spawnSync } from 'child_process'
 import fs from 'fs'
 import path from 'path'
 import { addCeloGethMiddleware, ensure0x, validateAccountAddress } from 'src/lib/utils'
 import * as yargs from 'yargs'
+import { GethArgv } from '../geth'
 
 const STATIC_NODES_FILE_NAME = 'static-nodes.json'
 
@@ -32,7 +32,7 @@ export const builder = (argv: yargs.Argv) => {
       default: '1101',
     })
     .option('sync-mode', {
-      choices: ['full', 'fast', 'light', 'celolatest', 'ultralight'],
+      choices: ['full', 'fast', 'light', 'ultralight'],
       demandOption: true,
     })
     .option('mining', {

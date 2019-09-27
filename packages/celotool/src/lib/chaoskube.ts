@@ -1,5 +1,5 @@
 import { makeHelmParameters } from 'src/lib/helm_deploy'
-import { envVar, fetchEnv } from 'src/lib/utils'
+import { envVar, fetchEnv } from './env-utils'
 
 export function helmReleaseName(celoEnv: string) {
   return celoEnv + '-chaoskube'

@@ -8,11 +8,14 @@ import { standardStyles, textStyles } from 'src/styles'
 interface Props {
   title: string
   invert?: boolean
+  nativeID?: string
+  ariaLevel?: '2' | '3'
 }
 
-const TitleComponent = React.memo(function Title({ title, invert }: Props) {
+const TitleComponent = React.memo(function Title({ title, invert, nativeID, ariaLevel }: Props) {
   return (
     <GridRow
+      nativeID={nativeID}
       desktopStyle={[standardStyles.blockMarginBottom, standardStyles.sectionMarginTop]}
       tabletStyle={[standardStyles.blockMarginBottomTablet, standardStyles.sectionMarginTopTablet]}
       mobileStyle={[standardStyles.blockMarginBottomMobile, standardStyles.sectionMarginMobile]}
@@ -20,7 +23,9 @@ const TitleComponent = React.memo(function Title({ title, invert }: Props) {
       <Cell span={Spans.full}>
         <Fade>
           <View>
-            <H1 style={[textStyles.center, invert && textStyles.invert]}>{title}</H1>
+            <H1 ariaLevel={ariaLevel} style={[textStyles.center, invert && textStyles.invert]}>
+              {title}
+            </H1>
           </View>
         </Fade>
       </Cell>

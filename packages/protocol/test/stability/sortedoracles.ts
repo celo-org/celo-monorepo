@@ -170,7 +170,9 @@ contract('SortedOracles', (accounts: string[]) => {
 
     describe('when a report has been made', () => {
       beforeEach(async () => {
-        await sortedOracles.report(aToken, 10, 1, NULL_ADDRESS, NULL_ADDRESS, { from: anOracle })
+        await sortedOracles.report(aToken, 10, 1, NULL_ADDRESS, NULL_ADDRESS, {
+          from: anOracle,
+        })
       })
 
       it('should decrease the number of rates', async () => {
@@ -180,9 +182,8 @@ contract('SortedOracles', (accounts: string[]) => {
 
       it('should reset the median rate', async () => {
         await sortedOracles.removeOracle(aToken, anOracle, 0)
-        const [actualNumerator, actualDenominator] = await sortedOracles.medianRate(aToken)
+        const [actualNumerator] = await sortedOracles.medianRate(aToken)
         assert.equal(actualNumerator.toNumber(), 0)
-        assert.equal(actualDenominator.toNumber(), 0)
       })
 
       it('should decrease the number of timestamps', async () => {
@@ -254,6 +255,8 @@ contract('SortedOracles', (accounts: string[]) => {
   describe('#report', () => {
     const numerator = 10
     const denominator = 1
+    const expectedDenominator = new BigNumber(2).pow(64)
+    const expectedNumerator = expectedDenominator.times(numerator).div(denominator)
     beforeEach(async () => {
       await sortedOracles.addOracle(aToken, anOracle)
     })
@@ -270,15 +273,15 @@ contract('SortedOracles', (accounts: string[]) => {
         from: anOracle,
       })
       const [actualNumerator, actualDenominator] = await sortedOracles.medianRate(aToken)
-      assert.equal(actualNumerator.toNumber(), numerator)
-      assert.equal(actualDenominator.toNumber(), denominator)
+      assertEqualBN(actualNumerator, expectedNumerator)
+      assertEqualBN(actualDenominator, expectedDenominator)
     })
 
     it('should increase the number of timestamps', async () => {
       await sortedOracles.report(aToken, numerator, denominator, NULL_ADDRESS, NULL_ADDRESS, {
         from: anOracle,
       })
-      assert.equal((await sortedOracles.numTimestamps(aToken)).toNumber(), 1)
+      assertEqualBN(await sortedOracles.numTimestamps(aToken), 1)
     })
 
     it('should set the median timestamp', async () => {
@@ -307,8 +310,8 @@ contract('SortedOracles', (accounts: string[]) => {
           token: matchAddress(aToken),
           oracle: matchAddress(anOracle),
           timestamp: matchAny,
-          numerator: new BigNumber(numerator),
-          denominator: new BigNumber(denominator),
+          numerator: expectedNumerator,
+          denominator: expectedDenominator,
         },
       })
 
@@ -316,8 +319,8 @@ contract('SortedOracles', (accounts: string[]) => {
         event: 'MedianUpdated',
         args: {
           token: matchAddress(aToken),
-          numerator: new BigNumber(numerator),
-          denominator: new BigNumber(denominator),
+          numerator: expectedNumerator,
+          denominator: expectedDenominator,
         },
       })
     })

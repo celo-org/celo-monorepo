@@ -7,7 +7,7 @@ import {
 } from 'google-libphonenumber'
 import * as Web3Utils from 'web3-utils'
 
-interface ParsedPhoneNumber {
+export interface ParsedPhoneNumber {
   e164Number: string
   displayNumber: string
   countryCode?: number
@@ -164,12 +164,6 @@ function handleSpecialCasesForParsing(
     // https://en.wikipedia.org/wiki/Telephone_numbers_in_Argentina
     case 54:
       return prependToFormMobilePhoneNumber(parsedNumber, regionCode, '9')
-
-    // Mexico
-    // https://github.com/googlei18n/libphonenumber/blob/master/FAQ.md#why-is-this-number-from-argentina-ar-or-mexico-mx-not-identified-as-the-right-number-type
-    // https://en.wikipedia.org/wiki/Telephone_numbers_in_Mexico
-    case 52:
-      return prependToFormMobilePhoneNumber(parsedNumber, regionCode, '1')
 
     default:
       return parsedNumber

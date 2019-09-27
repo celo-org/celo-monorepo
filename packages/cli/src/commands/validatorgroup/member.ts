@@ -1,7 +1,6 @@
 import { flags } from '@oclif/command'
 import { IArg } from '@oclif/parser/lib/args'
 import { BaseCommand } from '../../base'
-import { Validators } from '../../generated/contracts'
 import { displaySendTx } from '../../utils/cli'
 import { Args, Flags } from '../../utils/command'
 
@@ -36,18 +35,13 @@ export default class ValidatorGroupRegister extends BaseCommand {
       return
     }
 
-    const contract = await Validators(this.web3, res.flags.from)
+    this.kit.defaultAccount = res.flags.from
+    const validators = await this.kit.contracts.getValidators()
 
     if (res.flags.accept) {
-      await displaySendTx(
-        'addMember',
-        contract.methods.addMember((res.args as any).validatorAddress)
-      )
+      await displaySendTx('addMember', validators.addMember((res.args as any).validatorAddress))
     } else {
-      await displaySendTx(
-        'addMember',
-        contract.methods.removeMember((res.args as any).validatorAddress)
-      )
+      await displaySendTx('addMember', validators.removeMember((res.args as any).validatorAddress))
     }
   }
 }

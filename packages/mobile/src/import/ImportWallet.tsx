@@ -4,7 +4,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { ActivityIndicator, StyleSheet, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, Keyboard, StyleSheet, Text, TextInput, View } from 'react-native'
 import { validateMnemonic } from 'react-native-bip39'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { connect } from 'react-redux'
@@ -13,13 +13,12 @@ import { errorSelector } from 'src/alert/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import CancelButton from 'src/components/CancelButton'
 import GethAwareButton from 'src/geth/GethAwareButton'
 import { Namespaces } from 'src/i18n'
 import NuxLogo from 'src/icons/NuxLogo'
 import { importBackupPhrase } from 'src/import/actions'
+import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
-import DisconnectBanner from 'src/shared/DisconnectBanner'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'ImportWallet'
@@ -27,6 +26,8 @@ const TAG = 'ImportWallet'
 // Because of a RN bug, we can't fully clean the text as the user types
 // https://github.com/facebook/react-native/issues/11068
 export const formatBackupPhraseOnEdit = (phrase: string) => phrase.replace(/\s+/gm, ' ')
+// Note(Ashish) The wordlists seem to use NFD and contains lower-case words for English and Spanish.
+// I am not sure if the words are lower-case for Japanese as well but I am assuming that for now.
 export const formatBackupPhraseOnSubmit = (phrase: string) =>
   formatBackupPhraseOnEdit(phrase)
     .trim()
@@ -63,7 +64,7 @@ const hasDisplayedError = (error: ErrorMessages | null) => {
 }
 
 export class ImportWallet extends React.Component<Props, State> {
-  static navigationOptions = { header: null }
+  static navigationOptions = nuxNavigationOptions
 
   static getDerivedStateFromProps(props: Props, state: State): State | null {
     if (hasDisplayedError(props.error) && state.isSubmitting) {
@@ -92,27 +93,41 @@ export class ImportWallet extends React.Component<Props, State> {
   }
 
   onSubmit = () => {
-    // Note(Ashish) The wordlists seem to use NFD and contains lower-case words for English and Spanish.
-    // I am not sure if the words are lower-case for Japanese as well but I am assuming that for now.
-    this.props.hideAlert()
-    CeloAnalytics.track(CustomEventNames.import_wallet_submit)
+    try {
+      this.setState({
+        isSubmitting: true,
+      })
 
-    const formattedPhrase = formatBackupPhraseOnSubmit(this.state.backupPhrase)
-    this.setState({
-      isSubmitting: true,
-      backupPhrase: formattedPhrase,
-    })
+      Keyboard.dismiss()
+      this.props.hideAlert()
+      CeloAnalytics.track(CustomEventNames.import_wallet_submit)
 
-    if (!validateMnemonic(formattedPhrase)) {
-      Logger.warn(TAG, 'Invalid mnemonic')
-      this.props.showError(ErrorMessages.INVALID_BACKUP)
+      const formattedPhrase = formatBackupPhraseOnSubmit(this.state.backupPhrase)
+      this.setState({
+        backupPhrase: formattedPhrase,
+      })
+
+      if (!validateMnemonic(formattedPhrase)) {
+        Logger.warn(TAG, 'Invalid mnemonic')
+        this.props.showError(ErrorMessages.INVALID_BACKUP)
+        this.setState({
+          isSubmitting: false,
+        })
+        return
+      }
+
+      this.props.importBackupPhrase(formattedPhrase)
+    } catch (error) {
       this.setState({
         isSubmitting: false,
       })
-      return
+      Logger.error(TAG, 'Error importing wallet', error)
+      this.props.showError(ErrorMessages.IMPORT_BACKUP_FAILED)
     }
+  }
 
-    this.props.importBackupPhrase(formattedPhrase)
+  isBackupPhraseValid() {
+    return this.state.backupPhrase.trim().split(/\s+/g).length >= 12
   }
 
   render() {
@@ -121,23 +136,17 @@ export class ImportWallet extends React.Component<Props, State> {
 
     return (
       <View style={styles.container}>
-        <View style={componentStyles.topBar}>
-          <View style={styles.cancel}>
-            <CancelButton eventName={CustomEventNames.import_wallet_cancel} />
-          </View>
-        </View>
         <KeyboardAwareScrollView
-          // @ts-ignore
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="always"
         >
-          <DisconnectBanner />
           <NuxLogo />
           <Text style={[fontStyles.h1, styles.h1]}>{t('restoreYourWallet.title')}</Text>
-          <Text style={[fontStyles.body, styles.body]}>
+          <Text style={[fontStyles.bodySmall, styles.body]}>
             {t('restoreYourWallet.userYourBackupKey')}
           </Text>
-          <Text style={[fontStyles.body, styles.body]}>
+          <Text style={[fontStyles.bodySmall, styles.body]}>{t('backupKeyTip')}</Text>
+          <Text style={[fontStyles.bodySmall, styles.body]}>
             <Text style={[styles.warning, fontStyles.medium]}>
               {t('restoreYourWallet.warning')}
             </Text>
@@ -165,25 +174,20 @@ export class ImportWallet extends React.Component<Props, State> {
               testID="ImportWalletBackupKeyInputField"
             />
           </View>
-          <Text style={fontStyles.bodySmall}>
-            <Text style={fontStyles.medium}>{t('tip')}</Text>
-            {t('backupKeyTip')}
-          </Text>
         </KeyboardAwareScrollView>
-        {isSubmitting ? (
+        {isSubmitting && (
           <View style={styles.loadingSpinnerContainer} testID="ImportWalletLoadingCircle">
             <ActivityIndicator size="large" color={colors.celoGreen} />
           </View>
-        ) : (
-          <GethAwareButton
-            disabled={isSubmitting || !this.state.backupPhrase}
-            onPress={this.onSubmit}
-            text={t('restoreWallet')}
-            standard={false}
-            type={BtnTypes.PRIMARY}
-            testID="ImportWalletButton"
-          />
         )}
+        <GethAwareButton
+          disabled={isSubmitting || !this.isBackupPhraseValid()}
+          onPress={this.onSubmit}
+          text={t('restoreWallet')}
+          standard={false}
+          type={BtnTypes.PRIMARY}
+          testID="ImportWalletButton"
+        />
       </View>
     )
   }
@@ -199,7 +203,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   scrollContainer: {
-    paddingHorizontal: 10,
+    padding: 20,
+    paddingTop: 0,
   },
   h1: {
     textAlign: 'center',
@@ -215,7 +220,7 @@ const styles = StyleSheet.create({
     height: 124,
   },
   loadingSpinnerContainer: {
-    marginVertical: 10,
+    marginVertical: 30,
   },
   inputError: {
     borderColor: colors.errorRed,

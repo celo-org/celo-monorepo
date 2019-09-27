@@ -4,12 +4,12 @@ import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native
 import Fade from 'react-reveal/Fade'
 import { H2 } from 'src/fonts/Fonts'
 import Cyclone from 'src/home/Cyclone'
-import { PARTNERSHIP_ID } from 'src/home/version3/HomeEmail'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
-import Button, { BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import menuItems, { hashNav } from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import { scrollTo } from 'src/utils/utils'
@@ -39,7 +39,7 @@ const onStabilityPress = () => {
 }
 
 const onLearnMorePress = () => {
-  scrollTo(PARTNERSHIP_ID)
+  scrollTo(hashNav.home.partnerships)
 }
 
 class HomeSystems extends React.PureComponent<Props> {
@@ -95,33 +95,16 @@ class HomeSystems extends React.PureComponent<Props> {
                 </Text>
                 <Text style={[fonts.p, styles.foreground]}>{t('buildOnCeloCopy')}</Text>
                 <View style={standardStyles.elementalMargin}>
-                  <Button text={t('learnMore')} kind={BTN.NAKED} onPress={onLearnMorePress} />
+                  <Button
+                    size={SIZE.normal}
+                    text={t('learnMore')}
+                    kind={BTN.NAKED}
+                    href={menuItems.BUILD.link}
+                  />
                 </View>
               </Cell>
               <Cell span={Spans.fourth}>
                 <Stencil source={builtOn} height={125} />
-              </Cell>
-            </GridRow>
-          </View>
-        </Fade>
-        <Fade bottom={true} distance="20px" delay={150}>
-          <View style={standardStyles.centered}>
-            <GridRow
-              desktopStyle={[standardStyles.blockMarginBottom, styles.avoidLogo]}
-              tabletStyle={standardStyles.blockMarginBottomTablet}
-              mobileStyle={standardStyles.blockMarginBottomMobile}
-            >
-              <Cell span={Spans.fourth}>
-                <Text style={[fonts.superLarge, styles.foreground]}>2</Text>
-              </Cell>
-              <Cell span={Spans.half}>
-                <Text style={[fonts.h3, textStyles.heading, styles.foreground]}>
-                  {t('verifyToEarn')}
-                </Text>
-                <Text style={[fonts.p, styles.foreground]}>{t('verifyToEarnCopy')}</Text>
-              </Cell>
-              <Cell span={Spans.fourth}>
-                <Stencil source={groupVerify} height={125} />
               </Cell>
             </GridRow>
           </View>
@@ -134,7 +117,7 @@ class HomeSystems extends React.PureComponent<Props> {
               mobileStyle={standardStyles.blockMarginBottomMobile}
             >
               <Cell span={Spans.fourth}>
-                <Text style={[fonts.superLarge, styles.foreground]}>3</Text>
+                <Text style={[fonts.superLarge, styles.foreground]}>2</Text>
               </Cell>
               <Cell span={Spans.half}>
                 <Text style={[fonts.h3, textStyles.heading, styles.foreground]}>
@@ -148,6 +131,29 @@ class HomeSystems extends React.PureComponent<Props> {
             </GridRow>
           </View>
         </Fade>
+        <Fade bottom={true} distance="20px" delay={150}>
+          <View style={standardStyles.centered}>
+            <GridRow
+              desktopStyle={[standardStyles.blockMarginBottom, styles.avoidLogo]}
+              tabletStyle={standardStyles.blockMarginBottomTablet}
+              mobileStyle={standardStyles.blockMarginBottomMobile}
+            >
+              <Cell span={Spans.fourth}>
+                <Text style={[fonts.superLarge, styles.foreground]}>3</Text>
+              </Cell>
+              <Cell span={Spans.half}>
+                <Text style={[fonts.h3, textStyles.heading, styles.foreground]}>
+                  {t('poweredByCommunity')}
+                </Text>
+                <Text style={[fonts.p, styles.foreground]}>{t('poweredByCommunityCopy')}</Text>
+              </Cell>
+              <Cell span={Spans.fourth}>
+                <Stencil source={groupVerify} height={125} />
+              </Cell>
+            </GridRow>
+          </View>
+        </Fade>
+
         <GridRow
           desktopStyle={[standardStyles.sectionMarginBottom, styles.avoidLogo]}
           tabletStyle={[standardStyles.sectionMarginBottomTablet]}

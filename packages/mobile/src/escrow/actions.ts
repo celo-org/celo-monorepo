@@ -1,10 +1,12 @@
 import BigNumber from 'bignumber.js'
-import { MinimalContact } from 'react-native-contacts'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
+import { RecipientWithContact } from 'src/recipients/recipient'
 
 export interface EscrowedPayment {
   senderAddress: string
-  recipient: MinimalContact | string
+  recipientPhone: string
+  recipientContact?: RecipientWithContact
   paymentID: string
   currency: SHORT_CURRENCIES
   amount: BigNumber
@@ -13,78 +15,98 @@ export interface EscrowedPayment {
   expirySeconds: BigNumber
 }
 
-// The number of seconds before the sender can revoke the payment.
-export const EXPIRY_SECONDS = 432000 // 5 days in seconds
-
 export enum Actions {
   TRANSFER_PAYMENT = 'ESCROW/TRANSFER_PAYMENT',
   RECLAIM_PAYMENT = 'ESCROW/RECLAIM_PAYMENT',
-  GET_SENT_PAYMENTS = 'ESCROW/GET_SENT_PAYMENTS',
+  FETCH_SENT_PAYMENTS = 'ESCROW/FETCH_SENT_PAYMENTS',
   STORE_SENT_PAYMENTS = 'ESCROW/STORE_SENT_PAYMENTS',
   RESEND_PAYMENT = 'ESCROW/RESEND_PAYMENT',
+  RECLAIM_PAYMENT_SUCCESS = 'ESCROW/RECLAIM_PAYMENT_SUCCESS',
+  RECLAIM_PAYMENT_FAILURE = 'ESCROW/RECLAIM_PAYMENT_FAILURE',
 }
 
-export interface TransferPaymentAction {
+export interface EscrowTransferPaymentAction {
   type: Actions.TRANSFER_PAYMENT
   phoneHash: string
   amount: BigNumber
-  txId: string
   tempWalletAddress: string
 }
-export interface ReclaimPaymentAction {
+export interface EscrowReclaimPaymentAction {
   type: Actions.RECLAIM_PAYMENT
   paymentID: string
 }
 
-export interface GetSentPaymentsAction {
-  type: Actions.GET_SENT_PAYMENTS
+export interface EscrowFetchSentPaymentsAction {
+  type: Actions.FETCH_SENT_PAYMENTS
+  forceRefresh: boolean
 }
 
-export interface StoreSentPaymentsAction {
+export interface EscrowStoreSentPaymentsAction {
   type: Actions.STORE_SENT_PAYMENTS
   sentPayments: EscrowedPayment[]
 }
 
-export interface ResendPaymentAction {
+export interface EscrowResendPaymentAction {
   type: Actions.RESEND_PAYMENT
   paymentId: string
 }
 
+export interface EscrowReclaimPaymentSuccessAction {
+  type: Actions.RECLAIM_PAYMENT_SUCCESS
+}
+
+export interface EscrowReclaimFailureAction {
+  type: Actions.RECLAIM_PAYMENT_FAILURE
+  error: ErrorMessages
+}
+
 export type ActionTypes =
-  | TransferPaymentAction
-  | ReclaimPaymentAction
-  | GetSentPaymentsAction
-  | StoreSentPaymentsAction
-  | ResendPaymentAction
+  | EscrowTransferPaymentAction
+  | EscrowReclaimPaymentAction
+  | EscrowFetchSentPaymentsAction
+  | EscrowStoreSentPaymentsAction
+  | EscrowResendPaymentAction
+  | EscrowReclaimPaymentSuccessAction
+  | EscrowReclaimFailureAction
 
 export const transferEscrowedPayment = (
   phoneHash: string,
   amount: BigNumber,
-  txId: string,
   tempWalletAddress: string
-): TransferPaymentAction => ({
+): EscrowTransferPaymentAction => ({
   type: Actions.TRANSFER_PAYMENT,
   phoneHash,
   amount,
-  txId,
   tempWalletAddress,
 })
 
-export const reclaimPayment = (paymentID: string): ReclaimPaymentAction => ({
+export const reclaimEscrowPayment = (paymentID: string): EscrowReclaimPaymentAction => ({
   type: Actions.RECLAIM_PAYMENT,
   paymentID,
 })
 
-export const getSentPayments = (): GetSentPaymentsAction => ({
-  type: Actions.GET_SENT_PAYMENTS,
+export const fetchSentEscrowPayments = (forceRefresh = false): EscrowFetchSentPaymentsAction => ({
+  type: Actions.FETCH_SENT_PAYMENTS,
+  forceRefresh,
 })
 
-export const storeSentPayments = (sentPayments: EscrowedPayment[]): StoreSentPaymentsAction => ({
+export const storeSentEscrowPayments = (
+  sentPayments: EscrowedPayment[]
+): EscrowStoreSentPaymentsAction => ({
   type: Actions.STORE_SENT_PAYMENTS,
   sentPayments,
 })
 
-export const resendPayment = (paymentId: string): ResendPaymentAction => ({
+export const resendEscrowPayment = (paymentId: string): EscrowResendPaymentAction => ({
   type: Actions.RESEND_PAYMENT,
   paymentId,
+})
+
+export const reclaimEscrowPaymentSuccess = (): EscrowReclaimPaymentSuccessAction => ({
+  type: Actions.RECLAIM_PAYMENT_SUCCESS,
+})
+
+export const reclaimEscrowPaymentFailure = (error: ErrorMessages): EscrowReclaimFailureAction => ({
+  type: Actions.RECLAIM_PAYMENT_FAILURE,
+  error,
 })

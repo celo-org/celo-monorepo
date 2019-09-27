@@ -1,23 +1,19 @@
-import { getKubernetesClusterRegion, switchToClusterFromEnv } from '@celo/celotool/src/lib/cluster'
-import { ensureAuthenticatedGcloudAccount } from '@celo/celotool/src/lib/gcloud_utils'
-import { generateGenesisFromEnv } from '@celo/celotool/src/lib/generate_utils'
-import { OG_ACCOUNTS } from '@celo/celotool/src/lib/genesis_constants'
-import { getStatefulSetReplicas, scaleStatefulSet } from '@celo/celotool/src/lib/kubernetes'
-import {
-  EnvTypes,
-  envVar,
-  execCmd,
-  execCmdWithExitOnFailure,
-  fetchEnv,
-  fetchEnvOrFallback,
-  getVerificationPoolRewardsURL,
-  getVerificationPoolSMSURL,
-  isProduction,
-  outputIncludes,
-  switchToProjectFromEnv,
-} from '@celo/celotool/src/lib/utils'
 import { entries, flatMap, range } from 'lodash'
 import sleep from 'sleep-promise'
+import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
+import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
+import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
+import { generateGenesisFromEnv } from './generate_utils'
+import { OG_ACCOUNTS } from './genesis_constants'
+import { getStatefulSetReplicas, scaleResource } from './kubernetes'
+import {
+  execCmd,
+  execCmdWithExitOnFailure,
+  getVerificationPoolRewardsURL,
+  getVerificationPoolSMSURL,
+  outputIncludes,
+  switchToProjectFromEnv,
+} from './utils'
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
@@ -453,6 +449,11 @@ export async function deletePersistentVolumeClaims(celoEnv: string) {
       `kubectl delete pvc --selector='component=validators' --namespace ${celoEnv}`
     )
     console.info(output)
+
+    const [outputTx] = await execCmd(
+      `kubectl delete pvc --selector='component=tx_nodes' --namespace ${celoEnv}`
+    )
+    console.info(outputTx)
   } catch (error) {
     console.error(error)
     if (!error.toString().includes('not found')) {
@@ -553,11 +554,16 @@ async function helmParameters(celoEnv: string) {
     `--set geth.faultyValidators="${fetchEnvOrFallback('FAULTY_VALIDATORS', '0')}"`,
     `--set geth.faultyValidatorType="${fetchEnvOrFallback('FAULTY_VALIDATOR_TYPE', '0')}"`,
     `--set geth.tx_nodes="${fetchEnv('TX_NODES')}"`,
-    `--set geth.admin_rpc_enabled=${fetchEnvOrFallback('ADMIN_RPC_ENABLED', 'false')}`,
+    `--set geth.ssd_disks="${fetchEnvOrFallback(envVar.GETH_NODES_SSD_DISKS, 'true')}"`,
     `--set mnemonic="${fetchEnv('MNEMONIC')}"`,
     `--set contracts.cron_jobs.enabled=${fetchEnv('CONTRACT_CRONJOBS_ENABLED')}`,
     `--set geth.account.secret="${fetchEnv('GETH_ACCOUNT_SECRET')}"`,
     `--set ethstats.webSocketSecret="${fetchEnv('ETHSTATS_WEBSOCKETSECRET')}"`,
+    `--set geth.ping_ip_from_packet=${fetchEnvOrFallback('PING_IP_FROM_PACKET', 'false')}`,
+    `--set geth.in_memory_discovery_table=${fetchEnvOrFallback(
+      'IN_MEMORY_DISCOVERY_TABLE',
+      'false'
+    )}`,
     ...productionTagOverrides,
     ...(await helmIPParameters(celoEnv)),
     ...gethAccountParameters,
@@ -639,15 +645,18 @@ export async function upgradeHelmChart(celoEnv: string) {
 export async function resetAndUpgradeHelmChart(celoEnv: string) {
   const txNodesSetName = `${celoEnv}-tx-nodes`
   const validatorsSetName = `${celoEnv}-validators`
+  const bootnodeName = `${celoEnv}-bootnode`
 
   // scale down nodes
-  await scaleStatefulSet(celoEnv, txNodesSetName, 0)
-  await scaleStatefulSet(celoEnv, validatorsSetName, 0)
+  await scaleResource(celoEnv, 'StatefulSet', txNodesSetName, 0)
+  await scaleResource(celoEnv, 'StatefulSet', validatorsSetName, 0)
+  await scaleResource(celoEnv, 'Deployment', bootnodeName, 0)
 
   await deletePersistentVolumeClaims(celoEnv)
-  await sleep(5000)
+  await sleep(10000)
 
   await upgradeHelmChart(celoEnv)
+  await sleep(10000)
 
   const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
   const numTxNodes = parseInt(fetchEnv(envVar.TX_NODES), 10)
@@ -655,8 +664,9 @@ export async function resetAndUpgradeHelmChart(celoEnv: string) {
   // Note(trevor): helm upgrade only compares the current chart to the
   // previously deployed chart when deciding what needs changing, so we need
   // to manually scale up to account for when a node count is the same
-  await scaleStatefulSet(celoEnv, txNodesSetName, numTxNodes)
-  await scaleStatefulSet(celoEnv, validatorsSetName, numValdiators)
+  await scaleResource(celoEnv, 'StatefulSet', txNodesSetName, numTxNodes)
+  await scaleResource(celoEnv, 'StatefulSet', validatorsSetName, numValdiators)
+  await scaleResource(celoEnv, 'Deployment', bootnodeName, 1)
 }
 
 export async function removeHelmRelease(celoEnv: string) {

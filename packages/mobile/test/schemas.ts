@@ -1,14 +1,15 @@
+import { PincodeType } from 'src/account/reducer'
 import { RootState } from 'src/redux/reducers'
 
 // Default (version -1 schema)
-const vNeg1Schema = {
+export const vNeg1Schema = {
   app: {
     inviteCodeEntered: false,
     loggedIn: false,
     numberVerified: false,
     error: null,
     dismissErrorAfter: null,
-    language: null,
+    language: 'es-AR',
     doingBackupFlow: false,
     message: null,
     dismissMessageAfter: null,
@@ -79,6 +80,7 @@ const vNeg1Schema = {
     paymentRequests: [],
     showFakeData: false,
     backupCompleted: false,
+    backupDelayedTime: 0,
     dismissedEarnRewards: false,
     dismissedInviteFriends: false,
   },
@@ -88,12 +90,13 @@ const vNeg1Schema = {
     redeemedInviteCode: '',
   },
   escrow: {
+    isReclaiming: false,
     sentEscrowedPayments: [],
-    currentPaymentId: '',
+    suggestedFee: null,
   },
 }
 
-const v0Schema = {
+export const v0Schema = {
   ...vNeg1Schema,
   identity: {
     ...vNeg1Schema.identity,
@@ -105,8 +108,47 @@ const v0Schema = {
     ...vNeg1Schema.invite,
     redeemComplete: false,
   },
+  send: {
+    isSending: false,
+    recentPhoneNumbers: undefined,
+    recipientCache: undefined,
+    recentRecipients: [],
+  },
+  recipients: {
+    recipientCache: {},
+  },
+  web3: {
+    ...vNeg1Schema.web3,
+    syncProgress: {
+      startingBlock: 0,
+      currentBlock: 0,
+      highestBlock: 0,
+    },
+  },
+  localCurrency: {
+    isLoading: false,
+    symbol: 'MXN',
+    exchangeRate: 1.33,
+  },
+}
+
+export const v1Schema = {
+  ...v0Schema,
+  app: {
+    ...v0Schema.app,
+    language: 'es-419',
+  },
+}
+
+export const v2Schema = {
+  ...v1Schema,
+  account: {
+    ...v1Schema.account,
+    pincodeType: PincodeType.Unset,
+    isSettingPin: false,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
-  return v0Schema as Partial<RootState>
+  return v2Schema as Partial<RootState>
 }

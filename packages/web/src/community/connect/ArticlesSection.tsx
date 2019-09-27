@@ -1,23 +1,29 @@
 import * as React from 'react'
-
+import { View } from 'react-native'
 import Fade from 'react-reveal/Fade'
-import Articles, { Props as ArticleProps } from 'src/community/Articles'
+import Articles from 'src/community/Articles'
+
+import { Articles as ArticleProps } from 'fullstack/ArticleProps'
 
 import { H2 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
+import MediumLogo from 'src/icons/MediumLogo'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Button, { BTN } from 'src/shared/Button.3'
-import MediumLogo from 'src/shared/MediumLogo'
-import menuItems from 'src/shared/menu-items'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import menuItems, { hashNav } from 'src/shared/menu-items'
 import { colors, standardStyles } from 'src/styles'
 
-type Props = I18nProps & ArticleProps
+interface OwnProps {
+  loading: boolean
+}
+
+type Props = I18nProps & ArticleProps & OwnProps
 
 class ArticlesSection extends React.PureComponent<Props> {
   render() {
-    const { t, articles } = this.props
+    const { t, articles, loading } = this.props
     return (
-      <>
+      <View nativeID={hashNav.connect.blog}>
         <GridRow
           desktopStyle={[standardStyles.sectionMarginTop, standardStyles.blockMarginBottom]}
           tabletStyle={[standardStyles.sectionMarginTablet, standardStyles.blockMarginBottomTablet]}
@@ -29,7 +35,7 @@ class ArticlesSection extends React.PureComponent<Props> {
             </Fade>
           </Cell>
         </GridRow>
-        <Articles articles={articles} />
+        <Articles articles={articles} loading={loading} />
         <GridRow
           allStyle={standardStyles.elementalMarginTop}
           desktopStyle={standardStyles.sectionMarginBottom}
@@ -40,13 +46,14 @@ class ArticlesSection extends React.PureComponent<Props> {
             <Button
               text={t('readMoreFromOurBlog')}
               kind={BTN.DARKNAKED}
+              size={SIZE.normal}
               href={menuItems.MEDIUM.link}
               target={'_blog'}
               iconRight={<MediumLogo height={16} color={colors.dark} wrapWithLink={false} />}
             />
           </Cell>
         </GridRow>
-      </>
+      </View>
     )
   }
 }

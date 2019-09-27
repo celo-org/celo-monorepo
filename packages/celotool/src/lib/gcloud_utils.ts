@@ -1,4 +1,5 @@
-import { envVar, execCmd, fetchEnv } from '@celo/celotool/src/lib/utils'
+import { envVar, fetchEnv } from './env-utils'
+import { execCmd } from './utils'
 
 async function getCurrentGcloudAccount() {
   const [output] = await execCmd('gcloud config get-value account')

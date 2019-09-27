@@ -1,5 +1,12 @@
 # Mobile (Celo Wallet)
 
+## Overview
+
+This is a wallet application for the [Celo platform].
+It's a self-soverign wallet that enables anyone to onboard onto the Celo network, manage their currencies, and send payments.
+
+![](https://storage.googleapis.com/celo-website/docs/wallet-preview.png)
+
 ## Architecture
 
 The app uses [React Native][react native] and a geth [light node][light node].
@@ -39,7 +46,7 @@ export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gr
 
     **Note:** We've seen some issues running the metro bundler from iTerm
 
-## Debugging
+### Debugging
 
 In order to debug, you should run:
 
@@ -55,12 +62,12 @@ console. In order to get a full picture, the console's filter should be set to
 You will probably want to open the dev menu again and enable `Live Reloading`
 and `Hot Reloading` to make development faster.
 
-### (_Optional_) React Native debugger app
+#### (_Optional_) React Native debugger app
 
 The [RN debugger app][rn debugger] bundles together the Redux and Chrome dev
 tools nicely.
 
-## App Profiling
+### App Profiling
 
 Start the emulator and load up the app. Then run the following to start react
 devtools.
@@ -79,31 +86,42 @@ renders when no state has changed. Reducing renders can be done via pure
 components in react or overloading the should component update method
 [example here][rn optimize example].
 
-## Connecting to networks
+### Connecting to networks
 
 By default, we have the `alfajores` network set up. If you have other testnets
-that you want to use with the app, you can run
+that you want to use with the app, update `.env.ENV-NAME` and `packages/mobile/.env.ENV-NAME` with the new network name and settings, then run
 
 ```bash
 yarn run build-sdk TESTNET
 ```
 
-## Snapshot Testing
+before rebuilding the app. Note that this will assume the testnets have a corresponding `/blockchain-api` and `/notification-service` set up.
+
+## Testing
+
+To execute the suite of tests, run `yarn test`
+
+## Snapshot testing
 
 We use Jest [snapshot testing][jest] to assert that no intentional changes to the
 component tree have been made without explicit developer intention. See an
-example at [`src/send/SendAmount.test.tsx`]. If your snapshot is
-expected to deviate, you can update the snapshot with the `--updateSnapshot`
+example at [`src/send/SendAmount.test.tsx`]. If your snapshot is expected
+to deviate, you can update the snapshot with the `-u` or `--updateSnapshot`
 flag when running the test.
 
-## React Component Unit Testing
+### React Component Unit Testing
 
-We use [react-native-testing-library][react-native-testing-library] to unit test react components. It allows for deep rendering
-and interaction with the rendered tree to assert proper reactions to user
-interaction and input. See an example at
+We use [react-native-testing-library][react-native-testing-library] to unit test
+react components. It allows for deep rendering and interaction with the rendered
+tree to assert proper reactions to user interaction and input. See an example at
 [`src/send/SendAmount.test.tsx`] or read more about the [docs][rntl-docs]
 
-## E2E testing
+## Saga testing
+
+We use [redux-saga-test-plan][redux-saga-test-plan] to test complex sagas.
+See [`src/identity/verification.test.ts`] for an example.
+
+### E2E testing
 
 We use [Detox][detox] for E2E testing. In order to run the tests locally, you
 must have the proper emulator set up. Emulator installation instructions are in
@@ -151,6 +169,7 @@ $ adb kill-server && adb start-server
 * daemon started successfully
 ```
 
+[celo platform]: https://celo.org
 [`src/components/bottombutton.test.tsx`]: ./src/components/BottomButton.test.tsx
 [detox]: https://github.com/wix/Detox
 [e2e readme]: ./e2e/README.md
@@ -168,3 +187,4 @@ $ adb kill-server && adb start-server
 [react-native-testing-library]: https://github.com/callstack/react-native-testing-library
 [rntl-docs]: https://callstack.github.io/react-native-testing-library/
 [jest]: https://jestjs.io/docs/en/snapshot-testing
+[redux-saga-test-plan]: https://github.com/jfairbank/redux-saga-test-plan

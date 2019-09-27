@@ -54,6 +54,7 @@ export async function processRequest(snap: DataSnapshot, pool: AccountPool, conf
     const success = await pool.doWithAccount(requestHandler)
     await snap.ref.update({ status: success ? RequestStatus.Done : RequestStatus.Failed })
   } catch (err) {
+    console.error(`req(${snap.key}): ERROR proccessRequest`, err)
     await snap.ref.update({ status: RequestStatus.Failed })
     throw err
   }
@@ -65,7 +66,8 @@ function buildHandleFaucet(request: RequestRecord, snap: DataSnapshot, config: N
       new Web3(config.nodeUrl),
       account.pk,
       config.stableTokenAddress,
-      config.escrowAddress
+      config.escrowAddress,
+      config.goldTokenAddress
     )
     const goldTx = await celo.transferGold(request.beneficiary, config.faucetGoldAmount)
     const goldTxHash = await goldTx.getHash()
@@ -93,7 +95,8 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
       new Web3(config.nodeUrl),
       account.pk,
       config.stableTokenAddress,
-      config.escrowAddress
+      config.escrowAddress,
+      config.goldTokenAddress
     )
     const { address: tempAddress, inviteCode } = generateInviteCode()
     const goldTx = await celo.transferGold(tempAddress, config.inviteGoldAmount)

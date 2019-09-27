@@ -37,42 +37,19 @@ export class Countries {
     this.assignCountries()
   }
 
-  private assignCountries() {
-    // add other languages to country data
-    this.localizedCountries = countryData.callingCountries.all.map(
-      (country: countryData.Country) => {
-        // this is assuming these two are the only cases, in i18n.ts seems like there
-        // are fallback languages 'es-US' and 'es-LA' that are not covered
-        const names: CountryNames = {
-          'en-us': country.name,
-          'es-ar': esData[country.alpha2],
-        }
-
-        const localizedCountry = {
-          names,
-          displayName: names[this.language],
-          ...country,
-        }
-
-        // use ISO 3166-1 alpha2 code as country id
-        this.countryMap.set(country.alpha2.toUpperCase(), localizedCountry)
-
-        return localizedCountry
-      }
-    )
-  }
-
   getCountry(countryName?: string | null): LocalizedCountry {
     if (!countryName) {
       return EMPTY_COUNTRY
     }
+
+    countryName = countryName.toLowerCase().trim()
 
     // also ignoring EU and FX here, only two missing
     const country = this.localizedCountries.find(
       (c: LocalizedCountry) =>
         c.names !== undefined &&
         c.names[this.language] !== undefined &&
-        c.names[this.language].toLowerCase() === countryName.toLowerCase()
+        c.names[this.language].toLowerCase() === countryName
     )
 
     return country || EMPTY_COUNTRY
@@ -97,7 +74,7 @@ export class Countries {
   }
 
   getFilteredCountries(query: string): string[] {
-    query = query.toLowerCase()
+    query = query.toLowerCase().trim()
     // Return empty list if the query is empty or matches a country exactly
     // This is necessary to hide the autocomplete window on country select
     if (!query || !query.length) {
@@ -108,7 +85,7 @@ export class Countries {
 
     const exactMatch = this.localizedCountries.find(
       (c: LocalizedCountry) =>
-        c.names && c.names[lng] !== undefined && c.names[lng].toLowerCase() === query.toLowerCase()
+        c.names && c.names[lng] !== undefined && c.names[lng].toLowerCase() === query
     )
 
     // since we no longer have the country name as the map key, we have to
@@ -128,5 +105,30 @@ export class Countries {
             c.countryCallingCodes[0].startsWith('+' + query))
       )
       .map((c: LocalizedCountry) => c.alpha2)
+  }
+
+  private assignCountries() {
+    // add other languages to country data
+    this.localizedCountries = countryData.callingCountries.all.map(
+      (country: countryData.Country) => {
+        // this is assuming these two are the only cases, in i18n.ts seems like there
+        // are fallback languages 'es-US' and 'es-LA' that are not covered
+        const names: CountryNames = {
+          'en-us': country.name,
+          'es-419': esData[country.alpha2],
+        }
+
+        const localizedCountry = {
+          names,
+          displayName: names[this.language],
+          ...country,
+        }
+
+        // use ISO 3166-1 alpha2 code as country id
+        this.countryMap.set(country.alpha2.toUpperCase(), localizedCountry)
+
+        return localizedCountry
+      }
+    )
   }
 }

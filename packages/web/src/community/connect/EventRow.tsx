@@ -4,10 +4,10 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN } from 'src/shared/Button.3'
 import OvalCoin from 'src/shared/OvalCoin'
-import { printDuration } from 'src/shared/PlaceDate'
+import { parseDate, printDuration } from 'src/shared/PlaceDate'
 import { colors, fonts, standardStyles } from 'src/styles'
 
-import { EventProps } from 'src/community/EventHelpers'
+import { EventProps } from 'fullstack/EventProps'
 import Chevron from 'src/icons/chevron'
 
 interface Section {
@@ -42,8 +42,6 @@ class EventRow extends React.PureComponent<Props> {
       screen,
       recap,
     } = this.props
-    const beginDate = new Date(startDate)
-    const stopDate = endDate ? new Date(endDate) : null
 
     const isMobile = screen === ScreenSizes.MOBILE
     const isHighlightEvent = section === 'Highlight Event'
@@ -84,7 +82,7 @@ class EventRow extends React.PureComponent<Props> {
         </View>
         <View style={!isMobile && styles.row}>
           <Text style={fonts.p}>
-            {location} — {printDuration(beginDate, stopDate)}
+            {location} — {printDuration(parseDate(startDate), parseDate(endDate))}
           </Text>
           <EventLink
             link={link}
@@ -109,7 +107,7 @@ interface EventLinkProps {
 class EventLink extends React.PureComponent<EventLinkProps> {
   render() {
     const { link, recap, isPastEvent, t, isMobile } = this.props
-    if (!isPastEvent && !isMobile) {
+    if (link && !isPastEvent && !isMobile) {
       return <Button text={t('events.eventPage')} kind={BTN.NAKED} href={link} target="_external" />
     }
     if (recap && recap.length) {

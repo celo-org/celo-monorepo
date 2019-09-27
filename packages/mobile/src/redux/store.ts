@@ -10,9 +10,9 @@ import { rootSaga } from 'src/redux/sagas'
 
 const persistConfig: any = {
   key: 'root',
-  version: 0, // default is -1, increment as we make migrations
+  version: 2, // default is -1, increment as we make migrations
   storage,
-  blacklist: ['home', 'geth', 'exchange', 'networkInfo', 'alert'],
+  blacklist: ['home', 'geth', 'exchange', 'networkInfo', 'alert', 'fees', 'recipients'],
   stateReconciler: autoMergeLevel2,
   migrate: createMigrate(migrations, { debug: true }),
 }

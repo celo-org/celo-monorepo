@@ -11,6 +11,7 @@ export enum PaymentRequestStatuses {
   DECLINED = 'DECLINED',
 }
 
+// TODO(Rossy) Find a better home for this
 export interface PaymentRequest {
   uid?: string
   amount: string

@@ -1,24 +1,8 @@
 {
-  "compileOnSave": false,
+  "extends": "../typescript/tsconfig.library.json",
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "baseUrl": ".",
-    "composite": true,
-    "declaration": true,
-    "esModuleInterop": true,
-    "jsx": "preserve",
-    "lib": ["dom", "es2015", "es2016"],
-    "moduleResolution": "node",
-    "noImplicitAny": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "outDir": "lib",
-    "removeComments": false,
-    "resolveJsonModule": true,
-    "sourceMap": false,
-    "skipLibCheck": true,
-    "strict": true,
-    "target": "es5"
+    "rootDir": "src",
+    "outDir": "lib"
   },
-  "exclude": ["node_modules", "lib"]
+  "include": ["src"]
 }

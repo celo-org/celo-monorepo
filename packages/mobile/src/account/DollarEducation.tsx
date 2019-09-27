@@ -5,8 +5,8 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { sendBetweenPhones, sendFee, stabilityScale } from 'src/images/Images'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
+import { Stacks } from 'src/navigator/Screens'
 import { setEducationCompleted } from 'src/stableToken/actions'
 
 interface DispatchProps {
@@ -21,14 +21,15 @@ export class DollarEducation extends React.Component<Props> {
   goToSend = () => {
     this.props.setEducationCompleted()
     CeloAnalytics.track(CustomEventNames.send_dollar_nux)
-    navigate(Screens.SendStack)
+    navigate(Stacks.SendStack)
   }
 
-  goToWallet = () => {
+  goToWalletHome = () => {
     this.props.setEducationCompleted()
     CeloAnalytics.track(CustomEventNames.wallet_dollar_nux)
-    navigateBack()
+    navigateHome()
   }
+
   render() {
     const stepInfo = [
       {
@@ -54,8 +55,8 @@ export class DollarEducation extends React.Component<Props> {
       <Education
         stepInfo={stepInfo}
         onFinish={this.goToSend}
-        onFinishAlternate={this.goToWallet}
-        buttonText={'sendCeloDollars'}
+        onFinishAlternate={this.goToWalletHome}
+        buttonText={'global:sendCeloDollars'}
         linkText={'backToWallet'}
       />
     )

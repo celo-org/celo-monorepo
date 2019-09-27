@@ -1,6 +1,7 @@
 import { FellowAppShape } from 'fullstack/Fellowship'
 import * as React from 'react'
 import { StyleSheet, Text } from 'react-native'
+import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
 import {
   ErrorMessage,
   Form,
@@ -13,7 +14,6 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import FormContainer, { emailIsValid, hasField } from 'src/shared/Form'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 export class FellowshipForm extends React.Component<I18nProps & ScreenProps> {
   render() {

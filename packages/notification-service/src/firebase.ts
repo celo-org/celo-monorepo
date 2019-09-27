@@ -1,22 +1,23 @@
+import { CURRENCY_ENUM } from '@celo/utils'
 import * as admin from 'firebase-admin'
 import i18next from 'i18next'
-import {
-  Currencies,
-  NOTIFICATIONS_DISABLED,
-  NOTIFICATIONS_TTL_MS,
-  NotificationTypes,
-} from './config'
+import { Currencies } from './blockscout/transfers'
+import { NOTIFICATIONS_DISABLED, NOTIFICATIONS_TTL_MS, NotificationTypes } from './config'
 
 let database: admin.database.Database
 let registrationsRef: admin.database.Reference
 let lastBlockRef: admin.database.Reference
 let pendingRequestsRef: admin.database.Reference
+let exchangeRatesRef: admin.database.Reference
 
 export interface Registrations {
-  [address: string]: {
-    fcmToken: string
-    language?: string
-  }
+  [address: string]:
+    | {
+        fcmToken: string
+        language?: string
+      }
+    | undefined
+    | null
 }
 
 export enum PaymentRequestStatuses {
@@ -42,9 +43,19 @@ interface PendingRequests {
   [uid: string]: PaymentRequest
 }
 
+interface ExchangeRateObject {
+  makerToken: CURRENCY_ENUM
+  exchangeRate: string
+  timestamp: string
+}
+
 let registrations: Registrations = {}
 let lastBlockNotified: number = -1
 let pendingRequests: PendingRequests = {}
+
+export function _setTestRegistrations(testRegistrations: Registrations) {
+  registrations = testRegistrations
+}
 
 function paymentObjectToNotification(po: PaymentRequest): { [key: string]: string } {
   return {
@@ -65,6 +76,7 @@ export function initializeDb() {
   registrationsRef = database.ref('/registrations')
   lastBlockRef = database.ref('/lastBlockNotified')
   pendingRequestsRef = database.ref('/pendingRequests')
+  exchangeRatesRef = database.ref('/exchangeRates')
 
   // Attach to the registration ref to keep local registrations mapping up to date
   registrationsRef.on(
@@ -103,15 +115,17 @@ export function initializeDb() {
 }
 
 export function getTokenFromAddress(address: string) {
-  if (address in registrations) {
-    return registrations[address].fcmToken
+  const registration = registrations[address]
+  if (registration) {
+    return registration.fcmToken
   } else {
     return null
   }
 }
 
 export function getTranslatorForAddress(address: string) {
-  const language = registrations[address].language
+  const registration = registrations[address]
+  const language = registration && registration.language
   // Language is set and i18next has the proper config
   if (language) {
     console.info(`Language resolved as ${language} for user address ${address}`)
@@ -119,7 +133,7 @@ export function getTranslatorForAddress(address: string) {
   }
   // If language is not supported falls back to env.DEFAULT_LOCALE
   console.info(`Users ${address} language is not set, valid or supported`)
-  return i18next.t
+  return i18next.t.bind(i18next)
 }
 
 export function getLastBlockNotified() {
@@ -132,6 +146,16 @@ export function getPendingRequests() {
 
 export function setPaymentRequestNotified(uid: string): Promise<void> {
   return database.ref(`/pendingRequests/${uid}`).update({ notified: true })
+}
+
+export function writeExchangeRatePair(
+  makerToken: CURRENCY_ENUM,
+  exchangeRate: string,
+  timestamp: string
+) {
+  const exchangeRateRecord: ExchangeRateObject = { makerToken, exchangeRate, timestamp }
+  exchangeRatesRef.push(exchangeRateRecord)
+  console.debug('Recorded exchange rate ', exchangeRateRecord)
 }
 
 export function setLastBlockNotified(newBlock: number): Promise<void> | undefined {

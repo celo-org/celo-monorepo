@@ -1,4 +1,3 @@
-import { getStableTokenContract } from '@celo/contractkit'
 import BigNumber from 'bignumber.js'
 import { Notification } from 'react-native-firebase/notifications'
 import {
@@ -8,12 +7,11 @@ import {
   TransferNotificationData,
 } from 'src/account'
 import { showMessage } from 'src/alert/actions'
-import { ERROR_BANNER_DURATION } from 'src/config'
 import { resolveCurrency } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
-import { lookupPhoneNumberAddress } from 'src/identity/verification'
+import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
+import { getRecipientFromAddress } from 'src/recipients/recipient'
 import { DispatchType, GetStateType } from 'src/redux/reducers'
-import { updateSuggestedFee } from 'src/send/actions'
 import {
   navigateToPaymentTransferReview,
   navigateToRequestedPaymentReview,
@@ -21,7 +19,6 @@ import {
 import { TransactionTypes } from 'src/transactions/reducer'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
-import { getRecipientFromAddress, phoneNumberToRecipient } from 'src/utils/recipient'
 
 const TAG = 'FirebaseNotifications'
 
@@ -32,37 +29,21 @@ const handlePaymentRequested = (
   if (notificationState === NotificationReceiveState.APP_ALREADY_OPEN) {
     return
   }
-  const { e164NumberToAddress } = getState().identity
-  const { recipientCache } = getState().send
-  let requesterAddress = e164NumberToAddress[paymentRequest.requesterE164Number]
-  if (!requesterAddress) {
-    const resolvedAddress = await lookupPhoneNumberAddress(paymentRequest.requesterE164Number)
-    if (!resolvedAddress) {
-      Logger.error(TAG, 'Unable to resolve requester address')
-      return
-    }
-    requesterAddress = resolvedAddress
-  }
-  const recipient = phoneNumberToRecipient(
-    paymentRequest.requesterE164Number,
-    requesterAddress,
-    recipientCache
-  )
 
-  const fee = await dispatch(
-    updateSuggestedFee(true, getStableTokenContract, {
-      recipientAddress: requesterAddress!,
-      amount: paymentRequest.amount,
-      comment: paymentRequest.comment,
-    })
-  )
+  if (!paymentRequest.requesterAddress) {
+    Logger.error(TAG, 'Payment request must specify a requester address')
+    return
+  }
+
+  const { recipientCache } = getState().recipients
+  const targetRecipient = getRecipientFromPaymentRequest(paymentRequest, recipientCache)
 
   navigateToRequestedPaymentReview({
-    recipient,
+    recipient: targetRecipient,
     amount: new BigNumber(paymentRequest.amount),
     reason: paymentRequest.comment,
-    recipientAddress: requesterAddress!,
-    fee,
+    recipientAddress: targetRecipient.address,
+    type: TransactionTypes.PAY_REQUEST,
   })
 }
 
@@ -73,7 +54,7 @@ const handlePaymentReceived = (
   dispatch(refreshAllBalances())
 
   if (notificationState !== NotificationReceiveState.APP_ALREADY_OPEN) {
-    const { recipientCache } = getState().send
+    const { recipientCache } = getState().recipients
     const { addressToE164Number } = getState().identity
     const address = transferNotification.sender.toLowerCase()
 
@@ -81,7 +62,7 @@ const handlePaymentReceived = (
       TransactionTypes.RECEIVED,
       new BigNumber(transferNotification.timestamp).toNumber(),
       {
-        value: new BigNumber(divideByWei(transferNotification.value)),
+        value: divideByWei(transferNotification.value),
         currency: resolveCurrency(transferNotification.currency),
         address: transferNotification.sender.toLowerCase(),
         comment: transferNotification.comment,
@@ -97,7 +78,7 @@ export const handleNotification = (
   notificationState: NotificationReceiveState
 ) => async (dispatch: DispatchType, getState: GetStateType) => {
   if (notificationState === NotificationReceiveState.APP_ALREADY_OPEN) {
-    dispatch(showMessage(notification.title, ERROR_BANNER_DURATION))
+    dispatch(showMessage(notification.title))
   }
   switch (notification.data.type) {
     case NotificationTypes.PAYMENT_REQUESTED:

@@ -6,40 +6,32 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { RNCamera } from 'react-native-camera'
+import { NavigationFocusInjectedProps, withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
-import BackButton from 'src/components/BackButton'
-import { Namespaces } from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
+import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { handleBarcodeDetected } from 'src/send/actions'
-import { checkCameraPermission, requestCameraPermission } from 'src/utils/androidPermissions'
+import { requestCameraPermission } from 'src/utils/androidPermissions'
 import Logger from 'src/utils/Logger'
 
 interface DispatchProps {
   handleBarcodeDetected: typeof handleBarcodeDetected
 }
 
-type Props = DispatchProps & WithNamespaces
+type Props = DispatchProps & WithNamespaces & NavigationFocusInjectedProps
 
 const goToQrCodeScreen = () => {
   navigate(Screens.QRCode)
 }
 
 class QRScanner extends React.Component<Props> {
-  static navigationOptions = {
-    headerTitle: 'Scanner',
-    headerTitleStyle: [
-      fontStyles.headerTitle,
-      {
-        flex: 1,
-        textAlign: 'center',
-      },
-    ],
-    // This helps vertically center the title
-    headerRight: <View />,
-    headerLeft: <BackButton />,
-  }
+  static navigationOptions = () => ({
+    ...headerWithBackButton,
+    headerTitle: i18n.t('sendFlow7:scanCode'),
+  })
 
   camera: RNCamera | null = null
 
@@ -49,10 +41,7 @@ class QRScanner extends React.Component<Props> {
 
   async componentDidMount() {
     const { t } = this.props
-    let cameraPermission = await checkCameraPermission()
-    if (!cameraPermission) {
-      cameraPermission = await requestCameraPermission()
-    }
+    const cameraPermission = await requestCameraPermission()
 
     if (!cameraPermission) {
       Logger.showMessage(t('needCameraPermissionToScan'))
@@ -66,42 +55,43 @@ class QRScanner extends React.Component<Props> {
     const { t } = this.props
     return (
       <View style={styles.container}>
-        {this.state.camera && (
-          <RNCamera
-            ref={(ref) => {
-              this.camera = ref
-            }}
-            // @ts-ignore
-            style={styles.preview}
-            type={RNCamera.Constants.Type.back}
-            onBarCodeRead={this.props.handleBarcodeDetected}
-            barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
-            captureAudio={false}
-          >
-            <View style={styles.view}>
-              <View style={styles.viewFillVertical} />
-              <View style={styles.viewCameraRow}>
-                <View style={styles.viewFillHorizontal} />
-                <View style={styles.viewCameraContainer}>
-                  <View style={styles.camera} />
-                  <Text style={[fontStyles.bodySmall, styles.viewInfoBox]}>
-                    {t('ScanCodeByPlacingItInTheBox')}
-                  </Text>
+        {this.state.camera &&
+          this.props.isFocused && (
+            <RNCamera
+              ref={(ref) => {
+                this.camera = ref
+              }}
+              // @ts-ignore
+              style={styles.preview}
+              type={RNCamera.Constants.Type.back}
+              onBarCodeRead={this.props.handleBarcodeDetected}
+              barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
+              captureAudio={false}
+            >
+              <View style={styles.view}>
+                <View style={styles.viewFillVertical} />
+                <View style={styles.viewCameraRow}>
+                  <View style={styles.viewFillHorizontal} />
+                  <View style={styles.viewCameraContainer}>
+                    <View style={styles.camera} />
+                    <Text style={[fontStyles.bodySmall, styles.viewInfoBox]}>
+                      {t('ScanCodeByPlacingItInTheBox')}
+                    </Text>
+                  </View>
+                  <View style={styles.viewFillHorizontal} />
                 </View>
-                <View style={styles.viewFillHorizontal} />
+                <View style={styles.viewFillVertical} />
               </View>
-              <View style={styles.viewFillVertical} />
-            </View>
-            <View style={styles.footerContainer}>
-              <View style={styles.footerIcon}>
-                <QRCode />
+              <View style={styles.footerContainer}>
+                <View style={styles.footerIcon}>
+                  <QRCode />
+                </View>
+                <TouchableOpacity onPress={goToQrCodeScreen}>
+                  <Text style={styles.footerText}> {t('showYourQRCode')} </Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity onPress={goToQrCodeScreen}>
-                <Text style={styles.footerText}> {t('backToYourQRCode')} </Text>
-              </TouchableOpacity>
-            </View>
-          </RNCamera>
-        )}
+            </RNCamera>
+          )}
       </View>
     )
   }
@@ -110,7 +100,6 @@ class QRScanner extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column',
   },
   preview: {
     flex: 1,
@@ -179,10 +168,12 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect(
-    null,
-    {
-      handleBarcodeDetected,
-    }
-  )(withNamespaces(Namespaces.sendFlow7)(QRScanner))
+  withNavigationFocus(
+    connect(
+      null,
+      {
+        handleBarcodeDetected,
+      }
+    )(withNamespaces(Namespaces.sendFlow7)(QRScanner))
+  )
 )

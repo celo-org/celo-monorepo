@@ -40,11 +40,11 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           </H1>
 
           <H4 style={[textStyles.center, textStyles.invert, standardStyles.elementalMarginBottom]}>
-            <Fade delay={DELAY} duration={DURATION}>
+            <Fade ssrReveal={true} delay={DELAY} duration={DURATION}>
               {t('buildCoverSubtitle')}
             </Fade>
           </H4>
-          <Fade delay={DELAY} duration={DURATION}>
+          <Fade ssrReveal={true} delay={DELAY} duration={DURATION}>
             <View style={styles.buttons}>
               <View style={[standardStyles.elementalMargin, styles.button]}>
                 <Button
@@ -68,7 +68,7 @@ const CoverComponent = React.memo(function Cover({ t }: I18nProps) {
           </Fade>
         </Cell>
       </GridRow>
-      <Fade delay={DELAY_2} duration={DURATION} bottom={true} distance={'40px'}>
+      <Fade ssrReveal={true} delay={DELAY_2} duration={DURATION} bottom={true} distance={'40px'}>
         <View>
           <CoverActions />
         </View>

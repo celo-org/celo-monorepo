@@ -1,11 +1,10 @@
-import { TransactionsArgv } from '@celo/celotool/src/cmds/transactions'
 import {
   constructFunctionABICache,
   FunctionABICache,
   getContracts,
   parseFunctionCall,
   parseLog,
-} from '@celo/contractkit'
+} from '@celo/walletkit'
 import moment from 'moment'
 import fetch from 'node-fetch'
 import { CONTRACTS_TO_COPY, copyContractArtifacts, downloadArtifacts } from 'src/lib/artifacts'
@@ -14,6 +13,7 @@ import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { getBlockscoutUrl } from 'src/lib/endpoints'
 import Web3 from 'web3'
 import * as yargs from 'yargs'
+import { TransactionsArgv } from '../transactions'
 
 export const command = 'list <address>'
 
