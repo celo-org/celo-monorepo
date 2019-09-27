@@ -42,6 +42,22 @@ const NameClaimType = t.type({
   name: t.string,
 })
 
+export const ClaimType = t.union([AttestationServiceURLClaimType, DnsClaimType, NameClaimType])
+export const SignedClaimType = t.type({
+  payload: ClaimType,
+  signature: SignatureType,
+})
+
+export const IdentityMetadataType = t.type({
+  claims: t.array(SignedClaimType),
+})
+
+export type Claim = t.TypeOf<typeof ClaimType>
+export type SignedClaim = t.TypeOf<typeof SignedClaimType>
+export type AttestationServiceURLClaim = t.TypeOf<typeof AttestationServiceURLClaimType>
+export type NameClaim = t.TypeOf<typeof NameClaimType>
+export type IdentityMetadata = t.TypeOf<typeof IdentityMetadataType>
+
 export class ValidationError extends Error {}
 // tslint:disable-next-line: max-classes-per-file
 export class ClaimNotFoundError extends Error {}
@@ -84,19 +100,3 @@ const deserializePayloads = (data: any) => {
     }
   }, (reason: any) => new ValidationError(reason.toString()))
 }
-
-export const ClaimType = t.union([AttestationServiceURLClaimType, DnsClaimType, NameClaimType])
-export const SignedClaimType = t.type({
-  payload: ClaimType,
-  signature: SignatureType,
-})
-
-export const IdentityMetadataType = t.type({
-  claims: t.array(SignedClaimType),
-})
-
-export type Claim = t.TypeOf<typeof ClaimType>
-export type SignedClaim = t.TypeOf<typeof SignedClaimType>
-export type AttestationServiceURLClaim = t.TypeOf<typeof AttestationServiceURLClaimType>
-export type NameClaim = t.TypeOf<typeof NameClaimType>
-export type IdentityMetadata = t.TypeOf<typeof IdentityMetadataType>
