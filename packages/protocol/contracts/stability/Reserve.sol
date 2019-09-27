@@ -54,14 +54,14 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    tobinTaxStalenessThreshold = _tobinTaxStalenessThreshold;
+    setTobinTaxStalenessThreshold(_tobinTaxStalenessThreshold);
   }
 
   /**
    * @notice Sets the number of seconds to cache the tobin tax value for.
    * @param value The number of seconds to cache the tobin tax value for.
    */
-  function setTobinTaxStalenessThreshold(uint256 value) external onlyOwner {
+  function setTobinTaxStalenessThreshold(uint256 value) public onlyOwner {
     require(value > 0, "value was zero");
     tobinTaxStalenessThreshold = value;
     emit TobinTaxStalenessThresholdSet(value);

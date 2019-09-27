@@ -135,12 +135,10 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
     symbol_ = _symbol;
     decimals_ = _decimals;
 
-    inflationState.rate = FixidityLib.wrap(inflationRate);
+    _setInflationParameters(inflationRate, inflationFactorUpdatePeriod);
     inflationState.factor = FixidityLib.fixed1();
-    inflationState.updatePeriod = inflationFactorUpdatePeriod;
     // solhint-disable-next-line not-rely-on-time
     inflationState.factorLastUpdated = now;
-
     setRegistry(registryAddress);
   }
 
@@ -152,6 +150,30 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
   function setMinter(address _minter) external onlyOwner {
     minter = _minter;
     emit MinterSet(minter);
+  }
+
+/**
+   * @notice Updates Inflation Parameters.
+   * @param rate new rate.
+   * @param updatePeriod how often inflationFactor is updated.
+   */
+  function _setInflationParameters(
+    uint256 rate,
+    uint256 updatePeriod
+  )
+    internal
+    onlyOwner
+  {
+    require(rate != 0, "Must provide a non-zero inflation rate.");
+    inflationState.rate = FixidityLib.wrap(rate);
+    inflationState.updatePeriod = updatePeriod;  
+    
+    emit InflationParametersUpdated(
+      rate,
+      updatePeriod,
+      // solhint-disable-next-line not-rely-on-time
+      now
+    );
   }
 
   /**
@@ -167,16 +189,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
     onlyOwner
     updateInflationFactor
   {
-    require(rate != 0, "Must provide a non-zero inflation rate.");
-    inflationState.rate = FixidityLib.wrap(rate);
-    inflationState.updatePeriod = updatePeriod;
-
-    emit InflationParametersUpdated(
-      rate,
-      updatePeriod,
-      // solhint-disable-next-line not-rely-on-time
-      now
-    );
+    _setInflationParameters(rate, updatePeriod);
   }
 
   /**

@@ -114,7 +114,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   function initialize(address registryAddress, uint256 _maxNoticePeriod) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    maxNoticePeriod = _maxNoticePeriod;
+    setMaxNoticePeriod(_maxNoticePeriod);
   }
 
   /**
@@ -154,7 +154,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @notice Sets the maximum notice period for an account.
    * @param _maxNoticePeriod The new maximum notice period.
    */
-  function setMaxNoticePeriod(uint256 _maxNoticePeriod) external onlyOwner {
+  function setMaxNoticePeriod(uint256 _maxNoticePeriod) public onlyOwner {
     maxNoticePeriod = _maxNoticePeriod;
     emit MaxNoticePeriodSet(maxNoticePeriod);
   }

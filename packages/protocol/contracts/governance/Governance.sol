@@ -246,14 +246,14 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     );
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    approver = _approver;
-    concurrentProposals = _concurrentProposals;
-    minDeposit = _minDeposit;
-    queueExpiry = _queueExpiry;
-    dequeueFrequency = _dequeueFrequency;
-    stageDurations.approval = approvalStageDuration;
-    stageDurations.referendum = referendumStageDuration;
-    stageDurations.execution = executionStageDuration;
+    setApprover(_approver);
+    setConcurrentProposals(_concurrentProposals);
+    setMinDeposit(_minDeposit);
+    setQueueExpiry(_queueExpiry);
+    setDequeueFrequency(_dequeueFrequency);
+    setApprovalStageDuration(approvalStageDuration);
+    setReferendumStageDuration(referendumStageDuration);
+    setExecutionStageDuration(executionStageDuration);
     setParticipationBaseline(participationBaseline);
     setParticipationFloor(participationFloor);
     setBaselineUpdateFactor(baselineUpdateFactor);
@@ -266,7 +266,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @notice Updates the address that has permission to approve proposals in the approval stage.
    * @param _approver The address that has permission to approve proposals in the approval stage.
    */
-  function setApprover(address _approver) external onlyOwner {
+  function setApprover(address _approver) public onlyOwner {
     require(_approver != address(0) && _approver != approver);
     approver = _approver;
     emit ApproverSet(_approver);
@@ -276,7 +276,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @notice Updates the number of proposals to dequeue at a time.
    * @param _concurrentProposals The number of proposals to dequeue at at a time.
    */
-  function setConcurrentProposals(uint256 _concurrentProposals) external onlyOwner {
+  function setConcurrentProposals(uint256 _concurrentProposals) public onlyOwner {
     require(_concurrentProposals > 0 && _concurrentProposals != concurrentProposals);
     concurrentProposals = _concurrentProposals;
     emit ConcurrentProposalsSet(_concurrentProposals);
@@ -286,7 +286,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @notice Updates the minimum deposit needed to make a proposal.
    * @param _minDeposit The minimum Celo Gold deposit needed to make a proposal.
    */
-  function setMinDeposit(uint256 _minDeposit) external onlyOwner {
+  function setMinDeposit(uint256 _minDeposit) public onlyOwner {
     require(_minDeposit != minDeposit);
     minDeposit = _minDeposit;
     emit MinDepositSet(_minDeposit);
@@ -296,7 +296,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @notice Updates the number of seconds before a queued proposal expires.
    * @param _queueExpiry The number of seconds a proposal can stay in the queue before expiring.
    */
-  function setQueueExpiry(uint256 _queueExpiry) external onlyOwner {
+  function setQueueExpiry(uint256 _queueExpiry) public onlyOwner {
     require(_queueExpiry > 0 && _queueExpiry != queueExpiry);
     queueExpiry = _queueExpiry;
     emit QueueExpirySet(_queueExpiry);
@@ -308,7 +308,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @param _dequeueFrequency The number of seconds before the next batch of proposals can be
    *   dequeued.
    */
-  function setDequeueFrequency(uint256 _dequeueFrequency) external onlyOwner {
+  function setDequeueFrequency(uint256 _dequeueFrequency) public onlyOwner {
     require(_dequeueFrequency > 0 && _dequeueFrequency != dequeueFrequency);
     dequeueFrequency = _dequeueFrequency;
     emit DequeueFrequencySet(_dequeueFrequency);
@@ -318,7 +318,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @notice Updates the number of seconds proposals stay in the approval stage.
    * @param approvalStageDuration The number of seconds proposals stay in the approval stage.
    */
-  function setApprovalStageDuration(uint256 approvalStageDuration) external onlyOwner {
+  function setApprovalStageDuration(uint256 approvalStageDuration) public onlyOwner {
     require(approvalStageDuration > 0 && approvalStageDuration != stageDurations.approval);
     stageDurations.approval = approvalStageDuration;
     emit ApprovalStageDurationSet(approvalStageDuration);
@@ -328,7 +328,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @notice Updates the number of seconds proposals stay in the referendum stage.
    * @param referendumStageDuration The number of seconds proposals stay in the referendum stage.
    */
-  function setReferendumStageDuration(uint256 referendumStageDuration) external onlyOwner {
+  function setReferendumStageDuration(uint256 referendumStageDuration) public onlyOwner {
     require(referendumStageDuration > 0 && referendumStageDuration != stageDurations.referendum);
     stageDurations.referendum = referendumStageDuration;
     emit ReferendumStageDurationSet(referendumStageDuration);
@@ -338,7 +338,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @notice Updates the number of seconds proposals stay in the execution stage.
    * @param executionStageDuration The number of seconds proposals stay in the execution stage.
    */
-  function setExecutionStageDuration(uint256 executionStageDuration) external onlyOwner {
+  function setExecutionStageDuration(uint256 executionStageDuration) public onlyOwner {
     require(executionStageDuration > 0 && executionStageDuration != stageDurations.execution);
     stageDurations.execution = executionStageDuration;
     emit ExecutionStageDurationSet(executionStageDuration);
