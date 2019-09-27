@@ -28,3 +28,9 @@ types/contracts/*
 
 .0x-artifacts/*
 coverage/*
+
+archive/*
+.certora_config/*
+.certora_build.json
+certora_verify.json
+emv-*/*
