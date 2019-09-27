@@ -572,6 +572,10 @@ workflows:
           requires:
             - lint-checks
             - walletkit-test
+      - end-to-end-geth-exit-test:
+          requires:
+            - lint-checks
+            - walletkit-test
       - end-to-end-geth-governance-test:
           requires:
             - lint-checks
