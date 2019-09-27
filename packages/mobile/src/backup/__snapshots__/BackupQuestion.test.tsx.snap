@@ -20,6 +20,12 @@ exports[`renders correctly on 1st question 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -28,7 +34,6 @@ exports[`renders correctly on 1st question 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "opacity": 1,
           "paddingHorizontal": 20,
           "paddingVertical": 10,
         }
@@ -559,6 +564,12 @@ exports[`renders correctly on 1st question 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -566,15 +577,22 @@ exports[`renders correctly on 1st question 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#A3EBC6",
-          "borderWidth": 0,
-          "flex": 1,
-          "height": 50,
-          "justifyContent": "center",
-          "opacity": 1,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#A3EBC6",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
       }
     >
       <View
@@ -693,6 +711,12 @@ exports[`renders correctly on 2nd word 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -701,7 +725,6 @@ exports[`renders correctly on 2nd word 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "opacity": 1,
           "paddingHorizontal": 20,
           "paddingVertical": 10,
         }
@@ -1232,6 +1255,12 @@ exports[`renders correctly on 2nd word 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -1239,15 +1268,22 @@ exports[`renders correctly on 2nd word 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#A3EBC6",
-          "borderWidth": 0,
-          "flex": 1,
-          "height": 50,
-          "justifyContent": "center",
-          "opacity": 1,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#A3EBC6",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
       }
     >
       <View
@@ -1366,6 +1402,12 @@ exports[`renders correctly on 3rd word 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -1374,7 +1416,6 @@ exports[`renders correctly on 3rd word 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "opacity": 1,
           "paddingHorizontal": 20,
           "paddingVertical": 10,
         }
@@ -1905,6 +1946,12 @@ exports[`renders correctly on 3rd word 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -1912,15 +1959,22 @@ exports[`renders correctly on 3rd word 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#A3EBC6",
-          "borderWidth": 0,
-          "flex": 1,
-          "height": 50,
-          "justifyContent": "center",
-          "opacity": 1,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#A3EBC6",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
       }
     >
       <View
@@ -2039,6 +2093,12 @@ exports[`renders correctly on 3rd word 2`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -2047,7 +2107,6 @@ exports[`renders correctly on 3rd word 2`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "opacity": 1,
           "paddingHorizontal": 20,
           "paddingVertical": 10,
         }
@@ -2578,6 +2637,12 @@ exports[`renders correctly on 3rd word 2`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -2585,15 +2650,22 @@ exports[`renders correctly on 3rd word 2`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#A3EBC6",
-          "borderWidth": 0,
-          "flex": 1,
-          "height": 50,
-          "justifyContent": "center",
-          "opacity": 1,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#A3EBC6",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
       }
     >
       <View
@@ -2712,6 +2784,12 @@ exports[`renders correctly on 3rd word 3`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -2720,7 +2798,6 @@ exports[`renders correctly on 3rd word 3`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "opacity": 1,
           "paddingHorizontal": 20,
           "paddingVertical": 10,
         }
@@ -3251,6 +3328,12 @@ exports[`renders correctly on 3rd word 3`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -3258,15 +3341,22 @@ exports[`renders correctly on 3rd word 3`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#A3EBC6",
-          "borderWidth": 0,
-          "flex": 1,
-          "height": 50,
-          "justifyContent": "center",
-          "opacity": 1,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#A3EBC6",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
       }
     >
       <View
