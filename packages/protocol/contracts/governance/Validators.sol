@@ -310,8 +310,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param identifier An identifier for this validator.
    * @param name A name for the validator.
    * @param url A URL for the validator.
-   * @param noticePeriod The notice period of the Locked Gold commitment that meets the
-   *   requirements for validator registration.
+   * @param noticePeriods The notice periods of the Locked Gold commitments that
+   *   cumulatively meet the requirements for validator registration.
    * @param publicKeysData Comprised of three tightly-packed elements:
    *    - publicKey - The public key that the validator is using for consensus, should match
    *      msg.sender. 64 bytes.
@@ -327,7 +327,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     string calldata name,
     string calldata url,
     bytes calldata publicKeysData,
-    uint256 noticePeriod
+    uint256[] calldata noticePeriods
   )
     external
     nonReentrant
@@ -340,12 +340,12 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       // secp256k1 public key + BLS public key + BLS proof of possession
       publicKeysData.length == (64 + 48 + 96)
     );
-    bytes memory proofOfPossessionBytes = publicKeysData.slice(64, 48 + 96);
-    require(checkProofOfPossession(proofOfPossessionBytes));
+    // Use the proof of possession bytes
+    require(checkProofOfPossession(publicKeysData.slice(64, 48 + 96)));
 
     address account = getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
-    require(meetsRegistrationRequirements(account, noticePeriod));
+    require(meetsRegistrationRequirements(account, noticePeriods));
 
     Validator memory validator = Validator(identifier, name, url, publicKeysData, address(0));
     validators[account] = validator;
@@ -421,8 +421,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param identifier A identifier for this validator group.
    * @param name A name for the validator group.
    * @param url A URL for the validator group.
-   * @param noticePeriod The notice period of the Locked Gold commitment that meets the
-   *   requirements for validator registration.
+   * @param noticePeriods The notice periods of the Locked Gold commitments that
+   *   cumulatively meet the requirements for validator registration.
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient weight.
@@ -431,7 +431,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     string calldata identifier,
     string calldata name,
     string calldata url,
-    uint256 noticePeriod
+    uint256[] calldata noticePeriods
   )
     external
     nonReentrant
@@ -440,7 +440,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(bytes(identifier).length > 0 && bytes(name).length > 0 && bytes(url).length > 0);
     address account = getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
-    require(meetsRegistrationRequirements(account, noticePeriod));
+    require(meetsRegistrationRequirements(account, noticePeriods));
     ValidatorGroup storage group = groups[account];
     group.identifier = identifier;
     group.name = name;
@@ -851,23 +851,28 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   /**
    * @notice Returns whether an account meets the requirements to register a validator or group.
    * @param account The account.
-   * @param noticePeriod The notice period of the Locked Gold commitment that meets the
-   *   requirements.
+   * @param noticePeriods An array of notice periods of the Locked Gold commitments
+   *   that cumulatively meet the requirements for validator registration.
    * @return Whether an account meets the requirements to register a validator or group.
    */
   function meetsRegistrationRequirements(
     address account,
-    uint256 noticePeriod
+    uint256[] memory noticePeriods
   )
     public
     view
     returns (bool)
   {
-    uint256 value = getLockedCommitmentValue(account, noticePeriod);
-    return (
-      value >= registrationRequirement.value &&
-      noticePeriod >= registrationRequirement.noticePeriod
-    );
+    uint256 lockedValueSum = 0;
+    for (uint256 i = 0; i < noticePeriods.length; i = i.add(1)) {
+      if (noticePeriods[i] >= registrationRequirement.noticePeriod) {
+        lockedValueSum = lockedValueSum.add(getLockedCommitmentValue(account, noticePeriods[i]));
+        if (lockedValueSum >= registrationRequirement.value) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**
