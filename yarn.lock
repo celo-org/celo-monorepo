@@ -2260,11 +2260,12 @@
     web3 "1.0.0-beta.37"
     web3-utils "1.0.0-beta.37"
 
-"@celo/contractkit@0.1.3":
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.1.3.tgz#d5bd6f1fec10dcc4bbc8f4adcbcca89ee73911c1"
-  integrity sha512-dNpkvLwpTB69eAmHy/x9H8xhrv3twLy7bdv1PefYuJPJ0BE8DrUkbFLnC4+TwrvxOpv1v2uRVG14SaTJjzKdjg==
+"@celo/contractkit@0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.1.5.tgz#097052ac8f672f03480a1226f11f0c398c35c75e"
+  integrity sha512-vW8/ZluqJXx4SOB64XyFZjR3Z6qzcCUjXk6ec5613NH8DC/7jzxPCnbPsnxL4R+zuEajDWKfjjeH94Y1uLgVGA==
   dependencies:
+    "@0x/subproviders" "^5.0.0"
     "@celo/utils" "0.1.0"
     "@types/debug" "^4.1.5"
     bignumber.js "^7.2.0"
