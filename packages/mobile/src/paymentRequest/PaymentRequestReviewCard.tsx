@@ -128,7 +128,7 @@ const style = StyleSheet.create({
     ...fontStyles.light,
     fontSize: 14,
     lineHeight: 20,
-    color: '#BDBDBD',
+    color: colors.lightGray,
     marginBottom: 3,
   },
 })

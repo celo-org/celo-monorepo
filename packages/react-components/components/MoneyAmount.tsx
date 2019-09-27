@@ -54,7 +54,7 @@ const style = StyleSheet.create({
     ...fontStyles.regular,
     fontSize: 16,
     lineHeight: 64,
-    color: '#BDBDBD',
+    color: colors.lightGray,
     marginLeft: 7,
     alignSelf: 'flex-end',
   },
