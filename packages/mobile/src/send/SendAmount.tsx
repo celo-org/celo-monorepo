@@ -32,7 +32,10 @@ import i18n, { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/contactMapping'
 import { E164NumberToAddressType } from 'src/identity/reducer'
-import { convertLocalAmountToDollars } from 'src/localCurrency/convert'
+import {
+  convertDollarsToMaxSupportedPrecision,
+  convertLocalAmountToDollars,
+} from 'src/localCurrency/convert'
 import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
@@ -163,15 +166,17 @@ export class SendAmount extends React.Component<Props, State> {
   getDollarsAmount = () => {
     const parsedInputAmount = parseInputAmount(this.state.amount)
 
+    let dollarsAmount
     if (LOCAL_CURRENCY_SYMBOL) {
       const { localCurrencyExchangeRate } = this.props
-      return (
+      dollarsAmount =
         convertLocalAmountToDollars(parsedInputAmount, localCurrencyExchangeRate) ||
         new BigNumber('')
-      )
     } else {
-      return parsedInputAmount
+      dollarsAmount = parsedInputAmount
     }
+
+    return convertDollarsToMaxSupportedPrecision(dollarsAmount)
   }
 
   getNewAccountBalance = () => {
@@ -199,14 +204,14 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   getConfirmationInput = (type: TransactionTypes) => {
-    const dollarsAmount = this.getDollarsAmount()
+    const amount = this.getDollarsAmount()
     const recipient = this.getRecipient()
     // TODO (Rossy) Remove address field from some recipient types.
     const recipientAddress = getAddressFromRecipient(recipient, this.props.e164NumberToAddress)
 
     const confirmationInput: ConfirmationInput = {
       recipient,
-      amount: new BigNumber(dollarsAmount.toPrecision(18, BigNumber.ROUND_UP)),
+      amount,
       reason: this.state.reason,
       recipientAddress,
       type,
