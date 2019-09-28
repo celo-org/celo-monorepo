@@ -73,7 +73,7 @@ module.exports = async (callback: (error?: any) => number) => {
     await sendEscrowedPayment(stableToken, escrow, argv.phone, stableTokenAmount, paymentID)
 
     const twilioClient = twilio(twilioConfig.sid, twilioConfig.authToken)
-    const messageText = `Hi Lorem Ipsum! I would like to invite you to join the Celo payments network. Your invite code is: ${inviteCode}`
+    const messageText = `Hi! I would like to invite you to join the Celo payments network. Your invite code is: ${inviteCode}`
     await twilioClient.messages.create({
       body: messageText,
       from: twilioConfig.phoneNumber,
