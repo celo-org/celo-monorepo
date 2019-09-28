@@ -16,7 +16,7 @@ Then, to deploy contracts to a network run:
 yarn run init-network -n NETWORK
 ```
 
-This will deploy the contracts to the network specified in `truffle.js` and save the artifacts to `build/NETWORK`.
+This will deploy the contracts to the network specified in `truffle-config.js` and save the artifacts to `build/NETWORK`.
 If your network was deployed with `helm`, you will probably set `NETWORK` the same as your `NAME` (which sets `NAMESPACE_NAME` and `RELEASE_NAME`). For more clarity on these names, also see the [testnet helm chart README](../helm-charts/testnet/README.md)
 
 ### Migrations
