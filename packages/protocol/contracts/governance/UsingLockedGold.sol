@@ -67,11 +67,11 @@ contract UsingLockedGold is UsingRegistry {
   }
 
 	/* new one */
-  function getTotalWeight() public view returns (uint256) {
-    return getBondedDeposits().getTotalWeight();
-  }
+ /* function getTotalWeight() public view returns (uint256) {
+    return getLockedGold().getTotalWeight();
+  }*/
   function getVoterFromAccount(address account) public view returns (address) {
-	return getBondedDeposits().getVoterFromAccount(account);
+	return getLockedGold().getDelegateFromAccountAndRole(account, ILockedGold.DelegateRole.Voting);
   }
 
   /**

@@ -1,6 +1,6 @@
 pragma solidity ^0.5.8;
 
-import "contracts/governance/SortedLinkedList.sol";
+import "contracts/common/linkedlists/SortedLinkedList.sol";
 
 contract SortedListCheck {
 	using SortedLinkedList for SortedLinkedList.List;

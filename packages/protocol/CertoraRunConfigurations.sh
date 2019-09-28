@@ -10,7 +10,7 @@ certoraRun.py specs/harnesses/RegistryHarness.sol specs/harnesses/LockedGoldHarn
 cp certora_verify.json.govern certora_verify.json
 #certoraRun.py contracts/governance/IntegerSortedLinkedList.sol specs/harnesses/GovernanceHarness.sol --solc solc-5.10.exe --link GovernanceHarness:queue=IntegerSortedLinkedList --settings -assumeUnwindCond
 
-certoraRun.py contracts/governance/IntegerSortedLinkedList.sol specs/harnesses/RegistryHarness.sol specs/harnesses/GovernanceHarness.sol --solc solc-5.10.exe --link GovernanceHarness:queue=IntegerSortedLinkedList GovernanceHarness:registry=RegistryHarness  --settings -assumeUnwindCond
+certoraRun.py contracts/common/linkedlists/IntegerSortedLinkedList.sol specs/harnesses/RegistryHarness.sol specs/harnesses/GovernanceHarness.sol --solc solc-5.10.exe --link GovernanceHarness:queue=IntegerSortedLinkedList GovernanceHarness:registry=RegistryHarness  --settings -assumeUnwindCond
 
 # certoraRun.py contracts/governance/IntegerSortedLinkedList.sol specs/harnesses/RegistryHarness.sol specs/harnesses/GovernanceHarness.sol --solc solc-5.10.exe --link GovernanceHarness:queue=IntegerSortedLinkedList GovernanceHarness:registry=RegistryHarness --settings -assumeUnwindCond
 

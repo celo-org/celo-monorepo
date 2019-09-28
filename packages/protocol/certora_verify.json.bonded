@@ -1,7 +1,7 @@
 [
 	{
 		"type":"spec",
-		"primary_contract":"BondedDepositsHarness",
-		"specfile":"specs/bonded_deposits.spec"
+		"primary_contract":"LockedGoldHarness",
+		"specfile":"specs/locked_gold.spec"
 	}
 ]

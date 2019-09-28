@@ -159,7 +159,7 @@ rule approval_only_if_promoted_and_allowed(uint256 p, uint256 index) {
 	
 	bool _isProposalApproved = sinvoke isApproved(_e,p);
 	bool _isDequeued = sinvoke getFromDequeued(_e,index) == p;
-	bool _isExpired = sinvoke isDequeuedProposalExpired(_e,p);
+	bool _isExpired = sinvoke _isDequeuedProposalExpired(_e,p);
 	
 	bool _approver = sinvoke approver(_e);
 	require !_isProposalApproved; // we assume not approved yet
@@ -239,7 +239,7 @@ rule sum_of_votes_cannot_exceed_total_weight(method f, uint256 p) {
 
 // TODO: Can a voting user provide weight to multiple proposals?
 
-rule cant_unvote(uint256 deqIndex, uint256 voteValue) {	
+rule cant_unvote(uint256 deqIndex, uint8 voteValue) {	
 	env e;
 	env eF;
 	
@@ -262,7 +262,7 @@ rule cant_unvote(uint256 deqIndex, uint256 voteValue) {
 	assert voteValue == NONE => (!result && recordValue_ == recordValue) || voteReverted, "Cannot vote for none: function either returns false and did not update the vote, or it reverted"; // not voting none
 }
 
-rule cant_vote_twice_with_delegate(uint256 deqIndex, uint256 voteValue) {	
+rule cant_vote_twice_with_delegate(uint256 deqIndex, uint8 voteValue) {	
 	// If I delegated voting, can I vote? Answer should be no
 	env e;
 	env eF;
@@ -412,7 +412,7 @@ rule no_double_vote_referendum_all_but_vote(method f, address account, uint256 d
 	require recordValue == NONE => (_yes == 0 && _no == 0 && _abstain == 0);
 	
 	//require eF.block.timestamp == eFTime.block.timestamp;
-	//bool isExpired = sinvoke isDequeuedProposalExpired(eFTime,p);
+	//bool isExpired = sinvoke _isDequeuedProposalExpired(eFTime,p);
 	
 	calldataarg arg;
 	require f != vote;

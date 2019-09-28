@@ -235,15 +235,14 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @dev Fails if the current account is already participating in validation.
    * @dev v, r, s constitute `delegate`'s signature on `msg.sender`.
    */
-  function delegateRole(
+  function _delegateRole(
     DelegateRole role,
     address delegate,
     uint8 v,
     bytes32 r,
     bytes32 s
   )
-    external
-    nonReentrant
+    internal // CERTORA: Changed from external to internal and added an external wrapper. This allows the harness to call into this function to implement methods per each delegate role.
   {
     // TODO: split and add error messages for better dev feedback
     require(isAccount(msg.sender) && isNotAccount(delegate) && isNotDelegate(delegate));
@@ -264,6 +263,11 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     account.delegates[uint256(role)] = delegate;
     delegations[delegate] = msg.sender;
     emit RoleDelegated(role, msg.sender, delegate);
+  }
+  
+  // TODO SG: Remove this after updating the spec
+  function delegateRole(DelegateRole role, address delegate, uint8 v, bytes32 r, bytes32 s) external nonReentrant {
+	_delegateRole(role,delegate,v,r,s);
   }
 
   /**

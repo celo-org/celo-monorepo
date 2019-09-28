@@ -720,6 +720,9 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   {
     return proposals[proposalId].unpack();
   }
+  
+  // Certora
+  function _getProposal(uint256 proposalId) internal view returns (Proposals.Proposal storage) { return proposals[proposalId]; }
 
   /**
    * @notice Returns a specified transaction in a proposal.
@@ -945,7 +948,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     Proposals.Proposal storage proposal,
     Proposals.Stage stage
   )
-    private
+    internal /* CERTORA: changed from private. TODO: Think about alternatives? */
     view
     returns (bool)
   {
