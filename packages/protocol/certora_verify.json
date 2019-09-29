@@ -1,17 +1,7 @@
 [
 	{
 		"type":"spec",
-		"primary_contract":"SortedListCheck",
-		"specfile":"specs/list.spec"
-	}
-	{
-		"type":"spec",
-		"primary_contract":"IntegerSortedListCheck",
-		"specfile":"specs/list.spec"
-	}
-	{
-		"type":"spec",
-		"primary_contract":"AddressSortedListCheck",
-		"specfile":"specs/list.spec"
+		"primary_contract":"GovernanceHarness",
+		"specfile":"specs/governance.spec"
 	}
 ]
