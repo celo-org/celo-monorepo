@@ -1,0 +1,119 @@
+import fetch from 'cross-fetch'
+import { isLeft } from 'fp-ts/lib/Either'
+import * as t from 'io-ts'
+import { PathReporter } from 'io-ts/lib/PathReporter'
+
+export enum ClaimTypes {
+  ATTESTATION_SERVICE_URL = 'ATTESTATION_SERVICE_URL',
+  DNS = 'DNS',
+  NAME = 'NAME',
+  PROFILE_PICTURE = 'PROFILE_PICTURE',
+  TWITTER = 'TWITTER',
+}
+
+const UrlType = t.string
+const SignatureType = t.string
+const TimestampType = t.number
+
+const AttestationServiceURLClaimType = t.type({
+  type: t.literal(ClaimTypes.ATTESTATION_SERVICE_URL),
+  timestamp: TimestampType,
+  url: UrlType,
+})
+
+const DnsClaimType = t.type({
+  type: t.literal(ClaimTypes.DNS),
+  timestamp: TimestampType,
+  domain: t.string,
+})
+
+const NameClaimType = t.type({
+  type: t.literal(ClaimTypes.NAME),
+  timestamp: TimestampType,
+  name: t.string,
+})
+
+export const ClaimType = t.union([AttestationServiceURLClaimType, DnsClaimType, NameClaimType])
+export const SignedClaimType = t.type({
+  payload: ClaimType,
+  signature: SignatureType,
+})
+
+export const IdentityMetadataType = t.type({
+  claims: t.array(SignedClaimType),
+})
+
+export type SignedClaim = t.TypeOf<typeof SignedClaimType>
+export type AttestationServiceURLClaim = t.TypeOf<typeof AttestationServiceURLClaimType>
+export type DnsClaim = t.TypeOf<typeof DnsClaimType>
+export type NameClaim = t.TypeOf<typeof NameClaimType>
+export type IdentityMetadata = t.TypeOf<typeof IdentityMetadataType>
+export type Claim = AttestationServiceURLClaim | DnsClaim | NameClaim
+
+type ClaimPayload<K extends ClaimTypes> = K extends typeof ClaimTypes.DNS
+  ? DnsClaim
+  : K extends typeof ClaimTypes.NAME ? NameClaim : AttestationServiceURLClaim
+
+const isOfType = <K extends ClaimTypes>(type: K) => (
+  data: SignedClaim['payload']
+): data is ClaimPayload<K> => data.type === type
+
+export class ValidationError extends Error {}
+export class ClaimNotFoundError extends Error {}
+
+export class IdentityMetadataWrapper {
+  data: IdentityMetadata
+
+  static async fetchFromURL(url: string) {
+    const resp = await fetch(url)
+    if (!resp.ok) {
+      throw new Error(`Request failed with status ${resp.status}`)
+    }
+    return this.fromRawString(await resp.text())
+  }
+
+  static fromRawString(rawData: string) {
+    const data = JSON.parse(rawData)
+    return new IdentityMetadataWrapper({
+      claims: data.claims.map((claim: any) => ({
+        payload: JSON.parse(claim.payload),
+        signature: claim.signature,
+      })),
+    })
+  }
+
+  constructor(data: IdentityMetadata) {
+    const result = IdentityMetadataType.decode(data)
+    if (isLeft(result)) {
+      throw new ValidationError(PathReporter.report(result).join(', '))
+    }
+    this.data = result.right
+  }
+
+  get claims() {
+    return this.data.claims
+  }
+
+  toString() {
+    return JSON.stringify({
+      claims: this.data.claims.map((claim) => ({
+        payload: JSON.stringify(claim.payload),
+        signature: claim.signature,
+      })),
+    })
+  }
+
+  addClaim(claim: Claim) {
+    this.data = { claims: [...this.data.claims, this.signClaim(claim)] }
+  }
+
+  findClaim<K extends ClaimTypes>(type: K): ClaimPayload<K> | undefined {
+    return this.data.claims.map((x) => x.payload).find(isOfType(type))
+  }
+
+  private signClaim = (claim: Claim): SignedClaim => ({
+    payload: claim,
+    // TOOD: Actually sign the claim
+    signature: '',
+  })
+}

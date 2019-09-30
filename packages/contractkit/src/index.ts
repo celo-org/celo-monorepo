@@ -1,7 +1,7 @@
 import Web3 from 'web3'
 
 export { Address, AllContracts, CeloContract, CeloToken, NULL_ADDRESS } from './base'
-export { MetadataManager } from './identity'
+export { IdentityMetadataWrapper } from './identity'
 export * from './kit'
 export { CeloTransactionObject } from './wrappers/BaseWrapper'
 export { Roles } from './wrappers/LockedGold'

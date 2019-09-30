@@ -1,9 +1,9 @@
-import { ClaimTypes } from '@celo/contractkit/lib/identity'
+import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { IArg } from '@oclif/parser/lib/args'
-import { isLeft } from 'fp-ts/lib/Either'
 import moment from 'moment'
 import { BaseCommand } from '../../base'
 import { Args } from '../../utils/command'
+
 export default class GetMetadata extends BaseCommand {
   static description = 'Show information about an address'
 
@@ -26,30 +26,29 @@ export default class GetMetadata extends BaseCommand {
       return
     }
 
-    const metadata = await this.metadataManager.fetchMetadataTE(metadataURL)()
+    try {
+      const metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
 
-    if (isLeft(metadata)) {
+      console.info('Metadata contains the following claims: \n')
+
+      metadata.claims.forEach((claim) => {
+        switch (claim.payload.type) {
+          case ClaimTypes.ATTESTATION_SERVICE_URL:
+            console.info(`Attestation Service Claim`)
+            console.info(`URL: ${claim.payload.url}`)
+            break
+          case ClaimTypes.NAME:
+            console.info(`Name Claim`)
+            console.info(`Name: "${claim.payload.name}"`)
+            break
+          default:
+            break
+        }
+
+        console.info(`(claim created ${moment.unix(claim.payload.timestamp).fromNow()})\n`)
+      })
+    } catch (error) {
       console.error('Metadata could not be retrieved from ', metadataURL)
-      return
     }
-
-    console.info('Metadata contains the following claims: \n')
-
-    metadata.right.claims.forEach((claim) => {
-      switch (claim.payload.type) {
-        case ClaimTypes.ATTESTATION_SERVICE_URL:
-          console.info(`Attestation Service Claim`)
-          console.info(`URL: ${claim.payload.url}`)
-          break
-        case ClaimTypes.NAME:
-          console.info(`Name Claim`)
-          console.info(`Name: "${claim.payload.name}"`)
-          break
-        default:
-          break
-      }
-
-      console.info(`(claim created ${moment.unix(claim.payload.timestamp).fromNow()})\n`)
-    })
   }
 }
