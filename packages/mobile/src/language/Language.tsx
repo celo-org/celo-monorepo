@@ -17,21 +17,11 @@ interface State {
   selectedAnswer: string | null
 }
 
-interface StateProps {
-  pincodeSet: boolean
-}
-
 interface DispatchProps {
   setLanguage: typeof setLanguage
 }
 
-type Props = DispatchProps & NavigationScreenProps & WithNamespaces & StateProps
-
-const mapStateToProps = (state: RootState): StateProps => {
-  return {
-    pincodeSet: state.account.pincodeSet,
-  }
-}
+type Props = DispatchProps & NavigationScreenProps & WithNamespaces
 
 export class Language extends React.Component<Props, State> {
   static navigationOptions = { header: null }
@@ -73,8 +63,8 @@ export class Language extends React.Component<Props, State> {
 }
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
+  connect<any, DispatchProps, {}, RootState>(
+    null,
     { setLanguage }
   )(withNamespaces(Namespaces.accountScreen10)(Language))
 )

@@ -8,7 +8,7 @@ import { AttestationsInstance } from 'types'
  *
  * Expects the following flags:
  * phone: the phone number to revoke in E164 format
- * network: name of the network defined in truffle.js
+ * network: name of the network defined in truffle-config.js
  *
  * Run using truffle exec, e.g.:
  * truffle exec identity/scripts/revoke.js --network testnet --phone +18005882300

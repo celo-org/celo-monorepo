@@ -16,7 +16,7 @@ import {
   StableTokenInstance,
 } from 'types'
 
-const truffle = require('@celo/protocol/truffle.js')
+const truffle = require('@celo/protocol/truffle-config.js')
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 const initializeArgs = async (): Promise<any[]> => {

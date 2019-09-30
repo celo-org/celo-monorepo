@@ -1,8 +1,15 @@
 import express from 'express'
 import * as admin from 'firebase-admin'
-import { ENVIRONMENT, FIREBASE_DB, getFirebaseAdminCreds, PORT, VERSION } from './config'
+import {
+  ENVIRONMENT,
+  FIREBASE_DB,
+  getFirebaseAdminCreds,
+  PORT,
+  VERSION,
+  WEB3_PROVIDER_URL,
+} from './config'
 import { getLastBlockNotified, initializeDb as initializeFirebaseDb } from './firebase'
-import { notificationPolling } from './polling'
+import { exchangePolling, notificationPolling } from './polling'
 
 console.info('Service starting with environment, version:', ENVIRONMENT, VERSION)
 const START_TIME = Date.now()
@@ -58,3 +65,13 @@ initializeFirebaseDb()
  */
 console.info('Starting Blockscout polling')
 notificationPolling.run()
+
+if (!WEB3_PROVIDER_URL) {
+  console.info('No Web3 provider found. Skipping exchange polling.')
+} else {
+  /**
+   * Start polling the Exchange contract
+   */
+  console.info('Starting Exchange contract polling')
+  exchangePolling.run()
+}

@@ -250,7 +250,6 @@ dependencies {
     implementation project(':react-native-flag-secure-android')
     implementation project(':react-native-firebase')
     implementation project(':react-native-confirm-device-credentials')
-    implementation project(':react-native-system-clock')
     implementation project(':react-native-restart-android')
     implementation project(':react-native-sms-retriever')
     implementation project(':react-native-share')

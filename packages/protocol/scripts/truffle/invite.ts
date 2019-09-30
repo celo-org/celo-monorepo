@@ -17,7 +17,7 @@ const twilioConfig = require('@celo/protocol/twilio-config')
  * A simple script to send a payment and invite a user.
  *
  * Expects the following flags:
- * network: name of the network defined in truffle.js to deploy to
+ * network: name of the network defined in truffle-config.js to deploy to
  * stableValue: amount of stable token to transfer
  * goldValue: amount of gold transfer
  * phone: phone number of user to invite
@@ -73,7 +73,7 @@ module.exports = async (callback: (error?: any) => number) => {
     await sendEscrowedPayment(stableToken, escrow, argv.phone, stableTokenAmount, paymentID)
 
     const twilioClient = twilio(twilioConfig.sid, twilioConfig.authToken)
-    const messageText = `Hi Lorem Ipsum! I would like to invite you to join the Celo payments network. Your invite code is: ${inviteCode}`
+    const messageText = `Hi! I would like to invite you to join the Celo payments network. Your invite code is: ${inviteCode}`
     await twilioClient.messages.create({
       body: messageText,
       from: twilioConfig.phoneNumber,

@@ -257,7 +257,7 @@ export class AccountPool {
 
     for (const key of accountKeys) {
       const lockPath = accountsSnap.child(key + '/locked')
-      if (!lockPath.val() && this.trySetLockField(lockPath.ref)) {
+      if (!lockPath.val() && (await this.trySetLockField(lockPath.ref))) {
         return accountsSnap.child(key)
       }
     }

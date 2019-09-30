@@ -5,6 +5,7 @@ import { switchToClusterFromEnv } from './cluster'
 import { envVar, fetchEnv } from './env-utils'
 import { retrieveIPAddress } from './helm_deploy'
 
+// Returns a Promise which resolves to [stdout, stderr] array
 export function execCmd(
   cmd: string,
   execOptions: any = {},

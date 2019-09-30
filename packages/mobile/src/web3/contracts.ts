@@ -1,3 +1,4 @@
+import { Platform } from 'react-native'
 import { DocumentDirectoryPath } from 'react-native-fs'
 import * as net from 'react-native-tcp'
 import Logger from 'src/utils/Logger'
@@ -7,7 +8,7 @@ import Web3 from 'web3'
 // Logging tag
 const tag = 'web3/contracts'
 
-export const getWeb3Provider = (testnet: Testnets) => {
+const getWeb3IpcProvider = (testnet: Testnets) => {
   Logger.debug(tag, 'creating IPCProvider...')
 
   const ipcProvider = new Web3.providers.IpcProvider(
@@ -46,6 +47,18 @@ export const getWeb3Provider = (testnet: Testnets) => {
   // })
   return ipcProvider
 }
+
+const getWeb3HttpProvider = (testnet: Testnets) => {
+  Logger.debug(tag, 'creating HttpProvider...')
+
+  const httpProvider = new Web3.providers.HttpProvider('http://localhost:8545')
+  Logger.debug(tag, 'created HttpProvider')
+
+  return httpProvider
+}
+
+// Use Http provider on iOS until we add support for local socket on iOS in react-native-tcp
+export const getWeb3Provider = Platform.OS === 'ios' ? getWeb3HttpProvider : getWeb3IpcProvider
 
 export const setWeb3Provider = (testnet: Testnets) => {
   web3.setProvider(getWeb3Provider(testnet))

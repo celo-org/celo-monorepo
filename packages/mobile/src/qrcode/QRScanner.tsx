@@ -67,6 +67,7 @@ class QRScanner extends React.Component<Props> {
               onBarCodeRead={this.props.handleBarcodeDetected}
               barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
               captureAudio={false}
+              autoFocus={RNCamera.Constants.AutoFocus.on}
             >
               <View style={styles.view}>
                 <View style={styles.viewFillVertical} />

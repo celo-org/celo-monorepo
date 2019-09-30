@@ -50,6 +50,8 @@
   "reclaimPayment": "Reclaim Payment",
   "sendMessage": "Send Message",
   "escrowedPaymentReminder": "Remind {{mobile}} to Accept Payment",
+  "escrowedPaymentReminderSms":
+    "A friendly reminder that you haven't yet redeemed your Celo Dollars!",
   "testnetAlert": {
     "0": "Testnet",
     "1": "A friendly reminder you're using a Testnet build - the balances here are not real."
