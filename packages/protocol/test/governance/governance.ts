@@ -988,11 +988,6 @@ contract('Governance', (accounts: string[]) => {
       await assertRevert(governance.revokeUpvote(0, 0))
     })
 
-    it('should revert when the account weight is 0', async () => {
-      await mockLockedGold.setAccountTotalLockedGold(account, 0)
-      await assertRevert(governance.revokeUpvote(0, 0))
-    })
-
     describe('when the upvoted proposal has expired', () => {
       beforeEach(async () => {
         await timeTravel(queueExpiry, web3)
