@@ -66,7 +66,7 @@ const DefaultConfig = {
     minLockedGoldValue: '1000000000000000000', // 1 gold
     minLockedGoldNoticePeriod: 60 * 24 * 60 * 60, // 60 days
     electionThreshold: '0', // no threshold
-    maxGroupSize: '10',
+    maxGroupSize: '30',
 
     validatorKeys: [],
     // We register a single validator group during the migration.

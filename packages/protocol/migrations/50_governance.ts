@@ -13,7 +13,7 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
-  const approver = require('@celo/protocol/truffle.js').networks[networkName].from
+  const approver = require('@celo/protocol/truffle-config.js').networks[networkName].from
 
   return [
     config.registry.predeployedProxyAddress,
