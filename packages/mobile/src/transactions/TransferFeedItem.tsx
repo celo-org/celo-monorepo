@@ -11,14 +11,14 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { HomeTransferFragment } from 'src/apollo/types'
-import { DEFAULT_TESTNET, LOCAL_CURRENCY_SYMBOL } from 'src/config'
+import { DEFAULT_TESTNET } from 'src/config'
 import { features } from 'src/flags'
 import { CURRENCIES, CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { coinsIcon, unknownUserIcon } from 'src/images/Images'
 import { Invitees } from 'src/invite/actions'
-import { useDollarsToLocalAmount } from 'src/localCurrency/hooks'
+import { useDollarsToLocalAmount, useLocalCurrencyCode } from 'src/localCurrency/hooks'
 import {
   getRecipientFromAddress,
   getRecipientThumbnail,
@@ -160,6 +160,7 @@ export function TransferFeedItem(props: Props) {
     showLocalCurrency,
   } = props
 
+  const localCurrencyCode = useLocalCurrencyCode()
   const localValue = useDollarsToLocalAmount(value)
   let info = decryptComment(comment, commentKey, type)
   const timeFormatted = formatFeedTime(timestamp, i18n)
@@ -272,12 +273,12 @@ export function TransferFeedItem(props: Props) {
               </Text>
             )}
             {showLocalCurrency &&
-              LOCAL_CURRENCY_SYMBOL &&
+              !!localCurrencyCode &&
               localValue && (
                 <Text style={[fontStyles.bodySmall, styles.localAmount]}>
                   {t('localCurrencyValue', {
                     localValue: `${currencyStyle.direction}${getMoneyDisplayValue(localValue)}`,
-                    localCurrencySymbol: LOCAL_CURRENCY_SYMBOL,
+                    localCurrencyCode,
                   })}
                 </Text>
               )}
