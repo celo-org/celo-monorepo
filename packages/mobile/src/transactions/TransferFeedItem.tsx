@@ -18,7 +18,7 @@ import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes, TransferStandby } from 'src/transactions/reducer'
 import { decryptComment, getTransferFeedParams } from 'src/transactions/transferFeedHelpers'
 import TransferFeedIcon from 'src/transactions/TransferFeedIcon'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
+import { getMoneyDisplayValue, getNetworkFeeDisplayValue } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
@@ -179,7 +179,9 @@ export function TransferFeedItem(props: Props) {
               ]}
             >
               {currencyStyle.direction}
-              {getMoneyDisplayValue(props.value)}
+              {type === TransactionTypes.NETWORK_FEE
+                ? getNetworkFeeDisplayValue(props.value)
+                : getMoneyDisplayValue(props.value)}
             </Text>
           </View>
           {!!info && <Text style={fontStyles.comment}>{info}</Text>}

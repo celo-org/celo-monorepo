@@ -14,7 +14,7 @@ import { Namespaces } from 'src/i18n'
 import { faucetIcon } from 'src/images/Images'
 import { Recipient } from 'src/recipients/recipient'
 import { TransactionTypes } from 'src/transactions/reducer'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
+import { getMoneyDisplayValue, getPreciseNetworkFeeDisplayValue } from 'src/utils/formatting'
 
 const iconSize = 40
 
@@ -73,7 +73,13 @@ class TransferConfirmationCard extends React.Component<OwnProps & WithNamespaces
         </Text>
       )
     } else if (type === TransactionTypes.NETWORK_FEE) {
-      return <Text style={style.pSmall}>{t('walletFlow5:networkFeeExplanation')}</Text>
+      return (
+        <Text style={style.pSmall}>
+          {CURRENCIES[currency].symbol}
+          {getPreciseNetworkFeeDisplayValue(this.props.value)}
+          {t('walletFlow5:networkFeeExplanation')}
+        </Text>
+      )
     } else if (type === TransactionTypes.INVITE_SENT || type === TransactionTypes.INVITE_RECEIVED) {
       return (
         <View style={style.bottomContainer}>
