@@ -4,7 +4,7 @@ import { RootState } from 'src/redux/reducers'
 
 const MIN_UPDATE_INTERVAL = 12 * 3600 * 1000 // 12 hours
 
-// Returns the best currency possible (it respects the user preferred languages list order).
+// Returns the best currency possible (it respects the user preferred currencies list order).
 function findBestAvailableCurrency(supportedCurrencyCodes: LocalCurrencyCode[]) {
   const deviceCurrencies = RNLocalize.getCurrencies()
   const supportedCurrenciesSet = new Set(supportedCurrencyCodes)
