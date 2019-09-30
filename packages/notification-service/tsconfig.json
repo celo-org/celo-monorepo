@@ -15,5 +15,6 @@
     "lib": ["es7", "esnext"]
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "vendor", ".bundle"]
+  "exclude": ["node_modules", "vendor", ".bundle"],
+  "references": [{ "path": "../utils" }]
 }

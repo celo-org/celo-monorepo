@@ -2248,6 +2248,34 @@
   resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.107.tgz#3cb82455bd66868e126aeb605346514085b0dff0"
   integrity sha512-s47vj2NYha1u3x5S0u/VhY4YHYb3KySmahKxWFZbWfojMe0vu/bZ3M72nIZf4LM34wEpv40nKe/foGH9Q9LOMw==
 
+"@celo/contractkit@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.1.1.tgz#bd85812d883b58fbc8d9897a59e2f7311cc0e2eb"
+  integrity sha512-GQbLuLUEgKtwy2I8ZVi4P0HBVhh9MlT5S90vIrGznb9eZ2vwGahfOxHapVKcxw2I4tbVBNTTWWpcjzOtJZCY7Q==
+  dependencies:
+    "@celo/utils" "^0.0.6-beta5"
+    "@types/debug" "^4.1.5"
+    bignumber.js "^7.2.0"
+    debug "^4.1.1"
+    web3 "1.0.0-beta.37"
+    web3-utils "1.0.0-beta.37"
+
+"@celo/contractkit@0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.1.5.tgz#097052ac8f672f03480a1226f11f0c398c35c75e"
+  integrity sha512-vW8/ZluqJXx4SOB64XyFZjR3Z6qzcCUjXk6ec5613NH8DC/7jzxPCnbPsnxL4R+zuEajDWKfjjeH94Y1uLgVGA==
+  dependencies:
+    "@0x/subproviders" "^5.0.0"
+    "@celo/utils" "0.1.0"
+    "@types/debug" "^4.1.5"
+    bignumber.js "^7.2.0"
+    debug "^4.1.1"
+    eth-lib "^0.2.8"
+    web3 "1.0.0-beta.37"
+    web3-core-helpers "1.0.0-beta.37"
+    web3-eth-abi "1.0.0-beta.37"
+    web3-utils "1.0.0-beta.37"
+
 "@celo/dev-cli@^2.0.3":
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@celo/dev-cli/-/dev-cli-2.0.3.tgz#67f61dfee373ad8b412925e386cf122aabada5f5"
@@ -2285,6 +2313,43 @@
 "@celo/react-native-sms-retriever@git+https://github.com/celo-org/react-native-sms-retriever#d3a2fdb":
   version "1.0.3"
   resolved "git+https://github.com/celo-org/react-native-sms-retriever#d3a2fdb148e3427c9a8c1c87acb61e79e2afcfee"
+
+"@celo/utils@0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.0.tgz#081e0c9a7ea3e7b50cbc88e89b0f7ff8d5578499"
+  integrity sha512-sSE17+lu0dqG+Zo+H/aZYFXq436+Kd9xhXk5a36RtONXuJY8q6jfaXMFoBJ0Wft19rJM24e9F2aM84HM/IiUTQ==
+  dependencies:
+    "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
+    bigi "^1.1.0"
+    bignumber.js "^7.2.0"
+    bn.js "4.11.8"
+    buffer-reverse "^1.0.1"
+    country-data "^0.0.31"
+    crypto-js "^3.1.9-1"
+    elliptic "^6.4.1"
+    ethereumjs-util "^5.2.0"
+    futoin-hkdf "^1.0.3"
+    google-libphonenumber "^3.2.4"
+    keccak256 "^1.0.0"
+    lodash "^4.17.14"
+    web3-utils "1.0.0-beta.37"
+
+"@celo/utils@^0.0.6-beta5":
+  version "0.0.6-beta5"
+  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.0.6-beta5.tgz#a558cfc9dc68d9ec15888798c95cd6e5f1d3fe67"
+  integrity sha512-TGIDjr1aCcNRVv2Z3DZkjd71K/vNd6C18BPZw8VfKzSFyt0UcxkbN/X+loqvJSrwymtYgu/s6JdIQD3t14xiJA==
+  dependencies:
+    "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
+    bignumber.js "^7.2.0"
+    bn.js "4.11.8"
+    country-data "^0.0.31"
+    crypto-js "^3.1.9-1"
+    elliptic "^6.4.1"
+    ethereumjs-util "^5.2.0"
+    futoin-hkdf "^1.0.3"
+    google-libphonenumber "^3.2.1"
+    lodash "^4.17.14"
+    web3-utils "1.0.0-beta.37"
 
 "@cnakazawa/watch@^1.0.3":
   version "1.0.3"
@@ -15953,6 +16018,11 @@ google-gax@^0.25.0:
     retry-request "^4.0.0"
     semver "^5.5.1"
     walkdir "^0.3.2"
+
+google-libphonenumber@^3.2.1:
+  version "3.2.5"
+  resolved "https://registry.yarnpkg.com/google-libphonenumber/-/google-libphonenumber-3.2.5.tgz#2ebe6437fd3dbbffd65f4339ad1ba93b3dc56836"
+  integrity sha512-Y0r7MFCI11UDLn0KaMPBEInhROyIOkWkQIyvWMFVF2I+h+sHE3vbl5a7FVe39td6u/w+nlKDdUMP9dMOZyv+2Q==
 
 google-libphonenumber@^3.2.4:
   version "3.2.4"
