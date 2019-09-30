@@ -17,7 +17,7 @@ export interface ParsedPhoneNumber {
 const phoneUtil = PhoneNumberUtil.getInstance()
 const MIN_PHONE_LENGTH = 4
 export const SCRYPT_PARAMS = {
-  salt: 'nNWKc3l0a1fAj0r35BLGB8kn',
+  salt: 'cel0',
   N: 512,
   r: 16,
   p: 1,

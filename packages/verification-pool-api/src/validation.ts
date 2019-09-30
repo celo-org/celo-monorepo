@@ -1,5 +1,5 @@
+import { PhoneNumberUtils } from '@celo/utils'
 import * as ethjsutil from 'ethereumjs-util'
-import scrypt from 'scrypt-js'
 // @ts-ignore
 import * as Web3Utils from 'web3-utils'
 import { getAttestations } from './config'
@@ -14,44 +14,9 @@ function isE164Number(phoneNumber: string) {
   return E164RegEx.test(phoneNumber)
 }
 
-// TODO: Copied from @celo/utils, should be removed once usable as a dependency
-export const SCRYPT_PARAMS = {
-  salt: 'nNWKc3l0a1fAj0r35BLGB8kn',
-  N: 512,
-  r: 16,
-  p: 1,
-  dkLen: 32,
-}
-export function getPhoneHash(phoneNumber: string) {
-  if (!phoneNumber || !isE164Number(phoneNumber)) {
-    throw Error('Attempting to hash a non-e164 number: ' + phoneNumber)
-  }
-  return new Promise<string>((resolve) => {
-    const phoneNumberText = `tel://${phoneNumber}`
-    scrypt(
-      Buffer.from(phoneNumberText.normalize('NFKC')),
-      Buffer.from(SCRYPT_PARAMS.salt.normalize('NFKC')),
-      SCRYPT_PARAMS.N,
-      SCRYPT_PARAMS.r,
-      SCRYPT_PARAMS.p,
-      SCRYPT_PARAMS.dkLen,
-      (error: any, progress: any, key: any) => {
-        if (error) {
-          throw Error(`Unable to hash ${phoneNumber}, error: ${error}`)
-        } else if (key) {
-          let hexHash = ''
-          for (const item of key) {
-            hexHash += item.toString(16)
-          }
-
-          // @ts-ignore
-          resolve(hexHash.padStart(64, '0'))
-        } else if (progress) {
-          // do nothing
-        }
-      }
-    )
-  })
+export async function getPhoneHash(phoneNumber: string) {
+  const phoneHash = await PhoneNumberUtils.getPhoneHash(phoneNumber)
+  return phoneHash
 }
 
 // TODO: Copied from @celo/utils, should be removed once usable as a dependency
