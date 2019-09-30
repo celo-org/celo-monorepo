@@ -7,7 +7,7 @@ import {
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { SignatureUtils } from '@celo/utils'
+import { attestToIdentifier } from '@celo/utils'
 import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { uniq } from 'lodash'
@@ -23,15 +23,6 @@ import {
   RegistryContract,
   RegistryInstance,
 } from 'types'
-import * as Web3Utils from 'web3-utils'
-
-function attestationMessageToSign(phoneHash: string, account: string) {
-  const messageHash: string = Web3Utils.soliditySha3(
-    { type: 'bytes32', value: phoneHash },
-    { type: 'address', value: account }
-  )
-  return messageHash
-}
 
 const Attestations: AttestationsContract = artifacts.require('Attestations')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
@@ -39,7 +30,6 @@ const MockValidators: MockValidatorsContract = artifacts.require('MockValidators
 const Random: RandomContract = artifacts.require('Random')
 const Registry: RegistryContract = artifacts.require('Registry')
 
-const signMessage = SignatureUtils.signMessage
 const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
 const longDataEncryptionKey =
   '0x04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111' +
@@ -53,6 +43,7 @@ contract('Attestations', (accounts: string[]) => {
   let mockValidators: MockValidatorsInstance
   let registry: RegistryInstance
   const provider = new Web3.providers.HttpProvider('http://localhost:8545')
+  const metadataURL = 'https://www.celo.org'
   const web3: Web3 = new Web3(provider)
   const phoneNumber: string = '+18005551212'
   const caller: string = accounts[0]
@@ -77,16 +68,11 @@ contract('Attestations', (accounts: string[]) => {
   const attestationFee = new BigNumber(web3.utils.toWei('.05', 'ether').toString())
 
   async function getVerificationCodeSignature(
-    phoneHashToSign: string,
     account: string,
     issuer: string
   ): Promise<[number, string, string]> {
     const privateKey = accountPrivateKeys[accounts.indexOf(issuer)]
-    const { v, r, s } = signMessage(
-      attestationMessageToSign(phoneHashToSign, account),
-      privateKey,
-      issuer
-    )
+    const { v, r, s } = attestToIdentifier(phoneNumber, account, privateKey)
     return [v, r, s]
   }
 
@@ -423,7 +409,7 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should revert if a user reveals a request that has been completed', async () => {
-      const [v, r, s] = await getVerificationCodeSignature(phoneHash, caller, issuer)
+      const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
       await attestations.complete(phoneHash, v, r, s)
 
       // @ts-ignore
@@ -444,7 +430,7 @@ contract('Attestations', (accounts: string[]) => {
     beforeEach(async () => {
       await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-      ;[v, r, s] = await getVerificationCodeSignature(phoneHash, caller, issuer)
+      ;[v, r, s] = await getVerificationCodeSignature(caller, issuer)
     })
 
     it('should add the account to the list upon completion', async () => {
@@ -460,7 +446,7 @@ contract('Attestations', (accounts: string[]) => {
     it('should not add the account twice to the list', async () => {
       await attestations.complete(phoneHash, v, r, s)
       const secondIssuer = (await attestations.getAttestationIssuers(phoneHash, caller))[1]
-      ;[v, r, s] = await getVerificationCodeSignature(phoneHash, caller, secondIssuer)
+      ;[v, r, s] = await getVerificationCodeSignature(caller, secondIssuer)
 
       await attestations.complete(phoneHash, v, r, s)
       const attestedAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
@@ -513,12 +499,12 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should revert when an invalid attestation code is provided', async () => {
-      ;[v, r, s] = await getVerificationCodeSignature(phoneHash, accounts[1], issuer)
+      ;[v, r, s] = await getVerificationCodeSignature(accounts[1], issuer)
       await assertRevert(attestations.complete(phoneHash, v, r, s))
     })
 
     it('should revert with a non-requested issuer', async () => {
-      ;[v, r, s] = await getVerificationCodeSignature(phoneHash, caller, await getNonIssuer())
+      ;[v, r, s] = await getVerificationCodeSignature(caller, await getNonIssuer())
       await assertRevert(attestations.complete(phoneHash, v, r, s))
     })
 
@@ -538,7 +524,7 @@ contract('Attestations', (accounts: string[]) => {
     beforeEach(async () => {
       await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-      const [v, r, s] = await getVerificationCodeSignature(phoneHash, caller, issuer)
+      const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
       await attestations.complete(phoneHash, v, r, s)
     })
 
@@ -582,7 +568,7 @@ contract('Attestations', (accounts: string[]) => {
   const requestAndCompleteAttestations = async () => {
     await requestAttestations()
     const issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-    const [v, r, s] = await getVerificationCodeSignature(phoneHash, caller, issuer)
+    const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
     await attestations.complete(phoneHash, v, r, s)
   }
 
@@ -684,7 +670,7 @@ contract('Attestations', (accounts: string[]) => {
               from: other,
             })
             const issuer = (await attestations.getAttestationIssuers(phoneHash, other))[0]
-            const [v, r, s] = await getVerificationCodeSignature(phoneHash, other, issuer)
+            const [v, r, s] = await getVerificationCodeSignature(other, issuer)
             await attestations.complete(phoneHash, v, r, s, { from: other })
             await attestations.setWalletAddress(other, { from: other })
           })
@@ -771,6 +757,24 @@ contract('Attestations', (accounts: string[]) => {
       assert.lengthOf(addresses, 0)
       assert.lengthOf(completed, 0)
       assert.lengthOf(total, 0)
+    })
+  })
+
+  describe('#setMetadataURL', async () => {
+    it('should set the metadataURL', async () => {
+      await attestations.setMetadataURL(metadataURL)
+      const result = await attestations.getMetadataURL(caller)
+      assert.equal(result, metadataURL)
+    })
+
+    it('should emit the AccountMetadataURLSet event', async () => {
+      const response = await attestations.setMetadataURL(metadataURL)
+      assert.lengthOf(response.logs, 1)
+      const event = response.logs[0]
+      assertLogMatches2(event, {
+        event: 'AccountMetadataURLSet',
+        args: { account: caller, metadataURL },
+      })
     })
   })
 })

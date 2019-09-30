@@ -10,8 +10,10 @@ import { StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import Avatar from 'src/components/Avatar'
 import LineItemRow from 'src/components/LineItemRow'
+import { LOCAL_CURRENCY_SYMBOL } from 'src/config'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
+import { useDollarsToLocalAmount } from 'src/localCurrency/hooks'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
@@ -36,42 +38,64 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 // Bordered content placed in a ReviewFrame for summarizing a payment request
-class PaymentRequestReviewCard extends React.Component<OwnProps & StateProps & WithNamespaces> {
-  render() {
-    const {
-      recipient,
-      address,
-      e164PhoneNumber,
-      t,
-      dollarBalance,
-      currency,
-      value,
-      comment,
-    } = this.props
+function PaymentRequestReviewCard({
+  recipient,
+  address,
+  e164PhoneNumber,
+  t,
+  dollarBalance,
+  currency,
+  value,
+  comment,
+}: OwnProps & StateProps & WithNamespaces) {
+  const localValue = useDollarsToLocalAmount(value)
 
-    return (
-      <View style={[componentStyles.roundedBorder, style.container]}>
-        <Avatar recipient={recipient} address={address} e164Number={e164PhoneNumber} />
+  return (
+    <View style={style.container}>
+      <Avatar recipient={recipient} address={address} e164Number={e164PhoneNumber} />
+      {LOCAL_CURRENCY_SYMBOL && localValue ? (
+        <MoneyAmount
+          amount={getMoneyDisplayValue(localValue)}
+          sign={'+'}
+          code={LOCAL_CURRENCY_SYMBOL}
+        />
+      ) : (
         <MoneyAmount
           symbol={CURRENCIES[currency].symbol}
           amount={getMoneyDisplayValue(value)}
           color={colors.celoGreen}
           sign={'+'}
         />
-        <View style={style.bottomContainer}>
-          {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
-          <HorizontalLine />
-          <View style={style.feeContainer}>
-            <LineItemRow
-              currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-              amount={getMoneyDisplayValue(value.plus(dollarBalance))}
-              title={t('newAccountBalance')}
-            />
-          </View>
+      )}
+      <View style={style.bottomContainer}>
+        {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
+        <HorizontalLine />
+        <View style={style.feeContainer}>
+          {LOCAL_CURRENCY_SYMBOL &&
+            localValue && (
+              <>
+                <LineItemRow
+                  currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+                  amount={getMoneyDisplayValue(value)}
+                  title={t('amountInCelloDollars')}
+                />
+                <Text style={style.localValueHint}>
+                  {t('localValueHint', {
+                    localValue: getMoneyDisplayValue(localValue),
+                    localCurrencySymbol: LOCAL_CURRENCY_SYMBOL,
+                  })}
+                </Text>
+              </>
+            )}
+          <LineItemRow
+            currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+            amount={getMoneyDisplayValue(value.plus(dollarBalance))}
+            title={t('newAccountBalance')}
+          />
         </View>
       </View>
-    )
-  }
+    </View>
+  )
 }
 
 const style = StyleSheet.create({
@@ -99,6 +123,13 @@ const style = StyleSheet.create({
     ...fontStyles.light,
     lineHeight: 18,
     textAlign: 'center',
+  },
+  localValueHint: {
+    ...fontStyles.light,
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.lightGray,
+    marginBottom: 3,
   },
 })
 

@@ -1,8 +1,28 @@
 ---
-description: View information about all of the account's commitments
+description: Delegate validating, voting and reward roles for Locked Gold account
 ---
 
 ## Commands
+
+### Delegate
+
+Delegate validating, voting and reward roles for Locked Gold account
+
+```
+USAGE
+  $ celocli lockedgold:delegate
+
+OPTIONS
+  -r, --role=Validating|Voting|Rewards               Role to delegate
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+  --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
+
+EXAMPLE
+  delegate --from=0x5409ED021D9299bf6814279A6A1411A7e866A631 --role Voting
+  --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+```
+
+_See code: [packages/cli/src/commands/lockedgold/delegate.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/lockedgold/delegate.ts)_
 
 ### List
 

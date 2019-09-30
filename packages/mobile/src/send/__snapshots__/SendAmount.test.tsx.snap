@@ -154,7 +154,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
               ]
             }
           >
-             +1
+            🇺🇸 +1
           </Text>
           <Text
             style={
@@ -238,7 +238,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
               ]
             }
           >
-            $
+            MXN
           </Text>
         </View>
         <View
@@ -304,7 +304,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
                 },
               ]
             }
-            title="$"
+            title="MXN"
             underlineColorAndroid="transparent"
             validator="decimal"
             value=""
@@ -567,6 +567,12 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
         <View
           accessible={true}
           isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -574,15 +580,22 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "#A3EBC6",
-              "borderWidth": 0,
-              "flex": 1,
-              "height": 50,
-              "justifyContent": "center",
-              "opacity": 1,
-            }
+            Array [
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "justifyContent": "center",
+              },
+              Object {
+                "backgroundColor": "#A3EBC6",
+              },
+              Object {
+                "height": 50,
+              },
+              Object {
+                "borderWidth": 0,
+              },
+            ]
           }
         >
           <View
@@ -675,6 +688,12 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
         <View
           accessible={true}
           isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -682,15 +701,22 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "#A3EBC6",
-              "borderWidth": 0,
-              "flex": 1,
-              "height": 50,
-              "justifyContent": "center",
-              "opacity": 1,
-            }
+            Array [
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "justifyContent": "center",
+              },
+              Object {
+                "backgroundColor": "#A3EBC6",
+              },
+              Object {
+                "height": 50,
+              },
+              Object {
+                "borderWidth": 0,
+              },
+            ]
           }
         >
           <View

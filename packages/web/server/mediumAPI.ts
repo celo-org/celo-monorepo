@@ -48,7 +48,7 @@ function getGramaticallyCorrectExcerpt(htmlstring: string) {
 
   // ensure it is a reasonable length
   return plainText.length > approximateMaxChars
-    ? plainText.substring(0, plainText.indexOf('.') + 1)
+    ? plainText.substring(0, plainText.indexOf('. ') + 1)
     : plainText
 }
 

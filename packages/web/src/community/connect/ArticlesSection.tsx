@@ -13,11 +13,15 @@ import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems, { hashNav } from 'src/shared/menu-items'
 import { colors, standardStyles } from 'src/styles'
 
-type Props = I18nProps & ArticleProps
+interface OwnProps {
+  loading: boolean
+}
+
+type Props = I18nProps & ArticleProps & OwnProps
 
 class ArticlesSection extends React.PureComponent<Props> {
   render() {
-    const { t, articles } = this.props
+    const { t, articles, loading } = this.props
     return (
       <View nativeID={hashNav.connect.blog}>
         <GridRow
@@ -31,7 +35,7 @@ class ArticlesSection extends React.PureComponent<Props> {
             </Fade>
           </Cell>
         </GridRow>
-        <Articles articles={articles} />
+        <Articles articles={articles} loading={loading} />
         <GridRow
           allStyle={standardStyles.elementalMarginTop}
           desktopStyle={standardStyles.sectionMarginBottom}

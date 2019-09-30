@@ -123,6 +123,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @dev Called by the EVM at the end of the block.
    */
   function setCumulativeRewardWeight(uint256 blockReward) external {
+    require(blockReward > 0, "placeholder to suppress warning");
     return;
     // TODO(asa): Modify ganache to set cumulativeRewardWeights.
     // TODO(asa): Make inheritable `onlyVm` modifier.
@@ -227,6 +228,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     external
     nonReentrant
   {
+    // TODO: split and add error messages for better dev feedback
     require(isAccount(msg.sender) && isNotAccount(delegate) && isNotDelegate(delegate));
 
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
@@ -721,9 +723,25 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     list.length = lastIndex;
   }
 
-  function isAccount(address account) internal view returns (bool) {
+  /**
+   * @notice Check if an account already exists.
+   * @param account The address of the account
+   * @return Returns `true` if account exists. Returns `false` otherwise.
+   *         In particular it will return `false` if a delegate with given address exists.
+   */
+  function isAccount(address account) public view returns (bool) {
     return (accounts[account].exists);
   }
+
+  /**
+   * @notice Check if a delegate already exists.
+   * @param account The address of the delegate
+   * @return Returns `true` if delegate exists. Returns `false` otherwise.
+   */
+  function isDelegate(address account) external view returns (bool) {
+    return (delegations[account] != address(0));
+  }
+
 
   function isNotAccount(address account) internal view returns (bool) {
     return (!accounts[account].exists);

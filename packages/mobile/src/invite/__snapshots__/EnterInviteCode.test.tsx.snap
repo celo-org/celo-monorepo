@@ -119,18 +119,14 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
       </svg>
       <Text
         style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Light",
-              "fontSize": 22,
-              "paddingBottom": 20,
-              "textAlign": "center",
-            },
-            Object {
-              "marginTop": 20,
-            },
-          ]
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Light",
+            "fontSize": 22,
+            "marginTop": 20,
+            "paddingBottom": 20,
+            "textAlign": "center",
+          }
         }
         testID="InviteCodeTitle"
       >
@@ -138,18 +134,14 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
       </Text>
       <View
         style={
-          Array [
-            Object {
-              "borderColor": "#EEEEEE",
-              "borderRadius": 3,
-              "borderWidth": 1,
-            },
-            Object {
-              "marginHorizontal": 20,
-              "marginVertical": 30,
-              "padding": 30,
-            },
-          ]
+          Object {
+            "borderColor": "#EEEEEE",
+            "borderRadius": 3,
+            "borderWidth": 1,
+            "marginHorizontal": 20,
+            "marginVertical": 30,
+            "padding": 30,
+          }
         }
       >
         <Text
@@ -172,20 +164,14 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
         <View>
           <Text
             style={
-              Array [
-                Object {
-                  "alignSelf": "center",
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 14,
-                  "lineHeight": 18,
-                  "textAlign": "center",
-                },
-                Object {
-                  "fontSize": 12,
-                  "marginVertical": 10,
-                },
-              ]
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 12,
+                "lineHeight": 16,
+                "marginVertical": 10,
+                "textAlign": "center",
+              }
             }
           >
             <Text
@@ -213,6 +199,12 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
               }
             }
             isTVSelectable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -220,19 +212,27 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              Object {
-                "alignItems": "center",
-                "alignSelf": "center",
-                "backgroundColor": "#42D689",
-                "borderRadius": 2,
-                "fontSize": 14,
-                "marginTop": 6,
-                "minWidth": 160,
-                "opacity": 1,
-                "paddingHorizontal": 18,
-                "paddingVertical": 8,
-                "textAlign": "center",
-              }
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "alignSelf": "flex-start",
+                  "borderRadius": 2,
+                  "minWidth": 160,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 6,
+                  "textAlign": "center",
+                },
+                Object {
+                  "backgroundColor": "#42D689",
+                  "paddingHorizontal": 18,
+                  "paddingVertical": 8,
+                },
+                Object {
+                  "alignSelf": "center",
+                  "fontSize": 14,
+                  "marginTop": 6,
+                },
+              ]
             }
             testID="openMessageButton"
           >
@@ -285,22 +285,13 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
       <Text
         onPress={[Function]}
         style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Bold",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-            },
-            Object {
-              "fontSize": 12,
-              "fontWeight": "300",
-            },
-          ]
+          Object {
+            "color": "#42D689",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 12,
+            "fontWeight": "300",
+            "lineHeight": 18,
+          }
         }
       >
         inviteCodeText.askForInvite.1
@@ -320,7 +311,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
             "width": "100%",
           },
           Object {
-            "backgroundColor": "#A3EBC6",
+            "backgroundColor": "#42D689",
           },
         ]
       }
@@ -328,6 +319,12 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -335,15 +332,22 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#A3EBC6",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#42D689",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
         testID="ContinueInviteButton"
       >
@@ -401,6 +405,12 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -408,15 +418,22 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "transparent",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
         testID="ContinueInviteButton"
       >
@@ -438,7 +455,7 @@ exports[`EnterInviteCode Screen renders correctly 1`] = `
                   "fontSize": 16,
                 },
                 Object {
-                  "color": "#42D689",
+                  "color": "#A3EBC6",
                 },
                 Object {
                   "paddingLeft": 5,
@@ -575,18 +592,14 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
       </svg>
       <Text
         style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Light",
-              "fontSize": 22,
-              "paddingBottom": 20,
-              "textAlign": "center",
-            },
-            Object {
-              "marginTop": 20,
-            },
-          ]
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Light",
+            "fontSize": 22,
+            "marginTop": 20,
+            "paddingBottom": 20,
+            "textAlign": "center",
+          }
         }
         testID="InviteCodeTitle"
       >
@@ -594,18 +607,14 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
       </Text>
       <View
         style={
-          Array [
-            Object {
-              "borderColor": "#EEEEEE",
-              "borderRadius": 3,
-              "borderWidth": 1,
-            },
-            Object {
-              "marginHorizontal": 20,
-              "marginVertical": 30,
-              "padding": 30,
-            },
-          ]
+          Object {
+            "borderColor": "#EEEEEE",
+            "borderRadius": 3,
+            "borderWidth": 1,
+            "marginHorizontal": 20,
+            "marginVertical": 30,
+            "padding": 30,
+          }
         }
       >
         <Text
@@ -628,20 +637,14 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
         <View>
           <Text
             style={
-              Array [
-                Object {
-                  "alignSelf": "center",
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 14,
-                  "lineHeight": 18,
-                  "textAlign": "center",
-                },
-                Object {
-                  "fontSize": 12,
-                  "marginVertical": 10,
-                },
-              ]
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 12,
+                "lineHeight": 16,
+                "marginVertical": 10,
+                "textAlign": "center",
+              }
             }
           >
             <Text
@@ -669,6 +672,12 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
               }
             }
             isTVSelectable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -676,19 +685,27 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              Object {
-                "alignItems": "center",
-                "alignSelf": "center",
-                "backgroundColor": "#42D689",
-                "borderRadius": 2,
-                "fontSize": 14,
-                "marginTop": 6,
-                "minWidth": 160,
-                "opacity": 1,
-                "paddingHorizontal": 18,
-                "paddingVertical": 8,
-                "textAlign": "center",
-              }
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "alignSelf": "flex-start",
+                  "borderRadius": 2,
+                  "minWidth": 160,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 6,
+                  "textAlign": "center",
+                },
+                Object {
+                  "backgroundColor": "#42D689",
+                  "paddingHorizontal": 18,
+                  "paddingVertical": 8,
+                },
+                Object {
+                  "alignSelf": "center",
+                  "fontSize": 14,
+                  "marginTop": 6,
+                },
+              ]
             }
             testID="openMessageButton"
           >
@@ -741,22 +758,13 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
       <Text
         onPress={[Function]}
         style={
-          Array [
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Bold",
-              "fontSize": 14,
-              "lineHeight": 18,
-            },
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-            },
-            Object {
-              "fontSize": 12,
-              "fontWeight": "300",
-            },
-          ]
+          Object {
+            "color": "#42D689",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 12,
+            "fontWeight": "300",
+            "lineHeight": 18,
+          }
         }
       >
         inviteCodeText.askForInvite.1
@@ -776,7 +784,7 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
             "width": "100%",
           },
           Object {
-            "backgroundColor": "#A3EBC6",
+            "backgroundColor": "#42D689",
           },
         ]
       }
@@ -784,6 +792,12 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -791,15 +805,22 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#A3EBC6",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#42D689",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
         testID="ContinueInviteButton"
       >
@@ -857,6 +878,12 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -864,15 +891,22 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "transparent",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
         testID="ContinueInviteButton"
       >
@@ -894,7 +928,7 @@ exports[`EnterInviteCode Screen renders with an error 1`] = `
                   "fontSize": 16,
                 },
                 Object {
-                  "color": "#42D689",
+                  "color": "#A3EBC6",
                 },
                 Object {
                   "paddingLeft": 5,
