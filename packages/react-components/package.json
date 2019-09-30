@@ -14,7 +14,7 @@
     "test:watch": "export TZ=UTC && jest --watch"
   },
   "dependencies": {
-    "@celo/utils": "^0.0.6-beta5",
+    "@celo/utils": "^0.1.0",
     "hoist-non-react-statics": "^3.3.0",
     "lodash": "^4.17.14",
     "react-native-autocomplete-input": "^3.6.0",

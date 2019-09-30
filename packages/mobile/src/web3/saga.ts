@@ -96,15 +96,16 @@ export function* waitForWeb3Sync() {
   }
 }
 
-export function* createNewAccount() {
+export function* getOrCreateAccount() {
   const account = yield select(currentAccountSelector)
   if (account) {
     Logger.debug(
-      TAG + '@createNewAccount',
+      TAG + '@getOrCreateAccount',
       'Tried to create account twice, returning the existing one'
     )
     return account
   }
+  Logger.debug(TAG + '@getOrCreateAccount', 'Creating a new account')
   const wordlist = getWordlist(yield select(currentLanguageSelector))
   const mnemonic = String(yield call(generateMnemonic, MNEMONIC_BIT_LENGTH, null, wordlist))
   const privateKey = yield call(mnemonicToSeedHex, mnemonic)
@@ -114,7 +115,7 @@ export function* createNewAccount() {
     try {
       yield call(setKey, 'mnemonic', mnemonic)
     } catch (e) {
-      Logger.error(TAG + '@createNewAccount', 'Failed to set mnemonic', e)
+      Logger.error(TAG + '@getOrCreateAccount', 'Failed to set mnemonic', e)
     }
     return accountAddress
   } else {
