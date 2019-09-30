@@ -135,7 +135,9 @@ const WrappedNavigator = connect<NavigatorStateProps, DispatchProps>(
 
 class App extends React.Component<{}, {}> {
   componentDidMount() {
-    initializeFirebase()
+    initializeFirebase().catch((err) => {
+      console.error('Failed to initialize firebase', err)
+    })
   }
 
   hideSplashScreen() {
