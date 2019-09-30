@@ -2,7 +2,7 @@ import _QRCode from 'qrcode'
 import React, { PureComponent } from 'react'
 import Svg, { Path, Rect } from 'react-native-svg'
 
-const genMatrix = (value: any, errorCorrectionLevel: string) => {
+export function genMatrix(value: any, errorCorrectionLevel: string) {
   const arr = Array.prototype.slice.call(
     _QRCode.create(value, { errorCorrectionLevel }).modules.data,
     0
@@ -38,7 +38,7 @@ export function calculateMatrix(props: any) {
 }
 
 /* project the matrix into path draw */
-function transformMatrixIntoPath(cellSize: number, matrix: any) {
+export function transformMatrixIntoPath(cellSize: number, matrix: any) {
   // adjust origin
   let d = ''
   matrix.forEach((row: any, i: number) => {
