@@ -43,5 +43,16 @@
   },
   "engines": {
     "node": "10"
+  },
+  "resolutions": {
+    "node-gyp": "5.0.1",
+    "tar": "4.4.10",
+    "lodash": "4.17.15",
+    "react-native-ntp-client": "^1.0.0",
+    "**/codecov/**/js-yaml": "^3.13.1",
+    "**/deep-extend": "^0.5.1",
+    "**/extend": "^3.0.2",
+    "sha3": "1.2.3",
+    "node-hid": "0.7.3"
   }
 }
