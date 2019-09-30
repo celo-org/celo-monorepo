@@ -1,23 +1,30 @@
-// import { lookup } from 'country-data'
-// import { defaultCountryCodeSelector } from 'src/account/reducer'
-import { LocalCurrencyCode } from 'src/localCurrency/consts'
+import * as RNLocalize from 'react-native-localize'
+import { LocalCurrencyCode, LOCAL_CURRENCY_CODES } from 'src/localCurrency/consts'
 import { RootState } from 'src/redux/reducers'
 
 const MIN_UPDATE_INTERVAL = 12 * 3600 * 1000 // 12 hours
 
-export function getLocalCurrencyCode(state: RootState): LocalCurrencyCode | null {
-  let currencyCode = state.localCurrency.preferredCurrencyCode
-  if (!currencyCode) {
-    // Determine currency from country code
-    // const countryCallingCode = defaultCountryCodeSelector(state)
-    // if (countryCallingCode) {
-    //   lookup.countries({ countryCallingCode })
-    // }
-    return null
+// Returns the best currency possible (it respects the user preferred languages list order).
+function findBestAvailableCurrency(supportedCurrencyCodes: LocalCurrencyCode[]) {
+  const deviceCurrencies = RNLocalize.getCurrencies()
+  const supportedCurrenciesSet = new Set(supportedCurrencyCodes)
+
+  for (const deviceCurrency of deviceCurrencies) {
+    if (supportedCurrenciesSet.has(deviceCurrency as LocalCurrencyCode)) {
+      return deviceCurrency as LocalCurrencyCode
+    }
   }
 
-  if (currencyCode === 'USD') {
-    // Disable local currency if USD is selected
+  return null
+}
+
+// TODO(jean): listen to locale changes so this stays accurate when changed while the app is running
+const DEVICE_BEST_CURRENCY_CODE = findBestAvailableCurrency(LOCAL_CURRENCY_CODES)
+
+export function getLocalCurrencyCode(state: RootState): LocalCurrencyCode | null {
+  const currencyCode = state.localCurrency.preferredCurrencyCode || DEVICE_BEST_CURRENCY_CODE
+  if (!currencyCode || currencyCode === LocalCurrencyCode.USD) {
+    // This disables local currency display
     return null
   }
 
