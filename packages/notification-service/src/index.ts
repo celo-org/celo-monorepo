@@ -68,6 +68,7 @@ notificationPolling.run()
 
 if (!WEB3_PROVIDER_URL) {
   console.info('No Web3 provider found. Skipping exchange polling.')
+  console.info('Note that you will need to manually set contract addresses.')
 } else {
   /**
    * Start polling the Exchange contract

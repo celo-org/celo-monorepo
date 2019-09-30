@@ -11,7 +11,7 @@
   "scripts": {
     "build": "tsc",
     "gcp-build": "npm run build",
-    "test": "export TZ=UTC && jest",
+    "test": "cp config/config.test.env .env; export TZ=UTC && jest",
     "test:watch": "yarn test --watch",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "start": "node ./dist/index.js",
@@ -19,8 +19,8 @@
     "deploy": "./deploy.sh"
   },
   "dependencies": {
-    "@celo/utils": "^0.0.6-beta5",
-    "@celo/walletkit": "^0.0.14",
+    "@celo/contractkit": "0.1.5",
+    "@celo/utils": "^0.1.0",
     "async-polling": "^0.2.1",
     "bignumber.js": "^7.2.0",
     "dotenv": "^6.0.0",
