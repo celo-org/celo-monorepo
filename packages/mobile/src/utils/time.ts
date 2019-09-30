@@ -6,7 +6,6 @@ import { enUS, es } from 'date-fns/locale'
 import { i18n as i18nType, TranslationFunction } from 'i18next'
 import * as _ from 'lodash'
 import clockSync from 'react-native-clock-sync'
-import RNSystemClock from 'react-native-system-clock'
 import i18n from 'src/i18n'
 import Logger from 'src/utils/Logger'
 
@@ -276,7 +275,7 @@ export const getRemoteTime = () => {
 const DRIFT_THRESHOLD_IN_MS = 1000 * 4 // 4 seconds - Clique future block allowed time is 5 seconds
 
 export const clockInSync = async () => {
-  const localTime = parseInt(await RNSystemClock.getDeviceTime(), 10)
+  const localTime = Date.now()
   const syncTime = getRemoteTime()
   const drift = localTime - syncTime // in milliseconds
   Logger.info(

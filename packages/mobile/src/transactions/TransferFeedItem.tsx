@@ -18,7 +18,7 @@ import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { coinsIcon, unknownUserIcon } from 'src/images/Images'
 import { Invitees } from 'src/invite/actions'
-import useLocalAmount from 'src/localCurrency/useLocalAmount'
+import { useDollarsToLocalAmount } from 'src/localCurrency/hooks'
 import {
   getRecipientFromAddress,
   getRecipientThumbnail,
@@ -160,7 +160,7 @@ export function TransferFeedItem(props: Props) {
     showLocalCurrency,
   } = props
 
-  const localValue = useLocalAmount(value)
+  const localValue = useDollarsToLocalAmount(value)
   let info = decryptComment(comment, commentKey, type)
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
@@ -336,14 +336,14 @@ const styles = StyleSheet.create({
     color: colors.celoGreen,
   },
   transactionStatus: {
-    color: '#BDBDBD',
+    color: colors.lightGray,
   },
   localAmount: {
     marginLeft: 'auto',
     paddingLeft: 10,
     fontSize: 14,
     lineHeight: 18,
-    color: '#BDBDBD',
+    color: colors.lightGray,
   },
 })
 

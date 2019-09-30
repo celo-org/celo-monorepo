@@ -73,20 +73,13 @@ exports[`InviteReview renders correctly 1`] = `
       >
         <View
           style={
-            Array [
-              Object {
-                "borderColor": "#EEEEEE",
-                "borderRadius": 3,
-                "borderWidth": 1,
-              },
-              Object {
-                "flex": 1,
-                "flexDirection": "column",
-                "justifyContent": "flex-start",
-                "paddingHorizontal": 40,
-                "paddingVertical": 25,
-              },
-            ]
+            Object {
+              "flex": 1,
+              "flexDirection": "column",
+              "justifyContent": "flex-start",
+              "paddingBottom": 25,
+              "paddingHorizontal": 40,
+            }
           }
         >
           <View
@@ -202,7 +195,7 @@ exports[`InviteReview renders correctly 1`] = `
                   ]
                 }
               >
-                 +1
+                🇺🇸 +1
               </Text>
               <Text
                 style={
@@ -229,23 +222,6 @@ exports[`InviteReview renders correctly 1`] = `
             }
           >
             <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 24,
-                    "textAlignVertical": "top",
-                  },
-                  Object {
-                    "color": "#81868B",
-                  },
-                ]
-              }
-            >
-              $
-            </Text>
-            <Text
               ellipsizeMode="tail"
               numberOfLines={1}
               style={
@@ -262,7 +238,21 @@ exports[`InviteReview renders correctly 1`] = `
                 ]
               }
             >
-              0.20
+              0.26
+            </Text>
+            <Text
+              style={
+                Object {
+                  "alignSelf": "flex-end",
+                  "color": "#BDBDBD",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 64,
+                  "marginLeft": 7,
+                }
+              }
+            >
+              MXN
             </Text>
           </View>
           <View
@@ -322,6 +312,62 @@ exports[`InviteReview renders correctly 1`] = `
                       }
                     }
                   >
+                    amountInCelloDollars
+                  </Text>
+                </View>
+                <Text
+                  style={
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 20,
+                    }
+                  }
+                >
+                  0.20
+                </Text>
+              </View>
+              <Text
+                style={
+                  Object {
+                    "color": "#BDBDBD",
+                    "fontFamily": "Hind-Light",
+                    "fontSize": 14,
+                    "lineHeight": 20,
+                    "marginBottom": 3,
+                  }
+                }
+              >
+                localValueHint
+              </Text>
+              <View
+                style={
+                  Object {
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "marginTop": 5,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "alignItems": "flex-start",
+                      "flexDirection": "row",
+                    }
+                  }
+                >
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 20,
+                      }
+                    }
+                  >
                     inviteAndSecurityFee
                   </Text>
                 </View>
@@ -335,7 +381,7 @@ exports[`InviteReview renders correctly 1`] = `
                     }
                   }
                 >
-                  $0.20
+                  0.20
                 </Text>
               </View>
               <View
@@ -378,6 +424,12 @@ exports[`InviteReview renders correctly 1`] = `
                       }
                     }
                     isTVSelectable={true}
+                    nativeBackgroundAndroid={
+                      Object {
+                        "attribute": "selectableItemBackgroundBorderless",
+                        "type": "ThemeAttrAndroid",
+                      }
+                    }
                     onResponderGrant={[Function]}
                     onResponderMove={[Function]}
                     onResponderRelease={[Function]}
@@ -388,7 +440,6 @@ exports[`InviteReview renders correctly 1`] = `
                       Object {
                         "alignItems": "center",
                         "justifyContent": "flex-end",
-                        "opacity": 1,
                         "paddingHorizontal": 5,
                       }
                     }
@@ -418,7 +469,7 @@ exports[`InviteReview renders correctly 1`] = `
                     }
                   }
                 >
-                  $0.001
+                  0.001
                 </Text>
               </View>
               <View
@@ -461,7 +512,7 @@ exports[`InviteReview renders correctly 1`] = `
                     }
                   }
                 >
-                  $0.20
+                  0.20
                 </Text>
               </View>
             </View>
@@ -491,6 +542,12 @@ exports[`InviteReview renders correctly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -498,15 +555,22 @@ exports[`InviteReview renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "transparent",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
       >
         <View
@@ -576,6 +640,12 @@ exports[`InviteReview renders correctly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -583,15 +653,22 @@ exports[`InviteReview renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "transparent",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
         testID="inviteWhatsApp"
       >
@@ -662,6 +739,12 @@ exports[`InviteReview renders correctly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -669,15 +752,22 @@ exports[`InviteReview renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "transparent",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
       >
         <View

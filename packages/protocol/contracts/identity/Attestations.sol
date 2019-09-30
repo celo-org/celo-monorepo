@@ -56,6 +56,11 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     bytes dataEncryptionKey
   );
 
+  event AccountMetadataURLSet(
+    address indexed account,
+    string metadataURL
+  );
+
   event AccountWalletAddressSet(
     address indexed account,
     address walletAddress
@@ -87,6 +92,9 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
 
     // The ECDSA public key used to encrypt and decrypt data for this account
     bytes dataEncryptionKey;
+
+    // The URL under which an account adds metadata and claims
+    string metadataURL;
   }
 
   // Stores attestations state for a single (identifier, account address) pair.
@@ -479,6 +487,24 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     require(_attestationExpirySeconds > 0, "attestationExpirySeconds has to be greater than 0");
     attestationExpirySeconds = _attestationExpirySeconds;
     emit AttestationExpirySecondsSet(_attestationExpirySeconds);
+  }
+
+  /**
+   * @notice Setter for the metadata of an account.
+   * @param metadataURL The URL to access the metadata.
+   */
+  function setMetadataURL(string calldata metadataURL) external {
+    accounts[msg.sender].metadataURL = metadataURL;
+    emit AccountMetadataURLSet(msg.sender, metadataURL);
+  }
+
+  /**
+   * @notice Getter for the metadata of an account.
+   * @param account The address of the account to get the metadata for.
+   * @return metdataURL The URL to access the metadata.
+   */
+  function getMetadataURL(address account) external view returns (string memory) {
+    return accounts[account].metadataURL;
   }
 
     /**

@@ -4,7 +4,15 @@ import BigNumber from 'bignumber.js'
 import * as Web3Utils from 'web3-utils'
 import { Address, CeloToken } from '../base'
 import { Attestations } from '../generated/types/Attestations'
-import { BaseWrapper, proxyCall, proxySend, toNumber, tupleParser, wrapSend } from './BaseWrapper'
+import {
+  BaseWrapper,
+  proxyCall,
+  proxySend,
+  toBigNumber,
+  toNumber,
+  tupleParser,
+  wrapSend,
+} from './BaseWrapper'
 const parseSignature = SignatureUtils.parseSignature
 
 export interface AttestationStat {
@@ -12,6 +20,19 @@ export interface AttestationStat {
   total: number
 }
 
+export interface AttestationsToken {
+  address: Address
+  fee: BigNumber
+}
+
+export interface AttestationsConfig {
+  attestationExpirySeconds: number
+  attestationRequestFees: AttestationsToken[]
+}
+
+/**
+ * Contract for managing identities
+ */
 export enum AttestationState {
   None,
   Incomplete,
@@ -83,6 +104,34 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param address The address to set
    */
   setWalletAddress = proxySend(this.kit, this.contract.methods.setWalletAddress)
+
+  /**
+   * Returns the attestation request fee in a given currency.
+   * @param address Token address.
+   * @returns The fee as big number.
+   */
+  attestationRequestFees = proxyCall(
+    this.contract.methods.attestationRequestFees,
+    undefined,
+    toBigNumber
+  )
+
+  /**
+   * Returns the current configuration parameters for the contract.
+   * @param tokens List of tokens used for attestation fees.
+   */
+  async getConfig(tokens: string[]): Promise<AttestationsConfig> {
+    const fees = await Promise.all(
+      tokens.map(async (token) => {
+        const fee = await this.attestationRequestFees(token)
+        return { fee, address: token }
+      })
+    )
+    return {
+      attestationExpirySeconds: await this.attestationExpirySeconds(),
+      attestationRequestFees: fees,
+    }
+  }
 
   /**
    * Calculates the amount of CeloToken to request Attestations

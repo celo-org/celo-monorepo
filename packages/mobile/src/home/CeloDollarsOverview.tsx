@@ -8,7 +8,7 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import { LOCAL_CURRENCY_SYMBOL } from 'src/config'
 import useBalanceAutoRefresh from 'src/home/useBalanceAutoRefresh'
 import { Namespaces } from 'src/i18n'
-import useLocalAmount from 'src/localCurrency/useLocalAmount'
+import { useDollarsToLocalAmount } from 'src/localCurrency/hooks'
 import useSelector from 'src/redux/useSelector'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
@@ -17,7 +17,7 @@ type Props = WithNamespaces
 function CeloDollarsOverview({ t }: Props) {
   useBalanceAutoRefresh()
   const dollarBalance = useSelector((state) => state.stableToken.balance)
-  const localBalance = useLocalAmount(dollarBalance)
+  const localBalance = useDollarsToLocalAmount(dollarBalance)
   const localValue =
     localBalance || dollarBalance === null ? getMoneyDisplayValue(localBalance || 0) : '---'
   const localCurrencySymbol = LOCAL_CURRENCY_SYMBOL

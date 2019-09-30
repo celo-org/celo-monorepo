@@ -5,7 +5,9 @@
   "adjustDate": "Arreglar hora",
   "submit": "Enviar",
   "continue": "Continuar",
+  "save": "Guarda",
   "next": "Siguiente",
+  "skip": "Saltar",
   "downloadRewards": "Descargar Recompensas Celo",
   "chooseLanguage": "Elegir idioma",
   "wallet": "Monedero",
@@ -69,7 +71,7 @@
   "escrowTransferFailed": "Transferencia a la custodia falló",
   "escrowWithdrawalFailed": "Retirada de la custodia fallida",
   "reclaimingEscrowedPaymentFailed": "El pago no pudo ser reclamado",
-  "connectingToCelo": "Conectando al Celo…",
+  "connectingToCelo": "Conectando a Celo…",
   "poorConnection": {
     "0": "Mala Conexión",
     "1": "algunas funciones no disponible"

@@ -1,6 +1,5 @@
+import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
-import { RequestType } from '../../server/FirebaseClient'
-
 import AppLogo from 'src/download/AppLogo'
 import PhoneIllo from 'src/download/PhoneIllo'
 import RequestFunds from 'src/fauceting/RequestFunds'
@@ -9,6 +8,7 @@ import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import { standardStyles, textStyles } from 'src/styles'
+import { RequestType } from '../../server/FirebaseClient'
 
 export default withScreenSize(
   withNamespaces(NameSpaces.download)(function DownloadCover({
@@ -17,43 +17,45 @@ export default withScreenSize(
   }: I18nProps & ScreenProps) {
     const isMobile = screen === ScreenSizes.MOBILE
     return (
-      <GridRow
-        desktopStyle={standardStyles.sectionMargin}
-        tabletStyle={standardStyles.sectionMarginTablet}
-        mobileStyle={standardStyles.blockMarginMobile}
-      >
-        <Cell
-          span={Spans.three4th}
-          tabletSpan={Spans.full}
-          style={[styles.container, !isMobile ? standardStyles.row : styles.mobileContainer]}
+      <View style={styles.zIndex}>
+        <GridRow
+          desktopStyle={standardStyles.sectionMargin}
+          tabletStyle={standardStyles.sectionMarginTablet}
+          mobileStyle={standardStyles.blockMarginMobile}
         >
-          <View style={[styles.flex1, styles.content, isMobile && standardStyles.centered]}>
-            <AppLogo />
-            <H1 style={[textStyles.invert, isMobile ? styles.titleMobile : styles.title]}>
-              {t('coverTitle')}
-            </H1>
-            <H4
+          <Cell
+            span={Spans.three4th}
+            tabletSpan={Spans.full}
+            style={[styles.container, !isMobile ? standardStyles.row : styles.mobileContainer]}
+          >
+            <View style={[styles.flex1, styles.content, isMobile && standardStyles.centered]}>
+              <AppLogo />
+              <H1 style={[textStyles.invert, isMobile ? styles.titleMobile : styles.title]}>
+                {t('coverTitle')}
+              </H1>
+              <H4
+                style={[
+                  textStyles.invert,
+                  standardStyles.elementalMarginBottom,
+                  isMobile && textStyles.center,
+                ]}
+              >
+                {t('coverSubTitle')}
+              </H4>
+              <RequestFunds kind={RequestType.Invite} />
+            </View>
+            <View
               style={[
-                textStyles.invert,
-                standardStyles.elementalMarginBottom,
-                isMobile && textStyles.center,
+                standardStyles.centered,
+                styles.flex1,
+                isMobile ? styles.mobilePhone : styles.phone,
               ]}
             >
-              {t('coverSubTitle')}
-            </H4>
-            <RequestFunds kind={RequestType.Invite} />
-          </View>
-          <View
-            style={[
-              standardStyles.centered,
-              styles.flex1,
-              isMobile ? styles.mobilePhone : styles.phone,
-            ]}
-          >
-            <PhoneIllo />
-          </View>
-        </Cell>
-      </GridRow>
+              <PhoneIllo />
+            </View>
+          </Cell>
+        </GridRow>
+      </View>
     )
   })
 )
@@ -86,5 +88,8 @@ const styles = StyleSheet.create({
     maxHeight: 300,
     marginBottom: 20,
     maxWidth: '60vw',
+  },
+  zIndex: {
+    zIndex: 20,
   },
 })

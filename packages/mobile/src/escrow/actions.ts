@@ -38,7 +38,6 @@ export interface EscrowReclaimPaymentAction {
 
 export interface EscrowFetchSentPaymentsAction {
   type: Actions.FETCH_SENT_PAYMENTS
-  forceRefresh: boolean
 }
 
 export interface EscrowStoreSentPaymentsAction {
@@ -85,9 +84,8 @@ export const reclaimEscrowPayment = (paymentID: string): EscrowReclaimPaymentAct
   paymentID,
 })
 
-export const fetchSentEscrowPayments = (forceRefresh = false): EscrowFetchSentPaymentsAction => ({
+export const fetchSentEscrowPayments = (): EscrowFetchSentPaymentsAction => ({
   type: Actions.FETCH_SENT_PAYMENTS,
-  forceRefresh,
 })
 
 export const storeSentEscrowPayments = (

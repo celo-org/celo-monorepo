@@ -102,6 +102,12 @@ exports[`renders home 1`] = `
       }
     }
     isTVSelectable={true}
+    nativeBackgroundAndroid={
+      Object {
+        "attribute": "selectableItemBackground",
+        "type": "ThemeAttrAndroid",
+      }
+    }
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
     onResponderRelease={[Function]}
@@ -109,18 +115,26 @@ exports[`renders home 1`] = `
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
     style={
-      Object {
-        "alignItems": "center",
-        "alignSelf": "center",
-        "backgroundColor": "#42D689",
-        "borderRadius": 2,
-        "marginTop": 20,
-        "minWidth": 160,
-        "opacity": 1,
-        "paddingHorizontal": 18,
-        "paddingVertical": 8,
-        "textAlign": "center",
-      }
+      Array [
+        Object {
+          "alignItems": "center",
+          "alignSelf": "flex-start",
+          "borderRadius": 2,
+          "minWidth": 160,
+          "paddingHorizontal": 16,
+          "paddingVertical": 6,
+          "textAlign": "center",
+        },
+        Object {
+          "backgroundColor": "#42D689",
+          "paddingHorizontal": 18,
+          "paddingVertical": 8,
+        },
+        Object {
+          "alignSelf": "center",
+          "marginTop": 20,
+        },
+      ]
     }
   >
     <Text

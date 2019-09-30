@@ -57,8 +57,6 @@ include ':react-native-flag-secure-android'
 project(':react-native-flag-secure-android').projectDir = new File(rootProject.projectDir, 	'../../../node_modules/react-native-flag-secure-android/android')
 include ':react-native-confirm-device-credentials'
 project(':react-native-confirm-device-credentials').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-confirm-device-credentials/android')
-include ':react-native-system-clock'
-project(':react-native-system-clock').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-system-clock/android')
 include ':react-native-restart-android'
 project(':react-native-restart-android').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-restart-android/android')
 include ':react-native-sms-retriever'
