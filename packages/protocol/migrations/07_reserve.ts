@@ -8,7 +8,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { RegistryInstance, ReserveInstance } from 'types'
-const truffle = require('@celo/protocol/truffle.js')
+const truffle = require('@celo/protocol/truffle-config.js')
 
 const initializeArgs = async (): Promise<[string, number]> => {
   const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
