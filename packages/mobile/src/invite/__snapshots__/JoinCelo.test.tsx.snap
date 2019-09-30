@@ -166,7 +166,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
           style={
             Array [
               Object {
-                "zIndex": 1,
+                "flex": 1,
               },
               undefined,
             ]
@@ -179,6 +179,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                   "borderColor": "#b9b9b9",
                   "borderRadius": 1,
                   "borderWidth": 1,
+                  "marginBottom": 0,
                 },
                 Array [
                   Object {
@@ -222,7 +223,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                 autoCapitalize="none"
                 autoCorrect={false}
                 data={Array []}
-                defaultValue=""
+                defaultValue="Canadá"
                 inputContainerStyle={
                   Array [
                     Object {
@@ -297,7 +298,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                 }
                 testID="CountryNameField"
                 underlineColorAndroid="transparent"
-                value=""
+                value="Canadá"
               />
             </View>
           </View>
@@ -338,7 +339,9 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                 "width": 60,
               }
             }
-          />
+          >
+            +1
+          </Text>
           <View
             style={
               Object {
@@ -371,6 +374,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
           >
             <TextInput
               allowFontScaling={true}
+              countryCallingCode="+1"
               keyboardType="phone-pad"
               onBlur={[Function]}
               onChangeText={[Function]}
@@ -446,7 +450,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
         null,
         undefined,
         Object {
-          "backgroundColor": "#A3EBC6",
+          "backgroundColor": "#42D689",
         },
       ]
     }
@@ -454,6 +458,12 @@ exports[`JoinCeloScreen renders correctly 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -461,15 +471,22 @@ exports[`JoinCeloScreen renders correctly 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#A3EBC6",
-          "borderWidth": 0,
-          "flex": 1,
-          "height": 50,
-          "justifyContent": "center",
-          "opacity": 1,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#42D689",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
       }
       testID="JoinCeloContinueButton"
     >
@@ -674,7 +691,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
           style={
             Array [
               Object {
-                "zIndex": 1,
+                "flex": 1,
               },
               undefined,
             ]
@@ -687,6 +704,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                   "borderColor": "#b9b9b9",
                   "borderRadius": 1,
                   "borderWidth": 1,
+                  "marginBottom": 0,
                 },
                 Array [
                   Object {
@@ -730,7 +748,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                 autoCapitalize="none"
                 autoCorrect={false}
                 data={Array []}
-                defaultValue=""
+                defaultValue="Canadá"
                 inputContainerStyle={
                   Array [
                     Object {
@@ -805,7 +823,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                 }
                 testID="CountryNameField"
                 underlineColorAndroid="transparent"
-                value=""
+                value="Canadá"
               />
             </View>
           </View>
@@ -846,7 +864,9 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                 "width": 60,
               }
             }
-          />
+          >
+            +1
+          </Text>
           <View
             style={
               Object {
@@ -879,6 +899,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
           >
             <TextInput
               allowFontScaling={true}
+              countryCallingCode="+1"
               keyboardType="phone-pad"
               onBlur={[Function]}
               onChangeText={[Function]}
@@ -954,7 +975,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
         null,
         undefined,
         Object {
-          "backgroundColor": "#A3EBC6",
+          "backgroundColor": "#42D689",
         },
       ]
     }
@@ -962,6 +983,12 @@ exports[`JoinCeloScreen renders with an error 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -969,15 +996,22 @@ exports[`JoinCeloScreen renders with an error 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#A3EBC6",
-          "borderWidth": 0,
-          "flex": 1,
-          "height": 50,
-          "justifyContent": "center",
-          "opacity": 1,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#42D689",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
       }
       testID="JoinCeloContinueButton"
     >

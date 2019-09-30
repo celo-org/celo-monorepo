@@ -26,7 +26,7 @@ function LineItemRow({
         <Text style={style.lineItemText}>{title}</Text>
         {titleIcon}
       </View>
-      {!!amount && <Text style={style.lineItemText}>{currencySymbol + amount}</Text>}
+      {!!amount && <Text style={style.lineItemText}>{amount}</Text>}
       {hasError && <Text style={style.lineItemText}>---</Text>}
       {isLoading && (
         <View style={style.loadingContainer}>

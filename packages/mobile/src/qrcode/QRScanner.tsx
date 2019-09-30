@@ -83,6 +83,7 @@ class QRScanner extends React.Component<Props> {
               }
               flashMode={RNCamera.Constants.FlashMode.auto}
               captureAudio={false}
+              autoFocus={RNCamera.Constants.AutoFocus.on}
             >
               <View style={styles.view}>
                 <View style={styles.viewFillVertical} />
