@@ -2,7 +2,6 @@ pragma solidity ^0.5.3;
 /* solhint-disable no-inline-assembly, avoid-low-level-calls, func-name-mixedcase, func-order */
 
 import "./Initializable.sol";
-import "./libraries/AddressesHelper.sol";
 
 
 /// @title Multisignature wallet - Allows multiple parties to agree on transactions before
@@ -262,10 +261,6 @@ contract MultiSig is Initializable {
     returns (bool)
   {
     bool result;
-
-    if (dataLength > 0)
-      require(AddressesHelper.isContract(destination), "Invalid contract address");
-
     /* solhint-disable max-line-length */
     assembly {
       let x := mload(0x40)   // "Allocate" memory for output (0x40 is where "free memory" pointer is stored by convention)
