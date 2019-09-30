@@ -28,9 +28,9 @@ const now = () => Math.round(new Date().getTime() / 1000)
 export type MetadataError = NetworkError | ValidationError
 
 export class MetadataManager {
-  emptyIdentityMetadata: IdentityMetadata = {
+  readonly emptyIdentityMetadata: IdentityMetadata = Object.freeze({
     claims: [],
-  }
+  })
 
   fetchMetadataTE = (url: string): TaskEither<MetadataError, IdentityMetadata> =>
     pipe(
