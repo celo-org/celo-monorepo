@@ -25,7 +25,7 @@ const contractMapping: any = {}
  * A simple script to check contract state invariants.
  *
  * Expects the following flags:
- * network: name of the network defined in truffle.js to test
+ * network: name of the network defined in truffle-config.js to test
  * build_directory: location of the appropriate build artifacts
  *
  * Run using truffle exec, e.g.:
