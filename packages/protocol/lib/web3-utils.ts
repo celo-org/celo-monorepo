@@ -1,21 +1,13 @@
 /* tslint:disable:no-console */
 // TODO(asa): Refactor and rename to 'deployment-utils.ts'
-import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
-import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { signTransaction } from '@celo/protocol/lib/signing-utils'
-import { BigNumber } from 'bignumber.js'
-import { ec as EC } from 'elliptic'
-import {
-  EscrowInstance,
-  GoldTokenInstance,
-  MultiSigInstance,
-  OwnableInstance,
-  ProxyContract,
-  ProxyInstance,
-  RegistryInstance,
-  StableTokenInstance,
-} from 'types'
-import { TransactionObject } from 'web3/eth/types'
+import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils';
+import { CeloContractName } from '@celo/protocol/lib/registry-utils';
+import { signTransaction } from '@celo/protocol/lib/signing-utils';
+import { PhoneNumberUtils } from '@celo/utils';
+import { BigNumber } from 'bignumber.js';
+import { ec as EC } from 'elliptic';
+import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types';
+import { TransactionObject } from 'web3/eth/types';
 
 import Web3 = require('web3')
 
@@ -319,10 +311,7 @@ export async function sendEscrowedPayment(
     'via Escrow.'
   )
   // @ts-ignore
-  const phoneHash: string = Web3.utils.soliditySha3({
-    type: 'string',
-    value: phone,
-  })
+  const phoneHash: string = await PhoneNumberUtils.getPhoneHash(phone)
 
   await contract.approve(escrow.address, value.toString())
   const expirySeconds = 60 * 60 * 24 * 5 // 5 days

@@ -72,7 +72,7 @@ contract('Attestations', async (accounts: string[]) => {
     issuer: string
   ): Promise<[number, string, string]> {
     const privateKey = accountPrivateKeys[accounts.indexOf(issuer)]
-    const { v, r, s } = attestToIdentifier(phoneNumber, account, privateKey)
+    const { v, r, s } = await attestToIdentifier(phoneNumber, account, privateKey)
     return [v, r, s]
   }
 

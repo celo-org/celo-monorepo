@@ -2,13 +2,13 @@ import { attestToIdentifier, SignatureUtils } from '@celo/utils'
 import express from 'express'
 import { sendSms } from './sms'
 
-function signAttestation(phoneNumber: string, account: string) {
+async function signAttestation(phoneNumber: string, account: string) {
   if (process.env.ATTESTATION_KEY === undefined) {
     console.error('Did not specify ATTESTATION_KEY')
     throw new Error('Did not specify ATTESTATION_KEY')
   }
 
-  const signature = attestToIdentifier(phoneNumber, account, process.env.ATTESTATION_KEY)
+  const signature = await attestToIdentifier(phoneNumber, account, process.env.ATTESTATION_KEY)
 
   return SignatureUtils.serializeSignature(signature)
 }
@@ -28,7 +28,7 @@ export async function handleAttestationRequest(req: express.Request, res: expres
   // const attestations = await kit.contracts.getAttestations()
 
   // Produce attestation
-  const attestationCode = signAttestation(req.body.phoneNumber, req.body.account)
+  const attestationCode = await signAttestation(req.body.phoneNumber, req.body.account)
   const textMessage = createAttestationTextMessage(attestationCode)
 
   // Send the SMS

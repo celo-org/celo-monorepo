@@ -5,6 +5,7 @@ import {
   getDeployedProxiedContract,
   sendEscrowedPayment,
 } from '@celo/protocol/lib/web3-utils'
+import { PhoneNumberUtils } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import * as twilio from 'twilio'
 import { AttestationsInstance, EscrowInstance, GoldTokenInstance, StableTokenInstance } from 'types'
@@ -68,7 +69,7 @@ module.exports = async (callback: (error?: any) => number) => {
     console.log('Invite Code:', inviteCode)
 
     // @ts-ignore soliditySha3 can take an object
-    const phoneHash: string = Web3.utils.soliditySha3({ type: 'string', value: argv.phone })
+    const phoneHash: string = await PhoneNumberUtils.getPhoneHash(argv.phone)
 
     await sendEscrowedPayment(stableToken, escrow, argv.phone, stableTokenAmount, paymentID)
 

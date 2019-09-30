@@ -1,6 +1,7 @@
 /* tslint:disable:no-console */
 
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import { PhoneNumberUtils } from '@celo/utils'
 import { AttestationsInstance } from 'types'
 
 /*
@@ -21,7 +22,7 @@ module.exports = async (callback: (error?: any) => number) => {
     })
     const phoneNumber: string = argv.phone
     // @ts-ignore soliditySha3 can take an object
-    const phoneHash: string = web3.utils.soliditySha3({ type: 'string', value: phoneNumber })
+    const phoneHash: string = await PhoneNumberUtils.getPhoneHash(phoneNumber)
     const attestations: AttestationsInstance = await getDeployedProxiedContract<
       AttestationsInstance
     >('Attestations', artifacts)

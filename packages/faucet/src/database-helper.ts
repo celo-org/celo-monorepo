@@ -111,7 +111,7 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
     await snap.ref.update({ dollarTxHash })
     await dollarTx.waitReceipt()
 
-    const phoneHash = getPhoneHash(request.beneficiary)
+    const phoneHash = await getPhoneHash(request.beneficiary)
     const escrowTx = await celo.escrowDollars(
       phoneHash,
       tempAddress,

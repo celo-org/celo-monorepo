@@ -1,3 +1,4 @@
+import { PhoneNumberUtils } from '@celo/utils'
 import Web3 from 'web3'
 
 export function wait(ms: number) {
@@ -48,10 +49,10 @@ export function isE164Number(phoneNumber: string) {
 }
 
 // TODO: Copied from @celo/utils, should be removed once usable as a dependency
-export const getPhoneHash = (phoneNumber: string): string => {
+export const getPhoneHash = async (phoneNumber: string) => {
   if (!phoneNumber || !isE164Number(phoneNumber)) {
     throw Error('Attempting to hash a non-e164 number: ' + phoneNumber)
   }
-  const web3 = new Web3()
-  return web3.utils.soliditySha3({ type: 'string', value: phoneNumber })
+  const phoneHash = await PhoneNumberUtils.getPhoneHash(phoneNumber)
+  return phoneHash
 }
