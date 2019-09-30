@@ -72,7 +72,7 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
     const shouldPassToSuperClassForHandling =
       !signingRequired || this.canSign(payload.params[0].from)
     if (shouldPassToSuperClassForHandling) {
-      super.handleRequest(payload, next, end)
+      return super.handleRequest(payload, next, end)
     } else {
       // Pass it to the next handler to sign
       next()

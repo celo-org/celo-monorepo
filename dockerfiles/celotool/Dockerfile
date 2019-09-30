@@ -18,6 +18,8 @@ COPY scripts/ scripts/
 COPY packages/utils/package.json packages/utils/
 COPY packages/typescript/package.json packages/typescript/
 COPY packages/walletkit/package.json packages/walletkit/
+COPY packages/contractkit/package.json packages/contractkit/
+COPY packages/protocol/package.json packages/protocol/
 COPY packages/verification-pool-api/package.json packages/verification-pool-api/
 COPY packages/celotool/package.json packages/celotool/
 
@@ -26,6 +28,8 @@ RUN yarn install --frozen-lockfile && yarn cache clean
 COPY packages/utils packages/utils/
 COPY packages/typescript packages/typescript/
 COPY packages/walletkit packages/walletkit/
+COPY packages/contractkit packages/contractkit/
+COPY packages/protocol packages/protocol/
 COPY packages/verification-pool-api packages/verification-pool-api/
 COPY packages/celotool packages/celotool/
 

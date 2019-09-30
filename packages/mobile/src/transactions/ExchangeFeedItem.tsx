@@ -204,14 +204,14 @@ const styles = StyleSheet.create({
     color: colors.celoGreen,
   },
   transactionStatus: {
-    color: '#BDBDBD',
+    color: colors.lightGray,
   },
   localAmount: {
     marginLeft: 'auto',
     paddingLeft: 10,
     fontSize: 14,
     lineHeight: 18,
-    color: '#BDBDBD',
+    color: colors.lightGray,
   },
 })
 
