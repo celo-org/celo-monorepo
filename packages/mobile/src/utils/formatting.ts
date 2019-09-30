@@ -32,16 +32,39 @@ export const getFeeDisplayValue = (value: BigNumber.Value | null | undefined): s
   return value ? numeral(BigNumber.max(value, 0.001).toNumber()).format('0[.][0000]') : ''
 }
 
+// More precise getFeeDisplayValue with built in rounding
+export const getNetworkFeeDisplayValue = (value: BigNumber.Value): string => {
+  const roundedNumber = new BigNumber(value)
+  if (roundedNumber.isLessThan(0.001)) {
+    return '<0.001'
+  } else {
+    return numeral(roundUp(value, 3).toNumber()).format('0[.][000]')
+  }
+}
+
+// Even more precise getFeeDisplay value for drilldown
+// Display fee to 6 decimal places if less than 0.0001, else to 3 decimal places
+export const getPreciseNetworkFeeDisplayValue = (value: BigNumber.Value): string => {
+  const roundedNumber = new BigNumber(value)
+  if (roundedNumber.isLessThan(0.000001)) {
+    return '<0.000001'
+  } else if (roundedNumber.isLessThan(0.001)) {
+    return numeral(roundUp(value, 6).toNumber()).format('0[.][000000]')
+  } else {
+    return numeral(roundUp(value, 3).toNumber()).format('0[.][000]')
+  }
+}
+
 export const divideByWei = (value: BigNumber.Value, decimals?: number) => {
   const bn = new BigNumber(value).div(WEI_PER_CELO)
   return decimals ? bn.decimalPlaces(decimals) : bn
 }
 
-export function roundDown(value: BigNumber.Value, decimals: number = 2) {
+export function roundDown(value: BigNumber.Value, decimals: number = 2): BigNumber {
   return new BigNumber(value).decimalPlaces(decimals, BigNumber.ROUND_DOWN)
 }
 
-export function roundUp(value: BigNumber.Value, decimals: number = 2) {
+export function roundUp(value: BigNumber.Value, decimals: number = 2): BigNumber {
   return new BigNumber(value).decimalPlaces(decimals, BigNumber.ROUND_UP)
 }
 
