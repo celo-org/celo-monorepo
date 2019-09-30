@@ -6,31 +6,6 @@ import Web3 from 'web3'
 import { Tx } from 'web3/eth/types'
 import { erc20Abi, getContractAddress, getEnode, getHooks, initAndStartGeth, sleep } from './utils'
 
-const blockchainParametersAbi = [
-  {
-    constant: false,
-    inputs: [
-      {
-        name: 'major',
-        type: 'uint256',
-      },
-      {
-        name: 'minor',
-        type: 'uint256',
-      },
-      {
-        name: 'patch',
-        type: 'uint256',
-      },
-    ],
-    name: 'setMinimumClientVersion',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-]
-
 const stableTokenAbi = erc20Abi.concat([
   {
     constant: false,
@@ -158,7 +133,6 @@ describe('transfer tests', function(this: any) {
   let expectedFees: any
   let txSuccess: boolean
   let stableTokenAddress: string
-  let blockchainParametersAddress: string
   let gasPriceMinimumAddress: string
   const expectedInfrastructureBlockReward: string = new BigNumber(
     Web3.utils.toWei('1', 'ether')
@@ -194,7 +168,6 @@ describe('transfer tests', function(this: any) {
     // TODO(asa): Move this to the `before`
     // Give the account we will send transfers as sufficient gold and dollars.
     stableTokenAddress = await getContractAddress('StableTokenProxy')
-    blockchainParametersAddress = await getContractAddress('BlockchainParametersProxy')
 
     const startBalance = DEF_AMOUNT.times(10)
     stableToken = new web3.eth.Contract(stableTokenAbi, stableTokenAddress)
@@ -318,16 +291,6 @@ describe('transfer tests', function(this: any) {
       toFixed(rateNumerator / rateDenominator).toString(),
       updatePeriod
     )
-    const gas = await tx.estimateGas({ from: validatorAddress })
-    return tx.send({ from: validatorAddress, gas })
-  }
-
-  const setMinimumClientVersion = async (major: number, minor: number, patch: number) => {
-    // We need to run this operation from the validator account as it is the owner of the
-    // contract.
-    const _web3 = new Web3('http://localhost:8545')
-    const _parameters = new _web3.eth.Contract(blockchainParametersAbi, blockchainParametersAddress)
-    const tx = _parameters.methods.setMinimumClientVersion(major, minor, patch)
     const gas = await tx.estimateGas({ from: validatorAddress })
     return tx.send({ from: validatorAddress, gas })
   }
@@ -472,18 +435,6 @@ describe('transfer tests', function(this: any) {
       )
     })
   }
-
-  describe('when running a node', () => {
-    it('should exit when minimum version is updated', async () => {
-      await restartGeth('full')
-      await setMinimumClientVersion(1, 8, 99)
-      await sleep(20)
-      try {
-        await setMinimumClientVersion(1, 8, 10)
-        throw new Error('expected failure')
-      } catch (_) {}
-    })
-  })
 
   const GOLD_TRANSACTION_GAS_COST = 29180
   const syncModes = ['full', 'fast', 'light', 'ultralight']

@@ -83,7 +83,7 @@ const DefaultConfig = {
     gasForCreditToTransactions: 32000,
     gasToReadErc20Balance: 15000,
     gasToReadTobinTax: 50000,
-    gasForNonGoldCurrencies: 100000,
+    gasForNonGoldCurrencies: 134000,
   },
 }
 

@@ -41,6 +41,7 @@ const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
 
 export function spawnWithLog(cmd: string, args: string[], logsFilepath: string) {
   try {
+    // fs.copyFileSync(logsFilepath, logsFilepath + "." + Date.now())
     fs.unlinkSync(logsFilepath)
   } catch (error) {
     // nothing to do
