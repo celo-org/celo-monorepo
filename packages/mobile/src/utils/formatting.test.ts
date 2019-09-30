@@ -2,6 +2,8 @@ import { CURRENCY_ENUM } from 'src/geth/consts'
 import {
   getCentAwareMoneyDisplay,
   getMoneyDisplayValue,
+  getNetworkFeeDisplayValue,
+  getPreciseNetworkFeeDisplayValue,
   roundDown,
   roundUp,
 } from 'src/utils/formatting'
@@ -53,6 +55,32 @@ describe('utils->formatting', () => {
     })
     it('it shows both cent digits when it shows any cents', () => {
       expect(getCentAwareMoneyDisplay(500.2)).toBe('500.20')
+    })
+  })
+
+  describe('getNetworkFeeDisplayValue', () => {
+    it('rounds up for fees smaller than 0.001', () => {
+      const BELOW_DISPLAY_THRESHOLD = 0.0000002
+      expect(getNetworkFeeDisplayValue(BELOW_DISPLAY_THRESHOLD)).toBe('<0.001')
+    })
+    it('shows right precision above 0.001', () => {
+      const ABOVE_ROUNDING_THRESHOLD = 0.02
+      expect(getNetworkFeeDisplayValue(ABOVE_ROUNDING_THRESHOLD)).toBe('0.020')
+    })
+  })
+
+  describe('getPreciseNetworkFeeDisplayValue', () => {
+    it('rounds up for fees smaller than 0.000001', () => {
+      const BELOW_DISPLAY_THRESHOLD = 0.0000002
+      expect(getPreciseNetworkFeeDisplayValue(BELOW_DISPLAY_THRESHOLD)).toBe('<0.000001')
+    })
+    it('shows right precision below 0.001', () => {
+      const BELOW_ROUNDING_THRESHOLD = 0.00002
+      expect(getPreciseNetworkFeeDisplayValue(BELOW_ROUNDING_THRESHOLD)).toBe('0.000020')
+    })
+    it('shows right precision above 0.001', () => {
+      const ABOVE_ROUNDING_THRESHOLD = 0.002
+      expect(getPreciseNetworkFeeDisplayValue(ABOVE_ROUNDING_THRESHOLD)).toBe('0.002')
     })
   })
 
