@@ -3,31 +3,13 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import {
-  EventTypeNames,
-  HomeTransferFragment as HomeTransferFragmentType,
-  UserTransactionsData,
-} from 'src/apollo/types'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import UserTransactionsQuery, { Event, UserTransactionsData } from 'src/apollo/types'
 import { Namespaces } from 'src/i18n'
 import { RootState } from 'src/redux/reducers'
 import { removeStandbyTransaction } from 'src/transactions/actions'
-import { StandbyTransaction, TransactionTypes } from 'src/transactions/reducer'
+import { StandbyTransaction, TransactionStatus } from 'src/transactions/reducer'
 import TransactionFeed, { FeedType } from 'src/transactions/TransactionFeed'
 import { currentAccountSelector } from 'src/web3/selectors'
-
-const standbyTransactions: HomeTransferFragmentType[] = [
-  {
-    __typename: EventTypeNames.Transfer,
-    type: TransactionTypes.NETWORK_FEE,
-    comment: '',
-    value: 0.002,
-    symbol: CURRENCY_ENUM.DOLLAR,
-    timestamp: 1542406112,
-    address: '0072bvy2o23u',
-    hash: '0x0celo',
-  },
-]
 
 interface StateProps {
   address?: string | null
@@ -90,8 +72,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 export class TransactionsList extends React.PureComponent<Props> {
   txsFetched = (data: UserTransactionsData | undefined) => {
-    return
-    /*
     if (!data || !data.events || data.events.length < 1) {
       return
     }
@@ -104,7 +84,6 @@ export class TransactionsList extends React.PureComponent<Props> {
     filteredStandbyTxs.forEach((tx) => {
       this.props.removeStandbyTransaction(tx.id)
     })
-    */
   }
 
   render() {
@@ -112,13 +91,18 @@ export class TransactionsList extends React.PureComponent<Props> {
     const queryAddress = address || ''
 
     return (
-      <TransactionFeed
-        loading={false}
-        error={undefined}
-        data={{ events: standbyTransactions }}
-        // standbyTransactions={standbyTransactions}
-        kind={FeedType.HOME}
-      />
+      <UserTransactionsQuery
+        query={transactionQuery}
+        pollInterval={10000}
+        variables={{ address: queryAddress }}
+        onCompleted={this.txsFetched}
+      >
+        {({ loading, error, data }) => {
+          return (
+            <TransactionFeed kind={FeedType.HOME} loading={loading} error={error} data={data} />
+          )
+        }}
+      </UserTransactionsQuery>
     )
   }
 }
