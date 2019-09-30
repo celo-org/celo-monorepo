@@ -33,9 +33,9 @@ ex_rates = ex_rate_start*np.exp(W_bridge)
 plt.plot(t, ex_rates)
 plt.show()
 with open('./exchange_rates/oracle_exchange_rates.csv', 'w') as csvfile:
-    writer = csv.writer(csvfile, delimiter=',',
-                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
-    timestamp = int(time.time())
-    writer.writerow(['timestamp', 'stableValue', 'goldValue'])
-    for i, rate in enumerate(ex_rates):
-        writer.writerow([timestamp + i * dt * 24 * 60 * 60, int(rate * 1000), int(ex_rate_start * 1000)])
+  writer = csv.writer(csvfile, delimiter=',',
+                          quotechar='|', quoting=csv.QUOTE_MINIMAL)
+  timestamp = int(time.time())
+  writer.writerow(['timestamp', 'stableValue', 'goldValue'])
+  for i, rate in enumerate(ex_rates):
+      writer.writerow([timestamp + i * dt * 24 * 60 * 60, int(rate * 1000), int(ex_rate_start * 1000)])
