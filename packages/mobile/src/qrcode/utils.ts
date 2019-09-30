@@ -19,10 +19,6 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'QR/utils'
 
-export enum BarcodeTypes {
-  QR_CODE = 'QR_CODE',
-}
-
 const QRFileName = '/celo-qr.png'
 
 export async function shareSVGImage(svg: SVG) {

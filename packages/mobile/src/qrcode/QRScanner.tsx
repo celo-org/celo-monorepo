@@ -17,6 +17,10 @@ import { handleBarcodeDetected } from 'src/send/actions'
 import { requestCameraPermission } from 'src/utils/androidPermissions'
 import Logger from 'src/utils/Logger'
 
+enum BarcodeTypes {
+  QR_CODE = 'QR_CODE',
+}
+
 interface DispatchProps {
   handleBarcodeDetected: typeof handleBarcodeDetected
 }
@@ -53,13 +57,9 @@ class QRScanner extends React.Component<Props> {
   }
 
   onBardCodeDetected = (rawData: any) => {
-    if (
-      rawData.type === 'barcode' &&
-      rawData.barcodes.length !== 0 &&
-      this.state.qrSubmitted === false
-    ) {
+    if (rawData.type === BarcodeTypes.QR_CODE && this.state.qrSubmitted === false) {
       this.setState({ qrSubmitted: true }, () => {
-        this.props.handleBarcodeDetected(rawData.barcodes[0])
+        this.props.handleBarcodeDetected(rawData)
       })
     }
   }
@@ -77,10 +77,8 @@ class QRScanner extends React.Component<Props> {
               // @ts-ignore
               style={styles.preview}
               type={RNCamera.Constants.Type.back}
-              onGoogleVisionBarcodesDetected={this.onBardCodeDetected}
-              googleVisionBarcodeType={
-                RNCamera.Constants.GoogleVisionBarcodeDetection.BarcodeType.QR_CODE
-              }
+              onBarCodeRead={this.onBardCodeDetected}
+              barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
               flashMode={RNCamera.Constants.FlashMode.auto}
               captureAudio={false}
               autoFocus={RNCamera.Constants.AutoFocus.on}
