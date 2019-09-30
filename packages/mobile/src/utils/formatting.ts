@@ -42,14 +42,14 @@ export const getNetworkFeeDisplayValue = (value: BigNumber.Value): string => {
   if (roundedNumber.isLessThan(0.001)) {
     return '<0.001'
   } else {
-    return numeral(roundUp(value, 3).toNumber()).format('0[.]000') // Always 3 digits, even if trailing 0s
+    return numeral(roundUp(value, 3).toNumber()).format('0[.][000]')
   }
 }
 
 /**
  * Even more precise getFeeDisplay value for Network Fee drilldown
  * Built in rounding below <0.000001. Displays fee to 6 decimal
- * places if less than 0.0001, else to 3 decimal places
+ * places if less than 0.001, else to 3 decimal places
  * @param value fee amount
  */
 export const getPreciseNetworkFeeDisplayValue = (value: BigNumber.Value): string => {
@@ -57,9 +57,9 @@ export const getPreciseNetworkFeeDisplayValue = (value: BigNumber.Value): string
   if (roundedNumber.isLessThan(0.000001)) {
     return '<0.000001'
   } else if (roundedNumber.isLessThan(0.001)) {
-    return numeral(roundUp(value, 6).toNumber()).format('0[.]000000') // Always 6 digits, even if trailing 0s
+    return numeral(roundUp(value, 6).toNumber()).format('0[.][000000]')
   } else {
-    return numeral(roundUp(value, 3).toNumber()).format('0[.]000') // Always 3 digits, even if trailing 0s
+    return numeral(roundUp(value, 3).toNumber()).format('0[.][000]')
   }
 }
 

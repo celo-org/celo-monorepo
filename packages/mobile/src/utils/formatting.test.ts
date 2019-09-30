@@ -64,8 +64,8 @@ describe('utils->formatting', () => {
       expect(getNetworkFeeDisplayValue(BELOW_DISPLAY_THRESHOLD)).toBe('<0.001')
     })
     it('shows right precision above 0.001', () => {
-      const ABOVE_ROUNDING_THRESHOLD = 0.02
-      expect(getNetworkFeeDisplayValue(ABOVE_ROUNDING_THRESHOLD)).toBe('0.020')
+      const ABOVE_ROUNDING_THRESHOLD = 0.1
+      expect(getNetworkFeeDisplayValue(ABOVE_ROUNDING_THRESHOLD)).toBe('0.1')
     })
   })
 
@@ -76,11 +76,11 @@ describe('utils->formatting', () => {
     })
     it('shows right precision below 0.001', () => {
       const BELOW_ROUNDING_THRESHOLD = 0.00002
-      expect(getPreciseNetworkFeeDisplayValue(BELOW_ROUNDING_THRESHOLD)).toBe('0.000020')
+      expect(getPreciseNetworkFeeDisplayValue(BELOW_ROUNDING_THRESHOLD)).toBe('0.00002')
     })
     it('shows right precision above 0.001', () => {
-      const ABOVE_ROUNDING_THRESHOLD = 0.002
-      expect(getPreciseNetworkFeeDisplayValue(ABOVE_ROUNDING_THRESHOLD)).toBe('0.002')
+      const ABOVE_ROUNDING_THRESHOLD = 0.10001
+      expect(getPreciseNetworkFeeDisplayValue(ABOVE_ROUNDING_THRESHOLD)).toBe('0.1')
     })
   })
 
