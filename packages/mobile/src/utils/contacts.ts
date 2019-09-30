@@ -34,9 +34,9 @@ export async function getPhoneHashRN(phoneNumber: string) {
   if (!phoneNumber || !isE164Number(phoneNumber)) {
     throw Error('Attempting to hash a non-e164 number: ' + phoneNumber)
   }
-
+  const phoneNumberText = `tel://${phoneNumber}`
   const result = await scrypt(
-    Buffer.from(phoneNumber.normalize('NFKC')),
+    Buffer.from(phoneNumberText.normalize('NFKC')),
     Buffer.from(SCRYPT_PARAMS.salt.normalize('NFKC')),
     SCRYPT_PARAMS.N,
     SCRYPT_PARAMS.r,

@@ -27,8 +27,9 @@ export function getPhoneHash(phoneNumber: string) {
     throw Error('Attempting to hash a non-e164 number: ' + phoneNumber)
   }
   return new Promise<string>((resolve) => {
+    const phoneNumberText = `tel://${phoneNumber}`
     scrypt(
-      Buffer.from(phoneNumber.normalize('NFKC')),
+      Buffer.from(phoneNumberText.normalize('NFKC')),
       Buffer.from(SCRYPT_PARAMS.salt.normalize('NFKC')),
       SCRYPT_PARAMS.N,
       SCRYPT_PARAMS.r,
