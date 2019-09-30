@@ -29,7 +29,7 @@ export const createBucketIfNotExists = async (
   location: string = 'US-CENTRAL1',
   storageClass: string = 'COLDLINE'
 ) => {
-  if (!checkBucketExists(client, bucketName)) {
+  if (!(await checkBucketExists(client, bucketName))) {
     await createBucket(client, bucketName, location, storageClass)
   }
 }
