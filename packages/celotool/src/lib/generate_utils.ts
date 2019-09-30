@@ -27,6 +27,7 @@ export enum AccountType {
   TX_NODE = 2,
   BOOTNODE = 3,
   FAUCET = 4,
+  PRICE_ORACLE = 5,
 }
 
 export enum ConsensusType {
@@ -45,6 +46,7 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'tx_node',
   'bootnode',
   'faucet',
+  'price_oracle',
 ]
 
 export const add0x = (str: string) => {
@@ -134,12 +136,13 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
 
   // Assing DEFAULT ammount of gold to 2 faucet accounts
   const faucetAddresses = getStrippedAddressesFor(AccountType.FAUCET, mnemonic, 2)
+  const priceOracleAddress = getStrippedAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1)
 
   return generateGenesis({
     validators,
     consensusType,
     blockTime,
-    initialAccounts: faucetAddresses,
+    initialAccounts: faucetAddresses.concat(priceOracleAddress),
     epoch,
     chainId,
     requestTimeout,

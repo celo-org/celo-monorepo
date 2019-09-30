@@ -115,6 +115,9 @@ export const handler = async (argv: InitialArgv) => {
       },
       stableToken: {
         initialAccounts: getAddressesFor(AccountType.FAUCET, mnemonic, 2),
+        priceOracleAccount: privateKeyToAddress(
+          generatePrivateKey(mnemonic, AccountType.PRICE_ORACLE, 0)
+        ),
       },
     })
 
