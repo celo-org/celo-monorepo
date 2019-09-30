@@ -6,26 +6,6 @@ import Web3 from 'web3'
 import { Tx } from 'web3/eth/types'
 import { erc20Abi, getContractAddress, getEnode, getHooks, initAndStartGeth, sleep } from './utils'
 
-/**
- * If after changing a Smart Contract implementation the e2e transfer tests are failing,
- * typically you can fix the tests adapting the new gas estimations with the output of the
- * `ci_test_transfers.sh` script.
- *
- * E2E tests can be run in your local using the following command from the
- * `$ ./ci_test_transfers.sh local /full/path/to/celo-blockchain/`
- *
- * In the output of the script execution, look for the error messages similar to:
- * "AssertionError: expected '3804860' to equal '3789120'"
- * This error means an assertion was expecting a gas cost of 3789120 but 3804860 was found.
- * If the new gas cost makes sense, the best way to fix this is to divide the expected gas cost
- * by the gas price (20) (in our case 3789120/20= 189456). Look for the resulted number in this
- * script. If you find it, divide the result obtained by the gas price
- * (in our example 3804860/20= 190243) and replace the result for the old value (in our case replace
- * 189456 by 190243). This should fix most of the errors.
- *
- * If still you have some errors, apply the same pattern with the GOLD_TRANSACTION_GAS_COST variable.
- */
-
 const stableTokenAbi = erc20Abi.concat([
   {
     constant: false,
@@ -456,7 +436,7 @@ describe('transfer tests', function(this: any) {
     })
   }
 
-  const GOLD_TRANSACTION_GAS_COST = 29967
+  const GOLD_TRANSACTION_GAS_COST = 29180
   const syncModes = ['full', 'fast', 'light', 'ultralight']
   for (const syncMode of syncModes) {
     describe(`when running ${syncMode} sync`, () => {
@@ -530,7 +510,7 @@ describe('transfer tests', function(this: any) {
               before(async function(this: any) {
                 await restartGeth(syncMode)
 
-                const expectedGasUsed = 163967
+                const expectedGasUsed = 163180
                 ;[txSuccess, newBalances, expectedFees] = await runTestTransaction(
                   transferCeloGold(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
                     gasCurrency: stableTokenAddress,
@@ -595,7 +575,7 @@ describe('transfer tests', function(this: any) {
 
                 await setInflationParams(2, 1, timeSinceLastUpdated.toNumber())
 
-                const expectedGasUsed = 163967
+                const expectedGasUsed = 163180
                 ;[txSuccess, newBalances, expectedFees] = await runTestTransaction(
                   transferCeloGold(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
                     gasCurrency: stableTokenAddress,
@@ -760,7 +740,7 @@ describe('transfer tests', function(this: any) {
           before(async function(this: any) {
             await restartGeth(syncMode)
 
-            const expectedGasUsed = 190243
+            const expectedGasUsed = 189456
             ;[txSuccess, newBalances, expectedFees] = await runTestTransaction(
               transferCeloDollars(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
                 gasCurrency: stableTokenAddress,
@@ -777,7 +757,7 @@ describe('transfer tests', function(this: any) {
           before(async function(this: any) {
             await restartGeth(syncMode)
 
-            const expectedGasUsed = 56243
+            const expectedGasUsed = 55456
             ;[txSuccess, newBalances, expectedFees] = await runTestTransaction(
               transferCeloDollars(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
                 gasFeeRecipient: feeRecipientAddress,
