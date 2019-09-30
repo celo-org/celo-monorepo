@@ -1,6 +1,7 @@
 // Supported local currency codes
 export enum LocalCurrencyCode {
   USD = 'USD',
+  CAD = 'CAD',
   EUR = 'EUR',
   MXN = 'MXN',
   PHP = 'PHP',
