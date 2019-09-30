@@ -1,5 +1,5 @@
 import * as RNLocalize from 'react-native-localize'
-import { LocalCurrencyCode, LOCAL_CURRENCY_CODES } from 'src/localCurrency/consts'
+import { LOCAL_CURRENCY_CODES, LocalCurrencyCode } from 'src/localCurrency/consts'
 import { RootState } from 'src/redux/reducers'
 
 const MIN_UPDATE_INTERVAL = 12 * 3600 * 1000 // 12 hours
