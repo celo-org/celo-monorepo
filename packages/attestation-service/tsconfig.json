@@ -4,5 +4,6 @@
     "rootDir": "src",
     "outDir": "lib"
   },
-  "include": ["src", "types/", "index.d.ts"]
+  "include": ["src", "types/", "index.d.ts"],
+  "references": [{ "path": "../utils" }]
 }
