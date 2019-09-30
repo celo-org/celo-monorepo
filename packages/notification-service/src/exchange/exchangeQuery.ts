@@ -33,8 +33,8 @@ export async function getExchangeRate(makerToken: CURRENCY_ENUM, web3Instance: W
 }
 
 let web3: Web3
-export function getWeb3Instance(): Web3 {
-  if (web3 && web3.eth.net.isListening()) {
+export async function getWeb3Instance(): Promise<Web3> {
+  if (web3 && (await web3.eth.net.isListening())) {
     // Already connected
     return web3
   } else {
