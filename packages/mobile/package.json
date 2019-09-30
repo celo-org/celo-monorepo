@@ -68,7 +68,6 @@
     "google-libphonenumber": "^3.2.4",
     "graphql": "^14.1.1",
     "i18next": "^11.9.1",
-    "instabug-reactnative": "^8.4.3",
     "js-sha3": "^0.7.0",
     "lodash": "^4.17.14",
     "moment": "^2.22.1",
