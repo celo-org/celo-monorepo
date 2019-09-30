@@ -74,6 +74,10 @@ export class IdentityMetadataWrapper {
 
   static fromRawString(rawData: string) {
     const data = JSON.parse(rawData)
+    // TODO: We should validate:
+    // 1. data.claims being an array
+    // 2. payload being JSON-parsable
+    // This is hard to put into io-ts + we need to eventually do signature checking
     return new IdentityMetadataWrapper({
       claims: data.claims.map((claim: any) => ({
         payload: JSON.parse(claim.payload),
@@ -85,6 +89,7 @@ export class IdentityMetadataWrapper {
   constructor(data: IdentityMetadata) {
     const result = IdentityMetadataType.decode(data)
     if (isLeft(result)) {
+      // TODO: We could probably return a more useful error in the future
       throw new ValidationError(PathReporter.report(result).join(', '))
     }
     this.data = result.right
