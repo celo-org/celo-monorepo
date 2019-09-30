@@ -189,7 +189,7 @@ PODS:
     - React
   - RNGestureHandler (1.1.0):
     - React
-  - RNLanguages (3.0.1):
+  - RNLocalize (1.2.1):
     - React
   - RNRandomBytes (2.2.3):
     - React
@@ -257,7 +257,7 @@ DEPENDENCIES:
   - RNFirebase (from `../../../node_modules/react-native-firebase/ios`)
   - RNFS (from `../../../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
-  - RNLanguages (from `../../../node_modules/react-native-languages`)
+  - RNLocalize (from `../../../node_modules/react-native-localize`)
   - RNRandomBytes (from `../../../node_modules/react-native-secure-randombytes`)
   - RNScreens (from `../../../node_modules/react-native-screens`)
   - RNSecureKeyStore (from `../../../node_modules/react-native-secure-key-store/ios`)
@@ -326,8 +326,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-fs"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
-  RNLanguages:
-    :path: "../../../node_modules/react-native-languages"
+  RNLocalize:
+    :path: "../../../node_modules/react-native-localize"
   RNRandomBytes:
     :path: "../../../node_modules/react-native-secure-randombytes"
   RNScreens:
@@ -377,7 +377,7 @@ SPEC CHECKSUMS:
   RNFirebase: 7d4733713a0f436d55388b55ca3744385c70fd2d
   RNFS: 0f4d630b538e93e0e9e3519ff0b7b7b48760d8ed
   RNGestureHandler: b65d391f4f570178d657b99a16ec99d09b8656b0
-  RNLanguages: 69291ca9fea686ff96c66a519f92f7e5af1d08ae
+  RNLocalize: f42aea3133d91d7fa3ec01284a6895019af1a83f
   RNRandomBytes: ed3e5894ef983d1afd17a63349cc517b260138fa
   RNScreens: 720a9e6968beb73e8196239801e887d8401f86ed
   RNSecureKeyStore: f1ad870e53806453039f650720d2845c678d89c8
@@ -388,6 +388,6 @@ SPEC CHECKSUMS:
   SentryReactNative: 014e5b1684c30c31e6514a57e51eff26cf2b99f7
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: 4685ed03314b9d51829f40dbedd326507098bd2e
+PODFILE CHECKSUM: ea805529954e50e03bce5f08a80fc13ef245de6e
 
 COCOAPODS: 1.7.5

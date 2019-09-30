@@ -37,7 +37,7 @@ import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.levelasquez.androidopensettings.AndroidOpenSettingsPackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import com.peel.react.TcpSocketsModule;
-import com.reactcommunity.rnlanguages.RNLanguagesPackage;
+import com.reactcommunity.rnlocalize.RNLocalizePackage;
 import com.reactnativegeth.RNGethPackage;
 import com.rnfs.RNFSPackage;
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
@@ -91,7 +91,7 @@ public class MainApplication extends Application implements ShareApplication, Re
               new SplashScreenReactPackage(),
               new AndroidOpenSettingsPackage(),
               new UdpSocketsModule(),
-              new RNLanguagesPackage(),
+              new RNLocalizePackage(),
               new ReactNativeConfigPackage(),
               new RNFirebasePackage(),
               new RNFirebaseMessagingPackage(),
