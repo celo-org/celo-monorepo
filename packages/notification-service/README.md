@@ -20,7 +20,7 @@ Next, run this task to build, configure, and start the service:
 
 Deploy your app. The project will be built automatically by Google Cloud Build:
 
-    yarn deploy:{ENVIRONMENT}
+    yarn deploy -n {ENVIRONMENT}
 
 Current supported environments are production, integration, staging-argentina
 

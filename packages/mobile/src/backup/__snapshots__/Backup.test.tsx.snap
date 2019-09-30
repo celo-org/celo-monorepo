@@ -4,163 +4,183 @@ exports[`Backup renders correctly if backup completed 1`] = `
 <View
   style={
     Object {
-      "backgroundColor": "white",
+      "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "flexDirection": "column",
       "justifyContent": "space-between",
-      "paddingHorizontal": 20,
     }
   }
 >
-  <View
-    style={
+  <RCTScrollView
+    contentContainerStyle={
       Object {
         "alignItems": "center",
+        "backgroundColor": "#FFFFFF",
+        "flexGrow": 1,
+        "paddingHorizontal": 20,
         "paddingTop": 40,
       }
     }
+    style={
+      Object {
+        "flex": 1,
+      }
+    }
   >
-    <View
-      style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "marginBottom": 20,
-          },
-          Object {},
-        ]
-      }
-    >
-      <Image
-        resizeMode="contain"
-        source={
-          Object {
-            "testUri": "../../../src/images/coins-logo.png",
-          }
-        }
+    <View>
+      <View
         style={
-          Object {
-            "height": 35,
-            "width": 35,
-          }
-        }
-      />
-    </View>
-    <Text
-      style={
-        Array [
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Light",
-            "fontSize": 22,
-            "paddingBottom": 20,
-            "textAlign": "center",
-          },
-          Object {
-            "color": "#2E3338",
-            "paddingTop": 25,
-          },
-        ]
-      }
-    >
-      backupKey
-    </Text>
-    <Text
-      style={
-        Object {
-          "color": "#2E3338",
-          "fontFamily": "Hind-Regular",
-          "fontSize": 16,
-          "lineHeight": 24,
-        }
-      }
-    >
-      dontLoseIt
-    </Text>
-    <View
-      style={
-        Object {
-          "alignContent": "center",
-          "backgroundColor": "#F8F8F8",
-          "justifyContent": "center",
-          "marginTop": 30,
-          "padding": 16,
-          "position": "relative",
-        }
-      }
-    >
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Light",
-            "fontSize": 18,
-            "textAlign": "left",
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "marginBottom": 20,
+            },
+            Object {},
+          ]
         }
       >
-        
-      </Text>
-    </View>
-    <View
-      accessible={true}
-      hitSlop={
-        Object {
-          "bottom": 7,
-          "left": 7,
-          "right": 7,
-          "top": 7,
-        }
-      }
-      isTVSelectable={true}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      style={
-        Object {
-          "alignItems": "center",
-          "alignSelf": "center",
-          "backgroundColor": "transparent",
-          "borderColor": "#42D689",
-          "borderRadius": 2,
-          "borderWidth": 2,
-          "fontSize": 14,
-          "marginTop": 50,
-          "minWidth": 160,
-          "opacity": 1,
-          "paddingHorizontal": 16,
-          "paddingVertical": 6,
-          "textAlign": "center",
-        }
-      }
-      testID="pasteMessageButton"
-    >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../src/images/coins-logo.png",
+            }
+          }
+          style={
+            Object {
+              "height": 35,
+              "width": 35,
+            }
+          }
+        />
+      </View>
       <Text
         style={
           Array [
             Object {
-              "color": "#81868B",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 13,
-              "lineHeight": 17,
+              "color": "#2E3338",
+              "fontFamily": "Hind-Light",
+              "fontSize": 22,
+              "paddingBottom": 20,
+              "textAlign": "center",
             },
             Object {
-              "lineHeight": 20,
+              "color": "#2E3338",
+              "paddingTop": 25,
             },
-            Object {
-              "color": "#42D689",
-            },
-            undefined,
           ]
         }
       >
-        copyToClipboard
+        backupKey
       </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 16,
+            "lineHeight": 24,
+          }
+        }
+      >
+        dontLoseIt
+      </Text>
+      <View
+        style={
+          Object {
+            "alignContent": "center",
+            "backgroundColor": "#F8F8F8",
+            "justifyContent": "center",
+            "marginTop": 30,
+            "padding": 16,
+            "position": "relative",
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Light",
+              "fontSize": 18,
+              "textAlign": "left",
+            }
+          }
+        >
+          
+        </Text>
+      </View>
+      <View
+        accessible={true}
+        hitSlop={
+          Object {
+            "bottom": 7,
+            "left": 7,
+            "right": 7,
+            "top": 7,
+          }
+        }
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "alignSelf": "flex-start",
+              "borderRadius": 2,
+              "minWidth": 160,
+              "paddingHorizontal": 16,
+              "paddingVertical": 6,
+              "textAlign": "center",
+            },
+            Object {
+              "backgroundColor": "transparent",
+              "borderColor": "#42D689",
+              "borderWidth": 2,
+            },
+            Object {
+              "alignSelf": "center",
+              "fontSize": 14,
+              "marginTop": 50,
+            },
+          ]
+        }
+        testID="pasteMessageButton"
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#81868B",
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 13,
+                "lineHeight": 17,
+              },
+              Object {
+                "lineHeight": 20,
+              },
+              Object {
+                "color": "#42D689",
+              },
+              undefined,
+            ]
+          }
+        >
+          copyToClipboard
+        </Text>
+      </View>
     </View>
-  </View>
+  </RCTScrollView>
   <View
     style={
       Array [
@@ -185,6 +205,12 @@ exports[`Backup renders correctly if backup completed 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -192,17 +218,24 @@ exports[`Backup renders correctly if backup completed 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#42D689",
-          "borderColor": "#42D689",
-          "borderRadius": 3,
-          "borderWidth": 2,
-          "flex": 1,
-          "height": 50,
-          "justifyContent": "center",
-          "opacity": 1,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#42D689",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderColor": "#42D689",
+            "borderRadius": 3,
+            "borderWidth": 2,
+          },
+        ]
       }
     >
       <View
@@ -261,6 +294,12 @@ exports[`Backup renders correctly if backup not completed 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -269,7 +308,6 @@ exports[`Backup renders correctly if backup not completed 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "opacity": 1,
           "paddingHorizontal": 20,
           "paddingVertical": 10,
         }
@@ -549,7 +587,7 @@ exports[`Backup renders correctly if backup not completed 1`] = `
                     ]
                   }
                 >
-                  skip
+                  global:skip
                 </Text>
               </View>
               <View
@@ -611,6 +649,12 @@ exports[`Backup renders correctly if backup not completed 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -618,15 +662,22 @@ exports[`Backup renders correctly if backup not completed 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#42D689",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#42D689",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
       >
         <View
@@ -683,6 +734,12 @@ exports[`Backup renders correctly if backup not completed 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -690,15 +747,22 @@ exports[`Backup renders correctly if backup not completed 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "transparent",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
       >
         <View

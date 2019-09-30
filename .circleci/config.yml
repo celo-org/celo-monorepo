@@ -93,7 +93,7 @@ jobs:
       - run:
           name: Build packages
           command: |
-            # separate build to avoid ENOMEN in CI :(
+            # separate build to avoid ENOMEM in CI :(
             yarn build --scope @celo/utils
             yarn build --scope @celo/protocol
             yarn build --scope docs
