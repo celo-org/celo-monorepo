@@ -79,8 +79,8 @@ describe('utils->formatting', () => {
       expect(getPreciseNetworkFeeDisplayValue(BELOW_ROUNDING_THRESHOLD)).toBe('0.00002')
     })
     it('shows right precision above 0.001', () => {
-      const ABOVE_ROUNDING_THRESHOLD = 0.10001
-      expect(getPreciseNetworkFeeDisplayValue(ABOVE_ROUNDING_THRESHOLD)).toBe('0.1')
+      const ABOVE_ROUNDING_THRESHOLD = 0.100001
+      expect(getPreciseNetworkFeeDisplayValue(ABOVE_ROUNDING_THRESHOLD)).toBe('0.101')
     })
   })
 
