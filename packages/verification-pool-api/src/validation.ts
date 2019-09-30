@@ -8,12 +8,6 @@ export function parseBase64(source: string) {
   return ethjsutil.bufferToHex(Buffer.from(source, 'base64'))
 }
 
-// TODO: Copied from @celo/utils, should be removed once usable as a dependency
-function isE164Number(phoneNumber: string) {
-  const E164RegEx = /^\+[1-9][0-9]{1,14}$/
-  return E164RegEx.test(phoneNumber)
-}
-
 export async function getPhoneHash(phoneNumber: string) {
   const phoneHash = await PhoneNumberUtils.getPhoneHash(phoneNumber)
   return phoneHash

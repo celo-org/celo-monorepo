@@ -33,7 +33,7 @@ export async function attestToIdentifier(
   identifier: string,
   account: string,
   privateKey: string
-): Signature {
+): Promise<Signature> {
   const issuer = privateKeyToAddress(privateKey)
   const { v, r, s } = SignatureUtils.signMessage(
     await attestationMessageToSign(identifier, account),
