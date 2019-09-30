@@ -4,12 +4,46 @@ import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import UserTransactionsQuery, { Event, UserTransactionsData } from 'src/apollo/types'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { RootState } from 'src/redux/reducers'
 import { removeStandbyTransaction } from 'src/transactions/actions'
-import { StandbyTransaction, TransactionStatus } from 'src/transactions/reducer'
+import { StandbyTransaction, TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
 import TransactionFeed, { FeedType } from 'src/transactions/TransactionFeed'
 import { currentAccountSelector } from 'src/web3/selectors'
+
+const standbyTransactions: StandbyTransaction[] = [
+  {
+    id: '0110',
+    type: TransactionTypes.SENT,
+    comment: 'Eye for an Eye',
+    status: TransactionStatus.Pending,
+    value: '100',
+    symbol: CURRENCY_ENUM.DOLLAR,
+    timestamp: 1542406112,
+    address: '0072bvy2o23u',
+  },
+  {
+    id: '0112',
+    type: TransactionTypes.EXCHANGE,
+    status: TransactionStatus.Pending,
+    inSymbol: CURRENCY_ENUM.DOLLAR,
+    inValue: '20',
+    outSymbol: CURRENCY_ENUM.GOLD,
+    outValue: '30',
+    timestamp: 1542409112,
+  },
+  {
+    id: '0113',
+    type: TransactionTypes.NETWORK_FEE,
+    comment: '',
+    status: TransactionStatus.Pending,
+    value: '0.0001',
+    symbol: CURRENCY_ENUM.DOLLAR,
+    timestamp: 1542406112,
+    address: '0072bvy2o23u',
+  },
+]
 
 interface StateProps {
   address?: string | null
@@ -99,7 +133,13 @@ export class TransactionsList extends React.PureComponent<Props> {
       >
         {({ loading, error, data }) => {
           return (
-            <TransactionFeed kind={FeedType.HOME} loading={loading} error={error} data={data} />
+            <TransactionFeed
+              loading={loading}
+              error={error}
+              data={{ events: [] }}
+              // standbyTransactions={standbyTransactions}
+              kind={FeedType.HOME}
+            />
           )
         }}
       </UserTransactionsQuery>

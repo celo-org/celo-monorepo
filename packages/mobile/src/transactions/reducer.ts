@@ -55,6 +55,7 @@ type TransferTransactionTypes =
   | TransactionTypes.VERIFICATION_FEE
   | TransactionTypes.INVITE_SENT
   | TransactionTypes.INVITE_RECEIVED
+  | TransactionTypes.NETWORK_FEE
 
 export interface State {
   standbyTransactions: StandbyTransaction[]
