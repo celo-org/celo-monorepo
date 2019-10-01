@@ -225,7 +225,6 @@ android {
 dependencies {
     implementation project(':react-native-install-referrer')
     implementation project(':react-native-send-intent')
-    // implementation project(':instabug-reactnative')
     // implementation project(':react-native-screens')
     implementation project(':react-native-webview')
     implementation project(':@react-native-community_netinfo')
