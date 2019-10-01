@@ -111,6 +111,8 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
+      # If this fails, fix it with 
+      # `./node_modules/.bin/prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx)'`
       - run: yarn run prettify:diff
       - run: yarn run lint
 
