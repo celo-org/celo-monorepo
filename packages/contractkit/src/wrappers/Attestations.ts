@@ -246,7 +246,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * Lookup mapped walleet addresses for a given list of hashes of phone numbers
    * @param phoneNumberHashes The hashes of phone numbers to lookup
    */
-  async lookupIdentifiers(
+  async lookupPhoneNumbers(
     identifierHashes: string[]
   ): Promise<Record<string, Record<string, AttestationStat>>> {
     // Unfortunately can't be destructured
