@@ -1,8 +1,8 @@
 import BigNumber from 'bignumber.js'
 import fetch from 'node-fetch'
-import { BLOCKSCOUT_API, GOLD_TOKEN_ADDRESS, STABLE_TOKEN_ADDRESS } from '../config'
+import { BLOCKSCOUT_API } from '../config'
 import { getLastBlockNotified, sendPaymentNotification, setLastBlockNotified } from '../firebase'
-import { removeEmptyValuesFromObject } from '../util/utils'
+import { getTokenAddresses, removeEmptyValuesFromObject } from '../util/utils'
 import { Log, Response, Transfer } from './blockscout'
 import { decodeLogs } from './decode'
 
@@ -121,15 +121,16 @@ export async function handleTransferNotifications(): Promise<void> {
     return
   }
 
+  const { goldTokenAddress, stableTokenAddress } = await getTokenAddresses()
   const {
     transfers: goldTransfers,
     latestBlock: goldTransfersLatestBlock,
-  } = await getLatestTokenTransfers(GOLD_TOKEN_ADDRESS, lastBlockNotified, Currencies.GOLD)
+  } = await getLatestTokenTransfers(goldTokenAddress, lastBlockNotified, Currencies.GOLD)
 
   const {
     transfers: stableTransfers,
     latestBlock: stableTransfersLatestBlock,
-  } = await getLatestTokenTransfers(STABLE_TOKEN_ADDRESS, lastBlockNotified, Currencies.DOLLAR)
+  } = await getLatestTokenTransfers(stableTokenAddress, lastBlockNotified, Currencies.DOLLAR)
 
   const allTransfers = filterAndJoinTransfers(goldTransfers, stableTransfers)
 
