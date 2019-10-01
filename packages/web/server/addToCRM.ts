@@ -164,7 +164,7 @@ export default async function addToCRM({
   } catch (e) {
     Sentry.withScope((scope) => {
       scope.setTag('Service', 'ActiveCampaign')
-      Sentry.captureException(e)
+      Sentry.captureEvent(e)
     })
     return { error: e }
   }

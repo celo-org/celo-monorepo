@@ -86,20 +86,24 @@ class HomeScreen extends React.Component<Props, State> {
   }
 
   async componentDidMount() {
-    this.getVerifierStatus()
-    NetInfo.addEventListener('connectionChange', this.handleNetworkStatusChange)
+    try {
+      NetInfo.addEventListener('connectionChange', this.handleNetworkStatusChange)
+      if (!this.props.isVerifying && isVerifyingDisabledLongTime(this.props.verifyingOffAt)) {
+        setTimeout(() => this.showVerifyingOffLongMessage(), 2000)
+      }
 
-    /**
-     * Note about FCMToken:
-     * Because we are getting this from our custom VerifierService, there is no way to subscribe to updates
-     * To ensure we keep it up to date, we will retrieve it every time the home page mounts
-     * To avoid this, we would need to add the RN Firebase module for messaging and subscribe to its updates
-     */
-    const fcmToken = await VerifierService.getFCMToken()
-    setFcmToken(fcmToken)
+      await this.getVerifierStatus()
 
-    if (!this.props.isVerifying && isVerifyingDisabledLongTime(this.props.verifyingOffAt)) {
-      setTimeout(() => this.showVerifyingOffLongMessage(), 2000)
+      /**
+       * Note about FCMToken:
+       * Because we are getting this from our custom VerifierService, there is no way to subscribe to updates
+       * To ensure we keep it up to date, we will retrieve it every time the home page mounts
+       * To avoid this, we would need to add the RN Firebase module for messaging and subscribe to its updates
+       */
+      const fcmToken = await VerifierService.getFCMToken()
+      await setFcmToken(fcmToken)
+    } catch (err) {
+      logger.error('HomeScreen/componentDidMount', err)
     }
   }
 
@@ -119,23 +123,27 @@ class HomeScreen extends React.Component<Props, State> {
     this.setState({ networkType: reachability.type })
   }
 
-  toggleVerifyingService = () => {
-    const isCurrentlyVerifying = this.props.isVerifying
+  toggleVerifyingService = async () => {
+    try {
+      const isCurrentlyVerifying = this.props.isVerifying
 
-    // The actual service that receices the verification texts
-    VerifierService.toggleVerifierService(!isCurrentlyVerifying)
-    // The firebase which lets everyone know we are open for business
-    setIsVerifying(!isCurrentlyVerifying)
-    // The Local redux state
-    this.props.setVerificationState(!isCurrentlyVerifying)
+      // The actual service that receices the verification texts
+      VerifierService.toggleVerifierService(!isCurrentlyVerifying)
+      // The firebase which lets everyone know we are open for business
+      await setIsVerifying(!isCurrentlyVerifying)
+      // The Local redux state
+      this.props.setVerificationState(!isCurrentlyVerifying)
 
-    // when Turning from On to off, and its the first time (verifyingOffAt never set so null) show message
-    if (isCurrentlyVerifying && !this.props.verifyingOffAt) {
-      this.showVerifyingOffLongMessage()
-    } else {
-      this.props.clearMessage()
+      // when Turning from On to off, and its the first time (verifyingOffAt never set so null) show message
+      if (isCurrentlyVerifying && !this.props.verifyingOffAt) {
+        this.showVerifyingOffLongMessage()
+      } else {
+        this.props.clearMessage()
+      }
+      trackVerificationState(isCurrentlyVerifying)
+    } catch (err) {
+      logger.error('HomeScreen/toggleVerifyingService', err)
     }
-    trackVerificationState(isCurrentlyVerifying)
   }
 
   getVerifierStatus = async () => {

@@ -51,6 +51,8 @@
   "reclaimPayment": "Reclamar el Pago",
   "sendMessage": "Enviar Mensaje",
   "escrowedPaymentReminder": "Recuérdele a {{mobile #}} que acepte el pago",
+  "escrowedPaymentReminderSms":
+    "¡Un recordatorio amistoso de que aún no ha canjeado sus dólares de celo!",
   "testnetAlert": {
     "0": "Testnet",
     "1":

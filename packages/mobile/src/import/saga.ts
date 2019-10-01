@@ -5,7 +5,7 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { refreshAllBalances } from 'src/home/actions'
 import { Actions, ImportBackupPhraseAction } from 'src/import/actions'
-import { redeemComplete } from 'src/invite/actions'
+import { redeemInviteSuccess } from 'src/invite/actions'
 import { navigateReset } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { setKey } from 'src/utils/keyStore'
@@ -17,8 +17,10 @@ export function* importBackupPhraseSaga(action: ImportBackupPhraseAction) {
   const account = yield call(assignAccountFromPrivateKey, privateKey)
   if (account) {
     yield call(setKey, 'mnemonic', phrase)
+    // Set backup complete so user isn't prompted to do backup flow
     yield put(setBackupCompleted())
-    yield put(redeemComplete(true))
+    // Set redeem invite complete so user isn't brought back into nux flow
+    yield put(redeemInviteSuccess())
     yield put(refreshAllBalances())
     navigateReset(Screens.ImportContacts)
   } else {

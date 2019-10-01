@@ -33,12 +33,19 @@ export interface Commitments {
   }
 }
 
-enum Roles {
-  validating,
-  voting,
-  rewards,
+export enum Roles {
+  Validating = '0',
+  Voting = '1',
+  Rewards = '2',
 }
 
+export interface LockedGoldConfig {
+  maxNoticePeriod: BigNumber
+}
+
+/**
+ * Contract for handling deposits needed for voting.
+ */
 export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   notifyCommitment = proxySend(this.kit, this.contract.methods.notifyCommitment)
   createAccount = proxySend(this.kit, this.contract.methods.createAccount)
@@ -47,13 +54,36 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   newCommitment = proxySend(this.kit, this.contract.methods.newCommitment)
   extendCommitment = proxySend(this.kit, this.contract.methods.extendCommitment)
   isVoting = proxyCall(this.contract.methods.isVoting)
+  /**
+   * Query maximum notice period.
+   * @returns Current maximum notice period.
+   */
   maxNoticePeriod = proxyCall(this.contract.methods.maxNoticePeriod, undefined, toBigNumber)
 
   getAccountWeight = proxyCall(this.contract.methods.getAccountWeight, undefined, toBigNumber)
+  /**
+   * Get the delegate for a role.
+   * @param account Address of the active account.
+   * @param role one of Roles Enum ("validating", "voting", "rewards")
+   * @return Address of the delegate
+   */
+  getDelegateFromAccountAndRole: (account: string, role: Roles) => Promise<Address> = proxyCall(
+    this.contract.methods.getDelegateFromAccountAndRole
+  )
+
+  /**
+   * Returns current configuration parameters.
+   */
+
+  async getConfig(): Promise<LockedGoldConfig> {
+    return {
+      maxNoticePeriod: await this.maxNoticePeriod(),
+    }
+  }
 
   async getVotingDetails(accountOrVoterAddress: Address): Promise<VotingDetails> {
     const accountAddress = await this.contract.methods
-      .getAccountFromDelegateAndRole(accountOrVoterAddress, Roles.voting)
+      .getAccountFromDelegateAndRole(accountOrVoterAddress, Roles.Voting)
       .call()
 
     return {
@@ -107,14 +137,56 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     }
   }
 
-  // FIXME this.contract.methods.delegateRewards does not exist
-  async delegateRewardsTx(account: string, delegate: string): Promise<CeloTransactionObject<void>> {
+  /**
+   * Delegate a Role to another account.
+   * @param account Address of the active account.
+   * @param delegate Address of the delegate
+   * @param role one of Roles Enum ("Validating", "Voting", "Rewards")
+   * @return A CeloTransactionObject
+   */
+  async delegateRoleTx(
+    account: Address,
+    delegate: Address,
+    role: Roles
+  ): Promise<CeloTransactionObject<void>> {
     const sig = await this.getParsedSignatureOfAddress(account, delegate)
-
     return wrapSend(
       this.kit,
-      this.contract.methods.delegateRole(Roles.rewards, delegate, sig.v, sig.r, sig.s)
+      this.contract.methods.delegateRole(role, delegate, sig.v, sig.r, sig.s)
     )
+  }
+
+  /**
+   * Delegate a Rewards to another account.
+   * @param account Address of the active account.
+   * @param delegate Address of the delegate
+   * @return A CeloTransactionObject
+   */
+  async delegateRewards(account: Address, delegate: Address): Promise<CeloTransactionObject<void>> {
+    return this.delegateRoleTx(account, delegate, Roles.Rewards)
+  }
+
+  /**
+   * Delegate a voting to another account.
+   * @param account Address of the active account.
+   * @param delegate Address of the delegate
+   * @return A CeloTransactionObject
+   */
+  async delegateVoting(account: Address, delegate: Address): Promise<CeloTransactionObject<void>> {
+    return this.delegateRoleTx(account, delegate, Roles.Voting)
+  }
+
+  /**
+   * Delegate a validating to another account.
+   * @param account Address of the active account.
+   * @param delegate Address of the delegate
+   * @return A CeloTransactionObject
+   */
+  async delegateValidating(
+    account: Address,
+    delegate: Address
+  ): Promise<CeloTransactionObject<void>> {
+    return this.delegateRoleTx(account, delegate, Roles.Validating)
   }
 
   private getValueFromCommitment(commitment: { 0: string; 1: string }) {

@@ -29,7 +29,7 @@
     "test": "TZ=UTC jest"
   },
   "dependencies": {
-    "@celo/utils": "^0.0.6-beta5",
+    "@celo/utils": "^0.1.0",
     "@celo/contractkit": "^0.1.1",
     "@oclif/command": "^1",
     "@oclif/config": "^1",

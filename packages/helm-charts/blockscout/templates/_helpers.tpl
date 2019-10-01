@@ -40,7 +40,7 @@ volumes:
   value: geth
 - name: ETHEREUM_JSONRPC_HTTP_URL
   value: {{ .Values.blockscout.jsonrpc_http_url }}
-- name: ETHEREUM_JSONRPC_WEB_SOCKET_URL
+- name: ETHEREUM_JSONRPC_WS_URL
   value: {{ .Values.blockscout.jsonrpc_ws_url }}
 - name: DATABASE_URL
   value: postgres://$(DB_USERNAME):$(DB_PASSWORD)@127.0.0.1:5432/{{ .Values.blockscout.db.name }}
