@@ -51,7 +51,7 @@ let tokenAddressMapping: { [key: string]: string }
 export async function getContractAddresses() {
   if (goldTokenAddress && stableTokenAddress && attestationsAddress) {
     console.info('Already got token addresses')
-    return { goldTokenAddress, stableTokenAddress, attestationsAddress }
+    return { tokenAddressMapping, attestationsAddress }
   } else {
     const kit = await getContractKit()
     goldTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
