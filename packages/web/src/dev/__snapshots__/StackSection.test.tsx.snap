@@ -51,7 +51,7 @@ exports[`StackSection renders with typical props 1`] = `
         }
       >
         <div
-          className="css-text-76zvg2"
+          className="css-text-901oao"
           dir="auto"
           style={
             Object {
@@ -91,7 +91,7 @@ exports[`StackSection renders with typical props 1`] = `
       >
         <h3
           aria-level="3"
-          className="css-reset-4rbku5 css-text-76zvg2"
+          className="css-reset-4rbku5 css-text-901oao"
           dir="auto"
           role="heading"
           style={
@@ -109,7 +109,7 @@ exports[`StackSection renders with typical props 1`] = `
           Test
         </h3>
         <div
-          className="css-text-76zvg2"
+          className="css-text-901oao"
           dir="auto"
           style={
             Object {
@@ -135,7 +135,7 @@ exports[`StackSection renders with typical props 1`] = `
           }
         >
           <div
-            className="css-text-76zvg2"
+            className="css-text-901oao"
             dir="auto"
           >
             I am a Child
@@ -172,7 +172,7 @@ exports[`StackSection renders with typical props 1`] = `
           onResponderRelease={[Function]}
         >
           <a
-            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-76zvg2"
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
             data-focusable={true}
             dir="auto"
             href="/text"
@@ -275,7 +275,7 @@ exports[`StackSection renders with typical props 1`] = `
             }
           >
             <a
-              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-76zvg2"
+              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
               href="/text"
