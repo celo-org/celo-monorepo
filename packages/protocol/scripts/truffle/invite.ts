@@ -13,6 +13,8 @@ import Web3 = require('web3')
 const truffle = require('@celo/protocol/truffle')
 const twilioConfig = require('@celo/protocol/twilio-config')
 
+const start = Date.now()
+
 /*
  * A simple script to send a payment and invite a user.
  *
@@ -34,19 +36,32 @@ module.exports = async (callback: (error?: any) => number) => {
     })
     const network = truffle.networks[argv.network]
 
+    logTime('Getting web3 providers...')
     const provider = new Web3.providers.HttpProvider('http://' + network.host + ':' + network.port)
     const web3 = new Web3(provider)
 
-    const attestations = await getDeployedProxiedContract<AttestationsInstance>(
+    logTime('Getting attestations...')
+    const attestationPromise = getDeployedProxiedContract<AttestationsInstance>(
       'Attestations',
       artifacts
     )
-    const goldToken = await getDeployedProxiedContract<GoldTokenInstance>('GoldToken', artifacts)
-    const stableToken = await getDeployedProxiedContract<StableTokenInstance>(
+
+    logTime('Getting Gold token...')
+    const goldTokenPromise = getDeployedProxiedContract<GoldTokenInstance>('GoldToken', artifacts)
+    logTime('Getting stable token...')
+    const stableTokenPromise = getDeployedProxiedContract<StableTokenInstance>(
       'StableToken',
       artifacts
     )
-    const escrow = await getDeployedProxiedContract<EscrowInstance>('Escrow', artifacts)
+    logTime('Getting Escrow token...')
+    const escrowPromise = getDeployedProxiedContract<EscrowInstance>('Escrow', artifacts)
+
+    logTime('Waiting for contracts...')
+    const attestations = await attestationPromise
+    const goldToken = await goldTokenPromise
+    const stableToken = await stableTokenPromise
+    const escrow = await escrowPromise
+    logTime('Contracts received')
 
     const stableTokenAmount = await convertToContractDecimals(argv.stableValue, stableToken)
     const verificationFee = new BigNumber(
@@ -54,6 +69,7 @@ module.exports = async (callback: (error?: any) => number) => {
     )
     const invitationStableTokenAmount = verificationFee.times(10)
 
+    logTime('Creating invite code...')
     const inviteCodeReturn = await createInviteCode(
       goldToken,
       stableToken,
@@ -64,16 +80,18 @@ module.exports = async (callback: (error?: any) => number) => {
 
     const paymentID = inviteCodeReturn[0]
     const inviteCode = inviteCodeReturn[1]
-    console.log('Payment Id', paymentID)
-    console.log('Invite Code:', inviteCode)
+    logTime(`Payment Id ${paymentID}`)
+    logTime(`Invite Code: ${inviteCode}`)
 
     // @ts-ignore soliditySha3 can take an object
     const phoneHash: string = Web3.utils.soliditySha3({ type: 'string', value: argv.phone })
 
+    logTime('Sending escrow payment...')
     await sendEscrowedPayment(stableToken, escrow, argv.phone, stableTokenAmount, paymentID)
-
+    logTime('Creating twilio client...')
     const twilioClient = twilio(twilioConfig.sid, twilioConfig.authToken)
     const messageText = `Hi! I would like to invite you to join the Celo payments network. Your invite code is: ${inviteCode}`
+    logTime('Sending SMS...')
     await twilioClient.messages.create({
       body: messageText,
       from: twilioConfig.phoneNumber,
@@ -83,4 +101,10 @@ module.exports = async (callback: (error?: any) => number) => {
   } catch (error) {
     callback(error)
   }
+  logTime('Finish')
+}
+
+function logTime(msg: string) {
+  const millis = Date.now() - start
+  console.log(`${millis} ms: ${msg}`)
 }
