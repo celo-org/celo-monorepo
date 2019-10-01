@@ -90,5 +90,6 @@
   "web3FailedToSync": "Fallo la sincronización, por favor verifica tu conexión",
   "errorDuringSync": "Ocurrió un error duranet la sincronización, por favor intente más tarde",
   "calculateFeeFailed": "No se pudo calcular la comisión",
-  "gold": "Oro"
+  "gold": "Oro",
+  "localCurrencyTitle": "Seleccione el tipo de moneda"
 }

@@ -20,6 +20,7 @@ export abstract class BaseCommand extends Command {
 
   private _web3: Web3 | null = null
   private _kit: ContractKit | null = null
+
   // This is required since we wrap the provider with a debug provider and
   // there is no way to unwrap the provider afterwards.
   // We need access to the original provider, so that, we can close it.

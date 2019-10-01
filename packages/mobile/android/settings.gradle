@@ -5,8 +5,6 @@ include ':react-native-send-intent'
 project(':react-native-send-intent').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-send-intent/android')
 include ':react-native-webview'
 project(':react-native-webview').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-webview/android')
-include ':instabug-reactnative'
-project(':instabug-reactnative').projectDir = new File(rootProject.projectDir, '../../../node_modules/instabug-reactnative/android')
 include ':@react-native-community_netinfo'
 project(':@react-native-community_netinfo').projectDir = new File(rootProject.projectDir, '../../../node_modules/@react-native-community/netinfo/android')
 include ':react-native-screens'
@@ -29,8 +27,8 @@ include ':react-native-android-open-settings'
 project(':react-native-android-open-settings').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-android-open-settings/android')
 include ':react-native-udp'
 project(':react-native-udp').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-udp/android')
-include ':react-native-languages'
-project(':react-native-languages').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-languages/android')
+include ':react-native-localize'
+project(':react-native-localize').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-localize/android')
 include ':react-native-config'
 project(':react-native-config').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-config/android')
 include ':react-native-firebase'

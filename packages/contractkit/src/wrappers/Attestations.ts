@@ -62,10 +62,27 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   )
 
   /**
+   * Returns the attestation request fee in a given currency.
+   * @param address Token address.
+   * @returns The fee as big number.
+   */
+  attestationRequestFees = proxyCall(
+    this.contract.methods.attestationRequestFees,
+    undefined,
+    toBigNumber
+  )
+
+  /**
    * Returns the set wallet address for the account
    * @param account Account
    */
   getWalletAddress = proxyCall(this.contract.methods.getWalletAddress)
+
+  /**
+   * Returns the metadataURL for the account
+   * @param account Account
+   */
+  getMetadataURL = proxyCall(this.contract.methods.getMetadataURL)
 
   /**
    * Sets the data encryption of the account
@@ -77,21 +94,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   )
 
   /**
-   * Sets the wallet address for the account
-   * @param address The address to set
+   * Sets the metadataURL for the account
+   * @param url The url to set
    */
-  setWalletAddress = proxySend(this.kit, this.contract.methods.setWalletAddress)
-
-  /**
-   * Returns the attestation request fee in a given currency.
-   * @param address Token address.
-   * @returns The fee as big number.
-   */
-  attestationRequestFees = proxyCall(
-    this.contract.methods.attestationRequestFees,
-    undefined,
-    toBigNumber
-  )
+  setMetadataURL = proxySend(this.kit, this.contract.methods.setMetadataURL)
 
   /**
    * Returns the attestation stats of a identifier/account pair
@@ -111,18 +117,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * Returns the current configuration parameters for the contract.
    * @param tokens List of tokens used for attestation fees.
    */
-  async getConfig(tokens: string[]): Promise<AttestationsConfig> {
-    const fees = await Promise.all(
-      tokens.map(async (token) => {
-        const fee = await this.attestationRequestFees(token)
-        return { fee, address: token }
-      })
-    )
-    return {
-      attestationExpirySeconds: await this.attestationExpirySeconds(),
-      attestationRequestFees: fees,
-    }
-  }
+  setWalletAddress = proxySend(this.kit, this.contract.methods.setWalletAddress)
 
   /**
    * Calculates the amount of CeloToken to request Attestations
@@ -231,8 +226,25 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
-   * Lookup mapped walleet addresses for a given list of hashes of identifiers
-   * @param identifierHashes The hashes of identifiers to lookup
+   * Returns the current configuration parameters for the contract.
+   * @param tokens List of tokens used for attestation fees.
+   */
+  async getConfig(tokens: string[]): Promise<AttestationsConfig> {
+    const fees = await Promise.all(
+      tokens.map(async (token) => {
+        const fee = await this.attestationRequestFees(token)
+        return { fee, address: token }
+      })
+    )
+    return {
+      attestationExpirySeconds: await this.attestationExpirySeconds(),
+      attestationRequestFees: fees,
+    }
+  }
+
+  /**
+   * Lookup mapped walleet addresses for a given list of hashes of phone numbers
+   * @param phoneNumberHashes The hashes of phone numbers to lookup
    */
   async lookupIdentifiers(
     identifierHashes: string[]
