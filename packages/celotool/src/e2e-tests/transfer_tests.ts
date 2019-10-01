@@ -110,6 +110,23 @@ const registryAbi = [
   },
 ]
 
+const blockchainParametersAbi = [
+  {
+    constant: false,
+    inputs: [
+      {
+        name: 'gas',
+        type: 'uint256',
+      },
+    ],
+    name: 'setGasForNonGoldCurrencies',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+]
+
 describe('transfer tests', function(this: any) {
   this.timeout(0)
 
@@ -134,6 +151,7 @@ describe('transfer tests', function(this: any) {
   let txSuccess: boolean
   let stableTokenAddress: string
   let gasPriceMinimumAddress: string
+  let blockchainParametersAddress: string
   const expectedInfrastructureBlockReward: string = new BigNumber(
     Web3.utils.toWei('1', 'ether')
   ).toString()
@@ -165,6 +183,7 @@ describe('transfer tests', function(this: any) {
     await tx.send({ gas, from: validatorAddress })
 
     gasPriceMinimumAddress = await getContractAddress('GasPriceMinimumProxy')
+    blockchainParametersAddress = await getContractAddress('BlockchainParametersProxy')
     // TODO(asa): Move this to the `before`
     // Give the account we will send transfers as sufficient gold and dollars.
     stableTokenAddress = await getContractAddress('StableTokenProxy')
@@ -291,6 +310,16 @@ describe('transfer tests', function(this: any) {
       toFixed(rateNumerator / rateDenominator).toString(),
       updatePeriod
     )
+    const gas = await tx.estimateGas({ from: validatorAddress })
+    return tx.send({ from: validatorAddress, gas })
+  }
+
+  const setGasCurrencyCost = async (cost: number) => {
+    // We need to run this operation from the validator account as it is the owner of the
+    // contract.
+    const _web3 = new Web3('http://localhost:8545')
+    const _parameters = new _web3.eth.Contract(blockchainParametersAbi, blockchainParametersAddress)
+    const tx = _parameters.methods.setGasForNonGoldCurrencies(cost)
     const gas = await tx.estimateGas({ from: validatorAddress })
     return tx.send({ from: validatorAddress, gas })
   }
@@ -545,6 +574,66 @@ describe('transfer tests', function(this: any) {
               it('should not add the transaction to the pool', async function(this: any) {
                 await restartGeth(syncMode)
                 const gas = intrinsicGas - 1
+                try {
+                  await transferCeloGold(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
+                    gas,
+                    gasCurrency: stableTokenAddress,
+                  })
+                } catch (error) {
+                  assert.include(error.toString(), 'Returned error: intrinsic gas too low')
+                }
+              })
+            })
+          })
+
+          describe('when gas currency cost has been changed', () => {
+            describe('when setting a gas amount greater than the amount of gas necessary', () => {
+              before(async function(this: any) {
+                await restartGeth(syncMode)
+
+                await setGasCurrencyCost(34000)
+
+                const expectedGasUsed = 63180
+                ;[txSuccess, newBalances, expectedFees] = await runTestTransaction(
+                  transferCeloGold(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
+                    gasCurrency: stableTokenAddress,
+                    gasFeeRecipient: feeRecipientAddress,
+                  }),
+                  expectedGasUsed,
+                  stableTokenAddress
+                )
+              })
+              assertBalances(CURRENCY_ENUM.GOLD, CURRENCY_ENUM.DOLLAR)
+            })
+
+            describe('when setting a gas amount less than the amount of gas necessary but more than the intrinsic gas amount', () => {
+              before(async function(this: any) {
+                await restartGeth(syncMode)
+
+                await setGasCurrencyCost(34000)
+
+                const gas = 55000 + 1000
+                ;[txSuccess, newBalances, expectedFees] = await runTestTransaction(
+                  transferCeloGold(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
+                    gas,
+                    gasCurrency: stableTokenAddress,
+                    gasFeeRecipient: feeRecipientAddress,
+                  }),
+                  gas,
+                  stableTokenAddress
+                )
+              })
+
+              assertBalances(CURRENCY_ENUM.GOLD, CURRENCY_ENUM.DOLLAR, false)
+            })
+
+            describe('when setting a gas amount less than the intrinsic gas amount', () => {
+              it('should not add the transaction to the pool', async function(this: any) {
+                await restartGeth(syncMode)
+
+                await setGasCurrencyCost(34000)
+
+                const gas = 55000 - 1
                 try {
                   await transferCeloGold(DEF_FROM_ADDR, DEF_TO_ADDR, DEF_AMOUNT, {
                     gas,
