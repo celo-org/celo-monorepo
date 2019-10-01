@@ -57,8 +57,8 @@
     "1": "A friendly reminder you're using a Testnet build - the balances here are not real."
   },
   "dismiss": "Dismiss",
-  "localCurrencyEqual": "Equal to <2>{{localValue}} {{localCurrencySymbol}}</2>",
-  "localCurrencyValue": "{{localValue}} {{localCurrencySymbol}}",
+  "localCurrencyEqual": "Equal to <2>{{localValue}} {{localCurrencyCode}}</2>",
+  "localCurrencyValue": "{{localValue}} {{localCurrencyCode}}",
   "feedItemVerificationFeeTitle": "Celo",
   "feedItemVerificationFeeInfo": "$t(verificationFee)",
   "feedItemVerificationRewardTitle": "Celo",

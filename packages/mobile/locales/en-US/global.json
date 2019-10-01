@@ -89,5 +89,6 @@
   "web3FailedToSync": "Failing to sync, check your network connection",
   "errorDuringSync": "Error occurred during sync, please try again later",
   "calculateFeeFailed": "Could not calculate fee",
-  "gold": "Gold"
+  "gold": "Gold",
+  "localCurrencyTitle": "Select Currency"
 }

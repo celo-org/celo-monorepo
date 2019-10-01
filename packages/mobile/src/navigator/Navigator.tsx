@@ -25,6 +25,7 @@ import ImportWallet from 'src/import/ImportWallet'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
 import JoinCelo from 'src/invite/JoinCelo'
 import Language from 'src/language/Language'
+import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import TabNavigator from 'src/navigator/TabNavigator'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
@@ -143,6 +144,7 @@ const AppStack = createStackNavigator(
     [Screens.Account]: { screen: Account },
     [Screens.Invite]: { screen: Invite },
     [Screens.InviteReview]: { screen: InviteReview },
+    [Screens.SelectLocalCurrency]: { screen: SelectLocalCurrency },
     [Screens.Licenses]: { screen: Licenses },
     [Screens.DollarEducation]: { screen: DollarEducation },
     [Screens.TransactionReview]: { screen: TransactionReviewScreen },
