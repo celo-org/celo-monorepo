@@ -3,6 +3,7 @@ import { Image, StyleSheet, View } from 'react-native'
 import Backers from 'src/about/Backers'
 import { mintPlaza, teamHero } from 'src/about/images'
 import Team from 'src/about/Team'
+import VideoCover from 'src/about/VideoCover'
 import { H1, H4 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import MissionText from 'src/home/MissionText'
@@ -38,30 +39,7 @@ export class About extends React.Component<Props & I18nProps> {
           description={t('description')}
         />
         <View style={styles.container}>
-          <View style={styles.background}>
-            <View style={styles.absolute}>
-              <View style={styles.maxWidth}>
-                <Responsive medium={styles.mediumHero} large={styles.largeHero}>
-                  <View style={styles.hero}>
-                    <H1>{t('aboutUs')}</H1>
-                    <H4>{t('ourTeam')}</H4>
-                  </View>
-                </Responsive>
-              </View>
-            </View>
-            <Responsive
-              medium={[styles.mintPlazaContainer, styles.mediumMintPlaza]}
-              large={[styles.mintPlazaContainer, styles.largeMintPlaza]}
-            >
-              <AspectRatio style={styles.mintPlazaContainer} ratio={IMAGE_WIDTH / IMAGE_HEIGHT}>
-                <Image
-                  resizeMode={'contain'}
-                  source={{ uri: mintPlaza }}
-                  style={styles.mintPlaza}
-                />
-              </AspectRatio>
-            </Responsive>
-          </View>
+          <VideoCover />
           <MissionText />
           <Team randomSeed={randomSeed} />
           <GridRow
