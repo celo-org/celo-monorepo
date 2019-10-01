@@ -201,6 +201,23 @@ const validatorsAbi = [
     stateMutability: 'view',
     type: 'function',
   },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        name: 'previousOwner',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    name: 'OwnershipTransferred',
+    type: 'event',
+  },
 ]
 
 describe('governance tests', () => {
@@ -322,6 +339,55 @@ describe('governance tests', () => {
     }
     return tx.send({ from: account, ...txOptions, gas })
   }
+
+  describe('when adding any block', () => {
+    let goldGenesisSupply: any
+    const addressesWithBalance: string[] = []
+    beforeEach(async function(this: any) {
+      this.timeout(0) // Disable test timeout
+      await restart()
+      const genesis = await importGenesis()
+      goldGenesisSupply = new BigNumber(0)
+      Object.keys(genesis.alloc).forEach((validator) => {
+        addressesWithBalance.push(validator)
+        goldGenesisSupply = goldGenesisSupply.plus(genesis.alloc[validator].balance)
+      })
+      // Block rewards are paid to governance and Locked Gold.
+      // Governance also receives a portion of transaction fees.
+      addressesWithBalance.push(await getContractAddress('GovernanceProxy'))
+      addressesWithBalance.push(await getContractAddress('LockedGoldProxy'))
+      // Some gold is sent to the reserve and exchange during migrations.
+      addressesWithBalance.push(await getContractAddress('ReserveProxy'))
+      addressesWithBalance.push(await getContractAddress('ExchangeProxy'))
+    })
+
+    it('should update the Celo Gold total supply correctly', async function(this: any) {
+      // To register a validator group, we send gold to a new address not included in
+      // `addressesWithBalance`. Therefore, we check the gold total supply at a block before
+      // that gold is sent.
+      // We don't set the total supply until block rewards are paid out, which can happen once
+      // either LockedGold or Governance are registered.
+      const validators = new web3.eth.Contract(
+        validatorsAbi,
+        await getContractAddress('ValidatorsProxy')
+      )
+      let events = await validators.getPastEvents('OwnershipTransferred', { fromBlock: 0 })
+
+      const blockNumber = events[events.length - 1].blockNumber + 1
+      const goldTotalSupply = await goldToken.methods.totalSupply().call({}, blockNumber)
+      const balances = await Promise.all(
+        addressesWithBalance.map(
+          async (a: string) => new BigNumber(await web3.eth.getBalance(a, blockNumber))
+        )
+      )
+      const expectedGoldTotalSupply = balances.reduce((total: BigNumber, b: BigNumber) =>
+        b.plus(total)
+      )
+      assert.isAtLeast(expectedGoldTotalSupply.toNumber(), goldGenesisSupply.toNumber())
+      //
+      assert.equal(goldTotalSupply.toString(), expectedGoldTotalSupply.toString())
+    })
+  })
 
   describe('Validators.numberValidatorsInCurrentSet()', () => {
     before(async function() {
@@ -563,49 +629,6 @@ describe('governance tests', () => {
       await sleep(1)
       await redeemRewards(account)
       assert.isAtLeast(await web3.eth.getBalance(delegate), 1)
-    })
-  })
-
-  describe('when adding any block', () => {
-    let goldGenesisSupply: any
-    const addressesWithBalance: string[] = []
-    beforeEach(async function(this: any) {
-      this.timeout(0) // Disable test timeout
-      await restart()
-      const genesis = await importGenesis()
-      goldGenesisSupply = new BigNumber(0)
-      Object.keys(genesis.alloc).forEach((validator) => {
-        addressesWithBalance.push(validator)
-        goldGenesisSupply = goldGenesisSupply.plus(genesis.alloc[validator].balance)
-      })
-      // Block rewards are paid to governance and Locked Gold.
-      // Governance also receives a portion of transaction fees.
-      addressesWithBalance.push(await getContractAddress('GovernanceProxy'))
-      addressesWithBalance.push(await getContractAddress('LockedGoldProxy'))
-      // Some gold is sent to the reserve and exchange during migrations.
-      addressesWithBalance.push(await getContractAddress('ReserveProxy'))
-      addressesWithBalance.push(await getContractAddress('ExchangeProxy'))
-    })
-
-    it('should update the Celo Gold total supply correctly', async function(this: any) {
-      // To register a validator group, we send gold to a new address not included in
-      // `addressesWithBalance`. Therefore, we check the gold total supply at a block before
-      // that gold is sent.
-      // We don't set the total supply until block rewards are paid out, which can happen once
-      // either LockedGold or Governance are registered.
-      const blockNumber = 175
-      const goldTotalSupply = await goldToken.methods.totalSupply().call({}, blockNumber)
-      const balances = await Promise.all(
-        addressesWithBalance.map(
-          async (a: string) => new BigNumber(await web3.eth.getBalance(a, blockNumber))
-        )
-      )
-      const expectedGoldTotalSupply = balances.reduce((total: BigNumber, b: BigNumber) =>
-        b.plus(total)
-      )
-      assert.isAtLeast(expectedGoldTotalSupply.toNumber(), goldGenesisSupply.toNumber())
-      //
-      assert.equal(goldTotalSupply.toString(), expectedGoldTotalSupply.toString())
     })
   })
 })
