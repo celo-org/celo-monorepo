@@ -58,9 +58,6 @@ const isOfType = <K extends ClaimTypes>(type: K) => (
   data: SignedClaim['payload']
 ): data is ClaimPayload<K> => data.type === type
 
-export class ValidationError extends Error {}
-export class ClaimNotFoundError extends Error {}
-
 export class IdentityMetadataWrapper {
   data: IdentityMetadata
 
@@ -90,7 +87,7 @@ export class IdentityMetadataWrapper {
     const result = IdentityMetadataType.decode(data)
     if (isLeft(result)) {
       // TODO: We could probably return a more useful error in the future
-      throw new ValidationError(PathReporter.report(result).join(', '))
+      throw new Error(PathReporter.report(result).join(', '))
     }
     this.data = result.right
   }
