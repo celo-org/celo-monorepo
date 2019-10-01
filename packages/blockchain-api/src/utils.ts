@@ -1,9 +1,9 @@
 /* tslint:disable:no-console */
 import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { WEB3_PROVIDER_URL } from 'config'
 import * as utf8 from 'utf8'
 import Web3 from 'web3'
 import coder from 'web3-eth-abi'
+import { WEB3_PROVIDER_URL } from './config'
 
 export function randomTimestamp() {
   const start = new Date(2018, 0, 1)
@@ -50,6 +50,7 @@ let attestationsAddress: string
 let tokenAddressMapping: { [key: string]: string }
 export async function getContractAddresses() {
   if (goldTokenAddress && stableTokenAddress && attestationsAddress) {
+    console.info('Already got token addresses')
     return { goldTokenAddress, stableTokenAddress, attestationsAddress }
   } else {
     const kit = await getContractKit()
@@ -60,6 +61,7 @@ export async function getContractAddresses() {
       [goldTokenAddress]: 'Celo Gold',
       [stableTokenAddress]: 'Celo Dollar',
     }
+    console.info('Got token addresses' + attestationsAddress)
     return { tokenAddressMapping, attestationsAddress }
   }
 }
@@ -70,9 +72,15 @@ export async function getContractKit(): Promise<ContractKit> {
     // Already connected
     return contractKit
   } else {
-    const httpProvider = new Web3.providers.HttpProvider(WEB3_PROVIDER_URL)
-    const web3 = new Web3(httpProvider)
-    contractKit = newKitFromWeb3(web3)
-    return contractKit
+    if (WEB3_PROVIDER_URL) {
+      const httpProvider = new Web3.providers.HttpProvider(WEB3_PROVIDER_URL)
+      const web3 = new Web3(httpProvider)
+      contractKit = newKitFromWeb3(web3)
+      return contractKit
+    } else {
+      throw new Error(
+        'Missing web3 provider URL, will not be able to fetch contract addresses. Check .yaml'
+      )
+    }
   }
 }
