@@ -1,6 +1,5 @@
-runtime: nodejs
-env: flex 
-service: integration 
+runtime: nodejs8
+service: integration
 instance_class: B4
 manual_scaling:
   instances: 1
