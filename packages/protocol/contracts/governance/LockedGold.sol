@@ -180,7 +180,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 timestamp
   )
     public
-    onlyRegisteredContract(ELECTION_REGISTRY_ID)
+    onlyRegisteredContract(VALIDATORS_REGISTRY_ID)
     nonReentrant
     returns (bool)
   {

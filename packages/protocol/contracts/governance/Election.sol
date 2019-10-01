@@ -529,7 +529,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
         break;
       }
     }
-    require(totalNumMembersElected >= minElectableValidators);
+    // require(totalNumMembersElected >= minElectableValidators);
     // Grab the top validators from each group that won seats.
     address[] memory electedValidators = new address[](totalNumMembersElected);
     totalNumMembersElected = 0;

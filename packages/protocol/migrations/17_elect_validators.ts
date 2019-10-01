@@ -9,6 +9,7 @@ import {
   sendTransactionWithPrivateKey,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import * as bls12377js from 'bls12377js'
 import { ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'
@@ -19,7 +20,7 @@ function serializeKeystore(keystore: any) {
   return Buffer.from(JSON.stringify(keystore)).toString('base64')
 }
 
-async function makeMinimumDeposit(lockedGold: LockedGoldInstance, privateKey: string) {
+async function lockGold(lockedGold: LockedGoldInstance, value: BigNumber, privateKey: string) {
   // @ts-ignore
   const createAccountTx = lockedGold.contract.methods.createAccount()
   await sendTransactionWithPrivateKey(web3, createAccountTx, privateKey, {
@@ -31,7 +32,7 @@ async function makeMinimumDeposit(lockedGold: LockedGoldInstance, privateKey: st
 
   await sendTransactionWithPrivateKey(web3, lockTx, privateKey, {
     to: lockedGold.address,
-    value: config.validators.registrationRequirements.validator,
+    value,
   })
 }
 
@@ -55,17 +56,16 @@ async function registerValidatorGroup(
   await web3.eth.sendTransaction({
     from: generateAccountAddressFromPrivateKey(privateKey.slice(0)),
     to: account.address,
-    value: config.validators.minLockedGoldValue * 2, // Add a premium to cover tx fees
+    value: config.validators.registrationRequirements.group * 2, // Add a premium to cover tx fees
   })
 
-  await makeMinimumDeposit(lockedGold, account.privateKey)
+  await lockGold(lockedGold, config.validators.registrationRequirements.group, account.privateKey)
 
   // @ts-ignore
   const tx = validators.contract.methods.registerValidatorGroup(
-    encodedKey,
-    config.validators.groupName,
+    `${config.validators.groupName} ${encodedKey}`,
     config.validators.groupUrl,
-    config.validators.minLockedGoldNoticePeriod
+    toFixed(config.validators.commission).toString()
   )
 
   await sendTransactionWithPrivateKey(web3, tx, account.privateKey, {
@@ -93,15 +93,17 @@ async function registerValidator(
   const blsPoP = bls12377js.BLS.signPoP(blsValidatorPrivateKeyBytes).toString('hex')
   const publicKeysData = publicKey + blsPublicKey + blsPoP
 
-  await makeMinimumDeposit(lockedGold, validatorPrivateKey)
+  await lockGold(
+    lockedGold,
+    config.validators.registrationRequirements.validator,
+    validatorPrivateKey
+  )
 
   // @ts-ignore
   const registerTx = validators.contract.methods.registerValidator(
     address,
-    address,
     config.validators.groupUrl,
-    add0x(publicKeysData),
-    config.validators.minLockedGoldNoticePeriod
+    add0x(publicKeysData)
   )
 
   await sendTransactionWithPrivateKey(web3, registerTx, validatorPrivateKey, {
@@ -184,8 +186,9 @@ module.exports = async (_deployer: any) => {
   const minLockedGoldVotePerValidator = 10000
   const value = new BigNumber(valKeys.length)
     .times(minLockedGoldVotePerValidator)
-    .times(web3.utils.toWei(1))
+    .times(web3.utils.toWei('1'))
   // @ts-ignore
   await lockedGold.lock({ value })
   await election.vote(account.address, value, NULL_ADDRESS, NULL_ADDRESS)
+  console.log(await election.electValidators())
 }

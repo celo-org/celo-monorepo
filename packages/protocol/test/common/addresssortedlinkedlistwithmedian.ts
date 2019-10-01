@@ -207,7 +207,7 @@ contract('AddressSortedLinkedListWithMedianTest', (accounts: string[]) => {
     }
 
     const randomElementOrNullAddress = (list: string[]): string => {
-      if (BigNumber.random() < 0.5) {
+      if (BigNumber.random().isLessThan(0.5)) {
         return NULL_ADDRESS
       } else {
         return randomElement(list)
