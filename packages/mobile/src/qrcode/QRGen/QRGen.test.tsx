@@ -8,11 +8,6 @@ describe('QRCode', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  it('renders with logo correctly', () => {
-    const tree = renderer.create(<QRCode logo={{ uri: 'fakeUri' }} />).toJSON()
-    expect(tree).toMatchSnapshot()
-  })
-
   // Simulate big data passed to QRCode and check if onError Callback
   // Called properly
   it('calls onError in case of issue with code generating', () => {
