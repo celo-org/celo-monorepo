@@ -61,6 +61,10 @@ const isOfType = <K extends ClaimTypes>(type: K) => (
 export class IdentityMetadataWrapper {
   data: IdentityMetadata
 
+  static emptyData: IdentityMetadata = {
+    claims: [],
+  }
+
   static async fetchFromURL(url: string) {
     const resp = await fetch(url)
     if (!resp.ok) {
@@ -119,3 +123,17 @@ export class IdentityMetadataWrapper {
     signature: '',
   })
 }
+
+const now = () => Math.round(new Date().getTime() / 1000)
+
+export const createAttestationServiceURLClaim = (url: string): AttestationServiceURLClaim => ({
+  url,
+  timestamp: now(),
+  type: ClaimTypes.ATTESTATION_SERVICE_URL,
+})
+
+export const createNameClaim = (name: string): NameClaim => ({
+  name,
+  timestamp: now(),
+  type: ClaimTypes.NAME,
+})
