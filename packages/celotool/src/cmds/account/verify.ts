@@ -129,7 +129,7 @@ async function verifyCode(
   attestationsToComplete: ActionableAttestation[]
 ) {
   const code = decodeAttestationCode(base64Code)
-  const matchingIssuer = attestations.findMatchingIssuer(
+  const matchingIssuer = await attestations.findMatchingIssuer(
     phoneNumber,
     account,
     code,

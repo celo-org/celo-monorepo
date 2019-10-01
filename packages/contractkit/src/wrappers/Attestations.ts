@@ -210,7 +210,12 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param code The code received by the validator
    * @param issuers The list of potential issuers
    */
-  async findMatchingIssuer(identifier: string, account: Address, code: string, issuers: string[]) {
+  async findMatchingIssuer(
+    identifier: string,
+    account: Address,
+    code: string,
+    issuers: string[]
+  ): Promise<string | null> {
     const identifierHash = await IdentityUtils.identityHash(identifier)
     for (const issuer of issuers) {
       const expectedSourceMessage = attestationMessageToSign(identifierHash, account)
