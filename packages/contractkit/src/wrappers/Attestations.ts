@@ -4,15 +4,7 @@ import BigNumber from 'bignumber.js'
 import * as Web3Utils from 'web3-utils'
 import { Address, CeloToken } from '../base'
 import { Attestations } from '../generated/types/Attestations'
-import {
-  BaseWrapper,
-  proxyCall,
-  proxySend,
-  toBigNumber,
-  toNumber,
-  tupleParser,
-  wrapSend,
-} from './BaseWrapper'
+import { BaseWrapper, proxyCall, proxySend, toBigNumber, toNumber, wrapSend } from './BaseWrapper'
 const parseSignature = SignatureUtils.parseSignature
 
 export interface AttestationStat {
@@ -70,20 +62,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   )
 
   /**
-   * Returns the attestation stats of a phone number/account pair
-   * @param phoneNumber Phone Number
-   * @param account Account
-   */
-  getAttestationStat: (
-    phoneNumber: string,
-    account: Address
-  ) => Promise<AttestationStat> = proxyCall(
-    this.contract.methods.getAttestationStats,
-    tupleParser(PhoneNumberUtils.getPhoneHash, (x: string) => x),
-    (stat) => ({ completed: toNumber(stat[0]), total: toNumber(stat[1]) })
-  )
-
-  /**
    * Returns the set wallet address for the account
    * @param account Account
    */
@@ -114,6 +92,20 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     undefined,
     toBigNumber
   )
+
+  /**
+   * Returns the attestation stats of a phone number/account pair
+   * @param identifier Phone Number
+   * @param account Account
+   */
+  getAttestationStat: (identifier: string, account: Address) => Promise<AttestationStat> = async (
+    identifier: string,
+    account: Address
+  ) => {
+    const identifierHash = await PhoneNumberUtils.getPhoneHash(identifier)
+    const stat = await this.contract.methods.getAttestationStats(identifierHash, account).call()
+    return { completed: toNumber(stat[0]), total: toNumber(stat[1]) }
+  }
 
   /**
    * Returns the current configuration parameters for the contract.
