@@ -367,11 +367,11 @@ describe('governance tests', () => {
       // that gold is sent.
       // We don't set the total supply until block rewards are paid out, which can happen once
       // either LockedGold or Governance are registered.
-      const validators = new web3.eth.Contract(
+      const _validators = new web3.eth.Contract(
         validatorsAbi,
         await getContractAddress('ValidatorsProxy')
       )
-      let events = await validators.getPastEvents('OwnershipTransferred', { fromBlock: 0 })
+      const events = await _validators.getPastEvents('OwnershipTransferred', { fromBlock: 0 })
 
       const blockNumber = events[events.length - 1].blockNumber + 1
       const goldTotalSupply = await goldToken.methods.totalSupply().call({}, blockNumber)
