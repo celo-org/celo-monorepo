@@ -176,6 +176,7 @@ function writeGenesis(validators: Validator[], path: string) {
     validators,
     blockTime: 0,
     epoch: 10,
+    requestTimeout: 3000,
     chainId: NetworkId,
   })
   fs.writeFileSync(path, genesis)

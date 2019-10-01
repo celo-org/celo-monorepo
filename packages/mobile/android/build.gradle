@@ -43,9 +43,6 @@ allprojects {
         flatDir {
             dirs celoClientDirectory
         }
-    	maven {
-      	    url "https://sdks.instabug.com/nexus/repository/instabug-cp"
-       	}  
       }
 }
 

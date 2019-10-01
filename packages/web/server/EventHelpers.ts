@@ -1,27 +1,22 @@
-// App crashes when these are imports instead of requires, now that the code is serverside
-const fecha = require('fecha')
-const Tabletop = require('tabletop')
+import airtableInit, { AirRecord } from '../server/airtable'
 
 import getConfig from 'next/config'
 import { EventProps } from '../fullstack/EventProps'
 import Sentry from '../fullstack/sentry'
-import { abort } from '../src/utils/abortableFetch'
 
 // Intermediate step Event With all String Values
 interface IncomingEvent {
   link: string // url
-  celoHosted: string // 'TRUE' | 'FALSE'
-  celoAttending: string // 'TRUE' | 'FALSE'
-  celoSpeaking: string // 'TRUE' | 'FALSE'
+  celoHosted: boolean
+  celoSpeaking: boolean
   name: string
   description: string
   location: string // (City, Country)
   startDate: string // (MM-DD-YY)
   endDate?: string // (MM-DD-YY)
-  recap?: string // text
 }
 
-const REQUIRED_KEYS = ['link', 'celoHosted', 'name', 'description', 'location', 'startDate']
+const REQUIRED_KEYS = ['name', 'location', 'startDate']
 
 interface State {
   pastEvents: EventProps[]
@@ -29,84 +24,84 @@ interface State {
   topEvent: EventProps | null
 }
 
-// From the google sheet column names
+// From the airtable sheet column names
 const KEY_CONVERSION = Object.freeze({
-  name: 'Name (string)',
-  description: 'Description (string)',
-  link: 'Link (url)',
-  location: 'Location (City, Country)',
-  celoHosted: 'Celo Hosted (True/False)',
-  celoAttending: 'Celo Attending (True/False)',
-  celoSpeaking: 'Celo Speaking (True/False)',
-  startDate: 'Start Date (MM-DD-YY)',
-  endDate: 'End Date (MM-DD-YY)',
-  recap: 'Recap (url)',
+  name: 'Title',
+  description: 'Description of Event',
+  link: 'Event Link',
+  location: 'Location (Format: City, Country)',
+  celoHosted: 'Celo Hosted?',
+  celoSpeaking: 'Celo Team Member Speaking?',
+  startDate: 'Start Date',
+  endDate: 'End Date',
 })
 
-type RawEvent = Record<string, string>
-
-function getURL() {
-  return getConfig().serverRuntimeConfig.EVENTS_SHEET_URL
+export interface RawAirTableEvent {
+  Title: string
+  'Notes / Run Of Show': string
+  Photos: object
+  Process: 'Complete' | 'Scheduled' | 'In conversation' | 'To organize'
+  Organizer: object[]
+  'Event Link': string
+  'Start Date': string
+  'Recap Individual': {
+    id: string
+    email: string
+    name: string
+  }
+  'Social Media': object[]
+  'Social Media Links': string
+  'Location (Format: City, Country)': string
+  'Celo Team Member Speaking?': boolean
+  'Description of Event': string
 }
 
 export default async function getFormattedEvents() {
-  const eventData = await intializeTableTop()
-  return splitEvents(normalizeEvents(eventData as RawEvent[]))
+  const eventData = await fetchEventsFromAirtable()
+  return splitEvents(normalizeEvents(eventData as RawAirTableEvent[]))
 }
 
-export function intializeTableTop() {
-  const promise = new Promise<RawEvent[]>((resolve) => {
-    const callback = (data: RawEvent[]) => {
-      resolve(data)
-    }
-    try {
-      Tabletop.init({
-        key: getURL(),
-        callback,
-        simpleSheet: true,
+function fetchEventsFromAirtable() {
+  return new Promise((resolve, reject) => {
+    getAirtable()
+      .select({
+        filterByFormula:
+          'OR(Process="Complete", Process="Scheduled", Process="Conference, Speaking", Process="This Week")',
+        sort: [{ field: 'Start Date', direction: 'desc' }],
       })
-    } catch (e) {
-      resolve([])
-      Sentry.withScope((scope) => {
-        scope.setTag('Service', 'GoogleSheets')
-        Sentry.captureException(e)
+      .firstPage((error: unknown, records: Array<AirRecord<RawAirTableEvent>>) => {
+        if (error) {
+          Sentry.captureEvent(error)
+          reject(error)
+        } else {
+          resolve(records.map((record) => record.fields))
+        }
       })
-    }
   })
-  return Promise.race([promise, abort(getURL(), 3000).catch(() => [])])
 }
 
-function convertKeys(rawEvent: RawEvent): IncomingEvent {
+function getAirtable() {
+  return airtableInit(getConfig().serverRuntimeConfig.AIRTABLE_EVENTS_ID)('Schedule')
+}
+
+function convertKeys(rawEvent: RawAirTableEvent): IncomingEvent {
   return {
     name: rawEvent[KEY_CONVERSION.name],
     link: rawEvent[KEY_CONVERSION.link],
     celoHosted: rawEvent[KEY_CONVERSION.celoHosted],
-    celoAttending: rawEvent[KEY_CONVERSION.celoAttending],
     celoSpeaking: rawEvent[KEY_CONVERSION.celoSpeaking],
     description: rawEvent[KEY_CONVERSION.description],
     location: rawEvent[KEY_CONVERSION.location],
     startDate: rawEvent[KEY_CONVERSION.startDate],
     endDate: rawEvent[KEY_CONVERSION.endDate],
-    recap: rawEvent[KEY_CONVERSION.recap],
   }
 }
 
 function parseDate(date: string) {
-  return fecha.parse(date, 'MM-DD-YY')
+  return new Date(date)
 }
 
-function convertValues(event: IncomingEvent): EventProps {
-  return {
-    ...event,
-    celoHosted: event.celoHosted === 'TRUE',
-    celoSpeaking: event.celoSpeaking === 'TRUE',
-    celoAttending: event.celoAttending === 'TRUE',
-    startDate: event.startDate,
-    endDate: event.endDate,
-  }
-}
-
-export function splitEvents(normalizedEvents): State {
+export function splitEvents(normalizedEvents: EventProps[]): State {
   const today = Date.now()
 
   const upcomingEvents = []
@@ -122,27 +117,53 @@ export function splitEvents(normalizedEvents): State {
     }
   })
   // take first event of upcoming, if that is blank take first of past (prefer celo hosted)
-  const topEvent = upcomingEvents.sort(celoFirst).shift() || pastEvents.sort(celoFirst).shift()
+  const topEvent =
+    upcomingEvents
+      .slice(0)
+      .filter((e) => !!e.description)
+      .sort(celoFirst)
+      .shift() ||
+    pastEvents
+      .slice(0)
+      .filter((e) => !!e.description)
+      .sort(celoFirst)
+      .shift()
 
   return { pastEvents, upcomingEvents, topEvent }
 }
 
 function removeEmpty(event: IncomingEvent): boolean {
   return REQUIRED_KEYS.reduce<boolean>(
-    (acc, cv) => (acc = acc && !!(event[cv] && event[cv].length)),
+    (acc, currentField) => (acc = acc && !!event[currentField]),
     true
   )
 }
 
+function convertValues(event: IncomingEvent): EventProps {
+  return {
+    ...event,
+    celoHosted: !!event.celoHosted,
+    celoSpeaking: !!event.celoSpeaking,
+  }
+}
+
 function orderByDate(eventA: EventProps, eventB: EventProps) {
-  return parseDate(eventA.startDate).valueOf() > parseDate(eventB.startDate).valueOf() ? -1 : 1
+  return eventA.startDate === eventB.startDate ? 0 : eventA.startDate > eventB.startDate ? -1 : 1
 }
 
-function celoFirst(eventA: EventProps, eventB: EventProps) {
-  return eventA.celoHosted === eventB.celoHosted ? 0 : eventA.celoHosted ? -1 : 1
+export function celoFirst(eventA: EventProps, eventB: EventProps) {
+  if (eventA.celoHosted && eventB.celoHosted) {
+    return eventA.startDate > eventB.startDate ? 1 : -1
+  } else if (eventA.celoHosted) {
+    return -1
+  } else if (!eventA.celoHosted && !eventB.celoHosted) {
+    return 0
+  } else {
+    return 1
+  }
 }
 
-export function normalizeEvents(data: RawEvent[]) {
+export function normalizeEvents(data: RawAirTableEvent[]): EventProps[] {
   return data
     .map(convertKeys)
     .filter(removeEmpty)

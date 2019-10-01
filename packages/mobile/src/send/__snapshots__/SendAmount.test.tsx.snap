@@ -154,7 +154,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
               ]
             }
           >
-             +1
+            🇺🇸 +1
           </Text>
           <Text
             style={
@@ -238,7 +238,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
               ]
             }
           >
-            $
+            MXN
           </Text>
         </View>
         <View
@@ -304,7 +304,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
                 },
               ]
             }
-            title="$"
+            title="MXN"
             underlineColorAndroid="transparent"
             validator="decimal"
             value=""

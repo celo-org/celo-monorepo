@@ -109,7 +109,7 @@ function wwwRedirect(req, res, nextAction) {
     } catch (e) {
       Sentry.withScope((scope) => {
         scope.setTag('Service', 'Airtable')
-        Sentry.captureException(e)
+        Sentry.captureEvent(e)
       })
       res.status(e.statusCode || 500).json({ message: e.message || 'unknownError' })
     }
@@ -154,7 +154,7 @@ function wwwRedirect(req, res, nextAction) {
     res.json(articlesdata)
   })
 
-  server.get('/proxy/events', async (_, res) => {
+  server.get('/proxy/events/', async (_, res) => {
     const events = await getFormattedEvents()
     res.json(events)
   })

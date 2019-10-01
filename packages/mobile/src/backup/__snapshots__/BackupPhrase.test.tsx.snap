@@ -58,7 +58,7 @@ exports[`renders correctly 1`] = `
     automaticallyAdjustContentInsets={false}
     contentContainerStyle={
       Object {
-        "flex": 1,
+        "flexGrow": 1,
         "justifyContent": "space-between",
         "paddingHorizontal": 20,
       }
