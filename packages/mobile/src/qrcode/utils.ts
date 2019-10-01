@@ -17,6 +17,10 @@ import {
 import { QrCode, storeLatestInRecents, SVG } from 'src/send/actions'
 import Logger from 'src/utils/Logger'
 
+export enum BarcodeTypes {
+  QR_CODE = 'QR_CODE',
+}
+
 const TAG = 'QR/utils'
 
 const QRFileName = '/celo-qr.png'
