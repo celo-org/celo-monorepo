@@ -12,6 +12,11 @@ import LineItemRow from 'src/components/LineItemRow'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
+import {
+  useDollarsToLocalAmount,
+  useExchangeRate,
+  useLocalCurrencyCode,
+} from 'src/localCurrency/hooks'
 import { Recipient } from 'src/recipients/recipient'
 import FeeIcon from 'src/send/FeeIcon'
 import { TransactionTypes } from 'src/transactions/reducer'
@@ -32,61 +37,80 @@ export interface OwnProps {
 
 // Bordered content placed in a ReviewFrame
 // Differs from TransferConfirmationCard which is used for viewing completed txs
-class TransferReviewCard extends React.Component<OwnProps & WithNamespaces> {
-  render() {
-    const {
-      recipient,
-      address,
-      e164PhoneNumber,
-      currency,
-      t,
-      type,
-      value,
-      comment,
-      fee,
-      isLoadingFee,
-      feeError,
-    } = this.props
+function TransferReviewCard({
+  recipient,
+  address,
+  e164PhoneNumber,
+  currency,
+  t,
+  type,
+  value,
+  comment,
+  fee,
+  isLoadingFee,
+  feeError,
+}: OwnProps & WithNamespaces) {
+  const localCurrencyCode = useLocalCurrencyCode()
+  const localValue = useDollarsToLocalAmount(value)
+  const exchangeRate = new BigNumber(useExchangeRate() as number)
+  const amountWithFees = value.plus(fee || 0)
+  const adjustedFee =
+    type === TransactionTypes.INVITE_SENT && fee
+      ? fee.minus(getInvitationVerificationFeeInDollars())
+      : fee
 
-    const amountWithFees = value.plus(fee || 0)
-    const adjustedFee =
-      type === TransactionTypes.INVITE_SENT && fee
-        ? fee.minus(getInvitationVerificationFeeInDollars())
-        : fee
-
-    return (
-      <View style={[componentStyles.roundedBorder, style.container]}>
-        <Avatar recipient={recipient} address={address} e164Number={e164PhoneNumber} />
+  return (
+    <View style={style.container}>
+      <Avatar recipient={recipient} address={address} e164Number={e164PhoneNumber} />
+      {!!localCurrencyCode && localValue ? (
+        <MoneyAmount amount={getMoneyDisplayValue(localValue)} code={localCurrencyCode} />
+      ) : (
         <MoneyAmount symbol={CURRENCIES[currency].symbol} amount={getMoneyDisplayValue(value)} />
-        <View style={style.bottomContainer}>
-          {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
-          <HorizontalLine />
-          <View style={style.feeContainer}>
-            {type === TransactionTypes.INVITE_SENT && (
-              <LineItemRow
-                currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-                amount={getMoneyDisplayValue(getInvitationVerificationFeeInDollars())}
-                title={t('inviteAndSecurityFee')}
-              />
+      )}
+      <View style={style.bottomContainer}>
+        {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
+        <HorizontalLine />
+        <View style={style.feeContainer}>
+          {!!localCurrencyCode &&
+            localValue && (
+              <>
+                <LineItemRow
+                  currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+                  amount={getMoneyDisplayValue(value)}
+                  title={t('amountInCelloDollars')}
+                />
+                <Text style={style.localValueHint}>
+                  {t('localValueHint', {
+                    localValue: getMoneyDisplayValue(exchangeRate),
+                    localCurrencyCode,
+                  })}
+                </Text>
+              </>
             )}
+          {type === TransactionTypes.INVITE_SENT && (
             <LineItemRow
               currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-              amount={getFeeDisplayValue(adjustedFee)}
-              title={t('securityFee')}
-              titleIcon={<FeeIcon />}
-              isLoading={isLoadingFee}
-              hasError={!!feeError}
+              amount={getMoneyDisplayValue(getInvitationVerificationFeeInDollars())}
+              title={t('inviteAndSecurityFee')}
             />
-            <LineItemRow
-              currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
-              amount={getMoneyDisplayValue(amountWithFees)}
-              title={t('total')}
-            />
-          </View>
+          )}
+          <LineItemRow
+            currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+            amount={getFeeDisplayValue(adjustedFee)}
+            title={t('securityFee')}
+            titleIcon={<FeeIcon />}
+            isLoading={isLoadingFee}
+            hasError={!!feeError}
+          />
+          <LineItemRow
+            currencySymbol={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+            amount={getMoneyDisplayValue(amountWithFees)}
+            title={t('total')}
+          />
         </View>
       </View>
-    )
-  }
+    </View>
+  )
 }
 
 const style = StyleSheet.create({
@@ -94,7 +118,7 @@ const style = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     flexDirection: 'column',
-    paddingVertical: 25,
+    paddingBottom: 25,
     paddingHorizontal: 40,
   },
   bottomContainer: {
@@ -114,6 +138,13 @@ const style = StyleSheet.create({
     ...fontStyles.light,
     lineHeight: 18,
     textAlign: 'center',
+  },
+  localValueHint: {
+    ...fontStyles.light,
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.lightGray,
+    marginBottom: 3,
   },
 })
 

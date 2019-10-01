@@ -51,14 +51,16 @@
   "reclaimPayment": "Reclamar el Pago",
   "sendMessage": "Enviar Mensaje",
   "escrowedPaymentReminder": "Recuérdele a {{mobile #}} que acepte el pago",
+  "escrowedPaymentReminderSms":
+    "¡Un recordatorio amistoso de que aún no ha canjeado sus dólares de celo!",
   "testnetAlert": {
     "0": "Testnet",
     "1":
       "Un recordatorio amistoso de que está utilizando una compilación de Testnet - los saldos aquí no son reales."
   },
   "dismiss": "Ocultar",
-  "localCurrencyEqual": "Igual a <2>{{localValue}} {{localCurrencySymbol}}</2>",
-  "localCurrencyValue": "{{localValue}} {{localCurrencySymbol}}",
+  "localCurrencyEqual": "Igual a <2>{{localValue}} {{localCurrencyCode}}</2>",
+  "localCurrencyValue": "{{localValue}} {{localCurrencyCode}}",
   "feedItemVerificationFeeTitle": "Celo",
   "feedItemVerificationFeeInfo": "$t(verificationFee)",
   "feedItemVerificationRewardTitle": "Celo",

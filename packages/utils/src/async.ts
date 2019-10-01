@@ -1,5 +1,10 @@
 const TAG = 'utils/src/async'
 
+/** Sleep for a number of milliseconds */
+export function sleep(ms: number): Promise<void> {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms))
+}
+
 type InFunction = (...params: any) => Promise<any>
 
 // Retries an async function when it raises an exeption
@@ -11,16 +16,38 @@ export const retryAsync = async (
   delay = 100
 ) => {
   let saveError
-  for (let i = 0; i < tries + 1; i++) {
+  for (let i = 0; i < tries; i++) {
     try {
       // it awaits otherwise it'd always do all the retries
       return await inFunction(...params)
     } catch (error) {
-      await new Promise((resolve) => setTimeout(resolve, delay)) // sleeps `delay` milliseconds
+      await sleep(delay)
       saveError = error
       console.info(`${TAG}/@reTryAsync, Failed to execute function on try #${i}`, error)
     }
   }
 
   throw saveError
+}
+
+/**
+ * Map an async function over a list xs with a given concurrency level
+ *
+ * @param concurrency number of `mapFn` concurrent executions
+ * @param xs list of value
+ * @param mapFn mapping function
+ */
+export async function concurrentMap<A, B>(
+  concurrency: number,
+  xs: A[],
+  mapFn: (val: A, idx: number) => Promise<B>
+): Promise<B[]> {
+  let res: B[] = []
+  for (let i = 0; i < xs.length; i += concurrency) {
+    const remaining = xs.length - i
+    const sliceSize = Math.min(remaining, concurrency)
+    const slice = xs.slice(i, i + sliceSize)
+    res = res.concat(await Promise.all(slice.map(mapFn)))
+  }
+  return res
 }

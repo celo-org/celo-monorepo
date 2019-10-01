@@ -1,0 +1,434 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SelectLocalCurrency renders correctly 1`] = `
+<RCTScrollView
+  data={
+    Array [
+      "USD",
+      "CAD",
+      "EUR",
+      "MXN",
+      "PHP",
+    ]
+  }
+  disableVirtualization={false}
+  extraData="MXN"
+  getItem={[Function]}
+  getItemCount={[Function]}
+  horizontal={false}
+  initialNumToRender={10}
+  keyExtractor={[Function]}
+  maxToRenderPerBatch={10}
+  numColumns={1}
+  onContentSizeChange={[Function]}
+  onEndReachedThreshold={2}
+  onLayout={[Function]}
+  onMomentumScrollEnd={[Function]}
+  onScroll={[Function]}
+  onScrollBeginDrag={[Function]}
+  onScrollEndDrag={[Function]}
+  removeClippedSubviews={true}
+  renderItem={[Function]}
+  scrollEventThrottle={50}
+  stickyHeaderIndices={Array []}
+  style={Object {}}
+  updateCellsBatchingPeriod={50}
+  viewabilityConfigCallbackPairs={Array []}
+  windowSize={21}
+>
+  <View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "height": 60,
+              },
+              false,
+            ]
+          }
+        >
+          <View
+            style={
+              Object {
+                "marginHorizontal": 12,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 12,
+                  "borderWidth": 2,
+                  "height": 24,
+                  "paddingTop": 2,
+                  "width": 24,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "#EEEEEE",
+                "height": 60,
+                "justifyContent": "center",
+                "width": 702,
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontSize": 16,
+                }
+              }
+            >
+              USD
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "height": 60,
+              },
+              false,
+            ]
+          }
+        >
+          <View
+            style={
+              Object {
+                "marginHorizontal": 12,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 12,
+                  "borderWidth": 2,
+                  "height": 24,
+                  "paddingTop": 2,
+                  "width": 24,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "#EEEEEE",
+                "height": 60,
+                "justifyContent": "center",
+                "width": 702,
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontSize": 16,
+                }
+              }
+            >
+              CAD
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "height": 60,
+              },
+              false,
+            ]
+          }
+        >
+          <View
+            style={
+              Object {
+                "marginHorizontal": 12,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 12,
+                  "borderWidth": 2,
+                  "height": 24,
+                  "paddingTop": 2,
+                  "width": 24,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "#EEEEEE",
+                "height": 60,
+                "justifyContent": "center",
+                "width": 702,
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontSize": 16,
+                }
+              }
+            >
+              EUR
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "height": 60,
+              },
+              Object {
+                "backgroundColor": "#F8F8F8",
+              },
+            ]
+          }
+        >
+          <View
+            style={
+              Object {
+                "marginHorizontal": 12,
+              }
+            }
+          >
+            <svg
+              height={24}
+              style={Object {}}
+              viewBox="0 0 24 24"
+              width={24}
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                fill="#42D689"
+                r="12"
+                style={Object {}}
+              />
+              <path
+                clip-rule="evenodd"
+                d="M9.74449 16.6294C9.74581 16.6307 9.74713 16.6321 9.74846 16.6334C10.0609 16.9458 10.5674 16.9458 10.8798 16.6334L18.2336 9.2796C18.5461 8.96718 18.5461 8.46065 18.2336 8.14823C17.9212 7.83581 17.4147 7.83581 17.1023 8.14823L10.3142 14.9363L7.29707 11.9192C6.98465 11.6068 6.47812 11.6068 6.1657 11.9192C5.85328 12.2317 5.85328 12.7382 6.1657 13.0506L9.74449 16.6294Z"
+                fill="white"
+                fill-rule="evenodd"
+                style={Object {}}
+              />
+            </svg>
+          </View>
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "#EEEEEE",
+                "height": 60,
+                "justifyContent": "center",
+                "width": 702,
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontSize": 16,
+                }
+              }
+            >
+              MXN
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "height": 60,
+              },
+              false,
+            ]
+          }
+        >
+          <View
+            style={
+              Object {
+                "marginHorizontal": 12,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 12,
+                  "borderWidth": 2,
+                  "height": 24,
+                  "paddingTop": 2,
+                  "width": 24,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "borderBottomWidth": 1,
+                "borderColor": "#EEEEEE",
+                "height": 60,
+                "justifyContent": "center",
+                "width": 702,
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontSize": 16,
+                }
+              }
+            >
+              PHP
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</RCTScrollView>
+`;
