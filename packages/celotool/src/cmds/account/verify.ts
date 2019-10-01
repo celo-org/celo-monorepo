@@ -152,7 +152,7 @@ async function verifyCode(
     return
   }
 
-  const tx = await attestations.complete(phoneNumber, account, matchingIssuer, code).send()
+  const tx = await (await attestations.complete(phoneNumber, account, matchingIssuer, code)).send()
   return tx.waitReceipt()
 }
 
