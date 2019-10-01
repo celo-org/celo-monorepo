@@ -8,15 +8,15 @@
 import TextInput from '@celo/react-components/components/TextInput'
 import { validateInput, ValidatorKind } from '@celo/utils/src/inputValidation'
 import * as React from 'react'
-import { TextInput as RNTextInput, TextInputProps } from 'react-native'
+import { KeyboardType, TextInputProps } from 'react-native'
 
 interface OwnProps {
   value: string
+  onChangeText: (input: string) => void
+  keyboardType: KeyboardType
   numberOfDecimals?: number
   placeholder?: string
   lng?: string
-  nativeInput?: boolean
-  onChangeText: (input: string) => void
 }
 
 // Required props when validator type is phone
@@ -53,11 +53,9 @@ export default class ValidatedTextInput extends React.Component<Props> {
       return
     }
 
-    if (!this.props.onChangeText) {
-      return
+    if (this.props.onChangeText) {
+      this.props.onChangeText(validated)
     }
-
-    this.props.onChangeText(validated)
   }
 
   getMaxLength = () => {
@@ -76,15 +74,7 @@ export default class ValidatedTextInput extends React.Component<Props> {
   }
 
   render() {
-    const { nativeInput = false } = this.props
-    return nativeInput ? (
-      <RNTextInput
-        maxLength={this.getMaxLength()}
-        {...this.props}
-        value={this.props.value}
-        onChangeText={this.onChangeText}
-      />
-    ) : (
+    return (
       <TextInput
         maxLength={this.getMaxLength()}
         {...this.props}

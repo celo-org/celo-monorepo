@@ -15,24 +15,25 @@ import { KeyboardType, StyleSheet, Text, TextStyle, View } from 'react-native'
 import Search from 'src/icons/Search'
 
 interface OwnProps {
-  autocorrect?: boolean
   keyboardType: KeyboardType
   title?: string
-  placeholder: string
   value: string
+  numberOfDecimals?: number
+  placeholder: string
+  lng?: string
   labelStyle?: TextStyle
   placeholderTextColor?: string
   autoFocus?: boolean
-  numberOfDecimals?: number
-  lng?: string
   maxLength?: number
   onChangeText(value: string): void
 }
 
 type Props = OwnProps & ValidatorProps
+
 interface State {
   active: boolean
 }
+
 export default class LabeledTextInput extends React.Component<Props, State> {
   state = {
     active: false,
@@ -47,7 +48,7 @@ export default class LabeledTextInput extends React.Component<Props, State> {
   }
 
   render() {
-    const props = this.props
+    const { title, labelStyle } = this.props
     return (
       <View
         style={[
@@ -56,10 +57,8 @@ export default class LabeledTextInput extends React.Component<Props, State> {
         ]}
       >
         <View style={style.titleContainer}>
-          {props.title ? (
-            <Text style={[fontStyles.bodySecondary, style.title, props.labelStyle]}>
-              {props.title}
-            </Text>
+          {title ? (
+            <Text style={[fontStyles.bodySecondary, style.title, labelStyle]}>{title}</Text>
           ) : (
             <Search />
           )}

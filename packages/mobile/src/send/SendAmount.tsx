@@ -375,7 +375,7 @@ export class SendAmount extends React.Component<Props, State> {
             placeholder={t('amount')}
             labelStyle={style.amountLabel as TextStyle}
             placeholderTextColor={colors.celoGreenInactive}
-            autocorrect={false}
+            // autocorrect={false}
             value={this.state.amount}
             onChangeText={this.onAmountChanged}
             autoFocus={true}

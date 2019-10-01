@@ -16,7 +16,7 @@ import {
 } from 'react-native'
 
 interface OwnProps {
-  onChangeText: (pin1: string) => void
+  onChangeText: (value: string) => void
   testID?: string
   showClearButton?: boolean
   forwardedRef?: React.RefObject<RNTextInput>
@@ -60,7 +60,7 @@ export class CTextInput extends React.Component<Props, State> {
       value = '',
       showClearButton = true,
       forwardedRef,
-      ...props
+      ...otherProps
     } = this.props
 
     const { isFocused = false } = this.state
@@ -71,7 +71,7 @@ export class CTextInput extends React.Component<Props, State> {
           ref={forwardedRef}
           style={[fontStyles.regular, style.borderedText, style.numberInput]}
           value={value}
-          {...props}
+          {...otherProps}
           onFocus={this.handleInputFocus}
           onBlur={this.handleInputBlur}
         />
