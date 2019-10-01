@@ -9,7 +9,7 @@ import { useLocalCurrencyCode } from 'src/localCurrency/hooks'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigateBack } from 'src/navigator/NavigationService'
 
-const DEFAULT_CURRENCY_CODE = 'USD'
+const DEFAULT_CURRENCY_CODE = LocalCurrencyCode.USD
 
 const keyExtractor = (item: LocalCurrencyCode) => item
 
