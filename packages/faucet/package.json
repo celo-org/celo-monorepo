@@ -5,9 +5,6 @@
   "author": "Celo",
   "license": "Apache-2.0",
   "main": "dist/index.js",
-  "engines": {
-    "node": "8"
-  },
   "scripts": {
     "preserve": "yarn run build",
     "serve": "cross-env NODE_ENV=production fi rebase serve",
@@ -25,7 +22,7 @@
     "eth-lib": "^0.2.8",
     "firebase": "^6.2.2",
     "firebase-admin": "^7.0.0",
-    "firebase-functions": "^2.3.1",
+    "firebase-functions": "^3.2.0",
     "rlp": "^2.2.3",
     "twilio": "^3.23.2",
     "web3": "1.0.0-beta.37",
@@ -41,5 +38,8 @@
     "firebase-tools": "^7.3.0",
     "rimraf": "2.6.3",
     "yargs": "14.0.0"
+  },
+  "engines": {
+    "node": "10"
   }
 }

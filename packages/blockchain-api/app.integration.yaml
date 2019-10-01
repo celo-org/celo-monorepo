@@ -1,13 +1,13 @@
-runtime: nodejs8
+runtime: nodejs10
 service: integration
 env_variables:
-  NODE_ENV: 'development'
-  DEPLOY_ENV: 'integration'
-  EXCHANGE_RATES_API: 'https://api.exchangeratesapi.io'
-  BLOCKSCOUT_API: 'https://integration-blockscout.celo-testnet.org/api'
+  NODE_ENV: "development"
+  DEPLOY_ENV: "integration"
+  EXCHANGE_RATES_API: "https://api.exchangeratesapi.io"
+  BLOCKSCOUT_API: "https://integration-blockscout.celo-testnet.org/api"
   # Pull addresses from the build artifacts of the network in protocol/build
-  CELO_GOLD_ADDRESS: '0x9102eCD93ac8D66bAc3D397BF52bc57Ee34Bcb87'
-  CELO_DOLLAR_ADDRESS: '0x47736AB66b892b0FCCb5c7d69B879C6141F6E80c'
-  FAUCET_ADDRESS: '0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95'
-  VERIFICATION_REWARDS_ADDRESS: '0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5'
-  ATTESTATIONS_ADDRESS: '0xD2C0894D551D4C810Dc5CB55081c0b7BE965A118'
+  CELO_GOLD_ADDRESS: "0x9102eCD93ac8D66bAc3D397BF52bc57Ee34Bcb87"
+  CELO_DOLLAR_ADDRESS: "0x47736AB66b892b0FCCb5c7d69B879C6141F6E80c"
+  FAUCET_ADDRESS: "0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95"
+  VERIFICATION_REWARDS_ADDRESS: "0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5"
+  ATTESTATIONS_ADDRESS: "0xD2C0894D551D4C810Dc5CB55081c0b7BE965A118"
