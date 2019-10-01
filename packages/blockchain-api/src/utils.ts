@@ -78,9 +78,7 @@ export async function getContractKit(): Promise<ContractKit> {
       contractKit = newKitFromWeb3(web3)
       return contractKit
     } else {
-      throw new Error(
-        'Missing web3 provider URL, will not be able to fetch contract addresses. Check .yaml'
-      )
+      throw new Error('Missing web3 provider URL, will not be able to fetch contract addresses.')
     }
   }
 }
