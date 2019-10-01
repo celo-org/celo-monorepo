@@ -15,7 +15,7 @@ import { Namespaces } from 'src/i18n'
 import { faucetIcon } from 'src/images/Images'
 import { Recipient } from 'src/recipients/recipient'
 import { TransactionTypes } from 'src/transactions/reducer'
-import { getMoneyDisplayValue, getPreciseNetworkFeeDisplayValue } from 'src/utils/formatting'
+import { getMoneyDisplayValue, getNetworkFeeDisplayValue } from 'src/utils/formatting'
 import { navigateToURI } from 'src/utils/linking'
 
 const iconSize = 40
@@ -69,7 +69,7 @@ class TransferConfirmationCard extends React.Component<OwnProps & WithNamespaces
         return (
           <MoneyAmount
             symbol={CURRENCIES[currency].symbol}
-            amount={getPreciseNetworkFeeDisplayValue(value)}
+            amount={getNetworkFeeDisplayValue(value, true)}
           />
         )
       default:

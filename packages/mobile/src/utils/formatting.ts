@@ -34,30 +34,19 @@ export const getFeeDisplayValue = (value: BigNumber.Value | null | undefined): s
 
 /**
  * More precise getFeeDisplayValue with built in rounding
- * Used for small Network Fees in transaction feed
+ * Used for small Network Fees
  * @param value fee amount
+ * @param precise true if additional precision to 6 digits for <0.001 needed
  */
-export const getNetworkFeeDisplayValue = (value: BigNumber.Value): string => {
+export const getNetworkFeeDisplayValue = (
+  value: BigNumber.Value,
+  precise: boolean = false
+): string => {
   const roundedNumber = new BigNumber(value)
-  if (roundedNumber.isLessThan(0.001)) {
-    return '<0.001'
-  } else {
-    return numeral(roundUp(value, 3).toNumber()).format('0[.][000]')
-  }
-}
-
-/**
- * Even more precise getFeeDisplay value for Network Fee drilldown
- * Built in rounding below <0.000001. Displays fee to 6 decimal
- * places if less than 0.001, else to 3 decimal places
- * @param value fee amount
- */
-export const getPreciseNetworkFeeDisplayValue = (value: BigNumber.Value): string => {
-  const roundedNumber = new BigNumber(value)
-  if (roundedNumber.isLessThan(0.000001)) {
+  if (precise && roundedNumber.isLessThan(0.000001)) {
     return '<0.000001'
   } else if (roundedNumber.isLessThan(0.001)) {
-    return numeral(roundUp(value, 6).toNumber()).format('0[.][000000]')
+    return precise ? numeral(roundUp(value, 6).toNumber()).format('0[.][000000]') : '<0.001'
   } else {
     return numeral(roundUp(value, 3).toNumber()).format('0[.][000]')
   }
