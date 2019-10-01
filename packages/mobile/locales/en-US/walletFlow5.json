@@ -33,6 +33,12 @@
   "letsGetStartedByFirstTransaction": "Let’s get started by sending your first transaction",
   "sendMoney": "Send Money",
   "verificationFee": "Verification Fee",
+  "networkFee": "Network Fee",
+  "networkFeeExplanation": {
+    "0":
+      "Each week, a very small fee (less than 0.01%) of every user's Celo Dollar Balance is used to keep the Celo Dollar's value stable. To learn more about Celo fees, visit the ",
+    "1": "FAQ"
+  },
   "confirmingPayment": "Confirming…",
   "confirmingExchange": "Confirming…",
   "paymentFailed": "Payment Failed",
@@ -61,6 +67,8 @@
   "localCurrencyValue": "{{localValue}} {{localCurrencyCode}}",
   "feedItemVerificationFeeTitle": "Celo",
   "feedItemVerificationFeeInfo": "$t(verificationFee)",
+  "feedItemNetworkFeeTitle": "Celo",
+  "feedItemNetworkFeeInfo": "Network Fee",
   "feedItemVerificationRewardTitle": "Celo",
   "feedItemVerificationRewardInfo": "Verifier Reward",
   "feedItemFaucetTitle": "Celo",
