@@ -27,7 +27,7 @@
     "ethereumjs-util": "^5.2.0",
     "express": "^4.16.4",
     "firebase-admin": "^7.0.0",
-    "firebase-functions": "^2.3.1",
+    "firebase-functions": "^3.2.0",
     "google-libphonenumber": "^3.2.4",
     "lodash": "^4.17.14",
     "nexmo": "2.4.2",
@@ -50,6 +50,6 @@
     "supertest": "^3.4.2"
   },
   "engines": {
-    "node": "8"
+    "node": "10"
   }
 }

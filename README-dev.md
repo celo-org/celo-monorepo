@@ -35,7 +35,6 @@ Let's say the published package version number 0.0.15, verify that it is install
 
 Add a tag with the most recent git commit of the published branch. Note that this commit comes before package.json is updated with the new package version.
 
-
 ```
 $ npm dist-tag add <package-name>@<version> [<tag>]
 ```
