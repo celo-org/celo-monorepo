@@ -48,7 +48,7 @@ export class CeloAdapter {
   }
 
   async escrowDollars(
-    phoneHash: string,
+    identifierHash: string,
     tempWallet: string,
     amount: string,
     expirarySeconds: number,
@@ -65,7 +65,7 @@ export class CeloAdapter {
     return sendTx(
       this.web3,
       this.escrow.methods.transfer(
-        phoneHash,
+        identifierHash,
         this.stableTokenAddress,
         amount,
         expirarySeconds,

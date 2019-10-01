@@ -1,4 +1,4 @@
-import { PhoneNumberUtils } from '@celo/utils'
+import { IdentityUtils } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import Contract from 'web3/eth/contract'
 import {
@@ -136,7 +136,7 @@ async function getVerifierInfo(
   }
 
   // @ts-ignore
-  const verifierPhoneHash = await PhoneNumberUtils.getPhoneHash(verifer.phoneNum)
+  const verifierPhoneHash = await IdentityUtils.identityHash(verifer.phoneNum)
   const verifierAddress = await (await getAttestations()).methods.lookup(verifierPhoneHash).call()
   return {
     address: verifierAddress,
@@ -171,7 +171,7 @@ async function getVerificationInfo(
   const verificationIndex = new BigNumber(messagePieces[2]).toNumber()
 
   // @ts-ignore soliditySha3 can take an object
-  const requesterPhoneHash = await PhoneNumberUtils.getPhoneHash(message.phoneNum)
+  const requesterPhoneHash = await IdentityUtils.identityHash(message.phoneNum)
   // TODO(asa): Use parseVerificationRequest from SDK
   const verificationRequest = await (await getAttestations()).methods
     .getVerificationRequest(requesterPhoneHash, message.address, requestIndex)

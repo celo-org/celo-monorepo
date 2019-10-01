@@ -1,4 +1,4 @@
-import { PhoneNumberUtils } from '@celo/utils'
+import { IdentityUtils } from '@celo/utils'
 import * as ethjsutil from 'ethereumjs-util'
 // @ts-ignore
 import * as Web3Utils from 'web3-utils'
@@ -8,15 +8,10 @@ export function parseBase64(source: string) {
   return ethjsutil.bufferToHex(Buffer.from(source, 'base64'))
 }
 
-export async function getPhoneHash(phoneNumber: string) {
-  const phoneHash = await PhoneNumberUtils.getPhoneHash(phoneNumber)
-  return phoneHash
-}
-
 // TODO: Copied from @celo/utils, should be removed once usable as a dependency
-function attestationMessageToSign(phoneHash: string, account: string) {
+function attestationMessageToSign(identifierHash: string, account: string) {
   const messageHash: string = Web3Utils.soliditySha3(
-    { type: 'bytes32', value: phoneHash },
+    { type: 'bytes32', value: identifierHash },
     { type: 'address', value: account }
   )
   return messageHash
@@ -76,19 +71,19 @@ function parseSignature(messageHash: string, signature: string, signer: string) 
 }
 
 export async function validateRequest(
-  phoneNumber: string,
+  identifier: string,
   account: string,
   message: string,
   issuer: string
 ) {
   const attestations = await getAttestations()
-  const phoneHash = await getPhoneHash(phoneNumber)
-  const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
+  const identifierHash = await IdentityUtils.identityHash(identifier)
+  const expectedSourceMessage = attestationMessageToSign(identifierHash, account)
   const { r, s, v } = parseSignature(expectedSourceMessage, message, issuer.toLowerCase())
 
   try {
     const issuerFromSignature: string = await attestations.methods
-      .validateAttestationCode(phoneHash, account, v, r, s)
+      .validateAttestationCode(identifierHash, account, v, r, s)
       .call()
     return issuerFromSignature.toLowerCase() === issuer.toLowerCase()
   } catch (e) {

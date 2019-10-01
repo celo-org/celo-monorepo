@@ -5,8 +5,8 @@ import {
   DappKitRequestMeta,
   DappKitRequestTypes,
   DappKitResponseStatus,
+  IdentityUtils,
   parseDappkitResponseDeeplink,
-  PhoneNumberUtils,
   serializeDappKitRequestDeeplink,
   SignTxRequest,
   SignTxResponseSuccess,
@@ -211,7 +211,9 @@ async function lookupPhoneNumbersOnAttestations(
   const attestations = await kit.contracts.getAttestations()
   const nestedResult = await Promise.all(
     chunk(Object.keys(allPhoneNumbers), 20).map(async (phoneNumbers) => {
-      const hashedPhoneNumbers = await Promise.all(phoneNumbers.map(PhoneNumberUtils.getPhoneHash))
+      const hashedPhoneNumbers = await Promise.all(
+        phoneNumbers.map((p) => IdentityUtils.identityHash(p))
+      )
 
       const phoneNumbersByHash = zipObject(hashedPhoneNumbers, phoneNumbers)
 

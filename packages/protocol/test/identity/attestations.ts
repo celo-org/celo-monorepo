@@ -7,8 +7,7 @@ import {
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { attestToIdentifier } from '@celo/utils'
-import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
+import { attestToIdentifier, IdentityUtils } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import { uniq } from 'lodash'
 import {
@@ -61,7 +60,7 @@ contract('Attestations', async (accounts: string[]) => {
     '0x23cb7121166b9a2f93ae0b7c05bde02eae50d64449b2cbb42bc84e9d38d6cc89',
   ]
 
-  const phoneHash: string = await getPhoneHash(phoneNumber)
+  const identifierHash: string = await IdentityUtils.identityHash(phoneNumber)
 
   const attestationsRequested = 3
   const attestationExpirySeconds = 60
@@ -81,7 +80,7 @@ contract('Attestations', async (accounts: string[]) => {
   }
 
   const getNonIssuer = async () => {
-    const issuers = await attestations.getAttestationIssuers(phoneHash, caller)
+    const issuers = await attestations.getAttestationIssuers(identifierHash, caller)
     let nonIssuerIndex = 0
     while (issuers.indexOf(accounts[nonIssuerIndex]) !== -1) {
       nonIssuerIndex++

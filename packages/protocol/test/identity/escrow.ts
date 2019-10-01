@@ -1,6 +1,6 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertRevert, NULL_ADDRESS, timeTravel } from '@celo/protocol/lib/test-utils'
-import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
+import { IdentityUtils } from '@celo/utils'
 import {
   EscrowContract,
   EscrowInstance,
@@ -118,7 +118,7 @@ contract('Escrow', (accounts: string[]) => {
     }
 
     // @ts-ignore
-    const aPhoneHash: string = await getPhoneHash('+18005555555')
+    const aPhoneHash: string = await IdentityUtils.identityHash('+18005555555')
     const withdrawKeyAddress: string = accounts[5]
     const anotherWithdrawKeyAddress: string = accounts[6]
     const oneDayInSecs: number = 86400

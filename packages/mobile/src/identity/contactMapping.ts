@@ -21,7 +21,8 @@ import {
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipient'
 import { checkContactsPermission } from 'src/utils/androidPermissions'
-import { getAllContacts, getPhoneHashRN } from 'src/utils/contacts'
+import { getAllContacts } from 'src/utils/contacts'
+import { IdentityUtils } from 'src/utils/identity'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
@@ -151,7 +152,9 @@ function* lookupNewRecipients(
 
 async function getAddresses(e164Numbers: string[], attestationsContract: AttestationsType) {
   Logger.debug(TAG, `Get addresses for ${e164Numbers.length} phone numbers`)
-  const phoneHashPromises = e164Numbers.map((phoneNumber) => getPhoneHashRN(phoneNumber))
+  const phoneHashPromises = e164Numbers.map((phoneNumber) =>
+    IdentityUtils.identityHash(phoneNumber)
+  )
   const phoneHashes = await Promise.all(phoneHashPromises)
   const results = await lookupPhoneNumbers(attestationsContract, phoneHashes)
   if (!results) {

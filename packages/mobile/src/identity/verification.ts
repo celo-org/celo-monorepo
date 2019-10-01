@@ -43,7 +43,7 @@ import { attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { RootState } from 'src/redux/reducers'
 import { sendTransaction, sendTransactionPromises } from 'src/transactions/send'
-import { getPhoneHashRN } from 'src/utils/contacts'
+import { IdentityUtils } from 'src/utils/identity'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -196,7 +196,7 @@ export function* doVerificationFlow() {
 function* getE164NumberHash() {
   try {
     const e164Number: string = yield select(e164NumberSelector)
-    const e164NumberHash: string = yield call(getPhoneHashRN, e164Number)
+    const e164NumberHash: string = yield call(IdentityUtils.identityHash, e164Number)
     return [e164Number, e164NumberHash]
   } catch (error) {
     Logger.error(TAG, 'Error hashing e164Number', error)
@@ -524,7 +524,7 @@ export async function lookupAddressFromPhoneNumber(e164Number: string) {
   Logger.debug(TAG + '@lookupPhoneNumberAddress', `Checking Phone Number Address`)
 
   try {
-    const phoneHash = await getPhoneHashRN(e164Number)
+    const phoneHash = await IdentityUtils.identityHash(e164Number)
     const attestationsContract = await getAttestationsContract(web3)
     const results = await lookupPhoneNumbers(attestationsContract, [phoneHash])
     if (!results || !results[phoneHash]) {

@@ -1,5 +1,4 @@
 import { retryAsync } from '@celo/utils/src/async'
-import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { stripHexLeader } from '@celo/utils/src/signatureUtils'
 import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
@@ -38,6 +37,7 @@ import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { dynamicLink } from 'src/utils/dynamicLink'
+import { IdentityUtils } from 'src/utils/identity'
 import Logger from 'src/utils/Logger'
 import { web3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
@@ -148,7 +148,7 @@ export function* sendInvite(
     // If this invitation has a payment attached to it, send the payment to the escrow.
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
       try {
-        const phoneHash = yield getPhoneHash(e164Number)
+        const phoneHash = yield IdentityUtils.identityHash(e164Number)
         yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress))
       } catch (e) {
         Logger.error(TAG, 'Error sending payment to unverified user: ', e)

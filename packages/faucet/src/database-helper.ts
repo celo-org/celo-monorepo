@@ -1,9 +1,10 @@
+import { IdentityUtils, PhoneNumberUtils } from '@celo/utils'
 import { database } from 'firebase-admin'
 import { DataSnapshot } from 'firebase-functions/lib/providers/database'
 import Web3 from 'web3'
 import { CeloAdapter } from './celo-adapter'
 import { NetworkConfig } from './config'
-import { generateInviteCode, getPhoneHash, isE164Number, wait } from './utils'
+import { generateInviteCode, wait } from './utils'
 
 export type Address = string
 export interface AccountRecord {
@@ -88,7 +89,7 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
     if (!config.twilioClient) {
       throw new Error('Cannot send an invite without a valid twilio client')
     }
-    if (!isE164Number(request.beneficiary)) {
+    if (!PhoneNumberUtils.isE164Number(request.beneficiary)) {
       throw new Error('Must send to valid E164 Number.')
     }
     const celo = new CeloAdapter(
@@ -111,9 +112,9 @@ function buildHandleInvite(request: RequestRecord, snap: DataSnapshot, config: N
     await snap.ref.update({ dollarTxHash })
     await dollarTx.waitReceipt()
 
-    const phoneHash = await getPhoneHash(request.beneficiary)
+    const identifierHash = await IdentityUtils.identityHash(request.beneficiary)
     const escrowTx = await celo.escrowDollars(
-      phoneHash,
+      identifierHash,
       tempAddress,
       config.escrowDollarAmount,
       config.expirarySeconds,

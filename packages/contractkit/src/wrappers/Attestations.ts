@@ -1,4 +1,4 @@
-import { ECIES, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
+import { ECIES, IdentityUtils, SignatureUtils } from '@celo/utils'
 import { zip3 } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import * as Web3Utils from 'web3-utils'
@@ -43,9 +43,9 @@ const parseAttestationInfo = (rawState: { 0: string; 1: string }) => ({
   time: parseInt(rawState[1], 10),
 })
 
-function attestationMessageToSign(phoneHash: string, account: Address) {
+function attestationMessageToSign(identifierHash: string, account: Address) {
   const messageHash: string = Web3Utils.soliditySha3(
-    { type: 'bytes32', value: phoneHash },
+    { type: 'bytes32', value: identifierHash },
     { type: 'address', value: account }
   )
   return messageHash
@@ -94,15 +94,15 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   )
 
   /**
-   * Returns the attestation stats of a phone number/account pair
-   * @param identifier Phone Number
+   * Returns the attestation stats of a identifier/account pair
+   * @param identifier eg. Phone Number
    * @param account Account
    */
   getAttestationStat: (identifier: string, account: Address) => Promise<AttestationStat> = async (
     identifier: string,
     account: Address
   ) => {
-    const identifierHash = await PhoneNumberUtils.getPhoneHash(identifier)
+    const identifierHash = await IdentityUtils.identityHash(identifier)
     const stat = await this.contract.methods.getAttestationStats(identifierHash, account).call()
     return { completed: toNumber(stat[0]), total: toNumber(stat[1]) }
   }
@@ -148,22 +148,24 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
   /**
    * Returns an array of attestations that can be completed, along with the issuers public key
-   * @param phoneNumber
+   * @param identifier
    * @param account
    */
   async getActionableAttestations(
-    phoneNumber: string,
+    identifier: string,
     account: Address
   ): Promise<ActionableAttestation[]> {
-    const phoneHash = await PhoneNumberUtils.getPhoneHash(phoneNumber)
+    const identifierHash = await IdentityUtils.identityHash(identifier)
     const expirySeconds = await this.attestationExpirySeconds()
     const nowInUnixSeconds = Math.floor(new Date().getTime() / 1000)
 
-    const issuers = await this.contract.methods.getAttestationIssuers(phoneHash, account).call()
+    const issuers = await this.contract.methods
+      .getAttestationIssuers(identifierHash, account)
+      .call()
     const issuerState = Promise.all(
       issuers.map((issuer) =>
         this.contract.methods
-          .getAttestationState(phoneHash, account, issuer)
+          .getAttestationState(identifierHash, account, issuer)
           .call()
           .then(parseAttestationInfo)
       )
@@ -194,29 +196,29 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
   /**
    * Completes an attestation with the corresponding code
-   * @param phoneNumber The phone number of the attestation
+   * @param identifier The identifier of the attestation
    * @param account The account of the attestation
    * @param issuer The issuer of the attestation
    * @param code The code received by the validator
    */
-  async complete(phoneNumber: string, account: Address, issuer: Address, code: string) {
-    const phoneHash = await PhoneNumberUtils.getPhoneHash(phoneNumber)
-    const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
+  async complete(identifier: string, account: Address, issuer: Address, code: string) {
+    const identifierHash = await IdentityUtils.identityHash(identifier)
+    const expectedSourceMessage = attestationMessageToSign(identifierHash, account)
     const { r, s, v } = parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
-    return wrapSend(this.kit, this.contract.methods.complete(phoneHash, v, r, s))
+    return wrapSend(this.kit, this.contract.methods.complete(identifierHash, v, r, s))
   }
 
   /**
    * Given a list of issuers, finds the matching issuer for a given code
-   * @param phoneNumber The phone number of the attestation
+   * @param identifier The identifier of the attestation
    * @param account The account of the attestation
    * @param code The code received by the validator
    * @param issuers The list of potential issuers
    */
-  async findMatchingIssuer(phoneNumber: string, account: Address, code: string, issuers: string[]) {
-    const phoneHash = await PhoneNumberUtils.getPhoneHash(phoneNumber)
+  async findMatchingIssuer(identifier: string, account: Address, code: string, issuers: string[]) {
+    const identifierHash = await IdentityUtils.identityHash(identifier)
     for (const issuer of issuers) {
-      const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
+      const expectedSourceMessage = attestationMessageToSign(identifierHash, account)
       try {
         parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
         return issuer
@@ -229,27 +231,27 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
-   * Lookup mapped walleet addresses for a given list of hashes of phone numbers
-   * @param phoneNumberHashes The hashes of phone numbers to lookup
+   * Lookup mapped walleet addresses for a given list of hashes of identifiers
+   * @param identifierHashes The hashes of identifiers to lookup
    */
-  async lookupPhoneNumbers(
-    phoneNumberHashes: string[]
+  async lookupIdentifiers(
+    identifierHashes: string[]
   ): Promise<Record<string, Record<string, AttestationStat>>> {
     // Unfortunately can't be destructured
-    const stats = await this.contract.methods.batchGetAttestationStats(phoneNumberHashes).call()
+    const stats = await this.contract.methods.batchGetAttestationStats(identifierHashes).call()
 
     const toNum = (n: string) => new BigNumber(n).toNumber()
     const matches = stats[0].map(toNum)
     const addresses = stats[1]
     const completed = stats[2].map(toNum)
     const total = stats[3].map(toNum)
-    // Map of phone hash -> (Map of address -> AttestationStat)
+    // Map of identifier hash -> (Map of address -> AttestationStat)
     const result: Record<string, Record<string, AttestationStat>> = {}
 
     let rIndex = 0
 
-    for (let pIndex = 0; pIndex < phoneNumberHashes.length; pIndex++) {
-      const pHash = phoneNumberHashes[pIndex]
+    for (let pIndex = 0; pIndex < identifierHashes.length; pIndex++) {
+      const pHash = identifierHashes[pIndex]
       const numberOfMatches = matches[pIndex]
       if (numberOfMatches === 0) {
         continue
@@ -272,26 +274,26 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
-   * Requests attestations for a phone number
-   * @param phoneNumber The phone number for which to request attestations for
+   * Requests attestations for a identifier
+   * @param identifier The identifier for which to request attestations for
    * @param attestationsRequested The number of attestations to request
    * @param token The token with which to pay for the attestation fee
    */
-  async request(phoneNumber: string, attestationsRequested: number, token: CeloToken) {
-    const phoneHash = await PhoneNumberUtils.getPhoneHash(phoneNumber)
+  async request(identifier: string, attestationsRequested: number, token: CeloToken) {
+    const identifierHash = await IdentityUtils.identityHash(identifier)
     const tokenAddress = await this.kit.registry.addressFor(token)
     return wrapSend(
       this.kit,
-      this.contract.methods.request(phoneHash, attestationsRequested, tokenAddress)
+      this.contract.methods.request(identifierHash, attestationsRequested, tokenAddress)
     )
   }
 
   /**
-   * Reveals the phone number to the issuer of the attestation on-chain
-   * @param phoneNumber The phone number which requested attestation
+   * Reveals the identifier to the issuer of the attestation on-chain
+   * @param identifer The identifier which requested attestation
    * @param issuer The address of issuer of the attestation
    */
-  async reveal(phoneNumber: string, issuer: Address) {
+  async reveal(identifer: string, issuer: Address) {
     const publicKey: string = (await this.contract.methods
       .getDataEncryptionKey(issuer)
       .call()) as any
@@ -300,18 +302,18 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       throw new Error('Issuer data encryption key is null')
     }
 
-    const encryptedPhone: any =
+    const encryptedIdentifier: any =
       '0x' +
       ECIES.Encrypt(
         Buffer.from(publicKey.slice(2), 'hex'),
-        Buffer.from(phoneNumber, 'utf8')
+        Buffer.from(identifer, 'utf8')
       ).toString('hex')
 
     return wrapSend(
       this.kit,
       this.contract.methods.reveal(
-        await PhoneNumberUtils.getPhoneHash(phoneNumber),
-        encryptedPhone,
+        await IdentityUtils.identityHash(identifer),
+        encryptedIdentifier,
         issuer,
         true
       )
@@ -320,20 +322,20 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
   /**
    * Validates a given code by the issuer on-chain
-   * @param phoneNumber The phone number which requested attestation
+   * @param identifer The identifer which requested attestation
    * @param account The account which requested attestation
    * @param issuer The address of the issuer of the attestation
    * @param code The code send by the issuer
    */
   async validateAttestationCode(
-    phoneNumber: string,
+    identifer: string,
     account: Address,
     issuer: Address,
     code: string
   ) {
-    const phoneHash = await PhoneNumberUtils.getPhoneHash(phoneNumber)
-    const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
+    const identifierHash = await IdentityUtils.identityHash(identifer)
+    const expectedSourceMessage = attestationMessageToSign(identifierHash, account)
     const { r, s, v } = parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
-    return this.contract.methods.validateAttestationCode(phoneHash, account, v, r, s).call()
+    return this.contract.methods.validateAttestationCode(identifierHash, account, v, r, s).call()
   }
 }

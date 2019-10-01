@@ -3,7 +3,7 @@
 import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils';
 import { CeloContractName } from '@celo/protocol/lib/registry-utils';
 import { signTransaction } from '@celo/protocol/lib/signing-utils';
-import { PhoneNumberUtils } from '@celo/utils';
+import { IdentityUtils } from '@celo/utils';
 import { BigNumber } from 'bignumber.js';
 import { ec as EC } from 'elliptic';
 import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types';
@@ -298,7 +298,7 @@ export async function createInviteCode(
 export async function sendEscrowedPayment(
   contract: StableTokenInstance,
   escrow: EscrowInstance,
-  phone: string,
+  identifier: string,
   value: number,
   paymentID: string
 ) {
@@ -307,13 +307,13 @@ export async function sendEscrowedPayment(
     await convertFromContractDecimals(value, contract),
     await contract.symbol(),
     'to',
-    phone,
+    identifier,
     'via Escrow.'
   )
   // @ts-ignore
-  const phoneHash: string = await PhoneNumberUtils.getPhoneHash(phone)
+  const identifierHash: string = await IdentityUtils.identityHash(identifier)
 
   await contract.approve(escrow.address, value.toString())
   const expirySeconds = 60 * 60 * 24 * 5 // 5 days
-  await escrow.transfer(phoneHash, contract.address, value.toString(), expirySeconds, paymentID, 0)
+  await escrow.transfer(identifierHash, contract.address, value.toString(), expirySeconds, paymentID, 0)
 }

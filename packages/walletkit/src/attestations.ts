@@ -1,4 +1,4 @@
-import { ECIES, PhoneNumberUtils, SignatureUtils } from '@celo/utils'
+import { ECIES, IdentityUtils, SignatureUtils } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import { Dictionary, zip } from 'lodash'
 import * as Web3Utils from 'web3-utils'
@@ -26,9 +26,9 @@ export async function getAttestationFee(
   return new BigNumber(attestationFee).times(attestationsRequested)
 }
 
-export function attestationMessageToSign(phoneHash: string, account: string) {
+export function attestationMessageToSign(identityHash: string, account: string) {
   const messageHash: string = Web3Utils.soliditySha3(
-    { type: 'bytes32', value: phoneHash },
+    { type: 'bytes32', value: identityHash },
     { type: 'address', value: account }
   )
   return messageHash
@@ -36,11 +36,11 @@ export function attestationMessageToSign(phoneHash: string, account: string) {
 
 export function makeRequestTx(
   attestations: Attestations,
-  phoneHash: string,
+  identityHash: string,
   attestationsRequested: number,
   tokenContract: CeloTokenType
 ) {
-  return attestations.methods.request(phoneHash, attestationsRequested, tokenContract._address)
+  return attestations.methods.request(identityHash, attestationsRequested, tokenContract._address)
 }
 
 type IssuerAttestationState = Array<
@@ -55,13 +55,13 @@ type IssuerAttestationState = Array<
 
 export async function getAttestationState(
   attestations: Attestations,
-  phoneHash: string,
+  identityHash: string,
   account: string
 ) {
-  const issuers = await attestations.methods.getAttestationIssuers(phoneHash, account).call()
+  const issuers = await attestations.methods.getAttestationIssuers(identityHash, account).call()
   const issuerState = await Promise.all(
     issuers.map((issuer: any) =>
-      attestations.methods.getAttestationState(phoneHash, account, issuer).call()
+      attestations.methods.getAttestationState(identityHash, account, issuer).call()
     )
   )
 
@@ -74,40 +74,36 @@ export enum AttestationState {
   Complete,
 }
 
-export async function makeRevealTx(
-  attestations: Attestations,
-  phoneNumber: string,
-  issuer: string
-) {
+export async function makeRevealTx(attestations: Attestations, identity: string, issuer: string) {
   const publicKey = await attestations.methods.getDataEncryptionKey(issuer).call()
 
   if (!publicKey) {
     throw new Error('Issuer data encryption key is null')
   }
 
-  const encryptedPhone: any =
+  const encryptedIdentity: any =
     '0x' +
     ECIES.Encrypt(
       // @ts-ignore
       Buffer.from(publicKey.slice(2), 'hex'),
-      Buffer.from(phoneNumber, 'utf8')
+      Buffer.from(identity, 'utf8')
     ).toString('hex')
   return attestations.methods.reveal(
-    await PhoneNumberUtils.getPhoneHash(phoneNumber),
-    encryptedPhone,
+    await IdentityUtils.identityHash(identity),
+    encryptedIdentity,
     issuer,
     true
   )
 }
 
 export function findMatchingIssuer(
-  phoneHash: string,
+  identityHash: string,
   account: string,
   code: string,
   issuers: string[]
 ): string | null {
   for (const issuer of issuers) {
-    const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
+    const expectedSourceMessage = attestationMessageToSign(identityHash, account)
     try {
       parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
       return issuer
@@ -126,14 +122,14 @@ export interface ActionableAttestation {
 }
 export async function getActionableAttestations(
   attestations: Attestations,
-  phoneHash: string,
+  identityHash: string,
   account: string
 ): Promise<ActionableAttestation[]> {
   const attestationExpirySeconds = parseInt(
     await attestations.methods.attestationExpirySeconds().call(),
     16
   )
-  const attestationStates = await getAttestationState(attestations, phoneHash, account)
+  const attestationStates = await getAttestationState(attestations, identityHash, account)
   const now = Math.floor(new Date().getTime() / 1000)
   const revealableAttestations = attestationStates
     .map(([issuer, issuerState]) => ({
@@ -164,14 +160,14 @@ export async function getActionableAttestations(
 
 export function makeCompleteTx(
   attestations: Attestations,
-  phoneHash: string,
+  identityHash: string,
   account: string,
   issuer: string,
   code: string
 ) {
-  const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
+  const expectedSourceMessage = attestationMessageToSign(identityHash, account)
   const { r, s, v } = parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
-  return attestations.methods.complete(phoneHash, v, r, s)
+  return attestations.methods.complete(identityHash, v, r, s)
 }
 
 const attestationCodeRegex = new RegExp(/(.* |^)([a-zA-Z0-9=_-]{87,88})($| .*)/)
@@ -208,14 +204,14 @@ export function decodeAttestationCode(base64String: string) {
 
 export function validateAttestationCode(
   attestations: Attestations,
-  phoneHash: string,
+  identityHash: string,
   account: string,
   issuer: string,
   code: string
 ) {
-  const expectedSourceMessage = attestationMessageToSign(phoneHash, account)
+  const expectedSourceMessage = attestationMessageToSign(identityHash, account)
   const { r, s, v } = parseSignature(expectedSourceMessage, code, issuer.toLowerCase())
-  return attestations.methods.validateAttestationCode(phoneHash, account, v, r, s).call()
+  return attestations.methods.validateAttestationCode(identityHash, account, v, r, s).call()
 }
 
 interface AttestationStat {
