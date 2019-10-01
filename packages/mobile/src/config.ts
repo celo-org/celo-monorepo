@@ -24,6 +24,8 @@ export const AVAILABLE_LANGUAGES = [
 export const isE2EEnv = Config.IS_E2E || false
 export const CELO_VERIFIER_DOWNLOAD_LINK = 'https://celo.org/rewards'
 export const CELO_VERIFIER_START_MINING_LINK = 'celo://verifier/start'
+export const CELO_FAUCET_LINK = 'https://celo.org/build/wallet'
+export const CELO_TERMS_LINK = 'https://celo.org/terms'
 
 export const DEFAULT_COUNTRY = Config.DEFAULT_COUNTRY || null
 
@@ -58,8 +60,6 @@ export const FIREBASE_WEB_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 
 export const SENTRY_URL = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SENTRY_URL')
 
 export const PROMOTE_REWARDS_APP = false
-
-export const LOCAL_CURRENCY_SYMBOL = Config.LOCAL_CURRENCY_SYMBOL || null
 
 // The number of seconds before the sender can reclaim the payment.
 export const ESCROW_PAYMENT_EXPIRY_SECONDS = 172800 // 2 days

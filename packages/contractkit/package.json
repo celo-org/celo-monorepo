@@ -1,6 +1,6 @@
 {
   "name": "@celo/contractkit",
-  "version": "0.1.1",
+  "version": "0.1.6",
   "description": "Celo's ContractKit to interact with Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -25,7 +25,8 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/utils": "^0.0.6-beta5",
+    "@0x/subproviders": "^5.0.0",
+    "@celo/utils": "^0.1.0",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^7.2.0",
     "cross-fetch": "3.0.4",

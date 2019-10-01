@@ -5,29 +5,24 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Linking, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { setName, setPhoneNumber } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
 import { hideAlert, showError } from 'src/alert/actions'
-import { errorSelector } from 'src/alert/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
+import { CELO_TERMS_LINK } from 'src/config'
 import { Namespaces } from 'src/i18n'
 import NuxLogo from 'src/icons/NuxLogo'
-import { redeemComplete } from 'src/invite/actions'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-
-function goToCeloSite() {
-  Linking.openURL('https://celo.org/terms')
-}
+import { navigateToURI } from 'src/utils/linking'
 
 interface StateProps {
-  error: ErrorMessages | null
   language: string
   cachedName: string
   cachedNumber: string
@@ -40,7 +35,6 @@ interface DispatchProps {
   hideAlert: typeof hideAlert
   setPhoneNumber: typeof setPhoneNumber
   setName: typeof setName
-  redeemComplete: typeof redeemComplete
 }
 
 type Props = StateProps & DispatchProps & WithNamespaces
@@ -50,7 +44,6 @@ interface State {
   e164Number: string
   countryCode: string
   isValidNumber: boolean
-  isSubmitting: boolean
 }
 
 const mapDispatchToProps = {
@@ -58,12 +51,10 @@ const mapDispatchToProps = {
   setName,
   showError,
   hideAlert,
-  redeemComplete,
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
-    error: errorSelector(state),
     language: state.app.language || 'en-us',
     cachedName: state.account.name,
     cachedNumber: state.account.e164PhoneNumber,
@@ -72,34 +63,14 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-const displayedErrors = [ErrorMessages.REDEEM_INVITE_FAILED, ErrorMessages.INVALID_INVITATION]
-
-const hasDisplayedError = (error: ErrorMessages | null) => {
-  return error && displayedErrors.includes(error)
-}
 export class JoinCelo extends React.Component<Props, State> {
   static navigationOptions = nuxNavigationOptions
 
-  static getDerivedStateFromProps(props: Props, state: State): State | null {
-    if (hasDisplayedError(props.error) && state.isSubmitting) {
-      return {
-        ...state,
-        isSubmitting: false,
-      }
-    }
-    return null
-  }
-
   state: State = {
     name: this.props.cachedName,
-    isSubmitting: false,
     e164Number: this.props.cachedNumber,
     countryCode: this.props.cachedCountryCode,
     isValidNumber: this.props.cachedNumber !== '',
-  }
-
-  back = () => {
-    navigateBack()
   }
 
   setE164Number = (e164Number: string) => {
@@ -130,7 +101,11 @@ export class JoinCelo extends React.Component<Props, State> {
     this.props.hideAlert()
   }
 
-  nextScreen = () => {
+  onPressGoToTerms = () => {
+    navigateToURI(CELO_TERMS_LINK)
+  }
+
+  goToNextScreen = () => {
     const nextScreen =
       this.props.pincodeType === PincodeType.Unset
         ? Screens.PincodeEducation
@@ -138,12 +113,14 @@ export class JoinCelo extends React.Component<Props, State> {
     navigate(nextScreen)
   }
 
-  submit = async () => {
+  onPressContinue = () => {
+    this.props.hideAlert()
+
     const { name, e164Number, isValidNumber, countryCode } = this.state
     const { cachedName, cachedNumber, cachedCountryCode } = this.props
 
     if (cachedName === name && cachedNumber === e164Number && cachedCountryCode === countryCode) {
-      this.nextScreen()
+      this.goToNextScreen()
       return
     }
 
@@ -152,13 +129,9 @@ export class JoinCelo extends React.Component<Props, State> {
       return
     }
 
-    this.setState({ isSubmitting: true })
-    this.props.hideAlert()
     this.props.setPhoneNumber(e164Number, countryCode)
     this.props.setName(name)
-    this.props.redeemComplete(false)
-    this.setState({ isSubmitting: false })
-    this.nextScreen()
+    this.goToNextScreen()
   }
 
   render() {
@@ -205,7 +178,7 @@ export class JoinCelo extends React.Component<Props, State> {
           />
           <Text style={[fontStyles.bodyXSmall, styles.disclaimer]}>
             {t('joinText.1')}
-            <Text onPress={goToCeloSite} style={fontStyles.link}>
+            <Text onPress={this.onPressGoToTerms} style={fontStyles.link}>
               {t('joinText.2')}
             </Text>
           </Text>
@@ -214,8 +187,8 @@ export class JoinCelo extends React.Component<Props, State> {
           standard={false}
           type={BtnTypes.PRIMARY}
           text={t('continue')}
-          onPress={this.submit}
-          disabled={this.state.isSubmitting || !this.state.isValidNumber}
+          onPress={this.onPressContinue}
+          disabled={!this.state.isValidNumber}
           testID={'JoinCeloContinueButton'}
         />
       </View>
