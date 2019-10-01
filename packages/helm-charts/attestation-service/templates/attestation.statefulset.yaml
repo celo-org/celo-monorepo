@@ -1,0 +1,93 @@
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: attestation-service
+    chart: attestation-service
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: attestation-service
+spec:
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+  replicas: {{ .Values.geth.validators }}
+  selector:
+    matchLabels:
+      app: attestation-service
+      release: {{ .Release.Name }}
+      component: attestation-service
+  template:
+    metadata:
+      labels:
+        app: attestation-service
+        release: {{ .Release.Name }}
+        component: attestation-service
+    spec:
+      initContainers:
+      - name: get-account
+        image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
+        imagePullPolicy: IfNotPresent
+        command:
+          - bash
+          - "-c"
+          - |
+            echo $REPLICA_NAME
+            [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
+            RID=${BASH_REMATCH[1]}
+            echo -n $RID >/root/.celo/replica_id
+            echo "Generating private key for rid=$RID"
+            celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $RID > /root/.celo/pkey
+        env:
+        - name: REPLICA_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+      containers:
+      - name: attestation-service
+        image: {{ .Values.attestation_service.image.repository }}:{{ .Values.attestation_service.image.tag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - |-
+          ATTESTATION_KEY=0x`cat /root/.celo/pkey` node lib/server.js
+        ports:
+        - name: http
+          containerPort: 3000
+        resources:
+          requests:
+            cpu: 50m
+            memory: 150Mi
+        env:
+        - name: DB_URL
+          value: sqlite://db/dev.db
+        - name: CELO_PROVIDER
+          value: https://{{ .Release.Namespace }}-infura.{{ .Values.domain.name }}.org
+        - name: APP_SIGNATURE
+          value: {{ .Values.attestation_service.sms_retriever_hash_code }}}
+        - name: NEXMO_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}
+              key: NEXMO_KEY
+        - name: NEXMO_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}
+              key: NEXMO_SECRET
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+
+      volumes:
+        - name: data
+          emptyDir: {}
+          {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}

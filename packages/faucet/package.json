@@ -20,6 +20,7 @@
     "cli": "ts-node scripts/cli.ts"
   },
   "dependencies": {
+    "@google-cloud/logging": "^5.3.1",
     "debug": "^4.1.1",
     "eth-lib": "^0.2.8",
     "firebase": "^6.2.2",
@@ -40,6 +41,5 @@
     "firebase-tools": "^7.3.0",
     "rimraf": "2.6.3",
     "yargs": "14.0.0"
-
   }
 }

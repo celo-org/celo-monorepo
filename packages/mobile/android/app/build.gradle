@@ -223,7 +223,6 @@ android {
 dependencies {
     implementation project(':react-native-install-referrer')
     implementation project(':react-native-send-intent')
-    // implementation project(':instabug-reactnative')
     // implementation project(':react-native-screens')
     implementation project(':react-native-webview')
     implementation project(':@react-native-community_netinfo')
@@ -236,7 +235,7 @@ dependencies {
     implementation project(':react-native-version-check')
     implementation project(':react-native-android-open-settings')
     implementation project(':react-native-udp')
-    implementation project(':react-native-languages')
+    implementation project(':react-native-localize')
     implementation project(':react-native-config')
     implementation project(':react-native-tcp')
     implementation project(':react-native-sentry')
