@@ -119,6 +119,52 @@ describe('transfer feed item renders correctly', () => {
     )
     expect(tree).toMatchSnapshot()
   })
+  it('for network fee', () => {
+    const tree = renderer.create(
+      <Provider store={createMockStore({})}>
+        <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
+          comment={''}
+          type={TransactionTypes.NETWORK_FEE}
+          hash={'0x'}
+          value={0.002}
+          address={mockAccount}
+          invitees={{}}
+          symbol={CURRENCY_ENUM.DOLLAR}
+          timestamp={1}
+          commentKey={null}
+          addressToE164Number={{}}
+          recipientCache={{}}
+          showLocalCurrency={true}
+          {...getMockI18nProps()}
+        />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+  it('for <0.000001 network fee', () => {
+    const tree = renderer.create(
+      <Provider store={createMockStore({})}>
+        <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
+          comment={''}
+          type={TransactionTypes.NETWORK_FEE}
+          hash={'0x'}
+          value={0.0000002}
+          address={mockAccount}
+          invitees={{}}
+          symbol={CURRENCY_ENUM.DOLLAR}
+          timestamp={1}
+          commentKey={null}
+          addressToE164Number={{}}
+          recipientCache={{}}
+          showLocalCurrency={true}
+          {...getMockI18nProps()}
+        />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
   it('for verification reward', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
