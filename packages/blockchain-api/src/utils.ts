@@ -1,5 +1,8 @@
 /* tslint:disable:no-console */
+import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { WEB3_PROVIDER_URL } from 'config'
 import * as utf8 from 'utf8'
+import Web3 from 'web3'
 import coder from 'web3-eth-abi'
 
 export function randomTimestamp() {
@@ -39,4 +42,37 @@ export function formatCommentString(functionCallHex: string): string {
 // Returns date string in YYYY-MM-DD
 export function formatDateString(date: Date) {
   return date.toISOString().split('T')[0]
+}
+
+let goldTokenAddress: string
+let stableTokenAddress: string
+let attestationsAddress: string
+let tokenAddressMapping: { [key: string]: string }
+export async function getContractAddresses() {
+  if (goldTokenAddress && stableTokenAddress && attestationsAddress) {
+    return { goldTokenAddress, stableTokenAddress, attestationsAddress }
+  } else {
+    const kit = await getContractKit()
+    goldTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
+    stableTokenAddress = await kit.registry.addressFor(CeloContract.GoldToken)
+    attestationsAddress = await kit.registry.addressFor(CeloContract.Attestations)
+    tokenAddressMapping = {
+      [goldTokenAddress]: 'Celo Gold',
+      [stableTokenAddress]: 'Celo Dollar',
+    }
+    return { tokenAddressMapping, attestationsAddress }
+  }
+}
+
+let contractKit: ContractKit
+export async function getContractKit(): Promise<ContractKit> {
+  if (contractKit && (await contractKit.isListening())) {
+    // Already connected
+    return contractKit
+  } else {
+    const httpProvider = new Web3.providers.HttpProvider(WEB3_PROVIDER_URL)
+    const web3 = new Web3(httpProvider)
+    contractKit = newKitFromWeb3(web3)
+    return contractKit
+  }
 }
