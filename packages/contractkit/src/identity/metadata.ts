@@ -79,21 +79,25 @@ export class IdentityMetadataWrapper {
     // 1. data.claims being an array
     // 2. payload being JSON-parsable
     // This is hard to put into io-ts + we need to eventually do signature checking
-    return new IdentityMetadataWrapper({
+    const parsedData = {
       claims: data.claims.map((claim: any) => ({
         payload: JSON.parse(claim.payload),
         signature: claim.signature,
       })),
-    })
+    }
+
+    const validatedData = IdentityMetadataType.decode(parsedData)
+
+    if (isLeft(validatedData)) {
+      // TODO: We could probably return a more useful error in the future
+      throw new Error(PathReporter.report(validatedData).join(', '))
+    }
+
+    return new IdentityMetadataWrapper(validatedData.right)
   }
 
   constructor(data: IdentityMetadata) {
-    const result = IdentityMetadataType.decode(data)
-    if (isLeft(result)) {
-      // TODO: We could probably return a more useful error in the future
-      throw new Error(PathReporter.report(result).join(', '))
-    }
-    this.data = result.right
+    this.data = data
   }
 
   get claims() {
@@ -110,7 +114,7 @@ export class IdentityMetadataWrapper {
   }
 
   addClaim(claim: Claim) {
-    this.data = { claims: [...this.data.claims, this.signClaim(claim)] }
+    this.data.claims.push(this.signClaim(claim))
   }
 
   findClaim<K extends ClaimTypes>(type: K): ClaimPayload<K> | undefined {
