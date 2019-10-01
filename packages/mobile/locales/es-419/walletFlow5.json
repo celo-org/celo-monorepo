@@ -34,6 +34,12 @@
   "letsGetStartedByFirstTransaction": "Empezemos enviando tu primera transacción",
   "sendMoney": "Enviar Dinero",
   "verificationFee": "Tasa de Verificación",
+  "networkFee": "Tasa de Red",
+  "networkFeeExplanation": {
+    "0":
+      "Cada semana, se utiliza una tarifa muy pequeña (menos del 0.01%) del saldo de Celo Dollar de cada usuario para mantener estable el valor del Celo Dollar. Para obtener más información sobre las tarifas de Celo, visite ",
+    "1": "las Preguntas frecuentes."
+  },
   "confirmingPayment": "Confirmando…",
   "confirmingExchange": "Confirmando…",
   "paymentFailed": "Pago Falló",
@@ -63,6 +69,8 @@
   "localCurrencyValue": "{{localValue}} {{localCurrencyCode}}",
   "feedItemVerificationFeeTitle": "Celo",
   "feedItemVerificationFeeInfo": "$t(verificationFee)",
+  "feedItemNetworkFeeTitle": "Celo",
+  "feedItemNetworkFeeInfo": "Tasa de Red",
   "feedItemVerificationRewardTitle": "Celo",
   "feedItemVerificationRewardInfo": "Recompensa del Verificador",
   "feedItemFaucetTitle": "Celo",
