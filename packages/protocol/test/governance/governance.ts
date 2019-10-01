@@ -48,6 +48,12 @@ enum VoteValue {
   Yes,
 }
 
+interface Transaction {
+  value: number,
+  destination: string,
+  data: Buffer
+}
+
 // TODO(asa): Test dequeueProposalsIfReady
 // TODO(asa): Dequeue explicitly to make the gas cost of operations more clear
 contract('Governance', (accounts: string[]) => {
@@ -79,10 +85,10 @@ contract('Governance', (accounts: string[]) => {
     multiply(fixed1.minus(baselineUpdateFactor), participationBaseline)
   )
 
-  let transactionSuccess1
-  let transactionSuccess2
-  let transactionFail
-  let proposalHash
+  let transactionSuccess1 : Transaction
+  let transactionSuccess2 : Transaction
+  let transactionFail : Transaction
+  let proposalHash: Buffer
   beforeEach(async () => {
     governance = await Governance.new()
     mockLockedGold = await MockLockedGold.new()
@@ -151,7 +157,7 @@ contract('Governance', (accounts: string[]) => {
           [String(transactionSuccess1.data.length)],
         ]
       )
-    )
+    ) as Buffer
   })
 
   describe('#initialize()', () => {
@@ -691,6 +697,7 @@ contract('Governance', (accounts: string[]) => {
       const id = await governance.propose.call(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -703,6 +710,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -715,6 +723,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -762,6 +771,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -779,6 +789,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -798,6 +809,7 @@ contract('Governance', (accounts: string[]) => {
         const resp = await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -897,6 +909,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -909,6 +922,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -928,6 +942,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -984,6 +999,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1007,6 +1023,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1050,6 +1067,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1082,6 +1100,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1191,6 +1210,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1226,6 +1246,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1273,6 +1294,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1291,6 +1313,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1310,6 +1333,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1355,6 +1379,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1421,6 +1446,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1548,6 +1574,7 @@ contract('Governance', (accounts: string[]) => {
           await governance.propose(
             [transactionSuccess1.value],
             [transactionSuccess1.destination],
+            // @ts-ignore bytes type
             transactionSuccess1.data,
             [transactionSuccess1.data.length],
             // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1612,6 +1639,7 @@ contract('Governance', (accounts: string[]) => {
           await governance.propose(
             [transactionFail.value],
             [transactionFail.destination],
+            // @ts-ignore bytes type
             transactionFail.data,
             [transactionFail.data.length],
             // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1754,6 +1782,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1810,41 +1839,60 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe('#whitelist()', () => {
+  describe.only('#whitelist()', () => {
     beforeEach(async () => {
       await mockValidators.addValidator(accounts[2])
-      await mockValidators.addValidator(approver)
+      await mockValidators.addValidator(accounts[3])
     })
 
     it('should revert if the validator address index does not match msg.sender', async () => {
-      await assertRevert(governance.whitelist(proposalHash, 0, { from: approver }))
+      // @ts-ignore bytes type
+      await assertRevert(governance.whitelist(proposalHash, 0, { from: accounts[3] }))
     })
 
-    it('should emit the ProposalWhitelisted event', async () => {
-      const resp = await governance.whitelist(proposalHash, 1, { from: approver })
+    it.only('should increment the hotfix record vote tally', async () => {
+      // @ts-ignore bytes type
+      await governance.whitelist(proposalHash, 1, { from: accounts[3] })
+      // @ts-ignore bytes type
+      const [tally, , ] = await governance.getHotfixRecord.call(proposalHash)
+      assertEqualBN(tally, new BigNumber(1))
+    })
+
+    it('should mark the hotfix record approved when called by approver', async () => {
+      // @ts-ignore bytes type
+      await governance.whitelist(proposalHash, 0, { from: approver })
+      // @ts-ignore bytes type
+      const [, approved, ] = await governance.getHotfixRecord.call(proposalHash)
+      assert.isTrue(approved)
+    })
+
+    it('should emit the HotfixWhitelist event', async () => {
+      // @ts-ignore bytes type
+      const resp = await governance.whitelist(proposalHash, 1, { from: accounts[3] })
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertLogMatches2(log, {
-        event: 'ProposalWhitelisted',
+        event: 'HotfixWhitelisted',
         args: {
-          proposalHash: matchAny,
-          whitelister: approver,
+          whitelister: accounts[3],
+          txHash: matchAny,
         },
       })
       assert.isTrue(
-        Buffer.from(stripHexEncoding(log.args.proposalHash), 'hex').equals(proposalHash)
+        Buffer.from(stripHexEncoding(log.args.txHash), 'hex').equals(proposalHash)
       )
     })
 
     it('should revert if called by a non-validator, non-approver', async () => {
-      await assertRevert(governance.whitelist(proposalHash, 1, { from: accounts[3] }))
+      // @ts-ignore bytes type
+      await assertRevert(governance.whitelist(proposalHash, 1, { from: accounts[4] }))
     })
   })
 
   describe('#hotfix()', () => {
-    describe('when the proposal hash is whitelisted', () => {
+    describe('when the hotfix is approved', () => {
       beforeEach(async () => {
-        await mockValidators.addValidator(approver)
+        // @ts-ignore bytes type
         await governance.whitelist(proposalHash, 0, { from: approver })
       })
 
@@ -1852,6 +1900,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.hotfix(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length]
         )
@@ -1862,6 +1911,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.hotfix(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length]
         )
@@ -1869,6 +1919,7 @@ contract('Governance', (accounts: string[]) => {
           governance.hotfix(
             [transactionSuccess1.value],
             [transactionSuccess1.destination],
+            // @ts-ignore bytes type
             transactionSuccess1.data,
             [transactionSuccess1.data.length]
           )
@@ -1879,6 +1930,7 @@ contract('Governance', (accounts: string[]) => {
         const resp = await governance.hotfix(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length]
         )
@@ -1887,39 +1939,22 @@ contract('Governance', (accounts: string[]) => {
         assertLogMatches2(log, {
           event: 'HotfixExecuted',
           args: {
-            txHash: 
+            txHash: matchAny
           },
         })
-      })
-
-      describe('when the approver changes', () => {
-        beforeEach(async () => {
-          await governance.setApprover(accounts[2])
-        })
-
-        it('should revert', async () => {
-          await assertRevert(
-            governance.hotfix(
-              [transactionSuccess1.value],
-              [transactionSuccess1.destination],
-              transactionSuccess1.data,
-              [transactionSuccess1.data.length]
-            )
-          )
-        })
+        assert.isTrue(
+          Buffer.from(stripHexEncoding(log.args.txHash), 'hex').equals(proposalHash)
+        )
       })
     })
 
-    describe('when the proposal hash is not whitelisted by the approver', () => {
-      beforeEach(async () => {
-        await mockValidators.addValidator(approver)
-      })
-
+    describe('when the hotfix is not whitelisted by the approver', () => {
       it('should revert', async () => {
         await assertRevert(
           governance.hotfix(
             [transactionSuccess1.value],
             [transactionSuccess1.destination],
+            // @ts-ignore bytes type
             transactionSuccess1.data,
             [transactionSuccess1.data.length]
           )
@@ -1942,6 +1977,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -1983,6 +2019,7 @@ contract('Governance', (accounts: string[]) => {
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
+          // @ts-ignore bytes type
           transactionSuccess1.data,
           [transactionSuccess1.data.length],
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -2018,6 +2055,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.propose(
         [transactionSuccess1.value],
         [transactionSuccess1.destination],
+        // @ts-ignore bytes type
         transactionSuccess1.data,
         [transactionSuccess1.data.length],
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails

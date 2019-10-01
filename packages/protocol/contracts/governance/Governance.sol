@@ -65,22 +65,10 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     mapping(bytes4 => FixidityLib.Fraction) functionThresholds;
   }
 
-  struct HotfixVote {
-    bytes32 txHash;
-    uint256 epoch;
-  }
-
-  struct HotfixTally {
-    uint256 voteCount;
-    uint256 totalVotes;
-    uint256 epoch;
-  }
-
   struct HotfixRecord {
-    mapping(address => HotfixVote) whitelist;
-    mapping(bytes32 => HotfixTally) tally;
-    mapping(bytes32 => bool) completed;
-    Proposals.Proposal proposal;
+    uint256 tally;
+    bool approved;
+    bool completed;
   }
 
   // The baseline is updated as
@@ -108,11 +96,12 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   mapping(address => ContractConstitution) private constitution;
   mapping(uint256 => Proposals.Proposal) private proposals;
   mapping(address => Voter) public voters;
+  mapping(bytes32 => HotfixRecord) public hotfixes;
+  Proposals.Proposal private hotfixProposal;
   SortedLinkedList.List private queue;
   uint256[] public dequeued;
   uint256[] public emptyIndices;
   ParticipationParameters private participationParameters;
-  HotfixRecord private hotfixRecord;
 
   event ApproverSet(
     address approver
@@ -218,8 +207,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
 
   event HotfixWhitelisted(
     address whitelister,
-    bytes32 txHash,
-    uint256 epoch
+    bytes32 txHash
   );
 
   function() external payable {} // solhint-disable no-empty-blocks
@@ -682,22 +670,16 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @param txHash The hash of the hotfix to be whitelisted.
    * @param validatorIndex The index in the validator set of the whitelisting validator.
    */
-  function whitelist(bytes32 txHash, uint256 validatorIndex) external {
-    IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
-    require(msg.sender == validators.validatorAddressFromCurrentSet(validatorIndex));
-    
-    uint256 epoch = getEpochNumber();
-    if (epoch > hotfixRecord.tally[txHash].epoch) {
-      hotfixRecord.tally[txHash].voteCount = 0;
+  function whitelist(bytes32 txHash, uint256 validatorIndex) external nonReentrant {
+    if (msg.sender == approver) {
+      hotfixes[txHash].approved = true;
+    } else {
+      IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
+      require(msg.sender == validators.validatorAddressFromCurrentSet(validatorIndex));
+      // TODO(yorke): consider resetting tally for new epochs
+      hotfixes[txHash].tally = hotfixes[txHash].tally.add(1);
     }
-    if (
-      hotfixRecord.whitelist[msg.sender].txHash != txHash ||
-      hotfixRecord.whitelist[msg.sender].epoch != epoch
-    ) {
-      hotfixRecord.whitelist[msg.sender] = HotfixVote(txHash, epoch);
-      hotfixRecord.tally[txHash].voteCount = hotfixRecord.tally[txHash].voteCount.add(1);
-      emit HotfixWhitelisted(msg.sender, txHash, epoch);
-    }
+    emit HotfixWhitelisted(msg.sender, txHash);
   }
 
   /**
@@ -717,19 +699,23 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     external
     nonReentrant
   {
-    uint256 epoch = getEpochNumber();
+    IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
+    uint256 totalVotes = validators.numberValidatorsInCurrentSet();
+    // TODO(yorke): double check 2f+1 validator quorum calculation
+    uint256 quorum = totalVotes.sub(totalVotes.sub(1).div(3));
+
     bytes32 txHash = keccak256(abi.encode(values, destinations, data, dataLengths));
-    uint256 totalVotes = hotfixRecord.tally[txHash].totalVotes;
     require(
-      hotfixRecord.tally[txHash].epoch == epoch &&
-      hotfixRecord.tally[txHash].voteCount >= totalVotes.sub(totalVotes.sub(1).div(3)) &&
-      hotfixRecord.completed[txHash] == false
+      !hotfixes[txHash].completed && 
+      hotfixes[txHash].approved && 
+      hotfixes[txHash].tally >= quorum
     );
-    hotfixRecord.proposal.make(values, destinations, data, dataLengths, msg.sender, 0);
-    hotfixRecord.proposal.execute();
+
+    hotfixProposal.make(values, destinations, data, dataLengths, msg.sender, 0);
+    hotfixProposal.execute();
+
     emit HotfixExecuted(txHash);
-    hotfixRecord.completed[txHash] = true;
-    delete hotfixRecord.proposal;
+    hotfixes[txHash].completed = true;
   }
 
   /**
@@ -745,11 +731,27 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   }
 
   /**
+   * @notice Returns the number of seconds proposals stay in approval stage.
+   * @return The number of seconds proposals stay in approval stage.
+   */
+  function getApprovalStageDuration() external view returns (uint256) {
+    return stageDurations.approval;
+  }
+
+  /**
    * @notice Returns the number of seconds proposals stay in each stage.
    * @return The number of seconds proposals stay in each stage.
    */
-  function getStageDurations() external view returns (uint256, uint256, uint256) {
-    return (stageDurations.approval, stageDurations.referendum, stageDurations.execution);
+  function getReferendumStageDuration() external view returns (uint256) {
+    return stageDurations.referendum;
+  }
+
+  /**
+   * @notice Returns the number of seconds proposals stay in each stage.
+   * @return The number of seconds proposals stay in each stage.
+   */
+  function getExecutionStageDuration() external view returns (uint256) {
+    return stageDurations.execution;
   }
 
   /**
@@ -886,6 +888,11 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    */
   function getMostRecentReferendumProposal(address account) external view returns (uint256) {
     return voters[account].mostRecentReferendumProposal;
+  }
+
+  function getHotfixRecord(bytes32 txHash) external view returns (uint256, bool, bool) {
+    HotfixRecord storage hotfixRecord = hotfixes[txHash];
+    return (hotfixRecord.tally, hotfixRecord.approved, hotfixRecord.completed);
   }
 
   /**
@@ -1119,10 +1126,5 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       threshold = constitution[destination].defaultThreshold;
     }
     return threshold;
-  }
-
-  function getEpochNumber() internal view returns (uint256) {
-    // TODO(yorke): more dynamic calculation
-    return block.number.div(3000);
   }
 }

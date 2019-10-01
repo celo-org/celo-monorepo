@@ -89,6 +89,7 @@ library Proposals {
     proposal.timestamp = now;
 
     uint256 dataPosition = 0;
+    delete proposal.transactions;
     for (uint256 i = 0; i < transactionCount; i = i.add(1)) {
       proposal.transactions.push(
         Transaction(values[i], destinations[i], data.slice(dataPosition, dataLengths[i]))
