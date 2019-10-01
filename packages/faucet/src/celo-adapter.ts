@@ -21,6 +21,7 @@ export class CeloAdapter {
     private readonly escrowAddress: string,
     private readonly goldTokenAddress: string
   ) {
+    // To add more logging:
     // Uncomment when in need for debug
     // injectDebugProvider(web3)
 

@@ -46,7 +46,7 @@
     ]
   },
   "dependencies": {
-    "@celo/client": "2d1d8ca",
+    "@celo/client": "ae27fd3",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#d3a2fdb",
     "@celo/utils": "^0.1.0",
     "@celo/walletkit": "^0.0.14",

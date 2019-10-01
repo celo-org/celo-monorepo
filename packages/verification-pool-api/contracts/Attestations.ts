@@ -1,4 +1,4 @@
-import Web3 from 'web3';
+import Web3 from 'web3'
 
 export default async function getInstance(web3: Web3) {
   return new web3.eth.Contract(
@@ -267,6 +267,23 @@ export default async function getInstance(web3: Web3) {
       }
     ],
     "name": "AccountDataEncryptionKeySet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "metadataURL",
+        "type": "string"
+      }
+    ],
+    "name": "AccountMetadataURLSet",
     "type": "event"
   },
   {
@@ -670,6 +687,39 @@ export default async function getInstance(web3: Web3) {
     "constant": false,
     "inputs": [
       {
+        "name": "metadataURL",
+        "type": "string"
+      }
+    ],
+    "name": "setMetadataURL",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "getMetadataURL",
+    "outputs": [
+      {
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
         "name": "dataEncryptionKey",
         "type": "bytes"
       }
@@ -801,6 +851,6 @@ export default async function getInstance(web3: Web3) {
     "type": "function"
   }
 ],
-   "0x2cDEc3af5727dF2d490cF6068980E67dc6c19438"
+   "0x31d9efd78ea09A3eEd23E93327Fb815821FA8802"
   )
 }
