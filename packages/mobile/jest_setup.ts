@@ -18,8 +18,3 @@ if (typeof window !== 'object') {
   // @ts-ignore
   global.window.navigator = {}
 }
-
-jest.mock('./src/config', () => ({
-  ...jest.requireActual('./src/config'),
-  LOCAL_CURRENCY_SYMBOL: 'MXN',
-}))

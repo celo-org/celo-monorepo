@@ -237,7 +237,7 @@ dependencies {
     implementation project(':react-native-version-check')
     implementation project(':react-native-android-open-settings')
     implementation project(':react-native-udp')
-    implementation project(':react-native-languages')
+    implementation project(':react-native-localize')
     implementation project(':react-native-config')
     implementation project(':react-native-tcp')
     implementation project(':react-native-sentry')

@@ -42,6 +42,7 @@ export enum Screens {
   QRScanner = 'QRScanner',
   ReclaimPaymentConfirmationScreen = 'ReclaimPaymentConfirmationScreen',
   PaymentRequestConfirmation = 'PaymentRequestConfirmation',
+  SelectLocalCurrency = 'SelectLocalCurrency',
   Send = 'Send',
   SendAmount = 'SendAmount',
   SendConfirmation = 'SendConfirmation',
