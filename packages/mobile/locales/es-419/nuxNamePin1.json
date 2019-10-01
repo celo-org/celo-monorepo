@@ -36,10 +36,7 @@
       "message": "Pegar código de invitación!",
       "hint": "Parece que has copiado un código"
     },
-    "validating": {
-      "0": "Genial! ",
-      "1": "Validando el código de invitación copiado"
-    },
+    "validating": "Genial! Validando el código de invitación copiado",
     "inviteAccepted": "🎉 Invitación aceptada!",
     "askForInvite": {
       "0": "Solicite una invitación de alguien con Celo Monedero o regístrese en Testnet en ",
@@ -55,32 +52,22 @@
   "cancel": "Cancelar",
   "important": "Importante",
   "createPin": {
-    "title": "Crear un código PIN de 6 dígitos",
-    "intro": "Cree un PIN para proteger tu Monedero Celo.",
-    "why": "En ciertos casos, necesitará este PIN para enviar {{CeloDollars}} a sus amigos.",
-    "warn":
-      "escribe tu código PIN de 6 dígitos en un papel y guárdelo en algún sitio seguro. Se lo solicitaremos más tarde para acceder a tu monedero.",
+    "title": "Crear un PIN de 6 dígitos",
     "yourPin": "Su PIN"
   },
-  "enableSecurity": "Habilitar seguridad",
   "verifyPin": {
-    "title": "Repetir el código PIN de 6 dígitos",
-    "finalPin": "Crear PIN"
+    "title": "Repetir el PIN"
   },
   "confirmPin": {
-    "title": "Ingrese el código PIN de 6 dígitos",
-    "submit": "Enviar"
+    "title": "Ingrese su PIN"
   },
-  "systemAuth": {
-    "title": "Asegura tu celular",
-    "secure":
-      "Agregar un PIN a tu teléfono ayuda a que tus fondos en Celo se mantengan seguros y protegidos.",
-    "intro":
-      "Necesitaremos que ingreses el código de bloqueo de pantalla de tu dispositivo o tu huella, si el mismo lo soporta.",
-    "why":
-      "Necesitamos este nivel de protección adicional para asegurar que el contenido de tu monedero se encuentra a salvo.",
+  "pincodeEducation": {
+    "title": "Asegure su billetera",
+    "intro": "Para proteger su cuenta, Celo billetera requiere un PIN.",
     "summary":
-      "Celo requiere que los teléfonos estén protegidos con un PIN o huella digital. Bloquear de tu dispositivo ayuda a garantizar que los fondos en tu billetera estén protegidos."
+      "Puede usar la autenticación existente de su teléfono o crear un nuevo PIN para esta aplicación.",
+    "usePhoneAuth": "Usar Autenticación de Teléfono",
+    "createNewPin": "Crear nuevo PIN"
   },
   "goToSystemSecuritySettingsActionLabel": "Vaya a seguridad",
   "enableSystemScreenLockFailedMessage": "Error al intentar habilitar el bloqueo de pantalla",
@@ -95,6 +82,5 @@
     "1": "No se preocupe: la conexión no envía invitaciones a sus contactos.",
     "enable": "Habilitar acceso a contactos",
     "loading": "Encontrar amigos en Celo..."
-  },
-  "skip": "Saltar"
+  }
 }

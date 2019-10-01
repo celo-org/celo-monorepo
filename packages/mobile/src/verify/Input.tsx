@@ -5,7 +5,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { setPhoneNumber } from 'src/account/actions'
 import { hideAlert, showError } from 'src/alert/actions'
@@ -151,7 +151,8 @@ const style = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 20,
+    // Stop gap solution until we properly fix layout on iOS
+    paddingTop: Platform.OS === 'ios' ? 100 : 20,
     backgroundColor: colors.background,
   },
   content: {

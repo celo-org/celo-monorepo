@@ -1,11 +1,11 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import { call, delay, select } from 'redux-saga/effects'
-import { pincodeSelector } from 'src/account/reducer'
+import { pincodeTypeSelector } from 'src/account/reducer'
 import { navigateToError } from 'src/navigator/NavigationService'
 import { setLatestBlockNumber, updateWeb3SyncProgress } from 'src/web3/actions'
 import {
   checkWeb3SyncProgress,
-  createNewAccount,
+  getOrCreateAccount,
   SYNC_TIMEOUT,
   waitForWeb3Sync,
 } from 'src/web3/saga'
@@ -38,13 +38,13 @@ jest.mock('src/web3/contracts', () => ({
 
 const state = createMockStore({ web3: { account: mockAccount } }).getState()
 
-describe(createNewAccount, () => {
+describe(getOrCreateAccount, () => {
   beforeAll(() => {
     jest.useRealTimers()
   })
 
   it('returns an existing account', async () => {
-    await expectSaga(createNewAccount)
+    await expectSaga(getOrCreateAccount)
       .withState(state)
       .provide([[select(currentAccountSelector), '123']])
       .returns('123')
@@ -52,10 +52,10 @@ describe(createNewAccount, () => {
   })
 
   it('creates a new account', async () => {
-    await expectSaga(createNewAccount)
+    await expectSaga(getOrCreateAccount)
       .withState(state)
       .provide([[select(currentAccountSelector), null]])
-      .provide([[select(pincodeSelector), '123']])
+      .provide([[select(pincodeTypeSelector), '123']])
       .returns('0x0000000000000000000000000000000000007E57')
       .run()
   })
