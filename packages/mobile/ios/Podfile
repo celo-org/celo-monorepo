@@ -47,7 +47,7 @@ target 'celo' do
   pod 'react-native-contacts', :path => '../../../node_modules/react-native-contacts'
   pod 'RNDeviceInfo', :path => '../../../node_modules/react-native-device-info'
   pod 'react-native-keep-awake', :path => '../../../node_modules/react-native-keep-awake'
-  pod 'RNLanguages', :path => '../../../node_modules/react-native-languages'
+  pod 'RNLocalize', :path => '../../../node_modules/react-native-localize'
   pod 'react-native-mail', :path => '../../../node_modules/react-native-mail'
   pod 'RNScreens', :path => '../../../node_modules/react-native-screens'
   pod 'SentryReactNative', :path => '../../../node_modules/react-native-sentry'

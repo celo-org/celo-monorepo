@@ -5,6 +5,7 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { FeeType } from 'src/fees/actions'
 import { fetchPhoneAddresses } from 'src/identity/actions'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import SendAmount, { SendAmount as SendAmountClass } from 'src/send/SendAmount'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 import { mockAccount2, mockE164Number2, mockNavigation } from 'test/values'
@@ -74,6 +75,7 @@ describe('SendAmount', () => {
             e164NumberToAddress={{ [mockE164Number2]: mockAccount2 }}
             defaultCountryCode={'+1'}
             feeType={FeeType.SEND}
+            localCurrencyCode={LocalCurrencyCode.MXN}
             localCurrencyExchangeRate={1.33}
           />
         </Provider>

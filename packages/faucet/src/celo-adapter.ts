@@ -22,6 +22,7 @@ export class CeloAdapter {
     private readonly goldTokenAddress: string
   ) {
     // To add more logging:
+    // Uncomment when in need for debug
     // injectDebugProvider(web3)
 
     this.privateKey = this.web3.utils.isHexStrict(pk) ? pk : '0x' + pk
@@ -29,10 +30,6 @@ export class CeloAdapter {
     this.goldToken = getGoldTokenInstance(this.web3, goldTokenAddress)
     this.stableToken = getStableTokenInstance(this.web3, stableTokenAddress)
     this.escrow = getEscrowInstance(this.web3, escrowAddress)
-  }
-
-  getStableToken() {
-    return
   }
 
   async transferGold(to: string, amount: string) {

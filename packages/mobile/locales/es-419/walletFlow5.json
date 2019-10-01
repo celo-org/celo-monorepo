@@ -59,8 +59,8 @@
       "Un recordatorio amistoso de que está utilizando una compilación de Testnet - los saldos aquí no son reales."
   },
   "dismiss": "Ocultar",
-  "localCurrencyEqual": "Igual a <2>{{localValue}} {{localCurrencySymbol}}</2>",
-  "localCurrencyValue": "{{localValue}} {{localCurrencySymbol}}",
+  "localCurrencyEqual": "Igual a <2>{{localValue}} {{localCurrencyCode}}</2>",
+  "localCurrencyValue": "{{localValue}} {{localCurrencyCode}}",
   "feedItemVerificationFeeTitle": "Celo",
   "feedItemVerificationFeeInfo": "$t(verificationFee)",
   "feedItemVerificationRewardTitle": "Celo",
