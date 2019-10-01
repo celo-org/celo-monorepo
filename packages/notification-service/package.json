@@ -16,7 +16,9 @@
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "start": "node ./dist/index.js",
     "start:local": "npm run build; cp config/config.local.env .env; node --inspect ./dist/index.js",
-    "deploy": "./deploy.sh"
+    "deploy": "./deploy.sh",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "dependencies": {
     "@celo/contractkit": "0.1.5",
@@ -29,9 +31,10 @@
     "i18next": "^12.1.0",
     "node-fetch": "^2.2.0",
     "utf8": "^3.0.0",
-    "web3": "1.0.0-beta.37",
+    "web3": "1.2.0",
     "web3-eth-abi": "1.0.0-beta.37",
-    "web3-utils": "1.0.0-beta.37"
+    "web3-utils": "1.0.0-beta.37",
+    "snyk": "^1.230.0"
   },
   "devDependencies": {
     "@google-cloud/nodejs-repo-tools": "^2.3.3",
@@ -43,5 +46,6 @@
     "@types/utf8": "^2.1.6",
     "@types/web3": "^1.0.18",
     "typescript": "^3.5.3"
-  }
+  },
+  "snyk": true
 }

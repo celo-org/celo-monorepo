@@ -1,0 +1,1320 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.13.5
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  'npm:stringstream:20180511':
+    - web3 > web3-eth > web3-eth-contract > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3-eth-abi > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-core > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > @celo/utils > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-abi > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-core > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-bzz > swarm-js > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-core > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-abi > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-abi > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-eth-abi > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-abi > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-core > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-eth-abi > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > @0x/subproviders > ganache-core > web3 > web3-bzz > swarm-js > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-eth-abi > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-eth-abi > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3-eth-abi > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-method > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-requestmanager > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-method > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-shh > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-contract > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-requestmanager > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-shh > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-accounts > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream:
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-http > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-method > web3-core-subscriptions > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-personal > web3-net > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-ipc > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
+    - '@celo/contractkit > web3 > web3-eth > web3-eth-ens > web3-eth-contract > web3-core > web3-core-requestmanager > web3-providers-ws > web3-core-helpers > web3-eth-iban > web3-utils > eth-lib > servify > request > stringstream':
+        patched: '2019-10-01T01:33:43.534Z'
