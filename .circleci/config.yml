@@ -6,7 +6,7 @@ version: 2
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: celohq/node8:gcloud-deps
+    - image: celohq/node10-gcloud
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: "--max-old-space-size=4096"
@@ -16,19 +16,18 @@ android-defaults: &android-defaults
   docker:
     - image: circleci/android:api-28-node8-alpha
   environment:
-    _JAVA_OPTIONS: '-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
+    _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
     GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError"'
 
 general:
   artifacts:
-    - 'mobile/coverage'
-    - 'protocol/coverage'
+    - "mobile/coverage"
+    - "protocol/coverage"
 
 jobs:
   install_dependencies:
     <<: *defaults
     steps:
-
       - restore_cache:
           keys:
             - source-v1-{{ .Branch }}-{{ .Revision }}
@@ -89,7 +88,7 @@ jobs:
           paths:
             - node_modules
             - packages/*/node_modules
-      
+
       - run:
           name: Build packages
           command: |
@@ -100,10 +99,9 @@ jobs:
             yarn build --scope @celo/walletkit
             yarn build --ignore @celo/protocol --ignore docs --ignore @celo/walletkit
 
-
       - persist_to_workspace:
           root: .
-          paths: 
+          paths:
             - .
 
   lint-checks:
@@ -238,14 +236,13 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
-      - run: 
+      - run:
           name: Generate DevChain
           command: |
             (cd packages/contractkit && yarn test:prepare)
       - run:
           name: Run Tests
           command: yarn --cwd=packages/contractkit test
-
 
   walletkit-test:
     <<: *defaults
@@ -496,7 +493,7 @@ jobs:
           command: npm install @celo/celocli
       - run:
           name: Minor test of celocli
-          command: ./node_modules/.bin/celocli account:new  # Small test
+          command: ./node_modules/.bin/celocli account:new # Small test
 
 workflows:
   version: 2
@@ -517,7 +514,7 @@ workflows:
             - install_dependencies
       - contractkit-test:
           requires:
-            - install_dependencies      
+            - install_dependencies
       - mobile-test:
           requires:
             - lint-checks

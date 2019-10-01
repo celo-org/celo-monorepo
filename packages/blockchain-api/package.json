@@ -5,9 +5,6 @@
   "private": true,
   "author": "Celo",
   "license": "Apache-2.0",
-  "engines": {
-    "node": "8.x"
-  },
   "scripts": {
     "test": "jest --ci --silent --coverage --runInBand",
     "test:verbose": "jest --ci --verbose --runInBand",
