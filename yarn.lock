@@ -8498,11 +8498,6 @@ bignumber.js@*, bignumber.js@7.2.1, bignumber.js@^7.0.0, bignumber.js@^7.2.1:
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-7.2.1.tgz#80c048759d826800807c4bfd521e50edbba57a5f"
   integrity sha512-S4XzBk5sMB+Rcb/LNcpzXr57VRTxgAvaAEDAl1AwRx27j00hT84O6OkteE7u8UB3NuaaygCRrEpqox4uDOrbdQ==
 
-bignumber.js@8.1.1:
-  version "8.1.1"
-  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-8.1.1.tgz#4b072ae5aea9c20f6730e4e5d529df1271c4d885"
-  integrity sha512-QD46ppGintwPGuL1KqmwhR0O+N2cZUg8JG/VzwI2e28sM9TqHjQB10lI4QAaMHVbLzwVLLAwEglpKPViWX+5NQ==
-
 bignumber.js@^7.2.0:
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-7.2.0.tgz#2a477d9dd87d3fedf77b18ad8ba9e373ef275850"
@@ -14690,12 +14685,6 @@ firebase@^6.2.4:
     "@firebase/polyfill" "0.3.14"
     "@firebase/storage" "0.3.4"
     "@firebase/util" "0.2.20"
-
-"fixidity@https://github.com/CementDAO/Fixidity":
-  version "0.1.0"
-  resolved "https://github.com/CementDAO/Fixidity#3547a290825d7e255ca2a4226b3ace5301f0f262"
-  dependencies:
-    bignumber.js "8.1.1"
 
 flagged-respawn@^1.0.0:
   version "1.0.1"

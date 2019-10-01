@@ -51,7 +51,6 @@
     "elliptic": "^6.4.1",
     "ethereumjs-util": "^5.2.0",
     "ethereumjs-vm": "^2.4.0",
-    "fixidity": "https://github.com/CementDAO/Fixidity",
     "fs-extra": "^5.0.0",
     "glob-fs": "^0.1.7",
     "graphql": "^14.1.1",
