@@ -2,7 +2,7 @@ rootProject.name = 'verifier'
 include ':@react-native-community_netinfo'
 project(':@react-native-community_netinfo').projectDir = new File(rootProject.projectDir, '../../../node_modules/@react-native-community/netinfo/android')
 include ':react-native-gesture-handler'
-project(':react-native-gesture-handler').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-gesture-handler/android')
+project(':react-native-gesture-handler').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-gesture-handler/android')
 include ':@segment_analytics-react-native-firebase'
 project(':@segment_analytics-react-native-firebase').projectDir = new File(rootProject.projectDir, '../../../node_modules/@segment/analytics-react-native-firebase/android')
 include ':@segment_analytics-react-native'
