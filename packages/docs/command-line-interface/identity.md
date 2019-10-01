@@ -100,7 +100,7 @@ _See code: [packages/cli/src/commands/identity/get-metadata.ts](https://github.c
 
 ### Register-metadata
 
-Show information about an address
+Register metadata about an address
 
 ```
 USAGE

@@ -3,7 +3,7 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class RegisterMetadata extends BaseCommand {
-  static description = 'Show information about an address'
+  static description = 'Register metadata about an address'
 
   static flags = {
     ...BaseCommand.flags,
