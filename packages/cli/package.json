@@ -29,7 +29,7 @@
     "test": "TZ=UTC jest"
   },
   "dependencies": {
-    "@celo/utils": "^0.0.6-beta5",
+    "@celo/utils": "^0.1.0",
     "@celo/contractkit": "^0.1.1",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
@@ -45,6 +45,7 @@
     "events": "^3.0.0",
     "firebase": "^6.2.4",
     "fs-extra": "^8.1.0",
+    "moment": "2.24.0",
     "path": "^0.12.7",
     "tslib": "^1",
     "web3": "1.0.0-beta.37"
@@ -61,6 +62,7 @@
     "@types/node": "^10",
     "@types/web3": "^1.0.18",
     "globby": "^8",
+    "prettier": "1.13.5",
     "typescript": "^3.5.3"
   },
   "files": [

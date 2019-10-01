@@ -1,16 +1,15 @@
 import * as React from 'react'
 import { Image, ImageBackground, StyleSheet, Text, View } from 'react-native'
 import Backers from 'src/about/Backers'
-import { mintPlaza, sacredEconBack, team } from 'src/about/images'
+import { sacredEconBack, team } from 'src/about/images'
 import PressMedia from 'src/about/PressMedia'
 import Team from 'src/about/Team'
-import { H1, H4 } from 'src/fonts/Fonts'
+import VideoCover from 'src/about/VideoCover'
+import { H1 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import SideTitledSection from 'src/layout/SideTitledSection'
-import AspectRatio from 'src/shared/AspectRatio'
 import menuItems from 'src/shared/menu-items'
-import Responsive from 'src/shared/Responsive'
 import { standardStyles, textStyles } from 'src/styles'
 
 const IMAGE_HEIGHT = 938
@@ -36,31 +35,7 @@ export class About extends React.Component<Props & I18nProps> {
           description={t('description')}
         />
         <View style={styles.container}>
-          <View style={styles.background}>
-            <View style={styles.absolute}>
-              <View style={styles.maxWidth}>
-                <Responsive medium={styles.mediumHero} large={styles.largeHero}>
-                  <View style={styles.hero}>
-                    <H1>{t('aboutUs')}</H1>
-                    <H4>{t('ourTeam')}</H4>
-                  </View>
-                </Responsive>
-              </View>
-            </View>
-            <Responsive
-              medium={[styles.mintPlazaContainer, styles.mediumMintPlaza]}
-              large={[styles.mintPlazaContainer, styles.largeMintPlaza]}
-            >
-              <AspectRatio style={styles.mintPlazaContainer} ratio={IMAGE_WIDTH / IMAGE_HEIGHT}>
-                <Image
-                  resizeMode={'contain'}
-                  source={{ uri: mintPlaza }}
-                  style={styles.mintPlaza}
-                />
-              </AspectRatio>
-            </Responsive>
-          </View>
-
+          <VideoCover />
           {/* Below Fold */}
           <SideTitledSection title={t('aboutMissionTitle')}>
             <H1>{t('aboutMissionText')}</H1>
