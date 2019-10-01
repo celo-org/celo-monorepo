@@ -279,15 +279,15 @@ contract('Attestations', async (accounts: string[]) => {
 
   describe('#request()', () => {
     it('should increment the number of attestations requested', async () => {
-      await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+      await attestations.request(identifierHash, attestationsRequested, mockStableToken.address)
 
-      const [completed, total] = await attestations.getAttestationStats(phoneHash, caller)
+      const [completed, total] = await attestations.getAttestationStats(identifierHash, caller)
       assert.equal(completed.toNumber(), 0)
       assert.equal(total.toNumber(), attestationsRequested)
     })
 
     it('should set the mostRecentAttestationRequested timestamp', async () => {
-      await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+      await attestations.request(identifierHash, attestationsRequested, mockStableToken.address)
 
       const requestBlock = await web3.eth.getBlock('latest')
       const mostRecentAttestationRequested = await attestations.getMostRecentAttestationRequest(
@@ -298,24 +298,28 @@ contract('Attestations', async (accounts: string[]) => {
     })
 
     it('should add the correct number attestation issuers', async () => {
-      assert.isEmpty(await attestations.getAttestationIssuers(phoneHash, caller))
-      await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+      assert.isEmpty(await attestations.getAttestationIssuers(identifierHash, caller))
+      await attestations.request(identifierHash, attestationsRequested, mockStableToken.address)
 
-      const attestationIssuers = await attestations.getAttestationIssuers(phoneHash, caller)
+      const attestationIssuers = await attestations.getAttestationIssuers(identifierHash, caller)
       assert.lengthOf(attestationIssuers, attestationsRequested)
       assert.lengthOf(uniq(attestationIssuers), attestationsRequested)
     })
 
     it('should set the block of request', async () => {
-      await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+      await attestations.request(identifierHash, attestationsRequested, mockStableToken.address)
 
       const expectedBlock = await web3.eth.getBlock('latest')
 
-      const attestationIssuers = await attestations.getAttestationIssuers(phoneHash, caller)
+      const attestationIssuers = await attestations.getAttestationIssuers(identifierHash, caller)
 
       await Promise.all(
         attestationIssuers.map(async (issuer) => {
-          const [status, time] = await attestations.getAttestationState(phoneHash, caller, issuer)
+          const [status, time] = await attestations.getAttestationState(
+            identifierHash,
+            caller,
+            issuer
+          )
 
           assert.equal(status.toNumber(), 1)
           assert.equal(time.toNumber(), expectedBlock.timestamp)
@@ -324,19 +328,19 @@ contract('Attestations', async (accounts: string[]) => {
     })
 
     it('should set the attestationRequestFeeToken', async () => {
-      await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+      await attestations.request(identifierHash, attestationsRequested, mockStableToken.address)
 
       const token = await attestations.getAttestationRequestFeeToken(caller)
       assert.equal(token, mockStableToken.address)
     })
 
     it('should revert if 0 attestations are requested', async () => {
-      await assertRevert(attestations.request(phoneHash, 0, mockStableToken.address))
+      await assertRevert(attestations.request(identifierHash, 0, mockStableToken.address))
     })
 
     it('should emit the AttestationsRequested event', async () => {
       const response = await attestations.request(
-        phoneHash,
+        identifierHash,
         attestationsRequested,
         mockStableToken.address
       )
@@ -346,7 +350,7 @@ contract('Attestations', async (accounts: string[]) => {
       assertLogMatches2(event, {
         event: 'AttestationsRequested',
         args: {
-          identifier: phoneHash,
+          identifier: identifierHash,
           account: caller,
           attestationsRequested: new BigNumber(attestationsRequested),
           attestationRequestFeeToken: mockStableToken.address,
@@ -356,13 +360,13 @@ contract('Attestations', async (accounts: string[]) => {
 
     describe('when attestations have already been requested', async () => {
       beforeEach(async () => {
-        await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+        await attestations.request(identifierHash, attestationsRequested, mockStableToken.address)
       })
 
       it('should allow to request more attestations', async () => {
-        await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+        await attestations.request(identifierHash, attestationsRequested, mockStableToken.address)
 
-        const attestationIssuers = await attestations.getAttestationIssuers(phoneHash, caller)
+        const attestationIssuers = await attestations.getAttestationIssuers(identifierHash, caller)
 
         assert.lengthOf(attestationIssuers, attestationsRequested * 2)
         assert.lengthOf(uniq(attestationIssuers), attestationsRequested * 2)
@@ -370,7 +374,7 @@ contract('Attestations', async (accounts: string[]) => {
 
       it('should revert if a different fee token is provided', async () => {
         await assertRevert(
-          attestations.request(phoneHash, attestationsRequested, otherMockStableToken.address)
+          attestations.request(identifierHash, attestationsRequested, otherMockStableToken.address)
         )
       })
 
@@ -380,7 +384,11 @@ contract('Attestations', async (accounts: string[]) => {
         })
 
         it('should allow using a different attestationRequestFeeToken', async () => {
-          await attestations.request(phoneHash, attestationsRequested, otherMockStableToken.address)
+          await attestations.request(
+            identifierHash,
+            attestationsRequested,
+            otherMockStableToken.address
+          )
 
           const newFeeToken = await attestations.getAttestationRequestFeeToken(caller)
           assert.equal(newFeeToken, otherMockStableToken.address)
@@ -393,32 +401,34 @@ contract('Attestations', async (accounts: string[]) => {
     let issuer: string
 
     beforeEach(async () => {
-      await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
-      issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
+      await attestations.request(identifierHash, attestationsRequested, mockStableToken.address)
+      issuer = (await attestations.getAttestationIssuers(identifierHash, caller))[0]
     })
 
     it('should allow a reveal', async () => {
       // @ts-ignore
-      await attestations.reveal(phoneHash, phoneHash, issuer, false)
+      await attestations.reveal(identifierHash, identifierHash, issuer, false)
     })
 
     it('should revert if users reveal a non-existent attestation request', async () => {
       // @ts-ignore
-      await assertRevert(attestations.reveal(phoneHash, phoneHash, await getNonIssuer(), false))
+      await assertRevert(
+        attestations.reveal(identifierHash, identifierHash, await getNonIssuer(), false)
+      )
     })
 
     it('should revert if a user reveals a request that has been completed', async () => {
       const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
-      await attestations.complete(phoneHash, v, r, s)
+      await attestations.complete(identifierHash, v, r, s)
 
       // @ts-ignore
-      await assertRevert(attestations.reveal(phoneHash, phoneHash, issuer, false))
+      await assertRevert(attestations.reveal(identifierHash, identifierHash, issuer, false))
     })
 
     it('should revert if the request as expired', async () => {
       await timeTravel(attestationExpirySeconds, web3)
       // @ts-ignore
-      await assertRevert(attestations.reveal(phoneHash, phoneHash, issuer, false))
+      await assertRevert(attestations.reveal(identifierHash, identifierHash, issuer, false))
     })
   })
 
@@ -427,55 +437,55 @@ contract('Attestations', async (accounts: string[]) => {
     let v: number
     let r: string, s: string
     beforeEach(async () => {
-      await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
-      issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
+      await attestations.request(identifierHash, attestationsRequested, mockStableToken.address)
+      issuer = (await attestations.getAttestationIssuers(identifierHash, caller))[0]
       ;[v, r, s] = await getVerificationCodeSignature(caller, issuer)
     })
 
     it('should add the account to the list upon completion', async () => {
-      let attestedAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
+      let attestedAccounts = await attestations.lookupAccountsForIdentifier(identifierHash)
       assert.isEmpty(attestedAccounts)
 
-      await attestations.complete(phoneHash, v, r, s)
-      attestedAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
+      await attestations.complete(identifierHash, v, r, s)
+      attestedAccounts = await attestations.lookupAccountsForIdentifier(identifierHash)
       assert.lengthOf(attestedAccounts, 1)
       assert.equal(attestedAccounts[0], caller)
     })
 
     it('should not add the account twice to the list', async () => {
-      await attestations.complete(phoneHash, v, r, s)
-      const secondIssuer = (await attestations.getAttestationIssuers(phoneHash, caller))[1]
+      await attestations.complete(identifierHash, v, r, s)
+      const secondIssuer = (await attestations.getAttestationIssuers(identifierHash, caller))[1]
       ;[v, r, s] = await getVerificationCodeSignature(caller, secondIssuer)
 
-      await attestations.complete(phoneHash, v, r, s)
-      const attestedAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
+      await attestations.complete(identifierHash, v, r, s)
+      const attestedAccounts = await attestations.lookupAccountsForIdentifier(identifierHash)
       assert.lengthOf(attestedAccounts, 1)
       assert.equal(attestedAccounts[0], caller)
     })
 
     it('should increment the number of completed verification requests', async () => {
-      let [numCompleted, numTotal] = await attestations.getAttestationStats(phoneHash, caller)
+      let [numCompleted, numTotal] = await attestations.getAttestationStats(identifierHash, caller)
       assert.equal(numCompleted.toNumber(), 0)
 
-      await attestations.complete(phoneHash, v, r, s)
-      ;[numCompleted, numTotal] = await attestations.getAttestationStats(phoneHash, caller)
+      await attestations.complete(identifierHash, v, r, s)
+      ;[numCompleted, numTotal] = await attestations.getAttestationStats(identifierHash, caller)
       assert.equal(numCompleted.toNumber(), 1)
       assert.equal(numTotal.toNumber(), attestationsRequested)
     })
 
     it('should set the block number of the successful completion', async () => {
-      await attestations.complete(phoneHash, v, r, s)
+      await attestations.complete(identifierHash, v, r, s)
 
       const expectedBlock = await web3.eth.getBlock('latest')
 
-      const [status, time] = await attestations.getAttestationState(phoneHash, caller, issuer)
+      const [status, time] = await attestations.getAttestationState(identifierHash, caller, issuer)
 
       assert.equal(status.toNumber(), 2)
       assert.equal(time.toNumber(), expectedBlock.timestamp)
     })
 
     it('should increment pendingWithdrawals for the rewards recipient', async () => {
-      await attestations.complete(phoneHash, v, r, s)
+      await attestations.complete(identifierHash, v, r, s)
       const pendingWithdrawals = await attestations.pendingWithdrawals.call(
         mockStableToken.address,
         issuer
@@ -484,13 +494,13 @@ contract('Attestations', async (accounts: string[]) => {
     })
 
     it('should emit the AttestationCompleted event', async () => {
-      const response = await attestations.complete(phoneHash, v, r, s)
+      const response = await attestations.complete(identifierHash, v, r, s)
       assert.lengthOf(response.logs, 1)
       const event = response.logs[0]
       assertLogMatches2(event, {
         event: 'AttestationCompleted',
         args: {
-          identifier: phoneHash,
+          identifier: identifierHash,
           account: caller,
           issuer,
         },
@@ -499,32 +509,32 @@ contract('Attestations', async (accounts: string[]) => {
 
     it('should revert when an invalid attestation code is provided', async () => {
       ;[v, r, s] = await getVerificationCodeSignature(accounts[1], issuer)
-      await assertRevert(attestations.complete(phoneHash, v, r, s))
+      await assertRevert(attestations.complete(identifierHash, v, r, s))
     })
 
     it('should revert with a non-requested issuer', async () => {
       ;[v, r, s] = await getVerificationCodeSignature(caller, await getNonIssuer())
-      await assertRevert(attestations.complete(phoneHash, v, r, s))
+      await assertRevert(attestations.complete(identifierHash, v, r, s))
     })
 
     it('should revert an already completed request', async () => {
-      await attestations.complete(phoneHash, v, r, s)
-      await assertRevert(attestations.complete(phoneHash, v, r, s))
+      await attestations.complete(identifierHash, v, r, s)
+      await assertRevert(attestations.complete(identifierHash, v, r, s))
     })
 
     it('does not let you verify beyond the window', async () => {
       await timeTravel(attestationExpirySeconds, web3)
-      await assertRevert(attestations.complete(phoneHash, v, r, s))
+      await assertRevert(attestations.complete(identifierHash, v, r, s))
     })
   })
 
   describe('#withdraw()', () => {
     let issuer: string
     beforeEach(async () => {
-      await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
-      issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
+      await attestations.request(identifierHash, attestationsRequested, mockStableToken.address)
+      issuer = (await attestations.getAttestationIssuers(identifierHash, caller))[0]
       const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
-      await attestations.complete(phoneHash, v, r, s)
+      await attestations.complete(identifierHash, v, r, s)
     })
 
     it('should remove the balance of available rewards for the issuer', async () => {
@@ -562,13 +572,13 @@ contract('Attestations', async (accounts: string[]) => {
   })
 
   const requestAttestations = async () => {
-    await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+    await attestations.request(identifierHash, attestationsRequested, mockStableToken.address)
   }
   const requestAndCompleteAttestations = async () => {
     await requestAttestations()
-    const issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
+    const issuer = (await attestations.getAttestationIssuers(identifierHash, caller))[0]
     const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
-    await attestations.complete(phoneHash, v, r, s)
+    await attestations.complete(identifierHash, v, r, s)
   }
 
   describe('#lookupAccountsForIdentifier()', () => {
@@ -578,7 +588,7 @@ contract('Attestations', async (accounts: string[]) => {
       })
 
       it("does not return the user's account", async () => {
-        const attestedAccounts = await attestations.lookupAccountsForIdentifier.call(phoneHash)
+        const attestedAccounts = await attestations.lookupAccountsForIdentifier.call(identifierHash)
         assert.isEmpty(attestedAccounts)
       })
     })
@@ -590,7 +600,9 @@ contract('Attestations', async (accounts: string[]) => {
 
       describe('when the account has no walletAddress mapped', async () => {
         it('should allow a user to lookup the attested account of a phone number', async () => {
-          const attestedAccounts = await attestations.lookupAccountsForIdentifier.call(phoneHash)
+          const attestedAccounts = await attestations.lookupAccountsForIdentifier.call(
+            identifierHash
+          )
           assert.deepEqual(attestedAccounts, [caller])
         })
       })
@@ -599,7 +611,9 @@ contract('Attestations', async (accounts: string[]) => {
         beforeEach(setAccountWalletAddress)
 
         it('should allow a user to lookup the attested account of a phone number', async () => {
-          const attestedAccounts = await attestations.lookupAccountsForIdentifier.call(phoneHash)
+          const attestedAccounts = await attestations.lookupAccountsForIdentifier.call(
+            identifierHash
+          )
           assert.deepEqual(attestedAccounts, [caller])
         })
       })
@@ -607,7 +621,7 @@ contract('Attestations', async (accounts: string[]) => {
 
     describe('when an account is not attested', () => {
       it('should return an empty array for the phone number', async () => {
-        const attestedAccounts = await attestations.lookupAccountsForIdentifier.call(phoneHash)
+        const attestedAccounts = await attestations.lookupAccountsForIdentifier.call(identifierHash)
         assert.isEmpty(attestedAccounts)
       })
     })
@@ -626,7 +640,7 @@ contract('Attestations', async (accounts: string[]) => {
           string[],
           BigNumber[],
           BigNumber[]
-        ] = await attestations.batchGetAttestationStats.call([phoneHash])
+        ] = await attestations.batchGetAttestationStats.call([identifierHash])
         assert.lengthOf(matches, 1)
         assert.lengthOf(addresses, 0)
         assert.lengthOf(completed, 0)
@@ -649,7 +663,7 @@ contract('Attestations', async (accounts: string[]) => {
             string[],
             BigNumber[],
             BigNumber[]
-          ] = await attestations.batchGetAttestationStats.call([phoneHash])
+          ] = await attestations.batchGetAttestationStats.call([identifierHash])
           assert.lengthOf(matches, 1)
           assert.lengthOf(addresses, 1)
           assert.lengthOf(completed, 1)
@@ -665,24 +679,29 @@ contract('Attestations', async (accounts: string[]) => {
           let other
           beforeEach(async () => {
             other = accounts[1]
-            await attestations.request(phoneHash, attestationsRequested, mockStableToken.address, {
-              from: other,
-            })
-            const issuer = (await attestations.getAttestationIssuers(phoneHash, other))[0]
+            await attestations.request(
+              identifierHash,
+              attestationsRequested,
+              mockStableToken.address,
+              {
+                from: other,
+              }
+            )
+            const issuer = (await attestations.getAttestationIssuers(identifierHash, other))[0]
             const [v, r, s] = await getVerificationCodeSignature(other, issuer)
-            await attestations.complete(phoneHash, v, r, s, { from: other })
+            await attestations.complete(identifierHash, v, r, s, { from: other })
             await attestations.setWalletAddress(other, { from: other })
           })
 
           it('should return multiple attested accounts', async () => {
-            await attestations.batchGetAttestationStats([phoneHash])
+            await attestations.batchGetAttestationStats([identifierHash])
 
             const [matches, addresses, completed, total]: [
               BigNumber[],
               string[],
               BigNumber[],
               BigNumber[]
-            ] = await attestations.batchGetAttestationStats.call([phoneHash])
+            ] = await attestations.batchGetAttestationStats.call([identifierHash])
             assert.lengthOf(matches, 1)
             assert.lengthOf(addresses, 2)
             assert.lengthOf(completed, 2)
@@ -706,7 +725,7 @@ contract('Attestations', async (accounts: string[]) => {
             string[],
             BigNumber[],
             BigNumber[]
-          ] = await attestations.batchGetAttestationStats.call([phoneHash])
+          ] = await attestations.batchGetAttestationStats.call([identifierHash])
           assert.lengthOf(matches, 1)
           assert.lengthOf(addresses, 1)
           assert.lengthOf(completed, 1)
@@ -727,7 +746,7 @@ contract('Attestations', async (accounts: string[]) => {
           string[],
           BigNumber[],
           BigNumber[]
-        ] = await attestations.batchGetAttestationStats.call([phoneHash])
+        ] = await attestations.batchGetAttestationStats.call([identifierHash])
         assert.lengthOf(matches, 1)
         assert.lengthOf(addresses, 0)
         assert.lengthOf(completed, 0)
@@ -743,15 +762,15 @@ contract('Attestations', async (accounts: string[]) => {
     })
 
     it('should allow a user to revoke their account for a phone number', async () => {
-      await attestations.revoke(phoneHash, 0)
-      const attestedAccounts = await attestations.lookupAccountsForIdentifier.call(phoneHash)
+      await attestations.revoke(identifierHash, 0)
+      const attestedAccounts = await attestations.lookupAccountsForIdentifier.call(identifierHash)
       assert.isEmpty(attestedAccounts)
       const [matches, addresses, completed, total]: [
         BigNumber[],
         string[],
         BigNumber[],
         BigNumber[]
-      ] = await attestations.batchGetAttestationStats.call([phoneHash])
+      ] = await attestations.batchGetAttestationStats.call([identifierHash])
       assert.lengthOf(matches, 1)
       assert.lengthOf(addresses, 0)
       assert.lengthOf(completed, 0)
