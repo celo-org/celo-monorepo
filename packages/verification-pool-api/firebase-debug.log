@@ -1,0 +1,780 @@
+[debug] [2019-10-01T23:23:40.418Z] ----------------------------------------------------------------------
+[debug] [2019-10-01T23:23:40.420Z] Command:       /Users/cmcewen/.nvm/versions/node/v10.16.3/bin/node /Users/cmcewen/celo/celo-monorepo/node_modules/.bin/firebase deploy --only database,functions:handleVerificationRequestintegration
+[debug] [2019-10-01T23:23:40.420Z] CLI Version:   7.3.0
+[debug] [2019-10-01T23:23:40.420Z] Platform:      darwin
+[debug] [2019-10-01T23:23:40.420Z] Node Version:  v10.16.3
+[debug] [2019-10-01T23:23:40.421Z] Time:          Tue Oct 01 2019 16:23:40 GMT-0700 (Pacific Daylight Time)
+[debug] [2019-10-01T23:23:40.421Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2019-10-01T23:23:40.432Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2019-10-01T23:23:40.432Z] > authorizing via signed-in user
+[debug] [2019-10-01T23:23:40.432Z] [iam] checking project celo-testnet for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get","firebasedatabase.instances.update"]
+[debug] [2019-10-01T23:23:40.434Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/celo-testnet:testIamPermissions  
+
+[debug] [2019-10-01T23:23:40.570Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:40.572Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/celo-testnet  
+ 
+[debug] [2019-10-01T23:23:40.731Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Deploying to 'celo-testnet'...
+[info] 
+[info] i  deploying database, functions
+[info] Running command: echo deploying
+[info] ✔  functions: Finished running predeploy script.
+[info] i  database: checking rules syntax...
+[debug] [2019-10-01T23:23:42.113Z] >>> HTTP REQUEST PUT https://celo-testnet.firebaseio.com/.settings/rules.json?dryRun=true  
+ {
+  "rules": {
+    "$environment": {
+      "mobileVerifiers": {
+        ".indexOn": [
+          "isVerifying"
+        ],
+        "$uid": {
+          ".validate": "newData.hasChildren(['fcmToken', 'name', 'phoneNum', 'supportedRegion', 'isVerifying'])",
+          "address": {
+            ".validate": "newData.isString()"
+          },
+          "fcmToken": {
+            ".validate": "newData.isString()"
+          },
+          "name": {
+            ".validate": "newData.isString()"
+          },
+          "phoneNum": {
+            ".validate": "newData.isString()"
+          },
+          "supportedRegion": {
+            ".validate": "newData.isString()"
+          },
+          "isVerifying": {
+            ".validate": "newData.isBoolean()"
+          },
+          "attemptCount": {
+            ".validate": "newData.isNumber()"
+          },
+          "$other": {
+            ".validate": "false"
+          },
+          ".read": "(auth != null && auth.uid == $uid)",
+          ".write": "(auth != null && auth.uid == $uid)"
+        }
+      },
+      "messages": {
+        ".indexOn": [
+          "messageState",
+          "phoneNum"
+        ],
+        "$key": {
+          ".validate": "newData.hasChildren(['phoneNum', 'address', 'message', 'startTime', 'messageState'])",
+          "phoneNum": {
+            ".validate": "newData.isString()"
+          },
+          "address": {
+            ".validate": "newData.isString()"
+          },
+          "message": {
+            ".validate": "newData.isString()"
+          },
+          "verifierId": {
+            ".validate": "newData.isString()"
+          },
+          "verifierCandidates": {
+            ".validate": "newData.isString()"
+          },
+          "startTime": {
+            ".validate": "newData.isNumber()"
+          },
+          "finishTime": {
+            ".validate": "newData.isNumber()"
+          },
+          "messageState": {
+            ".validate": "newData.isNumber()"
+          },
+          "$other": {
+            ".validate": "false"
+          },
+          ".read": "((auth != null && data.child('verifierCandidates').val() != null) && data.child('verifierCandidates').val().contains(auth.uid))",
+          ".write": "((auth != null && newData.child('verifierCandidates').val() != null) && newData.child('verifierCandidates').val().contains(auth.uid))"
+        }
+      },
+      "rewards": {
+        ".validate": "newData.hasChildren(['isRewarding'])",
+        "isRewarding": {
+          ".validate": "newData.isBoolean()"
+        },
+        "$other": {
+          ".validate": "false"
+        }
+      }
+    }
+  }
+}
+
+[debug] [2019-10-01T23:23:42.436Z] <<< HTTP RESPONSE 200
+[info] ✔  database: rules syntax for database celo-testnet is valid
+[debug] [2019-10-01T23:23:42.438Z] > [functions] package.json contents: {
+  "name": "@celo/verification-pool-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mobile verification pool firebase API",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "main": "lib/src/index.js",
+  "scripts": {
+    "build:for-env": "./build.sh -e",
+    "get-config": "firebase functions:config:get",
+    "set-config": "ts-node ./deployment/set-config.ts --celo-env",
+    "set-env": "ts-node ./deployment/set-env.ts --celo-env",
+    "deploy": "ts-node ./deployment/deploy.ts --celo-env",
+    "delete": " ts-node ./deployment/delete.ts --celo-env",
+    "shell": "firebase functions:shell",
+    "start": "yarn run shell",
+    "logs": "firebase functions:log",
+    "lint": "tslint -c tslint.json --project tsconfig.json",
+    "build": "tsc -p .",
+    "test": "jest --ci --coverage --runInBand --detectOpenHandles",
+    "test:verbose": "jest --ci --verbose --runInBand --detectOpenHandles"
+  },
+  "dependencies": {
+    "@celo/contractkit": "^0.1.5",
+    "@celo/utils": "^0.1.0",
+    "bignumber.js": "^7.2.0",
+    "eth-lib": "^0.2.8",
+    "ethereumjs-util": "^5.2.0",
+    "express": "^4.16.4",
+    "firebase-admin": "^8.6.0",
+    "firebase-functions": "^3.2.0",
+    "google-libphonenumber": "^3.2.4",
+    "lodash": "^4.17.14",
+    "nexmo": "2.4.2",
+    "sleep-promise": "^8.0.1",
+    "twilio": "^3.23.2",
+    "web3": "1.0.0-beta.37",
+    "web3-core-helpers": "1.0.0-beta.37",
+    "web3-utils": "^1.0.0-beta.37"
+  },
+  "devDependencies": {
+    "@types/express": "^4.16.1",
+    "@types/google-libphonenumber": "^7.4.17",
+    "@types/minimist": "^1.2.0",
+    "@types/supertest": "^2.0.7",
+    "@types/web3": "^1.0.18",
+    "firebase-bolt": "^0.8.3",
+    "firebase-functions-test": "^0.1.6",
+    "firebase-tools": "^7.3.0",
+    "minimist": "^1.2.0",
+    "supertest": "^3.4.2"
+  },
+  "engines": {
+    "node": "10"
+  }
+}
+[info] i  functions: ensuring necessary APIs are enabled...
+[debug] [2019-10-01T23:23:42.439Z] >>> HTTP REQUEST GET https://serviceusage.googleapis.com/v1/projects/celo-testnet/services/cloudfunctions.googleapis.com  
+ 
+[debug] [2019-10-01T23:23:42.440Z] >>> HTTP REQUEST GET https://serviceusage.googleapis.com/v1/projects/celo-testnet/services/runtimeconfig.googleapis.com  
+ 
+[debug] [2019-10-01T23:23:43.019Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.031Z] <<< HTTP RESPONSE 200
+[info] ✔  functions: all necessary APIs are enabled
+[debug] [2019-10-01T23:23:43.032Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/celo-testnet/adminSdkConfig  
+ 
+[debug] [2019-10-01T23:23:43.203Z] <<< HTTP RESPONSE 200
+[info] i  functions: preparing . directory for uploading...
+[debug] [2019-10-01T23:23:43.206Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs  
+ 
+[debug] [2019-10-01T23:23:43.422Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.423Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/argentinaproduction/variables  
+ 
+[debug] [2019-10-01T23:23:43.423Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/asasdk/variables  
+ 
+[debug] [2019-10-01T23:23:43.423Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/dogmango/variables  
+ 
+[debug] [2019-10-01T23:23:43.423Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/kamyartest/variables  
+ 
+[debug] [2019-10-01T23:23:43.423Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/true/variables  
+ 
+[debug] [2019-10-01T23:23:43.424Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/argentinastaging/variables  
+ 
+[debug] [2019-10-01T23:23:43.424Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/namidentity26/variables  
+ 
+[debug] [2019-10-01T23:23:43.424Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/shared/variables  
+ 
+[debug] [2019-10-01T23:23:43.424Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/rossytest/variables  
+ 
+[debug] [2019-10-01T23:23:43.424Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/pilotstaging/variables  
+ 
+[debug] [2019-10-01T23:23:43.424Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/trevor1/variables  
+ 
+[debug] [2019-10-01T23:23:43.424Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/alfajoresstaging/variables  
+ 
+[debug] [2019-10-01T23:23:43.425Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/integration/variables  
+ 
+[debug] [2019-10-01T23:23:43.567Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.568Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/rossytest/variables/testnet-id  
+ 
+[debug] [2019-10-01T23:23:43.568Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/rossytest/variables/tx-ip  
+ 
+[debug] [2019-10-01T23:23:43.568Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/rossytest/variables/tx-port  
+ 
+[debug] [2019-10-01T23:23:43.576Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.577Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.577Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/argentinastaging/variables/app-signature  
+ 
+[debug] [2019-10-01T23:23:43.577Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/argentinastaging/variables/testnet-id  
+ 
+[debug] [2019-10-01T23:23:43.578Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/argentinastaging/variables/tx-ip  
+ 
+[debug] [2019-10-01T23:23:43.578Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/argentinastaging/variables/tx-port  
+ 
+[debug] [2019-10-01T23:23:43.578Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.579Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/asasdk/variables/tx-ip  
+ 
+[debug] [2019-10-01T23:23:43.579Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/asasdk/variables/tx-port  
+ 
+[debug] [2019-10-01T23:23:43.579Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/asasdk/variables/eth-address  
+ 
+[debug] [2019-10-01T23:23:43.581Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/asasdk/variables/eth-private-key  
+ 
+[debug] [2019-10-01T23:23:43.581Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/asasdk/variables/testnet-id  
+ 
+[debug] [2019-10-01T23:23:43.582Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.582Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/namidentity26/variables/tx-ip  
+ 
+[debug] [2019-10-01T23:23:43.582Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/namidentity26/variables/tx-port  
+ 
+[debug] [2019-10-01T23:23:43.583Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/namidentity26/variables/app-signature  
+ 
+[debug] [2019-10-01T23:23:43.583Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/namidentity26/variables/testnet-id  
+ 
+[debug] [2019-10-01T23:23:43.583Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.584Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/shared/variables/twilio-auth-token  
+ 
+[debug] [2019-10-01T23:23:43.584Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/shared/variables/eth-address  
+ 
+[debug] [2019-10-01T23:23:43.584Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/shared/variables/nexmo-from  
+ 
+[debug] [2019-10-01T23:23:43.584Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/shared/variables/eth-private-key  
+ 
+[debug] [2019-10-01T23:23:43.585Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/shared/variables/fcmkey  
+ 
+[debug] [2019-10-01T23:23:43.585Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/shared/variables/nexmo-from-mx  
+ 
+[debug] [2019-10-01T23:23:43.585Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/shared/variables/nexmo-key  
+ 
+[debug] [2019-10-01T23:23:43.585Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/shared/variables/twilio-sid  
+ 
+[debug] [2019-10-01T23:23:43.585Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/shared/variables/nexmo-from-us  
+ 
+[debug] [2019-10-01T23:23:43.585Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/shared/variables/nexmo-secret  
+ 
+[debug] [2019-10-01T23:23:43.585Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/shared/variables/twilio-phone-number  
+ 
+[debug] [2019-10-01T23:23:43.608Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.609Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/trevor1/variables/testnet-id  
+ 
+[debug] [2019-10-01T23:23:43.609Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/trevor1/variables/tx-ip  
+ 
+[debug] [2019-10-01T23:23:43.609Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/trevor1/variables/tx-port  
+ 
+[debug] [2019-10-01T23:23:43.610Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/trevor1/variables/app-signature  
+ 
+[debug] [2019-10-01T23:23:43.610Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.611Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/pilotstaging/variables/tx-ip  
+ 
+[debug] [2019-10-01T23:23:43.611Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/pilotstaging/variables/tx-port  
+ 
+[debug] [2019-10-01T23:23:43.611Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/pilotstaging/variables/app-signature  
+ 
+[debug] [2019-10-01T23:23:43.611Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/pilotstaging/variables/testnet-id  
+ 
+[debug] [2019-10-01T23:23:43.612Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.612Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/kamyartest/variables/tx-ip  
+ 
+[debug] [2019-10-01T23:23:43.612Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/kamyartest/variables/tx-port  
+ 
+[debug] [2019-10-01T23:23:43.612Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/kamyartest/variables/testnet-id  
+ 
+[debug] [2019-10-01T23:23:43.613Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.613Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/argentinaproduction/variables/app-signature  
+ 
+[debug] [2019-10-01T23:23:43.614Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/argentinaproduction/variables/testnet-id  
+ 
+[debug] [2019-10-01T23:23:43.614Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/argentinaproduction/variables/tx-ip  
+ 
+[debug] [2019-10-01T23:23:43.614Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/argentinaproduction/variables/tx-port  
+ 
+[debug] [2019-10-01T23:23:43.614Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.615Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/alfajoresstaging/variables/tx-ip  
+ 
+[debug] [2019-10-01T23:23:43.615Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/alfajoresstaging/variables/tx-port  
+ 
+[debug] [2019-10-01T23:23:43.615Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/alfajoresstaging/variables/app-signature  
+ 
+[debug] [2019-10-01T23:23:43.615Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/alfajoresstaging/variables/testnet-id  
+ 
+[debug] [2019-10-01T23:23:43.615Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.616Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/integration/variables/app-signature  
+ 
+[debug] [2019-10-01T23:23:43.616Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/integration/variables/testnet-id  
+ 
+[debug] [2019-10-01T23:23:43.616Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/integration/variables/tx-ip  
+ 
+[debug] [2019-10-01T23:23:43.616Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/integration/variables/tx-port  
+ 
+[debug] [2019-10-01T23:23:43.616Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.617Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/dogmango/variables/tx-ip  
+ 
+[debug] [2019-10-01T23:23:43.617Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/dogmango/variables/tx-port  
+ 
+[debug] [2019-10-01T23:23:43.617Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/dogmango/variables/app-signature  
+ 
+[debug] [2019-10-01T23:23:43.617Z] >>> HTTP REQUEST GET https://runtimeconfig.googleapis.com/v1beta1/projects/celo-testnet/configs/dogmango/variables/testnet-id  
+ 
+[debug] [2019-10-01T23:23:43.767Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.767Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.768Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.768Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.768Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.769Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.769Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.769Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.770Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.771Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.771Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.826Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.827Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.827Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.828Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.828Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.829Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.829Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.829Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.830Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.830Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.830Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.831Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.831Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.831Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.831Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.832Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.832Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.832Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.833Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.833Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.833Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.834Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.834Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.835Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.835Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.836Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.837Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.837Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.838Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.839Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.840Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.840Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.841Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.841Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.841Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.843Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.844Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.844Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.845Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.845Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.846Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:43.846Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:44.184Z] <<< HTTP RESPONSE 200
+[info] i  functions: packaged . (165.67 KB) for uploading
+[debug] [2019-10-01T23:23:46.760Z] >>> HTTP REQUEST POST https://cloudfunctions.googleapis.com/v1/projects/celo-testnet/locations/us-central1/functions:generateUploadUrl  
+ 
+[debug] [2019-10-01T23:23:47.419Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:47.420Z] >>> HTTP REQUEST PUT https://storage.googleapis.com/gcf-upload-us-central1-d47362c9-5d94-44cc-9275-552634742877/b5b0e068-c868-49d5-b74b-0c9c529492e7.zip?GoogleAccessId=service-253914576835@gcf-admin-robot.iam.gserviceaccount.com&Expires=1569974029&Signature=NyW5F5KagYvZC%2BfgbD5vK9nvTNExdOGtdZPZYMRDMzkbv6EexveV3fckN5TlSiQT63%2F5iZa89%2BBKtPSJFpB7sk4aVTEsMtP77%2BWCqfmdkhF4qhQaaw0jj0D%2Fy%2BYUZs1ADAc3LODQ1Hmtnu%2B5%2BeGtf3vx2wEE%2B0Ern1ce9L%2BybvflbkHLbVfOF1s4LVsH4u05xHTfEF5LU1wFi%2FsyAZzPaWAciuiI0%2FlZGXGdvIfCnrCYSBYPebPNVoSGC8c1zCJ%2BSUPtWbO9o7n7R%2BPL0Zz1%2F7rQ%2BPsawpdXkGz7i3FFfXHMvwjeRJiUBBa1Ws7lDm1KCS%2BgytVqvzXPWdZJzFBdsQ%3D%3D  
+ <request body omitted>
+[debug] [2019-10-01T23:23:47.927Z] <<< HTTP RESPONSE 200
+[info] ✔  functions: . folder uploaded successfully
+[info] i  database: releasing rules...
+[debug] [2019-10-01T23:23:47.929Z] >>> HTTP REQUEST PUT https://celo-testnet.firebaseio.com/.settings/rules.json  
+ {
+  "rules": {
+    "$environment": {
+      "mobileVerifiers": {
+        ".indexOn": [
+          "isVerifying"
+        ],
+        "$uid": {
+          ".validate": "newData.hasChildren(['fcmToken', 'name', 'phoneNum', 'supportedRegion', 'isVerifying'])",
+          "address": {
+            ".validate": "newData.isString()"
+          },
+          "fcmToken": {
+            ".validate": "newData.isString()"
+          },
+          "name": {
+            ".validate": "newData.isString()"
+          },
+          "phoneNum": {
+            ".validate": "newData.isString()"
+          },
+          "supportedRegion": {
+            ".validate": "newData.isString()"
+          },
+          "isVerifying": {
+            ".validate": "newData.isBoolean()"
+          },
+          "attemptCount": {
+            ".validate": "newData.isNumber()"
+          },
+          "$other": {
+            ".validate": "false"
+          },
+          ".read": "(auth != null && auth.uid == $uid)",
+          ".write": "(auth != null && auth.uid == $uid)"
+        }
+      },
+      "messages": {
+        ".indexOn": [
+          "messageState",
+          "phoneNum"
+        ],
+        "$key": {
+          ".validate": "newData.hasChildren(['phoneNum', 'address', 'message', 'startTime', 'messageState'])",
+          "phoneNum": {
+            ".validate": "newData.isString()"
+          },
+          "address": {
+            ".validate": "newData.isString()"
+          },
+          "message": {
+            ".validate": "newData.isString()"
+          },
+          "verifierId": {
+            ".validate": "newData.isString()"
+          },
+          "verifierCandidates": {
+            ".validate": "newData.isString()"
+          },
+          "startTime": {
+            ".validate": "newData.isNumber()"
+          },
+          "finishTime": {
+            ".validate": "newData.isNumber()"
+          },
+          "messageState": {
+            ".validate": "newData.isNumber()"
+          },
+          "$other": {
+            ".validate": "false"
+          },
+          ".read": "((auth != null && data.child('verifierCandidates').val() != null) && data.child('verifierCandidates').val().contains(auth.uid))",
+          ".write": "((auth != null && newData.child('verifierCandidates').val() != null) && newData.child('verifierCandidates').val().contains(auth.uid))"
+        }
+      },
+      "rewards": {
+        ".validate": "newData.hasChildren(['isRewarding'])",
+        "isRewarding": {
+          ".validate": "newData.isBoolean()"
+        },
+        "$other": {
+          ".validate": "false"
+        }
+      }
+    }
+  }
+}
+
+[debug] [2019-10-01T23:23:48.439Z] <<< HTTP RESPONSE 200
+[info] ✔  database: rules for database celo-testnet released successfully
+[debug] [2019-10-01T23:23:48.440Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/projects/celo-testnet/locations/-/functions  
+ 
+[debug] [2019-10-01T23:23:48.972Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:48.973Z] > [functions] filtering triggers to: [
+  "projects/celo-testnet/locations/us-central1/functions/handleVerificationRequestintegration"
+]
+[info] i  functions: current functions in project: handleVerificationRequestalfajoresstaging(us-central1), handleVerificationRequestintegration(us-central1), handleVerificationRequestnamidentity26(us-central1), handleVerificationRequestpilotstaging(us-central1)
+[info] i  functions: uploading functions in project: handleVerificationRequestintegration(us-central1)
+[info] i  functions: updating Node.js 10 (Beta) function handleVerificationRequestintegration(us-central1)...
+[debug] [2019-10-01T23:23:48.977Z] Trigger is:  {"httpsTrigger":{}}
+[debug] [2019-10-01T23:23:48.978Z] >>> HTTP REQUEST GET https://serviceusage.googleapis.com/v1/projects/celo-testnet/services/cloudscheduler.googleapis.com  
+ 
+[debug] [2019-10-01T23:23:49.462Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:49.463Z] >>> HTTP REQUEST PATCH https://cloudfunctions.googleapis.com/v1/projects/celo-testnet/locations/us-central1/functions/handleVerificationRequestintegration {"updateMask":"sourceUploadUrl,name,labels,runtime,httpsTrigger"} 
+
+[debug] [2019-10-01T23:23:50.178Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:50.180Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/projects/celo-testnet/locations/-/functions  
+ 
+[debug] [2019-10-01T23:23:50.589Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:50.590Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:23:50.999Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:53.001Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:23:53.355Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:55.356Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:23:55.811Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:23:57.813Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:23:58.270Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:00.274Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:02.727Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:04.728Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:05.134Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:07.138Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:07.596Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:09.597Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:09.946Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:11.947Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:12.117Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:14.119Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:14.274Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:16.278Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:16.701Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:18.704Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:19.059Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:21.063Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:21.382Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:23.385Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:23.562Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:25.566Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:26.020Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:28.023Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:28.477Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:30.482Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:30.833Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:32.835Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:32.967Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:34.972Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:35.149Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:37.153Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:37.694Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:39.697Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:39.834Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:41.838Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:42.006Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:44.008Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:44.350Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:46.353Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:46.486Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:48.489Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:48.855Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:50.857Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:50.998Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:53.001Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:53.258Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:55.263Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:55.512Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:57.514Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:24:57.867Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:24:59.868Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:00.015Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:02.017Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:03.682Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:05.681Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:06.077Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:08.079Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:08.537Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:10.539Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:10.974Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:12.974Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:13.124Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:15.127Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:15.581Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:17.585Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:17.937Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:19.939Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:20.055Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:22.058Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:22.196Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:24.197Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:24.317Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:26.322Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:26.656Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:28.657Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:28.996Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:30.997Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:31.326Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:33.326Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:33.706Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:35.707Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:36.051Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:38.055Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:38.417Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:40.419Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:40.772Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:42.775Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:43.232Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:45.232Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:45.357Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:47.358Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:47.737Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:49.739Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:50.913Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:52.914Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:53.367Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:55.373Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:55.711Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:25:57.714Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:25:58.180Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:00.185Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:00.340Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:02.344Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:02.813Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:04.818Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:07.236Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:09.237Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:09.649Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:11.655Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:12.006Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:14.007Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:14.362Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:16.364Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:16.612Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:18.614Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:18.755Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:20.763Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:21.111Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:23.114Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:23.451Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:25.452Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:25.798Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:27.799Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:27.939Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:29.944Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:30.281Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:32.282Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:32.423Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:34.427Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:34.839Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:36.840Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:37.195Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:39.200Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:39.573Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:41.578Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:42.009Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:44.014Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:44.263Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:46.264Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:46.396Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:48.397Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:48.775Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:50.780Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:50.910Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:52.914Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:53.053Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:55.057Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:55.322Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:57.323Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:26:57.674Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:26:59.680Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:27:00.030Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:27:02.033Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:27:02.487Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:27:04.492Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:27:04.842Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:27:06.848Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:27:07.201Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:27:09.206Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:27:11.576Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:27:13.578Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:27:13.962Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:27:15.964Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:27:16.097Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:27:18.101Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:27:18.462Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:27:20.467Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:27:20.920Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:27:22.921Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:27:23.274Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:27:25.279Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:27:25.734Z] <<< HTTP RESPONSE 200
+[debug] [2019-10-01T23:27:27.740Z] >>> HTTP REQUEST GET https://cloudfunctions.googleapis.com/v1/operations/Y2Vsby10ZXN0bmV0L3VzLWNlbnRyYWwxL2hhbmRsZVZlcmlmaWNhdGlvblJlcXVlc3RpbnRlZ3JhdGlvbi9kcXp3cDNpTTUxZw  
+ 
+[debug] [2019-10-01T23:27:28.079Z] <<< HTTP RESPONSE 200
