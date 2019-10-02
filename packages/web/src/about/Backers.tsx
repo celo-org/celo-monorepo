@@ -39,7 +39,7 @@ export class Backers extends React.Component<I18nProps & ScreenProps> {
                         style={styles.photo}
                       />
                     ) : (
-                      <Text style={[fonts.h4, textStyles.center]}>{backer.name}</Text>
+                      <Text style={[fonts.h4, styles.name, textStyles.center]}>{backer.name}</Text>
                     )}
                   </View>
                 </Responsive>
@@ -83,6 +83,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     marginVertical: 30,
     width: 210,
+  },
+  name: {
+    fontSize: 22,
   },
 })
 
