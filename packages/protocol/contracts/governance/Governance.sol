@@ -66,8 +66,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   }
 
   struct HotfixRecord {
-    uint256 tally;
-    uint256 epoch;
+    mapping(address => bool) whitelisted;
     bool approved;
     bool completed;
   }
@@ -678,15 +677,9 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     } else {
       IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
       require(msg.sender == validators.validatorAddressFromCurrentSet(validatorIndex));
+      require(!hotfixes[txHash].whitelisted[msg.sender]);
 
-      uint256 epoch = getEpochNumber(); 
-      // TODO: consider using more state s.t. recurring validators can whitelist in different epochs
-      if (epoch > hotfixes[txHash].epoch) { // also initializes when hotfixes[txHash].epoch == 0
-        hotfixes[txHash].tally = 0;
-        hotfixes[txHash].epoch = epoch;
-      }
-
-      hotfixes[txHash].tally = hotfixes[txHash].tally.add(1);
+      hotfixes[txHash].whitelisted[msg.sender] = true;
     }
 
     emit HotfixWhitelisted(msg.sender, txHash);
@@ -708,29 +701,23 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   )
     external
   {
-
-    IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
-    uint256 totalVotes = validators.numberValidatorsInCurrentSet();
-    // TODO(yorke): double check 2f+1 validator quorum calculation
-    uint256 quorum = totalVotes.sub(totalVotes.sub(1).div(2));
-
     bytes32 txHash = keccak256(abi.encode(values, destinations, data, dataLengths));
-    require(!hotfixes[txHash].completed, "hotfix already executed");
-    require(hotfixes[txHash].approved, "hotfix not approved");
-    require(hotfixes[txHash].tally >= quorum, "hotfix not whitelisted by enough validators");
+
+    (bool approved, bool completed, bool whitelisted) = getHotfixRecord(txHash);
+    require(!completed && approved && whitelisted);
 
     hotfixProposal.make(values, destinations, data, dataLengths, msg.sender, 0);
     hotfixProposal.execute();
 
-    emit HotfixExecuted(txHash);
     hotfixes[txHash].completed = true;
+    emit HotfixExecuted(txHash);
   }
 
   /**
    * @notice Withdraws refunded Celo Gold deposits.
    * @return Whether or not the withdraw was successful.
    */
-  function withdraw() external returns (bool) {
+  function withdraw() external nonReentrant returns (bool) {
     uint256 value = refundedDeposits[msg.sender];
     require(value > 0 && value <= address(this).balance);
     refundedDeposits[msg.sender] = 0;
@@ -898,9 +885,20 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     return voters[account].mostRecentReferendumProposal;
   }
 
-  function getHotfixRecord(bytes32 txHash) external view returns (uint256, uint256, bool, bool) {
-    HotfixRecord storage hotfixRecord = hotfixes[txHash];
-    return (hotfixRecord.tally, hotfixRecord.epoch, hotfixRecord.approved, hotfixRecord.completed);
+  function getHotfixRecord(bytes32 txHash) public view returns (bool, bool, bool) {
+    IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
+    uint256 numValidators = validators.numberValidatorsInCurrentSet();
+    uint256 quorum = numValidators.sub(numValidators.sub(1).div(2));
+    
+    uint256 tally = 0;
+    for (uint256 idx = 0; idx < numValidators; idx++) {
+      address validator = validators.validatorAddressFromCurrentSet(idx);
+      if (hotfixes[txHash].whitelist[validator]) {
+        tally = tally.add(1);
+      }
+    }
+
+    return (hotfixes[txHash].approved, hotfixes[txHash].completed, tally >= quorum);
   }
 
   /**
@@ -1134,10 +1132,5 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       threshold = constitution[destination].defaultThreshold;
     }
     return threshold;
-  }
-
-  function getEpochNumber() internal view returns (uint256) {
-    // TODO: replace 30000 with GovernanceParams.epochSize
-    return block.number.div(30000);
   }
 }
