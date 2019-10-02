@@ -1,7 +1,8 @@
-import { newKit } from '@celo/contractkit'
+import { newKitFromWeb3 } from '@celo/contractkit'
 import * as ethjsutil from 'ethereumjs-util'
+import { web3 } from './config'
 
-const kit = newKit('https://integration-infura.celo-testnet.org')
+const kit = newKitFromWeb3(web3)
 
 export function parseBase64(source: string) {
   return ethjsutil.bufferToHex(Buffer.from(source, 'base64'))
