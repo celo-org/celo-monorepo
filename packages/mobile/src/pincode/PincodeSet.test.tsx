@@ -4,6 +4,10 @@ import { Provider } from 'react-redux'
 import PincodeSet from 'src/pincode/PincodeSet'
 import { createMockStore } from 'test/utils'
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('Pincode', () => {
   it('renders correctly', () => {
     const { toJSON, getByTestId } = render(

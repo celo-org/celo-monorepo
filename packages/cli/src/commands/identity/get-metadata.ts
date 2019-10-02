@@ -1,8 +1,8 @@
-import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
+import { IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { IArg } from '@oclif/parser/lib/args'
-import moment from 'moment'
 import { BaseCommand } from '../../base'
 import { Args } from '../../utils/command'
+import { displayMetadata } from '../../utils/identity'
 
 export default class GetMetadata extends BaseCommand {
   static description = 'Show information about an address'
@@ -28,25 +28,8 @@ export default class GetMetadata extends BaseCommand {
 
     try {
       const metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
-
       console.info('Metadata contains the following claims: \n')
-
-      metadata.claims.forEach((claim) => {
-        switch (claim.payload.type) {
-          case ClaimTypes.ATTESTATION_SERVICE_URL:
-            console.info(`Attestation Service Claim`)
-            console.info(`URL: ${claim.payload.url}`)
-            break
-          case ClaimTypes.NAME:
-            console.info(`Name Claim`)
-            console.info(`Name: "${claim.payload.name}"`)
-            break
-          default:
-            break
-        }
-
-        console.info(`(claim created ${moment.unix(claim.payload.timestamp).fromNow()})\n`)
-      })
+      displayMetadata(metadata)
     } catch (error) {
       console.error('Metadata could not be retrieved from ', metadataURL)
     }
