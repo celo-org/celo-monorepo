@@ -666,7 +666,11 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
       maxElectableValidators,
       votes.total.eligible.list.numElements
     );
-    // uint256 requiredVotes = electabilityThreshold.multiply(FixidityLib.newFixed(votes.total.total)).fromFixed();
+    /*
+    uint256 requiredVotes = electabilityThreshold.multiply(
+      FixidityLib.newFixed(votes.total.total)
+    ).fromFixed();
+    */
     // TODO(asa): Filter by > requiredVotes
     address[] memory electionGroups = votes.total.eligible.headN(maxNumElectionGroups);
     uint256[] memory numMembers = getValidators().getGroupsNumMembers(electionGroups);

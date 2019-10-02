@@ -54,7 +54,14 @@ contract MockLockedGold is ILockedGold {
     nonvotingAccountBalance[account] = nonvotingAccountBalance[account].sub(value);
   }
 
-  function setAccountMustMaintain(address account, uint256 value, uint256 timestamp) external returns (bool) {
+  function setAccountMustMaintain(
+    address account,
+    uint256 value,
+    uint256 timestamp
+  )
+    external
+    returns (bool)
+  {
     mustMaintain[account] = MustMaintain(value, timestamp);
     return true;
   }

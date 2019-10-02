@@ -8,8 +8,8 @@ import {
   sendTransactionWithPrivateKey,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { toFixed } from '@celo/utils/lib/fixidity'
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import * as bls12377js from 'bls12377js'
 import { ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'

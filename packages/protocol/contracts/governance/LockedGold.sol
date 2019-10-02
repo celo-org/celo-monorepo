@@ -192,7 +192,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     MustMaintain memory requirement = account.balances.requirements;
     require(
       now >= requirement.timestamp ||
-      getAccountTotalLockedGold(msg.sender).sub(value) >= requirement.value, "didn't meet mustmaintain requirements"
+      getAccountTotalLockedGold(msg.sender).sub(value) >= requirement.value,
+      "didn't meet mustmaintain requirements"
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
@@ -262,7 +263,10 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   function getAccountFromVoter(address accountOrVoter) external view returns (address) {
     address authorizingAccount = authorizedBy[accountOrVoter];
     if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].authorizations.voting == accountOrVoter, 'failed first check');
+      require(
+        accounts[authorizingAccount].authorizations.voting == accountOrVoter,
+        'failed first check'
+      );
       return authorizingAccount;
     } else {
       require(isAccount(accountOrVoter));
@@ -349,13 +353,21 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param account The address of the account.
    * @return The value and timestamp for each pending withdrawal.
    */
-  function getPendingWithdrawals(address account) public view returns (uint256[] memory, uint256[] memory) {
+  function getPendingWithdrawals(
+    address account
+  )
+    public
+    view
+    returns (uint256[] memory, uint256[] memory)
+  {
     require(isAccount(account));
     uint256 length = accounts[account].balances.pendingWithdrawals.length;
     uint256[] memory values = new uint256[](length);
     uint256[] memory timestamps = new uint256[](length);
     for (uint256 i = 0; i < length; i++) {
-      PendingWithdrawal memory pendingWithdrawal = accounts[account].balances.pendingWithdrawals[i];
+      PendingWithdrawal memory pendingWithdrawal = (
+        accounts[account].balances.pendingWithdrawals[i]
+      );
       values[i] = pendingWithdrawal.value;
       timestamps[i] = pendingWithdrawal.timestamp;
     }

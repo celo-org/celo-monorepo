@@ -45,7 +45,14 @@ contract MockValidators is IValidators {
     members[group] = _members;
   }
 
-  function getTopValidatorsFromGroup(address group, uint256 n) external view returns (address[] memory) {
+  function getTopValidatorsFromGroup(
+    address group,
+    uint256 n
+  )
+    external
+    view
+    returns (address[] memory)
+  {
     require(n <= members[group].length);
     address[] memory validators = new address[](n);
     for (uint256 i = 0; i < n; i++) {
