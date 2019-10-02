@@ -19,6 +19,15 @@ const storeData = {
   },
 }
 
+jest.mock('src/web3/contracts', () => ({
+  web3: {
+    utils: {
+      fromWei: jest.fn((x: any) => x / 1e18),
+    },
+  },
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('NotificationBox', () => {
   it('Simple test', () => {
     // const store = createMockStore(storeData)

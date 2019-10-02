@@ -19,6 +19,15 @@ jest.mock('src/firebase/firebase', () => ({
   getVersionInfo: jest.fn(async () => ({ deprecated: false })),
 }))
 
+jest.mock('src/web3/contracts', () => ({
+  web3: {
+    utils: {
+      fromWei: jest.fn((x: any) => x / 1e18),
+    },
+  },
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 const { navigate } = require('src/navigator/NavigationService')
 const { getVersionInfo } = require('src/firebase/firebase')
 

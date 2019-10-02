@@ -41,7 +41,6 @@ import { dynamicLink } from 'src/utils/dynamicLink'
 import Logger from 'src/utils/Logger'
 import { addLocalAccount, isZeroSyncMode, web3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'
-import Web3 from 'web3'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
@@ -77,7 +76,7 @@ export function getInvitationVerificationFeeInDollars() {
 }
 
 export function getInvitationVerificationFeeInWei() {
-  return new BigNumber(Web3.utils.toWei(INVITE_FEE))
+  return new BigNumber(web3.utils.toWei(INVITE_FEE))
 }
 
 export async function generateLink(inviteCode: string, recipientName: string) {
@@ -220,24 +219,19 @@ export function* doRedeemInvite(inviteCode: string) {
   try {
     const tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
     Logger.debug(`TAG@doRedeemInvite`, 'Invite code contains temp account', tempAccount)
-    // TODO(ashishb): check getAccountBalance for zero sync mode - should be fine
     const tempAccountBalanceWei: BigNumber = yield call(getAccountBalance, tempAccount)
     if (tempAccountBalanceWei.isLessThanOrEqualTo(0)) {
       yield put(showError(ErrorMessages.EMPTY_INVITE_CODE))
       return false
     }
 
-    // TODO(ashishb): check getOrCreateAccount for zero sync mode
     const newAccount = yield call(getOrCreateAccount)
     if (!newAccount) {
       throw Error('Unable to create your account')
     }
 
-    // TODO(ashishb): check addTempAccountToWallet for zero sync mode - fixed
     yield call(addTempAccountToWallet, inviteCode)
-    // TODO(ashishb): check withdrawFundsFromTempAccount for zero sync mode - fixed
     yield call(withdrawFundsFromTempAccount, tempAccount, tempAccountBalanceWei, newAccount)
-    // TODO(ashishb): check fetchDollarBalance for zero sync mode - most likely fine?
     yield put(fetchDollarBalance())
     return true
   } catch (e) {
