@@ -712,7 +712,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
     uint256 totalVotes = validators.numberValidatorsInCurrentSet();
     // TODO(yorke): double check 2f+1 validator quorum calculation
-    uint256 quorum = totalVotes.sub(totalVotes.sub(1).div(3));
+    uint256 quorum = totalVotes.sub(totalVotes.sub(1).div(2));
 
     bytes32 txHash = keccak256(abi.encode(values, destinations, data, dataLengths));
     require(!hotfixes[txHash].completed, "hotfix already executed");

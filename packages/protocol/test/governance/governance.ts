@@ -1852,7 +1852,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.only('#whitelist()', () => {
+  describe('#whitelist()', () => {
     beforeEach(async () => {
       await mockValidators.addValidator(accounts[2])
       await mockValidators.addValidator(accounts[3])
@@ -1914,7 +1914,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.only('#hotfix()', () => {
+  describe('#hotfix()', () => {
     describe('when the hotfix is approved and whitelisted', () => {
       beforeEach(async () => {
         await mockValidators.addValidator(accounts[2])
