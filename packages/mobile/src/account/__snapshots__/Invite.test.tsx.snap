@@ -18,108 +18,124 @@ exports[`Invite renders correctly with no recipients 1`] = `
   >
     <View
       style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "borderColor": "#EEEEEE",
-            "borderRadius": 3,
-            "borderWidth": 1,
-            "flexDirection": "row",
-            "height": 50,
-            "marginHorizontal": 10,
-            "marginVertical": 5,
-          },
-          Object {
-            "borderColor": "#EEEEEE",
-          },
-        ]
+        Object {
+          "position": "relative",
+        }
       }
     >
-      <View
-        style={
-          Object {
-            "alignItems": "center",
-            "flexDirection": "column",
-            "justifyContent": "center",
-            "minWidth": 45,
-          }
-        }
-      >
-        <svg
-          fill="none"
-          height={18}
-          style={Object {}}
-          viewBox="0 0 18 18"
-          width={18}
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            clipRule="evenodd"
-            d="M2.65971 7.31402C2.65971 9.88456 4.74354 11.9684 7.31408 11.9684C9.88462 11.9684 11.9685 9.88456 11.9685 7.31402C11.9685 4.74348 9.88462 2.65964 7.31408 2.65964C4.74354 2.65964 2.65971 4.74348 2.65971 7.31402ZM6.10352e-05 7.31402C6.10352e-05 11.3534 3.27466 14.628 7.31408 14.628C8.65119 14.628 9.9045 14.2692 10.983 13.6427L14.9508 17.6105C15.4701 18.1298 16.3121 18.1298 16.8315 17.6105C17.3508 17.0912 17.3508 16.2492 16.8315 15.7298L13.0074 11.9058C14.0211 10.6505 14.6281 9.05315 14.6281 7.31402C14.6281 3.2746 11.3535 0 7.31408 0C3.27466 0 6.10352e-05 3.2746 6.10352e-05 7.31402Z"
-            fill="#81868B"
-            fillRule="evenodd"
-            style={Object {}}
-          />
-        </svg>
-      </View>
-      <View
-        style={
-          Array [
-            Object {
-              "height": 35,
-              "width": 1,
-            },
-            Object {
-              "backgroundColor": "#EEEEEE",
-            },
-          ]
-        }
-      />
       <View
         style={
           Array [
             Object {
               "alignItems": "center",
-              "flex": 1,
+              "borderColor": "#EEEEEE",
+              "borderRadius": 3,
+              "borderWidth": 1,
               "flexDirection": "row",
-              "justifyContent": "center",
+              "height": 50,
+              "marginHorizontal": 10,
+              "marginVertical": 5,
             },
             Object {
-              "flex": 1,
-              "height": 54,
-              "marginHorizontal": 8,
+              "borderColor": "#EEEEEE",
             },
           ]
         }
       >
-        <TextInput
-          allowFontScaling={true}
-          keyboardType="default"
-          onBlur={[Function]}
-          onChangeText={[Function]}
-          onFocus={[Function]}
-          placeholder="nameOrPhoneNumber"
-          placeholderTextColor="rgba(0, 0, 0, .4)"
-          rejectResponderTermination={true}
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "column",
+              "justifyContent": "center",
+              "minWidth": 45,
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height={18}
+            style={Object {}}
+            viewBox="0 0 18 18"
+            width={18}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              clipRule="evenodd"
+              d="M2.65971 7.31402C2.65971 9.88456 4.74354 11.9684 7.31408 11.9684C9.88462 11.9684 11.9685 9.88456 11.9685 7.31402C11.9685 4.74348 9.88462 2.65964 7.31408 2.65964C4.74354 2.65964 2.65971 4.74348 2.65971 7.31402ZM6.10352e-05 7.31402C6.10352e-05 11.3534 3.27466 14.628 7.31408 14.628C8.65119 14.628 9.9045 14.2692 10.983 13.6427L14.9508 17.6105C15.4701 18.1298 16.3121 18.1298 16.8315 17.6105C17.3508 17.0912 17.3508 16.2492 16.8315 15.7298L13.0074 11.9058C14.0211 10.6505 14.6281 9.05315 14.6281 7.31402C14.6281 3.2746 11.3535 0 7.31408 0C3.27466 0 6.10352e-05 3.2746 6.10352e-05 7.31402Z"
+              fill="#81868B"
+              fillRule="evenodd"
+              style={Object {}}
+            />
+          </svg>
+        </View>
+        <View
           style={
             Array [
               Object {
-                "fontFamily": "Hind-Regular",
+                "height": 35,
+                "width": 1,
               },
               Object {
-                "borderColor": "#D1D5D8",
-                "borderRadius": 3,
-                "padding": 8,
-              },
-              Object {
-                "backgroundColor": "#FFFFFF",
-                "flex": 1,
+                "backgroundColor": "#EEEEEE",
               },
             ]
           }
-          underlineColorAndroid="transparent"
-          value=""
         />
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "flexDirection": "row",
+                "justifyContent": "center",
+              },
+              Object {
+                "alignSelf": "center",
+                "color": "#2E3338",
+                "height": 54,
+                "marginHorizontal": 8,
+              },
+            ]
+          }
+        >
+          <TextInput
+            allowFontScaling={true}
+            icon={
+              <Search
+                color="#81868B"
+                height={18}
+                width={18}
+              />
+            }
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            placeholder="nameOrPhoneNumber"
+            placeholderTextColor="rgba(0, 0, 0, .4)"
+            rejectResponderTermination={true}
+            shouldShowClipboard={[Function]}
+            style={
+              Array [
+                Object {
+                  "fontFamily": "Hind-Regular",
+                },
+                Object {
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 3,
+                  "padding": 8,
+                },
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "flex": 1,
+                },
+              ]
+            }
+            underlineColorAndroid="transparent"
+            value=""
+          />
+        </View>
       </View>
     </View>
     <RCTScrollView
@@ -240,108 +256,124 @@ exports[`Invite renders correctly with recipients 1`] = `
   >
     <View
       style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "borderColor": "#EEEEEE",
-            "borderRadius": 3,
-            "borderWidth": 1,
-            "flexDirection": "row",
-            "height": 50,
-            "marginHorizontal": 10,
-            "marginVertical": 5,
-          },
-          Object {
-            "borderColor": "#EEEEEE",
-          },
-        ]
+        Object {
+          "position": "relative",
+        }
       }
     >
-      <View
-        style={
-          Object {
-            "alignItems": "center",
-            "flexDirection": "column",
-            "justifyContent": "center",
-            "minWidth": 45,
-          }
-        }
-      >
-        <svg
-          fill="none"
-          height={18}
-          style={Object {}}
-          viewBox="0 0 18 18"
-          width={18}
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            clipRule="evenodd"
-            d="M2.65971 7.31402C2.65971 9.88456 4.74354 11.9684 7.31408 11.9684C9.88462 11.9684 11.9685 9.88456 11.9685 7.31402C11.9685 4.74348 9.88462 2.65964 7.31408 2.65964C4.74354 2.65964 2.65971 4.74348 2.65971 7.31402ZM6.10352e-05 7.31402C6.10352e-05 11.3534 3.27466 14.628 7.31408 14.628C8.65119 14.628 9.9045 14.2692 10.983 13.6427L14.9508 17.6105C15.4701 18.1298 16.3121 18.1298 16.8315 17.6105C17.3508 17.0912 17.3508 16.2492 16.8315 15.7298L13.0074 11.9058C14.0211 10.6505 14.6281 9.05315 14.6281 7.31402C14.6281 3.2746 11.3535 0 7.31408 0C3.27466 0 6.10352e-05 3.2746 6.10352e-05 7.31402Z"
-            fill="#81868B"
-            fillRule="evenodd"
-            style={Object {}}
-          />
-        </svg>
-      </View>
-      <View
-        style={
-          Array [
-            Object {
-              "height": 35,
-              "width": 1,
-            },
-            Object {
-              "backgroundColor": "#EEEEEE",
-            },
-          ]
-        }
-      />
       <View
         style={
           Array [
             Object {
               "alignItems": "center",
-              "flex": 1,
+              "borderColor": "#EEEEEE",
+              "borderRadius": 3,
+              "borderWidth": 1,
               "flexDirection": "row",
-              "justifyContent": "center",
+              "height": 50,
+              "marginHorizontal": 10,
+              "marginVertical": 5,
             },
             Object {
-              "flex": 1,
-              "height": 54,
-              "marginHorizontal": 8,
+              "borderColor": "#EEEEEE",
             },
           ]
         }
       >
-        <TextInput
-          allowFontScaling={true}
-          keyboardType="default"
-          onBlur={[Function]}
-          onChangeText={[Function]}
-          onFocus={[Function]}
-          placeholder="nameOrPhoneNumber"
-          placeholderTextColor="rgba(0, 0, 0, .4)"
-          rejectResponderTermination={true}
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "column",
+              "justifyContent": "center",
+              "minWidth": 45,
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height={18}
+            style={Object {}}
+            viewBox="0 0 18 18"
+            width={18}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              clipRule="evenodd"
+              d="M2.65971 7.31402C2.65971 9.88456 4.74354 11.9684 7.31408 11.9684C9.88462 11.9684 11.9685 9.88456 11.9685 7.31402C11.9685 4.74348 9.88462 2.65964 7.31408 2.65964C4.74354 2.65964 2.65971 4.74348 2.65971 7.31402ZM6.10352e-05 7.31402C6.10352e-05 11.3534 3.27466 14.628 7.31408 14.628C8.65119 14.628 9.9045 14.2692 10.983 13.6427L14.9508 17.6105C15.4701 18.1298 16.3121 18.1298 16.8315 17.6105C17.3508 17.0912 17.3508 16.2492 16.8315 15.7298L13.0074 11.9058C14.0211 10.6505 14.6281 9.05315 14.6281 7.31402C14.6281 3.2746 11.3535 0 7.31408 0C3.27466 0 6.10352e-05 3.2746 6.10352e-05 7.31402Z"
+              fill="#81868B"
+              fillRule="evenodd"
+              style={Object {}}
+            />
+          </svg>
+        </View>
+        <View
           style={
             Array [
               Object {
-                "fontFamily": "Hind-Regular",
+                "height": 35,
+                "width": 1,
               },
               Object {
-                "borderColor": "#D1D5D8",
-                "borderRadius": 3,
-                "padding": 8,
-              },
-              Object {
-                "backgroundColor": "#FFFFFF",
-                "flex": 1,
+                "backgroundColor": "#EEEEEE",
               },
             ]
           }
-          underlineColorAndroid="transparent"
-          value=""
         />
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "flexDirection": "row",
+                "justifyContent": "center",
+              },
+              Object {
+                "alignSelf": "center",
+                "color": "#2E3338",
+                "height": 54,
+                "marginHorizontal": 8,
+              },
+            ]
+          }
+        >
+          <TextInput
+            allowFontScaling={true}
+            icon={
+              <Search
+                color="#81868B"
+                height={18}
+                width={18}
+              />
+            }
+            onBlur={[Function]}
+            onChangeText={[Function]}
+            onFocus={[Function]}
+            placeholder="nameOrPhoneNumber"
+            placeholderTextColor="rgba(0, 0, 0, .4)"
+            rejectResponderTermination={true}
+            shouldShowClipboard={[Function]}
+            style={
+              Array [
+                Object {
+                  "fontFamily": "Hind-Regular",
+                },
+                Object {
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 3,
+                  "padding": 8,
+                },
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "flex": 1,
+                },
+              ]
+            }
+            underlineColorAndroid="transparent"
+            value=""
+          />
+        </View>
       </View>
     </View>
     <RCTScrollView
