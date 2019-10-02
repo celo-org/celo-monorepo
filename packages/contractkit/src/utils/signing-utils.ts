@@ -55,16 +55,18 @@ export async function signTransaction(txn: any, privateKey: string) {
       transaction.gasCurrency = tx.gasCurrency || '0x'
       transaction.gasFeeRecipient = tx.gasFeeRecipient || '0x'
 
+      // This order should match the order in Geth.
+      // https://github.com/celo-org/celo-blockchain/blob/027dba2e4584936cc5a8e8993e4e27d28d5247b8/core/types/transaction.go#L65
       const rlpEncoded = RLP.encode([
-        Bytes.fromNat(transaction.nonce), // 0
-        Bytes.fromNat(transaction.gasPrice), // 1
-        Bytes.fromNat(transaction.gas), // 2
-        transaction.gasCurrency.toLowerCase(), // 3
-        transaction.gasFeeRecipient.toLowerCase(), // 4
-        transaction.to.toLowerCase(), // 5
-        Bytes.fromNat(transaction.value), // 6
-        transaction.data, // 7
-        Bytes.fromNat(transaction.chainId || '0x1'), // 8
+        Bytes.fromNat(transaction.nonce),
+        Bytes.fromNat(transaction.gasPrice),
+        Bytes.fromNat(transaction.gas),
+        transaction.gasCurrency.toLowerCase(),
+        transaction.gasFeeRecipient.toLowerCase(),
+        transaction.to.toLowerCase(),
+        Bytes.fromNat(transaction.value),
+        transaction.data,
+        Bytes.fromNat(transaction.chainId || '0x1'),
         '0x',
         '0x',
       ])
@@ -121,16 +123,6 @@ export async function signTransaction(txn: any, privateKey: string) {
   txn.nonce = nonce
   return signed(txn)
 }
-
-// Bytes.fromNat(transaction.nonce),  // 0
-// Bytes.fromNat(transaction.gasPrice),  // 1
-// Bytes.fromNat(transaction.gas),  // 2
-// transaction.gasCurrency.toLowerCase(),  // 3
-// transaction.gasFeeRecipient.toLowerCase(),  // 4
-// transaction.to.toLowerCase(),  // 5
-// Bytes.fromNat(transaction.value),  // 6
-// transaction.data,  // 7
-// Bytes.fromNat(transaction.chainId || '0x1'),  // 8
 
 // Recover transaction and sender address from a raw transaction.
 // This is used for testing.

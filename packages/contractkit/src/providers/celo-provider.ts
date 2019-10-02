@@ -2,7 +2,6 @@ import { JSONRPCRequestPayload, Web3ProviderEngine } from '@0x/subproviders'
 import debugFactory from 'debug'
 import { JsonRPCResponse, Provider } from 'web3/providers'
 import { Callback } from 'web3/types'
-import { GasPriceMinimum } from '../generated/types/GasPriceMinimum'
 import { CeloPrivateKeysWalletProvider } from './celo-private-keys-subprovider'
 import { WrappingSubprovider } from './wrapping-subprovider'
 
@@ -15,17 +14,13 @@ export class CeloProvider implements Provider {
   private readonly localSigningProvider: CeloPrivateKeysWalletProvider
   private readonly underlyingProvider: Provider
 
-  constructor(
-    readonly existingProvider: Provider,
-    readonly privateKey: string,
-    readonly gasPriceMinimum?: Promise<GasPriceMinimum>
-  ) {
+  constructor(readonly existingProvider: Provider, readonly privateKey: string) {
     debug('Setting up providers...')
     // Create a Web3 Provider Engine
     this.providerEngine = new Web3ProviderEngine()
     // Compose our Providers, order matters
     // First add provider for signing
-    this.localSigningProvider = new CeloPrivateKeysWalletProvider(privateKey, gasPriceMinimum)
+    this.localSigningProvider = new CeloPrivateKeysWalletProvider(privateKey)
     this.providerEngine.addProvider(this.localSigningProvider)
     // Use the existing provider to route all other requests
     const wrappingSubprovider = new WrappingSubprovider(existingProvider)

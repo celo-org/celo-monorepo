@@ -2,7 +2,6 @@ import Web3 from 'web3'
 import { TransactionObject, Tx } from 'web3/eth/types'
 import { AddressRegistry } from './address-registry'
 import { Address, CeloContract, CeloToken } from './base'
-import { GasInflationFactor } from './consts'
 import { WrapperCache } from './contract-cache'
 import { sendTransaction, TxOptions } from './utils/send-tx'
 import { toTxResult, TransactionResult } from './utils/tx-result'
@@ -46,7 +45,7 @@ export class ContractKit {
   private _defaultOptions: TxOptions
   constructor(readonly web3: Web3) {
     this._defaultOptions = {
-      gasInflationFactor: GasInflationFactor,
+      gasInflationFactor: 1.3,
     }
 
     this.registry = new AddressRegistry(this)
@@ -98,7 +97,7 @@ export class ContractKit {
   }
 
   addAccount(privateKey: string) {
-    addLocalAccount(this.web3, privateKey, this._web3Contracts.getGasPriceMinimum())
+    addLocalAccount(this.web3, privateKey)
   }
 
   set defaultAccount(address: Address) {

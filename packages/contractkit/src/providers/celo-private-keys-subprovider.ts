@@ -2,12 +2,14 @@ import { Callback, ErrorCallback, PrivateKeyWalletSubprovider } from '@0x/subpro
 import debugFactory from 'debug'
 import { JSONRPCRequestPayload } from 'ethereum-types'
 import Web3 from 'web3'
-import { GasInflationFactor } from '../consts'
-import { GasPriceMinimum } from '../generated/types/GasPriceMinimum'
 import { signTransaction } from '../utils/signing-utils'
 import { CeloPartialTxParams } from '../utils/tx-signing'
 
 const debug = debugFactory('kit:providers:celo-private-keys-subprovider')
+
+// Same as geth
+// https://github.com/celo-org/celo-blockchain/blob/027dba2e4584936cc5a8e8993e4e27d28d5247b8/internal/ethapi/api.go#L1222
+const DefaultGasLimit = 90000
 
 function getPrivateKeyWithout0xPrefix(privateKey: string) {
   return privateKey.toLowerCase().startsWith('0x') ? privateKey.substring(2) : privateKey
@@ -37,16 +39,14 @@ function isEmpty(value: string | undefined) {
 export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
   // Account addresses are hex-encoded, lower case alphabets
   private readonly accountAddressToPrivateKey = new Map<string, string>()
-  private readonly gasPriceMinimumContractPromise?: Promise<GasPriceMinimum>
 
   private chainId: number | null = null
   private gasFeeRecipient: string | null = null
 
-  constructor(readonly privateKey: string, readonly gasPriceMinimum?: Promise<GasPriceMinimum>) {
+  constructor(readonly privateKey: string) {
     // This won't accept a privateKey with 0x prefix and will call that an invalid key.
     super(getPrivateKeyWithout0xPrefix(privateKey))
     this.addAccount(privateKey)
-    this.gasPriceMinimumContractPromise = gasPriceMinimum
   }
 
   public addAccount(privateKey: string) {
@@ -132,7 +132,7 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
     debug('Gas price for the transaction is %s', txParams.gasPrice)
 
     if (isEmpty(txParams.gas)) {
-      txParams.gas = String(Math.round((await this.getGasEstimate(txParams)) * GasInflationFactor))
+      txParams.gas = String(DefaultGasLimit)
     }
     debug('Max gas fee for the transaction is %s', txParams.gas)
 
@@ -203,18 +203,11 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
     if (!gasCurrency) {
       return this.getGasPriceInCeloGold()
     }
-    if (!this.gasPriceMinimumContractPromise) {
-      throw new Error(
-        `celo-private-keys-subprovider@getGasPrice: gas price for ` +
-          `currency ${gasCurrency} cannot be computed since GasPriceMinimum contract is not missing`
-      )
-    }
-    const gasPriceMinimumContract = await this.gasPriceMinimumContractPromise
-    const gasPrice: string = await gasPriceMinimumContract.methods
-      .getGasPriceMinimum(gasCurrency)
-      .call()
-    debug('getGasPrice gas price for currency %s is %s', gasCurrency, gasPrice)
-    return gasPrice
+    throw new Error(
+      `celo-private-keys-subprovider@getGasPrice: gas price for ` +
+        `currency ${gasCurrency} cannot be computed in the CeloPrivateKeysWalletProvider, ` +
+        ' pass it explicitly'
+    )
   }
 
   private async getGasPriceInCeloGold(): Promise<string> {
@@ -227,18 +220,5 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
     const gasPriceInHex = result.result.toString()
     debug('getGasPriceInCeloGold gas price is %s', parseInt(gasPriceInHex.substr(2), 16))
     return gasPriceInHex
-  }
-
-  private async getGasEstimate(txParams: CeloPartialTxParams): Promise<number> {
-    debug('getGasEstimate fetching gas estimate...')
-    // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_estimategas
-    const result = await this.emitPayloadAsync({
-      method: 'eth_estimateGas',
-      params: [txParams],
-    })
-    const gasEstimateInHex = result.result.toString()
-    const gasEstimate = parseInt(gasEstimateInHex.substr(2), 16)
-    debug('getGasEstimate gas estimate is %s', gasEstimate)
-    return gasEstimate
   }
 }
