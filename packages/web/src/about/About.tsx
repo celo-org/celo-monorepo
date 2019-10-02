@@ -70,7 +70,9 @@ export class About extends React.Component<Props & I18nProps> {
           </SideTitledSection>
           <SideTitledSection title={t('ValuesTitle')}>
             <H1>{t('ValuesText')}</H1>
-            <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('ValuesCopy')}</Text>
+            <Text style={[fonts.p, standardStyles.elementalMargin]}>
+              {t('ValuesCopy', { celoCLabs: 'Celo\u00a0– C\u00a0Labs' })}
+            </Text>
           </SideTitledSection>
           <CeloValues />
           <Image source={team} style={styles.teamImage} resizeMode={'cover'} />
