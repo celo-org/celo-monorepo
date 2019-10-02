@@ -2,7 +2,9 @@ import Cookies from 'js-cookie'
 import getConfig from 'next/config'
 const isInEU = require('@segment/in-eu')
 
-let analytics
+let analytics: {
+  track: (key: string, properties: object, options: object) => void
+}
 const ALLOW_ANALYTICS_COOKIE_NAME = '__allow__analytics__cookie__'
 const RESPONDED_TO_CONSENT = '__responded_to_consent__'
 
@@ -23,8 +25,7 @@ const initializeAnalytics = () => {
     analytics = Segment({ key: publicRuntimeConfig.__SEGMENT_KEY__ })
   } else {
     analytics = {
-      // tslint:disable-next-line
-      track: () => {},
+      track: () => null,
     }
   }
 }
@@ -32,16 +33,16 @@ const initializeAnalytics = () => {
 initializeAnalytics()
 
 export const agree = () => {
-  Cookies.set(ALLOW_ANALYTICS_COOKIE_NAME, true, { expires: EXPIRE_DAYS })
-  Cookies.set(RESPONDED_TO_CONSENT, true, { expires: EXPIRE_DAYS })
+  Cookies.set(ALLOW_ANALYTICS_COOKIE_NAME, true, { expires: OPTIN_EXPIRE_DAYS })
+  Cookies.set(RESPONDED_TO_CONSENT, true, { expires: OPTIN_EXPIRE_DAYS })
   initializeAnalytics()
 }
 
 export const disagree = () => {
-  Cookies.set(ALLOW_ANALYTICS_COOKIE_NAME, false, { expires: EXPIRE_DAYS })
-  Cookies.set(RESPONDED_TO_CONSENT, true, { expires: EXPIRE_DAYS })
+  Cookies.set(RESPONDED_TO_CONSENT, true, { expires: OPTOUT_EXPIRE_DAYS })
 }
 
-const EXPIRE_DAYS = 365
+const OPTIN_EXPIRE_DAYS = 365
+const OPTOUT_EXPIRE_DAYS = 1
 
 export default analytics
