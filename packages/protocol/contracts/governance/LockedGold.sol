@@ -292,7 +292,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   /**
    * @notice Returns the total amount of locked gold for an account.
-   * @account The account.
+   * @param account The account.
    * @return The total amount of locked gold for an account.
    */
   function getAccountTotalLockedGold(address account) public view returns (uint256) {
@@ -302,7 +302,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   /**
    * @notice Returns the total amount of non-voting locked gold for an account.
-   * @account The account.
+   * @param account The account.
    * @return The total amount of non-voting locked gold for an account.
    */
   function getAccountNonvotingLockedGold(address account) external view returns (uint256) {
