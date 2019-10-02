@@ -59,6 +59,7 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       SortedOraclesInstance
     >('SortedOracles', artifacts)
 
+    await sortedOracles.addOracle(stableToken.address, config.stableToken.priceOracleAccount)
     await sortedOracles.addOracle(stableToken.address, minerAddress)
     await sortedOracles.report(
       stableToken.address,
