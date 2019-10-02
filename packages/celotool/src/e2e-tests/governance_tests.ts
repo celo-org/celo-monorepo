@@ -50,6 +50,28 @@ const electionAbi = [
   },
 ]
 
+const registryAbi = [
+  {
+    constant: true,
+    inputs: [
+      {
+        name: 'identifier',
+        type: 'string',
+      },
+    ],
+    name: 'getAddressForString',
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+]
+
 const validatorsAbi = [
   {
     constant: true,
@@ -149,19 +171,22 @@ describe('governance tests', () => {
   let election: any
   let validators: any
   let goldToken: any
+  let registry: any
 
   before(async function(this: any) {
     this.timeout(0)
     await context.hooks.before()
   })
 
-  // after(context.hooks.after)
+  after(context.hooks.after)
 
   const restart = async () => {
     await context.hooks.restart()
     web3 = new Web3('http://localhost:8545')
     goldToken = new web3.eth.Contract(erc20Abi, await getContractAddress('GoldTokenProxy'))
     validators = new web3.eth.Contract(validatorsAbi, await getContractAddress('ValidatorsProxy'))
+    registry = new web3.eth.Contract(registryAbi, '0x000000000000000000000000000000000000ce10')
+    election = new web3.eth.Contract(electionAbi, await getContractAddress('ElectionProxy'))
   }
 
   const unlockAccount = async (address: string, theWeb3: any) => {
@@ -217,8 +242,6 @@ describe('governance tests', () => {
     before(async function() {
       this.timeout(0)
       await restart()
-      validators = new web3.eth.Contract(validatorsAbi, await getContractAddress('ValidatorsProxy'))
-      election = new web3.eth.Contract(electionAbi, await getContractAddress('ElectionProxy'))
     })
 
     it('should return the validator set size', async () => {
@@ -268,8 +291,6 @@ describe('governance tests', () => {
     before(async function() {
       this.timeout(0)
       await restart()
-      election = new web3.eth.Contract(electionAbi, await getContractAddress('ElectionProxy'))
-      validators = new web3.eth.Contract(validatorsAbi, await getContractAddress('ValidatorsProxy'))
     })
 
     it('should return the first validator', async () => {
@@ -327,7 +348,6 @@ describe('governance tests', () => {
         await removeMember(groupWeb3, groupAddress, members[0])
         await sleep(epoch * 2)
 
-        election = new web3.eth.Contract(electionAbi, await getContractAddress('ElectionProxy'))
         validators = new web3.eth.Contract(
           validatorsAbi,
           await getContractAddress('ValidatorsProxy')
@@ -455,8 +475,19 @@ describe('governance tests', () => {
       // `addressesWithBalance`. Therefore, we check the gold total supply at a block before
       // that gold is sent.
       // We don't set the total supply until block rewards are paid out, which can happen once
-      // either LockedGold or Governance are registered.
-      const blockNumber = 175
+      // Governance is registered.
+      let blockNumber = 150
+      while (true) {
+        // This will fail if Governance is not registered.
+        const governanceAddress = await registry.methods
+          .getAddressForString('Governance')
+          .call({}, blockNumber)
+        if (new BigNumber(governanceAddress).isZero()) {
+          blockNumber += 1
+        } else {
+          break
+        }
+      }
       const goldTotalSupply = await goldToken.methods.totalSupply().call({}, blockNumber)
       const balances = await Promise.all(
         addressesWithBalance.map(

@@ -190,5 +190,4 @@ module.exports = async (_deployer: any) => {
   // @ts-ignore
   await lockedGold.lock({ value })
   await election.vote(account.address, value, NULL_ADDRESS, NULL_ADDRESS)
-  console.log(await election.electValidators())
 }
