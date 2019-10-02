@@ -8,6 +8,7 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
+import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { UserContactDetails, userContactDetailsSelector } from 'src/account/reducer'
 import { AvatarSelf } from 'src/components/AvatarSelf'
@@ -85,7 +86,7 @@ class QRCodeDisplay extends React.Component<Props, State> {
     const { t } = this.props
 
     return (
-      <View style={style.container}>
+      <SafeAreaView style={style.container}>
         <View style={style.userInfo}>
           <AvatarSelf />
         </View>
@@ -118,7 +119,7 @@ class QRCodeDisplay extends React.Component<Props, State> {
             <ScanCodeIcon color={colors.celoGreen} />
           </Button>
         </View>
-      </View>
+      </SafeAreaView>
     )
   }
 }

@@ -10,6 +10,7 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
@@ -228,7 +229,11 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     const borderStyle = { borderColor: this.hasError() ? colors.errorRed : colors.dark }
 
     return (
-      <View style={styles.background}>
+      <SafeAreaView
+        // TODO(jeanregisser): This screen is quite laggy, find out why this is required
+        forceInset={{ top: 'never', bottom: 'always' }}
+        style={styles.background}
+      >
         <View>
           <DisconnectBanner />
           <KeyboardAwareScrollView
@@ -314,7 +319,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
             type={BtnTypes.PRIMARY}
           />
         </View>
-      </View>
+      </SafeAreaView>
     )
   }
 }

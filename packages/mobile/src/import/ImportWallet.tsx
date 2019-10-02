@@ -7,6 +7,7 @@ import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ActivityIndicator, Keyboard, StyleSheet, Text, TextInput, View } from 'react-native'
 import { validateMnemonic } from 'react-native-bip39'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
@@ -135,7 +136,7 @@ export class ImportWallet extends React.Component<Props, State> {
     const { t, error } = this.props
 
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <KeyboardAwareScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="always"
@@ -188,7 +189,7 @@ export class ImportWallet extends React.Component<Props, State> {
           type={BtnTypes.PRIMARY}
           testID="ImportWalletButton"
         />
-      </View>
+      </SafeAreaView>
     )
   }
 }

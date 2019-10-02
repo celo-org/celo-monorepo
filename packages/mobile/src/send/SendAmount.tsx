@@ -10,6 +10,7 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, TextStyle, TouchableWithoutFeedback, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError, showMessage } from 'src/alert/actions'
@@ -345,7 +346,7 @@ export class SendAmount extends React.Component<Props, State> {
     const verificationStatus = this.getVerificationStatus()
 
     return (
-      <View style={style.body}>
+      <SafeAreaView style={style.body}>
         {feeType && <EstimateFee feeType={feeType} />}
         <KeyboardAwareScrollView keyboardShouldPersistTaps="always">
           <DisconnectBanner />
@@ -412,7 +413,7 @@ export class SendAmount extends React.Component<Props, State> {
           </View>
         </KeyboardAwareScrollView>
         {this.renderBottomContainer()}
-      </View>
+      </SafeAreaView>
     )
   }
 }

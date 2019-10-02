@@ -5,6 +5,7 @@ import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { errorSelector } from 'src/alert/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
@@ -96,7 +97,7 @@ class ImportContacts extends React.Component<Props, State> {
     const { isSubmitting } = this.state
 
     return (
-      <View style={style.container}>
+      <SafeAreaView style={style.container}>
         <DevSkipButton nextScreen={Screens.VerifyEducation} />
         <ScrollView contentContainerStyle={style.scrollContainer}>
           <View style={style.header} />
@@ -135,7 +136,7 @@ class ImportContacts extends React.Component<Props, State> {
             testID="importContactsSkip"
           />
         </View>
-      </View>
+      </SafeAreaView>
     )
   }
 }

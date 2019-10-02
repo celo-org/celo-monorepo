@@ -1,3 +1,4 @@
+import { Platform } from 'react-native'
 import { createStackNavigator, createSwitchNavigator } from 'react-navigation'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
@@ -47,9 +48,20 @@ import VerifyVerifying from 'src/verify/Verifying'
 import VerifyEducation from 'src/verify/VerifyPhoneEducation'
 
 export const headerArea = {
+  // Force this for now on iOS so screen transitions look normal
+  // given we intentionally hide the bottom separator from the nav bar
+  headerMode: 'screen',
   defaultNavigationOptions: {
     headerStyle: {
-      elevation: 0,
+      ...Platform.select({
+        android: {
+          elevation: 0,
+        },
+        ios: {
+          borderBottomWidth: 0,
+          borderBottomColor: 'transparent',
+        },
+      }),
     },
   },
 }
