@@ -194,12 +194,9 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @notice Freezes the voting power of `msg.sender`'s account.
    */
   function freezeVoting() external {
-    require(
-      isAccount(msg.sender),
-      "Account not registered"
-    );
+    require(isAccount(msg.sender), "Account not registered");
     Account storage account = accounts[msg.sender];
-    require(account.votingFrozen == false);
+    require(account.votingFrozen == false, "Voting was already frozen");
     account.votingFrozen = true;
     emit VotingFrozen(msg.sender);
   }
@@ -208,9 +205,9 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @notice Unfreezes the voting power of `msg.sender`'s account.
    */
   function unfreezeVoting() external {
-    require(isAccount(msg.sender));
+    require(isAccount(msg.sender), "Account not registered");
     Account storage account = accounts[msg.sender];
-    require(account.votingFrozen == true);
+    require(account.votingFrozen == false, "Voting was already frozen");
     account.votingFrozen = false;
     emit VotingUnfrozen(msg.sender);
   }
@@ -236,15 +233,17 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     nonReentrant
   {
     // TODO: split and add error messages for better dev feedback
-    require(isAccount(msg.sender) && isNotAccount(delegate) && isNotDelegate(delegate));
+    require(isAccount(msg.sender), "Sender is not an account");
+    require(isNotAccount(delegate), "Delegate cannot be another account");
+    require(isNotDelegate(delegate), "Delegate already exists");
 
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
-    require(signer == delegate);
+    require(signer == delegate, "Signature doesn't belong to delegate");
 
     if (role == DelegateRole.Validating) {
-      require(isNotValidating(msg.sender));
+      require(isNotValidating(msg.sender), "Sender is already validating");
     } else if (role == DelegateRole.Voting) {
-      require(!isVoting(msg.sender));
+      require(!isVoting(msg.sender), "Sender is already voting");
     } else if (role == DelegateRole.Rewards) {
       _redeemRewards(msg.sender);
     }
@@ -269,10 +268,15 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     payable
     returns (uint256)
   {
-    require(isAccount(msg.sender) && !isVoting(msg.sender));
+    require(
+      isAccount(msg.sender) &&
+      !isVoting(msg.sender),
+      "Only non-voting accounts can add commitment"
+    );
 
     // _redeemRewards(msg.sender);
-    require(msg.value > 0 && noticePeriod <= maxNoticePeriod);
+    require(msg.value > 0, "Commitment value cannot be zero");
+    require(noticePeriod <= maxNoticePeriod, "Notice period longer than allowed");
     Account storage account = accounts[msg.sender];
     Commitment storage locked = account.commitments.locked[noticePeriod];
     updateLockedCommitment(account, uint256(locked.value).add(msg.value), noticePeriod);
@@ -295,11 +299,13 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     nonReentrant
     returns (uint256)
   {
-    require(isAccount(msg.sender) && isNotValidating(msg.sender) && !isVoting(msg.sender));
+    require(isAccount(msg.sender), "Unknown account");
+    require(isNotValidating(msg.sender) && !isVoting(msg.sender), "Account locked");
     // _redeemRewards(msg.sender);
     Account storage account = accounts[msg.sender];
     Commitment storage locked = account.commitments.locked[noticePeriod];
-    require(locked.value >= value && value > 0);
+    require(locked.value >= value, "Trying to withdraw more than locked amount");
+    require(value > 0, "Value cannot be zero");
     updateLockedCommitment(account, uint256(locked.value).sub(value), noticePeriod);
 
     // solhint-disable-next-line not-rely-on-time
@@ -326,13 +332,15 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     nonReentrant
     returns (uint256)
   {
-    require(isAccount(msg.sender) && !isVoting(msg.sender));
+    require(isAccount(msg.sender), "extendCommitment: Unknown account");
+    require(!isVoting(msg.sender), "extendCommitment: Account locked");
     // solhint-disable-next-line not-rely-on-time
-    require(availabilityTime > now);
+    require(availabilityTime > now, "Cannot extend commitment to past time");
     // _redeemRewards(msg.sender);
     Account storage account = accounts[msg.sender];
     Commitment storage notified = account.commitments.notified[availabilityTime];
-    require(notified.value >= value && value > 0);
+    require(notified.value >= value, "Attempted value larger than committed");
+    require(value > 0, "extendCommitment: Value zero");
     updateNotifiedDeposit(account, uint256(notified.value).sub(value), availabilityTime);
     // solhint-disable-next-line not-rely-on-time
     uint256 noticePeriod = availabilityTime.sub(now);
@@ -354,19 +362,20 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     nonReentrant
     returns (uint256)
   {
-    require(isAccount(msg.sender) && !isVoting(msg.sender));
+    require(isAccount(msg.sender), "withdrawCommitment: Unknown account");
+    require(!isVoting(msg.sender), "withdrawCommitment: Account locked");
     // _redeemRewards(msg.sender);
     // solhint-disable-next-line not-rely-on-time
-    require(now >= availabilityTime);
+    require(now >= availabilityTime, "Trying to withdraw too early");
     _redeemRewards(msg.sender);
     Account storage account = accounts[msg.sender];
     Commitment storage notified = account.commitments.notified[availabilityTime];
     uint256 value = notified.value;
-    require(value > 0);
+    require(value > 0, "Empty commitment");
     updateNotifiedDeposit(account, 0, availabilityTime);
 
     IERC20Token goldToken = IERC20Token(registry.getAddressFor(GOLD_TOKEN_REGISTRY_ID));
-    require(goldToken.transfer(msg.sender, value));
+    require(goldToken.transfer(msg.sender, value), "Transfer failed");
     emit Withdrawal(msg.sender, value);
     return account.weight;
   }
@@ -387,12 +396,14 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     nonReentrant
     returns (uint256)
   {
-    require(isAccount(msg.sender) && !isVoting(msg.sender));
+    require(isAccount(msg.sender), "increaseNoticePeriod: Unknown account");
+    require(!isVoting(msg.sender), "increaseNoticePeriod: Account locked");
     // _redeemRewards(msg.sender);
-    require(value > 0 && increase > 0);
+    require(value > 0, "Value zero");
+    require(increase > 0, "Increase zero");
     Account storage account = accounts[msg.sender];
     Commitment storage locked = account.commitments.locked[noticePeriod];
-    require(locked.value >= value);
+    require(locked.value >= value, "Attempted value larger than locked amount");
     updateLockedCommitment(account, uint256(locked.value).sub(value), noticePeriod);
     uint256 increasedNoticePeriod = noticePeriod.add(increase);
     uint256 increasedValue = account.commitments.locked[increasedNoticePeriod].value;
@@ -501,7 +512,10 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   {
     address delegatingAccount = delegations[accountOrDelegate];
     if (delegatingAccount != address(0)) {
-      require(accounts[delegatingAccount].delegates[uint256(role)] == accountOrDelegate);
+      require(
+        accounts[delegatingAccount].delegates[uint256(role)] == accountOrDelegate,
+        "Inconsistent delegate record"
+      );
       return delegatingAccount;
     } else {
       return accountOrDelegate;
@@ -595,7 +609,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     if (value > 0) {
       address recipient = getDelegateFromAccountAndRole(_account, DelegateRole.Rewards);
       IERC20Token goldToken = IERC20Token(registry.getAddressFor(GOLD_TOKEN_REGISTRY_ID));
-      require(goldToken.transfer(recipient, value));
+      require(goldToken.transfer(recipient, value), "GLD transfer failed");
       emit Withdrawal(recipient, value);
     }
     return value;
@@ -615,7 +629,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     private
   {
     Commitment storage locked = account.commitments.locked[noticePeriod];
-    require(value != locked.value);
+    require(value != locked.value, "Value mismatch");
     uint256 weight;
     if (locked.value == 0) {
       locked.index = uint128(account.commitments.noticePeriods.length);
@@ -662,7 +676,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     private
   {
     Commitment storage notified = account.commitments.notified[availabilityTime];
-    require(value != notified.value);
+    require(value != notified.value, "Value mismatch");
     if (notified.value == 0) {
       notified.index = uint128(account.commitments.availabilityTimes.length);
       notified.value = uint128(value);

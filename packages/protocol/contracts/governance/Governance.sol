@@ -242,7 +242,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       _dequeueFrequency != 0 &&
       approvalStageDuration != 0 &&
       referendumStageDuration != 0 &&
-      executionStageDuration != 0
+      executionStageDuration != 0,
+      "Bad input"
     );
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -267,7 +268,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @param _approver The address that has permission to approve proposals in the approval stage.
    */
   function setApprover(address _approver) external onlyOwner {
-    require(_approver != address(0) && _approver != approver);
+    require(_approver != address(0), "Approver cannot be 0");
+    require(_approver != approver, "Approver unchanged");
     approver = _approver;
     emit ApproverSet(_approver);
   }
@@ -277,7 +279,11 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @param _concurrentProposals The number of proposals to dequeue at at a time.
    */
   function setConcurrentProposals(uint256 _concurrentProposals) external onlyOwner {
-    require(_concurrentProposals > 0 && _concurrentProposals != concurrentProposals);
+    require(_concurrentProposals > 0, "Number of proposals must be larger than zero");
+    require(
+      _concurrentProposals != concurrentProposals,
+      "Number of proposals unchanged"
+    );
     concurrentProposals = _concurrentProposals;
     emit ConcurrentProposalsSet(_concurrentProposals);
   }
@@ -287,7 +293,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @param _minDeposit The minimum Celo Gold deposit needed to make a proposal.
    */
   function setMinDeposit(uint256 _minDeposit) external onlyOwner {
-    require(_minDeposit != minDeposit);
+    require(_minDeposit != minDeposit, "Minimum deposit unchanged");
     minDeposit = _minDeposit;
     emit MinDepositSet(_minDeposit);
   }
@@ -297,7 +303,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @param _queueExpiry The number of seconds a proposal can stay in the queue before expiring.
    */
   function setQueueExpiry(uint256 _queueExpiry) external onlyOwner {
-    require(_queueExpiry > 0 && _queueExpiry != queueExpiry);
+    require(_queueExpiry > 0, "QueueExpiry must be larger than 0");
+    require(_queueExpiry != queueExpiry, "QueueExpiry unchanged");
     queueExpiry = _queueExpiry;
     emit QueueExpirySet(_queueExpiry);
   }
@@ -309,7 +316,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    *   dequeued.
    */
   function setDequeueFrequency(uint256 _dequeueFrequency) external onlyOwner {
-    require(_dequeueFrequency > 0 && _dequeueFrequency != dequeueFrequency);
+    require(_dequeueFrequency > 0, "dequeueFrequency must be larger than 0");
+    require(dequeueFrequency != dequeueFrequency, "dequeueFrequency unchanged");
     dequeueFrequency = _dequeueFrequency;
     emit DequeueFrequencySet(_dequeueFrequency);
   }
@@ -319,7 +327,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @param approvalStageDuration The number of seconds proposals stay in the approval stage.
    */
   function setApprovalStageDuration(uint256 approvalStageDuration) external onlyOwner {
-    require(approvalStageDuration > 0 && approvalStageDuration != stageDurations.approval);
+    require(approvalStageDuration > 0, "Duration must be larger than 0");
+    require(approvalStageDuration != stageDurations.approval, "Duration unchanged");
     stageDurations.approval = approvalStageDuration;
     emit ApprovalStageDurationSet(approvalStageDuration);
   }
@@ -329,7 +338,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @param referendumStageDuration The number of seconds proposals stay in the referendum stage.
    */
   function setReferendumStageDuration(uint256 referendumStageDuration) external onlyOwner {
-    require(referendumStageDuration > 0 && referendumStageDuration != stageDurations.referendum);
+    require(referendumStageDuration > 0, "Duration must be larger than 0");
+    require(referendumStageDuration != stageDurations.referendum, "Duration unchanged");
     stageDurations.referendum = referendumStageDuration;
     emit ReferendumStageDurationSet(referendumStageDuration);
   }
@@ -339,7 +349,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @param executionStageDuration The number of seconds proposals stay in the execution stage.
    */
   function setExecutionStageDuration(uint256 executionStageDuration) external onlyOwner {
-    require(executionStageDuration > 0 && executionStageDuration != stageDurations.execution);
+    require(executionStageDuration > 0, "Duration must be larger than 0");
+    require(executionStageDuration != stageDurations.execution, "Duration unchanged");
     stageDurations.execution = executionStageDuration;
     emit ExecutionStageDurationSet(executionStageDuration);
   }
@@ -351,8 +362,12 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   function setParticipationBaseline(uint256 participationBaseline) public onlyOwner {
     FixidityLib.Fraction memory participationBaselineFrac = FixidityLib.wrap(participationBaseline);
     require(
-      FixidityLib.isProperFraction(participationBaselineFrac) &&
-      !participationBaselineFrac.equals(participationParameters.baseline)
+      FixidityLib.isProperFraction(participationBaselineFrac),
+      "Improper fraction"
+    );
+    require(
+      !participationBaselineFrac.equals(participationParameters.baseline),
+      "Participation baseline unchanged"
     );
     participationParameters.baseline = participationBaselineFrac;
     emit ParticipationBaselineUpdated(participationBaseline);
@@ -365,8 +380,12 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   function setParticipationFloor(uint256 participationFloor) public onlyOwner {
     FixidityLib.Fraction memory participationFloorFrac = FixidityLib.wrap(participationFloor);
     require(
-      FixidityLib.isProperFraction(participationFloorFrac) &&
-      !participationFloorFrac.equals(participationParameters.baselineFloor)
+      FixidityLib.isProperFraction(participationFloorFrac),
+      "Improper fraction"
+    );
+    require(
+      !participationFloorFrac.equals(participationParameters.baselineFloor),
+      "Participation baseline floor unchanged"
     );
     participationParameters.baselineFloor = participationFloorFrac;
     emit ParticipationFloorSet(participationFloor);
@@ -379,8 +398,12 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   function setBaselineUpdateFactor(uint256 baselineUpdateFactor) public onlyOwner {
     FixidityLib.Fraction memory baselineUpdateFactorFrac = FixidityLib.wrap(baselineUpdateFactor);
     require(
-      FixidityLib.isProperFraction(baselineUpdateFactorFrac) &&
-      !baselineUpdateFactorFrac.equals(participationParameters.baselineUpdateFactor)
+      FixidityLib.isProperFraction(baselineUpdateFactorFrac),
+      "Improper fraction"
+    );
+    require(
+      !baselineUpdateFactorFrac.equals(participationParameters.baselineUpdateFactor),
+      "Baseline update factor unchanged"
     );
     participationParameters.baselineUpdateFactor = baselineUpdateFactorFrac;
     emit ParticipationBaselineUpdateFactorSet(baselineUpdateFactor);
@@ -393,8 +416,12 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   function setBaselineQuorumFactor(uint256 baselineQuorumFactor) public onlyOwner {
     FixidityLib.Fraction memory baselineQuorumFactorFrac = FixidityLib.wrap(baselineQuorumFactor);
     require(
-      FixidityLib.isProperFraction(baselineQuorumFactorFrac) &&
-      !baselineQuorumFactorFrac.equals(participationParameters.baselineQuorumFactor)
+      FixidityLib.isProperFraction(baselineQuorumFactorFrac),
+      "Improper fraction"
+    );
+    require(
+      !baselineQuorumFactorFrac.equals(participationParameters.baselineQuorumFactor),
+      "Baseline quorum factor unchanged"
     );
     participationParameters.baselineQuorumFactor = baselineQuorumFactorFrac;
     emit ParticipationBaselineQuorumFactorSet(baselineQuorumFactor);
@@ -417,9 +444,11 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     onlyOwner
   {
     // TODO(asa): https://github.com/celo-org/celo-monorepo/pull/3414#discussion_r283588332
-    require(destination != address(0));
-    // Threshold has to be greater than majority and not greater than unaninimty
-    require(threshold > FIXED_HALF && threshold <= FixidityLib.fixed1().unwrap());
+    require(destination != address(0), "Destination cannot be zero");
+    require(
+      threshold > FIXED_HALF && threshold <= FixidityLib.fixed1().unwrap(),
+      "Threshold has to be greater than majority and not greater than unanimity"
+    );
     if (functionId == 0) {
       constitution[destination].defaultThreshold = FixidityLib.wrap(threshold);
     } else {
@@ -450,7 +479,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     returns (uint256)
   {
     dequeueProposalsIfReady();
-    require(msg.value >= minDeposit);
+    require(msg.value >= minDeposit, "Too small deposit");
 
     proposalCount = proposalCount.add(1);
     Proposals.Proposal storage proposal = proposals[proposalCount];
@@ -480,7 +509,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     returns (bool)
   {
     address account = getAccountFromVoter(msg.sender);
-    require(!isVotingFrozen(account));
+    require(!isVotingFrozen(account), "Account voting frozen");
     // TODO(asa): When upvoting a proposal that will get dequeued, should we let the tx succeed
     // and return false?
     dequeueProposalsIfReady();
@@ -494,11 +523,13 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     Voter storage voter = voters[account];
     // We can upvote a proposal in the queue if we're not already upvoting a proposal in the queue.
     uint256 weight = getAccountWeight(account);
+    require(isQueued(proposalId), "Proposal not queued");
     require(
-      isQueued(proposalId) &&
-      (voter.upvotedProposal == 0 || !queue.contains(voter.upvotedProposal)) &&
-      weight > 0
+      voter.upvotedProposal == 0 ||
+      !queue.contains(voter.upvotedProposal),
+      "Already voting"
     );
+    require(weight > 0, "Voter weight 0");
     uint256 upvotes = queue.getValue(proposalId).add(uint256(weight));
     queue.update(proposalId, upvotes, lesser, greater);
     voter.upvotedProposal = proposalId;
@@ -528,7 +559,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     Voter storage voter = voters[account];
     uint256 proposalId = voter.upvotedProposal;
     Proposals.Proposal storage proposal = proposals[proposalId];
-    require(proposal.exists());
+    require(proposal.exists(), "Proposal doesn't exist");
     // If acting on an expired proposal, expire the proposal.
     // TODO(asa): Break this out into a separate function.
     if (queue.contains(proposalId)) {
@@ -538,7 +569,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
         emit ProposalExpired(proposalId);
       } else {
         uint256 weight = getAccountWeight(account);
-        require(weight > 0);
+        require(weight > 0, "Voter weight 0");
         queue.update(proposalId, queue.getValue(proposalId).sub(weight), lesser, greater);
         emit ProposalUpvoteRevoked(proposalId, account, weight);
       }
@@ -558,13 +589,18 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   function approve(uint256 proposalId, uint256 index) external returns (bool) {
     dequeueProposalsIfReady();
     Proposals.Proposal storage proposal = proposals[proposalId];
-    require(isDequeuedProposal(proposal, proposalId, index));
+    require(
+      isDequeuedProposal(proposal, proposalId, index),
+      "Proposal not dequeued"
+    );
     Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
     if (isDequeuedProposalExpired(proposal, stage)) {
       deleteDequeuedProposal(proposal, proposalId, index);
       return false;
     }
-    require(msg.sender == approver && !proposal.isApproved() && stage == Proposals.Stage.Approval);
+    require(msg.sender == approver, "Only approver can approve");
+    require(!proposal.isApproved(), "Proposal already approved");
+    require(stage == Proposals.Stage.Approval, "Proposal not in approval stage");
     proposal.approved = true;
     // Ensures networkWeight is set by the end of the Referendum stage, even if 0 votes are cast.
     proposal.networkWeight = getTotalWeight();
@@ -590,10 +626,13 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     returns (bool)
   {
     address account = getAccountFromVoter(msg.sender);
-    require(!isVotingFrozen(account));
+    require(!isVotingFrozen(account), "Account voting frozen");
     dequeueProposalsIfReady();
     Proposals.Proposal storage proposal = proposals[proposalId];
-    require(isDequeuedProposal(proposal, proposalId, index));
+    require(
+      isDequeuedProposal(proposal, proposalId, index),
+      "Proposal not dequeued"
+    );
     Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
     if (isDequeuedProposalExpired(proposal, stage)) {
       deleteDequeuedProposal(proposal, proposalId, index);
@@ -603,10 +642,11 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     uint256 weight = getAccountWeight(account);
     require(
       proposal.isApproved() &&
-      stage == Proposals.Stage.Referendum &&
-      value != Proposals.VoteValue.None &&
-      weight > 0
+      stage == Proposals.Stage.Referendum,
+      "Proposal not approved"
     );
+    require(value != Proposals.VoteValue.None, "Vote value unset");
+    require(weight > 0, "Voter weight zero");
     VoteRecord storage voteRecord = voter.referendumVotes[index];
     proposal.updateVote(
       weight,
@@ -634,12 +674,19 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   function execute(uint256 proposalId, uint256 index) external nonReentrant returns (bool) {
     dequeueProposalsIfReady();
     Proposals.Proposal storage proposal = proposals[proposalId];
-    require(isDequeuedProposal(proposal, proposalId, index));
+    require(
+      isDequeuedProposal(proposal, proposalId, index),
+      "Proposal not dequeued"
+    );
     Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
     bool expired = isDequeuedProposalExpired(proposal, stage);
     if (!expired) {
       // TODO(asa): Think through the effects of changing the passing function
-      require(stage == Proposals.Stage.Execution && _isProposalPassing(proposal));
+      require(
+        stage == Proposals.Stage.Execution &&
+        _isProposalPassing(proposal),
+        "Proposal not in execution stage"
+      );
       proposal.execute();
       emit ProposalExecuted(proposalId);
     }
@@ -654,7 +701,8 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    */
   function withdraw() external nonReentrant returns (bool) {
     uint256 value = refundedDeposits[msg.sender];
-    require(value > 0 && value <= address(this).balance);
+    require(value > 0, "Nothing to withdraw");
+    require(value <= address(this).balance, "Inconsistent balance");
     refundedDeposits[msg.sender] = 0;
     msg.sender.transfer(value);
     return true;
@@ -908,7 +956,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
       bytes4 functionId = extractFunctionSignature(proposal.transactions[i].data);
       FixidityLib.Fraction memory threshold = _getConstitution(
-        proposal.transactions[i].destination, 
+        proposal.transactions[i].destination,
         functionId
       );
       if (support.lte(threshold)) {

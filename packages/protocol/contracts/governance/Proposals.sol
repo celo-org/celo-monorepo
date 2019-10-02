@@ -80,7 +80,11 @@ library Proposals {
   )
     public
   {
-    require(values.length == destinations.length && destinations.length == dataLengths.length);
+    require(
+      values.length == destinations.length &&
+      destinations.length == dataLengths.length,
+      "Array length mismatch"
+    );
     uint256 transactionCount = values.length;
 
     proposal.proposer = proposer;
@@ -144,7 +148,8 @@ library Proposals {
           proposal.transactions[i].value,
           proposal.transactions[i].data.length,
           proposal.transactions[i].data
-        )
+        ),
+        "Proposal execution failed"
       );
     }
   }
@@ -224,10 +229,10 @@ library Proposals {
    */
   function getParticipation(
     Proposal storage proposal
-  ) 
-    internal 
-    view 
-    returns (FixidityLib.Fraction memory) 
+  )
+    internal
+    view
+    returns (FixidityLib.Fraction memory)
   {
     uint256 totalVotes = proposal.votes.yes.add(proposal.votes.no).add(proposal.votes.abstain);
     return FixidityLib.newFixedFraction(totalVotes, proposal.networkWeight);
@@ -247,7 +252,7 @@ library Proposals {
     view
     returns (uint256, address, bytes memory)
   {
-    require(index < proposal.transactions.length);
+    require(index < proposal.transactions.length, "getTransaction: bad index");
     Transaction storage transaction = proposal.transactions[index];
     return (transaction.value, transaction.destination, transaction.data);
   }

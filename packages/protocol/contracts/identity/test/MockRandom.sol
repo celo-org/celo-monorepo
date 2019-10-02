@@ -11,12 +11,12 @@ contract MockRandom is IRandom {
 
   function revealAndCommit(
     bytes32 randomness,
-    bytes32 newCommitment,
-    address proposer
+    bytes32 /* newCommitment */,
+    address /* proposer */
   ) external {
     _r = randomness;
   }
-  
+
   function random() external view returns (bytes32) {
     return _r;
   }
