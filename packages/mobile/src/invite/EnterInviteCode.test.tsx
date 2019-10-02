@@ -18,6 +18,10 @@ import { createMockStore, getMockI18nProps } from 'test/utils'
 
 SendIntentAndroid.openSMSApp = jest.fn()
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('EnterInviteCode Screen', () => {
   it('renders correctly', () => {
     const store = createMockStore()

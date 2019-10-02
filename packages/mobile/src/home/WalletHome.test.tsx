@@ -20,6 +20,15 @@ const storeData = {
 jest.mock('src/components/AccountOverview')
 jest.mock('src/home/TransactionsList')
 
+jest.mock('src/web3/contracts', () => ({
+  web3: {
+    utils: {
+      fromWei: jest.fn((x: any) => x / 1e18),
+    },
+  },
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('Testnet banner', () => {
   it('Shows testnet banner for 5 seconds', async () => {
     const store = createMockStore({
