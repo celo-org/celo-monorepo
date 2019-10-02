@@ -98,6 +98,7 @@ const TextInput = React.forwardRef((props: Props, ref: React.RefObject<RNTextInp
 })
 
 export default TextInput
+export type TextInputProps = Props
 
 const style = StyleSheet.create({
   container: {

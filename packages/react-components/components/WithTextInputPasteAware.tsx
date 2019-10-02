@@ -54,6 +54,8 @@ export default function withTextInputPasteAware<P extends TextInputProps>(
 
     render() {
       const { isPasteIconVisible } = this.state
+
+      // TODO(Rossy) Use a more paste-y instead of copy looking icon when we have one
       return (
         <View style={style.container}>
           <WrappedTextInput {...this.props} showClearButton={!isPasteIconVisible} />

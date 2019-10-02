@@ -90,9 +90,6 @@ export function* navigateToProperScreen() {
     return
   }
 
-  navigate(Screens.Send)
-  return
-
   if (!language) {
     navigate(Stacks.NuxStack)
   } else if (!inSync) {

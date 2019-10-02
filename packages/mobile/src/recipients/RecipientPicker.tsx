@@ -1,14 +1,14 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import SectionHead from '@celo/react-components/components/SectionHead'
-import TextInput from '@celo/react-components/components/TextInput'
+import TextInput, { TextInputProps } from '@celo/react-components/components/TextInput'
 import withTextInputLabeling from '@celo/react-components/components/WithTextInputLabeling'
 import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
 import ForwardChevron from '@celo/react-components/icons/ForwardChevron'
 import QRCode from '@celo/react-components/icons/QRCode'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
-import { isValidAddress } from '@celo/utils/lib/signatureUtils'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
+import { isValidAddress } from '@celo/utils/src/signatureUtils'
 import { TranslationFunction } from 'i18next'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
@@ -44,7 +44,9 @@ import { requestContactsPermission } from 'src/utils/androidPermissions'
 import Logger from 'src/utils/Logger'
 import { assertUnreachable } from 'src/utils/typescript'
 
-const RecipientSearchInput = withTextInputPasteAware(withTextInputLabeling(TextInput))
+const RecipientSearchInput = withTextInputPasteAware(
+  withTextInputLabeling<TextInputProps>(TextInput)
+)
 
 const goToQrCodeScreen = () => {
   navigate(Screens.QRScanner)
@@ -246,7 +248,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
           onChangeText={this.props.onSearchQueryChanged}
           icon={<Search />}
           style={style.textInput}
-          shouldShowClipboard={() => true}
+          shouldShowClipboard={isValidAddress}
         />
         {this.props.showQRCode && <QRCodeCTA t={t} />}
         <SectionList

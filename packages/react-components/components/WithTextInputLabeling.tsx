@@ -11,40 +11,7 @@ interface LabeledInputProps {
   labelStyle?: TextStyle
   title?: string
   icon?: React.ReactNode
-  // keyboardType: KeyboardType
-  // numberOfDecimals?: number
-  // placeholder: string
-  // lng?: string
-  // placeholderTextColor?: string
-  // autoFocus?: boolean
-  // maxLength?: number
 }
-
-// type Props = OwnProps & TextInputProps
-
-// interface State {
-//   active: boolean
-// }
-
-// const withLoading = <P extends object>(
-//   Component: React.ComponentType<P>
-// ): React.FC<P & WithLoadingProps> => ({
-//   loading,
-//   ...props
-// }: WithLoadingProps) =>
-//   loading ? <LoadingSpinner /> : <Component {...props as P} />;
-
-// interface WithLoadingProps {
-//   loading: boolean
-// }
-
-// const withLoading = <P extends object>(Component: React.ComponentType<P>) =>
-//   class WithLoading extends React.Component<P & WithLoadingProps> {
-//     render() {
-//       const { loading, ...props } = this.props
-//       return loading ? <LoadingSpinner /> : <Component {...props as P} />
-//     }
-//   }
 
 export default function withTextInputLabeling<P extends TextInputProps>(
   WrappedTextInput: React.ComponentType<P>
