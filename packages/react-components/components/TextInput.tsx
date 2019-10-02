@@ -60,7 +60,7 @@ export class CTextInput extends React.Component<Props, State> {
       value = '',
       showClearButton = true,
       forwardedRef,
-      ...otherProps
+      ...passThroughProps
     } = this.props
 
     const { isFocused = false } = this.state
@@ -71,7 +71,7 @@ export class CTextInput extends React.Component<Props, State> {
           ref={forwardedRef}
           style={[fontStyles.regular, style.borderedText, style.numberInput]}
           value={value}
-          {...otherProps}
+          {...passThroughProps}
           onFocus={this.handleInputFocus}
           onBlur={this.handleInputBlur}
         />
