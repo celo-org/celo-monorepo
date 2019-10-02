@@ -89,6 +89,7 @@ contract('Governance', (accounts: string[]) => {
   let transactionSuccess2 : Transaction
   let transactionFail : Transaction
   let proposalHash: Buffer
+  let proposalHashStr: string
   beforeEach(async () => {
     governance = await Governance.new()
     mockLockedGold = await MockLockedGold.new()
@@ -158,6 +159,7 @@ contract('Governance', (accounts: string[]) => {
         ]
       )
     ) as Buffer
+    proposalHashStr = '0x' + proposalHash.toString('hex')
   })
 
   describe('#initialize()', () => {
@@ -1850,19 +1852,33 @@ contract('Governance', (accounts: string[]) => {
       await assertRevert(governance.whitelist(proposalHash, 0, { from: accounts[3] }))
     })
 
-    it.only('should increment the hotfix record vote tally', async () => {
+    it('should increment the hotfix record vote tally', async () => {
       // @ts-ignore bytes type
       await governance.whitelist(proposalHash, 1, { from: accounts[3] })
       // @ts-ignore bytes type
-      const [tally, , ] = await governance.getHotfixRecord.call(proposalHash)
+      const [tally, , , ] = await governance.getHotfixRecord.call(proposalHashStr)
       assertEqualBN(tally, new BigNumber(1))
+    })
+
+    it('should set the hotfix record epoch', async () => {
+      // @ts-ignore bytes type
+      await governance.whitelist(proposalHash, 1, { from: accounts[3] })
+      // @ts-ignore bytes type
+      const [, epoch, , ] = await governance.getHotfixRecord.call(proposalHashStr)
+      // TODO: add epoch number to utils library
+      const currEpoch = Math.floor(await web3.eth.getBlockNumber() / 30000)
+      assertEqualBN(epoch, currEpoch)
+    })
+
+    it('UNIMPL: should reset hotfix record vote tally when epoch elapses', async () => {
+      // TODO: timeTravel by number of blocks reliably
     })
 
     it('should mark the hotfix record approved when called by approver', async () => {
       // @ts-ignore bytes type
       await governance.whitelist(proposalHash, 0, { from: approver })
       // @ts-ignore bytes type
-      const [, approved, ] = await governance.getHotfixRecord.call(proposalHash)
+      const [, , approved, ] = await governance.getHotfixRecord.call(proposalHashStr)
       assert.isTrue(approved)
     })
 
@@ -1889,9 +1905,12 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe('#hotfix()', () => {
-    describe('when the hotfix is approved', () => {
+  describe.only('#hotfix()', () => {
+    describe('when the hotfix is approved and whitelisted', () => {
       beforeEach(async () => {
+        await mockValidators.addValidator(accounts[2])
+        // @ts-ignore bytes type
+        await governance.whitelist(proposalHash, 0, { from: accounts[2] })
         // @ts-ignore bytes type
         await governance.whitelist(proposalHash, 0, { from: approver })
       })
@@ -1948,18 +1967,39 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe('when the hotfix is not whitelisted by the approver', () => {
-      it('should revert', async () => {
-        await assertRevert(
-          governance.hotfix(
-            [transactionSuccess1.value],
-            [transactionSuccess1.destination],
-            // @ts-ignore bytes type
-            transactionSuccess1.data,
-            [transactionSuccess1.data.length]
-          )
+    it('should revert when the hotfix is not approved', async () => {
+      await mockValidators.addValidator(accounts[2])
+      // @ts-ignore bytes type
+      await governance.whitelist(proposalHash, 0, { from: accounts[2] })
+
+      await assertRevert(
+        governance.hotfix(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length]
         )
-      })
+      )
+    })
+
+    it('should revert when the hotfix is not whitelisted by 2f+1 validators', async () => {
+      await mockValidators.addValidator(accounts[2])
+      await mockValidators.addValidator(accounts[3])
+      // @ts-ignore bytes type
+      await governance.whitelist(proposalHash, 0, { from: accounts[2] })
+      // @ts-ignore bytes type
+      await governance.whitelist(proposalHash, 0, { from: approver })
+
+      await assertRevert(
+        governance.hotfix(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length]
+        )
+      )
     })
   })
 
