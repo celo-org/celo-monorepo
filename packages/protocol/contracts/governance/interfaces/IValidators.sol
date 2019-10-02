@@ -5,4 +5,6 @@ interface IValidators {
   function isVoting(address) external view returns (bool);
   function isValidating(address) external view returns (bool);
   function getValidators() external view returns (address[] memory);
+  function validatorAddressFromCurrentSet(uint256) external view returns (address);
+  function numberValidatorsInCurrentSet() external view returns (uint256);
 }

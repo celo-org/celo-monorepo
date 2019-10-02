@@ -642,16 +642,21 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     internal
   {
     IRandom random = IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
+    IValidators validators = IValidators(
+      registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID)
+    );
 
     bytes32 seed = random.random();
-    address[] memory validators = getValidators();
+    uint256 numberValidators = validators.numberValidatorsInCurrentSet();
 
     uint256 currentIndex = 0;
     address validator;
 
     while (currentIndex < n) {
       seed = keccak256(abi.encodePacked(seed));
-      validator = validators[uint256(seed) % validators.length];
+      validator = validators.validatorAddressFromCurrentSet(
+          uint256(seed) % numberValidators
+      );
 
       Attestation storage attestations =
         state.issuedAttestations[validator];

@@ -23,6 +23,14 @@ contract MockValidators is IValidators {
     return validators;
   }
 
+  function numberValidatorsInCurrentSet() external view returns (uint256) {
+    return validators.length;
+  }
+
+  function validatorAddressFromCurrentSet(uint256 index) external view returns (address) {
+    return validators[index];
+  }
+
   function setValidating(address account) external {
     _isValidating[account] = true;
   }
