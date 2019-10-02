@@ -1,5 +1,4 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { toFixed } from '@celo/utils/lib/fixidity'
 import {
   assertContainSubset,
   assertEqualBN,
@@ -17,6 +16,7 @@ import {
   ValidatorsContract,
   ValidatorsInstance,
 } from 'types'
+import { toFixed } from '@celo/utils/lib/fixidity'
 
 const Validators: ValidatorsContract = artifacts.require('Validators')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
@@ -372,21 +372,11 @@ contract('Validators', (accounts: string[]) => {
           // @ts-ignore bytes type
           publicKeysData
         )
-      })
-
-      it('should revert', async () => {
-        await assertRevert(
-          validators.registerValidator(
-            name,
-            url,
-            // @ts-ignore bytes type
-            publicKeysData
-          )
-        )
+        assert.deepEqual(await validators.getRegisteredValidators(), [validator])
       })
     })
 
-    describe('when the account is already a registered validator group', () => {
+    describe('when the account is already a registered validator', () => {
       beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(validator, registrationRequirements.group)
         await validators.registerValidatorGroup(name, url, commission)
@@ -871,6 +861,13 @@ contract('Validators', (accounts: string[]) => {
     })
 
     it('should revert when the member is not a registered validator', async () => {
+      await assertRevert(validators.addMember(accounts[2]))
+    })
+
+    it('should revert when trying to add too many members to group', async () => {
+      await validators.setMaxGroupSize(1)
+      await registerValidator(accounts[2])
+      await validators.affiliate(group, { from: accounts[2] })
       await assertRevert(validators.addMember(accounts[2]))
     })
 

@@ -303,12 +303,26 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     authorizedBy[current] = msg.sender;
   }
 
-  function isAccount(address account) internal view returns (bool) {
+  /**
+   * @notice Check if an account already exists.
+   * @param account The address of the account
+   * @return Returns `true` if account exists. Returns `false` otherwise.
+   */
+  function isAccount(address account) public view returns (bool) {
     return (accounts[account].exists);
   }
 
   function isNotAccount(address account) internal view returns (bool) {
     return (!accounts[account].exists);
+  }
+
+  /**
+   * @notice Check if an address has been authorized by an account for voting or validating.
+   * @param account The possibly authorized address.
+   * @return Returns `true` if authorized. Returns `false` otherwise.
+   */
+  function isAuthorized(address account) external view returns (bool) {
+    return (authorizedBy[account] != address(0));
   }
 
   function isNotAuthorized(address account) internal view returns (bool) {

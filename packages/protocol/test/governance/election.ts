@@ -5,6 +5,7 @@ import {
   assertRevert,
   NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   MockLockedGoldContract,
@@ -39,6 +40,8 @@ contract('Election', (accounts: string[]) => {
   const minElectableValidators = new BigNumber(4)
   const maxElectableValidators = new BigNumber(6)
   const maxVotesPerAccount = new BigNumber(3)
+  const electabilityThreshold = new BigNumber(0)
+
   beforeEach(async () => {
     election = await Election.new()
     mockLockedGold = await MockLockedGold.new()
@@ -50,7 +53,8 @@ contract('Election', (accounts: string[]) => {
       registry.address,
       minElectableValidators,
       maxElectableValidators,
-      maxVotesPerAccount
+      maxVotesPerAccount,
+      electabilityThreshold
     )
   })
 
@@ -81,9 +85,24 @@ contract('Election', (accounts: string[]) => {
           registry.address,
           minElectableValidators,
           maxElectableValidators,
-          maxVotesPerAccount
+          maxVotesPerAccount,
+          electabilityThreshold
         )
       )
+    })
+  })
+
+  describe('#setElectabilityThreshold', () => {
+    it('should set the electability threshold', async () => {
+      const threshold = toFixed(1 / 10)
+      await election.setElectabilityThreshold(threshold)
+      const result = await election.getElectabilityThreshold()
+      assertEqualBN(result, threshold)
+    })
+
+    it('should revert when the threshold is larger than 100%', async () => {
+      const threshold = toFixed(new BigNumber('2'))
+      await assertRevert(election.setElectabilityThreshold(threshold))
     })
   })
 

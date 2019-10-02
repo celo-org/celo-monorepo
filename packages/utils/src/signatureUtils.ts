@@ -1,5 +1,3 @@
-import { stripHexLeader } from './commentEncryption'
-
 const ethjsutil = require('ethereumjs-util')
 
 export function signMessage(messageHash: string, privateKey: string, address: string) {
@@ -18,6 +16,19 @@ export function signMessage(messageHash: string, privateKey: string, address: st
     throw new Error('Unable to validate signature')
   }
   return { v, r: ethjsutil.bufferToHex(r), s: ethjsutil.bufferToHex(s) }
+}
+
+export interface Signature {
+  v: number
+  r: string
+  s: string
+}
+
+export function serializeSignature(signature: Signature) {
+  const serializedV = signature.v.toString(16)
+  const serializedR = signature.r.slice(2)
+  const serializedS = signature.s.slice(2)
+  return serializedV + serializedR + serializedS
 }
 
 export function parseSignature(messageHash: string, signature: string, signer: string) {
@@ -69,6 +80,17 @@ function isValidSignature(signer: string, message: string, v: number, r: string,
   }
 }
 
+/**
+ * Strips out the leading '0x' from a hex string. Does not fail on a string that does not
+ * contain a leading '0x'
+ *
+ * @param hexString Hex string that may have '0x' prepended to it.
+ * @returns hexString with no leading '0x'.
+ */
+export function stripHexLeader(hexString: string): string {
+  return hexString.indexOf('0x') === 0 ? hexString.slice(2) : hexString
+}
+
 export function isValidAddress(address: string) {
   return (
     typeof address === 'string' &&
@@ -90,6 +112,8 @@ export function areAddressesEqual(address1: string | null, address2: string | nu
 export const SignatureUtils = {
   signMessage,
   parseSignature,
+  stripHexLeader,
+  serializeSignature,
   isValidAddress,
   areAddressesEqual,
 }

@@ -79,6 +79,10 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     uint256 maxVotesPerAccount
   );
 
+  event ElectabilityThresholdSet(
+    uint256 electabilityThreshold
+  );
+
   event ValidatorGroupMarkedEligible(
     address group
   );
@@ -110,13 +114,15 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
    * @param registryAddress The address of the registry contract.
    * @param _minElectableValidators The minimum number of validators that can be elected.
    * @param _maxVotesPerAccount The maximum number of groups that an acconut can vote for at once.
+   * @param _electabilityThreshold The minimum ratio of votes a group needs before its members can be elected.
    * @dev Should be called only once.
    */
   function initialize(
     address registryAddress,
     uint256 _minElectableValidators,
     uint256 _maxElectableValidators,
-    uint256 _maxVotesPerAccount
+    uint256 _maxVotesPerAccount,
+    uint256 _electabilityThreshold
   )
     external
     initializer
@@ -127,6 +133,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     minElectableValidators = _minElectableValidators;
     maxElectableValidators = _maxElectableValidators;
     maxVotesPerAccount = _maxVotesPerAccount;
+    electabilityThreshold = FixidityLib.wrap(_electabilityThreshold);
   }
 
   /**
@@ -183,6 +190,34 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     emit MaxVotesPerAccountSet(_maxVotesPerAccount);
     return true;
   }
+
+  /**
+   * @notice Sets the election threshold.
+   * @param threshold Election threshold as unwrapped Fraction.
+   * @return True upon success.
+   */
+  function setElectabilityThreshold(uint256 threshold)
+    public
+    onlyOwner
+    returns (bool)
+  {
+    electabilityThreshold = FixidityLib.wrap(threshold);
+    require(
+      electabilityThreshold.lt(FixidityLib.fixed1()),
+      "Electability threshold must be lower than 100%"
+    );
+    emit ElectabilityThresholdSet(threshold);
+    return true;
+  }
+
+  /**
+   * @notice Gets the election threshold.
+   * @return Threshold value as unwrapped fraction.
+   */
+  function getElectabilityThreshold() external view returns (uint256) {
+    return electabilityThreshold.unwrap();
+  }
+
 
   /**
    * @notice Increments the number of total and pending votes for `group`.
@@ -529,7 +564,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
         break;
       }
     }
-    // require(totalNumMembersElected >= minElectableValidators);
+    require(totalNumMembersElected >= minElectableValidators);
     // Grab the top validators from each group that won seats.
     address[] memory electedValidators = new address[](totalNumMembersElected);
     totalNumMembersElected = 0;

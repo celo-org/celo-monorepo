@@ -1,5 +1,4 @@
 /* tslint:disable:no-console */
-import { blsPrivateKeyToProcessedPrivateKey } from '@celo/celotool/src/lib/bls_utils'
 import { NULL_ADDRESS } from '@celo/protocol/lib/test-utils'
 import {
   add0x,
@@ -10,6 +9,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
+import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
 import { BigNumber } from 'bignumber.js'
 import * as bls12377js from 'bls12377js'
 import { ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'

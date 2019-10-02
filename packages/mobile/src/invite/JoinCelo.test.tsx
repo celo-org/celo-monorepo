@@ -3,9 +3,14 @@ import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
+import { PincodeType } from 'src/account/reducer'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import JoinCelo, { JoinCelo as JoinCeloClass } from 'src/invite/JoinCelo'
 import { createMockStore, getMockI18nProps } from 'test/utils'
+
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
 
 describe('JoinCeloScreen', () => {
   it('renders correctly', () => {
@@ -36,13 +41,11 @@ describe('JoinCeloScreen', () => {
           hideAlert={jest.fn()}
           setPhoneNumber={jest.fn()}
           setName={jest.fn()}
-          error={null}
           language={'en-us'}
           cachedName={''}
           cachedNumber={''}
           cachedCountryCode={''}
-          pincodeSet={false}
-          redeemComplete={jest.fn()}
+          pincodeType={PincodeType.Unset}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -60,13 +63,11 @@ describe('JoinCeloScreen', () => {
           hideAlert={jest.fn()}
           setPhoneNumber={jest.fn()}
           setName={jest.fn()}
-          error={null}
           language={'en-us'}
           cachedName={''}
           cachedNumber={''}
           cachedCountryCode={''}
-          pincodeSet={false}
-          redeemComplete={jest.fn()}
+          pincodeType={PincodeType.Unset}
           {...getMockI18nProps()}
         />
       </Provider>

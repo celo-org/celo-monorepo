@@ -35,9 +35,10 @@
   "testnetAddress": "Testnet Address",
   "getStarted": "Get Started",
   "done": "Done. SMS arriving \n in 1 – 2 Minutes",
-  "inviteError": "Unable to complete - double check your number",
-  "invalidNumber": "Must be a valid E.164 number",
+  "inviteError": "Unable to complete",
   "cUSDsent": "cUSD Sent",
   "cGLDsent": "cGLD Sent",
-  "walletBuilt": "Wallet Built"
+  "walletBuilt": "Wallet Built",
+  "countryPlaceholder": "Country or Overseas Territory",
+  "phonePlaceholder": "Phone Number"
 }

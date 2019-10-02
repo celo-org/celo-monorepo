@@ -343,11 +343,10 @@ contract('LockedGold', (accounts: string[]) => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         await lockedGold.lock({ value })
         // Allow ourselves to call `setAccountMustMaintain()`
-        await registry.setAddressFor(CeloContractName.Election, account)
+        await registry.setAddressFor(CeloContractName.Validators, account)
         const timestamp = (await web3.eth.getBlock('latest')).timestamp
         mustMaintain = { value: 100, timestamp: timestamp + DAY }
         await lockedGold.setAccountMustMaintain(account, mustMaintain.value, mustMaintain.timestamp)
-        await registry.setAddressFor(CeloContractName.Election, mockElection.address)
       })
 
       describe('when unlocking would yield a locked gold balance less than the required value', () => {

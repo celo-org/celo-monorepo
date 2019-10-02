@@ -9,6 +9,7 @@ const initializeArgs = async (): Promise<any[]> => {
     config.election.minElectableValidators,
     config.election.maxElectableValidators,
     config.election.maxVotesPerAccount,
+    config.election.electabilityThreshold,
   ]
 }
 

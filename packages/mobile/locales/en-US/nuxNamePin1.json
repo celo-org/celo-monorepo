@@ -35,10 +35,7 @@
       "message": "Paste Invite Code!",
       "hint": "Looks like you've copied a code"
     },
-    "validating": {
-      "0": "Great! ",
-      "1": "Validating copied invite code"
-    },
+    "validating": "Great! Validating copied invite code",
     "inviteAccepted": "🎉 Invite Accepted!",
     "askForInvite": {
       "0": "Request an invite from someone with Celo Wallet or sign up for the Testnet at ",
@@ -54,32 +51,22 @@
   "cancel": "Cancel",
   "important": "Important",
   "createPin": {
-    "title": "Create 6 digit PIN Code",
-    "intro": "Create a PIN to secure your Celo Wallet.",
-    "why":
-      "You'll need this PIN occasionally when you want to send {{CeloDollars}} to your friends.",
-    "warn":
-      "Write down your 6 digit PIN code & secure it somewhere safe. You will be asked for this later to access your wallet.",
+    "title": "Set a 6 digit PIN",
     "yourPin": "Your PIN"
   },
-  "enableSecurity": "Enable Security",
   "verifyPin": {
-    "title": "Re-enter your PIN",
-    "finalPin": "Create PIN"
+    "title": "Re-Enter PIN"
   },
   "confirmPin": {
-    "title": "Enter 6 digit PIN Code",
-    "submit": "Submit"
+    "title": "Enter PIN"
   },
-  "systemAuth": {
-    "title": "Secure Your Phone",
-    "secure": "Adding a PIN to your phone helps to keep your funds in Celo safe and secure.",
-    "intro":
-      "We will need you to input your device's lockscreen PIN or thumbprint, if your device supports it.",
-    "why":
-      "We need this additional level of protection to ensure that the value in your wallet stays secure.",
+  "pincodeEducation": {
+    "title": "Secure Your Wallet",
+    "intro": "To protect your account, the Celo Wallet requires a PIN.",
     "summary":
-      "Celo requires phones to be secured with a PIN or fingerprint. Your device’s lock helps ensure that the funds in your wallet are protected."
+      "You can use your phone’s existing authentication or create a new PIN for this application.",
+    "usePhoneAuth": "Use Phone Authentication",
+    "createNewPin": "Create New PIN"
   },
   "goToSystemSecuritySettingsActionLabel": "Go to security",
   "enableSystemScreenLockFailedMessage": "Failed to enable screen lock",
@@ -94,6 +81,5 @@
     "1": "Don’t worry—connecting does not send invites to your contacts.",
     "enable": "Enable Contact Access",
     "loading": "Finding friends on Celo..."
-  },
-  "skip": "Skip"
+  }
 }

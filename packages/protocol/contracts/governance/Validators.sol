@@ -6,6 +6,9 @@ import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "./interfaces/IValidators.sol";
+
+import "../identity/interfaces/IRandom.sol";
+
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
@@ -238,12 +241,12 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       // secp256k1 public key + BLS public key + BLS proof of possession
       publicKeysData.length == (64 + 48 + 96)
     );
-    bytes memory proofOfPossessionBytes = publicKeysData.slice(64, 48 + 96);
-    require(checkProofOfPossession(proofOfPossessionBytes));
+    // Use the proof of possession bytes
+    require(checkProofOfPossession(publicKeysData.slice(64, 48 + 96)));
 
     address account = getLockedGold().getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
-    require(meetsValidatorRegistrationRequirement(account), "4");
+    require(meetsValidatorRegistrationRequirement(account));
 
     Validator memory validator = Validator(name, url, publicKeysData, address(0));
     validators[account] = validator;

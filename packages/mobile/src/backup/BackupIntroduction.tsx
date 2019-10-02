@@ -78,7 +78,7 @@ class BackupIntroduction extends React.Component<Props, State> {
         </Text>
         <View style={styles.modalOptionsContainer}>
           <TouchableOpacity onPress={this.onInsistSkip}>
-            <Text style={[styles.modalOptions, fontStyles.semiBold]}>{t('skip')}</Text>
+            <Text style={[styles.modalOptions, fontStyles.semiBold]}>{t('global:skip')}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={this.onInsistBackup}>
             <Text style={[styles.modalOptions, fontStyles.semiBold, { color: colors.celoGreen }]}>
@@ -131,7 +131,7 @@ class BackupIntroduction extends React.Component<Props, State> {
             <Button
               onPress={this.onSkip}
               style={styles.skipLink}
-              text={t('skip')}
+              text={t('global:skip')}
               standard={false}
               type={BtnTypes.TERTIARY}
             />

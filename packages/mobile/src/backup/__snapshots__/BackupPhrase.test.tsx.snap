@@ -20,6 +20,12 @@ exports[`renders correctly 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -28,7 +34,6 @@ exports[`renders correctly 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "opacity": 1,
           "paddingHorizontal": 20,
           "paddingVertical": 10,
         }
@@ -53,7 +58,7 @@ exports[`renders correctly 1`] = `
     automaticallyAdjustContentInsets={false}
     contentContainerStyle={
       Object {
-        "flex": 1,
+        "flexGrow": 1,
         "justifyContent": "space-between",
         "paddingHorizontal": 20,
       }
@@ -185,6 +190,12 @@ exports[`renders correctly 1`] = `
           <View
             accessible={true}
             isTVSelectable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
             onResponderRelease={[Function]}
@@ -192,17 +203,24 @@ exports[`renders correctly 1`] = `
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
             style={
-              Object {
-                "alignItems": "center",
-                "backgroundColor": "#42D689",
-                "borderColor": "#42D689",
-                "borderRadius": 3,
-                "borderWidth": 2,
-                "flex": 1,
-                "height": 50,
-                "justifyContent": "center",
-                "opacity": 1,
-              }
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "justifyContent": "center",
+                },
+                Object {
+                  "backgroundColor": "#42D689",
+                },
+                Object {
+                  "height": 50,
+                },
+                Object {
+                  "borderColor": "#42D689",
+                  "borderRadius": 3,
+                  "borderWidth": 2,
+                },
+              ]
             }
           >
             <View

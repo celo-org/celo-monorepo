@@ -109,15 +109,13 @@ class CeloAnalytics {
       return
     }
 
-    try {
-      const props = this.getProps(eventProperties)
-      if (attachDeviceInfo) {
-        _.set(props, 'device', getDeviceInfo())
-      }
-      Analytics.track(eventName, props)
-    } catch (err) {
-      this.Logger.error(TAG, `Failed to tracking event ${eventName}`, err)
+    const props = this.getProps(eventProperties)
+    if (attachDeviceInfo) {
+      _.set(props, 'device', getDeviceInfo())
     }
+    Analytics.track(eventName, props).catch((err) => {
+      this.Logger.error(TAG, `Failed to tracking event ${eventName}`, err)
+    })
   }
 
   // Used with trackSubEvent and endTracking to track durations for
@@ -170,12 +168,10 @@ class CeloAnalytics {
       return
     }
 
-    try {
-      const props = this.getProps(eventProperties)
-      Analytics.screen(page, props)
-    } catch (err) {
+    const props = this.getProps(eventProperties)
+    Analytics.screen(page, props).catch((err) => {
       this.Logger.error(TAG, 'Error tracking page', err)
-    }
+    })
   }
 
   applyWhitelist(allProps: {}) {
