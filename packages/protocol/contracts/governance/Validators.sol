@@ -179,7 +179,11 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     external
     initializer
   {
-    require(_minElectableValidators > 0 && _maxElectableValidators >= _minElectableValidators);
+    require(
+      _minElectableValidators > 0 &&
+      _maxElectableValidators >= _minElectableValidators,
+      "Illegal number of validators"
+    );
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setElectionThreshold(threshold);
@@ -205,7 +209,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(
       _minElectableValidators > 0 &&
       _minElectableValidators != minElectableValidators &&
-      _minElectableValidators <= maxElectableValidators
+      _minElectableValidators <= maxElectableValidators,
+      "Illegal number of validators"
     );
     minElectableValidators = _minElectableValidators;
     emit MinElectableValidatorsSet(_minElectableValidators);
@@ -226,7 +231,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   {
     require(
       _maxElectableValidators != maxElectableValidators &&
-      _maxElectableValidators >= minElectableValidators
+      _maxElectableValidators >= minElectableValidators,
+      "Illegal number of validators"
     );
     maxElectableValidators = _maxElectableValidators;
     emit MaxElectableValidatorsSet(_maxElectableValidators);
@@ -245,7 +251,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     onlyOwner
     returns (bool)
   {
-    require(_maxGroupSize > 0);
+    require(_maxGroupSize > 0, "Max group size cannot be zero");
     maxGroupSize = _maxGroupSize;
     emit MaxGroupSizeSet(_maxGroupSize);
     return true;
@@ -269,7 +275,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   {
     require(
       value != registrationRequirement.value ||
-      noticePeriod != registrationRequirement.noticePeriod
+      noticePeriod != registrationRequirement.noticePeriod,
+      "Illegal value for registration requirement"
     );
     registrationRequirement.value = value;
     registrationRequirement.noticePeriod = noticePeriod;
@@ -338,14 +345,25 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       bytes(name).length > 0 &&
       bytes(url).length > 0 &&
       // secp256k1 public key + BLS public key + BLS proof of possession
-      publicKeysData.length == (64 + 48 + 96)
+      publicKeysData.length == (64 + 48 + 96),
+      "registerValidator: bad input"
     );
     // Use the proof of possession bytes
-    require(checkProofOfPossession(publicKeysData.slice(64, 48 + 96)));
+    require(
+      checkProofOfPossession(publicKeysData.slice(64, 48 + 96)),
+      "Bad proof of possession"
+    );
 
     address account = getAccountFromValidator(msg.sender);
-    require(!isValidator(account) && !isValidatorGroup(account));
-    require(meetsRegistrationRequirements(account, noticePeriods));
+    require(
+      !isValidator(account) &&
+      !isValidatorGroup(account),
+      "Cannot register existing validators or groups"
+    );
+    require(
+      meetsRegistrationRequirements(account, noticePeriods),
+      "The account doesn't meet the requirements for validator"
+    );
 
     Validator memory validator = Validator(identifier, name, url, publicKeysData, address(0));
     validators[account] = validator;
@@ -373,7 +391,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    */
   function deregisterValidator(uint256 index) external nonReentrant returns (bool) {
     address account = getAccountFromValidator(msg.sender);
-    require(isValidator(account));
+    require(isValidator(account), "deregisterValidator: Not a validator");
     Validator storage validator = validators[account];
     if (validator.affiliation != address(0)) {
       _deaffiliate(validator, account);
@@ -392,7 +410,11 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    */
   function affiliate(address group) external nonReentrant returns (bool) {
     address account = getAccountFromValidator(msg.sender);
-    require(isValidator(account) && isValidatorGroup(group));
+    require(
+      isValidator(account) &&
+      isValidatorGroup(group),
+      "Already affiliated"
+    );
     Validator storage validator = validators[account];
     if (validator.affiliation != address(0)) {
       _deaffiliate(validator, account);
@@ -409,9 +431,15 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    */
   function deaffiliate() external nonReentrant returns (bool) {
     address account = getAccountFromValidator(msg.sender);
-    require(isValidator(account));
+    require(
+      isValidator(account),
+      "deaffiliate: not a validator"
+    );
     Validator storage validator = validators[account];
-    require(validator.affiliation != address(0));
+    require(
+      validator.affiliation != address(0),
+      "deaffiliate: not affiliated"
+    );
     _deaffiliate(validator, account);
     return true;
   }
@@ -437,10 +465,19 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     nonReentrant
     returns (bool)
   {
-    require(bytes(identifier).length > 0 && bytes(name).length > 0 && bytes(url).length > 0);
+    require(
+      bytes(identifier).length > 0 && bytes(name).length > 0 && bytes(url).length > 0,
+      "registerValidatorGroup: bad input"
+    );
     address account = getAccountFromValidator(msg.sender);
-    require(!isValidator(account) && !isValidatorGroup(account));
-    require(meetsRegistrationRequirements(account, noticePeriods));
+    require(
+      !isValidator(account) && !isValidatorGroup(account),
+      "registerValidatorGroup: already registered"
+    );
+    require(
+      meetsRegistrationRequirements(account, noticePeriods),
+      "registerValidatorGroup: didn't meet requirements"
+    );
     ValidatorGroup storage group = groups[account];
     group.identifier = identifier;
     group.name = name;
@@ -458,8 +495,11 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    */
   function deregisterValidatorGroup(uint256 index) external nonReentrant returns (bool) {
     address account = getAccountFromValidator(msg.sender);
-    // Only empty Validator Groups can be deregistered.
-    require(isValidatorGroup(account) && groups[account].members.numElements == 0);
+    require(
+      isValidatorGroup(account) &&
+      groups[account].members.numElements == 0,
+      "Only empty Validator Groups can be deregistered"
+    );
     delete groups[account];
     deleteElement(_groups, account, index);
     emit ValidatorGroupDeregistered(account);
@@ -474,9 +514,13 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    */
   function addMember(address validator) external nonReentrant returns (bool) {
     address account = getAccountFromValidator(msg.sender);
-    require(isValidatorGroup(account) && isValidator(validator));
+    require(
+      isValidatorGroup(account) && isValidator(validator),
+      "Not a validator or group"
+    );
     ValidatorGroup storage group = groups[account];
-    require(validators[validator].affiliation == account && !group.members.contains(validator));
+    require(validators[validator].affiliation == account, "Not affiliated to the group");
+    require(!group.members.contains(validator), "Already in the group");
     require(group.members.numElements < maxGroupSize, "Maximum group size exceeded");
     group.members.push(validator);
     emit ValidatorGroupMemberAdded(account, validator);
@@ -491,7 +535,11 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    */
   function removeMember(address validator) external nonReentrant returns (bool) {
     address account = getAccountFromValidator(msg.sender);
-    require(isValidatorGroup(account) && isValidator(validator));
+    require(
+      isValidatorGroup(account) &&
+      isValidator(validator),
+      "Invalid validator or group"
+    );
     return _removeMember(account, validator);
   }
 
@@ -515,9 +563,13 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     returns (bool)
   {
     address account = getAccountFromValidator(msg.sender);
-    require(isValidatorGroup(account) && isValidator(validator));
+    require(
+      isValidatorGroup(account) &&
+      isValidator(validator),
+      "Invalid validator or group"
+    );
     ValidatorGroup storage group = groups[account];
-    require(group.members.contains(validator));
+    require(group.members.contains(validator), "Not contained in the group");
     group.members.update(validator, lesserMember, greaterMember);
     emit ValidatorGroupMemberReordered(account, validator);
     return true;
@@ -544,12 +596,16 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     returns (bool)
   {
     // Empty validator groups are not electable.
-    require(isValidatorGroup(group) && groups[group].members.numElements > 0);
+    require(
+      isValidatorGroup(group) &&
+      groups[group].members.numElements > 0,
+      "Invalid group"
+    );
     address account = getAccountFromVoter(msg.sender);
-    require(!isVotingFrozen(account));
-    require(voters[account] == address(0));
+    require(!isVotingFrozen(account), "Voting frozen");
+    require(voters[account] == address(0), "Already voted");
     uint256 weight = getAccountWeight(account);
-    require(weight > 0);
+    require(weight > 0, "No voter weight");
     totalVotes = totalVotes.add(weight);
     if (votes.contains(group)) {
       votes.update(
@@ -590,13 +646,13 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   {
     address account = getAccountFromVoter(msg.sender);
     address group = voters[account];
-    require(group != address(0));
+    require(group != address(0), "Not voted yet");
     uint256 weight = getAccountWeight(account);
     totalVotes = totalVotes.sub(weight);
     // If the group we had previously voted on removed all its members it is no longer eligible
     // to receive votes and we don't have to worry about removing our vote.
     if (votes.contains(group)) {
-      require(weight > 0);
+      require(weight > 0, "No voter weight");
       uint256 newVoteTotal = votes.getValue(group).sub(uint256(weight));
       if (newVoteTotal > 0) {
         votes.update(
@@ -672,7 +728,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       address affiliation
     )
   {
-    require(isValidator(account));
+    require(isValidator(account), "Not a validator");
     Validator storage validator = validators[account];
     return (
       validator.identifier,
@@ -695,7 +751,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     view
     returns (string memory, string memory, string memory, address[] memory)
   {
-    require(isValidatorGroup(account));
+    require(isValidatorGroup(account), "Not a validator group");
     ValidatorGroup storage group = groups[account];
     return (group.identifier, group.name, group.url, group.members.getKeys());
   }
@@ -804,7 +860,10 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
         totalNumMembersElected = totalNumMembersElected.add(1);
       }
     }
-    require(totalNumMembersElected >= minElectableValidators);
+    require(
+      totalNumMembersElected >= minElectableValidators,
+      "Could not elect enough validators"
+    );
     // Grab the top validators from each group that won seats.
     address[] memory electedValidators = new address[](totalNumMembersElected);
     totalNumMembersElected = 0;
@@ -882,7 +941,10 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param index The index of `element` in the list.
    */
   function deleteElement(address[] storage list, address element, uint256 index) private {
-    require(index < list.length && list[index] == element);
+    require(
+      index < list.length && list[index] == element,
+      "deleteElement: index out of range"
+    );
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];
     list[lastIndex] = address(0);
@@ -899,7 +961,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    */
   function _removeMember(address group, address validator) private returns (bool) {
     ValidatorGroup storage _group = groups[group];
-    require(validators[validator].affiliation == group && _group.members.contains(validator));
+    require(validators[validator].affiliation == group, "Not affiliated to group");
+    require(_group.members.contains(validator), "Not contained in the group");
     _group.members.remove(validator);
     emit ValidatorGroupMemberRemoved(group, validator);
 

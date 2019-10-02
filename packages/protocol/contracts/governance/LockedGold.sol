@@ -168,7 +168,11 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     external
     returns (bool)
   {
-    require(isNotAccount(msg.sender) && isNotDelegate(msg.sender));
+    require(
+      isNotAccount(msg.sender) &&
+      isNotDelegate(msg.sender),
+      "Account already exists"
+    );
     Account storage account = accounts[msg.sender];
     account.exists = true;
     account.rewardsLastRedeemed = uint96(block.number);
@@ -190,7 +194,10 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @notice Freezes the voting power of `msg.sender`'s account.
    */
   function freezeVoting() external {
-    require(isAccount(msg.sender));
+    require(
+      isAccount(msg.sender),
+      "Account not registered"
+    );
     Account storage account = accounts[msg.sender];
     require(account.votingFrozen == false);
     account.votingFrozen = true;
