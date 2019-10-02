@@ -40,7 +40,7 @@ export interface NetworkConfig {
 }
 
 export interface KitOptions {
-  gasInflationFactor?: number
+  gasInflationFactor: number
   gasCurrency: Address | null
   from?: Address
 }
@@ -143,18 +143,19 @@ export class ContractKit {
   }
 
   async sendTransaction(tx: Tx): Promise<TransactionResult> {
-    const finalTx: Tx = this.fillTxDefaults(tx)
+    tx = this.fillTxDefaults(tx)
 
-    let gas = finalTx.gas
+    let gas = tx.gas
     if (gas == null) {
-      const inflactionFactor = this.config.gasInflationFactor || 1
-      gas = Math.round((await this.web3.eth.estimateGas({ ...tx })) * inflactionFactor)
+      gas = Math.round(
+        (await this.web3.eth.estimateGas({ ...tx })) * this.config.gasInflationFactor
+      )
       debug('estimatedGas: %s', gas)
     }
 
     return toTxResult(
       this.web3.eth.sendTransaction({
-        ...finalTx,
+        ...tx,
         gas,
       })
     )
@@ -164,18 +165,17 @@ export class ContractKit {
     txObj: TransactionObject<any>,
     tx?: Omit<Tx, 'data'>
   ): Promise<TransactionResult> {
-    const finalTx: Omit<Tx, 'data'> = this.fillTxDefaults(tx)
+    tx = this.fillTxDefaults(tx)
 
-    let gas = finalTx.gas
+    let gas = tx.gas
     if (gas == null) {
-      const inflactionFactor = this.config.gasInflationFactor || 1
-      gas = Math.round((await txObj.estimateGas({ ...finalTx })) * inflactionFactor)
+      gas = Math.round((await txObj.estimateGas({ ...tx })) * this.config.gasInflationFactor)
       debug('estimatedGas: %s', gas)
     }
 
     return toTxResult(
       txObj.send({
-        ...finalTx,
+        ...tx,
         gas,
       })
     )
@@ -184,6 +184,7 @@ export class ContractKit {
   private fillTxDefaults(tx?: Tx): Tx {
     const defaultTx: Tx = {
       from: this.config.from,
+      // gasPrice:0 means the node will compute gasPrice on it's own
       gasPrice: '0',
     }
 
