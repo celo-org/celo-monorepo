@@ -160,6 +160,10 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     return true;
   }
 
+  /**
+   * @notice Returns the maximum number of members a group can add.
+   * @return The maximum number of members a group can add.
+   */
   function getMaxGroupSize() external view returns (uint256) {
     return maxGroupSize;
   }
@@ -300,7 +304,11 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     }
     delete validators[account];
     deleteElement(_validators, account, index);
-    getLockedGold().setAccountMustMaintain(account, registrationRequirements.validator, now.add(deregistrationLockups.validator));
+    getLockedGold().setAccountMustMaintain(
+      account,
+      registrationRequirements.validator,
+      now.add(deregistrationLockups.validator)
+    );
     emit ValidatorDeregistered(account);
     return true;
   }
@@ -384,7 +392,11 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(isValidatorGroup(account) && groups[account].members.numElements == 0);
     delete groups[account];
     deleteElement(_groups, account, index);
-    getLockedGold().setAccountMustMaintain(account, registrationRequirements.group, now.add(deregistrationLockups.group));
+    getLockedGold().setAccountMustMaintain(
+      account,
+      registrationRequirements.group,
+      now.add(deregistrationLockups.group)
+    );
     emit ValidatorGroupDeregistered(account);
     return true;
   }
@@ -401,6 +413,12 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     return _addMember(account, validator);
   }
 
+  /**
+   * @notice Adds a member to the end of a validator group's list of members.
+   * @param validator The validator to add to the group
+   * @return True upon success.
+   * @dev Fails if `validator` has not set their affiliation to this account.
+   */
   function _addMember(address group, address validator) private returns (bool) {
     ValidatorGroup storage _group = groups[group];
     require(_group.members.numElements < maxGroupSize);
@@ -409,9 +427,6 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     emit ValidatorGroupMemberAdded(group, validator);
     return true;
   }
-
-  /**
-   * @notice De-affiliates a validator, removing it from the group for which it is a member.
 
   /**
    * @notice Removes a member from a validator group.
@@ -497,11 +512,29 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     return (group.name, group.url, group.members.getKeys());
   }
 
+  /**
+   * @notice Returns the number of members in a validator group.
+   * @param account The address of the validator group.
+   * @return The number of members in a validator group.
+   */
   function getGroupNumMembers(address account) public view returns (uint256) {
     return groups[account].members.numElements;
   }
 
-  function getTopValidatorsFromGroup(address account, uint256 n) external view returns (address[] memory) {
+  /**
+   * @notice Returns the top n group members for a particular group.
+   * @param account The address of the validator group.
+   * @param n The number of members to return.
+   * @return The top n group members for a particular group.
+   */
+  function getTopValidatorsFromGroup(
+    address account,
+    uint256 n
+  )
+    external
+    view
+    returns (address[] memory)
+  {
     address[] memory topAccounts = groups[account].members.headN(n);
     address[] memory topValidators = new address[](n);
     for (uint256 i = 0; i < n; i = i.add(1)) {
@@ -510,7 +543,18 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     return topValidators;
   }
 
-  function getGroupsNumMembers(address[] calldata accounts) external view returns (uint256[] memory) {
+  /**
+   * @notice Returns the number of members in the provided validator groups.
+   * @param accounts The addresses of the validator groups.
+   * @return The number of members in the provided validator groups.
+   */
+  function getGroupsNumMembers(
+    address[] calldata accounts
+  )
+    external
+    view
+    returns (uint256[] memory)
+  {
     uint256[] memory numMembers = new uint256[](accounts.length);
     for (uint256 i = 0; i < accounts.length; i = i.add(1)) {
       numMembers[i] = getGroupNumMembers(accounts[i]);
@@ -518,6 +562,10 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     return numMembers;
   }
 
+  /**
+   * @notice Returns the number of registered validators.
+   * @return The number of registered validators.
+   */
   function getNumRegisteredValidators() external view returns (uint256) {
     return _validators.length;
   }
@@ -530,6 +578,10 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     return (registrationRequirements.group, registrationRequirements.validator);
   }
 
+  /**
+   * @notice Returns the lockup periods after deregistering groups and validators.
+   * @return The lockup periods after deregistering groups and validators.
+   */
   function getDeregistrationLockups() external view returns (uint256, uint256) {
     return (deregistrationLockups.group, deregistrationLockups.validator);
   }
@@ -592,7 +644,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    */
   function _removeMember(address group, address validator) private returns (bool) {
     ValidatorGroup storage _group = groups[group];
-    require(validators[validator].affiliation == group && _group.members.contains(validator), "boogie");
+    require(validators[validator].affiliation == group && _group.members.contains(validator));
     _group.members.remove(validator);
     emit ValidatorGroupMemberRemoved(group, validator);
 

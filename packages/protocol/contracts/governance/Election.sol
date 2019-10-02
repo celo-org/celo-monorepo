@@ -18,9 +18,6 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-  // We need some way of keeping track of the number of active/pending votes per group, so that
-  // we know how to adjust `activeVotes`.
-
   // Pending votes are those for which no following elections have been held.
   // These votes have yet to contribute to the election of validators and thus do not accrue
   // rewards.
@@ -44,7 +41,6 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     // Maps groups to the denominator of all accounts' fraction of the group's total active votes.
     mapping(address => uint256) denominators;
   }
-
 
   struct TotalVotes {
     // The total number of votes cast.
@@ -114,7 +110,8 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
    * @param registryAddress The address of the registry contract.
    * @param _minElectableValidators The minimum number of validators that can be elected.
    * @param _maxVotesPerAccount The maximum number of groups that an acconut can vote for at once.
-   * @param _electabilityThreshold The minimum ratio of votes a group needs before its members can be elected.
+   * @param _electabilityThreshold The minimum ratio of votes a group needs before its members can
+   *   be elected.
    * @dev Should be called only once.
    */
   function initialize(
@@ -192,11 +189,13 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
   }
 
   /**
-   * @notice Sets the election threshold.
-   * @param threshold Election threshold as unwrapped Fraction.
+   * @notice Sets the electability threshold.
+   * @param threshold Electability threshold as unwrapped Fraction.
    * @return True upon success.
    */
-  function setElectabilityThreshold(uint256 threshold)
+  function setElectabilityThreshold(
+    uint256 threshold
+  )
     public
     onlyOwner
     returns (bool)
@@ -217,7 +216,6 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
   function getElectabilityThreshold() external view returns (uint256) {
     return electabilityThreshold.unwrap();
   }
-
 
   /**
    * @notice Increments the number of total and pending votes for `group`.
@@ -240,13 +238,13 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     nonReentrant
     returns (bool)
   {
-    require(votes.total.eligible.contains(group), "1");
-    require(0 < value && value <= getNumVotesReceivable(group), "2");
+    require(votes.total.eligible.contains(group));
+    require(0 < value && value <= getNumVotesReceivable(group));
     address account = getLockedGold().getAccountFromVoter(msg.sender);
     address[] storage list = votes.lists[account];
-    require(list.length < maxVotesPerAccount, "3");
+    require(list.length < maxVotesPerAccount);
     for (uint256 i = 0; i < list.length; i = i.add(1)) {
-      require(list[i] != group, "4");
+      require(list[i] != group);
     }
     list.push(group);
     incrementPendingVotes(group, account, value);
@@ -265,7 +263,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     address account = getLockedGold().getAccountFromVoter(msg.sender);
     PendingVotes storage pending = votes.pending;
     uint256 value = pending.balances[group][account];
-    require(value > 0, 'one');
+    require(value > 0);
     decrementPendingVotes(group, account, value);
     incrementActiveVotes(group, account, value);
     emit ValidatorGroupVoteActivated(account, group, value);
@@ -352,15 +350,46 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     return total;
   }
 
+  /**
+   * @notice Returns the groups voted for by a particular account.
+   * @param account The address of the account.
+   * @return The groups voted for by a particular account.
+   */
   function getAccountGroupsVotedFor(address account) external view returns (address[] memory) {
     return votes.lists[account];
   }
 
-  function getAccountPendingVotesForGroup(address group, address account) public view returns (uint256) {
+  /**
+   * @notice Returns the pending votes for `group` made by `account`.
+   * @param group The address of the validator group.
+   * @param account The address of the voting account.
+   * @return The pending votes for `group` made by `account`.
+   */
+  function getAccountPendingVotesForGroup(
+    address group,
+    address account
+  )
+    public
+    view
+    returns (uint256)
+  {
     return votes.pending.balances[group][account];
   }
 
-  function getAccountActiveVotesForGroup(address group, address account) public view returns (uint256) {
+  /**
+   * @notice Returns the active votes for `group` made by `account`.
+   * @param group The address of the validator group.
+   * @param account The address of the voting account.
+   * @return The active votes for `group` made by `account`.
+   */
+  function getAccountActiveVotesForGroup(
+    address group,
+    address account
+  )
+    public
+    view
+    returns (uint256)
+  {
     uint256 numerator = votes.active.numerators[group][account].mul(votes.active.total[group]);
     if (numerator == 0) {
       return 0;
@@ -369,12 +398,30 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     return numerator.div(denominator);
   }
 
-  function getAccountTotalVotesForGroup(address group, address account) public view returns (uint256) {
+  /**
+   * @notice Returns the total votes for `group` made by `account`.
+   * @param group The address of the validator group.
+   * @param account The address of the voting account.
+   * @return The total votes for `group` made by `account`.
+   */
+  function getAccountTotalVotesForGroup(
+    address group,
+    address account
+  )
+    public
+    view
+    returns (uint256)
+  {
     uint256 pending = getAccountPendingVotesForGroup(group, account);
     uint256 active = getAccountActiveVotesForGroup(group, account);
     return pending.add(active);
   }
 
+  /**
+   * @notice Returns the total votes made for `group`.
+   * @param group The address of the validator group.
+   * @return The total votes made for `group`.
+   */
   function getGroupTotalVotes(address group) external view returns (uint256) {
     return votes.total.eligible.getValue(group);
   }
@@ -426,12 +473,27 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     votes.total.total = votes.total.total.sub(value);
   }
 
-  function markGroupIneligible(address group) external onlyRegisteredContract(VALIDATORS_REGISTRY_ID) {
+  /**
+   * @notice Marks a group ineligible for electing validators.
+   * @param group The address of the validator group.
+   * @dev Can only be called by the registered "Validators" contract.
+   */
+  function markGroupIneligible(
+    address group
+  )
+    external
+    onlyRegisteredContract(VALIDATORS_REGISTRY_ID)
+  {
     votes.total.eligible.remove(group);
     emit ValidatorGroupMarkedIneligible(group);
   }
 
-  // TODO(asa): Should this only be callable by the group?
+  /**
+   * @notice Marks a group eligible for electing validators.
+   * @param group The address of the validator group.
+   * @param lesser The address of the group that has received fewer votes than this group.
+   * @param greater The address of the group that has received more votes than this group.
+   */
   function markGroupEligible(address group, address lesser, address greater) external {
     require(!votes.total.eligible.contains(group), "aaa");
     require(getValidators().getGroupNumMembers(group) > 0, "b");
@@ -440,6 +502,12 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     emit ValidatorGroupMarkedEligible(group);
   }
 
+  /**
+   * @notice Increments the number of pending votes for `group` made by `account`.
+   * @param group The address of the validator group.
+   * @param account The address of the voting account.
+   * @param value The number of votes.
+   */
   function incrementPendingVotes(address group, address account, uint256 value) private {
     PendingVotes storage pending = votes.pending;
     pending.balances[group][account] = pending.balances[group][account].add(value);
@@ -447,6 +515,12 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     pending.total[group] = pending.total[group].add(value);
   }
 
+  /**
+   * @notice Decrements the number of pending votes for `group` made by `account`.
+   * @param group The address of the validator group.
+   * @param account The address of the voting account.
+   * @param value The number of votes.
+   */
   function decrementPendingVotes(address group, address account, uint256 value) private {
     PendingVotes storage pending = votes.pending;
     uint256 newValue = pending.balances[group][account].sub(value);
@@ -457,6 +531,12 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     pending.total[group] = pending.total[group].sub(value);
   }
 
+  /**
+   * @notice Increments the number of active votes for `group` made by `account`.
+   * @param group The address of the validator group.
+   * @param account The address of the voting account.
+   * @param value The number of votes.
+   */
   function incrementActiveVotes(address group, address account, uint256 value) private {
     uint256 delta = getActiveVotesDelta(group, value);
     ActiveVotes storage active = votes.active;
@@ -465,6 +545,12 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     active.total[group] = active.total[group].add(value);
   }
 
+  /**
+   * @notice Decrements the number of active votes for `group` made by `account`.
+   * @param group The address of the validator group.
+   * @param account The address of the voting account.
+   * @param value The number of votes.
+   */
   function decrementActiveVotes(address group, address account, uint256 value) private {
     uint256 delta = getActiveVotesDelta(group, value);
     ActiveVotes storage active = votes.active;
@@ -473,9 +559,17 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     active.total[group] = active.total[group].sub(value);
   }
 
+  /**
+   * @notice Returns the delta in active vote denominator for `group`.
+   * @param group The address of the validator group.
+   * @param value The numebr of active votes being added.
+   * @return The delta in active vote denominator for `group`.
+   */
   function getActiveVotesDelta(address group, uint256 value) private view returns (uint256) {
     // Preserve delta * total = value * denominator
-    return value.mul(votes.active.denominators[group].add(1)).div(votes.active.total[group].add(1));
+    return value.mul(votes.active.denominators[group].add(1)).div(
+      votes.active.total[group].add(1)
+    );
   }
 
   /**
@@ -492,21 +586,46 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     list.length = lastIndex;
   }
 
+  /**
+   * @notice Returns the number of votes that a group can receive.
+   * @param group The address of the group.
+   * @return The number of votes that a group can receive.
+   */
   function getNumVotesReceivable(address group) public view returns (uint256) {
-    uint256 numerator = getValidators().getGroupNumMembers(group).add(1).mul(getLockedGold().getTotalLockedGold());
-    uint256 denominator = Math.min(maxElectableValidators, getValidators().getNumRegisteredValidators());
+    uint256 totalLockedGold = getLockedGold().getTotalLockedGold();
+    uint256 numerator = getValidators().getGroupNumMembers(group).add(1).mul(totalLockedGold);
+    uint256 denominator = Math.min(
+      maxElectableValidators,
+      getValidators().getNumRegisteredValidators()
+    );
     return numerator.div(denominator);
   }
 
+  /**
+   * @notice Returns the total votes received across all groups.
+   * @return The total votes received across all groups.
+   */
   function getTotalVotes() external view returns (uint256) {
     return votes.total.total;
   }
 
+  /**
+   * @notice Returns the list of validator groups eligible to elect validators.
+   * @return The list of validator groups eligible to elect validators.
+   */
   function getEligibleValidatorGroups() external view returns (address[] memory) {
     return votes.total.eligible.getKeys();
   }
 
-  function getEligibleValidatorGroupsVoteTotals() external view returns (address[] memory, uint256[] memory) {
+  /**
+   * @notice Returns lists of all validator groups and the number of votes they've received.
+   * @return Lists of all validator groups and the number of votes they've received.
+   */
+  function getEligibleValidatorGroupsVoteTotals()
+    external
+    view
+    returns (address[] memory, uint256[] memory)
+  {
     return votes.total.eligible.getElements();
   }
 
@@ -543,7 +662,10 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
    */
   function electValidators() external view returns (address[] memory) {
     // Only members of these validator groups are eligible for election.
-    uint256 maxNumElectionGroups = Math.min(maxElectableValidators, votes.total.eligible.list.numElements);
+    uint256 maxNumElectionGroups = Math.min(
+      maxElectableValidators,
+      votes.total.eligible.list.numElements
+    );
     // uint256 requiredVotes = electabilityThreshold.multiply(FixidityLib.newFixed(votes.total.total)).fromFixed();
     // TODO(asa): Filter by > requiredVotes
     address[] memory electionGroups = votes.total.eligible.headN(maxNumElectionGroups);
@@ -598,7 +720,11 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
    * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
    * @return Whether or not a group elected a member, and the index of the group if so.
    */
-  function dHondt(address[] memory electionGroups, uint256[] memory numMembers, uint256[] memory numMembersElected)
+  function dHondt(
+    address[] memory electionGroups,
+    uint256[] memory numMembers,
+    uint256[] memory numMembersElected
+  )
     private
     view
     returns (uint256, bool)
@@ -610,7 +736,9 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
       address group = electionGroups[i];
       // Only consider groups with members left to be elected.
       if (numMembers[i] > numMembersElected[i]) {
-        FixidityLib.Fraction memory n = FixidityLib.newFixed(votes.total.eligible.getValue(group)).divide(
+        FixidityLib.Fraction memory n = FixidityLib.newFixed(
+          votes.total.eligible.getValue(group)
+        ).divide(
           FixidityLib.newFixed(numMembersElected[i].add(1))
         );
         if (n.gt(maxN)) {

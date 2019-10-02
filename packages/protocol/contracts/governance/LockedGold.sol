@@ -14,8 +14,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   using SafeMath for uint256;
 
-  // TODO(asa): How do adjust for updated requirements?
-  // Have a refreshRequirements function validators and groups can call
   struct MustMaintain {
     uint256 value;
     uint256 timestamp;
@@ -78,6 +76,13 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     return true;
   }
 
+  /**
+   * @notice Authorizes an address to vote on behalf of the account.
+   * @param voter The address to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   */
   function authorizeVoter(
     address voter,
     uint8 v,
@@ -93,6 +98,13 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     emit VoterAuthorized(msg.sender, voter);
   }
 
+  /**
+   * @notice Authorizes an address to validate on behalf of the account.
+   * @param validator The address to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   */
   function authorizeValidator(
     address validator,
     uint8 v,
@@ -118,25 +130,62 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     emit GoldLocked(msg.sender, msg.value);
   }
 
-  function incrementNonvotingAccountBalance(address account, uint256 value) external onlyRegisteredContract(ELECTION_REGISTRY_ID) {
+  /**
+   * @notice Increments the non-voting balance for an account.
+   * @param account The account whose non-voting balance should be incremented.
+   * @param value The amount by which to increment.
+   * @dev Can only be called by the registered "Election" smart contract.
+   */
+  function incrementNonvotingAccountBalance(
+    address account,
+    uint256 value
+  )
+    external
+    onlyRegisteredContract(ELECTION_REGISTRY_ID)
+  {
     _incrementNonvotingAccountBalance(account, value);
   }
 
-  function decrementNonvotingAccountBalance(address account, uint256 value) external onlyRegisteredContract(ELECTION_REGISTRY_ID) {
+  /**
+   * @notice Decrements the non-voting balance for an account.
+   * @param account The account whose non-voting balance should be decremented.
+   * @param value The amount by which to decrement.
+   * @dev Can only be called by the registered "Election" smart contract.
+   */
+  function decrementNonvotingAccountBalance(
+    address account,
+    uint256 value
+  )
+    external
+    onlyRegisteredContract(ELECTION_REGISTRY_ID)
+  {
     _decrementNonvotingAccountBalance(account, value);
   }
 
+  /**
+   * @notice Increments the non-voting balance for an account.
+   * @param account The account whose non-voting balance should be incremented.
+   * @param value The amount by which to increment.
+   */
   function _incrementNonvotingAccountBalance(address account, uint256 value) private {
     accounts[account].balances.nonvoting = accounts[account].balances.nonvoting.add(value);
     totalNonvoting = totalNonvoting.add(value);
   }
 
+  /**
+   * @notice Decrements the non-voting balance for an account.
+   * @param account The account whose non-voting balance should be decremented.
+   * @param value The amount by which to decrement.
+   */
   function _decrementNonvotingAccountBalance(address account, uint256 value) private {
     accounts[account].balances.nonvoting = accounts[account].balances.nonvoting.sub(value);
     totalNonvoting = totalNonvoting.sub(value);
   }
 
-  // TODO: Can't unlock if voting in governance.
+  /**
+   * @notice Unlocks gold that becomes withdrawable after the unlocking period.
+   * @param value The amount of gold to unlock.
+   */
   function unlock(uint256 value) external nonReentrant {
     require(isAccount(msg.sender), "not account");
     Account storage account = accounts[msg.sender];
@@ -152,6 +201,10 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   // TODO(asa): Allow partial relock
+  /**
+   * @notice Relocks gold that has been unlocked but not withdrawn.
+   * @param index The index of the pending withdrawal to relock.
+   */
   function relock(uint256 index) external nonReentrant {
     require(isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
@@ -162,6 +215,10 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     emit GoldLocked(msg.sender, value);
   }
 
+  /**
+   * @notice Withdraws a gold that has been unlocked after the unlocking period has passed.
+   * @param index The index of the pending withdrawal to withdraw.
+   */
   function withdraw(uint256 index) external nonReentrant {
     require(isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
@@ -174,6 +231,13 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     emit GoldWithdrawn(msg.sender, value);
   }
 
+  /**
+   * @notice Sets account locked gold balance requirements.
+   * @param account The account for which to set balance requirements.
+   * @param value The value that the account must maintain.
+   * @param timestamp The timestamp after which the account no longer must maintain this balance.
+   * @dev Can only be called by the registered "Validators" smart contract.
+   */
   function setAccountMustMaintain(
     address account,
     uint256 value,
@@ -206,19 +270,37 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     }
   }
 
+  /**
+   * @notice Returns the total amount of locked gold in the system.
+   * @return The total amount of locked gold in the system.
+   */
   function getTotalLockedGold() external view returns (uint256) {
     return totalNonvoting.add(getElection().getTotalVotes());
   }
 
+  /**
+   * @notice Returns the total amount of locked gold not being used to vote in elections.
+   * @return The total amount of locked gold not being used to vote in elections.
+   */
   function getNonvotingLockedGold() external view returns (uint256) {
     return totalNonvoting;
-  } 
+  }
 
+  /**
+   * @notice Returns the total amount of locked gold for an account.
+   * @account The account.
+   * @return The total amount of locked gold for an account.
+   */
   function getAccountTotalLockedGold(address account) public view returns (uint256) {
     uint256 total = accounts[account].balances.nonvoting;
     return total.add(getElection().getAccountTotalVotes(account));
   }
 
+  /**
+   * @notice Returns the total amount of non-voting locked gold for an account.
+   * @account The account.
+   * @return The total amount of non-voting locked gold for an account.
+   */
   function getAccountNonvotingLockedGold(address account) external view returns (uint256) {
     return accounts[account].balances.nonvoting;
   }
@@ -262,6 +344,11 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     return validator == address(0) ? account : validator;
   }
 
+  /**
+   * @notice Returns the pending withdrawals from unlocked gold for an account.
+   * @param account The address of the account.
+   * @return The value and timestamp for each pending withdrawal.
+   */
   function getPendingWithdrawals(address account) public view returns (uint256[] memory, uint256[] memory) {
     require(isAccount(account));
     uint256 length = accounts[account].balances.pendingWithdrawals.length;
@@ -312,6 +399,11 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     return (accounts[account].exists);
   }
 
+  /**
+   * @notice Check if an account already exists.
+   * @param account The address of the account
+   * @return Returns `false` if account exists. Returns `true` otherwise.
+   */
   function isNotAccount(address account) internal view returns (bool) {
     return (!accounts[account].exists);
   }
@@ -325,6 +417,11 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     return (authorizedBy[account] != address(0));
   }
 
+  /**
+   * @notice Check if an address has been authorized by an account for voting or validating.
+   * @param account The possibly authorized address.
+   * @return Returns `false` if authorized. Returns `true` otherwise.
+   */
   function isNotAuthorized(address account) internal view returns (bool) {
     return (authorizedBy[account] == address(0));
   }
