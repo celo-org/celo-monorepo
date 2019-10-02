@@ -12,7 +12,18 @@ import {
 import { toFixed, multiply, fixed1 } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { keccak256 } from 'ethereumjs-util'
-import { GovernanceContract, GovernanceInstance, MockLockedGoldContract, MockLockedGoldInstance, MockValidatorsContract, MockValidatorsInstance, RegistryContract, RegistryInstance, TestTransactionsContract, TestTransactionsInstance } from 'types'
+import {
+  GovernanceContract,
+  GovernanceInstance,
+  MockLockedGoldContract,
+  MockLockedGoldInstance,
+  MockValidatorsContract,
+  MockValidatorsInstance,
+  RegistryContract,
+  RegistryInstance,
+  TestTransactionsContract,
+  TestTransactionsInstance,
+} from 'types'
 
 const Governance: GovernanceContract = artifacts.require('Governance')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
@@ -49,8 +60,8 @@ enum VoteValue {
 }
 
 interface Transaction {
-  value: number,
-  destination: string,
+  value: number
+  destination: string
   data: Buffer
 }
 
@@ -85,9 +96,9 @@ contract('Governance', (accounts: string[]) => {
     multiply(fixed1.minus(baselineUpdateFactor), participationBaseline)
   )
 
-  let transactionSuccess1 : Transaction
-  let transactionSuccess2 : Transaction
-  let transactionFail : Transaction
+  let transactionSuccess1: Transaction
+  let transactionSuccess2: Transaction
+  let transactionFail: Transaction
   let proposalHash: Buffer
   let proposalHashStr: string
   beforeEach(async () => {
@@ -1856,7 +1867,7 @@ contract('Governance', (accounts: string[]) => {
       // @ts-ignore bytes type
       await governance.whitelist(proposalHash, 1, { from: accounts[3] })
       // @ts-ignore bytes type
-      const [tally, , , ] = await governance.getHotfixRecord.call(proposalHashStr)
+      const [tally, , ,] = await governance.getHotfixRecord.call(proposalHashStr)
       assertEqualBN(tally, new BigNumber(1))
     })
 
@@ -1864,9 +1875,9 @@ contract('Governance', (accounts: string[]) => {
       // @ts-ignore bytes type
       await governance.whitelist(proposalHash, 1, { from: accounts[3] })
       // @ts-ignore bytes type
-      const [, epoch, , ] = await governance.getHotfixRecord.call(proposalHashStr)
+      const [, epoch, ,] = await governance.getHotfixRecord.call(proposalHashStr)
       // TODO: add epoch number to utils library
-      const currEpoch = Math.floor(await web3.eth.getBlockNumber() / 30000)
+      const currEpoch = Math.floor((await web3.eth.getBlockNumber()) / 30000)
       assertEqualBN(epoch, currEpoch)
     })
 
@@ -1878,7 +1889,7 @@ contract('Governance', (accounts: string[]) => {
       // @ts-ignore bytes type
       await governance.whitelist(proposalHash, 0, { from: approver })
       // @ts-ignore bytes type
-      const [, , approved, ] = await governance.getHotfixRecord.call(proposalHashStr)
+      const [, , approved] = await governance.getHotfixRecord.call(proposalHashStr)
       assert.isTrue(approved)
     })
 
@@ -1894,9 +1905,7 @@ contract('Governance', (accounts: string[]) => {
           txHash: matchAny,
         },
       })
-      assert.isTrue(
-        Buffer.from(stripHexEncoding(log.args.txHash), 'hex').equals(proposalHash)
-      )
+      assert.isTrue(Buffer.from(stripHexEncoding(log.args.txHash), 'hex').equals(proposalHash))
     })
 
     it('should revert if called by a non-validator, non-approver', async () => {
@@ -1958,12 +1967,10 @@ contract('Governance', (accounts: string[]) => {
         assertLogMatches2(log, {
           event: 'HotfixExecuted',
           args: {
-            txHash: matchAny
+            txHash: matchAny,
           },
         })
-        assert.isTrue(
-          Buffer.from(stripHexEncoding(log.args.txHash), 'hex').equals(proposalHash)
-        )
+        assert.isTrue(Buffer.from(stripHexEncoding(log.args.txHash), 'hex').equals(proposalHash))
       })
     })
 
