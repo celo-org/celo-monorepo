@@ -8,7 +8,7 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import AspectRatio from 'src/shared/AspectRatio'
 import Responsive from 'src/shared/Responsive'
 import { fonts, standardStyles } from 'src/styles'
-import SideTitledSection from 'src/layout/SideTitledSection'
+import BookLayout from 'src/about/BookLayout'
 import { withScreenSize, ScreenSizes, ScreenProps } from 'src/layout/ScreenSize'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 
@@ -23,11 +23,11 @@ export class Team extends React.Component<Props & I18nProps & ScreenProps> {
 
     return (
       <>
-        <SideTitledSection title={t('teamTitle')}>
+        <BookLayout title={t('teamTitle')} startBlock={true}>
           <H1>{t('teamAlternateTitle')}</H1>
           <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('teamCopy')} </Text>
-        </SideTitledSection>
-        <GridRow desktopStyle={styles.backerContainer}>
+        </BookLayout>
+        <GridRow>
           <Cell span={Spans.full} tabletSpan={Spans.full}>
             <View
               style={[
@@ -48,7 +48,7 @@ export class Team extends React.Component<Props & I18nProps & ScreenProps> {
                       </AspectRatio>
                     </LazyLoad>
                     <H4>{person.name}</H4>
-                    <Text style={fonts.h5}>{(t(person.role) as string).toUpperCase()}</Text>
+                    <Text style={fonts.p}>{t(person.role) as string}</Text>
                   </View>
                 </Responsive>
               ))}

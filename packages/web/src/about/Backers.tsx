@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import backerList from 'src/about/backers/backers'
+import BookLayout from 'src/about/BookLayout'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import SideTitledSection from 'src/layout/SideTitledSection'
+import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import { hashNav } from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
-import { fonts, textStyles } from 'src/styles'
-import { withScreenSize, ScreenProps, ScreenSizes } from 'src/layout/ScreenSize'
+import { fonts, standardStyles, textStyles } from 'src/styles'
 
 export class Backers extends React.Component<I18nProps & ScreenProps> {
   render() {
@@ -15,12 +15,15 @@ export class Backers extends React.Component<I18nProps & ScreenProps> {
 
     return (
       <>
-        <SideTitledSection
-          title={t('celoBackers')}
-          nativeID={hashNav.about.backers}
-          text={t('celoBackersText')}
-        />
-        <GridRow desktopStyle={styles.backerContainer}>
+        <BookLayout startBlock={true} title={t('celoBackers')} nativeID={hashNav.about.backers}>
+          <Text style={fonts.p}>{t('celoBackersText')}</Text>
+        </BookLayout>
+        <GridRow
+          allStyle={standardStyles.elementalMarginTop}
+          desktopStyle={[styles.backerContainer, standardStyles.sectionMarginBottom]}
+          tabletStyle={[styles.backerContainer, standardStyles.sectionMarginBottomTablet]}
+          mobileStyle={standardStyles.sectionMarginBottomMobile}
+        >
           <Cell span={Spans.three4th} tabletSpan={Spans.full}>
             <View
               style={[styles.photoList, screen === ScreenSizes.DESKTOP && styles.photoListDesktop]}
