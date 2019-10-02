@@ -317,7 +317,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    */
   function setDequeueFrequency(uint256 _dequeueFrequency) external onlyOwner {
     require(_dequeueFrequency > 0, "dequeueFrequency must be larger than 0");
-    require(dequeueFrequency != dequeueFrequency, "dequeueFrequency unchanged");
+    require(_dequeueFrequency != dequeueFrequency, "dequeueFrequency unchanged");
     dequeueFrequency = _dequeueFrequency;
     emit DequeueFrequencySet(_dequeueFrequency);
   }

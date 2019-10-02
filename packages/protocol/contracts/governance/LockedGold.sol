@@ -207,7 +207,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   function unfreezeVoting() external {
     require(isAccount(msg.sender), "Account not registered");
     Account storage account = accounts[msg.sender];
-    require(account.votingFrozen == false, "Voting was already frozen");
+    require(account.votingFrozen == true, "Voting was not frozen");
     account.votingFrozen = false;
     emit VotingUnfrozen(msg.sender);
   }
