@@ -4,14 +4,14 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { standardStyles } from 'src/styles'
 
 interface Props {
-  title: React.ReactNode
+  label: React.ReactNode
   children: React.ReactNode
   nativeID?: string
   endBlock?: boolean
   startBlock?: boolean
 }
 
-function BookLayout({ title, children, nativeID, endBlock, startBlock }: Props) {
+function BookLayout({ label, children, nativeID, endBlock, startBlock }: Props) {
   const margins = {
     desktop: [
       standardStyles.blockMarginTop,
@@ -38,7 +38,7 @@ function BookLayout({ title, children, nativeID, endBlock, startBlock }: Props) 
       nativeID={nativeID}
     >
       <Cell span={Spans.fourth}>
-        <H3>{title}</H3>
+        <H3>{label}</H3>
       </Cell>
       <Cell tabletSpan={Spans.three4th} span={Spans.half}>
         {children}

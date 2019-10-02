@@ -23,7 +23,7 @@ export class Team extends React.Component<Props & I18nProps & ScreenProps> {
 
     return (
       <>
-        <BookLayout title={t('teamTitle')} startBlock={true}>
+        <BookLayout label={t('teamTitle')} startBlock={true}>
           <H1>{t('teamAlternateTitle')}</H1>
           <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('teamCopy')} </Text>
         </BookLayout>

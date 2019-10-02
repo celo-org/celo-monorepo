@@ -8,7 +8,7 @@ import CeloValues from 'src/about/Values'
 import VideoCover from 'src/about/VideoCover'
 import { H1 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
-import { I18nProps, withNamespaces } from 'src/i18n'
+import { I18nProps, withNamespaces, Trans } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import BookLayout from 'src/about/BookLayout'
 import LogoLightBg from 'src/logos/LogoLightBg'
@@ -47,18 +47,30 @@ export class About extends React.Component<Props & I18nProps> {
               <LogoLightBg height={47} />
             </Cell>
           </GridRow>
-          <BookLayout title={t('MissionTitle')}>
+          <BookLayout label={t('MissionTitle')}>
             <H1>{t('MissionText')}</H1>
           </BookLayout>
-          <BookLayout title={t('MeaningTile')} endBlock={true}>
-            <H1>{t('MeaningText')}</H1>
+          <BookLayout label={t('MeaningTile')} endBlock={true}>
+            <H1 style={standardStyles.elementalMarginBottom}>
+              <Trans
+                // @ts-ignore
+                t={t}
+                i18nKey={'MeaningText'}
+                values={{ phonetic: '/ˈtselo/' }}
+                components={[
+                  <Text key={1} style={textStyles.italic}>
+                    "/ˈtselo/"
+                  </Text>,
+                ]}
+              />
+            </H1>
             <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('MeaningCopy')}</Text>
           </BookLayout>
           <BeautifulQuote />
-          <BookLayout title={t('SacredEconTitle')} startBlock={true}>
+          <BookLayout label={t('SacredEconTitle')} startBlock={true}>
             <H1>{t('SacredEconText')}</H1>
           </BookLayout>
-          <BookLayout title={t('ValuesTitle')}>
+          <BookLayout label={t('ValuesTitle')}>
             <H1>{t('ValuesText')}</H1>
             <Text style={[fonts.p, standardStyles.elementalMargin]}>
               {t('ValuesCopy', { celoCLabs: 'Celo\u00a0– C\u00a0Labs' })}
