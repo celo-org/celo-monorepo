@@ -50,6 +50,10 @@ jest.mock('@celo/utils', () => ({
   SignatureUtils: { parseSignature: jest.fn(() => ({ r: 'r', s: 's', v: 'v' })) },
 }))
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 const attestationCode0: AttestationCode = {
   code:
     'ab8049b95ac02e989aae8b61fddc10fe9b3ac3c6aebcd3e68be495570b2d3da15aabc691ab88de69648f988fab653ac943f67404e532cfd1013627f56365f36501',

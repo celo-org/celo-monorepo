@@ -1,5 +1,4 @@
-runtime: nodejs
-env: flex
+runtime: nodejs10
 service: pilot
 instance_class: B4
 manual_scaling:

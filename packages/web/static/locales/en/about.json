@@ -3,7 +3,9 @@
   "description": "Meet the core contributors working on Celo and see our backer list.",
   "join": "Join us",
   "aboutUs": "About us",
-  "ourTeam": "Our Team",
+  "prosperityForAll": "Prosperity for All",
+  "prosperityForAllMobile": "Prosperity\nfor All",
+  "whatIfMoney": "What if money were beautiful?",
   "celoBackers": "Celo Backers",
   "coreContributors": "Core Contributors",
   "InNoOrder": "In no particular order",
@@ -29,5 +31,5 @@
   "missionText":
     "Celo, pronounced /ˈtselo/, means ‘purpose’ in Esperanto. In a similar spirit, we are aiming to create a new platform to connect people globally and bring financial stability to those who need it most. We believe blockchain technology is one of the most exciting innovations in recent history and as a team we look to push the boundaries of what is possible with it today. More importantly, we are driven by purpose -- to solve real-world problems such as lack of access to sound currency, or friction for cash-transfer programs aimed to alleviate poverty. Our mission is to build a monetary system that creates the conditions for prosperity for all.",
   "celoBackersText":
-    "Celo is supported by over 40 investors, including prominent venture funds, C-level operators, academics, and experts across a wide range of fields, including in no particular order"
+    "Celo is supported by over 40 companies and individuals, including prominent venture funds, C-level operators, academics, and experts across a wide range of fields, including in no particular order"
 }
