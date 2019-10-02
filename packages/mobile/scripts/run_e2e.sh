@@ -16,12 +16,6 @@ if [[ ! $($ANDROID_SDK_ROOT/emulator/emulator -list-avds | grep ^$DEFAULT_AVD$) 
   exit 1
 fi
 
-# unlock device
-yarn dev:emulator
-
-# Just to be safe kill any process that listens on the port 'yarn start' is going to use
-lsof -t -i :8081 | xargs kill -9
-yarn start:bg
 
 bash ./scripts/unlock.sh
 adb reconnect
@@ -36,12 +30,22 @@ echo "Waiting for emulator to unlock..."
 sleep 3
 echo "Emulator unlocked!"
 
-# start logs
-pidcat -t "ReactNativeJS" > e2e_pidcat_run.log & 
-
 # sometimes the emulator locks itself after boot
 # this prevents that
 bash ./scripts/unlock.sh
+
+# Just to be safe kill any process that listens on the port 'yarn start' is going to use
+lsof -t -i :8081 | xargs kill -9
+yarn start:bg
+
+
+echo "waiting for device to connect to Wifi, this is a good proxy the device is ready"
+until adb shell dumpsys wifi | grep "mNetworkInfo" |grep "state: CONNECTED"
+do
+  sleep 10
+done
+
+cp ../../node_modules/.bin/jest node_modules/.bin/
 
 yarn test:detox
 STATUS=$?
