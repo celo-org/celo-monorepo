@@ -1,13 +1,15 @@
-import { I18nProps, withNamespaces } from 'src/i18n'
-import { GridRow, Cell, Spans } from 'src/layout/GridRow'
-import { H2 } from 'src/fonts/Fonts'
-import { fonts, standardStyles } from 'src/styles'
-import { Text, View } from 'react-native'
-
-import FullCircle from 'src/community/connect/FullCircle'
+import * as React from 'react'
+import { StyleSheet, Text, View } from 'react-native'
 import Testris from 'src/about/Testris'
+import FullCircle from 'src/community/connect/FullCircle'
+import { H2 } from 'src/fonts/Fonts'
+import { I18nProps, withNamespaces } from 'src/i18n'
+import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
+import { fonts, standardStyles } from 'src/styles'
 
-function Values({ t }: I18nProps) {
+function Values({ t, screen }: I18nProps & ScreenProps) {
+  const isMobile = screen === ScreenSizes.MOBILE
   return (
     <>
       <GridRow
@@ -16,7 +18,9 @@ function Values({ t }: I18nProps) {
         mobileStyle={standardStyles.sectionMarginMobile}
       >
         <Cell span={Spans.half}>
-          <Testris />
+          <View style={isMobile ? styles.tetrisMobile : styles.tetrisDesktop}>
+            <Testris />
+          </View>
         </Cell>
         <Cell span={Spans.half} style={{ justifyContent: 'center' }}>
           <H2>{t('value1Title')}</H2>
@@ -29,7 +33,7 @@ function Values({ t }: I18nProps) {
         mobileStyle={standardStyles.sectionMarginBottomMobile}
       >
         <Cell span={Spans.half}>
-          <View style={{ height: 450, transform: [{ translateX: -50 }] }}>
+          <View style={isMobile ? styles.circleMobile : styles.circleDesktop}>
             <FullCircle lightBackground={true} />
           </View>
         </Cell>
@@ -42,4 +46,11 @@ function Values({ t }: I18nProps) {
   )
 }
 
-export default withNamespaces('about')(Values)
+const styles = StyleSheet.create({
+  circleDesktop: { height: 450, padding: 20 },
+  circleMobile: { height: 325, padding: 15 },
+  tetrisDesktop: { height: 325, padding: 20 },
+  tetrisMobile: { height: 250, padding: 15 },
+})
+
+export default React.memo(withScreenSize(withNamespaces('about')(Values)))

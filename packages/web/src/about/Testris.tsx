@@ -2,7 +2,7 @@ import Svg, { Path } from 'svgs'
 
 export default function Tetris() {
   return (
-    <Svg width="421" height="301" viewBox="0 0 421 301" fill="none">
+    <Svg width="100%" height="100%" viewBox="0 0 421 301" fill="none">
       <Path
         d="M386.82 147.078C368.481 147.078 353.615 161.966 353.615 180.332C353.615 198.697 368.481 213.585 386.82 213.585C405.158 213.585 420.025 198.697 420.025 180.332C420.025 161.966 405.158 147.078 386.82 147.078Z"
         stroke="#81868B"
