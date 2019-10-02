@@ -29,8 +29,8 @@ function Values({ t }: I18nProps) {
         mobileStyle={standardStyles.sectionMarginBottomMobile}
       >
         <Cell span={Spans.half}>
-          <View style={{ height: 465 }}>
-            <FullCircle />
+          <View style={{ height: 450, transform: [{ translateX: -50 }] }}>
+            <FullCircle lightBackground={true} />
           </View>
         </Cell>
         <Cell span={Spans.half} style={{ justifyContent: 'center' }}>

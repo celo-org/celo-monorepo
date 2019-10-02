@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native-web'
 import shuffleSeed from 'shuffle-seed'
 import VECTORS from 'src/community/connect/RingOfCoinVectors'
 import { Path } from 'src/shared/svg'
-import { baseCoinStyle, colors } from 'src/styles'
+import { baseCoinStyleLight, baseCoinStyle, colors } from 'src/styles'
 import { randomIntegerInRange } from 'src/utils/utils'
 import Svg from 'svgs'
 
@@ -36,6 +36,7 @@ interface State {
 
 interface Props {
   init?: () => void
+  lightBackground: boolean
 }
 
 export default class FullCircle extends React.PureComponent<Props, State> {
@@ -109,6 +110,7 @@ export default class FullCircle extends React.PureComponent<Props, State> {
           const style = ringStyle({
             color: playing ? this.getColor(colorArray, colorIndex) : 'transparent',
             duration: this.state.duration,
+            lightBackground: this.props.lightBackground,
             playing,
           })
           return <Path key={path} d={path} style={style} />
@@ -200,8 +202,11 @@ function isTogetherBeat(beat: number) {
   return beat % BEAT_COUNT === 0
 }
 
-function ringStyle({ color, playing, duration }) {
-  const styleArray: ViewStyle[] = [styles.normal, baseCoinStyle]
+function ringStyle({ color, playing, duration, lightBackground }) {
+  const styleArray: ViewStyle[] = [
+    styles.normal,
+    lightBackground ? baseCoinStyleLight : baseCoinStyle,
+  ]
 
   if (playing) {
     styleArray.push(styles.animatedBase, {

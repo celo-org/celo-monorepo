@@ -326,3 +326,8 @@ export const baseCoinStyle = {
   stroke: colors.screenGray,
   mixBlendMode: 'screen',
 }
+
+export const baseCoinStyleLight = {
+  stroke: colors.gray,
+  mixBlendMode: 'multiply',
+}
