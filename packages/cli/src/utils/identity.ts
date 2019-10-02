@@ -33,7 +33,7 @@ export const displayMetadata = (metadata: IdentityMetadata) => {
 
 export const modifyMetadata = (
   filePath: string,
-  operation: (metadata: IdentityMetadata) => void
+  operation: (metadata: IdentityMetadataWrapper) => void
 ) => {
   const metadata = IdentityMetadataWrapper.fromFile(filePath)
   operation(metadata)
