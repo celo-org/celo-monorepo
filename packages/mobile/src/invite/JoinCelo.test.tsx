@@ -8,6 +8,10 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import JoinCelo, { JoinCelo as JoinCeloClass } from 'src/invite/JoinCelo'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('JoinCeloScreen', () => {
   it('renders correctly', () => {
     const store = createMockStore()

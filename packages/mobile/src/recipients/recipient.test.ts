@@ -1,6 +1,10 @@
 import { contactsToRecipients, RecipientKind } from 'src/recipients/recipient'
 import { mockAccount, mockContactList, mockDisplayNumber, mockE164Number } from 'test/values'
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('contactsToRecipients', () => {
   it('returns a recipient per phone number', () => {
     const countryCode = '+1'
