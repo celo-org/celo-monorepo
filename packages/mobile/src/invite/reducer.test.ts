@@ -2,6 +2,10 @@ import { storeInviteeData } from 'src/invite/actions'
 import { initialState, inviteReducer as reducer } from 'src/invite/reducer'
 import { mockAccount, mockE164Number } from 'test/values'
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('invite/reducer', () => {
   describe(reducer, () => {
     it('returns the default state', () => {

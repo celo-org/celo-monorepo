@@ -5,6 +5,10 @@ import * as renderer from 'react-test-renderer'
 import PhotosEducation from 'src/account/PhotosEducation'
 import { createMockStore } from 'test/utils'
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('PhotosEducation', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
