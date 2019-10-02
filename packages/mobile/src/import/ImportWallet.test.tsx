@@ -61,7 +61,9 @@ describe('ImportWallet', () => {
   })
 
   it('renders with an error', () => {
-    const store = createMockStore({ alert: { underlyingError: ErrorMessages.INVALID_BACKUP } })
+    const store = createMockStore({
+      alert: { underlyingError: ErrorMessages.INVALID_BACKUP_PHRASE },
+    })
     const tree = renderer.create(
       <Provider store={store}>
         <ImportWallet {...getMockI18nProps()} />
@@ -100,7 +102,7 @@ describe('ImportWallet', () => {
       BAD_ENGLISH_MNEMONIC
     )
     fireEvent.press(wrapper.getByTestId('ImportWalletButton'))
-    expect(error).toHaveBeenCalledWith(ErrorMessages.INVALID_BACKUP)
+    expect(error).toHaveBeenCalledWith(ErrorMessages.INVALID_BACKUP_PHRASE)
   })
 
   it('calls assign account with the proper private key', () => {

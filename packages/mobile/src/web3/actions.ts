@@ -46,7 +46,7 @@ export type ActionTypes =
   | UpdateWeb3SyncProgressAction
 
 export const setAccount = (address: string): SetAccountAction => {
-  CeloAnalytics.track(DefaultEventNames.accountSet, { address })
+  CeloAnalytics.track(DefaultEventNames.accountSet)
   return {
     type: Actions.SET_ACCOUNT,
     address,
