@@ -2,11 +2,10 @@ import { Callback, ErrorCallback, PrivateKeyWalletSubprovider } from '@0x/subpro
 import debugFactory from 'debug'
 import { JSONRPCRequestPayload } from 'ethereum-types'
 import Web3 from 'web3'
-import { gasInflationFactor } from '../consts'
+import { GasInflationFactor } from '../consts'
 import { GasPriceMinimum } from '../generated/types/GasPriceMinimum'
 import { signTransaction } from '../utils/signing-utils'
 import { CeloPartialTxParams } from '../utils/tx-signing'
-import { Web3ContractCache } from '../web3-contract-cache'
 
 const debug = debugFactory('kit:providers:celo-private-keys-subprovider')
 
@@ -38,16 +37,16 @@ function isEmpty(value: string | undefined) {
 export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
   // Account addresses are hex-encoded, lower case alphabets
   private readonly accountAddressToPrivateKey = new Map<string, string>()
-  private readonly contractsCache: Web3ContractCache
+  private readonly gasPriceMinimumContractPromise?: Promise<GasPriceMinimum>
 
   private chainId: number | null = null
   private gasFeeRecipient: string | null = null
 
-  constructor(readonly web3ContractsCache: Web3ContractCache, readonly privateKey: string) {
+  constructor(readonly privateKey: string, readonly gasPriceMinimum?: Promise<GasPriceMinimum>) {
     // This won't accept a privateKey with 0x prefix and will call that an invalid key.
     super(getPrivateKeyWithout0xPrefix(privateKey))
     this.addAccount(privateKey)
-    this.contractsCache = web3ContractsCache
+    this.gasPriceMinimumContractPromise = gasPriceMinimum
   }
 
   public addAccount(privateKey: string) {
@@ -107,11 +106,11 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
     } else {
       debug(`Signer is ${txParams.from} and is one  of ${this.getAccounts()}`)
     }
-    if (txParams.chainId === undefined || txParams.chainId === null) {
+    if (txParams.chainId == null) {
       txParams.chainId = await this.getChainId()
     }
 
-    if (txParams.chainId === undefined || txParams.nonce === null) {
+    if (txParams.nonce == null) {
       txParams.nonce = await this.getNonce(txParams.from)
     }
 
@@ -128,14 +127,12 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
     }
 
     if (isEmpty(txParams.gasPrice)) {
-      // TODO(ashishb): For now, this will only work when gas payments are in Celo Gold
-      // It won't work when the gas payments are in C$.
-      txParams.gasPrice = await this.getGasPrice(this.contractsCache, txParams.gasCurrency)
+      txParams.gasPrice = await this.getGasPrice(txParams.gasCurrency)
     }
     debug('Gas price for the transaction is %s', txParams.gasPrice)
 
     if (isEmpty(txParams.gas)) {
-      txParams.gas = String(Math.round((await this.getGasEstimate(txParams)) * gasInflationFactor))
+      txParams.gas = String(Math.round((await this.getGasEstimate(txParams)) * GasInflationFactor))
     }
     debug('Max gas fee for the transaction is %s', txParams.gas)
 
@@ -201,16 +198,21 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
     return this.gasFeeRecipient
   }
 
-  private async getGasPrice(
-    web3Contracts: Web3ContractCache,
-    gasCurrency: string | undefined
-  ): Promise<string | undefined> {
+  private async getGasPrice(gasCurrency: string | undefined): Promise<string | undefined> {
     // Gold Token
-    if (gasCurrency === undefined) {
+    if (!gasCurrency) {
       return this.getGasPriceInCeloGold()
     }
-    const gasPriceMinimum: GasPriceMinimum = await web3Contracts.getGasPriceMinimum()
-    const gasPrice: string = await gasPriceMinimum.methods.getGasPriceMinimum(gasCurrency).call()
+    if (!this.gasPriceMinimumContractPromise) {
+      throw new Error(
+        `celo-private-keys-subprovider@getGasPrice: gas price for ` +
+          `currency ${gasCurrency} cannot be computed since GasPriceMinimum contract is not missing`
+      )
+    }
+    const gasPriceMinimumContract = await this.gasPriceMinimumContractPromise
+    const gasPrice: string = await gasPriceMinimumContract.methods
+      .getGasPriceMinimum(gasCurrency)
+      .call()
     debug('getGasPrice gas price for currency %s is %s', gasCurrency, gasPrice)
     return gasPrice
   }

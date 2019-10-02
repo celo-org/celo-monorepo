@@ -3,6 +3,7 @@ import debugFactory from 'debug'
 import { account as Account, bytes as Bytes, hash as Hash, nat as Nat, RLP } from 'eth-lib'
 // @ts-ignore-next-line
 import * as helpers from 'web3-core-helpers'
+import { CeloTx } from './tx-signing'
 
 const debug = debugFactory('kit:tx:sign')
 
@@ -55,15 +56,15 @@ export async function signTransaction(txn: any, privateKey: string) {
       transaction.gasFeeRecipient = tx.gasFeeRecipient || '0x'
 
       const rlpEncoded = RLP.encode([
-        Bytes.fromNat(transaction.nonce),
-        Bytes.fromNat(transaction.gasPrice),
-        Bytes.fromNat(transaction.gas),
-        transaction.gasCurrency.toLowerCase(),
-        transaction.gasFeeRecipient.toLowerCase(),
-        transaction.to.toLowerCase(),
-        Bytes.fromNat(transaction.value),
-        transaction.data,
-        Bytes.fromNat(transaction.chainId || '0x1'),
+        Bytes.fromNat(transaction.nonce), // 0
+        Bytes.fromNat(transaction.gasPrice), // 1
+        Bytes.fromNat(transaction.gas), // 2
+        transaction.gasCurrency.toLowerCase(), // 3
+        transaction.gasFeeRecipient.toLowerCase(), // 4
+        transaction.to.toLowerCase(), // 5
+        Bytes.fromNat(transaction.value), // 6
+        transaction.data, // 7
+        Bytes.fromNat(transaction.chainId || '0x1'), // 8
         '0x',
         '0x',
       ])
@@ -121,15 +122,38 @@ export async function signTransaction(txn: any, privateKey: string) {
   return signed(txn)
 }
 
-// Recover sender address from a raw transaction.
-export function recoverTransaction(rawTx: string): string {
-  const values = RLP.decode(rawTx)
-  debug('signing-utils@recoverTransaction: values are %s', values)
-  const signature = Account.encodeSignature(values.slice(8, 11))
-  const recovery = Bytes.toNumber(values[8])
+// Bytes.fromNat(transaction.nonce),  // 0
+// Bytes.fromNat(transaction.gasPrice),  // 1
+// Bytes.fromNat(transaction.gas),  // 2
+// transaction.gasCurrency.toLowerCase(),  // 3
+// transaction.gasFeeRecipient.toLowerCase(),  // 4
+// transaction.to.toLowerCase(),  // 5
+// Bytes.fromNat(transaction.value),  // 6
+// transaction.data,  // 7
+// Bytes.fromNat(transaction.chainId || '0x1'),  // 8
+
+// Recover transaction and sender address from a raw transaction.
+// This is used for testing.
+export function recoverTransaction(rawTx: string): [CeloTx, string] {
+  const rawValues = RLP.decode(rawTx)
+  debug('signing-utils@recoverTransaction: values are %s', rawValues)
+  const celoTx: CeloTx = {
+    nonce: rawValues[0].toLowerCase() === '0x' ? 0 : parseInt(rawValues[0], 16),
+    gasPrice: rawValues[1].toLowerCase() === '0x' ? 0 : parseInt(rawValues[1], 16),
+    gas: rawValues[2].toLowerCase() === '0x' ? 0 : parseInt(rawValues[2], 16),
+    gasCurrency: rawValues[3],
+    gasFeeRecipient: rawValues[4],
+    to: rawValues[5],
+    value: rawValues[6],
+    data: rawValues[7],
+    chainId: rawValues[8],
+  }
+  const signature = Account.encodeSignature(rawValues.slice(8, 11))
+  const recovery = Bytes.toNumber(rawValues[8])
   // tslint:disable-next-line:no-bitwise
   const extraData = recovery < 35 ? [] : [Bytes.fromNumber((recovery - 35) >> 1), '0x', '0x']
-  const signingData = values.slice(0, 8).concat(extraData)
+  const signingData = rawValues.slice(0, 8).concat(extraData)
   const signingDataHex = RLP.encode(signingData)
-  return Account.recover(Hash.keccak256(signingDataHex), signature)
+  const signer = Account.recover(Hash.keccak256(signingDataHex), signature)
+  return [celoTx, signer]
 }

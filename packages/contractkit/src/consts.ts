@@ -1,1 +1,1 @@
-export const gasInflationFactor = 1.3
+export const GasInflationFactor = 1.3
