@@ -1,9 +1,9 @@
+import debugFactory from 'debug'
 import Web3 from 'web3'
 import { TransactionObject, Tx } from 'web3/eth/types'
 import { AddressRegistry } from './address-registry'
 import { Address, CeloContract, CeloToken } from './base'
 import { WrapperCache } from './contract-cache'
-import { sendTransaction, TxOptions } from './utils/send-tx'
 import { toTxResult, TransactionResult } from './utils/tx-result'
 import { addLocalAccount } from './utils/web3-utils'
 import { Web3ContractCache } from './web3-contract-cache'
@@ -16,6 +16,8 @@ import { ReserveConfig } from './wrappers/Reserve'
 import { SortedOraclesConfig } from './wrappers/SortedOracles'
 import { StableTokenConfig } from './wrappers/StableTokenWrapper'
 import { ValidatorConfig } from './wrappers/Validators'
+
+const debug = debugFactory('kit:kit')
 
 export function newKit(url: string) {
   return newKitFromWeb3(new Web3(url))
@@ -37,14 +39,21 @@ export interface NetworkConfig {
   validators: ValidatorConfig
 }
 
+export interface KitOptions {
+  gasInflationFactor?: number
+  gasCurrency: Address | null
+  from?: Address
+}
+
 export class ContractKit {
   readonly registry: AddressRegistry
   readonly _web3Contracts: Web3ContractCache
   readonly contracts: WrapperCache
 
-  private _defaultOptions: TxOptions
+  private config: KitOptions
   constructor(readonly web3: Web3) {
-    this._defaultOptions = {
+    this.config = {
+      gasCurrency: null,
       gasInflationFactor: 1.3,
     }
 
@@ -92,8 +101,8 @@ export class ContractKit {
   }
 
   async setGasCurrency(token: CeloToken) {
-    this._defaultOptions.gasCurrency =
-      token === CeloContract.GoldToken ? undefined : await this.registry.addressFor(token)
+    this.config.gasCurrency =
+      token === CeloContract.GoldToken ? null : await this.registry.addressFor(token)
   }
 
   addAccount(privateKey: string) {
@@ -101,7 +110,7 @@ export class ContractKit {
   }
 
   set defaultAccount(address: Address) {
-    this._defaultOptions.from = address
+    this.config.from = address
     this.web3.eth.defaultAccount = address
   }
 
@@ -109,12 +118,20 @@ export class ContractKit {
     return this.web3.eth.defaultAccount
   }
 
-  get defaultOptions(): Readonly<TxOptions> {
-    return { ...this._defaultOptions }
+  set gasInflactionFactor(factor: number) {
+    this.config.gasInflationFactor = factor
   }
 
-  setGasCurrencyAddress(address: Address) {
-    this._defaultOptions.gasCurrency = address
+  get gasInflationFactor() {
+    return this.config.gasInflationFactor
+  }
+
+  set defaultGasCurrency(address: Address | null) {
+    this.config.gasCurrency = address
+  }
+
+  get defaultGasCurrency() {
+    return this.config.gasCurrency
   }
 
   isListening(): Promise<boolean> {
@@ -125,27 +142,58 @@ export class ContractKit {
     return this.web3.eth.isSyncing()
   }
 
-  sendTransaction(tx: Tx): TransactionResult {
-    const promiEvent = this.web3.eth.sendTransaction({
-      from: this._defaultOptions.from,
-      // TODO this won't work for locally signed TX
-      gasPrice: '0',
-      // @ts-ignore
-      gasCurrency: this._defaultOptions.gasCurrency,
-      // TODO needed for locally signed tx, ignored by now (celo-blockchain with set it)
-      // gasFeeRecipient: this.defaultOptions.gasFeeRecipient,
-      ...tx,
-    })
-    return toTxResult(promiEvent)
+  async sendTransaction(tx: Tx): Promise<TransactionResult> {
+    const finalTx: Tx = this.fillTxDefaults(tx)
+
+    let gas = finalTx.gas
+    if (gas == null) {
+      const inflactionFactor = this.config.gasInflationFactor || 1
+      gas = Math.round((await this.web3.eth.estimateGas({ ...tx })) * inflactionFactor)
+      debug('estimatedGas: %s', gas)
+    }
+
+    return toTxResult(
+      this.web3.eth.sendTransaction({
+        ...finalTx,
+        gas,
+      })
+    )
   }
 
-  sendTransactionObject(
+  async sendTransactionObject(
     txObj: TransactionObject<any>,
-    options?: TxOptions
+    tx?: Omit<Tx, 'data'>
   ): Promise<TransactionResult> {
-    return sendTransaction(txObj, {
-      ...this._defaultOptions,
-      ...options,
-    })
+    const finalTx: Omit<Tx, 'data'> = this.fillTxDefaults(tx)
+
+    let gas = finalTx.gas
+    if (gas == null) {
+      const inflactionFactor = this.config.gasInflationFactor || 1
+      gas = Math.round((await txObj.estimateGas({ ...finalTx })) * inflactionFactor)
+      debug('estimatedGas: %s', gas)
+    }
+
+    return toTxResult(
+      txObj.send({
+        ...finalTx,
+        gas,
+      })
+    )
+  }
+
+  private fillTxDefaults(tx?: Tx): Tx {
+    const defaultTx: Tx = {
+      from: this.config.from,
+      gasPrice: '0',
+    }
+
+    if (this.config.gasCurrency) {
+      defaultTx.gasCurrency = this.config.gasCurrency
+    }
+
+    return {
+      ...defaultTx,
+      ...tx,
+    }
   }
 }
