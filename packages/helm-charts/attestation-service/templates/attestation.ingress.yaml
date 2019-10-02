@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-ingress
+  labels:
+    app: attestation-service
+    chart: attestation-service
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: attestation-service
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    kubernetes.io/tls-acme: "true"
+spec:
+  tls:
+  - hosts:
+    - {{ .Release.Name }}.{{ .Values.domain.name }}.org
+    secretName: {{ .Release.Name }}-tls
+  rules:
+  - host: {{ .Release.Name }}.{{ .Values.domain.name }}.org
+    http:
+      paths:
+      {{ range $index, $e := until (.Values.geth.validators | int) }}
+      - path: /{{ $index | toString }}/(.*)
+        backend:
+          serviceName: {{ $.Release.Name }}-{{ $index | toString }}
+          servicePort: 3000
+      {{ end }}

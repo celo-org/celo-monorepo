@@ -9,7 +9,7 @@
     "build": "next build && tsc --project tsconfig.server.json",
     "start": "NODE_ENV=production node dist/server/index.js",
     "compile-global": "yarn run node-sass src/layout/global.scss static/global.css",
-    "deploy": "yarn run kill-dev; yarn run build; yarn remove @celo/types @celo/typescript; gcloud app deploy $MANIFEST",
+    "deploy": "yarn run kill-dev; yarn run build; gcloud app deploy $MANIFEST",
     "deploy:dev": "gcloud config set project celo-testnet; NODE_ENV=production DEPLOY_ENV=development MANIFEST=development.yaml yarn run deploy",
     "deploy:staging": "gcloud config set project celo-testnet; NODE_ENV=production DEPLOY_ENV=staging MANIFEST=staging.yaml yarn run deploy",
     "deploy:prod": "gcloud config set project celo-testnet-production; NODE_ENV=production DEPLOY_ENV=production MANIFEST=production.yaml yarn run deploy",
@@ -95,8 +95,5 @@
     "postcss-scss": "^1.0.5",
     "react-native-svg": "^9.3.6",
     "webpack": "4.20.2"
-  },
-  "engines": {
-    "node": "8.x.x"
   }
 }

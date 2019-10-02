@@ -1,13 +1,13 @@
-runtime: nodejs8
+runtime: nodejs10
 service: pilot
 env_variables:
-  NODE_ENV: 'production'
-  DEPLOY_ENV: 'pilot'
-  EXCHANGE_RATES_API: 'https://api.exchangeratesapi.io'
-  BLOCKSCOUT_API: 'https://pilot-blockscout.celo-testnet.org/api'
+  NODE_ENV: "production"
+  DEPLOY_ENV: "pilot"
+  EXCHANGE_RATES_API: "https://api.exchangeratesapi.io"
+  BLOCKSCOUT_API: "https://pilot-blockscout.celo-testnet.org/api"
   # Pull addresses from the build artifacts of the network in protocol/build
-  CELO_GOLD_ADDRESS: '0xa69c3D18a74B3FD5F8aDA748428d0bfF8c5387Fe'
-  CELO_DOLLAR_ADDRESS: '0x996e24D7791A182f237635018c49E30cdA8FBa5e'
-  FAUCET_ADDRESS: '0x387bCb16Bfcd37AccEcF5c9eB2938E30d3aB8BF2'
-  VERIFICATION_REWARDS_ADDRESS: '0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5'
-  ATTESTATIONS_ADDRESS: '0x2cDEc3af5727dF2d490cF6068980E67dc6c19438'
+  CELO_GOLD_ADDRESS: "0xa69c3D18a74B3FD5F8aDA748428d0bfF8c5387Fe"
+  CELO_DOLLAR_ADDRESS: "0x996e24D7791A182f237635018c49E30cdA8FBa5e"
+  FAUCET_ADDRESS: "0x387bCb16Bfcd37AccEcF5c9eB2938E30d3aB8BF2"
+  VERIFICATION_REWARDS_ADDRESS: "0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5"
+  ATTESTATIONS_ADDRESS: "0x2cDEc3af5727dF2d490cF6068980E67dc6c19438"

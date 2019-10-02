@@ -4,6 +4,10 @@ import * as renderer from 'react-test-renderer'
 import PincodeConfirmation from 'src/pincode/PincodeConfirmation'
 import { createMockNavigationProp, createMockStore } from 'test/utils'
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('PincodeConfirmation', () => {
   it('renders correctly', () => {
     const navigation = createMockNavigationProp({

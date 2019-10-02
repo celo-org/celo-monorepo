@@ -14,6 +14,10 @@ import { createMockStore } from 'test/utils'
 
 jest.mock('src/utils/time.ts')
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 const standbyTransactions: StandbyTransaction[] = [
   {
     id: '0110',
@@ -34,6 +38,16 @@ const standbyTransactions: StandbyTransaction[] = [
     outSymbol: CURRENCY_ENUM.GOLD,
     outValue: '30',
     timestamp: 1542409112,
+  },
+  {
+    id: '0113',
+    type: TransactionTypes.NETWORK_FEE,
+    comment: '',
+    status: TransactionStatus.Pending,
+    value: '0.0001',
+    symbol: CURRENCY_ENUM.DOLLAR,
+    timestamp: 1542406112,
+    address: '0072bvy2o23u',
   },
 ]
 

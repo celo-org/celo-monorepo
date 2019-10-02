@@ -1,8 +1,7 @@
 steps:
-
-# Deploy to app engine using yarn command 
-- name: "gcr.io/celo-testnet/global/yarn-gcloud"
-  args: ['yarn', 'deploy', '-n', '$_NETWORK_NAME']
-  id: Deploy blockchain api to app engine based on _NETWORK_NAME substitution (integration, production, etc.)
-  dir: 'packages/blockchain-api'
+  # Deploy to app engine using yarn command
+  - name: "gcr.io/celo-testnet/global/yarn-gcloud"
+    args: ["yarn", "deploy", "-n", "$_NETWORK_NAME", "-p", "celo-testnet"]
+    id: Deploy blockchain api to app engine based on _NETWORK_NAME substitution (integration, production, etc.)
+    dir: "packages/blockchain-api"
 timeout: "1200s"
