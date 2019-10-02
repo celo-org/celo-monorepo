@@ -1,4 +1,4 @@
-import { scrypt as scryptjs } from 'scrypt-js'
+const scrypt = require('scrypt-js')
 
 enum IdentifierTypeEnum {
   PHONE_NUMBER = 'phone_number',
@@ -36,7 +36,7 @@ function isE164Number(phoneNumber: string) {
 
 async function _calculateHash(identifier: string) {
   return new Promise<string>((resolve) => {
-    scryptjs(
+    scrypt(
       Buffer.from(identifier.normalize('NFKC')),
       Buffer.from(SCRYPT_PARAMS.salt.normalize('NFKC')),
       SCRYPT_PARAMS.N,

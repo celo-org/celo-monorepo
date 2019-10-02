@@ -1,3 +1,4 @@
+import { IdentityUtils } from '@celo/utils'
 import { configure } from 'enzyme'
 // @ts-ignore TODO(cmcewen): remove enzyme
 import Adapter from 'enzyme-adapter-react-16'
@@ -12,6 +13,10 @@ jest.useFakeTimers()
 const customGlobal: GlobalWithFetchMock = global as GlobalWithFetchMock
 customGlobal.fetch = require('jest-fetch-mock')
 customGlobal.fetchMock = customGlobal.fetch
+
+jest.mock('src/utils/identity', () => ({
+  IdentityUtils,
+}))
 
 if (typeof window !== 'object') {
   // @ts-ignore
