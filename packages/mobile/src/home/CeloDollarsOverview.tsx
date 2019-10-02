@@ -5,10 +5,9 @@ import * as React from 'react'
 import { Trans, withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { LOCAL_CURRENCY_SYMBOL } from 'src/config'
 import useBalanceAutoRefresh from 'src/home/useBalanceAutoRefresh'
 import { Namespaces } from 'src/i18n'
-import { useDollarsToLocalAmount } from 'src/localCurrency/hooks'
+import { useDollarsToLocalAmount, useLocalCurrencyCode } from 'src/localCurrency/hooks'
 import useSelector from 'src/redux/useSelector'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
@@ -16,11 +15,11 @@ type Props = WithNamespaces
 
 function CeloDollarsOverview({ t }: Props) {
   useBalanceAutoRefresh()
+  const localCurrencyCode = useLocalCurrencyCode()
   const dollarBalance = useSelector((state) => state.stableToken.balance)
   const localBalance = useDollarsToLocalAmount(dollarBalance)
   const localValue =
     localBalance || dollarBalance === null ? getMoneyDisplayValue(localBalance || 0) : '---'
-  const localCurrencySymbol = LOCAL_CURRENCY_SYMBOL
 
   return (
     <View style={styles.container}>
@@ -28,12 +27,12 @@ function CeloDollarsOverview({ t }: Props) {
       <Text style={[fontStyles.semiBold, styles.balance]}>
         {getMoneyDisplayValue(dollarBalance || 0)}
       </Text>
-      {LOCAL_CURRENCY_SYMBOL && (
+      {!!localCurrencyCode && (
         <Text style={[fontStyles.light, styles.localBalance]}>
           <Trans i18nKey="localCurrencyEqual">
             Equal to{' '}
             <Text style={fontStyles.semiBold}>
-              {{ localValue }} {{ localCurrencySymbol }}
+              {{ localValue }} {{ localCurrencyCode }}
             </Text>
           </Trans>
         </Text>

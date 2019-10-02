@@ -9,6 +9,10 @@ import { Screens } from 'src/navigator/Screens'
 import { createMockStore } from 'test/utils'
 import { mockNavigation } from 'test/values'
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 function profileFactory() {
   return (
     <Provider store={createMockStore({})}>

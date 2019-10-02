@@ -10,6 +10,10 @@ import { mockE164Number, mockRecipient } from 'test/values'
 
 const store = createMockStore()
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('ReclaimPaymentConfirmationCard', () => {
   it('renders correctly for send payment confirmation', () => {
     const tree = renderer.create(

@@ -26,7 +26,6 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import Avatar from 'src/components/Avatar'
 import {
   DOLLAR_TRANSACTION_MIN_AMOUNT,
-  LOCAL_CURRENCY_SYMBOL,
   MAX_COMMENT_LENGTH,
   NUMBER_INPUT_MAX_DECIMALS,
 } from 'src/config'
@@ -38,11 +37,12 @@ import i18n, { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/contactMapping'
 import { E164NumberToAddressType } from 'src/identity/reducer'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import {
   convertDollarsToMaxSupportedPrecision,
   convertLocalAmountToDollars,
 } from 'src/localCurrency/convert'
-import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
+import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -84,6 +84,7 @@ interface StateProps {
   defaultCountryCode: string
   e164NumberToAddress: E164NumberToAddressType
   feeType: FeeType | null
+  localCurrencyCode: LocalCurrencyCode | null
   localCurrencyExchangeRate: number | null | undefined
 }
 
@@ -136,6 +137,7 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
     defaultCountryCode: state.account.defaultCountryCode,
     e164NumberToAddress,
     feeType,
+    localCurrencyCode: getLocalCurrencyCode(state),
     localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
   }
 }
@@ -175,10 +177,10 @@ export class SendAmount extends React.Component<Props, State> {
 
   getDollarsAmount = () => {
     const parsedInputAmount = parseInputAmount(this.state.amount)
+    const { localCurrencyCode, localCurrencyExchangeRate } = this.props
 
     let dollarsAmount
-    if (LOCAL_CURRENCY_SYMBOL) {
-      const { localCurrencyExchangeRate } = this.props
+    if (localCurrencyCode) {
       dollarsAmount =
         convertLocalAmountToDollars(parsedInputAmount, localCurrencyExchangeRate) ||
         new BigNumber('')
@@ -347,7 +349,7 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, feeType, estimateFeeDollars } = this.props
+    const { t, feeType, estimateFeeDollars, localCurrencyCode } = this.props
     const newAccountBalance = this.getNewAccountBalance()
     const recipient = this.getRecipient()
     const verificationStatus = this.getVerificationStatus()
@@ -377,11 +379,7 @@ export class SendAmount extends React.Component<Props, State> {
           </View>
           <AmountInput
             keyboardType="numeric"
-            title={
-              LOCAL_CURRENCY_SYMBOL
-                ? LOCAL_CURRENCY_SYMBOL
-                : CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol
-            }
+            title={localCurrencyCode ? localCurrencyCode : CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
             placeholder={t('amount')}
             labelStyle={style.amountLabel as TextStyle}
             placeholderTextColor={colors.celoGreenInactive}

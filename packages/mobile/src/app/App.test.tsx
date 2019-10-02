@@ -25,6 +25,10 @@ jest.mock('src/redux/sagas', () => {
   }
 })
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('App', () => {
   it('renders an ApolloProvider', () => {
     const wrapper = shallow(<App />)
