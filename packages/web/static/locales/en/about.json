@@ -6,6 +6,8 @@
   "ourTeam": "Our Team",
   "celoBackers": "Backers",
   "prosperityForAll": "Prosperity for All",
+  "beautifulLifeQuote": "“How beautiful can life be?\nWe hardly dare imagine it.’’",
+  "beautifulLifeSource": "Charles Eisenstein",
   "prosperityForAllMobile": "Prosperity\nfor All",
   "whatIfMoney": "What if money were beautiful?",
   "coreContributors": "Core Contributors",
@@ -29,8 +31,26 @@
     "We are growing a team with all kinds of different perspectives, experiences and backgrounds to create products that are used and loved by people all around the world.",
   "joinUsBtn": "JOIN US",
   "pressText": "For media inquiries, please contact us at",
-  "missionText":
-    "Celo, pronounced /ˈtselo/, means ‘purpose’ in Esperanto. In a similar spirit, we are aiming to create a new platform to connect people globally and bring financial stability to those who need it most. We believe blockchain technology is one of the most exciting innovations in recent history and as a team we look to push the boundaries of what is possible with it today. More importantly, we are driven by purpose -- to solve real-world problems such as lack of access to sound currency, or friction for cash-transfer programs aimed to alleviate poverty. Our mission is to build a monetary system that creates the conditions for prosperity for all.",
+  "MissionTitle": "Mission",
+  "MissionText": "To build a monetary system creating conditions or prosperity for all",
+  "MeaningTile": "Meaning",
+  "MeaningText": "Celo, pronounced /ˈtselo/ means ‘purpose’ in Esperanto.",
+  "MeaningCopy":
+    "The spirit of Esperanto and auxiliary languages, is to equip speakers with a means to connect, engage, and build trust with someone who speaks a different native tongue.\n\nIn a similar spirit, we are aiming to create a new platform to connect people globally and bring financial stability to those who need it most. We believe blockchain technology is one of the most exciting innovations in recent history and as a team we look to push the boundaries of what is possible with it today.\n\nMore importantly, we are driven by purpose – to solve real-world problems such as lack of access to sound currency, or friction for cash-transfer programs aimed to alleviate poverty.",
+  "SacredEconTitle": "Sacred Economics",
+  "ValuesTitle": "Celo Values",
+  "ValuesText": "Unique Purpose \n& Connectedness",
+  "ValuesCopy":
+    "We were founded on two core values: unique purpose and connectedness. These, in turn, lead to practices that foster personal growth and community.\n\nOne of the most important things we can do is to foster a culture and environment that helps to unlock the intrinsic potential of the community of people who choose to become involved with Celo – C Labs, our network of contributors, our investors, and most importantly, our users.\n\nThe foundation for any culture is a set of values, a set of evolving practices that are based on these values, and a system by which these practices (and far less frequently, the values themselves) can be changed. We believe it is important to any culture to articulate these values, practices, and systems, and especially so in a decentralized network.",
+  "value1Title": "Unique Purpose",
+  "value1Text":
+    "We believe that everyone has their own unique path of growth, and that personal fulfilment depends in large part on being able to reach one’s potential along that path. We embrace values that enable people to grow towards their full potential.",
+  "value2Title": "Connectedness",
+  "value2Text":
+    "We believe that people live primarily in connection to one another. We recognize that individuals are healthier and happier when they are members of a strong social community with meaningful relationships – that is, when they are living within a healthy and happy whole. We embrace values that strengthen community",
+  "teamTitle": "C Labs",
+  "teamAlternateTitle": "The Founding Team",
+  "teamCopy": "TBD",
   "celoBackersText":
     "Celo is supported by over 40 companies and individuals, including prominent venture funds, C-level operators, academics, and experts across a wide range of fields, including in no particular order"
 }

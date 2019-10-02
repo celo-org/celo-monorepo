@@ -4,16 +4,16 @@ import Backers from 'src/about/Backers'
 import { sacredEconBack, team } from 'src/about/images'
 import PressMedia from 'src/about/PressMedia'
 import Team from 'src/about/Team'
+import CeloValues from 'src/about/Values'
 import VideoCover from 'src/about/VideoCover'
 import { H1 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, withNamespaces } from 'src/i18n'
+import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import SideTitledSection from 'src/layout/SideTitledSection'
+import LogoLightBg from 'src/logos/LogoLightBg'
 import menuItems from 'src/shared/menu-items'
-import { standardStyles, textStyles } from 'src/styles'
-
-const IMAGE_HEIGHT = 938
-const IMAGE_WIDTH = 835
+import { fonts, standardStyles, textStyles } from 'src/styles'
 
 interface Props {
   randomSeed: number
@@ -34,32 +34,46 @@ export class About extends React.Component<Props & I18nProps> {
           title={t('pageTitle')}
           description={t('description')}
         />
-        <View style={styles.container}>
+        <View>
           <VideoCover />
           {/* Below Fold */}
-          <SideTitledSection title={t('aboutMissionTitle')}>
-            <H1>{t('aboutMissionText')}</H1>
+          <GridRow
+            desktopStyle={[styles.logoArea, standardStyles.sectionMarginTop]}
+            tabletStyle={[styles.logoArea, standardStyles.sectionMarginTopTablet]}
+            mobileStyle={standardStyles.sectionMarginTopMobile}
+          >
+            <Cell span={Spans.three4th}>
+              <LogoLightBg height={47} />
+            </Cell>
+          </GridRow>
+          <SideTitledSection title={t('MissionTitle')}>
+            <H1>{t('MissionText')}</H1>
           </SideTitledSection>
-          <SideTitledSection title={t('aboutMeaningTile')}>
-            <H1>{t('aboutMeaningText')}</H1>
-            <Text>{t('aboutMeaningCopy')}</Text>
+          <SideTitledSection title={t('MeaningTile')}>
+            <H1>{t('MeaningText')}</H1>
+            <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('MeaningCopy')}</Text>
           </SideTitledSection>
           <ImageBackground
             source={sacredEconBack}
-            style={[{ width: '100%', height: 511 }, standardStyles.centered]}
+            style={[styles.sacredEconImage, standardStyles.centered]}
             resizeMode={'cover'}
           >
-            <Text style={[textStyles.invert, textStyles.center]}>{t('beautifulLifeQuote')}</Text>
-            <Text style={textStyles.invert}>{t('beautifulLifeSource')}</Text>
+            <Text style={[fonts.h1, styles.quote, textStyles.invert, textStyles.center]}>
+              {t('beautifulLifeQuote')}
+            </Text>
+            <Text style={[fonts.h1, textStyles.invert, standardStyles.blockMarginTopTablet]}>
+              – {t('beautifulLifeSource')}
+            </Text>
           </ImageBackground>
-          <SideTitledSection title={t('aboutSacredEconTitle')}>
-            <H1>{t('aboutSacredEconText')}</H1>
+          <SideTitledSection title={t('SacredEconTitle')}>
+            <H1>{t('SacredEconText')}</H1>
           </SideTitledSection>
-          <SideTitledSection title={t('aboutValuesTile')}>
-            <H1>{t('aboutValuesText')}</H1>
-            <Text>{t('aboutValuesCopy')}</Text>
+          <SideTitledSection title={t('ValuesTitle')}>
+            <H1>{t('ValuesText')}</H1>
+            <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('ValuesCopy')}</Text>
           </SideTitledSection>
-          <Image source={team} style={[{ width: '100%', height: 649 }]} resizeMode={'cover'} />
+          <CeloValues />
+          <Image source={team} style={styles.teamImage} resizeMode={'cover'} />
           <Team randomSeed={randomSeed} />
           <Backers />
           <PressMedia />
@@ -70,68 +84,13 @@ export class About extends React.Component<Props & I18nProps> {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'stretch',
-  },
-  sacredEcon: {
-    width: '100%',
-    height: 300,
-  },
-  background: {
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-    justifyContent: 'flex-end',
-    position: 'relative',
-  },
-  absolute: {
-    position: 'absolute',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  maxWidth: {
-    flex: 1,
-    position: 'relative',
-  },
-  mintPlaza: {
-    width: '100%',
-    height: '100%',
-  },
-  mintPlazaContainer: {
-    flex: 1,
-    height: IMAGE_HEIGHT / 2,
-    width: IMAGE_WIDTH / 2,
-  },
-  mediumMintPlaza: {},
-  largeMintPlaza: {
-    height: IMAGE_HEIGHT,
-    width: IMAGE_WIDTH,
-  },
-  hero: {
-    position: 'absolute',
-    left: 20,
-  },
-  mediumHero: {
-    position: 'absolute',
-    left: 60,
-    top: 150,
-  },
-  largeHero: {
-    position: 'absolute',
-    left: 80,
-    top: 260,
-  },
-  teamHero: {
-    width: 505,
-    maxWidth: '100vw',
-    flex: 1,
+  sacredEconImage: { width: '100%', height: 511 },
+  teamImage: { width: '100%', height: 649 },
+  logoArea: { justifyContent: 'flex-end' },
+  quote: {
+    fontSize: 65,
+    lineHeight: 72,
+    fontStyle: 'italic',
   },
 })
 

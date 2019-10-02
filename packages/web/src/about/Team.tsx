@@ -3,12 +3,11 @@ import LazyLoad from 'react-lazyload'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import shuffleSeed from 'shuffle-seed'
 import teamList from 'src/about/team/team-list'
-import { H3, H4 } from 'src/fonts/Fonts'
+import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import AspectRatio from 'src/shared/AspectRatio'
 import Responsive from 'src/shared/Responsive'
-import { MENU_MAX_WIDTH } from 'src/shared/Styles'
-import { fonts } from 'src/styles'
+import { fonts, standardStyles } from 'src/styles'
 import SideTitledSection from 'src/layout/SideTitledSection'
 import { withScreenSize, ScreenSizes, ScreenProps } from 'src/layout/ScreenSize'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
@@ -25,8 +24,8 @@ export class Team extends React.Component<Props & I18nProps & ScreenProps> {
     return (
       <>
         <SideTitledSection title={t('teamTitle')}>
-          <H3>{t('teamAlternateTitle')}</H3>
-          <Text style={fonts.p}>{t('teamCopy')} </Text>
+          <H1>{t('teamAlternateTitle')}</H1>
+          <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('teamCopy')} </Text>
         </SideTitledSection>
         <GridRow desktopStyle={styles.backerContainer}>
           <Cell span={Spans.full} tabletSpan={Spans.full}>
