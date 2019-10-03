@@ -16,6 +16,10 @@ import { getConnectedAccount } from 'src/web3/saga'
 
 jest.useRealTimers()
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('refreshBalances', () => {
   test('ask for balance when geth and account are ready', () =>
     expectSaga(refreshBalances)

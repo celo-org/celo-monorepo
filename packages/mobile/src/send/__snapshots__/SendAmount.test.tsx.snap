@@ -263,18 +263,14 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
                 "flexDirection": "row",
                 "justifyContent": "center",
               },
-              Object {
-                "flex": 1,
-                "height": 54,
-                "marginHorizontal": 8,
-              },
+              undefined,
             ]
           }
         >
           <TextInput
             allowFontScaling={true}
+            autoCorrect={false}
             autoFocus={true}
-            autocorrect={false}
             keyboardType="numeric"
             labelStyle={
               Object {
@@ -383,17 +379,12 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
                 "flexDirection": "row",
                 "justifyContent": "center",
               },
-              Object {
-                "flex": 1,
-                "height": 54,
-                "marginHorizontal": 8,
-              },
+              undefined,
             ]
           }
         >
           <TextInput
             allowFontScaling={true}
-            keyboardType="default"
             maxLength={70}
             onBlur={[Function]}
             onChangeText={[Function]}
