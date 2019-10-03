@@ -7,6 +7,9 @@ import { Tx } from 'web3/eth/types'
 
 export async function displaySendTx<A>(name: string, txObj: CeloTransactionObject<A>, tx?: Tx) {
   cli.action.start(`Sending Transaction: ${name}`)
+  console.log(await txObj.estimateGas(tx))
+  console.log('txobj', txObj)
+  console.log('tx', tx)
   const txResult = await txObj.send(tx)
 
   const txHash = await txResult.getHash()

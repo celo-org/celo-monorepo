@@ -34,6 +34,7 @@ export default class Lock extends BaseCommand {
       failWith(`require(goldAmount > 0) => [${goldAmount}]`)
     }
 
+    // TODO(asa): Why is this failing?
     const tx = lockedGold.lock()
     await displaySendTx('lock', tx, { value: goldAmount.toString() })
   }
