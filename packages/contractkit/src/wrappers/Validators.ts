@@ -1,7 +1,8 @@
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
 import { Validators } from '../generated/types/Validators'
-import { BaseWrapper, proxySend, toBigNumber } from './BaseWrapper'
+import { BaseWrapper, proxyCall, proxySend, toBigNumber } from './BaseWrapper'
+import { fromFixed } from '@celo/utils/lib/fixidity'
 
 export interface Validator {
   address: Address
@@ -16,6 +17,7 @@ export interface ValidatorGroup {
   name: string
   url: string
   members: Address[]
+  commission: BigNumber
 }
 
 export interface RegistrationRequirements {
@@ -86,6 +88,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return Promise.all(vgAddresses.map((addr) => this.getValidator(addr)))
   }
 
+  getGroupNumMembers: (group: Address) => Promise<string> = proxyCall(
+    this.contract.methods.getGroupNumMembers
+  )
+
   async getValidator(address: Address): Promise<Validator> {
     const res = await this.contract.methods.getValidator(address).call()
     return {
@@ -104,6 +110,12 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
 
   async getValidatorGroup(address: Address): Promise<ValidatorGroup> {
     const res = await this.contract.methods.getValidatorGroup(address).call()
-    return { address, name: res[0], url: res[1], members: res[2] }
+    return {
+      address,
+      name: res[0],
+      url: res[1],
+      members: res[2],
+      commission: fromFixed(new BigNumber(res[3])),
+    }
   }
 }

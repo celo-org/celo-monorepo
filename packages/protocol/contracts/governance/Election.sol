@@ -498,12 +498,13 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
    * @param lesser The address of the group that has received fewer votes than this group.
    * @param greater The address of the group that has received more votes than this group.
    */
-  function markGroupEligible(address group, address lesser, address greater) external {
+  function markGroupEligible(address group, address lesser, address greater) external returns (bool) {
     require(!votes.total.eligible.contains(group));
     require(getValidators().getGroupNumMembers(group) > 0);
     uint256 value = votes.pending.total[group].add(votes.active.total[group]);
     votes.total.eligible.insert(group, value, lesser, greater);
     emit ValidatorGroupMarkedEligible(group);
+    return true;
   }
 
   /**

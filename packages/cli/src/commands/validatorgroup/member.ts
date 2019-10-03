@@ -37,11 +37,19 @@ export default class ValidatorGroupRegister extends BaseCommand {
 
     this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
+    const election = await this.kit.contracts.getElection()
 
     if (res.flags.accept) {
       await displaySendTx('addMember', validators.addMember((res.args as any).validatorAddress))
+      if ((await validators.getGroupNumMembers(res.flags.from)) === '1') {
+        const tx = await election.markGroupEligible(res.flags.from)
+        await displaySendTx('markGroupEligible', tx)
+      }
     } else {
-      await displaySendTx('addMember', validators.removeMember((res.args as any).validatorAddress))
+      await displaySendTx(
+        'removeMember',
+        validators.removeMember((res.args as any).validatorAddress)
+      )
     }
   }
 }

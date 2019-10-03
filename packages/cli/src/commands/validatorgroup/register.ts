@@ -1,7 +1,9 @@
+import BigNumber from 'bignumber.js'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { toFixed } from '@celo/utils/lib/fixidity'
 
 export default class ValidatorGroupRegister extends BaseCommand {
   static description = 'Register a new Validator Group'
@@ -23,10 +25,11 @@ export default class ValidatorGroupRegister extends BaseCommand {
 
     this.kit.defaultAccount = res.flags.from
     const validators = await this.kit.contracts.getValidators()
+    const commission = toFixed(new BigNumber(res.flags.commission)).toFixed()
 
     await displaySendTx(
       'registerValidatorGroup',
-      validators.registerValidatorGroup(res.flags.name, res.flags.url, res.flags.commission)
+      validators.registerValidatorGroup(res.flags.name, res.flags.url, commission)
     )
   }
 }

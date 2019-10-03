@@ -124,8 +124,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @notice Locks gold to be used for voting.
    */
   function lock() external payable nonReentrant {
-    require(isAccount(msg.sender));
-    require(msg.value > 0);
+    require(isAccount(msg.sender), "not account");
+    require(msg.value > 0, "no value");
     _incrementNonvotingAccountBalance(msg.sender, msg.value);
     emit GoldLocked(msg.sender, msg.value);
   }
@@ -393,10 +393,10 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   )
     private
   {
-    require(isAccount(msg.sender) && isNotAccount(current) && isNotAuthorized(current), "Accounts");
+    require(isAccount(msg.sender) && isNotAccount(current) && isNotAuthorized(current), "account checks");
 
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
-    require(signer == current, "Signature");
+    require(signer == current, "signature checks");
 
     authorizedBy[previous] = address(0);
     authorizedBy[current] = msg.sender;

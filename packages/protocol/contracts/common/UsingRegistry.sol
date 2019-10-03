@@ -38,7 +38,7 @@ contract UsingRegistry is Ownable {
   IRegistry public registry;
 
   modifier onlyRegisteredContract(bytes32 identifierHash) {
-    require(registry.getAddressForOrDie(identifierHash) == msg.sender);
+    require(registry.getAddressForOrDie(identifierHash) == msg.sender, "only registered contract");
     _;
   }
   /**

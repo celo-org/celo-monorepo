@@ -102,7 +102,7 @@ library LinkedList {
    */
   function remove(List storage list, bytes32 key) public {
     Element storage element = list.elements[key];
-    require(key != bytes32(0) && contains(list, key));
+    require(key != bytes32(0) && contains(list, key), "can't remove");
     if (element.previousKey != bytes32(0)) {
       Element storage previousElement = list.elements[element.previousKey];
       previousElement.nextKey = element.nextKey;

@@ -246,7 +246,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       publicKeysData.length == (64 + 48 + 96)
     );
     // Use the proof of possession bytes
-    require(checkProofOfPossession(publicKeysData.slice(64, 48 + 96)));
+    // DO NOT SUBMIT: Commented out for testing.
+    // require(checkProofOfPossession(publicKeysData.slice(64, 48 + 96)));
 
     address account = getLockedGold().getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
@@ -436,7 +437,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    */
   function removeMember(address validator) external nonReentrant returns (bool) {
     address account = getLockedGold().getAccountFromValidator(msg.sender);
-    require(isValidatorGroup(account) && isValidator(validator));
+    require(isValidatorGroup(account) && isValidator(validator), "is not group and validator");
     return _removeMember(account, validator);
   }
 
@@ -505,11 +506,11 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   )
     external
     view
-    returns (string memory, string memory, address[] memory)
+    returns (string memory, string memory, address[] memory, uint256)
   {
     require(isValidatorGroup(account));
     ValidatorGroup storage group = groups[account];
-    return (group.name, group.url, group.members.getKeys());
+    return (group.name, group.url, group.members.getKeys(), group.commission.unwrap());
   }
 
   /**
@@ -644,7 +645,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    */
   function _removeMember(address group, address validator) private returns (bool) {
     ValidatorGroup storage _group = groups[group];
-    require(validators[validator].affiliation == group && _group.members.contains(validator));
+    require(validators[validator].affiliation == group && _group.members.contains(validator), "not a member");
     _group.members.remove(validator);
     emit ValidatorGroupMemberRemoved(group, validator);
 
