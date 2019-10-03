@@ -65,7 +65,7 @@ export async function getContractAddresses() {
       console.info('Got token addresses' + attestationsAddress)
       return { tokenAddressMapping, attestationsAddress }
     } catch (e) {
-      console.info('@getContractAddresses() error', e)
+      console.error('@getContractAddresses() error', e)
       throw new Error('Unable to fetch contract addresses')
     }
   }
@@ -77,13 +77,18 @@ export async function getContractKit(): Promise<ContractKit> {
     // Already connected
     return contractKit
   } else {
-    if (WEB3_PROVIDER_URL) {
-      const httpProvider = new Web3.providers.HttpProvider(WEB3_PROVIDER_URL)
-      const web3 = new Web3(httpProvider)
-      contractKit = newKitFromWeb3(web3)
-      return contractKit
-    } else {
-      throw new Error('Missing web3 provider URL, will not be able to fetch contract addresses.')
+    try {
+      if (WEB3_PROVIDER_URL) {
+        const httpProvider = new Web3.providers.HttpProvider(WEB3_PROVIDER_URL)
+        const web3 = new Web3(httpProvider)
+        contractKit = newKitFromWeb3(web3)
+        return contractKit
+      } else {
+        throw new Error('Missing web3 provider URL, will not be able to fetch contract addresses.')
+      }
+    } catch (e) {
+      console.error('@getContractKit() error', e)
+      throw new Error('Failed to create contractKit instance')
     }
   }
 }
