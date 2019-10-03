@@ -14,7 +14,7 @@ contract BlockchainParameters is Ownable, Initializable {
     uint256 patch;
   }
 
-  ClientVersion minimumClientVersion;
+  ClientVersion private minimumClientVersion;
 
   event MinimumClientVersionSet(uint256 major, uint256 minor, uint256 patch);
 
