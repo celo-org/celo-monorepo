@@ -8,6 +8,7 @@ import { toTxResult, TransactionResult } from './utils/tx-result'
 import { addLocalAccount } from './utils/web3-utils'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
+import { ElectionConfig } from './wrappers/Election'
 import { ExchangeConfig } from './wrappers/Exchange'
 import { GasPriceMinimumConfig } from './wrappers/GasPriceMinimum'
 import { GovernanceConfig } from './wrappers/Governance'
@@ -15,7 +16,7 @@ import { LockedGoldConfig } from './wrappers/LockedGold'
 import { ReserveConfig } from './wrappers/Reserve'
 import { SortedOraclesConfig } from './wrappers/SortedOracles'
 import { StableTokenConfig } from './wrappers/StableTokenWrapper'
-import { ValidatorConfig } from './wrappers/Validators'
+import { ValidatorsConfig } from './wrappers/Validators'
 
 export function newKit(url: string) {
   return newKitFromWeb3(new Web3(url))
@@ -26,6 +27,7 @@ export function newKitFromWeb3(web3: Web3) {
 }
 
 export interface NetworkConfig {
+  election: ElectionConfig
   exchange: ExchangeConfig
   attestations: AttestationsConfig
   governance: GovernanceConfig
@@ -34,7 +36,7 @@ export interface NetworkConfig {
   gasPriceMinimum: GasPriceMinimumConfig
   reserve: ReserveConfig
   stableToken: StableTokenConfig
-  validators: ValidatorConfig
+  validators: ValidatorsConfig
 }
 
 export class ContractKit {
@@ -58,6 +60,7 @@ export class ContractKit {
     const token2 = await this.registry.addressFor(CeloContract.StableToken)
     const contracts = await Promise.all([
       this.contracts.getExchange(),
+      this.contracts.getElection(),
       this.contracts.getAttestations(),
       this.contracts.getGovernance(),
       this.contracts.getLockedGold(),
@@ -69,25 +72,27 @@ export class ContractKit {
     ])
     const res = await Promise.all([
       contracts[0].getConfig(),
-      contracts[1].getConfig([token1, token2]),
-      contracts[2].getConfig(),
+      contracts[1].getConfig(),
+      contracts[2].getConfig([token1, token2]),
       contracts[3].getConfig(),
       contracts[4].getConfig(),
       contracts[5].getConfig(),
       contracts[6].getConfig(),
       contracts[7].getConfig(),
       contracts[8].getConfig(),
+      contracts[9].getConfig(),
     ])
     return {
       exchange: res[0],
-      attestations: res[1],
-      governance: res[2],
-      lockedGold: res[3],
-      sortedOracles: res[4],
-      gasPriceMinimum: res[5],
-      reserve: res[6],
-      stableToken: res[7],
-      validators: res[8],
+      election: res[1],
+      attestations: res[2],
+      governance: res[3],
+      lockedGold: res[4],
+      sortedOracles: res[5],
+      gasPriceMinimum: res[6],
+      reserve: res[7],
+      stableToken: res[8],
+      validators: res[9],
     }
   }
 

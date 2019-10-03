@@ -1,12 +1,7 @@
 export const LockedGoldArgs = {
-  noticePeriodArg: {
-    name: 'noticePeriod',
-    description:
-      'duration (seconds) from notice to withdrawable; doubles as ID of a Locked Gold commitment; ',
-  },
-  availabilityTimeArg: {
-    name: 'availabilityTime',
-    description: 'unix timestamp at which withdrawable; doubles as ID of a notified commitment',
+  pendingWithdrawalIndexArg: {
+    name: 'pendingWithdrawalINdex',
+    description: 'index of pending withdrawal whose unlocking period has passed',
   },
   goldAmountArg: {
     name: 'goldAmount',

@@ -54,13 +54,13 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     ActiveVotes active;
     TotalVotes total;
     // Maps an account to the list of groups it's voting for.
-    mapping(address => address[]) lists;
+    mapping(address => address[]) groupsVotedFor;
   }
 
   Votes private votes;
   uint256 public minElectableValidators;
   uint256 public maxElectableValidators;
-  uint256 public maxVotesPerAccount;
+  uint256 public maxNumGroupsVotedFor;
   FixidityLib.Fraction public electabilityThreshold;
 
   event MinElectableValidatorsSet(
@@ -71,8 +71,8 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     uint256 maxElectableValidators
   );
 
-  event MaxVotesPerAccountSet(
-    uint256 maxVotesPerAccount
+  event MaxNumGroupsVotedForSet(
+    uint256 maxNumGroupsVotedFor
   );
 
   event ElectabilityThresholdSet(
@@ -109,7 +109,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
    * @notice Initializes critical variables.
    * @param registryAddress The address of the registry contract.
    * @param _minElectableValidators The minimum number of validators that can be elected.
-   * @param _maxVotesPerAccount The maximum number of groups that an acconut can vote for at once.
+   * @param _maxNumGroupsVotedFor The maximum number of groups that an acconut can vote for at once.
    * @param _electabilityThreshold The minimum ratio of votes a group needs before its members can
    *   be elected.
    * @dev Should be called only once.
@@ -118,7 +118,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     address registryAddress,
     uint256 _minElectableValidators,
     uint256 _maxElectableValidators,
-    uint256 _maxVotesPerAccount,
+    uint256 _maxNumGroupsVotedFor,
     uint256 _electabilityThreshold
   )
     external
@@ -129,7 +129,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     setRegistry(registryAddress);
     minElectableValidators = _minElectableValidators;
     maxElectableValidators = _maxElectableValidators;
-    maxVotesPerAccount = _maxVotesPerAccount;
+    maxNumGroupsVotedFor = _maxNumGroupsVotedFor;
     electabilityThreshold = FixidityLib.wrap(_electabilityThreshold);
   }
 
@@ -178,13 +178,13 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
 
   /**
    * @notice Updates the maximum number of groups an account can be voting for at once.
-   * @param _maxVotesPerAccount The maximum number of groups an account can vote for.
+   * @param _maxNumGroupsVotedFor The maximum number of groups an account can vote for.
    * @return True upon success.
    */
-  function setMaxVotesPerAccount(uint256 _maxVotesPerAccount) external onlyOwner returns (bool) {
-    require(_maxVotesPerAccount != maxVotesPerAccount);
-    maxVotesPerAccount = _maxVotesPerAccount;
-    emit MaxVotesPerAccountSet(_maxVotesPerAccount);
+  function setMaxNumGroupsVotedFor(uint256 _maxNumGroupsVotedFor) external onlyOwner returns (bool) {
+    require(_maxNumGroupsVotedFor != maxNumGroupsVotedFor);
+    maxNumGroupsVotedFor = _maxNumGroupsVotedFor;
+    emit MaxNumGroupsVotedForSet(_maxNumGroupsVotedFor);
     return true;
   }
 
@@ -241,12 +241,12 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     require(votes.total.eligible.contains(group));
     require(0 < value && value <= getNumVotesReceivable(group));
     address account = getLockedGold().getAccountFromVoter(msg.sender);
-    address[] storage list = votes.lists[account];
-    require(list.length < maxVotesPerAccount);
-    for (uint256 i = 0; i < list.length; i = i.add(1)) {
-      require(list[i] != group);
+    address[] storage groups = votes.groupsVotedFor[account];
+    require(groups.length < maxNumGroupsVotedFor);
+    for (uint256 i = 0; i < groups.length; i = i.add(1)) {
+      require(groups[i] != group);
     }
-    list.push(group);
+    groups.push(group);
     incrementPendingVotes(group, account, value);
     incrementTotalVotes(group, value, lesser, greater);
     getLockedGold().decrementNonvotingAccountBalance(account, value);
@@ -299,7 +299,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     decrementTotalVotes(group, value, lesser, greater);
     getLockedGold().incrementNonvotingAccountBalance(account, value);
     if (getAccountTotalVotesForGroup(group, account) == 0) {
-      deleteElement(votes.lists[account], group, index);
+      deleteElement(votes.groupsVotedFor[account], group, index);
     }
     emit ValidatorGroupVoteRevoked(account, group, value);
     return true;
@@ -335,7 +335,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     decrementTotalVotes(group, value, lesser, greater);
     getLockedGold().incrementNonvotingAccountBalance(account, value);
     if (getAccountTotalVotesForGroup(group, account) == 0) {
-      deleteElement(votes.lists[account], group, index);
+      deleteElement(votes.groupsVotedFor[account], group, index);
     }
     emit ValidatorGroupVoteRevoked(account, group, value);
     return true;
@@ -343,7 +343,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
 
   function getAccountTotalVotes(address account) external view returns (uint256) {
     uint256 total = 0;
-    address[] memory groups = votes.lists[account];
+    address[] memory groups = votes.groupsVotedFor[account];
     for (uint256 i = 0; i < groups.length; i = i.add(1)) {
       total = total.add(getAccountTotalVotesForGroup(groups[i], account));
     }
@@ -356,7 +356,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
    * @return The groups voted for by a particular account.
    */
   function getAccountGroupsVotedFor(address account) external view returns (address[] memory) {
-    return votes.lists[account];
+    return votes.groupsVotedFor[account];
   }
 
   /**
@@ -423,7 +423,11 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
    * @return The total votes made for `group`.
    */
   function getGroupTotalVotes(address group) external view returns (uint256) {
-    return votes.total.eligible.getValue(group);
+    return votes.pending.total[group].add(votes.active.total[group]);
+  }
+
+  function getGroupEligibility(address group) external view returns (bool) {
+    return votes.total.eligible.contains(group);
   }
 
   /**
@@ -495,8 +499,8 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
    * @param greater The address of the group that has received more votes than this group.
    */
   function markGroupEligible(address group, address lesser, address greater) external {
-    require(!votes.total.eligible.contains(group), "aaa");
-    require(getValidators().getGroupNumMembers(group) > 0, "b");
+    require(!votes.total.eligible.contains(group));
+    require(getValidators().getGroupNumMembers(group) > 0);
     uint256 value = votes.pending.total[group].add(votes.active.total[group]);
     votes.total.eligible.insert(group, value, lesser, greater);
     emit ValidatorGroupMarkedEligible(group);
@@ -570,6 +574,10 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     return value.mul(votes.active.denominators[group].add(1)).div(
       votes.active.total[group].add(1)
     );
+  }
+
+  function getGroupsVotedFor(address account) external view returns (address[] memory) {
+    return votes.groupsVotedFor[account];
   }
 
   /**

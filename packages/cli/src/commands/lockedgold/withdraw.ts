@@ -4,22 +4,28 @@ import { Flags } from '../../utils/command'
 import { LockedGoldArgs } from '../../utils/lockedgold'
 
 export default class Withdraw extends BaseCommand {
-  static description = 'Withdraw notified commitment given availability time'
+  static description = 'Withdraw unlocked gold whose unlocking period has passed.'
 
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({ required: true }),
   }
 
-  static args = [{ ...LockedGoldArgs.availabilityTimeArg, required: true }]
-
-  static examples = ['withdraw 3600']
+  static examples = ['withdraw']
 
   async run() {
     // tslint:disable-next-line
     const { flags, args } = this.parse(Withdraw)
     this.kit.defaultAccount = flags.from
     const lockedgold = await this.kit.contracts.getLockedGold()
-    await displaySendTx('withdrawCommitment', lockedgold.withdrawCommitment(args.availabilityTime))
+    const pendingWithdrawals = await lockedgold.getPendingWithdrawals()
+    const currentTime = Math.round(new Date().getTime() / 1000)
+    let withdrawals = 0
+    for (let i = 0; i < pendingWithdrawals.length; i++) {
+      if (pendingWithdrawals[i].time <= currentTime) {
+        await displaySendTx('withdraw', lockedgold.withdraw(i - withdrawals))
+        withdrawals += 1
+      }
+    }
   }
 }
