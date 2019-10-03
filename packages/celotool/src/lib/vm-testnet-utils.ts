@@ -20,10 +20,10 @@ import {
   untaintTerraformModuleResource,
 } from './terraform'
 import {
-  uploadStaticNodesToGoogleStorage,
   uploadEnvFileToGoogleStorage,
   uploadFileToGoogleStorage,
   uploadGenesisBlockToGoogleStorage,
+  uploadStaticNodesToGoogleStorage,
 } from './testnet-utils'
 
 const secretsBucketName = 'celo-testnet-secrets'
