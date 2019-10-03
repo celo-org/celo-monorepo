@@ -16,7 +16,7 @@
     "deploy": "./deploy.sh"
   },
   "dependencies": {
-    "@celo/contractkit": "0.1.5",
+    "@celo/contractkit": "0.1.6",
     "apollo-datasource-rest": "^0.3.1",
     "apollo-server-express": "^2.4.2",
     "bignumber.js": "^7.2.0",

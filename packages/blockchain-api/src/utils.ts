@@ -53,16 +53,21 @@ export async function getContractAddresses() {
     console.info('Already got token addresses')
     return { tokenAddressMapping, attestationsAddress }
   } else {
-    const kit = await getContractKit()
-    goldTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
-    stableTokenAddress = await kit.registry.addressFor(CeloContract.GoldToken)
-    attestationsAddress = await kit.registry.addressFor(CeloContract.Attestations)
-    tokenAddressMapping = {
-      [goldTokenAddress]: 'Celo Gold',
-      [stableTokenAddress]: 'Celo Dollar',
+    try {
+      const kit = await getContractKit()
+      goldTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
+      stableTokenAddress = await kit.registry.addressFor(CeloContract.GoldToken)
+      attestationsAddress = await kit.registry.addressFor(CeloContract.Attestations)
+      tokenAddressMapping = {
+        [goldTokenAddress]: 'Celo Gold',
+        [stableTokenAddress]: 'Celo Dollar',
+      }
+      console.info('Got token addresses' + attestationsAddress)
+      return { tokenAddressMapping, attestationsAddress }
+    } catch (e) {
+      console.info('@getContractAddresses() error', e)
+      throw new Error('Unable to fetch contract addresses')
     }
-    console.info('Got token addresses' + attestationsAddress)
-    return { tokenAddressMapping, attestationsAddress }
   }
 }
 
