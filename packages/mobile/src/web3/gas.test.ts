@@ -6,6 +6,10 @@ jest.mock('@celo/walletkit', () => ({
   },
 }))
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('getGasPrice', () => {
   it('refreshes the gas price correctly', async () => {
     const gasPrice = await getGasPrice()

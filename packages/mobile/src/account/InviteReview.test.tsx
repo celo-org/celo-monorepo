@@ -18,6 +18,15 @@ jest.mock('src/identity/verification', () => {
   return { isPhoneVerified: jest.fn(() => true) }
 })
 
+jest.mock('src/web3/contracts', () => ({
+  web3: {
+    utils: {
+      fromWei: jest.fn((x: any) => x / 1e18),
+    },
+  },
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('InviteReview', () => {
   it('renders correctly', () => {
     const tree = renderer.create(

@@ -18,6 +18,16 @@ jest.mock('@celo/walletkit', () => ({
   },
 }))
 
+jest.mock('src/web3/contracts', () => ({
+  web3: {
+    utils: {
+      fromWei: jest.fn((x: any) => x / 1e18),
+      toWei: jest.fn((x: any) => x * 1e18),
+    },
+  },
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe(estimateFeeSaga, () => {
   beforeAll(() => {
     jest.useRealTimers()

@@ -9,7 +9,7 @@
     "build": "next build && tsc --project tsconfig.server.json",
     "start": "NODE_ENV=production node dist/server/index.js",
     "compile-global": "yarn run node-sass src/layout/global.scss static/global.css",
-    "deploy": "yarn run kill-dev; yarn run build; yarn remove @celo/types @celo/typescript; gcloud app deploy $MANIFEST",
+    "deploy": "yarn run kill-dev; yarn run build; gcloud app deploy $MANIFEST",
     "deploy:dev": "gcloud config set project celo-testnet; NODE_ENV=production DEPLOY_ENV=development MANIFEST=development.yaml yarn run deploy",
     "deploy:staging": "gcloud config set project celo-testnet; NODE_ENV=production DEPLOY_ENV=staging MANIFEST=staging.yaml yarn run deploy",
     "deploy:prod": "gcloud config set project celo-testnet-production; NODE_ENV=production DEPLOY_ENV=production MANIFEST=production.yaml yarn run deploy",
@@ -19,7 +19,7 @@
     "test-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'"
   },
   "dependencies": {
-    "@celo/utils": "^0.1.0",
+    "@celo/utils": "0.1.2-dev",
     "@segment/in-eu": "^0.2.1",
     "@sentry/browser": "^5.6.2",
     "@sentry/node": "^5.6.2",
@@ -95,8 +95,5 @@
     "postcss-scss": "^1.0.5",
     "react-native-svg": "^9.3.6",
     "webpack": "4.20.2"
-  },
-  "engines": {
-    "node": "8.x.x"
   }
 }

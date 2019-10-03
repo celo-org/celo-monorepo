@@ -8,6 +8,10 @@ import { getMockI18nProps } from 'test/utils'
 const SAMPLE_BALANCE = '55.00001'
 const exchangeRatePair: ExchangeRatePair = { goldMaker: '0.11', dollarMaker: '10' }
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 it('renders correctly when ready', () => {
   const tree = renderer.create(
     <AccountOverview

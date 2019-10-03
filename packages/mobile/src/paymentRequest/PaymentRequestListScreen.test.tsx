@@ -29,6 +29,10 @@ const requests = [
   }),
 ]
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 function testStore(paymentRequests: PaymentRequest[]) {
   return createMockStore({
     stableToken: { balance: '120' },
