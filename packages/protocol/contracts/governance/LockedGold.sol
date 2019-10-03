@@ -187,13 +187,12 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @param value The amount of gold to unlock.
    */
   function unlock(uint256 value) external nonReentrant {
-    require(isAccount(msg.sender), "not account");
+    require(isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
     MustMaintain memory requirement = account.balances.requirements;
     require(
       now >= requirement.timestamp ||
-      getAccountTotalLockedGold(msg.sender).sub(value) >= requirement.value,
-      "didn't meet mustmaintain requirements"
+      getAccountTotalLockedGold(msg.sender).sub(value) >= requirement.value
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
@@ -263,10 +262,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   function getAccountFromVoter(address accountOrVoter) external view returns (address) {
     address authorizingAccount = authorizedBy[accountOrVoter];
     if (authorizingAccount != address(0)) {
-      require(
-        accounts[authorizingAccount].authorizations.voting == accountOrVoter,
-        'failed first check'
-      );
+      require(accounts[authorizingAccount].authorizations.voting == accountOrVoter);
       return authorizingAccount;
     } else {
       require(isAccount(accountOrVoter));
@@ -393,10 +389,10 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   )
     private
   {
-    require(isAccount(msg.sender) && isNotAccount(current) && isNotAuthorized(current), "account checks");
+    require(isAccount(msg.sender) && isNotAccount(current) && isNotAuthorized(current));
 
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
-    require(signer == current, "signature checks");
+    require(signer == current);
 
     authorizedBy[previous] = address(0);
     authorizedBy[current] = msg.sender;

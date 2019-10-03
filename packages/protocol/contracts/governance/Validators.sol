@@ -246,8 +246,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       publicKeysData.length == (64 + 48 + 96)
     );
     // Use the proof of possession bytes
-    // DO NOT SUBMIT: Commented out for testing.
-    // require(checkProofOfPossession(publicKeysData.slice(64, 48 + 96)));
+    require(checkProofOfPossession(publicKeysData.slice(64, 48 + 96)));
 
     address account = getLockedGold().getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
@@ -365,8 +364,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   {
     require(bytes(name).length > 0);
     require(bytes(url).length > 0);
-    // TODO(asa)
-    // require(isFraction(commission));
+    require(commission.lt(FixidityLib.fixed1()), "Commission must be lower than 100%");
     address account = getLockedGold().getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     require(meetsValidatorGroupRegistrationRequirement(account));
@@ -645,7 +643,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    */
   function _removeMember(address group, address validator) private returns (bool) {
     ValidatorGroup storage _group = groups[group];
-    require(validators[validator].affiliation == group && _group.members.contains(validator), "not a member");
+    require(validators[validator].affiliation == group && _group.members.contains(validator));
     _group.members.remove(validator);
     emit ValidatorGroupMemberRemoved(group, validator);
 

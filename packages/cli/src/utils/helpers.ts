@@ -57,7 +57,6 @@ export async function nodeIsSynced(web3: Web3): Promise<boolean> {
 }
 
 export async function requireNodeIsSynced(web3: Web3) {
-  return
   if (!(await nodeIsSynced(web3))) {
     failWith('Node is not currently synced. Run node:synced to check its status')
   }

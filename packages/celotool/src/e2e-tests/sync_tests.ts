@@ -40,7 +40,7 @@ describe('sync tests', function(this: any) {
       peers: [await getEnode(8545)],
     }
     await initAndStartGeth(hooks.gethBinaryPath, fullInstance)
-    await sleep(30000000000000000000)
+    await sleep(3)
   })
 
   after(hooks.after)
