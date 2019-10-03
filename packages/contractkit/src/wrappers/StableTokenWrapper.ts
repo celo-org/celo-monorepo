@@ -71,6 +71,20 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
   )
 
   approve = proxySend(this.kit, this.contract.methods.approve)
+  /**
+   * Increases the allowance of another user.
+   * @param spender The address which is being approved to spend StableToken.
+   * @param value The increment of the amount of StableToken approved to the spender.
+   * @returns true if success.
+   */
+  increaseAllowance = proxySend(this.kit, this.contract.methods.increaseAllowance)
+  /**
+   * Decreases the allowance of another user.
+   * @param spender The address which is being approved to spend StableToken.
+   * @param value The decrement of the amount of StableToken approved to the spender.
+   * @returns true if success.
+   */
+  decreaseAllowance = proxySend(this.kit, this.contract.methods.decreaseAllowance)
   mint = proxySend(this.kit, this.contract.methods.mint)
   burn = proxySend(this.kit, this.contract.methods.burn)
   transferWithComment = proxySend(this.kit, this.contract.methods.transferWithComment)
