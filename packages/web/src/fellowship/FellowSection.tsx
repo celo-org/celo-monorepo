@@ -3,7 +3,7 @@ import { View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import FellowshipForm from 'src/fellowship/FellowshipForm'
 import FellowViewer from 'src/fellowship/FellowViewer'
-import { I18nProps, withNamespaces } from 'src/i18n'
+import { I18nProps, withNamespaces, NameSpaces } from 'src/i18n'
 
 class FellowSection extends React.PureComponent<I18nProps> {
   render() {
@@ -22,4 +22,4 @@ class FellowSection extends React.PureComponent<I18nProps> {
   }
 }
 
-export default withNamespaces('community')(FellowSection)
+export default withNamespaces(NameSpaces.fellowship)(FellowSection)
