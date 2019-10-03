@@ -36,6 +36,7 @@ import PincodeSet from 'src/pincode/PincodeSet'
 import QRCode from 'src/qrcode/QRCode'
 import QRScanner from 'src/qrcode/QRScanner'
 import FeeEducation from 'src/send/FeeEducation'
+import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
 import Send from 'src/send/Send'
 import SendAmount from 'src/send/SendAmount'
 import SendConfirmation from 'src/send/SendConfirmation'
@@ -156,6 +157,7 @@ const AppStack = createStackNavigator(
     [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
     [Screens.ReclaimPaymentConfirmationScreen]: { screen: ReclaimPaymentConfirmationScreen },
     [Screens.FeeEducation]: { screen: FeeEducation },
+    [Screens.FeeExchangeEducation]: { screen: FeeExchangeEducation },
     ...commonScreens,
   },
   {

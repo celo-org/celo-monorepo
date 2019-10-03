@@ -12,6 +12,7 @@ import RoundedArrow from 'src/shared/RoundedArrow'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 import LineItemRow from 'src/components/LineItemRow'
 import FeeIcon from 'src/send/FeeIcon'
+import FeeExchangeIcon from 'src/exchange/FeeExchangeIcon'
 
 export interface ExchangeConfirmationCardProps {
   makerToken: CURRENCY_ENUM
@@ -106,7 +107,7 @@ class ExchangeConfirmationCard extends React.PureComponent<Props> {
             currencySymbol={this.getTakerToken()}
             amount={'1'}
             title={t('exchangeFee')}
-            titleIcon={<FeeIcon />}
+            titleIcon={<FeeExchangeIcon />}
           />
         </View>
 
