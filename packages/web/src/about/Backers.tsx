@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import backerList from 'src/about/backers/backers'
-import BookLayout from 'src/about/BookLayout'
+import BookLayout from 'src/layout/BookLayout'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
