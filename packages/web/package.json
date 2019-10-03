@@ -19,7 +19,7 @@
     "test-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'"
   },
   "dependencies": {
-    "@celo/utils": "^0.1.0",
+    "@celo/utils": "0.1.2-dev",
     "@segment/in-eu": "^0.2.1",
     "@sentry/browser": "^5.6.2",
     "@sentry/node": "^5.6.2",
