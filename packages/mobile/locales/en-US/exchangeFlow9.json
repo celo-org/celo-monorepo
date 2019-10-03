@@ -14,6 +14,8 @@
   "continue": "Continue",
   "reviewExchange": "Review Exchange",
   "fee": "Fee",
+  "securityFee": "Security Fee",
+  "exchangeFee": "Exchange Fee",
   "edit": "Edit",
   "notEnoughDollars": "Not enough {{CeloDollars}} to make exchange",
   "notEnoughGold": "Not enough Celo Gold to make exchange",
