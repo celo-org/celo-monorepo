@@ -72,7 +72,8 @@ describe('exit tests', function(this: any) {
       await setMinimumClientVersion(1, 8, 99)
       await sleep(20)
       try {
-        await setMinimumClientVersion(1, 8, 10)
+        // It should have exited by now, call RPC to trigger error
+        await web3.eth.getBlockNumber()
       } catch (_) {
         return
       }
