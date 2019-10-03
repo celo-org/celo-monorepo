@@ -13,6 +13,8 @@ contract Random is IRandom {
 
   bytes32 public _random;
 
+  mapping (uint256 => bytes32) public history;
+
   function initialize() external {
   }
 
@@ -44,6 +46,7 @@ contract Random is IRandom {
 
     // add entropy
     _random = keccak256(abi.encodePacked(_random, randomness));
+    history[block.number] = _random;
 
     commitments[proposer] = newCommitment;
   }
