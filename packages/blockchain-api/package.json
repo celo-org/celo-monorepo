@@ -32,6 +32,6 @@
     "@types/utf8": "^2.1.6",
     "@types/web3": "^1.0.18",
     "tsc-watch": "^1.0.31",
-    "typescript": "^3.5.3"
+    "typescript": "^3.6.3"
   }
 }

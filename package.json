@@ -57,7 +57,7 @@
     "typescript-tslint-plugin": "^0.5.4",
     "tsconfig-paths": "^3.8.0",
     "ts-node": "^8.3.0",
-    "typescript": "^3.5.3"
+    "typescript": "^3.6.3"
   },
   "dependencies": {
     "codecov": "^3.1.0"

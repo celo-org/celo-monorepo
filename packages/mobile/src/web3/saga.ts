@@ -49,7 +49,7 @@ export function* checkWeb3SyncProgress() {
       Logger.debug(TAG, 'checkWeb3SyncProgress', 'Checking sync progress')
 
       // isSyncing returns a syncProgress object when it's still syncing, false otherwise
-      const syncProgress = yield web3.eth.isSyncing()
+      const syncProgress = yield call(web3.eth.isSyncing)
 
       if (typeof syncProgress === 'boolean' && !syncProgress) {
         Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync maybe complete, checking')

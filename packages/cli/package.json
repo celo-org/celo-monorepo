@@ -63,7 +63,7 @@
     "@types/web3": "^1.0.18",
     "globby": "^8",
     "prettier": "1.13.5",
-    "typescript": "^3.5.3"
+    "typescript": "^3.6.3"
   },
   "files": [
     "README.md",

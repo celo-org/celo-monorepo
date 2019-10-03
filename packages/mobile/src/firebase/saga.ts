@@ -4,7 +4,7 @@ import { eventChannel } from 'redux-saga'
 import { all, call, cancelled, put, select, spawn, take, takeEvery } from 'redux-saga/effects'
 import { PaymentRequest, PaymentRequestStatuses, updatePaymentRequests } from 'src/account'
 import { showError } from 'src/alert/actions'
-import { Actions as AppActions } from 'src/app/actions'
+import { Actions as AppActions, SetLanguageAction } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FIREBASE_ENABLED } from 'src/config'
 import { Actions, firebaseAuthorized } from 'src/firebase/actions'
@@ -138,7 +138,7 @@ export function* watchPaymentRequestStatusUpdates() {
   }
 }
 
-export function* syncLanguageSelection({ language }: { language: string }) {
+export function* syncLanguageSelection({ language }: SetLanguageAction) {
   yield call(waitForFirebaseAuth)
   const address = yield select(currentAccountSelector)
   try {
