@@ -2,11 +2,8 @@ import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import CodeOfConduct from 'src/community/connect/CodeOfConduct'
-import Contribute from 'src/community/connect/Contribute'
 import CoverArea from 'src/community/connect/CoverArea'
-import FellowSection from 'src/community/connect/FellowSection'
 import Tenets from 'src/community/connect/Tenets'
-import EcoFund from 'src/community/EcoFund'
 import { H2, H3 } from 'src/fonts/Fonts'
 import EmailForm, { After } from 'src/forms/EmailForm'
 import OpenGraph from 'src/header/OpenGraph'
@@ -72,8 +69,6 @@ export class ConnectPage extends React.Component<Props> {
           <EventData />
           <ArticleData />
           <Contribute />
-          <EcoFund />
-          <FellowSection />
           <View style={styles.darkBackground} nativeID={hashNav.connect.newsletter}>
             <GridRow
               desktopStyle={standardStyles.sectionMarginTop}

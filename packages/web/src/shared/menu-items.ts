@@ -27,6 +27,10 @@ export const menuItems = {
     name: 'Connect',
     link: '/community',
   },
+  FELLOWSHIP: {
+    name: 'Fellowship',
+    link: '/connect/fellowship',
+  },
   PRIVACY: {
     name: 'Privacy Policy',
     link: '/privacy',

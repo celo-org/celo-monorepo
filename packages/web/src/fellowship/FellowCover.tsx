@@ -6,14 +6,14 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { colors, standardStyles, textStyles } from 'src/styles'
 
-function Contribute({ t }: I18nProps) {
+function FellowCover({ t }: I18nProps) {
   return (
     <View style={[styles.darkBackground, styles.keepOnScreen]}>
       <GridRow mobileStyle={[styles.proposalArea, standardStyles.blockMarginBottomTablet]}>
         <Cell span={Spans.half} style={styles.verticalCenter}>
           <View style={styles.proposalText}>
             <H2 style={[textStyles.invert, standardStyles.elementalMarginBottom]}>
-              {t(`contribute.title`)}
+              {t(`coverTitle`)}
             </H2>
             <Button
               kind={BTN.NAKED}
@@ -32,7 +32,7 @@ function Contribute({ t }: I18nProps) {
   )
 }
 
-export default withNamespaces(NameSpaces.community)(Contribute)
+export default withNamespaces(NameSpaces.fellowship)(FellowCover)
 
 const styles = StyleSheet.create({
   darkBackground: {

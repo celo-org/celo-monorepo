@@ -3,7 +3,7 @@ import * as React from 'react'
 import { View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import PagingDots from 'src/carousel/PagingDots'
-import Fellow from 'src/community/connect/Fellow'
+import Fellow from 'src/fellowship/Fellow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN } from 'src/shared/Button.3'
 import { colors, standardStyles } from 'src/styles'
@@ -11,7 +11,7 @@ import { colors, standardStyles } from 'src/styles'
 const fellows = [
   {
     name: 'Xochitl Cazador',
-    image: require('src/community/connect/fellow-xochitl@2x.jpg'),
+    image: require('src/fellowship/fellow-xochitl@2x.jpg'),
     location: 'Mexico',
     role: ' Go-to-Market',
     color: colors.purpleScreen,
@@ -22,7 +22,7 @@ const fellows = [
   },
   {
     name: 'Pratyush Ranjan Tiwari',
-    image: require('src/community/connect/fellow-pratyush@2x.jpg'),
+    image: require('src/fellowship/fellow-pratyush@2x.jpg'),
     location: 'India',
     role: 'Engineering',
     color: colors.purpleScreen,
@@ -51,7 +51,7 @@ const fellows = [
   },
   {
     name: 'James Downer',
-    image: require('src/community/connect/fellow-james@2x.jpg'),
+    image: require('src/fellowship/fellow-james@2x.jpg'),
     location: 'Colombia',
     role: 'Experience',
     color: colors.purpleScreen,
