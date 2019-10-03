@@ -234,14 +234,11 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
         // Force inset as this screen uses auto focus and KeyboardSpacer padding is initially
         // incorrect because of that
         forceInset={{ top: 'never', bottom: 'always' }}
-        style={styles.background}
+        style={styles.container}
       >
-        <View>
-          <DisconnectBanner />
-          <KeyboardAwareScrollView
-            contentContainerStyle={styles.transferArea}
-            keyboardShouldPersistTaps={'always'}
-          >
+        <DisconnectBanner />
+        <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}>
+          <View style={styles.transferArea}>
             <View style={styles.transferInfo}>
               <Text style={[styles.currencyLabel, fontStyles.bodySmall]}>{maker.tokenText}</Text>
               <TextInput
@@ -304,13 +301,13 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
                 </Text>
               </View>
             </View>
-          </KeyboardAwareScrollView>
+          </View>
           <ExchangeRate
             rate={exchangeRate}
             makerToken={this.state.makerToken}
             showFinePrint={true}
           />
-        </View>
+        </KeyboardAwareScrollView>
         <View style={componentStyles.bottomContainer}>
           <Button
             onPress={this.goToReview}
@@ -339,6 +336,11 @@ export default componentWithAnalytics(
 )
 
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: colors.background,
+    flex: 1,
+    justifyContent: 'space-between',
+  },
   transferArea: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -357,13 +359,6 @@ const styles = StyleSheet.create({
   },
   currencyLabel: {
     color: colors.darkSecondary,
-  },
-  background: {
-    backgroundColor: colors.background,
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    justifyContent: 'space-between',
   },
   exchangeButtonBackground: {
     justifyContent: 'center',
