@@ -50,6 +50,33 @@ jest.mock('src/transactions/send', () => ({
   sendTransaction: async () => true,
 }))
 
+jest.mock('src/web3/contracts', () => ({
+  web3: {
+    eth: {
+      accounts: {
+        privateKeyToAccount: () =>
+          '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
+        wallet: {
+          add: () => null,
+        },
+        create: () => ({
+          address: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
+          privateKey: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
+        }),
+      },
+      personal: {
+        importRawKey: () => '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
+        unlockAccount: async () => true,
+      },
+    },
+    utils: {
+      fromWei: (x: any) => x / 1e18,
+      sha3: (x: any) => `a sha3 hash`,
+    },
+  },
+  isZeroSyncMode: () => false,
+}))
+
 SendIntentAndroid.sendSms = jest.fn()
 
 const state = createMockStore({ web3: { account: mockAccount } }).getState()

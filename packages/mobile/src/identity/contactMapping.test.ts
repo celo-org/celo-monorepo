@@ -33,6 +33,10 @@ const e164NumberRecipients = recipients!.e164NumberToRecipients
 const otherRecipients = recipients!.otherRecipients
 const allRecipients = { ...e164NumberRecipients, ...otherRecipients }
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('Import Contacts Saga', () => {
   it('imports contacts and creates contact mappings correctly', async () => {
     const attestationsContract = createMockContract(attestationsStub)
