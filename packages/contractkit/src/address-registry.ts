@@ -10,6 +10,9 @@ const debug = debugFactory('kit:registry')
 // Registry contract is always predeployed to this address
 const REGISTRY_CONTRACT_ADDRESS = '0x000000000000000000000000000000000000ce10'
 
+/**
+ * Celo Core Contract's Address Registry
+ */
 export class AddressRegistry {
   private readonly registry: Registry
   private readonly cache: Map<CeloContract, Address> = new Map()
@@ -19,6 +22,9 @@ export class AddressRegistry {
     this.registry = newRegistry(kit.web3, REGISTRY_CONTRACT_ADDRESS)
   }
 
+  /**
+   * Get the address for a `CeloContract`
+   */
   async addressFor(contract: CeloContract): Promise<Address> {
     if (!this.cache.has(contract)) {
       debug('Fetching address from Registry for %s', contract)
@@ -34,6 +40,10 @@ export class AddressRegistry {
     const cachedAddress = this.cache.get(contract)!
     return cachedAddress
   }
+
+  /**
+   * Get the address for all possible `CeloContract`
+   */
 
   async allAddresses(): Promise<Record<CeloContract, Address>> {
     const res: Partial<Record<CeloContract, Address>> = {}
