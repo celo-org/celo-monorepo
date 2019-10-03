@@ -77,20 +77,23 @@
       "account": {
         "description": "Manage your account, send and receive Celo Gold and Celo Dollars"
       },
-      "bonds": {
-        "description": "Manage Locked Gold to participate in governance and earn rewards"
+      "election": {
+        "description": "View and manage validator elections"
       },
       "config": {
         "description": "Configure CLI options which persist across commands"
+      },
+      "lockedgold": {
+        "description": "View and manage locked celo gold"
       },
       "node": {
         "description": "Manage your full node"
       },
       "validator": {
-        "description": "View validator information and register your own"
+        "description": "View and manage validators"
       },
       "validatorgroup": {
-        "description": "View validator group information and cast votes"
+        "description": "View and manage validator groups"
       },
       "exchange": {
         "description": "Commands for interacting with the Exchange"
