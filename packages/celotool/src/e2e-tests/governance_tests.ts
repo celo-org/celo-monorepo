@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
+import fs from 'fs'
 import Web3 from 'web3'
 import { strip0x } from '../lib/utils'
 import {
@@ -257,6 +258,7 @@ describe('governance tests', () => {
 
   const unlockAccount = async (address: string, theWeb3: any) => {
     // Assuming empty password
+    console.debug('unlocking account', new Date())
     await theWeb3.eth.personal.unlockAccount(address, '', 1000)
   }
 
@@ -272,8 +274,11 @@ describe('governance tests', () => {
   }
 
   const getValidatorGroupMembers = async () => {
+    console.debug('get group members 1', new Date())
     const [groupAddress] = await validators.methods.getRegisteredValidatorGroups().call()
+    console.debug('get group members 2', new Date())
     const groupInfo = await validators.methods.getValidatorGroup(groupAddress).call()
+    console.debug('get group members 3', new Date())
     return groupInfo[3]
   }
 
@@ -379,10 +384,15 @@ describe('governance tests', () => {
         )
         console.debug('Waiting', new Date())
         // Give the node time to sync.
-        await sleep(15)
-        const members = await getValidatorGroupMembers()
-        await removeMember(groupWeb3, groupAddress, members[0])
+        try {
+          await sleep(15)
+          const members = await getValidatorGroupMembers()
+          await removeMember(groupWeb3, groupAddress, members[0])
+        } catch (err) {
+          console.error('got error', err)
+        }
         await sleep(epoch * 2)
+        console.debug(fs.readFileSync('/tmp/e2e/validatorGroup/datadir/logs.txt'))
       })
 
       it('should return the reduced validator set size', async () => {
@@ -452,10 +462,15 @@ describe('governance tests', () => {
 
         console.debug('Waiting', new Date())
         // Give the node time to sync.
-        await sleep(15)
-        const members = await getValidatorGroupMembers()
-        await removeMember(groupWeb3, groupAddress, members[0])
+        try {
+          await sleep(15)
+          const members = await getValidatorGroupMembers()
+          await removeMember(groupWeb3, groupAddress, members[0])
+        } catch (err) {
+          console.error('got error', err)
+        }
         await sleep(epoch * 2)
+        console.debug(fs.readFileSync('/tmp/e2e/validatorGroup/datadir/logs.txt'))
 
         validators = new web3.eth.Contract(
           validatorsAbi,
@@ -510,11 +525,18 @@ describe('governance tests', () => {
         await getContractAddress('ValidatorsProxy')
       )
       // Give the node time to sync.
+      let membersToSwap: string[]
+      try {
+        await sleep(15)
+        const members = await getValidatorGroupMembers()
+        membersToSwap = [members[0], members[1]]
+        // Start with 10 nodes
+        await removeMember(groupWeb3, groupAddress, membersToSwap[0])
+      } catch (err) {
+        console.error('got error', err)
+      }
       await sleep(15)
-      const members = await getValidatorGroupMembers()
-      const membersToSwap = [members[0], members[1]]
-      // Start with 10 nodes
-      await removeMember(groupWeb3, groupAddress, membersToSwap[0])
+      console.debug(fs.readFileSync('/tmp/e2e/validatorGroup/datadir/logs.txt'))
 
       const changeValidatorSet = async (header: any) => {
         // At the start of epoch N, swap members so the validator set is different for epoch N + 1.
