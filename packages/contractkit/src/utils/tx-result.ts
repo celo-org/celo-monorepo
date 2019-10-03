@@ -5,10 +5,20 @@ import { TransactionReceipt } from 'web3/types'
 
 const debug = debugFactory('kit:tx:result')
 
+/**
+ * Transforms a `PromiEvent` to a `TransactionResult`.
+ *
+ * PromiEvents are returned by web3 when we do a `contract.method.xxx.send()`
+ */
 export function toTxResult(pe: PromiEvent<any>) {
   return new TransactionResult(pe)
 }
 
+/**
+ * Replacement interface for web3's `PromiEvent`. Instead of emiting events
+ * to signal different stages, eveything is exposed as a promise. Which ends
+ * up being nicer when doing promise/async based programming.
+ */
 export class TransactionResult {
   private hashFuture = new Future<string>()
   private receiptFuture = new Future<TransactionReceipt>()
@@ -34,10 +44,12 @@ export class TransactionResult {
       }) as any)
   }
 
+  /** Get (& wait for) transaction hash */
   getHash() {
     return this.hashFuture.wait()
   }
 
+  /** Get (& wait for) transaction receipt */
   waitReceipt() {
     return this.receiptFuture.wait()
   }
