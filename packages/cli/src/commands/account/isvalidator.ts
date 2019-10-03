@@ -17,7 +17,7 @@ export default class IsValidator extends BaseCommand {
   async run() {
     const { args } = this.parse(IsValidator)
 
-    const election = await this.kit.contracts.getValidators()
+    const election = await this.kit.contracts.getElection()
     const numberValidators = await election.numberValidatorsInCurrentSet()
 
     for (let i = 0; i < numberValidators; i++) {

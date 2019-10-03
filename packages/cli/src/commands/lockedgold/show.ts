@@ -1,11 +1,6 @@
-import { flags } from '@oclif/command'
-import BigNumber from 'bignumber.js'
-import chalk from 'chalk'
-import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 import { Args } from '../../utils/command'
-import { LockedGoldArgs } from '../../utils/lockedgold'
 
 export default class Show extends BaseCommand {
   static description = 'Show locked gold information for a given account'
@@ -20,7 +15,7 @@ export default class Show extends BaseCommand {
 
   async run() {
     // tslint:disable-next-line
-    const { flags, args } = this.parse(Show)
+    const { args } = this.parse(Show)
 
     const lockedGold = await this.kit.contracts.getLockedGold()
     const nonvoting = await lockedGold.getAccountNonvotingLockedGold(args.account)
