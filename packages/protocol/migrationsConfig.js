@@ -99,7 +99,6 @@ const linkedLibraries = {
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
   Signatures: ['LockedGold', 'Escrow'],
-  //  ExtractFunctionSignature: ['Governance', 'ExtractFunctionSignatureTest'],
 }
 
 const argv = minimist(process.argv.slice(2), {
