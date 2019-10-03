@@ -81,6 +81,7 @@ export async function execCmdWithExitOnFailure(
 ) {
   const code = await execCmd(cmd, args, options)
   if (code !== 0) {
+    console.error(`Failed to execute ${cmd} ${args}`)
     process.exit(1)
   }
 }
@@ -377,6 +378,7 @@ export async function initAndStartGeth(gethBinaryPath: string, instance: GethIns
   const datadir = getDatadir(instance)
   console.info(`geth:${instance.name}: init datadir ${datadir}`)
   await init(gethBinaryPath, datadir, GENESIS_PATH)
+  console.log('Inited geth', new Date())
   if (instance.privateKey) {
     await importPrivateKey(gethBinaryPath, instance)
   }
@@ -434,7 +436,9 @@ export function getContext(gethConfig: GethTestConfig) {
   }
 
   const restart = async () => {
+    console.log('killing geth', new Date())
     await killGeth()
+    console.log('killed geth', new Date())
     let validatorIndex = 0
     for (const instance of gethConfig.instances) {
       await restoreDatadir(instance)

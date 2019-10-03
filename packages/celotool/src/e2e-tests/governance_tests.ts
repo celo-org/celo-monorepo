@@ -246,7 +246,9 @@ describe('governance tests', () => {
   after(context.hooks.after)
 
   const restart = async () => {
+    console.log('restarting', new Date())
     await context.hooks.restart()
+    console.log('restarted', new Date())
     web3 = new Web3('http://localhost:8545')
     lockedGold = new web3.eth.Contract(lockedGoldAbi, await getContractAddress('LockedGoldProxy'))
     goldToken = new web3.eth.Contract(erc20Abi, await getContractAddress('GoldTokenProxy'))
@@ -375,6 +377,7 @@ describe('governance tests', () => {
           validatorsAbi,
           await getContractAddress('ValidatorsProxy')
         )
+        console.log('Waiting', new Date())
         // Give the node time to sync.
         await sleep(15)
         const members = await getValidatorGroupMembers()
@@ -446,6 +449,8 @@ describe('governance tests', () => {
           validatorsAbi,
           await getContractAddress('ValidatorsProxy')
         )
+
+        console.log('Waiting', new Date())
         // Give the node time to sync.
         await sleep(15)
         const members = await getValidatorGroupMembers()
