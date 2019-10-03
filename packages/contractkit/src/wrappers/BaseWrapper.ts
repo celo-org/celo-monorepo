@@ -1,10 +1,9 @@
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import Contract from 'web3/eth/contract'
-import { TransactionObject } from 'web3/eth/types'
+import { TransactionObject, Tx } from 'web3/eth/types'
 import { TransactionReceipt } from 'web3/types'
 import { ContractKit } from '../kit'
-import { TxOptions } from '../utils/send-tx'
 import { TransactionResult } from '../utils/tx-result'
 
 type Method<I extends any[], O> = (...args: I) => TransactionObject<O>
@@ -22,8 +21,8 @@ export abstract class BaseWrapper<T extends Contract> {
 
 export interface CeloTransactionObject<O> {
   txo: TransactionObject<O>
-  send(options?: TxOptions): Promise<TransactionResult>
-  sendAndWaitForReceipt(options?: TxOptions): Promise<TransactionReceipt>
+  send(params?: Omit<Tx, 'data'>): Promise<TransactionResult>
+  sendAndWaitForReceipt(params?: Omit<Tx, 'data'>): Promise<TransactionReceipt>
 }
 
 export function toBigNumber(input: string) {
@@ -202,9 +201,9 @@ export function proxySend<InputArgs extends any[], ParsedInputArgs extends any[]
 
 export function wrapSend<O>(kit: ContractKit, txo: TransactionObject<O>): CeloTransactionObject<O> {
   return {
-    send: (options?: TxOptions) => kit.sendTransactionObject(txo, options),
+    send: (params?: Omit<Tx, 'data'>) => kit.sendTransactionObject(txo, params),
     txo,
-    sendAndWaitForReceipt: (options?: TxOptions) =>
-      kit.sendTransactionObject(txo, options).then((result) => result.waitReceipt()),
+    sendAndWaitForReceipt: (params?: Omit<Tx, 'data'>) =>
+      kit.sendTransactionObject(txo, params).then((result) => result.waitReceipt()),
   }
 }
