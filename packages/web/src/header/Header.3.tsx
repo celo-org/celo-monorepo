@@ -29,6 +29,8 @@ const DARK_PAGES = new Set([
   CeloLinks.walletApp,
 ])
 
+const TRANSLUCENT_PAGES = new Set([menu.ABOUT_US.link])
+
 interface OwnProps {
   router: Router
 }
@@ -41,6 +43,7 @@ interface State {
   mobileMenuFade: Animated.Value
   menuFade: Animated.Value
   menuFaded: boolean
+  belowFoldUpScroll: boolean
   isBannerShowing: boolean
 }
 
@@ -58,9 +61,16 @@ export class Header extends React.Component<Props, State> {
   lastScrollOffset: number
 
   handleScroll = throttle(() => {
-    // GOing Up
+    const goingUp = this.lastScrollOffset > scrollOffset()
+    const belowFold = scrollOffset() > menuHidePoint()
 
-    if (this.lastScrollOffset > scrollOffset()) {
+    if (goingUp && belowFold) {
+      this.setState({ belowFoldUpScroll: true })
+    } else {
+      this.setState({ belowFoldUpScroll: false })
+    }
+
+    if (goingUp) {
       this.setState({ menuFaded: false }, () => {
         Animated.timing(this.state.menuFade, {
           toValue: 1,
@@ -68,13 +78,14 @@ export class Header extends React.Component<Props, State> {
           easing: Easing.in(Easing.quad),
         }).start()
       })
-    } else if (scrollOffset() > menuHidePoint()) {
+    } else if (belowFold) {
       Animated.timing(this.state.menuFade, {
         toValue: 0,
         duration: 100,
         easing: Easing.in(Easing.quad),
       }).start(() => this.setState({ menuFaded: true }))
     }
+
     this.lastScrollOffset = scrollOffset()
   }, 100)
 
@@ -106,6 +117,7 @@ export class Header extends React.Component<Props, State> {
       menuFade: new Animated.Value(1),
       menuFaded: false,
       mobileMenuActive: false,
+      belowFoldUpScroll: false,
       isBannerShowing: false,
     }
   }
@@ -145,13 +157,23 @@ export class Header extends React.Component<Props, State> {
   }
 
   isDarkMode = () => {
-    return DARK_PAGES.has(this.props.router.pathname)
+    return (
+      DARK_PAGES.has(this.props.router.pathname) ||
+      (this.props.router.pathname === menu.ABOUT_US.link && !this.state.belowFoldUpScroll)
+    )
+  }
+
+  isTranslucent = () => {
+    return TRANSLUCENT_PAGES.has(this.props.router.pathname)
   }
 
   getForegroundColor = () => {
     return this.isDarkMode() ? colors.white : colors.dark
   }
   getBackgroundColor = () => {
+    if (this.isTranslucent() && !this.state.belowFoldUpScroll) {
+      return 'transparent'
+    }
     return this.isDarkMode() ? colors.dark : colors.white
   }
 
@@ -205,7 +227,10 @@ export class Header extends React.Component<Props, State> {
                     <>
                       <Animated.View style={[{ opacity: this.state.menuFade }]}>
                         {this.isDarkMode() ? (
-                          <LogoDarkBg height={30} />
+                          <LogoDarkBg
+                            height={30}
+                            allWhite={this.isTranslucent() && !this.state.belowFoldUpScroll}
+                          />
                         ) : (
                           <LogoLightBg height={30} />
                         )}

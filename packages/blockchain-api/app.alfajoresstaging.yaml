@@ -1,13 +1,13 @@
-runtime: nodejs8
+runtime: nodejs10
 service: alfajoresstaging
 env_variables:
-  NODE_ENV: 'development'
-  DEPLOY_ENV: 'alfajoresstaging'
-  EXCHANGE_RATES_API: 'https://api.exchangeratesapi.io'
-  BLOCKSCOUT_API: 'https://alfajoresstaging-blockscout.celo-testnet.org/api'
+  NODE_ENV: "development"
+  DEPLOY_ENV: "alfajoresstaging"
+  EXCHANGE_RATES_API: "https://api.exchangeratesapi.io"
+  BLOCKSCOUT_API: "https://alfajoresstaging-blockscout.celo-testnet.org/api"
   # Pull addresses from the build artifacts of the network in protocol/build
-  CELO_GOLD_ADDRESS: '0x1313e2f3EBef8f0d869EECEb796D55A066eEA863'
-  CELO_DOLLAR_ADDRESS: '0x2dF4dD6Bd1b26a8503F763506bdB8e7cf165f69E'
-  FAUCET_ADDRESS: '0xF4314cb9046bECe6AA54bb9533155434d0c76909'
-  VERIFICATION_REWARDS_ADDRESS: '0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5'
-  ATTESTATIONS_ADDRESS: '0x8B7649116f169D2D2aeBB6Ea1A77F0baF31F2811'
+  CELO_GOLD_ADDRESS: "0x1313e2f3EBef8f0d869EECEb796D55A066eEA863"
+  CELO_DOLLAR_ADDRESS: "0x2dF4dD6Bd1b26a8503F763506bdB8e7cf165f69E"
+  FAUCET_ADDRESS: "0xF4314cb9046bECe6AA54bb9533155434d0c76909"
+  VERIFICATION_REWARDS_ADDRESS: "0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5"
+  ATTESTATIONS_ADDRESS: "0x8B7649116f169D2D2aeBB6Ea1A77F0baF31F2811"

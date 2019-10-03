@@ -6,6 +6,10 @@ import Invite from 'src/account/Invite'
 import { createMockStore } from 'test/utils'
 import { mockE164NumberToInvitableRecipient, mockNavigation } from 'test/values'
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('Invite', () => {
   it('renders correctly with recipients', () => {
     const tree = renderer.create(
