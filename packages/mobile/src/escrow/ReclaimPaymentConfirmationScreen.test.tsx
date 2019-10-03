@@ -12,6 +12,15 @@ const TEST_FEE = new BigNumber(10000000000000000)
 
 jest.mock('src/escrow/saga')
 
+jest.mock('src/web3/contracts', () => ({
+  web3: {
+    utils: {
+      fromWei: jest.fn((x: any) => x / 1e18),
+    },
+  },
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 const mockedGetReclaimEscrowFee = getReclaimEscrowFee as jest.Mock
 
 const store = createMockStore()
@@ -84,13 +93,12 @@ describe('ReclaimPaymentConfirmationScreen', () => {
     expect(toJSON()).toMatchSnapshot()
     expect(queryByText('securityFee')).not.toBeNull()
     expect(queryByText('$0.001')).toBeNull()
-    expect(queryAllByText('$10.00')).toHaveLength(1)
-    expect(queryAllByText('$10')).toHaveLength(1)
+    expect(queryAllByText('10.00')).toHaveLength(2)
+
     // Wait for fee error
     await waitForElement(() => getByText('---'))
 
-    expect(queryAllByText('$10.00')).toHaveLength(1)
-    expect(queryAllByText('$10')).toHaveLength(1)
+    expect(queryAllByText('10.00')).toHaveLength(2)
     expect(toJSON()).toMatchSnapshot()
   })
 })

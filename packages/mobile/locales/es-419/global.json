@@ -71,7 +71,7 @@
   "escrowTransferFailed": "Transferencia a la custodia falló",
   "escrowWithdrawalFailed": "Retirada de la custodia fallida",
   "reclaimingEscrowedPaymentFailed": "El pago no pudo ser reclamado",
-  "connectingToCelo": "Conectando al Celo…",
+  "connectingToCelo": "Conectando a Celo…",
   "poorConnection": {
     "0": "Mala Conexión",
     "1": "algunas funciones no disponible"
@@ -90,5 +90,6 @@
   "web3FailedToSync": "Fallo la sincronización, por favor verifica tu conexión",
   "errorDuringSync": "Ocurrió un error duranet la sincronización, por favor intente más tarde",
   "calculateFeeFailed": "No se pudo calcular la comisión",
-  "gold": "Oro"
+  "gold": "Oro",
+  "localCurrencyTitle": "Seleccione el tipo de moneda"
 }

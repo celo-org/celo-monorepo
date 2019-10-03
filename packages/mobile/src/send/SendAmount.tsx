@@ -1,5 +1,11 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import LoadingLabel from '@celo/react-components/components/LoadingLabel'
+import TextInput, { TextInputProps } from '@celo/react-components/components/TextInput'
+import ValidatedTextInput, {
+  DecimalValidatorProps,
+  ValidatedTextInputProps,
+} from '@celo/react-components/components/ValidatedTextInput'
+import withTextInputLabeling from '@celo/react-components/components/WithTextInputLabeling'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
@@ -31,6 +37,12 @@ import i18n, { Namespaces } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/contactMapping'
 import { E164NumberToAddressType } from 'src/identity/reducer'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
+import {
+  convertDollarsToMaxSupportedPrecision,
+  convertLocalAmountToDollars,
+} from 'src/localCurrency/convert'
+import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -41,12 +53,16 @@ import {
   RecipientKind,
 } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import LabeledTextInput from 'src/send/LabeledTextInput'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { TransactionTypes } from 'src/transactions/reducer'
 import { getBalanceColor, getFeeDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
+
+const AmountInput = withTextInputLabeling<ValidatedTextInputProps<DecimalValidatorProps>>(
+  ValidatedTextInput
+)
+const CommentInput = withTextInputLabeling<TextInputProps>(TextInput)
 
 interface State {
   amount: string
@@ -68,6 +84,8 @@ interface StateProps {
   defaultCountryCode: string
   e164NumberToAddress: E164NumberToAddressType
   feeType: FeeType | null
+  localCurrencyCode: LocalCurrencyCode | null
+  localCurrencyExchangeRate: number | null | undefined
 }
 
 interface DispatchProps {
@@ -119,6 +137,8 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
     defaultCountryCode: state.account.defaultCountryCode,
     e164NumberToAddress,
     feeType,
+    localCurrencyCode: getLocalCurrencyCode(state),
+    localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
   }
 }
 
@@ -155,9 +175,25 @@ export class SendAmount extends React.Component<Props, State> {
     this.props.fetchPhoneAddresses([recipient.e164PhoneNumber])
   }
 
+  getDollarsAmount = () => {
+    const parsedInputAmount = parseInputAmount(this.state.amount)
+    const { localCurrencyCode, localCurrencyExchangeRate } = this.props
+
+    let dollarsAmount
+    if (localCurrencyCode) {
+      dollarsAmount =
+        convertLocalAmountToDollars(parsedInputAmount, localCurrencyExchangeRate) ||
+        new BigNumber('')
+    } else {
+      dollarsAmount = parsedInputAmount
+    }
+
+    return convertDollarsToMaxSupportedPrecision(dollarsAmount)
+  }
+
   getNewAccountBalance = () => {
     return new BigNumber(this.props.dollarBalance)
-      .minus(parseInputAmount(this.state.amount))
+      .minus(this.getDollarsAmount())
       .minus(this.props.estimateFeeDollars || 0)
   }
 
@@ -180,7 +216,7 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   getConfirmationInput = (type: TransactionTypes) => {
-    const amount = parseInputAmount(this.state.amount)
+    const amount = this.getDollarsAmount()
     const recipient = this.getRecipient()
     // TODO (Rossy) Remove address field from some recipient types.
     const recipientAddress = getAddressFromRecipient(recipient, this.props.e164NumberToAddress)
@@ -313,7 +349,7 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, feeType, estimateFeeDollars } = this.props
+    const { t, feeType, estimateFeeDollars, localCurrencyCode } = this.props
     const newAccountBalance = this.getNewAccountBalance()
     const recipient = this.getRecipient()
     const verificationStatus = this.getVerificationStatus()
@@ -341,13 +377,13 @@ export class SendAmount extends React.Component<Props, State> {
               labelTextStyle={fontStyles.center}
             />
           </View>
-          <LabeledTextInput
+          <AmountInput
             keyboardType="numeric"
-            title={CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+            title={localCurrencyCode ? localCurrencyCode : CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
             placeholder={t('amount')}
             labelStyle={style.amountLabel as TextStyle}
             placeholderTextColor={colors.celoGreenInactive}
-            autocorrect={false}
+            autoCorrect={false}
             value={this.state.amount}
             onChangeText={this.onAmountChanged}
             autoFocus={true}
@@ -355,8 +391,7 @@ export class SendAmount extends React.Component<Props, State> {
             validator={ValidatorKind.Decimal}
             lng={this.props.lng}
           />
-          <LabeledTextInput
-            keyboardType="default"
+          <CommentInput
             title={t('for')}
             placeholder={t('groceriesRent')}
             value={this.state.reason}

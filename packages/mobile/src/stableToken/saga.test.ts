@@ -29,6 +29,10 @@ jest.mock('src/web3/actions', () => ({
   unlockAccount: jest.fn(async () => true),
 }))
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 const { unlockAccount } = require('src/web3/actions')
 
 const state = createMockStore().getState()

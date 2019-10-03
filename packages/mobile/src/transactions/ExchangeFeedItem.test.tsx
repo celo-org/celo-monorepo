@@ -8,6 +8,10 @@ import { ExchangeFeedItem } from 'src/transactions/ExchangeFeedItem'
 import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('ExchangeFeedItem', () => {
   let dateNowSpy: any
   beforeAll(() => {
