@@ -8,6 +8,7 @@ import {
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import {
   GasCurrencyWhitelistInstance,
   ReserveInstance,
@@ -15,17 +16,18 @@ import {
   StableTokenInstance,
 } from 'types'
 
-const truffle = require('@celo/protocol/truffle.js')
+const truffle = require('@celo/protocol/truffle-config.js')
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 const initializeArgs = async (): Promise<any[]> => {
+  const rate = toFixed(config.stableToken.inflationRate)
+
   return [
     config.stableToken.tokenName,
     config.stableToken.tokenSymbol,
     config.stableToken.decimals,
     config.registry.predeployedProxyAddress,
-    config.stableToken.inflationRateNumerator,
-    config.stableToken.inflationRateDenominator,
+    rate.toString(),
     config.stableToken.inflationPeriod,
   ]
 }
@@ -45,7 +47,12 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       `Minting ${minerAddress} ${config.stableToken.minerDollarBalance.toString()} StableToken`
     )
     await stableToken.setMinter(minerAddress)
-    await stableToken.mint(minerAddress, web3.utils.toBN(minerStartBalance))
+
+    const initialBalance = web3.utils.toBN(minerStartBalance)
+    await stableToken.mint(minerAddress, initialBalance)
+    for (const address of config.stableToken.initialAccounts) {
+      await stableToken.mint(address, initialBalance)
+    }
 
     console.log('Setting GoldToken/USD exchange rate')
     const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract<

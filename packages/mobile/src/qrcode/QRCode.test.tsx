@@ -14,7 +14,11 @@ const commonProps = {
   ...getMockI18nProps(),
 }
 
-describe(QRCode, () => {
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
+describe('QRCode', () => {
   const store = createMockStore({
     account: { name: mockName },
     web3: {

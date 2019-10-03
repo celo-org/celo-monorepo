@@ -6,18 +6,19 @@ import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
 
 interface StateProps {
-  disabled: boolean
+  backupTooLate: boolean
 }
 
 interface OwnProps {
   onTabPress?: () => void
+  inactiveTintColor: string
 }
 
 type Props = StateProps & OwnProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
-    disabled: isBackupTooLate(state),
+    backupTooLate: isBackupTooLate(state),
   }
 }
 
@@ -25,9 +26,9 @@ const mapStateToProps = (state: RootState): StateProps => {
 const onPress = () => {}
 
 export const TabBar = (props: Props) => {
-  const { disabled } = props
-  const inactiveTintColor = disabled ? colors.inactive : colors.darkSecondary
-  const onTabPress = disabled ? onPress : props.onTabPress
+  const { backupTooLate } = props
+  const inactiveTintColor = backupTooLate ? colors.inactive : props.inactiveTintColor
+  const onTabPress = backupTooLate ? onPress : props.onTabPress
   return <BottomTabBar {...props} inactiveTintColor={inactiveTintColor} onTabPress={onTabPress} />
 }
 

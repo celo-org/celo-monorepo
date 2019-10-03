@@ -127,12 +127,7 @@ export default async function getInstance(web3: Web3) {
     "inputs": [
       {
         "indexed": false,
-        "name": "numerator",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "name": "denominator",
+        "name": "factor",
         "type": "uint256"
       },
       {
@@ -149,12 +144,7 @@ export default async function getInstance(web3: Web3) {
     "inputs": [
       {
         "indexed": false,
-        "name": "numerator",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "name": "denominator",
+        "name": "rate",
         "type": "uint256"
       },
       {
@@ -276,11 +266,7 @@ export default async function getInstance(web3: Web3) {
         "type": "address"
       },
       {
-        "name": "inflationRateNumerator",
-        "type": "uint256"
-      },
-      {
-        "name": "inflationRateDenominator",
+        "name": "inflationRate",
         "type": "uint256"
       },
       {
@@ -312,11 +298,7 @@ export default async function getInstance(web3: Web3) {
     "constant": false,
     "inputs": [
       {
-        "name": "rateNumerator",
-        "type": "uint256"
-      },
-      {
-        "name": "rateDenominator",
+        "name": "rate",
         "type": "uint256"
       },
       {
@@ -495,7 +477,7 @@ export default async function getInstance(web3: Web3) {
     "constant": true,
     "inputs": [
       {
-        "name": "owner",
+        "name": "accountOwner",
         "type": "address"
       },
       {
@@ -518,7 +500,7 @@ export default async function getInstance(web3: Web3) {
     "constant": true,
     "inputs": [
       {
-        "name": "owner",
+        "name": "accountOwner",
         "type": "address"
       }
     ],
@@ -552,14 +534,6 @@ export default async function getInstance(web3: Web3) {
     "inputs": [],
     "name": "getInflationParameters",
     "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "name": "",
-        "type": "uint256"
-      },
       {
         "name": "",
         "type": "uint256"
@@ -722,6 +696,6 @@ export default async function getInstance(web3: Web3) {
     "type": "function"
   }
 ],
-   "0xd4b4fcaCAc9e23225680e89308E0a4C41Dd9C6B4"
+   "0x88F24De331525cf6cFD7455Eb96A9E4D49B7F292"
   )
 }

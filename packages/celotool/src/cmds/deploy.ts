@@ -1,4 +1,4 @@
-import { addCeloEnvMiddleware, CeloEnvArgv } from '@celo/celotool/src/lib/env-utils'
+import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
 import * as yargs from 'yargs'
 
 export const command = 'deploy <deployMethod> <deployPackage>'

@@ -1,19 +1,13 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import { call, delay, select } from 'redux-saga/effects'
-import { pincodeSelector } from 'src/account/reducer'
-import { waitForGethConnectivity } from 'src/geth/saga'
+import { pincodeTypeSelector } from 'src/account/reducer'
 import { navigateToError } from 'src/navigator/NavigationService'
+import { setLatestBlockNumber, updateWeb3SyncProgress } from 'src/web3/actions'
 import {
-  getLatestBlock,
-  setLatestBlockNumber,
-  setSyncProgress,
-  updateWeb3SyncProgress,
-} from 'src/web3/actions'
-import {
-  _CHECK_SYNC_PROGRESS_TIMEOUT,
-  _checkWeb3SyncProgressClaim,
-  checkWeb3Sync,
-  createNewAccount,
+  checkWeb3SyncProgress,
+  getOrCreateAccount,
+  SYNC_TIMEOUT,
+  waitForWeb3Sync,
 } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 import { createMockStore, sleep } from 'test/utils'
@@ -37,19 +31,21 @@ jest.mock('src/web3/contracts', () => ({
         .fn()
         .mockReturnValueOnce({ startingBlock: 0, currentBlock: 10, highestBlock: 100 })
         .mockReturnValueOnce(false),
+      getBlock: jest.fn(() => ({ number: LAST_BLOCK_NUMBER })),
     },
   },
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
 }))
 
 const state = createMockStore({ web3: { account: mockAccount } }).getState()
 
-describe(createNewAccount, () => {
+describe(getOrCreateAccount, () => {
   beforeAll(() => {
     jest.useRealTimers()
   })
 
   it('returns an existing account', async () => {
-    await expectSaga(createNewAccount)
+    await expectSaga(getOrCreateAccount)
       .withState(state)
       .provide([[select(currentAccountSelector), '123']])
       .returns('123')
@@ -57,49 +53,46 @@ describe(createNewAccount, () => {
   })
 
   it('creates a new account', async () => {
-    await expectSaga(createNewAccount)
+    await expectSaga(getOrCreateAccount)
       .withState(state)
       .provide([[select(currentAccountSelector), null]])
-      .provide([[select(pincodeSelector), '123']])
+      .provide([[select(pincodeTypeSelector), '123']])
       .returns('0x0000000000000000000000000000000000007E57')
       .run()
   })
 })
 
-describe(checkWeb3Sync, () => {
+describe(waitForWeb3Sync, () => {
   it('reports connection successfully', async () => {
-    await expectSaga(checkWeb3Sync)
+    await expectSaga(waitForWeb3Sync)
       .withState(state)
       .provide([
-        [call(waitForGethConnectivity), true],
         // needs this async function to win the race with a delay
-        [call(_checkWeb3SyncProgressClaim), call(async () => true)],
-        [call(getLatestBlock), { number: LAST_BLOCK_NUMBER }],
+        [call(checkWeb3SyncProgress), call(async () => true)],
       ])
-      .put(setLatestBlockNumber(LAST_BLOCK_NUMBER))
+      .returns(true)
       .run()
   })
 
   it('times out', async () => {
-    await expectSaga(checkWeb3Sync)
+    await expectSaga(waitForWeb3Sync)
       .withState(state)
       .provide([
-        [call(waitForGethConnectivity), true],
-        [call(_checkWeb3SyncProgressClaim), call(sleep, 100)], // sleep so timeout always wins the race
-        [delay(_CHECK_SYNC_PROGRESS_TIMEOUT), true],
-        [call(getLatestBlock), { number: LAST_BLOCK_NUMBER }],
+        [call(checkWeb3SyncProgress), call(sleep, 100)], // sleep so timeout always wins the race
+        [delay(SYNC_TIMEOUT), true],
       ])
+      .returns(false)
       .run()
     expect(navigateToError).toHaveBeenCalled()
   })
 })
 
-describe(_checkWeb3SyncProgressClaim, () => {
+describe(checkWeb3SyncProgress, () => {
   it('reports web3 status correctly', async () => {
-    await expectSaga(_checkWeb3SyncProgressClaim)
+    await expectSaga(checkWeb3SyncProgress)
       .withState(state)
       .put(updateWeb3SyncProgress({ startingBlock: 0, currentBlock: 10, highestBlock: 100 })) // is syncing the first time
-      .put(setSyncProgress(100)) // finished syncing the second time
+      .put(setLatestBlockNumber(LAST_BLOCK_NUMBER)) // finished syncing the second time
       .returns(true)
       .run()
   })

@@ -4,17 +4,18 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
 <View
   accessible={true}
   isTVSelectable={true}
+  nativeBackgroundAndroid={
+    Object {
+      "attribute": "selectableItemBackground",
+      "type": "ThemeAttrAndroid",
+    }
+  }
   onResponderGrant={[Function]}
   onResponderMove={[Function]}
   onResponderRelease={[Function]}
   onResponderTerminate={[Function]}
   onResponderTerminationRequest={[Function]}
   onStartShouldSetResponder={[Function]}
-  style={
-    Object {
-      "opacity": 1,
-    }
-  }
 >
   <View
     style={
@@ -22,94 +23,97 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
         "flex": 1,
         "flexDirection": "row",
         "justifyContent": "space-between",
-        "paddingLeft": 10,
-        "paddingTop": 20,
+        "padding": 16,
       }
     }
   >
     <View
       style={
-        Array [
+        Object {
+          "alignItems": "center",
+          "flexDirection": "column",
+          "height": 40,
+          "justifyContent": "center",
+          "width": 40,
+        }
+      }
+    >
+      <Image
+        resizeMode="contain"
+        source={
           Object {
-            "borderBottomWidth": 1,
-            "borderColor": "rgba(134, 138, 141, 0.15)",
-            "flex": 1,
-            "flexDirection": "row",
-            "justifyContent": "space-between",
-            "paddingRight": 10,
-          },
-          false,
-        ]
+            "testUri": "../../../src/transactions/ExchangeGreenGold.png",
+          }
+        }
+        style={
+          Object {
+            "width": 40,
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        Object {
+          "flex": 1,
+          "marginLeft": 16,
+        }
       }
     >
       <View
         style={
           Object {
-            "flex": 1,
-            "justifyContent": "flex-start",
+            "flexDirection": "row",
+            "marginTop": 3,
           }
         }
       >
-        <View
+        <Text
           style={
             Object {
-              "opacity": 1,
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 14,
+              "lineHeight": 18,
             }
           }
         >
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 14,
-                "lineHeight": 18,
-              }
-            }
-          >
-            exchange
-          </Text>
-        </View>
+          exchange
+        </Text>
         <Text
           style={
             Array [
               Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
+                "color": "#FBCC5C",
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 15,
+                "lineHeight": 20,
               },
               Object {
-                "paddingBottom": 10,
-                "paddingTop": 25,
+                "marginLeft": "auto",
+                "paddingLeft": 10,
               },
             ]
           }
         >
-          Dec 31 at 5:00 PM
+          
+          10.00
         </Text>
       </View>
       <View
         style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "alignSelf": "flex-start",
-              "flexDirection": "row",
-              "justifyContent": "flex-end",
-            },
-            Object {
-              "opacity": 1,
-            },
-          ]
+          Object {
+            "alignItems": "center",
+            "flexDirection": "row",
+          }
         }
       >
         <Text
           style={
             Array [
               Object {
-                "color": "#81868B",
-                "fontFamily": "Hind-Regular",
+                "color": "#2E3338",
+                "fontFamily": "Hind-SemiBold",
                 "fontSize": 16,
                 "lineHeight": 20,
               },
@@ -119,13 +123,12 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
             ]
           }
         >
-          $
           1.00
         </Text>
         <View
           style={
             Object {
-              "paddingBottom": 5,
+              "paddingBottom": 8,
               "paddingHorizontal": 5,
             }
           }
@@ -151,8 +154,8 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
           style={
             Array [
               Object {
-                "color": "#81868B",
-                "fontFamily": "Hind-Regular",
+                "color": "#2E3338",
+                "fontFamily": "Hind-SemiBold",
                 "fontSize": 16,
                 "lineHeight": 20,
               },
@@ -162,8 +165,35 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
             ]
           }
         >
-          
           10.00
+        </Text>
+      </View>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "marginTop": 8,
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
+              },
+              Object {
+                "color": "#BDBDBD",
+              },
+            ]
+          }
+        >
+          Dec 31 at 5:00 PM
         </Text>
       </View>
     </View>

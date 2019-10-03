@@ -43,6 +43,7 @@ const handlePaymentRequested = (
     amount: new BigNumber(paymentRequest.amount),
     reason: paymentRequest.comment,
     recipientAddress: targetRecipient.address,
+    type: TransactionTypes.PAY_REQUEST,
   })
 }
 

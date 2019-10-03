@@ -5,6 +5,7 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { FeeType } from 'src/fees/actions'
 import { fetchPhoneAddresses } from 'src/identity/actions'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import SendAmount, { SendAmount as SendAmountClass } from 'src/send/SendAmount'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 import { mockAccount2, mockE164Number2, mockNavigation } from 'test/values'
@@ -29,6 +30,10 @@ const storeData = {
 
 const TEXT_PLACEHOLDER = 'groceriesRent'
 const AMOUNT_PLACEHOLDER = 'amount'
+
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
 
 describe('SendAmount', () => {
   beforeAll(() => {
@@ -69,11 +74,13 @@ describe('SendAmount', () => {
             showError={jest.fn()}
             hideAlert={jest.fn()}
             fetchPhoneAddresses={fetchPhoneAddresses}
-            dollarBalance={new BigNumber(1)}
-            suggestedFeeDollars={new BigNumber(1)}
+            dollarBalance={'1'}
+            estimateFeeDollars={new BigNumber(1)}
             e164NumberToAddress={{ [mockE164Number2]: mockAccount2 }}
             defaultCountryCode={'+1'}
             feeType={FeeType.SEND}
+            localCurrencyCode={LocalCurrencyCode.MXN}
+            localCurrencyExchangeRate={1.33}
           />
         </Provider>
       )
@@ -108,7 +115,7 @@ describe('SendAmount', () => {
 
     it('handles commas', () => {
       numeral.locale('es')
-      const wrapper = getWrapper('es-AR')
+      const wrapper = getWrapper('es_419')
       const input = wrapper.getByPlaceholder(AMOUNT_PLACEHOLDER)
       fireEvent.changeText(input, '4,0')
       expect(wrapper.queryAllByDisplayValue('4,0')).toHaveLength(1)

@@ -233,8 +233,10 @@ export async function requestAndRetrieveAttestations(
       account
     )
 
+    CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_start)
     // Check if we have a sufficient set now by fetching the new total set
     attestations = await getActionableAttestations(attestationsContract, e164NumberHash, account)
+    CeloAnalytics.track(CustomEventNames.verification_actionable_attestation_finish)
   }
 
   return attestations
@@ -360,6 +362,7 @@ function attestationCodeReceiver(
 
       Logger.debug(TAG + '@attestationCodeReceiver', `Received code for issuer ${issuer}`)
 
+      CeloAnalytics.track(CustomEventNames.verification_validate_code_start, { issuer })
       const isValidRequest = yield call(
         validateAttestationCode,
         attestationsContract,
@@ -368,6 +371,8 @@ function attestationCodeReceiver(
         issuer,
         code
       )
+      CeloAnalytics.track(CustomEventNames.verification_validate_code_finish, { issuer })
+
       if (isValidRequest === NULL_ADDRESS) {
         throw new Error('Code is not valid')
       }
@@ -394,7 +399,7 @@ function* revealNeededAttestations(
 ) {
   Logger.debug(TAG + '@revealNeededAttestations', `Revealing ${attestations.length} attestations`)
   yield all(
-    attestations.map((attestation) => {
+    attestations.map((attestation, index) => {
       return call(
         revealAndCompleteAttestation,
         attestationsContract,
@@ -417,6 +422,7 @@ function* revealAndCompleteAttestation(
   Logger.debug(TAG + '@revealAttestation', `Revealing an attestation for issuer: ${issuer}`)
   CeloAnalytics.track(CustomEventNames.verification_reveal_attestation, { issuer })
   const revealTx = yield call(makeRevealTx, attestationsContract, e164Number, issuer)
+  // Crude way to prevent sendTransaction being called in parallel and use the same nonces.
   yield call(sendTransaction, revealTx, account, TAG, `Reveal ${issuer}`)
 
   CeloAnalytics.track(CustomEventNames.verification_revealed_attestation, { issuer })

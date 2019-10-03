@@ -4,13 +4,14 @@ import {
   assertRevert,
   NULL_ADDRESS,
 } from '@celo/protocol/lib/test-utils'
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
+import BigNumber from 'bignumber.js'
 import {
   GasPriceMinimumContract,
   GasPriceMinimumInstance,
   RegistryContract,
   RegistryInstance,
 } from 'types'
-import BigNumber from 'bignumber.js'
 
 const Registry: RegistryContract = artifacts.require('Registry')
 const GasPriceMinimum: GasPriceMinimumContract = artifacts.require('GasPriceMinimum')
@@ -20,9 +21,9 @@ contract('GasPriceMinimum', (accounts: string[]) => {
   let registry: RegistryInstance
   const nonOwner = accounts[1]
   const initialGasPriceMinimum = new BigNumber(500)
-  const targetDensity = { numerator: new BigNumber(1), denominator: new BigNumber(2) }
-  const adjustmentSpeed = { numerator: new BigNumber(1), denominator: new BigNumber(2) }
-  const infrastructureFraction = { numerator: new BigNumber(1), denominator: new BigNumber(2) }
+  const targetDensity = toFixed(1 / 2)
+  const adjustmentSpeed = toFixed(1 / 2)
+  const infrastructureFraction = toFixed(1 / 2)
 
   beforeEach(async () => {
     registry = await Registry.new()
@@ -31,12 +32,9 @@ contract('GasPriceMinimum', (accounts: string[]) => {
     await gasPriceMinimum.initialize(
       registry.address,
       initialGasPriceMinimum,
-      targetDensity.numerator,
-      targetDensity.denominator,
-      adjustmentSpeed.numerator,
-      adjustmentSpeed.denominator,
-      infrastructureFraction.numerator,
-      infrastructureFraction.denominator
+      targetDensity,
+      adjustmentSpeed,
+      infrastructureFraction
     )
   })
 
@@ -53,20 +51,17 @@ contract('GasPriceMinimum', (accounts: string[]) => {
 
     it('should set the target density', async () => {
       const actualTargetDensity = await gasPriceMinimum.targetDensity()
-      assertEqualBN(actualTargetDensity[0], targetDensity.numerator)
-      assertEqualBN(actualTargetDensity[1], targetDensity.denominator)
+      assertEqualBN(actualTargetDensity, targetDensity)
     })
 
     it('should set the adjustment speed', async () => {
       const actualAdjustmentSpeed = await gasPriceMinimum.adjustmentSpeed()
-      assertEqualBN(actualAdjustmentSpeed[0], adjustmentSpeed.numerator)
-      assertEqualBN(actualAdjustmentSpeed[1], adjustmentSpeed.denominator)
+      assertEqualBN(actualAdjustmentSpeed, adjustmentSpeed)
     })
 
     it('should set the infrastructure fraction', async () => {
       const actualInfrastructureFraction = await gasPriceMinimum.infrastructureFraction()
-      assertEqualBN(actualInfrastructureFraction[0], infrastructureFraction.numerator)
-      assertEqualBN(actualInfrastructureFraction[1], infrastructureFraction.denominator)
+      assertEqualBN(actualInfrastructureFraction, infrastructureFraction)
     })
 
     it('should not be callable again', async () => {
@@ -74,105 +69,72 @@ contract('GasPriceMinimum', (accounts: string[]) => {
         gasPriceMinimum.initialize(
           registry.address,
           initialGasPriceMinimum,
-          targetDensity.numerator,
-          targetDensity.denominator,
-          adjustmentSpeed.numerator,
-          adjustmentSpeed.denominator,
-          infrastructureFraction.numerator,
-          infrastructureFraction.denominator
+          targetDensity,
+          adjustmentSpeed,
+          infrastructureFraction
         )
       )
     })
   })
 
   describe('#setAdjustmentSpeed', () => {
-    const newAdjustmentSpeed = { numerator: new BigNumber(1), denominator: new BigNumber(3) }
+    const newAdjustmentSpeed = toFixed(1 / 3)
 
     it('should set the adjustment speed', async () => {
-      await gasPriceMinimum.setAdjustmentSpeed(
-        newAdjustmentSpeed.numerator,
-        newAdjustmentSpeed.denominator
-      )
+      await gasPriceMinimum.setAdjustmentSpeed(newAdjustmentSpeed)
       const actualAdjustmentSpeed = await gasPriceMinimum.adjustmentSpeed()
-      assertEqualBN(actualAdjustmentSpeed[0], newAdjustmentSpeed.numerator)
-      assertEqualBN(actualAdjustmentSpeed[1], newAdjustmentSpeed.denominator)
+      assertEqualBN(actualAdjustmentSpeed, newAdjustmentSpeed)
     })
 
     it('should emit the AdjustmentSpeedSet event', async () => {
-      const resp = await gasPriceMinimum.setAdjustmentSpeed(
-        newAdjustmentSpeed.numerator,
-        newAdjustmentSpeed.denominator
-      )
+      const resp = await gasPriceMinimum.setAdjustmentSpeed(newAdjustmentSpeed)
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertLogMatches2(log, {
         event: 'AdjustmentSpeedSet',
         args: {
-          numerator: newAdjustmentSpeed.numerator,
-          denominator: newAdjustmentSpeed.denominator,
+          adjustmentSpeed: newAdjustmentSpeed,
         },
       })
     })
 
-    it('should revert when the provided denominator is 0', async () => {
-      await assertRevert(gasPriceMinimum.setAdjustmentSpeed(0, 0))
-    })
-
     it('should revert when the provided fraction is greater than one', async () => {
-      await assertRevert(gasPriceMinimum.setAdjustmentSpeed(2, 1))
+      await assertRevert(gasPriceMinimum.setAdjustmentSpeed(toFixed(3 / 2)))
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevert(
-        gasPriceMinimum.setAdjustmentSpeed(
-          newAdjustmentSpeed.numerator,
-          newAdjustmentSpeed.denominator,
-          { from: nonOwner }
-        )
-      )
+      await assertRevert(gasPriceMinimum.setAdjustmentSpeed(newAdjustmentSpeed, { from: nonOwner }))
     })
   })
 
   describe('#setTargetDensity', () => {
-    const newTargetDensity = { numerator: new BigNumber(1), denominator: new BigNumber(3) }
+    const newTargetDensity = toFixed(1 / 3)
 
     it('should set the adjustment speed', async () => {
-      await gasPriceMinimum.setTargetDensity(
-        newTargetDensity.numerator,
-        newTargetDensity.denominator
-      )
+      await gasPriceMinimum.setTargetDensity(newTargetDensity)
       const actualTargetDensity = await gasPriceMinimum.targetDensity()
-      assertEqualBN(actualTargetDensity[0], newTargetDensity.numerator)
-      assertEqualBN(actualTargetDensity[1], newTargetDensity.denominator)
+      assertEqualBN(actualTargetDensity, newTargetDensity)
     })
 
     it('should emit the TargetDensitySet event', async () => {
-      const resp = await gasPriceMinimum.setTargetDensity(
-        newTargetDensity.numerator,
-        newTargetDensity.denominator
-      )
+      const resp = await gasPriceMinimum.setTargetDensity(newTargetDensity)
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertLogMatches2(log, {
         event: 'TargetDensitySet',
         args: {
-          numerator: newTargetDensity.numerator,
-          denominator: newTargetDensity.denominator,
+          targetDensity: newTargetDensity,
         },
       })
     })
 
-    it('should revert when the provided denominator is 0', async () => {
-      await assertRevert(gasPriceMinimum.setTargetDensity(0, 0))
-    })
-
     it('should revert when the provided fraction is greater than one', async () => {
-      await assertRevert(gasPriceMinimum.setTargetDensity(2, 1))
+      await assertRevert(gasPriceMinimum.setTargetDensity(toFixed(3 / 2)))
     })
 
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(
-        gasPriceMinimum.setTargetDensity(newTargetDensity.numerator, newTargetDensity.denominator, {
+        gasPriceMinimum.setTargetDensity(newTargetDensity, {
           from: nonOwner,
         })
       )
@@ -180,49 +142,33 @@ contract('GasPriceMinimum', (accounts: string[]) => {
   })
 
   describe('#setInfrastructureFraction', () => {
-    const newInfrastructureFraction = { numerator: new BigNumber(1), denominator: new BigNumber(3) }
+    const newInfrastructureFraction = toFixed(1 / 3)
 
     it('should set the adjustment speed', async () => {
-      await gasPriceMinimum.setInfrastructureFraction(
-        newInfrastructureFraction.numerator,
-        newInfrastructureFraction.denominator
-      )
+      await gasPriceMinimum.setInfrastructureFraction(newInfrastructureFraction)
       const actualInfrastructureFraction = await gasPriceMinimum.infrastructureFraction()
-      assertEqualBN(actualInfrastructureFraction[0], newInfrastructureFraction.numerator)
-      assertEqualBN(actualInfrastructureFraction[1], newInfrastructureFraction.denominator)
+      assertEqualBN(actualInfrastructureFraction, newInfrastructureFraction)
     })
 
     it('should emit the InfrastructureFractionSet event', async () => {
-      const resp = await gasPriceMinimum.setInfrastructureFraction(
-        newInfrastructureFraction.numerator,
-        newInfrastructureFraction.denominator
-      )
+      const resp = await gasPriceMinimum.setInfrastructureFraction(newInfrastructureFraction)
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertLogMatches2(log, {
         event: 'InfrastructureFractionSet',
         args: {
-          numerator: newInfrastructureFraction.numerator,
-          denominator: newInfrastructureFraction.denominator,
+          infrastructureFraction: newInfrastructureFraction,
         },
       })
     })
 
-    it('should revert when the provided denominator is 0', async () => {
-      await assertRevert(gasPriceMinimum.setInfrastructureFraction(0, 0))
-    })
-
     it('should revert when the provided fraction is greater than one', async () => {
-      await assertRevert(gasPriceMinimum.setInfrastructureFraction(2, 1))
+      await assertRevert(gasPriceMinimum.setInfrastructureFraction(toFixed(3 / 2)))
     })
 
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(
-        gasPriceMinimum.setInfrastructureFraction(
-          newInfrastructureFraction.numerator,
-          newInfrastructureFraction.denominator,
-          { from: nonOwner }
-        )
+        gasPriceMinimum.setInfrastructureFraction(newInfrastructureFraction, { from: nonOwner })
       )
     })
   })
@@ -253,19 +199,17 @@ contract('GasPriceMinimum', (accounts: string[]) => {
     describe('when the fullness of the block is random', () => {
       const getUpdatedGasPriceMinimum = (
         previousGasPriceMinimum,
-        densityNumerator,
-        densityDenominator,
-        targetDensityNumerator,
-        targetDensityDenominator,
-        adjustmentSpeedNumerator,
-        adjustmentSpeedDenominator
+        density,
+        targetDensity,
+        adjustmentSpeed
       ) => {
-        const density = densityNumerator.div(densityDenominator)
-        const targetDensity = targetDensityNumerator.div(targetDensityDenominator)
-        const adjSpeed = adjustmentSpeedNumerator.div(adjustmentSpeedDenominator)
         const one = new BigNumber(1)
         return previousGasPriceMinimum
-          .times(one.plus(adjSpeed.times(density.minus(targetDensity))))
+          .times(
+            one.plus(
+              fromFixed(adjustmentSpeed).times(fromFixed(density).minus(fromFixed(targetDensity)))
+            )
+          )
           .plus(one)
           .integerValue(BigNumber.ROUND_DOWN)
       }
@@ -283,12 +227,9 @@ contract('GasPriceMinimum', (accounts: string[]) => {
           )
           const expectedUpdatedGasPriceMinimum = getUpdatedGasPriceMinimum(
             initialGasPriceMinimum,
-            gasUsed,
-            blockGasLimit,
-            targetDensity.numerator,
-            targetDensity.denominator,
-            adjustmentSpeed.numerator,
-            adjustmentSpeed.denominator
+            toFixed(gasUsed.div(blockGasLimit)),
+            targetDensity,
+            adjustmentSpeed
           )
           assertEqualBN(actualUpdatedGasPriceMinimum, expectedUpdatedGasPriceMinimum)
         }

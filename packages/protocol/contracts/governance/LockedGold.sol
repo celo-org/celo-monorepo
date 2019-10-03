@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -10,12 +10,14 @@ import "./interfaces/IValidators.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
+import "../common/FixidityLib.sol";
 import "../common/interfaces/IERC20Token.sol";
 import "../common/Signatures.sol";
 import "../common/FractionUtil.sol";
 
 contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistry {
 
+  using FixidityLib for FixidityLib.Fraction;
   using FractionUtil for FractionUtil.Fraction;
   using SafeMath for uint256;
 
@@ -57,7 +59,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   // Maps voting, rewards, and validating delegates to the account that delegated these rights.
   mapping(address => address) public delegations;
   // Maps a block number to the cumulative reward for an account with weight 1 since genesis.
-  mapping(uint256 => FractionUtil.Fraction) public cumulativeRewardWeights;
+  mapping(uint256 => FixidityLib.Fraction) public cumulativeRewardWeights;
 
   event MaxNoticePeriodSet(
     uint256 maxNoticePeriod
@@ -121,6 +123,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @dev Called by the EVM at the end of the block.
    */
   function setCumulativeRewardWeight(uint256 blockReward) external {
+    require(blockReward > 0, "placeholder to suppress warning");
     return;
     // TODO(asa): Modify ganache to set cumulativeRewardWeights.
     // TODO(asa): Make inheritable `onlyVm` modifier.
@@ -225,6 +228,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     external
     nonReentrant
   {
+    // TODO: split and add error messages for better dev feedback
     require(isAccount(msg.sender) && isNotAccount(delegate) && isNotDelegate(delegate));
 
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
@@ -410,7 +414,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     return account.rewardsLastRedeemed;
   }
 
-  function isValidating(address validator) public view returns (bool) {
+  function isValidating(address validator) external view returns (bool) {
     IValidators validators = IValidators(registry.getAddressFor(VALIDATORS_REGISTRY_ID));
     return validators.isValidating(validator);
   }
@@ -564,22 +568,22 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   function _redeemRewards(address _account) private returns (uint256) {
     Account storage account = accounts[_account];
     uint256 rewardBlockNumber = block.number.sub(1);
-    FractionUtil.Fraction storage previousCumulativeRewardWeight = cumulativeRewardWeights[
+    FixidityLib.Fraction memory previousCumulativeRewardWeight = cumulativeRewardWeights[
       account.rewardsLastRedeemed
     ];
-    FractionUtil.Fraction storage cumulativeRewardWeight = cumulativeRewardWeights[
+    FixidityLib.Fraction memory cumulativeRewardWeight = cumulativeRewardWeights[
       rewardBlockNumber
     ];
     // We should never get here except in testing, where cumulativeRewardWeight will not be set.
-    if (!previousCumulativeRewardWeight.exists() || !cumulativeRewardWeight.exists()) {
+    if (previousCumulativeRewardWeight.unwrap() == 0 || cumulativeRewardWeight.unwrap() == 0) {
       return 0;
     }
 
-    FractionUtil.Fraction memory rewardWeight = cumulativeRewardWeight.sub(
+    FixidityLib.Fraction memory rewardWeight = cumulativeRewardWeight.subtract(
       previousCumulativeRewardWeight
     );
-    require(rewardWeight.exists(), "Rewards weight does not exist");
-    uint256 value = rewardWeight.mul(account.weight);
+    require(rewardWeight.unwrap() != 0, "Rewards weight does not exist");
+    uint256 value = rewardWeight.multiply(FixidityLib.wrap(account.weight)).fromFixed();
     account.rewardsLastRedeemed = uint96(rewardBlockNumber);
     if (value > 0) {
       address recipient = getDelegateFromAccountAndRole(_account, DelegateRole.Rewards);
@@ -719,9 +723,25 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     list.length = lastIndex;
   }
 
-  function isAccount(address account) internal view returns (bool) {
+  /**
+   * @notice Check if an account already exists.
+   * @param account The address of the account
+   * @return Returns `true` if account exists. Returns `false` otherwise.
+   *         In particular it will return `false` if a delegate with given address exists.
+   */
+  function isAccount(address account) public view returns (bool) {
     return (accounts[account].exists);
   }
+
+  /**
+   * @notice Check if a delegate already exists.
+   * @param account The address of the delegate
+   * @return Returns `true` if delegate exists. Returns `false` otherwise.
+   */
+  function isDelegate(address account) external view returns (bool) {
+    return (delegations[account] != address(0));
+  }
+
 
   function isNotAccount(address account) internal view returns (bool) {
     return (!accounts[account].exists);
@@ -740,6 +760,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     return (!validators.isValidating(validator));
   }
 
+  // TODO: consider using Fixidity's roots
   /**
    * @notice Approxmiates the square root of x using the Bablyonian method.
    * @param x The number to take the square root of.

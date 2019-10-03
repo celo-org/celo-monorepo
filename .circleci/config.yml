@@ -6,7 +6,7 @@ version: 2
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: celohq/node8:gcloud-deps
+    - image: celohq/node10-gcloud
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: "--max-old-space-size=4096"
@@ -16,19 +16,18 @@ android-defaults: &android-defaults
   docker:
     - image: circleci/android:api-28-node8-alpha
   environment:
-    _JAVA_OPTIONS: '-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
+    _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
     GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError"'
 
 general:
   artifacts:
-    - 'mobile/coverage'
-    - 'protocol/coverage'
+    - "mobile/coverage"
+    - "protocol/coverage"
 
 jobs:
   install_dependencies:
     <<: *defaults
     steps:
-
       - restore_cache:
           keys:
             - source-v1-{{ .Branch }}-{{ .Revision }}
@@ -59,7 +58,7 @@ jobs:
           at: ~/app
 
       - restore_cache:
-          keys: 
+          keys:
             - yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
             - yarn-v2-{{ arch }}-{{ .Branch }}-
             - yarn-v2-{{ arch }}-
@@ -89,20 +88,20 @@ jobs:
           paths:
             - node_modules
             - packages/*/node_modules
-      
+
       - run:
           name: Build packages
           command: |
-            # separate build to avoid ENOMEN in CI :(
+            # separate build to avoid ENOMEM in CI :(
+            yarn build --scope @celo/utils
             yarn build --scope @celo/protocol
             yarn build --scope docs
             yarn build --scope @celo/walletkit
             yarn build --ignore @celo/protocol --ignore docs --ignore @celo/walletkit
 
-
       - persist_to_workspace:
           root: .
-          paths: 
+          paths:
             - .
 
   lint-checks:
@@ -110,6 +109,8 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
+      # If this fails, fix it with 
+      # `./node_modules/.bin/prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx)'`
       - run: yarn run prettify:diff
       - run: yarn run lint
 
@@ -207,16 +208,41 @@ jobs:
           name: test
           # Flaky tests - run them twice
           command: yarn --cwd packages/protocol test || yarn --cwd packages/protocol test
+
+  # Slow and flaky compared to protocol-test which runs without coverage
+  protocol-test-with-code-coverage:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            FILES_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+      - run:
+          name: test
+          # Flaky tests - run them twice
+          command: yarn --cwd packages/protocol test:coverage || yarn --cwd packages/protocol test:coverage
+      - store_artifacts:
+          path: packages/protocol/coverage
+          destination: protocol/coverage
+      - run:
+          name: Upload to CodeCov
+          command: yarn codecov -F protocol
+
   contractkit-test:
     <<: *defaults
     steps:
       - attach_workspace:
           at: ~/app
       - run:
+          name: Generate DevChain
           command: |
-            yarn --cwd=packages/contractkit test:prepare
-            yarn --cwd=packages/contractkit test
-
+            (cd packages/contractkit && yarn test:prepare)
+      - run:
+          name: Run Tests
+          command: yarn --cwd=packages/contractkit test
 
   walletkit-test:
     <<: *defaults
@@ -257,7 +283,11 @@ jobs:
               git --no-pager diff packages/docs/command-line-interface
               echo "There are git differences after generating CLI docs"
               exit 1
-            fi            
+            fi
+      - run:
+          name: Verify that a new account can be created
+          command: |
+            yarn --cwd=packages/cli run celocli account:new
 
   end-to-end-geth-transfer-test:
     <<: *defaults
@@ -448,7 +478,10 @@ jobs:
     steps:
       - run:
           name: Installing npm package - @celo/walletkit
-          command: yarn add @celo/walletkit
+          command: |
+            # Try one more time in case the first attempt fails
+            # to deal with scenarios like https://circleci.com/gh/celo-org/celo-monorepo/23329
+            yarn add @celo/walletkit || yarn add @celo/walletkit
 
   test-celocli-npm-package-install:
     working_directory: ~/app
@@ -460,7 +493,7 @@ jobs:
           command: npm install @celo/celocli
       - run:
           name: Minor test of celocli
-          command: ./node_modules/.bin/celocli account:new  # Small test
+          command: ./node_modules/.bin/celocli account:new # Small test
 
 workflows:
   version: 2
@@ -477,6 +510,9 @@ workflows:
           requires:
             - install_dependencies
       - cli-test:
+          requires:
+            - install_dependencies
+      - contractkit-test:
           requires:
             - install_dependencies
       - mobile-test:
@@ -508,7 +544,7 @@ workflows:
           requires:
             - lint-checks
             - walletkit-test
-  nightly:
+  npm-install-testing-cron-workflow:
     triggers:
       - schedule:
           # 7 PM in UTC = noon in PDT.
@@ -523,3 +559,25 @@ workflows:
       - test-utils-npm-package-install
       - test-walletkit-npm-package-install
       - test-celocli-npm-package-install
+  protocol-testing-with-code-coverage-cron-workflow:
+    triggers:
+      - schedule:
+          # 1 PM in UTC = 6 AM in PDT.
+          # Best for this slow test (~3 hours) to run during SF early morning.
+          cron: "0 13 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - install_dependencies
+      - lint-checks:
+          requires:
+            - install_dependencies
+      - walletkit-test:
+          requires:
+            - install_dependencies
+      - protocol-test-with-code-coverage:
+          requires:
+            - lint-checks
+            - walletkit-test

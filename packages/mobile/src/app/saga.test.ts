@@ -1,6 +1,7 @@
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { expectSaga } from 'redux-saga-test-plan'
 import { call } from 'redux-saga/effects'
+import { PincodeType } from 'src/account/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { checkAppDeprecation, navigateToProperScreen, waitForRehydrate } from 'src/app/saga'
 import { waitForFirebaseAuth } from 'src/firebase/saga'
@@ -16,6 +17,15 @@ jest.mock('src/navigator/NavigationService', () => ({
 jest.mock('src/firebase/firebase', () => ({
   ...jest.requireActual('src/firebase/firebase'),
   getVersionInfo: jest.fn(async () => ({ deprecated: false })),
+}))
+
+jest.mock('src/web3/contracts', () => ({
+  web3: {
+    utils: {
+      fromWei: jest.fn((x: any) => x / 1e18),
+    },
+  },
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
 }))
 
 const { navigate } = require('src/navigator/NavigationService')
@@ -46,7 +56,7 @@ const numberVerified = {
     syncProgress: 101,
   },
   account: {
-    pincodeSet: true,
+    pincodeType: PincodeType.PhoneAuth,
     e164PhoneNumber: '+1234',
   },
   invite: {

@@ -1,6 +1,6 @@
-import { DestroyArgv } from '@celo/celotool/src/cmds/deploy/destroy'
-import { createClusterIfNotExists, switchToClusterFromEnv } from '@celo/celotool/src/lib/cluster'
-import { removeHelmRelease } from '@celo/celotool/src/lib/ethstats'
+import { createClusterIfNotExists, switchToClusterFromEnv } from 'src/lib/cluster'
+import { removeHelmRelease } from 'src/lib/ethstats'
+import { DestroyArgv } from '../../deploy/destroy'
 
 export const command = 'ethstats'
 

@@ -1,16 +1,29 @@
-#! /bin/sh
+#! /bin/bash
+
+# ---- Set Up Logging ----
+
+curl -sSO https://dl.google.com/cloudagents/install-logging-agent.sh
+bash install-logging-agent.sh
+
+# ---- Install Docker ----
 
 echo "Installing Docker..."
 apt update && apt upgrade
 apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg2
 curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-apt update
+apt update && apt upgrade
 apt install -y docker-ce
 systemctl start docker
 
 echo "Configuring Docker..."
 gcloud auth configure-docker
+
+# use GCP logging for Docker containers
+echo '{"log-driver":"gcplogs"}' > /etc/docker/daemon.json
+systemctl restart docker
+
+# ---- Set Up and Run Geth ----
 
 GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_image_tag}
 
@@ -32,7 +45,7 @@ docker pull $GETH_NODE_DOCKER_IMAGE
 
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`)
-docker run -p 8545:8545/tcp -p 8546:8546/tcp --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
+docker run -p 8545:8545/tcp -p 8546:8546/tcp --name geth --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
   set -euo pipefail && \
   mkdir -p /root/.celo/account /var/geth && \
   echo -n '${genesis_content_base64}' | base64 -d > /var/geth/genesis.json && \
@@ -52,13 +65,13 @@ docker run -p 8545:8545/tcp -p 8546:8546/tcp --net=host --entrypoint /bin/sh -d 
     --maxpeers 1100 \
     --rpc \
     --rpcaddr 0.0.0.0 \
-    --rpcapi=eth,net,web3 \
+    --rpcapi=eth,net,web3,debug \
     --rpccorsdomain='*' \
     --rpcvhosts=* \
     --ws \
     --wsaddr 0.0.0.0 \
     --wsorigins=* \
-    --wsapi=eth,net,web3 \
+    --wsapi=eth,net,web3,debug \
     --nodekey=/root/.celo/pkey \
     --etherbase=$ACCOUNT_ADDRESS \
     --networkid=${network_id} \

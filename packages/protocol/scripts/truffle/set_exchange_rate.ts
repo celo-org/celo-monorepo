@@ -67,7 +67,7 @@ const getLesserAndGreater = (
  *
  * Expects the following flags:
  * csv: Filepath to csv of (timestamp, stableValue, goldValue) tuples
- * network: name of the network defined in truffle.js to set the exchange rate on
+ * network: name of the network defined in truffle-config.js to set the exchange rate on
  * stableValue: StableToken component of exchange rate
  * goldValue: GoldToken component of exchange rate
  *

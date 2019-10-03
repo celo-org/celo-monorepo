@@ -1,16 +1,12 @@
-import {
-  confirmAction,
-  envVar,
-  fetchEnv,
-  fetchEnvOrFallback,
-} from '@celo/celotool/src/lib/env-utils'
+import { writeFileSync } from 'fs'
+import { confirmAction, envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,
   generateGenesisFromEnv,
   generatePrivateKey,
   privateKeyToAddress,
   privateKeyToPublicKey,
-} from '@celo/celotool/src/lib/generate_utils'
+} from './generate_utils'
 import {
   applyTerraformModule,
   destroyTerraformModule,
@@ -18,17 +14,20 @@ import {
   getTerraformModuleResourceNames,
   initTerraformModule,
   planTerraformModule,
+  showTerraformModulePlan,
   taintTerraformModuleResource,
   TerraformVars,
   untaintTerraformModuleResource,
-} from '@celo/celotool/src/lib/terraform'
+} from './terraform'
 import {
+  uploadEnvFileToGoogleStorage,
   uploadFileToGoogleStorage,
   uploadGenesisBlockToGoogleStorage,
-} from '@celo/celotool/src/lib/testnet-utils'
-import { writeFileSync } from 'fs'
+  uploadStaticNodesToGoogleStorage,
+} from './testnet-utils'
 
 const secretsBucketName = 'celo-testnet-secrets'
+
 const testnetTerraformModule = 'testnet'
 const testnetNetworkTerraformModule = 'testnet-network'
 
@@ -72,6 +71,8 @@ export async function deploy(celoEnv: string, onConfirmFailed?: () => Promise<vo
   })
 
   await uploadGenesisBlockToGoogleStorage(celoEnv)
+  await uploadStaticNodesToGoogleStorage(celoEnv)
+  await uploadEnvFileToGoogleStorage(celoEnv)
 }
 
 async function deployModule(
@@ -96,6 +97,8 @@ async function deployModule(
 
   console.info('Planning...')
   await planTerraformModule(terraformModule, vars)
+
+  await showTerraformModulePlan(terraformModule)
 
   await confirmAction(
     `Are you sure you want to perform the above plan for Celo env ${celoEnv} in environment ${envType}?`,
@@ -137,6 +140,8 @@ async function destroyModule(celoEnv: string, terraformModule: string, vars: Ter
 
   console.info('Planning...')
   await planTerraformModule(terraformModule, vars, true)
+
+  await showTerraformModulePlan(terraformModule)
 
   await confirmAction(`Are you sure you want to destroy ${celoEnv} in environment ${envType}?`)
 
@@ -342,7 +347,13 @@ function uploadSecrets(celoEnv: string, secrets: string, resourceName: string) {
   const localTmpFilePath = `/tmp/${celoEnv}-${resourceName}-secrets`
   writeFileSync(localTmpFilePath, secrets)
   const cloudStorageFileName = `${secretsBasePath(celoEnv)}/.env.${resourceName}`
-  return uploadFileToGoogleStorage(localTmpFilePath, secretsBucketName, cloudStorageFileName, false)
+  return uploadFileToGoogleStorage(
+    localTmpFilePath,
+    secretsBucketName,
+    cloudStorageFileName,
+    false,
+    'text/plain'
+  )
 }
 
 function generateBootnodeSecretEnvVars() {

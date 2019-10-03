@@ -13,4 +13,15 @@ USAGE
   $ celocli node:accounts
 ```
 
-_See code: [packages/cli/lib/commands/node/accounts.js](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/lib/commands/node/accounts.js)_
+_See code: [packages/cli/src/commands/node/accounts.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/node/accounts.ts)_
+
+### Synced
+
+Check if the node is synced
+
+```
+USAGE
+  $ celocli node:synced
+```
+
+_See code: [packages/cli/src/commands/node/synced.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/node/synced.ts)_

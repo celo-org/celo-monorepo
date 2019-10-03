@@ -39,7 +39,7 @@ exports[`renders correctly blank 1`] = `
         Object {
           "color": "rgba(0, 0, 0, 0.3)",
           "fontSize": 16,
-          "marginHorizontal": 20,
+          "marginHorizontal": 32,
         }
       }
     >
@@ -110,7 +110,7 @@ exports[`renders correctly when filled and last 1`] = `
         Object {
           "color": "rgba(0, 0, 0, 0.3)",
           "fontSize": 16,
-          "marginHorizontal": 20,
+          "marginHorizontal": 32,
         }
       }
     >

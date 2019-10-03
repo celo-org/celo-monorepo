@@ -15,8 +15,11 @@ import { Namespaces } from 'src/i18n'
 import backupIcon from 'src/images/backup-icon.png'
 
 type Props = {
+  backupDelayedTime: number
+  backupTooLate: boolean
   onPress: () => void
   onCancel: () => void
+  onDelay: () => void
 } & WithNamespaces
 
 interface State {
@@ -49,6 +52,11 @@ class BackupIntroduction extends React.Component<Props, State> {
     this.props.onPress()
   }
 
+  onDelay = () => {
+    CeloAnalytics.track(CustomEventNames.delay_backup)
+    this.props.onDelay()
+  }
+
   onInsistSkip = () => {
     CeloAnalytics.track(CustomEventNames.insist_skip_backup)
     this.props.onCancel()
@@ -70,7 +78,7 @@ class BackupIntroduction extends React.Component<Props, State> {
         </Text>
         <View style={styles.modalOptionsContainer}>
           <TouchableOpacity onPress={this.onInsistSkip}>
-            <Text style={[styles.modalOptions, fontStyles.semiBold]}>{t('skip')}</Text>
+            <Text style={[styles.modalOptions, fontStyles.semiBold]}>{t('global:skip')}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={this.onInsistBackup}>
             <Text style={[styles.modalOptions, fontStyles.semiBold, { color: colors.celoGreen }]}>
@@ -83,7 +91,7 @@ class BackupIntroduction extends React.Component<Props, State> {
   }
 
   render() {
-    const { t } = this.props
+    const { t, backupDelayedTime, backupTooLate } = this.props
     return (
       <View style={styles.container}>
         <View style={componentStyles.topBar}>
@@ -108,13 +116,26 @@ class BackupIntroduction extends React.Component<Props, State> {
             standard={false}
             type={BtnTypes.PRIMARY}
           />
-          <Button
-            onPress={this.onSkip}
-            style={styles.skipLink}
-            text={t('skip')}
-            standard={false}
-            type={BtnTypes.TERTIARY}
-          />
+          {backupTooLate &&
+            !backupDelayedTime && (
+              <Button
+                onPress={this.onDelay}
+                style={styles.skipLink}
+                text={t('delayBackup')}
+                standard={false}
+                type={BtnTypes.TERTIARY}
+              />
+            )}
+
+          {!backupTooLate && (
+            <Button
+              onPress={this.onSkip}
+              style={styles.skipLink}
+              text={t('global:skip')}
+              standard={false}
+              type={BtnTypes.TERTIARY}
+            />
+          )}
         </View>
       </View>
     )

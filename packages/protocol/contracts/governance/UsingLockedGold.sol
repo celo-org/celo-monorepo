@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "./interfaces/ILockedGold.sol";
 import "../common/UsingRegistry.sol";
@@ -64,6 +64,14 @@ contract UsingLockedGold is UsingRegistry {
    */
   function getAccountWeight(address account) internal view returns (uint256) {
     return getLockedGold().getAccountWeight(account);
+  }
+
+  /**
+  * @notice Returns the total weight.
+  * @return Total account weight.
+  */
+  function getTotalWeight() internal view returns (uint256) {
+    return getLockedGold().totalWeight();
   }
 
   /**

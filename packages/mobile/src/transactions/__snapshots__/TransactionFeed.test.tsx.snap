@@ -48,475 +48,68 @@ exports[`filters out Failed 1`] = `
 `;
 
 exports[`renders for error 1`] = `
-<RCTScrollView
-  data={
-    Array [
-      Object {
-        "address": "0072bvy2o23u",
-        "comment": "Eye for an Eye",
-        "id": "0110",
-        "status": "Pending",
-        "symbol": "Celo Dollar",
-        "timestamp": 1542406112,
-        "type": "SENT",
-        "value": "100",
-      },
-      Object {
-        "id": "0112",
-        "inSymbol": "Celo Dollar",
-        "inValue": "20",
-        "outSymbol": "Celo Gold",
-        "outValue": "30",
-        "status": "Pending",
-        "timestamp": 1542409112,
-        "type": "EXCHANGED",
-      },
-    ]
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "paddingHorizontal": 20,
+      "paddingVertical": 20,
+    }
   }
-  disableVirtualization={false}
-  getItem={[Function]}
-  getItemCount={[Function]}
-  horizontal={false}
-  initialNumToRender={10}
-  keyExtractor={[Function]}
-  maxToRenderPerBatch={10}
-  numColumns={1}
-  onContentSizeChange={[Function]}
-  onEndReachedThreshold={2}
-  onLayout={[Function]}
-  onMomentumScrollEnd={[Function]}
-  onScroll={[Function]}
-  onScrollBeginDrag={[Function]}
-  onScrollEndDrag={[Function]}
-  removeClippedSubviews={false}
-  renderItem={[Function]}
-  scrollEventThrottle={50}
-  stickyHeaderIndices={Array []}
-  updateCellsBatchingPeriod={50}
-  viewabilityConfigCallbackPairs={Array []}
-  windowSize={21}
 >
-  <View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
-      <View
-        accessible={true}
-        isTVSelectable={true}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "opacity": 1,
-          }
-        }
-      >
-        <View
-          style={
-            Object {
-              "flex": 1,
-              "flexDirection": "row",
-              "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
-            }
-          }
-        >
-          <View
-            style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                },
-                Object {
-                  "opacity": 0.3,
-                },
-              ]
-            }
-          >
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  },
-                  undefined,
-                ]
-              }
-            >
-              <View
-                style={
-                  Array [
-                    Object {
-                      "alignItems": "center",
-                      "justifyContent": "center",
-                    },
-                    Object {
-                      "backgroundColor": "#FEB45E",
-                      "borderRadius": 20,
-                      "height": 40,
-                      "width": 40,
-                    },
-                  ]
-                }
-              >
-                <Image
-                  source={
-                    Object {
-                      "testUri": "../../../src/images/unknown-user-icon.png",
-                    }
-                  }
-                  style={
-                    Object {
-                      "alignItems": "center",
-                      "height": 40,
-                      "justifyContent": "center",
-                      "width": 40,
-                    }
-                  }
-                />
-              </View>
-            </View>
-          </View>
-          <View
-            style={
-              Object {
-                "borderBottomWidth": 1,
-                "borderColor": "rgba(134, 138, 141, 0.15)",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "marginLeft": 10,
-                "paddingRight": 10,
-              }
-            }
-          >
-            <View
-              style={
-                Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
-                }
-              }
-            >
-              <View
-                style={
-                  Object {
-                    "opacity": 0.3,
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  sentTo
-                </Text>
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Light",
-                        "fontSize": 16,
-                        "lineHeight": 24,
-                      },
-                      Object {
-                        "paddingTop": 10,
-                      },
-                    ]
-                  }
-                >
-                  Eye for an Eye
-                </Text>
-              </View>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
-                    },
-                  ]
-                }
-              >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
-                  }
-                >
-                  confirmingPayment
-                </Text>
-                 undefined
-              </Text>
-            </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
-              }
-            >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 20,
-                    },
-                    Object {
-                      "color": "#81868B",
-                    },
-                  ]
-                }
-              >
-                
-                $
-                100.00
-              </Text>
-            </View>
-          </View>
-        </View>
-      </View>
-    </View>
-    <View
-      onLayout={[Function]}
-      style={null}
-    >
-      <View
-        accessible={true}
-        isTVSelectable={true}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "opacity": 1,
-          }
-        }
-      >
-        <View
-          style={
-            Object {
-              "flex": 1,
-              "flexDirection": "row",
-              "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
-            }
-          }
-        >
-          <View
-            style={
-              Array [
-                Object {
-                  "borderBottomWidth": 1,
-                  "borderColor": "rgba(134, 138, 141, 0.15)",
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "paddingRight": 10,
-                },
-                false,
-              ]
-            }
-          >
-            <View
-              style={
-                Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
-                }
-              }
-            >
-              <View
-                style={
-                  Object {
-                    "opacity": 0.3,
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  exchange
-                </Text>
-              </View>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
-                    },
-                  ]
-                }
-              >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
-                  }
-                >
-                  confirmingExchange
-                </Text>
-                 undefined
-              </Text>
-            </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
-              }
-            >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 20,
-                    },
-                    Object {
-                      "color": "rgba(0, 0, 0, .4)",
-                    },
-                  ]
-                }
-              >
-                $
-                20.00
-              </Text>
-              <View
-                style={
-                  Object {
-                    "paddingBottom": 5,
-                    "paddingHorizontal": 5,
-                  }
-                }
-              >
-                <svg
-                  fill="none"
-                  height="6"
-                  style={Object {}}
-                  viewBox="0 0 9 6"
-                  width="9"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    clip-rule="evenodd"
-                    d="M5.0998 5.45001L8.39993 3.02504L5.0998 0.600067V2.22512L0.399933 2.22512V3.82518L5.0998 3.82518V5.45001Z"
-                    fill="rgba(0, 0, 0, .4)"
-                    fill-rule="evenodd"
-                    style={Object {}}
-                  />
-                </svg>
-              </View>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 20,
-                    },
-                    Object {
-                      "color": "rgba(0, 0, 0, .4)",
-                    },
-                  ]
-                }
-              >
-                
-                30.00
-              </Text>
-            </View>
-          </View>
-        </View>
-      </View>
-    </View>
-  </View>
-</RCTScrollView>
+  <View
+    style={
+      Object {
+        "backgroundColor": "#FD785B",
+        "borderRadius": 15,
+        "height": 30,
+        "marginVertical": 20,
+        "width": 30,
+      }
+    }
+  />
+  <Text
+    style={
+      Array [
+        Object {
+          "color": "#81868B",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 16,
+          "lineHeight": 24,
+        },
+        Object {
+          "marginBottom": 10,
+          "textAlign": "center",
+        },
+      ]
+    }
+  >
+    errorLoadingActivity.0
+  </Text>
+  <Text
+    style={
+      Array [
+        Object {
+          "color": "#81868B",
+          "fontFamily": "Hind-Regular",
+          "fontSize": 16,
+          "lineHeight": 24,
+        },
+        Object {
+          "marginBottom": 10,
+          "textAlign": "center",
+        },
+      ]
+    }
+  >
+    errorLoadingActivity.1
+  </Text>
+</View>
 `;
 
 exports[`renders for gold to dollar exchange properly 1`] = `
 <RCTScrollView
+  ItemSeparatorComponent={[Function]}
   data={
     Array [
       Object {
@@ -537,7 +130,17 @@ exports[`renders for gold to dollar exchange properly 1`] = `
         "outValue": "30",
         "status": "Pending",
         "timestamp": 1542409112,
-        "type": "EXCHANGED",
+        "type": "EXCHANGE",
+      },
+      Object {
+        "address": "0072bvy2o23u",
+        "comment": "",
+        "id": "0113",
+        "status": "Pending",
+        "symbol": "Celo Dollar",
+        "timestamp": 1542406112,
+        "type": "NETWORK_FEE",
+        "value": "0.0001",
       },
       Object {
         "__typename": "Exchange",
@@ -547,7 +150,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
         "outSymbol": "Celo Gold",
         "outValue": 200,
         "timestamp": 1542306118,
-        "type": "EXCHANGED",
+        "type": "EXCHANGE",
       },
     ]
   }
@@ -566,7 +169,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
   onScroll={[Function]}
   onScrollBeginDrag={[Function]}
   onScrollEndDrag={[Function]}
-  removeClippedSubviews={false}
+  removeClippedSubviews={true}
   renderItem={[Function]}
   scrollEventThrottle={50}
   stickyHeaderIndices={Array []}
@@ -582,17 +185,18 @@ exports[`renders for gold to dollar exchange properly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
         onResponderTerminate={[Function]}
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "opacity": 1,
-          }
-        }
       >
         <View
           style={
@@ -600,22 +204,16 @@ exports[`renders for gold to dollar exchange properly 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                },
-                Object {
-                  "opacity": 0.3,
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
             }
           >
             <View
@@ -667,61 +265,81 @@ exports[`renders for gold to dollar exchange properly 1`] = `
           <View
             style={
               Object {
-                "borderBottomWidth": 1,
-                "borderColor": "rgba(134, 138, 141, 0.15)",
                 "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "marginLeft": 10,
-                "paddingRight": 10,
+                "marginLeft": 16,
               }
             }
           >
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
+              <Text
                 style={
-                  Object {
-                    "opacity": 0.3,
-                  }
-                }
-              >
-                <Text
-                  style={
+                  Array [
+                    Object {
+                      "fontFamily": "Hind-SemiBold",
+                    },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  sentTo
-                </Text>
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Light",
-                        "fontSize": 16,
-                        "lineHeight": 24,
-                      },
-                      Object {
-                        "paddingTop": 10,
-                      },
-                    ]
-                  }
-                >
-                  Eye for an Eye
-                </Text>
-              </View>
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                  ]
+                }
+              >
+                feedItemSentTitle
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                -
+                100.00
+              </Text>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                }
+              }
+            >
+              Eye for an Eye
+            </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                  },
+                  Object {
+                    "marginTop": 8,
+                  },
+                ]
+              }
+            >
               <Text
                 style={
                   Array [
@@ -732,8 +350,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                       "lineHeight": 18,
                     },
                     Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
+                      "color": "#BDBDBD",
                     },
                   ]
                 }
@@ -748,6 +365,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
@@ -758,45 +376,40 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 </Text>
                  undefined
               </Text>
-            </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
-              }
-            >
               <Text
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 20,
+                      "fontSize": 14,
+                      "lineHeight": 18,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": "#BDBDBD",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
                     },
                   ]
                 }
               >
-                
-                $
-                100.00
+                localCurrencyValue
               </Text>
             </View>
           </View>
         </View>
       </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
     </View>
     <View
       onLayout={[Function]}
@@ -805,17 +418,18 @@ exports[`renders for gold to dollar exchange properly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
         onResponderTerminate={[Function]}
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "opacity": 1,
-          }
-        }
       >
         <View
           style={
@@ -823,25 +437,19 @@ exports[`renders for gold to dollar exchange properly 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                  "height": 40,
-                  "justifyContent": "center",
-                  "width": 40,
-                },
-                Object {
-                  "opacity": 0.3,
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "height": 40,
+                "justifyContent": "center",
+                "width": 40,
+              }
             }
           >
             <Image
@@ -860,49 +468,130 @@ exports[`renders for gold to dollar exchange properly 1`] = `
           </View>
           <View
             style={
-              Array [
-                Object {
-                  "borderBottomWidth": 1,
-                  "borderColor": "rgba(134, 138, 141, 0.15)",
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "paddingRight": 10,
-                },
-                Object {
-                  "marginLeft": 10,
-                },
-              ]
+              Object {
+                "flex": 1,
+                "marginLeft": 16,
+              }
             }
           >
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
+              <Text
                 style={
                   Object {
-                    "opacity": 0.3,
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
                   }
                 }
               >
-                <Text
-                  style={
+                exchange
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                -
+                20.00
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
                     Object {
                       "color": "#2E3338",
                       "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "rgba(0, 0, 0, .4)",
+                    },
+                  ]
+                }
+              >
+                20.00
+              </Text>
+              <View
+                style={
+                  Object {
+                    "paddingBottom": 8,
+                    "paddingHorizontal": 5,
                   }
+                }
+              >
+                <svg
+                  fill="none"
+                  height="6"
+                  style={Object {}}
+                  viewBox="0 0 9 6"
+                  width="9"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  exchange
-                </Text>
+                  <path
+                    clip-rule="evenodd"
+                    d="M5.0998 5.45001L8.39993 3.02504L5.0998 0.600067V2.22512L0.399933 2.22512V3.82518L5.0998 3.82518V5.45001Z"
+                    fill="rgba(0, 0, 0, .4)"
+                    fill-rule="evenodd"
+                    style={Object {}}
+                  />
+                </svg>
               </View>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 16,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "rgba(0, 0, 0, .4)",
+                    },
+                  ]
+                }
+              >
+                30.00
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "marginTop": 8,
+                }
+              }
+            >
               <Text
                 style={
                   Array [
@@ -913,8 +602,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                       "lineHeight": 18,
                     },
                     Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
+                      "color": "#BDBDBD",
                     },
                   ]
                 }
@@ -929,6 +617,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
@@ -940,86 +629,18 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                  undefined
               </Text>
             </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
-              }
-            >
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 20,
-                    },
-                    Object {
-                      "color": "rgba(0, 0, 0, .4)",
-                    },
-                  ]
-                }
-              >
-                $
-                20.00
-              </Text>
-              <View
-                style={
-                  Object {
-                    "paddingBottom": 5,
-                    "paddingHorizontal": 5,
-                  }
-                }
-              >
-                <svg
-                  fill="none"
-                  height="6"
-                  style={Object {}}
-                  viewBox="0 0 9 6"
-                  width="9"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    clip-rule="evenodd"
-                    d="M5.0998 5.45001L8.39993 3.02504L5.0998 0.600067V2.22512L0.399933 2.22512V3.82518L5.0998 3.82518V5.45001Z"
-                    fill="rgba(0, 0, 0, .4)"
-                    fill-rule="evenodd"
-                    style={Object {}}
-                  />
-                </svg>
-              </View>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 20,
-                    },
-                    Object {
-                      "color": "rgba(0, 0, 0, .4)",
-                    },
-                  ]
-                }
-              >
-                
-                30.00
-              </Text>
-            </View>
           </View>
         </View>
       </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
     </View>
     <View
       onLayout={[Function]}
@@ -1028,17 +649,18 @@ exports[`renders for gold to dollar exchange properly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
         onResponderTerminate={[Function]}
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "opacity": 1,
-          }
-        }
       >
         <View
           style={
@@ -1046,25 +668,222 @@ exports[`renders for gold to dollar exchange properly 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
+            }
+          >
+            <Image
+              source={
+                Object {
+                  "testUri": "../../../src/images/coins-logo.png",
+                }
+              }
+              style={
                 Object {
                   "alignItems": "center",
-                  "flexDirection": "column",
                   "height": 40,
                   "justifyContent": "center",
                   "width": 40,
-                },
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "marginLeft": 16,
+              }
+            }
+          >
+            <View
+              style={
                 Object {
-                  "opacity": 1,
-                },
-              ]
+                  "flexDirection": "row",
+                  "marginTop": 3,
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "fontFamily": "Hind-SemiBold",
+                    },
+                    Object {
+                      "color": "#2E3338",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                  ]
+                }
+              >
+                feedItemNetworkFeeTitle
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                
+                &lt;0.001
+              </Text>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                }
+              }
+            >
+              feedItemNetworkFeeInfo
+            </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                  },
+                  Object {
+                    "marginTop": 8,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "color": "#42D689",
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingPayment
+                </Text>
+                 undefined
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                localCurrencyValue
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "padding": 16,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "height": 40,
+                "justifyContent": "center",
+                "width": 40,
+              }
             }
           >
             <Image
@@ -1083,87 +902,66 @@ exports[`renders for gold to dollar exchange properly 1`] = `
           </View>
           <View
             style={
-              Array [
-                Object {
-                  "borderBottomWidth": 1,
-                  "borderColor": "rgba(134, 138, 141, 0.15)",
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "paddingRight": 10,
-                },
-                Object {
-                  "marginLeft": 10,
-                },
-              ]
+              Object {
+                "flex": 1,
+                "marginLeft": 16,
+              }
             }
           >
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
+              <Text
                 style={
                   Object {
-                    "opacity": 1,
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
                   }
                 }
               >
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  exchange
-                </Text>
-              </View>
-              <Text
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
-                    },
-                  ]
-                }
-              />
-            </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 1,
-                  },
-                ]
-              }
-            >
+                exchange
+              </Text>
               <Text
                 style={
                   Array [
                     Object {
                       "color": "#81868B",
                       "fontFamily": "Hind-Regular",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                -
+                30.00
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -1173,13 +971,12 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
-                $
                 30.00
               </Text>
               <View
                 style={
                   Object {
-                    "paddingBottom": 5,
+                    "paddingBottom": 8,
                     "paddingHorizontal": 5,
                   }
                 }
@@ -1205,8 +1002,8 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -1216,9 +1013,34 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   ]
                 }
               >
-                
                 200.00
               </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "marginTop": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                    },
+                  ]
+                }
+              />
             </View>
           </View>
         </View>
@@ -1230,6 +1052,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
 
 exports[`renders for loading 1`] = `
 <RCTScrollView
+  ItemSeparatorComponent={[Function]}
   data={
     Array [
       Object {
@@ -1250,7 +1073,17 @@ exports[`renders for loading 1`] = `
         "outValue": "30",
         "status": "Pending",
         "timestamp": 1542409112,
-        "type": "EXCHANGED",
+        "type": "EXCHANGE",
+      },
+      Object {
+        "address": "0072bvy2o23u",
+        "comment": "",
+        "id": "0113",
+        "status": "Pending",
+        "symbol": "Celo Dollar",
+        "timestamp": 1542406112,
+        "type": "NETWORK_FEE",
+        "value": "0.0001",
       },
     ]
   }
@@ -1269,7 +1102,7 @@ exports[`renders for loading 1`] = `
   onScroll={[Function]}
   onScrollBeginDrag={[Function]}
   onScrollEndDrag={[Function]}
-  removeClippedSubviews={false}
+  removeClippedSubviews={true}
   renderItem={[Function]}
   scrollEventThrottle={50}
   stickyHeaderIndices={Array []}
@@ -1285,17 +1118,18 @@ exports[`renders for loading 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
         onResponderTerminate={[Function]}
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "opacity": 1,
-          }
-        }
       >
         <View
           style={
@@ -1303,22 +1137,16 @@ exports[`renders for loading 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                },
-                Object {
-                  "opacity": 0.3,
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
             }
           >
             <View
@@ -1370,61 +1198,81 @@ exports[`renders for loading 1`] = `
           <View
             style={
               Object {
-                "borderBottomWidth": 1,
-                "borderColor": "rgba(134, 138, 141, 0.15)",
                 "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "marginLeft": 10,
-                "paddingRight": 10,
+                "marginLeft": 16,
               }
             }
           >
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
+              <Text
                 style={
-                  Object {
-                    "opacity": 0.3,
-                  }
-                }
-              >
-                <Text
-                  style={
+                  Array [
+                    Object {
+                      "fontFamily": "Hind-SemiBold",
+                    },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  sentTo
-                </Text>
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Light",
-                        "fontSize": 16,
-                        "lineHeight": 24,
-                      },
-                      Object {
-                        "paddingTop": 10,
-                      },
-                    ]
-                  }
-                >
-                  Eye for an Eye
-                </Text>
-              </View>
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                  ]
+                }
+              >
+                feedItemSentTitle
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                -
+                100.00
+              </Text>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                }
+              }
+            >
+              Eye for an Eye
+            </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                  },
+                  Object {
+                    "marginTop": 8,
+                  },
+                ]
+              }
+            >
               <Text
                 style={
                   Array [
@@ -1435,8 +1283,7 @@ exports[`renders for loading 1`] = `
                       "lineHeight": 18,
                     },
                     Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
+                      "color": "#BDBDBD",
                     },
                   ]
                 }
@@ -1451,6 +1298,7 @@ exports[`renders for loading 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
@@ -1461,45 +1309,40 @@ exports[`renders for loading 1`] = `
                 </Text>
                  undefined
               </Text>
-            </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
-              }
-            >
               <Text
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 20,
+                      "fontSize": 14,
+                      "lineHeight": 18,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": "#BDBDBD",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
                     },
                   ]
                 }
               >
-                
-                $
-                100.00
+                localCurrencyValue
               </Text>
             </View>
           </View>
         </View>
       </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
     </View>
     <View
       onLayout={[Function]}
@@ -1508,17 +1351,18 @@ exports[`renders for loading 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
         onResponderTerminate={[Function]}
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "opacity": 1,
-          }
-        }
       >
         <View
           style={
@@ -1526,25 +1370,19 @@ exports[`renders for loading 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                  "height": 40,
-                  "justifyContent": "center",
-                  "width": 40,
-                },
-                Object {
-                  "opacity": 0.3,
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "height": 40,
+                "justifyContent": "center",
+                "width": 40,
+              }
             }
           >
             <Image
@@ -1563,107 +1401,66 @@ exports[`renders for loading 1`] = `
           </View>
           <View
             style={
-              Array [
-                Object {
-                  "borderBottomWidth": 1,
-                  "borderColor": "rgba(134, 138, 141, 0.15)",
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "paddingRight": 10,
-                },
-                Object {
-                  "marginLeft": 10,
-                },
-              ]
+              Object {
+                "flex": 1,
+                "marginLeft": 16,
+              }
             }
           >
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
-                style={
-                  Object {
-                    "opacity": 0.3,
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  exchange
-                </Text>
-              </View>
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
-                    },
-                  ]
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
-                  }
-                >
-                  confirmingExchange
-                </Text>
-                 undefined
+                exchange
               </Text>
-            </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
-              }
-            >
               <Text
                 style={
                   Array [
                     Object {
                       "color": "#81868B",
                       "fontFamily": "Hind-Regular",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                -
+                20.00
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -1673,13 +1470,12 @@ exports[`renders for loading 1`] = `
                   ]
                 }
               >
-                $
                 20.00
               </Text>
               <View
                 style={
                   Object {
-                    "paddingBottom": 5,
+                    "paddingBottom": 8,
                     "paddingHorizontal": 5,
                   }
                 }
@@ -1705,8 +1501,8 @@ exports[`renders for loading 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -1716,8 +1512,257 @@ exports[`renders for loading 1`] = `
                   ]
                 }
               >
-                
                 30.00
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "marginTop": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "color": "#42D689",
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingExchange
+                </Text>
+                 undefined
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "padding": 16,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
+            }
+          >
+            <Image
+              source={
+                Object {
+                  "testUri": "../../../src/images/coins-logo.png",
+                }
+              }
+              style={
+                Object {
+                  "alignItems": "center",
+                  "height": 40,
+                  "justifyContent": "center",
+                  "width": 40,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "marginLeft": 16,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flexDirection": "row",
+                  "marginTop": 3,
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "fontFamily": "Hind-SemiBold",
+                    },
+                    Object {
+                      "color": "#2E3338",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                  ]
+                }
+              >
+                feedItemNetworkFeeTitle
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                
+                &lt;0.001
+              </Text>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                }
+              }
+            >
+              feedItemNetworkFeeInfo
+            </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                  },
+                  Object {
+                    "marginTop": 8,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "color": "#42D689",
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingPayment
+                </Text>
+                 undefined
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                localCurrencyValue
               </Text>
             </View>
           </View>
@@ -1730,6 +1775,7 @@ exports[`renders for loading 1`] = `
 
 exports[`renders for no transactions 1`] = `
 <RCTScrollView
+  ItemSeparatorComponent={[Function]}
   data={
     Array [
       Object {
@@ -1750,7 +1796,17 @@ exports[`renders for no transactions 1`] = `
         "outValue": "30",
         "status": "Pending",
         "timestamp": 1542409112,
-        "type": "EXCHANGED",
+        "type": "EXCHANGE",
+      },
+      Object {
+        "address": "0072bvy2o23u",
+        "comment": "",
+        "id": "0113",
+        "status": "Pending",
+        "symbol": "Celo Dollar",
+        "timestamp": 1542406112,
+        "type": "NETWORK_FEE",
+        "value": "0.0001",
       },
     ]
   }
@@ -1769,7 +1825,7 @@ exports[`renders for no transactions 1`] = `
   onScroll={[Function]}
   onScrollBeginDrag={[Function]}
   onScrollEndDrag={[Function]}
-  removeClippedSubviews={false}
+  removeClippedSubviews={true}
   renderItem={[Function]}
   scrollEventThrottle={50}
   stickyHeaderIndices={Array []}
@@ -1785,17 +1841,18 @@ exports[`renders for no transactions 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
         onResponderTerminate={[Function]}
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "opacity": 1,
-          }
-        }
       >
         <View
           style={
@@ -1803,22 +1860,16 @@ exports[`renders for no transactions 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                },
-                Object {
-                  "opacity": 0.3,
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
             }
           >
             <View
@@ -1870,61 +1921,81 @@ exports[`renders for no transactions 1`] = `
           <View
             style={
               Object {
-                "borderBottomWidth": 1,
-                "borderColor": "rgba(134, 138, 141, 0.15)",
                 "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "marginLeft": 10,
-                "paddingRight": 10,
+                "marginLeft": 16,
               }
             }
           >
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
+              <Text
                 style={
-                  Object {
-                    "opacity": 0.3,
-                  }
-                }
-              >
-                <Text
-                  style={
+                  Array [
+                    Object {
+                      "fontFamily": "Hind-SemiBold",
+                    },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  sentTo
-                </Text>
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Light",
-                        "fontSize": 16,
-                        "lineHeight": 24,
-                      },
-                      Object {
-                        "paddingTop": 10,
-                      },
-                    ]
-                  }
-                >
-                  Eye for an Eye
-                </Text>
-              </View>
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                  ]
+                }
+              >
+                feedItemSentTitle
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                -
+                100.00
+              </Text>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                }
+              }
+            >
+              Eye for an Eye
+            </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                  },
+                  Object {
+                    "marginTop": 8,
+                  },
+                ]
+              }
+            >
               <Text
                 style={
                   Array [
@@ -1935,8 +2006,7 @@ exports[`renders for no transactions 1`] = `
                       "lineHeight": 18,
                     },
                     Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
+                      "color": "#BDBDBD",
                     },
                   ]
                 }
@@ -1951,6 +2021,7 @@ exports[`renders for no transactions 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
@@ -1961,45 +2032,40 @@ exports[`renders for no transactions 1`] = `
                 </Text>
                  undefined
               </Text>
-            </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
-              }
-            >
               <Text
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 20,
+                      "fontSize": 14,
+                      "lineHeight": 18,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": "#BDBDBD",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
                     },
                   ]
                 }
               >
-                
-                $
-                100.00
+                localCurrencyValue
               </Text>
             </View>
           </View>
         </View>
       </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
     </View>
     <View
       onLayout={[Function]}
@@ -2008,17 +2074,18 @@ exports[`renders for no transactions 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
         onResponderTerminate={[Function]}
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "opacity": 1,
-          }
-        }
       >
         <View
           style={
@@ -2026,25 +2093,19 @@ exports[`renders for no transactions 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                  "height": 40,
-                  "justifyContent": "center",
-                  "width": 40,
-                },
-                Object {
-                  "opacity": 0.3,
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "height": 40,
+                "justifyContent": "center",
+                "width": 40,
+              }
             }
           >
             <Image
@@ -2063,107 +2124,66 @@ exports[`renders for no transactions 1`] = `
           </View>
           <View
             style={
-              Array [
-                Object {
-                  "borderBottomWidth": 1,
-                  "borderColor": "rgba(134, 138, 141, 0.15)",
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "paddingRight": 10,
-                },
-                Object {
-                  "marginLeft": 10,
-                },
-              ]
+              Object {
+                "flex": 1,
+                "marginLeft": 16,
+              }
             }
           >
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
-                style={
-                  Object {
-                    "opacity": 0.3,
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  exchange
-                </Text>
-              </View>
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
-                    },
-                  ]
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
-                  }
-                >
-                  confirmingExchange
-                </Text>
-                 undefined
+                exchange
               </Text>
-            </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
-              }
-            >
               <Text
                 style={
                   Array [
                     Object {
                       "color": "#81868B",
                       "fontFamily": "Hind-Regular",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                -
+                20.00
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -2173,13 +2193,12 @@ exports[`renders for no transactions 1`] = `
                   ]
                 }
               >
-                $
                 20.00
               </Text>
               <View
                 style={
                   Object {
-                    "paddingBottom": 5,
+                    "paddingBottom": 8,
                     "paddingHorizontal": 5,
                   }
                 }
@@ -2205,8 +2224,8 @@ exports[`renders for no transactions 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -2216,8 +2235,257 @@ exports[`renders for no transactions 1`] = `
                   ]
                 }
               >
-                
                 30.00
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "marginTop": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "color": "#42D689",
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingExchange
+                </Text>
+                 undefined
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "padding": 16,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
+            }
+          >
+            <Image
+              source={
+                Object {
+                  "testUri": "../../../src/images/coins-logo.png",
+                }
+              }
+              style={
+                Object {
+                  "alignItems": "center",
+                  "height": 40,
+                  "justifyContent": "center",
+                  "width": 40,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "marginLeft": 16,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flexDirection": "row",
+                  "marginTop": 3,
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "fontFamily": "Hind-SemiBold",
+                    },
+                    Object {
+                      "color": "#2E3338",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                  ]
+                }
+              >
+                feedItemNetworkFeeTitle
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                
+                &lt;0.001
+              </Text>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                }
+              }
+            >
+              feedItemNetworkFeeInfo
+            </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                  },
+                  Object {
+                    "marginTop": 8,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "color": "#42D689",
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingPayment
+                </Text>
+                 undefined
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                localCurrencyValue
               </Text>
             </View>
           </View>
@@ -2230,6 +2498,7 @@ exports[`renders for no transactions 1`] = `
 
 exports[`renders for standbyTransactions 1`] = `
 <RCTScrollView
+  ItemSeparatorComponent={[Function]}
   data={
     Array [
       Object {
@@ -2250,7 +2519,17 @@ exports[`renders for standbyTransactions 1`] = `
         "outValue": "30",
         "status": "Pending",
         "timestamp": 1542409112,
-        "type": "EXCHANGED",
+        "type": "EXCHANGE",
+      },
+      Object {
+        "address": "0072bvy2o23u",
+        "comment": "",
+        "id": "0113",
+        "status": "Pending",
+        "symbol": "Celo Dollar",
+        "timestamp": 1542406112,
+        "type": "NETWORK_FEE",
+        "value": "0.0001",
       },
     ]
   }
@@ -2269,7 +2548,7 @@ exports[`renders for standbyTransactions 1`] = `
   onScroll={[Function]}
   onScrollBeginDrag={[Function]}
   onScrollEndDrag={[Function]}
-  removeClippedSubviews={false}
+  removeClippedSubviews={true}
   renderItem={[Function]}
   scrollEventThrottle={50}
   stickyHeaderIndices={Array []}
@@ -2285,17 +2564,18 @@ exports[`renders for standbyTransactions 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
         onResponderTerminate={[Function]}
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "opacity": 1,
-          }
-        }
       >
         <View
           style={
@@ -2303,22 +2583,16 @@ exports[`renders for standbyTransactions 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                },
-                Object {
-                  "opacity": 0.3,
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
             }
           >
             <View
@@ -2370,61 +2644,81 @@ exports[`renders for standbyTransactions 1`] = `
           <View
             style={
               Object {
-                "borderBottomWidth": 1,
-                "borderColor": "rgba(134, 138, 141, 0.15)",
                 "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "marginLeft": 10,
-                "paddingRight": 10,
+                "marginLeft": 16,
               }
             }
           >
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
+              <Text
                 style={
-                  Object {
-                    "opacity": 0.3,
-                  }
-                }
-              >
-                <Text
-                  style={
+                  Array [
+                    Object {
+                      "fontFamily": "Hind-SemiBold",
+                    },
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  sentTo
-                </Text>
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Light",
-                        "fontSize": 16,
-                        "lineHeight": 24,
-                      },
-                      Object {
-                        "paddingTop": 10,
-                      },
-                    ]
-                  }
-                >
-                  Eye for an Eye
-                </Text>
-              </View>
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                  ]
+                }
+              >
+                feedItemSentTitle
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                -
+                100.00
+              </Text>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                }
+              }
+            >
+              Eye for an Eye
+            </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                  },
+                  Object {
+                    "marginTop": 8,
+                  },
+                ]
+              }
+            >
               <Text
                 style={
                   Array [
@@ -2435,8 +2729,7 @@ exports[`renders for standbyTransactions 1`] = `
                       "lineHeight": 18,
                     },
                     Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
+                      "color": "#BDBDBD",
                     },
                   ]
                 }
@@ -2451,6 +2744,7 @@ exports[`renders for standbyTransactions 1`] = `
                         "lineHeight": 18,
                       },
                       Object {
+                        "color": "#42D689",
                         "fontSize": 13,
                         "lineHeight": 18,
                       },
@@ -2461,45 +2755,40 @@ exports[`renders for standbyTransactions 1`] = `
                 </Text>
                  undefined
               </Text>
-            </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
-              }
-            >
               <Text
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                       "fontFamily": "Hind-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 20,
+                      "fontSize": 14,
+                      "lineHeight": 18,
                     },
                     Object {
-                      "color": "#81868B",
+                      "color": "#BDBDBD",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
                     },
                   ]
                 }
               >
-                
-                $
-                100.00
+                localCurrencyValue
               </Text>
             </View>
           </View>
         </View>
       </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
     </View>
     <View
       onLayout={[Function]}
@@ -2508,17 +2797,18 @@ exports[`renders for standbyTransactions 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
         onResponderTerminate={[Function]}
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "opacity": 1,
-          }
-        }
       >
         <View
           style={
@@ -2526,25 +2816,19 @@ exports[`renders for standbyTransactions 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "paddingLeft": 10,
-              "paddingTop": 20,
+              "padding": 16,
             }
           }
         >
           <View
             style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flexDirection": "column",
-                  "height": 40,
-                  "justifyContent": "center",
-                  "width": 40,
-                },
-                Object {
-                  "opacity": 0.3,
-                },
-              ]
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "height": 40,
+                "justifyContent": "center",
+                "width": 40,
+              }
             }
           >
             <Image
@@ -2563,107 +2847,66 @@ exports[`renders for standbyTransactions 1`] = `
           </View>
           <View
             style={
-              Array [
-                Object {
-                  "borderBottomWidth": 1,
-                  "borderColor": "rgba(134, 138, 141, 0.15)",
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "justifyContent": "space-between",
-                  "paddingRight": 10,
-                },
-                Object {
-                  "marginLeft": 10,
-                },
-              ]
+              Object {
+                "flex": 1,
+                "marginLeft": 16,
+              }
             }
           >
             <View
               style={
                 Object {
-                  "flex": 1,
-                  "justifyContent": "flex-start",
+                  "flexDirection": "row",
+                  "marginTop": 3,
                 }
               }
             >
-              <View
-                style={
-                  Object {
-                    "opacity": 0.3,
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-SemiBold",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  exchange
-                </Text>
-              </View>
               <Text
                 style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 14,
-                      "lineHeight": 18,
-                    },
-                    Object {
-                      "paddingBottom": 10,
-                      "paddingTop": 25,
-                    },
-                  ]
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
                 }
               >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-Bold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "fontSize": 13,
-                        "lineHeight": 18,
-                      },
-                    ]
-                  }
-                >
-                  confirmingExchange
-                </Text>
-                 undefined
+                exchange
               </Text>
-            </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "alignSelf": "flex-start",
-                    "flexDirection": "row",
-                    "justifyContent": "flex-end",
-                  },
-                  Object {
-                    "opacity": 0.3,
-                  },
-                ]
-              }
-            >
               <Text
                 style={
                   Array [
                     Object {
                       "color": "#81868B",
                       "fontFamily": "Hind-Regular",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                -
+                20.00
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -2673,13 +2916,12 @@ exports[`renders for standbyTransactions 1`] = `
                   ]
                 }
               >
-                $
                 20.00
               </Text>
               <View
                 style={
                   Object {
-                    "paddingBottom": 5,
+                    "paddingBottom": 8,
                     "paddingHorizontal": 5,
                   }
                 }
@@ -2705,8 +2947,8 @@ exports[`renders for standbyTransactions 1`] = `
                 style={
                   Array [
                     Object {
-                      "color": "#81868B",
-                      "fontFamily": "Hind-Regular",
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 20,
                     },
@@ -2716,8 +2958,257 @@ exports[`renders for standbyTransactions 1`] = `
                   ]
                 }
               >
-                
                 30.00
+              </Text>
+            </View>
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "marginTop": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "color": "#42D689",
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingExchange
+                </Text>
+                 undefined
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "rgba(134, 138, 141, 0.15)",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "padding": 16,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+              }
+            }
+          >
+            <Image
+              source={
+                Object {
+                  "testUri": "../../../src/images/coins-logo.png",
+                }
+              }
+              style={
+                Object {
+                  "alignItems": "center",
+                  "height": 40,
+                  "justifyContent": "center",
+                  "width": 40,
+                }
+              }
+            />
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "marginLeft": 16,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "flexDirection": "row",
+                  "marginTop": 3,
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "fontFamily": "Hind-SemiBold",
+                    },
+                    Object {
+                      "color": "#2E3338",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                  ]
+                }
+              >
+                feedItemNetworkFeeTitle
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#42D689",
+                      "fontFamily": "Hind-SemiBold",
+                      "fontSize": 15,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                
+                &lt;0.001
+              </Text>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                }
+              }
+            >
+              feedItemNetworkFeeInfo
+            </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                  },
+                  Object {
+                    "marginTop": 8,
+                  },
+                ]
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                    },
+                  ]
+                }
+              >
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-Bold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "color": "#42D689",
+                        "fontSize": 13,
+                        "lineHeight": 18,
+                      },
+                    ]
+                  }
+                >
+                  confirmingPayment
+                </Text>
+                 undefined
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "color": "#BDBDBD",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                      "marginLeft": "auto",
+                      "paddingLeft": 10,
+                    },
+                  ]
+                }
+              >
+                localCurrencyValue
               </Text>
             </View>
           </View>

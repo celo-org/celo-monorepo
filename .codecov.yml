@@ -7,11 +7,14 @@ coverage:
         flags: mobile
         threshold: 40%
         target: 10%
-      # protocol:
-      #   paths: "packages/protocol/"
-      #   flags: protocol
-      #   threshold: 5%
-      #   target: 90%
+      protocol:
+        paths: "packages/protocol/"
+        flags: protocol
+        threshold: 5%
+        target: 90%
+        if_no_uploads: error
+        if_not_found: success
+        if_ci_failed: error
     patch:
       default: off
 
@@ -19,6 +22,6 @@ flags:
   mobile:
     paths:
       - packages/mobile/
-  # protocol:
-  #   paths:
-  #     - packages/protocol/
+  protocol:
+    paths:
+      - packages/protocol/

@@ -1,8 +1,7 @@
 import * as React from 'react'
-
 import Touchable from 'react-native-platform-touchable'
 
-interface Props {
+export interface Props {
   borderless?: boolean
   onPress?: () => void
   children: React.ReactNode // must only have one direct child. see https://github.com/react-native-community/react-native-platform-touchable#touchable
@@ -28,11 +27,10 @@ export default class TouchableDefault extends React.PureComponent<Props> {
       : Touchable.SelectableBackground()
   }
   render() {
-    const props = { ...this.props }
-    delete props.onPress
+    const { onPress, children, ...passThroughProps } = this.props
     return (
-      <Touchable {...props} onPress={this.delayedOnPress} background={this.effect()}>
-        {this.props.children}
+      <Touchable {...passThroughProps} onPress={this.delayedOnPress} background={this.effect()}>
+        {children}
       </Touchable>
     )
   }

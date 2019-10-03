@@ -1,16 +1,21 @@
-import { zip } from '@celo/utils/lib/src/collections'
+import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import Contract from 'web3/eth/contract'
-import { TransactionObject } from 'web3/eth/types'
+import { TransactionObject, Tx } from 'web3/eth/types'
+import { TransactionReceipt } from 'web3/types'
 import { ContractKit } from '../kit'
-import { TxOptions } from '../utils/send-tx'
 import { TransactionResult } from '../utils/tx-result'
 
+/** Represents web3 native contract Method */
 type Method<I extends any[], O> = (...args: I) => TransactionObject<O>
 
+export type NumberLike = string | number | BigNumber
+
+/** Base ContractWrapper */
 export abstract class BaseWrapper<T extends Contract> {
   constructor(protected readonly kit: ContractKit, protected readonly contract: T) {}
 
+  /** Contract address */
   get address(): string {
     // TODO fix typings
     return (this.contract as any)._address
@@ -18,24 +23,39 @@ export abstract class BaseWrapper<T extends Contract> {
 }
 
 export interface CeloTransactionObject<O> {
+  /** web3 native TransactionObject. Normally not used */
   txo: TransactionObject<O>
-  send(options?: TxOptions): Promise<TransactionResult>
+  /** send the transaction to the chain */
+  send(params?: Omit<Tx, 'data'>): Promise<TransactionResult>
+  /** send the transaction and waits for the receipt */
+  sendAndWaitForReceipt(params?: Omit<Tx, 'data'>): Promise<TransactionReceipt>
 }
 
+/** Parse string -> BigNumber */
 export function toBigNumber(input: string) {
   return new BigNumber(input)
 }
 
+/** Parse string -> int */
 export function toNumber(input: string) {
   return parseInt(input, 10)
 }
 
-export function parseNumber(input: string | number | BigNumber) {
-  return new BigNumber(input).toString()
+export function parseNumber(input: NumberLike) {
+  return new BigNumber(input).toString(10)
 }
 
 type Parser<A, B> = (input: A) => B
 
+/** Identity Parser */
+export function identity<A>(a: A) {
+  return a
+}
+
+/**
+ * Tuple parser
+ * Useful to map different input arguments
+ */
 export function tupleParser<A0, B0>(parser0: Parser<A0, B0>): (...args: [A0]) => [B0]
 export function tupleParser<A0, B0, A1, B1>(
   parser0: Parser<A0, B0>,
@@ -194,7 +214,9 @@ export function proxySend<InputArgs extends any[], ParsedInputArgs extends any[]
 
 export function wrapSend<O>(kit: ContractKit, txo: TransactionObject<O>): CeloTransactionObject<O> {
   return {
-    send: (options?: TxOptions) => kit.sendTransactionObject(txo, options),
+    send: (params?: Omit<Tx, 'data'>) => kit.sendTransactionObject(txo, params),
     txo,
+    sendAndWaitForReceipt: (params?: Omit<Tx, 'data'>) =>
+      kit.sendTransactionObject(txo, params).then((result) => result.waitReceipt()),
   }
 }

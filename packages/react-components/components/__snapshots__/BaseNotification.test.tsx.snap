@@ -7,7 +7,7 @@ exports[`BaseNotification renders correctly 1`] = `
       Object {
         "flexDirection": "row",
         "justifyContent": "space-between",
-        "padding": 10,
+        "padding": 16,
         "width": "100%",
       },
       undefined,

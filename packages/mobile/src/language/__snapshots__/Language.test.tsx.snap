@@ -7,7 +7,7 @@ exports[`renders correctly 1`] = `
       "backgroundColor": "white",
       "flex": 1,
       "justifyContent": "space-between",
-      "paddingTop": 70,
+      "paddingTop": 30,
     }
   }
 >
@@ -39,6 +39,7 @@ exports[`renders correctly 1`] = `
         style={
           Array [
             Object {
+              "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 22,
               "paddingBottom": 20,
@@ -150,7 +151,7 @@ exports[`renders correctly 1`] = `
             "opacity": 1,
           }
         }
-        testID="ChooseLanguage/es-AR"
+        testID="ChooseLanguage/es-419"
       >
         <View
           style={
@@ -203,7 +204,7 @@ exports[`renders correctly 1`] = `
                 }
               }
             >
-              Español (AR)
+              Español (América Latina)
             </Text>
           </View>
         </View>
@@ -230,6 +231,12 @@ exports[`renders correctly 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -237,15 +244,22 @@ exports[`renders correctly 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#42D689",
-          "borderWidth": 0,
-          "flex": 1,
-          "height": 50,
-          "justifyContent": "center",
-          "opacity": 1,
-        }
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#42D689",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
       }
       testID="ChooseLanguageButton"
     >
