@@ -53,7 +53,6 @@ export class ConnectPage extends React.Component<Props> {
         <View>
           <CoverArea />
           <Tenets />
-
           <CodeOfConduct />
           <GridRow
             nativeID={hashNav.connect.events}
@@ -68,7 +67,6 @@ export class ConnectPage extends React.Component<Props> {
           </GridRow>
           <EventData />
           <ArticleData />
-          <Contribute />
           <View style={styles.darkBackground} nativeID={hashNav.connect.newsletter}>
             <GridRow
               desktopStyle={standardStyles.sectionMarginTop}
@@ -102,11 +100,11 @@ export class ConnectPage extends React.Component<Props> {
               </Cell>
             </GridRow>
             <SocialLinks>
-              <TwitterChannel isDarkMode={true} />
-              <GitHubChannel isDarkMode={true} />
-              <DiscordChannel isDarkMode={true} />
-              <ForumChannel isDarkMode={true} />
-              <LinkedInChannel isDarkMode={true} />
+              <TwitterChannel isDarkMode={true} alignCenter={true} />
+              <GitHubChannel isDarkMode={true} alignCenter={true} />
+              <DiscordChannel isDarkMode={true} alignCenter={true} />
+              <ForumChannel isDarkMode={true} alignCenter={true} />
+              <LinkedInChannel isDarkMode={true} alignCenter={true} />
             </SocialLinks>
           </View>
         </View>
