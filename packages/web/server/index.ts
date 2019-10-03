@@ -17,6 +17,7 @@ import { submitFellowApp } from './FellowshipApp'
 import { RequestType } from './FirebaseClient'
 import mailer from './mailer'
 import { getFormattedMediumArticles } from './mediumAPI'
+import { Tables } from 'fullstack/EcoFundFields'
 const port = parseInt(process.env.PORT, 10) || 3000
 
 const dev = process.env.NEXT_DEV === 'true'
@@ -103,7 +104,7 @@ function wwwRedirect(req, res, nextAction) {
 
   server.post('/ecosystem/:table', async (req, res) => {
     try {
-      const record = await ecoFundSubmission(req.body, req.params.table)
+      const record = await ecoFundSubmission(req.body, req.params.table as Tables)
       res.status(204).json({ id: record.id })
     } catch (e) {
       Sentry.withScope((scope) => {

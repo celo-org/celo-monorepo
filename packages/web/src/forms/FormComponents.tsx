@@ -58,30 +58,11 @@ interface FieldProps {
   isMobile: boolean
 }
 
-export function HolisticField({
-  fieldName,
-  onChange,
-  errors,
-  t,
-  value,
-  multiline,
-  isMobile,
-}: FieldProps) {
+export function HolisticField({ fieldName, onChange, errors, t, value, multiline }: FieldProps) {
   const borderStyle = errors.includes(fieldName) && styles.errorBorder
   return (
     <>
-      <Cell
-        span={Spans.fourth}
-        tabletSpan={Spans.full}
-        style={isMobile ? [styles.verticalSpace, styles.alignStart] : styles.validationMessage}
-      >
-        <ErrorMessage allErrors={errors} field={fieldName} t={t} />
-      </Cell>
-      <Cell
-        span={Spans.half}
-        tabletSpan={Spans.full}
-        style={isMobile ? styles.zeroVertical : styles.verticalSpace}
-      >
+      <Cell span={Spans.full} style={styles.verticalSpace}>
         <TextInput
           focusStyle={standardStyles.inputFocused}
           multiline={multiline}
@@ -94,6 +75,7 @@ export function HolisticField({
           onChange={onChange}
           required={true}
         />
+        <ErrorMessage allErrors={errors} field={fieldName} t={t} />
       </Cell>
     </>
   )

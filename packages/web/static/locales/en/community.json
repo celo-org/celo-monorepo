@@ -147,5 +147,10 @@
   "stayConnectedThanks": "Thanks for joining the Celo community, expect our newsletter soon.",
   "readMoreFromOurBlog": "Read more on our blog",
   "receiveUpdates": "Receive the latest updates to your inbox",
-  "signUp": "Sign Up"
+  "signUp": "Sign Up",
+  "conductText":
+    "Shared norms and behaviors are the foundation of a beautiful community. Please read and respect our code of conduct.",
+  "conductBtn": "Read Document",
+  "conductLabel": "Code of Conduct",
+  "socialLabel": "Engage"
 }

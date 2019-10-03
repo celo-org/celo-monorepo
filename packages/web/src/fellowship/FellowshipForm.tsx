@@ -25,9 +25,12 @@ export class FellowshipForm extends React.Component<I18nProps & ScreenProps> {
       <FormContainer route="/fellowship" blankForm={blankForm()} validateWith={validateFields}>
         {({ onAltSubmit, onInput, formState }) => (
           <Form style={styles.form}>
-            <GridRow tabletStyle={styles.emailNameArea} mobileStyle={styles.emailNameArea}>
-              {!isMobile && <NameErrorArea t={t} formState={formState} isMobile={isMobile} />}
-              <Cell span={Spans.fourth} tabletSpan={Spans.full} style={cellStyle}>
+            <GridRow
+              allStyle={styles.container}
+              tabletStyle={styles.emailNameArea}
+              mobileStyle={styles.emailNameArea}
+            >
+              <Cell span={Spans.half} tabletSpan={Spans.full} style={cellStyle}>
                 <TextInput
                   style={[inputStyle, formState.errors.includes('name') && formStyles.errorBorder]}
                   focusStyle={standardStyles.inputFocused}
@@ -38,9 +41,9 @@ export class FellowshipForm extends React.Component<I18nProps & ScreenProps> {
                   onChange={onInput}
                   required={true}
                 />
+                <ErrorMessage allErrors={formState.errors} field={'name'} t={t} />
               </Cell>
-              {isMobile && <NameErrorArea t={t} formState={formState} isMobile={isMobile} />}
-              <Cell span={Spans.fourth} tabletSpan={Spans.full} style={cellStyle}>
+              <Cell span={Spans.half} tabletSpan={Spans.full} style={cellStyle}>
                 <TextInput
                   focusStyle={standardStyles.inputFocused}
                   style={[inputStyle, formState.errors.includes('email') && formStyles.errorBorder]}
@@ -52,16 +55,6 @@ export class FellowshipForm extends React.Component<I18nProps & ScreenProps> {
                   onChange={onInput}
                   required={true}
                 />
-              </Cell>
-              <Cell
-                span={Spans.fourth}
-                tabletSpan={Spans.three4th}
-                style={[
-                  formStyles.validationMessage,
-                  formStyles.alignStart,
-                  isMobile && formStyles.verticalSpace,
-                ]}
-              >
                 <ErrorMessage allErrors={formState.errors} field={'email'} t={t} />
               </Cell>
             </GridRow>
@@ -112,18 +105,18 @@ export class FellowshipForm extends React.Component<I18nProps & ScreenProps> {
             <GridRow
               desktopStyle={standardStyles.sectionMarginBottom}
               mobileStyle={standardStyles.sectionMarginBottomMobile}
-              allStyle={[standardStyles.centered, standardStyles.elementalMarginTop]}
+              allStyle={[standardStyles.elementalMarginTop]}
             >
-              <Cell span={Spans.half} style={standardStyles.centered}>
+              <Cell span={Spans.full}>
                 <Button
                   text={t('submit')}
                   kind={BTN.PRIMARY}
                   onPress={onAltSubmit}
                   size={SIZE.big}
-                  align={'center'}
+                  align={'flex-start'}
                 />
                 {formState.isComplete && (
-                  <Text style={[textStyles.center, fonts.p, standardStyles.elementalMarginTop]}>
+                  <Text style={[fonts.p, standardStyles.elementalMarginTop]}>
                     {t('form.fellowshipSubmitted')}
                   </Text>
                 )}
@@ -158,6 +151,9 @@ const styles = StyleSheet.create({
   },
   emailNameArea: {
     flexDirection: 'column',
+  },
+  container: {
+    padding: 0,
   },
 })
 

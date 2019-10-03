@@ -13,7 +13,7 @@ function FellowshipPage({ t }: I18nProps) {
   return (
     <View style={{ marginTop: HEADER_HEIGHT }}>
       <FellowCover />
-      <BookLayout label={t('fellowsLabel')}>
+      <BookLayout startBlock={true} label={t('fellowsLabel')}>
         <Text style={fonts.p}>{t('fellowsText')}</Text>
       </BookLayout>
       <FellowViewer />

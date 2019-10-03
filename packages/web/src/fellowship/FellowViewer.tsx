@@ -70,11 +70,11 @@ class FellowViewer extends React.PureComponent<ScreenProps> {
   render() {
     return (
       <View
-        style={
+        style={[
           ScreenSizes.MOBILE === this.props.screen
-            ? standardStyles.sectionMarginTopMobile
-            : standardStyles.sectionMarginTop
-        }
+            ? standardStyles.blockMarginMobile
+            : standardStyles.blockMargin,
+        ]}
       >
         <Fade distance={'20px'} bottom={true}>
           <Carousel
@@ -82,6 +82,7 @@ class FellowViewer extends React.PureComponent<ScreenProps> {
             autoplay={false}
             dragging={true}
             swiping={true}
+            enableKeyboardControls={true}
             renderCenterLeftControls={null}
             renderCenterRightControls={null}
             renderBottomCenterControls={PagingDots}

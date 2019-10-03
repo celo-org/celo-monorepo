@@ -26,9 +26,6 @@ export default function PagingDots(props: CarouselSlideRenderControlProps) {
 
 const DOT_SIZE = 13
 const styles = StyleSheet.create({
-  tenet: {
-    marginBottom: 100,
-  },
   tabletStyle: {
     marginHorizontal: 15,
   },
