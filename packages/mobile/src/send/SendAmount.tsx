@@ -1,4 +1,6 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import LoadingLabel from '@celo/react-components/components/LoadingLabel'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
@@ -9,7 +11,6 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, TextStyle, TouchableWithoutFeedback, View } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
@@ -346,7 +347,12 @@ export class SendAmount extends React.Component<Props, State> {
     const verificationStatus = this.getVerificationStatus()
 
     return (
-      <SafeAreaView style={style.body}>
+      <SafeAreaView
+        // Force inset as this screen uses auto focus and KeyboardSpacer padding is initially
+        // incorrect because of that
+        forceInset={{ bottom: 'always' }}
+        style={style.body}
+      >
         {feeType && <EstimateFee feeType={feeType} />}
         <KeyboardAwareScrollView keyboardShouldPersistTaps="always">
           <DisconnectBanner />
@@ -413,6 +419,7 @@ export class SendAmount extends React.Component<Props, State> {
           </View>
         </KeyboardAwareScrollView>
         {this.renderBottomContainer()}
+        <KeyboardSpacer />
       </SafeAreaView>
     )
   }

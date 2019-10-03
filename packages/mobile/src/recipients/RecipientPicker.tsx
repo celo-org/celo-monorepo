@@ -1,4 +1,5 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import SectionHead from '@celo/react-components/components/SectionHead'
 import ForwardChevron from '@celo/react-components/icons/ForwardChevron'
 import QRCode from '@celo/react-components/icons/QRCode'
@@ -254,6 +255,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
           keyboardShouldPersistTaps="handled"
         />
         {this.renderRequestContactPermission()}
+        <KeyboardSpacer />
       </View>
     )
   }

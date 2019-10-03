@@ -1,4 +1,6 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
@@ -9,7 +11,6 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
@@ -230,7 +231,8 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
     return (
       <SafeAreaView
-        // TODO(jeanregisser): This screen is quite laggy, find out why this is required
+        // Force inset as this screen uses auto focus and KeyboardSpacer padding is initially
+        // incorrect because of that
         forceInset={{ top: 'never', bottom: 'always' }}
         style={styles.background}
       >
@@ -319,6 +321,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
             type={BtnTypes.PRIMARY}
           />
         </View>
+        <KeyboardSpacer />
       </SafeAreaView>
     )
   }

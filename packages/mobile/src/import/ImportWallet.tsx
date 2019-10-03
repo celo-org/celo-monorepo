@@ -1,4 +1,6 @@
 import { BtnTypes } from '@celo/react-components/components/Button'
+import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
@@ -6,7 +8,6 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ActivityIndicator, Keyboard, StyleSheet, Text, TextInput, View } from 'react-native'
 import { validateMnemonic } from 'react-native-bip39'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
@@ -189,6 +190,7 @@ export class ImportWallet extends React.Component<Props, State> {
           type={BtnTypes.PRIMARY}
           testID="ImportWalletButton"
         />
+        <KeyboardSpacer />
       </SafeAreaView>
     )
   }

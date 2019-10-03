@@ -1,4 +1,6 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
@@ -6,7 +8,6 @@ import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import FlagSecure from 'react-native-flag-secure-android'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import SafeAreaView from 'react-native-safe-area-view'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -73,6 +74,7 @@ class BackupPhrase extends React.Component<Props, State> {
             />
           </View>
         </KeyboardAwareScrollView>
+        <KeyboardSpacer />
       </SafeAreaView>
     )
   }

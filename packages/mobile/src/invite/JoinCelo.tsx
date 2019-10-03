@@ -1,4 +1,5 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import PhoneNumberInput from '@celo/react-components/components/PhoneNumberInput'
 import TextInput from '@celo/react-components/components/TextInput'
 import colors from '@celo/react-components/styles/colors'
@@ -192,6 +193,7 @@ export class JoinCelo extends React.Component<Props, State> {
           disabled={!this.state.isValidNumber}
           testID={'JoinCeloContinueButton'}
         />
+        <KeyboardSpacer />
       </SafeAreaView>
     )
   }
