@@ -51,7 +51,7 @@
     "prettier": "1.13.5",
     "pretty-quick": "^1.11.1",
     "solc": "0.5.8",
-    "tslint": "^5.12.1",
+    "tslint": "^5.20.0",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2",
     "typescript-tslint-plugin": "^0.5.4",
@@ -69,6 +69,7 @@
     "react-native-ntp-client": "^1.0.0",
     "**/codecov/**/js-yaml": "^3.13.1",
     "**/deep-extend": "^0.5.1",
-    "**/extend": "^3.0.2"
+    "**/extend": "^3.0.2",
+    "sha3": "1.2.3"
   }
 } 
