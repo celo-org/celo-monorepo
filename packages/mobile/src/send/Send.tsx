@@ -4,6 +4,7 @@ import { throttle } from 'lodash'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps, withNavigation } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
@@ -214,7 +215,7 @@ class Send extends React.Component<Props, State> {
     const { loading, searchQuery } = this.state
 
     return (
-      <View style={style.body}>
+      <SafeAreaView style={style.body}>
         {loading ? (
           <View style={style.container}>
             <ActivityIndicator style={style.icon} size="large" color={colors.celoGreen} />
@@ -233,7 +234,7 @@ class Send extends React.Component<Props, State> {
             onPermissionsAccepted={this.onPermissionsAccepted}
           />
         )}
-      </View>
+      </SafeAreaView>
     )
   }
 }
