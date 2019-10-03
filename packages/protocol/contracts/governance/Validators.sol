@@ -364,7 +364,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   {
     require(bytes(name).length > 0);
     require(bytes(url).length > 0);
-    require(commission.lt(FixidityLib.fixed1()), "Commission must be lower than 100%");
+    require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
     address account = getLockedGold().getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
     require(meetsValidatorGroupRegistrationRequirement(account));
