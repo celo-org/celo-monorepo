@@ -18,6 +18,10 @@ jest.mock('src/shared/DisconnectBanner', () => ({
   DisconnectBanner: () => null,
 }))
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 const store = createMockStore({
   exchange: {
     exchangeRatePair,

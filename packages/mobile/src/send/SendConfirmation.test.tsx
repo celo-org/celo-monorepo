@@ -11,6 +11,15 @@ const TEST_FEE = new BigNumber(10000000000000000)
 
 jest.mock('src/send/saga')
 
+jest.mock('src/web3/contracts', () => ({
+  web3: {
+    utils: {
+      fromWei: jest.fn((x: any) => x / 1e18),
+    },
+  },
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 const mockedGetSendFee = getSendFee as jest.Mock
 
 const store = createMockStore({

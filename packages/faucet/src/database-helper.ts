@@ -1,8 +1,10 @@
+/* tslint:disable max-classes-per-file */
 import { database } from 'firebase-admin'
 import { DataSnapshot } from 'firebase-functions/lib/providers/database'
 import Web3 from 'web3'
 import { CeloAdapter } from './celo-adapter'
 import { NetworkConfig } from './config'
+import { ExecutionResult, logExecutionResult } from './metrics'
 import { generateInviteCode, getPhoneHash, isE164Number, wait } from './utils'
 
 export type Address = string
@@ -49,11 +51,26 @@ export async function processRequest(snap: DataSnapshot, pool: AccountPool, conf
     } else if (request.type === RequestType.Invite) {
       requestHandler = buildHandleInvite(request, snap, config)
     } else {
-      throw new Error(`Unkown request type: ${request.type}`)
+      logExecutionResult(snap.key, ExecutionResult.InvalidRequestErr)
+      return ExecutionResult.InvalidRequestErr
     }
-    const success = await pool.doWithAccount(requestHandler)
-    await snap.ref.update({ status: success ? RequestStatus.Done : RequestStatus.Failed })
+
+    const actionResult = await pool.doWithAccount(requestHandler)
+    if (actionResult === ActionResult.Ok) {
+      await snap.ref.update({ status: RequestStatus.Done })
+      logExecutionResult(snap.key, ExecutionResult.Ok)
+      return ExecutionResult.Ok
+    } else {
+      await snap.ref.update({ status: RequestStatus.Failed })
+      const result =
+        actionResult === ActionResult.NoFreeAccount
+          ? ExecutionResult.NoFreeAccountErr
+          : ExecutionResult.ActionTimedOutErr
+      logExecutionResult(snap.key, result)
+      return result
+    }
   } catch (err) {
+    logExecutionResult(snap.key, ExecutionResult.OtherErr)
     console.error(`req(${snap.key}): ERROR proccessRequest`, err)
     await snap.ref.update({ status: RequestStatus.Failed })
     throw err
@@ -174,6 +191,12 @@ export interface PoolOptions {
 }
 
 const SECOND = 1000
+
+enum ActionResult {
+  Ok,
+  NoFreeAccount,
+  ActionTimeout,
+}
 export class AccountPool {
   constructor(
     private db: database.Database,
@@ -201,17 +224,23 @@ export class AccountPool {
     return this.accountsRef.once('value').then((snap) => snap.val())
   }
 
-  async doWithAccount(action: (account: AccountRecord) => Promise<any>) {
+  async doWithAccount(action: (account: AccountRecord) => Promise<any>): Promise<ActionResult> {
     const accountSnap = await this.tryLockAccountWithRetries()
-    if (accountSnap) {
-      try {
-        await withTimeout(this.options.actionTimeoutMS, () => action(accountSnap.val()))
-      } finally {
-        await accountSnap.child('locked').ref.set(false)
-      }
-      return true
-    } else {
-      return false
+    if (!accountSnap) {
+      return ActionResult.NoFreeAccount
+    }
+
+    try {
+      return withTimeout(
+        this.options.actionTimeoutMS,
+        async () => {
+          await action(accountSnap.val())
+          return ActionResult.Ok
+        },
+        () => ActionResult.ActionTimeout
+      )
+    } finally {
+      await accountSnap.child('locked').ref.set(false)
     }
   }
 
