@@ -10,10 +10,9 @@ import { StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import Avatar from 'src/components/Avatar'
 import LineItemRow from 'src/components/LineItemRow'
-import { LOCAL_CURRENCY_SYMBOL } from 'src/config'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
-import { useDollarsToLocalAmount } from 'src/localCurrency/hooks'
+import { useDollarsToLocalAmount, useLocalCurrencyCode } from 'src/localCurrency/hooks'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
@@ -48,16 +47,17 @@ function PaymentRequestReviewCard({
   value,
   comment,
 }: OwnProps & StateProps & WithNamespaces) {
+  const localCurrencyCode = useLocalCurrencyCode()
   const localValue = useDollarsToLocalAmount(value)
 
   return (
     <View style={style.container}>
       <Avatar recipient={recipient} address={address} e164Number={e164PhoneNumber} />
-      {LOCAL_CURRENCY_SYMBOL && localValue ? (
+      {!!localCurrencyCode && localValue ? (
         <MoneyAmount
           amount={getMoneyDisplayValue(localValue)}
           sign={'+'}
-          code={LOCAL_CURRENCY_SYMBOL}
+          code={localCurrencyCode}
         />
       ) : (
         <MoneyAmount
@@ -71,7 +71,7 @@ function PaymentRequestReviewCard({
         {!!comment && <Text style={[style.pSmall, componentStyles.paddingTop5]}>{comment}</Text>}
         <HorizontalLine />
         <View style={style.feeContainer}>
-          {LOCAL_CURRENCY_SYMBOL &&
+          {!!localCurrencyCode &&
             localValue && (
               <>
                 <LineItemRow
@@ -82,7 +82,7 @@ function PaymentRequestReviewCard({
                 <Text style={style.localValueHint}>
                   {t('localValueHint', {
                     localValue: getMoneyDisplayValue(localValue),
-                    localCurrencySymbol: LOCAL_CURRENCY_SYMBOL,
+                    localCurrencyCode,
                   })}
                 </Text>
               </>

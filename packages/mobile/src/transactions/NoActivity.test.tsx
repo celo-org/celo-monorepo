@@ -4,6 +4,10 @@ import * as renderer from 'react-test-renderer'
 import NoActivity from 'src/transactions/NoActivity'
 import { FeedType } from 'src/transactions/TransactionFeed'
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 it('renders loading', () => {
   const tree = renderer.create(<NoActivity loading={true} kind={FeedType.HOME} error={undefined} />)
   expect(tree).toMatchSnapshot()

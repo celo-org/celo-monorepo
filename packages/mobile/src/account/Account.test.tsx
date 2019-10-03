@@ -12,6 +12,10 @@ import { createMockStore } from 'test/utils'
 
 jest.useFakeTimers()
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('Account', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
