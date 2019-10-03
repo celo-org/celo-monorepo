@@ -2,15 +2,18 @@ import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import ah from 'src/community/ah-logo.png'
 import polychain from 'src/community/polychain-logo.png'
-import { H2 } from 'src/fonts/Fonts'
+import { H3 } from 'src/fonts/Fonts'
 import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
 import { ErrorMessage, Form, LabeledInput } from 'src/forms/FormComponents'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import BookLayout from 'src/layout/BookLayout'
+
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Rings from 'src/logos/RingsLight'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems, { hashNav } from 'src/shared/menu-items'
+
 import Navigation from 'src/shared/navigation'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import {
@@ -42,48 +45,54 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
   render() {
     const { t, screen } = this.props
     return (
-      <GridRow
-        nativeID={hashNav.connect.fund}
-        desktopStyle={[standardStyles.sectionMarginTop]}
-        tabletStyle={[standardStyles.sectionMarginTopTablet]}
-        mobileStyle={[standardStyles.sectionMarginTopMobile]}
-      >
-        <Cell span={Spans.half} style={screen !== ScreenSizes.MOBILE && styles.insideEdge}>
-          <H2>{t('ecoFund.title')}</H2>
-          <Text style={[fonts.p, textStyles.italic]}>{t('ecoFund.poweredBy')}</Text>
-          <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('ecoFund.description')}</Text>
-          <View style={[standardStyles.row, standardStyles.elementalMargin, standardStyles.wrap]}>
-            <View style={styles.partners}>
-              <Text style={[fonts.h5, styles.partnerText]}>{t('ecoFund.generalPartner')}</Text>
-              <Image
-                resizeMode="contain"
-                accessibilityLabel="Polychain"
-                source={{ uri: polychain }}
-                style={styles.polyChain}
-              />
-            </View>
-            <View style={styles.partners}>
-              <Text style={[fonts.h5, styles.partnerText]}>{t('ecoFund.limitedPartners')}</Text>
-              <View style={[standardStyles.row, styles.limitedPartners]}>
-                <Rings color={colors.dark} height={40} />
+      <>
+        <GridRow
+          nativeID={hashNav.connect.fund}
+          desktopStyle={[standardStyles.sectionMarginTop]}
+          tabletStyle={[standardStyles.sectionMarginTopTablet]}
+          mobileStyle={[standardStyles.sectionMarginTopMobile]}
+        >
+          <Cell span={Spans.fourth}>
+            <H3>{t('ecoFund.title')}</H3>
+            <Text style={[fonts.p, textStyles.italic]}>{t('ecoFund.poweredBy')}</Text>
+          </Cell>
+          <Cell span={Spans.half} style={screen !== ScreenSizes.MOBILE && styles.insideEdge}>
+            <Text style={[fonts.p, standardStyles.elementalMargin]}>
+              {t('ecoFund.description')}
+            </Text>
+            <View style={[standardStyles.row, standardStyles.elementalMargin, standardStyles.wrap]}>
+              <View style={styles.partners}>
+                <Text style={[fonts.h5, styles.partnerText]}>{t('ecoFund.generalPartner')}</Text>
                 <Image
                   resizeMode="contain"
-                  accessibilityLabel="a16z"
-                  source={ah}
-                  style={styles.a16z}
+                  accessibilityLabel="Polychain"
+                  source={{ uri: polychain }}
+                  style={styles.polyChain}
                 />
               </View>
+              <View style={styles.partners}>
+                <Text style={[fonts.h5, styles.partnerText]}>{t('ecoFund.limitedPartners')}</Text>
+                <View style={[standardStyles.row, styles.limitedPartners]}>
+                  <Rings color={colors.dark} height={40} />
+                  <Image
+                    resizeMode="contain"
+                    accessibilityLabel="a16z"
+                    source={ah}
+                    style={styles.a16z}
+                  />
+                </View>
+              </View>
             </View>
-          </View>
-          <Button
-            style={styles.button}
-            text={t('ecoFund.link')}
-            kind={BTN.NAKED}
-            size={SIZE.normal}
-            href={menuItems.BUILD.link}
-          />
-        </Cell>
-        <Cell span={Spans.half}>
+            <Button
+              style={styles.button}
+              text={t('ecoFund.link')}
+              kind={BTN.NAKED}
+              size={SIZE.normal}
+              href={menuItems.BUILD.link}
+            />
+          </Cell>
+        </GridRow>
+        <BookLayout label={t('apply')}>
           <View
             style={[
               standardStyles.row,
@@ -189,8 +198,8 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
               </FormContainer>
             </View>
           </View>
-        </Cell>
-      </GridRow>
+        </BookLayout>
+      </>
     )
   }
 }

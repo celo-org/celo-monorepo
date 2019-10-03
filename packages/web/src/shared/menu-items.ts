@@ -31,6 +31,10 @@ export const menuItems = {
     name: 'Fellowship',
     link: '/connect/fellowship',
   },
+  ECOSYSTEM: {
+    name: 'Ecosystem Fund',
+    link: '/connect/ecosystem-fund',
+  },
   PRIVACY: {
     name: 'Privacy Policy',
     link: '/privacy',

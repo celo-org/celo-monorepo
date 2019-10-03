@@ -36,6 +36,7 @@ interface AllButtonProps {
 type NakedProps = {
   size: SIZE
   kind: BTN.NAKED | BTN.DARKNAKED
+  style?: TextStyle | TextStyle[]
 } & AllButtonProps
 
 type PrimaryProps = {
