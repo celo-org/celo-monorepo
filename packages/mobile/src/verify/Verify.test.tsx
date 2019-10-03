@@ -11,6 +11,10 @@ import { mockAttestationMessage } from 'test/values'
 
 const store = createMockStore({})
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 it('renders the Education step correctly', () => {
   const tree = renderer.create(
     <Provider store={store}>

@@ -1,11 +1,7 @@
-import { InitialArgv } from '@celo/celotool/src/cmds/deploy/initial'
-import {
-  createClusterIfNotExists,
-  setupCluster,
-  switchToClusterFromEnv,
-} from '@celo/celotool/src/lib/cluster'
-import { installHelmChart } from '@celo/celotool/src/lib/ethstats'
+import { createClusterIfNotExists, setupCluster, switchToClusterFromEnv } from 'src/lib/cluster'
+import { installHelmChart } from 'src/lib/ethstats'
 import yargs from 'yargs'
+import { InitialArgv } from '../../deploy/initial'
 
 export const command = 'ethstats'
 

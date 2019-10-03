@@ -26,6 +26,10 @@ const invitee = {
 const encryptedMockComment =
   'BAChYK3v1R/Y1ixIKqhpT6BW9AqigzaHfCl/MTu4Sg6fp1ckDUHR4qMOyxG3UiMe1GrlpJ+Ce66NJh6VemaWkHD7tU3TCbyUHsLHXBwJ0nBwLqt9Lvqrp4MO7unbFYCofqhjZKH+9g3OFBr6TwvSg/JaY7CZiSjq0FPiA+hcmScJBJl12DcGnB+cNl97n7tdCGQZj+LY/ktPdPzH9wUtTNx+UKDjHfF06pWRPd3d7k0rO+ww01cKuh+8aBdS1oMA8HPFUttM2pcigqD1uTWaD/LCnGjYR5nVfSj5luaI/lqinRGHcCPlFzmflqbS3kpaCM/dolP8By7UC8V8leQ3tMI/JsrusWTRFkctBTCEqmk/Pd8/ezPVae8813EisGlsDC7Uxq3VDhkPMTVwrT2NjplqQ6CCLQ4aKvFAdZEo3e/iJWlXa5RKMTiRmpNjb5vhlIC0bWnAkMC17r/5poawS3SjWR+5RLFD+vsj0x/gErZaUCXxOVdiR1CURh1qZ9VyEUTxm1ZnZpC+tg=='
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('transfer feed item renders correctly', () => {
   it('for sent transaction', () => {
     const tree = renderer.create(
@@ -43,6 +47,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -65,6 +70,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={mockPrivateDEK}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -87,6 +93,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={mockPrivateDEK2}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -109,6 +116,53 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
+          {...getMockI18nProps()}
+        />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+  it('for network fee', () => {
+    const tree = renderer.create(
+      <Provider store={createMockStore({})}>
+        <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
+          comment={''}
+          type={TransactionTypes.NETWORK_FEE}
+          hash={'0x'}
+          value={0.002}
+          address={mockAccount}
+          invitees={{}}
+          symbol={CURRENCY_ENUM.DOLLAR}
+          timestamp={1}
+          commentKey={null}
+          addressToE164Number={{}}
+          recipientCache={{}}
+          showLocalCurrency={true}
+          {...getMockI18nProps()}
+        />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+  it('for <0.000001 network fee', () => {
+    const tree = renderer.create(
+      <Provider store={createMockStore({})}>
+        <TransferFeedItem
+          __typename={EventTypeNames.Transfer}
+          comment={''}
+          type={TransactionTypes.NETWORK_FEE}
+          hash={'0x'}
+          value={0.0000002}
+          address={mockAccount}
+          invitees={{}}
+          symbol={CURRENCY_ENUM.DOLLAR}
+          timestamp={1}
+          commentKey={null}
+          addressToE164Number={{}}
+          recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -131,6 +185,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -153,6 +208,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -175,6 +231,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -197,6 +254,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -219,6 +277,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -241,6 +300,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={mockAddressToE164Number}
           recipientCache={mockRecipientCache}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -263,6 +323,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={{}}
           recipientCache={{}}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -285,6 +346,7 @@ describe('transfer feed item renders correctly', () => {
           commentKey={null}
           addressToE164Number={mockAddressToE164Number}
           recipientCache={mockRecipientCache}
+          showLocalCurrency={true}
           {...getMockI18nProps()}
         />
       </Provider>

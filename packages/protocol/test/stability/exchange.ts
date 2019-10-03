@@ -5,7 +5,7 @@ import {
   isSameAddress,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { fixed1, toFixed, fromFixed } from '@celo/protocol/lib/fixidity'
+import { fixed1, toFixed, fromFixed, multiply } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   ExchangeInstance,
@@ -54,7 +54,7 @@ contract('Exchange', (accounts: string[]) => {
   const SECONDS_IN_A_WEEK = 604800
 
   const unit = new BigNumber(10).pow(decimals)
-  const initialReserveBalance = new BigNumber(1000)
+  const initialReserveBalance = new BigNumber(10000000000000000000000)
   const reserveFraction = toFixed(5 / 100)
   const initialGoldBucket = initialReserveBalance
     .times(fromFixed(reserveFraction))
@@ -68,14 +68,10 @@ contract('Exchange', (accounts: string[]) => {
     buySupply: BigNumber,
     _spread: BigNumber = spread
   ) {
-    const alpha = new BigNumber(sellAmount).div(sellSupply)
-    const gamma = fromFixed(fixed1.minus(_spread))
-    const res = alpha
-      .times(gamma)
-      .times(buySupply)
-      .div(alpha.times(gamma).plus(1))
-      .integerValue(BigNumber.ROUND_FLOOR)
-    return res
+    const reducedSellAmount = multiply(fixed1.minus(_spread), toFixed(sellAmount))
+    const numerator = multiply(reducedSellAmount, toFixed(buySupply))
+    const denominator = toFixed(sellSupply).plus(reducedSellAmount)
+    return numerator.idiv(denominator)
   }
 
   async function fundReserve() {
@@ -208,6 +204,92 @@ contract('Exchange', (accounts: string[]) => {
 
     it('should not allow a non-owner not set the minimum reports', async () => {
       await assertRevert(exchange.setMinimumReports(newMinimumReports, { from: accounts[1] }))
+    })
+  })
+
+  describe('#setStableToken', () => {
+    const newStable = '0x0000000000000000000000000000000000077cfa'
+
+    it('should set the stable token address', async () => {
+      await exchange.setStableToken(newStable)
+
+      const actualStable = await exchange.stable()
+      assert.equal(actualStable, newStable)
+    })
+
+    it('should emit a StableTokenSet event', async () => {
+      const tx = await exchange.setStableToken(newStable)
+      assert(tx.logs.length === 1, 'Did not receive event')
+
+      const log = tx.logs[0]
+      assertLogMatches2(log, {
+        event: 'StableTokenSet',
+        args: {
+          stable: newStable,
+        },
+      })
+    })
+
+    it('should not allow a non-owner not set the spread', async () => {
+      await assertRevert(exchange.setStableToken(newStable, { from: accounts[1] }))
+    })
+  })
+
+  describe('#setSpread', () => {
+    const newSpread = toFixed(6 / 1000)
+
+    it('should set the spread', async () => {
+      await exchange.setSpread(newSpread)
+
+      const actualSpread = await exchange.spread()
+
+      assert.isTrue(actualSpread.eq(newSpread))
+    })
+
+    it('should emit a SpreadSet event', async () => {
+      const tx = await exchange.setSpread(newSpread)
+      assert(tx.logs.length === 1, 'Did not receive event')
+
+      const log = tx.logs[0]
+      assertLogMatches2(log, {
+        event: 'SpreadSet',
+        args: {
+          spread: newSpread,
+        },
+      })
+    })
+
+    it('should not allow a non-owner not set the spread', async () => {
+      await assertRevert(exchange.setSpread(newSpread, { from: accounts[1] }))
+    })
+  })
+
+  describe('#setReserveFraction', () => {
+    const newReserveFraction = toFixed(3 / 100)
+
+    it('should set the reserve fraction', async () => {
+      await exchange.setReserveFraction(newReserveFraction)
+
+      const actualReserveFraction = await exchange.reserveFraction()
+
+      assert.isTrue(actualReserveFraction.eq(newReserveFraction))
+    })
+
+    it('should emit a ReserveFractionSet event', async () => {
+      const tx = await exchange.setReserveFraction(newReserveFraction)
+      assert(tx.logs.length === 1, 'Did not receive event')
+
+      const log = tx.logs[0]
+      assertLogMatches2(log, {
+        event: 'ReserveFractionSet',
+        args: {
+          reserveFraction: newReserveFraction,
+        },
+      })
+    })
+
+    it('should not allow a non-owner not set the minimum reports', async () => {
+      await assertRevert(exchange.setReserveFraction(newReserveFraction, { from: accounts[1] }))
     })
   })
 
@@ -438,6 +520,62 @@ contract('Exchange', (accounts: string[]) => {
           )
         )
       })
+
+      describe('when buckets need updating', () => {
+        // fundReserve() will double the amount in the gold bucket
+        const updatedGoldBucket = initialGoldBucket.times(2)
+
+        const updatedStableBucket = updatedGoldBucket
+          .times(stableAmountForRate)
+          .div(goldAmountForRate)
+
+        const expectedStableAmount = getBuyTokenAmount(
+          goldTokenAmount,
+          updatedGoldBucket,
+          updatedStableBucket
+        )
+
+        beforeEach(async () => {
+          await fundReserve()
+          await timeTravel(updateFrequency, web3)
+          await mockSortedOracles.setMedianTimestampToNow(stableToken.address)
+        })
+
+        it('the exchange should succeed', async () => {
+          await exchange.exchange(
+            goldTokenAmount,
+            expectedStableAmount.integerValue(BigNumber.ROUND_FLOOR),
+            true,
+            {
+              from: user,
+            }
+          )
+          const newStableBalance = await stableToken.balanceOf(user)
+          assertEqualBN(newStableBalance, expectedStableAmount)
+        })
+
+        it('should update the buckets', async () => {
+          await exchange.exchange(
+            goldTokenAmount,
+            expectedStableBalance.integerValue(BigNumber.ROUND_FLOOR),
+            true,
+            {
+              from: user,
+            }
+          )
+          const newGoldBucket = await exchange.goldBucket()
+          const newStableBucket = await exchange.stableBucket()
+
+          // The new value should be the updatedGoldBucket value, which is 2x the
+          // initial amount after fundReserve() is called, plus the amount of gold
+          // that was paid in the exchange.
+          assertEqualBN(newGoldBucket, updatedGoldBucket.plus(goldTokenAmount))
+
+          // The new value should be the updatedStableBucket (derived from the new
+          // Gold Bucket value), minus the amount purchased during the exchange
+          assertEqualBN(newStableBucket, updatedStableBucket.minus(expectedStableAmount))
+        })
+      })
     })
 
     describe('when exchanging stable for gold', () => {
@@ -596,6 +734,62 @@ contract('Exchange', (accounts: string[]) => {
             }
           )
         )
+      })
+
+      describe('when buckets need updating', () => {
+        // fundReserve() will double the amount in the gold bucket
+        const updatedGoldBucket = initialGoldBucket.times(2)
+
+        const updatedStableBucket = updatedGoldBucket
+          .times(stableAmountForRate)
+          .div(goldAmountForRate)
+
+        const expectedGoldAmount = getBuyTokenAmount(
+          stableTokenBalance,
+          updatedStableBucket,
+          updatedGoldBucket
+        )
+
+        beforeEach(async () => {
+          await fundReserve()
+          await timeTravel(updateFrequency, web3)
+          await mockSortedOracles.setMedianTimestampToNow(stableToken.address)
+        })
+
+        it('the exchange should succeed', async () => {
+          await exchange.exchange(
+            stableTokenBalance,
+            expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
+            false,
+            {
+              from: user,
+            }
+          )
+          const newGoldBalance = await goldToken.balanceOf(user)
+          assertEqualBN(newGoldBalance, oldGoldBalance.plus(expectedGoldAmount))
+        })
+
+        it('should update the buckets', async () => {
+          await exchange.exchange(
+            stableTokenBalance,
+            expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
+            false,
+            {
+              from: user,
+            }
+          )
+          const newGoldBucket = await exchange.goldBucket()
+          const newStableBucket = await exchange.stableBucket()
+
+          // The new value should be the updatedGoldBucket value, which is 2x the
+          // initial amount after fundReserve() is called, plus the amount of gold
+          // that was paid in the exchange.
+          assertEqualBN(newGoldBucket, updatedGoldBucket.minus(expectedGoldAmount))
+
+          // The new value should be the updatedStableBucket (derived from the new
+          // Gold Bucket value), minus the amount purchased during the exchange
+          assertEqualBN(newStableBucket, updatedStableBucket.plus(stableTokenBalance))
+        })
       })
     })
   })

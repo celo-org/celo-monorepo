@@ -170,7 +170,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           ]
         }
       >
-         +1
+        🇺🇸 +1
       </Text>
       <Text
         style={
@@ -236,7 +236,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           }
         }
       >
-        $10
+        10
       </Text>
     </View>
     <View
@@ -279,6 +279,12 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             }
           }
           isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackgroundBorderless",
+              "type": "ThemeAttrAndroid",
+            }
+          }
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -289,7 +295,6 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             Object {
               "alignItems": "center",
               "justifyContent": "flex-end",
-              "opacity": 1,
               "paddingHorizontal": 5,
             }
           }
@@ -319,7 +324,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           }
         }
       >
-        $0.01
+        0.01
       </Text>
     </View>
     <View
@@ -362,7 +367,7 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
           }
         }
       >
-        $9.99
+        9.99
       </Text>
     </View>
   </View>

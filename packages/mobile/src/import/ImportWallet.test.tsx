@@ -17,6 +17,10 @@ jest.mock('src/geth/GethAwareButton', () => {
   return Button
 })
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 const SPANISH_MNEMONIC = 'avance colmo poema momia cofre pata res verso secta cinco tubería yacer eterno observar ojo tabaco seta ruina bebé oral miembro gato suelo violín'.normalize(
   'NFD'
 )

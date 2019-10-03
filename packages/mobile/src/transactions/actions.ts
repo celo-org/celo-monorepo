@@ -103,6 +103,9 @@ export const navigateToPaymentTransferReview = (
     case TransactionTypes.INVITE_RECEIVED:
       headerText = i18n.t('inviteFlow11:inviteReceived')
       break
+    case TransactionTypes.NETWORK_FEE:
+      headerText = i18n.t('walletFlow5:networkFee')
+      break
   }
 
   navigate(Screens.TransactionReview, {
@@ -121,7 +124,7 @@ export const navigateToExchangeReview = (
 ) => {
   navigate(Screens.TransactionReview, {
     reviewProps: {
-      type: TransactionTypes.EXCHANGED,
+      type: TransactionTypes.EXCHANGE,
       timestamp,
       header: i18n.t('exchangeFlow9:exchange'),
     },

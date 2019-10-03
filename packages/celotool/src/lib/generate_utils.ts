@@ -1,20 +1,21 @@
-import { blsPrivateKeyToProcessedPrivateKey } from '@celo/celotool/src/lib/bls_utils'
-import { envVar, fetchEnv, fetchEnvOrFallback } from '@celo/celotool/src/lib/env-utils'
+import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
+import * as bls12377js from 'bls12377js'
+import { ec as EC } from 'elliptic'
+import fs from 'fs'
+import { range, repeat } from 'lodash'
+import path from 'path'
+import rlp from 'rlp'
+import Web3 from 'web3'
+import { envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import {
-  CONTRACT_ADDRESSES,
   CONTRACT_OWNER_STORAGE_LOCATION,
   GETH_CONFIG_OLD,
   ISTANBUL_MIX_HASH,
   OG_ACCOUNTS,
-  PROXY_CONTRACT_CODE,
+  REGISTRY_ADDRESS,
   TEMPLATE,
-} from '@celo/celotool/src/lib/genesis_constants'
-import { ensure0x, strip0x } from '@celo/celotool/src/lib/utils'
-import * as bls12377js from 'bls12377js'
-import { ec as EC } from 'elliptic'
-import { range, repeat } from 'lodash'
-import rlp from 'rlp'
-import Web3 from 'web3'
+} from './genesis_constants'
+import { ensure0x, strip0x } from './utils'
 
 import bip32 = require('bip32')
 import bip39 = require('bip39')
@@ -93,18 +94,17 @@ export const getStrippedAddressesFor = (accountType: AccountType, mnemonic: stri
   getAddressesFor(accountType, mnemonic, n).map(strip0x)
 
 export const getValidators = (mnemonic: string, n: number) => {
-  return range(0, n)
-    .map((i) => generatePrivateKey(mnemonic, AccountType.VALIDATOR, i))
-    .map((key) => {
-      const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(key)
-      return {
-        address: privateKeyToAddress(key).slice(2),
-        blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
-      }
-    })
+  return getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, n).map((key) => {
+    const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(key)
+    return {
+      address: strip0x(privateKeyToAddress(key)),
+      blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
+    }
+  })
 }
 
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
+  const mnemonic = fetchEnv(envVar.MNEMONIC)
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
   const validators =
     validatorEnv === VALIDATOR_OG_SOURCE
@@ -115,41 +115,36 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
             blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
           }
         })
-      : getValidators(fetchEnv(envVar.MNEMONIC), parseInt(validatorEnv, 10))
+      : getValidators(mnemonic, parseInt(validatorEnv, 10))
 
-  // @ts-ignore
-  if (![ConsensusType.CLIQUE, ConsensusType.ISTANBUL].includes(fetchEnv(envVar.CONSENSUS_TYPE))) {
+  const consensusType = fetchEnv(envVar.CONSENSUS_TYPE) as ConsensusType
+
+  if (![ConsensusType.CLIQUE, ConsensusType.ISTANBUL].includes(consensusType)) {
     console.error('Unsupported CONSENSUS_TYPE')
     process.exit(1)
   }
 
-  // @ts-ignore
-  const consensusType: ConsensusType = fetchEnv(envVar.CONSENSUS_TYPE)
-
-  const contracts: string[] = fetchEnv(envVar.PREDEPLOYED_CONTRACTS)
-    .split(',')
-    // @ts-ignore
-    .map((contract) => CONTRACT_ADDRESSES[contract])
-
-  // @ts-ignore
-  if (contracts.includes(undefined)) {
-    console.error('Unsupported PREDEPLOYED_CONTRACTS value')
-    process.exit(1)
-  }
-
   const blockTime = parseInt(fetchEnv(envVar.BLOCK_TIME), 10)
+  const requestTimeout = parseInt(
+    fetchEnvOrFallback(envVar.ISTANBUL_REQUEST_TIMEOUT_MS, '3000'),
+    10
+  )
   const epoch = parseInt(fetchEnvOrFallback(envVar.EPOCH, '30000'), 10)
   const chainId = parseInt(fetchEnv(envVar.NETWORK_ID), 10)
 
-  return generateGenesis(
+  // Assing DEFAULT ammount of gold to 2 faucet accounts
+  const faucetAddresses = getStrippedAddressesFor(AccountType.FAUCET, mnemonic, 2)
+
+  return generateGenesis({
     validators,
     consensusType,
-    contracts,
     blockTime,
+    initialAccounts: faucetAddresses,
     epoch,
     chainId,
-    enablePetersburg
-  )
+    requestTimeout,
+    enablePetersburg,
+  })
 }
 
 const generateIstanbulExtraData = (validators: Validator[]) => {
@@ -174,15 +169,25 @@ const generateIstanbulExtraData = (validators: Validator[]) => {
   )
 }
 
-export const generateGenesis = (
-  validators: Validator[],
-  consensusType: ConsensusType,
-  contracts: string[],
-  blockTime: number,
-  epoch: number,
-  chainId: number,
-  enablePetersburg: boolean = true
-) => {
+export const generateGenesis = ({
+  validators,
+  consensusType = ConsensusType.ISTANBUL,
+  initialAccounts: otherAccounts = [],
+  blockTime,
+  epoch,
+  chainId,
+  requestTimeout,
+  enablePetersburg = true,
+}: {
+  validators: Validator[]
+  consensusType?: ConsensusType
+  initialAccounts?: string[]
+  blockTime: number
+  epoch: number
+  chainId: number
+  requestTimeout: number
+  enablePetersburg?: boolean
+}) => {
   const genesis: any = { ...TEMPLATE }
 
   if (!enablePetersburg) {
@@ -202,6 +207,8 @@ export const generateGenesis = (
     genesis.extraData = generateIstanbulExtraData(validators)
     genesis.config.istanbul = {
       policy: 0,
+      period: blockTime,
+      requesttimeout: requestTimeout,
       epoch,
     }
   }
@@ -212,9 +219,20 @@ export const generateGenesis = (
     }
   }
 
+  for (const address of otherAccounts) {
+    genesis.alloc[address] = {
+      balance: DEFAULT_BALANCE,
+    }
+  }
+
+  const contracts = [REGISTRY_ADDRESS]
+  const contractBuildPath = path.resolve(
+    monorepoRoot,
+    'packages/protocol/build/contracts/Proxy.json'
+  )
   for (const contract of contracts) {
     genesis.alloc[contract] = {
-      code: PROXY_CONTRACT_CODE,
+      code: JSON.parse(fs.readFileSync(contractBuildPath).toString()).deployedBytecode,
       storage: {
         [CONTRACT_OWNER_STORAGE_LOCATION]: validators[0].address,
       },
