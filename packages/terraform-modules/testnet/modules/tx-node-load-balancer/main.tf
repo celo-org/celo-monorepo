@@ -43,4 +43,6 @@ resource "google_compute_instance_group" "tx_node_lb" {
   name = "${local.name_prefix}-group"
 
   instances = var.tx_node_self_links
+
+  depends_on = [var.tx_node_self_links]
 }
