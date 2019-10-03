@@ -39,7 +39,7 @@ contract('Election', (accounts: string[]) => {
   const nonOwner = accounts[1]
   const minElectableValidators = new BigNumber(4)
   const maxElectableValidators = new BigNumber(6)
-  const maxVotesPerAccount = new BigNumber(3)
+  const maxNumGroupsVotedFor = new BigNumber(3)
   const electabilityThreshold = new BigNumber(0)
 
   beforeEach(async () => {
@@ -53,7 +53,7 @@ contract('Election', (accounts: string[]) => {
       registry.address,
       minElectableValidators,
       maxElectableValidators,
-      maxVotesPerAccount,
+      maxNumGroupsVotedFor,
       electabilityThreshold
     )
   })
@@ -74,9 +74,9 @@ contract('Election', (accounts: string[]) => {
       assertEqualBN(actualMaxElectableValidators, maxElectableValidators)
     })
 
-    it('should have set maxVotesPerAccount', async () => {
-      const actualMaxVotesPerAccount = await election.maxVotesPerAccount()
-      assertEqualBN(actualMaxVotesPerAccount, maxVotesPerAccount)
+    it('should have set maxNumGroupsVotedFor', async () => {
+      const actualMaxNumGroupsVotedFor = await election.maxNumGroupsVotedFor()
+      assertEqualBN(actualMaxNumGroupsVotedFor, maxNumGroupsVotedFor)
     })
 
     it('should not be callable again', async () => {
@@ -85,7 +85,7 @@ contract('Election', (accounts: string[]) => {
           registry.address,
           minElectableValidators,
           maxElectableValidators,
-          maxVotesPerAccount,
+          maxNumGroupsVotedFor,
           electabilityThreshold
         )
       )
@@ -178,31 +178,33 @@ contract('Election', (accounts: string[]) => {
     })
   })
 
-  describe('#setMaxVotesPerAccount', () => {
-    const newMaxVotesPerAccount = maxVotesPerAccount.plus(1)
+  describe('#setMaxNumGroupsVotedFor', () => {
+    const newMaxNumGroupsVotedFor = maxNumGroupsVotedFor.plus(1)
     it('should set the max electable validators', async () => {
-      await election.setMaxVotesPerAccount(newMaxVotesPerAccount)
-      assertEqualBN(await election.maxVotesPerAccount(), newMaxVotesPerAccount)
+      await election.setMaxNumGroupsVotedFor(newMaxNumGroupsVotedFor)
+      assertEqualBN(await election.maxNumGroupsVotedFor(), newMaxNumGroupsVotedFor)
     })
 
-    it('should emit the MaxVotesPerAccountSet event', async () => {
-      const resp = await election.setMaxVotesPerAccount(newMaxVotesPerAccount)
+    it('should emit the MaxNumGroupsVotedForSet event', async () => {
+      const resp = await election.setMaxNumGroupsVotedFor(newMaxNumGroupsVotedFor)
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertContainSubset(log, {
-        event: 'MaxVotesPerAccountSet',
+        event: 'MaxNumGroupsVotedForSet',
         args: {
-          maxVotesPerAccount: new BigNumber(newMaxVotesPerAccount),
+          maxNumGroupsVotedFor: new BigNumber(newMaxNumGroupsVotedFor),
         },
       })
     })
 
-    it('should revert when the maxVotesPerAccount is unchanged', async () => {
-      await assertRevert(election.setMaxVotesPerAccount(maxVotesPerAccount))
+    it('should revert when the maxNumGroupsVotedFor is unchanged', async () => {
+      await assertRevert(election.setMaxNumGroupsVotedFor(maxNumGroupsVotedFor))
     })
 
     it('should revert when called by anyone other than the owner', async () => {
-      await assertRevert(election.setMaxVotesPerAccount(newMaxVotesPerAccount, { from: nonOwner }))
+      await assertRevert(
+        election.setMaxNumGroupsVotedFor(newMaxNumGroupsVotedFor, { from: nonOwner })
+      )
     })
   })
 
@@ -383,7 +385,7 @@ contract('Election', (accounts: string[]) => {
           let newGroup: string
           beforeEach(async () => {
             await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
-            for (let i = 0; i < maxVotesPerAccount.toNumber(); i++) {
+            for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
               newGroup = accounts[i + 2]
               await mockValidators.setMembers(newGroup, [accounts[9]])
               await election.markGroupEligible(newGroup, group, NULL_ADDRESS)
@@ -393,7 +395,7 @@ contract('Election', (accounts: string[]) => {
 
           it('should revert', async () => {
             await assertRevert(
-              election.vote(group, value - maxVotesPerAccount.toNumber(), newGroup, NULL_ADDRESS)
+              election.vote(group, value - maxNumGroupsVotedFor.toNumber(), newGroup, NULL_ADDRESS)
             )
           })
         })
