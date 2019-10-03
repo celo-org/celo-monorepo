@@ -19,10 +19,18 @@ import { ValidatorConfig } from './wrappers/Validators'
 
 const debug = debugFactory('kit:kit')
 
+/**
+ * Creates a new instance of `ContractKit` give a nodeUrl
+ * @param url CeloBlockchain node url
+ */
 export function newKit(url: string) {
   return newKitFromWeb3(new Web3(url))
 }
 
+/**
+ * Creates a new instance of `ContractKit` give a web3 instance
+ * @param web3 Web3 instance
+ */
 export function newKitFromWeb3(web3: Web3) {
   return new ContractKit(web3)
 }
@@ -46,8 +54,11 @@ export interface KitOptions {
 }
 
 export class ContractKit {
+  /** core contract's address registry */
   readonly registry: AddressRegistry
+  /** factory for core contract's native web3 wrappers  */
   readonly _web3Contracts: Web3ContractCache
+  /** factory for core contract's kit wrappers  */
   readonly contracts: WrapperCache
 
   private config: KitOptions
@@ -100,7 +111,11 @@ export class ContractKit {
     }
   }
 
-  async setGasCurrency(token: CeloToken) {
+  /**
+   * Set CeloToken to use to pay for gas fees
+   * @param token cUsd or cGold
+   */
+  async setGasCurrency(token: CeloToken): Promise<void> {
     this.config.gasCurrency =
       token === CeloContract.GoldToken ? null : await this.registry.addressFor(token)
   }
@@ -109,11 +124,17 @@ export class ContractKit {
     addLocalAccount(this.web3, privateKey)
   }
 
+  /**
+   * Set default account for generated transactions (eg. tx.from )
+   */
   set defaultAccount(address: Address) {
     this.config.from = address
     this.web3.eth.defaultAccount = address
   }
 
+  /**
+   * Default account for generated transactions (eg. tx.from)
+   */
   get defaultAccount(): Address {
     return this.web3.eth.defaultAccount
   }
@@ -126,6 +147,14 @@ export class ContractKit {
     return this.config.gasInflationFactor
   }
 
+  /**
+   * Set the ERC20 address for the token to use to pay for gas fees.
+   * The ERC20 must be whitelisted for gas.
+   *
+   * Set to `null` to use cGold
+   *
+   * @param address ERC20 address
+   */
   set defaultGasCurrency(address: Address | null) {
     this.config.gasCurrency = address
   }
@@ -142,6 +171,14 @@ export class ContractKit {
     return this.web3.eth.isSyncing()
   }
 
+  /**
+   * Send a transaction to celo-blockchain.
+   *
+   * Similar to `web3.eth.sendTransaction()` but with following differences:
+   *  - applies kit tx's defaults
+   *  - estimatesGas before sending
+   *  - returns a `TransactionResult` instead of `PromiEvent`
+   */
   async sendTransaction(tx: Tx): Promise<TransactionResult> {
     tx = this.fillTxDefaults(tx)
 
