@@ -15,6 +15,7 @@ import {
 export interface VotingDetails {
   accountAddress: Address
   voterAddress: Address
+  /** vote's weight */
   weight: BigNumber
 }
 
@@ -101,7 +102,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
       withdrawals[0]
     )
   }
-  private async getParsedSignatureOfAddress(address: string, signer: string) {
+  private async getParsedSignatureOfAddress(address: Address, signer: string) {
     const hash = Web3.utils.soliditySha3({ type: 'address', value: address })
     const signature = (await this.kit.web3.eth.sign(hash, signer)).slice(2)
     return {

@@ -5,6 +5,10 @@ export { IdentityMetadataWrapper } from './identity'
 export * from './kit'
 export { CeloTransactionObject } from './wrappers/BaseWrapper'
 
+/**
+ * Creates a new web3 instance
+ * @param url node url
+ */
 export function newWeb3(url: string) {
   return new Web3(url)
 }
