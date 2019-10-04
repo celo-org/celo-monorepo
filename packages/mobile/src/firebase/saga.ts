@@ -33,7 +33,7 @@ function* initializeFirebase() {
 
   if (!FIREBASE_ENABLED) {
     Logger.info(TAG, 'Firebase disabled')
-    yield put(showError(ErrorMessages.FIREBASE_DISABLED))
+    // yield put(showError(ErrorMessages.FIREBASE_DISABLED))
     return
   }
 
