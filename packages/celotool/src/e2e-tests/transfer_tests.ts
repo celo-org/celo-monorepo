@@ -195,6 +195,7 @@ describe('Transfer tests', function(this: any) {
   const ToAddress = '0xbBae99F0E1EE565404465638d40827b54D343638'
   const FeeRecipientAddress = '0x4f5f8a3f45d179553e7b95119ce296010f50f6f1'
 
+  const syncModes = ['full', 'fast', 'light', 'ultralight']
   const gethConfig = {
     migrateTo: 8,
     migrateGovernance: false,
@@ -460,7 +461,7 @@ describe('Transfer tests', function(this: any) {
 
   describe('Normal Transfer >', () => {
     before(restartWithCleanNodes)
-    const syncModes = ['full', 'fast', 'light', 'ultralight']
+
     for (const syncMode of syncModes) {
       describe(`${syncMode} Node >`, () => {
         before(`start geth on sync: ${syncMode}`, () => startSyncNode(syncMode))
@@ -593,152 +594,156 @@ describe('Transfer tests', function(this: any) {
   describe('Transfer with Demurrage >', () => {
     let inflationManager: InflationManager
 
-    const restart = async () => {
-      await restartWithCleanNodes()
-      await startSyncNode('full')
-      inflationManager = new InflationManager('http://localhost:8545', validatorAddress)
+    for (const syncMode of syncModes) {
+      describe(`${syncMode} Node >`, () => {
+        const restart = async () => {
+          await restartWithCleanNodes()
+          await startSyncNode(syncMode)
+          inflationManager = new InflationManager('http://localhost:8545', validatorAddress)
+        }
+
+        describe('when there is demurrage of 50% applied', () => {
+          describe('when setting a gas amount greater than the amount of gas necessary', () => {
+            let balances: BalanceWatcher
+            let expectedFees: Fees
+
+            before(async () => {
+              await restart()
+              balances = await newBalanceWatcher(kit, [
+                FromAddress,
+                ToAddress,
+                validatorAddress,
+                FeeRecipientAddress,
+              ])
+
+              await inflationManager.changeInflationFactorOnNextTransfer(new BigNumber(2))
+              const stableTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
+              const expectedGasUsed = 163180
+              const txRes = await runTestTransaction(
+                await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
+                  gasCurrency: stableTokenAddress,
+                  gasFeeRecipient: FeeRecipientAddress,
+                }),
+                expectedGasUsed,
+                stableTokenAddress
+              )
+              assert.isTrue(txRes.txOk)
+
+              await balances.update()
+              expectedFees = txRes.txFees
+            })
+
+            it("should decrement the sender's Celo Gold balance by the transfer amount", () => {
+              assertEqualBN(
+                balances.delta(FromAddress, CeloContract.GoldToken).negated(),
+                TransferAmount
+              )
+            })
+
+            it("should increment the receiver's Celo Gold balance by the transfer amount", () => {
+              assertEqualBN(balances.delta(ToAddress, CeloContract.GoldToken), TransferAmount)
+            })
+
+            it("should halve the sender's Celo Dollar balance due to demurrage and decrement it by the gas fee", () => {
+              assertEqualBN(
+                balances
+                  .initial(FromAddress, CeloContract.StableToken)
+                  .div(2)
+                  .minus(balances.current(FromAddress, CeloContract.StableToken)),
+                expectedFees.total
+              )
+            })
+
+            it("should increment the fee receipient's Celo Dollar balance by a portion of the gas fee", () => {
+              assertEqualBN(
+                balances
+                  .current(FeeRecipientAddress, CeloContract.StableToken)
+                  .minus(balances.initial(FeeRecipientAddress, CeloContract.StableToken).div(2)),
+
+                // balances.delta(FeeRecipientAddress, CeloContract.StableToken),
+                expectedFees.recipient
+              )
+            })
+
+            // TODO mcortesi
+            // it("should increment the infrastructure fund's Celo Dollar balance by the rest of the gas fee", () => {
+            //   assertEqualBN(
+            //     newBalances[CeloContract.StableToken][governanceAddress]
+            //       .minus(initialBalances[CeloContract.StableToken][governanceAddress])
+            //       ,
+            //     expectedFees.infrastructure
+            //   )
+            // })
+          })
+
+          describe('when setting a gas amount less than the amount of gas necessary but more than the intrinsic gas amount', () => {
+            let balances: BalanceWatcher
+            let expectedFees: Fees
+            before(async () => {
+              await restart()
+              balances = await newBalanceWatcher(kit, [
+                FromAddress,
+                ToAddress,
+                validatorAddress,
+                FeeRecipientAddress,
+              ])
+
+              await inflationManager.changeInflationFactorOnNextTransfer(new BigNumber(2))
+
+              const intrinsicGas = 155000
+              const gas = intrinsicGas + 1000
+              const txRes = await runTestTransaction(
+                await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
+                  gas,
+                  gasCurrency: await kit.registry.addressFor(CeloContract.StableToken),
+                  gasFeeRecipient: FeeRecipientAddress,
+                }),
+                gas,
+                await kit.registry.addressFor(CeloContract.StableToken)
+              )
+              assert.isFalse(txRes.txOk)
+
+              await balances.update()
+              expectedFees = txRes.txFees
+            })
+
+            it("should not change the sender's Celo Gold balance", () => {
+              assertEqualBN(balances.delta(FromAddress, CeloContract.GoldToken), new BigNumber(0))
+            })
+
+            it("should not change the receiver's Celo Gold balance", () => {
+              assertEqualBN(balances.delta(ToAddress, CeloContract.GoldToken), new BigNumber(0))
+            })
+
+            it("should halve the sender's Celo Dollar balance due to demurrage and decrement it by the gas fee", () => {
+              assertEqualBN(
+                balances
+                  .initial(FromAddress, CeloContract.StableToken)
+                  .div(2)
+                  .minus(balances.current(FromAddress, CeloContract.StableToken)),
+                expectedFees.total
+              )
+            })
+
+            it("should increment the fee recipient's Celo Dollar balance by a portion of the gas fee", () => {
+              assertEqualBN(
+                balances.delta(FeeRecipientAddress, CeloContract.StableToken),
+                expectedFees.recipient
+              )
+            })
+
+            // TODO(mcortesi)
+            // it("should increment the proposers Celo Dollar balance by the rest of the gas fee", () => {
+            //   assertEqualBN(
+            //     newBalances[CeloContract.StableToken][governanceAddress]
+            //       .minus(initialBalances[CeloContract.StableToken][governanceAddress])
+            //       ,
+            //     expectedFees.infrastructure
+            //   )
+            // })
+          })
+        })
+      })
     }
-
-    describe('when there is demurrage of 50% applied', () => {
-      describe('when setting a gas amount greater than the amount of gas necessary', () => {
-        let balances: BalanceWatcher
-        let expectedFees: Fees
-
-        before(async () => {
-          await restart()
-          balances = await newBalanceWatcher(kit, [
-            FromAddress,
-            ToAddress,
-            validatorAddress,
-            FeeRecipientAddress,
-          ])
-
-          await inflationManager.changeInflationFactorOnNextTransfer(new BigNumber(2))
-          const stableTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
-          const expectedGasUsed = 163180
-          const txRes = await runTestTransaction(
-            await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
-              gasCurrency: stableTokenAddress,
-              gasFeeRecipient: FeeRecipientAddress,
-            }),
-            expectedGasUsed,
-            stableTokenAddress
-          )
-          assert.isTrue(txRes.txOk)
-
-          await balances.update()
-          expectedFees = txRes.txFees
-        })
-
-        it("should decrement the sender's Celo Gold balance by the transfer amount", () => {
-          assertEqualBN(
-            balances.delta(FromAddress, CeloContract.GoldToken).negated(),
-            TransferAmount
-          )
-        })
-
-        it("should increment the receiver's Celo Gold balance by the transfer amount", () => {
-          assertEqualBN(balances.delta(ToAddress, CeloContract.GoldToken), TransferAmount)
-        })
-
-        it("should halve the sender's Celo Dollar balance due to demurrage and decrement it by the gas fee", () => {
-          assertEqualBN(
-            balances
-              .initial(FromAddress, CeloContract.StableToken)
-              .div(2)
-              .minus(balances.current(FromAddress, CeloContract.StableToken)),
-            expectedFees.total
-          )
-        })
-
-        it("should increment the fee receipient's Celo Dollar balance by a portion of the gas fee", () => {
-          assertEqualBN(
-            balances
-              .current(FeeRecipientAddress, CeloContract.StableToken)
-              .minus(balances.initial(FeeRecipientAddress, CeloContract.StableToken).div(2)),
-
-            // balances.delta(FeeRecipientAddress, CeloContract.StableToken),
-            expectedFees.recipient
-          )
-        })
-
-        // TODO mcortesi
-        // it("should increment the infrastructure fund's Celo Dollar balance by the rest of the gas fee", () => {
-        //   assertEqualBN(
-        //     newBalances[CeloContract.StableToken][governanceAddress]
-        //       .minus(initialBalances[CeloContract.StableToken][governanceAddress])
-        //       ,
-        //     expectedFees.infrastructure
-        //   )
-        // })
-      })
-
-      describe('when setting a gas amount less than the amount of gas necessary but more than the intrinsic gas amount', () => {
-        let balances: BalanceWatcher
-        let expectedFees: Fees
-        before(async () => {
-          await restart()
-          balances = await newBalanceWatcher(kit, [
-            FromAddress,
-            ToAddress,
-            validatorAddress,
-            FeeRecipientAddress,
-          ])
-
-          await inflationManager.changeInflationFactorOnNextTransfer(new BigNumber(2))
-
-          const intrinsicGas = 155000
-          const gas = intrinsicGas + 1000
-          const txRes = await runTestTransaction(
-            await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
-              gas,
-              gasCurrency: await kit.registry.addressFor(CeloContract.StableToken),
-              gasFeeRecipient: FeeRecipientAddress,
-            }),
-            gas,
-            await kit.registry.addressFor(CeloContract.StableToken)
-          )
-          assert.isFalse(txRes.txOk)
-
-          await balances.update()
-          expectedFees = txRes.txFees
-        })
-
-        it("should not change the sender's Celo Gold balance", () => {
-          assertEqualBN(balances.delta(FromAddress, CeloContract.GoldToken), new BigNumber(0))
-        })
-
-        it("should not change the receiver's Celo Gold balance", () => {
-          assertEqualBN(balances.delta(ToAddress, CeloContract.GoldToken), new BigNumber(0))
-        })
-
-        it("should halve the sender's Celo Dollar balance due to demurrage and decrement it by the gas fee", () => {
-          assertEqualBN(
-            balances
-              .initial(FromAddress, CeloContract.StableToken)
-              .div(2)
-              .minus(balances.current(FromAddress, CeloContract.StableToken)),
-            expectedFees.total
-          )
-        })
-
-        it("should increment the fee recipient's Celo Dollar balance by a portion of the gas fee", () => {
-          assertEqualBN(
-            balances.delta(FeeRecipientAddress, CeloContract.StableToken),
-            expectedFees.recipient
-          )
-        })
-
-        // TODO(mcortesi)
-        // it("should increment the proposers Celo Dollar balance by the rest of the gas fee", () => {
-        //   assertEqualBN(
-        //     newBalances[CeloContract.StableToken][governanceAddress]
-        //       .minus(initialBalances[CeloContract.StableToken][governanceAddress])
-        //       ,
-        //     expectedFees.infrastructure
-        //   )
-        // })
-      })
-    })
   })
 })
