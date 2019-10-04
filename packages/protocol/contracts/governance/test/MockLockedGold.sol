@@ -8,7 +8,8 @@ import "../interfaces/ILockedGold.sol";
  /**
  * @title A mock LockedGold for testing.
  */
-contract MockLockedGold is ILockedGold {
+// TODO(asa): Use ILockedGold interface.
+contract MockLockedGold {
 
   using SafeMath for uint256;
 
@@ -37,7 +38,11 @@ contract MockLockedGold is ILockedGold {
     return accountOrValidator;
   }
 
-  function getAccountFromVoter(address accountOrVoter) external view returns (address) {
+  function getAccountFromActiveValidator(address accountOrValidator) external view returns (address) {
+    return accountOrValidator;
+  }
+
+  function getAccountFromActiveVoter(address accountOrVoter) external view returns (address) {
     return accountOrVoter;
   }
 

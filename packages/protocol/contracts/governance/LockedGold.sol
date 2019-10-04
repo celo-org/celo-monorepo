@@ -19,6 +19,11 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 timestamp;
   }
 
+  struct AuthorizedBy {
+    address account;
+    bool active;
+  }
+
   struct Authorizations {
     address voting;
     address validating;
@@ -48,7 +53,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   mapping(address => Account) private accounts;
   // Maps voting and validating keys to the account that provided the authorization.
-  mapping(address => address) public authorizedBy;
+  // Authorized addresses may not be reused.
+  mapping(address => AuthorizedBy) private authorizedBy;
   uint256 public totalNonvoting;
   uint256 public unlockingPeriod;
 
@@ -255,15 +261,14 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   // TODO(asa): Dedup
   /**
    * @notice Returns the account associated with `accountOrVoter`.
-   * @param accountOrVoter The address of the account or authorized voter.
-   * @dev Fails if the `accountOrVoter` is not an account or authorized voter.
+   * @param accountOrVoter The address of the account or active authorized voter.
+   * @dev Fails if the `accountOrVoter` is not an account or active authorized voter.
    * @return The associated account.
    */
-  function getAccountFromVoter(address accountOrVoter) external view returns (address) {
-    address authorizingAccount = authorizedBy[accountOrVoter];
-    if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].authorizations.voting == accountOrVoter);
-      return authorizingAccount;
+  function getAccountFromActiveVoter(address accountOrVoter) external view returns (address) {
+    AuthorizedBy memory ab = authorizedBy[accountOrVoter];
+    if (ab.active && ab.account != address(0)) {
+      return ab.account;
     } else {
       require(isAccount(accountOrVoter));
       return accountOrVoter;
@@ -307,15 +312,30 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   /**
    * @notice Returns the account associated with `accountOrValidator`.
-   * @param accountOrValidator The address of the account or authorized validator.
-   * @dev Fails if the `accountOrValidator` is not an account or authorized validator.
+   * @param accountOrValidator The address of the account or active authorized validator.
+   * @dev Fails if the `accountOrValidator` is not an account or active authorized validator.
+   * @return The associated account.
+   */
+  function getAccountFromActiveValidator(address accountOrValidator) public view returns (address) {
+    AuthorizedBy memory ab = authorizedBy[accountOrValidator];
+    if (ab.active && ab.account != address(0)) {
+      return ab.account;
+    } else {
+      require(isAccount(accountOrValidator));
+      return accountOrValidator;
+    }
+  }
+
+  /**
+   * @notice Returns the account associated with `accountOrValidator`.
+   * @param accountOrValidator The address of the account or previously authorized validator.
+   * @dev Fails if the `accountOrValidator` is not an account or previously authorized validator.
    * @return The associated account.
    */
   function getAccountFromValidator(address accountOrValidator) public view returns (address) {
-    address authorizingAccount = authorizedBy[accountOrValidator];
-    if (authorizingAccount != address(0)) {
-      require(accounts[authorizingAccount].authorizations.validating == accountOrValidator);
-      return authorizingAccount;
+    AuthorizedBy memory ab = authorizedBy[accountOrValidator];
+    if (ab.account != address(0)) {
+      return ab.account;
     } else {
       require(isAccount(accountOrValidator));
       return accountOrValidator;
@@ -394,8 +414,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
     require(signer == current);
 
-    authorizedBy[previous] = address(0);
-    authorizedBy[current] = msg.sender;
+    authorizedBy[previous].active = false;
+    authorizedBy[current] = AuthorizedBy(msg.sender, true);
   }
 
   /**
@@ -422,7 +442,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return Returns `true` if authorized. Returns `false` otherwise.
    */
   function isAuthorized(address account) external view returns (bool) {
-    return (authorizedBy[account] != address(0));
+    return (authorizedBy[account].account != address(0));
   }
 
   /**
@@ -431,7 +451,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    * @return Returns `false` if authorized. Returns `true` otherwise.
    */
   function isNotAuthorized(address account) internal view returns (bool) {
-    return (authorizedBy[account] == address(0));
+    return (authorizedBy[account].account == address(0));
   }
 
   function deletePendingWithdrawal(PendingWithdrawal[] storage list, uint256 index) private {

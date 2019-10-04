@@ -75,6 +75,12 @@ const DefaultConfig = {
       group: 60 * 24 * 60 * 60, // 60 days
       validator: 60 * 24 * 60 * 60, // 60 days
     },
+    validatorScoreParameters: {
+      exponent: 1,
+      adjustmentSpeed: 0.1,
+    },
+    validatorEpochPayment: '1000000000000000000',
+    membershipHistoryLength: 60,
     maxGroupSize: 10,
 
     validatorKeys: [],
@@ -104,7 +110,7 @@ const linkedLibraries = {
     'SortedLinkedListWithMedian',
   ],
   SortedLinkedListWithMedian: ['AddressSortedLinkedListWithMedian'],
-  AddressLinkedList: ['Validators'],
+  AddressLinkedList: ['Validators', 'ValidatorsTest'],
   AddressSortedLinkedList: ['Election'],
   IntegerSortedLinkedList: ['Governance', 'IntegerSortedLinkedListTest'],
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],

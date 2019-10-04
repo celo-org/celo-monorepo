@@ -485,7 +485,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     nonReentrant
     returns (bool)
   {
-    address account = getLockedGold().getAccountFromVoter(msg.sender);
+    address account = getLockedGold().getAccountFromActiveVoter(msg.sender);
     // TODO(asa): When upvoting a proposal that will get dequeued, should we let the tx succeed
     // and return false?
     dequeueProposalsIfReady();
@@ -529,7 +529,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     returns (bool)
   {
     dequeueProposalsIfReady();
-    address account = getLockedGold().getAccountFromVoter(msg.sender);
+    address account = getLockedGold().getAccountFromActiveVoter(msg.sender);
     Voter storage voter = voters[account];
     uint256 proposalId = voter.upvote.proposalId;
     Proposals.Proposal storage proposal = proposals[proposalId];
@@ -597,7 +597,7 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     nonReentrant
     returns (bool)
   {
-    address account = getLockedGold().getAccountFromVoter(msg.sender);
+    address account = getLockedGold().getAccountFromActiveVoter(msg.sender);
     dequeueProposalsIfReady();
     Proposals.Proposal storage proposal = proposals[proposalId];
     require(isDequeuedProposal(proposal, proposalId, index));

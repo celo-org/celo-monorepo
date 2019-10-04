@@ -3,7 +3,9 @@ import {
   assertContainSubset,
   assertEqualBN,
   assertRevert,
+  assertSameAddress,
   NULL_ADDRESS,
+  mineBlocks,
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
@@ -13,12 +15,12 @@ import {
   MockElectionInstance,
   RegistryContract,
   RegistryInstance,
-  ValidatorsContract,
-  ValidatorsInstance,
+  ValidatorsTestContract,
+  ValidatorsTestInstance,
 } from 'types'
-import { toFixed } from '@celo/utils/lib/fixidity'
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 
-const Validators: ValidatorsContract = artifacts.require('Validators')
+const Validators: ValidatorsTestContract = artifacts.require('ValidatorsTest')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -33,6 +35,7 @@ const parseValidatorParams = (validatorParams: any) => {
     url: validatorParams[1],
     publicKeysData: validatorParams[2],
     affiliation: validatorParams[3],
+    score: validatorParams[4],
   }
 }
 
@@ -41,18 +44,36 @@ const parseValidatorGroupParams = (groupParams: any) => {
     name: groupParams[0],
     url: groupParams[1],
     members: groupParams[2],
+    commission: groupParams[3],
   }
 }
 
 const HOUR = 60 * 60
 const DAY = 24 * HOUR
 const MAX_UINT256 = new BigNumber(2).pow(256).minus(1)
+// Hard coded in ValidatorsTest.sol
+const EPOCH = 100
 
 contract('Validators', (accounts: string[]) => {
-  let validators: ValidatorsInstance
+  let validators: ValidatorsTestInstance
   let registry: RegistryInstance
   let mockLockedGold: MockLockedGoldInstance
   let mockElection: MockElectionInstance
+  const nonOwner = accounts[1]
+
+  const registrationRequirements = { group: new BigNumber(1000), validator: new BigNumber(100) }
+  const deregistrationLockups = {
+    group: new BigNumber(100 * DAY),
+    validator: new BigNumber(60 * DAY),
+  }
+  const validatorScoreParameters = {
+    exponent: new BigNumber(1),
+    adjustmentSpeed: toFixed(0.25),
+  }
+  const validatorEpochPayment = new BigNumber(10000000000000)
+  const membershipHistoryLength = new BigNumber(3)
+  const maxGroupSize = new BigNumber(5)
+
   // A random 64 byte hex string.
   const publicKey =
     'ea0733ad275e2b9e05541341a97ee82678c58932464fad26164657a111a7e37a9fa0300266fb90e2135a1f1512350cb4e985488a88809b14e3cbe415e76e82b2'
@@ -60,16 +81,7 @@ contract('Validators', (accounts: string[]) => {
     '4d23d8cd06f30b1fa7cf368e2f5399ab04bb6846c682f493a98a607d3dfb7e53a712bb79b475c57b0ac2785460f91301'
   const blsPoP =
     '9d3e1d8f49f6b0d8e9a03d80ca07b1d24cf1cc0557bdcc04f5e17a46e35d02d0d411d956dbd5d2d2464eebd7b74ae30005d223780d785d2abc5644fac7ac29fb0e302bdc80c81a5d45018b68b1045068a4b3a4861c93037685fd0d252d740501'
-
   const publicKeysData = '0x' + publicKey + blsPublicKey + blsPoP
-
-  const nonOwner = accounts[1]
-  const registrationRequirements = { group: new BigNumber(1000), validator: new BigNumber(100) }
-  const deregistrationLockups = {
-    group: new BigNumber(100 * DAY),
-    validator: new BigNumber(60 * DAY),
-  }
-  const maxGroupSize = 5
   const name = 'test-name'
   const url = 'test-url'
   const commission = toFixed(1 / 100)
@@ -86,6 +98,10 @@ contract('Validators', (accounts: string[]) => {
       registrationRequirements.validator,
       deregistrationLockups.group,
       deregistrationLockups.validator,
+      validatorScoreParameters.exponent,
+      validatorScoreParameters.adjustmentSpeed,
+      validatorEpochPayment,
+      membershipHistoryLength,
       maxGroupSize
     )
   })
@@ -133,6 +149,27 @@ contract('Validators', (accounts: string[]) => {
       assertEqualBN(validator, deregistrationLockups.validator)
     })
 
+    it('should have set the validator score parameters', async () => {
+      const [exponent, adjustmentSpeed] = await validators.getValidatorScoreParameters()
+      assertEqualBN(exponent, validatorScoreParameters.exponent)
+      assertEqualBN(adjustmentSpeed, validatorScoreParameters.adjustmentSpeed)
+    })
+
+    it('should have set the validator epoch payment', async () => {
+      const actual = await validators.validatorEpochPayment()
+      assertEqualBN(actual, validatorEpochPayment)
+    })
+
+    it('should have set the membership history length', async () => {
+      const actual = await validators.membershipHistoryLength()
+      assertEqualBN(actual, membershipHistoryLength)
+    })
+
+    it('should have set the max group size', async () => {
+      const actual = await validators.maxGroupSize()
+      assertEqualBN(actual, maxGroupSize)
+    })
+
     it('should not be callable again', async () => {
       await assertRevert(
         validators.initialize(
@@ -141,9 +178,103 @@ contract('Validators', (accounts: string[]) => {
           registrationRequirements.validator,
           deregistrationLockups.group,
           deregistrationLockups.validator,
+          validatorScoreParameters.exponent,
+          validatorScoreParameters.adjustmentSpeed,
+          validatorEpochPayment,
+          membershipHistoryLength,
           maxGroupSize
         )
       )
+    })
+  })
+
+  describe('#setValidatorEpochPayment()', () => {
+    describe('when the payment is different', () => {
+      const newPayment = validatorEpochPayment.plus(1)
+
+      describe('when called by the owner', () => {
+        let resp: any
+
+        beforeEach(async () => {
+          resp = await validators.setValidatorEpochPayment(newPayment)
+        })
+
+        it('should set the validator epoch payment', async () => {
+          assertEqualBN(await validators.validatorEpochPayment(), newPayment)
+        })
+
+        it('should emit the ValidatorEpochPaymentSet event', async () => {
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          assertContainSubset(log, {
+            event: 'ValidatorEpochPaymentSet',
+            args: {
+              value: new BigNumber(newPayment),
+            },
+          })
+        })
+
+        describe('when called by a non-owner', () => {
+          it('should revert', async () => {
+            await assertRevert(
+              validators.setValidatorEpochPayment(newPayment, {
+                from: nonOwner,
+              })
+            )
+          })
+        })
+      })
+
+      describe('when the payment is the same', () => {
+        it('should revert', async () => {
+          await assertRevert(validators.setValidatorEpochPayment(validatorEpochPayment))
+        })
+      })
+    })
+  })
+
+  describe('#setMaxGroupSize()', () => {
+    describe('when the group size is different', () => {
+      const newSize = maxGroupSize.plus(1)
+
+      describe('when called by the owner', () => {
+        let resp: any
+
+        beforeEach(async () => {
+          resp = await validators.setMaxGroupSize(newSize)
+        })
+
+        it('should set the max group size', async () => {
+          assertEqualBN(await validators.maxGroupSize(), newSize)
+        })
+
+        it('should emit the MaxGroupSizeSet event', async () => {
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          assertContainSubset(log, {
+            event: 'MaxGroupSizeSet',
+            args: {
+              size: new BigNumber(newSize),
+            },
+          })
+        })
+
+        describe('when called by a non-owner', () => {
+          it('should revert', async () => {
+            await assertRevert(
+              validators.setMaxGroupSize(newSize, {
+                from: nonOwner,
+              })
+            )
+          })
+        })
+      })
+
+      describe('when the size is the same', () => {
+        it('should revert', async () => {
+          await assertRevert(validators.setMaxGroupSize(maxGroupSize))
+        })
+      })
     })
   })
 
@@ -211,7 +342,7 @@ contract('Validators', (accounts: string[]) => {
   })
 
   describe('#setDeregistrationLockups()', () => {
-    describe('when the requirements are different', () => {
+    describe('when the lockups are different', () => {
       const newLockups = {
         group: deregistrationLockups.group.plus(1),
         validator: deregistrationLockups.validator.plus(1),
@@ -224,7 +355,7 @@ contract('Validators', (accounts: string[]) => {
           resp = await validators.setDeregistrationLockups(newLockups.group, newLockups.validator)
         })
 
-        it('should set the group and validator requirements', async () => {
+        it('should set the group and validator lockups', async () => {
           const [group, validator] = await validators.getDeregistrationLockups()
           assertEqualBN(group, newLockups.group)
           assertEqualBN(validator, newLockups.validator)
@@ -253,7 +384,7 @@ contract('Validators', (accounts: string[]) => {
         })
       })
 
-      describe('when the requirements are the same', () => {
+      describe('when the lockups are the same', () => {
         it('should revert', async () => {
           await assertRevert(
             validators.setDeregistrationLockups(
@@ -266,11 +397,74 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
+  describe('#setValidatorScoreParameters()', () => {
+    describe('when the parameters are different', () => {
+      const newParameters = {
+        exponent: validatorScoreParameters.exponent.plus(1),
+        adjustmentSpeed: validatorScoreParameters.adjustmentSpeed.plus(1),
+      }
+
+      describe('when called by the owner', () => {
+        let resp: any
+
+        beforeEach(async () => {
+          resp = await validators.setValidatorScoreParameters(
+            newParameters.exponent,
+            newParameters.adjustmentSpeed
+          )
+        })
+
+        it('should set the exponent and adjustment speed', async () => {
+          const [exponent, adjustmentSpeed] = await validators.getValidatorScoreParameters()
+          assertEqualBN(exponent, newParameters.exponent)
+          assertEqualBN(adjustmentSpeed, newParameters.adjustmentSpeed)
+        })
+
+        it('should emit the ValidatorScoreParametersSet event', async () => {
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          assertContainSubset(log, {
+            event: 'ValidatorScoreParametersSet',
+            args: {
+              exponent: new BigNumber(newParameters.exponent),
+              adjustmentSpeed: new BigNumber(newParameters.adjustmentSpeed),
+            },
+          })
+        })
+
+        describe('when called by a non-owner', () => {
+          it('should revert', async () => {
+            await assertRevert(
+              validators.setValidatorScoreParameters(
+                newParameters.exponent,
+                newParameters.adjustmentSpeed,
+                {
+                  from: nonOwner,
+                }
+              )
+            )
+          })
+        })
+      })
+
+      describe('when the requirements are the same', () => {
+        it('should revert', async () => {
+          await assertRevert(
+            validators.setValidatorScoreParameters(
+              validatorScoreParameters.exponent,
+              validatorScoreParameters.adjustmentSpeed
+            )
+          )
+        })
+      })
+    })
+  })
+
   describe('#setMaxGroupSize()', () => {
     describe('when the size is different', () => {
       describe('when called by the owner', () => {
         let resp: any
-        const newSize = maxGroupSize + 1
+        const newSize = maxGroupSize.plus(1)
 
         beforeEach(async () => {
           resp = await validators.setMaxGroupSize(newSize)
@@ -665,6 +859,18 @@ contract('Validators', (accounts: string[]) => {
         assert.deepEqual(parsedGroup.members, [])
       })
 
+      it("should update the member's membership history", async () => {
+        await validators.deaffiliate()
+        const membershipHistory = await validators.getMembershipHistory(validator)
+        const expectedEpoch = new BigNumber(
+          Math.floor((await web3.eth.getBlock('latest')).number / EPOCH)
+        )
+        assert.equal(membershipHistory[0].length, 1)
+        assertEqualBN(membershipHistory[0][0], expectedEpoch)
+        assert.equal(membershipHistory[1].length, 1)
+        assertSameAddress(membershipHistory[1][0], NULL_ADDRESS)
+      })
+
       it('should emit the ValidatorGroupMemberRemoved event', async () => {
         const resp = await validators.deaffiliate()
         assert.equal(resp.logs.length, 2)
@@ -844,6 +1050,17 @@ contract('Validators', (accounts: string[]) => {
       assert.deepEqual(parsedGroup.members, [validator])
     })
 
+    it("should update the member's membership history", async () => {
+      const membershipHistory = await validators.getMembershipHistory(validator)
+      const expectedEpoch = new BigNumber(
+        Math.floor((await web3.eth.getBlock('latest')).number / EPOCH)
+      )
+      assert.equal(membershipHistory[0].length, 1)
+      assertEqualBN(membershipHistory[0][0], expectedEpoch)
+      assert.equal(membershipHistory[1].length, 1)
+      assertSameAddress(membershipHistory[1][0], group)
+    })
+
     it('should emit the ValidatorGroupMemberAdded event', async () => {
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
@@ -899,6 +1116,18 @@ contract('Validators', (accounts: string[]) => {
       await validators.removeMember(validator)
       const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
       assert.deepEqual(parsedGroup.members, [])
+    })
+
+    it("should update the member's membership history", async () => {
+      await validators.removeMember(validator)
+      const membershipHistory = await validators.getMembershipHistory(validator)
+      const expectedEpoch = new BigNumber(
+        Math.floor((await web3.eth.getBlock('latest')).number / EPOCH)
+      )
+      assert.equal(membershipHistory[0].length, 1)
+      assertEqualBN(membershipHistory[0][0], expectedEpoch)
+      assert.equal(membershipHistory[1].length, 1)
+      assertSameAddress(membershipHistory[1][0], NULL_ADDRESS)
     })
 
     it('should emit the ValidatorGroupMemberRemoved event', async () => {
@@ -984,6 +1213,117 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(validators.reorderMember(validator2, validator1, NULL_ADDRESS))
+      })
+    })
+  })
+
+  describe('#updateValidatorScore', () => {
+    const validator = accounts[0]
+    beforeEach(async () => {
+      await registerValidator(validator)
+    })
+
+    describe('when 0 <= uptime <= 1.0', () => {
+      const uptime = 0.99
+      const adjustmentSpeed = fromFixed(validatorScoreParameters.adjustmentSpeed)
+      beforeEach(async () => {
+        await validators.updateValidatorScore(validator, toFixed(uptime))
+      })
+
+      it('should update the validator score', async () => {
+        const expectedScore = adjustmentSpeed.times(uptime)
+        const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+        assertEqualBN(parsedValidator.score, toFixed(expectedScore))
+      })
+
+      describe('when the validator already has a non-zero score', () => {
+        beforeEach(async () => {
+          await validators.updateValidatorScore(validator, toFixed(uptime))
+        })
+
+        it('should update the validator score', async () => {
+          let expectedScore = adjustmentSpeed.times(uptime)
+          expectedScore = new BigNumber(1)
+            .minus(adjustmentSpeed)
+            .times(expectedScore)
+            .plus(expectedScore)
+          const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
+          assertEqualBN(parsedValidator.score, toFixed(expectedScore))
+        })
+      })
+    })
+
+    describe('when uptime > 1.0', () => {
+      const uptime = 1.01
+      it('should revert', async () => {
+        await assertRevert(validators.updateValidatorScore(validator, toFixed(uptime)))
+      })
+    })
+  })
+
+  describe('#updateMembershipHistory', () => {
+    const validator = accounts[0]
+    const groups = accounts.slice(1)
+    beforeEach(async () => {
+      await registerValidator(validator)
+      for (const group of groups) {
+        await registerValidatorGroup(group)
+      }
+    })
+
+    describe('when changing groups more times than membership history length', () => {
+      it('should always store the most recent memberships', async () => {
+        for (let i = 0; i < membershipHistoryLength.plus(1).toNumber(); i++) {
+          await validators.affiliate(groups[i])
+          const currentEpoch = new BigNumber(
+            Math.floor((await web3.eth.getBlock('latest')).number / EPOCH)
+          )
+          await validators.addMember(validator, { from: groups[i] })
+          await mineBlocks(EPOCH, web3)
+
+          const membershipHistory = await validators.getMembershipHistory(validator)
+          const expectedMembershipHistoryLength = Math.min(
+            i + 1,
+            membershipHistoryLength.toNumber()
+          )
+          assert.equal(membershipHistory[0].length, expectedMembershipHistoryLength)
+          assert.equal(membershipHistory[1].length, expectedMembershipHistoryLength)
+          for (let j = 0; j < expectedMembershipHistoryLength; j++) {
+            assert.include(
+              membershipHistory[0].map((x) => x.toNumber()),
+              currentEpoch.minus(j).toNumber()
+            )
+            assert.include(
+              membershipHistory[1].map((x) => x.toLowerCase()),
+              groups[i - j].toLowerCase()
+            )
+          }
+        }
+      })
+    })
+  })
+
+  describe('#getMembershipInLastEpoch', () => {
+    const validator = accounts[0]
+    const groups = accounts.slice(1)
+    beforeEach(async () => {
+      await registerValidator(validator)
+      for (const group of groups) {
+        await registerValidatorGroup(group)
+      }
+    })
+
+    describe('when changing groups more times than membership history length', () => {
+      it('should always return the correct membership for the last epoch', async () => {
+        for (let i = 0; i < membershipHistoryLength.plus(1).toNumber(); i++) {
+          await validators.affiliate(groups[i])
+          await validators.addMember(validator, { from: groups[i] })
+          if (i > 0) {
+            assert.equal(await validators.getMembershipInLastEpoch(validator), groups[i - 1])
+          }
+          await mineBlocks(EPOCH, web3)
+          assert.equal(await validators.getMembershipInLastEpoch(validator), groups[i])
+        }
       })
     })
   })

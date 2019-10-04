@@ -85,6 +85,12 @@ export async function timeTravel(seconds: number, web3: Web3) {
   await jsonRpc(web3, 'evm_mine', [])
 }
 
+export async function mineBlocks(blocks: number, web3: Web3) {
+  for (let i = 0; i < blocks; i++) {
+    await jsonRpc(web3, 'evm_mine', [])
+  }
+}
+
 export async function assertBalance(address: string, balance: BigNumber) {
   const block = await web3.eth.getBlock('latest')
   const web3balance = new BigNumber(await web3.eth.getBalance(address))

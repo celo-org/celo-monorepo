@@ -246,7 +246,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
   {
     require(votes.total.eligible.contains(group));
     require(0 < value && value <= getNumVotesReceivable(group));
-    address account = getLockedGold().getAccountFromVoter(msg.sender);
+    address account = getLockedGold().getAccountFromActiveVoter(msg.sender);
     address[] storage groups = votes.groupsVotedFor[account];
     require(groups.length < maxNumGroupsVotedFor);
     for (uint256 i = 0; i < groups.length; i = i.add(1)) {
@@ -266,7 +266,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
    * @return True upon success.
    */
   function activate(address group) external nonReentrant returns (bool) {
-    address account = getLockedGold().getAccountFromVoter(msg.sender);
+    address account = getLockedGold().getAccountFromActiveVoter(msg.sender);
     PendingVotes storage pending = votes.pending;
     uint256 value = pending.balances[group][account];
     require(value > 0);
@@ -299,7 +299,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     returns (bool)
   {
     require(group != address(0));
-    address account = getLockedGold().getAccountFromVoter(msg.sender);
+    address account = getLockedGold().getAccountFromActiveVoter(msg.sender);
     require(0 < value && value <= getAccountPendingVotesForGroup(group, account));
     decrementPendingVotes(group, account, value);
     decrementTotalVotes(group, value, lesser, greater);
@@ -335,7 +335,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     returns (bool)
   {
     require(group != address(0));
-    address account = getLockedGold().getAccountFromVoter(msg.sender);
+    address account = getLockedGold().getAccountFromActiveVoter(msg.sender);
     require(0 < value && value <= getAccountActiveVotesForGroup(group, account));
     decrementActiveVotes(group, account, value);
     decrementTotalVotes(group, value, lesser, greater);
@@ -718,7 +718,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     totalNumMembersElected = 0;
     for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
       // We use the validating delegate if one is set.
-      address[] memory electedGroupValidators = getValidators().getTopValidatorsFromGroup(
+      address[] memory electedGroupValidators = getValidators().getTopGroupValidators(
         electionGroups[i],
         numMembersElected[i]
       );

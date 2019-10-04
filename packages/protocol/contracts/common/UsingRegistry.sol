@@ -41,6 +41,7 @@ contract UsingRegistry is Ownable {
     require(registry.getAddressForOrDie(identifierHash) == msg.sender, "only registered contract");
     _;
   }
+
   /**
    * @notice Updates the address pointing to a Registry contract.
    * @param registryAddress The address of a registry contract for routing to other contracts.
