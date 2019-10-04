@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { StyleSheet, View } from 'react-native-web'
+import { StyleSheet } from 'react-native-web'
 import VECTORS from 'src/community/connect/RingOfCoinVectors'
-import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
+import { ScreenProps, withScreenSize } from 'src/layout/ScreenSize'
 import { G, Path } from 'src/shared/svg'
-import { baseCoinStyle, colors, standardStyles } from 'src/styles'
+import { baseCoinStyle, colors } from 'src/styles'
 import Svg from 'svgs'
 
 // note this is the animation duration of a single coin,
@@ -11,15 +11,11 @@ import Svg from 'svgs'
 const DURATION = 1500
 
 const INTERVAL_MS = DURATION * 4 // needs to be at least 4x DURATION to give the complete animation a chance to finish
-
-interface OwnProps {
-  children: React.ReactNode
-}
 interface State {
   animating: boolean
 }
 
-type Props = OwnProps & ScreenProps
+type Props = ScreenProps
 class Sweep extends React.Component<Props, State> {
   timer: number
   state = {
@@ -42,32 +38,26 @@ class Sweep extends React.Component<Props, State> {
 
   render() {
     const frame = DURATION / VECTORS.length
-    const isMobile = this.props.screen === ScreenSizes.MOBILE
 
     return (
-      <View style={isMobile ? styles.mobileSweepContainer : styles.sweepContainer}>
-        <Svg width="100%" height="100%" viewBox="0 0 717 750" fill="none">
-          <G style={this.state.animating ? styles.lighting : styles.lightingOff}>
-            {VECTORS.map((path, index) => {
-              const style = {
-                animationDelay: `${index * frame}ms`,
-              }
+      <Svg viewBox="0 0 717 750" fill="none">
+        <G style={this.state.animating ? styles.lighting : styles.lightingOff}>
+          {VECTORS.map((path, index) => {
+            const style = {
+              animationDelay: `${index * frame}ms`,
+            }
 
-              return (
-                <Path
-                  key={path.slice(0, 10)}
-                  d={path}
-                  style={[styles.base, this.state.animating && styles.cycle, baseCoinStyle, style]}
-                />
-              )
-            })}
-          </G>
-          <StableCircle />
-        </Svg>
-        <View style={isMobile ? standardStyles.centered : styles.absoluteCenter}>
-          {this.props.children}
-        </View>
-      </View>
+            return (
+              <Path
+                key={path.slice(0, 10)}
+                d={path}
+                style={[styles.base, this.state.animating && styles.cycle, baseCoinStyle, style]}
+              />
+            )
+          })}
+        </G>
+        <StableCircle />
+      </Svg>
     )
   }
 }
@@ -106,14 +96,6 @@ const styles = StyleSheet.create({
   },
   cycle: {
     animationKeyframes: getKeyframes(),
-  },
-  sweepContainer: {
-    height: 1000,
-    width: '100%',
-  },
-  mobileSweepContainer: {
-    height: '180vw',
-    width: '100%',
   },
   lightingOff: {
     opacity: 0,

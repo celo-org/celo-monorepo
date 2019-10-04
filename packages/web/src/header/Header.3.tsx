@@ -26,6 +26,7 @@ const DARK_PAGES = new Set([
   menu.COMMUNITY.link,
   menu.BUILD.link,
   menu.FELLOWSHIP.link,
+  menu.ECOSYSTEM.link,
   CeloLinks.faucet,
   CeloLinks.walletApp,
 ])

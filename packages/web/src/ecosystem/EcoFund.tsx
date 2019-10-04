@@ -57,7 +57,7 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
             <Text style={[fonts.p, textStyles.italic]}>{t('ecoFund.poweredBy')}</Text>
           </Cell>
           <Cell span={Spans.half} style={screen !== ScreenSizes.MOBILE && styles.insideEdge}>
-            <Text style={[fonts.p, standardStyles.elementalMargin]}>
+            <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
               {t('ecoFund.description')}
             </Text>
             <View style={[standardStyles.row, standardStyles.elementalMargin, standardStyles.wrap]}>

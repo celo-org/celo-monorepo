@@ -21,10 +21,11 @@ export enum NameSpaces {
   community = 'community',
   download = 'download',
   dev = 'dev',
+  ecosystem = 'ecosystem',
   faucet = 'faucet',
+  fellowship = 'fellowship',
   home = 'home',
   jobs = 'jobs',
   terms = 'terms',
   technology = 'technology',
-  fellowship = 'fellowship',
 }
