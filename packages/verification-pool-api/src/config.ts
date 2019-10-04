@@ -16,13 +16,11 @@ export const twilioPhoneNum = functionConfig.shared['twilio-phone-number']
 export const alwaysUseTwilio = functionConfig.shared['always-use-twilio'] === 'true'
 export const fcmKey = functionConfig.shared.fcmkey
 export const networkid = functionConfig[CELO_ENV]['testnet-id']
-export const hostIP = functionConfig[CELO_ENV]['tx-ip']
-export const hostPort = functionConfig[CELO_ENV]['tx-port']
 export const appSignature = functionConfig[CELO_ENV]['app-signature']
 export const smsAckTimeout = functionConfig[CELO_ENV]['sms-ack-timeout'] || 5000 // default 5 seconds
 
 // @ts-ignore
-export const web3 = new Web3(`http://${hostIP}:${hostPort}`)
+export const web3 = new Web3(`https://${CELO_ENV}-infura.celo-testnet.org`)
 
 let twilioClient: any
 let nexmoClient: any
