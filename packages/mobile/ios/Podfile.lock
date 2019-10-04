@@ -76,13 +76,13 @@ PODS:
   - nanopb/encode (0.3.901)
   - React (0.59.10):
     - React/Core (= 0.59.10)
-  - react-native-camera (1.13.1):
+  - react-native-camera (2.9.0):
     - React
-    - react-native-camera/RCT (= 1.13.1)
-    - react-native-camera/RN (= 1.13.1)
-  - react-native-camera/RCT (1.13.1):
+    - react-native-camera/RCT (= 2.9.0)
+    - react-native-camera/RN (= 2.9.0)
+  - react-native-camera/RCT (2.9.0):
     - React
-  - react-native-camera/RN (1.13.1):
+  - react-native-camera/RN (2.9.0):
     - React
   - react-native-config (0.11.7):
     - React
@@ -350,7 +350,7 @@ SPEC CHECKSUMS:
   GoogleUtilities: 111a012f4c3a29c9e7c954c082fafd6ee3c999c0
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
-  react-native-camera: b322bc25f47536219473c6d00c666d221f7f2695
+  react-native-camera: 571e4cfe70e7021e9077c1699a53e659db971f96
   react-native-config: 8f6b2b9e017f6a5e92a97353c768e19e67294bb1
   react-native-contacts: 348958bb7da4399040b1eb45bfb7f6af08e61412
   react-native-geth: 8ec5ada8b9c69eea6a515fdfe784878a625c9b6e
