@@ -311,6 +311,7 @@ describe('Transfer tests', function(this: any) {
     let usedGas = expectedGasUsed
     if (receipt) {
       if (receipt.gasUsed !== expectedGasUsed) {
+        // tslint:disable-next-line: no-console
         console.log('OOPSS: Different Gas', receipt.gasUsed, expectedGasUsed)
       }
       // assert.equal(receipt.gasUsed, expectedGasUsed, 'Expected gas doesnt match')
