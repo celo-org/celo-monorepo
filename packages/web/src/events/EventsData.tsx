@@ -1,6 +1,6 @@
 import fetch from 'cross-fetch'
 import * as React from 'react'
-import Events from 'src/community/connect/Events'
+import Events from 'src/events/Events'
 
 export async function getEvents() {
   const res = await fetch('/proxy/events', {

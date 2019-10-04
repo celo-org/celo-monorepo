@@ -12,7 +12,7 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { hashNav } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import ArticleData from './ArticleData'
-import EventData from './EventsData'
+import EventData from '../../events/EventsData'
 
 import {
   DiscordChannel,

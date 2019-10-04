@@ -2,7 +2,7 @@ import { EventProps } from 'fullstack/EventProps'
 import * as React from 'react'
 import { SectionList, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
-import EventRow from 'src/community/connect/EventRow'
+import EventRow from 'src/events/EventRow'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
@@ -10,6 +10,8 @@ import OvalCoin from 'src/shared/OvalCoin'
 import Spinner from 'src/shared/Spinner'
 import { colors, fonts, standardStyles } from 'src/styles'
 import { NoneFound, Radio, SectionHeader } from 'src/table/table'
+import menuItems from 'src/shared/menu-items'
+
 interface OwnProps {
   upcomingEvents?: EventProps[]
   pastEvents?: EventProps[]
@@ -137,7 +139,7 @@ class Events extends React.PureComponent<Props, State> {
                 kind={BTN.DARKNAKED}
                 size={SIZE.normal}
                 text={t('events.pastEvents')}
-                href={'/past-events'}
+                href={menuItems.PAST_EVENTS.link}
                 target={'_new'}
               />
             </View>

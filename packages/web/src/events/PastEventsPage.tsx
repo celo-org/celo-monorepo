@@ -1,11 +1,12 @@
 import { EventProps } from 'fullstack/EventProps'
 import * as React from 'react'
 import { View } from 'react-native'
-import Events from 'src/community/connect/Events'
-import { getEvents } from 'src/community/connect/EventsData'
+import Events from 'src/events/Events'
+import { getEvents } from 'src/events/EventsData'
 import OpenGraph from 'src/header/OpenGraph'
 import { NameSpaces } from 'src/i18n'
 import { standardStyles } from 'src/styles'
+import menuItems from 'src/shared/menu-items'
 
 const preview = require('src/community/connect/preview.jpg')
 
@@ -33,7 +34,7 @@ export default class PastEventsPage extends React.PureComponent<{}, State> {
     return (
       <View style={standardStyles.sectionMargin}>
         <OpenGraph
-          path="/past-events"
+          path={menuItems.PAST_EVENTS.link}
           title={'Past Celo Events'}
           description={
             'Celo is building a monetary system that allows more people to participate, and we invite you to join the conversation and our community. Diverse perspectives and inclusive conversations welcomed.'

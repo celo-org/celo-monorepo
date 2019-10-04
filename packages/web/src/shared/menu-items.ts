@@ -1,28 +1,17 @@
 export const menuItems = {
-  HOME: {
-    name: 'Home',
-    link: '/',
-  },
   ABOUT_US: {
     name: 'About Us',
     link: '/about-us',
-  },
-  JOBS: {
-    name: 'Join',
-    link: '/jobs',
-  },
-  TECH: {
-    name: 'Technology',
-    link: '/technology',
-  },
-  BUILD: {
-    name: 'Build',
-    link: '/build',
   },
   APPLICATIONS: {
     name: 'Applications',
     link: '/applications',
   },
+  BUILD: {
+    name: 'Build',
+    link: '/build',
+  },
+
   COMMUNITY: {
     name: 'Connect',
     link: '/community',
@@ -35,17 +24,39 @@ export const menuItems = {
     name: 'Ecosystem Fund',
     link: '/connect/ecosystem-fund',
   },
-  PRIVACY: {
-    name: 'Privacy Policy',
-    link: '/privacy',
+  EVENTS: {
+    name: 'Events',
+    link: '/connect/events',
+  },
+  PAST_EVENTS: {
+    name: 'Past Events',
+    link: '/connect/past-events',
+  },
+  HOME: {
+    name: 'Home',
+    link: '/',
   },
   MEDIUM: {
     name: 'Medium',
     link: 'https://medium.com/@celo.org',
   },
+  JOBS: {
+    name: 'Join',
+    link: '/jobs',
+  },
+
+  PRIVACY: {
+    name: 'Privacy Policy',
+    link: '/privacy',
+  },
+
   TWITTER: {
     name: 'Twitter',
     link: 'https://twitter.com/CeloHQ',
+  },
+  TECH: {
+    name: 'Technology',
+    link: '/technology',
   },
 }
 
