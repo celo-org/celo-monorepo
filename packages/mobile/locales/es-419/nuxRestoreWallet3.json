@@ -1,10 +1,4 @@
 {
-  "welcomeCelo": "Te damos la bienvenida a Celo",
-  "enterInvite":
-    "Ingresegcódigo de invitación. Si no tiene uno, pídale a alguien de la comunidad de Celo que lo invite.\n\nAl unirse a esta aplicación, acuerda compartir tu nombre y número telefónico con nosotros. Obtenga más información en celo.org",
-  "fullName": "Nombre completo",
-  "invitationCode": "Código de invitación",
-  "alreadyHaveWallet": "¿Ya tiene un Monedero Celo? Restáurelo",
   "title": "Restaurar tu Monedero Celo",
   "userYourBackupKey":
     "¿Ya tiene un Monedero Celo? Ingrese su Clave de Respaldo para restaurarla a este teléfono.",
@@ -13,7 +7,8 @@
   "tip": "Consejo: ",
   "backupKeyTip": "Las Claves de Respaldo son de 24 palabras, separadas por un espacio.",
   "restoreWallet": "Restaurar",
-  "emptyWalletWarning": "~This wallet is empty. Would you like to use it anyway?",
-  "useEmptyWallet": "~Use Empty Wallet",
-  "tryAnotherKey": "~Try Another Backup Key"
+  "emptyWalletWarning": "Este Monedero esta vacio",
+  "useEmptyAnyway": "¿Te gustaría usarlo de todos modos?",
+  "useEmptyWallet": "Usar Monedero Vacío",
+  "tryAnotherKey": "Probar con otra Clave de Respaldo"
 }

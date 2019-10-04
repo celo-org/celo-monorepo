@@ -7,13 +7,13 @@ import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ActivityIndicator, Keyboard, StyleSheet, Text, TextInput, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { connect } from 'react-redux'
-import { hideAlert, showError } from 'src/alert/actions'
+import { hideAlert } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import GethAwareButton from 'src/geth/GethAwareButton'
 import { Namespaces } from 'src/i18n'
 import NuxLogo from 'src/icons/NuxLogo'
-import { importBackupPhrase } from 'src/import/actions'
+import { importBackupPhrase, tryAnotherBackupPhrase } from 'src/import/actions'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
@@ -35,7 +35,7 @@ interface State {
 
 interface DispatchProps {
   importBackupPhrase: typeof importBackupPhrase
-  showError: typeof showError
+  tryAnotherBackupPhrase: typeof tryAnotherBackupPhrase
   hideAlert: typeof hideAlert
 }
 
@@ -89,7 +89,7 @@ export class ImportWallet extends React.Component<Props, State> {
   }
 
   onPressTryAnotherKey = () => {
-    // TODO
+    this.props.tryAnotherBackupPhrase()
   }
 
   isBackupPhraseValid() {
@@ -102,20 +102,17 @@ export class ImportWallet extends React.Component<Props, State> {
 
   render() {
     const { backupPhrase } = this.state
-    //TODO
-    let { t, isImportingWallet, isWalletEmpty } = this.props
-
-    isWalletEmpty = true
+    const { t, isImportingWallet, isWalletEmpty } = this.props
 
     return (
       <View style={styles.container}>
-        <KeyboardAwareScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="always"
-        >
-          <NuxLogo />
-          {!isWalletEmpty && (
-            <>
+        {!isWalletEmpty && (
+          <>
+            <KeyboardAwareScrollView
+              contentContainerStyle={styles.scrollContainer}
+              keyboardShouldPersistTaps="always"
+            >
+              <NuxLogo />
               <Text style={fontStyles.h1}>{t('title')}</Text>
               <Text style={fontStyles.body}>{t('userYourBackupKey')}</Text>
               <View style={styles.backupInput}>
@@ -138,32 +135,32 @@ export class ImportWallet extends React.Component<Props, State> {
                 <Text style={fontStyles.semiBold}>{t('tip')}</Text>
                 {t('backupKeyTip')}
               </Text>
-            </>
-          )}
-          {isWalletEmpty && (
-            <>
+            </KeyboardAwareScrollView>
+
+            {isImportingWallet && (
+              <View style={styles.loadingSpinnerContainer} testID="ImportWalletLoadingCircle">
+                <ActivityIndicator size="large" color={colors.celoGreen} />
+              </View>
+            )}
+
+            <GethAwareButton
+              disabled={isImportingWallet || !this.isBackupPhraseValid()}
+              onPress={this.onPressRestore}
+              text={t('restoreWallet')}
+              standard={false}
+              type={BtnTypes.PRIMARY}
+              testID="ImportWalletButton"
+            />
+          </>
+        )}
+        {isWalletEmpty && ( // TODO use backup icon instead of Nuxlogo when we have one
+          <>
+            <View style={styles.emptyWarningContainer}>
+              <NuxLogo />
               <Text style={fontStyles.h1}>{getMoneyDisplayValue(0)}</Text>
               <Text style={fontStyles.bodyLarge}>{t('emptyWalletWarning')}</Text>
-            </>
-          )}
-        </KeyboardAwareScrollView>
-        {isImportingWallet && (
-          <View style={styles.loadingSpinnerContainer} testID="ImportWalletLoadingCircle">
-            <ActivityIndicator size="large" color={colors.celoGreen} />
-          </View>
-        )}
-        {!isWalletEmpty && (
-          <GethAwareButton
-            disabled={isImportingWallet || !this.isBackupPhraseValid()}
-            onPress={this.onPressRestore}
-            text={t('restoreWallet')}
-            standard={false}
-            type={BtnTypes.PRIMARY}
-            testID="ImportWalletButton"
-          />
-        )}
-        {isWalletEmpty && (
-          <>
+              <Text style={fontStyles.bodyLarge}>{t('useEmptyAnyway')}</Text>
+            </View>
             <GethAwareButton
               onPress={this.onPressUseEmpty}
               text={t('useEmptyWallet')}
@@ -177,7 +174,7 @@ export class ImportWallet extends React.Component<Props, State> {
               standard={false}
               type={BtnTypes.SECONDARY}
               testID="TryAnotherKeyButton"
-            />)
+            />
           </>
         )}
       </View>
@@ -207,6 +204,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
     height: 145,
   },
+  emptyWarningContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    paddingHorizontal: 30,
+    paddingBottom: 30,
+  },
   loadingSpinnerContainer: {
     marginVertical: 30,
   },
@@ -216,7 +221,7 @@ export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   {
     importBackupPhrase,
-    showError,
+    tryAnotherBackupPhrase,
     hideAlert,
   }
 )(withNamespaces(Namespaces.nuxRestoreWallet3)(ImportWallet))

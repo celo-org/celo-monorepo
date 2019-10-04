@@ -30,6 +30,12 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
         isImportingWallet: false,
         isWalletEmpty: true,
       }
+    case Actions.TRY_ANOTHER_BACKUP_PHRASE: {
+      return {
+        ...state,
+        isWalletEmpty: false,
+      }
+    }
 
     default:
       return state
