@@ -156,10 +156,10 @@ jobs:
           name: Install emulator dependencies
           command: (yes | sdkmanager "platform-tools" "platforms;android-26" "extras;intel;Hardware_Accelerated_Execution_Manager" "build-tools;26.0.0" "system-images;android-26;google_apis;x86" "emulator" --verbose) || true > /dev/null
       - *download_android_dependencies
-      - run: avdmanager create avd -n Pixel_2_API_26 -k "system-images;android-26;google_apis;x86" -g google_apis -d "Nexus 5"
+      - run: avdmanager create avd -n Nexus_5X_API_28_x86 -k "system-images;android-26;google_apis;x86" -g google_apis -d "Nexus 5"
       - run:
           name: Run emulator in background
-          command: /usr/local/share/android-sdk/tools/emulator @Pixel_2_API_26 -skin 1080x2066 -memory 2048 -noaudio
+          command: /usr/local/share/android-sdk/tools/emulator @Nexus_5X_API_28_x86 -skin 1080x2066 -memory 2048 -noaudio
           background: true
       - run:
           name: Run Tests
@@ -561,7 +561,10 @@ workflows:
   celo-monorepo-build:
     jobs:
       - install_dependencies
-      - ui_test
+      - ui_test:
+          requires:
+            - install_dependencies
+            - mobile-test-build-app
       # - lint-checks:
       #     requires:
       #       - install_dependencies
