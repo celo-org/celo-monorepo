@@ -3,6 +3,7 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "lib",
+    "target": "es6",
     "esModuleInterop": true
   },
   "include": ["src"],
