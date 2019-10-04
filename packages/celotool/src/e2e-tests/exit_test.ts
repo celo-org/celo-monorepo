@@ -30,7 +30,7 @@ describe('exit tests', function(this: any) {
   this.timeout(0)
 
   const gethConfig = {
-    migrateTo: 16,
+    migrateTo: 15,
     migrateGovernance: false,
     instances: [
       { name: 'validator', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
