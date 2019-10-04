@@ -565,9 +565,9 @@ workflows:
           requires:
             - install_dependencies
             - mobile-test-build-app
-      # - lint-checks:
-      #     requires:
-      #       - install_dependencies
+      - lint-checks:
+          requires:
+            - install_dependencies
       # - general-test:
       #     requires:
       #       - install_dependencies
