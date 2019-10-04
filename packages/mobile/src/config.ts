@@ -1,6 +1,7 @@
 import { stringToBoolean } from '@celo/utils/src/parsing'
 import BigNumber from 'bignumber.js'
 import Config from 'react-native-config'
+import { GethSyncMode } from 'src/geth/consts'
 import config from 'src/geth/network-config'
 import { Testnets } from 'src/web3/testnets'
 // if I use @celo/utils breaks all the tests for some reason
@@ -78,4 +79,4 @@ if (DEFAULT_SYNC_MODE_TEMP.isNaN()) {
   throw new Error('DEFAULT_SYNC_MODE in env file is not valid')
 }
 
-export const _DEFAULT_SYNC_MODE = DEFAULT_SYNC_MODE_TEMP.toNumber()
+export const DEFAULT_SYNC_MODE: GethSyncMode = DEFAULT_SYNC_MODE_TEMP.toNumber()
