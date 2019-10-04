@@ -1,6 +1,6 @@
 import { CeloContract, CeloToken, ContractKit, newKit, newKitFromWeb3 } from '@celo/contractkit'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
-import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
@@ -15,35 +15,6 @@ import {
 } from './utils'
 
 const nowSeconds = () => Math.floor(Date.now() / 1000)
-
-function logReceiptEvents(receipt: TransactionReceipt) {
-  if (receipt.events && receipt.events.InflationParametersUpdated) {
-    // tslint:disable-next-line: no-console
-    console.log(
-      'inflaction Parameters updated:',
-      'rate',
-      fromFixed(
-        new BigNumber(receipt.events.InflationParametersUpdated.returnValues.rate)
-      ).toString(),
-      'updatePeriod',
-      receipt.events.InflationParametersUpdated.returnValues.updatePeriod,
-      'lastUpdated',
-      receipt.events.InflationParametersUpdated.returnValues.lastUpdated
-    )
-  }
-  if (receipt.events && receipt.events.InflationFactorUpdated) {
-    // tslint:disable-next-line: no-console
-    console.log(
-      'inflaction factor updated:',
-      'factor',
-      fromFixed(
-        new BigNumber(receipt.events.InflationFactorUpdated.returnValues.factor)
-      ).toString(),
-      'lastUpdated',
-      receipt.events.InflationFactorUpdated.returnValues.lastUpdated
-    )
-  }
-}
 
 /**
  * Helper Class to change StableToken Inflation in tests
