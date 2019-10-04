@@ -5,7 +5,7 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { sendFee } from 'src/images/Images'
+import { ringsPlusCircle } from 'src/images/Images'
 import { navigateBack } from 'src/navigator/NavigationService'
 
 type Props = WithNamespaces
@@ -17,7 +17,7 @@ class FeeExchangeEducation extends React.PureComponent<Props> {
     const { t } = this.props
     return (
       <View style={styles.container}>
-        <Image source={sendFee} resizeMode={'contain'} style={styles.image} />
+        <Image source={ringsPlusCircle} resizeMode={'contain'} style={styles.image} />
         <View style={styles.textBox}>
           <Text style={[fontStyles.telephoneHeadline, styles.text]}>
             {t('feeExchangeEducation')}
