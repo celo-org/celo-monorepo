@@ -14,7 +14,7 @@ Before publishing a new celocli package, test in isolation using Docker. This co
 ```
 # To test utils package, change $PWD/packages/cli to $PWD/packages/utils
 # To test contractkit package, change $PWD/packages/contractkit to $PWD/packages/contractkit
-celo-monorepo $ docker run -v $PWD/packages/cli:/tmp/npm_package -it --entrypoint bash node:8
+celo-monorepo $ docker run -v $PWD/packages/cli:/tmp/npm_package -it --entrypoint bash node:10fn
 root@e0d56700584f:/# mkdir /tmp/tmp1 && cd /tmp/tmp1
 root@e0d56700584f:/tmp/tmp1# npm install /tmp/npm_package/
 ```
@@ -43,7 +43,7 @@ Once you publish do some manual tests, for example, after publishing `celocli`
 
 ```
 # Docker for an isolated environment again
-celo-monorepo $ docker run -it --entrypoint bash node:8
+celo-monorepo $ docker run -it --entrypoint bash node:10
 root@e0d56700584f:/# mkdir /tmp/tmp1 && cd /tmp/tmp1
 root@e0d56700584f:/tmp/tmp1# npm install @celo/celocli@0.0.20
 /tmp/tmp1# ./node_modules/.bin/celocli
