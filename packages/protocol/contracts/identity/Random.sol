@@ -13,9 +13,12 @@ contract Random is IRandom {
 
   bytes32 public _random;
 
-  mapping (uint256 => bytes32) public history;
+  uint256 constant HISTORY_LENGTH = 256;
+
+  bytes32[] private history;
 
   function initialize() external {
+    history.length = HISTORY_LENGTH;
   }
 
   /**
@@ -46,7 +49,7 @@ contract Random is IRandom {
 
     // add entropy
     _random = keccak256(abi.encodePacked(_random, randomness));
-    history[block.number] = _random;
+    history[block.number % HISTORY_LENGTH] = _random;
 
     commitments[proposer] = newCommitment;
   }
@@ -57,5 +60,11 @@ contract Random is IRandom {
 
   function random() external view returns (bytes32) {
     return _random;
+  }
+
+  function getBlockRandomness(uint256 bn) external view returns (bytes32) {
+    require(bn <= block.number, "Cannot query randomness of future blocks");
+    require(bn > block.number - HISTORY_LENGTH, "Cannot query randomness of old blocks");
+    return history[bn % HISTORY_LENGTH];
   }
 }
