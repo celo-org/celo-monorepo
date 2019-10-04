@@ -30,7 +30,7 @@
     "test:verbose": "export TZ=UTC && jest --verbose",
     "test:build-e2e": "bash ./scripts/build_e2e.sh",
     "test:run-e2e": "bash ./scripts/run_e2e.sh",
-    "test:dry-run-e2e": "yarn dev:emulator && cd android && yarn test:build-e2e && yarn test:run-e2e && yarn dev:clean-android",
+    "test:dry-run-e2e": "yarn dev:emulator && cd android && yarn test:build-e2e && yarn test:run-e2e",
     "test:detox": "CELO_TEST_CONFIG=e2e detox test -c android.emu.debug -a e2e/tmp/ --take-screenshots=failing --record-logs=failing --detectOpenHandles -l verbose",
     "test:unlock": "./scripts/unlock.sh",
     "pre-deploy": "./scripts/pre-deploy.sh",

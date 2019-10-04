@@ -70,3 +70,9 @@ export const SHOW_TESTNET_BANNER = stringToBoolean(Config.SHOW_TESTNET_BANNER ||
 // The minimum allowed value for a transaction such as a transfer
 export const DOLLAR_TRANSACTION_MIN_AMOUNT = 0.01
 export const GOLD_TRANSACTION_MIN_AMOUNT = 0.001
+
+export const DEFAULT_SYNC_MODE = parseInt(Config.DEFAULT_SYNC_MODE, 10)
+
+if (Number.isNaN(DEFAULT_SYNC_MODE)) {
+  throw new Error('DEFAULT_SYNC_MODE in env file is not valid')
+}

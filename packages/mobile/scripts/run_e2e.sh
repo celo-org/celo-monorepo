@@ -39,7 +39,7 @@ lsof -t -i :8081 | xargs kill -9
 yarn start:bg
 
 
-echo "waiting for device to connect to Wifi, this is a good proxy the device is ready"
+echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"
 until adb shell dumpsys wifi | grep "mNetworkInfo" |grep "state: CONNECTED"
 do
   sleep 10
