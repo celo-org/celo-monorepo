@@ -22,6 +22,7 @@ import {
   SocialLinks,
   TwitterChannel,
 } from 'src/shared/SocialChannels'
+import ConnectionFooter from 'src/shared/ConnectionFooter'
 
 const preview = require('src/community/connect/preview.jpg')
 
@@ -52,80 +53,15 @@ export class ConnectPage extends React.Component<Props> {
         />
         <View>
           <CoverArea />
-          <Tenets />
-          <CodeOfConduct />
-          <GridRow
-            nativeID={hashNav.connect.events}
-            desktopStyle={standardStyles.sectionMarginTop}
-            mobileStyle={standardStyles.sectionMarginTopMobile}
-          >
-            <Cell span={Spans.full} style={standardStyles.centered}>
-              <Fade bottom={true} distance={'20px'}>
-                <H2>{t('events.title')}</H2>
-              </Fade>
-            </Cell>
-          </GridRow>
+
           <EventData />
           <ArticleData />
-          <View style={styles.darkBackground} nativeID={hashNav.connect.newsletter}>
-            <GridRow
-              desktopStyle={standardStyles.sectionMarginTop}
-              tabletStyle={standardStyles.sectionMarginTopTablet}
-              mobileStyle={standardStyles.blockMarginTopMobile}
-            >
-              <Cell span={Spans.full} style={standardStyles.centered}>
-                <Image
-                  source={{ uri: require('src/shared/Developer-news.png') }}
-                  style={styles.emailLogo}
-                />
-                <View style={styles.form}>
-                  <H3 style={[textStyles.invert, textStyles.center]}>{t('stayConnected')}</H3>
-                  <Text
-                    style={[
-                      fonts.p,
-                      textStyles.invert,
-                      textStyles.center,
-                      standardStyles.elementalMarginBottom,
-                    ]}
-                  >
-                    {t('receiveUpdates')}
-                  </Text>
-                  <EmailForm
-                    submitText={t('signUp')}
-                    route={'/contacts'}
-                    whenComplete={<After t={this.props.t} />}
-                    isDarkMode={true}
-                  />
-                </View>
-              </Cell>
-            </GridRow>
-            <SocialLinks>
-              <TwitterChannel isDarkMode={true} alignCenter={true} />
-              <GitHubChannel isDarkMode={true} alignCenter={true} />
-              <DiscordChannel isDarkMode={true} alignCenter={true} />
-              <ForumChannel isDarkMode={true} alignCenter={true} />
-              <LinkedInChannel isDarkMode={true} alignCenter={true} />
-            </SocialLinks>
-          </View>
+          <Tenets />
+          <ConnectionFooter />
         </View>
       </>
     )
   }
 }
-
-const styles = StyleSheet.create({
-  darkBackground: {
-    backgroundColor: colors.dark,
-  },
-  form: {
-    maxWidth: 372,
-    paddingBottom: 30,
-  },
-  emailLogo: {
-    height: 45,
-    width: 45,
-    marginBottom: 10,
-  },
-})
 
 export default withNamespaces(NameSpaces.community)(ConnectPage)

@@ -7,6 +7,7 @@ import OpenGraph from 'src/header/OpenGraph'
 import { NameSpaces } from 'src/i18n'
 import { standardStyles } from 'src/styles'
 import menuItems from 'src/shared/menu-items'
+import ConnectionFooter from 'src/shared/ConnectionFooter'
 
 const preview = require('src/community/connect/preview.jpg')
 
@@ -42,6 +43,7 @@ export default class PastEventsPage extends React.PureComponent<{}, State> {
           image={preview}
         />
         <Events pastEvents={this.state.pastEvents} loading={this.state.loading} />
+        <ConnectionFooter />
       </View>
     )
   }
