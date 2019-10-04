@@ -129,6 +129,7 @@ android {
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "string", "build_config_package", "org.celo.mobile"
+        missingDimensionStrategy 'react-native-camera', 'general'
     }
     signingConfigs {
         release {
@@ -217,6 +218,7 @@ android {
 
     packagingOptions {
         exclude 'META-INF/-no-jdk.kotlin_module'
+        exclude 'META-INF/androidx.exifinterface_exifinterface.version'
     }
 }
 

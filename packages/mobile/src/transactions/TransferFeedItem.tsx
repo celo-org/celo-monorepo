@@ -1,38 +1,27 @@
-import ContactCircle from '@celo/react-components/components/ContactCircle'
 import Touchable from '@celo/react-components/components/Touchable'
-import RewardIcon from '@celo/react-components/icons/RewardIcon'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
-import { decryptComment as decryptCommentRaw } from '@celo/utils/src/commentEncryption'
 import BigNumber from 'bignumber.js'
-import * as _ from 'lodash'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { HomeTransferFragment } from 'src/apollo/types'
-import { DEFAULT_TESTNET } from 'src/config'
-import { features } from 'src/flags'
 import { CURRENCIES, CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
-import { coinsIcon, unknownUserIcon } from 'src/images/Images'
 import { Invitees } from 'src/invite/actions'
 import { useDollarsToLocalAmount, useLocalCurrencyCode } from 'src/localCurrency/hooks'
-import {
-  getRecipientFromAddress,
-  getRecipientThumbnail,
-  NumberToRecipient,
-} from 'src/recipients/recipient'
+import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes, TransferStandby } from 'src/transactions/reducer'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
+import TransferFeedIcon from 'src/transactions/TransferFeedIcon'
+import { decryptComment, getTransferFeedParams } from 'src/transactions/transferFeedUtils'
+import { getMoneyDisplayValue, getNetworkFeeDisplayValue } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
 const TAG = 'transactions/TransferFeedItem.tsx'
-
-const avatarSize = 40
 
 type Props = (HomeTransferFragment | TransferStandby) &
   WithNamespaces & {
@@ -94,16 +83,6 @@ function getCurrencyStyles(currency: CURRENCY_ENUM, type: string): CurrencySymbo
   }
 }
 
-function decryptComment(
-  comment: string | undefined,
-  commentKey: Buffer | null,
-  type: TransactionTypes
-) {
-  return comment && commentKey && features.USE_COMMENT_ENCRYPTION
-    ? decryptCommentRaw(comment, commentKey, type === TransactionTypes.SENT).comment
-    : comment
-}
-
 function navigateToTransactionReview({
   address,
   type,
@@ -162,77 +141,29 @@ export function TransferFeedItem(props: Props) {
 
   const localCurrencyCode = useLocalCurrencyCode()
   const localValue = useDollarsToLocalAmount(value)
-  let info = decryptComment(comment, commentKey, type)
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
   const currency = resolveCurrency(symbol)
   const currencyStyle = getCurrencyStyles(currency, type)
   const isPending = status === TransactionStatus.Pending
 
-  let icon, title
-
-  // TODO move this out to a seperate file, too much clutter here
-  if (type === TransactionTypes.VERIFICATION_FEE) {
-    icon = <Image source={coinsIcon} style={styles.image} />
-    title = t('feedItemVerificationFeeTitle')
-    info = t('feedItemVerificationFeeInfo')
-  } else if (type === TransactionTypes.VERIFICATION_REWARD) {
-    icon = (
-      <View style={styles.image}>
-        <RewardIcon height={38} />
-      </View>
-    )
-    title = t('feedItemVerificationRewardTitle')
-    info = t('feedItemVerificationRewardInfo')
-  } else if (type === TransactionTypes.FAUCET) {
-    icon = <Image source={coinsIcon} style={styles.image} />
-    title = t('feedItemFaucetTitle')
-    info = t('feedItemFaucetInfo', {
-      context: !DEFAULT_TESTNET ? 'missingTestnet' : null,
-      faucet: DEFAULT_TESTNET ? _.startCase(DEFAULT_TESTNET) : null,
-    })
-  } else if (type === TransactionTypes.INVITE_SENT) {
-    icon = <Image source={coinsIcon} style={styles.image} />
-    const inviteeE164Number = invitees[address]
-    const inviteeRecipient = recipientCache[inviteeE164Number]
-    title = t('feedItemInviteSentTitle')
-    info = t('feedItemInviteSentInfo', {
-      context: !inviteeE164Number ? 'missingInviteeDetails' : null,
-      nameOrNumber: inviteeRecipient ? inviteeRecipient.displayName : inviteeE164Number,
-    })
-  } else if (type === TransactionTypes.INVITE_RECEIVED) {
-    icon = <Image source={coinsIcon} style={styles.image} />
-    title = t('feedItemInviteReceivedTitle')
-    info = t('feedItemInviteReceivedInfo')
-  } else {
-    const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
-    const shortAddr = address.substring(0, 8)
-
-    if (recipient) {
-      title = recipient.displayName
-    } else if (type === TransactionTypes.RECEIVED) {
-      title = t('feedItemReceivedTitle', { context: 'missingSenderDetails', address: shortAddr })
-    } else if (type === TransactionTypes.SENT) {
-      title = t('feedItemSentTitle', { context: 'missingReceiverDetails', address: shortAddr })
-    } else {
-      // Fallback to just using the type
-      title = _.capitalize(t(_.camelCase(type)))
-    }
-    icon = (
-      <ContactCircle
-        address={address}
-        size={avatarSize}
-        thumbnailPath={getRecipientThumbnail(recipient)}
-      >
-        {<Image source={unknownUserIcon} style={styles.image} />}
-      </ContactCircle>
-    )
-  }
+  const { title, info, recipient } = getTransferFeedParams(
+    type,
+    t,
+    invitees,
+    recipientCache,
+    address,
+    addressToE164Number,
+    comment,
+    commentKey
+  )
 
   return (
     <Touchable onPress={onItemPress}>
       <View style={styles.container}>
-        <View style={styles.iconContainer}>{icon}</View>
+        <View style={styles.iconContainer}>
+          <TransferFeedIcon type={type} recipient={recipient} address={address} />
+        </View>
         <View style={styles.contentContainer}>
           <View style={styles.titleContainer}>
             <Text style={[fontStyles.semiBold, styles.title]}>{title}</Text>
@@ -248,7 +179,9 @@ export function TransferFeedItem(props: Props) {
               ]}
             >
               {currencyStyle.direction}
-              {getMoneyDisplayValue(props.value)}
+              {type === TransactionTypes.NETWORK_FEE
+                ? getNetworkFeeDisplayValue(props.value)
+                : getMoneyDisplayValue(props.value)}
             </Text>
           </View>
           {!!info && <Text style={fontStyles.comment}>{info}</Text>}
@@ -298,12 +231,6 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     flexDirection: 'column',
-    alignItems: 'center',
-  },
-  image: {
-    height: avatarSize,
-    width: avatarSize,
-    justifyContent: 'center',
     alignItems: 'center',
   },
   contentContainer: {
