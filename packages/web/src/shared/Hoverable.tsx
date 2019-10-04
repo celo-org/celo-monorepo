@@ -17,7 +17,7 @@ interface Props {
 export default class Hoverable extends React.Component<Props, State> {
   isHoverEnabled: boolean = true
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
     this.state = { isHovered: false, showHover: true }
   }
