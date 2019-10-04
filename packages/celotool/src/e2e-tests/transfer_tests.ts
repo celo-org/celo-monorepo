@@ -6,7 +6,6 @@ import { assert } from 'chai'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3/types'
 import {
-  getContractAddress,
   getEnode,
   GethInstanceConfig,
   getHooks,
@@ -15,31 +14,11 @@ import {
   sleep,
 } from './utils'
 
-const registryAbi = [
-  {
-    constant: false,
-    inputs: [
-      {
-        name: 'identifier',
-        type: 'string',
-      },
-      {
-        name: 'addr',
-        type: 'address',
-      },
-    ],
-    name: 'setAddressFor',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-]
-
 const nowSeconds = () => Math.floor(Date.now() / 1000)
 
 function logReceiptEvents(receipt: TransactionReceipt) {
   if (receipt.events && receipt.events.InflationParametersUpdated) {
+    // tslint:disable-next-line: no-console
     console.log(
       'inflaction Parameters updated:',
       'rate',
@@ -53,6 +32,7 @@ function logReceiptEvents(receipt: TransactionReceipt) {
     )
   }
   if (receipt.events && receipt.events.InflationFactorUpdated) {
+    // tslint:disable-next-line: no-console
     console.log(
       'inflaction factor updated:',
       'factor',
@@ -65,6 +45,9 @@ function logReceiptEvents(receipt: TransactionReceipt) {
   }
 }
 
+/**
+ * Helper Class to change StableToken Inflation in tests
+ */
 class InflationManager {
   private kit: ContractKit
   constructor(readonly validatorUri: string, readonly validatorAddress: string) {
@@ -79,7 +62,11 @@ class InflationManager {
     const timeSinceLastUpdated = nowSeconds() - factorLastUpdated.toNumber()
 
     if (timeSinceLastUpdated < 10) {
-      console.log('Waiting until some time pass to update inflation')
+      // tslint:disable-next-line: no-console
+      console.log(
+        `Last inflation change too close, waiting ${10 -
+          timeSinceLastUpdated} seconds before doing it again`
+      )
       await sleep(10 - timeSinceLastUpdated)
       return this.getNextUpdateRate()
     } else {
@@ -136,6 +123,7 @@ class InflationManager {
   }
 }
 
+/** Helper to watch balance changes over accounts */
 interface BalanceWatcher {
   update(): Promise<void>
   delta(address: string, token: CeloToken): BigNumber
@@ -202,14 +190,13 @@ function assertEqualBN(value: BigNumber, expected: BigNumber) {
 describe('transfer tests', function(this: any) {
   this.timeout(0)
 
-  let web3: Web3
   let kit: ContractKit
   const TransferAmount: BigNumber = new BigNumber(Web3.utils.toWei('1', 'ether'))
 
   let currentGethInstance: GethInstanceConfig
-  // const expectedInfrastructureBlockReward: string = new BigNumber(
-  //   Web3.utils.toWei('1', 'ether')
-  // ).toString()
+  const expectedProposerBlockReward: string = new BigNumber(
+    Web3.utils.toWei('1', 'ether')
+  ).toString()
 
   const validatorAddress = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
   const DEF_FROM_PK = 'f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d'
@@ -218,7 +205,6 @@ describe('transfer tests', function(this: any) {
   // Arbitrary addresses.
   const ToAddress = '0xbBae99F0E1EE565404465638d40827b54D343638'
   const FeeRecipientAddress = '0x4f5f8a3f45d179553e7b95119ce296010f50f6f1'
-  const GovernanceAddress = '0x1a748f924e5b346d68b2202e85ba6a2c72570b26'
 
   const inflationManager = new InflationManager('http://localhost:8545', validatorAddress)
 
@@ -235,8 +221,7 @@ describe('transfer tests', function(this: any) {
   before('start validator', async () => {
     await hooks.before()
     await hooks.restart()
-    web3 = new Web3('http://localhost:8545')
-    kit = newKitFromWeb3(web3)
+    kit = newKitFromWeb3(new Web3('http://localhost:8545'))
     kit.gasInflactionFactor = 1
   })
 
@@ -244,18 +229,7 @@ describe('transfer tests', function(this: any) {
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
     await sleep(2)
     // Assuming empty password
-    await web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
-  })
-
-  // We do not deploy the governance contract so that we can set inflation parameters on
-  // StableToken. We instead, point the registry to a dummy address, so that we can test
-  // transaction fees going to the infrastructure fund.
-  before('set fake Governance', async () => {
-    const registryAddress = await getContractAddress('RegistryProxy')
-    const registry = new web3.eth.Contract(registryAbi, registryAddress)
-    const tx = registry.methods.setAddressFor('Governance', GovernanceAddress)
-    const gas = await tx.estimateGas()
-    await tx.send({ gas, from: validatorAddress })
+    await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
   })
 
   // Give the account we will send transfers as sufficient gold and dollars.
@@ -283,7 +257,7 @@ describe('transfer tests', function(this: any) {
     await initAndStartGeth(hooks.gethBinaryPath, fullInstance)
   })
 
-  const restartGeth = async (syncmode: string) => {
+  const startSyncNode = async (syncmode: string) => {
     if (currentGethInstance != null) {
       await killInstance(currentGethInstance)
     }
@@ -303,10 +277,10 @@ describe('transfer tests', function(this: any) {
     await sleep(10)
 
     // Reset contracts to send RPCs through transferring node.
-    web3.currentProvider = new web3.providers.HttpProvider('http://localhost:8549')
+    kit.web3.currentProvider = new kit.web3.providers.HttpProvider('http://localhost:8549')
 
     // Unlock Node account
-    await web3.eth.personal.unlockAccount(FromAddress, '', 1000000)
+    await kit.web3.eth.personal.unlockAccount(FromAddress, '', 1000000)
   }
 
   const transferCeloGold = async (
@@ -391,7 +365,7 @@ describe('transfer tests', function(this: any) {
     }
 
     const txHash = await txResult.getHash()
-    const tx = await web3.eth.getTransaction(txHash)
+    const tx = await kit.web3.eth.getTransaction(txHash)
     const gasPrice = tx.gasPrice
     assert.isAbove(parseInt(gasPrice, 10), 0)
     const expectedTransactionFee = new BigNumber(usedGas).times(gasPrice)
@@ -436,7 +410,7 @@ describe('transfer tests', function(this: any) {
           ? await kit.registry.addressFor(CeloContract.StableToken)
           : undefined
 
-      const accounts = [FromAddress, ToAddress, GovernanceAddress, FeeRecipientAddress]
+      const accounts = [FromAddress, ToAddress, validatorAddress, FeeRecipientAddress]
       balances = await newBalanceWatcher(kit, accounts)
 
       const transferFn =
@@ -495,22 +469,18 @@ describe('transfer tests', function(this: any) {
     it(`should increment the gas fee recipient's ${feeToken} balance by a portion of the gas fee`, () =>
       assertEqualBN(balances.delta(FeeRecipientAddress, feeToken), txRes.txFees.recipient))
 
-    // it(`should increment the infrastructure fund's ${feeToken} balance by the rest of the gas fee`, () => {
-    //   assertEqualBN(
-    //     newBalances[feeToken][governanceAddress]
-    //       .minus(initialBalances[feeToken][governanceAddress])
-    //       .mod(expectedInfrastructureBlockReward)
-    //       ,
-    //     txRes.expectedFees.infrastructure
-    //   )
-    // })
+    it(`should increment the proposers's ${feeToken} balance by the rest of the gas fee`, () => {
+      assertEqualBN(
+        balances.delta(validatorAddress, feeToken).mod(expectedProposerBlockReward),
+        txRes.txFees.proposer
+      )
+    })
   }
 
   const syncModes = ['full', 'fast', 'light', 'ultralight']
-  // const syncModes = ['full', 'fast']
   for (const syncMode of syncModes) {
     describe(`when running ${syncMode} sync`, () => {
-      before(`start geth on sync: ${syncMode}`, () => restartGeth(syncMode))
+      before(`start geth on sync: ${syncMode}`, () => startSyncNode(syncMode))
 
       describe('when transferring Celo Gold', () => {
         const GOLD_TRANSACTION_GAS_COST = 29180
@@ -539,7 +509,7 @@ describe('transfer tests', function(this: any) {
                   it('should get rejected by the sending node before being added to the tx pool', async () => {
                     try {
                       const res = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
-                        gasFeeRecipient: web3.utils.randomHex(20),
+                        gasFeeRecipient: kit.web3.utils.randomHex(20),
                       })
                       await res.waitReceipt()
                     } catch (error) {
@@ -617,7 +587,7 @@ describe('transfer tests', function(this: any) {
                 balances = await newBalanceWatcher(kit, [
                   FromAddress,
                   ToAddress,
-                  GovernanceAddress,
+                  validatorAddress,
                   FeeRecipientAddress,
                 ])
 
@@ -689,7 +659,7 @@ describe('transfer tests', function(this: any) {
                 balances = await newBalanceWatcher(kit, [
                   FromAddress,
                   ToAddress,
-                  GovernanceAddress,
+                  validatorAddress,
                   FeeRecipientAddress,
                 ])
 
@@ -738,7 +708,7 @@ describe('transfer tests', function(this: any) {
               })
 
               // TODO(mcortesi)
-              // it("should increment the infrastructure fund's Celo Dollar balance by the rest of the gas fee", () => {
+              // it("should increment the proposers Celo Dollar balance by the rest of the gas fee", () => {
               //   assertEqualBN(
               //     newBalances[CeloContract.StableToken][governanceAddress]
               //       .minus(initialBalances[CeloContract.StableToken][governanceAddress])
@@ -752,7 +722,7 @@ describe('transfer tests', function(this: any) {
               it('should not add the transaction to the pool', async () => {
                 const gas = intrinsicGas - 1
 
-                inflationManager.changeInflationFactorOnNextTransfer(new BigNumber(2))
+                await inflationManager.changeInflationFactorOnNextTransfer(new BigNumber(2))
 
                 try {
                   const res = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
