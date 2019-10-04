@@ -1,4 +1,5 @@
 import { stringToBoolean } from '@celo/utils/src/parsing'
+import BigNumber from 'bignumber.js'
 import Config from 'react-native-config'
 import config from 'src/geth/network-config'
 import { Testnets } from 'src/web3/testnets'
@@ -71,8 +72,10 @@ export const SHOW_TESTNET_BANNER = stringToBoolean(Config.SHOW_TESTNET_BANNER ||
 export const DOLLAR_TRANSACTION_MIN_AMOUNT = 0.01
 export const GOLD_TRANSACTION_MIN_AMOUNT = 0.001
 
-export const DEFAULT_SYNC_MODE = parseInt(Config.DEFAULT_SYNC_MODE, 10)
+const DEFAULT_SYNC_MODE_TEMP = new BigNumber(Config.DEFAULT_SYNC_MODE)
 
-if (Number.isNaN(DEFAULT_SYNC_MODE)) {
+if (DEFAULT_SYNC_MODE_TEMP.isNaN()) {
   throw new Error('DEFAULT_SYNC_MODE in env file is not valid')
 }
+
+export const _DEFAULT_SYNC_MODE = DEFAULT_SYNC_MODE_TEMP.toNumber()
