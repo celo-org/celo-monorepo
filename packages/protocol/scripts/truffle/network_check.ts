@@ -5,7 +5,6 @@ import {
   assertContractsRegistered,
   assertProxiesSet,
   assertRegistryAddressesSet,
-  assertStableTokenMinter,
   getReserveBalance,
   proxiedContracts,
 } from '@celo/protocol/lib/test-utils'
@@ -41,7 +40,6 @@ module.exports = async (callback: (error?: any) => number) => {
     await assertContractsRegistered(getContract)
     await assertRegistryAddressesSet(getContract)
     await assertContractsOwnedByMultiSig(getContract)
-    await assertStableTokenMinter(getContract)
     await assertReserveBalance()
     console.log('Network check succeeded!')
     callback()

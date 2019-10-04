@@ -58,13 +58,15 @@ const DefaultConfig = {
   stableToken: {
     decimals: 18,
     goldPrice: 10,
-    minerDollarBalance: 60000,
     tokenName: 'Celo Dollar',
     tokenSymbol: 'cUSD',
     // 52nd root of 1.005, equivalent to 0.5% annual inflation
     inflationRate: 1.00009591886,
     inflationPeriod: 7 * 24 * 60 * 60, // 1 week
-    initialAccounts: [],
+    initialBalances: {
+      addresses: [],
+      values: [],
+    },
   },
   validators: {
     registrationRequirements: {

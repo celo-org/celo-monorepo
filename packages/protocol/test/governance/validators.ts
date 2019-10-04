@@ -13,6 +13,8 @@ import {
   MockLockedGoldInstance,
   MockElectionContract,
   MockElectionInstance,
+  MockStableTokenContract,
+  MockStableTokenInstance,
   RegistryContract,
   RegistryInstance,
   ValidatorsTestContract,
@@ -23,6 +25,7 @@ import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 const Validators: ValidatorsTestContract = artifacts.require('ValidatorsTest')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
+const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const Registry: RegistryContract = artifacts.require('Registry')
 
 // @ts-ignore
@@ -54,6 +57,7 @@ const MAX_UINT256 = new BigNumber(2).pow(256).minus(1)
 // Hard coded in ValidatorsTest.sol
 const EPOCH = 100
 
+// TODO(asa): Test epoch payment distribution
 contract('Validators', (accounts: string[]) => {
   let validators: ValidatorsTestInstance
   let registry: RegistryInstance
@@ -1324,6 +1328,40 @@ contract('Validators', (accounts: string[]) => {
           await mineBlocks(EPOCH, web3)
           assert.equal(await validators.getMembershipInLastEpoch(validator), groups[i])
         }
+      })
+    })
+  })
+
+  describe('#distributeEpochPayment', () => {
+    const validator = accounts[0]
+    const group = accounts[1]
+    let mockStableToken: MockStableTokenInstance
+    beforeEach(async () => {
+      await registerValidatorGroupWithMembers(group, [validator])
+      mockStableToken = await MockStableToken.new()
+      await registry.setAddressFor(CeloContractName.StableToken, mockStableToken.address)
+    })
+
+    describe('when the validator score is non-zero', () => {
+      const uptime = 0.99
+      const adjustmentSpeed = fromFixed(validatorScoreParameters.adjustmentSpeed)
+      const expectedScore = adjustmentSpeed.times(uptime)
+      const expectedTotalPayment = expectedScore.times(validatorEpochPayment)
+      beforeEach(async () => {
+        await validators.updateValidatorScore(validator, toFixed(uptime))
+        await validators.distributeEpochPayment(validator)
+      })
+
+      it('should pay the validator', async () => {
+        const expectedPayment = expectedTotalPayment.times(
+          new BigNumber(1).minus(fromFixed(commission))
+        )
+        assertEqualBN(await mockStableToken.balanceOf(validator), expectedPayment)
+      })
+
+      it('should pay the group', async () => {
+        const expectedPayment = expectedTotalPayment.times(fromFixed(commission))
+        assertEqualBN(await mockStableToken.balanceOf(group), expectedPayment)
       })
     })
   })

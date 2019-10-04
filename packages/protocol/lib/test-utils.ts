@@ -5,11 +5,9 @@ import * as chaiSubset from 'chai-subset'
 import { spawn } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
 import {
-  ExchangeInstance,
   ProxyInstance,
   RegistryInstance,
   ReserveInstance,
-  StableTokenInstance,
   UsingRegistryInstance,
 } from 'types'
 const soliditySha3 = new (require('web3'))().utils.soliditySha3
@@ -182,16 +180,6 @@ export const assertContractsOwnedByMultiSig = async (getContract: any) => {
     const proxyOwner = await (await getContract(contractName, 'proxy'))._getOwner()
     assert.equal(proxyOwner, multiSigAddress, contractName + 'Proxy is not owned by the MultiSig')
   }
-}
-
-export const assertStableTokenMinter = async (getContract: any) => {
-  const stableToken: StableTokenInstance = await getContract('StableToken', 'proxiedContract')
-  const exchange: ExchangeInstance = await getContract('Exchange', 'proxiedContract')
-  assert.equal(
-    await stableToken.minter(),
-    exchange.address,
-    'StableToken minter not set to Exchange'
-  )
 }
 
 export const assertFloatEquality = (

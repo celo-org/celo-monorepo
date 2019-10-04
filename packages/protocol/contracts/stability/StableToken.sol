@@ -21,8 +21,6 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-  event MinterSet(address indexed _minter);
-
   event InflationFactorUpdated(
     uint256 factor,
     uint256 lastUpdated
@@ -44,7 +42,6 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
     string comment
   );
 
-  address public minter;
   string internal name_;
   string internal symbol_;
   uint8 internal decimals_;
@@ -70,14 +67,6 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
   }
 
   InflationState inflationState;
-
-  /**
-   * @notice Throws if called by any account other than the minter.
-   */
-  modifier onlyMinter() {
-    require(msg.sender == minter, "sender was not minter");
-    _;
-  }
 
   /**
    * Only VM would be able to set the caller address to 0x0 unless someone
@@ -123,12 +112,22 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
     uint8 _decimals,
     address registryAddress,
     uint256 inflationRate,
-    uint256 inflationFactorUpdatePeriod
+    uint256 inflationFactorUpdatePeriod,
+    address[] calldata initialBalanceAddresses,
+    uint256[] calldata initialBalanceValues
   )
     external
     initializer
   {
     require(inflationRate != 0, "Must provide a non-zero inflation rate.");
+    require(initialBalanceAddresses.length == initialBalanceValues.length);
+    for (uint256 i = 0; i < initialBalanceAddresses.length; i = i.add(1)) {
+      totalSupply_ = totalSupply_.add(initialBalanceValues[i]);
+      balances[initialBalanceAddresses[i]] = balances[initialBalanceAddresses[i]].add(
+        initialBalanceValues[i]
+      );
+    }
+
     _transferOwnership(msg.sender);
     totalSupply_ = 0;
     name_ = _name;
@@ -142,16 +141,6 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
     inflationState.factorLastUpdated = now;
 
     setRegistry(registryAddress);
-  }
-
-  // Should this be tied to the registry?
-  /**
-   * @notice Updates 'minter'.
-   * @param _minter An address with special permissions to modify its balance
-   */
-  function setMinter(address _minter) external onlyOwner {
-    minter = _minter;
-    emit MinterSet(minter);
   }
 
   /**
@@ -208,10 +197,15 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
     uint256 value
   )
     external
-    onlyMinter
     updateInflationFactor
     returns (bool)
   {
+    // Only the Exchange and Validators contracts are authorized to mint.
+    require(
+      msg.sender == registry.getAddressFor(EXCHANGE_REGISTRY_ID) ||
+      msg.sender == registry.getAddressFor(VALIDATORS_REGISTRY_ID)
+    );
+
     uint256 units = _valueToUnits(inflationState.factor, value);
     totalSupply_ = totalSupply_.add(units);
     balances[to] = balances[to].add(units);
@@ -241,10 +235,17 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
   }
 
   /**
-   * @notice Burns StableToken from the balance of 'minter'.
+   * @notice Burns StableToken from the balance of msg.sender.
    * @param value The amount of StableToken to burn.
    */
-  function burn(uint256 value) external onlyMinter updateInflationFactor returns (bool) {
+  function burn(
+    uint256 value
+  )
+    external
+    onlyRegisteredContract(EXCHANGE_REGISTRY_ID)
+    updateInflationFactor
+    returns (bool)
+  {
     uint256 units = _valueToUnits(inflationState.factor, value);
     require(units <= balances[msg.sender], "value exceeded balance of sender");
     totalSupply_ = totalSupply_.sub(units);

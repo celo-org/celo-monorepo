@@ -439,10 +439,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     address group = getMembershipInLastEpoch(account);
     uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
     uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
-    /*
     getStableToken().mint(group, groupPayment);
     getStableToken().mint(account, validatorPayment);
-    */
   }
 
   /**
