@@ -8,7 +8,7 @@ const { CoverageSubprovider } = require('@0x/sol-coverage')
 const argv = require('minimist')(process.argv.slice(2), { string: ['truffle_override', 'network'] })
 
 const SOLC_VERSION = '0.5.8'
-const ALFAJORES_NETWORKID = 44782
+const ALFAJORES_NETWORKID = 44784
 
 const OG_FROM = '0xfeE1a22F43BeeCB912B5a4912ba87527682ef0fC'
 const DEVELOPMENT_FROM = '0x5409ed021d9299bf6814279a6a1411a7e866a631'
