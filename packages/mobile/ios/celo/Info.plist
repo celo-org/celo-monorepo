@@ -35,10 +35,14 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>This is so you can scan QR codes.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like to access you contacts, so you can invite and transact with them.</string>
+	<string>This is so you can invite and transact with them.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>N/A</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>N/A</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Hind-Bold.ttf</string>
