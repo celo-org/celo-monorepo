@@ -21,7 +21,7 @@ import { filterRecipients, NumberToRecipient, Recipient } from 'src/recipients/r
 import RecipientPicker from 'src/recipients/RecipientPicker'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
-import { checkContactsPermission } from 'src/utils/androidPermissions'
+import { checkContactsPermission } from 'src/utils/permissions'
 
 interface State {
   searchQuery: string

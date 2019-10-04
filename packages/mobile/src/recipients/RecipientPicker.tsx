@@ -38,8 +38,8 @@ import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import LabeledTextInput from 'src/send/LabeledTextInput'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { requestContactsPermission } from 'src/utils/androidPermissions'
 import Logger from 'src/utils/Logger'
+import { requestContactsPermission } from 'src/utils/permissions'
 import { assertUnreachable } from 'src/utils/typescript'
 
 const goToQrCodeScreen = () => {

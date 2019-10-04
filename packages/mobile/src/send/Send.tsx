@@ -30,7 +30,7 @@ import RecipientPicker from 'src/recipients/RecipientPicker'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import { storeLatestInRecents } from 'src/send/actions'
-import { checkContactsPermission } from 'src/utils/androidPermissions'
+import { checkContactsPermission } from 'src/utils/permissions'
 
 const SEARCH_THROTTLE_TIME = 50
 const defaultRecipientPhoneNumber = '+10000000000'

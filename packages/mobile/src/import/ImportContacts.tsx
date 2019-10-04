@@ -19,7 +19,7 @@ import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import { requestContactsPermission } from 'src/utils/androidPermissions'
+import { requestContactsPermission } from 'src/utils/permissions'
 
 interface DispatchProps {
   importContacts: typeof importContacts
