@@ -19,7 +19,9 @@
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "build": "tsc -p .",
     "test": "jest --ci --coverage --runInBand --detectOpenHandles",
-    "test:verbose": "jest --ci --verbose --runInBand --detectOpenHandles"
+    "test:verbose": "jest --ci --verbose --runInBand --detectOpenHandles",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "dependencies": {
     "@celo/contractkit": "^0.1.5",
@@ -37,7 +39,8 @@
     "twilio": "^3.23.2",
     "web3": "1.0.0-beta.37",
     "web3-core-helpers": "1.0.0-beta.37",
-    "web3-utils": "^1.0.0-beta.37"
+    "web3-utils": "^1.0.0-beta.37",
+    "snyk": "^1.230.5"
   },
   "devDependencies": {
     "@types/express": "^4.16.1",
@@ -53,5 +56,6 @@
   },
   "engines": {
     "node": "10"
-  }
+  },
+  "snyk": true
 }
