@@ -93,19 +93,9 @@ class InflationManager {
 
   setInflationParameters = async (rate: BigNumber, updatePeriod: number) => {
     const stableToken = await this.kit.contracts.getStableToken()
-    const receipt = await stableToken
+    await stableToken
       .setInflationParameters(toFixed(rate).toString(), updatePeriod)
       .sendAndWaitForReceipt({ from: this.validatorAddress })
-
-    console.log('setInflation')
-    logReceiptEvents(receipt)
-
-    // const mintReceipt = await stableToken
-    //   .mint(validatorAddress, ONE.toString())
-    //   .sendAndWaitForReceipt({ from: validatorAddress })
-
-    // console.log('mint!')
-    // logReceiptEvents(mintReceipt)
   }
 
   resetInflation = async () => {
@@ -118,7 +108,6 @@ class InflationManager {
     await this.setInflationParameters(ONE, ONE_WEEK)
 
     const parametersPost = await this.getParameters()
-    console.log('FACTOR', parametersPost.factor.toString())
     assertEqualBN(parametersPost.factor, ONE)
   }
 }
@@ -187,7 +176,7 @@ function assertEqualBN(value: BigNumber, expected: BigNumber) {
   assert.equal(value.toString(), expected.toString())
 }
 
-describe('transfer tests', function(this: any) {
+describe('Transfer tests', function(this: any) {
   this.timeout(0)
 
   let kit: ContractKit
@@ -206,8 +195,6 @@ describe('transfer tests', function(this: any) {
   const ToAddress = '0xbBae99F0E1EE565404465638d40827b54D343638'
   const FeeRecipientAddress = '0x4f5f8a3f45d179553e7b95119ce296010f50f6f1'
 
-  const inflationManager = new InflationManager('http://localhost:8545', validatorAddress)
-
   const gethConfig = {
     migrateTo: 8,
     migrateGovernance: false,
@@ -216,32 +203,21 @@ describe('transfer tests', function(this: any) {
     ],
   }
   const hooks = getHooks(gethConfig)
-
   after(hooks.after)
-  before('start validator', async () => {
-    await hooks.before()
+  before(hooks.before)
+
+  const restartWithCleanNodes = async () => {
     await hooks.restart()
+
     kit = newKitFromWeb3(new Web3('http://localhost:8545'))
     kit.gasInflactionFactor = 1
-  })
 
-  before('unlock validator account', async () => {
     // TODO(mcortesi): magic sleep. without it unlockAccount sometimes fails
     await sleep(2)
     // Assuming empty password
     await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
-  })
 
-  // Give the account we will send transfers as sufficient gold and dollars.
-  before('fund FROM account', async () => {
-    const startBalance = TransferAmount.times(500)
-    const resDollars = await transferCeloDollars(validatorAddress, FromAddress, startBalance)
-    const resGold = await transferCeloGold(validatorAddress, FromAddress, startBalance)
-    await Promise.all([resDollars.waitReceipt(), resGold.waitReceipt()])
-  })
-
-  // Spin up a node that we can sync with.
-  before('run txNode', async () => {
+    // Spin up a node that we can sync with.
     const fullInstance = {
       name: 'txFull',
       validating: false,
@@ -255,7 +231,13 @@ describe('transfer tests', function(this: any) {
       peers: [await getEnode(8545)],
     }
     await initAndStartGeth(hooks.gethBinaryPath, fullInstance)
-  })
+
+    // Give the account we will send transfers as sufficient gold and dollars.
+    const startBalance = TransferAmount.times(500)
+    const resDollars = await transferCeloDollars(validatorAddress, FromAddress, startBalance)
+    const resGold = await transferCeloGold(validatorAddress, FromAddress, startBalance)
+    await Promise.all([resDollars.waitReceipt(), resGold.waitReceipt()])
+  }
 
   const startSyncNode = async (syncmode: string) => {
     if (currentGethInstance != null) {
@@ -349,7 +331,6 @@ describe('transfer tests', function(this: any) {
     let receipt: undefined | TransactionReceipt
     try {
       receipt = await txResult.waitReceipt()
-      logReceiptEvents(receipt)
       txOk = true
     } catch (err) {
       txOk = false
@@ -477,292 +458,287 @@ describe('transfer tests', function(this: any) {
     })
   }
 
-  const syncModes = ['full', 'fast', 'light', 'ultralight']
-  for (const syncMode of syncModes) {
-    describe(`when running ${syncMode} sync`, () => {
-      before(`start geth on sync: ${syncMode}`, () => startSyncNode(syncMode))
+  describe('Normal Transfer >', () => {
+    before(restartWithCleanNodes)
+    const syncModes = ['full', 'fast', 'light', 'ultralight']
+    for (const syncMode of syncModes) {
+      describe(`${syncMode} Node >`, () => {
+        before(`start geth on sync: ${syncMode}`, () => startSyncNode(syncMode))
 
-      describe('when transferring Celo Gold', () => {
-        const GOLD_TRANSACTION_GAS_COST = 29180
-        describe('when paying for gas in Celo Gold', () => {
-          if (syncMode === 'light' || syncMode === 'ultralight') {
-            describe('when running in light/ultralight sync mode', () => {
-              describe('when not explicitly specifying a gas fee recipient', () =>
-                testTransferToken({
-                  expectedGas: GOLD_TRANSACTION_GAS_COST,
-                  transferToken: CeloContract.GoldToken,
-                  feeToken: CeloContract.GoldToken,
-                }))
-
-              describe('when explicitly specifying the gas fee recipient', () => {
-                describe("when using a peer's etherbase", () =>
+        describe('Transfer CeloGold >', () => {
+          const GOLD_TRANSACTION_GAS_COST = 29180
+          describe('gasCurrency = CeloGold >', () => {
+            if (syncMode === 'light' || syncMode === 'ultralight') {
+              describe('when running in light/ultralight sync mode', () => {
+                describe('when not explicitly specifying a gas fee recipient', () =>
                   testTransferToken({
                     expectedGas: GOLD_TRANSACTION_GAS_COST,
                     transferToken: CeloContract.GoldToken,
                     feeToken: CeloContract.GoldToken,
-                    txOptions: {
-                      gasFeeRecipient: FeeRecipientAddress,
-                    },
                   }))
 
-                describe('when setting to an arbitrary address', () => {
-                  it('should get rejected by the sending node before being added to the tx pool', async () => {
-                    try {
-                      const res = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
-                        gasFeeRecipient: kit.web3.utils.randomHex(20),
-                      })
-                      await res.waitReceipt()
-                    } catch (error) {
-                      assert.include(
-                        error.toString(),
-                        'Returned error: no peer with etherbase found'
-                      )
-                    }
+                describe('when explicitly specifying the gas fee recipient', () => {
+                  describe("when using a peer's etherbase", () =>
+                    testTransferToken({
+                      expectedGas: GOLD_TRANSACTION_GAS_COST,
+                      transferToken: CeloContract.GoldToken,
+                      feeToken: CeloContract.GoldToken,
+                      txOptions: {
+                        gasFeeRecipient: FeeRecipientAddress,
+                      },
+                    }))
+
+                  describe('when setting to an arbitrary address', () => {
+                    it('should get rejected by the sending node before being added to the tx pool', async () => {
+                      try {
+                        const res = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
+                          gasFeeRecipient: kit.web3.utils.randomHex(20),
+                        })
+                        await res.waitReceipt()
+                      } catch (error) {
+                        assert.include(
+                          error.toString(),
+                          'Returned error: no peer with etherbase found'
+                        )
+                      }
+                    })
                   })
                 })
               })
+            } else {
+              testTransferToken({
+                expectedGas: GOLD_TRANSACTION_GAS_COST,
+                transferToken: CeloContract.GoldToken,
+                feeToken: CeloContract.GoldToken,
+                txOptions: {
+                  gasFeeRecipient: FeeRecipientAddress,
+                },
+              })
+            }
+          })
+
+          describe('gasCurrency = CeloDollars >', () => {
+            const intrinsicGas = 155000
+            describe('when there is no demurrage', () => {
+              describe('when setting a gas amount greater than the amount of gas necessary', () =>
+                testTransferToken({
+                  expectedGas: 163180,
+                  transferToken: CeloContract.GoldToken,
+                  feeToken: CeloContract.StableToken,
+                  txOptions: {
+                    gasFeeRecipient: FeeRecipientAddress,
+                  },
+                }))
+
+              describe('when setting a gas amount less than the amount of gas necessary but more than the intrinsic gas amount', () => {
+                const gas = intrinsicGas + 1000
+                testTransferToken({
+                  expectedGas: gas,
+                  transferToken: CeloContract.GoldToken,
+                  feeToken: CeloContract.StableToken,
+                  expectSuccess: false,
+                  txOptions: {
+                    gas,
+                    gasFeeRecipient: FeeRecipientAddress,
+                  },
+                })
+              })
+
+              describe('when setting a gas amount less than the intrinsic gas amount', () => {
+                it('should not add the transaction to the pool', async () => {
+                  const gas = intrinsicGas - 1
+                  const gasCurrency = await kit.registry.addressFor(CeloContract.StableToken)
+                  try {
+                    const res = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
+                      gas,
+                      gasCurrency,
+                    })
+                    await res.getHash()
+                  } catch (error) {
+                    assert.include(error.toString(), 'Returned error: intrinsic gas too low')
+                  }
+                })
+              })
             })
-          } else {
+          })
+        })
+
+        describe('Transfer CeloDollars', () => {
+          describe('gasCurrency = CeloDollars >', () => {
             testTransferToken({
-              expectedGas: GOLD_TRANSACTION_GAS_COST,
-              transferToken: CeloContract.GoldToken,
+              expectedGas: 189456,
+              transferToken: CeloContract.StableToken,
+              feeToken: CeloContract.StableToken,
+              txOptions: {
+                gasFeeRecipient: FeeRecipientAddress,
+              },
+            })
+          })
+
+          describe('gasCurrency = CeloGold >', () => {
+            testTransferToken({
+              expectedGas: 40456,
+              transferToken: CeloContract.StableToken,
               feeToken: CeloContract.GoldToken,
               txOptions: {
                 gasFeeRecipient: FeeRecipientAddress,
               },
             })
-          }
-        })
-
-        describe('when paying for gas in Celo Dollars', () => {
-          const intrinsicGas = 155000
-          describe('when there is no demurrage', () => {
-            describe('when setting a gas amount greater than the amount of gas necessary', () =>
-              testTransferToken({
-                expectedGas: 163180,
-                transferToken: CeloContract.GoldToken,
-                feeToken: CeloContract.StableToken,
-                txOptions: {
-                  gasFeeRecipient: FeeRecipientAddress,
-                },
-              }))
-
-            describe('when setting a gas amount less than the amount of gas necessary but more than the intrinsic gas amount', () => {
-              const gas = intrinsicGas + 1000
-              testTransferToken({
-                expectedGas: gas,
-                transferToken: CeloContract.GoldToken,
-                feeToken: CeloContract.StableToken,
-                expectSuccess: false,
-                txOptions: {
-                  gas,
-                  gasFeeRecipient: FeeRecipientAddress,
-                },
-              })
-            })
-
-            describe('when setting a gas amount less than the intrinsic gas amount', () => {
-              it('should not add the transaction to the pool', async () => {
-                const gas = intrinsicGas - 1
-                const gasCurrency = await kit.registry.addressFor(CeloContract.StableToken)
-                try {
-                  const res = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
-                    gas,
-                    gasCurrency,
-                  })
-                  await res.getHash()
-                } catch (error) {
-                  assert.include(error.toString(), 'Returned error: intrinsic gas too low')
-                }
-              })
-            })
-          })
-
-          describe.skip('when there is demurrage of 50% applied', () => {
-            describe('when setting a gas amount greater than the amount of gas necessary', () => {
-              let balances: BalanceWatcher
-              let expectedFees: Fees
-
-              before(async () => {
-                balances = await newBalanceWatcher(kit, [
-                  FromAddress,
-                  ToAddress,
-                  validatorAddress,
-                  FeeRecipientAddress,
-                ])
-
-                await inflationManager.changeInflationFactorOnNextTransfer(new BigNumber(2))
-                const stableTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
-                const expectedGasUsed = 163180
-                const txRes = await runTestTransaction(
-                  await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
-                    gasCurrency: stableTokenAddress,
-                    gasFeeRecipient: FeeRecipientAddress,
-                  }),
-                  expectedGasUsed,
-                  stableTokenAddress
-                )
-                assert.isTrue(txRes.txOk)
-
-                await balances.update()
-                expectedFees = txRes.txFees
-              })
-              after('resetInflation', inflationManager.resetInflation)
-
-              it("should decrement the sender's Celo Gold balance by the transfer amount", () => {
-                assertEqualBN(
-                  balances.delta(FromAddress, CeloContract.GoldToken).negated(),
-                  TransferAmount
-                )
-              })
-
-              it("should increment the receiver's Celo Gold balance by the transfer amount", () => {
-                assertEqualBN(balances.delta(ToAddress, CeloContract.GoldToken), TransferAmount)
-              })
-
-              it("should halve the sender's Celo Dollar balance due to demurrage and decrement it by the gas fee", () => {
-                assertEqualBN(
-                  balances
-                    .initial(FromAddress, CeloContract.StableToken)
-                    .div(2)
-                    .minus(balances.current(FromAddress, CeloContract.StableToken)),
-                  expectedFees.total
-                )
-              })
-
-              it("should increment the fee receipient's Celo Dollar balance by a portion of the gas fee", () => {
-                assertEqualBN(
-                  balances
-                    .current(FeeRecipientAddress, CeloContract.StableToken)
-                    .minus(balances.initial(FeeRecipientAddress, CeloContract.StableToken).div(2)),
-
-                  // balances.delta(FeeRecipientAddress, CeloContract.StableToken),
-                  expectedFees.recipient
-                )
-              })
-
-              // TODO mcortesi
-              // it("should increment the infrastructure fund's Celo Dollar balance by the rest of the gas fee", () => {
-              //   assertEqualBN(
-              //     newBalances[CeloContract.StableToken][governanceAddress]
-              //       .minus(initialBalances[CeloContract.StableToken][governanceAddress])
-              //       ,
-              //     expectedFees.infrastructure
-              //   )
-              // })
-            })
-
-            describe('when setting a gas amount less than the amount of gas necessary but more than the intrinsic gas amount', () => {
-              let balances: BalanceWatcher
-              let expectedFees: Fees
-              before(async () => {
-                balances = await newBalanceWatcher(kit, [
-                  FromAddress,
-                  ToAddress,
-                  validatorAddress,
-                  FeeRecipientAddress,
-                ])
-
-                await inflationManager.changeInflationFactorOnNextTransfer(new BigNumber(2))
-
-                const gas = intrinsicGas + 1000
-                const txRes = await runTestTransaction(
-                  await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
-                    gas,
-                    gasCurrency: await kit.registry.addressFor(CeloContract.StableToken),
-                    gasFeeRecipient: FeeRecipientAddress,
-                  }),
-                  gas,
-                  await kit.registry.addressFor(CeloContract.StableToken)
-                )
-                assert.isFalse(txRes.txOk)
-
-                await balances.update()
-                expectedFees = txRes.txFees
-              })
-              after('resetInflation', inflationManager.resetInflation)
-
-              it("should not change the sender's Celo Gold balance", () => {
-                assertEqualBN(balances.delta(FromAddress, CeloContract.GoldToken), new BigNumber(0))
-              })
-
-              it("should not change the receiver's Celo Gold balance", () => {
-                assertEqualBN(balances.delta(ToAddress, CeloContract.GoldToken), new BigNumber(0))
-              })
-
-              it("should halve the sender's Celo Dollar balance due to demurrage and decrement it by the gas fee", () => {
-                assertEqualBN(
-                  balances
-                    .initial(FromAddress, CeloContract.StableToken)
-                    .div(2)
-                    .minus(balances.current(FromAddress, CeloContract.StableToken)),
-                  expectedFees.total
-                )
-              })
-
-              it("should increment the fee recipient's Celo Dollar balance by a portion of the gas fee", () => {
-                assertEqualBN(
-                  balances.delta(FeeRecipientAddress, CeloContract.StableToken),
-                  expectedFees.recipient
-                )
-              })
-
-              // TODO(mcortesi)
-              // it("should increment the proposers Celo Dollar balance by the rest of the gas fee", () => {
-              //   assertEqualBN(
-              //     newBalances[CeloContract.StableToken][governanceAddress]
-              //       .minus(initialBalances[CeloContract.StableToken][governanceAddress])
-              //       ,
-              //     expectedFees.infrastructure
-              //   )
-              // })
-            })
-
-            describe.skip('when setting a gas amount less than the intrinsic gas amount', () => {
-              it('should not add the transaction to the pool', async () => {
-                const gas = intrinsicGas - 1
-
-                await inflationManager.changeInflationFactorOnNextTransfer(new BigNumber(2))
-
-                try {
-                  const res = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
-                    gas,
-                    gasCurrency: await kit.registry.addressFor(CeloContract.StableToken),
-                  })
-                  await res.waitReceipt()
-                } catch (error) {
-                  assert.include(error.toString(), 'Returned error: intrinsic gas too low')
-                }
-              })
-              after(inflationManager.resetInflation)
-            })
           })
         })
       })
+    }
+  })
 
-      describe('when transferring Celo Dollars', () => {
-        describe('when paying for gas in Celo Dollars', () => {
-          testTransferToken({
-            expectedGas: 189456,
-            transferToken: CeloContract.StableToken,
-            feeToken: CeloContract.StableToken,
-            txOptions: {
+  describe('Transfer with Demurrage >', () => {
+    let inflationManager: InflationManager
+
+    const restart = async () => {
+      await restartWithCleanNodes()
+      await startSyncNode('full')
+      inflationManager = new InflationManager('http://localhost:8545', validatorAddress)
+    }
+
+    describe('when there is demurrage of 50% applied', () => {
+      describe('when setting a gas amount greater than the amount of gas necessary', () => {
+        let balances: BalanceWatcher
+        let expectedFees: Fees
+
+        before(async () => {
+          await restart()
+          balances = await newBalanceWatcher(kit, [
+            FromAddress,
+            ToAddress,
+            validatorAddress,
+            FeeRecipientAddress,
+          ])
+
+          await inflationManager.changeInflationFactorOnNextTransfer(new BigNumber(2))
+          const stableTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
+          const expectedGasUsed = 163180
+          const txRes = await runTestTransaction(
+            await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
+              gasCurrency: stableTokenAddress,
               gasFeeRecipient: FeeRecipientAddress,
-            },
-          })
+            }),
+            expectedGasUsed,
+            stableTokenAddress
+          )
+          assert.isTrue(txRes.txOk)
+
+          await balances.update()
+          expectedFees = txRes.txFees
         })
 
-        describe('when paying for gas in Celo Gold', () => {
-          testTransferToken({
-            expectedGas: 40456,
-            transferToken: CeloContract.StableToken,
-            feeToken: CeloContract.GoldToken,
-            txOptions: {
-              gasFeeRecipient: FeeRecipientAddress,
-            },
-          })
+        it("should decrement the sender's Celo Gold balance by the transfer amount", () => {
+          assertEqualBN(
+            balances.delta(FromAddress, CeloContract.GoldToken).negated(),
+            TransferAmount
+          )
         })
+
+        it("should increment the receiver's Celo Gold balance by the transfer amount", () => {
+          assertEqualBN(balances.delta(ToAddress, CeloContract.GoldToken), TransferAmount)
+        })
+
+        it("should halve the sender's Celo Dollar balance due to demurrage and decrement it by the gas fee", () => {
+          assertEqualBN(
+            balances
+              .initial(FromAddress, CeloContract.StableToken)
+              .div(2)
+              .minus(balances.current(FromAddress, CeloContract.StableToken)),
+            expectedFees.total
+          )
+        })
+
+        it("should increment the fee receipient's Celo Dollar balance by a portion of the gas fee", () => {
+          assertEqualBN(
+            balances
+              .current(FeeRecipientAddress, CeloContract.StableToken)
+              .minus(balances.initial(FeeRecipientAddress, CeloContract.StableToken).div(2)),
+
+            // balances.delta(FeeRecipientAddress, CeloContract.StableToken),
+            expectedFees.recipient
+          )
+        })
+
+        // TODO mcortesi
+        // it("should increment the infrastructure fund's Celo Dollar balance by the rest of the gas fee", () => {
+        //   assertEqualBN(
+        //     newBalances[CeloContract.StableToken][governanceAddress]
+        //       .minus(initialBalances[CeloContract.StableToken][governanceAddress])
+        //       ,
+        //     expectedFees.infrastructure
+        //   )
+        // })
+      })
+
+      describe('when setting a gas amount less than the amount of gas necessary but more than the intrinsic gas amount', () => {
+        let balances: BalanceWatcher
+        let expectedFees: Fees
+        before(async () => {
+          await restart()
+          balances = await newBalanceWatcher(kit, [
+            FromAddress,
+            ToAddress,
+            validatorAddress,
+            FeeRecipientAddress,
+          ])
+
+          await inflationManager.changeInflationFactorOnNextTransfer(new BigNumber(2))
+
+          const intrinsicGas = 155000
+          const gas = intrinsicGas + 1000
+          const txRes = await runTestTransaction(
+            await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
+              gas,
+              gasCurrency: await kit.registry.addressFor(CeloContract.StableToken),
+              gasFeeRecipient: FeeRecipientAddress,
+            }),
+            gas,
+            await kit.registry.addressFor(CeloContract.StableToken)
+          )
+          assert.isFalse(txRes.txOk)
+
+          await balances.update()
+          expectedFees = txRes.txFees
+        })
+
+        it("should not change the sender's Celo Gold balance", () => {
+          assertEqualBN(balances.delta(FromAddress, CeloContract.GoldToken), new BigNumber(0))
+        })
+
+        it("should not change the receiver's Celo Gold balance", () => {
+          assertEqualBN(balances.delta(ToAddress, CeloContract.GoldToken), new BigNumber(0))
+        })
+
+        it("should halve the sender's Celo Dollar balance due to demurrage and decrement it by the gas fee", () => {
+          assertEqualBN(
+            balances
+              .initial(FromAddress, CeloContract.StableToken)
+              .div(2)
+              .minus(balances.current(FromAddress, CeloContract.StableToken)),
+            expectedFees.total
+          )
+        })
+
+        it("should increment the fee recipient's Celo Dollar balance by a portion of the gas fee", () => {
+          assertEqualBN(
+            balances.delta(FeeRecipientAddress, CeloContract.StableToken),
+            expectedFees.recipient
+          )
+        })
+
+        // TODO(mcortesi)
+        // it("should increment the proposers Celo Dollar balance by the rest of the gas fee", () => {
+        //   assertEqualBN(
+        //     newBalances[CeloContract.StableToken][governanceAddress]
+        //       .minus(initialBalances[CeloContract.StableToken][governanceAddress])
+        //       ,
+        //     expectedFees.infrastructure
+        //   )
+        // })
       })
     })
-  }
+  })
 })
