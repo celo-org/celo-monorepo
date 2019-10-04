@@ -68,9 +68,10 @@ describe('exit tests', function(this: any) {
 
   describe('when running a node', () => {
     it('should exit when minimum version is updated', async () => {
+      this.timeout(0)
       await restartGeth()
       await setMinimumClientVersion(1, 8, 99)
-      await sleep(20)
+      await sleep(120)
       try {
         // It should have exited by now, call RPC to trigger error
         await web3.eth.getBlockNumber()
