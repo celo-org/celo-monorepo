@@ -3,7 +3,7 @@ import Error from '@celo/react-components/icons/Error'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Animated, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { useSafeArea } from 'react-native-safe-area-context'
 
 export enum NotificationTypes {
@@ -134,7 +134,7 @@ function SmartTopAlert(props: Props) {
 
   return (
     <View style={styles.overflowContainer} testID={testID}>
-      <TouchableOpacity onPress={onPress}>
+      <TouchableWithoutFeedback onPress={onPress}>
         <Animated.View
           ref={animatedRef}
           style={[
@@ -164,7 +164,7 @@ function SmartTopAlert(props: Props) {
             />
           )}
         </Animated.View>
-      </TouchableOpacity>
+      </TouchableWithoutFeedback>
     </View>
   )
 }
