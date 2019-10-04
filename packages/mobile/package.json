@@ -46,7 +46,7 @@
     ]
   },
   "dependencies": {
-    "@celo/client": "ae27fd3",
+    "@celo/client": "640a41f",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#d3a2fdb",
     "@celo/utils": "^0.1.0",
     "@celo/walletkit": "^0.0.14",
@@ -82,7 +82,7 @@
     "react-native-android-open-settings": "^1.2.0",
     "react-native-autocomplete-input": "^3.6.0",
     "react-native-bip39": "git://github.com/celo-org/react-native-bip39#1488fa1",
-    "react-native-camera": "^1.9.1",
+    "react-native-camera": "2.9.0",
     "react-native-clock-sync": "^1.0.0",
     "react-native-config": "https://github.com/luggit/react-native-config#89a602b",
     "react-native-confirm-device-credentials": "^2.0.0",

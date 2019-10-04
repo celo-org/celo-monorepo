@@ -1,5 +1,7 @@
 import TextInput from '@celo/react-components/components/TextInput'
-import ValidatedTextInput from '@celo/react-components/components/ValidatedTextInput'
+import ValidatedTextInput, {
+  PhoneValidatorProps,
+} from '@celo/react-components/components/ValidatedTextInput'
 import colors from '@celo/react-components/styles/colors'
 import { Countries } from '@celo/utils/src/countries'
 import { ValidatorKind } from '@celo/utils/src/inputValidation'
@@ -192,7 +194,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
         <View style={[style.phoneNumberContainer, style.borderedBox]}>
           <Text style={style.phoneCountryCode}>{countryCallingCode}</Text>
           <View style={style.line} />
-          <ValidatedTextInput
+          <ValidatedTextInput<PhoneValidatorProps>
             style={[style.inputBox, style.phoneNumberInput]}
             placeholderTextColor={colors.inactive}
             onChangeText={this.onChangePhoneNumber}
