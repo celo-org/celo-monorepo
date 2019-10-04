@@ -19,6 +19,10 @@ const commonProps = {
   },
 }
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('PaymentRequestListItem', () => {
   it('renders correctly', () => {
     // @ts-ignore -- kind is not assignable?

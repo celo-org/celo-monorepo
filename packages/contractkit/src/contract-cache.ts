@@ -50,6 +50,11 @@ interface WrapperCacheMap {
   [CeloContract.Validators]?: ValidatorsWrapper
 }
 
+/**
+ * Kit ContractWrappers factory & cache.
+ *
+ * Provides access to all contract wrappers for celo core contracts
+ */
 export class WrapperCache {
   // private wrapperCache: Map<CeloContract, any> = new Map()
   private wrapperCache: WrapperCacheMap = {}
@@ -99,6 +104,9 @@ export class WrapperCache {
     return this.getContract(CeloContract.Validators)
   }
 
+  /**
+   * Get Contract wrapper
+   */
   public async getContract<C extends ValidWrappers>(contract: C) {
     if (this.wrapperCache[contract] == null) {
       const instance = await this.kit._web3Contracts.getContract(contract)

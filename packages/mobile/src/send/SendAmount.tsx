@@ -1,5 +1,11 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import LoadingLabel from '@celo/react-components/components/LoadingLabel'
+import TextInput, { TextInputProps } from '@celo/react-components/components/TextInput'
+import ValidatedTextInput, {
+  DecimalValidatorProps,
+  ValidatedTextInputProps,
+} from '@celo/react-components/components/ValidatedTextInput'
+import withTextInputLabeling from '@celo/react-components/components/WithTextInputLabeling'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
@@ -47,12 +53,16 @@ import {
   RecipientKind,
 } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import LabeledTextInput from 'src/send/LabeledTextInput'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { TransactionTypes } from 'src/transactions/reducer'
 import { getBalanceColor, getFeeDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
+
+const AmountInput = withTextInputLabeling<ValidatedTextInputProps<DecimalValidatorProps>>(
+  ValidatedTextInput
+)
+const CommentInput = withTextInputLabeling<TextInputProps>(TextInput)
 
 interface State {
   amount: string
@@ -367,13 +377,13 @@ export class SendAmount extends React.Component<Props, State> {
               labelTextStyle={fontStyles.center}
             />
           </View>
-          <LabeledTextInput
+          <AmountInput
             keyboardType="numeric"
             title={localCurrencyCode ? localCurrencyCode : CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
             placeholder={t('amount')}
             labelStyle={style.amountLabel as TextStyle}
             placeholderTextColor={colors.celoGreenInactive}
-            autocorrect={false}
+            autoCorrect={false}
             value={this.state.amount}
             onChangeText={this.onAmountChanged}
             autoFocus={true}
@@ -381,8 +391,7 @@ export class SendAmount extends React.Component<Props, State> {
             validator={ValidatorKind.Decimal}
             lng={this.props.lng}
           />
-          <LabeledTextInput
-            keyboardType="default"
+          <CommentInput
             title={t('for')}
             placeholder={t('groceriesRent')}
             value={this.state.reason}

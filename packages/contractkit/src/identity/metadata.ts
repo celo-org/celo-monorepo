@@ -1,11 +1,12 @@
 import fetch from 'cross-fetch'
 import { isLeft } from 'fp-ts/lib/Either'
+import { readFileSync } from 'fs'
 import * as t from 'io-ts'
 import { PathReporter } from 'io-ts/lib/PathReporter'
 
 export enum ClaimTypes {
   ATTESTATION_SERVICE_URL = 'ATTESTATION_SERVICE_URL',
-  DNS = 'DNS',
+  DOMAIN = 'DOMAIN',
   NAME = 'NAME',
   PROFILE_PICTURE = 'PROFILE_PICTURE',
   TWITTER = 'TWITTER',
@@ -21,8 +22,8 @@ const AttestationServiceURLClaimType = t.type({
   url: UrlType,
 })
 
-const DnsClaimType = t.type({
-  type: t.literal(ClaimTypes.DNS),
+const DomainClaimType = t.type({
+  type: t.literal(ClaimTypes.DOMAIN),
   timestamp: TimestampType,
   domain: t.string,
 })
@@ -33,7 +34,7 @@ const NameClaimType = t.type({
   name: t.string,
 })
 
-export const ClaimType = t.union([AttestationServiceURLClaimType, DnsClaimType, NameClaimType])
+export const ClaimType = t.union([AttestationServiceURLClaimType, DomainClaimType, NameClaimType])
 export const SignedClaimType = t.type({
   payload: ClaimType,
   signature: SignatureType,
@@ -45,13 +46,13 @@ export const IdentityMetadataType = t.type({
 
 export type SignedClaim = t.TypeOf<typeof SignedClaimType>
 export type AttestationServiceURLClaim = t.TypeOf<typeof AttestationServiceURLClaimType>
-export type DnsClaim = t.TypeOf<typeof DnsClaimType>
+export type DomainClaim = t.TypeOf<typeof DomainClaimType>
 export type NameClaim = t.TypeOf<typeof NameClaimType>
 export type IdentityMetadata = t.TypeOf<typeof IdentityMetadataType>
-export type Claim = AttestationServiceURLClaim | DnsClaim | NameClaim
+export type Claim = AttestationServiceURLClaim | DomainClaim | NameClaim
 
-type ClaimPayload<K extends ClaimTypes> = K extends typeof ClaimTypes.DNS
-  ? DnsClaim
+type ClaimPayload<K extends ClaimTypes> = K extends typeof ClaimTypes.DOMAIN
+  ? DomainClaim
   : K extends typeof ClaimTypes.NAME ? NameClaim : AttestationServiceURLClaim
 
 const isOfType = <K extends ClaimTypes>(type: K) => (
@@ -71,6 +72,10 @@ export class IdentityMetadataWrapper {
       throw new Error(`Request failed with status ${resp.status}`)
     }
     return this.fromRawString(await resp.text())
+  }
+
+  static fromFile(path: string) {
+    return this.fromRawString(readFileSync(path, 'utf-8'))
   }
 
   static fromRawString(rawData: string) {
@@ -140,4 +145,10 @@ export const createNameClaim = (name: string): NameClaim => ({
   name,
   timestamp: now(),
   type: ClaimTypes.NAME,
+})
+
+export const createDomainClaim = (domain: string): DomainClaim => ({
+  domain,
+  timestamp: now(),
+  type: ClaimTypes.DOMAIN,
 })
