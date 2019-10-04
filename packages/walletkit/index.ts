@@ -64,6 +64,7 @@ export {
   SendTransaction,
   sendTransaction,
   sendTransactionAsync,
+  sendTransactionAsyncWithWeb3Signing,
   SendTransactionLogEvent,
   SendTransactionLogEventType,
   TxLogger,
@@ -96,3 +97,4 @@ export { GoogleStorageUtils }
 export { Logger as WalletKitLogger, LogLevel as WalletKitLogLevel }
 export { StaticNodeUtils }
 export { Web3Utils }
+export { addLocalAccount, getAccountAddressFromPrivateKey } from './src/new-web3-utils'

@@ -399,7 +399,7 @@ function* revealNeededAttestations(
 ) {
   Logger.debug(TAG + '@revealNeededAttestations', `Revealing ${attestations.length} attestations`)
   yield all(
-    attestations.map((attestation) => {
+    attestations.map((attestation, index) => {
       return call(
         revealAndCompleteAttestation,
         attestationsContract,
@@ -422,6 +422,7 @@ function* revealAndCompleteAttestation(
   Logger.debug(TAG + '@revealAttestation', `Revealing an attestation for issuer: ${issuer}`)
   CeloAnalytics.track(CustomEventNames.verification_reveal_attestation, { issuer })
   const revealTx = yield call(makeRevealTx, attestationsContract, e164Number, issuer)
+  // Crude way to prevent sendTransaction being called in parallel and use the same nonces.
   yield call(sendTransaction, revealTx, account, TAG, `Reveal ${issuer}`)
 
   CeloAnalytics.track(CustomEventNames.verification_revealed_attestation, { issuer })

@@ -27,5 +27,4 @@ export interface AirRecord<Fields> {
     fields: Fields
     createdTime: string
   }
-  _table: AirtableAPI.Table<AirtableAPI.FieldSet>
 }

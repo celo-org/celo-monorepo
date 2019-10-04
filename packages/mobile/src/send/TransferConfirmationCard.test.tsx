@@ -20,6 +20,10 @@ const store = createMockStore({
   },
 })
 
+jest.mock('src/web3/contracts', () => ({
+  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
+}))
+
 describe('TransferConfirmationCard', () => {
   it('renders correctly for verification fee drilldown', () => {
     const props = {

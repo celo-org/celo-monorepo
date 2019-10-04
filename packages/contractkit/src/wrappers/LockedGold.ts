@@ -16,6 +16,7 @@ import {
 export interface VotingDetails {
   accountAddress: Address
   voterAddress: Address
+  /** vote's weight */
   weight: BigNumber
 }
 
@@ -47,19 +48,86 @@ export interface LockedGoldConfig {
  * Contract for handling deposits needed for voting.
  */
 export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
-  notifyCommitment = proxySend(this.kit, this.contract.methods.notifyCommitment)
-  createAccount = proxySend(this.kit, this.contract.methods.createAccount)
-  withdrawCommitment = proxySend(this.kit, this.contract.methods.withdrawCommitment)
-  redeemRewards = proxySend(this.kit, this.contract.methods.redeemRewards)
-  newCommitment = proxySend(this.kit, this.contract.methods.newCommitment)
-  extendCommitment = proxySend(this.kit, this.contract.methods.extendCommitment)
+  /**
+   * Notifies a Locked Gold commitment, allowing funds to be withdrawn after the notice
+   *   period.
+   * @param value The amount of the commitment to eventually withdraw.
+   * @param noticePeriod The notice period of the Locked Gold commitment.
+   * @return CeloTransactionObject
+   */
+  notifyCommitment: (
+    value: string | number,
+    noticePeriod: string | number
+  ) => CeloTransactionObject<string> = proxySend(this.kit, this.contract.methods.notifyCommitment)
+
+  /**
+   * Creates an account.
+   * @return CeloTransactionObject
+   */
+  createAccount: () => CeloTransactionObject<boolean> = proxySend(
+    this.kit,
+    this.contract.methods.createAccount
+  )
+
+  /**
+   * Withdraws a notified commitment after the duration of the notice period.
+   * @param availabilityTime The availability time of the notified commitment.
+   * @return CeloTransactionObject
+   */
+  withdrawCommitment: (
+    availabilityTime: string | number
+  ) => CeloTransactionObject<string> = proxySend(this.kit, this.contract.methods.withdrawCommitment)
+
+  /**
+   * Redeems rewards accrued since the last redemption for the specified account.
+   * @return CeloTransactionObject
+   */
+  redeemRewards: () => CeloTransactionObject<string> = proxySend(
+    this.kit,
+    this.contract.methods.redeemRewards
+  )
+
+  /**
+   * Adds a Locked Gold commitment to `msg.sender`'s account.
+   * @param noticePeriod The notice period for the commitment.
+   * @return CeloTransactionObject
+   */
+  newCommitment: (noticePeriod: string | number) => CeloTransactionObject<string> = proxySend(
+    this.kit,
+    this.contract.methods.newCommitment
+  )
+
+  /**
+   * Rebonds a notified commitment, with notice period >= the remaining time to
+   * availability.
+   *
+   * @param value The amount of the commitment to rebond.
+   * @param availabilityTime The availability time of the notified commitment.
+   * @return CeloTransactionObject
+   */
+  extendCommitment: (
+    value: string | number,
+    availabilityTime: string | number
+  ) => CeloTransactionObject<string> = proxySend(this.kit, this.contract.methods.extendCommitment)
+
+  /**
+   * Returns whether or not a specified account is voting.
+   * @param account The address of the account.
+   * @return Whether or not the account is voting.
+   */
   isVoting = proxyCall(this.contract.methods.isVoting)
+
   /**
    * Query maximum notice period.
    * @returns Current maximum notice period.
    */
   maxNoticePeriod = proxyCall(this.contract.methods.maxNoticePeriod, undefined, toBigNumber)
 
+  /**
+   * Returns the weight of a specified account.
+   * @param _account The address of the account.
+   * @return The weight of the specified account.
+   */
   getAccountWeight = proxyCall(this.contract.methods.getAccountWeight, undefined, toBigNumber)
   /**
    * Get the delegate for a role.
@@ -81,6 +149,10 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     }
   }
 
+  /**
+   * Get voting details for an address
+   * @param accountOrVoterAddress Accout or Voter address
+   */
   async getVotingDetails(accountOrVoterAddress: Address): Promise<VotingDetails> {
     const accountAddress = await this.contract.methods
       .getAccountFromDelegateAndRole(accountOrVoterAddress, Roles.Voting)
@@ -93,12 +165,12 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     }
   }
 
-  async getLockedCommitmentValue(account: string, noticePeriod: string): Promise<BigNumber> {
+  async getLockedCommitmentValue(account: Address, noticePeriod: string): Promise<BigNumber> {
     const commitment = await this.contract.methods.getLockedCommitment(account, noticePeriod).call()
     return this.getValueFromCommitment(commitment)
   }
 
-  async getLockedCommitments(account: string): Promise<Commitment[]> {
+  async getLockedCommitments(account: Address): Promise<Commitment[]> {
     return this.zipAccountTimesAndValuesToCommitments(
       account,
       this.contract.methods.getNoticePeriods,
@@ -106,12 +178,12 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     )
   }
 
-  async getNotifiedCommitmentValue(account: string, availTime: string): Promise<BigNumber> {
+  async getNotifiedCommitmentValue(account: Address, availTime: string): Promise<BigNumber> {
     const commitment = await this.contract.methods.getNotifiedCommitment(account, availTime).call()
     return this.getValueFromCommitment(commitment)
   }
 
-  async getNotifiedCommitments(account: string): Promise<Commitment[]> {
+  async getNotifiedCommitments(account: Address): Promise<Commitment[]> {
     return this.zipAccountTimesAndValuesToCommitments(
       account,
       this.contract.methods.getAvailabilityTimes,
@@ -119,7 +191,11 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     )
   }
 
-  async getCommitments(account: string): Promise<Commitments> {
+  /**
+   * Get commitments for an Account
+   * @param account Account address
+   */
+  async getCommitments(account: Address): Promise<Commitments> {
     const locked = await this.getLockedCommitments(account)
     const notified = await this.getNotifiedCommitments(account)
     const weight = await this.getAccountWeight(account)
@@ -193,7 +269,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     return new BigNumber(commitment[0])
   }
 
-  private async getParsedSignatureOfAddress(address: string, signer: string) {
+  private async getParsedSignatureOfAddress(address: Address, signer: string) {
     const hash = Web3.utils.soliditySha3({ type: 'address', value: address })
     const signature = (await this.kit.web3.eth.sign(hash, signer)).slice(2)
     return {
@@ -204,7 +280,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   }
 
   private async zipAccountTimesAndValuesToCommitments(
-    account: string,
+    account: Address,
     timesFunc: (account: string) => TransactionObject<string[]>,
     valueFunc: (account: string, time: string) => Promise<BigNumber>
   ) {
