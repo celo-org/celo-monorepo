@@ -2,7 +2,7 @@ import * as React from 'react'
 import FadeIn from 'react-lazyload-fadein'
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
 import { H3 } from 'src/fonts/Fonts'
-import Button, { BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { fonts, standardStyles, textStyles } from 'src/styles'
 
 interface Props {
@@ -40,7 +40,7 @@ export default function CoverAction({ title, text, graphic, link, isMobile }: Pr
           {text}
         </Text>
       </View>
-      {link && <Button kind={BTN.NAKED} href={link.href} text={link.text} style={styles.btn} />}
+      {link && <Button kind={BTN.NAKED} href={link.href} text={link.text} size={SIZE.normal} />}
     </View>
   )
 }
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     height: '100%',
-    maxWidth: 300,
+    maxWidth: 270,
     minWidth: 160,
     marginTop: 30,
     marginHorizontal: 20,
@@ -65,5 +65,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  btn: { fontSize: 18 },
 })

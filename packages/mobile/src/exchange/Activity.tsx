@@ -23,7 +23,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 })
 
 function filterToExchangeTxs(tx: StandbyTransaction) {
-  return tx.type === TransactionTypes.EXCHANGED
+  return tx.type === TransactionTypes.EXCHANGE
 }
 
 export class Activity extends React.Component<Props> {

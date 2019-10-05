@@ -53,6 +53,12 @@ exports[`Verifying process renders the fully verified state correctly 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -61,7 +67,6 @@ exports[`Verifying process renders the fully verified state correctly 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "opacity": 1,
           "paddingHorizontal": 20,
           "paddingVertical": 10,
         }
@@ -95,8 +100,7 @@ exports[`Verifying process renders the fully verified state correctly 1`] = `
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
             Object {},
           ]
@@ -112,8 +116,8 @@ exports[`Verifying process renders the fully verified state correctly 1`] = `
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -459,6 +463,12 @@ exports[`Verifying process renders the fully verified state correctly 1`] = `
         <View
           accessible={true}
           isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -466,17 +476,24 @@ exports[`Verifying process renders the fully verified state correctly 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "transparent",
-              "borderColor": "#42D689",
-              "borderRadius": 3,
-              "borderWidth": 2,
-              "flex": 1,
-              "height": 50,
-              "justifyContent": "center",
-              "opacity": 1,
-            }
+            Array [
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "justifyContent": "center",
+              },
+              Object {
+                "backgroundColor": "transparent",
+              },
+              Object {
+                "height": 50,
+              },
+              Object {
+                "borderColor": "#42D689",
+                "borderRadius": 3,
+                "borderWidth": 2,
+              },
+            ]
           }
         >
           <View
@@ -569,6 +586,12 @@ exports[`Verifying process renders the initial verifying state correctly 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -577,7 +600,6 @@ exports[`Verifying process renders the initial verifying state correctly 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "opacity": 1,
           "paddingHorizontal": 20,
           "paddingVertical": 10,
         }
@@ -611,8 +633,7 @@ exports[`Verifying process renders the initial verifying state correctly 1`] = `
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
             Object {},
           ]
@@ -628,8 +649,8 @@ exports[`Verifying process renders the initial verifying state correctly 1`] = `
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -939,6 +960,12 @@ exports[`Verifying process renders the initial verifying state correctly 1`] = `
         <View
           accessible={true}
           isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -946,17 +973,24 @@ exports[`Verifying process renders the initial verifying state correctly 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "transparent",
-              "borderColor": "#42D689",
-              "borderRadius": 3,
-              "borderWidth": 2,
-              "flex": 1,
-              "height": 50,
-              "justifyContent": "center",
-              "opacity": 1,
-            }
+            Array [
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "justifyContent": "center",
+              },
+              Object {
+                "backgroundColor": "transparent",
+              },
+              Object {
+                "height": 50,
+              },
+              Object {
+                "borderColor": "#42D689",
+                "borderRadius": 3,
+                "borderWidth": 2,
+              },
+            ]
           }
         >
           <View
@@ -1049,6 +1083,12 @@ exports[`Verifying process renders the partially verified state correctly 1`] = 
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}
@@ -1057,7 +1097,6 @@ exports[`Verifying process renders the partially verified state correctly 1`] = 
       onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "opacity": 1,
           "paddingHorizontal": 20,
           "paddingVertical": 10,
         }
@@ -1091,8 +1130,7 @@ exports[`Verifying process renders the partially verified state correctly 1`] = 
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
             Object {},
           ]
@@ -1108,8 +1146,8 @@ exports[`Verifying process renders the partially verified state correctly 1`] = 
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -1443,6 +1481,12 @@ exports[`Verifying process renders the partially verified state correctly 1`] = 
         <View
           accessible={true}
           isTVSelectable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
           onResponderRelease={[Function]}
@@ -1450,17 +1494,24 @@ exports[`Verifying process renders the partially verified state correctly 1`] = 
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "transparent",
-              "borderColor": "#42D689",
-              "borderRadius": 3,
-              "borderWidth": 2,
-              "flex": 1,
-              "height": 50,
-              "justifyContent": "center",
-              "opacity": 1,
-            }
+            Array [
+              Object {
+                "alignItems": "center",
+                "flex": 1,
+                "justifyContent": "center",
+              },
+              Object {
+                "backgroundColor": "transparent",
+              },
+              Object {
+                "height": 50,
+              },
+              Object {
+                "borderColor": "#42D689",
+                "borderRadius": 3,
+                "borderWidth": 2,
+              },
+            ]
           }
         >
           <View
@@ -1553,8 +1604,7 @@ exports[`Verifying process renders the verification error state correctly 1`] = 
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
             Object {},
           ]
@@ -1570,8 +1620,8 @@ exports[`Verifying process renders the verification error state correctly 1`] = 
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -1840,6 +1890,12 @@ exports[`Verifying process renders the verification error state correctly 1`] = 
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -1847,17 +1903,24 @@ exports[`Verifying process renders the verification error state correctly 1`] = 
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#42D689",
-            "borderColor": "#42D689",
-            "borderRadius": 3,
-            "borderWidth": 2,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#42D689",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderColor": "#42D689",
+              "borderRadius": 3,
+              "borderWidth": 2,
+            },
+          ]
         }
       >
         <View
@@ -1903,52 +1966,53 @@ exports[`renders the Education step correctly 1`] = `
       "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
-      "paddingTop": 20,
     }
   }
 >
-  <View
-    style={
-      Object {
-        "height": 35,
-        "paddingRight": 10,
-        "paddingTop": 10,
-        "position": "absolute",
-        "right": 0,
-        "top": 0,
-        "width": 70,
-        "zIndex": 100,
-      }
-    }
-  >
-    <Text
-      accessible={true}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-    >
-         
-    </Text>
-  </View>
   <RCTScrollView
-    style={
+    contentContainerStyle={
       Object {
+        "alignItems": "center",
         "flex": 1,
-        "paddingHorizontal": 20,
+        "justifyContent": "center",
+        "padding": 30,
+        "paddingTop": 0,
       }
     }
   >
     <View>
       <View
         style={
+          Object {
+            "height": 35,
+            "paddingRight": 10,
+            "paddingTop": 10,
+            "position": "absolute",
+            "right": 0,
+            "top": 0,
+            "width": 70,
+            "zIndex": 100,
+          }
+        }
+      >
+        <Text
+          accessible={true}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+        >
+             
+        </Text>
+      </View>
+      <View
+        style={
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
             Object {},
           ]
@@ -1964,8 +2028,8 @@ exports[`renders the Education step correctly 1`] = `
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -1973,6 +2037,7 @@ exports[`renders the Education step correctly 1`] = `
       <Text
         style={
           Object {
+            "color": "#2E3338",
             "fontFamily": "Hind-Light",
             "fontSize": 22,
             "paddingBottom": 20,
@@ -1990,10 +2055,10 @@ exports[`renders the Education step correctly 1`] = `
               "alignItems": "center",
               "flexDirection": "row",
               "flexWrap": "nowrap",
-              "marginTop": 30,
+              "marginTop": 20,
             },
             Object {
-              "marginTop": 20,
+              "marginTop": 10,
             },
           ]
         }
@@ -2007,11 +2072,12 @@ exports[`renders the Education step correctly 1`] = `
           style={
             Array [
               Object {
-                "height": 70,
-                "width": 80,
+                "height": 50,
+                "width": 50,
               },
               Object {
                 "flex": 0,
+                "marginLeft": 10,
                 "marginRight": 20,
               },
             ]
@@ -2041,7 +2107,7 @@ exports[`renders the Education step correctly 1`] = `
             "alignItems": "center",
             "flexDirection": "row",
             "flexWrap": "nowrap",
-            "marginTop": 30,
+            "marginTop": 20,
           }
         }
       >
@@ -2054,11 +2120,12 @@ exports[`renders the Education step correctly 1`] = `
           style={
             Array [
               Object {
-                "height": 70,
-                "width": 80,
+                "height": 50,
+                "width": 50,
               },
               Object {
                 "flex": 0,
+                "marginLeft": 10,
                 "marginRight": 20,
               },
             ]
@@ -2088,7 +2155,7 @@ exports[`renders the Education step correctly 1`] = `
             "alignItems": "center",
             "flexDirection": "row",
             "flexWrap": "nowrap",
-            "marginTop": 30,
+            "marginTop": 20,
           }
         }
       >
@@ -2101,11 +2168,12 @@ exports[`renders the Education step correctly 1`] = `
           style={
             Array [
               Object {
-                "height": 70,
-                "width": 80,
+                "height": 50,
+                "width": 50,
               },
               Object {
                 "flex": 0,
+                "marginLeft": 10,
                 "marginRight": 20,
               },
             ]
@@ -2152,6 +2220,12 @@ exports[`renders the Education step correctly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -2159,15 +2233,22 @@ exports[`renders the Education step correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#42D689",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#42D689",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
         testID="VerifyContinueButton"
       >
@@ -2259,8 +2340,7 @@ exports[`renders the Input step correctly 1`] = `
           Array [
             Object {
               "alignItems": "center",
-              "marginBottom": 25,
-              "marginTop": 25,
+              "marginBottom": 20,
             },
             Object {},
           ]
@@ -2276,8 +2356,8 @@ exports[`renders the Input step correctly 1`] = `
           }
           style={
             Object {
-              "height": 50,
-              "width": 50,
+              "height": 35,
+              "width": 35,
             }
           }
         />
@@ -2286,6 +2366,7 @@ exports[`renders the Input step correctly 1`] = `
         style={
           Array [
             Object {
+              "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 22,
               "paddingBottom": 20,
@@ -2316,7 +2397,7 @@ exports[`renders the Input step correctly 1`] = `
           style={
             Array [
               Object {
-                "zIndex": 1,
+                "flex": 1,
               },
               undefined,
             ]
@@ -2329,6 +2410,7 @@ exports[`renders the Input step correctly 1`] = `
                   "borderColor": "#b9b9b9",
                   "borderRadius": 1,
                   "borderWidth": 1,
+                  "marginBottom": 0,
                 },
                 Array [
                   Object {
@@ -2589,6 +2671,12 @@ exports[`renders the Input step correctly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -2596,17 +2684,24 @@ exports[`renders the Input step correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#42D689",
-            "borderColor": "#42D689",
-            "borderRadius": 3,
-            "borderWidth": 2,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#42D689",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderColor": "#42D689",
+              "borderRadius": 3,
+              "borderWidth": 2,
+            },
+          ]
         }
         testID="VerifyInputAutomaticButton"
       >
@@ -2688,8 +2783,7 @@ exports[`renders the Verified step correctly 1`] = `
       Array [
         Object {
           "alignItems": "center",
-          "marginBottom": 25,
-          "marginTop": 25,
+          "marginBottom": 20,
         },
         Object {},
       ]
@@ -2705,8 +2799,8 @@ exports[`renders the Verified step correctly 1`] = `
       }
       style={
         Object {
-          "height": 50,
-          "width": 50,
+          "height": 35,
+          "width": 35,
         }
       }
     />
@@ -2715,6 +2809,7 @@ exports[`renders the Verified step correctly 1`] = `
     style={
       Array [
         Object {
+          "color": "#2E3338",
           "fontFamily": "Hind-Light",
           "fontSize": 22,
           "paddingBottom": 20,

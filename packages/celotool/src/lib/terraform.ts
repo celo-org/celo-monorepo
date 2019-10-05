@@ -1,56 +1,94 @@
 import fs from 'fs'
 import path from 'path'
-
-import { generateGenesisFromEnv } from '@celo/celotool/src/lib/generate_utils'
-import { envVar, execCmd, fetchEnv } from '@celo/celotool/src/lib/utils'
+import { execCmd } from './utils'
 
 const terraformModulesPath = path.join(__dirname, '../../../terraform-modules')
 
-// NOTE(trevor): The keys correspond to the variable names that Terraform expects
-// and the values correspond to the names of the appropriate env variables
-const terraformEnvVars: { [varName: string]: string } = {
-  block_time: envVar.BLOCK_TIME,
-  celo_env: envVar.CELOTOOL_CELOENV,
-  celotool_docker_image_repository: envVar.CELOTOOL_DOCKER_IMAGE_REPOSITORY,
-  celotool_docker_image_tag: envVar.CELOTOOL_DOCKER_IMAGE_TAG,
-  geth_verbosity: envVar.GETH_VERBOSITY,
-  geth_bootnode_docker_image_repository: envVar.GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY,
-  geth_bootnode_docker_image_tag: envVar.GETH_BOOTNODE_DOCKER_IMAGE_TAG,
-  geth_node_docker_image_repository: envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY,
-  geth_node_docker_image_tag: envVar.GETH_NODE_DOCKER_IMAGE_TAG,
-  mnemonic: envVar.MNEMONIC,
-  network_id: envVar.NETWORK_ID,
-  validator_count: envVar.VALIDATORS,
-  validator_geth_account_secret: envVar.GETH_ACCOUNT_SECRET,
-  verification_pool_url: envVar.VERIFICATION_POOL_URL,
+export interface TerraformVars {
+  [key: string]: string
 }
 
-export function initTerraformModule(moduleName: string) {
-  return execTerraformCmd('init', getModulePath(moduleName), getEnvVarOptions())
+// Terraform requires the `backend-config` options to configure a remote backend
+// with dynamic values
+export async function initTerraformModule(
+  moduleName: string,
+  vars: TerraformVars,
+  backendConfigVars: TerraformVars
+) {
+  const modulePath = getModulePath(moduleName)
+  return buildAndExecTerraformCmd(
+    'init',
+    modulePath,
+    modulePath,
+    getVarOptions(vars),
+    getVarOptions(backendConfigVars, 'backend-config')
+  )
 }
 
-export function planTerraformModule(moduleName: string, destroy: boolean = false) {
+export function planTerraformModule(
+  moduleName: string,
+  vars: TerraformVars,
+  destroy: boolean = false
+) {
   const planPath = getPlanPath(moduleName)
   // Terraform requires an out directory to exist
   const planDir = path.dirname(planPath)
   if (!fs.existsSync(planDir)) {
     fs.mkdirSync(planDir)
   }
-  return execTerraformCmd(
+  const modulePath = getModulePath(moduleName)
+  return buildAndExecTerraformCmd(
     'plan',
-    getModulePath(moduleName),
+    modulePath,
+    modulePath,
     `-out=${planPath}`,
-    getVarOptions(),
+    getVarOptions(vars),
     destroy ? '-destroy' : ''
   )
 }
 
 export function applyTerraformModule(moduleName: string) {
-  return execTerraformCmd('apply', getPlanPath(moduleName))
+  return buildAndExecTerraformCmd('apply', getModulePath(moduleName), getPlanPath(moduleName))
 }
 
-export function destroyTerraformModule(moduleName: string) {
-  return execTerraformCmd('destroy', getModulePath(moduleName), getVarOptions(), '-force')
+export function destroyTerraformModule(moduleName: string, vars: TerraformVars) {
+  return buildAndExecTerraformCmd(
+    'destroy',
+    getModulePath(moduleName),
+    getVarOptions(vars),
+    '-force'
+  )
+}
+
+export function taintTerraformModuleResource(moduleName: string, resourceName: string) {
+  return execTerraformCmd(`terraform taint ${resourceName}`, getModulePath(moduleName), false)
+}
+
+export function untaintTerraformModuleResource(moduleName: string, resourceName: string) {
+  return execTerraformCmd(`terraform untaint ${resourceName}`, getModulePath(moduleName), false)
+}
+
+// pulls remote state
+function refreshTerraformModule(moduleName: string, vars: TerraformVars) {
+  return buildAndExecTerraformCmd('refresh', getModulePath(moduleName), getVarOptions(vars))
+}
+
+export async function getTerraformModuleOutputs(
+  moduleName: string,
+  vars: TerraformVars,
+  backendConfigVars: TerraformVars
+) {
+  await initTerraformModule(moduleName, vars, backendConfigVars)
+  await refreshTerraformModule(moduleName, vars)
+  const modulePath = getModulePath(moduleName)
+  const [output] = await execCmd(`cd ${modulePath} && terraform output -json`)
+  return JSON.parse(output)
+}
+
+// returns an array of resource and data names in the current state
+export async function getTerraformModuleResourceNames(moduleName: string) {
+  const [output] = await execTerraformCmd(`terraform state list`, getModulePath(moduleName), false)
+  return output.split('\n')
 }
 
 function getModulePath(moduleName: string) {
@@ -61,26 +99,34 @@ function getPlanPath(moduleName: string) {
   return path.join(terraformModulesPath, 'plan', moduleName)
 }
 
-function getVarOptions() {
-  const genesisBuffer = new Buffer(generateGenesisFromEnv())
-  return [
-    getEnvVarOptions(),
-    `-var='genesis_content_base64=${genesisBuffer.toString('base64')}'`,
-  ].join(' ')
-}
-
-// Uses the `terraformEnvVars` mapping to create terraform cli options
-// for each variable using values from env vars
-function getEnvVarOptions() {
-  const nameValuePairs = Object.keys(terraformEnvVars).map(
-    (varName) => `-var='${varName}=${fetchEnv(terraformEnvVars[varName])}'`
+// Uses a TerraformVars object to generate command line var options for Terraform
+function getVarOptions(vars: TerraformVars, optionName: string = 'var') {
+  const nameValuePairs = Object.keys(vars).map(
+    (varName) => `-${optionName}='${varName}=${vars[varName]}'`
   )
   return nameValuePairs.join(' ')
 }
 
-function execTerraformCmd(command: string, workspacePath: string, ...options: string[]) {
-  const optionsStr = options ? options.join(' ') : ''
-  const cmd = `terraform ${command} -input=false ${optionsStr} ${workspacePath}`
+function execTerraformCmd(command: string, modulePath: string, pipeOutput: boolean) {
   // use the middle two default arguments
-  return execCmd(cmd, {}, false, true)
+  return execCmd(`cd ${modulePath} && ${command}`, {}, false, pipeOutput)
+}
+
+// `modulePath` is the path to the module that will be cd'd into. We change
+// directories for each module so that module-specific configurations
+// that are stored in the local .terraform directories do not conflict.
+// `cmdPath` is the path to be provided to the terraform command
+function buildAndExecTerraformCmd(
+  commandName: string,
+  modulePath: string,
+  cmdPath: string,
+  ...options: string[]
+) {
+  const terraformCmd = buildTerraformCmd(commandName, cmdPath, ...options)
+  return execTerraformCmd(terraformCmd, modulePath, true)
+}
+
+function buildTerraformCmd(command: string, cmdPath: string, ...options: string[]) {
+  const optionsStr = options ? options.join(' ') : ''
+  return `terraform ${command} -input=false ${optionsStr} ${cmdPath}`
 }

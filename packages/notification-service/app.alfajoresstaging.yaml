@@ -1,5 +1,4 @@
-runtime: nodejs
-env: flex
+runtime: nodejs10
 service: alfajoresstaging
 instance_class: B4
 manual_scaling:

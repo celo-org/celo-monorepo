@@ -44,7 +44,9 @@ class DisconnectBanner extends React.PureComponent<Props> {
         <Text style={fontStyles.bold}>{t('poorConnection.0')}</Text> {t('poorConnection.1')}
       </Text>
     ) : (
-      <Text style={[styles.text, styles.textGrey, fontStyles.bold]}>{t('connectingToCelo')}</Text>
+      <Text style={[styles.text, styles.textGrey, fontStyles.bold]} testID="connectingToCeloBanner">
+        {t('connectingToCelo')}
+      </Text>
     )
   }
 }
@@ -56,6 +58,8 @@ const styles = StyleSheet.create({
   text: {
     ...fontStyles.bodySmall,
     textAlign: 'center',
+    // Unset explicit lineHeight set by fonts.tsx otherwise the text is not centered vertically
+    lineHeight: undefined,
   },
   textGrey: {
     color: colors.disconnectBannerGrey,

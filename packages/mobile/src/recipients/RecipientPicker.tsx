@@ -4,7 +4,7 @@ import ForwardChevron from '@celo/react-components/icons/ForwardChevron'
 import QRCode from '@celo/react-components/icons/QRCode'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
-import { isValidAddress } from '@celo/utils/lib/src/signatureUtils'
+import { isValidAddress } from '@celo/utils/lib/signatureUtils'
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import { TranslationFunction } from 'i18next'
 import * as React from 'react'
@@ -64,6 +64,7 @@ interface Section {
 }
 
 interface Props {
+  testID?: string
   showQRCode: boolean
   searchQuery: string
   sections: Section[]
@@ -232,7 +233,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     const showFooter = sections.length > 0
 
     return (
-      <View style={style.body}>
+      <View style={style.body} testID={this.props.testID}>
         <DisconnectBanner />
         <LabeledTextInput
           keyboardType="default"

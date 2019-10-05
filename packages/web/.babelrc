@@ -6,7 +6,8 @@
       {
         "root": ["./"],
         "alias": {
-          "src": "./src"
+          "src": "./src",
+          "server": "./server"
         }
       }
     ],

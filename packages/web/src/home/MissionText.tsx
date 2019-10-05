@@ -14,7 +14,7 @@ function MissionText({ t }: I18nProps) {
       allStyle={standardStyles.centered}
     >
       <Cell span={Spans.half}>
-        <H1 style={[textStyles.center, standardStyles.elementalMarginBottom]}>
+        <H1 ariaLevel="2" style={[textStyles.center, standardStyles.elementalMarginBottom]}>
           {t('missionMeaning')}
         </H1>
         <Text style={fonts.p}>{t('missionText')}</Text>

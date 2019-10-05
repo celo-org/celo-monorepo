@@ -2,7 +2,6 @@ import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
-import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
@@ -13,8 +12,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
-import { EscrowedPayment, reclaimPayment } from 'src/escrow/actions'
+import { EscrowedPayment, reclaimEscrowPayment } from 'src/escrow/actions'
 import ReclaimPaymentConfirmationCard from 'src/escrow/ReclaimPaymentConfirmationCard'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, { CalculateFeeChildren } from 'src/fees/CalculateFee'
@@ -34,17 +32,17 @@ interface StateProps {
   isReclaiming: boolean
   e164PhoneNumber: string
   account: string | null
-  dollarBalance: BigNumber
+  dollarBalance: string
   appConnected: boolean
 }
 
 interface DispatchProps {
-  reclaimPayment: typeof reclaimPayment
+  reclaimPayment: typeof reclaimEscrowPayment
   showError: typeof showError
 }
 
 const mapDispatchToProps = {
-  reclaimPayment,
+  reclaimPayment: reclaimEscrowPayment,
   showError,
 }
 
@@ -53,7 +51,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     isReclaiming: state.escrow.isReclaiming,
     e164PhoneNumber: state.account.e164PhoneNumber,
     account: currentAccountSelector(state),
-    dollarBalance: new BigNumber(state.stableToken.balance || 0),
+    dollarBalance: state.stableToken.balance || '0',
     appConnected: isAppConnected(state),
   }
 }
@@ -83,7 +81,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
       this.props.reclaimPayment(escrowedPayment.paymentID)
     } catch (error) {
       Logger.error(TAG, 'Reclaiming escrowed payment failed, show error message', error)
-      this.props.showError(ErrorMessages.RECLAIMING_ESCROWED_PAYMENT_FAILED, ALERT_BANNER_DURATION)
+      this.props.showError(ErrorMessages.RECLAIMING_ESCROWED_PAYMENT_FAILED)
       return
     }
   }
@@ -106,13 +104,11 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
   }
 
   renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
-    const { t, isReclaiming, appConnected } = this.props
+    const { t, isReclaiming, appConnected, dollarBalance } = this.props
     const payment = this.getReclaimPaymentInput()
-    const fee = asyncFee.result && getFeeDollars(asyncFee.result)
+    const fee = getFeeDollars(asyncFee.result)
     const convertedAmount = divideByWei(payment.amount.valueOf())
-
-    const currentBalance = this.props.dollarBalance
-    const userHasEnough = fee && fee.isLessThanOrEqualTo(currentBalance)
+    const userHasEnough = fee && fee.isLessThanOrEqualTo(dollarBalance)
 
     return (
       <View style={styles.container}>
@@ -135,7 +131,6 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
           <ReclaimPaymentConfirmationCard
             recipientPhone={payment.recipientPhone}
             recipientContact={payment.recipientContact}
-            comment={payment.message}
             amount={convertedAmount}
             currency={CURRENCY_ENUM.DOLLAR} // User can only request in Dollars
             fee={fee}

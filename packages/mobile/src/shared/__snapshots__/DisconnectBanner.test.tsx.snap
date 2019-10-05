@@ -8,7 +8,7 @@ exports[`renders banner when app is disconnected 1`] = `
         "color": "#2E3338",
         "fontFamily": "Hind-Regular",
         "fontSize": 14,
-        "lineHeight": 18,
+        "lineHeight": undefined,
         "textAlign": "center",
       },
       Object {
@@ -19,6 +19,7 @@ exports[`renders banner when app is disconnected 1`] = `
       },
     ]
   }
+  testID="connectingToCeloBanner"
 >
   connectingToCelo
 </Text>

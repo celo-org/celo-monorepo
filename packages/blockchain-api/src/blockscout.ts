@@ -1,7 +1,7 @@
 import { RESTDataSource } from 'apollo-datasource-rest'
 import BigNumber from 'bignumber.js'
 import {
-  ABE_ADDRESS,
+  ATTESTATIONS_ADDRESS,
   BLOCKSCOUT_API,
   CONTRACT_SYMBOL_MAPPING,
   FAUCET_ADDRESS,
@@ -29,7 +29,7 @@ const MODULE_ACTIONS = {
   },
 }
 
-interface BlockscoutTransaction {
+export interface BlockscoutTransaction {
   value: string
   txreceipt_status: string
   transactionIndex: string
@@ -181,8 +181,8 @@ function resolveTransferEventType(
   if (eventToAddress === userAddress && eventFromAddress === FAUCET_ADDRESS) {
     return [EventTypes.FAUCET, FAUCET_ADDRESS]
   }
-  if (eventToAddress === ABE_ADDRESS && eventFromAddress === userAddress) {
-    return [EventTypes.VERIFICATION_FEE, ABE_ADDRESS]
+  if (eventToAddress === ATTESTATIONS_ADDRESS && eventFromAddress === userAddress) {
+    return [EventTypes.VERIFICATION_FEE, ATTESTATIONS_ADDRESS]
   }
   if (eventToAddress === userAddress && eventFromAddress === VERIFICATION_REWARDS_ADDRESS) {
     return [EventTypes.VERIFICATION_REWARD, VERIFICATION_REWARDS_ADDRESS]

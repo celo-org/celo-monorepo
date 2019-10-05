@@ -3,7 +3,7 @@ import CopyIcon from '@celo/react-components/icons/Copy'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
-import { stripHexLeader } from '@celo/utils/src/commentEncryption'
+import { stripHexLeader } from '@celo/utils/src/signatureUtils'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { Clipboard, ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -17,7 +17,6 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CancelButton from 'src/components/CancelButton'
 import DevSkipButton from 'src/components/DevSkipButton'
-import { ALERT_BANNER_DURATION } from 'src/config'
 import GethAwareButton from 'src/geth/GethAwareButton'
 import i18n, { Namespaces } from 'src/i18n'
 import NuxLogo from 'src/icons/NuxLogo'
@@ -154,7 +153,7 @@ export class Verifying extends React.Component<Props, State> {
       this.props.hideAlert()
       const message = await Clipboard.getString()
       if (!message) {
-        this.props.showError(ErrorMessages.EMPTY_ATTESTATION_CODE, ALERT_BANNER_DURATION)
+        this.props.showError(ErrorMessages.EMPTY_ATTESTATION_CODE)
         return
       }
       Logger.debug(TAG + '@onPasteVerificationCode', 'Submitting code manually')
@@ -162,7 +161,7 @@ export class Verifying extends React.Component<Props, State> {
       this.props.receiveVerificationMessage(message, CodeInputType.MANUAL)
     } catch (error) {
       Logger.error(TAG, 'Error during manual code input', error)
-      this.props.showError(ErrorMessages.INVALID_ATTESTATION_CODE, ALERT_BANNER_DURATION)
+      this.props.showError(ErrorMessages.INVALID_ATTESTATION_CODE)
       this.setState({ isCodeSubmitting: false })
     }
   }

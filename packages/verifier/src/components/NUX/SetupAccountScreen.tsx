@@ -57,7 +57,7 @@ const mapDispatchToProps = {
 }
 
 class SetupAccountScreen extends React.Component<Props, State> {
-  state = {
+  state: State = {
     name: null,
     e164Number: null,
     countryCode: null,
@@ -82,7 +82,7 @@ class SetupAccountScreen extends React.Component<Props, State> {
     this.props.setName(name)
 
     const fcmToken = await VerifierService.getFCMToken()
-    setVerifier({
+    await setVerifier({
       name,
       phoneNum: e164Number,
       fcmToken,
