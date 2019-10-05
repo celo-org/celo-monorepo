@@ -166,10 +166,11 @@ jobs:
       - run: brew install wget
       - run: wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | bash
       - run: printf '\n' >> ~/.bash_profile && echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bash_profile # add nvm to path
+      - run: source ~/.bash_profile
       - run: nvm install v10.16.3 && nvm use v10.16.3
       - run: cd ~/src/
       - run: yarn && yarn build
-      - #detox
+      # - detox
       - run:
           name: Run Tests
           command: ./gradlew app:connectedAndroidTest
