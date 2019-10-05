@@ -392,8 +392,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
    * @return True upon success.
    */
-  function updateValidatorScore(address validator, uint256 uptime) external onlyVm() returns (bool) {
-    return _updateValidatorScore(validator, uptime);
+  function updateValidatorScore(address validator, uint256 uptime) external onlyVm() {
+    _updateValidatorScore(validator, uptime);
   }
 
   /**
@@ -402,7 +402,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param uptime The Fixidity representation of the validator's uptime, between 0 and 1.
    * @return True upon success.
    */
-  function _updateValidatorScore(address validator, uint256 uptime) internal returns (bool) {
+  function _updateValidatorScore(address validator, uint256 uptime) internal {
     address account = getLockedGold().getAccountFromValidator(validator);
     require(isValidator(account), "isvalidator");
     require(uptime <= FixidityLib.fixed1().unwrap(), "uptime");
@@ -425,14 +425,13 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
         newComponent.add(currentComponent).unwrap()
       )
     );
-    return true;
   }
 
-  function distributeEpochPayment(address validator) external onlyVm() returns (bool) {
-    return _distributeEpochPayment(validator);
+  function distributeEpochPayment(address validator) external onlyVm() {
+    _distributeEpochPayment(validator);
   }
 
-  function _distributeEpochPayment(address validator) internal returns (bool) {
+  function _distributeEpochPayment(address validator) internal {
     address account = getLockedGold().getAccountFromValidator(validator);
     require(isValidator(account));
     FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(validatorEpochPayment).multiply(validators[account].score);

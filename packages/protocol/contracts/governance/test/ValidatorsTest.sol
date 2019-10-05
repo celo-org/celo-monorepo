@@ -12,11 +12,11 @@ contract ValidatorsTest is Validators {
     return block.number / 100;
   }
 
-  function updateValidatorScore(address validator, uint256 uptime) external returns (bool) {
+  function updateValidatorScore(address validator, uint256 uptime) external {
     return _updateValidatorScore(validator, uptime);
   }
 
-  function distributeEpochPayment(address validator) external returns (bool) {
+  function distributeEpochPayment(address validator) external {
     return _distributeEpochPayment(validator);
   }
 }
