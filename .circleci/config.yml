@@ -165,8 +165,7 @@ jobs:
       #     background: true
       - run: brew install wget
       - run: wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | bash
-      - run: `[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"`  # This loads nvm
-      - run: `[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"`  # This loads nvm bash_completion
+      - run: printf '\n' >> ~/.bash_profile && echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bash_profile # add nvm to path
       - run: nvm install v10.16.3 && nvm use v10.16.3
       - run: cd ~/src/
       - run: yarn && yarn build
