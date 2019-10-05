@@ -12,7 +12,7 @@ reference:
   android_config: &android_config
     working_directory: *workspace
     macos:
-      xcode: "9.4.0"
+      xcode: "10.2.1"
     shell: /bin/bash --login -eo pipefail
     environment:
       TERM: dumb
@@ -147,6 +147,7 @@ jobs:
             echo 'export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"' >> $BASH_ENV
             echo 'export QEMU_AUDIO_DRV=none' >> $BASH_ENV
             echo 'export JAVA_HOME=/Library/Java/Home' >> $BASH_ENV
+            export PATH=$PATH:/usr/local/share/android-sdk/platform-tools/
       - run:
           name: Install Android sdk
           command: |
@@ -156,11 +157,20 @@ jobs:
           name: Install emulator dependencies
           command: (yes | sdkmanager "platform-tools" "platforms;android-26" "extras;intel;Hardware_Accelerated_Execution_Manager" "build-tools;26.0.0" "system-images;android-26;google_apis;x86" "emulator" --verbose) || true > /dev/null
       # - *download_android_dependencies
+      - run: brew cask install android-platform-tools
       - run: avdmanager create avd -n Nexus_5X_API_28_x86 -k "system-images;android-26;google_apis;x86" -g google_apis -d "Nexus 5"
       - run:
           name: Run emulator in background
           command: /usr/local/share/android-sdk/tools/emulator @Nexus_5X_API_28_x86 -skin 1080x2066 -memory 2048 -noaudio
           background: true
+      - run: brew install wget
+      - run: wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | bash
+      - run: [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+      - run: [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+      - run: nvm install v10.16.3 && nvm use v10.16.3
+      - run: cd ~/src/
+      - run: yarn && yarn build
+      - #detox
       - run:
           name: Run Tests
           command: ./gradlew app:connectedAndroidTest
