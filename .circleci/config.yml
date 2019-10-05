@@ -146,7 +146,7 @@ jobs:
             echo 'export ANDROID_SDK_HOME="/usr/local/share/android-sdk"' >> $BASH_ENV
             echo 'export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"' >> $BASH_ENV
             echo 'export QEMU_AUDIO_DRV=none' >> $BASH_ENV
-            echo 'export JAVA_HOME=/Library/Java/Home' >> $BASH_ENV
+            # echo 'export JAVA_HOME=/Library/Java/Home' >> $BASH_ENV
             export PATH=$PATH:/usr/local/share/android-sdk/platform-tools/
       - run:
           name: Install Android sdk
@@ -571,13 +571,13 @@ workflows:
   celo-monorepo-build:
     jobs:
       - install_dependencies
-      - ui_test:
-          requires:
-            - install_dependencies
-            - mobile-test-build-app
-      - lint-checks:
-          requires:
-            - install_dependencies
+      - ui_test #:
+      #     requires:
+      #       - install_dependencies
+      #       - mobile-test-build-app
+      # - lint-checks:
+      #     requires:
+      #       - install_dependencies
       # - general-test:
       #     requires:
       #       - install_dependencies
