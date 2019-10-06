@@ -163,7 +163,7 @@ jobs:
       #     name: Run emulator in background
       #     command: /usr/local/share/android-sdk/tools/emulator @Nexus_5X_API_28_x86 -skin 1080x2066 -memory 2048 -noaudio
       #     background: true
-      - run: echo `. ~/.bash_profile`
+      - run: echo `. ~/.bash_profile` # for some mreason just `source ~/.bash_profile` makes the build fail
       - run: brew install wget
       - run: brew install pidcat
       - run: brew install watchman
@@ -183,7 +183,7 @@ jobs:
       # - detox
       - run:
           name: Run Tests
-          command: yarn test:dry-run-e2e
+          command: cd ~/src/packages/mobile && yarn test:dry-run-e2e
   
   lint-checks:
     <<: *defaults
