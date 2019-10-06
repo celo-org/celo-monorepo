@@ -9,7 +9,12 @@ import "../../common/FixidityLib.sol";
 contract ValidatorsTest is Validators {
 
   function getEpochNumber() public view returns (uint256) {
-    return block.number / 100;
+    uint256 epoch = 100;
+    uint256 ret = block.number / epoch;
+    if (block.number % epoch == 0) {
+      ret = ret - 1;
+    }
+    return ret;
   }
 
   function updateValidatorScore(address validator, uint256 uptime) external {

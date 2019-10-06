@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import { assert } from 'chai'
 import Web3 from 'web3'
 import {
@@ -33,7 +34,7 @@ describe('governance tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
-    await context.hooks.before()
+    // await context.hooks.before()
   })
 
   after(context.hooks.after)
@@ -64,9 +65,7 @@ describe('governance tests', () => {
       return groupInfo[2]
     } else {
       const [groupAddress] = await validators.methods.getRegisteredValidatorGroups().call()
-      console.log('group address', groupAddress)
       const groupInfo = await validators.methods.getValidatorGroup(groupAddress).call()
-      console.log('group info', groupInfo)
       return groupInfo[2]
     }
   }
@@ -109,20 +108,17 @@ describe('governance tests', () => {
     return tx.send({ from: group, ...txOptions, gas })
   }
 
-  /*
-  const getLastEpochBlock = (blockNumber: number, epochSize: number) => {
-    const epochNumber = Math.floor(blockNumber / epochSize)
-    return epochNumber * epochSize
+  const isLastBlockOfEpoch = (blockNumber: number, epochSize: number) => {
+    return blockNumber % epochSize == 0
   }
-  */
 
-  describe.only('when the validator set is changing', () => {
+  describe('when the validator set is changing', () => {
     const epoch = 10
     const blockNumbers: number[] = []
+    let allValidators: string[]
     before(async function() {
       this.timeout(0)
       await restart()
-      console.log('getting keys')
       const [groupAddress, groupPrivateKey] = await getValidatorGroupKeys()
 
       const groupInstance = {
@@ -135,25 +131,22 @@ describe('governance tests', () => {
         peers: [await getEnode(8545)],
       }
       await initAndStartGeth(context.hooks.gethBinaryPath, groupInstance)
-      const members = await getValidatorGroupMembers()
-      assert.equal(members.length, 5)
+      allValidators = await getValidatorGroupMembers()
+      assert.equal(allValidators.length, 5)
 
       // Give the node time to sync.
       await sleep(15)
       const groupWeb3 = new Web3('ws://localhost:8567')
       const groupKit = newKitFromWeb3(groupWeb3)
       validators = await groupKit._web3Contracts.getValidators()
-      const membersToSwap = [members[0], members[1]]
+      const membersToSwap = [allValidators[0], allValidators[1]]
       let includedMemberIndex = 1
-      console.log('removing member')
       await removeMember(groupWeb3, groupAddress, membersToSwap[0])
-      console.log('removed member')
 
       const changeValidatorSet = async (header: any) => {
         blockNumbers.push(header.number)
         // At the start of epoch N, swap members so the validator set is different for epoch N + 1.
-        if (header.number % epoch === 0) {
-          console.log('new epoch')
+        if (header.number % epoch === 1) {
           const memberToRemove = membersToSwap[includedMemberIndex]
           const memberToAdd = membersToSwap[(includedMemberIndex + 1) % 2]
           await removeMember(groupWeb3, groupAddress, memberToRemove)
@@ -168,82 +161,224 @@ describe('governance tests', () => {
       const subscription = await groupWeb3.eth.subscribe('newBlockHeaders')
       subscription.on('data', changeValidatorSet)
       // Wait for a few epochs while changing the validator set.
-      await sleep(epoch * 3)
+      await sleep(epoch * 4)
       ;(subscription as any).unsubscribe()
       // Wait for the current epoch to complete.
       await sleep(epoch)
     })
 
+    // Note that this returns the validator set at the END of `blockNumber`, i.e. the validator set
+    // that will validate the next block, and NOT necessarily the validator set that validated this
+    // block.
+    const getValidatorSetAtBlock = async (blockNumber: number) => {
+      const validatorSetSize = await election.methods
+        .numberValidatorsInCurrentSet()
+        .call({}, blockNumber)
+      const validatorSet = []
+      for (let i = 0; i < validatorSetSize; i++) {
+        validatorSet.push(
+          await election.methods.validatorAddressFromCurrentSet(i).call({}, blockNumber)
+        )
+      }
+      return validatorSet
+    }
+
     it('should always return a validator set size equal to the number of group members at the end of the last epoch', async () => {
       for (const blockNumber of blockNumbers) {
-        const lastEpochBlock = blockNumber - (blockNumber % epoch) - 1
+        const lastEpochBlock = blockNumber - (blockNumber % epoch)
         const validatorSetSize = await election.methods
           .numberValidatorsInCurrentSet()
           .call({}, blockNumber)
         const groupMembership = await getValidatorGroupMembers(lastEpochBlock)
-        console.log(blockNumber, lastEpochBlock, validatorSetSize, groupMembership.length)
-        // assert.equal(validatorSetSize, groupMembership.length)
+        assert.equal(validatorSetSize, groupMembership.length)
       }
     })
 
     it('should always return a validator set equal to the group members at the end of the last epoch', async () => {
       for (const blockNumber of blockNumbers) {
-        const lastEpochBlock = blockNumber - (blockNumber % epoch) - 1
+        const lastEpochBlock = blockNumber - (blockNumber % epoch)
         const groupMembership = await getValidatorGroupMembers(lastEpochBlock)
-        const validatorSetSize = await election.methods
-          .numberValidatorsInCurrentSet()
-          .call({}, blockNumber)
-        const validatorSet = []
-        for (let i = 0; i < validatorSetSize; i++) {
-          const validator = await election.methods
-            .validatorAddressFromCurrentSet(i)
-            .call({}, blockNumber)
-          validatorSet.push(validator)
-        }
-        // assert.deepEqual(groupMembership, validatorSet)
-        console.log(blockNumber, lastEpochBlock, groupMembership, validatorSet)
+        const validatorSet = await getValidatorSetAtBlock(blockNumber)
+        assert.sameMembers(groupMembership, validatorSet)
       }
     })
 
     it('should only have created blocks whose miner was in the current validator set', async () => {
       for (const blockNumber of blockNumbers) {
-        const validatorSetSize = await election.methods
-          .numberValidatorsInCurrentSet()
-          .call({}, blockNumber)
-        const validatorSet = []
-        for (let i = 0; i < validatorSetSize; i++) {
-          const validator = await election.methods
-            .validatorAddressFromCurrentSet(i)
-            .call({}, blockNumber)
-          validatorSet.push(validator)
-        }
+        // The validators responsible for creating `blockNumber` were those in the validator set at
+        // `blockNumber-1`.
+        const validatorSet = await getValidatorSetAtBlock(blockNumber - 1)
         const block = await web3.eth.getBlock(blockNumber)
         assert.include(validatorSet.map((x) => x.toLowerCase()), block.miner.toLowerCase())
       }
     })
 
     it('should update the validator scores at the end of each epoch', async () => {
-      const validators = await kit.contracts.getValidators()
+      const validators = await kit._web3Contracts.getValidators()
+      const adjustmentSpeed = fromFixed(
+        new BigNumber((await validators.methods.getValidatorScoreParameters().call())[1])
+      )
+      const uptime = 1
+
+      const assertScoreUnchanged = async (validator: string, blockNumber: number) => {
+        const score = new BigNumber(
+          (await validators.methods.getValidator(validator).call({}, blockNumber))[4]
+        )
+        const previousScore = new BigNumber(
+          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[4]
+        )
+        assert.equal(score.toFixed(), previousScore.toFixed())
+      }
+
+      const assertScoreChanged = async (validator: string, blockNumber: number) => {
+        const score = new BigNumber(
+          (await validators.methods.getValidator(validator).call({}, blockNumber))[4]
+        )
+        const previousScore = new BigNumber(
+          (await validators.methods.getValidator(validator).call({}, blockNumber - 1))[4]
+        )
+        const expectedScore = adjustmentSpeed
+          .times(uptime)
+          .plus(new BigNumber(1).minus(adjustmentSpeed).times(fromFixed(previousScore)))
+        assert.equal(score.toFixed(), toFixed(expectedScore).toFixed())
+      }
+
       for (const blockNumber of blockNumbers) {
-        const validatorSetSize = await election.methods
-          .numberValidatorsInCurrentSet()
-          .call({}, blockNumber)
-        const validatorSet = []
-        for (let i = 0; i < validatorSetSize; i++) {
-          const validator = await election.methods
-            .validatorAddressFromCurrentSet(i)
-            .call({}, blockNumber)
-          validatorSet.push(validator)
-          if (false) {
-            console.log(await validators.getValidator(validator))
-          }
+        let expectUnchangedScores: string[]
+        let expectChangedScores: string[]
+        if (isLastBlockOfEpoch(blockNumber, epoch)) {
+          expectChangedScores = await getValidatorSetAtBlock(blockNumber - 1)
+          expectUnchangedScores = allValidators.filter((x) => !expectChangedScores.includes(x))
+        } else {
+          expectUnchangedScores = allValidators
+          expectChangedScores = []
+        }
+
+        for (const validator of expectUnchangedScores) {
+          await assertScoreUnchanged(validator, blockNumber)
+        }
+
+        for (const validator of expectChangedScores) {
+          await assertScoreChanged(validator, blockNumber)
         }
       }
     })
 
-    it('should distribute epoch payments to each validator at the end of an epoch', async () => {})
+    it('should distribute epoch payments at the end of each epoch', async () => {
+      const validators = await kit._web3Contracts.getValidators()
+      const stableToken = await kit._web3Contracts.getStableToken()
+      const commission = 0.1
+      const validatorEpochPayment = new BigNumber(
+        await validators.methods.validatorEpochPayment().call()
+      )
+      const [group] = await validators.methods.getRegisteredValidatorGroups().call()
 
-    it('should distribute epoch payments to the validator group at the end of an epoch', async () => {})
+      const assertBalanceUnchanged = async (validator: string, blockNumber: number) => {
+        const currentBalance = new BigNumber(
+          await stableToken.methods.balanceOf(validator).call({}, blockNumber)
+        )
+        const previousBalance = new BigNumber(
+          await stableToken.methods.balanceOf(validator).call({}, blockNumber - 1)
+        )
+        assert.equal(currentBalance.toFixed(), previousBalance.toFixed())
+      }
+
+      const assertBalanceChanged = async (
+        validator: string,
+        blockNumber: number,
+        expected: BigNumber
+      ) => {
+        const currentBalance = new BigNumber(
+          await stableToken.methods.balanceOf(validator).call({}, blockNumber)
+        )
+        const previousBalance = new BigNumber(
+          await stableToken.methods.balanceOf(validator).call({}, blockNumber - 1)
+        )
+        assert.equal(expected.toFixed(), currentBalance.minus(previousBalance).toFixed())
+      }
+
+      const getExpectedTotalPayment = async (validator: string, blockNumber: number) => {
+        const score = new BigNumber(
+          (await validators.methods.getValidator(validator).call({}, blockNumber))[4]
+        )
+        return validatorEpochPayment.times(fromFixed(score))
+      }
+
+      for (const blockNumber of blockNumbers) {
+        let expectUnchangedBalances: string[]
+        let expectChangedBalances: string[]
+        if (isLastBlockOfEpoch(blockNumber, epoch)) {
+          expectChangedBalances = await getValidatorSetAtBlock(blockNumber - 1)
+          expectUnchangedBalances = allValidators.filter((x) => !expectChangedBalances.includes(x))
+        } else {
+          expectUnchangedBalances = allValidators
+          expectChangedBalances = []
+        }
+
+        for (const validator of expectUnchangedBalances) {
+          await assertBalanceUnchanged(validator, blockNumber)
+        }
+
+        let expectedGroupPayment = new BigNumber(0)
+        for (const validator of expectChangedBalances) {
+          const expectedTotalPayment = await getExpectedTotalPayment(validator, blockNumber)
+          const groupPayment = expectedTotalPayment.times(commission)
+          await assertBalanceChanged(
+            validator,
+            blockNumber,
+            expectedTotalPayment.minus(groupPayment)
+          )
+          expectedGroupPayment = expectedGroupPayment.plus(groupPayment)
+        }
+        await assertBalanceChanged(group, blockNumber, expectedGroupPayment)
+      }
+    })
+
+    it('should distribute epoch rewards at the end of each epoch', async () => {
+      const validators = await kit._web3Contracts.getValidators()
+      const election = await kit._web3Contracts.getElection()
+      // const lockedGold = await kit._web3Contracts.getLockedGold()
+      const epochReward = new BigNumber(10).pow(18)
+      const [group] = await validators.methods.getRegisteredValidatorGroups().call()
+
+      const assertVotesUnchanged = async (group: string, blockNumber: number) => {
+        const currentVotes = new BigNumber(
+          await election.methods.getGroupTotalVotes(group).call({}, blockNumber)
+        )
+        const previousVotes = new BigNumber(
+          await election.methods.getGroupTotalVotes(group).call({}, blockNumber - 1)
+        )
+        assert.equal(currentVotes.toFixed(), previousVotes.toFixed())
+      }
+
+      const assertVotesChanged = async (
+        group: string,
+        blockNumber: number,
+        expected: BigNumber
+      ) => {
+        const currentVotes = new BigNumber(
+          await election.methods.getGroupTotalVotes(group).call({}, blockNumber)
+        )
+        const previousVotes = new BigNumber(
+          await election.methods.getGroupTotalVotes(group).call({}, blockNumber - 1)
+        )
+        console.log(
+          currentVotes.toFixed(),
+          previousVotes.toFixed(),
+          expected.toFixed(),
+          currentVotes.minus(previousVotes).toFixed()
+        )
+        assert.equal(expected.toFixed(), currentVotes.minus(previousVotes).toFixed())
+      }
+
+      for (const blockNumber of blockNumbers) {
+        if (isLastBlockOfEpoch(blockNumber, epoch)) {
+          await assertVotesChanged(group, blockNumber, epochReward)
+        } else {
+          await assertVotesUnchanged(group, blockNumber)
+        }
+      }
+    })
   })
 
   describe('after the governance smart contract is registered', () => {
@@ -295,7 +430,6 @@ describe('governance tests', () => {
         b.plus(total)
       )
       assert.isAtLeast(expectedGoldTotalSupply.toNumber(), goldGenesisSupply.toNumber())
-      //
       assert.equal(goldTotalSupply.toString(), expectedGoldTotalSupply.toString())
     })
   })

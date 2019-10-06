@@ -45,7 +45,7 @@ contract MockValidators is IValidators {
     members[group] = _members;
   }
 
-  function getTopValidatorsFromGroup(
+  function getTopGroupValidators(
     address group,
     uint256 n
   )

@@ -157,6 +157,15 @@ contract('FixidityLib', () => {
       assertEqualBN(result, expected)
     })
 
+    it('should multiply two numbers less than 1', async () => {
+      const a = toFixed(0.1)
+      const b = toFixed(new BigNumber(10).pow(-14))
+      const expected = toFixed(new BigNumber(10).pow(-15))
+      const result = await fixidityTest.multiply(a, b)
+
+      assertEqualBN(result, expected)
+    })
+
     it('should multiply by 0', async () => {
       const result = await fixidityTest.multiply(maxFixedMul, zero)
 

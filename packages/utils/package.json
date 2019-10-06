@@ -29,7 +29,7 @@
     "web3-utils": "1.0.0-beta.37",
     "keccak256": "^1.0.0",
     "buffer-reverse": "^1.0.1",
-    "bigi": "^1.1.0"    
+    "bigi": "^1.1.0"
   },
   "devDependencies": {
     "@celo/typescript": "0.0.1",

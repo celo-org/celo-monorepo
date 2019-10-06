@@ -43,9 +43,9 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
   }
 
   struct TotalVotes {
-    // The total number of votes cast.
+    // The total number of votes cast, including those for ineligible Validator Groups.
     uint256 total;
-    // A list of eligible ValidatorGroups sorted by total votes.
+    // A list of eligible Validator Groups sorted by total votes.
     SortedLinkedList.List eligible;
   }
 
@@ -436,6 +436,24 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     return votes.total.eligible.contains(group);
   }
 
+  function distributeEpochRewards(address group, uint256 value, address lesser, address greater) external {
+    require(msg.sender == address(0));
+    _distributeEpochRewards(group, value, lesser, greater);
+  }
+
+  function _distributeEpochRewards(address group, uint256 value, address lesser, address greater) internal {
+    // TODO(asa): What do here?
+    if (votes.active.total[group] == 0) {
+    }
+    if (votes.total.eligible.contains(group)) {
+      uint256 newVoteTotal = votes.total.eligible.getValue(group).add(value);
+      votes.total.eligible.update(group, newVoteTotal, lesser, greater);
+    }
+    
+    votes.active.total[group] = votes.active.total[group].add(value);
+    votes.total.total = votes.total.total.add(value);
+  }
+
   /**
    * @notice Increments the number of total votes for `group` by `value`.
    * @param group The validator group whose vote total should be incremented.
@@ -646,7 +664,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
   function getEligibleValidatorGroupsVoteTotals()
     external
     view
-    returns (address[] memory, uint256[] memory)
+    returns (address[] memory groups, uint256[] memory values)
   {
     return votes.total.eligible.getElements();
   }

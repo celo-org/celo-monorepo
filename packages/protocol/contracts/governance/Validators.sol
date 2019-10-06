@@ -410,15 +410,19 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     // TODO(asa): Use exponent.
     FixidityLib.Fraction memory epochScore = FixidityLib.wrap(uptime);
 
+
+    // New component is 0! Uptime is non-zero.
     FixidityLib.Fraction memory newComponent = validatorScoreParameters.adjustmentSpeed.multiply(
       epochScore
     );
+    // validators[validator].score = newComponent;
+    // This works:
+    // validators[validator].score = epochScore;
+
     FixidityLib.Fraction memory currentComponent = FixidityLib.fixed1().subtract(
       validatorScoreParameters.adjustmentSpeed
     );
-    emit Debug(currentComponent.unwrap());
     currentComponent = currentComponent.multiply(validators[account].score);
-    emit Debug(currentComponent.unwrap());
     validators[account].score = FixidityLib.wrap(
       Math.min(
         epochScore.unwrap(),
@@ -438,6 +442,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     address group = getMembershipInLastEpoch(account);
     uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
     uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
+    // For some reason, one validator seems to be getting the full payment (not less commission)
+    // Perhaps, getMembershipInLastEpoch is returning 0? Probably what's happening...
     getStableToken().mint(group, groupPayment);
     getStableToken().mint(account, validatorPayment);
   }

@@ -16,11 +16,11 @@ import {
   MockRandomInstance,
   RegistryContract,
   RegistryInstance,
-  ElectionContract,
-  ElectionInstance,
+  ElectionTestContract,
+  ElectionTestInstance,
 } from 'types'
 
-const Election: ElectionContract = artifacts.require('Election')
+const ElectionTest: ElectionTestContract = artifacts.require('ElectionTest')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
 const MockRandom: MockRandomContract = artifacts.require('MockRandom')
@@ -28,10 +28,10 @@ const Registry: RegistryContract = artifacts.require('Registry')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
-Election.numberFormat = 'BigNumber'
+ElectionTest.numberFormat = 'BigNumber'
 
 contract('Election', (accounts: string[]) => {
-  let election: ElectionInstance
+  let election: ElectionTestInstance
   let registry: RegistryInstance
   let mockLockedGold: MockLockedGoldInstance
   let mockValidators: MockValidatorsInstance
@@ -43,7 +43,7 @@ contract('Election', (accounts: string[]) => {
   const electabilityThreshold = new BigNumber(0)
 
   beforeEach(async () => {
-    election = await Election.new()
+    election = await ElectionTest.new()
     mockLockedGold = await MockLockedGold.new()
     mockValidators = await MockValidators.new()
     registry = await Registry.new()
@@ -852,6 +852,151 @@ contract('Election', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(election.electValidators())
+      })
+    })
+  })
+
+  describe.only('#distributeEpochRewards', () => {
+    const voter = accounts[0]
+    const group = accounts[1]
+    const voteValue = new BigNumber(1000000)
+    const rewardValue = new BigNumber(1000000)
+    beforeEach(async () => {
+      await mockValidators.setMembers(group, [accounts[9]])
+      await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+      await mockLockedGold.setTotalLockedGold(voteValue)
+      await mockValidators.setNumRegisteredValidators(1)
+      await mockLockedGold.incrementNonvotingAccountBalance(voter, voteValue)
+      await election.vote(group, voteValue, NULL_ADDRESS, NULL_ADDRESS)
+      await election.activate(group)
+    })
+
+    describe('when there is a single group with active votes', () => {
+      describe('when the group is eligible', () => {
+        beforeEach(async () => {
+          await election.distributeEpochRewards(group, rewardValue, NULL_ADDRESS, NULL_ADDRESS)
+        })
+
+        it("should increment the account's active votes for the group", async () => {
+          assertEqualBN(
+            await election.getAccountActiveVotesForGroup(group, voter),
+            voteValue.plus(rewardValue)
+          )
+        })
+
+        it("should increment the account's total votes for the group", async () => {
+          assertEqualBN(
+            await election.getAccountTotalVotesForGroup(group, voter),
+            voteValue.plus(rewardValue)
+          )
+        })
+
+        it("should increment account's total votes", async () => {
+          assertEqualBN(await election.getAccountTotalVotes(voter), voteValue.plus(rewardValue))
+        })
+
+        it('should increment the total votes for the group', async () => {
+          assertEqualBN(await election.getGroupTotalVotes(group), voteValue.plus(rewardValue))
+        })
+
+        it('should increment the total votes', async () => {
+          assertEqualBN(await election.getTotalVotes(), voteValue.plus(rewardValue))
+        })
+      })
+    })
+
+    describe('when there are two groups with active votes', () => {
+      const voter2 = accounts[2]
+      const group2 = accounts[3]
+      const voteValue2 = new BigNumber(1000000)
+      const rewardValue2 = new BigNumber(10000000)
+      beforeEach(async () => {
+        await mockValidators.setMembers(group2, [accounts[8]])
+        await election.markGroupEligible(group2, NULL_ADDRESS, group)
+        await mockLockedGold.setTotalLockedGold(voteValue.plus(voteValue2))
+        await mockValidators.setNumRegisteredValidators(2)
+        await mockLockedGold.incrementNonvotingAccountBalance(voter2, voteValue2)
+        // Split voter2's vote between the two groups.
+        await election.vote(group, voteValue2.div(2), group2, NULL_ADDRESS, { from: voter2 })
+        await election.vote(group2, voteValue2.div(2), NULL_ADDRESS, group, { from: voter2 })
+        await election.activate(group, { from: voter2 })
+        await election.activate(group2, { from: voter2 })
+      })
+
+      describe('when boths groups are eligible', () => {
+        const expectedGroupTotalActiveVotes = voteValue.plus(voteValue2.div(2)).plus(rewardValue)
+        const expectedVoterActiveVotesForGroup = expectedGroupTotalActiveVotes
+          .times(2)
+          .div(3)
+          .dp(0, BigNumber.ROUND_FLOOR)
+        const expectedVoter2ActiveVotesForGroup = expectedGroupTotalActiveVotes
+          .div(3)
+          .dp(0, BigNumber.ROUND_FLOOR)
+        const expectedVoter2ActiveVotesForGroup2 = voteValue2.div(2).plus(rewardValue2)
+        beforeEach(async () => {
+          await election.distributeEpochRewards(group, rewardValue, group2, NULL_ADDRESS)
+          await election.distributeEpochRewards(group2, rewardValue2, group, NULL_ADDRESS)
+        })
+
+        it("should increment the accounts' active votes for both groups", async () => {
+          assertEqualBN(
+            await election.getAccountActiveVotesForGroup(group, voter),
+            expectedVoterActiveVotesForGroup
+          )
+          assertEqualBN(
+            await election.getAccountActiveVotesForGroup(group, voter2),
+            expectedVoter2ActiveVotesForGroup
+          )
+          assertEqualBN(
+            await election.getAccountActiveVotesForGroup(group2, voter2),
+            expectedVoter2ActiveVotesForGroup2
+          )
+        })
+
+        it("should increment the accounts' total votes for both groups", async () => {
+          assertEqualBN(
+            await election.getAccountTotalVotesForGroup(group, voter),
+            expectedVoterActiveVotesForGroup
+          )
+          assertEqualBN(
+            await election.getAccountTotalVotesForGroup(group, voter2),
+            expectedVoter2ActiveVotesForGroup
+          )
+          assertEqualBN(
+            await election.getAccountTotalVotesForGroup(group2, voter2),
+            expectedVoter2ActiveVotesForGroup2
+          )
+        })
+
+        it("should increment the accounts' total votes", async () => {
+          assertEqualBN(
+            await election.getAccountTotalVotes(voter),
+            expectedVoterActiveVotesForGroup
+          )
+          assertEqualBN(
+            await election.getAccountTotalVotes(voter2),
+            expectedVoter2ActiveVotesForGroup.plus(expectedVoter2ActiveVotesForGroup2)
+          )
+        })
+
+        it('should increment the total votes for the groups', async () => {
+          assertEqualBN(await election.getGroupTotalVotes(group), expectedGroupTotalActiveVotes)
+          assertEqualBN(
+            await election.getGroupTotalVotes(group2),
+            expectedVoter2ActiveVotesForGroup2
+          )
+        })
+
+        it('should increment the total votes', async () => {
+          assertEqualBN(
+            await election.getTotalVotes(),
+            expectedGroupTotalActiveVotes.plus(expectedVoter2ActiveVotesForGroup2)
+          )
+        })
+
+        it('should update the ordering of the eligible groups', async () => {
+          assert.deepEqual(await election.getEligibleValidatorGroups(), [group2, group])
+        })
       })
     })
   })
