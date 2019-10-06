@@ -337,6 +337,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     validators[account].url = url;
     validators[account].publicKeysData = publicKeysData;
     _validators.push(account);
+    updateMembershipHistory(account, address(0));
     getLockedGold().setAccountMustMaintain(account, registrationRequirements.validator, MAX_INT);
     emit ValidatorRegistered(account, name, url, publicKeysData);
     return true;
