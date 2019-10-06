@@ -27,6 +27,7 @@ export enum AccountType {
   TX_NODE = 2,
   BOOTNODE = 3,
   FAUCET = 4,
+  SENTRY = 5,
 }
 
 export enum ConsensusType {

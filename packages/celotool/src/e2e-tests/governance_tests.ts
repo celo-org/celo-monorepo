@@ -213,6 +213,7 @@ describe('governance tests', () => {
       { name: 'validator3', validating: true, syncmode: 'full', port: 30309, rpcport: 8551 },
       { name: 'validator4', validating: true, syncmode: 'full', port: 30311, rpcport: 8553 },
     ],
+    useBootnode: true,
   }
 
   const context: any = getContext(gethConfig)

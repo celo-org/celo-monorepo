@@ -20,6 +20,7 @@ describe('sync tests', function(this: any) {
       { name: 'validator2', validating: true, syncmode: 'full', port: 30307, rpcport: 8549 },
       { name: 'validator3', validating: true, syncmode: 'full', port: 30309, rpcport: 8551 },
     ],
+    useBootnode: true,
   }
   const hooks = getHooks(gethConfig)
 

@@ -19,6 +19,7 @@ export interface GethInstanceConfig {
   validating: boolean
   syncmode: string
   port: number
+  sentryport?: number
   rpcport?: number
   wsport?: number
   lightserv?: boolean
@@ -26,12 +27,17 @@ export interface GethInstanceConfig {
   etherbase?: string
   peers?: string[]
   pid?: number
+  isProxied?: boolean
+  isSentry?: boolean
+  bootnodeEnode?: string
+  sentry?: string
 }
 
 export interface GethTestConfig {
   migrate?: boolean
   migrateTo?: number
   instances: GethInstanceConfig[]
+  useBootnode?: boolean
 }
 
 const TEST_DIR = '/tmp/e2e'
@@ -46,6 +52,8 @@ export function spawnWithLog(cmd: string, args: string[], logsFilepath: string) 
     // nothing to do
   }
   const logStream = fs.createWriteStream(logsFilepath, { flags: 'a' })
+  console.log(cmd)
+  console.log(args)
   const process = spawn(cmd, args)
   process.stdout.pipe(logStream)
   process.stderr.pipe(logStream)
@@ -204,6 +212,11 @@ export async function importPrivateKey(gethBinaryPath: string, instance: GethIns
   )
 }
 
+export async function killBootnode() {
+  console.info(`Killing the bootnode`)
+  await execCmd('pkill', ['-SIGINT', 'bootnode'], { silent: true })
+}
+
 export async function killGeth() {
   console.info(`Killing ALL geth instances`)
   await execCmd('pkill', ['-SIGINT', 'geth'], { silent: true })
@@ -246,7 +259,7 @@ export async function getEnode(port: number, ws: boolean = false) {
 
 export async function startGeth(gethBinaryPath: string, instance: GethInstanceConfig) {
   const datadir = getDatadir(instance)
-  const { syncmode, port, rpcport, wsport, validating } = instance
+  const { syncmode, port, rpcport, wsport, validating, bootnodeEnode } = instance
   const privateKey = instance.privateKey || ''
   const lightserv = instance.lightserv || false
   const etherbase = instance.etherbase || ''
@@ -258,7 +271,6 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     '--debug',
     '--port',
     port.toString(),
-    '--nodiscover',
     '--rpcvhosts=*',
     '--networkid',
     NetworkId.toString(),
@@ -301,13 +313,20 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     gethArgs.push('--password=/dev/null', `--unlock=0`)
     gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
   }
+
+  if (bootnodeEnode) {
+    gethArgs.push(`--bootnodes=${bootnodeEnode}`)
+  } else {
+    gethArgs.push('--nodiscover')
+  }
+
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`)
   instance.pid = gethProcess.pid
 
   // Give some time for geth to come up
   const waitForPort = wsport ? wsport : rpcport
   if (waitForPort) {
-    const isOpen = await waitForPortOpen('localhost', waitForPort, 5)
+    const isOpen = await waitForPortOpen('localhost', waitForPort, 10)
     if (!isOpen) {
       console.error(`geth:${instance.name}: jsonRPC didn't open after 5 seconds`)
       process.exit(1)
@@ -386,6 +405,19 @@ export async function initAndStartGeth(gethBinaryPath: string, instance: GethIns
   return startGeth(gethBinaryPath, instance)
 }
 
+export async function startBootnode(bootnodeBinaryPath: string, mnemonic: string) {
+  const bootnodePrivateKey = getPrivateKeysFor(AccountType.BOOTNODE, mnemonic, 1)[0]
+  const bootnodeLog = joinPath(TEST_DIR, 'bootnode.log')
+  const bootnodeArgs = [
+    '--verbosity=5',
+    `--nodekeyhex=${bootnodePrivateKey}`,
+    `--networkid=${NetworkId}`,
+  ]
+
+  spawnWithLog(bootnodeBinaryPath, bootnodeArgs, bootnodeLog)
+  return getEnodeAddress(privateKeyToPublicKey(bootnodePrivateKey), '127.0.0.1', 30301)
+}
+
 export function getContext(gethConfig: GethTestConfig) {
   const mnemonic =
     'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
@@ -393,13 +425,21 @@ export function getContext(gethConfig: GethTestConfig) {
   const numValidators = validatorInstances.length
   const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
   const validators = getValidators(mnemonic, numValidators)
-  const validatorEnodes = validatorPrivateKeys.map((x: any, i: number) =>
-    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
-  )
+
+  const sentryInstances = gethConfig.instances.filter((x: any) => x.isSentry)
+  const numSentries = sentryInstances.length
+  const sentryPrivateKeys = getPrivateKeysFor(AccountType.SENTRY, mnemonic, numSentries)
+  const sentryEnodes = sentryPrivateKeys.map((x: any, i: number) => [
+    sentryInstances[i].name,
+    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', sentryInstances[i].port),
+  ])
+
   const argv = require('minimist')(process.argv.slice(2))
   const branch = argv.branch || 'master'
   const gethRepoPath = argv.localgeth || '/tmp/geth'
   const gethBinaryPath = `${gethRepoPath}/build/bin/geth`
+
+  const bootnodeBinaryPath = `${gethRepoPath}/build/bin/bootnode`
 
   const before = async () => {
     if (!argv.localgeth) {
@@ -408,17 +448,41 @@ export function getContext(gethConfig: GethTestConfig) {
     await buildGeth(gethRepoPath)
     await setupTestDir(TEST_DIR)
     await writeGenesis(validators, GENESIS_PATH)
+
+    let bootnodeEnode: string = ''
+    if (gethConfig.useBootnode) {
+      bootnodeEnode = await startBootnode(bootnodeBinaryPath, mnemonic)
+    }
+
     let validatorIndex = 0
+    let sentryIndex = 0
     for (const instance of gethConfig.instances) {
+      // Non proxied validators and sentries should to the bootnode
+      if ((instance.validating && !instance.isProxied) || instance.isSentry) {
+        if (gethConfig.useBootnode) {
+          instance.bootnodeEnode = bootnodeEnode
+        }
+
+        // Proxied validators should connect to only the sentry
+      } else if (instance.validating && instance.isProxied) {
+        const sentryEnode = sentryEnodes.filter((x: any, _: number) => x[0] === instance.sentry)
+
+        if (sentryEnode.length != 1) {
+          throw new Error('proxied validator must have exactly one sentry')
+        }
+
+        instance.peers = [sentryEnode[0][1]]
+      }
+
+      // Set the private key for the validator or sentry instance
       if (instance.validating) {
-        // Automatically connect validator nodes to eachother.
-        const otherValidators = validatorEnodes.filter(
-          (_: string, i: number) => i !== validatorIndex
-        )
-        instance.peers = (instance.peers || []).concat(otherValidators)
         instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
         validatorIndex++
+      } else if (instance.isSentry) {
+        instance.privateKey = instance.privateKey || sentryPrivateKeys[sentryIndex]
+        sentryIndex++
       }
+
       await initAndStartGeth(gethBinaryPath, instance)
     }
     if (gethConfig.migrate || gethConfig.migrateTo) {
@@ -435,6 +499,10 @@ export function getContext(gethConfig: GethTestConfig) {
 
   const restart = async () => {
     await killGeth()
+    if (gethConfig.useBootnode) {
+      killBootnode()
+      await startBootnode(bootnodeBinaryPath, mnemonic)
+    }
     let validatorIndex = 0
     for (const instance of gethConfig.instances) {
       await restoreDatadir(instance)
