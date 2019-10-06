@@ -164,16 +164,21 @@ jobs:
       #     command: /usr/local/share/android-sdk/tools/emulator @Nexus_5X_API_28_x86 -skin 1080x2066 -memory 2048 -noaudio
       #     background: true
       - run: brew install wget
+      - run: brew install pidcat
       - run: wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | bash
-      - run: printf '\n' >> ~/.bash_profile && echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bash_profile # add nvm to path
+      - run: echo -e '\nexport NVM_DIR="$HOME/.nvm"' >> ~/.bash_profile
+      - run: echo -e '\n[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bash_profile # add nvm to path
       - run: source ~/.bash_profile
       - run: nvm install v10.16.3 && nvm use v10.16.3
       - run: cd ~/src/
-      - run: yarn && yarn build
+      - run: yarn && yarn build # need to run this because it's another OS than install_dependecies job
+      - run: brew install cask
+      - run: brew tap homebrew/cask-versions
+      - run: brew cask install homebrew/cask-versions/adoptopenjdk8
       # - detox
       - run:
           name: Run Tests
-          command: ./gradlew app:connectedAndroidTest
+          command: yarn test:dry-run-e2e
   
   lint-checks:
     <<: *defaults
