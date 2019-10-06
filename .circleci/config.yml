@@ -163,6 +163,7 @@ jobs:
       #     name: Run emulator in background
       #     command: /usr/local/share/android-sdk/tools/emulator @Nexus_5X_API_28_x86 -skin 1080x2066 -memory 2048 -noaudio
       #     background: true
+      - run: echo `. ~/.bash_profile`
       - run: brew install wget
       - run: brew install pidcat
       - run: brew install watchman
@@ -170,7 +171,7 @@ jobs:
       - run: wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | bash
       - run: echo -e '\nexport NVM_DIR="$HOME/.nvm"' >> ~/.bash_profile
       - run: echo -e '\n[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bash_profile # add nvm to path
-      - run: source ~/.bash_profile | true
+      - run: echo `. ~/.bash_profile`
       # create device conf
       - run: nvm install v10.16.3 && nvm use v10.16.3
       - run: cd ~/src/
