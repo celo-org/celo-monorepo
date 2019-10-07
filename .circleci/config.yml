@@ -136,7 +136,7 @@ jobs:
 
   ui_test:
     <<: *android_config
-    resource_class: xlarge
+    resource_class: large
     steps:
       - checkout
       - restore_cache:
