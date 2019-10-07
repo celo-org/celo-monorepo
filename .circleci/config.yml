@@ -210,6 +210,7 @@ jobs:
       - run: 
           name: detox
           command: cd ~/src/packages/mobile && ENVFILE=".env.test" yarn test:detox
+
       # - run:
       #     name: Run Tests
       #     command: cd ~/src/packages/mobile && yarn test:dry-run-e2e || true
