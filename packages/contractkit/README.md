@@ -48,7 +48,7 @@ import { newKit, CeloContract } from '@celo/contractkit'
 
 async function getKit(myAddress: string) {
   const kit = newKit('https://alfajores-infura.celo-testnet.org:8545')
-  
+
   // default from
   kit.defaultAccount = myAddress
   // paid gas in celo dollars
@@ -115,21 +115,21 @@ We expose native wrappers for all Celo core contracts.
 
 The complete list of Celo Core contracts is:
 
- - Attestations
- - LockedGold
- - Escrow
- - Exchange
- - GasCurrencyWhitelist
- - GasPriceMinimum
- - GoldToken
- - Governance
- - MultiSig
- - Random
- - Registry
- - Reserve
- - SortedOracles
- - StableToken
- - Validators
+- Attestations
+- LockedGold
+- Escrow
+- Exchange
+- GasCurrencyWhitelist
+- GasPriceMinimum
+- GoldToken
+- Governance
+- MultiSig
+- Random
+- Registry
+- Reserve
+- SortedOracles
+- StableToken
+- Validators
 
 ## A Note About Contract Addresses
 
