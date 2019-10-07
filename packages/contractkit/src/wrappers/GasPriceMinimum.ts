@@ -6,7 +6,7 @@ export interface GasPriceMinimumConfig {
   gasPriceMinimum: BigNumber
   targetDensity: BigNumber
   adjustmentSpeed: BigNumber
-  infrastructureFraction: BigNumber
+  proposerFraction: BigNumber
 }
 
 /**
@@ -33,11 +33,7 @@ export class GasPriceMinimumWrapper extends BaseWrapper<GasPriceMinimum> {
    * @returns current fraction of the gas price minimum which is sent to
    * the infrastructure fund
    */
-  infrastructureFraction = proxyCall(
-    this.contract.methods.infrastructureFraction,
-    undefined,
-    toBigNumber
-  )
+  proposerFraction = proxyCall(this.contract.methods.proposerFraction, undefined, toBigNumber)
   /**
    * Returns current configuration parameters.
    */
@@ -46,13 +42,13 @@ export class GasPriceMinimumWrapper extends BaseWrapper<GasPriceMinimum> {
       this.gasPriceMinimum(),
       this.targetDensity(),
       this.adjustmentSpeed(),
-      this.infrastructureFraction(),
+      this.proposerFraction(),
     ])
     return {
       gasPriceMinimum: res[0],
       targetDensity: res[1],
       adjustmentSpeed: res[2],
-      infrastructureFraction: res[3],
+      proposerFraction: res[3],
     }
   }
 }
