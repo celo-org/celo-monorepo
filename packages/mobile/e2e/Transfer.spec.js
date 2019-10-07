@@ -61,7 +61,7 @@ describe('Transfer Works', () => {
     await element(by.id('SystemAuthContinue')).tap()
   })
 
-  it('NUX->Invite', async () => {
+  it.skip('NUX->Invite', async () => {
     await waitFor(element(by.id('InviteCodeTitle')))
       .toBeVisible()
       .withTimeout(2000)
@@ -93,7 +93,7 @@ describe('Transfer Works', () => {
     await sleep(10000)
   })
 
-  it('NUX->ImportContacts', async () => {
+  it.skip('NUX->ImportContacts', async () => {
     await device.launchApp({ permissions: { contacts: 'YES' } })
 
     await waitFor(element(by.id('ImportContactsPermissionTitle')))
@@ -115,7 +115,7 @@ describe('Transfer Works', () => {
     }
   })
 
-  it('NUX->VerifyEducation', async () => {
+  it.skip('NUX->VerifyEducation', async () => {
     await waitFor(element(by.id('VerifyEducationHeader')))
       .toBeVisible()
       .withTimeout(10000000)
@@ -132,13 +132,13 @@ describe('Transfer Works', () => {
     // await element(by.id('VerifyContinueButton')).tap()
   })
 
-  it('NUX->Verify', async () => {
+  it.skip('NUX->Verify', async () => {
     // skipping for now
     skipTo('WalletHome')
     await sleep(10000)
   })
 
-  it('Wallet Home', async () => {
+  it.skip('Wallet Home', async () => {
     await waitFor(element(by.id('AccountOverviewInHome/dollarBalance')))
       .toBeVisible()
       .withTimeout(10000)
@@ -148,7 +148,7 @@ describe('Transfer Works', () => {
       .withTimeout(10000)
   })
 
-  it('Wallet Home->Send', async () => {
+  it.skip('Wallet Home->Send', async () => {
     await element(by.id('SendNavigator')).tap()
 
     await waitFor(element(by.id('RecipientPicker')))
