@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { Address, CeloContract } from '../base'
 import { SortedOracles } from '../generated/types/SortedOracles'
 import { BaseWrapper, proxyCall, proxySend, toBigNumber } from './BaseWrapper'
 
@@ -6,13 +7,22 @@ export interface SortedOraclesConfig {
   reportExpirySeconds: BigNumber
 }
 
+export interface OracleRate {
+  address: Address
+  rate: BigNumber
+  medianRelation: string
+}
 /**
  * Currency price oracle contract.
  */
 export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
-  getRates = proxyCall(this.contract.methods.getRates)
   numRates = proxyCall(this.contract.methods.numRates)
   medianRate = proxyCall(this.contract.methods.medianRate)
+
+  isOracle: (token: Address, oracle: Address) => Promise<boolean> = proxyCall(
+    this.contract.methods.isOracle
+  )
+
   /**
    * Returns the report expiry parameter.
    * @returns Current report expiry.
@@ -36,4 +46,28 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
       reportExpirySeconds: await this.reportExpirySeconds(),
     }
   }
+
+  getUsdRates = async (): Promise<OracleRate[]> =>
+    this.getRates(await this.kit.registry.addressFor(CeloContract.StableToken))
+
+  /**
+   * Gets all elements from the doubly linked list.
+   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   * @return An unpacked list of elements from largest to smallest.
+   */
+  getRates: (token: Address) => Promise<OracleRate[]> = proxyCall(
+    this.contract.methods.getRates,
+    undefined,
+    (out) => {
+      const rates: OracleRate[] = []
+      for (let i = 0; i < out[0].length; i++) {
+        rates.push({
+          address: out[0][i],
+          rate: new BigNumber(out[1][i]),
+          medianRelation: out[2][i],
+        })
+      }
+      return rates
+    }
+  )
 }
