@@ -142,7 +142,9 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     validators,
     consensusType,
     blockTime,
-    initialAccounts: faucetAddresses.concat(priceOracleAddress),
+    initialAccounts: faucetAddresses
+      .concat(priceOracleAddress)
+      .concat('5409ED021D9299bf6814279A6A1411A7e866A631'),
     epoch,
     chainId,
     requestTimeout,

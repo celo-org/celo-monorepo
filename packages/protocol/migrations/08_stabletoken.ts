@@ -59,8 +59,15 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       SortedOraclesInstance
     >('SortedOracles', artifacts)
 
-    await sortedOracles.addOracle(stableToken.address, config.stableToken.priceOracleAccount)
+    console.log(config.stableToken)
+    // console.log(`adding first one ${config.stableToken.priceOracleAccounts}`)
+    // await sortedOracles.addOracle(stableToken.address, config.stableToken.priceOracleAccounts[0])
+    // console.log('adding second one')
+    // await sortedOracles.addOracle(stableToken.address, '5409ED021D9299bf6814279A6A1411A7e866A631')
+    console.log(`adding third one: ${minerAddress}`)
     await sortedOracles.addOracle(stableToken.address, minerAddress)
+    await sortedOracles.addOracle(stableToken.address, '0xE834EC434DABA538cd1b9Fe1582052B880BD7e63')
+    console.log(`reporting initial: ${config.stableToken.goldPrice}`)
     await sortedOracles.report(
       stableToken.address,
       config.stableToken.goldPrice,
@@ -68,6 +75,7 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       NULL_ADDRESS,
       NULL_ADDRESS
     )
+    console.log(await sortedOracles.getRates(stableToken.address))
 
     const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
       'Reserve',
