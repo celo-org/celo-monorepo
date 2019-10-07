@@ -407,13 +407,18 @@ contract('Attestations', async (accounts: string[]) => {
 
     it('should allow a reveal', async () => {
       // @ts-ignore
-      await attestations.reveal(identifierHash, identifierHash, issuer, false)
+      await attestations.reveal(identifierHash, identifierHash.toString('hex'), issuer, false)
     })
 
     it('should revert if users reveal a non-existent attestation request', async () => {
-      // @ts-ignore
       await assertRevert(
-        attestations.reveal(identifierHash, identifierHash, await getNonIssuer(), false)
+        attestations.reveal(
+          identifierHash,
+          // @ts-ignore
+          identifierHash.toString('hex'),
+          await getNonIssuer(),
+          false
+        )
       )
     })
 
@@ -421,14 +426,18 @@ contract('Attestations', async (accounts: string[]) => {
       const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
       await attestations.complete(identifierHash, v, r, s)
 
-      // @ts-ignore
-      await assertRevert(attestations.reveal(identifierHash, identifierHash, issuer, false))
+      await assertRevert(
+        // @ts-ignore
+        attestations.reveal(identifierHash, identifierHash.toString('hex'), issuer, false)
+      )
     })
 
     it('should revert if the request as expired', async () => {
       await timeTravel(attestationExpirySeconds, web3)
-      // @ts-ignore
-      await assertRevert(attestations.reveal(identifierHash, identifierHash, issuer, false))
+      await assertRevert(
+        // @ts-ignore
+        attestations.reveal(identifierHash, identifierHash.toString('hex'), issuer, false)
+      )
     })
   })
 
