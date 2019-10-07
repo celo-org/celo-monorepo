@@ -25,8 +25,6 @@ async function main() {
 
   console.log(await sortedOracles.getRates(stableTokenAddress))
   console.log(`number of rates?? ${await sortedOracles.numRates(stableTokenAddress)}`)
-  console.log('what the fuck is the goddamn median')
-  console.log(await sortedOracles.medianRate(stableTokenAddress))
 }
 
 main().catch((err) => {
