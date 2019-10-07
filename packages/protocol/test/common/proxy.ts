@@ -116,6 +116,13 @@ contract('Proxy', (accounts: string[]) => {
       assert.equal(events[0].event, 'ImplementationSet')
     })
 
+    it('should not allow to call a non contract address', async () =>
+      assertRevert(
+        proxy._setAndInitializeImplementation(accounts[1], initializeData(42), {
+          from: accounts[1],
+        })
+      ))
+
     it('should not allow a non-owner to set an implementation', async () =>
       assertRevert(
         proxy._setAndInitializeImplementation(hasInitializer.address, initializeData(42), {
