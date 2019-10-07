@@ -286,8 +286,8 @@ export async function getTestnetOutputs(celoEnv: string) {
     celoEnv,
     testnetTerraformModule
   )
-
-  return getTerraformModuleOutputs(testnetTerraformModule, vars, backendConfigVars)
+  await initTerraformModule(celoEnv, vars, backendConfigVars)
+  return getTerraformModuleOutputs(testnetTerraformModule, vars)
 }
 
 function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string) {
