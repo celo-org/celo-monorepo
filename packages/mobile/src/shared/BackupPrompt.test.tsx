@@ -5,10 +5,6 @@ import { getMockI18nProps } from 'test/utils'
 
 const time = 1552353116086
 
-jest.mock('src/web3/contracts', () => ({
-  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
-}))
-
 describe('BackupPrompt', () => {
   it('renders correctly', () => {
     const { toJSON } = render(
