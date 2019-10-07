@@ -5,14 +5,14 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import LineItemRow from 'src/components/LineItemRow'
 import ExchangeRate from 'src/exchange/ExchangeRate'
+import FeeExchangeIcon from 'src/exchange/FeeExchangeIcon'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
+import FeeIcon from 'src/send/FeeIcon'
 import RoundedArrow from 'src/shared/RoundedArrow'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
-import LineItemRow from 'src/components/LineItemRow'
-import FeeIcon from 'src/send/FeeIcon'
-import FeeExchangeIcon from 'src/exchange/FeeExchangeIcon'
 
 export interface ExchangeConfirmationCardProps {
   makerToken: CURRENCY_ENUM
