@@ -6,6 +6,6 @@
     "esModuleInterop": true,
     "target": "es6"
   },
-  "include": ["src"],
+  "include": ["src", "../contractkit/types"],
   "references": [{ "path": "../utils" }, { "path": "../contractkit" }]
 }
