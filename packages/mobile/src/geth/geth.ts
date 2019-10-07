@@ -4,10 +4,10 @@ import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import RNGeth from 'react-native-geth'
+import { DEFAULT_TESTNET } from 'src/config'
 import config from 'src/geth/network-config'
 import Logger from 'src/utils/Logger'
 import FirebaseLogUploader from 'src/utils/LogUploader'
-import { DEFAULT_TESTNET } from 'src/web3/testnets'
 
 let gethLock = false
 let gethInstance: typeof RNGeth | null = null
