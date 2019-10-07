@@ -218,7 +218,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
           </Text>
           <Button
             onPress={this.onPressContinue}
-            disabled={!redeemComplete && !account}
+            disabled={isRedeemingInvite || !redeemComplete || !account}
             text={t('continue')}
             standard={false}
             style={styles.continueButton}
@@ -227,7 +227,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
           />
           <Button
             onPress={this.onPressImportClick}
-            disabled={redeemComplete || !!account}
+            disabled={isRedeemingInvite || !!account}
             text={t('importIt')}
             standard={false}
             style={styles.continueButton}

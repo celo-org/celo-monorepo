@@ -326,7 +326,7 @@ jobs:
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_transfers.sh checkout master
+            ./ci_test_transfers.sh checkout mc/proposer-fees
 
   end-to-end-geth-governance-test:
     <<: *defaults
@@ -367,7 +367,7 @@ jobs:
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_governance.sh checkout master
+            ./ci_test_governance.sh checkout mc/proposer-fees
 
   end-to-end-geth-sync-test:
     <<: *defaults
@@ -407,7 +407,7 @@ jobs:
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_sync.sh checkout master
+            ./ci_test_sync.sh checkout mc/proposer-fees
 
   end-to-end-geth-integration-sync-test:
     <<: *defaults
@@ -440,7 +440,7 @@ jobs:
             go version
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            ./ci_test_sync_with_network.sh checkout master
+            ./ci_test_sync_with_network.sh checkout mc/proposer-fees
 
   web:
     working_directory: ~/app

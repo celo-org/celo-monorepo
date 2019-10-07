@@ -161,6 +161,10 @@ export const v3Schema = {
     fetchedCurrencyCode: 'MXN',
     symbol: undefined,
   },
+  imports: {
+    isImportingWallet: false,
+    isWalletEmpty: false,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {
