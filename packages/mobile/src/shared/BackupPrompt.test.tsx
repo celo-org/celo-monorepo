@@ -36,7 +36,7 @@ describe('BackupPrompt', () => {
 
   describe('when backupCompleted is false', () => {
     it('renders visible', () => {
-      const { toJSON, queryByText } = render(
+      const { queryByText } = render(
         <BackupPrompt
           accountCreationTime={time}
           backupCompleted={false}
@@ -56,7 +56,7 @@ describe('BackupPrompt', () => {
         accountCreationTime: time,
         doingBackupFlow: false,
       }
-      const { update, queryByText } = render(
+      const { update } = render(
         <BackupPrompt {...initialProps} backupCompleted={false} backupTooLate={true} />
       )
       update(<BackupPrompt {...initialProps} backupCompleted={true} backupTooLate={false} />)
