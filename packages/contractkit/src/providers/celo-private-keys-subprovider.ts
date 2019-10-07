@@ -7,6 +7,10 @@ import { CeloPartialTxParams } from '../utils/tx-signing'
 
 const debug = debugFactory('kit:providers:celo-private-keys-subprovider')
 
+// Same as geth
+// https://github.com/celo-org/celo-blockchain/blob/027dba2e4584936cc5a8e8993e4e27d28d5247b8/internal/ethapi/api.go#L1222
+const DefaultGasLimit = 90000
+
 function getPrivateKeyWithout0xPrefix(privateKey: string) {
   return privateKey.toLowerCase().startsWith('0x') ? privateKey.substring(2) : privateKey
 }
@@ -16,6 +20,16 @@ export function generateAccountAddressFromPrivateKey(privateKey: string): string
     privateKey = '0x' + privateKey
   }
   return new Web3().eth.accounts.privateKeyToAccount(privateKey).address
+}
+
+function isEmpty(value: string | undefined) {
+  return (
+    value === undefined ||
+    value === null ||
+    value === '0' ||
+    value.toLowerCase() === '0x' ||
+    value.toLowerCase() === '0x0'
+  )
 }
 
 /**
@@ -29,7 +43,7 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
   private chainId: number | null = null
   private gasFeeRecipient: string | null = null
 
-  constructor(privateKey: string) {
+  constructor(readonly privateKey: string) {
     // This won't accept a privateKey with 0x prefix and will call that an invalid key.
     super(getPrivateKeyWithout0xPrefix(privateKey))
     this.addAccount(privateKey)
@@ -100,9 +114,9 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
       txParams.nonce = await this.getNonce(txParams.from)
     }
 
-    if (txParams.gasFeeRecipient == null) {
+    if (isEmpty(txParams.gasFeeRecipient)) {
       txParams.gasFeeRecipient = await this.getCoinbase()
-      if (txParams.gasFeeRecipient == null) {
+      if (isEmpty(txParams.gasFeeRecipient)) {
         // Fail early. The validator nodes will reject a transaction missing
         // gas fee recipient anyways.
         throw new Error(
@@ -112,9 +126,15 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
       }
     }
 
-    if (txParams.gasPrice == null) {
-      txParams.gasPrice = await this.getGasPrice()
+    if (isEmpty(txParams.gasPrice)) {
+      txParams.gasPrice = await this.getGasPrice(txParams.gasCurrency)
     }
+    debug('Gas price for the transaction is %s', txParams.gasPrice)
+
+    if (isEmpty(txParams.gas)) {
+      txParams.gas = String(DefaultGasLimit)
+    }
+    debug('Max gas fee for the transaction is %s', txParams.gas)
 
     const signedTx = await signTransaction(txParams, this.getPrivateKeyFor(txParams.from))
     const rawTransaction = signedTx.rawTransaction.toString('hex')
@@ -178,15 +198,27 @@ export class CeloPrivateKeysWalletProvider extends PrivateKeyWalletSubprovider {
     return this.gasFeeRecipient
   }
 
-  private async getGasPrice(): Promise<string> {
-    debug('getGasPrice fetching gas price...')
+  private async getGasPrice(gasCurrency: string | undefined): Promise<string | undefined> {
+    // Gold Token
+    if (!gasCurrency) {
+      return this.getGasPriceInCeloGold()
+    }
+    throw new Error(
+      `celo-private-keys-subprovider@getGasPrice: gas price for ` +
+        `currency ${gasCurrency} cannot be computed in the CeloPrivateKeysWalletProvider, ` +
+        ' pass it explicitly'
+    )
+  }
+
+  private async getGasPriceInCeloGold(): Promise<string> {
+    debug('getGasPriceInCeloGold fetching gas price...')
     // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_gasprice
     const result = await this.emitPayloadAsync({
       method: 'eth_gasPrice',
       params: [],
     })
     const gasPriceInHex = result.result.toString()
-    debug('getGasPrice gas price is %s', parseInt(gasPriceInHex.substr(2), 16))
+    debug('getGasPriceInCeloGold gas price is %s', parseInt(gasPriceInHex.substr(2), 16))
     return gasPriceInHex
   }
 }

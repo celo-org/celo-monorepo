@@ -62,7 +62,7 @@
   "canNotRequestFromUnverified": "Can not request from unverified users",
   "restartApp": "Restart App",
   "loading": "Loading…",
-  "invalidBackup": "Invalid Backup Key",
+  "invalidBackupPhrase": "Invalid Backup Key",
   "importBackupFailed": "Importing Wallet Failed",
   "inviteFailed": "Failure sending invite",
   "importContactsFailed": "Failed to import contacts",

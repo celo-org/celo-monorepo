@@ -43,13 +43,12 @@ export default class {
     },
     getAccounts: () => {},
     accounts: {
-      privateKeyToAccount: () =>
-        '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
+      privateKeyToAccount: () => ({ address: '0x0000000000000000000000000000000000007E57' }),
       wallet: {
         add: () => null,
       },
       create: () => ({
-        address: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
+        address: '0x0000000000000000000000000000000000007E57',
         privateKey: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
       }),
     },

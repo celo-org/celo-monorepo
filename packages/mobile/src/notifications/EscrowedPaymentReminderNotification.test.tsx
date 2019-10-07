@@ -8,10 +8,6 @@ import { mockEscrowedPayment } from 'test/values'
 
 const store = createMockStore()
 
-jest.mock('src/web3/contracts', () => ({
-  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
-}))
-
 describe('EscrowedPaymentReminderNotification', () => {
   it('renders correctly', () => {
     const tree = renderer.create(

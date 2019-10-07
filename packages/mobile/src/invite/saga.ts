@@ -1,4 +1,3 @@
-import { retryAsync } from '@celo/utils/src/async'
 import { stripHexLeader } from '@celo/utils/src/signatureUtils'
 import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
@@ -32,7 +31,7 @@ import { Screens } from 'src/navigator/Screens'
 import { waitWeb3LastBlock } from 'src/networkInfo/saga'
 import { getSendTxGas } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
-import { createTransaction } from 'src/tokens/saga'
+import { createTransaction, fetchTokenBalanceWithRetry } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
@@ -219,7 +218,11 @@ export function* doRedeemInvite(inviteCode: string) {
   try {
     const tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
     Logger.debug(`TAG@doRedeemInvite`, 'Invite code contains temp account', tempAccount)
-    const tempAccountBalanceWei: BigNumber = yield call(getAccountBalance, tempAccount)
+    const tempAccountBalanceWei: BigNumber = yield call(
+      fetchTokenBalanceWithRetry,
+      getStableTokenContract,
+      tempAccount
+    )
     if (tempAccountBalanceWei.isLessThanOrEqualTo(0)) {
       yield put(showError(ErrorMessages.EMPTY_INVITE_CODE))
       return false
@@ -267,15 +270,6 @@ async function addTempAccountToWallet(inviteCode: string) {
     Logger.error(TAG + '@addTempAccountToWallet', 'Failed to add account', e)
     throw new Error('Failed to add temp account to wallet')
   }
-}
-
-async function getAccountBalance(account: string) {
-  Logger.debug(TAG + '@getAccountBalance', 'Checking account balance', account)
-  const StableToken = await getStableTokenContract(web3)
-  // Retry needed here because it's typically the app's first tx and seems to fail on occasion
-  const stableBalance = await retryAsync(StableToken.methods.balanceOf(account).call, 3, [])
-  Logger.debug(TAG + '@getAccountBalance', 'Account balance', stableBalance)
-  return new BigNumber(stableBalance)
 }
 
 export async function withdrawFundsFromTempAccount(

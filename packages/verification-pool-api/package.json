@@ -22,11 +22,13 @@
     "test:verbose": "jest --ci --verbose --runInBand --detectOpenHandles"
   },
   "dependencies": {
+    "@celo/contractkit": "^0.1.5",
+    "@celo/utils": "^0.1.0",
     "bignumber.js": "^7.2.0",
     "eth-lib": "^0.2.8",
     "ethereumjs-util": "^5.2.0",
     "express": "^4.16.4",
-    "firebase-admin": "^7.0.0",
+    "firebase-admin": "^8.6.0",
     "firebase-functions": "^3.2.0",
     "google-libphonenumber": "^3.2.4",
     "lodash": "^4.17.14",
