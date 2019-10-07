@@ -194,6 +194,9 @@ jobs:
       # - detox
       - run:
           name: Run Tests
+          command: cd ~/src/packages/mobile && yarn test:dry-run-e2e || true
+      - run:
+          name: Run Tests (again)
           command: cd ~/src/packages/mobile && yarn test:dry-run-e2e
   
   lint-checks:
