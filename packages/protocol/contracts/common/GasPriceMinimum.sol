@@ -22,8 +22,8 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
     uint256 adjustmentSpeed
   );
 
-  event InfrastructureFractionSet(
-    uint256 infrastructureFraction
+  event ProposerFractionSet(
+    uint256 proposerFraction
   );
 
   uint256 public gasPriceMinimum;
@@ -35,10 +35,10 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
   FixidityLib.Fraction public adjustmentSpeed;
 
   // FixidityLib.Fraction of the gas price minimum allocated to the infrastructure fund.
-  FixidityLib.Fraction public infrastructureFraction;
+  FixidityLib.Fraction public proposerFraction;
 
-  function infrastructureFraction_() external view returns (uint256, uint256) {
-    return (infrastructureFraction.unwrap(), FixidityLib.fixed1().unwrap());
+  function proposerFraction_() external view returns (uint256, uint256) {
+    return (proposerFraction.unwrap(), FixidityLib.fixed1().unwrap());
   }
 
   modifier onlyVm() {
@@ -51,7 +51,7 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
     uint256 initialGas,
     uint256 _targetDensity,
     uint256 _adjustmentSpeed,
-    uint256 _infrastructureFraction
+    uint256 _proposerFraction
   )
     external
     initializer
@@ -61,7 +61,7 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
     gasPriceMinimum = initialGas;
     setTargetDensity(_targetDensity);
     setAdjustmentSpeed(_adjustmentSpeed);
-    setInfrastructureFraction(_infrastructureFraction);
+    setProposerFraction(_proposerFraction);
   }
 
   /**
@@ -89,10 +89,10 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
    * the infrastructure fund.
    * @dev Value is expected to be < 1.
    */
-  function setInfrastructureFraction(uint256 _infrastructureFraction) public onlyOwner {
-    infrastructureFraction = FixidityLib.wrap(_infrastructureFraction);
-    require(infrastructureFraction.lt(FixidityLib.fixed1()));
-    emit InfrastructureFractionSet(_infrastructureFraction);
+  function setProposerFraction(uint256 _proposerFraction) public onlyOwner {
+    proposerFraction = FixidityLib.wrap(_proposerFraction);
+    require(proposerFraction.lt(FixidityLib.fixed1()));
+    emit ProposerFractionSet(_proposerFraction);
   }
 
   /**
