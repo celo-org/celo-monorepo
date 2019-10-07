@@ -193,11 +193,25 @@ jobs:
       - run: cd ~/src/packages/mobile && yarn test:build-e2e # tests seem to fail if the app is built at the same time the emulator runs
       # - detox
       - run:
-          name: Run Tests
-          command: cd ~/src/packages/mobile && yarn test:dry-run-e2e || true
+          name: Start emulator
+          command: cd ~/src/packages/mobile && yarn dev:emulator
+          background: true
+      - run: 
+          name: Start metro
+          command: cd ~/src/packages/mobile && yarn start
+          background: true
       - run:
-          name: Run Tests (again)
-          command: cd ~/src/packages/mobile && yarn test:dry-run-e2e
+          name: Sleep until Device connects
+          command: echo `until adb shell dumpsys wifi | grep "mNetworkInfo" | grep "state: CONNECTED"; do sleep 10 ; done`
+      - run: 
+          name: detox
+          command: cd ~/src/packages/mobile && yarn test:detox
+      # - run:
+      #     name: Run Tests
+      #     command: cd ~/src/packages/mobile && yarn test:dry-run-e2e || true
+      # - run:
+      #     name: Run Tests (again)
+      #     command: cd ~/src/packages/mobile && yarn test:dry-run-e2e
   
   lint-checks:
     <<: *defaults
