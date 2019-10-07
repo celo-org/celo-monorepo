@@ -24,7 +24,7 @@ export const componentStyles = StyleSheet.create({
     flexDirection: 'row',
     marginVertical: 5,
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
     height: 60,
   },
   input: {
