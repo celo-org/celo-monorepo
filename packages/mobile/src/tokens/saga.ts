@@ -1,3 +1,4 @@
+import { retryAsync } from '@celo/utils/src/async'
 import { getErc20Balance, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { call, put, take, takeEvery } from 'redux-saga/effects'
@@ -14,6 +15,8 @@ import { web3 } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import * as utf8 from 'utf8'
 
+const TAG = 'tokens/saga'
+
 interface TokenFetchFactory {
   actionName: string
   contractGetter: (web3: any) => any
@@ -21,12 +24,12 @@ interface TokenFetchFactory {
   tag: string
 }
 
-export const tokenFetchFactory = ({
+export function tokenFetchFactory({
   actionName,
   contractGetter,
   actionCreator,
   tag,
-}: TokenFetchFactory) => {
+}: TokenFetchFactory) {
   function* tokenFetch() {
     try {
       Logger.debug(tag, 'Fetching balance')
@@ -69,10 +72,10 @@ interface TokenTransferFactory {
 }
 
 // TODO(martinvol) this should go to the SDK
-export const createTransaction = async (
+export async function createTransaction(
   contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract,
   transferAction: BasicTokenTransfer
-) => {
+) {
   const { recipientAddress, amount, comment } = transferAction
 
   // TODO(cmcewen): Use proper typing when there is a common interface
@@ -91,13 +94,25 @@ export const createTransaction = async (
   return tx
 }
 
-export const tokenTransferFactory = ({
+export async function fetchTokenBalanceWithRetry(
+  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract,
+  account: string
+) {
+  Logger.debug(TAG + '@fetchTokenBalanceWithRetry', 'Checking account balance', account)
+  const tokenContract = await contractGetter(web3)
+  // Retry needed here because it's typically the app's first tx and seems to fail on occasion
+  const tokenBalance = await retryAsync(tokenContract.methods.balanceOf(account).call, 3, [])
+  Logger.debug(TAG + '@fetchTokenBalanceWithRetry', 'Account balance', tokenBalance)
+  return new BigNumber(tokenBalance)
+}
+
+export function tokenTransferFactory({
   actionName,
   contractGetter,
   tag,
   currency,
   fetchAction,
-}: TokenTransferFactory) => {
+}: TokenTransferFactory) {
   return function*() {
     while (true) {
       const transferAction: TokenTransferAction = yield take(actionName)
