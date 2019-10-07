@@ -55,14 +55,19 @@ export async function getContractAddresses() {
   } else {
     try {
       const kit = await getContractKit()
-      goldTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
-      stableTokenAddress = await kit.registry.addressFor(CeloContract.GoldToken)
-      attestationsAddress = await kit.registry.addressFor(CeloContract.Attestations)
+      goldTokenAddress = (await kit.registry.addressFor(CeloContract.StableToken)).toLowerCase()
+      stableTokenAddress = (await kit.registry.addressFor(CeloContract.GoldToken)).toLowerCase()
+      attestationsAddress = (await kit.registry.addressFor(CeloContract.Attestations)).toLowerCase()
       tokenAddressMapping = {
         [goldTokenAddress]: 'Celo Gold',
         [stableTokenAddress]: 'Celo Dollar',
       }
-      console.info('Got token addresses' + attestationsAddress)
+      console.info(
+        'Got token addresses. Attestations: ' +
+          attestationsAddress +
+          ' Token mapping: ' +
+          JSON.stringify(tokenAddressMapping)
+      )
       return { tokenAddressMapping, attestationsAddress }
     } catch (e) {
       console.error('@getContractAddresses() error', e)

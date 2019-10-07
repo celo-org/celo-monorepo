@@ -76,14 +76,19 @@ export class BlockscoutAPI extends RESTDataSource {
 
   getTokenAtAddress(tokenAddress: string) {
     if (this.tokenAddressMapping) {
-      if (tokenAddress in this.tokenAddressMapping) {
-        return this.tokenAddressMapping[tokenAddress]
+      const lowerCaseTokenAddress = tokenAddress.toLowerCase()
+      if (lowerCaseTokenAddress in this.tokenAddressMapping) {
+        return this.tokenAddressMapping[lowerCaseTokenAddress]
       } else {
         console.info('Token addresses mapping: ' + JSON.stringify(this.tokenAddressMapping))
-        throw new Error('No token corresponding to ' + tokenAddress)
+        throw new Error(
+          'No token corresponding to ' +
+            lowerCaseTokenAddress +
+            '. Check web3 provider is for correct network.'
+        )
       }
     } else {
-      throw new Error('Cannot find tokenAddressMapping despite intialization')
+      throw new Error('Cannot find tokenAddressMapping')
     }
   }
 
@@ -91,7 +96,7 @@ export class BlockscoutAPI extends RESTDataSource {
     if (this.attestationsAddress) {
       return this.attestationsAddress
     } else {
-      throw new Error('Cannot find attestation address despite intialization')
+      throw new Error('Cannot find attestation address')
     }
   }
 
@@ -135,9 +140,9 @@ export class BlockscoutAPI extends RESTDataSource {
           type: EventTypes.EXCHANGE,
           timestamp: new BigNumber(inEvent.timeStamp).toNumber(),
           block: new BigNumber(inEvent.blockNumber).toNumber(),
-          inSymbol: this.getTokenAtAddress(inEvent.contractAddress.toLowerCase()),
+          inSymbol: this.getTokenAtAddress(inEvent.contractAddress),
           inValue: new BigNumber(inEvent.value).dividedBy(WEI_PER_GOLD).toNumber(),
-          outSymbol: this.getTokenAtAddress(outEvent.contractAddress.toLowerCase()),
+          outSymbol: this.getTokenAtAddress(outEvent.contractAddress),
           outValue: new BigNumber(outEvent.value).dividedBy(WEI_PER_GOLD).toNumber(),
           hash: txhash,
         })
@@ -161,7 +166,7 @@ export class BlockscoutAPI extends RESTDataSource {
           value: new BigNumber(event.value).dividedBy(WEI_PER_GOLD).toNumber(),
           address,
           comment,
-          symbol: this.getTokenAtAddress(event.contractAddress.toLowerCase()) || 'unknown',
+          symbol: this.getTokenAtAddress(event.contractAddress) || 'unknown',
           hash: txhash,
         })
       }
