@@ -92,6 +92,14 @@ export async function getTerraformModuleResourceNames(moduleName: string) {
   return output.split('\n')
 }
 
+export function showTerraformModulePlan(moduleName: string) {
+  return execTerraformCmd(
+    `terraform show ${getPlanPath(moduleName)}`,
+    getModulePath(moduleName),
+    true
+  )
+}
+
 function getModulePath(moduleName: string) {
   return path.join(terraformModulesPath, moduleName)
 }
