@@ -1,4 +1,5 @@
-import { DEFAULT_SYNC_MODE, Testnets } from 'src/web3/testnets'
+import { DEFAULT_SYNC_MODE } from 'src/config'
+import { Testnets } from 'src/web3/testnets'
 
 export default {
   [Testnets.integration]: {
