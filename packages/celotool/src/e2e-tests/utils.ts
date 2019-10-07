@@ -232,6 +232,18 @@ export async function addStaticPeers(datadir: string, enodes: string[]) {
   fs.writeFileSync(`${datadir}/static-nodes.json`, JSON.stringify(enodes))
 }
 
+export async function addSentryPeer(gethBinaryPath: string, instance: GethInstanceConfig) {
+  if (instance.peers) {
+    await execCmdWithExitOnFailure(gethBinaryPath, [
+      '--datadir',
+      getDatadir(instance),
+      'attach',
+      '--exec',
+      `admin.addSentry('${instance.peers[0]}')`,
+    ])
+  }
+}
+
 async function isPortOpen(host: string, port: number) {
   return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
 }
@@ -259,7 +271,17 @@ export async function getEnode(port: number, ws: boolean = false) {
 
 export async function startGeth(gethBinaryPath: string, instance: GethInstanceConfig) {
   const datadir = getDatadir(instance)
-  const { syncmode, port, rpcport, wsport, validating, bootnodeEnode } = instance
+  const {
+    syncmode,
+    port,
+    rpcport,
+    wsport,
+    validating,
+    bootnodeEnode,
+    isSentry,
+    isProxied,
+    sentryport,
+  } = instance
   const privateKey = instance.privateKey || ''
   const lightserv = instance.lightserv || false
   const etherbase = instance.etherbase || ''
@@ -312,6 +334,17 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
   if (validating) {
     gethArgs.push('--password=/dev/null', `--unlock=0`)
     gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
+
+    if (isProxied) {
+      gethArgs.push('--proxied')
+    }
+  } else if (isSentry) {
+    gethArgs.push('--sentry')
+    if (sentryport) {
+      gethArgs.push('--proxyport')
+      gethArgs.push(sentryport.toString())
+    }
+    gethArgs.push(`--nodekeyhex=${privateKey}`)
   }
 
   if (bootnodeEnode) {
@@ -333,6 +366,10 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     } else {
       console.info(`geth:${instance.name}: jsonRPC port open ${waitForPort}`)
     }
+  }
+
+  if (isProxied) {
+    addSentryPeer(gethBinaryPath, instance)
   }
 }
 
@@ -431,7 +468,9 @@ export function getContext(gethConfig: GethTestConfig) {
   const sentryPrivateKeys = getPrivateKeysFor(AccountType.SENTRY, mnemonic, numSentries)
   const sentryEnodes = sentryPrivateKeys.map((x: any, i: number) => [
     sentryInstances[i].name,
-    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', sentryInstances[i].port),
+    !sentryInstances[i].sentryport
+      ? null
+      : getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', sentryInstances[i].sentryport!),
   ])
 
   const argv = require('minimist')(process.argv.slice(2))
@@ -471,7 +510,7 @@ export function getContext(gethConfig: GethTestConfig) {
           throw new Error('proxied validator must have exactly one sentry')
         }
 
-        instance.peers = [sentryEnode[0][1]]
+        instance.peers = [sentryEnode[0][1]!]
       }
 
       // Set the private key for the validator or sentry instance
