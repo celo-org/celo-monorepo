@@ -50,7 +50,7 @@ export function* refreshBalancesWithLoadingSaga() {
   )
 }
 
-function* autoRefreshSaga() {
+export function* autoRefreshSaga() {
   while (true) {
     if (yield select(shouldUpdateBalance)) {
       yield put(refreshAllBalances())
@@ -62,7 +62,7 @@ function* autoRefreshSaga() {
   }
 }
 
-function* autoRefreshWatcher() {
+export function* autoRefreshWatcher() {
   while (yield take(Actions.START_BALANCE_AUTOREFRESH)) {
     // starts the task in the background
     const autoRefresh = yield fork(autoRefreshSaga)
@@ -71,7 +71,7 @@ function* autoRefreshWatcher() {
   }
 }
 
-function* watchRefreshBalances() {
+export function* watchRefreshBalances() {
   yield takeLeading(
     Actions.REFRESH_BALANCES,
     withLoading(withTimeout(REFRESH_TIMEOUT, refreshBalances))
@@ -86,6 +86,3 @@ export function* homeSaga() {
   // keep us stuck on sync screen
   // yield spawn(refreshBalancesWithLoadingSaga)
 }
-
-export const _watchRefreshBalances = watchRefreshBalances
-export const _autoRefreshSaga = autoRefreshSaga
