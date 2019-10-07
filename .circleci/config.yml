@@ -136,6 +136,7 @@ jobs:
 
   ui_test:
     <<: *android_config
+    resource_class: xlarge
     steps:
       - checkout
       - restore_cache:
@@ -201,9 +202,11 @@ jobs:
           command: cd ~/src/packages/mobile && yarn start
           background: true
       - run: cp node_modules/.bin/jest packages/mobile/node_modules/.bin/ # for some reason jest is just not there
+      - run: lock device
       - run:
           name: Sleep until Device connects
           command: cd ~/src/packages/mobile && bash ./scripts/wait_for_emulator_to_connect.sh && sleep 30
+      - run: unlock device
       - run:
           name: Run yarn dev
           command: cd ~/src/packages/mobile && ENVFILE=".env.test" yarn dev
