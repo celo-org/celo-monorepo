@@ -76,7 +76,12 @@ export class BlockscoutAPI extends RESTDataSource {
 
   getTokenAtAddress(tokenAddress: string) {
     if (this.tokenAddressMapping) {
-      return this.tokenAddressMapping[tokenAddress]
+      if (tokenAddress in this.tokenAddressMapping) {
+        return this.tokenAddressMapping[tokenAddress]
+      } else {
+        console.info('Token addresses mapping: ' + JSON.stringify(this.tokenAddressMapping))
+        throw new Error('No token corresponding to ' + tokenAddress)
+      }
     } else {
       throw new Error('Cannot find tokenAddressMapping despite intialization')
     }
