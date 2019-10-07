@@ -137,13 +137,13 @@ jobs:
   ui_test:
     <<: *android_config
     steps:
+      - checkout
       - restore_cache:
           keys:
             - yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
             - yarn-v2-{{ arch }}-{{ .Branch }}-
             - yarn-v2-{{ arch }}-
             - yarn-v2-
-      - checkout
       - run:
           name: Setup environment variables
           command: |
