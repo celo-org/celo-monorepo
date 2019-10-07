@@ -7,6 +7,7 @@ import { Image, StyleSheet, Text, View } from 'react-native'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ringsPlusCircle } from 'src/images/Images'
 import { navigateBack } from 'src/navigator/NavigationService'
+import { Namespaces } from 'src/i18n'
 
 type Props = WithNamespaces
 
@@ -57,4 +58,6 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withNamespaces('exchangeFlow9')(FeeExchangeEducation))
+export default componentWithAnalytics(
+  withNamespaces(Namespaces.exchangeFlow9)(FeeExchangeEducation)
+)

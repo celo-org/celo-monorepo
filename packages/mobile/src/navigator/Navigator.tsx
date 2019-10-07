@@ -107,6 +107,7 @@ const ExchangeStack = createStackNavigator(
     // Note, ExchangeHomeScreen isn't in this stack because it's part of the tab navigator
     [Screens.ExchangeTradeScreen]: { screen: ExchangeTradeScreen },
     [Screens.ExchangeReview]: { screen: ExchangeReview },
+    [Screens.FeeExchangeEducation]: { screen: FeeExchangeEducation },
   },
   {
     navigationOptions: {
@@ -157,7 +158,6 @@ const AppStack = createStackNavigator(
     [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
     [Screens.ReclaimPaymentConfirmationScreen]: { screen: ReclaimPaymentConfirmationScreen },
     [Screens.FeeEducation]: { screen: FeeEducation },
-    [Screens.FeeExchangeEducation]: { screen: FeeExchangeEducation },
     ...commonScreens,
   },
   {

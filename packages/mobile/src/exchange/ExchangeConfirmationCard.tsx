@@ -105,7 +105,7 @@ class ExchangeConfirmationCard extends React.PureComponent<Props> {
           />
           <LineItemRow
             currencySymbol={this.getTakerToken()}
-            amount={'1'}
+            amount={'0.01'}
             title={t('exchangeFee')}
             titleIcon={<FeeExchangeIcon />}
           />
