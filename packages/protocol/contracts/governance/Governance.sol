@@ -12,7 +12,7 @@ import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/FractionUtil.sol";
 import "../common/linkedlists/IntegerSortedLinkedList.sol";
-
+import "../common/ExtractFunctionSignature.sol";
 
 // TODO(asa): Hardcode minimum times for queueExpiry, etc.
 /**
@@ -906,9 +906,11 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       participationParameters.baseline.multiply(participationParameters.baselineQuorumFactor)
     );
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
-      bytes4 functionId = extractFunctionSignature(proposal.transactions[i].data);
+      bytes4 functionId = ExtractFunctionSignature.extractFunctionSignature(
+        proposal.transactions[i].data
+      );
       FixidityLib.Fraction memory threshold = _getConstitution(
-        proposal.transactions[i].destination, 
+        proposal.transactions[i].destination,
         functionId
       );
       if (support.lte(threshold)) {
@@ -999,22 +1001,6 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
       participationParameters.baseline = participationParameters.baselineFloor;
     }
     emit ParticipationBaselineUpdated(participationParameters.baseline.unwrap());
-  }
-
-  /**
-   * @notice Extracts the first four bytes of a byte array.
-   * @param input The byte array.
-   * @return The first four bytes of `input`.
-   */
-  function extractFunctionSignature(bytes memory input) private pure returns (bytes4) {
-    bytes4 output;
-    /* solhint-disable no-inline-assembly */
-    assembly {
-      mstore(output, input)
-      mstore(add(output, 4), add(input, 4))
-    }
-    /* solhint-enable no-inline-assembly */
-    return output;
   }
 
   function getConstitution(
