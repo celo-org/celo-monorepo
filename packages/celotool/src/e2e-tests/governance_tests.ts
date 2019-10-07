@@ -3,14 +3,7 @@ import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import { assert } from 'chai'
 import Web3 from 'web3'
-import {
-  getContext,
-  getContractAddress,
-  getEnode,
-  importGenesis,
-  initAndStartGeth,
-  sleep,
-} from './utils'
+import { getContext, getEnode, importGenesis, initAndStartGeth, sleep } from './utils'
 
 describe('governance tests', () => {
   const gethConfig = {
@@ -34,7 +27,7 @@ describe('governance tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
-    // await context.hooks.before()
+    await context.hooks.before()
   })
 
   after(context.hooks.after)
@@ -116,8 +109,8 @@ describe('governance tests', () => {
     const epoch = 10
     const blockNumbers: number[] = []
     let allValidators: string[]
-    before(async function() {
-      this.timeout(0)
+    before(async function(this: any) {
+      this.timeout(0) // Disable test timeout
       await restart()
       const [groupAddress, groupPrivateKey] = await getValidatorGroupKeys()
 
@@ -273,16 +266,6 @@ describe('governance tests', () => {
       )
       const [group] = await validators.methods.getRegisteredValidatorGroups().call()
 
-      const assertBalanceUnchanged = async (validator: string, blockNumber: number) => {
-        const currentBalance = new BigNumber(
-          await stableToken.methods.balanceOf(validator).call({}, blockNumber)
-        )
-        const previousBalance = new BigNumber(
-          await stableToken.methods.balanceOf(validator).call({}, blockNumber - 1)
-        )
-        assert.equal(currentBalance.toFixed(), previousBalance.toFixed())
-      }
-
       const assertBalanceChanged = async (
         validator: string,
         blockNumber: number,
@@ -295,6 +278,10 @@ describe('governance tests', () => {
           await stableToken.methods.balanceOf(validator).call({}, blockNumber - 1)
         )
         assert.equal(expected.toFixed(), currentBalance.minus(previousBalance).toFixed())
+      }
+
+      const assertBalanceUnchanged = async (validator: string, blockNumber: number) => {
+        await assertBalanceChanged(validator, blockNumber, new BigNumber(0))
       }
 
       const getExpectedTotalPayment = async (validator: string, blockNumber: number) => {
@@ -337,19 +324,11 @@ describe('governance tests', () => {
     it('should distribute epoch rewards at the end of each epoch', async () => {
       const validators = await kit._web3Contracts.getValidators()
       const election = await kit._web3Contracts.getElection()
-      // const lockedGold = await kit._web3Contracts.getLockedGold()
+      const lockedGold = await kit._web3Contracts.getLockedGold()
+      const governance = await kit._web3Contracts.getGovernance()
       const epochReward = new BigNumber(10).pow(18)
+      const infraReward = new BigNumber(10).pow(18)
       const [group] = await validators.methods.getRegisteredValidatorGroups().call()
-
-      const assertVotesUnchanged = async (group: string, blockNumber: number) => {
-        const currentVotes = new BigNumber(
-          await election.methods.getGroupTotalVotes(group).call({}, blockNumber)
-        )
-        const previousVotes = new BigNumber(
-          await election.methods.getGroupTotalVotes(group).call({}, blockNumber - 1)
-        )
-        assert.equal(currentVotes.toFixed(), previousVotes.toFixed())
-      }
 
       const assertVotesChanged = async (
         group: string,
@@ -362,75 +341,100 @@ describe('governance tests', () => {
         const previousVotes = new BigNumber(
           await election.methods.getGroupTotalVotes(group).call({}, blockNumber - 1)
         )
-        console.log(
-          currentVotes.toFixed(),
-          previousVotes.toFixed(),
-          expected.toFixed(),
-          currentVotes.minus(previousVotes).toFixed()
-        )
         assert.equal(expected.toFixed(), currentVotes.minus(previousVotes).toFixed())
+      }
+
+      const assertGoldTokenTotalSupplyChanged = async (
+        blockNumber: number,
+        expected: BigNumber
+      ) => {
+        const currentSupply = new BigNumber(
+          await goldToken.methods.totalSupply().call({}, blockNumber)
+        )
+        const previousSupply = new BigNumber(
+          await goldToken.methods.totalSupply().call({}, blockNumber - 1)
+        )
+        assert.equal(expected.toFixed(), currentSupply.minus(previousSupply).toFixed())
+      }
+
+      const assertBalanceChanged = async (
+        address: string,
+        blockNumber: number,
+        expected: BigNumber
+      ) => {
+        const currentBalance = new BigNumber(
+          await goldToken.methods.balanceOf(address).call({}, blockNumber)
+        )
+        const previousBalance = new BigNumber(
+          await goldToken.methods.balanceOf(address).call({}, blockNumber - 1)
+        )
+        assert.equal(expected.toFixed(), currentBalance.minus(previousBalance).toFixed())
+      }
+
+      const assertLockedGoldBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
+        await assertBalanceChanged(lockedGold.options.address, blockNumber, expected)
+      }
+
+      const assertGovernanceBalanceChanged = async (blockNumber: number, expected: BigNumber) => {
+        await assertBalanceChanged(governance.options.address, blockNumber, expected)
+      }
+
+      const assertVotesUnchanged = async (group: string, blockNumber: number) => {
+        await assertVotesChanged(group, blockNumber, new BigNumber(0))
+      }
+
+      const assertGoldTokenTotalSupplyUnchanged = async (blockNumber: number) => {
+        await assertGoldTokenTotalSupplyChanged(blockNumber, new BigNumber(0))
+      }
+
+      const assertLockedGoldBalanceUnchanged = async (blockNumber: number) => {
+        await assertLockedGoldBalanceChanged(blockNumber, new BigNumber(0))
+      }
+
+      const assertGovernanceBalanceUnchanged = async (blockNumber: number) => {
+        await assertGovernanceBalanceChanged(blockNumber, new BigNumber(0))
       }
 
       for (const blockNumber of blockNumbers) {
         if (isLastBlockOfEpoch(blockNumber, epoch)) {
           await assertVotesChanged(group, blockNumber, epochReward)
+          await assertGoldTokenTotalSupplyChanged(blockNumber, epochReward.plus(infraReward))
+          await assertLockedGoldBalanceChanged(blockNumber, epochReward)
+          await assertGovernanceBalanceChanged(blockNumber, infraReward)
         } else {
           await assertVotesUnchanged(group, blockNumber)
+          await assertGoldTokenTotalSupplyUnchanged(blockNumber)
+          await assertLockedGoldBalanceUnchanged(blockNumber)
+          await assertGovernanceBalanceUnchanged(blockNumber)
         }
       }
     })
   })
 
-  describe('after the governance smart contract is registered', () => {
-    let goldGenesisSupply: any
-    const addressesWithBalance: string[] = []
+  describe('after the gold token smart contract is registered', () => {
+    let goldGenesisSupply = new BigNumber(0)
     beforeEach(async function(this: any) {
       this.timeout(0) // Disable test timeout
       await restart()
       const genesis = await importGenesis()
-      goldGenesisSupply = new BigNumber(0)
-      Object.keys(genesis.alloc).forEach((validator) => {
-        addressesWithBalance.push(validator)
-        goldGenesisSupply = goldGenesisSupply.plus(genesis.alloc[validator].balance)
+      Object.keys(genesis.alloc).forEach((address) => {
+        goldGenesisSupply = goldGenesisSupply.plus(genesis.alloc[address].balance)
       })
-      // Block rewards are paid to governance and Locked Gold.
-      // Governance also receives a portion of transaction fees.
-      addressesWithBalance.push(await getContractAddress('GovernanceProxy'))
-      addressesWithBalance.push(await getContractAddress('LockedGoldProxy'))
-      // Some gold is sent to the reserve and exchange during migrations.
-      addressesWithBalance.push(await getContractAddress('ReserveProxy'))
-      addressesWithBalance.push(await getContractAddress('ExchangeProxy'))
     })
 
-    it('should update the Celo Gold total supply correctly', async function(this: any) {
-      // To register a validator group, we send gold to a new address not included in
-      // `addressesWithBalance`. Therefore, we check the gold total supply at a block before
-      // that gold is sent.
-      // We don't set the total supply until block rewards are paid out, which can happen once
-      // Governance is registered.
-      let blockNumber = 150
-      while (true) {
-        // This will fail if Governance is not registered.
-        const governanceAddress = await registry.methods
-          .getAddressForString('Governance')
-          .call({}, blockNumber)
-        if (new BigNumber(governanceAddress).isZero()) {
-          blockNumber += 1
-        } else {
+    it('should initialize the Celo Gold total supply correctly', async function(this: any) {
+      const events = await registry.getPastEvents('RegistryUpdated', { fromBlock: 0 })
+      let blockNumber = 0
+      for (const e of events) {
+        if (e.returnValues.identifier === 'GoldToken') {
+          blockNumber = e.blockNumber
           break
         }
       }
+      assert.isAtLeast(blockNumber, 1)
+
       const goldTotalSupply = await goldToken.methods.totalSupply().call({}, blockNumber)
-      const balances = await Promise.all(
-        addressesWithBalance.map(
-          async (a: string) => new BigNumber(await web3.eth.getBalance(a, blockNumber))
-        )
-      )
-      const expectedGoldTotalSupply = balances.reduce((total: BigNumber, b: BigNumber) =>
-        b.plus(total)
-      )
-      assert.isAtLeast(expectedGoldTotalSupply.toNumber(), goldGenesisSupply.toNumber())
-      assert.equal(goldTotalSupply.toString(), expectedGoldTotalSupply.toString())
+      assert.equal(goldTotalSupply, goldGenesisSupply.toFixed())
     })
   })
 })

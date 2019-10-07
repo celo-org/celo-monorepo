@@ -856,7 +856,7 @@ contract('Election', (accounts: string[]) => {
     })
   })
 
-  describe.only('#distributeEpochRewards', () => {
+  describe('#distributeEpochRewards', () => {
     const voter = accounts[0]
     const group = accounts[1]
     const voteValue = new BigNumber(1000000)

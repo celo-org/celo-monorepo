@@ -1128,10 +1128,19 @@ contract('Validators', (accounts: string[]) => {
       const expectedEpoch = new BigNumber(
         Math.floor((await web3.eth.getBlock('latest')).number / EPOCH)
       )
-      assert.equal(membershipHistory[0].length, 1)
-      assertEqualBN(membershipHistory[0][0], expectedEpoch)
-      assert.equal(membershipHistory[1].length, 1)
-      assertSameAddress(membershipHistory[1][0], NULL_ADDRESS)
+
+      // Depending on test timing, we may or may not span an epoch boundary between registration
+      // and removal.
+      const numEntries = membershipHistory[0].length
+      assert.isTrue(numEntries == 1 || numEntries == 2)
+      assert.equal(membershipHistory[1].length, numEntries)
+      if (numEntries == 1) {
+        assertEqualBN(membershipHistory[0][0], expectedEpoch)
+        assertSameAddress(membershipHistory[1][0], NULL_ADDRESS)
+      } else {
+        assertEqualBN(membershipHistory[0][1], expectedEpoch)
+        assertSameAddress(membershipHistory[1][1], NULL_ADDRESS)
+      }
     })
 
     it('should emit the ValidatorGroupMemberRemoved event', async () => {

@@ -327,6 +327,22 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   /**
+   * @notice Returns the account associated with `accountOrVoter`.
+   * @param accountOrVoter The address of the account or previously authorized voter.
+   * @dev Fails if the `accountOrVoter` is not an account or previously authorized voter.
+   * @return The associated account.
+   */
+  function getAccountFromVoter(address accountOrVoter) public view returns (address) {
+    AuthorizedBy memory ab = authorizedBy[accountOrVoter];
+    if (ab.account != address(0)) {
+      return ab.account;
+    } else {
+      require(isAccount(accountOrVoter));
+      return accountOrVoter;
+    }
+  }
+
+  /**
    * @notice Returns the account associated with `accountOrValidator`.
    * @param accountOrValidator The address of the account or previously authorized validator.
    * @dev Fails if the `accountOrValidator` is not an account or previously authorized validator.

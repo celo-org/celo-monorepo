@@ -35,7 +35,9 @@ contract('StableToken', (accounts: string[]) => {
       18,
       registry.address,
       fixed1,
-      SECONDS_IN_A_WEEK
+      SECONDS_IN_A_WEEK,
+      [],
+      []
     )
     initializationTime = (await web3.eth.getBlock('latest')).timestamp
   })
@@ -87,7 +89,9 @@ contract('StableToken', (accounts: string[]) => {
           18,
           registry.address,
           fixed1,
-          SECONDS_IN_A_WEEK
+          SECONDS_IN_A_WEEK,
+          [],
+          []
         )
       )
     })
@@ -132,7 +136,7 @@ contract('StableToken', (accounts: string[]) => {
     })
 
     it('should not allow anyone else to mint', async () => {
-      await assertRevert(stableToken.mint(minter, amountToMint, { from: accounts[2] }))
+      await assertRevert(stableToken.mint(validators, amountToMint, { from: accounts[2] }))
     })
   })
 
