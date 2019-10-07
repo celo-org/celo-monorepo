@@ -1,3 +1,4 @@
+import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { StableToken } from '../generated/types/StableToken'
 import {
@@ -109,8 +110,8 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
   async getInflationParameters(): Promise<InflationParameters> {
     const res = await this.contract.methods.getInflationParameters().call()
     return {
-      rate: toBigNumber(res[0]),
-      factor: toBigNumber(res[1]),
+      rate: fromFixed(toBigNumber(res[0])),
+      factor: fromFixed(toBigNumber(res[1])),
       updatePeriod: toBigNumber(res[2]),
       factorLastUpdated: toBigNumber(res[3]),
     }

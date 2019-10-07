@@ -1,5 +1,6 @@
 import { deriveCEK } from '@celo/utils/src/commentEncryption'
 import { getAccountAddressFromPrivateKey } from '@celo/walletkit'
+import * as Crypto from 'crypto'
 import { generateMnemonic, mnemonicToSeedHex } from 'react-native-bip39'
 import * as RNFS from 'react-native-fs'
 import { REHYDRATE } from 'redux-persist/es/constants'
@@ -203,12 +204,15 @@ function getPrivateKeyFilePath(account: string): string {
 
 function ensureAddressAndKeyMatch(address: string, privateKey: string) {
   const generatedAddress = getAccountAddressFromPrivateKey(privateKey)
+  if (!generatedAddress) {
+    throw new Error(`Failed to generate address from private key`)
+  }
   if (address.toLowerCase() !== generatedAddress.toLowerCase()) {
     throw new Error(
       `Address from private key: ${generatedAddress}, ` + `address of sender ${address}`
     )
   }
-  console.debug(`signing-utils@ensureCorrectSigner: sender and private key match`)
+  Logger.debug(TAG + '@ensureAddressAndKeyMatch', `Sender and private key match`)
 }
 
 async function savePrivateKeyToLocalDisk(
@@ -218,9 +222,10 @@ async function savePrivateKeyToLocalDisk(
 ) {
   ensureAddressAndKeyMatch(account, privateKey)
   const filePath = getPrivateKeyFilePath(account)
-  Logger.debug('savePrivateKeyToLocalDisk', `Writing private key to ${filePath}`)
-  // TODO(ashishb): Store encrypted private key instead
-  await RNFS.writeFile(getPrivateKeyFilePath(account), privateKey)
+  const plainTextData = privateKey
+  const encryptedData: Buffer = getEncryptedData(plainTextData, encryptionPassword)
+  Logger.debug('savePrivateKeyToLocalDisk', `Writing encrypted private key to ${filePath}`)
+  await RNFS.writeFile(getPrivateKeyFilePath(account), encryptedData.toString('hex'))
 }
 
 // Reads and returns unencrypted private key
@@ -230,8 +235,34 @@ export async function readPrivateKeyFromLocalDisk(
 ): Promise<string> {
   const filePath = getPrivateKeyFilePath(account)
   Logger.debug('readPrivateKeyFromLocalDisk', `Reading private key from ${filePath}`)
-  // TODO(ashishb): Read and decrypt private key instead
-  return RNFS.readFile(getPrivateKeyFilePath(account))
+  const hexEncodedEncryptedData: string = await RNFS.readFile(filePath)
+  const encryptedDataBuffer: Buffer = new Buffer(hexEncodedEncryptedData, 'hex')
+  const privateKey: string = getDecryptedData(encryptedDataBuffer, encryptionPassword)
+  ensureAddressAndKeyMatch(account, privateKey)
+  return privateKey
+}
+
+// Exported for testing
+export function getEncryptedData(plainTextData: string, password: string): Buffer {
+  try {
+    const cipher = Crypto.createCipher('aes-256-cbc', password)
+    return Buffer.concat([cipher.update(new Buffer(plainTextData, 'utf8')), cipher.final()])
+  } catch (e) {
+    Logger.error(TAG + '@getEncryptedData', 'Failed to write private key', e)
+    throw e // Re-throw
+  }
+}
+
+// Exported for testing
+export function getDecryptedData(encryptedData: Buffer, password: string): string {
+  try {
+    const decipher = Crypto.createDecipher('aes-256-cbc', password)
+    const decrypted = Buffer.concat([decipher.update(encryptedData), decipher.final()])
+    return decrypted.toString('utf8')
+  } catch (e) {
+    Logger.error(TAG + '@getDecryptedData', 'Failed to read private key', e)
+    throw e // Re-throw
+  }
 }
 
 // Wait for account to exist and then return it
