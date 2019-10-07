@@ -149,11 +149,52 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     }
   }
 
+  /**
+   * Returns whether a particular account is voting for a validator group.
+   * @param account The account.
+   * @return Whether a particular account is voting for a validator group.
+   */
+  isVoting = proxyCall(this.contract.methods.isVoting)
+
+  /**
+   * Returns whether a particular account is a registered validator or validator group.
+   * @param account The account.
+   * @return Whether a particular account is a registered validator or validator group.
+   */
+  isValidating = proxyCall(this.contract.methods.isValidating)
+
+  /**
+   * Returns whether a particular account has a registered validator.
+   * @param account The account.
+   * @return Whether a particular address is a registered validator.
+   */
+  isValidator = proxyCall(this.contract.methods.isValidator)
+
+  /**
+   * Returns whether a particular account has a registered validator group.
+   * @param account The account.
+   * @return Whether a particular address is a registered validator group.
+   */
+  isValidatorGroup = proxyCall(this.contract.methods.isValidatorGroup)
+
+  /**
+   * Returns whether an account meets the requirements to register a validator or group.
+   * @param account The account.
+   * @param noticePeriods An array of notice periods of the Locked Gold commitments
+   *   that cumulatively meet the requirements for validator registration.
+   * @return Whether an account meets the requirements to register a validator or group.
+   */
+  meetsRegistrationRequirements = proxyCall(this.contract.methods.meetsRegistrationRequirements)
+
   addMember = proxySend(this.kit, this.contract.methods.addMember)
   removeMember = proxySend(this.kit, this.contract.methods.removeMember)
 
   async reorderMember(groupAddr: Address, validator: Address, newIndex: number) {
     const group = await this.getValidatorGroup(groupAddr)
+
+    if (newIndex < 0 || newIndex >= group.members.length) {
+      throw new Error(`Invalid index ${newIndex}; max index is ${group.members.length - 1}`)
+    }
 
     const currentIdx = group.members.indexOf(validator)
     if (currentIdx < 0) {
@@ -161,6 +202,11 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     } else if (currentIdx === newIndex) {
       throw new Error(`Validator is already in position ${newIndex}`)
     }
+
+    // remove the element
+    group.members.splice(currentIdx, 1)
+    // add it on new position
+    group.members.splice(newIndex, 0, validator)
 
     const nextMember =
       newIndex === group.members.length - 1 ? NULL_ADDRESS : group.members[newIndex + 1]

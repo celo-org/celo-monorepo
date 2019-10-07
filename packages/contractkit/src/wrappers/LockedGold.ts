@@ -118,6 +118,21 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   isVoting = proxyCall(this.contract.methods.isVoting)
 
   /**
+   * Check if an account already exists.
+   * @param account The address of the account
+   * @return Returns `true` if account exists. Returns `false` otherwise.
+   *         In particular it will return `false` if a delegate with given address exists.
+   */
+  isAccount = proxyCall(this.contract.methods.isAccount)
+
+  /**
+   * Check if a delegate already exists.
+   * @param account The address of the delegate
+   * @return Returns `true` if delegate exists. Returns `false` otherwise.
+   */
+  isDelegate = proxyCall(this.contract.methods.isDelegate)
+
+  /**
    * Query maximum notice period.
    * @returns Current maximum notice period.
    */
