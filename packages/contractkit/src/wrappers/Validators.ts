@@ -10,7 +10,7 @@ import {
   proxySend,
   toBigNumber,
   toNumber,
-  wrapSend,
+  toTransactionObject,
 } from './BaseWrapper'
 
 export interface Validator {
@@ -53,8 +53,6 @@ export interface ValidatorConfig {
 export class ValidatorsWrapper extends BaseWrapper<Validators> {
   affiliate = proxySend(this.kit, this.contract.methods.affiliate)
   deaffiliate = proxySend(this.kit, this.contract.methods.deaffiliate)
-  addMember = proxySend(this.kit, this.contract.methods.addMember)
-  removeMember = proxySend(this.kit, this.contract.methods.removeMember)
   registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
   registerValidatorGroup = proxySend(this.kit, this.contract.methods.registerValidatorGroup)
   /**
@@ -151,6 +149,30 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     }
   }
 
+  addMember = proxySend(this.kit, this.contract.methods.addMember)
+  removeMember = proxySend(this.kit, this.contract.methods.removeMember)
+
+  async reorderMember(groupAddr: Address, validator: Address, newIndex: number) {
+    const group = await this.getValidatorGroup(groupAddr)
+
+    const currentIdx = group.members.indexOf(validator)
+    if (currentIdx < 0) {
+      throw new Error(`ValidatorGroup ${groupAddr} does not inclue ${validator}`)
+    } else if (currentIdx === newIndex) {
+      throw new Error(`Validator is already in position ${newIndex}`)
+    }
+
+    const nextMember =
+      newIndex === group.members.length - 1 ? NULL_ADDRESS : group.members[newIndex + 1]
+    const prevMember = newIndex === 0 ? NULL_ADDRESS : group.members[newIndex - 1]
+
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.reorderMember(validator, nextMember, prevMember),
+      { from: groupAddr }
+    )
+  }
+
   async getRegisteredValidatorGroups(): Promise<ValidatorGroup[]> {
     const vgAddresses = await this.contract.methods.getRegisteredValidatorGroups().call()
     return Promise.all(vgAddresses.map((addr) => this.getValidatorGroup(addr)))
@@ -191,7 +213,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       votingDetails.weight.negated()
     )
 
-    return wrapSend(this.kit, this.contract.methods.revokeVote(lesser, greater))
+    return toTransactionObject(this.kit, this.contract.methods.revokeVote(lesser, greater))
   }
 
   async vote(validatorGroup: Address): Promise<CeloTransactionObject<boolean>> {
@@ -207,7 +229,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       votingDetails.weight
     )
 
-    return wrapSend(this.kit, this.contract.methods.vote(validatorGroup, lesser, greater))
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.vote(validatorGroup, lesser, greater)
+    )
   }
 
   private async findLesserAndGreaterAfterVote(

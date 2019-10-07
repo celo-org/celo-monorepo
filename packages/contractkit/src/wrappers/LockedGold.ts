@@ -10,7 +10,7 @@ import {
   proxyCall,
   proxySend,
   toBigNumber,
-  wrapSend,
+  toTransactionObject,
 } from '../wrappers/BaseWrapper'
 
 export interface VotingDetails {
@@ -226,7 +226,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     role: Roles
   ): Promise<CeloTransactionObject<void>> {
     const sig = await this.getParsedSignatureOfAddress(account, delegate)
-    return wrapSend(
+    return toTransactionObject(
       this.kit,
       this.contract.methods.delegateRole(role, delegate, sig.v, sig.r, sig.s)
     )
