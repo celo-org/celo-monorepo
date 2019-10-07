@@ -180,6 +180,7 @@ jobs:
       - run: brew install cask
       - run: brew tap homebrew/cask-versions
       - run: brew cask install homebrew/cask-versions/adoptopenjdk8
+      - run: cd ~/src/packages/mobile && yarn test:build-e2e # tests seem to fail if the app is built at the same time the emulator runs
       # - detox
       - run:
           name: Run Tests
