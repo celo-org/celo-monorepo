@@ -57,10 +57,6 @@ const fakeRequests = [
 ]
 const store = createMockStore()
 
-jest.mock('src/web3/contracts', () => ({
-  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
-}))
-
 describe('PaymentRequestSummaryNotification', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
