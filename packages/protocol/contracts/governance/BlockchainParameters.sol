@@ -39,9 +39,9 @@ contract BlockchainParameters is Ownable, Initializable {
    * patch level.
    */
   function initialize(
-    uint256 _minimumClientVersion1,
-    uint256 _minimumClientVersion2,
-    uint256 _minimumClientVersion3,
+    uint256 major,
+    uint256 minor,
+    uint256 patch,
     uint256 _gasForDebitFromTransactions,
     uint256 _gasForCreditToTransactions,
     uint256 _gasToReadErc20Balance,
