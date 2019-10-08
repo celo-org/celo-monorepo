@@ -14,8 +14,8 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 import Spinner from 'src/shared/Spinner'
+import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 export class FellowshipForm extends React.Component<I18nProps & ScreenProps> {
   render() {
     const { t, screen } = this.props
