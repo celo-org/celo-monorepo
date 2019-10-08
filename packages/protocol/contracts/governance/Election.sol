@@ -442,6 +442,10 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry, Usi
   }
 
   function getGroupEpochRewards(address group, uint256 totalEpochRewards) external view returns (uint256) {
+    // TODO(asa): Is this right?
+    if (votes.active.total[group] == 0 || votes.total.active == 0) {
+      return 0;
+    }
     return totalEpochRewards.mul(votes.active.total[group]).div(votes.total.active);
   }
 
@@ -451,10 +455,6 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry, Usi
   }
 
   function _distributeEpochRewards(address group, uint256 value, address lesser, address greater) internal {
-    // TODO(asa): What do here?
-    if (votes.active.total[group] == 0) {
-    }
-
     if (votes.total.eligible.contains(group)) {
       uint256 newVoteTotal = votes.total.eligible.getValue(group).add(value);
       votes.total.eligible.update(group, newVoteTotal, lesser, greater);

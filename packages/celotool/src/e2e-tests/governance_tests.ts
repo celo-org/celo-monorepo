@@ -76,6 +76,17 @@ describe('governance tests', () => {
     return [groupAddress, decryptedKeystore.privateKey]
   }
 
+  const activate = async (web3: any, account: string, txOptions: any = {}) => {
+    await unlockAccount(account, web3)
+    const [group] = await validators.methods.getRegisteredValidatorGroups().call()
+    const tx = election.methods.activate(group)
+    let gas = txOptions.gas
+    if (!gas) {
+      gas = await tx.estimateGas({ ...txOptions })
+    }
+    return tx.send({ from: account, ...txOptions, gas })
+  }
+
   const removeMember = async (
     groupWeb3: any,
     group: string,
@@ -106,7 +117,7 @@ describe('governance tests', () => {
   }
 
   describe('when the validator set is changing', () => {
-    const epoch = 10
+    let epoch: number
     const blockNumbers: number[] = []
     let allValidators: string[]
     before(async function(this: any) {
@@ -126,9 +137,12 @@ describe('governance tests', () => {
       await initAndStartGeth(context.hooks.gethBinaryPath, groupInstance)
       allValidators = await getValidatorGroupMembers()
       assert.equal(allValidators.length, 5)
+      epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
+      assert.equal(epoch, 10)
 
       // Give the node time to sync.
       await sleep(15)
+      await activate(web3, allValidators[0])
       const groupWeb3 = new Web3('ws://localhost:8567')
       const groupKit = newKitFromWeb3(groupWeb3)
       validators = await groupKit._web3Contracts.getValidators()
