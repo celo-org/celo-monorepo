@@ -1,6 +1,7 @@
 import debugFactory from 'debug'
 import { CeloContract } from './base'
 import { newAttestations } from './generated/Attestations'
+import { newBlockchainParameters } from './generated/BlockchainParameters'
 import { newEscrow } from './generated/Escrow'
 import { newExchange } from './generated/Exchange'
 import { newGasCurrencyWhitelist } from './generated/GasCurrencyWhitelist'
@@ -20,13 +21,14 @@ const debug = debugFactory('kit:web3-contract-cache')
 
 const ContractFactories = {
   [CeloContract.Attestations]: newAttestations,
-  [CeloContract.LockedGold]: newLockedGold,
+  [CeloContract.BlockchainParameters]: newBlockchainParameters,
   [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
   [CeloContract.GasCurrencyWhitelist]: newGasCurrencyWhitelist,
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
+  [CeloContract.LockedGold]: newLockedGold,
   [CeloContract.Random]: newRandom,
   [CeloContract.Registry]: newRegistry,
   [CeloContract.Reserve]: newReserve,
@@ -54,8 +56,8 @@ export class Web3ContractCache {
   getAttestations() {
     return this.getContract(CeloContract.Attestations)
   }
-  getLockedGold() {
-    return this.getContract(CeloContract.LockedGold)
+  getBlockchainParameters() {
+    return this.getContract(CeloContract.BlockchainParameters)
   }
   getEscrow() {
     return this.getContract(CeloContract.Escrow)
@@ -74,6 +76,9 @@ export class Web3ContractCache {
   }
   getGovernance() {
     return this.getContract(CeloContract.Governance)
+  }
+  getLockedGold() {
+    return this.getContract(CeloContract.LockedGold)
   }
   getRandom() {
     return this.getContract(CeloContract.Random)

@@ -21,6 +21,7 @@ export const ProxyContracts = [
   'SortedOraclesProxy',
   'GovernanceProxy',
   'RegistryProxy',
+  'BlockchainParametersProxy',
 ]
 export const CoreContracts = [
   // common
@@ -34,6 +35,7 @@ export const CoreContracts = [
   // governance
   'LockedGold',
   'Governance',
+  'BlockchainParameters',
 
   // identity
   'Attestations',
