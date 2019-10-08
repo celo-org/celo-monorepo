@@ -1,8 +1,6 @@
 import { DEFAULT_SYNC_MODE, DEFAULT_TESTNET } from 'src/config'
 import { GethSyncMode } from 'src/geth/consts'
 
-console.log('sync mode in net-config', DEFAULT_SYNC_MODE)
-
 export enum Testnets {
   integration = 'integration',
   alfajoresstaging = 'alfajoresstaging',
