@@ -43,6 +43,9 @@ echo "Bootnode enode: $BOOTNODE_ENODE"
 echo "Pulling geth..."
 docker pull $GETH_NODE_DOCKER_IMAGE
 
+IN_MEMORY_DISCOVERY_TABLE_FLAG=""
+[[ ${in_memory_discovery_table} == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
+
 echo "Starting geth..."
 # We need to override the entrypoint in the geth image (which is originally `geth`)
 docker run -p 8545:8545/tcp -p 8546:8546/tcp --name geth --net=host --entrypoint /bin/sh -d $GETH_NODE_DOCKER_IMAGE -c "\
@@ -82,4 +85,5 @@ docker run -p 8545:8545/tcp -p 8546:8546/tcp --name geth --net=host --entrypoint
     --verbosity=${geth_verbosity} \
     --ethstats=${tx_node_name}:$ETHSTATS_WEBSOCKETSECRET@${ethstats_host} \
     --nat=extip:${ip_address} \
-    --ping-ip-from-packet"
+    --metrics \
+    $IN_MEMORY_DISCOVERY_TABLE_FLAG"
