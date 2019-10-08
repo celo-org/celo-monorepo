@@ -4,8 +4,8 @@ import {
   assertRevert,
   matchAddress,
   matchAny,
-  timeTravel,
   NULL_ADDRESS,
+  timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import { SortedOraclesContract, SortedOraclesInstance } from 'types'

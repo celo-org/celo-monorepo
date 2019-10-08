@@ -262,7 +262,7 @@ library SortedLinkedListWithMedian {
     LinkedList.Element storage previousMedian = list.list.list.elements[list.median];
     if (action == MedianAction.Lesser) {
       list.relation[list.median] = MedianRelation.Greater;
-      list.median  = previousMedian.previousKey;
+      list.median = previousMedian.previousKey;
     } else if (action == MedianAction.Greater) {
       list.relation[list.median] = MedianRelation.Lesser;
       list.median = previousMedian.nextKey;

@@ -17,7 +17,7 @@ import {
 } from 'types'
 
 const truffle = require('@celo/protocol/truffle-config.js')
-// const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
+const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 const initializeArgs = async (): Promise<any[]> => {
   const rate = toFixed(config.stableToken.inflationRate)
@@ -59,23 +59,14 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       SortedOraclesInstance
     >('SortedOracles', artifacts)
 
-    await sortedOracles.addOracle(stableToken.address, config.stableToken.priceOracleAccount)
-    // await sortedOracles.report(
-    //   stableToken.address,
-    //   config.stableToken.goldPrice,
-    //   1,
-    //   NULL_ADDRESS,
-    //   NULL_ADDRESS
-    // )
-
-    // // @ts-ignore
-    // const reportTx = sortedOracles.contract.methods.report(
-    //   stableToken.address,
-    //   config.stableToken.goldPrice,
-    //   1,
-    //   NULL_ADDRESS,
-    //   NULL_ADDRESS
-    // )
+    await sortedOracles.addOracle(stableToken.address, minerAddress)
+    await sortedOracles.report(
+      stableToken.address,
+      config.stableToken.goldPrice,
+      1,
+      NULL_ADDRESS,
+      NULL_ADDRESS
+    )
 
     const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
       'Reserve',
