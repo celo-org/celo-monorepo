@@ -13,7 +13,6 @@ export enum CeloContractName {
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
   Validators = 'Validators',
-  BlockchainParameters = 'BlockchainParameters',
 }
 
 // TODO(amy): Pull this list from the build artifacts instead
@@ -29,12 +28,11 @@ export const hasEntryInRegistry: string[] = [
   CeloContractName.BlockchainParameters,
   CeloContractName.Escrow,
   CeloContractName.Exchange,
-  CeloContractName.GoldToken,
   CeloContractName.GasCurrencyWhitelist,
   CeloContractName.GasPriceMinimum,
-  CeloContractName.SortedOracles,
-  CeloContractName.StableToken,
+  CeloContractName.GoldToken,
   CeloContractName.Random,
   CeloContractName.Reserve,
-  CeloContractName.BlockchainParameters,
+  CeloContractName.SortedOracles,
+  CeloContractName.StableToken,
 ]
