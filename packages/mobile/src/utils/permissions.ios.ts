@@ -1,7 +1,7 @@
 import Contacts from 'react-native-contacts'
 
 export async function requestPhoneStatePermission() {
-  throw new Error('Unsupported method')
+  throw new Error('Unimplemented method')
   return false
 }
 
@@ -18,7 +18,7 @@ export async function requestContactsPermission(): Promise<boolean> {
 }
 
 export async function requestCameraPermission() {
-  throw new Error('Unsupported method')
+  throw new Error('Unimplemented method')
   return false
 }
 
@@ -35,6 +35,6 @@ export async function checkContactsPermission(): Promise<boolean> {
 }
 
 export async function checkCameraPermission() {
-  throw new Error('Unsupported method')
+  throw new Error('Unimplemented method')
   return false
 }
