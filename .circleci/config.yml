@@ -132,7 +132,6 @@ jobs:
       - restore_cache:
           keys:
             - android-emulator-image-v3-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
-      - run: ls node_modules
       - run:
           name: Setup environment variables
           command: |
@@ -202,6 +201,7 @@ jobs:
           paths:
             - ~/src/node_modules
             - ~/src/packages/*/node_modules
+            - ~/.cache/yarn
       - run:
           name: Install some extra dependencies the app needs
           command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pidcat watchman
