@@ -199,23 +199,24 @@ jobs:
           # need to run this because it's another OS than install_dependecies job
           name: yarn
           command: |
-            if [ ! -d node_modules ]; then
-                echo "No cache found, install yarn. Hold tight."
-                yarn
-            else
-              echo "Cache found, just run post-script."
-              yarn postinstall
-            fi
-            rm -rf packages/web
+            # if [ ! -d node_modules ]; then
+            #     echo "No cache found, install yarn. Hold tight."
+            #     yarn
+            # else
+            #   echo "Cache found, just run post-script."
+            #   yarn postinstall
+            # fi
+            # rm -rf packages/web
+            yarn
             yarn build 
-      - run:
-          name: Install some extra dependencies the app needs
-          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install wget pidcat watchman
       - save_cache:
           key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
             - packages/*/node_modules
+      - run:
+          name: Install some extra dependencies the app needs
+          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install wget pidcat watchman
       - run: cd ~/src/packages/mobile && yarn test:build-e2e # tests seem to fail if the app is built at the same time the emulator runs
       # - detox
       - run:
