@@ -39,7 +39,7 @@ export default class KeyboardAwareScrollView extends React.Component<Props> {
     }
   }
 
-  scrollRef() {
+  getScrollRef() {
     return this.scrollViewRef.current
   }
 
