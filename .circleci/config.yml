@@ -206,6 +206,7 @@ jobs:
               echo "Cache found, just run post-script."
               yarn postinstall
             fi
+            rm -rf packages/web
             yarn build 
       - run:
           name: Install some extra dependencies the app needs
