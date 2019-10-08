@@ -10,6 +10,7 @@ import "../common/interfaces/ICeloToken.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/UsingRegistry.sol";
+import "../common/UsingPrecompiles.sol";
 
 
 /**
@@ -17,7 +18,7 @@ import "../common/UsingRegistry.sol";
  */
 // solhint-disable-next-line max-line-length
 contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
-  Initializable, UsingRegistry {
+  Initializable, UsingRegistry, UsingPrecompiles {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
@@ -449,67 +450,6 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
 
     return (currentInflationFactor, lastUpdated);
     /* solhint-enable not-rely-on-time */
-  }
-
-  /**
-   * @notice calculate a * b^x for fractions a, b to `decimals` precision
-   * @param aNumerator Numerator of first fraction
-   * @param aDenominator Denominator of first fraction
-   * @param bNumerator Numerator of exponentiated fraction
-   * @param bDenominator Denominator of exponentiated fraction
-   * @param exponent exponent to raise b to
-   * @param _decimals precision
-   * @return numerator/denominator of the computed quantity (not reduced).
-   */
-  function fractionMulExp(
-    uint256 aNumerator,
-    uint256 aDenominator,
-    uint256 bNumerator,
-    uint256 bDenominator,
-    uint256 exponent,
-    uint256 _decimals
-  )
-    public
-    view
-    returns(uint256, uint256)
-  {
-    require(aDenominator != 0 && bDenominator != 0);
-    uint256 returnNumerator;
-    uint256 returnDenominator;
-    // solhint-disable-next-line no-inline-assembly
-    assembly {
-      let newCallDataPosition := mload(0x40)
-      mstore(0x40, add(newCallDataPosition, calldatasize))
-      mstore(newCallDataPosition, aNumerator)
-      mstore(add(newCallDataPosition, 32), aDenominator)
-      mstore(add(newCallDataPosition, 64), bNumerator)
-      mstore(add(newCallDataPosition, 96), bDenominator)
-      mstore(add(newCallDataPosition, 128), exponent)
-      mstore(add(newCallDataPosition, 160), _decimals)
-      let delegatecallSuccess := staticcall(
-        1050,                 // estimated gas cost for this function
-        0xfc,
-        newCallDataPosition,
-        0xc4,                 // input size, 6 * 32 = 192 bytes
-        0,
-        0
-      )
-
-      let returnDataSize := returndatasize
-      let returnDataPosition := mload(0x40)
-      mstore(0x40, add(returnDataPosition, returnDataSize))
-      returndatacopy(returnDataPosition, 0, returnDataSize)
-
-      switch delegatecallSuccess
-      case 0 {
-        revert(returnDataPosition, returnDataSize)
-      }
-      default {
-        returnNumerator := mload(returnDataPosition)
-        returnDenominator := mload(add(returnDataPosition, 32))
-      }
-    }
-    return (returnNumerator, returnDenominator);
   }
 
   /**

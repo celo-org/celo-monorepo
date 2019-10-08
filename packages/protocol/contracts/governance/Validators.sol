@@ -13,14 +13,14 @@ import "../identity/interfaces/IRandom.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
-import "../common/UsingEpochs.sol";
 import "../common/UsingRegistry.sol";
+import "../common/UsingPrecompiles.sol";
 
 
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
  */
-contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, UsingEpochs, UsingRegistry {
+contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, UsingRegistry, UsingPrecompiles {
 
   using FixidityLib for FixidityLib.Fraction;
   using AddressLinkedList for LinkedList.List;
@@ -408,17 +408,21 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(isValidator(account), "isvalidator");
     require(uptime <= FixidityLib.fixed1().unwrap(), "uptime");
 
-    // TODO(asa): Use exponent.
-    FixidityLib.Fraction memory epochScore = FixidityLib.wrap(uptime);
+    uint256 numerator;
+    uint256 denominator;
+    (numerator, denominator) = fractionMulExp(
+      FixidityLib.fixed1().unwrap(),
+      FixidityLib.fixed1().unwrap(),
+      uptime,
+      FixidityLib.fixed1().unwrap(),
+      validatorScoreParameters.exponent,
+      18
+    );
 
-
-    // New component is 0! Uptime is non-zero.
+    FixidityLib.Fraction memory epochScore = FixidityLib.wrap(numerator).divide(FixidityLib.wrap(denominator));
     FixidityLib.Fraction memory newComponent = validatorScoreParameters.adjustmentSpeed.multiply(
       epochScore
     );
-    // validators[validator].score = newComponent;
-    // This works:
-    // validators[validator].score = epochScore;
 
     FixidityLib.Fraction memory currentComponent = FixidityLib.fixed1().subtract(
       validatorScoreParameters.adjustmentSpeed

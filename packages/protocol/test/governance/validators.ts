@@ -54,7 +54,7 @@ const parseValidatorGroupParams = (groupParams: any) => {
 const HOUR = 60 * 60
 const DAY = 24 * HOUR
 const MAX_UINT256 = new BigNumber(2).pow(256).minus(1)
-// Hard coded in ValidatorsTest.sol
+// Hard coded in ganache.
 const EPOCH = 100
 
 // TODO(asa): Test epoch payment distribution
@@ -71,7 +71,7 @@ contract('Validators', (accounts: string[]) => {
     validator: new BigNumber(60 * DAY),
   }
   const validatorScoreParameters = {
-    exponent: new BigNumber(1),
+    exponent: new BigNumber(5),
     adjustmentSpeed: toFixed(0.25),
   }
   const validatorEpochPayment = new BigNumber(10000000000000)
@@ -1237,14 +1237,16 @@ contract('Validators', (accounts: string[]) => {
     })
 
     describe('when 0 <= uptime <= 1.0', () => {
-      const uptime = 0.99
+      const uptime = new BigNumber(0.99)
+      // @ts-ignore
+      const epochScore = uptime.pow(validatorScoreParameters.exponent)
       const adjustmentSpeed = fromFixed(validatorScoreParameters.adjustmentSpeed)
       beforeEach(async () => {
         await validators.updateValidatorScore(validator, toFixed(uptime))
       })
 
       it('should update the validator score', async () => {
-        const expectedScore = adjustmentSpeed.times(uptime)
+        const expectedScore = adjustmentSpeed.times(epochScore)
         const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
         assertEqualBN(parsedValidator.score, toFixed(expectedScore))
       })
@@ -1255,7 +1257,7 @@ contract('Validators', (accounts: string[]) => {
         })
 
         it('should update the validator score', async () => {
-          let expectedScore = adjustmentSpeed.times(uptime)
+          let expectedScore = adjustmentSpeed.times(epochScore)
           expectedScore = new BigNumber(1)
             .minus(adjustmentSpeed)
             .times(expectedScore)
@@ -1341,6 +1343,12 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
+  describe('#getEpochSize', () => {
+    it('should always return 100', async () => {
+      assertEqualBN(await validators.getEpochSize(), 100)
+    })
+  })
+
   describe('#distributeEpochPayment', () => {
     const validator = accounts[0]
     const group = accounts[1]
@@ -1352,25 +1360,26 @@ contract('Validators', (accounts: string[]) => {
     })
 
     describe('when the validator score is non-zero', () => {
-      const uptime = 0.99
+      const uptime = new BigNumber(0.99)
       const adjustmentSpeed = fromFixed(validatorScoreParameters.adjustmentSpeed)
-      const expectedScore = adjustmentSpeed.times(uptime)
+      // @ts-ignore
+      const expectedScore = adjustmentSpeed.times(uptime.pow(validatorScoreParameters.exponent))
       const expectedTotalPayment = expectedScore.times(validatorEpochPayment)
+      const expectedGroupPayment = expectedTotalPayment
+        .times(fromFixed(commission))
+        .dp(0, BigNumber.ROUND_FLOOR)
+      const expectedValidatorPayment = expectedTotalPayment.minus(expectedGroupPayment)
       beforeEach(async () => {
         await validators.updateValidatorScore(validator, toFixed(uptime))
         await validators.distributeEpochPayment(validator)
       })
 
       it('should pay the validator', async () => {
-        const expectedPayment = expectedTotalPayment.times(
-          new BigNumber(1).minus(fromFixed(commission))
-        )
-        assertEqualBN(await mockStableToken.balanceOf(validator), expectedPayment)
+        assertEqualBN(await mockStableToken.balanceOf(validator), expectedValidatorPayment)
       })
 
       it('should pay the group', async () => {
-        const expectedPayment = expectedTotalPayment.times(fromFixed(commission))
-        assertEqualBN(await mockStableToken.balanceOf(group), expectedPayment)
+        assertEqualBN(await mockStableToken.balanceOf(group), expectedGroupPayment)
       })
     })
   })

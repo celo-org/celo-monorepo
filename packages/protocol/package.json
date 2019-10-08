@@ -9,7 +9,7 @@
     "lint:ts": "tslint -c tslint.json --project tsconfig.json",
     "lint:sol": "solhint './contracts/**/*.sol'",
     "lint": "yarn run lint:ts && yarn run lint:sol",
-    "clean": "rm -rf ./types/typechain && rm -rf build/* && rm -rf migrations/*.js* && rm -rf test/**/*.js* && rm -f lib/*.js*",
+    "clean": "rm -rf ./types/typechain && rm -rf build/* && rm -rf .0x-artifacts/* && rm -rf migrations/*.js* && rm -rf test/**/*.js* && rm -f lib/*.js*",
     "pretest": "yarn run build",
     "test": "node runTests.js",
     "test:coverage": "yarn run test --coverage",
@@ -74,7 +74,7 @@
     "web3-provider-engine": "^15.0.0"
   },
   "devDependencies": {
-    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#816a475",
+    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#4cf9664",
     "@celo/typescript": "0.0.1",
     "@types/bignumber.js": "^5.0.0",
     "@types/bn.js": "^4.11.0",

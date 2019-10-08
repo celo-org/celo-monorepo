@@ -9,10 +9,11 @@ import "./interfaces/IValidators.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
+import "../common/UsingPrecompiles.sol";
 import "../common/UsingRegistry.sol";
 
 
-contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
+contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry, UsingPrecompiles {
 
   using AddressSortedLinkedList for SortedLinkedList.List;
   using FixidityLib for FixidityLib.Fraction;
@@ -26,8 +27,8 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     mapping(address => uint256) total;
     // Maps groups to accounts to pending voting balance.
     mapping(address => mapping(address => uint256)) balances;
-    // Maps groups to accounts to timestamp of the account's most recent vote for the group.
-    mapping(address => mapping(address => uint256)) timestamps;
+    // Maps groups to accounts to the epoch of the account's most recent vote for the group.
+    mapping(address => mapping(address => uint256)) epochs;
   }
 
   // Active votes are those for which at least one following election has been held.
@@ -43,8 +44,10 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
   }
 
   struct TotalVotes {
-    // The total number of votes cast, including those for ineligible Validator Groups.
-    uint256 total;
+    // The total number of active votes cast, including those for ineligible Validator Groups.
+    uint256 active;
+    // The total number of pending votes cast, including those for ineligible Validator Groups.
+    uint256 pending;
     // A list of eligible Validator Groups sorted by total votes.
     SortedLinkedList.List eligible;
   }
@@ -63,6 +66,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
   uint256 public maxNumGroupsVotedFor;
   FixidityLib.Fraction public electabilityThreshold;
 
+  event Debug(uint256 value, string desc);
   event MinElectableValidatorsSet(
     uint256 minElectableValidators
   );
@@ -268,6 +272,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
   function activate(address group) external nonReentrant returns (bool) {
     address account = getLockedGold().getAccountFromActiveVoter(msg.sender);
     PendingVotes storage pending = votes.pending;
+    require(getEpochNumber() > pending.epochs[group][account]);
     uint256 value = pending.balances[group][account];
     require(value > 0);
     decrementPendingVotes(group, account, value);
@@ -436,6 +441,10 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     return votes.total.eligible.contains(group);
   }
 
+  function getGroupEpochRewards(address group, uint256 totalEpochRewards) external view returns (uint256) {
+    return totalEpochRewards.mul(votes.active.total[group]).div(votes.total.active);
+  }
+
   function distributeEpochRewards(address group, uint256 value, address lesser, address greater) external {
     require(msg.sender == address(0));
     _distributeEpochRewards(group, value, lesser, greater);
@@ -445,13 +454,14 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     // TODO(asa): What do here?
     if (votes.active.total[group] == 0) {
     }
+
     if (votes.total.eligible.contains(group)) {
       uint256 newVoteTotal = votes.total.eligible.getValue(group).add(value);
       votes.total.eligible.update(group, newVoteTotal, lesser, greater);
     }
-    
+
     votes.active.total[group] = votes.active.total[group].add(value);
-    votes.total.total = votes.total.total.add(value);
+    votes.total.active = votes.total.active.add(value);
   }
 
   /**
@@ -474,7 +484,6 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     require(votes.total.eligible.contains(group));
     uint256 newVoteTotal = votes.total.eligible.getValue(group).add(value);
     votes.total.eligible.update(group, newVoteTotal, lesser, greater);
-    votes.total.total = votes.total.total.add(value);
   }
 
   /**
@@ -498,7 +507,6 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
       uint256 newVoteTotal = votes.total.eligible.getValue(group).sub(value);
       votes.total.eligible.update(group, newVoteTotal, lesser, greater);
     }
-    votes.total.total = votes.total.total.sub(value);
   }
 
   /**
@@ -547,8 +555,9 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
   function incrementPendingVotes(address group, address account, uint256 value) private {
     PendingVotes storage pending = votes.pending;
     pending.balances[group][account] = pending.balances[group][account].add(value);
-    pending.timestamps[group][account] = now;
+    pending.epochs[group][account] = getEpochNumber();
     pending.total[group] = pending.total[group].add(value);
+    votes.total.pending = votes.total.pending.add(value);
   }
 
   /**
@@ -562,9 +571,10 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     uint256 newValue = pending.balances[group][account].sub(value);
     pending.balances[group][account] = newValue;
     if (newValue == 0) {
-      pending.timestamps[group][account] = 0;
+      pending.epochs[group][account] = 0;
     }
     pending.total[group] = pending.total[group].sub(value);
+    votes.total.pending = votes.total.pending.sub(value);
   }
 
   /**
@@ -579,6 +589,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     active.numerators[group][account] = active.numerators[group][account].add(delta);
     active.denominators[group] = active.denominators[group].add(delta);
     active.total[group] = active.total[group].add(value);
+    votes.total.active = votes.total.active.add(value);
   }
 
   /**
@@ -593,6 +604,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
     active.numerators[group][account] = active.numerators[group][account].sub(delta);
     active.denominators[group] = active.denominators[group].sub(delta);
     active.total[group] = active.total[group].sub(value);
+    votes.total.active = votes.total.active.sub(value);
   }
 
   /**
@@ -646,7 +658,7 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
    * @return The total votes received across all groups.
    */
   function getTotalVotes() external view returns (uint256) {
-    return votes.total.total;
+    return votes.total.active.add(votes.total.pending);
   }
 
   /**
