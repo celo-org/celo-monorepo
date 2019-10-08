@@ -72,10 +72,10 @@ jobs:
 
       - restore_cache:
           keys:
-            - yarn-v2-macOs-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-v2-macOs-{{ .Branch }}-
-            - yarn-v2-macOs-
-            - yarn-v2-
+            - yarn-v3-macOs-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-v3-macOs-{{ .Branch }}-
+            - yarn-v3-macOs-
+            - yarn-v3-
 
       - run:
           name: Delete @celo dir from node_modules (if its there)
@@ -96,7 +96,7 @@ jobs:
             fi
       - run: npm rebuild scrypt
       - save_cache:
-          key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          key: yarn-v3-macOs-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
             - packages/*/node_modules
