@@ -132,7 +132,7 @@ async function initGeth() {
         throw new Error('Geth already running, need to restart app')
       } else if (errorType === ErrorType.CorruptChainData) {
         Logger.warn('Geth@init/startInstance', 'Geth start reported chain data error')
-        attemptGethCorruptionFix(geth)
+        await attemptGethCorruptionFix(geth)
       } else {
         Logger.error('Geth@init/startInstance', 'Unexpected error starting geth', e)
         throw e
