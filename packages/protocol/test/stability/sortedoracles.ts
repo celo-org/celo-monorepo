@@ -330,5 +330,80 @@ contract('SortedOracles', (accounts: string[]) => {
         sortedOracles.report(aToken, numerator, denominator, NULL_ADDRESS, NULL_ADDRESS)
       )
     })
+
+    describe('when there exists exactly one other report, by this oracle', () => {
+      const newNumerator = 12
+      const newExpectedNumerator = expectedDenominator.times(numerator).div(denominator)
+      beforeEach(async () => {
+        await sortedOracles.report(aToken, numerator, denominator, NULL_ADDRESS, NULL_ADDRESS, {
+          from: anOracle,
+        })
+      })
+      it('should reset the median rate', async () => {
+        const [initialNumerator, initialDenominator] = await sortedOracles.medianRate(aToken)
+        assertEqualBN(initialNumerator, expectedNumerator)
+        assertEqualBN(initialDenominator, expectedDenominator)
+
+        await sortedOracles.report(aToken, newNumerator, denominator, NULL_ADDRESS, NULL_ADDRESS, {
+          from: anOracle,
+        })
+
+        const [actualNumerator, actualDenominator] = await sortedOracles.medianRate(aToken)
+        assertEqualBN(actualNumerator, newExpectedNumerator)
+        assertEqualBN(actualDenominator, expectedDenominator)
+      })
+    })
+
+    describe('when there exists another report, by another oracle', () => {
+      const otherNumerator = 15
+      const otherDenominator = 1
+      const anotherOracle = accounts[6]
+      beforeEach(async () => {
+        await sortedOracles.addOracle(aToken, anotherOracle)
+        await sortedOracles.report(
+          aToken,
+          otherNumerator,
+          otherDenominator,
+          NULL_ADDRESS,
+          NULL_ADDRESS,
+          {
+            from: anotherOracle,
+          }
+        )
+      })
+      it('should add a report', async () => {
+        assert.equal((await sortedOracles.numRates(aToken)).toNumber(), 1)
+        await sortedOracles.report(aToken, numerator, denominator, NULL_ADDRESS, anotherOracle, {
+          from: anOracle,
+        })
+        assert.equal((await sortedOracles.numRates(aToken)).toNumber(), 2)
+      })
+    })
+
+    describe("making a second report when another oracle's report exists", () => {
+      const secondNumerator = 12
+      const secondExpectedNumerator = expectedDenominator.times(secondNumerator).div(denominator)
+      const anotherOracle = accounts[6]
+      beforeEach(async () => {
+        await sortedOracles.addOracle(aToken, anotherOracle)
+        await sortedOracles.report(aToken, numerator, denominator, NULL_ADDRESS, NULL_ADDRESS, {
+          from: anOracle,
+        })
+        console.info('added the first report')
+      })
+      it('should work at all', async () => {
+        await sortedOracles.report(aToken, secondNumerator, denominator, anOracle, NULL_ADDRESS, {
+          from: anotherOracle,
+        })
+        const [actualNumerator, actualDenominator] = await sortedOracles.medianRate(aToken)
+        assertEqualBN(actualNumerator, secondExpectedNumerator)
+        assertEqualBN(actualDenominator, expectedDenominator)
+
+        await sortedOracles.report(aToken, 8, 1, NULL_ADDRESS, anotherOracle, {
+          from: anOracle,
+        })
+        console.info('made it')
+      })
+    })
   })
 })
