@@ -328,6 +328,45 @@ jobs:
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
             ./ci_test_transfers.sh checkout master
 
+  end-to-end-geth-exit-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+      - run:
+          name: Setup Go language
+          command: |
+            set -e
+            set -v
+            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
+            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
+            ls /tmp/go/bin/go
+            /tmp/go/bin/go version
+      - run:
+          name: Setup Rust language
+          command: |
+            set -e
+            set -v
+            curl https://sh.rustup.rs -sSf | sh -s -- -y
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+            rustup install 1.36.0
+            rustup default 1.36.0
+      - run:
+          name: Run test
+          no_output_timeout: 20m
+          command: |
+            set -e
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+            go version
+            cd packages/celotool
+            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+            ./ci_test_exit.sh checkout master
+
   end-to-end-geth-governance-test:
     <<: *defaults
     # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
@@ -529,6 +568,10 @@ workflows:
             - lint-checks
             - walletkit-test
       - end-to-end-geth-transfer-test:
+          requires:
+            - lint-checks
+            - walletkit-test
+      - end-to-end-geth-exit-test:
           requires:
             - lint-checks
             - walletkit-test
