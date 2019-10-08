@@ -206,7 +206,7 @@ jobs:
           name: Install some extra dependencies the app needs
           command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pidcat watchman
       - restore_cache:
-          key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}
+          key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
       - run: cd ~/src/packages/mobile && yarn test:build-e2e # tests seem to fail if the app is built at the same time the emulator runs
       - run:
           name: Start emulator
@@ -231,7 +231,7 @@ jobs:
           command: cd ~/src/packages/mobile && ENVFILE=".env.test" yarn test:detox
       - run: cd ~/src
       - save_cache:
-          key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}
+          key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
           paths:
             - ~/src/packages/mobile/android/app/build/outputs/apk/
             - ~/.gradle/
