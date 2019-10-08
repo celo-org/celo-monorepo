@@ -205,6 +205,8 @@ jobs:
       - run:
           name: Install some extra dependencies the app needs
           command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pidcat watchman
+      - restore_cache:
+          key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}
       - run: cd ~/src/packages/mobile && yarn test:build-e2e # tests seem to fail if the app is built at the same time the emulator runs
       # - detox
       - run:
@@ -217,8 +219,6 @@ jobs:
           background: true
       - run: cp node_modules/.bin/jest packages/mobile/node_modules/.bin/ # for some reason jest is just not there
       # - run: lock device
-      - restore_cache:
-          key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}
       - run: tree packages/mobile/android/app/build/outputs/apk/
       - run:
           name: Sleep until Device connects
