@@ -274,22 +274,17 @@ exports[`renders for gold to dollar exchange properly 1`] = `
               style={
                 Object {
                   "flexDirection": "row",
-                  "marginTop": 3,
+                  "marginTop": -1,
                 }
               }
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "fontFamily": "Hind-SemiBold",
-                    },
-                    Object {
-                      "color": "#2E3338",
-                      "fontSize": 15,
-                      "lineHeight": 20,
-                    },
-                  ]
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 15,
+                  }
                 }
               >
                 feedItemSentTitle
@@ -320,7 +315,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-Regular",
                   "fontSize": 15,
-                  "lineHeight": 20,
+                  "marginTop": -2,
                 }
               }
             >
@@ -708,22 +703,17 @@ exports[`renders for gold to dollar exchange properly 1`] = `
               style={
                 Object {
                   "flexDirection": "row",
-                  "marginTop": 3,
+                  "marginTop": -1,
                 }
               }
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "fontFamily": "Hind-SemiBold",
-                    },
-                    Object {
-                      "color": "#2E3338",
-                      "fontSize": 15,
-                      "lineHeight": 20,
-                    },
-                  ]
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 15,
+                  }
                 }
               >
                 feedItemNetworkFeeTitle
@@ -754,7 +744,7 @@ exports[`renders for gold to dollar exchange properly 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-Regular",
                   "fontSize": 15,
-                  "lineHeight": 20,
+                  "marginTop": -2,
                 }
               }
             >
@@ -1207,22 +1197,17 @@ exports[`renders for loading 1`] = `
               style={
                 Object {
                   "flexDirection": "row",
-                  "marginTop": 3,
+                  "marginTop": -1,
                 }
               }
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "fontFamily": "Hind-SemiBold",
-                    },
-                    Object {
-                      "color": "#2E3338",
-                      "fontSize": 15,
-                      "lineHeight": 20,
-                    },
-                  ]
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 15,
+                  }
                 }
               >
                 feedItemSentTitle
@@ -1253,7 +1238,7 @@ exports[`renders for loading 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-Regular",
                   "fontSize": 15,
-                  "lineHeight": 20,
+                  "marginTop": -2,
                 }
               }
             >
@@ -1641,22 +1626,17 @@ exports[`renders for loading 1`] = `
               style={
                 Object {
                   "flexDirection": "row",
-                  "marginTop": 3,
+                  "marginTop": -1,
                 }
               }
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "fontFamily": "Hind-SemiBold",
-                    },
-                    Object {
-                      "color": "#2E3338",
-                      "fontSize": 15,
-                      "lineHeight": 20,
-                    },
-                  ]
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 15,
+                  }
                 }
               >
                 feedItemNetworkFeeTitle
@@ -1687,7 +1667,7 @@ exports[`renders for loading 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-Regular",
                   "fontSize": 15,
-                  "lineHeight": 20,
+                  "marginTop": -2,
                 }
               }
             >
@@ -1930,22 +1910,17 @@ exports[`renders for no transactions 1`] = `
               style={
                 Object {
                   "flexDirection": "row",
-                  "marginTop": 3,
+                  "marginTop": -1,
                 }
               }
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "fontFamily": "Hind-SemiBold",
-                    },
-                    Object {
-                      "color": "#2E3338",
-                      "fontSize": 15,
-                      "lineHeight": 20,
-                    },
-                  ]
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 15,
+                  }
                 }
               >
                 feedItemSentTitle
@@ -1976,7 +1951,7 @@ exports[`renders for no transactions 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-Regular",
                   "fontSize": 15,
-                  "lineHeight": 20,
+                  "marginTop": -2,
                 }
               }
             >
@@ -2364,22 +2339,17 @@ exports[`renders for no transactions 1`] = `
               style={
                 Object {
                   "flexDirection": "row",
-                  "marginTop": 3,
+                  "marginTop": -1,
                 }
               }
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "fontFamily": "Hind-SemiBold",
-                    },
-                    Object {
-                      "color": "#2E3338",
-                      "fontSize": 15,
-                      "lineHeight": 20,
-                    },
-                  ]
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 15,
+                  }
                 }
               >
                 feedItemNetworkFeeTitle
@@ -2410,7 +2380,7 @@ exports[`renders for no transactions 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-Regular",
                   "fontSize": 15,
-                  "lineHeight": 20,
+                  "marginTop": -2,
                 }
               }
             >
@@ -2653,22 +2623,17 @@ exports[`renders for standbyTransactions 1`] = `
               style={
                 Object {
                   "flexDirection": "row",
-                  "marginTop": 3,
+                  "marginTop": -1,
                 }
               }
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "fontFamily": "Hind-SemiBold",
-                    },
-                    Object {
-                      "color": "#2E3338",
-                      "fontSize": 15,
-                      "lineHeight": 20,
-                    },
-                  ]
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 15,
+                  }
                 }
               >
                 feedItemSentTitle
@@ -2699,7 +2664,7 @@ exports[`renders for standbyTransactions 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-Regular",
                   "fontSize": 15,
-                  "lineHeight": 20,
+                  "marginTop": -2,
                 }
               }
             >
@@ -3087,22 +3052,17 @@ exports[`renders for standbyTransactions 1`] = `
               style={
                 Object {
                   "flexDirection": "row",
-                  "marginTop": 3,
+                  "marginTop": -1,
                 }
               }
             >
               <Text
                 style={
-                  Array [
-                    Object {
-                      "fontFamily": "Hind-SemiBold",
-                    },
-                    Object {
-                      "color": "#2E3338",
-                      "fontSize": 15,
-                      "lineHeight": 20,
-                    },
-                  ]
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-SemiBold",
+                    "fontSize": 15,
+                  }
                 }
               >
                 feedItemNetworkFeeTitle
@@ -3133,7 +3093,7 @@ exports[`renders for standbyTransactions 1`] = `
                   "color": "#81868B",
                   "fontFamily": "Hind-Regular",
                   "fontSize": 15,
-                  "lineHeight": 20,
+                  "marginTop": -2,
                 }
               }
             >

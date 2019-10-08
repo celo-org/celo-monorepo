@@ -4,9 +4,8 @@ import { DocumentDirectoryPath } from 'react-native-fs'
 import * as net from 'react-native-tcp'
 import { DEFAULT_INFURA_URL, DEFAULT_TESTNET } from 'src/config'
 import { GethSyncMode } from 'src/geth/consts'
-import config from 'src/geth/network-config'
+import networkConfig, { Testnets } from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
-import { Testnets } from 'src/web3/testnets'
 import Web3 from 'web3'
 import { Provider } from 'web3/providers'
 
@@ -16,7 +15,7 @@ const tag = 'web3/contracts'
 export const web3: Web3 = getWeb3()
 
 export function isZeroSyncMode(): boolean {
-  return config[DEFAULT_TESTNET].syncMode === GethSyncMode.ZeroSync
+  return networkConfig.syncMode === GethSyncMode.ZeroSync
 }
 
 function getIpcProvider(testnet: Testnets) {

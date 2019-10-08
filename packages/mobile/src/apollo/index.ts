@@ -3,7 +3,7 @@ import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemo
 import { persistCache } from 'apollo-cache-persist'
 import { AsyncStorage } from 'react-native'
 import introspectionQueryResultData from 'src/apollo/fragmentTypes.json'
-import { BLOCKCHAIN_API_URL } from 'src/config'
+import config from 'src/geth/networkConfig'
 
 const fragmentMatcher = new IntrospectionFragmentMatcher({
   introspectionQueryResultData,
@@ -18,6 +18,6 @@ persistCache({
 })
 
 export const apolloClient = new ApolloClient<InMemoryCache>({
-  uri: BLOCKCHAIN_API_URL,
+  uri: config.blockchainApiUrl,
   cache,
 })
