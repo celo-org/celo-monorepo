@@ -131,7 +131,7 @@ jobs:
             - yarn-v2-
       - restore_cache:
           keys:
-            - android-emulator-image-2-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
+            - android-emulator-image-v3-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
       - run: ls node_modules
       - run:
           name: Setup environment variables
@@ -151,9 +151,9 @@ jobs:
           name: Install emulator dependencies
           command: (yes | bash ./packages/mobile/scripts/install_android_emulator_image.sh > /dev/null) || true
       - save_cache:
-          key: android-emulator-image-2-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
+          key: android-emulator-image-v3-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
           paths:
-            - /usr/local/share/android-sdk/*
+            - /usr/local/Caskroom/android-sdk/*
       - run:
           name: Install Android dependencies
           command: |
@@ -234,7 +234,8 @@ jobs:
       - save_cache:
           key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}
           paths:
-            - packages/mobile/android/app/build/outputs/apk/
+            - ~/src/packages/mobile/android/app/build/outputs/apk/
+            - ~/.gradle/
 
 
 
