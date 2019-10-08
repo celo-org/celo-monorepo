@@ -10,6 +10,5 @@ export async function setAndInitializeImplementation(
   ...args: any[]
 ) {
   const callData = web3.eth.abi.encodeFunctionCall(initializerAbi, args)
-  const res = await proxy._setAndInitializeImplementation(implementationAddress, callData as any)
-  return res
+  return proxy._setAndInitializeImplementation(implementationAddress, callData as any)
 }
