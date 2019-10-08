@@ -216,7 +216,6 @@ export const fontStyles = StyleSheet.create({
   },
   comment: {
     fontSize: 15,
-    lineHeight: 20,
     fontFamily: HindSilguri.Regular,
     color: colors.darkSecondary,
   },
