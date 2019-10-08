@@ -671,92 +671,92 @@ workflows:
   celo-monorepo-build:
     jobs:
       - install_dependencies
-      - mobile_e2e_test
+      - mobile_e2e_test:
           requires:
             - install_dependencies
             - mobile-test-build-app
-  #     - lint-checks:
-  #         requires:
-  #           - install_dependencies
-  #     - general-test:
-  #         requires:
-  #           - install_dependencies
-  #     - walletkit-test:
-  #         requires:
-  #           - install_dependencies
-  #     - cli-test:
-  #         requires:
-  #           - install_dependencies
-  #     - contractkit-test:
-  #         requires:
-  #           - install_dependencies
-  #     - mobile-test:
-  #         requires:
-  #           - lint-checks
-  #     - mobile-test-build-app:
-  #         requires:
-  #           - mobile-test
-  #     - verification-pool-api:
-  #         requires:
-  #           - lint-checks
-  #     - protocol-test:
-  #         requires:
-  #           - lint-checks
-  #           - walletkit-test
-  #     - end-to-end-geth-transfer-test:
-  #         requires:
-  #           - lint-checks
-  #           - walletkit-test
-  #     - end-to-end-geth-exit-test:
-  #         requires:
-  #           - lint-checks
-  #           - walletkit-test
-  #     - end-to-end-geth-governance-test:
-  #         requires:
-  #           - lint-checks
-  #           - walletkit-test
-  #     - end-to-end-geth-sync-test:
-  #         requires:
-  #           - lint-checks
-  #           - walletkit-test
-  #     - end-to-end-geth-integration-sync-test:
-  #         requires:
-  #           - lint-checks
-  #           - walletkit-test
-  # npm-install-testing-cron-workflow:
-  #   triggers:
-  #     - schedule:
-  #         # 7 PM in UTC = noon in PDT.
-  #         # Best for test to fail during SF afternoon, so that, someone can fix it during the day time.
-  #         cron: "0 19 * * *"
-  #         filters:
-  #           branches:
-  #             only:
-  #               - master
-  #   jobs:
-  #     - test-typescript-npm-package-install
-  #     - test-utils-npm-package-install
-  #     - test-walletkit-npm-package-install
-  #     - test-celocli-npm-package-install
-  # protocol-testing-with-code-coverage-cron-workflow:
-  #   triggers:
-  #     - schedule:
-  #         # 1 PM in UTC = 6 AM in PDT.
-  #         # Best for this slow test (~3 hours) to run during SF early morning.
-  #         cron: "0 13 * * *"
-  #         filters:
-  #           branches:
-  #             only:
-  #               - master
-  #   jobs:
-  #     - install_dependencies
-  #     - lint-checks:
-  #         requires:
-  #           - install_dependencies
-  #     - walletkit-test:
-  #         requires:
-  #           - install_dependencies
-  #     - protocol-test-with-code-coverage:
-  #         requires:
-  #           - lint-checks
-  #           - walletkit-test
+      - lint-checks:
+          requires:
+            - install_dependencies
+      - general-test:
+          requires:
+            - install_dependencies
+      - walletkit-test:
+          requires:
+            - install_dependencies
+      - cli-test:
+          requires:
+            - install_dependencies
+      - contractkit-test:
+          requires:
+            - install_dependencies
+      - mobile-test:
+          requires:
+            - lint-checks
+      - mobile-test-build-app:
+          requires:
+            - mobile-test
+      - verification-pool-api:
+          requires:
+            - lint-checks
+      - protocol-test:
+          requires:
+            - lint-checks
+            - walletkit-test
+      - end-to-end-geth-transfer-test:
+          requires:
+            - lint-checks
+            - walletkit-test
+      - end-to-end-geth-exit-test:
+          requires:
+            - lint-checks
+            - walletkit-test
+      - end-to-end-geth-governance-test:
+          requires:
+            - lint-checks
+            - walletkit-test
+      - end-to-end-geth-sync-test:
+          requires:
+            - lint-checks
+            - walletkit-test
+      - end-to-end-geth-integration-sync-test:
+          requires:
+            - lint-checks
+            - walletkit-test
+  npm-install-testing-cron-workflow:
+    triggers:
+      - schedule:
+          # 7 PM in UTC = noon in PDT.
+          # Best for test to fail during SF afternoon, so that, someone can fix it during the day time.
+          cron: "0 19 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - test-typescript-npm-package-install
+      - test-utils-npm-package-install
+      - test-walletkit-npm-package-install
+      - test-celocli-npm-package-install
+  protocol-testing-with-code-coverage-cron-workflow:
+    triggers:
+      - schedule:
+          # 1 PM in UTC = 6 AM in PDT.
+          # Best for this slow test (~3 hours) to run during SF early morning.
+          cron: "0 13 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - install_dependencies
+      - lint-checks:
+          requires:
+            - install_dependencies
+      - walletkit-test:
+          requires:
+            - install_dependencies
+      - protocol-test-with-code-coverage:
+          requires:
+            - lint-checks
+            - walletkit-test
