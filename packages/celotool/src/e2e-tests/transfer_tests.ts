@@ -81,6 +81,13 @@ class InflationManager {
     const parametersPost = await this.getParameters()
     assertEqualBN(parametersPost.factor, ONE)
   }
+
+  setGasCurrencyCost = async (cost: number) => {
+    const parameters = await this.kit.contracts.getBlockchainParameters()
+    await parameters
+      .setGasForNonGoldCurrencies(cost.toString())
+      .sendAndWaitForReceipt({ from: this.validatorAddress })
+  }
 }
 
 /** Helper to watch balance changes over accounts */
@@ -168,7 +175,7 @@ describe('Transfer tests', function(this: any) {
 
   const syncModes = ['full', 'fast', 'light', 'ultralight']
   const gethConfig = {
-    migrateTo: 8,
+    migrateTo: 15,
     migrateGovernance: false,
     instances: [
       { name: 'validator', validating: true, syncmode: 'full', port: 30303, rpcport: 8545 },
@@ -553,6 +560,84 @@ describe('Transfer tests', function(this: any) {
               expectedGas: 40456,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.GoldToken,
+              txOptions: {
+                gasFeeRecipient: FeeRecipientAddress,
+              },
+            })
+          })
+        })
+      })
+    }
+  })
+
+  describe('Transfer with changed cost >', () => {
+    before(restartWithCleanNodes)
+
+    for (const syncMode of syncModes) {
+      describe(`${syncMode} Node >`, () => {
+        before(`start geth on sync: ${syncMode}`, async () => {
+          try {
+            await startSyncNode(syncMode)
+            const inflationManager = new InflationManager('http://localhost:8545', validatorAddress)
+            await inflationManager.setGasCurrencyCost(34000)
+          } catch (err) {
+            console.debug('some error', err)
+          }
+        })
+
+        describe('Transfer CeloGold >', () => {
+          describe('gasCurrency = CeloDollars >', () => {
+            const intrinsicGas = 55000
+            describe('when there is no demurrage', () => {
+              describe('when setting a gas amount greater than the amount of gas necessary', () =>
+                testTransferToken({
+                  expectedGas: 63180,
+                  transferToken: CeloContract.GoldToken,
+                  feeToken: CeloContract.StableToken,
+                  txOptions: {
+                    gasFeeRecipient: FeeRecipientAddress,
+                  },
+                }))
+
+              describe('when setting a gas amount less than the amount of gas necessary but more than the intrinsic gas amount', () => {
+                const gas = intrinsicGas + 1000
+                testTransferToken({
+                  expectedGas: gas,
+                  transferToken: CeloContract.GoldToken,
+                  feeToken: CeloContract.StableToken,
+                  expectSuccess: false,
+                  txOptions: {
+                    gas,
+                    gasFeeRecipient: FeeRecipientAddress,
+                  },
+                })
+              })
+
+              describe('when setting a gas amount less than the intrinsic gas amount', () => {
+                it('should not add the transaction to the pool', async () => {
+                  const gas = intrinsicGas - 1
+                  const gasCurrency = await kit.registry.addressFor(CeloContract.StableToken)
+                  try {
+                    const res = await transferCeloGold(FromAddress, ToAddress, TransferAmount, {
+                      gas,
+                      gasCurrency,
+                    })
+                    await res.getHash()
+                  } catch (error) {
+                    assert.include(error.toString(), 'Returned error: intrinsic gas too low')
+                  }
+                })
+              })
+            })
+          })
+        })
+
+        describe('Transfer CeloDollars', () => {
+          describe('gasCurrency = CeloDollars >', () => {
+            testTransferToken({
+              expectedGas: 89456,
+              transferToken: CeloContract.StableToken,
+              feeToken: CeloContract.StableToken,
               txOptions: {
                 gasFeeRecipient: FeeRecipientAddress,
               },
