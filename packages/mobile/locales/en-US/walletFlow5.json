@@ -80,5 +80,7 @@
   "feedItemInviteReceivedTitle": "Celo",
   "feedItemInviteReceivedInfo": "$t(inviteFlow11:inviteReceived)",
   "feedItemReceivedTitle_missingSenderDetails": "Payment Received",
-  "feedItemSentTitle_missingReceiverDetails": "Payment Sent"
+  "feedItemReceivedTitle_escrowRecieved": "Escrow Payment Received",
+  "feedItemSentTitle_missingReceiverDetails": "Payment Sent",
+  "feedItemSentTitle_escrowSent": "Escrow Payment Sent"
 }

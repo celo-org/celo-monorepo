@@ -252,6 +252,8 @@ function* doFetchSentPayments() {
     for (let i = 0; i < sentPaymentsRaw.length; i++) {
       const id = sentPaymentIDs[i].toLowerCase()
       const recipientPhoneNumber = tempAddresstoRecipientPhoneNumber[id]
+      console.log(recipientPhoneNumber)
+      console.log('+++++++++++++++++++++++++++=')
 
       const payment = sentPaymentsRaw[i]
       if (!payment) {

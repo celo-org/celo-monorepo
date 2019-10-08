@@ -168,6 +168,8 @@ export function getRecipientFromAddress(
   recipientCache: NumberToRecipient
 ) {
   const e164PhoneNumber = addressToE164Number[address]
+  console.log(address)
+  console.log('==============================================')
   return e164PhoneNumber ? recipientCache[e164PhoneNumber] : undefined
 }
 

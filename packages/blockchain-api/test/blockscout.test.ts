@@ -132,5 +132,27 @@ describe('Blockscout', () => {
       symbol: 'Celo Gold',
       hash: '0xcc2120e5d050fd68284dc01f6464b2ed8f7358ca80fccb20967af28eb7d79160',
     })
+
+    expect(events[7]).toMatchObject({
+      type: 'ESCROW_SENT',
+      timestamp: 1566485000,
+      block: 117451,
+      value: 1,
+      address: '0xf4314cb9046bece6aa54bb9533155434d0c76909',
+      comment: '',
+      symbol: 'Celo Gold',
+      hash: '0xe70bf600802bae7a0d42d89d54b8cdb977a8c5a34a239ec73597c7abcab74536',
+    })
+
+    expect(events[8]).toMatchObject({
+      type: 'ESCROW_RECEIVED',
+      timestamp: 1566486000,
+      block: 117451,
+      value: 1,
+      address: '0xf4314cb9046bece6aa54bb9533155434d0c76909',
+      comment: '',
+      symbol: 'Celo Dollar',
+      hash: '0xe70bf600802bae7a0d42d89d54b8cdb977a8c5a34a239ec73597c7abcab74536',
+    })
   })
 })

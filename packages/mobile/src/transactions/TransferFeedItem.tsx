@@ -44,7 +44,8 @@ function getCurrencyStyles(currency: CURRENCY_ENUM, type: string): CurrencySymbo
   if (
     type === TransactionTypes.SENT ||
     type === TransactionTypes.VERIFICATION_FEE ||
-    type === TransactionTypes.INVITE_SENT
+    type === TransactionTypes.INVITE_SENT ||
+    type === TransactionTypes.ESCROW_SENT
   ) {
     return {
       color: colors.darkSecondary,
@@ -57,7 +58,8 @@ function getCurrencyStyles(currency: CURRENCY_ENUM, type: string): CurrencySymbo
     type === TransactionTypes.FAUCET ||
     type === TransactionTypes.VERIFICATION_REWARD ||
     type === TransactionTypes.INVITE_RECEIVED ||
-    type === TransactionTypes.PAY_REQUEST
+    type === TransactionTypes.PAY_REQUEST ||
+    type === TransactionTypes.ESCROW_RECIEVED
   ) {
     if (currency === CURRENCY_ENUM.DOLLAR) {
       return {

@@ -86,9 +86,11 @@ export const navigateToPaymentTransferReview = (
   let headerText = ''
   switch (type) {
     case TransactionTypes.SENT:
+    case TransactionTypes.ESCROW_SENT:
       headerText = i18n.t('sendFlow7:sentPayment')
       break
     case TransactionTypes.RECEIVED:
+    case TransactionTypes.ESCROW_RECIEVED:
       headerText = i18n.t('receiveFlow8:receivedPayment')
       break
     case TransactionTypes.VERIFICATION_FEE:

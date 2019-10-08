@@ -34,6 +34,8 @@ export default function TransferFeedIcon(props: Props) {
     }
     case TransactionTypes.RECEIVED: // fallthrough
     case TransactionTypes.SENT: // fallthrough
+    case TransactionTypes.ESCROW_SENT:
+    case TransactionTypes.ESCROW_RECIEVED:
     default: {
       return (
         <ContactCircle
