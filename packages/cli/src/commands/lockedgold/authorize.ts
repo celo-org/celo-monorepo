@@ -43,6 +43,9 @@ export default class Authorize extends BaseCommand {
       tx = await lockedGold.authorizeVoter(res.flags.from, res.flags.to)
     } else if (res.flags.role == 'validator') {
       tx = await lockedGold.authorizeValidator(res.flags.from, res.flags.to)
+    } else {
+      this.error(`Invalid role provided`)
+      return
     }
     await displaySendTx('authorizeTx', tx)
   }

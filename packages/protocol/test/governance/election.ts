@@ -37,8 +37,10 @@ contract('Election', (accounts: string[]) => {
   let mockValidators: MockValidatorsInstance
 
   const nonOwner = accounts[1]
-  const minElectableValidators = new BigNumber(4)
-  const maxElectableValidators = new BigNumber(6)
+  const electableValidators = {
+    min: new BigNumber(4),
+    max: new BigNumber(6),
+  }
   const maxNumGroupsVotedFor = new BigNumber(3)
   const electabilityThreshold = new BigNumber(0)
 
@@ -51,8 +53,8 @@ contract('Election', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await election.initialize(
       registry.address,
-      minElectableValidators,
-      maxElectableValidators,
+      electableValidators.min,
+      electableValidators.max,
       maxNumGroupsVotedFor,
       electabilityThreshold
     )
@@ -64,14 +66,10 @@ contract('Election', (accounts: string[]) => {
       assert.equal(owner, accounts[0])
     })
 
-    it('should have set minElectableValidators', async () => {
-      const actualMinElectableValidators = await election.minElectableValidators()
-      assertEqualBN(actualMinElectableValidators, minElectableValidators)
-    })
-
-    it('should have set maxElectableValidators', async () => {
-      const actualMaxElectableValidators = await election.maxElectableValidators()
-      assertEqualBN(actualMaxElectableValidators, maxElectableValidators)
+    it('should have set electableValidators', async () => {
+      const [min, max] = await election.getElectableValidators()
+      assertEqualBN(min, electableValidators.min)
+      assertEqualBN(max, electableValidators.max)
     })
 
     it('should have set maxNumGroupsVotedFor', async () => {
@@ -79,12 +77,17 @@ contract('Election', (accounts: string[]) => {
       assertEqualBN(actualMaxNumGroupsVotedFor, maxNumGroupsVotedFor)
     })
 
+    it('should have set electabilityThreshold', async () => {
+      const actualElectabilityThreshold = await election.getElectabilityThreshold()
+      assertEqualBN(actualElectabilityThreshold, electabilityThreshold)
+    })
+
     it('should not be callable again', async () => {
       await assertRevert(
         election.initialize(
           registry.address,
-          minElectableValidators,
-          maxElectableValidators,
+          electableValidators.min,
+          electableValidators.max,
           maxNumGroupsVotedFor,
           electabilityThreshold
         )
@@ -106,74 +109,59 @@ contract('Election', (accounts: string[]) => {
     })
   })
 
-  describe('#setMinElectableValidators', () => {
-    const newMinElectableValidators = minElectableValidators.plus(1)
+  describe('#setElectableValidators', () => {
+    const newElectableValidators = {
+      min: electableValidators.min.plus(1),
+      max: electableValidators.max.plus(1),
+    }
+
     it('should set the minimum electable valdiators', async () => {
-      await election.setMinElectableValidators(newMinElectableValidators)
-      assertEqualBN(await election.minElectableValidators(), newMinElectableValidators)
+      await election.setElectableValidators(newElectableValidators.min, newElectableValidators.max)
+      const [min, max] = await election.getElectableValidators()
+      assertEqualBN(min, newElectableValidators.min)
+      assertEqualBN(max, newElectableValidators.max)
     })
 
-    it('should emit the MinElectableValidatorsSet event', async () => {
-      const resp = await election.setMinElectableValidators(newMinElectableValidators)
+    it('should emit the ElectableValidatorsSet event', async () => {
+      const resp = await election.setElectableValidators(
+        newElectableValidators.min,
+        newElectableValidators.max
+      )
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertContainSubset(log, {
-        event: 'MinElectableValidatorsSet',
+        event: 'ElectableValidatorsSet',
         args: {
-          minElectableValidators: new BigNumber(newMinElectableValidators),
+          min: newElectableValidators.min,
+          max: newElectableValidators.max,
         },
       })
     })
 
     it('should revert when the minElectableValidators is zero', async () => {
-      await assertRevert(election.setMinElectableValidators(0))
+      await assertRevert(election.setElectableValidators(0, newElectableValidators.max))
     })
 
-    it('should revert when the minElectableValidators is greater than maxElectableValidators', async () => {
-      await assertRevert(election.setMinElectableValidators(maxElectableValidators.plus(1)))
-    })
-
-    it('should revert when the minElectableValidators is unchanged', async () => {
-      await assertRevert(election.setMinElectableValidators(minElectableValidators))
-    })
-
-    it('should revert when called by anyone other than the owner', async () => {
+    it('should revert when the min is greater than max', async () => {
       await assertRevert(
-        election.setMinElectableValidators(newMinElectableValidators, { from: nonOwner })
+        election.setElectableValidators(
+          newElectableValidators.max.plus(1),
+          newElectableValidators.max
+        )
       )
     })
-  })
 
-  describe('#setMaxElectableValidators', () => {
-    const newMaxElectableValidators = maxElectableValidators.plus(1)
-    it('should set the max electable validators', async () => {
-      await election.setMaxElectableValidators(newMaxElectableValidators)
-      assertEqualBN(await election.maxElectableValidators(), newMaxElectableValidators)
-    })
-
-    it('should emit the MaxElectableValidatorsSet event', async () => {
-      const resp = await election.setMaxElectableValidators(newMaxElectableValidators)
-      assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertContainSubset(log, {
-        event: 'MaxElectableValidatorsSet',
-        args: {
-          maxElectableValidators: new BigNumber(newMaxElectableValidators),
-        },
-      })
-    })
-
-    it('should revert when the maxElectableValidators is less than minElectableValidators', async () => {
-      await assertRevert(election.setMaxElectableValidators(minElectableValidators.minus(1)))
-    })
-
-    it('should revert when the maxElectableValidators is unchanged', async () => {
-      await assertRevert(election.setMaxElectableValidators(maxElectableValidators))
+    it('should revert when the values are unchanged', async () => {
+      await assertRevert(
+        election.setElectableValidators(electableValidators.min, electableValidators.max)
+      )
     })
 
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(
-        election.setMaxElectableValidators(newMaxElectableValidators, { from: nonOwner })
+        election.setElectableValidators(newElectableValidators.min, newElectableValidators.max, {
+          from: nonOwner,
+        })
       )
     })
   })
@@ -218,7 +206,7 @@ contract('Election', (accounts: string[]) => {
       describe('when the group has no votes', () => {
         let resp: any
         beforeEach(async () => {
-          resp = await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+          resp = await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
         })
 
         it('should add the group to the list of eligible groups', async () => {
@@ -238,7 +226,9 @@ contract('Election', (accounts: string[]) => {
 
         describe('when the group has already been marked eligible', () => {
           it('should revert', async () => {
-            await assertRevert(election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS))
+            await assertRevert(
+              election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
+            )
           })
         })
       })
@@ -246,7 +236,7 @@ contract('Election', (accounts: string[]) => {
 
     describe('when the group has no members', () => {
       it('should revert', async () => {
-        await assertRevert(election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS))
+        await assertRevert(election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group }))
       })
     })
   })
@@ -256,7 +246,7 @@ contract('Election', (accounts: string[]) => {
     describe('when the group is eligible', () => {
       beforeEach(async () => {
         await mockValidators.setMembers(group, [accounts[9]])
-        await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+        await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
       })
 
       describe('when called by the registered Validators contract', () => {
@@ -307,11 +297,11 @@ contract('Election', (accounts: string[]) => {
   describe('#vote', () => {
     const voter = accounts[0]
     const group = accounts[1]
-    const value = 1000
+    const value = new BigNumber(1000)
     describe('when the group is eligible', () => {
       beforeEach(async () => {
         await mockValidators.setMembers(group, [accounts[9]])
-        await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+        await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
       })
 
       describe('when the group can receive votes', () => {
@@ -329,23 +319,23 @@ contract('Election', (accounts: string[]) => {
             })
 
             it('should add the group to the list of groups the account has voted for', async () => {
-              assert.deepEqual(await election.getAccountGroupsVotedFor(voter), [group])
+              assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [group])
             })
 
             it("should increment the account's pending votes for the group", async () => {
-              assertEqualBN(await election.getAccountPendingVotesForGroup(group, voter), value)
+              assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter), value)
             })
 
             it("should increment the account's total votes for the group", async () => {
-              assertEqualBN(await election.getAccountTotalVotesForGroup(group, voter), value)
+              assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), value)
             })
 
             it("should increment the account's total votes", async () => {
-              assertEqualBN(await election.getAccountTotalVotes(voter), value)
+              assertEqualBN(await election.getTotalVotesByAccount(voter), value)
             })
 
             it('should increment the total votes for the group', async () => {
-              assertEqualBN(await election.getGroupTotalVotes(group), value)
+              assertEqualBN(await election.getTotalVotesForGroup(group), value)
             })
 
             it('should increment the total votes', async () => {
@@ -372,7 +362,7 @@ contract('Election', (accounts: string[]) => {
 
           describe('when the voter does not have sufficient non-voting balance', () => {
             beforeEach(async () => {
-              await mockLockedGold.incrementNonvotingAccountBalance(voter, value - 1)
+              await mockLockedGold.incrementNonvotingAccountBalance(voter, value.minus(1))
             })
 
             it('should revert', async () => {
@@ -388,20 +378,26 @@ contract('Election', (accounts: string[]) => {
             for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
               newGroup = accounts[i + 2]
               await mockValidators.setMembers(newGroup, [accounts[9]])
-              await election.markGroupEligible(newGroup, group, NULL_ADDRESS)
+              await election.markGroupEligible(group, NULL_ADDRESS, { from: newGroup })
               await election.vote(newGroup, 1, group, NULL_ADDRESS)
             }
           })
 
           it('should revert', async () => {
             await assertRevert(
-              election.vote(group, value - maxNumGroupsVotedFor.toNumber(), newGroup, NULL_ADDRESS)
+              election.vote(group, value.minus(maxNumGroupsVotedFor), newGroup, NULL_ADDRESS)
             )
           })
         })
       })
 
       describe('when the group cannot receive votes', () => {
+        beforeEach(async () => {
+          await mockLockedGold.setTotalLockedGold(value.div(2).minus(1))
+          await mockValidators.setNumRegisteredValidators(1)
+          assertEqualBN(await election.getNumVotesReceivable(group), value.minus(2))
+        })
+
         it('should revert', async () => {
           await assertRevert(election.vote(group, value, NULL_ADDRESS, NULL_ADDRESS))
         })
@@ -421,7 +417,7 @@ contract('Election', (accounts: string[]) => {
     const value = 1000
     beforeEach(async () => {
       await mockValidators.setMembers(group, [accounts[9]])
-      await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+      await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
       await mockLockedGold.setTotalLockedGold(value)
       await mockValidators.setNumRegisteredValidators(1)
       await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
@@ -435,23 +431,23 @@ contract('Election', (accounts: string[]) => {
       })
 
       it("should decrement the account's pending votes for the group", async () => {
-        assertEqualBN(await election.getAccountPendingVotesForGroup(group, voter), 0)
+        assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter), 0)
       })
 
       it("should increment the account's active votes for the group", async () => {
-        assertEqualBN(await election.getAccountActiveVotesForGroup(group, voter), value)
+        assertEqualBN(await election.getActiveVotesForGroupByAccount(group, voter), value)
       })
 
       it("should not modify the account's total votes for the group", async () => {
-        assertEqualBN(await election.getAccountTotalVotesForGroup(group, voter), value)
+        assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), value)
       })
 
       it("should not modify the account's total votes", async () => {
-        assertEqualBN(await election.getAccountTotalVotes(voter), value)
+        assertEqualBN(await election.getTotalVotesByAccount(voter), value)
       })
 
       it('should not modify the total votes for the group', async () => {
-        assertEqualBN(await election.getGroupTotalVotes(group), value)
+        assertEqualBN(await election.getTotalVotesForGroup(group), value)
       })
 
       it('should not modify the total votes', async () => {
@@ -481,35 +477,35 @@ contract('Election', (accounts: string[]) => {
         })
 
         it("should not modify the first account's active votes for the group", async () => {
-          assertEqualBN(await election.getAccountActiveVotesForGroup(group, voter), value)
+          assertEqualBN(await election.getActiveVotesForGroupByAccount(group, voter), value)
         })
 
         it("should not modify the first account's total votes for the group", async () => {
-          assertEqualBN(await election.getAccountTotalVotesForGroup(group, voter), value)
+          assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), value)
         })
 
         it("should not modify the first account's total votes", async () => {
-          assertEqualBN(await election.getAccountTotalVotes(voter), value)
+          assertEqualBN(await election.getTotalVotesByAccount(voter), value)
         })
 
         it("should decrement the second account's pending votes for the group", async () => {
-          assertEqualBN(await election.getAccountPendingVotesForGroup(group, voter2), 0)
+          assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter2), 0)
         })
 
         it("should increment the second account's active votes for the group", async () => {
-          assertEqualBN(await election.getAccountActiveVotesForGroup(group, voter2), value2)
+          assertEqualBN(await election.getActiveVotesForGroupByAccount(group, voter2), value2)
         })
 
         it("should not modify the second account's total votes for the group", async () => {
-          assertEqualBN(await election.getAccountTotalVotesForGroup(group, voter2), value2)
+          assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter2), value2)
         })
 
         it("should not modify the second account's total votes", async () => {
-          assertEqualBN(await election.getAccountTotalVotes(voter2), value2)
+          assertEqualBN(await election.getTotalVotesByAccount(voter2), value2)
         })
 
         it('should not modify the total votes for the group', async () => {
-          assertEqualBN(await election.getGroupTotalVotes(group), value + value2)
+          assertEqualBN(await election.getTotalVotesForGroup(group), value + value2)
         })
 
         it('should not modify the total votes', async () => {
@@ -532,7 +528,7 @@ contract('Election', (accounts: string[]) => {
     describe('when the voter has pending votes', () => {
       beforeEach(async () => {
         await mockValidators.setMembers(group, [accounts[9]])
-        await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+        await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
         await mockLockedGold.setTotalLockedGold(value)
         await mockValidators.setNumRegisteredValidators(1)
         await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
@@ -555,19 +551,19 @@ contract('Election', (accounts: string[]) => {
         })
 
         it("should decrement the account's pending votes for the group", async () => {
-          assertEqualBN(await election.getAccountPendingVotesForGroup(group, voter), remaining)
+          assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter), remaining)
         })
 
         it("should decrement the account's total votes for the group", async () => {
-          assertEqualBN(await election.getAccountTotalVotesForGroup(group, voter), remaining)
+          assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), remaining)
         })
 
         it("should decrement the account's total votes", async () => {
-          assertEqualBN(await election.getAccountTotalVotes(voter), remaining)
+          assertEqualBN(await election.getTotalVotesByAccount(voter), remaining)
         })
 
         it('should decrement the total votes for the group', async () => {
-          assertEqualBN(await election.getGroupTotalVotes(group), remaining)
+          assertEqualBN(await election.getTotalVotesForGroup(group), remaining)
         })
 
         it('should decrement the total votes', async () => {
@@ -600,7 +596,7 @@ contract('Election', (accounts: string[]) => {
           })
 
           it('should remove the group to the list of groups the account has voted for', async () => {
-            assert.deepEqual(await election.getAccountGroupsVotedFor(voter), [])
+            assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [])
           })
         })
 
@@ -632,7 +628,7 @@ contract('Election', (accounts: string[]) => {
     describe('when the voter has active votes', () => {
       beforeEach(async () => {
         await mockValidators.setMembers(group, [accounts[9]])
-        await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+        await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
         await mockLockedGold.setTotalLockedGold(value)
         await mockValidators.setNumRegisteredValidators(1)
         await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
@@ -650,19 +646,19 @@ contract('Election', (accounts: string[]) => {
         })
 
         it("should decrement the account's active votes for the group", async () => {
-          assertEqualBN(await election.getAccountActiveVotesForGroup(group, voter), remaining)
+          assertEqualBN(await election.getActiveVotesForGroupByAccount(group, voter), remaining)
         })
 
         it("should decrement the account's total votes for the group", async () => {
-          assertEqualBN(await election.getAccountTotalVotesForGroup(group, voter), remaining)
+          assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), remaining)
         })
 
         it("should decrement the account's total votes", async () => {
-          assertEqualBN(await election.getAccountTotalVotes(voter), remaining)
+          assertEqualBN(await election.getTotalVotesByAccount(voter), remaining)
         })
 
         it('should decrement the total votes for the group', async () => {
-          assertEqualBN(await election.getGroupTotalVotes(group), remaining)
+          assertEqualBN(await election.getTotalVotesForGroup(group), remaining)
         })
 
         it('should decrement the total votes', async () => {
@@ -695,7 +691,7 @@ contract('Election', (accounts: string[]) => {
           })
 
           it('should remove the group to the list of groups the account has voted for', async () => {
-            assert.deepEqual(await election.getAccountGroupsVotedFor(voter), [])
+            assert.deepEqual(await election.getGroupsVotedForByAccount(voter), [])
           })
         })
 
@@ -755,9 +751,9 @@ contract('Election', (accounts: string[]) => {
       await mockValidators.setMembers(group2, [validator5, validator6])
       await mockValidators.setMembers(group3, [validator7])
 
-      await election.markGroupEligible(group1, NULL_ADDRESS, NULL_ADDRESS)
-      await election.markGroupEligible(group2, NULL_ADDRESS, group1)
-      await election.markGroupEligible(group3, NULL_ADDRESS, group2)
+      await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group1 })
+      await election.markGroupEligible(NULL_ADDRESS, group1, { from: group2 })
+      await election.markGroupEligible(NULL_ADDRESS, group2, { from: group3 })
 
       for (const voter of [voter1, voter2, voter3]) {
         await mockLockedGold.incrementNonvotingAccountBalance(voter.address, voter.weight)

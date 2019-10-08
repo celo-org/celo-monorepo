@@ -18,7 +18,7 @@ const DefaultConfig = {
     reportExpiry: 60 * 60, // 1 hour
   },
   election: {
-    minElectableValidators: '10',
+    minElectableValidators: '22',
     maxElectableValidators: '100',
     maxVotesPerAccount: 3,
     electabilityThreshold: '0', // no threshold

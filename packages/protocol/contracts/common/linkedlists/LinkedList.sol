@@ -153,6 +153,7 @@ library LinkedList {
    * @notice Returns the keys of the N elements at the head of the list.
    * @param n The number of elements to return.
    * @return The keys of the N elements at the head of the list.
+   * @dev Reverts if n is greater than the number of elements in the list.
    */
   function headN(List storage list, uint256 n) public view returns (bytes32[] memory) {
     require(n <= list.numElements);

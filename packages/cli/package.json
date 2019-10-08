@@ -84,7 +84,7 @@
         "description": "Configure CLI options which persist across commands"
       },
       "lockedgold": {
-        "description": "View and manage locked celo gold"
+        "description": "View and manage locked Celo Gold"
       },
       "node": {
         "description": "Manage your full node"

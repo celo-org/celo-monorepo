@@ -133,6 +133,11 @@ contract('Validators', (accounts: string[]) => {
       assertEqualBN(validator, deregistrationLockups.validator)
     })
 
+    it('should have set the max group size', async () => {
+      const actualMaxGroupSize = await validators.getMaxGroupSize()
+      assertEqualBN(actualMaxGroupSize, maxGroupSize)
+    })
+
     it('should not be callable again', async () => {
       await assertRevert(
         validators.initialize(
@@ -419,7 +424,7 @@ contract('Validators', (accounts: string[]) => {
     const validator = accounts[0]
     const index = 0
     let resp: any
-    describe('when the account is not a registered validator', () => {
+    describe('when the account is a registered validator', () => {
       beforeEach(async () => {
         await registerValidator(validator)
         resp = await validators.deregisterValidator(index)

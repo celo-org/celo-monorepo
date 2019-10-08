@@ -15,16 +15,14 @@ import {
 
 export interface Validator {
   address: Address
-  id: string
   name: string
   url: string
   publicKey: string
-  affiliation: string | null
+  affiliation: Address | null
 }
 
 export interface ValidatorGroup {
   address: Address
-  id: string
   name: string
   url: string
   members: Address[]
@@ -118,17 +116,19 @@ export class ElectionWrapper extends BaseWrapper<Election> {
 
   async getValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
     const validators = await this.kit.contracts.getValidators()
-    const vgAddresses = (await validators.getRegisteredValidatorGroups()).map((g) => g.address)
-    const vgVotes = await Promise.all(
-      vgAddresses.map((g) => this.contract.methods.getGroupTotalVotes(g).call())
+    const validatorGroupAddresses = (await validators.getRegisteredValidatorGroups()).map(
+      (g) => g.address
     )
-    const vgEligible = await Promise.all(
-      vgAddresses.map((g) => this.contract.methods.getGroupEligibility(g).call())
+    const validatorGroupVotes = await Promise.all(
+      validatorGroupAddresses.map((g) => this.contract.methods.getGroupTotalVotes(g).call())
     )
-    return vgAddresses.map((a, i) => ({
+    const validatorGroupEligible = await Promise.all(
+      validatorGroupAddresses.map((g) => this.contract.methods.getGroupEligibility(g).call())
+    )
+    return validatorGroupAddresses.map((a, i) => ({
       address: a,
-      votes: toBigNumber(vgVotes[i]),
-      eligible: vgEligible[i],
+      votes: toBigNumber(validatorGroupVotes[i]),
+      eligible: validatorGroupEligible[i],
     }))
   }
 
@@ -136,29 +136,6 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const res = await this.contract.methods.getEligibleValidatorGroupsVoteTotals().call()
     return zip((a, b) => ({ address: a, votes: new BigNumber(b), eligible: true }), res[0], res[1])
   }
-
-  /*
-  async revokeVote(): Promise<CeloTransactionObject<boolean>> {
-    if (this.kit.defaultAccount == null) {
-      throw new Error(`missing from at new ValdidatorUtils()`)
-    }
-
-    const lockedGold = await this.kit.contracts.getLockedGold()
-    const votingDetails = await lockedGold.getVotingDetails(this.kit.defaultAccount)
-    const votedGroup = await this.getVoteFrom(votingDetails.accountAddress)
-
-    if (votedGroup == null) {
-      throw new Error(`Not current vote for ${this.kit.defaultAccount}`)
-    }
-
-    const { lesser, greater } = await this.findLesserAndGreaterAfterVote(
-      votedGroup,
-      votingDetails.weight.negated()
-    )
-
-    return wrapSend(this.kit, this.contract.methods.revokeVote(lesser, greater))
-  }
-  */
 
   async markGroupEligible(validatorGroup: Address): Promise<CeloTransactionObject<boolean>> {
     if (this.kit.defaultAccount == null) {
@@ -187,13 +164,13 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     )
   }
 
-  private async findLesserAndGreaterAfterVote(
+  async findLesserAndGreaterAfterVote(
     votedGroup: Address,
     voteWeight: BigNumber
   ): Promise<{ lesser: Address; greater: Address }> {
     const currentVotes = await this.getEligibleValidatorGroupsVotes()
 
-    const selectedGroup = currentVotes.find((cv) => eqAddress(cv.address, votedGroup))
+    const selectedGroup = currentVotes.find((votes) => eqAddress(votes.address, votedGroup))
 
     // modify the list
     if (selectedGroup) {
@@ -210,7 +187,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     currentVotes.sort((a, b) => a.votes.comparedTo(b.votes))
 
     // find new index
-    const newIdx = currentVotes.findIndex((cv) => eqAddress(cv.address, votedGroup))
+    const newIdx = currentVotes.findIndex((votes) => eqAddress(votes.address, votedGroup))
 
     return {
       lesser: newIdx === 0 ? NULL_ADDRESS : currentVotes[newIdx - 1].address,

@@ -15,17 +15,23 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   using SafeMath for uint256;
 
   struct MustMaintain {
+    // The Locked Gold balance that the account must maintain.
     uint256 value;
+    // The timestamp at which the account is no longer subject to these constraints.
     uint256 timestamp;
   }
 
   struct Authorizations {
+    // The address that is authorized to vote on behalf of the account.
     address voting;
+    // The address that is authorized to validate on behalf of the account.
     address validating;
   }
 
   struct PendingWithdrawal {
+    // The value of the pending withdrawal.
     uint256 value;
+    // The timestamp at which the pending withdrawal becomes available.
     uint256 timestamp;
   }
 
@@ -33,7 +39,9 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     // This contract does not store an account's locked gold that is being used in electing
     // validators.
     uint256 nonvoting;
+    // Gold that has been unlocked and will become available for withdrawal.
     PendingWithdrawal[] pendingWithdrawals;
+    // Balance requirements imposed on this account.
     MustMaintain requirements;
   }
 
@@ -189,7 +197,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   function unlock(uint256 value) external nonReentrant {
     require(isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
-    MustMaintain memory requirement = account.balances.requirements;
+    MustMaintain storage requirement = account.balances.requirements;
     require(
       now >= requirement.timestamp ||
       getAccountTotalLockedGold(msg.sender).sub(value) >= requirement.value
@@ -223,7 +231,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     require(isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
     require(index < account.balances.pendingWithdrawals.length);
-    PendingWithdrawal memory pendingWithdrawal = account.balances.pendingWithdrawals[index];
+    PendingWithdrawal storage pendingWithdrawal = account.balances.pendingWithdrawals[index];
     require(now >= pendingWithdrawal.timestamp);
     uint256 value = pendingWithdrawal.value;
     deletePendingWithdrawal(account.balances.pendingWithdrawals, index);
@@ -271,7 +279,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   }
 
   /**
-   * @notice Returns the total amount of locked gold in the system.
+   * @notice Returns the total amount of locked gold in the system. Note that this does not include
+   *   gold that has been unlocked but not yet withdrawn.
    * @return The total amount of locked gold in the system.
    */
   function getTotalLockedGold() external view returns (uint256) {

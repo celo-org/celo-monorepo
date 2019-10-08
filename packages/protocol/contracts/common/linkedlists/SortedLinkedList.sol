@@ -148,6 +148,7 @@ library SortedLinkedList {
    * @notice Returns first N greatest elements of the list.
    * @param n The number of elements to return.
    * @return The keys of the first n elements.
+   * @dev Reverts if n is greater than the number of elements in the list.
    */
   function headN(List storage list, uint256 n) public view returns (bytes32[] memory) {
     return list.list.headN(n);
