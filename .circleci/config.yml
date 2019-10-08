@@ -165,30 +165,30 @@ jobs:
           name: Install emulator dependencies
           command: (yes | sdkmanager "platform-tools" "platforms;android-26" "extras;intel;Hardware_Accelerated_Execution_Manager" "build-tools;26.0.0" "system-images;android-26;google_apis;x86" "emulator" --verbose) || true > /dev/null
       # - *download_android_dependencies
-      -run:
-        name: Install Android dependencies
-        command: |
-          HOMEBREW_NO_AUTO_UPDATE=1 brew install cask
-          HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-platform-tools
-          HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/cask-versions
-          HOMEBREW_NO_AUTO_UPDATE=1 brew cask install homebrew/cask-versions/adoptopenjdk8
-      - run: 
-        name: Creace Android Virtual Device (AVD)
-        command: |
-          avdmanager create avd -n Nexus_5X_API_28_x86 -k "system-images;android-26;google_apis;x86" -g google_apis -d "Nexus 5"
-          # Copy device configuarion, adv for some reason doesn't
-          mkdir -p ~/.android/avd/Nexus_5X_API_28_x86.avd/ && cp packages/mobile/e2e/conf/avd_conf.ini ~/.android/avd/Nexus_5X_API_28_x86.avd/config.ini
       - run:
-        name: Set up nodejs
-        command: |
-          echo `. ~/.bash_profile` # for some mreason just `source ~/.bash_profile` makes the build fail
-          # install nvm
-          HOMEBREW_NO_AUTO_UPDATE=1 brew install wget pidcat
-          wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | bash
-          echo -e '\nexport NVM_DIR="$HOME/.nvm"' >> ~/.bash_profile
-          echo -e '\n[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bash_profile # add nvm to path
-          echo `. ~/.bash_profile`
-          nvm install v10.16.3 && nvm use v10.16.3
+          name: Install Android dependencies
+          command: |
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install cask
+            HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-platform-tools
+            HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/cask-versions
+            HOMEBREW_NO_AUTO_UPDATE=1 brew cask install homebrew/cask-versions/adoptopenjdk8
+      - run: 
+          name: Creace Android Virtual Device (AVD)
+          command: |
+            avdmanager create avd -n Nexus_5X_API_28_x86 -k "system-images;android-26;google_apis;x86" -g google_apis -d "Nexus 5"
+            # Copy device configuarion, adv for some reason doesn't
+            mkdir -p ~/.android/avd/Nexus_5X_API_28_x86.avd/ && cp packages/mobile/e2e/conf/avd_conf.ini ~/.android/avd/Nexus_5X_API_28_x86.avd/config.ini
+      - run:
+          name: Set up nodejs
+          command: |
+            echo `. ~/.bash_profile` # for some mreason just `source ~/.bash_profile` makes the build fail
+            # install nvm
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install wget pidcat
+            wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | bash
+            echo -e '\nexport NVM_DIR="$HOME/.nvm"' >> ~/.bash_profile
+            echo -e '\n[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bash_profile # add nvm to path
+            echo `. ~/.bash_profile`
+            nvm install v10.16.3 && nvm use v10.16.3
 
       # Currently not used
       # - run: npm install --global react-native-kill-packager 
@@ -196,11 +196,9 @@ jobs:
       
       # TODO, create cache
       - run: yarn && yarn build # need to run this because it's another OS than install_dependecies job
-      
-      
-      - run: 
-        name: Install some extra dependencies the app needs
-        command: HOMEBREW_NO_AUTO_UPDATE=1 brew install wget pidcat watchman
+      - run:
+          name: Install some extra dependencies the app needs
+          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install wget pidcat watchman
       - save_cache:
           key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
