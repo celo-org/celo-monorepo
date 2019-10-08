@@ -206,7 +206,7 @@ jobs:
           name: Install some extra dependencies the app needs
           command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pidcat watchman
       - restore_cache:
-          key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}
+          key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}
       - run: cd ~/src/packages/mobile && yarn test:build-e2e # tests seem to fail if the app is built at the same time the emulator runs
       - run:
           name: Start emulator
@@ -217,12 +217,12 @@ jobs:
           command: cd ~/src/packages/mobile && yarn start
           background: true
       - run: cp node_modules/.bin/jest packages/mobile/node_modules/.bin/ # for some reason jest is just not there
-      # - run: lock device
+      # TODO - run: lock device
       - run: tree packages/mobile/android/app/build/outputs/apk/
       - run:
           name: Sleep until Device connects
-          command: cd ~/src/packages/mobile && bash ./scripts/wait_for_emulator_to_connect.sh && sleep 30
-      # - run: unlock device
+          command: cd ~/src/packages/mobile && bash ./scripts/wait_for_emulator_to_connect.sh
+      # TODO - run: unlock device
       - run:
           name: Run yarn dev
           command: cd ~/src/packages/mobile && ENVFILE=".env.test" yarn dev
@@ -231,7 +231,7 @@ jobs:
           command: cd ~/src/packages/mobile && ENVFILE=".env.test" yarn test:detox
       - run: cd ~/src
       - save_cache:
-          key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}
+          key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}
           paths:
             - ~/src/packages/mobile/android/app/build/outputs/apk/
             - ~/.gradle/
