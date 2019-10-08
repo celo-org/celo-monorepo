@@ -44,6 +44,7 @@ export enum TransactionTypes {
   INVITE_SENT = 'INVITE_SENT',
   INVITE_RECEIVED = 'INVITE_RECEIVED',
   PAY_REQUEST = 'PAY_REQUEST',
+  NETWORK_FEE = 'NETWORK_FEE',
 }
 
 type TransferTransactionTypes =
@@ -54,6 +55,7 @@ type TransferTransactionTypes =
   | TransactionTypes.VERIFICATION_FEE
   | TransactionTypes.INVITE_SENT
   | TransactionTypes.INVITE_RECEIVED
+  | TransactionTypes.NETWORK_FEE
 
 export interface State {
   standbyTransactions: StandbyTransaction[]

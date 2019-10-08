@@ -38,7 +38,7 @@ export function* sendAndMonitorTransaction(
   currency?: CURRENCY_ENUM
 ) {
   try {
-    Logger.debug(TAG + '@sendAndMonitorTransaction', 'Sending transaction with id: ', txId)
+    Logger.debug(TAG + '@sendAndMonitorTransaction', `Sending transaction with id: ${txId}`)
 
     const { transactionHash, confirmation } = yield call(
       sendTransactionPromises,

@@ -16,6 +16,8 @@ resource "google_compute_instance" "validator" {
 
   count = var.validator_count
 
+  allow_stopping_for_update = true
+
   boot_disk {
     initialize_params {
       image = "debian-cloud/debian-9"
@@ -56,8 +58,11 @@ resource "google_compute_instance" "validator" {
   )
 
   service_account {
-    email  = var.gcloud_vm_service_account_email
-    scopes = ["storage-ro"]
+    email = var.gcloud_vm_service_account_email
+    scopes = [
+      "https://www.googleapis.com/auth/devstorage.read_only",
+      "https://www.googleapis.com/auth/logging.write"
+    ]
   }
 }
 

@@ -99,6 +99,43 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken {
   }
 
   /**
+   * @notice Increases the allowance of another user.
+   * @param spender The address which is being approved to spend Celo Gold.
+   * @param value The increment of the amount of Celo Gold approved to the spender.
+   * @return True if the transaction succeeds.
+   */
+  function increaseAllowance(address spender, uint256 value)
+    external
+    returns (bool)
+  {
+    uint256 oldValue = allowed[msg.sender][spender];
+    uint256 newValue = oldValue.add(value);
+    allowed[msg.sender][spender] = newValue;
+    emit Approval(msg.sender, spender, newValue);
+    return true;
+  }
+
+  /**
+   * @notice Decreases the allowance of another user.
+   * @param spender The address which is being approved to spend Celo Gold.
+   * @param value The decrement of the amount of Celo Gold approved to the spender.
+   * @return True if the transaction succeeds.
+   */
+  function decreaseAllowance(
+    address spender,
+    uint256 value
+  )
+    external
+    returns (bool)
+  {
+    uint256 oldValue = allowed[msg.sender][spender];
+    uint256 newValue = oldValue.sub(value);
+    allowed[msg.sender][spender] = newValue;
+    emit Approval(msg.sender, spender, newValue);
+    return true;
+  }
+
+  /**
    * @notice Transfers Celo Gold from one address to another on behalf of a user.
    * @param from The address to transfer Celo Gold from.
    * @param to The address to transfer Celo Gold to.

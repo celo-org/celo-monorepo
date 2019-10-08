@@ -49,9 +49,9 @@ describe('EnterInviteCode Screen', () => {
           redeemInvite={redeem}
           showError={jest.fn()}
           hideAlert={jest.fn()}
-          error={null}
-          name={''}
           redeemComplete={false}
+          isRedeemingInvite={false}
+          account={null}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -60,7 +60,7 @@ describe('EnterInviteCode Screen', () => {
     expect(wrapper.queryByTestId('pasteMessageButton')).not.toBeNull()
     fireEvent.press(wrapper.getByTestId('pasteMessageButton'))
     await Clipboard.getString()
-    expect(redeem).toHaveBeenCalledWith(PARTIAL_INVITE_KEY, '')
+    expect(redeem).toHaveBeenCalledWith(PARTIAL_INVITE_KEY)
   })
 
   it('calls redeem invite with valid invite key in clipboard', async () => {
@@ -72,9 +72,9 @@ describe('EnterInviteCode Screen', () => {
           redeemInvite={redeem}
           showError={jest.fn()}
           hideAlert={jest.fn()}
-          error={null}
-          name={''}
           redeemComplete={false}
+          isRedeemingInvite={false}
+          account={null}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -83,7 +83,7 @@ describe('EnterInviteCode Screen', () => {
     await Clipboard.getString()
     fireEvent.press(wrapper.getByTestId('pasteMessageButton'))
     await Clipboard.getString()
-    expect(redeem).toHaveBeenCalledWith(VALID_INVITE_KEY, '')
+    expect(redeem).toHaveBeenCalledWith(VALID_INVITE_KEY)
   })
 
   it('does not proceed with an invalid invite key in clipboard', async () => {
@@ -95,9 +95,9 @@ describe('EnterInviteCode Screen', () => {
           redeemInvite={redeem}
           showError={jest.fn()}
           hideAlert={jest.fn()}
-          error={null}
-          name={''}
           redeemComplete={false}
+          isRedeemingInvite={false}
+          account={null}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -106,6 +106,6 @@ describe('EnterInviteCode Screen', () => {
     fireEvent.press(wrapper.getByTestId('openMessageButton'))
     await Clipboard.getString()
     expect(wrapper.queryByTestId('pasteMessageButton')).toBeNull()
-    expect(redeem).not.toHaveBeenCalledWith(VALID_INVITE_KEY, '')
+    expect(redeem).not.toHaveBeenCalledWith(VALID_INVITE_KEY)
   })
 })

@@ -15,10 +15,11 @@ import fetch from 'node-fetch'
 import path from 'path'
 import Web3Type from 'web3'
 import { TransactionReceipt } from 'web3/types'
-import { envVar, fetchEnv } from './env-utils'
+import { envVar, fetchEnv, isVmBased } from './env-utils'
 import { AccountType, generatePrivateKey, privateKeyToPublicKey } from './generate_utils'
 import { retrieveIPAddress } from './helm_deploy'
 import { execCmd, execCmdWithExitOnFailure } from './utils'
+import { getTestnetOutputs } from './vm-testnet-utils'
 
 type HandleErrorCallback = (isError: boolean, data: { location: string; error: string }) => void
 
@@ -86,12 +87,20 @@ export const getBootnodeEnode = async (namespace: string) => {
   return [getEnodeAddress(nodeId, ip, DISCOVERY_PORT)]
 }
 
+const retrieveTxNodeAddresses = async (namespace: string, txNodesNum: number) => {
+  if (isVmBased()) {
+    const outputs = await getTestnetOutputs(namespace)
+    return outputs.tx_node_ip_addresses.value
+  } else {
+    const txNodesRange = range(0, txNodesNum)
+    return Promise.all(txNodesRange.map((i) => retrieveIPAddress(`${namespace}-tx-nodes-${i}`)))
+  }
+}
+
 const getEnodesWithIpAddresses = async (namespace: string, getExternalIP: boolean) => {
-  const txNodesNum = fetchEnv(envVar.TX_NODES)
-  const txNodesRange = range(0, parseInt(txNodesNum, 10))
-  const txAddresses = await Promise.all(
-    txNodesRange.map((i) => retrieveIPAddress(`${namespace}-tx-nodes-${i}`))
-  )
+  const txNodesNum = parseInt(fetchEnv(envVar.TX_NODES), 10)
+  const txAddresses = await retrieveTxNodeAddresses(namespace, txNodesNum)
+  const txNodesRange = range(0, txNodesNum)
   const enodes = Promise.all(
     txNodesRange.map(async (index) => {
       const privateKey = generatePrivateKey(fetchEnv(envVar.MNEMONIC), AccountType.TX_NODE, index)

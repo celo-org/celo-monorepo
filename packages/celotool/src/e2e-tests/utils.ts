@@ -176,6 +176,7 @@ function writeGenesis(validators: Validator[], path: string) {
     validators,
     blockTime: 0,
     epoch: 10,
+    requestTimeout: 3000,
     chainId: NetworkId,
   })
   fs.writeFileSync(path, genesis)
@@ -314,6 +315,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
       console.info(`geth:${instance.name}: jsonRPC port open ${waitForPort}`)
     }
   }
+  return instance
 }
 
 export async function migrateContracts(validatorPrivateKeys: string[], to: number = 1000) {

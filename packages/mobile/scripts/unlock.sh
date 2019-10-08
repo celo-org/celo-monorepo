@@ -35,10 +35,3 @@ sleep 2
 adb shell input text $SECRET_PIN		# Input Pin
 sleep 1
 adb shell input keyevent 66		# Enter
-
-
-echo "waiting for device to connect to Wifi, this is a good proxy the device is ready"
-until adb shell dumpsys wifi | grep "mNetworkInfo" |grep "state: CONNECTED"
-do
-  sleep 10
-done

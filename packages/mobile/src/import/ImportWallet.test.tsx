@@ -5,7 +5,6 @@ import { mnemonicToSeedHex, validateMnemonic } from 'react-native-bip39'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { ErrorMessages } from 'src/app/ErrorMessages'
 import ImportWallet, {
   formatBackupPhraseOnEdit,
   formatBackupPhraseOnSubmit,
@@ -50,17 +49,19 @@ describe('ImportWallet', () => {
     const store = createMockStore()
     const tree = renderer.create(
       <Provider store={store}>
-        <ImportWallet {...getMockI18nProps()} />
+        <ImportWallet />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
   })
 
-  it('renders with an error', () => {
-    const store = createMockStore({ alert: { underlyingError: ErrorMessages.INVALID_BACKUP } })
+  it('renders with an empty wallet', () => {
+    const store = createMockStore({
+      imports: { isWalletEmpty: true },
+    })
     const tree = renderer.create(
       <Provider store={store}>
-        <ImportWallet {...getMockI18nProps()} />
+        <ImportWallet />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -76,29 +77,6 @@ describe('ImportWallet', () => {
     expect(wrapper.queryAllByProps({ disabled: true }).length).toBeGreaterThan(0)
   })
 
-  it('shows an error with an invalid backup phrase', () => {
-    const error = jest.fn()
-
-    const wrapper = render(
-      <Provider store={createMockStore()}>
-        <ImportWalletClass
-          importBackupPhrase={jest.fn()}
-          showError={error}
-          hideAlert={jest.fn()}
-          error={null}
-          {...getMockI18nProps()}
-        />
-      </Provider>
-    )
-
-    fireEvent.changeText(
-      wrapper.getByTestId('ImportWalletBackupKeyInputField'),
-      BAD_ENGLISH_MNEMONIC
-    )
-    fireEvent.press(wrapper.getByTestId('ImportWalletButton'))
-    expect(error).toHaveBeenCalledWith(ErrorMessages.INVALID_BACKUP)
-  })
-
   it('calls assign account with the proper private key', () => {
     const importFn = jest.fn()
 
@@ -106,9 +84,10 @@ describe('ImportWallet', () => {
       <Provider store={createMockStore()}>
         <ImportWalletClass
           importBackupPhrase={importFn}
-          showError={jest.fn()}
+          tryAnotherBackupPhrase={jest.fn()}
           hideAlert={jest.fn()}
-          error={null}
+          isImportingWallet={false}
+          isWalletEmpty={false}
           {...getMockI18nProps()}
         />
       </Provider>
@@ -119,7 +98,7 @@ describe('ImportWallet', () => {
       MULTILINE_ENGLISH_MNEMONIC_EXTRA_SPACES
     )
     fireEvent.press(wrapper.getByTestId('ImportWalletButton'))
-    expect(importFn).toHaveBeenCalledWith(ENGLISH_MNEMONIC)
+    expect(importFn).toHaveBeenCalledWith(ENGLISH_MNEMONIC, false)
   })
 })
 

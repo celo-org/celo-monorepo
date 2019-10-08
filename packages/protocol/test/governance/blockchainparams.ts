@@ -33,6 +33,7 @@ contract('BlockchainParameters', (accounts: string[]) => {
       assert.equal(version.minor, versionQueried[1].toNumber())
       assert.equal(version.patch, versionQueried[2].toNumber())
     })
+
     it('should emit the MinimumClientVersionSet event', async () => {
       const resp = await blockchainParameters.setMinimumClientVersion(
         version.major,
@@ -93,6 +94,7 @@ contract('BlockchainParameters', (accounts: string[]) => {
       assert.equal(version.patch, versionQueried[2].toNumber())
       assert.equal((await blockchainParameters.blockGasLimit()).toNumber(), gasLimit)
     })
+
     it('should emit correct events', async () => {
       const resp = await blockchainParameters.initialize(
         version.major,
