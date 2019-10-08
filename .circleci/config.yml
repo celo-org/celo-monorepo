@@ -195,7 +195,6 @@ jobs:
             #   echo "Cache found, just run post-script."
             #   yarn postinstall
             # fi
-            rm -rf packages/web
             yarn
             yarn build 
       - save_cache:
