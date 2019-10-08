@@ -117,7 +117,7 @@ jobs:
           paths:
             - .
 
-  ui_test:
+  mobile_e2e_test:
     <<: *android_config
     resource_class: large
     steps:
@@ -183,11 +183,11 @@ jobs:
           command: HOMEBREW_NO_AUTO_UPDATE=1 brew install tree
       # Currently not used
       # - run: npm install --global react-native-kill-packager 
-      # TODO, create cache
       - run:
           # need to run this because it's another OS than install_dependecies job
           name: yarn
           command: |
+            # TODO, Make cache work and figure out why this doesn't work
             # if [ ! -d node_modules ]; then
             #     echo "No cache found, install yarn. Hold tight."
             #     yarn
@@ -208,7 +208,6 @@ jobs:
       - restore_cache:
           key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}
       - run: cd ~/src/packages/mobile && yarn test:build-e2e # tests seem to fail if the app is built at the same time the emulator runs
-      # - detox
       - run:
           name: Start emulator
           command: cd ~/src/packages/mobile && bash ./scripts/start_emulator.sh
@@ -228,7 +227,7 @@ jobs:
           name: Run yarn dev
           command: cd ~/src/packages/mobile && ENVFILE=".env.test" yarn dev
       - run:
-          name: detox
+          name: Run test itself
           command: cd ~/src/packages/mobile && ENVFILE=".env.test" yarn test:detox
       - run: cd ~/src
       - save_cache:
@@ -236,16 +235,6 @@ jobs:
           paths:
             - ~/src/packages/mobile/android/app/build/outputs/apk/
             - ~/.gradle/
-
-
-
-
-      # - run:
-      #     name: Run Tests
-      #     command: cd ~/src/packages/mobile && yarn test:dry-run-e2e || true
-      # - run:
-      #     name: Run Tests (again)
-      #     command: cd ~/src/packages/mobile && yarn test:dry-run-e2e
   
   lint-checks:
     <<: *defaults
@@ -471,6 +460,45 @@ jobs:
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
             ./ci_test_transfers.sh checkout master
 
+  end-to-end-geth-exit-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+      - run:
+          name: Setup Go language
+          command: |
+            set -e
+            set -v
+            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
+            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
+            ls /tmp/go/bin/go
+            /tmp/go/bin/go version
+      - run:
+          name: Setup Rust language
+          command: |
+            set -e
+            set -v
+            curl https://sh.rustup.rs -sSf | sh -s -- -y
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+            rustup install 1.36.0
+            rustup default 1.36.0
+      - run:
+          name: Run test
+          no_output_timeout: 20m
+          command: |
+            set -e
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+            go version
+            cd packages/celotool
+            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+            ./ci_test_exit.sh checkout master
+
   end-to-end-geth-governance-test:
     <<: *defaults
     # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
@@ -643,54 +671,58 @@ workflows:
   celo-monorepo-build:
     jobs:
       # - install_dependencies
-      - ui_test #:
+      - mobile_e2e_test #:
       #     requires:
       #       - install_dependencies
       #       - mobile-test-build-app
-      # - lint-checks:
-      #     requires:
-      #       - install_dependencies
-      # - general-test:
-      #     requires:
-      #       - install_dependencies
-      # - walletkit-test:
-      #     requires:
-      #       - install_dependencies
-      # - cli-test:
-      #     requires:
-      #       - install_dependencies
-      # - contractkit-test:
-      #     requires:
-      #       - install_dependencies
-      # - mobile-test:
-      #     requires:
-      #       - lint-checks
-      # - mobile-test-build-app:
-      #     requires:
-      #       - mobile-test
-      # - verification-pool-api:
-      #     requires:
-      #       - lint-checks
-      # - protocol-test:
-      #     requires:
-      #       - lint-checks
-      #       - walletkit-test
-      # - end-to-end-geth-transfer-test:
-      #     requires:
-      #       - lint-checks
-      #       - walletkit-test
-      # - end-to-end-geth-governance-test:
-      #     requires:
-      #       - lint-checks
-      #       - walletkit-test
-      # - end-to-end-geth-sync-test:
-      #     requires:
-      #       - lint-checks
-      #       - walletkit-test
-      # - end-to-end-geth-integration-sync-test:
-      #     requires:
-      #       - lint-checks
-      #       - walletkit-test
+  #     - lint-checks:
+  #         requires:
+  #           - install_dependencies
+  #     - general-test:
+  #         requires:
+  #           - install_dependencies
+  #     - walletkit-test:
+  #         requires:
+  #           - install_dependencies
+  #     - cli-test:
+  #         requires:
+  #           - install_dependencies
+  #     - contractkit-test:
+  #         requires:
+  #           - install_dependencies
+  #     - mobile-test:
+  #         requires:
+  #           - lint-checks
+  #     - mobile-test-build-app:
+  #         requires:
+  #           - mobile-test
+  #     - verification-pool-api:
+  #         requires:
+  #           - lint-checks
+  #     - protocol-test:
+  #         requires:
+  #           - lint-checks
+  #           - walletkit-test
+  #     - end-to-end-geth-transfer-test:
+  #         requires:
+  #           - lint-checks
+  #           - walletkit-test
+  #     - end-to-end-geth-exit-test:
+  #         requires:
+  #           - lint-checks
+  #           - walletkit-test
+  #     - end-to-end-geth-governance-test:
+  #         requires:
+  #           - lint-checks
+  #           - walletkit-test
+  #     - end-to-end-geth-sync-test:
+  #         requires:
+  #           - lint-checks
+  #           - walletkit-test
+  #     - end-to-end-geth-integration-sync-test:
+  #         requires:
+  #           - lint-checks
+  #           - walletkit-test
   # npm-install-testing-cron-workflow:
   #   triggers:
   #     - schedule:

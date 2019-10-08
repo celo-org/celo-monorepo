@@ -40,7 +40,7 @@ const DefaultConfig = {
     initialMinimum: 10000,
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
-    infrastructureFraction: 1 / 2,
+    proposerFraction: 1 / 2,
   },
   registry: {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
@@ -72,6 +72,13 @@ const DefaultConfig = {
     // We register a single validator group during the migration.
     groupName: 'C-Labs',
     groupUrl: 'https://www.celo.org',
+  },
+  blockchainParameters: {
+    minimumClientVersion: {
+      major: 1,
+      minor: 8,
+      patch: 23,
+    },
   },
 }
 

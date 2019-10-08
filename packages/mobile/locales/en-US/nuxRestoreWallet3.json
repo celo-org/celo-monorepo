@@ -1,22 +1,14 @@
 {
-  "welcomeCelo": "Welcome to Celo",
-  "enterInvite":
-    "Enter your invitation code. If you do not have one, ask someone in the Celo Community to invite you. By joining this application, you agree to share your name & phone number with us. Learn more at celo.org",
-  "fullName": "Full Name",
-  "invitationCode": "Invitation Code",
-  "submit": "Submit",
-  "alreadyHaveWallet": "Already have a Celo Wallet? Restore it",
-  "restoreYourWallet": {
-    "title": "Restore your Celo Wallet",
-    "userYourBackupKey":
-      "Already have a Celo Wallet? Use your secure Backup Key to restore your wallet to this phone.",
-    "warning": "Warning ",
-    "restoreInPrivate": "Restore your Wallet in private "
-  },
-  "backupKeyPrompt": "Backup Key",
+  "title": "Restore your Celo Wallet",
+  "userYourBackupKey":
+    "Already have a Celo Wallet? Enter your Backup Key to restore it to this phone.",
+  "backupKeyPrompt":
+    "horse leopard dog monkey shark tiger lemur whale squid wolf squirrel mouse lion elephant cat shrimp bear penguin deer turtle fox zebra goat giraffe",
   "tip": "Tip: ",
-  "backupKeyTip": "Backup Key words are separated by a space",
-  "continue": "Continue",
-  "cancel": "Cancel",
-  "restoreWallet": "Restore Celo Wallet"
+  "backupKeyTip": "Backup Keys are 24 words long, separated by a space.",
+  "restoreWallet": "Restore",
+  "emptyWalletWarning": "This wallet is empty.",
+  "useEmptyAnyway": "Would you like to use it anyway?",
+  "useEmptyWallet": "Use Empty Wallet",
+  "tryAnotherKey": "Try Another Backup Key"
 }
