@@ -72,9 +72,9 @@ jobs:
 
       - restore_cache:
           keys:
-            - yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - yarn-v2-{{ arch }}-{{ .Branch }}-
-            - yarn-v2-{{ arch }}-
+            - yarn-v2-macOs-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-v2-macOs-{{ .Branch }}-
+            - yarn-v2-macOs-
             - yarn-v2-
 
       - run:
@@ -95,13 +95,12 @@ jobs:
               exit 1
             fi
       - run: npm rebuild scrypt
-
       - save_cache:
           key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
             - packages/*/node_modules
-
+            - ~/.cache/yarn
       - run:
           name: Build packages
           command: |
