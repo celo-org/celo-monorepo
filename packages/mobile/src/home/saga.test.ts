@@ -2,12 +2,7 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { call, put, select } from 'redux-saga/effects'
 import { fetchGoldBalance } from 'src/goldToken/actions'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
-import {
-  _autoRefreshSaga,
-  _watchRefreshBalances,
-  refreshBalances,
-  withLoading,
-} from 'src/home/saga'
+import { autoRefreshSaga, refreshBalances, watchRefreshBalances, withLoading } from 'src/home/saga'
 import { fetchCurrentRate } from 'src/localCurrency/actions'
 import { shouldFetchCurrentRate } from 'src/localCurrency/selectors'
 import { shouldUpdateBalance } from 'src/redux/selectors'
@@ -27,7 +22,7 @@ describe('refreshBalances', () => {
 
 describe('watchRefreshBalances', () => {
   test('reacts on REFRESH_BALANCES', async () => {
-    await expectSaga(_watchRefreshBalances)
+    await expectSaga(watchRefreshBalances)
       .put(setLoading(true))
       .put(setLoading(false))
       .provide([[call(getConnectedAccount), true]])
@@ -77,7 +72,7 @@ describe('autoRefreshSaga', () => {
       return next()
     }
 
-    await expectSaga(_autoRefreshSaga)
+    await expectSaga(autoRefreshSaga)
       .provide([
         [select(shouldUpdateBalance), true],
         [select(shouldFetchCurrentRate), true],

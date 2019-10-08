@@ -129,6 +129,7 @@ android {
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "string", "build_config_package", "org.celo.mobile"
+        missingDimensionStrategy 'react-native-camera', 'general'
     }
     signingConfigs {
         release {
@@ -217,13 +218,13 @@ android {
 
     packagingOptions {
         exclude 'META-INF/-no-jdk.kotlin_module'
+        exclude 'META-INF/androidx.exifinterface_exifinterface.version'
     }
 }
 
 dependencies {
     implementation project(':react-native-install-referrer')
     implementation project(':react-native-send-intent')
-    // implementation project(':instabug-reactnative')
     // implementation project(':react-native-screens')
     implementation project(':react-native-webview')
     implementation project(':@react-native-community_netinfo')
@@ -236,7 +237,7 @@ dependencies {
     implementation project(':react-native-version-check')
     implementation project(':react-native-android-open-settings')
     implementation project(':react-native-udp')
-    implementation project(':react-native-languages')
+    implementation project(':react-native-localize')
     implementation project(':react-native-config')
     implementation project(':react-native-tcp')
     implementation project(':react-native-sentry')

@@ -1,51 +1,52 @@
 /**
- * TextInput with input validation, interchangeable with `./TextInput.tsx` and
- * React Native's TextInput if input validation is required.  Set the
- * `nativeInput` prop to `true` for RN TextInput replacement without visual
- * changes.
+ * TextInput with input validation, interchangeable with `./TextInput.tsx`
  */
 
 import TextInput from '@celo/react-components/components/TextInput'
 import { validateInput, ValidatorKind } from '@celo/utils/src/inputValidation'
 import * as React from 'react'
-import { TextInput as RNTextInput, TextInputProps } from 'react-native'
+import { KeyboardType, TextInputProps } from 'react-native'
 
 interface OwnProps {
   value: string
+  onChangeText: (input: string) => void
+  keyboardType: KeyboardType
   numberOfDecimals?: number
   placeholder?: string
   lng?: string
-  nativeInput?: boolean
-  onChangeText: (input: string) => void
 }
 
-// Required props when validator type is phone
-interface PhoneValidatorProps {
+export interface PhoneValidatorProps {
   validator: ValidatorKind.Phone
   countryCallingCode: string
-  // Following props unused w/ 'phone' validator but required to be defined
-  customValidator?: CustomValidatorProps['customValidator']
 }
 
-interface NumberValidatorProps {
-  validator?: ValidatorKind.Integer | ValidatorKind.Decimal
-  // Following props unused w/ number validators but required to be defined
-  countryCallingCode?: string
-  customValidator?: CustomValidatorProps['customValidator']
+export interface IntegerValidatorProps {
+  validator: ValidatorKind.Integer
 }
 
-interface CustomValidatorProps {
+export interface DecimalValidatorProps {
+  validator: ValidatorKind.Decimal
+  numberOfDecimals: number
+}
+
+// Required props for a custom input validator
+export interface CustomValidatorProps {
   validator: ValidatorKind.Custom
   customValidator: (input: string) => string
-  // Following props unused w/ 'custom' but required to be defined
-  countryCallingCode?: string
 }
 
-export type ValidatorProps = PhoneValidatorProps | NumberValidatorProps | CustomValidatorProps
+export type ValidatorProps =
+  | PhoneValidatorProps
+  | IntegerValidatorProps
+  | DecimalValidatorProps
+  | CustomValidatorProps
 
-type Props = OwnProps & ValidatorProps & TextInputProps
+export type ValidatedTextInputProps<V extends ValidatorProps> = OwnProps & V & TextInputProps
 
-export default class ValidatedTextInput extends React.Component<Props> {
+export default class ValidatedTextInput<V extends ValidatorProps> extends React.Component<
+  ValidatedTextInputProps<V>
+> {
   onChangeText = (input: string): void => {
     const validated = validateInput(input, this.props)
     // Don't propagate change if new change is invalid
@@ -53,38 +54,28 @@ export default class ValidatedTextInput extends React.Component<Props> {
       return
     }
 
-    if (!this.props.onChangeText) {
-      return
+    if (this.props.onChangeText) {
+      this.props.onChangeText(validated)
     }
-
-    this.props.onChangeText(validated)
   }
 
   getMaxLength = () => {
-    if (!this.props.numberOfDecimals) {
+    const { numberOfDecimals, validator, value, lng } = this.props
+
+    if (validator !== ValidatorKind.Decimal || !numberOfDecimals) {
       return undefined
     }
-
-    const { value, lng } = this.props
 
     const decimalPos = lng && lng.startsWith('es') ? value.indexOf(',') : value.indexOf('.')
     if (decimalPos === -1) {
       return undefined
     }
 
-    return decimalPos + this.props.numberOfDecimals + 1
+    return decimalPos + (numberOfDecimals as number) + 1
   }
 
   render() {
-    const { nativeInput = false } = this.props
-    return nativeInput ? (
-      <RNTextInput
-        maxLength={this.getMaxLength()}
-        {...this.props}
-        value={this.props.value}
-        onChangeText={this.onChangeText}
-      />
-    ) : (
+    return (
       <TextInput
         maxLength={this.getMaxLength()}
         {...this.props}

@@ -96,6 +96,10 @@ export class Account extends React.Component<Props, State> {
     navigate(Screens.Language, { nextScreen: Screens.Account })
   }
 
+  goToLocalCurrencySetting() {
+    navigate(Screens.SelectLocalCurrency)
+  }
+
   goToLicenses() {
     navigate(Screens.Licenses)
   }
@@ -224,6 +228,7 @@ export class Account extends React.Component<Props, State> {
           )}
           <SettingsItem title={t('analytics')} onPress={this.goToAnalytics} />
           <SettingsItem title={t('languageSettings')} onPress={this.goToLanguageSetting} />
+          <SettingsItem title={t('localCurrencySetting')} onPress={this.goToLocalCurrencySetting} />
           <SettingsItem title={t('licenses')} onPress={this.goToLicenses} />
           <SettingsItem title={t('sendIssueReport')} onPress={this.sendLogsToSupport} />
         </View>

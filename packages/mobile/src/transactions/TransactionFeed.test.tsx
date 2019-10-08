@@ -35,6 +35,16 @@ const standbyTransactions: StandbyTransaction[] = [
     outValue: '30',
     timestamp: 1542409112,
   },
+  {
+    id: '0113',
+    type: TransactionTypes.NETWORK_FEE,
+    comment: '',
+    status: TransactionStatus.Pending,
+    value: '0.0001',
+    symbol: CURRENCY_ENUM.DOLLAR,
+    timestamp: 1542406112,
+    address: '0072bvy2o23u',
+  },
 ]
 
 const failedExchange: StandbyTransaction[] = [

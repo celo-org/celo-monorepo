@@ -153,6 +153,20 @@ export const v2Schema = {
   },
 }
 
+export const v3Schema = {
+  ...v2Schema,
+  localCurrency: {
+    ...v2Schema.localCurrency,
+    preferredCurrencyCode: 'MXN',
+    fetchedCurrencyCode: 'MXN',
+    symbol: undefined,
+  },
+  imports: {
+    isImportingWallet: false,
+    isWalletEmpty: false,
+  },
+}
+
 export function getLatestSchema(): Partial<RootState> {
-  return v2Schema as Partial<RootState>
+  return v3Schema as Partial<RootState>
 }

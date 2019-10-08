@@ -20,7 +20,7 @@
   "securityFee": "Security Fee",
   "inviteAndSecurityFee": "Invitation Fee",
   "amountInCelloDollars": "Amount in Celo Dollars",
-  "localValueHint": "@ {{localValue}} {{localCurrencySymbol}}",
+  "localValueHint": "@ {{localValue}} {{localCurrencyCode}}",
   "feeEducation":
     "Sending payments and making exchanges include a small fee for service security and maintenance.",
   "learnMore": "Learn More",

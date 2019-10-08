@@ -1,6 +1,6 @@
 {
   "name": "@celo/contractkit",
-  "version": "0.1.1",
+  "version": "0.1.6",
   "description": "Celo's ContractKit to interact with Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -25,11 +25,15 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/utils": "^0.0.6-beta5",
+    "@0x/subproviders": "^5.0.0",
+    "@celo/utils": "^0.1.0",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^7.2.0",
+    "cross-fetch": "3.0.4",
     "debug": "^4.1.1",
+    "fp-ts": "2.0.5",
     "eth-lib": "^0.2.8",
+    "io-ts": "2.0.1",
     "web3": "1.0.0-beta.37",
     "web3-core-helpers": "1.0.0-beta.37",
     "web3-utils": "1.0.0-beta.37",
@@ -39,7 +43,8 @@
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#98ad2ba",
     "@celo/protocol": "1.0.0",
     "@types/debug": "^4.1.5",
-    "@types/web3": "^1.0.18"
+    "@types/web3": "^1.0.18",
+    "ts-node": "8.3.0"
   },
   "engines": {
     "node": ">=8.13.0"

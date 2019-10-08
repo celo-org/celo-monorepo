@@ -1,5 +1,7 @@
 import { stringToBoolean } from '@celo/utils/src/parsing'
+import BigNumber from 'bignumber.js'
 import Config from 'react-native-config'
+import { GethSyncMode } from 'src/geth/consts'
 import config from 'src/geth/network-config'
 import { Testnets } from 'src/web3/testnets'
 // if I use @celo/utils breaks all the tests for some reason
@@ -53,6 +55,7 @@ export const FIREBASE_ENABLED = stringToBoolean(Config.FIREBASE_ENABLED || 'true
 // react-native-config is undefined.
 export const DEFAULT_TESTNET: Testnets = Config.DEFAULT_TESTNET || 'integration'
 export const BLOCKCHAIN_API_URL = config[DEFAULT_TESTNET].blockchainApiUrl
+export const DEFAULT_INFURA_URL = `https://${DEFAULT_TESTNET}-infura.celo-testnet.org/`
 
 export const SEGMENT_API_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SEGMENT_API_KEY')
 export const FIREBASE_WEB_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'FIREBASE_WEB_KEY')
@@ -60,8 +63,6 @@ export const FIREBASE_WEB_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 
 export const SENTRY_URL = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SENTRY_URL')
 
 export const PROMOTE_REWARDS_APP = false
-
-export const LOCAL_CURRENCY_SYMBOL = Config.LOCAL_CURRENCY_SYMBOL || null
 
 // The number of seconds before the sender can reclaim the payment.
 export const ESCROW_PAYMENT_EXPIRY_SECONDS = 172800 // 2 days
@@ -71,3 +72,11 @@ export const SHOW_TESTNET_BANNER = stringToBoolean(Config.SHOW_TESTNET_BANNER ||
 // The minimum allowed value for a transaction such as a transfer
 export const DOLLAR_TRANSACTION_MIN_AMOUNT = 0.01
 export const GOLD_TRANSACTION_MIN_AMOUNT = 0.001
+
+const DEFAULT_SYNC_MODE_TEMP = new BigNumber(Config.DEFAULT_SYNC_MODE)
+
+if (DEFAULT_SYNC_MODE_TEMP.isNaN()) {
+  throw new Error('DEFAULT_SYNC_MODE in env file is not valid')
+}
+
+export const DEFAULT_SYNC_MODE: GethSyncMode = DEFAULT_SYNC_MODE_TEMP.toNumber()

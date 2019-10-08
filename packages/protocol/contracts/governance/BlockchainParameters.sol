@@ -14,7 +14,7 @@ contract BlockchainParameters is Ownable, Initializable {
     uint256 patch;
   }
 
-  ClientVersion minimumClientVersion;
+  ClientVersion private minimumClientVersion;
 
   uint256 public gasForDebitFromTransactions;
   uint256 public gasForCreditToTransactions;
@@ -31,11 +31,11 @@ contract BlockchainParameters is Ownable, Initializable {
 
   /**
    * @notice Initializes critical variables.
-   * @param _minimumClientVersion1 Minimum client version that can be used in the chain,
+   * @param major Minimum client version that can be used in the chain,
    * major version.
-   * @param _minimumClientVersion2 Minimum client version that can be used in the chain,
+   * @param minor Minimum client version that can be used in the chain,
    * minor version.
-   * @param _minimumClientVersion3 Minimum client version that can be used in the chain,
+   * @param patch Minimum client version that can be used in the chain,
    * patch level.
    */
   function initialize(
@@ -50,11 +50,7 @@ contract BlockchainParameters is Ownable, Initializable {
   ) external initializer
   {
     _transferOwnership(msg.sender);
-    setMinimumClientVersion(
-      _minimumClientVersion1,
-      _minimumClientVersion2,
-      _minimumClientVersion3
-    );
+    setMinimumClientVersion(major, minor, patch);
     setGasForDebitFromTransactions(_gasForDebitFromTransactions);
     setGasForCreditToTransactions(_gasForCreditToTransactions);
     setGasToReadErc20Balance(_gasToReadErc20Balance);
@@ -102,7 +98,12 @@ contract BlockchainParameters is Ownable, Initializable {
     emit GasForNonGoldCurrenciesSet(gas);
   }
 
-  function getMinimumClientVersion() public view
+  /** @notice Query minimum client version.
+   * @return Returns major, minor, and patch version numbers.
+   */
+  function getMinimumClientVersion()
+    external
+    view
     returns (uint256 major, uint256 minor, uint256 patch)
   {
     return (minimumClientVersion.major, minimumClientVersion.minor, minimumClientVersion.patch);

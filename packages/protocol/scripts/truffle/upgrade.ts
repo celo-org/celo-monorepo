@@ -15,7 +15,7 @@ const argv = require('minimist')(process.argv.slice(2))
 
 const contractsDir = argv.build_directory + '/contracts'
 
-const truffle = require('@celo/protocol/truffle')
+const truffle = require('@celo/protocol/truffle-config.js')
 const network = truffle.networks[argv.network]
 
 const artifactor = new Artifactor(contractsDir)

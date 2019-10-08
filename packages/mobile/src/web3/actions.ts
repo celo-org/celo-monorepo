@@ -46,7 +46,7 @@ export type ActionTypes =
   | UpdateWeb3SyncProgressAction
 
 export const setAccount = (address: string): SetAccountAction => {
-  CeloAnalytics.track(DefaultEventNames.accountSet, { address })
+  CeloAnalytics.track(DefaultEventNames.accountSet)
   return {
     type: Actions.SET_ACCOUNT,
     address,
@@ -76,11 +76,13 @@ export const updateWeb3SyncProgress = (payload: {
 
 export const checkSyncProgress = () => ({ type: Actions.REQUEST_SYNC_PROGRESS })
 
+// Note: This returns Promise<Block>
 export function getLatestBlock() {
   Logger.debug(TAG, 'Getting latest block')
   return web3.eth.getBlock('latest')
 }
 
+// Note: This returns Promise<Block>
 export function getBlock(blockNumber: number) {
   Logger.debug(TAG, 'Getting block ' + blockNumber)
   return web3.eth.getBlock(blockNumber)

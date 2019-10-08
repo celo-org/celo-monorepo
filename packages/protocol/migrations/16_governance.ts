@@ -54,18 +54,18 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
 
     const proxyAndImplementationOwnedByGovernance = [
       'Attestations',
-      'LockedGold',
+      'BlockchainParameters',
       'Escrow',
       'Exchange',
       'GasCurrencyWhitelist',
       'GasPriceMinimum',
       'Governance',
+      'LockedGold',
       'Registry',
       'Reserve',
       'SortedOracles',
       'StableToken',
       'Validators',
-      'BlockchainParameters',
     ]
 
     await Promise.all(
