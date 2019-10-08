@@ -8,13 +8,13 @@ import CeloValues from 'src/about/Values'
 import VideoCover from 'src/about/VideoCover'
 import { H1 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
-import { I18nProps, withNamespaces, Trans } from 'src/i18n'
-import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { I18nProps, Trans, withNamespaces } from 'src/i18n'
 import BookLayout from 'src/layout/BookLayout'
+import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import menuItems from 'src/shared/menu-items'
 import { fonts, standardStyles, textStyles } from 'src/styles'
-import { withScreenSize, ScreenProps, ScreenSizes } from 'src/layout/ScreenSize'
 
 interface Props {
   randomSeed: number

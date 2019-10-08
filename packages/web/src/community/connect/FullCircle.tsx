@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native-web'
 import shuffleSeed from 'shuffle-seed'
 import VECTORS from 'src/community/connect/RingOfCoinVectors'
 import { Path } from 'src/shared/svg'
-import { baseCoinStyleLight, baseCoinStyle, colors } from 'src/styles'
+import { baseCoinStyle, baseCoinStyleLight, colors } from 'src/styles'
 import { randomIntegerInRange } from 'src/utils/utils'
 import Svg from 'svgs'
 

@@ -5,12 +5,12 @@ import shuffleSeed from 'shuffle-seed'
 import teamList from 'src/about/team/team-list'
 import { H1, H4 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
+import BookLayout from 'src/layout/BookLayout'
+import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
 import Responsive from 'src/shared/Responsive'
 import { fonts, standardStyles } from 'src/styles'
-import BookLayout from 'src/layout/BookLayout'
-import { withScreenSize, ScreenSizes, ScreenProps } from 'src/layout/ScreenSize'
-import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 
 interface Props {
   randomSeed: number

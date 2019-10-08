@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Text } from 'react-native'
-import BookLayout from 'src/layout/BookLayout'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import BookLayout from 'src/layout/BookLayout'
 import Button, { BTN } from 'src/shared/Button.3'
 import { fonts } from 'src/styles'
 
