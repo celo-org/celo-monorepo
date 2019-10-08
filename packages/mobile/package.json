@@ -30,7 +30,7 @@
     "test:verbose": "export TZ=UTC && jest --verbose",
     "test:build-e2e": "bash ./scripts/build_e2e.sh",
     "test:run-e2e": "bash ./scripts/run_e2e.sh",
-    "test:dry-run-e2e": "cd android && yarn test:build-e2e && yarn test:run-e2e && yarn dev:clean-android",
+    "test:dry-run-e2e": "yarn dev:emulator && cd android && yarn test:build-e2e && yarn test:run-e2e",
     "test:detox": "CELO_TEST_CONFIG=e2e detox test -c android.emu.debug -a e2e/tmp/ --take-screenshots=failing --record-logs=failing --detectOpenHandles -l verbose",
     "test:unlock": "./scripts/unlock.sh",
     "pre-deploy": "./scripts/pre-deploy.sh",
@@ -48,7 +48,7 @@
   "dependencies": {
     "@celo/client": "640a41f",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#d3a2fdb",
-    "@celo/utils": "^0.1.0",
+    "@celo/utils": "^0.1.1",
     "@celo/walletkit": "^0.0.14",
     "@react-native-community/netinfo": "^2.0.4",
     "@segment/analytics-react-native": "^1.1.0-beta.1",

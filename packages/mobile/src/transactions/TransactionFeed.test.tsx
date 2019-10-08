@@ -14,10 +14,6 @@ import { createMockStore } from 'test/utils'
 
 jest.mock('src/utils/time.ts')
 
-jest.mock('src/web3/contracts', () => ({
-  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
-}))
-
 const standbyTransactions: StandbyTransaction[] = [
   {
     id: '0110',
