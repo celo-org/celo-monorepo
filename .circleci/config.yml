@@ -149,7 +149,7 @@ jobs:
             HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-sdk
       - run:
           name: Install emulator dependencies
-          command: (yes | bash ./packages/mobile/scripts/install_android_emulator_image.sh  /dev/null) || true
+          command: (yes | bash ./packages/mobile/scripts/install_android_emulator_image.sh > /dev/null) || true
       - save_cache:
           key: android-emulator-image-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
           paths:
@@ -196,7 +196,7 @@ jobs:
             #   yarn postinstall
             # fi
             rm -rf packages/web
-            # yarn
+            yarn
             yarn build 
       - save_cache:
           key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
