@@ -75,3 +75,19 @@ publicKey: 0429b83753806f2b61ddab2e8a139214c3c8a5dfd0557557830b13342f2490bad6f61
 
 Now push your changes `git push origin alfajores`.
 If you don't have access to the repo, you might have to open a PR.
+
+## Testnet configs stored on Google Cloud storage
+
+[Celotool](https://github.com/celo-org/celo-monorepo/tree/master/packages/celotool) stores following configuration related items on Google Cloud storage after a successful deployment
+
+1. Genesis block - in [genesis_blocks](https://console.cloud.google.com/storage/browser/genesis_blocks?project=celo-testnet) bucket. This is used by the mobile app via walletkit to connect to a testnet.
+2. Static nodes - in [static_nodes](https://console.cloud.google.com/storage/browser/static_nodes?project=celo-testnet) bucket. This is used by the mobile app via walletkit to connect to a testnet.
+3. `.env` file used for thee deployment of the testnet in [env\_config\_files](https://console.cloud.google.com/storage/browser/env_config_files?project=celo-testnet) bucket
+4. Contract artifacts - in [contract_artifacts](https://console.cloud.google.com/storage/browser/contract_artifacts?project=celo-testnet) bucket. Contract artifacts are downloaded by the walletkit and contractkit to build a higher level helper functions to interact with the testnet and perform tasks like exchange currency, send Celo Dollars etc.
+
+So, for example, if you are looking at `integration` network.
+
+1. `gsutil cat gs://genesis_blocks/integration | jq` would list the genesis block of the latest integration deployment
+2. ` gsutil cat gs://static_nodes/integration | jq` would list the static nodes of the latest integration deployment
+3. `gsutil cat gs://env_config_files/integration` would show the config file used for the latest integration deployment. The first few lines of this contains the information of who did the deployment and the date and time of the deployment.
+4. `gsutil cp gs://contract_artifacts/integration tmp1.tar.gz && tar zxvf tmp1.tar.gz && ls build` would show all the JSON type definitions of the protocol/smart contracts deployed to integration.
