@@ -73,6 +73,13 @@ const DefaultConfig = {
     groupName: 'C-Labs',
     groupUrl: 'https://www.celo.org',
   },
+  blockchainParameters: {
+    minimumClientVersion: {
+      major: 1,
+      minor: 8,
+      patch: 23,
+    },
+  },
 }
 
 const linkedLibraries = {
