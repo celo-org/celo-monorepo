@@ -1,18 +1,18 @@
 export enum CeloContractName {
   Attestations = 'Attestations',
-  LockedGold = 'LockedGold',
+  BlockchainParameters = 'BlockchainParameters',
   Escrow = 'Escrow',
   Exchange = 'Exchange',
   GasCurrencyWhitelist = 'GasCurrencyWhitelist',
   GasPriceMinimum = 'GasPriceMinimum',
   GoldToken = 'GoldToken',
   Governance = 'Governance',
+  LockedGold = 'LockedGold',
   Random = 'Random',
   Reserve = 'Reserve',
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
   Validators = 'Validators',
-  BlockchainParameters = 'BlockchainParameters',
 }
 
 // TODO(amy): Pull this list from the build artifacts instead
@@ -25,6 +25,7 @@ export const usesRegistry = [
 // TODO(amy): Find another way to create this list
 export const hasEntryInRegistry: string[] = [
   CeloContractName.Attestations,
+  CeloContractName.BlockchainParameters,
   CeloContractName.Escrow,
   CeloContractName.Exchange,
   CeloContractName.GoldToken,
@@ -34,5 +35,4 @@ export const hasEntryInRegistry: string[] = [
   CeloContractName.StableToken,
   CeloContractName.Random,
   CeloContractName.Reserve,
-  CeloContractName.BlockchainParameters,
 ]

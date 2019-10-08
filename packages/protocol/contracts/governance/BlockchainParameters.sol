@@ -58,7 +58,7 @@ contract BlockchainParameters is Ownable, Initializable {
    * @return Returns major, minor, and patch version numbers.
    */
   function getMinimumClientVersion()
-    public
+    external
     view
     returns (uint256 major, uint256 minor, uint256 patch)
   {
