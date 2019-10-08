@@ -3,9 +3,6 @@
 
 version: 2
 reference:
-  ## Constants
-  gradle_cache_path: &gradle_cache_path
-    gradle_cache-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
   workspace: &workspace
     ~/src
   ## Configurations
@@ -17,20 +14,6 @@ reference:
     environment:
       TERM: dumb
       JVM_OPTS: -Xmx3200m
-  ## Cache
-  restore_gradle_cache: &restore_gradle_cache
-    restore_cache:
-      key: *gradle_cache_path
-  save_gradle_cache: &save_gradle_cache
-    save_cache:
-      key: *gradle_cache_path
-      paths:
-        - ~/.gradle
-  ## Dependency Downloads
-  download_android_dependencies: &download_android_dependencies
-    run:
-      name: Download Android Dependencies
-      command: ./gradlew androidDependencies
 
 
 defaults: &defaults
@@ -164,7 +147,6 @@ jobs:
       - run:
           name: Install emulator dependencies
           command: (yes | sdkmanager "platform-tools" "platforms;android-26" "extras;intel;Hardware_Accelerated_Execution_Manager" "build-tools;26.0.0" "system-images;android-26;google_apis;x86" "emulator" --verbose > /dev/null) || true
-      # - *download_android_dependencies
       - run:
           name: Install Android dependencies
           command: |
@@ -189,7 +171,9 @@ jobs:
             echo -e '\n[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bash_profile # add nvm to path
       - run: echo `. ~/.bash_profile`
       - run: nvm install v10.16.3 && nvm use v10.16.3
-
+      - run:
+          name: install miscellaneous
+          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install tree
       # Currently not used
       # - run: npm install --global react-native-kill-packager 
       # - run: cd ~/src/
@@ -199,15 +183,15 @@ jobs:
           # need to run this because it's another OS than install_dependecies job
           name: yarn
           command: |
-            # if [ ! -d node_modules ]; then
-            #     echo "No cache found, install yarn. Hold tight."
-            #     yarn
-            # else
-            #   echo "Cache found, just run post-script."
-            #   yarn postinstall
-            # fi
-            # rm -rf packages/web
-            yarn
+            if [ ! -d node_modules ]; then
+                echo "No cache found, install yarn. Hold tight."
+                yarn
+            else
+              echo "Cache found, just run post-script."
+              yarn postinstall
+            fi
+            rm -rf packages/web
+            # yarn
             yarn build 
       - save_cache:
           key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
@@ -216,7 +200,7 @@ jobs:
             - ~/src/packages/*/node_modules
       - run:
           name: Install some extra dependencies the app needs
-          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install wget pidcat watchman
+          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pidcat watchman
       - run: cd ~/src/packages/mobile && yarn test:build-e2e # tests seem to fail if the app is built at the same time the emulator runs
       # - detox
       - run:
@@ -231,6 +215,7 @@ jobs:
       # - run: lock device
       - restore_cache:
           key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}
+      - run: tree packages/mobile/android/app/build/outputs/apk/
       - run:
           name: Sleep until Device connects
           command: cd ~/src/packages/mobile && bash ./scripts/wait_for_emulator_to_connect.sh && sleep 30
