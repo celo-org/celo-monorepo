@@ -1,14 +1,8 @@
 import { RESTDataSource } from 'apollo-datasource-rest'
 import BigNumber from 'bignumber.js'
-import {
-  ATTESTATIONS_ADDRESS,
-  BLOCKSCOUT_API,
-  CONTRACT_SYMBOL_MAPPING,
-  FAUCET_ADDRESS,
-  VERIFICATION_REWARDS_ADDRESS,
-} from './config'
+import { BLOCKSCOUT_API, FAUCET_ADDRESS, VERIFICATION_REWARDS_ADDRESS } from './config'
 import { EventArgs, EventInterface, EventTypes, TransferEvent } from './schema'
-import { formatCommentString } from './utils'
+import { formatCommentString, getContractAddresses } from './utils'
 
 // to get rid of 18 extra 0s in the values
 const WEI_PER_GOLD = Math.pow(10, 18)
@@ -51,6 +45,8 @@ export interface BlockscoutTransaction {
 }
 
 export class BlockscoutAPI extends RESTDataSource {
+  tokenAddressMapping: { [key: string]: string } | undefined
+  attestationsAddress: string | undefined
   constructor() {
     super()
     this.baseURL = BLOCKSCOUT_API
@@ -65,6 +61,43 @@ export class BlockscoutAPI extends RESTDataSource {
     }
     const { result } = await this.get('', params)
     return result
+  }
+
+  async ensureTokenAddresses() {
+    if (this.tokenAddressMapping && this.attestationsAddress) {
+      // Already got addresses
+      return
+    } else {
+      const addresses = await getContractAddresses()
+      this.attestationsAddress = addresses.attestationsAddress
+      this.tokenAddressMapping = addresses.tokenAddressMapping
+    }
+  }
+
+  getTokenAtAddress(tokenAddress: string) {
+    if (this.tokenAddressMapping) {
+      const lowerCaseTokenAddress = tokenAddress.toLowerCase()
+      if (lowerCaseTokenAddress in this.tokenAddressMapping) {
+        return this.tokenAddressMapping[lowerCaseTokenAddress]
+      } else {
+        console.info('Token addresses mapping: ' + JSON.stringify(this.tokenAddressMapping))
+        throw new Error(
+          'No token corresponding to ' +
+            lowerCaseTokenAddress +
+            '. Check web3 provider is for correct network.'
+        )
+      }
+    } else {
+      throw new Error('Cannot find tokenAddressMapping')
+    }
+  }
+
+  getAttestationAddress() {
+    if (this.attestationsAddress) {
+      return this.attestationsAddress
+    } else {
+      throw new Error('Cannot find attestation address')
+    }
   }
 
   // LIMITATION:
@@ -89,6 +122,7 @@ export class BlockscoutAPI extends RESTDataSource {
       txHashToEventTransactions.set(tx.hash, currentTX)
     }
 
+    await this.ensureTokenAddresses()
     // Generate final events
     txHashToEventTransactions.forEach((transactions: BlockscoutTransaction[], txhash: string) => {
       // Exchange events have two corresponding transactions (in and out)
@@ -106,9 +140,9 @@ export class BlockscoutAPI extends RESTDataSource {
           type: EventTypes.EXCHANGE,
           timestamp: new BigNumber(inEvent.timeStamp).toNumber(),
           block: new BigNumber(inEvent.blockNumber).toNumber(),
-          inSymbol: CONTRACT_SYMBOL_MAPPING[inEvent.contractAddress.toLowerCase()],
+          inSymbol: this.getTokenAtAddress(inEvent.contractAddress),
           inValue: new BigNumber(inEvent.value).dividedBy(WEI_PER_GOLD).toNumber(),
-          outSymbol: CONTRACT_SYMBOL_MAPPING[outEvent.contractAddress.toLowerCase()],
+          outSymbol: this.getTokenAtAddress(outEvent.contractAddress),
           outValue: new BigNumber(outEvent.value).dividedBy(WEI_PER_GOLD).toNumber(),
           hash: txhash,
         })
@@ -122,7 +156,8 @@ export class BlockscoutAPI extends RESTDataSource {
         const [type, address] = resolveTransferEventType(
           userAddress,
           eventToAddress,
-          eventFromAddress
+          eventFromAddress,
+          this.getAttestationAddress()
         )
         events.push({
           type,
@@ -131,7 +166,7 @@ export class BlockscoutAPI extends RESTDataSource {
           value: new BigNumber(event.value).dividedBy(WEI_PER_GOLD).toNumber(),
           address,
           comment,
-          symbol: CONTRACT_SYMBOL_MAPPING[event.contractAddress.toLowerCase()] || 'unknown',
+          symbol: this.getTokenAtAddress(event.contractAddress) || 'unknown',
           hash: txhash,
         })
       }
@@ -148,6 +183,7 @@ export class BlockscoutAPI extends RESTDataSource {
   async getFeedRewards(args: EventArgs) {
     const rewards: TransferEvent[] = []
     const rawTransactions = await this.getTokenTransactions(args)
+    await this.ensureTokenAddresses()
     for (const t of rawTransactions) {
       // Only include verification rewards transfers
       if (t.from.toLowerCase() !== VERIFICATION_REWARDS_ADDRESS) {
@@ -160,7 +196,7 @@ export class BlockscoutAPI extends RESTDataSource {
         value: new BigNumber(t.value).dividedBy(WEI_PER_GOLD).toNumber(),
         address: VERIFICATION_REWARDS_ADDRESS,
         comment: t.input ? formatCommentString(t.input) : '',
-        symbol: CONTRACT_SYMBOL_MAPPING[t.contractAddress],
+        symbol: this.getTokenAtAddress(t.contractAddress),
         hash: t.hash,
       })
     }
@@ -176,13 +212,14 @@ export class BlockscoutAPI extends RESTDataSource {
 function resolveTransferEventType(
   userAddress: string,
   eventToAddress: string,
-  eventFromAddress: string
+  eventFromAddress: string,
+  attestationsAddress: string
 ): [EventTypes, string] {
   if (eventToAddress === userAddress && eventFromAddress === FAUCET_ADDRESS) {
     return [EventTypes.FAUCET, FAUCET_ADDRESS]
   }
-  if (eventToAddress === ATTESTATIONS_ADDRESS && eventFromAddress === userAddress) {
-    return [EventTypes.VERIFICATION_FEE, ATTESTATIONS_ADDRESS]
+  if (eventToAddress === attestationsAddress && eventFromAddress === userAddress) {
+    return [EventTypes.VERIFICATION_FEE, attestationsAddress]
   }
   if (eventToAddress === userAddress && eventFromAddress === VERIFICATION_REWARDS_ADDRESS) {
     return [EventTypes.VERIFICATION_REWARD, VERIFICATION_REWARDS_ADDRESS]

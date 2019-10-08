@@ -92,7 +92,7 @@ export async function registerMetadata(testnet: string, privateKey: string, inde
   const address = privateKeyToAddress(privateKey)
   await makeMetadata(testnet, address, index)
 
-  const kit = newKit('https://integration-infura.celo-testnet.org')
+  const kit = newKit('http://localhost:8545')
   kit.addAccount(privateKey)
   kit.defaultAccount = address
 
