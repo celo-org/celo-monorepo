@@ -129,6 +129,9 @@ jobs:
             - yarn-v2-{{ arch }}-{{ .Branch }}-
             - yarn-v2-{{ arch }}-
             - yarn-v2-
+      - restore_cache:
+          keys:
+            - no-key-android-dep
       - run: ls 
       - run:
           name: Setup environment variables
@@ -144,6 +147,10 @@ jobs:
           command: |
             HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/cask
             HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-sdk
+      - save_cache:
+          key: no-key-android-dep
+          paths:
+            - /usr/local/share/android-sdk/*
       - run:
           name: Install emulator dependencies
           command: (yes | sdkmanager "platform-tools" "platforms;android-26" "extras;intel;Hardware_Accelerated_Execution_Manager" "build-tools;26.0.0" "system-images;android-26;google_apis;x86" "emulator" --verbose > /dev/null) || true
@@ -183,13 +190,13 @@ jobs:
           # need to run this because it's another OS than install_dependecies job
           name: yarn
           command: |
-            if [ ! -d node_modules ]; then
-                echo "No cache found, install yarn. Hold tight."
-                yarn
-            else
-              echo "Cache found, just run post-script."
-              yarn postinstall
-            fi
+            # if [ ! -d node_modules ]; then
+            #     echo "No cache found, install yarn. Hold tight."
+            #     yarn
+            # else
+            #   echo "Cache found, just run post-script."
+            #   yarn postinstall
+            # fi
             rm -rf packages/web
             # yarn
             yarn build 
