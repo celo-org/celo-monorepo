@@ -57,8 +57,8 @@ Install `nvm` (allows you to manage multiple versions of Node), Node 8 and `yarn
 brew install nvm
 # follow the instructions from the command above to edit your .bash_profile
 # then restart the terminal
-nvm install 8
-nvm alias default 8
+nvm install 10
+nvm alias default 10
 brew install yarn
 ```
 
@@ -254,7 +254,8 @@ Then install packages:
 
 ```bash
 cd celo-monorepo
-yarn
+yarn # install dependencies and run post-install script
+yarn build # build all packages
 ```
 
 > Note that if you do your checkouts with a different method, Yarn will fail if
@@ -296,8 +297,6 @@ To deploy the app to your connected Android device:
 
 ```bash
 cd packages/mobile
-# install packages
-yarn
 # install app and start dev server
 yarn dev
 ```

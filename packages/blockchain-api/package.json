@@ -5,9 +5,6 @@
   "private": true,
   "author": "Celo",
   "license": "Apache-2.0",
-  "engines": {
-    "node": "8.x"
-  },
   "scripts": {
     "test": "jest --ci --silent --coverage --runInBand",
     "test:verbose": "jest --ci --verbose --runInBand",
@@ -19,6 +16,7 @@
     "deploy": "./deploy.sh"
   },
   "dependencies": {
+    "@celo/contractkit": "0.1.6",
     "apollo-datasource-rest": "^0.3.1",
     "apollo-server-express": "^2.4.2",
     "bignumber.js": "^7.2.0",

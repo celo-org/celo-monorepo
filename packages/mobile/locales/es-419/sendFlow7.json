@@ -20,7 +20,7 @@
   "securityFee": "Comisión de seguridad",
   "inviteAndSecurityFee": "Comisión de Invitación",
   "amountInCelloDollars": "Cantidad en Celo dólares",
-  "localValueHint": "@ {{localValue}} {{localCurrencySymbol}}",
+  "localValueHint": "@ {{localValue}} {{localCurrencyCode}}",
   "feeEducation":
     "Enviar pagos y hacer cambios incluye una pequeña comisión de seguridad y mantenimiento.",
   "learnMore": "Saber más",

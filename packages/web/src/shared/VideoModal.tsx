@@ -1,5 +1,4 @@
 import * as React from 'react'
-import LazyLoad from 'react-lazyload'
 import ReactModal from 'react-modal'
 import { Dimensions, Image, StyleSheet, Text, TouchableHighlight, View } from 'react-native'
 import YouTube from 'react-youtube'
@@ -7,8 +6,10 @@ import AspectRatio from 'src/shared/AspectRatio'
 import EX from 'src/shared/EX'
 import PlayCircle from 'src/shared/PlayCircle'
 interface Props {
-  previewImage: string
   videoID: string
+  previewImage?: string
+  children?: (onPlay: () => void) => React.ReactNode
+  ariaDescription: string
 }
 
 interface State {
@@ -20,7 +21,7 @@ interface State {
 
 const HEIGHT = 360
 
-export default class FeatureVideo extends React.Component<Props, State> {
+export default class VideoModal extends React.Component<Props, State> {
   state = { playing: false, isClient: false, width: 0, height: 0 }
 
   componentDidMount() {
@@ -47,6 +48,10 @@ export default class FeatureVideo extends React.Component<Props, State> {
     this.setState({ playing: false })
   }
 
+  onEnd = () => {
+    this.close()
+  }
+
   render() {
     const opts = {
       height: this.state.height,
@@ -56,6 +61,7 @@ export default class FeatureVideo extends React.Component<Props, State> {
         autoplay: 1,
         // controls: 0,
         playsinline: 1,
+        modestbranding: 1,
       },
     }
 
@@ -69,14 +75,27 @@ export default class FeatureVideo extends React.Component<Props, State> {
 
             .ReactModal__Content iframe {
               position: absolute;
-              bottom: 40px;
+              bottom: 60px;
               left: 0;
               width: 100%;
               height: calc(90% - 100px)
             }
+
+            .ReactModal__Overlay {
+              transform: translateY(-100vh);
+              transition: transform 1000ms ease-in-out;
+            }
+            
+            .ReactModal__Overlay--after-open{
+              transform: translateY(0);
+            }
+
+            .ReactModal__Overlay--before-close {
+              transform: translateY(-100vh);
+            }
           `}
         </style>
-        <LazyLoad height={HEIGHT}>
+        {this.props.previewImage ? (
           <TouchableHighlight onPress={this.play}>
             <View style={styles.container}>
               <AspectRatio ratio={300 / 958} style={{ height: HEIGHT }}>
@@ -91,18 +110,23 @@ export default class FeatureVideo extends React.Component<Props, State> {
               </View>
             </View>
           </TouchableHighlight>
-        </LazyLoad>
-
+        ) : (
+          this.props.children(this.play)
+        )}
         {this.state.isClient && (
           <ReactModal
             isOpen={this.state.playing}
             onRequestClose={this.close}
             style={{ overlay: htmlStyles.cinema, content: htmlStyles.modalContent }}
+            aria={{
+              labelledby: 'Video',
+              describedby: this.props.ariaDescription,
+            }}
           >
             <Text onPress={this.close} style={styles.closeButton}>
               <EX size={30} />
             </Text>
-            {this.state.playing && <YouTube videoId={this.props.videoID} opts={opts} />}
+            <YouTube videoId={this.props.videoID} opts={opts} onEnd={this.onEnd} />
           </ReactModal>
         )}
       </>

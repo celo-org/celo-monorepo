@@ -34,4 +34,14 @@ export const migrations = {
       },
     }
   },
+  3: (state: any) => {
+    return {
+      ...state,
+      localCurrency: {
+        ...state.localCurrency,
+        fetchedCurrencyCode: state.localCurrency.symbol || undefined,
+        symbol: undefined,
+      },
+    }
+  },
 }
