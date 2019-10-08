@@ -3,6 +3,13 @@ import { Address, CeloContract } from '../base'
 import { SortedOracles } from '../generated/types/SortedOracles'
 import { BaseWrapper, proxyCall, proxySend, toBigNumber } from './BaseWrapper'
 
+export enum MedianRelation {
+  Undefined,
+  Lesser,
+  Greater,
+  Equal,
+}
+
 export interface SortedOraclesConfig {
   reportExpirySeconds: BigNumber
 }
@@ -10,7 +17,7 @@ export interface SortedOraclesConfig {
 export interface OracleRate {
   address: Address
   rate: BigNumber
-  medianRelation: string
+  medianRelation: MedianRelation
 }
 /**
  * Currency price oracle contract.
@@ -55,16 +62,17 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @return An unpacked list of elements from largest to smallest.
    */
-  getRates: (token: Address) => Promise<OracleRate[]> = proxyCall(
+  getRates: (token: Address) => Promise<any> = proxyCall(
     this.contract.methods.getRates,
     undefined,
     (out) => {
       const rates: OracleRate[] = []
       for (let i = 0; i < out[0].length; i++) {
+        const medRelIndex = parseInt(out[2][i], 10)
         rates.push({
           address: out[0][i],
           rate: new BigNumber(out[1][i]),
-          medianRelation: out[2][i],
+          medianRelation: medRelIndex,
         })
       }
       return rates

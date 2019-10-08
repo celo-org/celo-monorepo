@@ -4,24 +4,16 @@ import { CeloContract, NULL_ADDRESS } from './base'
 async function main() {
   const kit = newKit('http://localhost:8545')
 
-  console.log(await kit.web3.eth.getAccounts())
-  // const validators = await kit.contracts.getValidators()
-
-  // console.log(await validators.getValidatorGroupsVotes())
-
-  // const tx = await validators.vote('0x....')
-  // const receipt = tx.sendAndWaitForReceipt({
-  //   from: '0x',
-  // })
-  // console.log(receipt)
+  // const accounts = await kit.web3.eth.getAccounts()
+  const firstOracle = '0x5409ED021D9299bf6814279A6A1411A7e866A631'
+  kit.defaultAccount = '0xE834EC434DABA538cd1b9Fe1582052B880BD7e63'
 
   const sortedOracles = await kit.contracts.getSortedOracles()
   const stableTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
-  console.log(await sortedOracles.getRates(stableTokenAddress))
-  await sortedOracles.report(stableTokenAddress, 25, 1, NULL_ADDRESS, NULL_ADDRESS)
-
-  kit.defaultAccount = '0xE834EC434DABA538cd1b9Fe1582052B880BD7e63'
-  await sortedOracles.report(stableTokenAddress, 12, 1, NULL_ADDRESS, NULL_ADDRESS)
+  const rates = await sortedOracles.getRates(stableTokenAddress)
+  console.log(rates)
+  const tx = await sortedOracles.report(stableTokenAddress, 25, 1, firstOracle, NULL_ADDRESS).send()
+  await tx.waitReceipt()
 
   console.log(await sortedOracles.getRates(stableTokenAddress))
   console.log(`number of rates?? ${await sortedOracles.numRates(stableTokenAddress)}`)
