@@ -458,6 +458,22 @@ contract('StableToken', (accounts: string[]) => {
       })
     })
 
+    describe('#increaseAllowance()', () => {
+      it('should increase "allowed"', async () => {
+        await stableToken.increaseAllowance(receiver, transferAmount)
+        await stableToken.increaseAllowance(receiver, transferAmount)
+        assert.equal((await stableToken.allowance(sender, receiver)).toNumber(), 2 * transferAmount)
+      })
+    })
+
+    describe('#decreaseAllowance()', () => {
+      it('should decrease "allowed"', async () => {
+        await stableToken.approve(receiver, 2 * transferAmount)
+        await stableToken.decreaseAllowance(receiver, transferAmount)
+        assert.equal((await stableToken.allowance(sender, receiver)).toNumber(), transferAmount)
+      })
+    })
+
     describe('#allowance()', () => {
       it('should return the allowance', async () => {
         await stableToken.approve(receiver, transferAmount)

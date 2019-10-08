@@ -170,6 +170,48 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
   }
 
   /**
+   * @notice Increase the allowance of another user.
+   * @param spender The address which is being approved to spend StableToken.
+   * @param value The increment of the amount of StableToken approved to the spender.
+   * @return True if the transaction succeeds.
+   */
+  function increaseAllowance(
+    address spender,
+    uint256 value
+  )
+    external
+    updateInflationFactor
+    returns (bool)
+  {
+    uint256 oldValue = allowed[msg.sender][spender];
+    uint256 newValue = oldValue.add(value);
+    allowed[msg.sender][spender] = newValue;
+    emit Approval(msg.sender, spender, newValue);
+    return true;
+  }
+
+  /**
+   * @notice Decrease the allowance of another user.
+   * @param spender The address which is being approved to spend StableToken.
+   * @param value The decrement of the amount of StableToken approved to the spender.
+   * @return True if the transaction succeeds.
+   */
+  function decreaseAllowance(
+    address spender,
+    uint256 value
+  )
+    external
+    updateInflationFactor
+    returns (bool)
+  {
+    uint256 oldValue = allowed[msg.sender][spender];
+    uint256 newValue = oldValue.sub(value);
+    allowed[msg.sender][spender] = newValue;
+    emit Approval(msg.sender, spender, newValue);
+    return true;
+  }
+
+  /**
    * @notice Approve a user to transfer StableToken on behalf of another user.
    * @param spender The address which is being approved to spend StableToken.
    * @param value The amount of StableToken approved to the spender.

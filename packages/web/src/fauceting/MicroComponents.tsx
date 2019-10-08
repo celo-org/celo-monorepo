@@ -95,7 +95,7 @@ export function ButtonWithFeedback({
     <Button
       disabled={isInvalid || !captchaOK || isStarted || isEnded || disabled}
       kind={isNotStarted ? BTN.PRIMARY : BTN.SECONDARY}
-      text={buttonText({ requestState, t })}
+      text={buttonText({ requestState, t, isFaucet })}
       onPress={onSubmit}
       iconLeft={icon}
       align={'flex-start'}
@@ -108,18 +108,20 @@ export function ButtonWithFeedback({
 interface TextFuncArgs {
   t: I18nProps['t']
   requestState: RequestState
+  isFaucet?: boolean
 }
 
-function buttonText({ requestState, t }: TextFuncArgs) {
+function buttonText({ requestState, t, isFaucet }: TextFuncArgs) {
   switch (requestState) {
     case RequestState.Working:
       return ''
     case RequestState.Completed:
-      return t('done')
+      return isFaucet ? t('faucetDone') : t('inviteDone')
     default:
       return t('getStarted')
   }
 }
+
 function faucetText({ requestState, t }: TextFuncArgs) {
   return (
     {

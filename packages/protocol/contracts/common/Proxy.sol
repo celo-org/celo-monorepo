@@ -1,6 +1,7 @@
 pragma solidity ^0.5.3;
 /* solhint-disable no-inline-assembly, no-complex-fallback, avoid-low-level-calls */
 
+import "./libraries/AddressesHelper.sol";
 
 /**
  * @title A Proxy utilizing the Unstructured Storage pattern.
@@ -32,8 +33,15 @@ contract Proxy {
   function () external payable {
     bytes32 implementationPosition = IMPLEMENTATION_POSITION;
 
+    address implementationAddress;
+
     assembly {
-      let implementationAddress := sload(implementationPosition)
+      implementationAddress := sload(implementationPosition)
+    }
+
+    require(AddressesHelper.isContract(implementationAddress), "Invalid contract address");
+
+    assembly {
       let newCallDataPosition := mload(0x40)
       mstore(0x40, add(newCallDataPosition, calldatasize))
 
@@ -113,6 +121,8 @@ contract Proxy {
    */
   function _setImplementation(address implementation) public onlyOwner {
     bytes32 implementationPosition = IMPLEMENTATION_POSITION;
+
+    require(AddressesHelper.isContract(implementation), "Invalid contract address");
 
     assembly {
       sstore(implementationPosition, implementation)

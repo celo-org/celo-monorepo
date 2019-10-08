@@ -432,7 +432,6 @@ describe('governance tests', () => {
         }
       }
       assert.isAtLeast(blockNumber, 1)
-
       const goldTotalSupply = await goldToken.methods.totalSupply().call({}, blockNumber)
       assert.equal(goldTotalSupply, goldGenesisSupply.toFixed())
     })

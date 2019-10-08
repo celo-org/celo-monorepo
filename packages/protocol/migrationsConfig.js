@@ -46,7 +46,7 @@ const DefaultConfig = {
     initialMinimum: 10000,
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
-    infrastructureFraction: 1 / 2,
+    proposerFraction: 1 / 2,
   },
   registry: {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
@@ -83,7 +83,7 @@ const DefaultConfig = {
     },
     validatorEpochPayment: '1000000000000000000',
     membershipHistoryLength: 60,
-    maxGroupSize: 10,
+    maxGroupSize: '70',
 
     validatorKeys: [],
     // We register a single validator group during the migration.
