@@ -37,10 +37,7 @@ function ConnectionFooter({ t }: I18nProps) {
           <EventsChannel isDarkMode={false} />
         </View>
         <View>
-          <Image
-            source={{ uri: require('src/shared/Developer-news.png') }}
-            style={styles.emailLogo}
-          />
+          <Image source={{ uri: require('src/dev/devNews.png') }} style={styles.emailLogo} />
           <View style={styles.form}>
             <H3 style={styles.formTitle}>{t('stayConnected')}</H3>
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
