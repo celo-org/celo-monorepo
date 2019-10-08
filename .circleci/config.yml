@@ -183,11 +183,11 @@ jobs:
           command: |
             echo `. ~/.bash_profile` # for some mreason just `source ~/.bash_profile` makes the build fail
             # install nvm
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install wget pidcat
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install wget
             wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | bash
             echo -e '\nexport NVM_DIR="$HOME/.nvm"' >> ~/.bash_profile
             echo -e '\n[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bash_profile # add nvm to path
-            echo `. ~/.bash_profile`
+            echo `. ~/.bash_profile` || true
             nvm install v10.16.3 && nvm use v10.16.3
 
       # Currently not used
@@ -195,7 +195,18 @@ jobs:
       # - run: cd ~/src/
       
       # TODO, create cache
-      - run: yarn && yarn build # need to run this because it's another OS than install_dependecies job
+      - run:
+          # need to run this because it's another OS than install_dependecies job
+          name: yarn
+          command: |
+            if [ ! -d node_modules ]; then
+                echo "No cache found, install yarn. Hold tight."
+                yarn
+            else
+              echo "Cache found, just run post-script."
+              yarn postinstall
+            fi
+            yarn build 
       - run:
           name: Install some extra dependencies the app needs
           command: HOMEBREW_NO_AUTO_UPDATE=1 brew install wget pidcat watchman
