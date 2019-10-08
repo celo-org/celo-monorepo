@@ -4,7 +4,6 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "../common/FixidityLib.sol";
-import "../common/libraries/AddressesHelper.sol";
 
 /**
  * @title A library operating on Celo Governance proposals.
@@ -325,10 +324,6 @@ library Proposals {
     returns (bool)
   {
     bool result;
-
-    if (dataLength > 0)
-      require(AddressesHelper.isContract(destination), "Invalid contract address");
-
     /* solhint-disable no-inline-assembly */
     assembly {
       /* solhint-disable max-line-length */
