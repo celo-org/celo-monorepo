@@ -187,8 +187,8 @@ jobs:
             wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | bash
             echo -e '\nexport NVM_DIR="$HOME/.nvm"' >> ~/.bash_profile
             echo -e '\n[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bash_profile # add nvm to path
-            echo `. ~/.bash_profile` || true
-            nvm install v10.16.3 && nvm use v10.16.3
+      - run: echo `. ~/.bash_profile`
+      - run: nvm install v10.16.3 && nvm use v10.16.3
 
       # Currently not used
       # - run: npm install --global react-native-kill-packager 
@@ -227,6 +227,8 @@ jobs:
           background: true
       - run: cp node_modules/.bin/jest packages/mobile/node_modules/.bin/ # for some reason jest is just not there
       # - run: lock device
+      - restore_cache:
+          key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}
       - run:
           name: Sleep until Device connects
           command: cd ~/src/packages/mobile && bash ./scripts/wait_for_emulator_to_connect.sh && sleep 30
@@ -234,9 +236,17 @@ jobs:
       - run:
           name: Run yarn dev
           command: cd ~/src/packages/mobile && ENVFILE=".env.test" yarn dev
-      - run: 
+      - run:
           name: detox
           command: cd ~/src/packages/mobile && ENVFILE=".env.test" yarn test:detox
+      - run: cd ~/src
+      - save_cache:
+          key: yarn-v2-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}
+          paths:
+            - packages/mobile/android/app/build/outputs/apk/
+
+
+
 
       # - run:
       #     name: Run Tests
