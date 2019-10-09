@@ -72,7 +72,7 @@ class ImportContacts extends React.Component<Props, State> {
     }
   }
 
-  nextScreen = async () => {
+  nextScreen = () => {
     navigate(Screens.VerifyEducation)
   }
 
