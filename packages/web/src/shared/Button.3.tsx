@@ -53,7 +53,7 @@ type NavProps = {
   kind: BTN.NAV | BTN.DARKNAV
 } & AllButtonProps
 
-type ButtonsProps = NakedProps | PrimaryProps | InlineProps | NavProps
+export type ButtonsProps = NakedProps | PrimaryProps | InlineProps | NavProps
 
 interface State {
   isHovering: boolean

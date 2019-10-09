@@ -7,6 +7,7 @@ import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
 import { ErrorMessage, Form, LabeledInput } from 'src/forms/FormComponents'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import BookLayout from 'src/layout/BookLayout'
+import LoaderButton from 'src/shared/LoaderButton'
 
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
@@ -139,7 +140,9 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
                         hasError={formState.errors.includes(key)}
                       />
                     ))}
-                    <Button
+                    <LoaderButton
+                      isLoading={formState.isLoading}
+                      spinnerColor={colors.white}
                       text={t('apply')}
                       kind={BTN.PRIMARY}
                       onPress={onAltSubmit}
@@ -181,7 +184,9 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
                         hasError={formState.errors.includes(key)}
                       />
                     ))}
-                    <Button
+                    <LoaderButton
+                      isLoading={formState.isLoading}
+                      spinnerColor={colors.white}
                       text={t('recommend')}
                       kind={BTN.PRIMARY}
                       onPress={onAltSubmit}
