@@ -25,7 +25,7 @@
     "build": "tsc -b .",
     "docs": "yarn oclif-dev readme --multi --dir=../docs/command-line-interface && yarn prettier ../docs/command-line-interface/*.md --write",
     "lint": "tslint -c tslint.json --project tsconfig.json",
-    "prepublishOnly": "yarn run build && oclif-dev manifest && oclif-dev readme",
+    "prepack": "yarn run build && oclif-dev manifest && oclif-dev readme",
     "test": "TZ=UTC jest"
   },
   "dependencies": {
