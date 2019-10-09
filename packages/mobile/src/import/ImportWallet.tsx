@@ -60,50 +60,11 @@ export class ImportWallet extends React.Component<Props, State> {
     backupPhrase: '',
   }
 
-  onBackButtonPressAndroid = () => {
-    // Override back button to not go back to BackupVerify screen
-    if (this.state.isSocial) {
-      this.setState({ isSocial: false })
-      return true
-    }
-
-    return false
-  }
-
-  useSocial = () => {
-    this.setState({ isSocial: true })
-  }
-
-  setBackupPhrase = async (input: string) => {
+  setBackupPhrase = (input: string) => {
     this.props.hideAlert()
-
-    this.setState({ backupPhrase: formatBackupPhraseOnEdit(input) })
-  }
-
-  setSocialBackupPhrase0 = (input: string) => {
-    const { socialBackupPhrase1 } = this.state
-
-    if (input && socialBackupPhrase1) {
-      this.setState({
-        socialBackupPhrase0: input,
-        backupPhrase: joinMnemonic([input, socialBackupPhrase1]),
-      })
-    } else {
-      this.setState({ socialBackupPhrase0: input })
-    }
-  }
-
-  setSocialBackupPhrase1 = (input: string) => {
-    const { socialBackupPhrase0 } = this.state
-
-    if (input && socialBackupPhrase0) {
-      this.setState({
-        socialBackupPhrase1: input,
-        backupPhrase: joinMnemonic([socialBackupPhrase0, input]),
-      })
-    } else {
-      this.setState({ socialBackupPhrase1: input })
-    }
+    this.setState({
+      backupPhrase: formatBackupPhraseOnEdit(input),
+    })
   }
 
   onEndEditing = () => {
@@ -139,17 +100,9 @@ export class ImportWallet extends React.Component<Props, State> {
     )
   }
 
-  openFaq = () => {
-    Linking.openURL('https://celo.org/faq')
-  }
-
   render() {
     const { backupPhrase } = this.state
     const { t, isImportingWallet, isWalletEmpty } = this.props
-
-    const restoreButtonDisabled = isSocial
-      ? !socialBackupPhrase0 || !socialBackupPhrase1
-      : !backupPhrase
 
     return (
       <View style={styles.container}>
@@ -258,15 +211,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 30,
     paddingBottom: 30,
-  },
-  lostKeyContainer: {
-    flexDirection: 'row',
-    marginTop: 5,
-    paddingVertical: 20,
-    justifyContent: 'center',
-  },
-  socialBackupInput: {
-    height: 100,
   },
   loadingSpinnerContainer: {
     marginVertical: 30,
