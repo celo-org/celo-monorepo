@@ -21,6 +21,7 @@ import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
+import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
 import ImportContacts from 'src/import/ImportContacts'
 import ImportWallet from 'src/import/ImportWallet'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
@@ -118,6 +119,7 @@ const ExchangeStack = createStackNavigator(
     // Note, ExchangeHomeScreen isn't in this stack because it's part of the tab navigator
     [Screens.ExchangeTradeScreen]: { screen: ExchangeTradeScreen },
     [Screens.ExchangeReview]: { screen: ExchangeReview },
+    [Screens.FeeExchangeEducation]: { screen: FeeExchangeEducation },
   },
   {
     navigationOptions: {

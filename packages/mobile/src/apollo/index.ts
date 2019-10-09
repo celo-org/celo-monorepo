@@ -3,7 +3,8 @@ import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemo
 import { persistCache } from 'apollo-cache-persist'
 import { AsyncStorage } from 'react-native'
 import introspectionQueryResultData from 'src/apollo/fragmentTypes.json'
-import { BLOCKCHAIN_API_URL } from 'src/config'
+import config from 'src/geth/networkConfig'
+import Logger from 'src/utils/Logger'
 
 const fragmentMatcher = new IntrospectionFragmentMatcher({
   introspectionQueryResultData,
@@ -15,9 +16,9 @@ persistCache({
   cache,
   // @ts-ignore https://github.com/apollographql/apollo-cache-persist/pull/58
   storage: AsyncStorage,
-})
+}).catch((reason: string) => Logger.error('Apollo/index', `Failure to persist cache: ${reason}`))
 
 export const apolloClient = new ApolloClient<InMemoryCache>({
-  uri: BLOCKCHAIN_API_URL,
+  uri: config.blockchainApiUrl,
   cache,
 })

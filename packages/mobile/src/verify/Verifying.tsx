@@ -186,7 +186,7 @@ export class Verifying extends React.Component<Props, State> {
     return false
   }
 
-  startVerification = async () => {
+  startVerification = () => {
     Logger.debug(TAG + '@startVerification', 'Starting verification process')
     this.props.startVerification()
   }

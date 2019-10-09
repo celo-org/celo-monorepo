@@ -200,12 +200,13 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   isAmountValid = () => {
-    const isAmountValid = parseInputAmount(this.state.amount).isGreaterThan(
+    const isAmountValid = parseInputAmount(this.state.amount).isGreaterThanOrEqualTo(
       DOLLAR_TRANSACTION_MIN_AMOUNT
     )
     return {
       isAmountValid,
-      isDollarBalanceSufficient: isAmountValid && this.getNewAccountBalance().isGreaterThan(0),
+      isDollarBalanceSufficient:
+        isAmountValid && this.getNewAccountBalance().isGreaterThanOrEqualTo(0),
     }
   }
 

@@ -137,7 +137,7 @@ export class Account extends React.Component<Props, State> {
 
   sendLogsToSupport = async () => {
     if (this.props.e164PhoneNumber) {
-      Logger.emailLogsToSupport(anonymizedPhone(this.props.e164PhoneNumber))
+      await Logger.emailLogsToSupport(anonymizedPhone(this.props.e164PhoneNumber))
     }
   }
 
