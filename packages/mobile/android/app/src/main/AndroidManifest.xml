@@ -32,11 +32,6 @@
         <action android:name="com.google.firebase.MESSAGING_EVENT" />
       </intent-filter>
     </service>
-    <service android:name="io.invertase.firebase.messaging.RNFirebaseInstanceIdService">
-      <intent-filter>
-        <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
-      </intent-filter>
-    </service>
     <service android:name="io.invertase.firebase.messaging.RNFirebaseBackgroundMessagingService" />
     <!-- Set custom default icon. This is used when no icon is set for incoming notification messages.
      See README(https://goo.gl/l4GJaQ) for more. -->

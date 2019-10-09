@@ -10,20 +10,23 @@ export function navigateToVerifierApp() {
 }
 
 export function navigateToWalletPlayStorePage() {
-  Linking.openURL(`market://details?id=${DeviceInfo.getBundleId()}`)
+  navigateToURI(`market://details?id=${DeviceInfo.getBundleId()}`)
 }
 
-export async function navigateToURI(uri: string, backupUri?: string) {
+export function navigateToURI(uri: string, backupUri?: string) {
   Logger.debug(TAG, 'Navigating to uri', uri)
-  const canOpenUrl = await Linking.canOpenURL(uri)
-
-  if (canOpenUrl) {
-    Linking.openURL(uri)
-  } else {
-    Logger.debug(TAG, 'Uri not supported', uri)
-    if (backupUri) {
-      Logger.debug(TAG, 'Trying backup uri', uri)
-      Linking.openURL(backupUri)
-    }
-  }
+  const onError = (reason: string) => Logger.error(TAG, `Error navigating to URI: ${reason}`)
+  Linking.canOpenURL(uri)
+    .then((canOpenUrl: boolean) => {
+      if (canOpenUrl) {
+        Linking.openURL(uri).catch(onError)
+      } else {
+        Logger.debug(TAG, 'Uri not supported', uri)
+        if (backupUri) {
+          Logger.debug(TAG, 'Trying backup uri', uri)
+          Linking.openURL(backupUri).catch(onError)
+        }
+      }
+    })
+    .catch(onError)
 }
