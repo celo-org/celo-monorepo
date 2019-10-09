@@ -5,6 +5,7 @@ env_variables:
   DEPLOY_ENV: "alfajores"
   EXCHANGE_RATES_API: "https://api.exchangeratesapi.io"
   BLOCKSCOUT_API: "https://alfajores-blockscout.celo-testnet.org/api"
+  # TODO Pull addresses from the build artifacts of the network in protocol/build
   FAUCET_ADDRESS: "0xCEa3eF8e187490A9d85A1849D98412E5D27D1Bb3"
   VERIFICATION_REWARDS_ADDRESS: "0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5"
   WEB3_PROVIDER_URL: "https://alfajores-infura.celo-testnet.org/"
