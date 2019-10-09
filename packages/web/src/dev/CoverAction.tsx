@@ -4,6 +4,7 @@ import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native
 import { H3 } from 'src/fonts/Fonts'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { fonts, standardStyles, textStyles } from 'src/styles'
+import { ViewStyle } from 'react-native'
 
 interface Props {
   title: string
@@ -11,13 +12,23 @@ interface Props {
   graphic: ImageSourcePropType
   link?: { href: string; text: string }
   isMobile: boolean
+  containerStyle?: ViewStyle
 }
 
 const GRAPHIC_SIZE = 80
 
-export default function CoverAction({ title, text, graphic, link, isMobile }: Props) {
+export default function CoverAction({
+  title,
+  text,
+  graphic,
+  link,
+  isMobile,
+  containerStyle,
+}: Props) {
+  const style = containerStyle || (isMobile ? styles.containerMobile : styles.container)
+
   return (
-    <View style={isMobile ? styles.containerMobile : styles.container}>
+    <View style={style}>
       <View style={isMobile && standardStyles.centered}>
         <FadeIn>
           {(load) => (

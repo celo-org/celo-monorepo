@@ -69,7 +69,7 @@
   "interested": "Interested in what we are building?",
   "interestedText": {
     "0":
-      "Stay up-to-date by signing up for our newsletter.  If you'd like to share, we'd love to learn more about you so that we can collectively build the Celo community. Our",
+      "Stay up-to-date by signing up for our newsletter. If you'd like to share, we'd love to learn more about you so that we can collectively build the Celo community. Our",
     "1": "Privacy Policy",
     "2": "will apply to any information you choose to provide."
   },
@@ -81,10 +81,18 @@
     "callForProp": "Read More in our Call for Proposals"
   },
   "contribute": {
-    "title":
-      "Have an idea for the Celo ecosystem? Propose a project as a Fellow or apply to the Celo Ecosystem Fund.",
-    "oldTitle": "Have an idea for the Celo ecosystem? Propose a project as a Fellow.",
-    "button": "Call for Proposals"
+    "title": "Contribute to the ecosystem",
+    "smallTitle": "Growth",
+    "button": "Call for Proposals",
+    "codeTitle": "Platform Code",
+    "codeText": "Become a developer on the Celo Platform",
+    "codeLink": "Learn More",
+    "fundTitle": "Ecosystem Fund",
+    "fundText": "A VC fund for projects in the Celo Ecosystem",
+    "fundLink": "Learn More",
+    "fellowTitle": "Fellowship",
+    "fellowText": "Lead a special project leveraging your unique purpose",
+    "fellowLink": "Learn More"
   },
   "submit": "Submit",
   "events": {
