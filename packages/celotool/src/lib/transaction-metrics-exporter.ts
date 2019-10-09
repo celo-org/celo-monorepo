@@ -1,5 +1,5 @@
-import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import { envVar, fetchEnv, isVmBased } from 'src/lib/env-utils'
+import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import { getTxNodeLoadBalancerIP } from 'src/lib/vm-testnet-utils'
 
 export async function installHelmChart(celoEnv: string) {

@@ -1,6 +1,7 @@
-import { execCmd } from 'src/lib/utils'
 import { addCeloEnvMiddleware, CeloEnvArgv, envVar, fetchEnv } from 'src/lib/env-utils'
+import { execCmd } from 'src/lib/utils'
 import * as yargs from 'yargs'
+
 export const command = 'ssh-vm-node <nodeType> [nodeIndex]'
 
 export const describe =
@@ -22,10 +23,10 @@ export const builder = (argv: yargs.Argv) => {
       describe: 'Index of the node. Only needed for validator or tx-node',
       type: 'number',
     })
-    .check((argv: SshVmNodeArgv) => {
-      const requiresIndex = argv.nodeType === 'validator' || argv.nodeType === 'tx-node'
-      if (requiresIndex && argv.nodeIndex === undefined) {
-        return new Error(`nodeIndex is required for nodeType ${argv.nodeType}`)
+    .check((checkArgv: SshVmNodeArgv) => {
+      const requiresIndex = checkArgv.nodeType === 'validator' || checkArgv.nodeType === 'tx-node'
+      if (requiresIndex && checkArgv.nodeIndex === undefined) {
+        return new Error(`nodeIndex is required for nodeType ${checkArgv.nodeType}`)
       }
       return true
     })
@@ -45,7 +46,7 @@ export const handler = async (argv: SshVmNodeArgv) => {
     }
   }
 
-  console.log(getSshCommand(project, zone, instanceName))
+  console.info(getSshCommand(project, zone, instanceName))
 }
 
 function getSshCommand(gcloudProject: string, gcloudZone: string, instanceName: string) {
