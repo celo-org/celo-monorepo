@@ -65,7 +65,7 @@ export class BlockscoutAPI extends RESTDataSource {
   }
 
   async ensureTokenAddresses() {
-    if (this.tokenAddressMapping && this.attestationsAddress) {
+    if (this.tokenAddressMapping && this.attestationsAddress && this.escrowAddress) {
       // Already got addresses
       return
     } else {
