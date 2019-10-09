@@ -1,28 +1,11 @@
-// import Web3 = require('web3')
-
 import { assertRevert } from '@celo/protocol/lib/test-utils'
 
-/*
-import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import {
-  assertLogMatches2,
-  assertRevert,
-  NULL_ADDRESS,
-  timeTravel,
-} from '@celo/protocol/lib/test-utils'
-import { attestToIdentifier } from '@celo/utils'
-import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
-import BigNumber from 'bignumber.js'
-import { uniq } from 'lodash'
-*/
 import { TestRandomContract, TestRandomInstance } from 'types'
 
 const Random: TestRandomContract = artifacts.require('TestRandom')
 
 contract('Random', (/* accounts: string[] */) => {
   let random: TestRandomInstance
-  // const provider = new Web3.providers.HttpProvider('http://localhost:8545')
-  // const web3: Web3 = new Web3(provider)
 
   beforeEach(async () => {
     random = await Random.new()
