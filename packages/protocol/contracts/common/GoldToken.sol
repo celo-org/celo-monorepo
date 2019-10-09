@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
@@ -95,6 +95,43 @@ contract GoldToken is Initializable, IERC20Token, ICeloToken {
   function approve(address spender, uint256 value) external returns (bool) {
     allowed[msg.sender][spender] = value;
     emit Approval(msg.sender, spender, value);
+    return true;
+  }
+
+  /**
+   * @notice Increases the allowance of another user.
+   * @param spender The address which is being approved to spend Celo Gold.
+   * @param value The increment of the amount of Celo Gold approved to the spender.
+   * @return True if the transaction succeeds.
+   */
+  function increaseAllowance(address spender, uint256 value)
+    external
+    returns (bool)
+  {
+    uint256 oldValue = allowed[msg.sender][spender];
+    uint256 newValue = oldValue.add(value);
+    allowed[msg.sender][spender] = newValue;
+    emit Approval(msg.sender, spender, newValue);
+    return true;
+  }
+
+  /**
+   * @notice Decreases the allowance of another user.
+   * @param spender The address which is being approved to spend Celo Gold.
+   * @param value The decrement of the amount of Celo Gold approved to the spender.
+   * @return True if the transaction succeeds.
+   */
+  function decreaseAllowance(
+    address spender,
+    uint256 value
+  )
+    external
+    returns (bool)
+  {
+    uint256 oldValue = allowed[msg.sender][spender];
+    uint256 newValue = oldValue.sub(value);
+    allowed[msg.sender][spender] = newValue;
+    emit Approval(msg.sender, spender, newValue);
     return true;
   }
 

@@ -1,16 +1,12 @@
-import {
-  confirmAction,
-  envVar,
-  fetchEnv,
-  fetchEnvOrFallback,
-} from '@celo/celotool/src/lib/env-utils'
+import { writeFileSync } from 'fs'
+import { confirmAction, envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,
   generateGenesisFromEnv,
   generatePrivateKey,
   privateKeyToAddress,
   privateKeyToPublicKey,
-} from '@celo/celotool/src/lib/generate_utils'
+} from './generate_utils'
 import {
   applyTerraformModule,
   destroyTerraformModule,
@@ -18,17 +14,20 @@ import {
   getTerraformModuleResourceNames,
   initTerraformModule,
   planTerraformModule,
+  showTerraformModulePlan,
   taintTerraformModuleResource,
   TerraformVars,
   untaintTerraformModuleResource,
-} from '@celo/celotool/src/lib/terraform'
+} from './terraform'
 import {
+  uploadEnvFileToGoogleStorage,
   uploadFileToGoogleStorage,
   uploadGenesisBlockToGoogleStorage,
-} from '@celo/celotool/src/lib/testnet-utils'
-import { writeFileSync } from 'fs'
+  uploadStaticNodesToGoogleStorage,
+} from './testnet-utils'
 
 const secretsBucketName = 'celo-testnet-secrets'
+
 const testnetTerraformModule = 'testnet'
 const testnetNetworkTerraformModule = 'testnet-network'
 
@@ -72,6 +71,8 @@ export async function deploy(celoEnv: string, onConfirmFailed?: () => Promise<vo
   })
 
   await uploadGenesisBlockToGoogleStorage(celoEnv)
+  await uploadStaticNodesToGoogleStorage(celoEnv)
+  await uploadEnvFileToGoogleStorage(celoEnv)
 }
 
 async function deployModule(
@@ -96,6 +97,8 @@ async function deployModule(
 
   console.info('Planning...')
   await planTerraformModule(terraformModule, vars)
+
+  await showTerraformModulePlan(terraformModule)
 
   await confirmAction(
     `Are you sure you want to perform the above plan for Celo env ${celoEnv} in environment ${envType}?`,
@@ -138,6 +141,8 @@ async function destroyModule(celoEnv: string, terraformModule: string, vars: Ter
   console.info('Planning...')
   await planTerraformModule(terraformModule, vars, true)
 
+  await showTerraformModulePlan(terraformModule)
+
   await confirmAction(`Are you sure you want to destroy ${celoEnv} in environment ${envType}?`)
 
   await destroyTerraformModule(terraformModule, vars)
@@ -171,11 +176,32 @@ export async function taintTestnet(celoEnv: string) {
     testnetTerraformModule,
     `module.validator.google_compute_disk.validator`
   )
+  // tx-node random id
+  console.info('Tainting tx-node random ids...')
+  await taintEveryResourceWithPrefix(testnetTerraformModule, `module.tx_node.random_id.tx_node`)
+  // tx-node addresses
+  console.info('Tainting tx-node addresses...')
+  await taintEveryResourceWithPrefix(
+    testnetTerraformModule,
+    `module.tx_node.google_compute_address.tx_node`
+  )
   // tx-nodes
   console.info('Tainting tx-nodes...')
   await taintEveryResourceWithPrefix(
     testnetTerraformModule,
     `module.tx_node.google_compute_instance.tx_node`
+  )
+  // tx-node instance group random id
+  console.info('Tainting tx-node instance group random id...')
+  await taintTerraformModuleResource(
+    testnetTerraformModule,
+    `module.tx_node_lb.random_id.tx_node_lb`
+  )
+  // tx-node instance group
+  console.info('Tainting tx-node instance group...')
+  await taintTerraformModuleResource(
+    testnetTerraformModule,
+    `module.tx_node_lb.google_compute_instance_group.tx_node_lb`
   )
 }
 
@@ -206,11 +232,32 @@ export async function untaintTestnet(celoEnv: string) {
     testnetTerraformModule,
     `module.validator.google_compute_disk.validator`
   )
+  // tx-node random id
+  console.info('Untainting tx-node random ids...')
+  await untaintEveryResourceWithPrefix(testnetTerraformModule, `module.tx_node.random_id.tx_node`)
+  // tx-node addresses
+  console.info('Untainting tx-node addresses...')
+  await untaintEveryResourceWithPrefix(
+    testnetTerraformModule,
+    `module.tx_node.google_compute_address.tx_node`
+  )
   // tx-nodes
   console.info('Untainting tx-nodes...')
   await untaintEveryResourceWithPrefix(
     testnetTerraformModule,
     `module.tx_node.google_compute_instance.tx_node`
+  )
+  // tx-node instance group random id
+  console.info('Untainting tx-node instance group random id...')
+  await untaintTerraformModuleResource(
+    testnetTerraformModule,
+    `module.tx_node_lb.random_id.tx_node_lb`
+  )
+  // tx-node instance group
+  console.info('Untainting tx-node instance group...')
+  await untaintTerraformModuleResource(
+    testnetTerraformModule,
+    `module.tx_node_lb.google_compute_instance_group.tx_node_lb`
   )
 }
 
@@ -300,7 +347,13 @@ function uploadSecrets(celoEnv: string, secrets: string, resourceName: string) {
   const localTmpFilePath = `/tmp/${celoEnv}-${resourceName}-secrets`
   writeFileSync(localTmpFilePath, secrets)
   const cloudStorageFileName = `${secretsBasePath(celoEnv)}/.env.${resourceName}`
-  return uploadFileToGoogleStorage(localTmpFilePath, secretsBucketName, cloudStorageFileName, false)
+  return uploadFileToGoogleStorage(
+    localTmpFilePath,
+    secretsBucketName,
+    cloudStorageFileName,
+    false,
+    'text/plain'
+  )
 }
 
 function generateBootnodeSecretEnvVars() {

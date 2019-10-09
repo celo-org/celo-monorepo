@@ -1,6 +1,6 @@
-import { execCmd } from '@celo/celotool/src/lib/utils'
 import fs from 'fs'
 import path from 'path'
+import { execCmd } from './utils'
 
 const terraformModulesPath = path.join(__dirname, '../../../terraform-modules')
 
@@ -89,6 +89,14 @@ export async function getTerraformModuleOutputs(
 export async function getTerraformModuleResourceNames(moduleName: string) {
   const [output] = await execTerraformCmd(`terraform state list`, getModulePath(moduleName), false)
   return output.split('\n')
+}
+
+export function showTerraformModulePlan(moduleName: string) {
+  return execTerraformCmd(
+    `terraform show ${getPlanPath(moduleName)}`,
+    getModulePath(moduleName),
+    true
+  )
 }
 
 function getModulePath(moduleName: string) {

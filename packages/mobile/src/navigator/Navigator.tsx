@@ -25,17 +25,20 @@ import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
+import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
 import ImportContacts from 'src/import/ImportContacts'
 import ImportWallet from 'src/import/ImportWallet'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
 import JoinCelo from 'src/invite/JoinCelo'
 import Language from 'src/language/Language'
+import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import TabNavigator from 'src/navigator/TabNavigator'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
 import PaymentRequestListScreen from 'src/paymentRequest/PaymentRequestListScreen'
-import Pincode from 'src/pincode/Pincode'
 import PincodeConfirmation from 'src/pincode/PincodeConfirmation'
+import PincodeEducation from 'src/pincode/PincodeEducation'
+import PincodeSet from 'src/pincode/PincodeSet'
 import QRCode from 'src/qrcode/QRCode'
 import QRScanner from 'src/qrcode/QRScanner'
 import FeeEducation from 'src/send/FeeEducation'
@@ -71,7 +74,8 @@ const NuxStack = createStackNavigator(
   {
     [Screens.Language]: { screen: Language },
     [Screens.JoinCelo]: { screen: JoinCelo },
-    [Screens.Pincode]: { screen: Pincode },
+    [Screens.PincodeEducation]: { screen: PincodeEducation },
+    [Screens.PincodeSet]: { screen: PincodeSet },
     [Screens.EnterInviteCode]: { screen: EnterInviteCode },
     [Screens.ImportWallet]: { screen: ImportWallet },
     [Screens.ImportContacts]: { screen: ImportContacts },
@@ -92,7 +96,6 @@ const SendStack = createStackNavigator(
     [Screens.Send]: { screen: Send },
     [Screens.SendAmount]: { screen: SendAmount },
     [Screens.SendConfirmation]: { screen: SendConfirmation },
-    [Screens.FeeEducation]: { screen: FeeEducation },
     [Screens.PaymentRequestConfirmation]: { screen: PaymentRequestConfirmation },
   },
   {
@@ -109,6 +112,7 @@ const ExchangeStack = createStackNavigator(
     // Note, ExchangeHomeScreen isn't in this stack because it's part of the tab navigator
     [Screens.ExchangeTradeScreen]: { screen: ExchangeTradeScreen },
     [Screens.ExchangeReview]: { screen: ExchangeReview },
+    [Screens.FeeExchangeEducation]: { screen: FeeExchangeEducation },
   },
   {
     navigationOptions: {
@@ -166,6 +170,7 @@ const AppStack = createStackNavigator(
     [Stacks.BackupStack]: { screen: BackupStack },
     [Screens.Invite]: { screen: Invite },
     [Screens.InviteReview]: { screen: InviteReview },
+    [Screens.SelectLocalCurrency]: { screen: SelectLocalCurrency },
     [Screens.Licenses]: { screen: Licenses },
     [Screens.DollarEducation]: { screen: DollarEducation },
     [Screens.TransactionReview]: { screen: TransactionReviewScreen },
@@ -173,9 +178,9 @@ const AppStack = createStackNavigator(
     [Screens.QRCode]: { screen: QRCode },
     [Screens.QRScanner]: { screen: QRScanner },
     [Screens.GoldEducation]: { screen: GoldEducation },
-    [Screens.Pincode]: { screen: Pincode },
     [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
     [Screens.ReclaimPaymentConfirmationScreen]: { screen: ReclaimPaymentConfirmationScreen },
+    [Screens.FeeEducation]: { screen: FeeEducation },
     ...commonScreens,
   },
   {

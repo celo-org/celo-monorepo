@@ -73,6 +73,7 @@ interface ButtonProps {
   t: I18nProps['t']
   onSubmit: () => void
   captchaOK: boolean
+  disabled?: boolean
 }
 
 export function ButtonWithFeedback({
@@ -81,6 +82,7 @@ export function ButtonWithFeedback({
   t,
   onSubmit,
   captchaOK,
+  disabled,
 }: ButtonProps) {
   const isNotStarted =
     requestState === RequestState.Initial || requestState === RequestState.Invalid
@@ -91,9 +93,9 @@ export function ButtonWithFeedback({
 
   return (
     <Button
-      disabled={isInvalid || !captchaOK || isStarted || isEnded}
+      disabled={isInvalid || !captchaOK || isStarted || isEnded || disabled}
       kind={isNotStarted ? BTN.PRIMARY : BTN.SECONDARY}
-      text={buttonText({ requestState, t })}
+      text={buttonText({ requestState, t, isFaucet })}
       onPress={onSubmit}
       iconLeft={icon}
       align={'flex-start'}
@@ -106,18 +108,20 @@ export function ButtonWithFeedback({
 interface TextFuncArgs {
   t: I18nProps['t']
   requestState: RequestState
+  isFaucet?: boolean
 }
 
-function buttonText({ requestState, t }: TextFuncArgs) {
+function buttonText({ requestState, t, isFaucet }: TextFuncArgs) {
   switch (requestState) {
     case RequestState.Working:
       return ''
     case RequestState.Completed:
-      return t('done')
+      return isFaucet ? t('faucetDone') : t('inviteDone')
     default:
       return t('getStarted')
   }
 }
+
 function faucetText({ requestState, t }: TextFuncArgs) {
   return (
     {
@@ -128,12 +132,7 @@ function faucetText({ requestState, t }: TextFuncArgs) {
 }
 
 function inviteText({ requestState, t }: TextFuncArgs) {
-  return (
-    {
-      [RequestState.Failed]: t('inviteError'),
-      [RequestState.Invalid]: t('invalidNumber'),
-    }[requestState] || ''
-  )
+  return RequestState.Failed === requestState ? t('inviteError') : ''
 }
 
 const styles = StyleSheet.create({

@@ -38,8 +38,12 @@ export function selectQuizWordOptions(
   return [correctWord, wordOptions]
 }
 
-export function getWordlist(language: string | null): string[] {
-  switch (language) {
+export function getWordlist(language: string | null) {
+  if (!language) {
+    return wordlists.EN
+  }
+
+  switch (language.slice(0, 2)) {
     case 'es': {
       return wordlists.ES
     }

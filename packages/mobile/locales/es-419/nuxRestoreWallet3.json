@@ -1,38 +1,14 @@
 {
-  "welcomeCelo": "Te damos la bienvenida a Celo",
-  "enterInvite":
-    "Ingresegcódigo de invitación. Si no tiene uno, pídale a alguien de la comunidad de Celo que lo invite.\n\nAl unirse a esta aplicación, acuerda compartir tu nombre y número telefónico con nosotros. Obtenga más información en celo.org",
-  "fullName": "Nombre completo",
-  "invitationCode": "Código de invitación",
-  "submit": "Enviar",
-  "alreadyHaveWallet": "¿Ya tiene un Monedero Celo? Restáurelo",
-  "restoreWallet": "Restaurar",
-  "restoreYourWallet": {
-    "title": "Restaurar tu Monedero Celo",
-    "socialTitle": "Secretos de recuperación",
-    "description":
-      "¿Ya tiene un Monedero Celo? Use tu clave de respaldo segura para restaurar tu monedero a este teléfono.",
-    "socialDescription":
-      "Cuando resguardaste tu clave de respaldo, enviaste secretos de recuperación a dos amigos para permitir que tu clave sea recuperada. Pega los secretos de recuperación aquí (en cualquier orden) para recuperar el acceso a tus fondos",
-    "warning": "¡Cuidado! ",
-    "restoreInPrivate": "Hágalo en privado"
-  },
-  "backupKeyPlaceholder": "Clave de respaldo",
-  "backupKeyPlaceholderHalves": {
-    "0": "Primer secreto de recuperación",
-    "1": "Segundo secreto de recuperación"
-  },
+  "title": "Restaurar tu Monedero Celo",
+  "userYourBackupKey":
+    "¿Ya tiene un Monedero Celo? Ingrese su Clave de Respaldo para restaurarla a este teléfono.",
+  "backupKeyPrompt":
+    "caballo leopardo perro mono tiburón tigre lémur ballena calamar lobo ardilla ratón león elefante gato camarones oso pingüino...",
   "tip": "Consejo: ",
-  "backupKeyTip": "las palabras de la clave de respaldo están separadas por un espacio",
-  "socialBackupKeyTip": "Las frases secretas son listas de 13 palabras separadas por espacios",
-  "lostYourKey": {
-    "0": "¿Perdió su clave?",
-    "1": "Ingrese los secretos de recuperación"
-  },
-  "noPhrases": {
-    "0": "¿No tienes estas frases?",
-    "1": "Visita las preguntas frecuentes"
-  },
-  "continue": "Continuar",
-  "cancel": "Cancelar"
+  "backupKeyTip": "Las Claves de Respaldo son de 24 palabras, separadas por un espacio.",
+  "restoreWallet": "Restaurar",
+  "emptyWalletWarning": "Este Monedero esta vacio",
+  "useEmptyAnyway": "¿Te gustaría usarlo de todos modos?",
+  "useEmptyWallet": "Usar Monedero Vacío",
+  "tryAnotherKey": "Probar con otra Clave de Respaldo"
 }

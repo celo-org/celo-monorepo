@@ -122,13 +122,6 @@ export const fontStyles = StyleSheet.create({
     fontFamily: HindSilguri.Regular,
     color: colors.darkSecondary,
   },
-  currency: {
-    fontSize: 16,
-    lineHeight: 20,
-    fontFamily: HindSilguri.Regular,
-    letterSpacing: -0.75,
-    color: colors.darkSecondary,
-  },
   activityCurrency: {
     fontSize: 16,
     lineHeight: 20,
@@ -223,7 +216,6 @@ export const fontStyles = StyleSheet.create({
   },
   comment: {
     fontSize: 15,
-    lineHeight: 20,
     fontFamily: HindSilguri.Regular,
     color: colors.darkSecondary,
   },

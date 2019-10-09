@@ -72,7 +72,7 @@ class ImportContacts extends React.Component<Props, State> {
     }
   }
 
-  nextScreen = async () => {
+  nextScreen = () => {
     navigate(Screens.VerifyEducation)
   }
 
@@ -128,7 +128,7 @@ class ImportContacts extends React.Component<Props, State> {
             testID="importContactsEnable"
           />
           <Button
-            text={t('skip')}
+            text={t('global:skip')}
             onPress={this.onPressSkip}
             standard={false}
             type={BtnTypes.SECONDARY}

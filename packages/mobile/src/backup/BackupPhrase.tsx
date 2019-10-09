@@ -134,10 +134,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
     paddingBottom: 60,
   },
   title: {

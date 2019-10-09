@@ -26,8 +26,8 @@ export class Debug extends React.Component<RootState, State> {
   }
 
   async componentDidMount() {
-    this.updateLogs()
-    this.updateLatestBlock()
+    await this.updateLogs()
+    await this.updateLatestBlock()
   }
 
   updateLogs = async () => {
@@ -53,12 +53,12 @@ export class Debug extends React.Component<RootState, State> {
   }
 
   onClickEmailLogs = async () => {
-    Logger.emailLogsToSupport(anonymizedPhone(this.props.account.e164PhoneNumber))
+    await Logger.emailLogsToSupport(anonymizedPhone(this.props.account.e164PhoneNumber))
   }
 
   render() {
     const { reactNativeLogs, gethLogs, latestBlockNumber } = this.state
-    const pincodeSet = this.props.account.pincodeSet
+    const pincodeType = this.props.account.pincodeType
     const address = currentAccountSelector(this.props) || ''
     const phoneNumber = this.props.account.e164PhoneNumber
     const version = DeviceInfo.getVersion()
@@ -75,7 +75,7 @@ export class Debug extends React.Component<RootState, State> {
           onPress={this.onClickText(version, buildNumber, String(apiLevel))}
           style={style.singleLine}
         >{`Version: ${version} | Build Number: ${buildNumber} | Api Level: ${apiLevel}`}</Text>
-        <Text style={style.singleLine}>{`Pin Set: ${pincodeSet}`}</Text>
+        <Text style={style.singleLine}>{`Pin Type: ${pincodeType}`}</Text>
         <Text
           onPress={this.onClickText(address)}
           style={style.singleLine}

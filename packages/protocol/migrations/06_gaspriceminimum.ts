@@ -1,8 +1,8 @@
 /* tslint:disable:no-console */
-import { toFixed } from '@celo/protocol/lib/fixidity'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import { GasPriceMinimumInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
@@ -11,7 +11,7 @@ const initializeArgs = async (): Promise<any[]> => {
     config.gasPriceMinimum.initialMinimum,
     toFixed(config.gasPriceMinimum.targetDensity).toString(),
     toFixed(config.gasPriceMinimum.adjustmentSpeed).toString(),
-    toFixed(config.gasPriceMinimum.infrastructureFraction).toString(),
+    toFixed(config.gasPriceMinimum.proposerFraction).toString(),
   ]
 }
 

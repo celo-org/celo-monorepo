@@ -4,15 +4,14 @@ exports[`BackupComplete renders correctly 1`] = `
 <View
   style={
     Object {
-      "backgroundColor": "white",
+      "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "flexDirection": "column",
       "justifyContent": "space-between",
     }
   }
 >
-  <View
-    style={
+  <RCTScrollView
+    contentContainerStyle={
       Object {
         "alignItems": "center",
         "flex": 1,
@@ -38,18 +37,12 @@ exports[`BackupComplete renders correctly 1`] = `
             "width": 75,
           }
         }
-      />
-    </View>
-    <Text
-      style={
-        Array [
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Light",
-            "fontSize": 22,
-            "paddingBottom": 20,
-            "textAlign": "center",
-          },
+      >
+        dontLoseIt
+      </Text>
+      <View
+        accessible={true}
+        hitSlop={
           Object {
             "color": "#2E3338",
             "paddingTop": 25,
@@ -92,6 +85,12 @@ exports[`BackupComplete renders correctly 1`] = `
     <View
       accessible={true}
       isTVSelectable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
       onResponderRelease={[Function]}

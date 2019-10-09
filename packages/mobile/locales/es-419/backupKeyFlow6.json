@@ -30,7 +30,6 @@
   "enterBackupKey": "Ingrese su clave de respaldo",
   "backupKeyConfirmation":
     "En el futuro, si pierde su teléfono, deberá proporcionar esta clave de respaldo para permitir que se recupere su cuenta. Para confirmar que tiene su clave de copia de seguridad escrita, ingrésela a continuación:",
-  "skip": "Saltar paso",
   "areYouSure": "¿Está seguro?",
   "shareBackupKey": "Compartir clave de respaldo",
   "backupRecovery":

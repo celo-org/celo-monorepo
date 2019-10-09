@@ -5,7 +5,7 @@ import {
   NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { fixed1, toFixed, fromFixed } from '@celo/protocol/lib/fixidity'
+import { fixed1, fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import * as _ from 'lodash'
 import { RegistryInstance, StableTokenInstance } from 'types'
@@ -451,6 +451,22 @@ contract('StableToken', (accounts: string[]) => {
     describe('#approve()', () => {
       it('should set "allowed"', async () => {
         await stableToken.approve(receiver, transferAmount)
+        assert.equal((await stableToken.allowance(sender, receiver)).toNumber(), transferAmount)
+      })
+    })
+
+    describe('#increaseAllowance()', () => {
+      it('should increase "allowed"', async () => {
+        await stableToken.increaseAllowance(receiver, transferAmount)
+        await stableToken.increaseAllowance(receiver, transferAmount)
+        assert.equal((await stableToken.allowance(sender, receiver)).toNumber(), 2 * transferAmount)
+      })
+    })
+
+    describe('#decreaseAllowance()', () => {
+      it('should decrease "allowed"', async () => {
+        await stableToken.approve(receiver, 2 * transferAmount)
+        await stableToken.decreaseAllowance(receiver, transferAmount)
         assert.equal((await stableToken.allowance(sender, receiver)).toNumber(), transferAmount)
       })
     })

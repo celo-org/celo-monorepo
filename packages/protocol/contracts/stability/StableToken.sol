@@ -1,4 +1,4 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -180,6 +180,48 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
   }
 
   /**
+   * @notice Increase the allowance of another user.
+   * @param spender The address which is being approved to spend StableToken.
+   * @param value The increment of the amount of StableToken approved to the spender.
+   * @return True if the transaction succeeds.
+   */
+  function increaseAllowance(
+    address spender,
+    uint256 value
+  )
+    external
+    updateInflationFactor
+    returns (bool)
+  {
+    uint256 oldValue = allowed[msg.sender][spender];
+    uint256 newValue = oldValue.add(value);
+    allowed[msg.sender][spender] = newValue;
+    emit Approval(msg.sender, spender, newValue);
+    return true;
+  }
+
+  /**
+   * @notice Decrease the allowance of another user.
+   * @param spender The address which is being approved to spend StableToken.
+   * @param value The decrement of the amount of StableToken approved to the spender.
+   * @return True if the transaction succeeds.
+   */
+  function decreaseAllowance(
+    address spender,
+    uint256 value
+  )
+    external
+    updateInflationFactor
+    returns (bool)
+  {
+    uint256 oldValue = allowed[msg.sender][spender];
+    uint256 newValue = oldValue.sub(value);
+    allowed[msg.sender][spender] = newValue;
+    emit Approval(msg.sender, spender, newValue);
+    return true;
+  }
+
+  /**
    * @notice Approve a user to transfer StableToken on behalf of another user.
    * @param spender The address which is being approved to spend StableToken.
    * @param value The amount of StableToken approved to the spender.
@@ -206,7 +248,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
   function mint(
     address to,
     uint256 value
-  ) 
+  )
     external
     onlyMinter
     updateInflationFactor
@@ -306,21 +348,21 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
 
   /**
    * @notice Gets the amount of owner's StableToken allowed to be spent by spender.
-   * @param owner The owner of the StableToken.
+   * @param accountOwner The owner of the StableToken.
    * @param spender The spender of the StableToken.
    * @return The amount of StableToken owner is allowing spender to spend.
    */
-  function allowance(address owner, address spender) external view returns (uint256) {
-    return allowed[owner][spender];
+  function allowance(address accountOwner, address spender) external view returns (uint256) {
+    return allowed[accountOwner][spender];
   }
 
   /**
    * @notice Gets the balance of the specified address using the presently stored inflation factor.
-   * @param owner The address to query the balance of.
+   * @param accountOwner The address to query the balance of.
    * @return The balance of the specified address.
    */
-  function balanceOf(address owner) external view returns (uint256) {
-    return unitsToValue(balances[owner]);
+  function balanceOf(address accountOwner) external view returns (uint256) {
+    return unitsToValue(balances[accountOwner]);
   }
 
   /**
@@ -375,6 +417,12 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
 
     (updatedInflationFactor, ) = getUpdatedInflationFactor();
 
+    // We're ok using FixidityLib.divide here because updatedInflationFactor is
+    // not going to surpass maxFixedDivisor any time soon.
+    // Quick upper-bound estimation: if annual inflation were 5% (an order of
+    // magnitude more than the initial proposal of 0.5%), in 500 years, the
+    // inflation factor would be on the order of 10**10, which is still a safe
+    // divisor.
     return FixidityLib.newFixed(units).divide(updatedInflationFactor).fromFixed();
   }
 
@@ -520,7 +568,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
    * @param from The account to debit balance from
    * @param value The value of balance to debit
    */
-  function debitFrom(address from, uint256 value) public onlyVm updateInflationFactor {
+  function debitFrom(address from, uint256 value) external onlyVm updateInflationFactor {
     uint256 units = _valueToUnits(inflationState.factor, value);
     totalSupply_ = totalSupply_.sub(units);
     balances[from] = balances[from].sub(units);
@@ -533,7 +581,7 @@ contract StableToken is IStableToken, IERC20Token, ICeloToken, Ownable,
    * @dev We can assume that the inflation factor is up to date as `debitFrom`
    * will have been called in the same transaction
    */
-  function creditTo(address to, uint256 value) public onlyVm {
+  function creditTo(address to, uint256 value) external onlyVm {
     uint256 units = _valueToUnits(inflationState.factor, value);
     totalSupply_ = totalSupply_.add(units);
     balances[to] = balances[to].add(units);

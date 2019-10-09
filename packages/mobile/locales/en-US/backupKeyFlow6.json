@@ -28,7 +28,6 @@
   "enterBackupKey": "Enter your Backup Key",
   "backupKeyConfirmation":
     "In the future, if you lose your phone you will need to provide this Backup Key to enable your account to be recovered. To confirm that you have your Backup Key written down, please enter it below:",
-  "skip": "Skip",
   "areYouSure": "Are you sure?",
   "backupSkipText": {
     "0": "Without a Backup Key, you can lose access to your wallet ",

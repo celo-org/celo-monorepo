@@ -1,39 +1,14 @@
 {
-  "welcomeCelo": "Welcome to Celo",
-  "enterInvite":
-    "Enter your invitation code. If you do not have one, ask someone in the Celo Community to invite you. By joining this application, you agree to share your name & phone number with us. Learn more at celo.org",
-  "fullName": "Full Name",
-  "invitationCode": "Invitation Code",
-  "submit": "Submit",
-  "alreadyHaveWallet": "Already have a Celo Wallet? Restore it",
-  "restoreYourWallet": {
-    "title": "Restore your Celo Wallet",
-    "socialTitle": "Recovery Secrets",
-    "description":
-      "Already have a Celo Wallet? Please enter your Backup Key to restore it to this phone.",
-    "socialDescription":
-      "When you safeguarded your Backup Key, you sent recovery secrets to two friends to allow your key to be recovered. Paste the recovery secrets here (in any order) to regain access to your funds.",
-    "warning": "Warning ",
-    "restoreInPrivate": "Restore your Wallet in private "
-  },
-  "backupKeyPlaceholder": "Backup Key",
-  "backupKeyPlaceholderHalves": {
-    "0": "First Recovery Secret",
-    "1": "Second Recovery Secret"
-  },
-  "tip": "Tip ",
-  "backupKeyTip":
-    "Backup Keys are 24 words long, separated by a space.  If you have a Backup Key created outside the Celo Wallet, you may enter also enter it here.",
-  "socialBackupKeyTip": "Secret phrases are lists of 13 words separated by spaces.",
-  "lostYourKey": {
-    "0": "Lost your key? ",
-    "1": "Enter Recovery Secrets"
-  },
-  "noPhrases": {
-    "0": "Don't have these phrases? ",
-    "1": "Visit the FAQ"
-  },
-  "continue": "Continue",
-  "cancel": "Cancel",
-  "restoreWallet": "Restore"
+  "title": "Restore your Celo Wallet",
+  "userYourBackupKey":
+    "Already have a Celo Wallet? Enter your Backup Key to restore it to this phone.",
+  "backupKeyPrompt":
+    "horse leopard dog monkey shark tiger lemur whale squid wolf squirrel mouse lion elephant cat shrimp bear penguin deer turtle fox zebra goat giraffe",
+  "tip": "Tip: ",
+  "backupKeyTip": "Backup Keys are 24 words long, separated by a space.",
+  "restoreWallet": "Restore",
+  "emptyWalletWarning": "This wallet is empty.",
+  "useEmptyAnyway": "Would you like to use it anyway?",
+  "useEmptyWallet": "Use Empty Wallet",
+  "tryAnotherKey": "Try Another Backup Key"
 }

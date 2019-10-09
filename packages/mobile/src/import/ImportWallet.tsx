@@ -1,38 +1,22 @@
-import { BtnTypes } from '@celo/react-components/components/Button'
-import Link from '@celo/react-components/components/Link'
+import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import {
-  ActivityIndicator,
-  Keyboard,
-  Linking,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native'
-import { validateMnemonic } from 'react-native-bip39'
+import { ActivityIndicator, Keyboard, StyleSheet, Text, TextInput, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { AndroidBackHandler } from 'react-navigation-backhandler'
 import { connect } from 'react-redux'
-import { hideAlert, showError } from 'src/alert/actions'
-import { errorSelector } from 'src/alert/reducer'
+import { hideAlert } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { ErrorMessages } from 'src/app/ErrorMessages'
-import { joinMnemonic } from 'src/backup/utils'
 import GethAwareButton from 'src/geth/GethAwareButton'
 import { Namespaces } from 'src/i18n'
 import NuxLogo from 'src/icons/NuxLogo'
-import { importBackupPhrase } from 'src/import/actions'
+import { importBackupPhrase, tryAnotherBackupPhrase } from 'src/import/actions'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
-import Logger from 'src/utils/Logger'
-
-const TAG = 'ImportWallet'
+import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 // Because of a RN bug, we can't fully clean the text as the user types
 // https://github.com/facebook/react-native/issues/11068
@@ -47,55 +31,33 @@ export const formatBackupPhraseOnSubmit = (phrase: string) =>
 
 interface State {
   backupPhrase: string
-  socialBackupPhrase0: string
-  socialBackupPhrase1: string
-  isSubmitting: boolean
-  isSocial: boolean
 }
 
 interface DispatchProps {
   importBackupPhrase: typeof importBackupPhrase
-  showError: typeof showError
+  tryAnotherBackupPhrase: typeof tryAnotherBackupPhrase
   hideAlert: typeof hideAlert
 }
 
 interface StateProps {
-  error: ErrorMessages | null
+  isImportingWallet: boolean
+  isWalletEmpty: boolean
 }
 
 type Props = StateProps & DispatchProps & WithNamespaces
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
-    error: errorSelector(state),
+    isImportingWallet: state.imports.isImportingWallet,
+    isWalletEmpty: state.imports.isWalletEmpty,
   }
-}
-
-const displayedErrors = [ErrorMessages.INVALID_BACKUP, ErrorMessages.IMPORT_BACKUP_FAILED]
-
-const hasDisplayedError = (error: ErrorMessages | null) => {
-  return error && displayedErrors.includes(error)
 }
 
 export class ImportWallet extends React.Component<Props, State> {
   static navigationOptions = nuxNavigationOptions
 
-  static getDerivedStateFromProps(props: Props, state: State): State | null {
-    if (hasDisplayedError(props.error) && state.isSubmitting) {
-      return {
-        ...state,
-        isSubmitting: false,
-      }
-    }
-    return null
-  }
-
   state = {
     backupPhrase: '',
-    socialBackupPhrase0: '',
-    socialBackupPhrase1: '',
-    isSubmitting: false,
-    isSocial: false,
   }
 
   onBackButtonPressAndroid = () => {
@@ -148,38 +110,33 @@ export class ImportWallet extends React.Component<Props, State> {
     CeloAnalytics.track(CustomEventNames.import_phrase_input)
   }
 
-  onSubmit = () => {
-    try {
-      this.setState({
-        isSubmitting: true,
-      })
+  onPressRestore = () => {
+    Keyboard.dismiss()
+    this.props.hideAlert()
+    CeloAnalytics.track(CustomEventNames.import_wallet_submit)
 
-      Keyboard.dismiss()
-      this.props.hideAlert()
-      CeloAnalytics.track(CustomEventNames.import_wallet_submit)
+    const formattedPhrase = formatBackupPhraseOnSubmit(this.state.backupPhrase)
+    this.setState({
+      backupPhrase: formattedPhrase,
+    })
 
-      const formattedPhrase = formatBackupPhraseOnSubmit(this.state.backupPhrase)
-      this.setState({
-        backupPhrase: formattedPhrase,
-      })
+    this.props.importBackupPhrase(formattedPhrase, false)
+  }
 
-      if (!validateMnemonic(formattedPhrase)) {
-        Logger.warn(TAG, 'Invalid mnemonic')
-        this.props.showError(ErrorMessages.INVALID_BACKUP)
-        this.setState({
-          isSubmitting: false,
-        })
-        return
-      }
+  onPressUseEmpty = () => {
+    this.props.importBackupPhrase(this.state.backupPhrase, true)
+  }
 
-      this.props.importBackupPhrase(formattedPhrase)
-    } catch (error) {
-      this.setState({
-        isSubmitting: false,
-      })
-      Logger.error(TAG, 'Error importing wallet', error)
-      this.props.showError(ErrorMessages.IMPORT_BACKUP_FAILED)
-    }
+  onPressTryAnotherKey = () => {
+    this.props.tryAnotherBackupPhrase()
+  }
+
+  isBackupPhraseValid() {
+    return (
+      formatBackupPhraseOnEdit(this.state.backupPhrase)
+        .trim()
+        .split(/\s+/g).length >= 12
+    )
   }
 
   openFaq = () => {
@@ -187,14 +144,8 @@ export class ImportWallet extends React.Component<Props, State> {
   }
 
   render() {
-    const {
-      backupPhrase,
-      socialBackupPhrase0,
-      socialBackupPhrase1,
-      isSubmitting,
-      isSocial,
-    } = this.state
-    const { t, error } = this.props
+    const { backupPhrase } = this.state
+    const { t, isImportingWallet, isWalletEmpty } = this.props
 
     const restoreButtonDisabled = isSocial
       ? !socialBackupPhrase0 || !socialBackupPhrase1
@@ -202,126 +153,77 @@ export class ImportWallet extends React.Component<Props, State> {
 
     return (
       <View style={styles.container}>
-        <AndroidBackHandler onBackPress={this.onBackButtonPressAndroid} />
-        <KeyboardAwareScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="always"
-        >
-          <NuxLogo />
-          <Text style={[fontStyles.h1, styles.h1]}>
-            {t(!isSocial ? 'restoreYourWallet.title' : 'restoreYourWallet.socialTitle')}
-          </Text>
-          <Text style={[fontStyles.bodySmall, styles.body]}>
-            {t(!isSocial ? 'restoreYourWallet.description' : 'restoreYourWallet.socialDescription')}
-          </Text>
-          <Text style={[fontStyles.bodySmall, styles.body]}>
-            <Text style={[styles.warning, fontStyles.medium]}>
-              {t('restoreYourWallet.warning')}
-            </Text>
-            {t('restoreYourWallet.restoreInPrivate')}
-          </Text>
-          {!isSocial ? (
-            <View
-              style={[
-                componentStyles.row,
-                styles.backupInput,
-                hasDisplayedError(error) && styles.inputError,
-              ]}
+        {!isWalletEmpty && (
+          <>
+            <KeyboardAwareScrollView
+              contentContainerStyle={styles.scrollContainer}
+              keyboardShouldPersistTaps="always"
             >
-              <TextInput
-                onChangeText={this.setBackupPhrase}
-                onEndEditing={this.onEndEditing}
-                value={backupPhrase}
-                style={componentStyles.input}
-                underlineColorAndroid="transparent"
-                placeholder={t('backupKeyPlaceholder')}
-                placeholderTextColor={colors.inactive}
-                enablesReturnKeyAutomatically={true}
-                multiline={true}
-                autoCorrect={false}
-                autoCapitalize="none"
-                testID="ImportWalletBackupKeyInputField"
-              />
-            </View>
-          ) : (
-            <>
-              <View
-                style={[
-                  componentStyles.row,
-                  styles.socialBackupInput,
-                  hasDisplayedError(error) && styles.inputError,
-                ]}
-              >
+              <NuxLogo />
+              <Text style={fontStyles.h1}>{t('title')}</Text>
+              <Text style={fontStyles.body}>{t('userYourBackupKey')}</Text>
+              <View style={styles.backupInput}>
                 <TextInput
-                  onChangeText={this.setSocialBackupPhrase0}
+                  onChangeText={this.setBackupPhrase}
                   onEndEditing={this.onEndEditing}
-                  value={socialBackupPhrase0}
+                  value={backupPhrase}
                   style={componentStyles.input}
                   underlineColorAndroid="transparent"
-                  placeholder={t('backupKeyPlaceholderHalves.0')}
+                  placeholder={t('backupKeyPrompt')}
                   placeholderTextColor={colors.inactive}
                   enablesReturnKeyAutomatically={true}
                   multiline={true}
                   autoCorrect={false}
-                  autoCapitalize="none"
-                  testID="ImportWalletSocialBackupKeyFirstInputField"
+                  autoCapitalize={'none'}
+                  testID="ImportWalletBackupKeyInputField"
                 />
               </View>
-              <View
-                style={[
-                  componentStyles.row,
-                  styles.socialBackupInput,
-                  hasDisplayedError(error) && styles.inputError,
-                ]}
-              >
-                <TextInput
-                  onChangeText={this.setSocialBackupPhrase1}
-                  onEndEditing={this.onEndEditing}
-                  value={socialBackupPhrase1}
-                  style={componentStyles.input}
-                  underlineColorAndroid="transparent"
-                  placeholder={t('backupKeyPlaceholderHalves.1')}
-                  placeholderTextColor={colors.inactive}
-                  enablesReturnKeyAutomatically={true}
-                  multiline={true}
-                  autoCorrect={false}
-                  autoCapitalize="none"
-                  testID="ImportWalletSocialBackupKeySecondInputField"
-                />
+              <Text style={styles.tip}>
+                <Text style={fontStyles.semiBold}>{t('tip')}</Text>
+                {t('backupKeyTip')}
+              </Text>
+            </KeyboardAwareScrollView>
+
+            {isImportingWallet && (
+              <View style={styles.loadingSpinnerContainer} testID="ImportWalletLoadingCircle">
+                <ActivityIndicator size="large" color={colors.celoGreen} />
               </View>
-            </>
-          )}
-          <Text style={[fontStyles.bodySmall, styles.body, styles.tip]}>
-            <Text style={[fontStyles.bold]}>{t('tip')}</Text>
-            {t(!isSocial ? 'backupKeyTip' : 'socialBackupKeyTip')}
-          </Text>
-        </KeyboardAwareScrollView>
-        {isSubmitting && (
-          <View style={styles.loadingSpinnerContainer} testID="ImportWalletLoadingCircle">
-            <ActivityIndicator size="large" color={colors.celoGreen} />
-          </View>
+            )}
+
+            <GethAwareButton
+              disabled={isImportingWallet || !this.isBackupPhraseValid()}
+              onPress={this.onPressRestore}
+              text={t('restoreWallet')}
+              standard={false}
+              type={BtnTypes.PRIMARY}
+              testID="ImportWalletButton"
+            />
+          </>
         )}
-        <GethAwareButton
-          disabled={isSubmitting || restoreButtonDisabled}
-          onPress={this.onSubmit}
-          text={t('restoreWallet')}
-          standard={false}
-          type={BtnTypes.PRIMARY}
-          testID="ImportWalletButton"
-        />
-        <View style={styles.lostKeyContainer}>
-          {!isSocial ? (
-            <>
-              <Text style={fontStyles.bodySmall}>{t('lostYourKey.0')} </Text>
-              <Link onPress={this.useSocial}>{t('lostYourKey.1')}</Link>
-            </>
-          ) : (
-            <>
-              <Text style={fontStyles.bodySmall}>{t('noPhrases.0')} </Text>
-              <Link onPress={this.openFaq}>{t('noPhrases.1')}</Link>
-            </>
-          )}
-        </View>
+        {isWalletEmpty && ( // TODO use backup icon instead of Nuxlogo when we have one
+          <>
+            <View style={styles.emptyWarningContainer}>
+              <NuxLogo />
+              <Text style={fontStyles.h1}>{getMoneyDisplayValue(0)}</Text>
+              <Text style={fontStyles.bodyLarge}>{t('emptyWalletWarning')}</Text>
+              <Text style={fontStyles.bodyLarge}>{t('useEmptyAnyway')}</Text>
+            </View>
+            <GethAwareButton
+              onPress={this.onPressUseEmpty}
+              text={t('useEmptyWallet')}
+              standard={false}
+              type={BtnTypes.PRIMARY}
+              testID="UseEmptyWalletButton"
+            />
+            <Button
+              onPress={this.onPressTryAnotherKey}
+              text={t('tryAnotherKey')}
+              standard={false}
+              type={BtnTypes.SECONDARY}
+              testID="TryAnotherKeyButton"
+            />
+          </>
+        )}
       </View>
     )
   }
@@ -333,28 +235,29 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
-  cancel: {
-    alignItems: 'flex-start',
-  },
   scrollContainer: {
     padding: 20,
     paddingTop: 0,
   },
-  h1: {
-    textAlign: 'center',
-    color: colors.dark,
-  },
-  body: {
-    paddingBottom: 15,
-  },
   tip: {
-    marginTop: 12,
-  },
-  warning: {
-    color: colors.errorRed,
+    ...fontStyles.bodyXSmall,
+    marginTop: 20,
+    marginHorizontal: 2,
   },
   backupInput: {
-    height: 124,
+    borderWidth: 1,
+    borderColor: colors.inactive,
+    borderRadius: 3,
+    marginTop: 20,
+    height: 145,
+  },
+  emptyWarningContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    paddingHorizontal: 30,
+    paddingBottom: 30,
   },
   lostKeyContainer: {
     flexDirection: 'row',
@@ -368,16 +271,13 @@ const styles = StyleSheet.create({
   loadingSpinnerContainer: {
     marginVertical: 30,
   },
-  inputError: {
-    borderColor: colors.errorRed,
-  },
 })
 
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   {
     importBackupPhrase,
-    showError,
+    tryAnotherBackupPhrase,
     hideAlert,
   }
 )(withNamespaces(Namespaces.nuxRestoreWallet3)(ImportWallet))

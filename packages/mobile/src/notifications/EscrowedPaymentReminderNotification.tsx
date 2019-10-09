@@ -1,7 +1,7 @@
 import BaseNotification from '@celo/react-components/components/BaseNotification'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Image, StyleSheet, View } from 'react-native'
+import { Image, Platform, StyleSheet, View } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -12,6 +12,7 @@ import { Namespaces } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
 
 interface OwnProps {
@@ -22,21 +23,26 @@ type Props = OwnProps & WithNamespaces
 
 export class EscrowedPaymentReminderNotification extends React.PureComponent<Props> {
   getCTA = () => {
-    const { payment } = this.props
+    const { payment, t } = this.props
     const recipientPhoneNumber = payment.recipientPhone
     return [
       {
-        text: this.props.t('sendMessage'),
+        text: t('sendMessage'),
         onPress: () => {
           CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_send_message)
           // TODO: open up whatsapp/text message slider with pre populated message
           try {
-            SendIntentAndroid.sendSms(recipientPhoneNumber, '')
+            if (Platform.OS === 'android') {
+              SendIntentAndroid.sendSms(recipientPhoneNumber, t('escrowedPaymentReminderSms'))
+            } else {
+              // TODO look into using MFMessageComposeViewController to prefill the body for iOS
+              navigateToURI(`sms:${recipientPhoneNumber}`)
+            }
           } catch {
-            Logger.showError(this.props.t('SMSError'))
+            Logger.showError(t('SMSError'))
             Logger.error(
               'EscrowedPaymentReminderNotification/',
-              this.props.t('SMSErrorDetails', {
+              t('SMSErrorDetails', {
                 recipientNumber: recipientPhoneNumber,
               })
             )
