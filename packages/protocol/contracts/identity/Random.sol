@@ -21,13 +21,10 @@ contract Random is IRandom {
 
   function initialize() external {
     randomnessBlockRetentionWindow = 256;
-    history.length = randomnessBlockRetentionWindow;
   }
 
   function setRandomnessBlockRetentionWindow(uint value) external {
-    historyIndex = (block.number - historyIndex) % ;
     randomnessBlockRetentionWindow = value;
-    if (history.length < randomnessBlockRetentionWindow) history.length = randomnessBlockRetentionWindow;
   }
 
   /**
@@ -64,15 +61,31 @@ contract Random is IRandom {
     }
 
     // add entropy
-    addRandomness(keccak256(abi.encodePacked(_random, randomness)));
-    if (historySize < history.length) historySize++;
+    addRandomness(block.number, keccak256(abi.encodePacked(_random, randomness)));
 
     commitments[proposer] = newCommitment;
   }
 
-  function addRandomness(bytes32 randomness) internal {
+  function addRandomness(uint bn, bytes32 randomness) internal {
     _random = randomness;
-    history[(block.number-historyIndex) % history.length] = randomness;
+    history[bn] = randomness;
+    if (historySize == 0) {
+      historyFirst = block.number;
+      historySize = 1;
+    }
+    else if (historySize > randomnessBlockRetentionWindow) {
+      delete history[historyFirst];
+      delete history[historyFirst+1];
+      historyFirst += 2;
+      historySize--;
+    }
+    else if (historySize == randomnessBlockRetentionWindow) {
+      delete history[historyFirst];
+      historyFirst++;
+    }
+    else /* historySize < randomnessBlockRetentionWindow) */ {
+      historySize++;
+    }
   }
 
   function computeCommitment(bytes32 randomness) public pure returns (bytes32) {
@@ -84,8 +97,15 @@ contract Random is IRandom {
   }
 
   function getBlockRandomness(uint256 bn) external view returns (bytes32) {
-    require(bn <= block.number, "Cannot query randomness of future blocks");
-    require(bn > block.number - historySize, "Cannot query randomness of old blocks");
-    return history[(bn-historyIndex) % history.length];
+    return _getBlockRandomness(bn, block.number);
+  }
+
+  function _getBlockRandomness(uint256 bn, uint256 cur) internal view returns (bytes32) {
+    require(bn <= cur, "Cannot query randomness of future blocks");
+    require(bn > cur - historySize, "Cannot query randomness of old blocks");
+    if (randomnessBlockRetentionWindow < cur) {
+      require(bn > cur - randomnessBlockRetentionWindow, "Cannot query randomness of old blocks");
+    }
+    return history[bn];
   }
 }
