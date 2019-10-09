@@ -17,7 +17,6 @@ import GethAwareButton from 'src/geth/GethAwareButton'
 import { Namespaces } from 'src/i18n'
 import SMSLogo from 'src/icons/InviteSendReceive'
 import WhatsAppLogo from 'src/icons/WhatsAppLogo'
-import { isPhoneNumberVerified } from 'src/identity/verification'
 import { InviteBy, sendInvite } from 'src/invite/actions'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import { navigateBack } from 'src/navigator/NavigationService'
@@ -28,7 +27,6 @@ import { fetchDollarBalance } from 'src/stableToken/actions'
 import { TransactionTypes } from 'src/transactions/reducer'
 
 interface State {
-  contactIsVerified: boolean
   amountIsValid: boolean
 }
 
@@ -66,13 +64,11 @@ export class InviteReview extends React.Component<Props, State> {
   static navigationOptions = { header: null }
 
   state: State = {
-    contactIsVerified: false,
     amountIsValid: false,
   }
 
   componentDidMount() {
     this.props.fetchDollarBalance()
-    this.checkIfPhoneNumberIsVerified()
     this.checkIfEnoughFundsAreAvailable()
   }
 
@@ -82,14 +78,6 @@ export class InviteReview extends React.Component<Props, State> {
       throw new Error('Recipient expected')
     }
     return recipient
-  }
-
-  checkIfPhoneNumberIsVerified = async () => {
-    const recipient = this.getRecipient()
-    const isVerified = await isPhoneNumberVerified(recipient.e164PhoneNumber)
-    this.setState({
-      contactIsVerified: isVerified,
-    })
   }
 
   checkIfEnoughFundsAreAvailable = () => {
