@@ -7,7 +7,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 
 function navigateToEducate() {
-  navigate(Screens.FeeEducation, {})
+  navigate(Screens.FeeExchangeEducation, {})
 }
 
 const FeeIcon = () => (

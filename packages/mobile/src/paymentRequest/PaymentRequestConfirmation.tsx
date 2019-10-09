@@ -9,7 +9,7 @@ import { StyleSheet, View } from 'react-native'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { PaymentRequestStatuses } from 'src/account'
+import { PaymentRequestStatus } from 'src/account'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -109,7 +109,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       requesteeAddress,
       currency: currencyToShortMap[CURRENCY_ENUM.DOLLAR],
       comment: reason,
-      status: PaymentRequestStatuses.REQUESTED,
+      status: PaymentRequestStatus.REQUESTED,
       notified: false,
     }
 
