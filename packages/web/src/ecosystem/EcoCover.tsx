@@ -29,7 +29,7 @@ function EcoCover({ t, screen }: I18nProps & ScreenProps) {
           </View>
         </Cell>
         <Cell span={Spans.half}>
-          <View style={isMobile ? styles.maskedCircleMobile : styles.maskedCircle}>
+          <View style={MASKED_CIRCLE[screen]}>
             <Sweep />
           </View>
         </Cell>
@@ -37,6 +37,7 @@ function EcoCover({ t, screen }: I18nProps & ScreenProps) {
     </View>
   )
 }
+
 // TODO masked circle will need to change for tablet and mobile
 export default withScreenSize(withNamespaces(NameSpaces.ecosystem)(EcoCover))
 
@@ -48,9 +49,13 @@ const styles = StyleSheet.create({
     height: '60vh',
     width: 800,
   },
+  maskedCircleTablet: {
+    height: '50vh',
+    width: 600,
+  },
   maskedCircleMobile: {
-    height: '110vw',
-    width: '110vw',
+    height: '100vw',
+    width: '100vw',
   },
   keepOnScreen: {
     overflow: 'hidden',
@@ -58,7 +63,7 @@ const styles = StyleSheet.create({
   },
   keepOnScreenMobile: {
     overflow: 'hidden',
-    height: '60vh',
+    height: '65vh',
   },
   proposalArea: { flexDirection: 'column', justifyContent: 'space-between' },
   proposalText: {},
@@ -68,3 +73,9 @@ const styles = StyleSheet.create({
     marginTop: 100,
   },
 })
+
+const MASKED_CIRCLE = {
+  [ScreenSizes.MOBILE]: styles.maskedCircleMobile,
+  [ScreenSizes.TABLET]: styles.maskedCircleTablet,
+  [ScreenSizes.DESKTOP]: styles.maskedCircle,
+}
