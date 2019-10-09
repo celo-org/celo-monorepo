@@ -18,7 +18,6 @@ jest.mock('../src/config.ts', () => {
   return {
     ...jest.requireActual('../src/config.ts'),
     FAUCET_ADDRESS: '0x0000000000000000000000000000000000f40c37',
-    ATTESTATIONS_ADDRESS: '0x0000000000000000000000000000000000a77357',
   }
 })
 
