@@ -456,10 +456,10 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
 
   function getGroupEpochRewards(address group, uint256 totalEpochRewards) external view returns (uint256) {
     // TODO(asa): Is this right?
-    if (votes.active.total[group] == 0 || votes.total.active == 0) {
+    if (votes.active.total == 0) {
       return 0;
     }
-    return totalEpochRewards.mul(votes.active.total[group]).div(votes.total.active);
+    return totalEpochRewards.mul(votes.active.forGroup[group].total).div(votes.active.total);
   }
 
   function distributeEpochRewards(address group, uint256 value, address lesser, address greater) external {
@@ -473,8 +473,8 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
       votes.total.eligible.update(group, newVoteTotal, lesser, greater);
     }
 
-    votes.active.total[group] = votes.active.total[group].add(value);
-    votes.total.active = votes.total.active.add(value);
+    votes.active.forGroup[group].total = votes.active.forGroup[group].total.add(value);
+    votes.active.total = votes.active.total.add(value);
   }
 
   /**

@@ -18,7 +18,7 @@ contract MockElection is IElection {
     return 0;
   }
 
-  function getAccountTotalVotes(address) external view returns (uint256) {
+  function getTotalVotesByAccount(address) external view returns (uint256) {
     return 0;
   }
 

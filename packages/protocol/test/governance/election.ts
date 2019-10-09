@@ -440,23 +440,23 @@ contract('Election', (accounts: string[]) => {
         })
 
         it("should decrement the account's pending votes for the group", async () => {
-          assertEqualBN(await election.getAccountPendingVotesForGroup(group, voter), 0)
+          assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter), 0)
         })
 
         it("should increment the account's active votes for the group", async () => {
-          assertEqualBN(await election.getAccountActiveVotesForGroup(group, voter), value)
+          assertEqualBN(await election.getActiveVotesForGroupByAccount(group, voter), value)
         })
 
         it("should not modify the account's total votes for the group", async () => {
-          assertEqualBN(await election.getAccountTotalVotesForGroup(group, voter), value)
+          assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), value)
         })
 
         it("should not modify the account's total votes", async () => {
-          assertEqualBN(await election.getAccountTotalVotes(voter), value)
+          assertEqualBN(await election.getTotalVotesByAccount(voter), value)
         })
 
         it('should not modify the total votes for the group', async () => {
-          assertEqualBN(await election.getGroupTotalVotes(group), value)
+          assertEqualBN(await election.getTotalVotesForGroup(group), value)
         })
 
         it('should not modify the total votes', async () => {
@@ -487,35 +487,35 @@ contract('Election', (accounts: string[]) => {
           })
 
           it("should not modify the first account's active votes for the group", async () => {
-            assertEqualBN(await election.getAccountActiveVotesForGroup(group, voter), value)
+            assertEqualBN(await election.getActiveVotesForGroupByAccount(group, voter), value)
           })
 
           it("should not modify the first account's total votes for the group", async () => {
-            assertEqualBN(await election.getAccountTotalVotesForGroup(group, voter), value)
+            assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter), value)
           })
 
           it("should not modify the first account's total votes", async () => {
-            assertEqualBN(await election.getAccountTotalVotes(voter), value)
+            assertEqualBN(await election.getTotalVotesByAccount(voter), value)
           })
 
           it("should decrement the second account's pending votes for the group", async () => {
-            assertEqualBN(await election.getAccountPendingVotesForGroup(group, voter2), 0)
+            assertEqualBN(await election.getPendingVotesForGroupByAccount(group, voter2), 0)
           })
 
           it("should increment the second account's active votes for the group", async () => {
-            assertEqualBN(await election.getAccountActiveVotesForGroup(group, voter2), value2)
+            assertEqualBN(await election.getActiveVotesForGroupByAccount(group, voter2), value2)
           })
 
           it("should not modify the second account's total votes for the group", async () => {
-            assertEqualBN(await election.getAccountTotalVotesForGroup(group, voter2), value2)
+            assertEqualBN(await election.getTotalVotesForGroupByAccount(group, voter2), value2)
           })
 
           it("should not modify the second account's total votes", async () => {
-            assertEqualBN(await election.getAccountTotalVotes(voter2), value2)
+            assertEqualBN(await election.getTotalVotesByAccount(voter2), value2)
           })
 
           it('should not modify the total votes for the group', async () => {
-            assertEqualBN(await election.getGroupTotalVotes(group), value + value2)
+            assertEqualBN(await election.getTotalVotesForGroup(group), value + value2)
           })
 
           it('should not modify the total votes', async () => {
@@ -877,7 +877,7 @@ contract('Election', (accounts: string[]) => {
     const rewardValue = new BigNumber(1000000)
     beforeEach(async () => {
       await mockValidators.setMembers(group, [accounts[9]])
-      await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+      await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
       await mockLockedGold.setTotalLockedGold(voteValue)
       await mockValidators.setNumRegisteredValidators(1)
       await mockLockedGold.incrementNonvotingAccountBalance(voter, voteValue)
@@ -894,24 +894,24 @@ contract('Election', (accounts: string[]) => {
 
         it("should increment the account's active votes for the group", async () => {
           assertEqualBN(
-            await election.getAccountActiveVotesForGroup(group, voter),
+            await election.getActiveVotesForGroupByAccount(group, voter),
             voteValue.plus(rewardValue)
           )
         })
 
         it("should increment the account's total votes for the group", async () => {
           assertEqualBN(
-            await election.getAccountTotalVotesForGroup(group, voter),
+            await election.getTotalVotesForGroupByAccount(group, voter),
             voteValue.plus(rewardValue)
           )
         })
 
         it("should increment account's total votes", async () => {
-          assertEqualBN(await election.getAccountTotalVotes(voter), voteValue.plus(rewardValue))
+          assertEqualBN(await election.getTotalVotesByAccount(voter), voteValue.plus(rewardValue))
         })
 
         it('should increment the total votes for the group', async () => {
-          assertEqualBN(await election.getGroupTotalVotes(group), voteValue.plus(rewardValue))
+          assertEqualBN(await election.getTotalVotesForGroup(group), voteValue.plus(rewardValue))
         })
 
         it('should increment the total votes', async () => {
@@ -927,7 +927,7 @@ contract('Election', (accounts: string[]) => {
       const rewardValue2 = new BigNumber(10000000)
       beforeEach(async () => {
         await mockValidators.setMembers(group2, [accounts[8]])
-        await election.markGroupEligible(group2, NULL_ADDRESS, group)
+        await election.markGroupEligible(NULL_ADDRESS, group, { from: group2 })
         await mockLockedGold.setTotalLockedGold(voteValue.plus(voteValue2))
         await mockValidators.setNumRegisteredValidators(2)
         await mockLockedGold.incrementNonvotingAccountBalance(voter2, voteValue2)
@@ -956,49 +956,49 @@ contract('Election', (accounts: string[]) => {
 
         it("should increment the accounts' active votes for both groups", async () => {
           assertEqualBN(
-            await election.getAccountActiveVotesForGroup(group, voter),
+            await election.getActiveVotesForGroupByAccount(group, voter),
             expectedVoterActiveVotesForGroup
           )
           assertEqualBN(
-            await election.getAccountActiveVotesForGroup(group, voter2),
+            await election.getActiveVotesForGroupByAccount(group, voter2),
             expectedVoter2ActiveVotesForGroup
           )
           assertEqualBN(
-            await election.getAccountActiveVotesForGroup(group2, voter2),
+            await election.getActiveVotesForGroupByAccount(group2, voter2),
             expectedVoter2ActiveVotesForGroup2
           )
         })
 
         it("should increment the accounts' total votes for both groups", async () => {
           assertEqualBN(
-            await election.getAccountTotalVotesForGroup(group, voter),
+            await election.getTotalVotesForGroupByAccount(group, voter),
             expectedVoterActiveVotesForGroup
           )
           assertEqualBN(
-            await election.getAccountTotalVotesForGroup(group, voter2),
+            await election.getTotalVotesForGroupByAccount(group, voter2),
             expectedVoter2ActiveVotesForGroup
           )
           assertEqualBN(
-            await election.getAccountTotalVotesForGroup(group2, voter2),
+            await election.getTotalVotesForGroupByAccount(group2, voter2),
             expectedVoter2ActiveVotesForGroup2
           )
         })
 
         it("should increment the accounts' total votes", async () => {
           assertEqualBN(
-            await election.getAccountTotalVotes(voter),
+            await election.getTotalVotesByAccount(voter),
             expectedVoterActiveVotesForGroup
           )
           assertEqualBN(
-            await election.getAccountTotalVotes(voter2),
+            await election.getTotalVotesByAccount(voter2),
             expectedVoter2ActiveVotesForGroup.plus(expectedVoter2ActiveVotesForGroup2)
           )
         })
 
         it('should increment the total votes for the groups', async () => {
-          assertEqualBN(await election.getGroupTotalVotes(group), expectedGroupTotalActiveVotes)
+          assertEqualBN(await election.getTotalVotesForGroup(group), expectedGroupTotalActiveVotes)
           assertEqualBN(
-            await election.getGroupTotalVotes(group2),
+            await election.getTotalVotesForGroup(group2),
             expectedVoter2ActiveVotesForGroup2
           )
         })
