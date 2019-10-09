@@ -76,10 +76,10 @@ export class EnterInviteCode extends React.Component<Props, State> {
     validCode: null,
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     AppState.addEventListener('change', this.handleAppStateChange)
-    this.checkForReferrerCode()
-    this.checkIfValidCodeInClipboard()
+    await this.checkIfValidCodeInClipboard()
+    await this.checkForReferrerCode()
   }
 
   componentWillUnmount() {
@@ -103,7 +103,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
 
   handleAppStateChange = async (nextAppState: AppStateStatus) => {
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-      this.checkIfValidCodeInClipboard()
+      await this.checkIfValidCodeInClipboard()
     }
     this.setState({ appState: nextAppState })
   }
@@ -218,7 +218,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
           </Text>
           <Button
             onPress={this.onPressContinue}
-            disabled={!redeemComplete && !account}
+            disabled={isRedeemingInvite || !redeemComplete || !account}
             text={t('continue')}
             standard={false}
             style={styles.continueButton}
@@ -227,7 +227,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
           />
           <Button
             onPress={this.onPressImportClick}
-            disabled={redeemComplete || !!account}
+            disabled={isRedeemingInvite || !!account}
             text={t('importIt')}
             standard={false}
             style={styles.continueButton}
