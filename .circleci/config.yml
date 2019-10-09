@@ -421,6 +421,16 @@ jobs:
           command: |
             yarn --cwd=packages/cli run celocli account:new
 
+      - run:
+          name: Install and test the npm package
+          command: |
+            set -euo pipefail
+            cd packages/cli
+            yarn pack
+            cd /tmp
+            npm install ~/app/packages/cli/celo-celocli-*.tgz
+            ./node_modules/.bin/celocli account:new # Small test
+
   end-to-end-geth-transfer-test:
     <<: *defaults
     steps:
