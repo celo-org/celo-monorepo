@@ -75,3 +75,18 @@ publicKey: 0429b83753806f2b61ddab2e8a139214c3c8a5dfd0557557830b13342f2490bad6f61
 
 Now push your changes `git push origin alfajores`.
 If you don't have access to the repo, you might have to open a PR.
+
+
+## Continuous integration setup
+
+### Circle CI
+
+Config files: [Celo-monorepo](https://github.com/celo-org/celo-monorepo/blob/master/.circleci/config.yml) and [Celo-blockchain](https://github.com/celo-org/celo-blockchain/blob/master/.circleci/config.yml)
+
+While we have [several](https://github.com/celo-org/) repos, most of our work is confined into two repos, [celo-monorepo](https://github.com/celo-org/celo-monorepo/) and [celo-blockchain](https://github.com/celo-org/celo-blockchain/). The latter is a fork of Go-ethereum, commonly known as Geth. We use Circle CI for testing. Our celo-monorepo has multiple Typescript packages and uses yarn workspaces. For testing, this maps well to [Circle CI workflows](https://circleci.com/blog/introducing-workflows-on-circleci-2-0/). Our main workflow is `celo-monorepo-build` where in the step `install_dependencies`, we download all the dependencies and build all of our packages. Then, in parallel, we test all the packages. Some of our end-to-end tests require pulling in, building celo-blockchain and runnning it as well. Some of our tests like `npm-install-testing-cron-workflow` and `protocol-testing-with-code-coverage-cron-workflow` run as cron-jobs. Given the monorepo setup, by default, all the tests run on every pull request. To avoid that, we have a [script](https://github.com/celo-org/celo-monorepo/blob/master/scripts/ci_check_if_test_should_run_v2.sh) which decides whether a test should run depending on the branch name and the files it modified.
+
+### Google Cloud Build
+
+Config files: [https://github.com/celo-org/celo-monorepo/blob/master/cloudbuild.yaml](https://github.com/celo-org/celo-monorepo/blob/master/cloudbuild.yaml) and [https://github.com/celo-org/celo-blockchain/blob/master/cloudbuild.yaml](https://github.com/celo-org/celo-blockchain/blob/master/cloudbuild.yaml)
+
+We use Google Cloud build to automatically build and upload new docker files to GCR (Google Container Reegistry). These docker files can then be referenced and used in the testnet `.env` config files which are located in the root directory of celo-monorepo, for example, [.env.integration](https://github.com/celo-org/celo-monorepo/blob/2fd020704c624e31e9885ee6265ecb60df194c17/.env.integration#L14)
