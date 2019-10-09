@@ -1,8 +1,15 @@
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
 import { Validators } from '../generated/types/Validators'
-import { BaseWrapper, proxyCall, proxySend, toBigNumber } from './BaseWrapper'
-import { fromFixed } from '@celo/utils/lib/fixidity'
+import {
+  BaseWrapper,
+  CeloTransactionObject,
+  proxyCall,
+  proxySend,
+  toBigNumber,
+  wrapSend,
+} from './BaseWrapper'
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 
 export interface Validator {
   address: Address
@@ -45,7 +52,19 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   addMember = proxySend(this.kit, this.contract.methods.addMember)
   removeMember = proxySend(this.kit, this.contract.methods.removeMember)
   registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
-  registerValidatorGroup = proxySend(this.kit, this.contract.methods.registerValidatorGroup)
+  async registerValidatorGroup(
+    name: string,
+    url: string,
+    commission: BigNumber
+  ): Promise<CeloTransactionObject<boolean>> {
+    if (this.kit.defaultAccount == null) {
+      throw new Error(`missing from at new ValdidatorUtils()`)
+    }
+    return wrapSend(
+      this.kit,
+      this.contract.methods.registerValidatorGroup(name, url, toFixed(commission).toFixed())
+    )
+  }
   /**
    * Returns the current registration requirements.
    * @returns Group and validator registration requirements.
@@ -88,8 +107,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     return Promise.all(vgAddresses.map((addr) => this.getValidator(addr)))
   }
 
-  getGroupNumMembers: (group: Address) => Promise<string> = proxyCall(
-    this.contract.methods.getGroupNumMembers
+  getGroupNumMembers: (group: Address) => Promise<BigNumber> = proxyCall(
+    this.contract.methods.getGroupNumMembers,
+    undefined,
+    toBigNumber
   )
 
   async getValidator(address: Address): Promise<Validator> {

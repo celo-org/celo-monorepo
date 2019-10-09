@@ -59,23 +59,23 @@ contract UsingRegistry is Ownable {
     return IElection(registry.getAddressForOrDie(ELECTION_REGISTRY_ID));
   }
 
-  function getGoldToken() internal view returns(IERC20Token) {
+  function getGoldToken() internal view returns (IERC20Token) {
     return IERC20Token(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
 
-  function getLockedGold() internal view returns(ILockedGold) {
+  function getLockedGold() internal view returns (ILockedGold) {
     return ILockedGold(registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
   }
 
-  function getRandom() internal view returns(IRandom) {
+  function getRandom() internal view returns (IRandom) {
     return IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
   }
 
-  function getStableToken() internal view returns(IStableToken) {
+  function getStableToken() internal view returns (IStableToken) {
     return IStableToken(registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID));
   }
 
-  function getValidators() internal view returns(IValidators) {
+  function getValidators() internal view returns (IValidators) {
     return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
   }
 }

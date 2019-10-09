@@ -17,14 +17,33 @@ export default class Withdraw extends BaseCommand {
     const { flags } = this.parse(Withdraw)
     this.kit.defaultAccount = flags.from
     const lockedgold = await this.kit.contracts.getLockedGold()
-    const pendingWithdrawals = await lockedgold.getPendingWithdrawals(flags.from)
     const currentTime = Math.round(new Date().getTime() / 1000)
-    let withdrawals = 0
-    for (let i = 0; i < pendingWithdrawals.length; i++) {
-      if (pendingWithdrawals[i].time.isLessThan(currentTime)) {
-        await displaySendTx('withdraw', lockedgold.withdraw(i - withdrawals))
-        withdrawals += 1
+
+    while (true) {
+      let madeWithdrawal = false
+      const pendingWithdrawals = await lockedgold.getPendingWithdrawals(flags.from)
+      for (let i = 0; i < pendingWithdrawals.length; i++) {
+        const pendingWithdrawal = pendingWithdrawals[i]
+        if (pendingWithdrawal.time.isLessThan(currentTime)) {
+          console.log(
+            `Found available pending withdrawal of value ${pendingWithdrawal.value.toString()}, withdrawing`
+          )
+          await displaySendTx('withdraw', lockedgold.withdraw(i))
+          madeWithdrawal = true
+          break
+        }
       }
+      if (!madeWithdrawal) {
+        break
+      }
+    }
+    const pendingWithdrawals = await lockedgold.getPendingWithdrawals(flags.from)
+    for (const pendingWithdrawal of pendingWithdrawals) {
+      console.log(
+        `Pending withdrawal of value ${pendingWithdrawal.value.toString()} available for withdrawal in ${pendingWithdrawal.time
+          .minus(currentTime)
+          .toString()} seconds.`
+      )
     }
   }
 }

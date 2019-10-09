@@ -4,7 +4,7 @@ import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Args, Flags } from '../../utils/command'
 
-export default class ValidatorGroupRegister extends BaseCommand {
+export default class ValidatorGroupMembers extends BaseCommand {
   static description = 'Add or remove members from a Validator Group'
 
   static flags = {
@@ -28,7 +28,7 @@ export default class ValidatorGroupRegister extends BaseCommand {
   ]
 
   async run() {
-    const res = this.parse(ValidatorGroupRegister)
+    const res = this.parse(ValidatorGroupMembers)
 
     if (!(res.flags.accept || res.flags.remove)) {
       this.error(`Specify action: --accept or --remove`)
@@ -41,7 +41,7 @@ export default class ValidatorGroupRegister extends BaseCommand {
 
     if (res.flags.accept) {
       await displaySendTx('addMember', validators.addMember((res.args as any).validatorAddress))
-      if ((await validators.getGroupNumMembers(res.flags.from)) === '1') {
+      if ((await validators.getGroupNumMembers(res.flags.from)).isEqualTo(1)) {
         const tx = await election.markGroupEligible(res.flags.from)
         await displaySendTx('markGroupEligible', tx)
       }

@@ -44,6 +44,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     string name;
     string url;
     LinkedList.List members;
+    // TODO(asa): Add a function that allows groups to update their commission.
     FixidityLib.Fraction commission;
   }
 
@@ -275,8 +276,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
   /**
    * @notice Updates the duration for which gold remains locked after deregistration.
-   * @param groupLockup The duration for groups.
-   * @param validatorLockup The duration for validators.
+   * @param groupLockup The duration for groups in seconds.
+   * @param validatorLockup The duration for validators in seconds.
    * @return True upon success.
    * @dev The new requirement is only enforced for future validator or group deregistrations.
    */
@@ -485,7 +486,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    */
   function affiliate(address group) external nonReentrant returns (bool) {
     address account = getLockedGold().getAccountFromActiveValidator(msg.sender);
-    require(isValidator(account) && isValidatorGroup(group), "blah");
+    require(isValidator(account) && isValidatorGroup(group));
     Validator storage validator = validators[account];
     if (validator.affiliation != address(0)) {
       _deaffiliate(validator, account);
@@ -584,7 +585,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    */
   function _addMember(address group, address validator) private returns (bool) {
     ValidatorGroup storage _group = groups[group];
-    require(_group.members.numElements < maxGroupSize);
+    require(_group.members.numElements < maxGroupSize, "group would exceed maximum size");
     require(validators[validator].affiliation == group && !_group.members.contains(validator));
     _group.members.push(validator);
     updateMembershipHistory(validator, group);
@@ -684,6 +685,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @return The number of members in a validator group.
    */
   function getGroupNumMembers(address account) public view returns (uint256) {
+    require(isValidatorGroup(account));
     return groups[account].members.numElements;
   }
 
@@ -796,7 +798,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(index < list.length && list[index] == element);
     uint256 lastIndex = list.length.sub(1);
     list[index] = list[lastIndex];
-    list[lastIndex] = address(0);
+    delete list[lastIndex];
     list.length = lastIndex;
   }
 

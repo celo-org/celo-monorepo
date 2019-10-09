@@ -54,13 +54,14 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
 
     const proxyAndImplementationOwnedByGovernance = [
       'Attestations',
-      'LockedGold',
+      'BlockchainParameters',
       'Election',
       'Escrow',
       'Exchange',
       'GasCurrencyWhitelist',
       'GasPriceMinimum',
       'Governance',
+      'LockedGold',
       'Registry',
       'Reserve',
       'SortedOracles',

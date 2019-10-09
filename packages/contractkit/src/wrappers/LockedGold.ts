@@ -1,3 +1,4 @@
+import { eqAddress } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
@@ -17,6 +18,18 @@ export interface VotingDetails {
   voterAddress: Address
   /** vote's weight */
   weight: BigNumber
+}
+
+interface AccountSummary {
+  lockedGold: {
+    total: BigNumber
+    nonvoting: BigNumber
+  }
+  authorizations: {
+    voter: string
+    validator: string
+  }
+  pendingWithdrawals: PendingWithdrawal[]
 }
 
 interface PendingWithdrawal {
@@ -64,6 +77,25 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     }
   }
 
+  async getAccountSummary(account: string): Promise<AccountSummary> {
+    const nonvoting = await this.getAccountNonvotingLockedGold(account)
+    const total = await this.getAccountTotalLockedGold(account)
+    const voter = await this.getVoterFromAccount(account)
+    const validator = await this.getValidatorFromAccount(account)
+    const pendingWithdrawals = await this.getPendingWithdrawals(account)
+    return {
+      lockedGold: {
+        total,
+        nonvoting,
+      },
+      authorizations: {
+        voter: eqAddress(voter, account) ? 'None' : voter,
+        validator: eqAddress(validator, account) ? 'None' : validator,
+      },
+      pendingWithdrawals,
+    }
+  }
+
   /**
    * Authorize voting on behalf of this account to another address.
    * @param account Address of the active account.
@@ -72,6 +104,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    */
   async authorizeVoter(account: Address, voter: Address): Promise<CeloTransactionObject<void>> {
     const sig = await this.getParsedSignatureOfAddress(account, voter)
+    // TODO(asa): Pass default tx "from" argument.
     return wrapSend(this.kit, this.contract.methods.authorizeVoter(voter, sig.v, sig.r, sig.s))
   }
 
@@ -95,8 +128,8 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   async getPendingWithdrawals(account: string) {
     const withdrawals = await this.contract.methods.getPendingWithdrawals(account).call()
     return zip(
-      // tslint:disable-next-line: no-object-literal-type-assertion
       (time, value) =>
+        // tslint:disable-next-line: no-object-literal-type-assertion
         ({ time: toBigNumber(time), value: toBigNumber(value) } as PendingWithdrawal),
       withdrawals[1],
       withdrawals[0]

@@ -14,7 +14,7 @@ export default class ElectionVote extends BaseCommand {
       description: "Set vote for ValidatorGroup's address",
       required: true,
     }),
-    value: flags.string({ description: 'Amount of gold used to vote for group', required: true }),
+    value: flags.string({ description: 'Amount of Gold used to vote for group', required: true }),
   }
 
   static examples = [

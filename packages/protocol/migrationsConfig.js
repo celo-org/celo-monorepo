@@ -18,7 +18,7 @@ const DefaultConfig = {
     reportExpiry: 60 * 60, // 1 hour
   },
   election: {
-    minElectableValidators: '10',
+    minElectableValidators: '22',
     maxElectableValidators: '100',
     maxVotesPerAccount: 3,
     electabilityThreshold: '0', // no threshold
@@ -90,6 +90,13 @@ const DefaultConfig = {
     groupName: 'C-Labs',
     groupUrl: 'celo.org',
     commission: 0.1,
+  },
+  blockchainParameters: {
+    minimumClientVersion: {
+      major: 1,
+      minor: 8,
+      patch: 23,
+    },
   },
 }
 

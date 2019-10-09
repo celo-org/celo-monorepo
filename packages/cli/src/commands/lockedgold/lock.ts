@@ -12,13 +12,13 @@ export default class Lock extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     from: flags.string({ ...Flags.address, required: true }),
-    goldAmount: flags.string({ ...LockedGoldArgs.goldAmountArg, required: true }),
+    value: flags.string({ ...LockedGoldArgs.valueArg, required: true }),
   }
 
   static args = []
 
   static examples = [
-    'lock --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --goldAmount 1000000000000000000',
+    'lock --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --value 1000000000000000000',
   ]
 
   async run() {
@@ -28,13 +28,13 @@ export default class Lock extends BaseCommand {
     this.kit.defaultAccount = address
     const lockedGold = await this.kit.contracts.getLockedGold()
 
-    const goldAmount = new BigNumber(res.flags.goldAmount)
+    const value = new BigNumber(res.flags.value)
 
-    if (!goldAmount.gt(new BigNumber(0))) {
-      failWith(`require(goldAmount > 0) => [${goldAmount}]`)
+    if (!value.gt(new BigNumber(0))) {
+      failWith(`Provided value must be greater than zero => [${value}]`)
     }
 
     const tx = lockedGold.lock()
-    await displaySendTx('lock', tx, { value: goldAmount.toString() })
+    await displaySendTx('lock', tx, { value: value.toString() })
   }
 }

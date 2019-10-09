@@ -63,22 +63,17 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemNetworkFeeTitle
@@ -109,7 +104,7 @@ exports[`transfer feed item renders correctly for <0.000001 network fee 1`] = `
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -219,22 +214,17 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemFaucetTitle
@@ -265,7 +255,7 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -405,22 +395,17 @@ exports[`transfer feed item renders correctly for known received 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           John Doe
@@ -577,22 +562,17 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           John Doe
@@ -719,22 +699,17 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemNetworkFeeTitle
@@ -765,7 +740,7 @@ exports[`transfer feed item renders correctly for network fee 1`] = `
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -905,22 +880,17 @@ exports[`transfer feed item renders correctly for received 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemReceivedTitle
@@ -1047,22 +1017,17 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemInviteReceivedTitle
@@ -1093,7 +1058,7 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -1233,22 +1198,17 @@ exports[`transfer feed item renders correctly for received with encrypted commen
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemReceivedTitle
@@ -1279,7 +1239,7 @@ exports[`transfer feed item renders correctly for received with encrypted commen
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -1419,22 +1379,17 @@ exports[`transfer feed item renders correctly for sent 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemSentTitle
@@ -1561,22 +1516,17 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemInviteSentTitle
@@ -1607,7 +1557,7 @@ exports[`transfer feed item renders correctly for sent invite 1`] = `
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -1747,22 +1697,17 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemSentTitle
@@ -1793,7 +1738,7 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -1933,22 +1878,17 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemSentTitle
@@ -1979,7 +1919,7 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -2089,22 +2029,17 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemVerificationFeeTitle
@@ -2135,7 +2070,7 @@ exports[`transfer feed item renders correctly for verification fee 1`] = `
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
@@ -2264,22 +2199,17 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
         style={
           Object {
             "flexDirection": "row",
-            "marginTop": 3,
+            "marginTop": -1,
           }
         }
       >
         <Text
           style={
-            Array [
-              Object {
-                "fontFamily": "Hind-SemiBold",
-              },
-              Object {
-                "color": "#2E3338",
-                "fontSize": 15,
-                "lineHeight": 20,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 15,
+            }
           }
         >
           feedItemVerificationRewardTitle
@@ -2310,7 +2240,7 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
             "color": "#81868B",
             "fontFamily": "Hind-Regular",
             "fontSize": 15,
-            "lineHeight": 20,
+            "marginTop": -2,
           }
         }
       >
