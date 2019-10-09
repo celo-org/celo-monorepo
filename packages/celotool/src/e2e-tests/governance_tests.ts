@@ -152,6 +152,56 @@ const validatorsAbi = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
+  {
+    constant: true,
+    inputs: [
+      {
+        name: 'index',
+        type: 'uint256',
+      },
+    ],
+    name: 'validatorAddressFromCurrentSet',
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'numberValidatorsInCurrentSet',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        name: 'previousOwner',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    name: 'OwnershipTransferred',
+    type: 'event',
+  },
 ]
 
 describe('governance tests', () => {
@@ -475,19 +525,14 @@ describe('governance tests', () => {
       // `addressesWithBalance`. Therefore, we check the gold total supply at a block before
       // that gold is sent.
       // We don't set the total supply until block rewards are paid out, which can happen once
-      // Governance is registered.
-      let blockNumber = 150
-      while (true) {
-        // This will fail if Governance is not registered.
-        const governanceAddress = await registry.methods
-          .getAddressForString('Governance')
-          .call({}, blockNumber)
-        if (new BigNumber(governanceAddress).isZero()) {
-          blockNumber += 1
-        } else {
-          break
-        }
-      }
+      // either LockedGold or Governance are registered.
+      const _validators = new web3.eth.Contract(
+        validatorsAbi,
+        await getContractAddress('ValidatorsProxy')
+      )
+      const events = await _validators.getPastEvents('OwnershipTransferred', { fromBlock: 0 })
+
+      const blockNumber = events[events.length - 1].blockNumber + 1
       const goldTotalSupply = await goldToken.methods.totalSupply().call({}, blockNumber)
       const balances = await Promise.all(
         addressesWithBalance.map(
@@ -498,7 +543,6 @@ describe('governance tests', () => {
         b.plus(total)
       )
       assert.isAtLeast(expectedGoldTotalSupply.toNumber(), goldGenesisSupply.toNumber())
-      //
       assert.equal(goldTotalSupply.toString(), expectedGoldTotalSupply.toString())
     })
   })

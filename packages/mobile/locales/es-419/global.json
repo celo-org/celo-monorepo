@@ -62,7 +62,7 @@
   "canNotRequestFromUnverified": "No se puede solicitar a usuarios no verificados.",
   "restartApp": "Reiniciar la aplicación",
   "loading": "Cargando…",
-  "invalidBackup": "Clave de respaldo inválida",
+  "invalidBackupPhrase": "Clave de respaldo inválida",
   "importBackupFailed": "No se pudo importar el monedero",
   "inviteFailed": "Falló el envío de la invitación",
   "importContactsFailed": "Error al importar contactos",

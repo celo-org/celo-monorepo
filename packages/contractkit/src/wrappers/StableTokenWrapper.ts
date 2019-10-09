@@ -1,3 +1,4 @@
+import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { StableToken } from '../generated/types/StableToken'
 import {
@@ -97,6 +98,20 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
     toBigNumber
   )
 
+  /**
+   * Increases the allowance of another user.
+   * @param spender The address which is being approved to spend StableToken.
+   * @param value The increment of the amount of StableToken approved to the spender.
+   * @returns true if success.
+   */
+  increaseAllowance = proxySend(this.kit, this.contract.methods.increaseAllowance)
+  /**
+   * Decreases the allowance of another user.
+   * @param spender The address which is being approved to spend StableToken.
+   * @param value The decrement of the amount of StableToken approved to the spender.
+   * @returns true if success.
+   */
+  decreaseAllowance = proxySend(this.kit, this.contract.methods.decreaseAllowance)
   mint = proxySend(this.kit, this.contract.methods.mint)
   burn = proxySend(this.kit, this.contract.methods.burn)
 
@@ -109,8 +124,8 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
   async getInflationParameters(): Promise<InflationParameters> {
     const res = await this.contract.methods.getInflationParameters().call()
     return {
-      rate: toBigNumber(res[0]),
-      factor: toBigNumber(res[1]),
+      rate: fromFixed(toBigNumber(res[0])),
+      factor: fromFixed(toBigNumber(res[1])),
       updatePeriod: toBigNumber(res[2]),
       factorLastUpdated: toBigNumber(res[3]),
     }

@@ -25,12 +25,12 @@
     "build": "tsc -b .",
     "docs": "yarn oclif-dev readme --multi --dir=../docs/command-line-interface && yarn prettier ../docs/command-line-interface/*.md --write",
     "lint": "tslint -c tslint.json --project tsconfig.json",
-    "prepublishOnly": "yarn run build && oclif-dev manifest && oclif-dev readme",
+    "prepack": "yarn run build && oclif-dev manifest && oclif-dev readme",
     "test": "TZ=UTC jest"
   },
   "dependencies": {
-    "@celo/utils": "0.1.2-dev",
-    "@celo/contractkit": "0.2.0-dev",
+    "@celo/utils": "^0.1.0",
+    "@celo/contractkit": "^0.1.1",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
