@@ -64,6 +64,9 @@ function widthToScreenType(width: number) {
 
 export interface ScreenProps {
   screen: ScreenSizes
+  isMobile: boolean
+  isTablet: boolean
+  isDesktop: boolean
 }
 
 export function withScreenSize<T>(Component: React.ComponentType<T>) {
@@ -71,7 +74,18 @@ export function withScreenSize<T>(Component: React.ComponentType<T>) {
     return (
       <ScreenSizeContext.Consumer>
         {({ screen }) => {
-          return <Component screen={screen} {...props} />
+          const isMobile = screen === ScreenSizes.MOBILE
+          const isTablet = screen === ScreenSizes.TABLET
+          const isDesktop = screen === ScreenSizes.DESKTOP
+          return (
+            <Component
+              screen={screen}
+              isMobile={isMobile}
+              isTablet={isTablet}
+              isDesktop={isDesktop}
+              {...props}
+            />
+          )
         }}
       </ScreenSizeContext.Consumer>
     )

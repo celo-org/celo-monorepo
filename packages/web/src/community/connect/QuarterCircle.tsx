@@ -12,9 +12,9 @@ type Props = ScreenProps
 class QuarterCircle extends React.PureComponent<Props> {
   getHeight = () => {
     return {
-      [ScreenSizes.MOBILE]: 520,
-      [ScreenSizes.TABLET]: 630,
-      [ScreenSizes.DESKTOP]: 770,
+      [ScreenSizes.MOBILE]: 250,
+      [ScreenSizes.TABLET]: 400,
+      [ScreenSizes.DESKTOP]: 600,
     }[this.props.screen]
   }
 
