@@ -5,9 +5,12 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import LineItemRow from 'src/components/LineItemRow'
 import ExchangeRate from 'src/exchange/ExchangeRate'
+import FeeExchangeIcon from 'src/exchange/FeeExchangeIcon'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
+import FeeIcon from 'src/send/FeeIcon'
 import RoundedArrow from 'src/shared/RoundedArrow'
 import { getMoneyDisplayValue } from 'src/utils/formatting'
 
@@ -70,11 +73,13 @@ class ExchangeConfirmationCard extends React.PureComponent<Props> {
 
   render() {
     const {
+      t,
       newDollarBalance,
       newGoldBalance,
       makerAmount,
       takerAmount,
       makerToken: token,
+      fee,
     } = this.props
 
     return (
@@ -89,6 +94,21 @@ class ExchangeConfirmationCard extends React.PureComponent<Props> {
 
         <View style={styles.title}>
           <ExchangeRate rate={this.getExchangeRate()} makerToken={token} />
+        </View>
+
+        <View style={styles.feeContainer}>
+          <LineItemRow
+            currencySymbol={this.getTakerToken()}
+            amount={fee}
+            title={t('securityFee')}
+            titleIcon={<FeeIcon />}
+          />
+          <LineItemRow
+            currencySymbol={this.getTakerToken()}
+            amount={'0.01'}
+            title={t('exchangeFee')}
+            titleIcon={<FeeExchangeIcon />}
+          />
         </View>
 
         {newDollarBalance &&
@@ -106,6 +126,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.darkLightest,
     justifyContent: 'center',
+  },
+  feeContainer: {
+    marginBottom: 10,
+    paddingHorizontal: 50,
   },
   arrow: {
     marginHorizontal: 10,

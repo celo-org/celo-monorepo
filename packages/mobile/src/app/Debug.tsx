@@ -26,8 +26,8 @@ export class Debug extends React.Component<RootState, State> {
   }
 
   async componentDidMount() {
-    this.updateLogs()
-    this.updateLatestBlock()
+    await this.updateLogs()
+    await this.updateLatestBlock()
   }
 
   updateLogs = async () => {
@@ -53,7 +53,7 @@ export class Debug extends React.Component<RootState, State> {
   }
 
   onClickEmailLogs = async () => {
-    Logger.emailLogsToSupport(anonymizedPhone(this.props.account.e164PhoneNumber))
+    await Logger.emailLogsToSupport(anonymizedPhone(this.props.account.e164PhoneNumber))
   }
 
   render() {
