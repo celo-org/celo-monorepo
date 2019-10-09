@@ -13,12 +13,21 @@ contract Random is IRandom {
 
   bytes32 public _random;
 
-  uint256 constant HISTORY_LENGTH = 256;
+  uint256 public randomnessBlockRetentionWindow = 256;
 
-  bytes32[] private history;
+  mapping (uint256 => bytes32) private history;
+  uint256 private historyFirst;
+  uint256 private historySize;
 
   function initialize() external {
-    history.length = HISTORY_LENGTH;
+    randomnessBlockRetentionWindow = 256;
+    history.length = randomnessBlockRetentionWindow;
+  }
+
+  function setRandomnessBlockRetentionWindow(uint value) external {
+    historyIndex = (block.number - historyIndex) % ;
+    randomnessBlockRetentionWindow = value;
+    if (history.length < randomnessBlockRetentionWindow) history.length = randomnessBlockRetentionWindow;
   }
 
   /**
@@ -37,7 +46,14 @@ contract Random is IRandom {
     address proposer
   ) external {
     require(msg.sender == address(0));
+    _revealAndCommit(randomness, newCommitment, proposer);
+  }
 
+  function _revealAndCommit(
+    bytes32 randomness,
+    bytes32 newCommitment,
+    address proposer
+  ) internal {
     // ensure revealed randomness matches previous commitment
     if (commitments[proposer] != 0) {
       require(randomness != 0);
@@ -48,10 +64,15 @@ contract Random is IRandom {
     }
 
     // add entropy
-    _random = keccak256(abi.encodePacked(_random, randomness));
-    history[block.number % HISTORY_LENGTH] = _random;
+    addRandomness(keccak256(abi.encodePacked(_random, randomness)));
+    if (historySize < history.length) historySize++;
 
     commitments[proposer] = newCommitment;
+  }
+
+  function addRandomness(bytes32 randomness) internal {
+    _random = randomness;
+    history[(block.number-historyIndex) % history.length] = randomness;
   }
 
   function computeCommitment(bytes32 randomness) public pure returns (bytes32) {
@@ -64,7 +85,7 @@ contract Random is IRandom {
 
   function getBlockRandomness(uint256 bn) external view returns (bytes32) {
     require(bn <= block.number, "Cannot query randomness of future blocks");
-    require(bn > block.number - HISTORY_LENGTH, "Cannot query randomness of old blocks");
-    return history[bn % HISTORY_LENGTH];
+    require(bn > block.number - historySize, "Cannot query randomness of old blocks");
+    return history[(bn-historyIndex) % history.length];
   }
 }
