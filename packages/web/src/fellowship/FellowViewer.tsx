@@ -1,12 +1,10 @@
-import Carousel from 'nuka-carousel'
 import * as React from 'react'
 import { View } from 'react-native'
 import Fade from 'react-reveal/Fade'
-import PagingDots from 'src/carousel/PagingDots'
 import Fellow from 'src/fellowship/Fellow'
-import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
+import { ScreenProps, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN } from 'src/shared/Button.3'
-import { colors, standardStyles } from 'src/styles'
+import { colors } from 'src/styles'
 
 const fellows = [
   {
@@ -62,34 +60,14 @@ const fellows = [
 ]
 
 class FellowViewer extends React.PureComponent<ScreenProps> {
-  componentDidMount() {
-    // ensure the Carousel sizes correctly
-    setImmediate(() => window.dispatchEvent(new Event('resize')))
-  }
-
   render() {
     return (
-      <View
-        style={[
-          ScreenSizes.MOBILE === this.props.screen
-            ? standardStyles.blockMarginMobile
-            : standardStyles.blockMargin,
-        ]}
-      >
-        <Fade distance={'20px'} bottom={true}>
-          <Carousel
-            heightMode={'current'}
-            autoplay={false}
-            dragging={true}
-            swiping={true}
-            enableKeyboardControls={true}
-            renderCenterLeftControls={null}
-            renderCenterRightControls={null}
-            renderBottomCenterControls={PagingDots}
-          >
-            {fellows.map((fellow) => <Fellow key={fellow.name} {...fellow} />)}
-          </Carousel>
-        </Fade>
+      <View>
+        {fellows.map((fellow, index) => (
+          <Fade key={fellow.name} distance={'20px'} bottom={true}>
+            <Fellow {...fellow} flip={index % 2 === 1} />
+          </Fade>
+        ))}
       </View>
     )
   }

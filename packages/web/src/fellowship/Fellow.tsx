@@ -13,34 +13,42 @@ interface FellowProps {
   quote: string
   text: string | React.ReactNode
   color: colors
+  flip: boolean
 }
 
 export default class Fellow extends React.PureComponent<FellowProps> {
   render() {
-    const { image, name, location, role, quote, text, color } = this.props
+    const { image, name, location, role, quote, text, color, flip } = this.props
     return (
-      <View style={standardStyles.blockMarginBottom}>
-        <GridRow>
-          <Cell span={Spans.half}>
-            <AspectRatio style={styles.imageContainer} ratio={940 / 1090}>
+      <View>
+        <GridRow
+          // allStyle={standardStyles.centered}
+          mobileStyle={standardStyles.blockMarginMobile}
+          tabletStyle={standardStyles.blockMarginTablet}
+          desktopStyle={[standardStyles.blockMargin, flip && styles.flip]}
+        >
+          <Cell span={Spans.half} tabletSpan={Spans.half}>
+            <AspectRatio style={styles.imageContainer} ratio={530 / 615}>
               <Image source={image} style={styles.image} />
             </AspectRatio>
           </Cell>
           <Cell span={Spans.half}>
-            <H4>{name}</H4>
-            <Text style={fonts.h5}>
-              {location} | {role}
-            </Text>
-            <H4
-              style={[
-                { color },
-                standardStyles.elementalMarginTop,
-                standardStyles.blockMarginBottom,
-              ]}
-            >
-              {quote}
-            </H4>
-            <Text style={fonts.p}>{text}</Text>
+            <View>
+              <H4>{name}</H4>
+              <Text style={fonts.h5}>
+                {location} | {role}
+              </Text>
+              <H4
+                style={[
+                  { color },
+                  standardStyles.elementalMarginTop,
+                  standardStyles.blockMarginBottom,
+                ]}
+              >
+                {quote}
+              </H4>
+              <Text style={fonts.p}>{text}</Text>
+            </View>
           </Cell>
         </GridRow>
       </View>
@@ -48,9 +56,6 @@ export default class Fellow extends React.PureComponent<FellowProps> {
   }
 }
 const styles = StyleSheet.create({
-  slideContainer: {
-    marginBottom: 50,
-  },
   image: {
     height: '100%',
     width: '100%',
@@ -58,4 +63,5 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: '100%',
   },
+  flip: { flexDirection: 'row-reverse' },
 })
