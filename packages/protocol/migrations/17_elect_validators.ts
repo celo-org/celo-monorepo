@@ -172,11 +172,7 @@ module.exports = async (_deployer: any) => {
 
   console.info('  Marking Validator Group as eligible for election ...')
   // @ts-ignore
-  const markTx = election.contract.methods.markGroupEligible(
-    account.address,
-    NULL_ADDRESS,
-    NULL_ADDRESS
-  )
+  const markTx = election.contract.methods.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS)
   await sendTransactionWithPrivateKey(web3, markTx, account.privateKey, {
     to: election.address,
   })
