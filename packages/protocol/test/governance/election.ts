@@ -202,15 +202,15 @@ contract('Election', (accounts: string[]) => {
 
   describe('#markGroupEligible', () => {
     const group = accounts[1]
-    describe('when the group has members', () => {
+    describe('when called by the registered validators contract', () => {
       beforeEach(async () => {
-        await mockValidators.setMembers(group, [accounts[9]])
+        await registry.setAddressFor(CeloContractName.Validators, accounts[0])
       })
 
       describe('when the group has no votes', () => {
         let resp: any
         beforeEach(async () => {
-          resp = await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
+          resp = await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
         })
 
         it('should add the group to the list of eligible groups', async () => {
@@ -230,17 +230,15 @@ contract('Election', (accounts: string[]) => {
 
         describe('when the group has already been marked eligible', () => {
           it('should revert', async () => {
-            await assertRevert(
-              election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
-            )
+            await assertRevert(election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS))
           })
         })
       })
     })
 
-    describe('when the group has no members', () => {
+    describe('not called by the registered validators contract', () => {
       it('should revert', async () => {
-        await assertRevert(election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group }))
+        await assertRevert(election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS))
       })
     })
   })
@@ -250,7 +248,9 @@ contract('Election', (accounts: string[]) => {
     describe('when the group is eligible', () => {
       beforeEach(async () => {
         await mockValidators.setMembers(group, [accounts[9]])
-        await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
+        await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+        await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+        await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
       })
 
       describe('when called by the registered Validators contract', () => {
@@ -304,8 +304,9 @@ contract('Election', (accounts: string[]) => {
     const value = new BigNumber(1000)
     describe('when the group is eligible', () => {
       beforeEach(async () => {
-        await mockValidators.setMembers(group, [accounts[9]])
-        await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
+        await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+        await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+        await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
       })
 
       describe('when the group can receive votes', () => {
@@ -381,8 +382,9 @@ contract('Election', (accounts: string[]) => {
             await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
             for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
               newGroup = accounts[i + 2]
-              await mockValidators.setMembers(newGroup, [accounts[9]])
-              await election.markGroupEligible(group, NULL_ADDRESS, { from: newGroup })
+              await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+              await election.markGroupEligible(newGroup, group, NULL_ADDRESS)
+              await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
               await election.vote(newGroup, 1, group, NULL_ADDRESS)
             }
           })
@@ -398,6 +400,7 @@ contract('Election', (accounts: string[]) => {
       describe('when the group cannot receive votes', () => {
         beforeEach(async () => {
           await mockLockedGold.setTotalLockedGold(value.div(2).minus(1))
+          await mockValidators.setMembers(group, [accounts[9]])
           await mockValidators.setNumRegisteredValidators(1)
           assertEqualBN(await election.getNumVotesReceivable(group), value.minus(2))
         })
@@ -420,9 +423,11 @@ contract('Election', (accounts: string[]) => {
     const group = accounts[1]
     const value = 1000
     beforeEach(async () => {
-      await mockValidators.setMembers(group, [accounts[9]])
-      await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
+      await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+      await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+      await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
       await mockLockedGold.setTotalLockedGold(value)
+      await mockValidators.setMembers(group, [accounts[9]])
       await mockValidators.setNumRegisteredValidators(1)
       await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
     })
@@ -544,8 +549,9 @@ contract('Election', (accounts: string[]) => {
     const value = 1000
     describe('when the voter has pending votes', () => {
       beforeEach(async () => {
-        await mockValidators.setMembers(group, [accounts[9]])
-        await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
+        await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+        await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+        await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
         await mockLockedGold.setTotalLockedGold(value)
         await mockValidators.setNumRegisteredValidators(1)
         await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
@@ -644,8 +650,9 @@ contract('Election', (accounts: string[]) => {
     const value = 1000
     describe('when the voter has active votes', () => {
       beforeEach(async () => {
-        await mockValidators.setMembers(group, [accounts[9]])
-        await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
+        await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+        await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+        await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
         await mockLockedGold.setTotalLockedGold(value)
         await mockValidators.setNumRegisteredValidators(1)
         await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
@@ -769,9 +776,11 @@ contract('Election', (accounts: string[]) => {
       await mockValidators.setMembers(group2, [validator5, validator6])
       await mockValidators.setMembers(group3, [validator7])
 
-      await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group1 })
-      await election.markGroupEligible(NULL_ADDRESS, group1, { from: group2 })
-      await election.markGroupEligible(NULL_ADDRESS, group2, { from: group3 })
+      await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+      await election.markGroupEligible(group1, NULL_ADDRESS, NULL_ADDRESS)
+      await election.markGroupEligible(group2, NULL_ADDRESS, group1)
+      await election.markGroupEligible(group3, NULL_ADDRESS, group2)
+      await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
 
       for (const voter of [voter1, voter2, voter3]) {
         await mockLockedGold.incrementNonvotingAccountBalance(voter.address, voter.weight)
@@ -876,9 +885,11 @@ contract('Election', (accounts: string[]) => {
     const voteValue = new BigNumber(1000000)
     const rewardValue = new BigNumber(1000000)
     beforeEach(async () => {
-      await mockValidators.setMembers(group, [accounts[9]])
-      await election.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS, { from: group })
+      await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+      await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+      await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
       await mockLockedGold.setTotalLockedGold(voteValue)
+      await mockValidators.setMembers(group, [accounts[9]])
       await mockValidators.setNumRegisteredValidators(1)
       await mockLockedGold.incrementNonvotingAccountBalance(voter, voteValue)
       await election.vote(group, voteValue, NULL_ADDRESS, NULL_ADDRESS)
@@ -926,8 +937,9 @@ contract('Election', (accounts: string[]) => {
       const voteValue2 = new BigNumber(1000000)
       const rewardValue2 = new BigNumber(10000000)
       beforeEach(async () => {
-        await mockValidators.setMembers(group2, [accounts[8]])
-        await election.markGroupEligible(NULL_ADDRESS, group, { from: group2 })
+        await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+        await election.markGroupEligible(group2, NULL_ADDRESS, group)
+        await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
         await mockLockedGold.setTotalLockedGold(voteValue.plus(voteValue2))
         await mockValidators.setNumRegisteredValidators(2)
         await mockLockedGold.incrementNonvotingAccountBalance(voter2, voteValue2)

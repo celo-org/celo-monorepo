@@ -234,8 +234,8 @@ async function waitForPortOpen(host: string, port: number, seconds: number) {
   return false
 }
 
-export async function sleep(seconds: number) {
-  await execCmd('sleep', [seconds.toString()])
+export function sleep(seconds: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, seconds * 1000))
 }
 
 export async function getEnode(port: number, ws: boolean = false) {

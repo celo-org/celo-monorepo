@@ -538,24 +538,21 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
 
   /**
    * @notice Marks a group eligible for electing validators.
+   * @param group The address of the validator group.
    * @param lesser The address of the group that has received fewer votes than this group.
    * @param greater The address of the group that has received more votes than this group.
    */
   function markGroupEligible(
+    address group,
     address lesser,
     address greater
   )
     external
-    nonReentrant
-    returns (bool)
+    onlyRegisteredContract(VALIDATORS_REGISTRY_ID)
   {
-    address group = getLockedGold().getAccountFromValidator(msg.sender);
-    require(!votes.total.eligible.contains(group));
-    require(getValidators().getGroupNumMembers(group) > 0);
     uint256 value = getTotalVotesForGroup(group);
     votes.total.eligible.insert(group, value, lesser, greater);
     emit ValidatorGroupMarkedEligible(group);
-    return true;
   }
 
   /**

@@ -27,7 +27,7 @@ describe('governance tests', () => {
 
   before(async function(this: any) {
     this.timeout(0)
-    await context.hooks.before()
+    // await context.hooks.before()
   })
 
   after(context.hooks.after)
@@ -350,10 +350,10 @@ describe('governance tests', () => {
         expected: BigNumber
       ) => {
         const currentVotes = new BigNumber(
-          await election.methods.getGroupTotalVotes(group).call({}, blockNumber)
+          await election.methods.getTotalVotesForGroup(group).call({}, blockNumber)
         )
         const previousVotes = new BigNumber(
-          await election.methods.getGroupTotalVotes(group).call({}, blockNumber - 1)
+          await election.methods.getTotalVotesForGroup(group).call({}, blockNumber - 1)
         )
         assert.equal(expected.toFixed(), currentVotes.minus(previousVotes).toFixed())
       }

@@ -570,24 +570,55 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param validator The validator to add to the group
    * @return True upon success.
    * @dev Fails if `validator` has not set their affiliation to this account.
+   * @dev Fails if the group has zero members.
    */
   function addMember(address validator) external nonReentrant returns (bool) {
     address account = getLockedGold().getAccountFromActiveValidator(msg.sender);
-    require(isValidatorGroup(account) && isValidator(validator));
-    return _addMember(account, validator);
+    require(groups[account].members.numElements > 0);
+    return _addMember(account, validator, address(0), address(0));
+  }
+
+  /**
+   * @notice Adds the first member to a group's list of members and marks it eligible for election.
+   * @param validator The validator to add to the group
+   * @param lesser The address of the group that has received fewer votes than this group.
+   * @param greater The address of the group that has received more votes than this group.
+   * @return True upon success.
+   * @dev Fails if `validator` has not set their affiliation to this account.
+   * @dev Fails if the group has > 0 members.
+   */
+  function addFirstMember(
+    address validator,
+    address lesser,
+    address greater
+  )
+    external
+    nonReentrant
+    returns (bool)
+  {
+    address account = getLockedGold().getAccountFromActiveValidator(msg.sender);
+    require(groups[account].members.numElements == 0);
+    return _addMember(account, validator, lesser, greater);
   }
 
   /**
    * @notice Adds a member to the end of a validator group's list of members.
-   * @param validator The validator to add to the group
+   * @param group The address of the validator group.
+   * @param validator The validator to add to the group.
+   * @param lesser The address of the group that has received fewer votes than this group.
+   * @param greater The address of the group that has received more votes than this group.
    * @return True upon success.
    * @dev Fails if `validator` has not set their affiliation to this account.
    */
-  function _addMember(address group, address validator) private returns (bool) {
+  function _addMember(address group, address validator, address lesser, address greater) private returns (bool) {
+    require(isValidatorGroup(group) && isValidator(validator));
     ValidatorGroup storage _group = groups[group];
     require(_group.members.numElements < maxGroupSize, "group would exceed maximum size");
     require(validators[validator].affiliation == group && !_group.members.contains(validator));
     _group.members.push(validator);
+    if (_group.members.numElements == 1) {
+      getElection().markGroupEligible(group, lesser, greater);
+    }
     updateMembershipHistory(validator, group);
     emit ValidatorGroupMemberAdded(group, validator);
     return true;

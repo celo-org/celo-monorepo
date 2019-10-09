@@ -131,7 +131,11 @@ contract('Validators', (accounts: string[]) => {
     for (const validator of members) {
       await registerValidator(validator)
       await validators.affiliate(group, { from: validator })
-      await validators.addMember(validator, { from: group })
+      if (validator == members[0]) {
+        await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, { from: group })
+      } else {
+        await validators.addMember(validator, { from: group })
+      }
     }
   }
 
@@ -676,7 +680,7 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the validator is a member of that group', () => {
         beforeEach(async () => {
-          await validators.addMember(validator, { from: group })
+          await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, { from: group })
         })
 
         it('should remove the validator from the group membership list', async () => {
@@ -784,7 +788,7 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the validator is a member of that group', () => {
         beforeEach(async () => {
-          await validators.addMember(validator, { from: group })
+          await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, { from: group })
         })
 
         it('should remove the validator from the group membership list', async () => {
@@ -854,7 +858,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the validator is a member of the affiliated group', () => {
       beforeEach(async () => {
-        await validators.addMember(validator, { from: group })
+        await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, { from: group })
       })
 
       it('should remove the validator from the group membership list', async () => {
@@ -1029,7 +1033,7 @@ contract('Validators', (accounts: string[]) => {
         await registerValidatorGroup(group)
         await registerValidator(validator)
         await validators.affiliate(group, { from: validator })
-        await validators.addMember(validator)
+        await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS)
       })
 
       it('should revert', async () => {
@@ -1046,7 +1050,7 @@ contract('Validators', (accounts: string[]) => {
       await registerValidator(validator)
       await registerValidatorGroup(group)
       await validators.affiliate(group, { from: validator })
-      resp = await validators.addMember(validator)
+      resp = await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS)
     })
 
     it('should add the member to the list of members', async () => {
@@ -1078,11 +1082,13 @@ contract('Validators', (accounts: string[]) => {
     })
 
     it('should revert when the account is not a registered validator group', async () => {
-      await assertRevert(validators.addMember(validator, { from: accounts[2] }))
+      await assertRevert(
+        validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, { from: accounts[2] })
+      )
     })
 
     it('should revert when the member is not a registered validator', async () => {
-      await assertRevert(validators.addMember(accounts[2]))
+      await assertRevert(validators.addFirstMember(accounts[2], NULL_ADDRESS, NULL_ADDRESS))
     })
 
     it('should revert when trying to add too many members to group', async () => {
@@ -1098,7 +1104,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        await assertRevert(validators.addMember(validator))
+        await assertRevert(validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS))
       })
     })
 
@@ -1293,7 +1299,9 @@ contract('Validators', (accounts: string[]) => {
           const currentEpoch = new BigNumber(
             Math.floor((await web3.eth.getBlock('latest')).number / EPOCH)
           )
-          await validators.addMember(validator, { from: groups[i] })
+          await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
+            from: groups[i],
+          })
           await mineBlocks(EPOCH, web3)
 
           const membershipHistory = await validators.getMembershipHistory(validator)
@@ -1332,7 +1340,9 @@ contract('Validators', (accounts: string[]) => {
       it('should always return the correct membership for the last epoch', async () => {
         for (let i = 0; i < membershipHistoryLength.plus(1).toNumber(); i++) {
           await validators.affiliate(groups[i])
-          await validators.addMember(validator, { from: groups[i] })
+          await validators.addFirstMember(validator, NULL_ADDRESS, NULL_ADDRESS, {
+            from: groups[i],
+          })
           if (i > 0) {
             assert.equal(await validators.getMembershipInLastEpoch(validator), groups[i - 1])
           }
