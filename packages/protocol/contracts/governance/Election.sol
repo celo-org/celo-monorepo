@@ -664,7 +664,9 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
         getValidators().getNumRegisteredValidators()
       )
     );
-    uint256 right = getValidators().getGroupNumMembers(group).add(1).mul(getLockedGold().getTotalLockedGold());
+    uint256 right = getValidators().getGroupNumMembers(group).add(1).mul(
+      getLockedGold().getTotalLockedGold()
+    );
     return left <= right;
   }
 
@@ -677,7 +679,9 @@ contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
    *   (numGroupMembers + 1) / min(maxElectableValidators, numRegisteredValidators)
    */
   function getNumVotesReceivable(address group) external view returns (uint256) {
-    uint256 numerator = getValidators().getGroupNumMembers(group).add(1).mul(getLockedGold().getTotalLockedGold());
+    uint256 numerator = getValidators().getGroupNumMembers(group).add(1).mul(
+      getLockedGold().getTotalLockedGold()
+    );
     uint256 denominator = Math.min(
       electableValidators.max,
       getValidators().getNumRegisteredValidators()
