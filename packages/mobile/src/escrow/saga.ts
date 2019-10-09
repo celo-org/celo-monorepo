@@ -83,7 +83,7 @@ function* registerStandbyTransaction(id: string, value: string, address: string)
   yield put(
     addStandbyTransaction({
       id,
-      type: TransactionTypes.SENT,
+      type: TransactionTypes.ESCROW_SENT,
       status: TransactionStatus.Pending,
       value,
       symbol: CURRENCY_ENUM.DOLLAR,
