@@ -19,6 +19,7 @@ export default withScreenSize(
     return (
       <View style={styles.zIndex}>
         <GridRow
+          allStyle={standardStyles.centered}
           desktopStyle={standardStyles.sectionMargin}
           tabletStyle={standardStyles.sectionMarginTablet}
           mobileStyle={standardStyles.blockMarginMobile}
@@ -26,7 +27,11 @@ export default withScreenSize(
           <Cell
             span={Spans.three4th}
             tabletSpan={Spans.full}
-            style={[styles.container, !isMobile ? standardStyles.row : styles.mobileContainer]}
+            style={[
+              styles.container,
+              screen === ScreenSizes.TABLET && { justifyContent: 'center' },
+              !isMobile ? standardStyles.row : styles.mobileContainer,
+            ]}
           >
             <View style={[styles.flex1, styles.content, isMobile && standardStyles.centered]}>
               <AppLogo />
@@ -44,13 +49,7 @@ export default withScreenSize(
               </H4>
               <RequestFunds kind={RequestType.Invite} />
             </View>
-            <View
-              style={[
-                standardStyles.centered,
-                styles.flex1,
-                isMobile ? styles.mobilePhone : styles.phone,
-              ]}
-            >
+            <View style={[standardStyles.centered, styles.flex1, phoneStyle(screen)]}>
               <PhoneIllo />
             </View>
           </Cell>
@@ -59,6 +58,17 @@ export default withScreenSize(
     )
   })
 )
+
+function phoneStyle(screen: ScreenSizes) {
+  switch (screen) {
+    case ScreenSizes.MOBILE:
+      return styles.mobilePhone
+    case ScreenSizes.TABLET:
+      return styles.tabletPhone
+    default:
+      return styles.phone
+  }
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -75,13 +85,18 @@ const styles = StyleSheet.create({
   flex1: {
     flex: 1,
   },
-  phone: {
-    height: '50vh',
-    maxWidth: '45vw',
-  },
   content: {
     justifyContent: 'center',
     marginHorizontal: 20,
+    maxWidth: 350,
+  },
+  phone: {
+    height: '50vh',
+    maxWidth: 275,
+  },
+  tabletPhone: {
+    height: '35vh',
+    maxWidth: 240,
   },
   mobilePhone: {
     height: '33vh',
