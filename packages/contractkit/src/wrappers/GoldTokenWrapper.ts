@@ -48,6 +48,20 @@ export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
    * @return True if the transaction succeeds.
    */
   approve = proxySend(this.kit, this.contract.methods.approve)
+  /**
+   * Increases the allowance of another user.
+   * @param spender The address which is being approved to spend Celo Gold.
+   * @param value The increment of the amount of Celo Gold approved to the spender.
+   * @returns true if success.
+   */
+  increaseAllowance = proxySend(this.kit, this.contract.methods.increaseAllowance)
+  /**
+   * Decreases the allowance of another user.
+   * @param spender The address which is being approved to spend Celo Gold.
+   * @param value The decrement of the amount of Celo Gold approved to the spender.
+   * @returns true if success.
+   */
+  decreaseAllowance = proxySend(this.kit, this.contract.methods.decreaseAllowance)
 
   /**
    * Transfers Celo Gold from one address to another with a comment.

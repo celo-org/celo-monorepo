@@ -166,7 +166,7 @@ export function TransferFeedItem(props: Props) {
         </View>
         <View style={styles.contentContainer}>
           <View style={styles.titleContainer}>
-            <Text style={[fontStyles.semiBold, styles.title]}>{title}</Text>
+            <Text style={styles.title}>{title}</Text>
             <Text
               style={[
                 currencyStyle.direction === '-'
@@ -184,7 +184,7 @@ export function TransferFeedItem(props: Props) {
                 : getMoneyDisplayValue(props.value)}
             </Text>
           </View>
-          {!!info && <Text style={fontStyles.comment}>{info}</Text>}
+          {!!info && <Text style={styles.info}>{info}</Text>}
           <View style={[styles.statusContainer, !!info && styles.statusContainerUnderComment]}>
             {isPending && (
               <Text style={[fontStyles.bodySmall, styles.transactionStatus]}>
@@ -239,12 +239,16 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     flexDirection: 'row',
-    marginTop: 3,
+    marginTop: -1,
   },
   title: {
+    ...fontStyles.semiBold,
     fontSize: 15,
-    lineHeight: 20,
     color: colors.dark,
+  },
+  info: {
+    ...fontStyles.comment,
+    marginTop: -2,
   },
   amount: {
     marginLeft: 'auto',
