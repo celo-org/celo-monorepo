@@ -34,9 +34,13 @@ export interface ValidatorGroupVote {
   eligible: boolean
 }
 
+export interface ElectableValidators {
+  min: BigNumber
+  max: BigNumber
+}
+
 export interface ElectionConfig {
-  minElectableValidators: BigNumber
-  maxElectableValidators: BigNumber
+  electableValidators: ElectableValidators
   electabilityThreshold: BigNumber
   maxNumGroupsVotedFor: BigNumber
 }
@@ -47,23 +51,13 @@ export interface ElectionConfig {
 export class ElectionWrapper extends BaseWrapper<Election> {
   activate = proxySend(this.kit, this.contract.methods.activate)
   /**
-   * Returns the minimum number of validators that can be elected.
-   * @returns The minimum number of validators that can be elected.
+   * Returns the minimum and maximum number of validators that can be elected.
+   * @returns The minimum and maximum number of validators that can be elected.
    */
-  minElectableValidators = proxyCall(
-    this.contract.methods.minElectableValidators,
-    undefined,
-    toBigNumber
-  )
-  /**
-   * Returns the maximum number of validators that can be elected.
-   * @returns The maximum number of validators that can be elected.
-   */
-  maxElectableValidators = proxyCall(
-    this.contract.methods.maxElectableValidators,
-    undefined,
-    toBigNumber
-  )
+  async electableValidators(): Promise<ElectableValidators> {
+    const { min, max } = await this.contract.methods.electableValidators().call()
+    return { min: toBigNumber(min), max: toBigNumber(max) }
+  }
   /**
    * Returns the current election threshold.
    * @returns Election threshold.
@@ -80,8 +74,8 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     toNumber
   )
 
-  getGroupsVotedFor: (account: Address) => Promise<Address[]> = proxyCall(
-    this.contract.methods.getGroupsVotedFor
+  getGroupsVotedForByAccount: (account: Address) => Promise<Address[]> = proxyCall(
+    this.contract.methods.getGroupsVotedForByAccount
   )
 
   /**
@@ -89,16 +83,14 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    */
   async getConfig(): Promise<ElectionConfig> {
     const res = await Promise.all([
-      this.minElectableValidators(),
-      this.maxElectableValidators(),
+      this.electableValidators(),
       this.electabilityThreshold(),
       this.contract.methods.maxNumGroupsVotedFor().call(),
     ])
     return {
-      minElectableValidators: res[0],
-      maxElectableValidators: res[1],
-      electabilityThreshold: res[2],
-      maxNumGroupsVotedFor: toBigNumber(res[3]),
+      electableValidators: res[0],
+      electabilityThreshold: res[1],
+      maxNumGroupsVotedFor: toBigNumber(res[2]),
     }
   }
 
@@ -120,7 +112,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       (g) => g.address
     )
     const validatorGroupVotes = await Promise.all(
-      validatorGroupAddresses.map((g) => this.contract.methods.getGroupTotalVotes(g).call())
+      validatorGroupAddresses.map((g) => this.contract.methods.getTotalVotesForGroup(g).call())
     )
     const validatorGroupEligible = await Promise.all(
       validatorGroupAddresses.map((g) => this.contract.methods.getGroupEligibility(g).call())
@@ -133,7 +125,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   }
 
   async getEligibleValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
-    const res = await this.contract.methods.getEligibleValidatorGroupsVoteTotals().call()
+    const res = await this.contract.methods.getTotalVotesForEligibleValidatorGroups().call()
     return zip((a, b) => ({ address: a, votes: new BigNumber(b), eligible: true }), res[0], res[1])
   }
 
@@ -142,13 +134,12 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       throw new Error(`missing from at new ValdidatorUtils()`)
     }
 
-    const value = toBigNumber(await this.contract.methods.getGroupTotalVotes(validatorGroup).call())
+    const value = toBigNumber(
+      await this.contract.methods.getTotalVotesForGroup(validatorGroup).call()
+    )
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(validatorGroup, value)
 
-    return wrapSend(
-      this.kit,
-      this.contract.methods.markGroupEligible(validatorGroup, lesser, greater)
-    )
+    return wrapSend(this.kit, this.contract.methods.markGroupEligible(lesser, greater))
   }
 
   async vote(validatorGroup: Address, value: BigNumber): Promise<CeloTransactionObject<boolean>> {

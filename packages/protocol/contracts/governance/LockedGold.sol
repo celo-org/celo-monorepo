@@ -302,7 +302,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
    */
   function getAccountTotalLockedGold(address account) public view returns (uint256) {
     uint256 total = accounts[account].balances.nonvoting;
-    return total.add(getElection().getAccountTotalVotes(account));
+    return total.add(getElection().getTotalVotesByAccount(account));
   }
 
   /**

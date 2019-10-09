@@ -5,14 +5,14 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 
-import "./interfaces/IValidators.sol";
+import "./interfaces/IElection.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 import "../common/UsingRegistry.sol";
 
 
-contract Election is Ownable, ReentrancyGuard, Initializable, UsingRegistry {
+contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRegistry {
 
   using AddressSortedLinkedList for SortedLinkedList.List;
   using FixidityLib for FixidityLib.Fraction;

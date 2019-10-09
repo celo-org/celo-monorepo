@@ -1,7 +1,6 @@
 import { BaseCommand } from '../../base'
 import { printValueMapRecursive } from '../../utils/cli'
 import { Args } from '../../utils/command'
-import { eqAddress } from '@celo/utils/lib/address'
 
 export default class Show extends BaseCommand {
   static description = 'Show Locked Gold information for a given account'
@@ -19,6 +18,6 @@ export default class Show extends BaseCommand {
     const { args } = this.parse(Show)
 
     const lockedGold = await this.kit.contracts.getLockedGold()
-    printValueMapRecursive(await lockedGold.geAccountSummary(args.account))
+    printValueMapRecursive(await lockedGold.getAccountSummary(args.account))
   }
 }

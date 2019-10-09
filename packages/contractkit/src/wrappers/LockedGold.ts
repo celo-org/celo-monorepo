@@ -78,12 +78,12 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   }
 
   async getAccountSummary(account: string): Promise<AccountSummary> {
-    const nonvoting = await this.getAccountNonvotingLockedGold(args.account)
-    const total = await this.getAccountTotalLockedGold(args.account)
-    const voter = await this.getVoterFromAccount(args.account)
-    const validator = await this.getValidatorFromAccount(args.account)
-    const pendingWithdrawals = await this.getPendingWithdrawals(args.account)
-    return (info = {
+    const nonvoting = await this.getAccountNonvotingLockedGold(account)
+    const total = await this.getAccountTotalLockedGold(account)
+    const voter = await this.getVoterFromAccount(account)
+    const validator = await this.getValidatorFromAccount(account)
+    const pendingWithdrawals = await this.getPendingWithdrawals(account)
+    return {
       lockedGold: {
         total,
         nonvoting,
@@ -93,7 +93,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
         validator: eqAddress(validator, account) ? 'None' : validator,
       },
       pendingWithdrawals,
-    })
+    }
   }
 
   /**

@@ -22,7 +22,8 @@ export default class Withdraw extends BaseCommand {
     while (true) {
       let madeWithdrawal = false
       const pendingWithdrawals = await lockedgold.getPendingWithdrawals(flags.from)
-      for (const pendingWithdrawal of pendingWithdrawals) {
+      for (let i = 0; i < pendingWithdrawals.length; i++) {
+        const pendingWithdrawal = pendingWithdrawals[i]
         if (pendingWithdrawal.time.isLessThan(currentTime)) {
           console.log(
             `Found available pending withdrawal of value ${pendingWithdrawal.value.toString()}, withdrawing`
@@ -31,6 +32,9 @@ export default class Withdraw extends BaseCommand {
           madeWithdrawal = true
           break
         }
+      }
+      if (!madeWithdrawal) {
+        break
       }
     }
     const pendingWithdrawals = await lockedgold.getPendingWithdrawals(flags.from)

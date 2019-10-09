@@ -1,7 +1,14 @@
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
 import { Validators } from '../generated/types/Validators'
-import { BaseWrapper, proxyCall, proxySend, toBigNumber } from './BaseWrapper'
+import {
+  BaseWrapper,
+  CeloTransactionObject,
+  proxyCall,
+  proxySend,
+  toBigNumber,
+  wrapSend,
+} from './BaseWrapper'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 
 export interface Validator {
@@ -45,8 +52,6 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   addMember = proxySend(this.kit, this.contract.methods.addMember)
   removeMember = proxySend(this.kit, this.contract.methods.removeMember)
   registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
-  registerValidatorGroup = proxySend(this.kit, this.contract.methods.registerValidatorGroup)
-
   async registerValidatorGroup(
     name: string,
     url: string,
@@ -57,7 +62,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     }
     return wrapSend(
       this.kit,
-      this.contract.methods.registerValidatorGroup(name, url, toFixed(commission))
+      this.contract.methods.registerValidatorGroup(name, url, toFixed(commission).toFixed())
     )
   }
   /**

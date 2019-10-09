@@ -499,10 +499,11 @@ contract Governance is IGovernance, Ownable, Initializable, ReentrancyGuard, Usi
     Voter storage voter = voters[account];
     // We can upvote a proposal in the queue if we're not already upvoting a proposal in the queue.
     uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
+    require(weight > 0, "cannot upvote without locking gold");
+    require(isQueued(proposalId), "cannot upvote a proposal not in the queue");
     require(
-      isQueued(proposalId) &&
-      (voter.upvote.proposalId == 0 || !queue.contains(voter.upvote.proposalId)) &&
-      weight > 0
+      voter.upvote.proposalId == 0 || !queue.contains(voter.upvote.proposalId),
+      "cannot upvote more than one queued proposal"
     );
     uint256 upvotes = queue.getValue(proposalId).add(weight);
     queue.update(proposalId, upvotes, lesser, greater);
