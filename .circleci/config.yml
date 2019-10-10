@@ -376,6 +376,15 @@ jobs:
           name: Run Tests
           command: yarn --cwd=packages/contractkit test
 
+      - run:
+          name: Install and test the npm package
+          command: |
+            set -euo pipefail
+            cd packages/contractkit
+            yarn pack
+            cd /tmp
+            npm install ~/app/packages/contractkit/*.tgz
+
   walletkit-test:
     <<: *defaults
     steps:
@@ -396,6 +405,15 @@ jobs:
             set -euo pipefail
             yarn --cwd=packages/walletkit build alfajoresstaging
             yarn --cwd=packages/walletkit test
+
+      - run:
+          name: Install and test the npm package
+          command: |
+            set -euo pipefail
+            cd packages/walletkit
+            yarn pack
+            cd /tmp
+            npm install ~/app/packages/walletkit/*.tgz
 
   cli-test:
     <<: *defaults
@@ -430,6 +448,36 @@ jobs:
             cd /tmp
             npm install ~/app/packages/cli/celo-celocli-*.tgz
             ./node_modules/.bin/celocli account:new # Small test
+
+  typescript-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+   
+      - run:
+          name: Install and test the npm package
+          command: |
+            set -euo pipefail
+            cd packages/typescript
+            yarn pack
+            cd /tmp
+            npm install ~/app/packages/typescript/*.tgz
+
+  utils-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+   
+      - run:
+          name: Install and test the npm package
+          command: |
+            set -euo pipefail
+            cd packages/utils
+            yarn pack
+            cd /tmp
+            npm install ~/app/packages/utils/*.tgz
 
   end-to-end-geth-transfer-test:
     <<: *defaults
@@ -626,7 +674,7 @@ jobs:
   web:
     working_directory: ~/app
     docker:
-      - image: celohq/node8:gcloud
+      - image: celohq/node10-gcloud
     steps:
       - attach_workspace:
           at: ~/app
@@ -637,7 +685,7 @@ jobs:
   test-typescript-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: celohq/node8:gcloud
+      - image: celohq/node10-gcloud
     steps:
       - run:
           name: Installing npm package - @celo/typescript
@@ -646,16 +694,28 @@ jobs:
   test-utils-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: celohq/node8:gcloud
+      - image: celohq/node10-gcloud
     steps:
       - run:
           name: Installing npm package - @celo/utils
           command: yarn add @celo/utils
 
+  test-contractkit-npm-package-install:
+    working_directory: ~/app
+    docker:
+      - image: celohq/node10-gcloud
+    steps:
+      - run:
+          name: Installing npm package - @celo/contractkit
+          command: |
+            # Try one more time in case the first attempt fails
+            # to deal with scenarios like https://circleci.com/gh/celo-org/celo-monorepo/23329
+            yarn add @celo/contractkit || yarn add @celo/contractkit
+
   test-walletkit-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: celohq/node8:gcloud
+      - image: celohq/node10-gcloud
     steps:
       - run:
           name: Installing npm package - @celo/walletkit
@@ -667,7 +727,7 @@ jobs:
   test-celocli-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: celohq/node8:gcloud
+      - image: celohq/node10-gcloud
     steps:
       - run:
           name: Installing npm package - @celo/celocli
@@ -713,6 +773,12 @@ workflows:
           requires:
             - lint-checks
             - walletkit-test
+      - typescript-test:
+          requires:
+            - install_dependencies
+      - utils-test:
+          requires:
+            - install_dependencies
       - end-to-end-geth-transfer-test:
           requires:
             - lint-checks
@@ -747,6 +813,7 @@ workflows:
       - test-typescript-npm-package-install
       - test-utils-npm-package-install
       - test-walletkit-npm-package-install
+      - test-contractkit-npm-package-install
       - test-celocli-npm-package-install
   protocol-testing-with-code-coverage-cron-workflow:
     triggers:

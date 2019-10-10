@@ -30,6 +30,30 @@ export const retryAsync = async (
   throw saveError
 }
 
+// Retries an async function when it raises an exeption
+// if all the tries fail it raises the last thrown exeption
+export const retryAsyncWithBackOff = async (
+  inFunction: InFunction,
+  tries: number,
+  params: any,
+  delay = 100,
+  factor = 1.5
+) => {
+  let saveError
+  for (let i = 0; i < tries; i++) {
+    try {
+      // it awaits otherwise it'd always do all the retries
+      return await inFunction(...params)
+    } catch (error) {
+      await sleep(Math.pow(factor, i) * delay)
+      saveError = error
+      console.info(`${TAG}/@reTryAsync, Failed to execute function on try #${i}`, error)
+    }
+  }
+
+  throw saveError
+}
+
 /**
  * Map an async function over a list xs with a given concurrency level
  *
