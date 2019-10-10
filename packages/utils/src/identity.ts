@@ -1,4 +1,4 @@
-const scrypt = require('scrypt-js')
+import scrypt from 'scrypt-js'
 
 enum IdentifierTypeEnum {
   PHONE_NUMBER = 'phone_number',
