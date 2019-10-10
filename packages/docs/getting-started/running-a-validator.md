@@ -93,9 +93,9 @@ In order to allow the node to sync with the network, give it the address of exis
 
 `` $ docker run -v `pwd`:/root/.celo --entrypoint cp us.gcr.io/celo-testnet/celo-node:alfajores /celo/static-nodes.json /root/.celo/ ``
 
-Start up the node:
+Start up the node. You'll be prompted for the password to your validator account:
 
-`` $ docker run -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v `pwd`:/root/.celo us.gcr.io/celo-testnet/celo-node:alfajores --verbosity 3 --networkid 44782 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --maxpeers 1100 --mine --miner.verificationpool=https://us-central1-celo-testnet-production.cloudfunctions.net/handleVerificationRequestalfajores/v0.1/sms/ --etherbase $CELO_VALIDATOR_ADDRESS ``
+`` $ docker run -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v `pwd`:/root/.celo us.gcr.io/celo-testnet/celo-node:alfajores --verbosity 3 --networkid 44782 --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --maxpeers 1100 --mine --miner.verificationpool=https://us-central1-celo-testnet-production.cloudfunctions.net/handleVerificationRequestalfajores/v0.1/sms/ --etherbase $CELO_VALIDATOR_ADDRESS --unlock $CELO_VALIDATOR_ADDRESS ``
 
 {% hint style="danger" %}
 **Security**: The command line above includes the parameter `--rpcaddr 0.0.0.0` which makes the Celo Blockchain software listen for incoming RPC requests on all network adaptors. Exercise extreme caution in doing this when running outside Docker, as it means that any unlocked accounts and their funds may be accessed from other machines on the Internet. In the context of running a Docker container on your local machine, this together with the `docker -p` flags allows you to make RPC calls from outside the container, i.e from your local host, but not from outside your machine. Read more about [Docker Networking](https://docs.docker.com/network/network-tutorial-standalone/#use-user-defined-bridge-networks) here.
@@ -109,7 +109,7 @@ The `networkid` parameter value of `44782` indicates we are connecting the Alfaj
 
 Visit the [Alfajores Faucet](https://celo.org/build/faucet) to send **both** of your accounts some funds.
 
-In a new tab, unlock your accounts so that you can send transactions:
+In a new tab, unlock your accounts so that you can send transactions. This only unlocks the accounts for the lifetime of the validator that's running:
 
 ```
 $ celocli account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS --password <YOUR_FIRST_PASSWORD>
