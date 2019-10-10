@@ -2,6 +2,19 @@
 # and https://github.com/facebook/react-native/blob/master/.circleci/config.yml
 
 version: 2
+reference:
+  workspace: &workspace
+    ~/src
+  ## Configurations
+  android_config: &android_config
+    working_directory: *workspace
+    macos:
+      xcode: "10.2.1"
+    shell: /bin/bash --login -eo pipefail
+    environment:
+      TERM: dumb
+      JVM_OPTS: -Xmx3200m
+
 
 defaults: &defaults
   working_directory: ~/app
@@ -104,6 +117,125 @@ jobs:
           paths:
             - .
 
+  mobile_e2e_test:
+    <<: *android_config
+    resource_class: large
+    steps:
+      - checkout
+      - run: cd ~/src/
+      - restore_cache:
+          keys:
+            - yarn-v4-macos-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - yarn-v4-macos-{{ .Branch }}-
+            - yarn-v4-macos-
+            - yarn-v4-
+      - restore_cache:
+          keys:
+            - android-emulator-image-v3-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
+      - run:
+          name: Setup environment variables
+          command: |
+            echo 'export PATH="$PATH:/usr/local/opt/node@8/bin:${HOME}/.yarn/bin:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin:/usr/local/share/android-sdk/tools/bin"' >> $BASH_ENV
+            echo 'export ANDROID_HOME="/usr/local/share/android-sdk"' >> $BASH_ENV
+            echo 'export ANDROID_SDK_HOME="/usr/local/share/android-sdk"' >> $BASH_ENV
+            echo 'export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"' >> $BASH_ENV
+            echo 'export QEMU_AUDIO_DRV=none' >> $BASH_ENV
+            export PATH=$PATH:/usr/local/share/android-sdk/platform-tools/
+      - run:
+          name: Install Android sdk
+          command: |
+            HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/cask
+            HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-sdk
+      - run:
+          name: Install emulator dependencies
+          command: (yes | bash ./packages/mobile/scripts/install_android_emulator_image.sh > /dev/null) || true
+      - save_cache:
+          key: android-emulator-image-v3-{{ checksum "packages/mobile/scripts/install_android_emulator_image.sh" }}
+          paths:
+            - /usr/local/Caskroom/android-sdk/*
+      - run:
+          name: Install Android dependencies
+          command: |
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install cask
+            HOMEBREW_NO_AUTO_UPDATE=1 brew cask install android-platform-tools
+            HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/cask-versions
+            HOMEBREW_NO_AUTO_UPDATE=1 brew cask install homebrew/cask-versions/adoptopenjdk8
+      - run: 
+          name: Creace Android Virtual Device (AVD)
+          command: |
+            avdmanager create avd -n Nexus_5X_API_28_x86 -k "system-images;android-26;google_apis;x86" -g google_apis -d "Nexus 5"
+            # Copy device configuarion, adv for some reason doesn't
+            mkdir -p ~/.android/avd/Nexus_5X_API_28_x86.avd/ && cp packages/mobile/e2e/conf/avd_conf.ini ~/.android/avd/Nexus_5X_API_28_x86.avd/config.ini
+      - run:
+          name: Set up nodejs
+          command: |
+            echo `. ~/.bash_profile` # for some mreason just `source ~/.bash_profile` makes the build fail
+            # install nvm
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install wget
+            wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | bash
+            echo -e '\nexport NVM_DIR="$HOME/.nvm"' >> ~/.bash_profile
+            echo -e '\n[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bash_profile # add nvm to path
+      - run: echo `. ~/.bash_profile`
+      - run: nvm install v10.16.3 && nvm use v10.16.3
+      - run:
+          name: install miscellaneous
+          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install tree
+      # Currently not used
+      # - run: npm install --global react-native-kill-packager 
+      - run:
+          # need to run this because it's another OS than install_dependecies job
+          name: yarn
+          command: |
+            # TODO, Make cache work and figure out why this doesn't work
+            # if [ ! -d node_modules ]; then
+            #     echo "No cache found, install yarn. Hold tight."
+            #     yarn
+            # else
+            #   echo "Cache found, just run post-script."
+            #   yarn postinstall
+            # fi
+            yarn
+            yarn build 
+      - save_cache:
+          key: yarn-v4-macos-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/src/node_modules
+            - ~/src/packages/*/node_modules
+            - ~/.cache/yarn
+      - run:
+          name: Install some extra dependencies the app needs
+          command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pidcat watchman
+      - restore_cache:
+          key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
+      - run: cd ~/src/packages/mobile && yarn test:build-e2e # tests seem to fail if the app is built at the same time the emulator runs
+      - run:
+          name: Start emulator
+          command: cd ~/src/packages/mobile && bash ./scripts/start_emulator.sh
+          background: true
+      - run: 
+          name: Start metro
+          command: cd ~/src/packages/mobile && yarn start
+          background: true
+      - run: cp node_modules/.bin/jest packages/mobile/node_modules/.bin/ # for some reason jest is just not there
+      # TODO - run: lock device
+      - run: tree packages/mobile/android/app/build/outputs/apk/
+      - run:
+          name: Sleep until Device connects
+          command: cd ~/src/packages/mobile && bash ./scripts/wait_for_emulator_to_connect.sh
+      # TODO - run: unlock device
+      - run:
+          name: Run yarn dev
+          command: cd ~/src/packages/mobile && ENVFILE=".env.test" yarn dev
+      - run:
+          name: Run test itself
+          command: cd ~/src/packages/mobile && ENVFILE=".env.test" yarn test:detox
+      - run: cd ~/src
+      - save_cache:
+          key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
+          paths:
+            - ~/src/packages/mobile/android/app/build/outputs/apk/
+            - ~/.gradle/
+  
   lint-checks:
     <<: *defaults
     steps:
@@ -244,6 +376,15 @@ jobs:
           name: Run Tests
           command: yarn --cwd=packages/contractkit test
 
+      - run:
+          name: Install and test the npm package
+          command: |
+            set -euo pipefail
+            cd packages/contractkit
+            yarn pack
+            cd /tmp
+            npm install ~/app/packages/contractkit/*.tgz
+
   walletkit-test:
     <<: *defaults
     steps:
@@ -264,6 +405,15 @@ jobs:
             set -euo pipefail
             yarn --cwd=packages/walletkit build alfajoresstaging
             yarn --cwd=packages/walletkit test
+
+      - run:
+          name: Install and test the npm package
+          command: |
+            set -euo pipefail
+            cd packages/walletkit
+            yarn pack
+            cd /tmp
+            npm install ~/app/packages/walletkit/*.tgz
 
   cli-test:
     <<: *defaults
@@ -288,6 +438,46 @@ jobs:
           name: Verify that a new account can be created
           command: |
             yarn --cwd=packages/cli run celocli account:new
+
+      - run:
+          name: Install and test the npm package
+          command: |
+            set -euo pipefail
+            cd packages/cli
+            yarn pack
+            cd /tmp
+            npm install ~/app/packages/cli/celo-celocli-*.tgz
+            ./node_modules/.bin/celocli account:new # Small test
+
+  typescript-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+   
+      - run:
+          name: Install and test the npm package
+          command: |
+            set -euo pipefail
+            cd packages/typescript
+            yarn pack
+            cd /tmp
+            npm install ~/app/packages/typescript/*.tgz
+
+  utils-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+   
+      - run:
+          name: Install and test the npm package
+          command: |
+            set -euo pipefail
+            cd packages/utils
+            yarn pack
+            cd /tmp
+            npm install ~/app/packages/utils/*.tgz
 
   end-to-end-geth-transfer-test:
     <<: *defaults
@@ -327,6 +517,45 @@ jobs:
             cd packages/celotool
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
             ./ci_test_transfers.sh checkout master
+
+  end-to-end-geth-exit-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
+            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+      - run:
+          name: Setup Go language
+          command: |
+            set -e
+            set -v
+            wget https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz
+            tar xf go1.11.5.linux-amd64.tar.gz -C /tmp
+            ls /tmp/go/bin/go
+            /tmp/go/bin/go version
+      - run:
+          name: Setup Rust language
+          command: |
+            set -e
+            set -v
+            curl https://sh.rustup.rs -sSf | sh -s -- -y
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+            rustup install 1.36.0
+            rustup default 1.36.0
+      - run:
+          name: Run test
+          no_output_timeout: 20m
+          command: |
+            set -e
+            export PATH=${PATH}:~/.cargo/bin:/tmp/go/bin
+            go version
+            cd packages/celotool
+            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+            ./ci_test_exit.sh checkout master
 
   end-to-end-geth-governance-test:
     <<: *defaults
@@ -445,7 +674,7 @@ jobs:
   web:
     working_directory: ~/app
     docker:
-      - image: celohq/node8:gcloud
+      - image: celohq/node10-gcloud
     steps:
       - attach_workspace:
           at: ~/app
@@ -456,7 +685,7 @@ jobs:
   test-typescript-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: celohq/node8:gcloud
+      - image: celohq/node10-gcloud
     steps:
       - run:
           name: Installing npm package - @celo/typescript
@@ -465,16 +694,28 @@ jobs:
   test-utils-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: celohq/node8:gcloud
+      - image: celohq/node10-gcloud
     steps:
       - run:
           name: Installing npm package - @celo/utils
           command: yarn add @celo/utils
 
+  test-contractkit-npm-package-install:
+    working_directory: ~/app
+    docker:
+      - image: celohq/node10-gcloud
+    steps:
+      - run:
+          name: Installing npm package - @celo/contractkit
+          command: |
+            # Try one more time in case the first attempt fails
+            # to deal with scenarios like https://circleci.com/gh/celo-org/celo-monorepo/23329
+            yarn add @celo/contractkit || yarn add @celo/contractkit
+
   test-walletkit-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: celohq/node8:gcloud
+      - image: celohq/node10-gcloud
     steps:
       - run:
           name: Installing npm package - @celo/walletkit
@@ -486,7 +727,7 @@ jobs:
   test-celocli-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: celohq/node8:gcloud
+      - image: celohq/node10-gcloud
     steps:
       - run:
           name: Installing npm package - @celo/celocli
@@ -500,6 +741,10 @@ workflows:
   celo-monorepo-build:
     jobs:
       - install_dependencies
+      - mobile_e2e_test:
+          requires:
+            - install_dependencies
+            - mobile-test-build-app
       - lint-checks:
           requires:
             - install_dependencies
@@ -528,7 +773,17 @@ workflows:
           requires:
             - lint-checks
             - walletkit-test
+      - typescript-test:
+          requires:
+            - install_dependencies
+      - utils-test:
+          requires:
+            - install_dependencies
       - end-to-end-geth-transfer-test:
+          requires:
+            - lint-checks
+            - walletkit-test
+      - end-to-end-geth-exit-test:
           requires:
             - lint-checks
             - walletkit-test
@@ -558,6 +813,7 @@ workflows:
       - test-typescript-npm-package-install
       - test-utils-npm-package-install
       - test-walletkit-npm-package-install
+      - test-contractkit-npm-package-install
       - test-celocli-npm-package-install
   protocol-testing-with-code-coverage-cron-workflow:
     triggers:

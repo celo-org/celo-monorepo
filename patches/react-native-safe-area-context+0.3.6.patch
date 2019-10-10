@@ -1,0 +1,33 @@
+patch-package
+--- a/node_modules/react-native-safe-area-context/android/gradle.properties
++++ b/node_modules/react-native-safe-area-context/android/gradle.properties
+@@ -2,5 +2,5 @@ ReactNativeSafeAreaView_compileSdkVersion=28
+ ReactNativeSafeAreaView_buildToolsVersion=28.0.3
+ ReactNativeSafeAreaView_targetSdkVersion=27
+ ReactNativeSafeAreaView_minSdkVersion=16
+-android.useAndroidX=true
+-android.enableJetifier=true
++android.useAndroidX=false
++android.enableJetifier=false
+--- a/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaView.java
++++ b/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaView.java
+@@ -13,7 +13,7 @@ import android.view.WindowManager;
+ import com.facebook.infer.annotation.Assertions;
+ import com.facebook.react.views.view.ReactViewGroup;
+ 
+-import androidx.annotation.Nullable;
++import android.support.annotation.Nullable;
+ 
+ public class SafeAreaView extends ReactViewGroup implements ViewTreeObserver.OnGlobalLayoutListener {
+   public interface OnInsetsChangeListener {
+--- a/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaViewManager.java
++++ b/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaViewManager.java
+@@ -8,7 +8,7 @@ import com.facebook.react.uimanager.events.EventDispatcher;
+ 
+ import java.util.Map;
+ 
+-import androidx.annotation.NonNull;
++import android.support.annotation.NonNull;
+ 
+ public class SafeAreaViewManager extends ViewGroupManager<SafeAreaView> {
+   @Override

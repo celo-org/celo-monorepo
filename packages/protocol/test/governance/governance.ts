@@ -1625,29 +1625,6 @@ contract('Governance', (accounts: string[]) => {
           await assertRevert(governance.execute(proposalId, index))
         })
       })
-
-      describe('when the proposal cannot execute because it is not a contract address', () => {
-        beforeEach(async () => {
-          await governance.propose(
-            [transactionSuccess1.value],
-            [accounts[1]],
-            transactionSuccess1.data,
-            [transactionSuccess1.data.length],
-            // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-            { value: minDeposit }
-          )
-          await timeTravel(dequeueFrequency, web3)
-          await governance.approve(proposalId, index)
-          await timeTravel(approvalStageDuration, web3)
-          await mockLockedGold.setWeight(account, weight)
-          await governance.vote(proposalId, index, value)
-          await timeTravel(referendumStageDuration, web3)
-        })
-
-        it('should revert', async () => {
-          await assertRevert(governance.execute(proposalId, index))
-        })
-      })
     })
 
     describe('when executing a proposal with two transactions', () => {
