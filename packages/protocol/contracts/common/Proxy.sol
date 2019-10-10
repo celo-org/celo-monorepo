@@ -39,7 +39,9 @@ contract Proxy {
       implementationAddress := sload(implementationPosition)
     }
 
-    require(AddressesHelper.isContract(implementationAddress), "Invalid contract address");
+	if (implementationAddress == address(0)) return;
+    
+	require(AddressesHelper.isContract(implementationAddress), "Invalid contract address");
 
     assembly {
       let newCallDataPosition := mload(0x40)
