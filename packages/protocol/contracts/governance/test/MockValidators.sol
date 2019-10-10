@@ -10,6 +10,7 @@ contract MockValidators is IValidators {
   mapping(address => bool) private _isValidating;
   mapping(address => bool) private _isVoting;
   mapping(address => uint256) private numGroupMembers;
+  mapping(address => uint256) private balanceRequirements;
   mapping(address => address[]) private members;
   uint256 private numRegisteredValidators;
 
@@ -43,6 +44,14 @@ contract MockValidators is IValidators {
 
   function setMembers(address group, address[] calldata _members) external {
     members[group] = _members;
+  }
+
+  function setAccountBalanceRequirement(address account, uint256 value) external {
+    balanceRequirements[account] = value;
+  }
+
+  function getAccountBalanceRequirement(address account) external view returns (uint256) {
+    return balanceRequirements[account];
   }
 
   function getTopGroupValidators(

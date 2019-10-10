@@ -7,9 +7,12 @@ import { LockedGold } from '../generated/types/LockedGold'
 import {
   BaseWrapper,
   CeloTransactionObject,
+  NumberLike,
+  parseNumber,
   proxyCall,
   proxySend,
   toBigNumber,
+  tupleParser,
   wrapSend,
 } from '../wrappers/BaseWrapper'
 
@@ -45,11 +48,21 @@ export interface LockedGoldConfig {
  * Contract for handling deposits needed for voting.
  */
 export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
-  unlock = proxySend(this.kit, this.contract.methods.unlock)
+  unlock: (value: NumberLike) => CeloTransactionObject<void> = proxySend(
+    this.kit,
+    this.contract.methods.unlock,
+    tupleParser(parseNumber)
+  )
   createAccount = proxySend(this.kit, this.contract.methods.createAccount)
-  withdraw = proxySend(this.kit, this.contract.methods.withdraw)
+  withdraw: (index: number) => CeloTransactionObject<void> = proxySend(
+    this.kit,
+    this.contract.methods.withdraw
+  )
   lock = proxySend(this.kit, this.contract.methods.lock)
-  relock = proxySend(this.kit, this.contract.methods.relock)
+  relock: (index: number) => CeloTransactionObject<void> = proxySend(
+    this.kit,
+    this.contract.methods.relock
+  )
 
   getAccountTotalLockedGold = proxyCall(
     this.contract.methods.getAccountTotalLockedGold,

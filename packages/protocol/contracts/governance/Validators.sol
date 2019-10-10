@@ -30,12 +30,29 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
   uint256 constant MAX_INT = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 
-  struct RegistrationRequirements {
+  // If an account has not registered a validator or group, these values represent the minimum
+  // amount of Locked Gold required to do so.
+  // If an account has a registered a validator or validator group, these values represent the
+  // minimum amount of Locked Gold required in order to earn epoch rewards. Furthermore, the
+  // account will not be able to unlock Gold if it would cause the account to fall below
+  // these values.
+  // If an account has deregistered a validator or validator group and is still subject to the
+  // `DeregistrationLockup`, the account will not be able to unlock Gold if it would cause the
+  // account to fall below these values.
+  struct BalanceRequirements {
     uint256 group;
     uint256 validator;
   }
 
+  // After deregistering a validator or validator group, the account will remain subject to the
+  // current balance requirements for this long (in seconds).
   struct DeregistrationLockups {
+    uint256 group;
+    uint256 validator;
+  }
+
+  // Stores the timestamps at which deregistration of a validator or validator group occurred.
+  struct DeregistrationTimestamps {
     uint256 group;
     uint256 validator;
   }
@@ -74,9 +91,10 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
   mapping(address => ValidatorGroup) private groups;
   mapping(address => Validator) private validators;
+  mapping(address => DeregistrationTimestamps) private deregistrationTimestamps;
   address[] private _groups;
   address[] private _validators;
-  RegistrationRequirements public registrationRequirements;
+  BalanceRequirements public balanceRequirements;
   DeregistrationLockups public deregistrationLockups;
   ValidatorScoreParameters private validatorScoreParameters;
   uint256 public validatorEpochPayment;
@@ -97,7 +115,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     uint256 adjustmentSpeed
   );
 
-  event RegistrationRequirementsSet(
+  event BalanceRequirementsSet(
     uint256 group,
     uint256 validator
   );
@@ -190,7 +208,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(validatorScoreAdjustmentSpeed <= FixidityLib.fixed1().unwrap());
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    registrationRequirements = RegistrationRequirements(groupRequirement, validatorRequirement);
+    balanceRequirements = BalanceRequirements(groupRequirement, validatorRequirement);
     deregistrationLockups = DeregistrationLockups(groupLockup, validatorLockup);
     validatorScoreParameters = ValidatorScoreParameters(
       validatorScoreExponent,
@@ -257,7 +275,9 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @return True upon success.
    * @dev The new requirement is only enforced for future validator or group registrations.
    */
-  function setRegistrationRequirements(
+  // TODO(asa): Allow validators to adjust their LockedGold MustMaintain if the registration
+  // requirements fall.
+  function setBalanceRequirements(
     uint256 groupRequirement,
     uint256 validatorRequirement
   )
@@ -266,11 +286,11 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     returns (bool)
   {
     require(
-      groupRequirement != registrationRequirements.group ||
-      validatorRequirement != registrationRequirements.validator
+      groupRequirement != balanceRequirements.group ||
+      validatorRequirement != balanceRequirements.validator
     );
-    registrationRequirements = RegistrationRequirements(groupRequirement, validatorRequirement);
-    emit RegistrationRequirementsSet(groupRequirement, validatorRequirement);
+    balanceRequirements = BalanceRequirements(groupRequirement, validatorRequirement);
+    emit BalanceRequirementsSet(groupRequirement, validatorRequirement);
     return true;
   }
 
@@ -332,14 +352,13 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
     address account = getLockedGold().getAccountFromActiveValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
-    require(meetsValidatorRegistrationRequirement(account));
+    require(meetsValidatorBalanceRequirements(account));
 
     validators[account].name = name;
     validators[account].url = url;
     validators[account].publicKeysData = publicKeysData;
     _validators.push(account);
     updateMembershipHistory(account, address(0));
-    getLockedGold().setAccountMustMaintain(account, registrationRequirements.validator, MAX_INT);
     emit ValidatorRegistered(account, name, url, publicKeysData);
     return true;
   }
@@ -360,8 +379,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param account The account.
    * @return Whether an account meets the requirements to register a validator.
    */
-  function meetsValidatorRegistrationRequirement(address account) public view returns (bool) {
-    return getLockedGold().getAccountTotalLockedGold(account) >= registrationRequirements.validator;
+  function meetsValidatorBalanceRequirements(address account) public view returns (bool) {
+    return getLockedGold().getAccountTotalLockedGold(account) >= balanceRequirements.validator;
   }
 
   /**
@@ -369,8 +388,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param account The account.
    * @return Whether an account meets the requirements to register a group.
    */
-  function meetsValidatorGroupRegistrationRequirement(address account) public view returns (bool) {
-    return getLockedGold().getAccountTotalLockedGold(account) >= registrationRequirements.group;
+  function meetsValidatorGroupBalanceRequirements(address account) public view returns (bool) {
+    return getLockedGold().getAccountTotalLockedGold(account) >= balanceRequirements.group;
   }
 
   function getValidatorScoreParameters() external view returns (uint256, uint256) {
@@ -469,11 +488,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     }
     delete validators[account];
     deleteElement(_validators, account, index);
-    getLockedGold().setAccountMustMaintain(
-      account,
-      registrationRequirements.validator,
-      now.add(deregistrationLockups.validator)
-    );
+    deregistrationTimestamps[account].validator = now;
     emit ValidatorDeregistered(account);
     return true;
   }
@@ -532,14 +547,13 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
     address account = getLockedGold().getAccountFromActiveValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
-    require(meetsValidatorGroupRegistrationRequirement(account));
+    require(meetsValidatorGroupBalanceRequirements(account));
 
     ValidatorGroup storage group = groups[account];
     group.name = name;
     group.url = url;
     group.commission = FixidityLib.wrap(commission);
     _groups.push(account);
-    getLockedGold().setAccountMustMaintain(account, registrationRequirements.group, MAX_INT);
     emit ValidatorGroupRegistered(account, name, url);
     return true;
   }
@@ -556,11 +570,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(isValidatorGroup(account) && groups[account].members.numElements == 0);
     delete groups[account];
     deleteElement(_groups, account, index);
-    getLockedGold().setAccountMustMaintain(
-      account,
-      registrationRequirements.group,
-      now.add(deregistrationLockups.group)
-    );
+    deregistrationTimestamps[account].group = now;
     emit ValidatorGroupDeregistered(account);
     return true;
   }
@@ -662,6 +672,32 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     group.members.update(validator, lesserMember, greaterMember);
     emit ValidatorGroupMemberReordered(account, validator);
     return true;
+  }
+
+  /**
+   * @notice Returns the locked gold balance requirement for the supplied account.
+   * @param account The account that may have to meet locked gold balance requirements.
+   * @return The locked gold balance requirement for the supplied account.
+   */
+  function getAccountBalanceRequirement(address account) external view returns (uint256) {
+    DeregistrationTimestamps storage timestamps = deregistrationTimestamps[account];
+    if (
+      isValidator(account) ||
+      (timestamps.validator > 0 && now < timestamps.validator.add(deregistrationLockups.validator))
+    ) {
+      return balanceRequirements.validator;
+    }
+    if (
+      isValidatorGroup(account) ||
+      (timestamps.group > 0 && now < timestamps.group.add(deregistrationLockups.group))
+    ) {
+      return balanceRequirements.group;
+    }
+    return 0;
+  }
+
+  function getDeregistrationTimestamps(address account) external view returns (uint256, uint256) {
+    return (deregistrationTimestamps[account].group, deregistrationTimestamps[account].validator);
   }
 
   /**
@@ -773,8 +809,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @notice Returns the Locked Gold requirements to register a validator or group.
    * @return The locked gold requirements to register a validator or group.
    */
-  function getRegistrationRequirements() external view returns (uint256, uint256) {
-    return (registrationRequirements.group, registrationRequirements.validator);
+  function getBalanceRequirements() external view returns (uint256, uint256) {
+    return (balanceRequirements.group, balanceRequirements.validator);
   }
 
   /**

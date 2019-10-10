@@ -13,19 +13,12 @@ contract MockLockedGold {
 
   using SafeMath for uint256;
 
-  struct MustMaintain {
-    uint256 value;
-    uint256 timestamp;
-  }
-
   struct Authorizations {
     address validator;
     address voter;
   }
 
   mapping(address => uint256) public accountTotalLockedGold;
-  // TODO(asa): Rename to minimumBalance
-  mapping(address => MustMaintain) public mustMaintain;
   mapping(address => uint256) public nonvotingAccountBalance;
   mapping(address => address) public authorizedValidators;
   uint256 private totalLockedGold;
@@ -57,23 +50,6 @@ contract MockLockedGold {
 
   function decrementNonvotingAccountBalance(address account, uint256 value) external {
     nonvotingAccountBalance[account] = nonvotingAccountBalance[account].sub(value);
-  }
-
-  function setAccountMustMaintain(
-    address account,
-    uint256 value,
-    uint256 timestamp
-  )
-    external
-    returns (bool)
-  {
-    mustMaintain[account] = MustMaintain(value, timestamp);
-    return true;
-  }
-
-  function getAccountMustMaintain(address account) external view returns (uint256, uint256) {
-    MustMaintain storage m = mustMaintain[account];
-    return (m.value, m.timestamp);
   }
 
   function setAccountTotalLockedGold(address account, uint256 value) external {

@@ -27,7 +27,7 @@ export interface ValidatorGroup {
   commission: BigNumber
 }
 
-export interface RegistrationRequirements {
+export interface BalanceRequirements {
   group: BigNumber
   validator: BigNumber
 }
@@ -38,7 +38,7 @@ export interface DeregistrationLockups {
 }
 
 export interface ValidatorsConfig {
-  registrationRequirements: RegistrationRequirements
+  balanceRequirements: BalanceRequirements
   deregistrationLockups: DeregistrationLockups
   maxGroupSize: BigNumber
 }
@@ -69,8 +69,8 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * Returns the current registration requirements.
    * @returns Group and validator registration requirements.
    */
-  async getRegistrationRequirements(): Promise<RegistrationRequirements> {
-    const res = await this.contract.methods.getRegistrationRequirements().call()
+  async getBalanceRequirements(): Promise<BalanceRequirements> {
+    const res = await this.contract.methods.getBalanceRequirements().call()
     return {
       group: toBigNumber(res[0]),
       validator: toBigNumber(res[1]),
@@ -90,12 +90,12 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
   async getConfig(): Promise<ValidatorsConfig> {
     const res = await Promise.all([
-      this.getRegistrationRequirements(),
+      this.getBalanceRequirements(),
       this.getDeregistrationLockups(),
       this.contract.methods.maxGroupSize().call(),
     ])
     return {
-      registrationRequirements: res[0],
+      balanceRequirements: res[0],
       deregistrationLockups: res[1],
       maxGroupSize: toBigNumber(res[2]),
     }

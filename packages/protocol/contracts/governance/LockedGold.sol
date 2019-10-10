@@ -14,13 +14,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
 
   using SafeMath for uint256;
 
-  struct MustMaintain {
-    // The Locked Gold balance that the account must maintain.
-    uint256 value;
-    // The timestamp at which the account is no longer subject to these constraints.
-    uint256 timestamp;
-  }
-
   struct AuthorizedBy {
     address account;
     bool active;
@@ -46,8 +39,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     uint256 nonvoting;
     // Gold that has been unlocked and will become available for withdrawal.
     PendingWithdrawal[] pendingWithdrawals;
-    // Balance requirements imposed on this account.
-    MustMaintain requirements;
   }
 
   struct Account {
@@ -71,7 +62,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   event GoldLocked(address indexed account, uint256 value);
   event GoldUnlocked(address indexed account, uint256 value, uint256 available);
   event GoldWithdrawn(address indexed account, uint256 value);
-  event AccountMustMaintainSet(address indexed account, uint256 value, uint256 timestamp);
 
   function initialize(address registryAddress, uint256 _unlockingPeriod) external initializer {
     _transferOwnership(msg.sender);
@@ -203,11 +193,8 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   function unlock(uint256 value) external nonReentrant {
     require(isAccount(msg.sender));
     Account storage account = accounts[msg.sender];
-    MustMaintain storage requirement = account.balances.requirements;
-    require(
-      now >= requirement.timestamp ||
-      getAccountTotalLockedGold(msg.sender).sub(value) >= requirement.value
-    );
+    uint256 balanceRequirement = getValidators().getAccountBalanceRequirement(msg.sender);
+    require(balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value));
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);
     account.balances.pendingWithdrawals.push(PendingWithdrawal(value, available));
@@ -243,27 +230,6 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     deletePendingWithdrawal(account.balances.pendingWithdrawals, index);
     require(getGoldToken().transfer(msg.sender, value));
     emit GoldWithdrawn(msg.sender, value);
-  }
-
-  /**
-   * @notice Sets account locked gold balance requirements.
-   * @param account The account for which to set balance requirements.
-   * @param value The value that the account must maintain.
-   * @param timestamp The timestamp after which the account no longer must maintain this balance.
-   * @dev Can only be called by the registered "Validators" smart contract.
-   */
-  function setAccountMustMaintain(
-    address account,
-    uint256 value,
-    uint256 timestamp
-  )
-    public
-    onlyRegisteredContract(VALIDATORS_REGISTRY_ID)
-    nonReentrant
-    returns (bool)
-  {
-    accounts[account].balances.requirements = MustMaintain(value, timestamp);
-    emit AccountMustMaintainSet(account, value, timestamp);
   }
 
   // TODO(asa): Dedup

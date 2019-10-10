@@ -6,10 +6,12 @@ import { Election } from '../generated/types/Election'
 import {
   BaseWrapper,
   CeloTransactionObject,
+  identity,
   proxyCall,
   proxySend,
   toBigNumber,
   toNumber,
+  tupleParser,
   wrapSend,
 } from './BaseWrapper'
 
@@ -67,7 +69,11 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     undefined,
     toBigNumber
   )
-  validatorAddressFromCurrentSet = proxyCall(this.contract.methods.validatorAddressFromCurrentSet)
+  validatorAddressFromCurrentSet: (index: number) => Promise<Address> = proxyCall(
+    this.contract.methods.validatorAddressFromCurrentSet,
+    tupleParser<number, number>(identity)
+  )
+
   numberValidatorsInCurrentSet = proxyCall(
     this.contract.methods.numberValidatorsInCurrentSet,
     undefined,
