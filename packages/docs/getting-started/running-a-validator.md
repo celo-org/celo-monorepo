@@ -109,7 +109,7 @@ The `networkid` parameter value of `44784` indicates we are connecting the Alfaj
 
 Visit the [Alfajores Faucet](https://celo.org/build/faucet) to send **both** of your accounts some funds.
 
-In a new tab, unlock your accounts so that you can send transactions:
+In a new tab, unlock your accounts so that you can send transactions. This only unlocks the accounts for the lifetime of the validator that's running, so be sure to unlock `$CELO_VALIDATOR_ADDRESS` again if your node gets restarted:
 
 ```
 $ celocli account:unlock --account $CELO_VALIDATOR_GROUP_ADDRESS --password <YOUR_FIRST_PASSWORD>
