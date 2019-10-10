@@ -7,8 +7,7 @@ promtosd:
 blockscout:
   image:
     repository: gcr.io/celo-testnet/blockscout
-    webTag: web
-    indexerTag: indexer
+    tag: v2.0.4-beta-celo
   db:
     # ip: must be provided at runtime # IP address of the postgres DB
     # connection_name: must be provided at runtime # name of the cloud sql connection

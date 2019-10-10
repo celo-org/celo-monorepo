@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: blockscout-web
-        image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.webTag }}
+        image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         command: ["/bin/sh"]
         args: ["-c", "echo Sleeping for 15; sleep 15; mix ecto.migrate"]
