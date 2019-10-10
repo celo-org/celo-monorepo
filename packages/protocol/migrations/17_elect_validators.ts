@@ -164,15 +164,19 @@ module.exports = async (_deployer: any) => {
   for (let i = 0; i < valKeys.length; i++) {
     const key = valKeys[i]
     const address = generateAccountAddressFromPrivateKey(key.slice(2))
-    const addTx =
-      i === 0
-        ? // @ts-ignore
-          validators.contract.methods.addFirstMember(address, NULL_ADDRESS, NULL_ADDRESS)
-        : // @ts-ignore
-          validators.contract.methods.addMember(address)
-    await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
-      to: validators.address,
-    })
+    if (i === 0) {
+      // @ts-ignore
+      const addTx = validators.contract.methods.addFirstMember(address, NULL_ADDRESS, NULL_ADDRESS)
+      await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
+        to: validators.address,
+      })
+    } else {
+      // @ts-ignore
+      const addTx = validators.contract.methods.addMember(address)
+      await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
+        to: validators.address,
+      })
+    }
   }
 
   console.info('  Voting for Validator Group ...')
