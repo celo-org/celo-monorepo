@@ -5,6 +5,7 @@ import { StyleSheet } from 'react-native'
 import InfoIcon from 'src/icons/InfoIcon'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+
 function navigateToEducate() {
   navigate(Screens.FeeEducation, {})
 }

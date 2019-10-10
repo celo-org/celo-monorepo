@@ -2,7 +2,7 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { PaymentRequestStatuses } from 'src/account'
+import { PaymentRequestStatus } from 'src/account'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import PaymentRequestSummaryNotification from 'src/notifications/PaymentRequestSummaryNotification'
 import { createMockStore } from 'test/utils'
@@ -24,7 +24,7 @@ const fakeRequests = [
     requesterE164Number,
     requesteeAddress,
     requesterAddress,
-    status: PaymentRequestStatuses.REQUESTED,
+    status: PaymentRequestStatus.REQUESTED,
     currency,
     notified: true,
   },
@@ -37,7 +37,7 @@ const fakeRequests = [
     requesterE164Number,
     requesteeAddress,
     requesterAddress,
-    status: PaymentRequestStatuses.REQUESTED,
+    status: PaymentRequestStatus.REQUESTED,
     currency,
     notified: true,
   },
@@ -50,16 +50,12 @@ const fakeRequests = [
     requesterE164Number,
     requesteeAddress,
     requesterAddress,
-    status: PaymentRequestStatuses.REQUESTED,
+    status: PaymentRequestStatus.REQUESTED,
     currency,
     notified: true,
   },
 ]
 const store = createMockStore()
-
-jest.mock('src/web3/contracts', () => ({
-  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
-}))
 
 describe('PaymentRequestSummaryNotification', () => {
   it('renders correctly', () => {

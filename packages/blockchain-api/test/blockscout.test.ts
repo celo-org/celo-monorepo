@@ -18,7 +18,22 @@ jest.mock('../src/config.ts', () => {
   return {
     ...jest.requireActual('../src/config.ts'),
     FAUCET_ADDRESS: '0x0000000000000000000000000000000000f40c37',
-    ATTESTATIONS_ADDRESS: '0x0000000000000000000000000000000000a77357',
+  }
+})
+
+jest.mock('../src/utils.ts', () => {
+  const contractGetter = jest.fn()
+  const tokenAddressMapping: { [key: string]: string } = {
+    ['0x000000000000000000000000000000000000gold']: 'Celo Gold',
+    ['0x0000000000000000000000000000000000dollar']: 'Celo Dollar',
+  }
+  contractGetter.mockReturnValue({
+    tokenAddressMapping,
+    attestationsAddress: '0x0000000000000000000000000000000000a77357',
+  })
+  return {
+    ...jest.requireActual('../src/utils.ts'),
+    getContractAddresses: contractGetter,
   }
 })
 
