@@ -50,28 +50,6 @@ const electionAbi = [
   },
 ]
 
-const registryAbi = [
-  {
-    constant: true,
-    inputs: [
-      {
-        name: 'identifier',
-        type: 'string',
-      },
-    ],
-    name: 'getAddressForString',
-    outputs: [
-      {
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-]
-
 const validatorsAbi = [
   {
     constant: true,
@@ -221,7 +199,6 @@ describe('governance tests', () => {
   let election: any
   let validators: any
   let goldToken: any
-  let registry: any
 
   before(async function(this: any) {
     this.timeout(0)
@@ -235,7 +212,6 @@ describe('governance tests', () => {
     web3 = new Web3('http://localhost:8545')
     goldToken = new web3.eth.Contract(erc20Abi, await getContractAddress('GoldTokenProxy'))
     validators = new web3.eth.Contract(validatorsAbi, await getContractAddress('ValidatorsProxy'))
-    registry = new web3.eth.Contract(registryAbi, '0x000000000000000000000000000000000000ce10')
     election = new web3.eth.Contract(electionAbi, await getContractAddress('ElectionProxy'))
   }
 
