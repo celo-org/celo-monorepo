@@ -26,6 +26,7 @@ export interface GethInstanceConfig {
   privateKey?: string
   etherbase?: string
   peers?: string[]
+  sentries?: string[2][]
   pid?: number
   isProxied?: boolean
   isSentry?: boolean
@@ -233,13 +234,13 @@ export async function addStaticPeers(datadir: string, enodes: string[]) {
 }
 
 export async function addSentryPeer(gethBinaryPath: string, instance: GethInstanceConfig) {
-  if (instance.peers) {
+  if (instance.sentries) {
     await execCmdWithExitOnFailure(gethBinaryPath, [
       '--datadir',
       getDatadir(instance),
       'attach',
       '--exec',
-      `admin.addSentry('${instance.peers[0]}')`,
+      `admin.addSentry('${instance.sentries[0]!}', '${instance.sentries[1]!}')`,
     ])
   }
 }
@@ -468,9 +469,8 @@ export function getContext(gethConfig: GethTestConfig) {
   const sentryPrivateKeys = getPrivateKeysFor(AccountType.SENTRY, mnemonic, numSentries)
   const sentryEnodes = sentryPrivateKeys.map((x: any, i: number) => [
     sentryInstances[i].name,
-    !sentryInstances[i].sentryport
-      ? null
-      : getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', sentryInstances[i].sentryport!),
+    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', sentryInstances[i].sentryport!),
+    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', sentryInstances[i].port),
   ])
 
   const argv = require('minimist')(process.argv.slice(2))
@@ -510,7 +510,7 @@ export function getContext(gethConfig: GethTestConfig) {
           throw new Error('proxied validator must have exactly one sentry')
         }
 
-        instance.peers = [sentryEnode[0][1]!]
+        instance.sentries = [sentryEnode[0][1]!, sentryEnode[0][2]!]
       }
 
       // Set the private key for the validator or sentry instance
@@ -524,6 +524,9 @@ export function getContext(gethConfig: GethTestConfig) {
 
       await initAndStartGeth(gethBinaryPath, instance)
     }
+
+    await sleep(600)
+
     if (gethConfig.migrate || gethConfig.migrateTo) {
       await migrateContracts(validatorPrivateKeys, gethConfig.migrateTo)
     }
