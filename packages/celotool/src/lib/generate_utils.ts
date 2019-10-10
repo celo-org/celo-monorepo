@@ -103,6 +103,23 @@ export const getValidators = (mnemonic: string, n: number) => {
   })
 }
 
+// To get faucet address, since validator 0 is used as faucet
+export const getValidator0AddressFromEnv = () => {
+  const mnemonic = fetchEnv(envVar.MNEMONIC)
+  const validatorEnv = fetchEnv(envVar.VALIDATORS)
+  const validators =
+    validatorEnv === VALIDATOR_OG_SOURCE
+      ? OG_ACCOUNTS.map((account) => {
+          const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(account.privateKey)
+          return {
+            address: account.address,
+            blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
+          }
+        })
+      : getValidators(mnemonic, parseInt(validatorEnv, 10))
+  return ensure0x(validators[0].address)
+}
+
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
