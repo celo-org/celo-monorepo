@@ -49,7 +49,6 @@ export interface ValidatorsConfig {
 export class ValidatorsWrapper extends BaseWrapper<Validators> {
   affiliate = proxySend(this.kit, this.contract.methods.affiliate)
   deaffiliate = proxySend(this.kit, this.contract.methods.deaffiliate)
-  addMember = proxySend(this.kit, this.contract.methods.addMember)
   removeMember = proxySend(this.kit, this.contract.methods.removeMember)
   registerValidator = proxySend(this.kit, this.contract.methods.registerValidator)
   async registerValidatorGroup(
@@ -64,6 +63,23 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.kit,
       this.contract.methods.registerValidatorGroup(name, url, toFixed(commission).toFixed())
     )
+  }
+  async addMember(member: string): Promise<CeloTransactionObject<boolean>> {
+    if (this.kit.defaultAccount == null) {
+      throw new Error(`missing from at new ValdidatorUtils()`)
+    }
+    // TODO(asa): Support authorized validators
+    const group = this.kit.defaultAccount
+    const numMembers = await this.getGroupNumMembers(group)
+    if (numMembers.isZero()) {
+      const election = await this.kit.contracts.getElection()
+      const voteWeight = await election.getTotalVotesForGroup(group)
+      const { lesser, greater } = await election.findLesserAndGreaterAfterVote(group, voteWeight)
+
+      return wrapSend(this.kit, this.contract.methods.addFirstMember(member, lesser, greater))
+    } else {
+      return wrapSend(this.kit, this.contract.methods.addMember(member))
+    }
   }
   /**
    * Returns the current registration requirements.

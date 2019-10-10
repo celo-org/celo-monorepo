@@ -80,6 +80,12 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     toNumber
   )
 
+  getTotalVotesForGroup = proxyCall(
+    this.contract.methods.getTotalVotesForGroup,
+    undefined,
+    toBigNumber
+  )
+
   getGroupsVotedForByAccount: (account: Address) => Promise<Address[]> = proxyCall(
     this.contract.methods.getGroupsVotedForByAccount
   )
