@@ -5,6 +5,7 @@ import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { errorSelector } from 'src/alert/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
@@ -18,7 +19,7 @@ import { nuxNavigationOptionsNoBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import { requestContactsPermission } from 'src/utils/androidPermissions'
+import { requestContactsPermission } from 'src/utils/permissions'
 
 interface DispatchProps {
   importContacts: typeof importContacts
@@ -72,7 +73,7 @@ class ImportContacts extends React.Component<Props, State> {
     }
   }
 
-  nextScreen = async () => {
+  nextScreen = () => {
     navigate(Screens.VerifyEducation)
   }
 
@@ -96,7 +97,7 @@ class ImportContacts extends React.Component<Props, State> {
     const { isSubmitting } = this.state
 
     return (
-      <View style={style.container}>
+      <SafeAreaView style={style.container}>
         <DevSkipButton nextScreen={Screens.VerifyEducation} />
         <ScrollView contentContainerStyle={style.scrollContainer}>
           <View style={style.header} />
@@ -135,7 +136,7 @@ class ImportContacts extends React.Component<Props, State> {
             testID="importContactsSkip"
           />
         </View>
-      </View>
+      </SafeAreaView>
     )
   }
 }

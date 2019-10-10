@@ -1,4 +1,5 @@
-import { createStackNavigator, createSwitchNavigator } from 'react-navigation'
+import { Platform } from 'react-native'
+import { createStackNavigator, createSwitchNavigator, StackNavigatorConfig } from 'react-navigation'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
 import DollarEducation from 'src/account/DollarEducation'
@@ -20,6 +21,7 @@ import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
+import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
 import ImportContacts from 'src/import/ImportContacts'
 import ImportWallet from 'src/import/ImportWallet'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
@@ -46,10 +48,21 @@ import VerifyVerified from 'src/verify/Verified'
 import VerifyVerifying from 'src/verify/Verifying'
 import VerifyEducation from 'src/verify/VerifyPhoneEducation'
 
-export const headerArea = {
+export const headerArea: StackNavigatorConfig = {
+  // Force this for now on iOS so screen transitions look normal
+  // given we intentionally hide the bottom separator from the nav bar
+  headerMode: 'screen',
   defaultNavigationOptions: {
     headerStyle: {
-      elevation: 0,
+      ...Platform.select({
+        android: {
+          elevation: 0,
+        },
+        ios: {
+          borderBottomWidth: 0,
+          borderBottomColor: 'transparent',
+        },
+      }),
     },
   },
 }
@@ -106,6 +119,7 @@ const ExchangeStack = createStackNavigator(
     // Note, ExchangeHomeScreen isn't in this stack because it's part of the tab navigator
     [Screens.ExchangeTradeScreen]: { screen: ExchangeTradeScreen },
     [Screens.ExchangeReview]: { screen: ExchangeReview },
+    [Screens.FeeExchangeEducation]: { screen: FeeExchangeEducation },
   },
   {
     navigationOptions: {

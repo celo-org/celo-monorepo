@@ -65,4 +65,6 @@ include ':react-native-secure-key-store'
 project(':react-native-secure-key-store').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-secure-key-store/android')
 include ':react-native-fast-crypto'
 project(':react-native-fast-crypto').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-fast-crypto/android')
+include ':react-native-safe-area-context'
+project(':react-native-safe-area-context').projectDir = new File(rootProject.projectDir, '../../../node_modules/react-native-safe-area-context/android')
 include ':app'

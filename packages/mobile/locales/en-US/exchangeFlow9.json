@@ -14,11 +14,15 @@
   "continue": "Continue",
   "reviewExchange": "Review Exchange",
   "fee": "Fee",
+  "securityFee": "Security Fee",
+  "exchangeFee": "Exchange Fee",
   "edit": "Edit",
   "notEnoughDollars": "Not enough {{CeloDollars}} to make exchange",
   "notEnoughGold": "Not enough Celo Gold to make exchange",
   "pending": "Pending",
   "loadingExchangeRate": "Loading Exchange Rate...",
   "errorRefreshingRate": "Could not refresh exchange rate",
-  "exchangeRateChange": "Exchange rate has changed, please retry"
+  "exchangeRateChange": "Exchange rate has changed, please retry",
+  "feeExchangeEducation":
+    "When making echanges, a small additional fee goes towards maintaining the stable value of Celo Dollar. To learn more about Celo fees, visit the FAQ."
 }
