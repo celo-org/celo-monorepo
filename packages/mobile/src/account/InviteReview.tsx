@@ -7,6 +7,7 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
@@ -168,22 +169,27 @@ export class InviteReview extends React.Component<Props, State> {
   render() {
     const recipient = this.getRecipient()
     return (
-      <ReviewFrame HeaderComponent={this.renderHeader} FooterComponent={this.renderFooter}>
-        <TransferReviewCard
-          recipient={recipient}
-          type={TransactionTypes.INVITE_SENT}
-          address={recipient.address}
-          value={getInvitationVerificationFeeInDollars()}
-          e164PhoneNumber={recipient.e164PhoneNumber}
-          currency={CURRENCY_ENUM.DOLLAR}
-          fee={new BigNumber(0)}
-        />
-      </ReviewFrame>
+      <SafeAreaView style={style.container}>
+        <ReviewFrame HeaderComponent={this.renderHeader} FooterComponent={this.renderFooter}>
+          <TransferReviewCard
+            recipient={recipient}
+            type={TransactionTypes.INVITE_SENT}
+            address={recipient.address}
+            value={getInvitationVerificationFeeInDollars()}
+            e164PhoneNumber={recipient.e164PhoneNumber}
+            currency={CURRENCY_ENUM.DOLLAR}
+            fee={new BigNumber(0)}
+          />
+        </ReviewFrame>
+      </SafeAreaView>
     )
   }
 }
 
 const style = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   loadingIcon: {
     position: 'absolute',
     left: 0,
