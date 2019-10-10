@@ -21,7 +21,7 @@ const DefaultConfig = {
     minElectableValidators: '22',
     maxElectableValidators: '100',
     maxVotesPerAccount: 3,
-    electabilityThreshold: '0', // no threshold
+    electabilityThreshold: 1 / 100,
   },
   exchange: {
     spread: 5 / 1000,

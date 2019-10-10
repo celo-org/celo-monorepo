@@ -6,7 +6,7 @@ import {
   NULL_ADDRESS,
   mineBlocks,
 } from '@celo/protocol/lib/test-utils'
-import { toFixed } from '@celo/utils/lib/fixidity'
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   MockLockedGoldContract,
@@ -46,7 +46,7 @@ contract('Election', (accounts: string[]) => {
     max: new BigNumber(6),
   }
   const maxNumGroupsVotedFor = new BigNumber(3)
-  const electabilityThreshold = new BigNumber(0)
+  const electabilityThreshold = toFixed(1 / 100)
 
   beforeEach(async () => {
     election = await ElectionTest.new()
@@ -861,6 +861,35 @@ contract('Election', (accounts: string[]) => {
           validator1,
           validator2,
           validator3,
+          validator5,
+          validator6,
+        ])
+      })
+    })
+
+    describe('when a group does not receive `electabilityThresholdVotes', () => {
+      beforeEach(async () => {
+        const thresholdExcludingGroup3 = (voter3.weight + 1) / totalLockedGold
+        await election.setElectabilityThreshold(toFixed(thresholdExcludingGroup3))
+        await election.vote(group1, voter1.weight, group2, NULL_ADDRESS, { from: voter1.address })
+        await election.vote(group2, voter2.weight, NULL_ADDRESS, group1, { from: voter2.address })
+        await election.vote(group3, voter3.weight, NULL_ADDRESS, group2, { from: voter3.address })
+        const totalVotes = await election.getTotalVotesForEligibleValidatorGroups()
+        console.log(totalVotes[1].map((x) => x.toFixed()))
+        console.log(fromFixed(await election.getElectabilityThreshold()).toFixed())
+        console.log((await election.getTotalVotes()).toFixed())
+        console.log((await election.getRequiredVotes()).toFixed())
+        console.log((await election.getNumElectionGroups()).toFixed())
+        console.log(await election.getElectionGroups())
+        console.log(group1, group2, group3)
+      })
+
+      it('should not elect any members from that group', async () => {
+        assertSameAddresses(await election.electValidators(), [
+          validator1,
+          validator2,
+          validator3,
+          validator4,
           validator5,
           validator6,
         ])

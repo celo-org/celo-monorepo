@@ -31,7 +31,13 @@ contract MockLockedGold {
     return accountOrValidator;
   }
 
-  function getAccountFromActiveValidator(address accountOrValidator) external pure returns (address) {
+  function getAccountFromActiveValidator(
+    address accountOrValidator
+  )
+    external
+    pure
+    returns (address)
+  {
     return accountOrValidator;
   }
 

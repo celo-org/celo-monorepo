@@ -13,7 +13,8 @@ import "../common/UsingPrecompiles.sol";
 import "../common/UsingRegistry.sol";
 
 
-contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRegistry, UsingPrecompiles {
+contract Election is
+  IElection, Ownable, ReentrancyGuard, Initializable, UsingRegistry, UsingPrecompiles {
 
   using AddressSortedLinkedList for SortedLinkedList.List;
   using FixidityLib for FixidityLib.Fraction;
@@ -454,7 +455,14 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
     return votes.total.eligible.contains(group);
   }
 
-  function getGroupEpochRewards(address group, uint256 totalEpochRewards) external view returns (uint256) {
+  function getGroupEpochRewards(
+    address group,
+    uint256 totalEpochRewards
+  )
+    external
+    view
+    returns (uint256)
+  {
     // TODO(asa): Is this right?
     if (votes.active.total == 0) {
       return 0;
@@ -462,12 +470,26 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
     return totalEpochRewards.mul(votes.active.forGroup[group].total).div(votes.active.total);
   }
 
-  function distributeEpochRewards(address group, uint256 value, address lesser, address greater) external {
+  function distributeEpochRewards(
+    address group,
+    uint256 value,
+    address lesser,
+    address greater
+  )
+    external
+  {
     require(msg.sender == address(0));
     _distributeEpochRewards(group, value, lesser, greater);
   }
 
-  function _distributeEpochRewards(address group, uint256 value, address lesser, address greater) internal {
+  function _distributeEpochRewards(
+    address group,
+    uint256 value,
+    address lesser,
+    address greater
+  )
+    internal
+  {
     if (votes.total.eligible.contains(group)) {
       uint256 newVoteTotal = votes.total.eligible.getValue(group).add(value);
       votes.total.eligible.update(group, newVoteTotal, lesser, greater);
@@ -741,31 +763,6 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
     return votes.total.eligible.getElements();
   }
 
-  function validatorAddressFromCurrentSet(uint256 index) external view returns (address) {
-    address validatorAddress;
-    assembly {
-      let newCallDataPosition := mload(0x40)
-      mstore(newCallDataPosition, index)
-      let success := staticcall(5000, 0xfa, newCallDataPosition, 32, 0, 0)
-      returndatacopy(add(newCallDataPosition, 64), 0, 32)
-      validatorAddress := mload(add(newCallDataPosition, 64))
-    }
-
-    return validatorAddress;
-  }
-
-  function numberValidatorsInCurrentSet() external view returns (uint256) {
-    uint256 numberValidators;
-    assembly {
-      let success := staticcall(5000, 0xf9, 0, 0, 0, 0)
-      let returnData := mload(0x40)
-      returndatacopy(returnData, 0, 32)
-      numberValidators := mload(returnData)
-    }
-
-    return numberValidators;
-  }
-
   /**
    * @notice Returns a list of elected validators with seats allocated to groups via the D'Hondt
    *   method.
@@ -773,13 +770,18 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
    */
   function electValidators() external view returns (address[] memory) {
-    // Only members of these validator groups are eligible for election.
-    uint256 maxNumElectionGroups = Math.min(
-      electableValidators.max,
-      votes.total.eligible.list.numElements
+    // Groups must have at least `electabilityThreshold` proportion of the total votes to be
+    // considered for the election.
+    uint256 requiredVotes = electabilityThreshold.multiply(
+      FixidityLib.newFixed(getTotalVotes())
+    ).fromFixed();
+    // Only consider groups with at least `requiredVotes` but do not consider more groups than the
+    // max number of electable validators.
+    uint256 numElectionGroups = votes.total.eligible.numElementsGreaterThan(
+      requiredVotes,
+      electableValidators.max
     );
-    // TODO(asa): Filter by > requiredVotes
-    address[] memory electionGroups = votes.total.eligible.headN(maxNumElectionGroups);
+    address[] memory electionGroups = votes.total.eligible.headN(numElectionGroups);
     uint256[] memory numMembers = getValidators().getGroupsNumMembers(electionGroups);
     // Holds the number of members elected for each of the eligible validator groups.
     uint256[] memory numMembersElected = new uint256[](electionGroups.length);

@@ -20,7 +20,8 @@ import "../common/UsingPrecompiles.sol";
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
  */
-contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, UsingRegistry, UsingPrecompiles {
+contract Validators is
+  IValidators, Ownable, ReentrancyGuard, Initializable, UsingRegistry, UsingPrecompiles {
 
   using FixidityLib for FixidityLib.Fraction;
   using AddressLinkedList for LinkedList.List;
@@ -186,7 +187,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param validatorScoreExponent The exponent used in calculating validator scores.
    * @param validatorScoreAdjustmentSpeed The speed at which validator scores are adjusted.
    * @param _validatorEpochPayment The duration the above gold remains locked after deregistration.
-   * @param _membershipHistoryLength The maximum number of entries for validator membership history.
+   * @param _membershipHistoryLength The max number of entries for validator membership history.
    * @param _maxGroupSize The maximum group size.
    * @dev Should be called only once.
    */
@@ -249,13 +250,23 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param adjustmentSpeed The speed at which the score is adjusted.
    * @return True upon success.
    */
-  function setValidatorScoreParameters(uint256 exponent, uint256 adjustmentSpeed) external onlyOwner returns (bool) {
+  function setValidatorScoreParameters(
+    uint256 exponent,
+    uint256 adjustmentSpeed
+  )
+    external
+    onlyOwner
+    returns (bool)
+  {
     require(adjustmentSpeed <= FixidityLib.fixed1().unwrap());
     require(
       exponent != validatorScoreParameters.exponent ||
       !FixidityLib.wrap(adjustmentSpeed).equals(validatorScoreParameters.adjustmentSpeed)
     );
-    validatorScoreParameters = ValidatorScoreParameters(exponent, FixidityLib.wrap(adjustmentSpeed));
+    validatorScoreParameters = ValidatorScoreParameters(
+      exponent,
+      FixidityLib.wrap(adjustmentSpeed)
+    );
     emit ValidatorScoreParametersSet(exponent, adjustmentSpeed);
     return true;
   }
@@ -396,7 +407,13 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     return (validatorScoreParameters.exponent, validatorScoreParameters.adjustmentSpeed.unwrap());
   }
 
-  function getMembershipHistory(address account) external view returns (uint256[] memory, address[] memory) {
+  function getMembershipHistory(
+    address account
+  )
+    external
+    view
+    returns (uint256[] memory, address[] memory)
+  {
     MembershipHistoryEntry[] memory entries = validators[account].membershipHistory.entries;
     uint256[] memory epochs = new uint256[](entries.length);
     address[] memory membershipGroups = new address[](entries.length);
@@ -439,7 +456,9 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       18
     );
 
-    FixidityLib.Fraction memory epochScore = FixidityLib.wrap(numerator).divide(FixidityLib.wrap(denominator));
+    FixidityLib.Fraction memory epochScore = FixidityLib.wrap(numerator).divide(
+      FixidityLib.wrap(denominator)
+    );
     FixidityLib.Fraction memory newComponent = validatorScoreParameters.adjustmentSpeed.multiply(
       epochScore
     );
@@ -463,12 +482,12 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   function _distributeEpochPayment(address validator) internal {
     address account = getLockedGold().getAccountFromValidator(validator);
     require(isValidator(account));
-    FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(validatorEpochPayment).multiply(validators[account].score);
+    FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(
+      validatorEpochPayment
+    ).multiply(validators[account].score);
     address group = getMembershipInLastEpoch(account);
     uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
     uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
-    // For some reason, one validator seems to be getting the full payment (not less commission)
-    // Perhaps, getMembershipInLastEpoch is returning 0? Probably what's happening...
     getStableToken().mint(group, groupPayment);
     getStableToken().mint(account, validatorPayment);
   }
@@ -620,7 +639,15 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @return True upon success.
    * @dev Fails if `validator` has not set their affiliation to this account.
    */
-  function _addMember(address group, address validator, address lesser, address greater) private returns (bool) {
+  function _addMember(
+    address group,
+    address validator,
+    address lesser,
+    address greater
+  )
+    private
+    returns (bool)
+  {
     require(isValidatorGroup(group) && isValidator(validator));
     ValidatorGroup storage _group = groups[group];
     require(_group.members.numElements < maxGroupSize, "group would exceed maximum size");

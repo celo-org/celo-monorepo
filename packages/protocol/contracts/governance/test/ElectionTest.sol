@@ -8,7 +8,14 @@ import "../../common/FixidityLib.sol";
  */
 contract ElectionTest is Election {
 
-  function distributeEpochRewards(address group, uint256 value, address lesser, address greater) external {
+  function distributeEpochRewards(
+    address group,
+    uint256 value,
+    address lesser,
+    address greater
+  )
+    external
+  {
     return _distributeEpochRewards(group, value, lesser, greater);
   }
 }
