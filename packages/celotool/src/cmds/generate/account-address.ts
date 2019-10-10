@@ -1,23 +1,47 @@
-/* tslint:disable no-console */
-import { privateKeyToAddress } from 'src/lib/generate_utils'
+import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
+import {
+  coerceMnemonicAccountType,
+  getAddressFromEnv,
+  MNEMONIC_ACCOUNT_TYPE_CHOICES,
+} from 'src/lib/generate_utils'
 import * as yargs from 'yargs'
-
-interface AccountAddressArgv {
-  privateKey: string
-}
 
 export const command = 'account-address'
 
-export const describe = 'command for generating account address from private key'
+export const describe =
+  'command for fetching addresses (validator, load_testing, tx_node, bootnode and faucet) as specified by the current environment'
 
-export const builder = (argv: yargs.Argv) => {
-  return argv.option('private-key', {
-    type: 'string',
-    description: 'private key',
-    demand: 'Please, specify an account private key',
-  })
+interface AccountAddressArgv {
+  index: number
+  accountType: string
 }
 
-export const handler = async (argv: AccountAddressArgv) => {
-  console.log(privateKeyToAddress(argv.privateKey))
+type ValidatorAddressArgv = CeloEnvArgv & AccountAddressArgv
+
+export const builder = (argv: yargs.Argv) => {
+  return addCeloEnvMiddleware(
+    argv
+      .option('index', {
+        alias: 'i',
+        type: 'number',
+        description: 'account index',
+        demand: 'Please specifiy account index',
+      })
+      .option('accountType', {
+        alias: 'a',
+        type: 'string',
+        choices: MNEMONIC_ACCOUNT_TYPE_CHOICES,
+        description: 'account type',
+        demand: 'Please specifiy account type',
+        required: true,
+      })
+  )
+}
+
+export const handler = async (argv: ValidatorAddressArgv) => {
+  const validatorAddress = getAddressFromEnv(
+    coerceMnemonicAccountType(argv.accountType),
+    argv.index
+  )
+  console.info(validatorAddress)
 }

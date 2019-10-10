@@ -1,5 +1,5 @@
 import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
-import { getValidatorAddressFromEnv } from 'src/lib/generate_utils'
+import { AccountType, getAddressFromEnv } from 'src/lib/generate_utils'
 import * as yargs from 'yargs'
 
 export const command = 'faucet-address'
@@ -14,6 +14,6 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (_argv: FaucetAddress) => {
-  const validator0Address = getValidatorAddressFromEnv(0)
+  const validator0Address = getAddressFromEnv(AccountType.VALIDATOR, 0)
   console.info(validator0Address)
 }

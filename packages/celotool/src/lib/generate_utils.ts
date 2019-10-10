@@ -103,8 +103,13 @@ export const getValidators = (mnemonic: string, n: number) => {
   })
 }
 
-export const getValidatorAddressFromEnv = (validatorIndex: number) => {
+export const getAddressFromEnv = (accountType: AccountType, n: number) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
+  const privateKey = generatePrivateKey(mnemonic, accountType, n)
+  return privateKeyToAddress(privateKey)
+  /*
+  ensure0x(validators[validatorIndex].address)
+
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
   const validators =
     validatorEnv === VALIDATOR_OG_SOURCE
@@ -117,6 +122,7 @@ export const getValidatorAddressFromEnv = (validatorIndex: number) => {
         })
       : getValidators(mnemonic, parseInt(validatorEnv, 10))
   return ensure0x(validators[validatorIndex].address)
+  */
 }
 
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
