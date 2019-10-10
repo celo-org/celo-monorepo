@@ -6,10 +6,12 @@ import { Election } from '../generated/types/Election'
 import {
   BaseWrapper,
   CeloTransactionObject,
+  identity,
   proxyCall,
   proxySend,
   toBigNumber,
   toNumber,
+  tupleParser,
   wrapSend,
 } from './BaseWrapper'
 

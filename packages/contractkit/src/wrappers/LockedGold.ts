@@ -7,9 +7,12 @@ import { LockedGold } from '../generated/types/LockedGold'
 import {
   BaseWrapper,
   CeloTransactionObject,
+  NumberLike,
+  parseNumber,
   proxyCall,
   proxySend,
   toBigNumber,
+  tupleParser,
   wrapSend,
 } from '../wrappers/BaseWrapper'
 
