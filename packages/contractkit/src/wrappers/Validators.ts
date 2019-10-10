@@ -1,3 +1,4 @@
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
 import { Validators } from '../generated/types/Validators'
@@ -9,7 +10,6 @@ import {
   toBigNumber,
   wrapSend,
 } from './BaseWrapper'
-import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 
 export interface Validator {
   address: Address

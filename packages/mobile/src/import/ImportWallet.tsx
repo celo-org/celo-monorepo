@@ -1,11 +1,13 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ActivityIndicator, Keyboard, StyleSheet, Text, TextInput, View } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -105,7 +107,7 @@ export class ImportWallet extends React.Component<Props, State> {
     const { t, isImportingWallet, isWalletEmpty } = this.props
 
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         {!isWalletEmpty && (
           <>
             <KeyboardAwareScrollView
@@ -177,7 +179,8 @@ export class ImportWallet extends React.Component<Props, State> {
             />
           </>
         )}
-      </View>
+        <KeyboardSpacer />
+      </SafeAreaView>
     )
   }
 }

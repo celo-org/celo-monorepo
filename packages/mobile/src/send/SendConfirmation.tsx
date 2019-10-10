@@ -7,6 +7,7 @@ import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import Modal from 'react-native-modal'
+import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -208,7 +209,7 @@ class SendConfirmation extends React.Component<Props, State> {
     }
 
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <DisconnectBanner />
         <ReviewFrame
           HeaderComponent={this.renderHeader}
@@ -249,7 +250,7 @@ class SendConfirmation extends React.Component<Props, State> {
             </View>
           </Modal>
         </ReviewFrame>
-      </View>
+      </SafeAreaView>
     )
   }
 

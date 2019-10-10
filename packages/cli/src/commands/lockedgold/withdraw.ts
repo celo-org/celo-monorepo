@@ -37,8 +37,8 @@ export default class Withdraw extends BaseCommand {
         break
       }
     }
-    const pendingWithdrawals = await lockedgold.getPendingWithdrawals(flags.from)
-    for (const pendingWithdrawal of pendingWithdrawals) {
+    const remainingPendingWithdrawals = await lockedgold.getPendingWithdrawals(flags.from)
+    for (const pendingWithdrawal of remainingPendingWithdrawals) {
       console.log(
         `Pending withdrawal of value ${pendingWithdrawal.value.toString()} available for withdrawal in ${pendingWithdrawal.time
           .minus(currentTime)

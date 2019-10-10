@@ -1,5 +1,5 @@
-import BigNumber from 'bignumber.js'
 import { flags } from '@oclif/command'
+import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
