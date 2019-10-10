@@ -67,6 +67,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
 
   struct HotfixRecord {
     mapping(address => bool) whitelisted;
+    uint256 preparedEpoch;
     bool approved;
     bool completed;
   }
@@ -205,9 +206,14 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     bytes32 txHash
   );
 
+  event HotfixPrepared(
+    bytes32 txHash,
+    uint256 epoch
+  );
+
   event HotfixWhitelisted(
-    address whitelister,
-    bytes32 txHash
+    bytes32 txHash,
+    address whitelister
   );
 
   function() external payable {} // solhint-disable no-empty-blocks
@@ -667,22 +673,34 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
 
   /**
    * @notice Whitelists the hash of a hotfix.
-   * @param txHash The hash of the hotfix to be whitelisted.
+   * @param txHash The abi encoded keccak256 hash of the hotfix transaction to be whitelisted.
    * @param validatorIndex The index in the validator set of the whitelisting validator.
    */
   function whitelist(bytes32 txHash, uint256 validatorIndex) external nonReentrant {
     if (msg.sender == approver) {
-      // TODO: consider using more state s.t. when approver changes, approval is reverted
+      require(!hotfixes[txHash].approved);
       hotfixes[txHash].approved = true;
     } else {
       IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
       require(msg.sender == validators.validatorAddressFromCurrentSet(validatorIndex));
       require(!hotfixes[txHash].whitelisted[msg.sender]);
-
       hotfixes[txHash].whitelisted[msg.sender] = true;
     }
 
-    emit HotfixWhitelisted(msg.sender, txHash);
+    emit HotfixWhitelisted(txHash, msg.sender);
+  }
+
+  /**
+   * @notice Gives hotfix a prepared epoch for execution.
+   * @param txHash The hash of the hotfix to be prepared.
+   */
+  function prepareHotfix(bytes32 txHash) external {
+    IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
+    uint256 epoch = validators.getEpochNumber();
+    require(hotfixes[txHash].preparedEpoch < epoch, "hotfix already prepared for this epoch");
+    require(isHotfixWhitelisted(txHash), "hotfix not whitelisted by 2f+1 validators");
+    hotfixes[txHash].preparedEpoch = epoch;
+    emit HotfixPrepared(txHash, epoch);
   }
 
   /**
@@ -691,9 +709,9 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @param destinations The destination addresses of the proposed transactions.
    * @param data The concatenated data to be included in the proposed transactions.
    * @param dataLengths The lengths of each transaction's data.
-   * @dev Reverts if the proposal is not whitelisted.
+   * @dev Reverts if hotfix is already completed, not approved, or not prepared for current epoch.
    */
-  function hotfix(
+  function executeHotfix(
     uint256[] calldata values,
     address[] calldata destinations,
     bytes calldata data,
@@ -703,8 +721,12 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
   {
     bytes32 txHash = keccak256(abi.encode(values, destinations, data, dataLengths));
 
-    (bool approved, bool completed, bool whitelisted) = getHotfixRecord(txHash);
-    require(!completed && approved && whitelisted);
+    (bool approved, bool completed, uint256 preparedEpoch) = getHotfixRecord(txHash);
+    require(!completed, "hotfix already executed");
+    require(approved, "hotfix not approved");
+
+    IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
+    require(preparedEpoch == validators.getEpochNumber(), "hotfix must be prepared for this epoch");
 
     hotfixProposal.make(values, destinations, data, dataLengths, msg.sender, 0);
     hotfixProposal.execute();
@@ -885,20 +907,33 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     return voters[account].mostRecentReferendumProposal;
   }
 
-  function getHotfixRecord(bytes32 txHash) public view returns (bool, bool, bool) {
+  /**
+   * @notice Checks if a byzantine quorum of validators has whitelisted the given hotfix.
+   * @param txHash The abi encoded keccak256 hash of the hotfix transaction.
+   * @return Whether validator whitelist tally >= validator byztanine quorum (2f+1)
+   */
+  function isHotfixWhitelisted(bytes32 txHash) public view returns (bool) {
     IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
-    uint256 numValidators = validators.numberValidatorsInCurrentSet();
-    uint256 quorum = numValidators.sub(numValidators.sub(1).div(2));
-    
+    uint256 quorum = validators.byzantineQuorumForCurrentSet();
+
     uint256 tally = 0;
-    for (uint256 idx = 0; idx < numValidators; idx++) {
+    for (uint256 idx = 0; idx < validators.numberValidatorsInCurrentSet(); idx++) {
       address validator = validators.validatorAddressFromCurrentSet(idx);
       if (hotfixes[txHash].whitelist[validator]) {
         tally = tally.add(1);
       }
     }
 
-    return (hotfixes[txHash].approved, hotfixes[txHash].completed, tally >= quorum);
+    return tally >= quorum;
+  }
+
+  /**
+   * @notice Gets information about a hotfix.
+   * @param txHash The abi encoded keccak256 hash of the hotfix transaction.
+   * @return Hotfix tuple of (approved, completed, preparedEpoch)
+   */
+  function getHotfixRecord(bytes32 txHash) public view returns (bool, bool, uint256) {
+    return (hotfixes[txHash].approved, hotfixes[txHash].completed, hotfixes[txHash].preparedEpoch);
   }
 
   /**

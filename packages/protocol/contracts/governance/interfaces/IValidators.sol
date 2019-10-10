@@ -7,4 +7,6 @@ interface IValidators {
   function getValidators() external view returns (address[] memory);
   function validatorAddressFromCurrentSet(uint256 index) external view returns (address);
   function numberValidatorsInCurrentSet() external view returns (uint256);
+  function getByzantineQuorumForCurrentSet() external view returns (uint256);
+  function getEpochNumber() external view returns (uint256);
 }

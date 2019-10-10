@@ -635,7 +635,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     return validatorAddress;
   }
 
-  function numberValidatorsInCurrentSet() external view returns (uint256) {
+  function numberValidatorsInCurrentSet() public view returns (uint256) {
     uint256 numberValidators;
     assembly {
       let success := staticcall(
@@ -652,6 +652,23 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     }
 
     return numberValidators;
+  }
+
+  /**
+   * @notice Returns number of validators required for 2f+1 quorum.
+   * @return The byzantine quorum.
+   */
+  function getByzantineQuorumForCurrentSet() external view returns (uint256) {
+    return numberValidatorsInCurrentSet().multiply(2).div(3).add(1);
+  }
+
+  /**
+   * @notice Returns the current epoch number.
+   * @return The epoch number.
+   */
+  function getEpochNumber() external view returns (uint256) {
+    // TODO: replace 30000 with governance parameter
+    return block.number.div(30000);
   }
 
   /**
