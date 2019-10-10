@@ -1,4 +1,5 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import SectionHead from '@celo/react-components/components/SectionHead'
 import TextInput, { TextInputProps } from '@celo/react-components/components/TextInput'
 import withTextInputLabeling from '@celo/react-components/components/WithTextInputLabeling'
@@ -40,8 +41,8 @@ import RecipientItem from 'src/recipients/RecipientItem'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { requestContactsPermission } from 'src/utils/androidPermissions'
 import Logger from 'src/utils/Logger'
+import { requestContactsPermission } from 'src/utils/permissions'
 import { assertUnreachable } from 'src/utils/typescript'
 
 const RecipientSearchInput = withTextInputPasteAware(
@@ -263,6 +264,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
           keyboardShouldPersistTaps="handled"
         />
         {this.renderRequestContactPermission()}
+        <KeyboardSpacer />
       </View>
     )
   }
