@@ -39,9 +39,9 @@ export default class Authorize extends BaseCommand {
     this.kit.defaultAccount = res.flags.from
     const lockedGold = await this.kit.contracts.getLockedGold()
     let tx: any
-    if (res.flags.role == 'voter') {
+    if (res.flags.role === 'voter') {
       tx = await lockedGold.authorizeVoter(res.flags.from, res.flags.to)
-    } else if (res.flags.role == 'validator') {
+    } else if (res.flags.role === 'validator') {
       tx = await lockedGold.authorizeValidator(res.flags.from, res.flags.to)
     } else {
       this.error(`Invalid role provided`)
