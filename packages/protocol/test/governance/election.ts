@@ -6,7 +6,7 @@ import {
   NULL_ADDRESS,
   mineBlocks,
 } from '@celo/protocol/lib/test-utils'
-import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   MockLockedGoldContract,
@@ -874,14 +874,6 @@ contract('Election', (accounts: string[]) => {
         await election.vote(group1, voter1.weight, group2, NULL_ADDRESS, { from: voter1.address })
         await election.vote(group2, voter2.weight, NULL_ADDRESS, group1, { from: voter2.address })
         await election.vote(group3, voter3.weight, NULL_ADDRESS, group2, { from: voter3.address })
-        const totalVotes = await election.getTotalVotesForEligibleValidatorGroups()
-        console.log(totalVotes[1].map((x) => x.toFixed()))
-        console.log(fromFixed(await election.getElectabilityThreshold()).toFixed())
-        console.log((await election.getTotalVotes()).toFixed())
-        console.log((await election.getRequiredVotes()).toFixed())
-        console.log((await election.getNumElectionGroups()).toFixed())
-        console.log(await election.getElectionGroups())
-        console.log(group1, group2, group3)
       })
 
       it('should not elect any members from that group', async () => {
@@ -904,6 +896,103 @@ contract('Election', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(election.electValidators())
+      })
+    })
+  })
+
+  describe('#getGroupEpochRewards', () => {
+    const voter = accounts[0]
+    const group1 = accounts[1]
+    const group2 = accounts[2]
+    const voteValue1 = new BigNumber(2000000)
+    const voteValue2 = new BigNumber(1000000)
+    const totalRewardValue = new BigNumber(3000000)
+    const balanceRequirement = new BigNumber(1000000)
+    beforeEach(async () => {
+      await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+      await election.markGroupEligible(group1, NULL_ADDRESS, NULL_ADDRESS)
+      await election.markGroupEligible(group2, NULL_ADDRESS, group1)
+      await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+      await mockLockedGold.setTotalLockedGold(voteValue1.plus(voteValue2))
+      await mockValidators.setMembers(group1, [accounts[8]])
+      await mockValidators.setMembers(group2, [accounts[9]])
+      await mockValidators.setNumRegisteredValidators(2)
+      await mockLockedGold.incrementNonvotingAccountBalance(voter, voteValue1.plus(voteValue2))
+      await election.vote(group1, voteValue1, group2, NULL_ADDRESS)
+      await election.vote(group2, voteValue2, NULL_ADDRESS, group1)
+      await mockValidators.setAccountBalanceRequirement(group1, balanceRequirement)
+      await mockValidators.setAccountBalanceRequirement(group2, balanceRequirement)
+    })
+
+    describe('when one group has active votes', () => {
+      beforeEach(async () => {
+        await mineBlocks(EPOCH, web3)
+        await election.activate(group1)
+      })
+
+      describe('when the group meets the balance requirements ', () => {
+        beforeEach(async () => {
+          await mockLockedGold.setAccountTotalLockedGold(group1, balanceRequirement)
+        })
+
+        it('should return the total reward value', async () => {
+          assertEqualBN(
+            await election.getGroupEpochRewards(group1, totalRewardValue),
+            totalRewardValue
+          )
+        })
+      })
+
+      describe('when the group does not meet the balance requirements ', () => {
+        beforeEach(async () => {
+          await mockLockedGold.setAccountTotalLockedGold(group1, balanceRequirement.minus(1))
+        })
+
+        it('should return zero', async () => {
+          assertEqualBN(await election.getGroupEpochRewards(group1, totalRewardValue), 0)
+        })
+      })
+    })
+
+    describe('when two groups have active votes', () => {
+      const balanceRequirement = new BigNumber(1000000)
+      const expectedGroup1EpochRewards = voteValue1
+        .div(voteValue1.plus(voteValue2))
+        .times(totalRewardValue)
+        .dp(0)
+      beforeEach(async () => {
+        await mineBlocks(EPOCH, web3)
+        await election.activate(group1)
+        await election.activate(group2)
+      })
+
+      describe('when one group meets the balance requirements ', () => {
+        beforeEach(async () => {
+          await mockLockedGold.setAccountTotalLockedGold(group1, balanceRequirement)
+        })
+
+        it('should return the proportional reward value for that group', async () => {
+          assertEqualBN(
+            await election.getGroupEpochRewards(group1, totalRewardValue),
+            expectedGroup1EpochRewards
+          )
+        })
+
+        it('should return zero for the other group', async () => {
+          assertEqualBN(await election.getGroupEpochRewards(group2, totalRewardValue), 0)
+        })
+      })
+    })
+
+    describe('when the group does not have active votes', () => {
+      describe('when the group meets the balance requirements ', () => {
+        beforeEach(async () => {
+          await mockLockedGold.setAccountTotalLockedGold(group1, balanceRequirement)
+        })
+
+        it('should return zero', async () => {
+          assertEqualBN(await election.getGroupEpochRewards(group1, totalRewardValue), 0)
+        })
       })
     })
   })
