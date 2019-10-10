@@ -124,10 +124,8 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
     }
   }
 
-  renderItem = (countryCode: string) => {
-    const { displayName, emoji, countryCallingCodes } = this.state.countries.getCountryByCode(
-      countryCode
-    )
+  renderItem = ({ item }: { item: string }) => {
+    const { displayName, emoji, countryCallingCodes } = this.state.countries.getCountryByCode(item)
     const onPress = () => this.onChangeCountryQuery(displayName)
 
     return (
@@ -157,6 +155,8 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
     />
   )
 
+  keyExtractor = (item: string) => item
+
   render() {
     const { countryCallingCode, countryQuery } = this.state
     const filteredCountries = this.state.countries.getFilteredCountries(countryQuery)
@@ -183,6 +183,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
             renderItem={this.renderItem}
             renderTextInput={this.renderTextInput}
             testID="CountryNameField"
+            keyExtractor={this.keyExtractor}
           />
         )}
         {!!defaultDisplayName && (
