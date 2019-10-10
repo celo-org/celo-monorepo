@@ -1,10 +1,6 @@
-import SmallButton from '@celo/react-components/components/SmallButton'
-import TopAlert from '@celo/react-components/components/TopAlert'
-import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import SmartTopAlert, { NotificationTypes } from '@celo/react-components/components/SmartTopAlert'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { StyleSheet, Text } from 'react-native'
 import { connect } from 'react-redux'
 import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
@@ -42,44 +38,18 @@ export class BackupPrompt extends React.Component<Props> {
   render() {
     const { t } = this.props
 
+    const isVisible = this.isVisible()
+
     return (
-      <TopAlert
-        height={93}
-        backgroundColor={colors.messageBlue}
-        visible={this.isVisible()}
-        style={styles.container}
-      >
-        <Text style={[fontStyles.bodySmall, styles.text]}>{t('backupPrompt')}</Text>
-        <SmallButton
-          onPress={this.goToBackup}
-          text={t('getBackupKey')}
-          solid={false}
-          style={styles.button}
-          textStyle={styles.buttonText}
-        />
-      </TopAlert>
+      <SmartTopAlert
+        text={isVisible && t('backupPrompt')}
+        onPress={this.goToBackup}
+        type={NotificationTypes.MESSAGE}
+        buttonMessage={isVisible && t('getBackupKey')}
+      />
     )
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  text: {
-    color: 'white',
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  button: {
-    borderColor: colors.white,
-    alignSelf: 'center',
-  },
-  buttonText: {
-    color: colors.white,
-  },
-})
 
 export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
   withNamespaces(Namespaces.backupKeyFlow6)(BackupPrompt)
