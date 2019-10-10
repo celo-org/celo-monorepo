@@ -135,19 +135,6 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     return zip((a, b) => ({ address: a, votes: new BigNumber(b), eligible: true }), res[0], res[1])
   }
 
-  async markGroupEligible(validatorGroup: Address): Promise<CeloTransactionObject<boolean>> {
-    if (this.kit.defaultAccount == null) {
-      throw new Error(`missing from at new ValdidatorUtils()`)
-    }
-
-    const value = toBigNumber(
-      await this.contract.methods.getTotalVotesForGroup(validatorGroup).call()
-    )
-    const { lesser, greater } = await this.findLesserAndGreaterAfterVote(validatorGroup, value)
-
-    return wrapSend(this.kit, this.contract.methods.markGroupEligible(lesser, greater))
-  }
-
   async vote(validatorGroup: Address, value: BigNumber): Promise<CeloTransactionObject<boolean>> {
     if (this.kit.defaultAccount == null) {
       throw new Error(`missing from at new ValdidatorUtils()`)

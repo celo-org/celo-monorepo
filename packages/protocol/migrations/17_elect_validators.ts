@@ -161,21 +161,21 @@ module.exports = async (_deployer: any) => {
   )
 
   console.info('  Adding Validators to Validator Group ...')
-  for (const key of valKeys) {
+  for (let i = 0; i < valKeys.length; i++) {
+    const key = valKeys[i]
     const address = generateAccountAddressFromPrivateKey(key.slice(2))
-    // @ts-ignore
-    const addTx = validators.contract.methods.addMember(address)
+    let addTx: any
+    if (i == 0) {
+      // @ts-ignore
+      addTx = validators.contract.methods.addFirstMember(address, NULL_ADDRESS, NULL_ADDRESS)
+    } else {
+      // @ts-ignore
+      addTx = validators.contract.methods.addMember(address)
+    }
     await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
       to: validators.address,
     })
   }
-
-  console.info('  Marking Validator Group as eligible for election ...')
-  // @ts-ignore
-  const markTx = election.contract.methods.markGroupEligible(NULL_ADDRESS, NULL_ADDRESS)
-  await sendTransactionWithPrivateKey(web3, markTx, account.privateKey, {
-    to: election.address,
-  })
 
   console.info('  Voting for Validator Group ...')
   // Make another deposit so our vote has more weight.
