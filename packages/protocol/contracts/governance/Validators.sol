@@ -482,14 +482,22 @@ contract Validators is
   function _distributeEpochPayment(address validator) internal {
     address account = getLockedGold().getAccountFromValidator(validator);
     require(isValidator(account));
-    FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(
-      validatorEpochPayment
-    ).multiply(validators[account].score);
     address group = getMembershipInLastEpoch(account);
-    uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
-    uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
-    getStableToken().mint(group, groupPayment);
-    getStableToken().mint(account, validatorPayment);
+    // Both the validator and the group must maintain the minimum locked gold balance in order to
+    // receive epoch payments.
+    bool meetsBalanceRequirements = (
+      getLockedGold().getAccountTotalLockedGold(group) >= getAccountBalanceRequirement(group) &&
+      getLockedGold().getAccountTotalLockedGold(account) >= getAccountBalanceRequirement(account)
+    );
+    if (meetsBalanceRequirements) {
+      FixidityLib.Fraction memory totalPayment = FixidityLib.newFixed(
+        validatorEpochPayment
+      ).multiply(validators[account].score);
+      uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
+      uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
+      getStableToken().mint(group, groupPayment);
+      getStableToken().mint(account, validatorPayment);
+    }
   }
 
   /**
@@ -706,7 +714,7 @@ contract Validators is
    * @param account The account that may have to meet locked gold balance requirements.
    * @return The locked gold balance requirement for the supplied account.
    */
-  function getAccountBalanceRequirement(address account) external view returns (uint256) {
+  function getAccountBalanceRequirement(address account) public view returns (uint256) {
     DeregistrationTimestamps storage timestamps = deregistrationTimestamps[account];
     if (
       isValidator(account) ||

@@ -164,11 +164,12 @@ module.exports = async (_deployer: any) => {
   for (let i = 0; i < valKeys.length; i++) {
     const key = valKeys[i]
     const address = generateAccountAddressFromPrivateKey(key.slice(2))
-    // @ts-ignore
     const addTx =
       i === 0
-        ? validators.contract.methods.addFirstMember(address, NULL_ADDRESS, NULL_ADDRESS)
-        : validators.contract.methods.addMember(address)
+        ? // @ts-ignore
+          validators.contract.methods.addFirstMember(address, NULL_ADDRESS, NULL_ADDRESS)
+        : // @ts-ignore
+          validators.contract.methods.addMember(address)
     await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
       to: validators.address,
     })

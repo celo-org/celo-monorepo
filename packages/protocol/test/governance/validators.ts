@@ -1363,7 +1363,7 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe('#distributeEpochPayment', () => {
+  describe.only('#distributeEpochPayment', () => {
     const validator = accounts[0]
     const group = accounts[1]
     let mockStableToken: MockStableTokenInstance
@@ -1385,15 +1385,53 @@ contract('Validators', (accounts: string[]) => {
       const expectedValidatorPayment = expectedTotalPayment.minus(expectedGroupPayment)
       beforeEach(async () => {
         await validators.updateValidatorScore(validator, toFixed(uptime))
-        await validators.distributeEpochPayment(validator)
       })
 
-      it('should pay the validator', async () => {
-        assertEqualBN(await mockStableToken.balanceOf(validator), expectedValidatorPayment)
+      describe('when the validator and group meet the balance requirements', () => {
+        beforeEach(async () => {
+          await validators.distributeEpochPayment(validator)
+        })
+
+        it('should pay the validator', async () => {
+          assertEqualBN(await mockStableToken.balanceOf(validator), expectedValidatorPayment)
+        })
+
+        it('should pay the group', async () => {
+          assertEqualBN(await mockStableToken.balanceOf(group), expectedGroupPayment)
+        })
       })
 
-      it('should pay the group', async () => {
-        assertEqualBN(await mockStableToken.balanceOf(group), expectedGroupPayment)
+      describe('when the validator does not meet the balance requirements', () => {
+        beforeEach(async () => {
+          await mockLockedGold.setAccountTotalLockedGold(
+            validator,
+            balanceRequirements.validator.minus(1)
+          )
+          await validators.distributeEpochPayment(validator)
+        })
+
+        it('should not pay the validator', async () => {
+          assertEqualBN(await mockStableToken.balanceOf(validator), 0)
+        })
+
+        it('should not pay the group', async () => {
+          assertEqualBN(await mockStableToken.balanceOf(group), 0)
+        })
+      })
+
+      describe('when the validator does not meet the balance requirements', () => {
+        beforeEach(async () => {
+          await mockLockedGold.setAccountTotalLockedGold(group, balanceRequirements.group.minus(1))
+          await validators.distributeEpochPayment(validator)
+        })
+
+        it('should not pay the validator', async () => {
+          assertEqualBN(await mockStableToken.balanceOf(validator), 0)
+        })
+
+        it('should not pay the group', async () => {
+          assertEqualBN(await mockStableToken.balanceOf(group), 0)
+        })
       })
     })
   })

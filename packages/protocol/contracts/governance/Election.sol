@@ -463,10 +463,10 @@ contract Election is
     view
     returns (uint256)
   {
-    // TODO(asa): Is this right?
     if (votes.active.total == 0) {
       return 0;
     }
+
     return totalEpochRewards.mul(votes.active.forGroup[group].total).div(votes.active.total);
   }
 
