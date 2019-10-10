@@ -9,8 +9,6 @@
   "backupKey": "Backup Key",
   "yourBackupKey": "Your Backup Key",
   "delayBackup": "Dismiss for an hour",
-  "inviteFriends": "Invite Friends",
-  "verifierApp": "Verifier App",
   "languageSettings": "Language Settings",
   "cancel": "Cancel",
   "backupKeyImportance": {
@@ -22,20 +20,11 @@
   "allDone": "You've successfully backed up your Key! Check back here to view it at any time.",
   "writeDownKey": "1. Write down your Backup Key",
   "shareSocialBackup": "2. Share Recovery Secrets",
-  "setBackupKey": "Set Backup Key",
-  "enterBackupKey": "Enter your Backup Key",
-  "backupKeyConfirmation":
-    "In the future, if you lose your phone you will need to provide this Backup Key to enable your account to be recovered. To confirm that you have your Backup Key written down, please enter it below:",
-  "areYouSure": "Are you sure?",
   "backupSkipText": {
     "0": "Without a Backup Key, you can lose access to your wallet ",
     "1": "forever."
   },
-  "shareBackupKey": "Share Backup Key",
   "backupRecovery": "Share your Backup Key with only one other person who you completely trust.",
-  "sendWhatsApp": "Send with WhatsApp",
-  "continue": "Continue",
-  "backupWithFriends": "Backup with Friends",
   "securityTip":
     "Keep your Backup Key somewhere you can access if you lose your phone. Do not take a screenshot or save it in your phone’s notes.",
   "backupKeySummary": "Please write down this Backup Key and store it somewhere safe.",
@@ -43,15 +32,6 @@
     "Recovery Secrets allow you to recover your account with the help of two friends. If you lose your Backup Key, you will need to contact your friends and enter both Recovery Secrets.",
   "sendFirstHalf": "First, send this recovery secret to one contact:",
   "sendSecondHalf": "Now, send this second recovery secret to another contact:",
-  "verifying": "Verifying ({{count}} of {{total}})",
-  "questionPhrase": "Which of these words is in your Backup Key?",
-  "submit": "Submit",
-  "dontKnow": "Don't Know? ",
-  "return": "Return to backup key",
-  "tryAgain": "Try Again",
-  "backToKey":
-    "We will take you back to the screen with your backup key so that you ensure you wrote it down correctly.",
-  "seeBackupKey": "See Backup Key",
   "bothBackupsDone": {
     "0": "Congratulations!",
     "1":
@@ -62,5 +42,7 @@
   "backupPrompt":
     "For the security of your funds, your account is frozen until you get your Backup Key",
   "copied": "Backup Key copied to clipboard",
-  "savedConfirmation": "I have saved my Backup Key."
+  "savedConfirmation": "I have saved my Backup Key.",
+  "verifyBackupKey":
+    "Please verify you have your Backup Key by choosing the words in the correct order."
 }

@@ -94,7 +94,7 @@ export class NotificationBox extends React.Component<Props, State> {
     if (!backupCompleted) {
       actions.push({
         title: t('getBackupKey'),
-        text: t('setBackupKey'),
+        text: t('getBackupKey'),
         image: backupIcon,
         ctaList: [
           {

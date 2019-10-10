@@ -85,8 +85,9 @@ class BackupPhrase extends React.Component<Props, State> {
   }
 
   onPressContinue = () => {
+    const { mnemonic } = this.state
     CeloAnalytics.track(CustomEventNames.backup_continue)
-    navigate(Screens.BackupQuiz)
+    navigate(Screens.BackupQuiz, { mnemonic })
   }
 
   render() {
@@ -113,7 +114,7 @@ class BackupPhrase extends React.Component<Props, State> {
                 value={isConfirmChecked}
                 onValueChange={this.onPressConfirmSwitch}
                 trackColor={switchTrackColors}
-                thumbColor={colors.celoDarkGreen}
+                thumbColor={colors.celoGreen}
               />
             </View>
             <Button
@@ -164,7 +165,7 @@ const styles = StyleSheet.create({
 })
 
 const switchTrackColors = {
-  false: colors.inactiveDark,
+  false: colors.inactive,
   true: colors.celoGreen,
 }
 

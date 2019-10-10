@@ -236,9 +236,6 @@ const styles = StyleSheet.create({
     paddingBottom: 5,
     paddingLeft: 20,
   },
-  // skipLink: {
-  //   textAlign: 'center',
-  // },
 })
 
 export default componentWithAnalytics(
