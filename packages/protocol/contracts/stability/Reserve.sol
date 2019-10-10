@@ -17,7 +17,6 @@ import "../common/interfaces/IERC20Token.sol";
  * @title Ensures price stability of StableTokens with respect to their pegs
  */
 contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyGuard {
-
   using SafeMath for uint256;
 
   struct TobinTaxCache {
@@ -160,6 +159,15 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
       tobinTaxCache.timestamp = uint128(now); // solhint-disable-line not-rely-on-time
     }
     return (uint256(tobinTaxCache.numerator), TOBIN_TAX_DENOMINATOR);
+  }
+
+  /**
+   * @notice Returns the tobin tax
+   * @return The tobin tax amount as a fraction.
+   */
+  function getTobinTax() external view returns (uint128)
+  {
+    return numerator;
   }
 
   function getTokens() external view returns (address[] memory) {
