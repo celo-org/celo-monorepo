@@ -66,6 +66,8 @@ target 'celo' do
   pod 'GoogleUtilities', '~> 5.3.7'
   # pod 'Segment-Firebase', '~> 2.4.0'
 
+  pod 'RNSentry', :path => '../node_modules/@sentry/react-native'
+
   target 'celoTests' do
     inherit! :search_paths
   end

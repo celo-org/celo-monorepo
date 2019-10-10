@@ -1,7 +1,7 @@
 import { anonymizedPhone } from '@celo/utils/src/phoneNumbers'
+import Sentry from '@sentry/react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
-import { Sentry } from 'react-native-sentry'
 import { e164NumberSelector } from 'src/account/reducer'
 import { SENTRY_URL } from 'src/config'
 import { DispatchType, GetStateType } from 'src/redux/reducers'

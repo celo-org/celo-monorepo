@@ -3,6 +3,7 @@ import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { withNamespaces } from 'react-i18next'
 import { DeviceEventEmitter, Linking, StatusBar, YellowBox } from 'react-native'
+import { useScreens } from 'react-native-screens'
 import SplashScreen from 'react-native-splash-screen'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
@@ -16,6 +17,8 @@ import i18n from 'src/i18n'
 import Navigator from 'src/navigator/NavigatorWrapper'
 import { persistor, store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
+
+useScreens()
 
 Logger.debug('App/init', 'Current Language: ' + i18n.language)
 YellowBox.ignoreWarnings([

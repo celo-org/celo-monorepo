@@ -7,10 +7,10 @@ import org.celo.verifier.PushNotificationToSMSService;
 import java.io.IOException;
 import java.net.*;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

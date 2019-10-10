@@ -4,4 +4,4 @@ const Sentry = {
   captureException: () => {},
 }
 
-export { Sentry }
+export default Sentry

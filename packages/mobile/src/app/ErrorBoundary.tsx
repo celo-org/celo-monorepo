@@ -1,7 +1,7 @@
 import { getErrorMessage } from '@celo/utils/src/displayFormatting'
+import Sentry from '@sentry/react-native'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { Sentry } from 'react-native-sentry'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
 import ErrorScreen from 'src/app/ErrorScreen'

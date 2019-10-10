@@ -320,7 +320,7 @@ async function uploadLogs(gethLogFilePath: string, reactNativeLogFilePath: strin
     // Phone number might not be verified here but that does not matter for logging.
     const phoneNumber = (await DeviceInfo.getPhoneNumber()) || 'unknown'
     const timestamp = new Date().getTime()
-    const deviceId = DeviceInfo.getUniqueID()
+    const deviceId = await DeviceInfo.getUniqueId()
     const uploadId = `${timestamp}_${deviceId}`
     const gethUploadFileName = `${phoneNumber}_${uploadId}_geth.txt`
     const reactNativeUploadFileName = `${phoneNumber}_${uploadId}_rn.txt`

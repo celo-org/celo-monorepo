@@ -1,4 +1,5 @@
-import { createStackNavigator, createSwitchNavigator } from 'react-navigation'
+import { createSwitchNavigator } from 'react-navigation'
+import { createStackNavigator } from 'react-navigation-stack'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
 import DollarEducation from 'src/account/DollarEducation'

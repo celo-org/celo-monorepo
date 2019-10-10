@@ -74,6 +74,7 @@ import com.android.build.OutputFile
 
 project.ext.react = [
         entryFile        : "index.js",
+        enableHermes: true,  // clean and rebuild if changing
         extraPackagerArgs: ["--max-workers=2"],
         bundleInIntegration: true,
         devDisabledInIntegration: true,
@@ -96,7 +97,7 @@ project.ext.envConfigFiles = [
 
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 apply from: "../../node_modules/react-native/react.gradle"
-apply from: "../../../../node_modules/react-native-sentry/sentry.gradle"
+apply from: "../../../../node_modules/@sentry/react-native/sentry.gradle"
 
 
  /**
@@ -109,6 +110,28 @@ def isDetoxTestBuild = !gradle.startParameter.taskNames.contains("assembleAndroi
  * Run Proguard to shrink the Java bytecode in release builds.
  */
 def enableProguardInReleaseBuilds = true
+
+/**
+ * The preferred build flavor of JavaScriptCore.
+ *
+ * For example, to use the international variant, you can use:
+ * `def jscFlavor = 'org.webkit:android-jsc-intl:+'`
+ *
+ * The international variant includes ICU i18n library and necessary data
+ * allowing to use e.g. `Date.toLocaleString` and `String.localeCompare` that
+ * give correct results when using with locales other than en-US.  Note that
+ * this variant is about 6MiB larger per architecture than default.
+ */
+def jscFlavor = 'org.webkit:android-jsc:+'
+
+/**
+ * Whether to enable the Hermes VM.
+ *
+ * This should be set on project.ext.react and mirrored here.  If it is not set
+ * on project.ext.react, JavaScript will not be compiled to Hermes Bytecode
+ * and the benefits of using Hermes will therefore be sharply reduced.
+ */
+def enableHermes = project.ext.react.get("enableHermes", false);
 
 def appVersionCode = Integer.valueOf(System.env.CIRCLE_BUILD_NUM ?: VERSION_CODE)
 
@@ -140,6 +163,13 @@ android {
                 keyPassword System.getenv("CELO_RELEASE_KEY_PASSWORD")
             }
         }
+
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
     }
     splits {
         abi {
@@ -161,6 +191,7 @@ android {
         debug {
             applicationIdSuffix ".debug"
             multiDexEnabled true
+            signingConfig signingConfigs.debug
         }
 
         integration {
@@ -205,9 +236,8 @@ android {
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
-            // For each separate APK per architecture, set a unique version code as described here:
-            // http://tools.android.com/tech-docs/new-build-system/user-guide/apk-splits
-            def versionCodes = ["armeabi-v7a":1, "x86":2, "arm64-v8a": 3, "x86_64": 4]
+            // https://developer.android.com/studio/build/configure-apk-splits.html
+            def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
             def abi = output.getFilter(OutputFile.ABI)
             if (abi != null) {  // null for the universal-debug, universal-release variants
                 output.versionCodeOverride =
@@ -223,55 +253,31 @@ android {
 }
 
 dependencies {
-    implementation project(':react-native-install-referrer')
-    implementation project(':react-native-send-intent')
-    // implementation project(':react-native-screens')
-    implementation project(':react-native-webview')
-    implementation project(':@react-native-community_netinfo')
-    implementation project(':react-native-gesture-handler')
-    implementation project(':@segment_analytics-react-native-firebase')
-    implementation project(':@segment_analytics-react-native')
-    implementation project(':react-native-camera')
-    implementation project(':react-native-mail')
-    implementation project(':react-native-splash-screen')
-    implementation project(':react-native-version-check')
-    implementation project(':react-native-android-open-settings')
-    implementation project(':react-native-udp')
-    implementation project(':react-native-localize')
-    implementation project(':react-native-config')
-    implementation project(':react-native-tcp')
-    implementation project(':react-native-sentry')
-    implementation project(':react-native-secure-randombytes')
-    implementation project(':react-native-svg')
-    implementation project(':react-native-contacts')
-    implementation project(':react-native-keep-awake')
-    implementation project(':react-native-device-info')
-    implementation project(':react-native-fs')
-    implementation project(':react-native-geth')
-    implementation project(':react-native-flag-secure-android')
-    implementation project(':react-native-firebase')
-    implementation project(':react-native-confirm-device-credentials')
-    implementation project(':react-native-restart-android')
-    implementation project(':react-native-sms-retriever')
-    implementation project(':react-native-share')
-    implementation project(':react-native-secure-key-store')
-
     androidTestImplementation('com.wix:detox:+') { transitive = true }
     androidTestImplementation 'junit:junit:4.12'
 
-    implementation 'com.google.android.gms:play-services-base:16.1.0'
-    implementation 'com.google.firebase:firebase-core:16.0.8'
-    implementation 'com.google.firebase:firebase-messaging:17.6.0'
-    implementation 'com.google.firebase:firebase-database:16.1.0'
-    implementation 'com.google.firebase:firebase-auth:16.2.1'
-    implementation 'com.google.firebase:firebase-invites:16.1.1'
-    implementation 'com.google.firebase:firebase-storage:16.1.0'
+    implementation platform("com.google.firebase:firebase-bom:22.2.0")
+    implementation 'com.google.android.gms:play-services-base'
+    implementation 'com.google.firebase:firebase-core'
+    implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-database'
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-invites'
+    implementation 'com.google.firebase:firebase-storage'
     implementation 'ru.ivanarh.ndcrash:jndcrash-libunwind:0.7'
-
+    implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'
+    implementation project(':react-native-geth')
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation 'com.facebook.react:react-native:+'  // From node_modules
-    implementation 'com.android.support:multidex:1.0.3'
+
+    if (enableHermes) {
+        def hermesPath = "../../../../node_modules/hermes-engine/android/";
+        debugImplementation files(hermesPath + "hermes-debug.aar")
+        releaseImplementation files(hermesPath + "hermes-release.aar")
+    } else {
+        implementation jscFlavor
+    }
 }
 
 // Run this once to be able to run the application with BUCK
@@ -290,3 +296,5 @@ if (enableFirebase.toBoolean()){
   println 'Info: Firebase is disabled in .env variable'
 }
 
+
+apply from: file("../../../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

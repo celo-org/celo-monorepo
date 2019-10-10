@@ -1,7 +1,7 @@
+import Sentry from '@sentry/react-native'
 import firebase, { Firebase } from 'react-native-firebase'
 import { RemoteMessage } from 'react-native-firebase/messaging'
 import { Notification, NotificationOpen } from 'react-native-firebase/notifications'
-import { Sentry } from 'react-native-sentry'
 import { NotificationReceiveState, PaymentRequest } from 'src/account'
 import { handleNotification } from 'src/firebase/notifications'
 import { getReduxStore } from 'src/redux/store'

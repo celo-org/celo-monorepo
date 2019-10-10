@@ -41,7 +41,7 @@ class LanguageSelectUI extends React.PureComponent<Props> {
             <Image source={logo} style={styles.logo} resizeMode={'contain'} />
           </View>
           <Text style={[fontStyles.h1, styles.h1]} testID={'ChooseLanguageTitle'}>
-            {t('chooseLanguage')}
+            {"I'm RN 0.61"}
           </Text>
           <View style={componentStyles.line} testID="line" />
           {languages.map((language: LanguageType) => (
