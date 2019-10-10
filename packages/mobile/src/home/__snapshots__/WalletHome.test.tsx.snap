@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -665,5 +665,5 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
       />
     </View>
   </RCTScrollView>
-</View>
+</SafeAreaView>
 `;

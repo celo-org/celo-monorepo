@@ -17,6 +17,7 @@ import {
   Text,
   View,
 } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import SendIntentAndroid from 'react-native-send-intent'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
@@ -76,10 +77,10 @@ export class EnterInviteCode extends React.Component<Props, State> {
     validCode: null,
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     AppState.addEventListener('change', this.handleAppStateChange)
-    this.checkForReferrerCode()
-    this.checkIfValidCodeInClipboard()
+    await this.checkIfValidCodeInClipboard()
+    await this.checkForReferrerCode()
   }
 
   componentWillUnmount() {
@@ -103,7 +104,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
 
   handleAppStateChange = async (nextAppState: AppStateStatus) => {
     if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-      this.checkIfValidCodeInClipboard()
+      await this.checkIfValidCodeInClipboard()
     }
     this.setState({ appState: nextAppState })
   }
@@ -147,7 +148,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
     const { validCode } = this.state
 
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <DevSkipButton nextScreen={Screens.ImportContacts} />
           <InviteCodeIcon />
@@ -235,7 +236,7 @@ export class EnterInviteCode extends React.Component<Props, State> {
             testID="ContinueInviteButton"
           />
         </View>
-      </View>
+      </SafeAreaView>
     )
   }
 }

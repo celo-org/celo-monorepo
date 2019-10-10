@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { PaymentRequestStatuses } from 'src/account'
+import { PaymentRequestStatus } from 'src/account'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
@@ -48,7 +48,7 @@ export class PaymentRequestListItem extends React.Component<Props> {
 
   onPaymentSuccess = () => {
     const { id } = this.props
-    this.props.updatePaymentRequestStatus(id.toString(), PaymentRequestStatuses.COMPLETED)
+    this.props.updatePaymentRequestStatus(id.toString(), PaymentRequestStatus.COMPLETED)
     Logger.showMessage(this.props.t('requestPaid'))
     CeloAnalytics.track(CustomEventNames.request_payment_pay)
     this.onFinalized()
@@ -56,7 +56,7 @@ export class PaymentRequestListItem extends React.Component<Props> {
 
   onPaymentDecline = () => {
     const { id } = this.props
-    this.props.updatePaymentRequestStatus(id.toString(), PaymentRequestStatuses.DECLINED)
+    this.props.updatePaymentRequestStatus(id.toString(), PaymentRequestStatus.DECLINED)
     Logger.showMessage(this.props.t('requestDeclined'))
     CeloAnalytics.track(CustomEventNames.request_payment_decline)
     this.onFinalized()

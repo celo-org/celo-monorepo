@@ -55,8 +55,8 @@ export async function getContractAddresses() {
   }
   try {
     const kit = await getContractKit()
-    goldTokenAddress = (await kit.registry.addressFor(CeloContract.StableToken)).toLowerCase()
-    stableTokenAddress = (await kit.registry.addressFor(CeloContract.GoldToken)).toLowerCase()
+    goldTokenAddress = (await kit.registry.addressFor(CeloContract.GoldToken)).toLowerCase()
+    stableTokenAddress = (await kit.registry.addressFor(CeloContract.StableToken)).toLowerCase()
     attestationsAddress = (await kit.registry.addressFor(CeloContract.Attestations)).toLowerCase()
     tokenAddressMapping = {
       [goldTokenAddress]: 'Celo Gold',

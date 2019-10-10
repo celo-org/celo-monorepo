@@ -5,11 +5,12 @@ import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { PaymentRequestStatuses } from 'src/account'
+import { PaymentRequestStatus } from 'src/account'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -109,7 +110,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       requesteeAddress,
       currency: currencyToShortMap[CURRENCY_ENUM.DOLLAR],
       comment: reason,
-      status: PaymentRequestStatuses.REQUESTED,
+      status: PaymentRequestStatus.REQUESTED,
       notified: false,
     }
 
@@ -142,7 +143,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
     } = this.getConfirmationInput()
 
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <DisconnectBanner />
         <ReviewFrame
           HeaderComponent={this.renderHeader}
@@ -162,7 +163,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
             currency={CURRENCY_ENUM.DOLLAR} // User can only request in Dollars
           />
         </ReviewFrame>
-      </View>
+      </SafeAreaView>
     )
   }
 }
