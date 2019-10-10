@@ -156,23 +156,28 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     uint256 value = numerator.mul(DENOMINATOR).div(denominator);
     if (rates[token].contains(msg.sender)) {
       rates[token].update(msg.sender, value, lesserKey, greaterKey);
-      timestamps[token].update(
-        msg.sender,
-        // solhint-disable-next-line not-rely-on-time
-        now,
-        timestamps[token].getHead(),
-        address(0)
-      );
+
+      // Rather than update the timestamp, we remove it and re-add it at the
+      // head of the list later. The reason for this is that we need to handle
+      // a few different cases:
+      //   1. This oracle is the only one to report so far. lesserKey = address(0)
+      //   2. Other oracles have reported since this one's last report. lesserKey = getHead()
+      //   3. Other oracles have reported, but the most recent is this one.
+      //      lesserKey = key immediately after getHead()
+      //
+      // However, if we just remove this timestamp, timestamps[token].getHead()
+      // does the right thing in all cases.
+      timestamps[token].remove(msg.sender);
     } else {
       rates[token].insert(msg.sender, value, lesserKey, greaterKey);
-      timestamps[token].insert(
-        msg.sender,
-        // solhint-disable-next-line not-rely-on-time
-        now,
-        timestamps[token].getHead(),
-        address(0)
-      );
     }
+    timestamps[token].insert(
+      msg.sender,
+      // solhint-disable-next-line not-rely-on-time
+      now,
+      timestamps[token].getHead(),
+      address(0)
+    );
     emit OracleReported(token, msg.sender, now, value, DENOMINATOR);
     uint256 newMedian = rates[token].getMedianValue();
     if (newMedian != originalMedian) {
