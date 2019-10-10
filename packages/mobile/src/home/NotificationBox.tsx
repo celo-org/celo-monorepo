@@ -101,7 +101,7 @@ export class NotificationBox extends React.Component<Props, State> {
             text: t('getBackupKey'),
             onPress: () => {
               CeloAnalytics.track(CustomEventNames.get_backup_key)
-              navigate(Screens.Backup)
+              navigate(Screens.BackupIntroduction)
             },
           },
         ],

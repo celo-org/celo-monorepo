@@ -1,13 +1,13 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import CopyIcon from '@celo/react-components/icons/Copy'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Clipboard, Linking, StyleSheet, Text, View } from 'react-native'
+import { Clipboard, StyleSheet, Text, View } from 'react-native'
+import FlagSecure from 'react-native-flag-secure-android'
 import { Namespaces } from 'src/i18n'
 import Logger from 'src/utils/Logger'
-
-const TAG = 'Backup/BackupPhraseContainer'
 
 type Props = {
   words: string | null
@@ -17,67 +17,51 @@ type Props = {
 } & WithNamespaces
 
 export class BackupPhraseContainer extends React.Component<Props> {
+  async componentDidMount() {
+    FlagSecure.activate()
+  }
+
+  componentWillUnmount() {
+    FlagSecure.deactivate()
+  }
+
   onShare = () => {
     const { onShare } = this.props
     if (onShare) {
       onShare()
     }
   }
+
   copy = () => {
     const { words, t } = this.props
     if (!words) {
-      Logger.showMessage(t('failedCopy'))
-      Logger.error(TAG, 'Failed to copy mnemonic')
-      this.onShare()
       return
     }
-
     Clipboard.setString(words)
     Logger.showMessage(t('copied'))
     this.onShare()
   }
 
-  sendWhatsapp = () => {
-    // TODO(Derrick): Analytics here and copy
-    const { words, t } = this.props
-    if (!words) {
-      this.onShare()
-      return
-    }
-
-    const msg = encodeURIComponent(t('whatsappMessage') + words)
-    Linking.openURL(`https://api.whatsapp.com/send?phone=&text=${msg}`)
-    this.onShare()
-  }
-
   render() {
-    const { t, words, showCopy, showWhatsApp } = this.props
+    const { t, words, showCopy } = this.props
 
     return (
       <View style={styles.phraseContainer}>
         {!!words && (
           <>
             <Text style={styles.phraseText}>{`${words}`}</Text>
-            <View style={styles.buttonsContainer}>
-              {showCopy && (
-                <Button
-                  onPress={this.copy}
-                  text={t('copy')}
-                  style={[styles.button, !showWhatsApp && styles.fullWidthButton]}
-                  standard={true}
-                  type={BtnTypes.QUATERNARY}
-                />
-              )}
-              {showWhatsApp && (
-                <Button
-                  onPress={this.sendWhatsapp}
-                  text={t('sendWhatsApp')}
-                  style={[styles.button, !showCopy && styles.fullWidthButton]}
-                  standard={true}
-                  type={BtnTypes.PRIMARY}
-                />
-              )}
-            </View>
+            {showCopy && (
+              <Button
+                onPress={this.copy}
+                text={t('global:copy')}
+                style={styles.button}
+                standard={true}
+                type={BtnTypes.QUATERNARY}
+                lineHeight={40}
+              >
+                <CopyIcon color={colors.celoGreen} height={18} width={23} />
+              </Button>
+            )}
           </>
         )}
       </View>
@@ -87,35 +71,22 @@ export class BackupPhraseContainer extends React.Component<Props> {
 
 const styles = StyleSheet.create({
   phraseContainer: {
-    position: 'relative',
     backgroundColor: colors.darkLightest,
     borderRadius: 4,
     alignContent: 'center',
     justifyContent: 'center',
-    padding: 16,
-    marginTop: 18,
-    marginBottom: 18,
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    padding: 14,
   },
   button: {
     alignSelf: 'center',
-    flex: 0.48,
-  },
-  fullWidthButton: {
     flex: 1,
+    paddingBottom: 0,
+    marginBottom: 0,
   },
   phraseText: {
-    ...fontStyles.h2,
-    textAlign: 'left',
-  },
-  labelText: {
     ...fontStyles.body,
-    fontSize: 16,
-    textAlign: 'left',
-    paddingTop: 15,
+    lineHeight: 27,
+    color: colors.darkSecondary,
   },
 })
 

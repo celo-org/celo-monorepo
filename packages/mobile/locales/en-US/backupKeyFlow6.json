@@ -1,12 +1,11 @@
 {
-  "readOnlyMode": "Read Only Mode Set Backup Key to continue sending and receiving {{CeloDollars}}",
   "getBackupKey": "Get Backup Key",
   "viewBackupKey": "View Backup Key",
-  "setUpSocialBackup": "Set Up Recovery Secrets",
-  "viewSocialBackup": "View Recovery Secrets",
+  "setUpSocialBackup": "Set Up Safeguards",
   "failedFetchMnemonic": "Failed to fetch your Backup Key",
-  "socialBackup": "Backup with Friends",
+  "socialBackupTitle": "Introducing Safeguards",
   "editProfile": "Edit Profile",
+  "backupAndRecovery": "Backup and Recovery",
   "backupKey": "Backup Key",
   "yourBackupKey": "Your Backup Key",
   "delayBackup": "Dismiss for an hour",
@@ -15,15 +14,14 @@
   "languageSettings": "Language Settings",
   "cancel": "Cancel",
   "backupKeyImportance": {
-    "0":
-      "Your Backup Key controls access ot your Celo Wallet. It is very important to keep this Key safe. ",
+    "0": "Your Backup Key is your Celo Wallet. It is very important to keep it safe.",
     "1":
-      "If you lose your phone or delete the Celo app, you will lose access to your Celo {{dollars}} and Gold."
+      "If you lose your Backup Key or it is stolen, you will lose your Celo {{dollars}} and Gold."
   },
-  "toDo": "To make sure your funds stay safe, you'll need to do the following:",
+  "toKeepSafe": "To keep your funds safe, you should:",
   "allDone": "You've successfully backed up your Key! Check back here to view it at any time.",
-  "writeDownKey": "- Write down your Backup Key",
-  "shareSocialBackup": "- Share Recovery Secrets",
+  "writeDownKey": "1. Write down your Backup Key",
+  "shareSocialBackup": "2. Share Recovery Secrets",
   "setBackupKey": "Set Backup Key",
   "enterBackupKey": "Enter your Backup Key",
   "backupKeyConfirmation":
@@ -38,14 +36,9 @@
   "sendWhatsApp": "Send with WhatsApp",
   "continue": "Continue",
   "backupWithFriends": "Backup with Friends",
-  "tip": "Tip ",
   "securityTip":
-    "Please do not take a screenshot or save it in your phone's notes. Keep your Backup Key somewhere you can access if you lose your phone.",
-  "backupKeySummary": {
-    "0": "Write this phrase down on a piece of paper and keep it somewhere safe.",
-    "1": "Don’t show your phrase to anyone else. They can access your wallet if they see it."
-  },
-  "heresYourKey": "Here is your Backup Key. Remember, keep this safe.",
+    "Keep your Backup Key somewhere you can access if you lose your phone. Do not take a screenshot or save it in your phone’s notes.",
+  "backupKeySummary": "Please write down this Backup Key and store it somewhere safe.",
   "socialBackupYourKey":
     "Recovery Secrets allow you to recover your account with the help of two friends. If you lose your Backup Key, you will need to contact your friends and enter both Recovery Secrets.",
   "sendFirstHalf": "First, send this recovery secret to one contact:",
@@ -66,13 +59,8 @@
   },
   "dontLoseIt":
     "Please do not lose this key. It is critical that you maintain this in a safe place, as this is the only way to unlock your wallet should you lose your phone.",
-  "done": "Done",
-  "whatsappMessage":
-    "Important: please keep this private. \n\nI'm sending you the Backup Phrase to my Celo Wallet: \n\n",
   "backupPrompt":
     "For the security of your funds, your account is frozen until you get your Backup Key",
-  "copy": "Copy",
-  "copied": "Copied to clipboard",
-  "clipboardCleared": "Clipboard cleared",
-  "failedCopy": "Failed to copy to clipboard"
+  "copied": "Backup Key copied to clipboard",
+  "savedConfirmation": "I have saved my Backup Key."
 }

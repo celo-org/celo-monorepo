@@ -90,5 +90,7 @@
   "errorDuringSync": "Error occurred during sync, please try again later",
   "calculateFeeFailed": "Could not calculate fee",
   "gold": "Gold",
-  "localCurrencyTitle": "Select Currency"
+  "localCurrencyTitle": "Select Currency",
+  "tip": "Tip: ",
+  "copy": "Copy"
 }

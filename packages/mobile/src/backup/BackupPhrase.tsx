@@ -3,8 +3,7 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Clipboard, StyleSheet, Text, View } from 'react-native'
-import FlagSecure from 'react-native-flag-secure-android'
+import { StyleSheet, Switch, Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
@@ -15,7 +14,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackupPhraseContainer from 'src/backup/BackupPhraseContainer'
 import { getStoredMnemonic } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
-import { headerWithBackButton } from 'src/navigator/Headers'
+import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -23,6 +22,7 @@ import Logger from 'src/utils/Logger'
 
 interface State {
   mnemonic: string
+  isConfirmChecked: boolean
 }
 
 interface StateProps {
@@ -43,22 +43,21 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 class BackupPhrase extends React.Component<Props, State> {
-  // TODO(Derrick): Show cancel if backup flow incomplete
+  // TODO(Rossy): Show modal when cancelling if backup flow incomplete
   static navigationOptions = () => ({
-    ...headerWithBackButton,
+    ...headerWithCancelButton,
   })
 
   state = {
     mnemonic: '',
+    isConfirmChecked: false,
   }
 
-  componentDidMount() {
-    FlagSecure.activate()
-    this.retrieveMnemonic()
+  async componentDidMount() {
+    await this.retrieveMnemonic()
   }
 
   componentWillUnmount() {
-    FlagSecure.deactivate()
     this.props.hideAlert()
   }
 
@@ -70,28 +69,29 @@ class BackupPhrase extends React.Component<Props, State> {
     try {
       const mnemonic = await getStoredMnemonic()
       if (!mnemonic) {
-        throw new Error('Mnemonic not stored in key store')
+        throw new Error('Mnemonic not found in key store')
       }
       this.setState({ mnemonic })
     } catch (e) {
-      Logger.error('backup/retrieveMnemonic', e)
+      Logger.error('BackupPhrase/retrieveMnemonic', 'Failed to retrieve mnemonic', e)
       this.props.showError(ErrorMessages.FAILED_FETCH_MNEMONIC)
     }
   }
 
-  continueBackup = () => {
-    const { t } = this.props
+  onPressConfirmSwitch = (value: boolean) => {
+    this.setState({
+      isConfirmChecked: value,
+    })
+  }
+
+  onPressContinue = () => {
     CeloAnalytics.track(CustomEventNames.backup_continue)
-    // Clear clipboard so that users won't just copy here and paste it directly
-    // in the verification step.  Hopefully makes users paste it somewhere else at least.
-    Clipboard.setString('')
-    Logger.showMessage(t('clipboardCleared'))
     navigate(Screens.BackupQuiz)
   }
 
   render() {
     const { t, backupCompleted } = this.props
-    const { mnemonic } = this.state
+    const { mnemonic, isConfirmChecked } = this.state
     return (
       <View style={styles.container}>
         <KeyboardAwareScrollView
@@ -99,29 +99,35 @@ class BackupPhrase extends React.Component<Props, State> {
           keyboardShouldPersistTaps="always"
         >
           <View>
-            <Text style={[fontStyles.h1, styles.title]}>{t('yourBackupKey')}</Text>
-            {!backupCompleted ? (
-              <Text style={styles.verifyText}>{t('backupKeySummary.0')}</Text>
-            ) : (
-              <Text style={styles.verifyText}>{t('heresYourKey')}</Text>
-            )}
+            <Text style={fontStyles.h1}>{t('yourBackupKey')}</Text>
+            <Text style={styles.body}>{t('backupKeySummary')}</Text>
             <BackupPhraseContainer words={mnemonic} showCopy={true} />
-            <Text style={styles.verifyText}>
-              <Text style={[styles.verifyText, fontStyles.bold]}>{t('tip')}</Text>
+            <Text style={styles.tipText}>
+              <Text style={[styles.tipText, fontStyles.bold]}>{t('global:tip')}</Text>
               {t('securityTip')}
             </Text>
           </View>
         </KeyboardAwareScrollView>
-        <View>
-          {!backupCompleted && (
+        {!backupCompleted && (
+          <View>
+            <View style={styles.confirmationSwitchContainer}>
+              <Text style={styles.confirmationSwitchLabel}>{t('savedConfirmation')}</Text>
+              <Switch
+                value={isConfirmChecked}
+                onValueChange={this.onPressConfirmSwitch}
+                trackColor={switchTrackColors}
+                thumbColor={colors.celoDarkGreen}
+              />
+            </View>
             <Button
-              onPress={this.continueBackup}
+              disabled={!isConfirmChecked}
+              onPress={this.onPressContinue}
               text={t('continue')}
               standard={false}
               type={BtnTypes.PRIMARY}
             />
-          )}
-        </View>
+          </View>
+        )}
       </View>
     )
   }
@@ -130,46 +136,40 @@ class BackupPhrase extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingBottom: 60,
-  },
-  title: {
-    paddingBottom: 10,
-    color: colors.dark,
+    paddingBottom: 20,
   },
   body: {
-    paddingBottom: 15,
-    color: colors.dark,
+    ...fontStyles.body,
+    marginBottom: 20,
   },
-  phraseContainer: {
-    position: 'relative',
-    backgroundColor: colors.altDarkBg,
-    alignContent: 'center',
-    justifyContent: 'center',
-    padding: 16,
-    marginTop: 30,
-  },
-  phraseText: {
-    ...fontStyles.h2,
-    textAlign: 'left',
-  },
-  verifyText: {
+  tipText: {
     ...fontStyles.bodySmall,
-    fontSize: 15,
-    textAlign: 'left',
-    paddingTop: 15,
+    marginTop: 25,
+    marginHorizontal: 3,
   },
-  buttonSpacing: {
-    marginTop: 20,
-    marginLeft: 5,
+  confirmationSwitchContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    flexDirection: 'row',
+  },
+  confirmationSwitchLabel: {
+    ...fontStyles.body,
+    paddingTop: 2,
+    paddingRight: 20,
   },
 })
+
+const switchTrackColors = {
+  false: colors.inactiveDark,
+  true: colors.celoGreen,
+}
 
 export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(

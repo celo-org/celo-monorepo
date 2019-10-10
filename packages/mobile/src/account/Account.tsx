@@ -232,7 +232,7 @@ export class Account extends React.Component<Props, State> {
           />
         </View>
         <View style={style.containerList}>
-          <SettingsItem title={t('backupKey')} onPress={this.backupScreen} />
+          <SettingsItem title={t('backupKeyFlow6:backupAndRecovery')} onPress={this.backupScreen} />
           <SettingsItem title={t('invite')} onPress={this.goToInvite} />
           {features.SHOW_SHOW_REWARDS_APP_LINK && (
             <SettingsItem title={t('celoRewards')} onPress={navigateToVerifierApp} />

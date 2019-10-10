@@ -4,16 +4,13 @@ import { setBackupCompleted } from 'src/account/actions'
 import { hideAlert, showError } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import BackupQuestion from 'src/backup/BackupQuestion'
 import BackupVerify from 'src/backup/BackupVerify'
-import { createQuizWordList, getStoredMnemonic, selectQuizWordOptions } from 'src/backup/utils'
+import { getStoredMnemonic, selectQuizWordOptions } from 'src/backup/utils'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
-
-const OPTIONS_PER_QUESTION = 4
 
 interface StateProps {
   language: string | null
@@ -22,7 +19,6 @@ interface StateProps {
 interface State {
   mnemonic: string
   wordsForBackupQuiz: string[]
-  step: number
 }
 
 interface DispatchProps {
@@ -47,14 +43,9 @@ export class BackupQuiz extends React.Component<Props, State> {
   state = {
     mnemonic: '',
     wordsForBackupQuiz: [],
-    step: 0,
   }
 
-  componentWillMount = async () => {
-    await this.retrieveMnemonic()
-  }
-
-  componentDidMount = async () => {
+  componentDidMount = () => {
     this.getWords()
   }
 
@@ -75,28 +66,9 @@ export class BackupQuiz extends React.Component<Props, State> {
     }
   }
 
-  getWords = async () => {
-    const { language } = this.props
-    const { mnemonic } = this.state
-    const wordsForBackupQuiz = await createQuizWordList(mnemonic, language)
-    this.setState({ wordsForBackupQuiz })
-  }
-
-  onCancel = () => {
-    // TODO(Derrick): Analytics for cancel
-    navigate(Screens.BackupIntroduction)
-  }
-
   onSuccess = () => {
-    const { step } = this.state
-
-    if (step === 0) {
-      this.setState({ step: step + 1 })
-      return
-    }
-
     this.props.setBackupCompleted()
-    navigate(Screens.BackupSocialFirst)
+    navigate(Screens.BackupSocial)
   }
 
   onWrongSubmit = () => {
@@ -111,7 +83,7 @@ export class BackupQuiz extends React.Component<Props, State> {
   }
 
   render() {
-    const { mnemonic, wordsForBackupQuiz, step } = this.state
+    const { mnemonic, wordsForBackupQuiz } = this.state
 
     // Empty defaults should not show as we fetch mnemonic before mount
     const [correctWord = '', wordOptions = []] = selectQuizWordOptions(
@@ -119,19 +91,6 @@ export class BackupQuiz extends React.Component<Props, State> {
       wordsForBackupQuiz,
       OPTIONS_PER_QUESTION
     )
-
-    if (step === 0) {
-      return (
-        <BackupQuestion
-          words={wordOptions}
-          correctAnswer={correctWord}
-          onReturnToPhrase={this.showBackupPhrase}
-          onCorrectSubmit={this.onSuccess}
-          onWrongSubmit={this.onWrongSubmit}
-          onCancel={this.onCancel}
-        />
-      )
-    }
 
     return (
       <BackupVerify

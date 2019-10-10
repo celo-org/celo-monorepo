@@ -9,8 +9,7 @@ import { setBackupDelayed } from 'src/account/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { enterBackupFlow } from 'src/app/actions'
-import BackupModal from 'src/backup/BackupModal'
+import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
 import { Namespaces } from 'src/i18n'
 import backupIcon from 'src/images/backup-icon.png'
 import { headerWithBackButton } from 'src/navigator/Headers'
@@ -34,6 +33,7 @@ interface StateProps {
 interface DispatchProps {
   setBackupDelayed: typeof setBackupDelayed
   enterBackupFlow: typeof enterBackupFlow
+  exitBackupFlow: typeof exitBackupFlow
 }
 
 type Props = WithNamespaces & StateProps & DispatchProps
@@ -57,6 +57,14 @@ class BackupIntroduction extends React.Component<Props, State> {
     visibleModal: false,
   }
 
+  componentDidMount() {
+    this.props.enterBackupFlow()
+  }
+
+  componentWillUnmount() {
+    this.props.exitBackupFlow()
+  }
+
   trackAnalytics = (event?: CustomEventNames) => {
     if (!event) {
       return
@@ -65,60 +73,47 @@ class BackupIntroduction extends React.Component<Props, State> {
     CeloAnalytics.track(CustomEventNames.backup_cancel)
   }
 
-  goBackup = (event?: CustomEventNames) => {
-    this.trackAnalytics(event)
+  // goSocialBackup = (event?: CustomEventNames) => {
+  // }
+  // onPressSkip = () => {
+  //   this.setState({ visibleModal: true })
+  //   this.trackAnalytics(CustomEventNames.skip_backup)
+  // }
+
+  onPressViewBackupKey = () => {
+    this.trackAnalytics(CustomEventNames.view_backup_phrase)
     navigate(Screens.BackupPhrase)
   }
 
-  goSocialBackup = (event?: CustomEventNames) => {
-    this.trackAnalytics(event)
-    navigate(Screens.BackupSocialFirst)
+  onPressBackup = () => {
+    this.trackAnalytics(CustomEventNames.set_backup_phrase)
+    navigate(Screens.BackupPhrase)
   }
 
-  goBack = (event?: CustomEventNames) => {
-    this.trackAnalytics(event)
+  onPressSetupSocialBackup = () => {
+    this.trackAnalytics(CustomEventNames.set_social_backup)
+    navigate(Screens.BackupSocial)
+  }
+
+  // onPressViewSocialBackup = () => {
+  //   this.goSocialBackup(CustomEventNames.view_social_backup)
+  // }
+
+  onPressDelay = () => {
+    this.props.setBackupDelayed()
+    this.trackAnalytics(CustomEventNames.delay_backup)
     navigateBack()
   }
 
-  cancel = () => {
-    this.goBack(CustomEventNames.backup_cancel)
-  }
+  // onInsistSkip = () => {
+  //   this.setState({ visibleModal: false }, () => this.goBack(CustomEventNames.insist_skip_backup))
+  // }
 
-  onSkip = () => {
-    this.setState({ visibleModal: true })
-    this.trackAnalytics(CustomEventNames.skip_backup)
-  }
-
-  onViewBackupKey = () => {
-    this.goBackup(CustomEventNames.view_backup_phrase)
-  }
-
-  onBackup = () => {
-    this.goBackup(CustomEventNames.set_backup_phrase)
-  }
-
-  onSocialBackup = () => {
-    this.goSocialBackup(CustomEventNames.set_social_backup)
-  }
-
-  onViewSocialBackup = () => {
-    this.goSocialBackup(CustomEventNames.view_social_backup)
-  }
-
-  onDelay = () => {
-    this.props.setBackupDelayed()
-    this.goBack(CustomEventNames.delay_backup)
-  }
-
-  onInsistSkip = () => {
-    this.setState({ visibleModal: false }, () => this.goBack(CustomEventNames.insist_skip_backup))
-  }
-
-  onInsistBackup = () => {
-    this.setState({ visibleModal: false }, () =>
-      this.goBackup(CustomEventNames.insist_backup_phrase)
-    )
-  }
+  // onInsistBackup = () => {
+  //   this.setState({ visibleModal: false }, () =>
+  //     this.goBackup(CustomEventNames.insist_backup_phrase)
+  //   )
+  // }
 
   render() {
     const {
@@ -131,28 +126,20 @@ class BackupIntroduction extends React.Component<Props, State> {
     return (
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <View style={styles.center}>
-            <Image source={backupIcon} style={styles.logo} />
-          </View>
-          <Text style={[fontStyles.h1, styles.h1]}>{t('backupKey')}</Text>
-          <Text style={[fontStyles.body, styles.body]}>
-            {t('backupKeyImportance.0')}
-            <Text style={[fontStyles.bold]}>{t('backupKeyImportance.1')}</Text>
-          </Text>
-          {!backupCompleted || !socialBackupCompleted ? (
-            <Text style={[fontStyles.body, styles.body]}>{t('toDo')}</Text>
-          ) : (
-            <Text style={[fontStyles.body, styles.body]}>{t('allDone')}</Text>
-          )}
+          <Image source={backupIcon} style={styles.logo} />
+          <Text style={styles.h1}>{t('backupAndRecovery')}</Text>
+          <Text style={styles.body}>{t('backupKeyImportance.0')}</Text>
+          <Text style={[styles.body, fontStyles.bold]}>{t('backupKeyImportance.1')}</Text>
           {!backupCompleted && (
-            <Text style={[fontStyles.body, styles.body]}>{t('writeDownKey')}</Text>
-          )}
-          {!socialBackupCompleted && (
-            <Text style={[fontStyles.body, styles.body]}>{t('shareSocialBackup')}</Text>
+            <>
+              <Text style={styles.body}>{t('toKeepSafe')}</Text>
+              <Text style={styles.bodyCta}>{t('writeDownKey')}</Text>
+              <Text style={styles.bodyCta}>{t('shareSocialBackup')}</Text>
+            </>
           )}
         </ScrollView>
         <View>
-          <BackupModal
+          {/* <BackupModal
             title={t('areYouSure')}
             isVisible={this.state.visibleModal}
             buttonText0={t('skip')}
@@ -164,59 +151,50 @@ class BackupIntroduction extends React.Component<Props, State> {
               {t('backupSkipText.0')}
               <Text style={fontStyles.bold}>{t('backupSkipText.1')}</Text>
             </Text>
-          </BackupModal>
+          </BackupModal> */}
+
+          {!backupCompleted && (
+            <Button
+              onPress={this.onPressBackup}
+              text={t('global:getStarted')}
+              standard={false}
+              type={BtnTypes.PRIMARY}
+            />
+          )}
+
           {backupCompleted &&
             !socialBackupCompleted && (
+              <>
+                <Button
+                  onPress={this.onPressSetupSocialBackup}
+                  text={t('setUpSocialBackup')}
+                  standard={false}
+                  type={BtnTypes.PRIMARY}
+                />
+                <Button
+                  onPress={this.onPressViewBackupKey}
+                  text={t('viewBackupKey')}
+                  standard={false}
+                  type={BtnTypes.TERTIARY}
+                />
+              </>
+            )}
+
+          {backupCompleted &&
+            socialBackupCompleted && (
               <Button
-                onPress={this.onSocialBackup}
-                text={t('setUpSocialBackup')}
+                onPress={this.onPressBackup}
+                text={t('viewBackupKey')}
                 standard={false}
                 type={BtnTypes.PRIMARY}
               />
             )}
 
-          {!backupCompleted ? (
-            <Button
-              onPress={this.onBackup}
-              text={t('getBackupKey')}
-              standard={false}
-              type={BtnTypes.PRIMARY}
-            />
-          ) : (
-            <Button
-              onPress={this.onViewBackupKey}
-              text={t('viewBackupKey')}
-              standard={false}
-              type={BtnTypes.TERTIARY}
-            />
-          )}
-
-          {socialBackupCompleted && (
-            <Button
-              onPress={this.onViewSocialBackup}
-              text={t('viewSocialBackup')}
-              standard={false}
-              type={BtnTypes.TERTIARY}
-            />
-          )}
-
           {backupTooLate &&
             !backupDelayedTime && (
               <Button
-                onPress={this.onDelay}
-                style={styles.skipLink}
+                onPress={this.onPressDelay}
                 text={t('delayBackup')}
-                standard={false}
-                type={BtnTypes.TERTIARY}
-              />
-            )}
-
-          {!backupTooLate &&
-            !backupCompleted && (
-              <Button
-                onPress={this.onSkip}
-                style={styles.skipLink}
-                text={t('skip')}
                 standard={false}
                 type={BtnTypes.TERTIARY}
               />
@@ -230,35 +208,36 @@ class BackupIntroduction extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column',
     backgroundColor: colors.background,
     justifyContent: 'space-between',
   },
   scrollContainer: {
-    paddingHorizontal: 20,
     flex: 1,
-    flexDirection: 'column',
+    paddingHorizontal: 20,
+    paddingBottom: 20,
     justifyContent: 'center',
   },
-  center: {
-    alignItems: 'center',
-  },
   logo: {
+    alignSelf: 'center',
     height: 75,
     width: 75,
-    padding: 10,
   },
   h1: {
+    ...fontStyles.h1,
     marginTop: 15,
-    color: colors.dark,
-    textAlign: 'center',
   },
   body: {
+    ...fontStyles.body,
     paddingBottom: 15,
   },
-  skipLink: {
-    textAlign: 'center',
+  bodyCta: {
+    ...fontStyles.body,
+    paddingBottom: 5,
+    paddingLeft: 20,
   },
+  // skipLink: {
+  //   textAlign: 'center',
+  // },
 })
 
 export default componentWithAnalytics(
@@ -267,6 +246,7 @@ export default componentWithAnalytics(
     {
       setBackupDelayed,
       enterBackupFlow,
+      exitBackupFlow,
     }
   )(withNamespaces(Namespaces.backupKeyFlow6)(BackupIntroduction))
 )

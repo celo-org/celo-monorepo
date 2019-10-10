@@ -1,5 +1,4 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
@@ -56,8 +55,6 @@ class BackupSocial extends React.Component<Props, State> {
     hasShared: false,
   }
 
-  partScreens = [Screens.BackupSocialFirst, Screens.BackupSocialSecond, Screens.BackupComplete]
-
   async componentDidMount() {
     FlagSecure.activate()
     await this.retrieveMnemonic()
@@ -89,15 +86,9 @@ class BackupSocial extends React.Component<Props, State> {
 
   continueBackup = () => {
     CeloAnalytics.track(CustomEventNames.backup_continue)
-    let { partNumber } = this.props
-    partNumber++
-
-    if (partNumber >= this.partScreens.length) {
-      throw new Error(`Invalid Social Backup part screen ${partNumber}`)
-    }
 
     this.setState({ hasShared: false })
-    navigate(this.partScreens[partNumber])
+    navigate(Screens.BackupComplete)
   }
 
   onShare = () => {
@@ -118,7 +109,7 @@ class BackupSocial extends React.Component<Props, State> {
           keyboardShouldPersistTaps="always"
         >
           <View>
-            <Text style={[fontStyles.h1, styles.title]}>{t('socialBackup')}</Text>
+            <Text style={fontStyles.h1}>{t('socialBackupTitle')}</Text>
             {partNumber === 0 &&
               firstHalf && (
                 <>
@@ -173,10 +164,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
-  },
-  title: {
-    paddingBottom: 10,
-    color: colors.dark,
   },
   verifyText: {
     ...fontStyles.bodySmall,

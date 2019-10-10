@@ -1,7 +1,6 @@
 import * as _ from 'lodash'
-import { AsyncStorage } from 'react-native'
 import { generateMnemonic, wordlists } from 'react-native-bip39'
-import { getKey, setKey } from 'src/utils/keyStore'
+import { getKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'Backup/utils'
@@ -115,25 +114,16 @@ export function joinMnemonic(mnemonicShards: string[]) {
     .join(' ')
 }
 
-// TODO(Rossy) Remove after the next alfa testnet reset
 export async function getStoredMnemonic(): Promise<string | null> {
   try {
     Logger.debug(TAG, 'Checking keystore for mnemonic')
-    let mnemonic = await getKey('mnemonic')
-    if (mnemonic) {
-      return mnemonic
+    const mnemonic = await getKey('mnemonic')
+
+    if (!mnemonic) {
+      throw new Error('No mnemonic found in storage')
     }
 
-    Logger.debug(TAG, 'Mnemonic not found in keystore, checking async storage')
-    mnemonic = await AsyncStorage.getItem('mnemonic')
-    if (mnemonic) {
-      await setKey('mnemonic', mnemonic)
-      await AsyncStorage.removeItem('mnemonic')
-      return mnemonic
-    }
-
-    Logger.error(TAG, 'No mnemonic found')
-    return null
+    return mnemonic
   } catch (error) {
     Logger.error(TAG, 'Failed to retrieve mnemonic', error)
     return null
