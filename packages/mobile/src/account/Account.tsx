@@ -7,6 +7,7 @@ import * as React from 'react'
 import { Trans, WithNamespaces, withNamespaces } from 'react-i18next'
 import { Clipboard, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
+import SafeAreaView from 'react-native-safe-area-view'
 import { Sentry } from 'react-native-sentry'
 import { connect } from 'react-redux'
 import { devModeTriggerClicked, resetBackupState } from 'src/account/actions'
@@ -211,65 +212,76 @@ export class Account extends React.Component<Props, State> {
 
     return (
       <ScrollView style={style.scrollView}>
-        <DisconnectBanner />
-        <View style={style.accountProfile}>
-          <TouchableOpacity onPress={this.onPressAvatar}>
-            <AvatarSelf />
-          </TouchableOpacity>
-          <View>
-            <TouchableOpacity onPress={this.onPressAddress}>
-              <Text numberOfLines={1} ellipsizeMode={'tail'} style={style.addressText}>
-                {account}
-              </Text>
+        <SafeAreaView>
+          <DisconnectBanner />
+          <View style={style.accountProfile}>
+            <TouchableOpacity onPress={this.onPressAvatar}>
+              <AvatarSelf />
             </TouchableOpacity>
-          </View>
-          <SmallButton
-            text={t('editProfile')}
-            testID={'editProfileButton'}
-            onPress={this.goToProfile}
-            solid={false}
-            style={style.buttonSpacing}
-          />
-        </View>
-        <View style={style.containerList}>
-          <SettingsItem title={t('backupKeyFlow6:backupAndRecovery')} onPress={this.backupScreen} />
-          <SettingsItem title={t('invite')} onPress={this.goToInvite} />
-          {features.SHOW_SHOW_REWARDS_APP_LINK && (
-            <SettingsItem title={t('celoRewards')} onPress={navigateToVerifierApp} />
-          )}
-          <SettingsItem title={t('analytics')} onPress={this.goToAnalytics} />
-          <SettingsItem title={t('languageSettings')} onPress={this.goToLanguageSetting} />
-          <SettingsItem title={t('localCurrencySetting')} onPress={this.goToLocalCurrencySetting} />
-          <SettingsItem title={t('licenses')} onPress={this.goToLicenses} />
-          <SettingsItem title={t('sendIssueReport')} onPress={this.sendLogsToSupport} />
-        </View>
-        {this.getDevSettingsComp()}
-
-        <View style={style.accountFooter}>
-          {DeviceInfo.getVersion() && (
-            <View style={style.accountFooterText}>
-              <Text style={fontStyles.bodySmall}>
-                {t('version') + ' ' + DeviceInfo.getVersion()}
-              </Text>
+            <View>
+              <TouchableOpacity onPress={this.onPressAddress}>
+                <Text numberOfLines={1} ellipsizeMode={'tail'} style={style.addressText}>
+                  {account}
+                </Text>
+              </TouchableOpacity>
             </View>
-          )}
-          <View style={style.accountFooterText}>
-            <Trans i18nKey="testFaqHere">
-              <Text style={fontStyles.bodySmall}>Test FAQ is </Text>
-              <Link style={[fontStyles.bodySmall, fontStyles.linkInline]} onPress={this.goToFAQ}>
-                here
-              </Link>
-            </Trans>
+            <SmallButton
+              text={t('editProfile')}
+              testID={'editProfileButton'}
+              onPress={this.goToProfile}
+              solid={false}
+              style={style.buttonSpacing}
+            />
           </View>
-          <View style={style.accountFooterText}>
-            <Trans i18nKey="termsOfServiceHere">
-              <Text style={fontStyles.bodySmall}>Terms of service are </Text>
-              <Link style={[fontStyles.bodySmall, fontStyles.linkInline]} onPress={this.goToTerms}>
-                here
-              </Link>
-            </Trans>
+          <View style={style.containerList}>
+            <SettingsItem
+              title={t('backupKeyFlow6:backupAndRecovery')}
+              onPress={this.backupScreen}
+            />
+            <SettingsItem title={t('invite')} onPress={this.goToInvite} />
+            {features.SHOW_SHOW_REWARDS_APP_LINK && (
+              <SettingsItem title={t('celoRewards')} onPress={navigateToVerifierApp} />
+            )}
+            <SettingsItem title={t('analytics')} onPress={this.goToAnalytics} />
+            <SettingsItem title={t('languageSettings')} onPress={this.goToLanguageSetting} />
+            <SettingsItem
+              title={t('localCurrencySetting')}
+              onPress={this.goToLocalCurrencySetting}
+            />
+            <SettingsItem title={t('licenses')} onPress={this.goToLicenses} />
+            <SettingsItem title={t('sendIssueReport')} onPress={this.sendLogsToSupport} />
           </View>
-        </View>
+          {this.getDevSettingsComp()}
+
+          <View style={style.accountFooter}>
+            {DeviceInfo.getVersion() && (
+              <View style={style.accountFooterText}>
+                <Text style={fontStyles.bodySmall}>
+                  {t('version') + ' ' + DeviceInfo.getVersion()}
+                </Text>
+              </View>
+            )}
+            <View style={style.accountFooterText}>
+              <Trans i18nKey="testFaqHere">
+                <Text style={fontStyles.bodySmall}>Test FAQ is </Text>
+                <Link style={[fontStyles.bodySmall, fontStyles.linkInline]} onPress={this.goToFAQ}>
+                  here
+                </Link>
+              </Trans>
+            </View>
+            <View style={style.accountFooterText}>
+              <Trans i18nKey="termsOfServiceHere">
+                <Text style={fontStyles.bodySmall}>Terms of service are </Text>
+                <Link
+                  style={[fontStyles.bodySmall, fontStyles.linkInline]}
+                  onPress={this.goToTerms}
+                >
+                  here
+                </Link>
+              </Trans>
+            </View>
+          </View>
+        </SafeAreaView>
       </ScrollView>
     )
   }

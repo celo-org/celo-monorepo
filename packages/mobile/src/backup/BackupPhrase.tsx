@@ -3,8 +3,8 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { StyleSheet, Switch, Text, View } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -93,11 +93,8 @@ class BackupPhrase extends React.Component<Props, State> {
     const { t, backupCompleted } = this.props
     const { mnemonic, isConfirmChecked } = this.state
     return (
-      <View style={styles.container}>
-        <KeyboardAwareScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="always"
-        >
+      <SafeAreaView style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View>
             <Text style={fontStyles.h1}>{t('yourBackupKey')}</Text>
             <Text style={styles.body}>{t('backupKeySummary')}</Text>
@@ -107,7 +104,7 @@ class BackupPhrase extends React.Component<Props, State> {
               {t('securityTip')}
             </Text>
           </View>
-        </KeyboardAwareScrollView>
+        </ScrollView>
         {!backupCompleted && (
           <View>
             <View style={styles.confirmationSwitchContainer}>
@@ -128,7 +125,7 @@ class BackupPhrase extends React.Component<Props, State> {
             />
           </View>
         )}
-      </View>
+      </SafeAreaView>
     )
   }
 }

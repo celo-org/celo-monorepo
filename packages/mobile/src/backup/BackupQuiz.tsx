@@ -76,12 +76,6 @@ export class BackupQuiz extends React.Component<Props, State> {
     this.showBackupPhrase()
   }
 
-  showBackupPhrase = () => {
-    this.setState({ step: 0 })
-    // TODO(Derrick): Analytics for show backup phrase
-    navigate(Screens.BackupPhrase)
-  }
-
   render() {
     const { mnemonic, wordsForBackupQuiz } = this.state
 

@@ -4,6 +4,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setBackupDelayed } from 'src/account/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -124,7 +125,7 @@ class BackupIntroduction extends React.Component<Props, State> {
       socialBackupCompleted,
     } = this.props
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <Image source={backupIcon} style={styles.logo} />
           <Text style={styles.h1}>{t('backupAndRecovery')}</Text>
@@ -200,7 +201,7 @@ class BackupIntroduction extends React.Component<Props, State> {
               />
             )}
         </View>
-      </View>
+      </SafeAreaView>
     )
   }
 }
