@@ -77,11 +77,14 @@
       "account": {
         "description": "Manage your account, send and receive Celo Gold and Celo Dollars"
       },
+      "config": {
+        "description": "Configure CLI options which persist across commands"
+      },
       "election": {
         "description": "View and manage validator elections"
       },
-      "config": {
-        "description": "Configure CLI options which persist across commands"
+      "exchange": {
+        "description": "Commands for interacting with the Exchange"
       },
       "lockedgold": {
         "description": "View and manage locked Celo Gold"
@@ -94,9 +97,6 @@
       },
       "validatorgroup": {
         "description": "View and manage validator groups"
-      },
-      "exchange": {
-        "description": "Commands for interacting with the Exchange"
       }
     },
     "bin": "celocli",

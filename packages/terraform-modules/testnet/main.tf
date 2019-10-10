@@ -78,6 +78,7 @@ module "bootnode" {
   gcloud_vm_service_account_email       = var.gcloud_vm_service_account_email
   geth_bootnode_docker_image_repository = var.geth_bootnode_docker_image_repository
   geth_bootnode_docker_image_tag        = var.geth_bootnode_docker_image_tag
+  network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
 }
 
@@ -95,6 +96,7 @@ module "tx_node" {
   geth_node_docker_image_repository = var.geth_node_docker_image_repository
   geth_node_docker_image_tag        = var.geth_node_docker_image_tag
   geth_verbosity                    = var.geth_verbosity
+  in_memory_discovery_table         = var.in_memory_discovery_table
   network_id                        = var.network_id
   network_name                      = data.google_compute_network.network.name
   tx_node_count                     = var.tx_node_count
@@ -124,6 +126,8 @@ module "validator" {
   geth_node_docker_image_repository = var.geth_node_docker_image_repository
   geth_node_docker_image_tag        = var.geth_node_docker_image_tag
   geth_verbosity                    = var.geth_verbosity
+  in_memory_discovery_table         = var.in_memory_discovery_table
+  istanbul_request_timeout_ms       = var.istanbul_request_timeout_ms
   network_id                        = var.network_id
   network_name                      = data.google_compute_network.network.name
   tx_node_count                     = var.tx_node_count

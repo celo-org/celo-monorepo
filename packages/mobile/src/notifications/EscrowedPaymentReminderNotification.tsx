@@ -1,7 +1,7 @@
 import BaseNotification from '@celo/react-components/components/BaseNotification'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Image, Linking, Platform, StyleSheet, View } from 'react-native'
+import { Image, Platform, StyleSheet, View } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -12,6 +12,7 @@ import { Namespaces } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
 
 interface OwnProps {
@@ -35,7 +36,7 @@ export class EscrowedPaymentReminderNotification extends React.PureComponent<Pro
               SendIntentAndroid.sendSms(recipientPhoneNumber, t('escrowedPaymentReminderSms'))
             } else {
               // TODO look into using MFMessageComposeViewController to prefill the body for iOS
-              Linking.openURL(`sms:${recipientPhoneNumber}`)
+              navigateToURI(`sms:${recipientPhoneNumber}`)
             }
           } catch {
             Logger.showError(t('SMSError'))
