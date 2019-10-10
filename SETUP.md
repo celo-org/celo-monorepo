@@ -129,7 +129,7 @@ source ~/.bashrc
 # Setting up the right version of Nvm
 nvm install 8
 nvm install 10
-alias default 10
+nvm alias default 10
 
 # Installing Yarn - https://yarnpkg.com/en/docs/install#debian-stable
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
@@ -218,7 +218,7 @@ Run the emulator with:
 emulator -avd Nexus_5X_API_28
 ```
 
-#### Optional: Install Genymotion Enumlator Manager
+#### Optional: Install Genymotion Emulator Manager
 
 Optionally, as alternative to other emulators you can install Genymotion
 
