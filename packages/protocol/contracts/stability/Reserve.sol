@@ -165,9 +165,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Returns the tobin tax
    * @return The tobin tax amount as a fraction.
    */
-  function getTobinTax() external view returns (uint128)
+  function getTobinTax() external view returns (uint256, uint256)
   {
-    return numerator;
+    return (uint256(tobinTaxCache.numerator), TOBIN_TAX_DENOMINATOR);
   }
 
   function getTokens() external view returns (address[] memory) {
