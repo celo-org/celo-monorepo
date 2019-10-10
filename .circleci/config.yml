@@ -783,10 +783,11 @@ workflows:
           requires:
             - lint-checks
             - walletkit-test
-      - end-to-end-geth-exit-test:
-          requires:
-            - lint-checks
-            - walletkit-test
+# disabled until https://github.com/celo-org/celo-blockchain/pull/481 is merged
+#      - end-to-end-geth-exit-test:
+#          requires:
+#            - lint-checks
+#            - walletkit-test
       - end-to-end-geth-governance-test:
           requires:
             - lint-checks
