@@ -169,7 +169,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function getPossiblyStaleTobinTax() external view returns (uint256, uint256, bool) {
     // solhint-disable-next-line not-rely-on-time
     bool stale = now.sub(tobinTaxCache.timestamp) > tobinTaxStalenessThreshold;
-    return (uint256(tobinTaxCache.numerator), TOBIN_TAX_DENOMINATOR, bool);
+    return (uint256(tobinTaxCache.numerator), TOBIN_TAX_DENOMINATOR, stale);
   }
 
   function getTokens() external view returns (address[] memory) {
