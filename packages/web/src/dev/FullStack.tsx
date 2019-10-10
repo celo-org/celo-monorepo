@@ -2,20 +2,19 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import LayersIllo from 'src/dev/LayersIllo'
-import Title from 'src/dev/Title'
+import { H2, H3, Li } from 'src/fonts/Fonts'
+import StackSection from 'src/dev/StackSection'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import { hashNav } from 'src/shared/menu-items'
-import OvalCoin from 'src/shared/OvalCoin'
-import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import { scrollTo as jumpTo } from 'src/utils/utils'
+import throttle from 'lodash.throttle'
 
+import { CeloLinks, hashNav } from 'src/shared/menu-items'
+import { fonts, standardStyles, textStyles, colors } from 'src/styles'
 enum Levels {
-  mobile,
-  protocol,
-  proof,
+  apps,
+  contracts,
+  blockchains,
 }
 
 interface State {
@@ -23,183 +22,103 @@ interface State {
 }
 
 class FullStack extends React.PureComponent<I18nProps, State> {
-  state = { selection: Levels.mobile }
-  setMobile = () => {
-    this.setState({ selection: Levels.mobile })
+  state = { selection: Levels.apps }
+
+  handleScroll = throttle((event) => {
+    debugger
+  }, 24)
+
+  setL1 = () => {
+    this.setState({ selection: Levels.apps })
   }
 
-  setProtocol = () => {
-    this.setState({ selection: Levels.protocol })
+  setL2 = () => {
+    this.setState({ selection: Levels.contracts })
   }
-  setProof = () => {
-    this.setState({ selection: Levels.proof })
+  setL3 = () => {
+    this.setState({ selection: Levels.blockchains })
   }
 
   setLevel = (level: Levels) => {
     this.setState({ selection: level })
   }
 
+  componentDidMount() {
+    window.addEventListener('scroll', this.handleScroll)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleScroll)
+  }
+
   render() {
     const { t } = this.props
-    const { selection } = this.state
-    const isMobileSelected = selection === Levels.mobile
-    const isProtocol = selection === Levels.protocol
-    const isProof = selection === Levels.proof
+
     return (
-      <Fade bottom={true} distance={'50px'}>
-        <View>
-          <Title title={t('techTitle')} />
-          <GridRow
-            desktopStyle={standardStyles.sectionMarginBottom}
-            tabletStyle={standardStyles.sectionMarginBottomTablet}
-            mobileStyle={standardStyles.sectionMarginBottomMobile}
-          >
-            <Cell span={Spans.fourth} tabletSpan={Spans.third}>
-              <Text style={fonts.p}>{t('fullStackText')}</Text>
-            </Cell>
-            <Cell span={Spans.half} tabletSpan={Spans.third} style={styles.illo}>
-              <LayersIllo onSelectLayer={this.setLevel} activeLayer={selection} />
-            </Cell>
-            <Cell span={Spans.fourth} tabletSpan={Spans.third} style={styles.indicators}>
-              <LevelSelection
-                active={isMobileSelected}
-                onPressTitle={this.setMobile}
-                onPressButton={jumpToMobile}
-                btnText={t('learnMore')}
-                text={t('levelLabel.mobileText')}
-              >
-                {t(`levelLabel.mobile`)}
-              </LevelSelection>
-              <LevelSelection
-                active={isProtocol}
-                onPressTitle={this.setProtocol}
-                onPressButton={jumpToProtocol}
-                btnText={t('learnMore')}
-                text={t('levelLabel.protocolText')}
-              >
-                {t(`levelLabel.protocol`)}
-              </LevelSelection>
-              <LevelSelection
-                active={isProof}
-                onPressTitle={this.setProof}
-                onPressButton={jumpToProof}
-                btnText={t('learnMore')}
-                text={t('levelLabel.proofText')}
-              >
-                {t(`levelLabel.proof`)}
-              </LevelSelection>
-            </Cell>
-          </GridRow>
-        </View>
-      </Fade>
-    )
-  }
-}
-
-function jumpToProof() {
-  jumpTo(hashNav.build.blockchain, 'center')
-}
-function jumpToProtocol() {
-  jumpTo(hashNav.build.contracts, 'center')
-}
-
-function jumpToMobile() {
-  jumpTo(hashNav.build.applications)
-}
-
-interface LevelSelectionProps {
-  active: boolean
-  children: React.ReactNode
-  onPressTitle: () => void
-  onPressButton: () => void
-  text: string
-  btnText: string
-}
-
-const LevelSelection = withScreenSize<LevelSelectionProps & ScreenProps>(
-  function LevelSelectionComponent({
-    active,
-    children,
-    onPressTitle,
-    text,
-    btnText,
-    onPressButton,
-    screen,
-  }) {
-    return (
-      <View
-        style={[
-          standardStyles.row,
-          standardStyles.elementalMarginBottom,
-          screen === ScreenSizes.DESKTOP && styles.levelSection,
-        ]}
-      >
-        <View style={styles.iconColumn}>
-          {active && (
-            <Fade>
-              <OvalCoin size={12} color={colors.primary} />
-            </Fade>
-          )}
-        </View>
-        <View style={styles.titleArea}>
-          <Text
-            style={[
-              fonts.a,
-              styles.levelSectionTitle,
-              textStyles.medium,
-              active ? {} : styles.levelSectionTitleInactive,
-            ]}
-            onPress={onPressTitle}
-          >
-            {children}
-          </Text>
-          {active && (
-            <Fade>
-              <View>
-                <Text style={[fonts.legal, styles.microText]}>{text}</Text>
-                <Button text={btnText} kind={BTN.NAKED} size={SIZE.small} onPress={onPressButton} />
-              </View>
-            </Fade>
-          )}
-        </View>
+      <View style={standardStyles.darkBackground}>
+        <GridRow>
+          <Cell span={Spans.half}>
+            <H3 style={textStyles.invert}>{t('stackSubtitle')}</H3>
+            <H2 style={[textStyles.invert, standardStyles.elementalMargin]}>{t('stackTitle')}</H2>
+          </Cell>
+        </GridRow>
+        <GridRow allStyle={{ overflow: 'hidden' }}>
+          <Cell span={Spans.half}>
+            <View style={{ width: '100%', maxWidth: 400 }}>
+              <Text style={[fonts.p, textStyles.invert, standardStyles.elementalMarginBottom]}>
+                {t('stackDescription')}
+              </Text>
+              <LayersIllo activeLayer={this.state.selection} onSelectLayer={this.setLevel} />
+            </View>
+          </Cell>
+          <Cell span={Spans.half}>
+            <StackSection
+              onPress={this.setL1}
+              id={hashNav.build.applications}
+              isSelected={this.state.selection === Levels.apps}
+              title={t('mobile.title')}
+              text={t('mobile.text')}
+              buttonOne={{ title: t('installWallet'), href: CeloLinks.walletApp }}
+              buttonTwo={{ title: t('seeCode'), href: CeloLinks.monorepo }}
+            >
+              <Li style={textStyles.invert}>{t('mobile.nonCustodial')}</Li>
+              <Li style={textStyles.invert}>{t('mobile.mobileUltra')}</Li>
+              <Li style={textStyles.invert}>{t('mobile.exchange')}</Li>
+              <Li style={textStyles.invert}>{t('mobile.qr')}</Li>
+            </StackSection>
+            <StackSection
+              onPress={this.setL2}
+              id={hashNav.build.contracts}
+              isSelected={this.state.selection === Levels.contracts}
+              title={t('protocol.title')}
+              text={t('protocol.text')}
+              buttonOne={{ title: t('readMore'), href: CeloLinks.docsOverview }}
+              buttonTwo={{ title: t('seeCode'), href: CeloLinks.monorepo }}
+            >
+              <Li style={textStyles.invert}>{t('protocol.algoReserve')}</Li>
+              <Li style={textStyles.invert}>{t('protocol.cryptoCollat')}</Li>
+              <Li style={textStyles.invert}>{t('protocol.native')}</Li>
+            </StackSection>
+            <StackSection
+              onPress={this.setL3}
+              id={hashNav.build.blockchain}
+              isSelected={this.state.selection === Levels.blockchains}
+              title={t('proof.title')}
+              text={t('proof.text')}
+              buttonOne={{ title: t('readMore'), href: CeloLinks.docsOverview }}
+              buttonTwo={{ title: t('seeCode'), href: CeloLinks.blockChainRepo }}
+            >
+              <Li style={textStyles.invert}>{t('proof.permissionless')}</Li>
+              <Li style={textStyles.invert}>{t('proof.rewardsWeighted')}</Li>
+              <Li style={textStyles.invert}>{t('proof.onChain')}</Li>
+            </StackSection>
+          </Cell>
+        </GridRow>
       </View>
     )
   }
-)
+}
 
 export default withNamespaces('dev')(FullStack)
 
-const styles = StyleSheet.create({
-  illo: {
-    paddingHorizontal: 10,
-  },
-  container: {
-    flexWrap: 'wrap',
-    flex: 1,
-  },
-  indicators: {
-    justifyContent: 'space-between',
-  },
-  levelSectionTitle: {
-    transitionProperty: 'color',
-    transitionDuration: '1500ms',
-  },
-  levelSectionTitleInactive: {
-    color: colors.secondary,
-  },
-  levelSection: {
-    minHeight: 100,
-    height: '30%',
-  },
-  microText: {
-    marginVertical: 10,
-  },
-  titleArea: {
-    flex: 1,
-  },
-  iconColumn: {
-    width: 8,
-    marginRight: 12,
-    marginTop: 2,
-  },
-})
+const styles = StyleSheet.create({})

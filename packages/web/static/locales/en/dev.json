@@ -11,6 +11,9 @@
   "installWallet": "Install Wallet",
   "seeCode": "See Code",
   "celoStack": "The Celo Stack",
+  "stackSubtitle": "Full Stack Approach",
+  "stackTitle": "Celo Layers of Technology",
+  "stackDescription": "Each layer of the technical stack is designed to meet mobile user needs.",
   "exploreCLI": "Explore the Celo CLI",
   "fullStackText": "Each layer of the technical stack is designed to meet mobile user needs.",
   "coverAction": {

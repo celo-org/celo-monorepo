@@ -17,7 +17,7 @@ interface Props {
 
 export default React.memo<Props>(function LayersIllo({ activeLayer, onSelectLayer }: Props) {
   return (
-    <Svg width="100%" height="100%" viewBox="0 0 470 290" fill="none">
+    <Svg width="100%" height="290px" viewBox="0 0 470 290" fill="none">
       {VECTORS.map((vector, index) => {
         const onPress = () => onSelectLayer(index)
         return (
@@ -26,7 +26,7 @@ export default React.memo<Props>(function LayersIllo({ activeLayer, onSelectLaye
             d={vector}
             onPress={onPress}
             style={[styles.clicky, activeLayer === index ? styles.active : styles.inactive]}
-            stroke={colors.screenGray}
+            stroke={colors.white}
             fill={'transparent'}
           />
         )
