@@ -4,7 +4,8 @@ import Fade from 'react-reveal/Fade'
 import Fellow from 'src/fellowship/Fellow'
 import { ScreenProps, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN } from 'src/shared/Button.3'
-import { colors } from 'src/styles'
+import BookLayout from 'src/layout/BookLayout'
+import { withNamespaces, NameSpaces, I18nProps } from 'src/i18n'
 
 const fellows = [
   {
@@ -12,7 +13,6 @@ const fellows = [
     image: require('src/fellowship/fellow-xochitl@2x.jpg'),
     location: 'Mexico',
     role: ' Go-to-Market',
-    color: colors.purpleScreen,
     quote:
       '“My grandparents were Mexican migrant farmers—I saw first hand how access to basic financial tools can save lives.”',
     text:
@@ -23,7 +23,6 @@ const fellows = [
     image: require('src/fellowship/fellow-pratyush@2x.jpg'),
     location: 'India',
     role: 'Engineering',
-    color: colors.purpleScreen,
     quote:
       '“As part of my thesis, I explored how to successfully maintain user privacy as we move to decentralized financial systems.”',
     text: (
@@ -52,25 +51,24 @@ const fellows = [
     image: require('src/fellowship/fellow-james@2x.jpg'),
     location: 'Colombia',
     role: 'Experience',
-    color: colors.purpleScreen,
     quote: '"I’ve spent my career running field operations under extreme financial circumstances.”',
     text:
       'James applied his skills as a Fixer to organize comprehensive field research for the entire C Labs team, interviewing 20 Venezuelan migrants in Colombia. The ethnographic interviews focused in particular on individual perspectives on the prolific informal remittance market and the process of becoming unbanked in the transition from Venezuela to Colombia. This immersive learning experience was instrumental in increasing empathy and understanding with our end users.',
   },
 ]
 
-class FellowViewer extends React.PureComponent<ScreenProps> {
+class FellowViewer extends React.PureComponent<ScreenProps & I18nProps> {
   render() {
     return (
-      <View>
-        {fellows.map((fellow, index) => (
-          <Fade key={fellow.name} distance={'20px'} bottom={true}>
-            <Fellow {...fellow} flip={index % 2 === 1} />
-          </Fade>
-        ))}
-      </View>
+      <BookLayout startBlock={true} isWide={true} label={this.props.t('fellowShowcaseLabel')}>
+        <View>
+          {fellows.map((fellow, index) => (
+            <Fellow key={fellow.name} {...fellow} flip={index % 2 === 1} />
+          ))}
+        </View>
+      </BookLayout>
     )
   }
 }
 
-export default withScreenSize(FellowViewer)
+export default withNamespaces(NameSpaces.fellowship)(withScreenSize(FellowViewer))
