@@ -28,7 +28,7 @@ spec:
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         env:
           - name: WEB3_PROVIDER
-            value: ws://tx-nodes:8546
+            value: {{ .Values.web3Provider }}
         ports:
           - name: http
             containerPort: 3000
