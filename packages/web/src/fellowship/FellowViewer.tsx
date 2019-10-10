@@ -35,7 +35,7 @@ const fellows = [
           href={'https://en.wikipedia.org/wiki/EigenTrust'}
           target="_new"
         />{' '}
-        Computation. His fellowship built on the work of Celo co-founder{' '}
+        Computation. His fellowship built on the work of Celo cofounder{' '}
         <Button
           kind={BTN.INLINE}
           text={'Sep Kamvar'}

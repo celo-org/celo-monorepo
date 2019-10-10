@@ -36,17 +36,27 @@ class Fellow extends React.PureComponent<FellowProps & ScreenProps> {
           </AspectRatio>
           {this.props.isTablet && (
             <View style={{ width: '100%', padding: 10, flex: 1 }}>
-              <H4 style={[standardStyles.elementalMarginTop, styles.quoteTablet]}>{quote}</H4>
+              <NameAndQuote
+                name={name}
+                role={role}
+                quote={quote}
+                isTablet={true}
+                location={location}
+              />
             </View>
           )}
         </View>
         <View style={[styles.content, this.props.isMobile && styles.contentMobile]}>
-          <H4>{name}</H4>
-          <Text style={fonts.h5}>
-            {location} | {role}
-          </Text>
           {!this.props.isTablet && (
-            <H4 style={[standardStyles.elementalMarginTop, styles.quote]}>{quote}</H4>
+            <View style={{ maxWidth: 450 }}>
+              <NameAndQuote
+                name={name}
+                role={role}
+                quote={quote}
+                isTablet={false}
+                location={location}
+              />
+            </View>
           )}
           <Text style={[fonts.p, standardStyles.elementalMarginTop]}>{text}</Text>
         </View>
@@ -55,16 +65,30 @@ class Fellow extends React.PureComponent<FellowProps & ScreenProps> {
   }
 }
 
+function NameAndQuote({ role, quote, isTablet, location, name }) {
+  return (
+    <>
+      <H4>{name}</H4>
+      <Text style={fonts.p}>
+        {location} | {role}
+      </Text>
+      <H4 style={[standardStyles.elementalMarginTop, isTablet ? styles.quoteTablet : styles.quote]}>
+        {quote}
+      </H4>
+    </>
+  )
+}
+
 const styles = StyleSheet.create({
   quote: {
     color: colors.purpleScreen,
   },
   quoteTablet: {
     color: colors.purpleScreen,
-    fontSize: 26,
-    lineHeight: 30,
+    fontSize: 24,
+    lineHeight: 28,
   },
-  tabletImageArea: { flexDirection: 'row', width: '100%', alignItems: 'center' },
+  tabletImageArea: { flexDirection: 'row', width: '100%' },
   image: {
     height: '100%',
     width: '100%',
