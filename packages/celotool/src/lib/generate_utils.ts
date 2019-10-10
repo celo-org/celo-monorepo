@@ -103,8 +103,7 @@ export const getValidators = (mnemonic: string, n: number) => {
   })
 }
 
-// To get faucet address, since validator 0 is used as faucet
-export const getValidator0AddressFromEnv = () => {
+export const getValidatorAddressFromEnv = (validatorIndex: number) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
   const validators =
@@ -117,7 +116,7 @@ export const getValidator0AddressFromEnv = () => {
           }
         })
       : getValidators(mnemonic, parseInt(validatorEnv, 10))
-  return ensure0x(validators[0].address)
+  return ensure0x(validators[validatorIndex].address)
 }
 
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
