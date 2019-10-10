@@ -37,6 +37,7 @@ resource "google_compute_instance" "bootnode" {
       geth_bootnode_docker_image_repository : var.geth_bootnode_docker_image_repository,
       geth_bootnode_docker_image_tag : var.geth_bootnode_docker_image_tag,
       ip_address : google_compute_address.bootnode.address,
+      network_id : var.network_id
     }
   )
 
