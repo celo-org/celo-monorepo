@@ -18,7 +18,7 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
-  struct TimestampedVote {
+  struct PendingVote {
     // The value of the vote, in gold.
     uint256 value;
     // The latest block number at which the vote was cast.
@@ -29,7 +29,7 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
     // The total number of pending votes that have been cast for this group.
     uint256 total;
     // Pending votes cast per voter.
-    mapping(address => TimestampedVote) byAccount;
+    mapping(address => PendingVote) byAccount;
   }
 
   // Pending votes are those for which no following elections have been held.
@@ -547,9 +547,9 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
     GroupPendingVotes storage groupPending = pending.forGroup[group];
     groupPending.total = groupPending.total.add(value);
 
-    TimestampedVote storage timestampedVote = groupPending.byAccount[account];
-    timestampedVote.value  = timestampedVote.value.add(value);
-    timestampedVote.blockNumber = block.number;
+    PendingVote storage pendingVote = groupPending.byAccount[account];
+    pendingVote.value  = pendingVote.value.add(value);
+    pendingVote.blockNumber = block.number;
   }
 
   /**
@@ -565,10 +565,10 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
     GroupPendingVotes storage groupPending = pending.forGroup[group];
     groupPending.total = groupPending.total.sub(value);
 
-    TimestampedVote storage timestampedVote = groupPending.byAccount[account];
-    timestampedVote.value = timestampedVote.value.sub(value);
-    if (timestampedVote.value == 0) {
-      timestampedVote.blockNumber = 0;
+    PendingVote storage pendingVote = groupPending.byAccount[account];
+    pendingVote.value = pendingVote.value.sub(value);
+    if (pendingVote.value == 0) {
+      pendingVote.blockNumber = 0;
     }
   }
 
@@ -655,6 +655,8 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @dev Votes are not allowed to be cast that would increase a group's proportion of locked gold
    *   voting for it to greater than
    *   (numGroupMembers + 1) / min(maxElectableValidators, numRegisteredValidators)
+   * @dev Note that groups may still receive additional votes via rewards even if this function
+   *   returns false.
    */
   function canReceiveVotes(address group, uint256 value) public view returns (bool) {
     uint256 totalVotesForGroup = getTotalVotesForGroup(group).add(value);
@@ -677,6 +679,7 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @dev Votes are not allowed to be cast that would increase a group's proportion of locked gold
    *   voting for it to greater than
    *   (numGroupMembers + 1) / min(maxElectableValidators, numRegisteredValidators)
+   * @dev Note that a group's vote total may exceed this number through rewards or config changes.
    */
   function getNumVotesReceivable(address group) external view returns (uint256) {
     uint256 numerator = getValidators().getGroupNumMembers(group).add(1).mul(
@@ -789,14 +792,7 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
       }
     }
     // Shuffle the validator set using validator-supplied entropy
-    bytes32 r = getRandom().random();
-    for (uint256 i = electedValidators.length - 1; i > 0; i = i.sub(1)) {
-      uint256 j = uint256(r) % (i + 1);
-      (electedValidators[i], electedValidators[j]) = (electedValidators[j], electedValidators[i]);
-      r = keccak256(abi.encodePacked(r));
-    }
-
-    return electedValidators;
+    return shuffleArray(electedValidators);
   }
 
   /**
@@ -836,5 +832,15 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
       }
     }
     return (groupIndex, memberElected);
+  }
+
+  function shuffleArray(address[] memory array) private view returns (address[] memory) {
+    bytes32 r = getRandom().random();
+    for (uint256 i = array.length - 1; i > 0; i = i.sub(1)) {
+      uint256 j = uint256(r) % (i + 1);
+      (array[i], array[j]) = (array[j], array[i]);
+      r = keccak256(abi.encodePacked(r));
+    }
+    return array;
   }
 }

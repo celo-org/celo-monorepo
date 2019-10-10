@@ -10,18 +10,21 @@ import BigNumber from 'bignumber.js'
 import {
   LockedGoldContract,
   LockedGoldInstance,
-  MockGoldTokenContract,
-  MockGoldTokenInstance,
   MockElectionContract,
   MockElectionInstance,
+  MockGoldTokenContract,
+  MockGoldTokenInstance,
+  MockValidatorsContract,
+  MockValidatorsInstance,
   RegistryContract,
   RegistryInstance,
 } from 'types'
 
 const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
-const Registry: RegistryContract = artifacts.require('Registry')
-const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
+const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
+const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
+const Registry: RegistryContract = artifacts.require('Registry')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
@@ -36,8 +39,9 @@ contract('LockedGold', (accounts: string[]) => {
   const nonOwner = accounts[1]
   const unlockingPeriod = 3 * DAY
   let lockedGold: LockedGoldInstance
-  let registry: RegistryInstance
   let mockElection: MockElectionInstance
+  let mockValidators: MockValidatorsInstance
+  let registry: RegistryInstance
 
   const capitalize = (s: string) => {
     return s.charAt(0).toUpperCase() + s.slice(1)
@@ -56,11 +60,13 @@ contract('LockedGold', (accounts: string[]) => {
 
   beforeEach(async () => {
     const mockGoldToken: MockGoldTokenInstance = await MockGoldToken.new()
-    mockElection = await MockElection.new()
     lockedGold = await LockedGold.new()
+    mockElection = await MockElection.new()
+    mockValidators = await MockValidators.new()
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
+    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await lockedGold.initialize(registry.address, unlockingPeriod)
     await lockedGold.createAccount()
 
@@ -338,15 +344,11 @@ contract('LockedGold', (accounts: string[]) => {
     })
 
     describe('when there are balance requirements', () => {
-      let mustMaintain: any
+      const balanceRequirement = 10
       beforeEach(async () => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         await lockedGold.lock({ value })
-        // Allow ourselves to call `setAccountMustMaintain()`
-        await registry.setAddressFor(CeloContractName.Validators, account)
-        const timestamp = (await web3.eth.getBlock('latest')).timestamp
-        mustMaintain = { value: 100, timestamp: timestamp + DAY }
-        await lockedGold.setAccountMustMaintain(account, mustMaintain.value, mustMaintain.timestamp)
+        await mockValidators.setAccountBalanceRequirement(account, balanceRequirement)
       })
 
       describe('when unlocking would yield a locked gold balance less than the required value', () => {
@@ -355,18 +357,11 @@ contract('LockedGold', (accounts: string[]) => {
             await assertRevert(lockedGold.unlock(value))
           })
         })
-
-        describe('when the the current time is later than the requirement time', () => {
-          it('should succeed', async () => {
-            await timeTravel(DAY, web3)
-            await lockedGold.unlock(value)
-          })
-        })
       })
 
       describe('when unlocking would yield a locked gold balance equal to the required value', () => {
         it('should succeed', async () => {
-          await lockedGold.unlock(value - mustMaintain.value)
+          await lockedGold.unlock(value - balanceRequirement)
         })
       })
     })

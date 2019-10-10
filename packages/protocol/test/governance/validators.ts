@@ -46,7 +46,6 @@ const parseValidatorGroupParams = (groupParams: any) => {
 
 const HOUR = 60 * 60
 const DAY = 24 * HOUR
-const MAX_UINT256 = new BigNumber(2).pow(256).minus(1)
 
 contract('Validators', (accounts: string[]) => {
   let validators: ValidatorsInstance
@@ -64,7 +63,7 @@ contract('Validators', (accounts: string[]) => {
   const publicKeysData = '0x' + publicKey + blsPublicKey + blsPoP
 
   const nonOwner = accounts[1]
-  const registrationRequirements = { group: new BigNumber(1000), validator: new BigNumber(100) }
+  const balanceRequirements = { group: new BigNumber(1000), validator: new BigNumber(100) }
   const deregistrationLockups = {
     group: new BigNumber(100 * DAY),
     validator: new BigNumber(60 * DAY),
@@ -82,8 +81,8 @@ contract('Validators', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await validators.initialize(
       registry.address,
-      registrationRequirements.group,
-      registrationRequirements.validator,
+      balanceRequirements.group,
+      balanceRequirements.validator,
       deregistrationLockups.group,
       deregistrationLockups.validator,
       maxGroupSize
@@ -91,7 +90,7 @@ contract('Validators', (accounts: string[]) => {
   })
 
   const registerValidator = async (validator: string) => {
-    await mockLockedGold.setAccountTotalLockedGold(validator, registrationRequirements.validator)
+    await mockLockedGold.setAccountTotalLockedGold(validator, balanceRequirements.validator)
     await validators.registerValidator(
       name,
       url,
@@ -102,7 +101,7 @@ contract('Validators', (accounts: string[]) => {
   }
 
   const registerValidatorGroup = async (group: string) => {
-    await mockLockedGold.setAccountTotalLockedGold(group, registrationRequirements.group)
+    await mockLockedGold.setAccountTotalLockedGold(group, balanceRequirements.group)
     await validators.registerValidatorGroup(name, url, commission, { from: group })
   }
 
@@ -121,10 +120,10 @@ contract('Validators', (accounts: string[]) => {
       assert.equal(owner, accounts[0])
     })
 
-    it('should have set the registration requirements', async () => {
-      const [group, validator] = await validators.getRegistrationRequirements()
-      assertEqualBN(group, registrationRequirements.group)
-      assertEqualBN(validator, registrationRequirements.validator)
+    it('should have set the balance requirements', async () => {
+      const [group, validator] = await validators.getBalanceRequirements()
+      assertEqualBN(group, balanceRequirements.group)
+      assertEqualBN(validator, balanceRequirements.validator)
     })
 
     it('should have set the deregistration lockups', async () => {
@@ -142,8 +141,8 @@ contract('Validators', (accounts: string[]) => {
       await assertRevert(
         validators.initialize(
           registry.address,
-          registrationRequirements.group,
-          registrationRequirements.validator,
+          balanceRequirements.group,
+          balanceRequirements.validator,
           deregistrationLockups.group,
           deregistrationLockups.validator,
           maxGroupSize
@@ -152,34 +151,34 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe('#setRegistrationRequirements()', () => {
+  describe('#setBalanceRequirements()', () => {
     describe('when the requirements are different', () => {
       const newRequirements = {
-        group: registrationRequirements.group.plus(1),
-        validator: registrationRequirements.validator.plus(1),
+        group: balanceRequirements.group.plus(1),
+        validator: balanceRequirements.validator.plus(1),
       }
 
       describe('when called by the owner', () => {
         let resp: any
 
         beforeEach(async () => {
-          resp = await validators.setRegistrationRequirements(
+          resp = await validators.setBalanceRequirements(
             newRequirements.group,
             newRequirements.validator
           )
         })
 
         it('should set the group and validator requirements', async () => {
-          const [group, validator] = await validators.getRegistrationRequirements()
+          const [group, validator] = await validators.getBalanceRequirements()
           assertEqualBN(group, newRequirements.group)
           assertEqualBN(validator, newRequirements.validator)
         })
 
-        it('should emit the RegistrationRequirementsSet event', async () => {
+        it('should emit the BalanceRequirementsSet event', async () => {
           assert.equal(resp.logs.length, 1)
           const log = resp.logs[0]
           assertContainSubset(log, {
-            event: 'RegistrationRequirementsSet',
+            event: 'BalanceRequirementsSet',
             args: {
               group: new BigNumber(newRequirements.group),
               validator: new BigNumber(newRequirements.validator),
@@ -190,13 +189,9 @@ contract('Validators', (accounts: string[]) => {
         describe('when called by a non-owner', () => {
           it('should revert', async () => {
             await assertRevert(
-              validators.setRegistrationRequirements(
-                newRequirements.group,
-                newRequirements.validator,
-                {
-                  from: nonOwner,
-                }
-              )
+              validators.setBalanceRequirements(newRequirements.group, newRequirements.validator, {
+                from: nonOwner,
+              })
             )
           })
         })
@@ -205,9 +200,9 @@ contract('Validators', (accounts: string[]) => {
       describe('when the requirements are the same', () => {
         it('should revert', async () => {
           await assertRevert(
-            validators.setRegistrationRequirements(
-              registrationRequirements.group,
-              registrationRequirements.validator
+            validators.setBalanceRequirements(
+              balanceRequirements.group,
+              balanceRequirements.validator
             )
           )
         })
@@ -317,10 +312,7 @@ contract('Validators', (accounts: string[]) => {
     let resp: any
     describe('when the account is not a registered validator', () => {
       beforeEach(async () => {
-        await mockLockedGold.setAccountTotalLockedGold(
-          validator,
-          registrationRequirements.validator
-        )
+        await mockLockedGold.setAccountTotalLockedGold(validator, balanceRequirements.validator)
         resp = await validators.registerValidator(
           name,
           url,
@@ -344,10 +336,9 @@ contract('Validators', (accounts: string[]) => {
         assert.equal(parsedValidator.publicKeysData, publicKeysData)
       })
 
-      it('should set account balance requirements on locked gold', async () => {
-        const [value, timestamp] = await mockLockedGold.getAccountMustMaintain(validator)
-        assertEqualBN(value, registrationRequirements.validator)
-        assertEqualBN(timestamp, MAX_UINT256)
+      it('should set account balance requirements', async () => {
+        const requirement = await validators.getAccountBalanceRequirement(validator)
+        assertEqualBN(requirement, balanceRequirements.validator)
       })
 
       it('should emit the ValidatorRegistered event', async () => {
@@ -367,10 +358,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the account is already a registered validator', () => {
       beforeEach(async () => {
-        await mockLockedGold.setAccountTotalLockedGold(
-          validator,
-          registrationRequirements.validator
-        )
+        await mockLockedGold.setAccountTotalLockedGold(validator, balanceRequirements.validator)
         await validators.registerValidator(
           name,
           url,
@@ -383,7 +371,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the account is already a registered validator', () => {
       beforeEach(async () => {
-        await mockLockedGold.setAccountTotalLockedGold(validator, registrationRequirements.group)
+        await mockLockedGold.setAccountTotalLockedGold(validator, balanceRequirements.group)
         await validators.registerValidatorGroup(name, url, commission)
       })
 
@@ -399,11 +387,11 @@ contract('Validators', (accounts: string[]) => {
       })
     })
 
-    describe('when the account does not meet the registration requirements', () => {
+    describe('when the account does not meet the balance requirements', () => {
       beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(
           validator,
-          registrationRequirements.validator.minus(1)
+          balanceRequirements.validator.minus(1)
         )
       })
 
@@ -438,14 +426,18 @@ contract('Validators', (accounts: string[]) => {
         assert.deepEqual(await validators.getRegisteredValidators(), [])
       })
 
-      it('should set account balance requirements on locked gold', async () => {
+      it('should preserve account balance requirements', async () => {
+        const requirement = await validators.getAccountBalanceRequirement(validator)
+        assertEqualBN(requirement, balanceRequirements.validator)
+      })
+
+      it('should set the validator deregistration timestamp', async () => {
         const latestTimestamp = (await web3.eth.getBlock('latest')).timestamp
-        const [value, timestamp] = await mockLockedGold.getAccountMustMaintain(validator)
-        assertEqualBN(value, registrationRequirements.validator)
-        assertEqualBN(
-          timestamp,
-          new BigNumber(latestTimestamp).plus(deregistrationLockups.validator)
+        const [groupTimestamp, validatorTimestamp] = await validators.getDeregistrationTimestamps(
+          validator
         )
+        assertEqualBN(groupTimestamp, 0)
+        assertEqualBN(validatorTimestamp, latestTimestamp)
       })
 
       it('should emit the ValidatorDeregistered event', async () => {
@@ -706,7 +698,7 @@ contract('Validators', (accounts: string[]) => {
     let resp: any
     describe('when the account is not a registered validator group', () => {
       beforeEach(async () => {
-        await mockLockedGold.setAccountTotalLockedGold(group, registrationRequirements.group)
+        await mockLockedGold.setAccountTotalLockedGold(group, balanceRequirements.group)
         resp = await validators.registerValidatorGroup(name, url, commission)
       })
 
@@ -722,6 +714,11 @@ contract('Validators', (accounts: string[]) => {
         const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
         assert.equal(parsedGroup.name, name)
         assert.equal(parsedGroup.url, url)
+      })
+
+      it('should set account balance requirements', async () => {
+        const requirement = await validators.getAccountBalanceRequirement(group)
+        assertEqualBN(requirement, balanceRequirements.group)
       })
 
       it('should emit the ValidatorGroupRegistered event', async () => {
@@ -744,15 +741,13 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should revert', async () => {
-        await assertRevert(
-          validators.registerValidatorGroup(name, url, registrationRequirements.group)
-        )
+        await assertRevert(validators.registerValidatorGroup(name, url, balanceRequirements.group))
       })
     })
 
     describe('when the account is already a registered validator group', () => {
       beforeEach(async () => {
-        await mockLockedGold.setAccountTotalLockedGold(group, registrationRequirements.group)
+        await mockLockedGold.setAccountTotalLockedGold(group, balanceRequirements.group)
         await validators.registerValidatorGroup(name, url, commission)
       })
 
@@ -761,12 +756,9 @@ contract('Validators', (accounts: string[]) => {
       })
     })
 
-    describe('when the account does not meet the registration requirements', () => {
+    describe('when the account does not meet the balance requirements', () => {
       beforeEach(async () => {
-        await mockLockedGold.setAccountTotalLockedGold(
-          group,
-          registrationRequirements.group.minus(1)
-        )
+        await mockLockedGold.setAccountTotalLockedGold(group, balanceRequirements.group.minus(1))
       })
 
       it('should revert', async () => {
@@ -792,11 +784,18 @@ contract('Validators', (accounts: string[]) => {
       assert.deepEqual(await validators.getRegisteredValidatorGroups(), [])
     })
 
-    it('should set account balance requirements on locked gold', async () => {
+    it('should preserve account balance requirements', async () => {
+      const requirement = await validators.getAccountBalanceRequirement(group)
+      assertEqualBN(requirement, balanceRequirements.group)
+    })
+
+    it('should set the group deregistration timestamp', async () => {
       const latestTimestamp = (await web3.eth.getBlock('latest')).timestamp
-      const [value, timestamp] = await mockLockedGold.getAccountMustMaintain(group)
-      assertEqualBN(value, registrationRequirements.group)
-      assertEqualBN(timestamp, new BigNumber(latestTimestamp).plus(deregistrationLockups.group))
+      const [groupTimestamp, validatorTimestamp] = await validators.getDeregistrationTimestamps(
+        group
+      )
+      assertEqualBN(groupTimestamp, latestTimestamp)
+      assertEqualBN(validatorTimestamp, 0)
     })
 
     it('should emit the ValidatorGroupDeregistered event', async () => {
