@@ -166,7 +166,7 @@ describe('Transfer tests', function(this: any) {
   const ToAddress = '0xbBae99F0E1EE565404465638d40827b54D343638'
   const FeeRecipientAddress = '0x4f5f8a3f45d179553e7b95119ce296010f50f6f1'
 
-  const syncModes = ['full', 'fast', 'light', 'ultralight']
+  const syncModes = ['full', 'fast', 'light', 'lightest']
   const gethConfig = {
     migrateTo: 8,
     migrateGovernance: false,
@@ -441,8 +441,8 @@ describe('Transfer tests', function(this: any) {
         describe('Transfer CeloGold >', () => {
           const GOLD_TRANSACTION_GAS_COST = 29180
           describe('gasCurrency = CeloGold >', () => {
-            if (syncMode === 'light' || syncMode === 'ultralight') {
-              describe('when running in light/ultralight sync mode', () => {
+            if (syncMode === 'light' || syncMode === 'lightest') {
+              describe('when running in light/lightest sync mode', () => {
                 describe('when not explicitly specifying a gas fee recipient', () =>
                   testTransferToken({
                     expectedGas: GOLD_TRANSACTION_GAS_COST,

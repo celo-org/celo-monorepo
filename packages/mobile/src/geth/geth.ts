@@ -22,7 +22,7 @@ export const FailedToFetchGenesisBlockError = new Error(
 // We are never going to run mobile node in full or fast mode.
 enum SyncMode {
   LIGHT = 'light',
-  ULTRA_LIGHT = 'ultralight',
+  ULTRA_LIGHT = 'lightest',
 }
 
 // Log levels correpond to the values defined in

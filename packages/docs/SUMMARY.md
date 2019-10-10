@@ -19,7 +19,7 @@
   - [Consensus](celo-codebase/protocol/consensus/README.md)
     - [Validator Set Differences](celo-codebase/protocol/consensus/validator-set-differences.md)
     - [Locating Validators](celo-codebase/protocol/consensus/locating-validators.md)
-    - [Ultralight Sync](celo-codebase/protocol/consensus/ultralight-sync.md)
+    - [Lightest Sync](celo-codebase/protocol/consensus/lightest-sync.md)
   - [Proof-of-Stake](celo-codebase/protocol/proof-of-stake/README.md)
     - [Locked Gold](celo-codebase/protocol/proof-of-stake/locked-gold.md)
     - [Electing Validators](celo-codebase/protocol/proof-of-stake/electing-validators.md)
@@ -50,7 +50,7 @@
     - [Verification](celo-codebase/wallet/how-the-wallet-works/verification.md)
     - [Invitations](celo-codebase/wallet/how-the-wallet-works/invitations.md)
     - [Payments and Exchanging](celo-codebase/wallet/how-the-wallet-works/sending-and-requesting-payments.md)
-    - [Ultralight Node Sync](celo-codebase/wallet/how-the-wallet-works/ultralight-node-sync.md)
+    - [Lightest Node Sync](celo-codebase/wallet/how-the-wallet-works/lightest-node-sync.md)
 
 ## Celo SDK
 

@@ -1,9 +1,9 @@
 import { equal, notEqual } from 'assert'
 import * as fs from 'fs'
 
-// These tests read logs from a client which was running in Ultralight sync mode and verifies that
+// These tests read logs from a client which was running in Lightest sync mode and verifies that
 // only epoch headers are fetched till the height block and all headers are fetched afrerwards.
-describe('Ultralight tests', () => {
+describe('Lightest tests', () => {
   beforeEach(function(this: any) {
     this.timeout(0)
   })

@@ -9,8 +9,8 @@ ls /usr/local/bin
 GETH_BINARY=${1:-"/usr/local/bin/geth"}
 # Default to testing the alfajores network
 NETWORK_NAME=${2:-"alfajores"}
-# Default to testing the ultralight sync mode
-SYNCMODE=${3:-"ultralight"}
+# Default to testing the lightest sync mode
+SYNCMODE=${3:-"lightest"}
 # Default to 44782
 NETWORK_ID=${4:-"44782"}
 DATA_DIR=${5:-"/tmp/tmp1"}

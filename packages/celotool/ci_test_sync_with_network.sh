@@ -29,16 +29,16 @@ CELO_MONOREPO_DIR="${PWD}/../.."
 # Assume that the logs are in /tmp/geth_stdout
 GETH_LOG_FILE=/tmp/geth_stdout
 
-# usage: test_ultralight_sync <network_name>
-test_ultralight_sync () {
+# usage: test_lightest_sync <network_name>
+test_lightest_sync () {
     NETWORK_NAME=$1
-    echo "Testing ultralight sync with '${NETWORK_NAME}' network"
-    # Run the sync in ultralight mode
-    geth_tests/network_sync_test.sh ${NETWORK_NAME} ultralight
+    echo "Testing lightest sync with '${NETWORK_NAME}' network"
+    # Run the sync in lightest mode
+    geth_tests/network_sync_test.sh ${NETWORK_NAME} lightest
     # Get the epoch size by sourcing this file
     source ${CELO_MONOREPO_DIR}/.env.${NETWORK_NAME}
     # Verify what happened by reading the logs.
-    ${CELO_MONOREPO_DIR}/node_modules/.bin/mocha -r ts-node/register ${CELO_MONOREPO_DIR}/packages/celotool/src/e2e-tests/verify_ultralight_geth_logs.ts --gethlogfile ${GETH_LOG_FILE} --epoch ${EPOCH}
+    ${CELO_MONOREPO_DIR}/node_modules/.bin/mocha -r ts-node/register ${CELO_MONOREPO_DIR}/packages/celotool/src/e2e-tests/verify_lightest_geth_logs.ts --gethlogfile ${GETH_LOG_FILE} --epoch ${EPOCH}
 }
 
 # Some code in celotool requires this file to contain the MNEMONOIC.
@@ -54,11 +54,11 @@ geth_tests/network_sync_test.sh ${NETWORK_NAME} full && echo
 # This is broken, I am not sure why, therefore, commented for now.
 # geth_tests/network_sync_test.sh ${NETWORK_NAME} fast && echo
 geth_tests/network_sync_test.sh ${NETWORK_NAME} light && echo
-test_ultralight_sync ${NETWORK_NAME} && echo
+test_lightest_sync ${NETWORK_NAME} && echo
 
 export NETWORK_NAME="alfajoresstaging"
 geth_tests/network_sync_test.sh ${NETWORK_NAME} full && echo
 # This is broken, I am not sure why, therefore, commented for now.
 # geth_tests/network_sync_test.sh ${NETWORK_NAME} fast && echo
 geth_tests/network_sync_test.sh ${NETWORK_NAME} light && echo
-test_ultralight_sync ${NETWORK_NAME} && echo
+test_lightest_sync ${NETWORK_NAME} && echo

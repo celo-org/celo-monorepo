@@ -5,7 +5,7 @@
 # docker build -f dockerfiles/cli/Dockerfile -t gcr.io/celo-testnet/celocli:$USER . --build-arg celo_env=alfajores
 # To run this image locally
 # docker rm cli_container; docker run --name cli_container -p 8545:8545 gcr.io/celo-testnet/celocli:$USER -v /
-# To run this image locally in ultralight mode
+# To run this image locally in lightest mode
 # docker rm cli_container; docker run --name cli_container -p 8545:8545 -it --entrypoint=/celo/start_geth.sh gcr.io/celo-testnet/celocli:$USER "/usr/local/bin/geth" "alfajores" "full"
 # and connect to it with
 # docker exec -t -i cli_container /bin/sh

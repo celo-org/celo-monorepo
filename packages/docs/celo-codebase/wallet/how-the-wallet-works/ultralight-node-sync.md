@@ -1,4 +1,4 @@
-# Ultralight Node Sync
+# Lightest Node Sync
 
 The Celo Wallet first fetches the latest header to learn about the likely latest block height. Next, it fetches all the _epoch headers_ between Genesis and the latest block height. The fetch is done in batches of 192 blocks \(Ethereum's default batch size\) to minimize latency. In Celo's case, each of these headers are not contiguous and are instead one epoch apart \(planned for around 1 day for mainnet\). The wallet then validates each of the epoch headers by updating the set of validators at every epoch, and using that set to verify signatures. Once the wallet has reached the latest epoch, it can verify the signatures of all header is that epoch, including the latest one.
 

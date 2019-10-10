@@ -28,9 +28,9 @@ For more details on configuring this container, see the [Running a Full Node](..
 
 `$ docker run --name celo_cli_container -it -p 8545:8545 us.gcr.io/celo-testnet/celocli:master -v`
 
-With additional arguments to the image, it can also be run in ultralight sync mode.
+With additional arguments to the image, it can also be run in lightest sync mode.
 
-`$ docker run --name celo_cli_container -p 8545:8545 --entrypoint=/celo/start_geth.sh us.gcr.io/celo-testnet/celocli:master "/usr/local/bin/geth" "alfajores" "ultralight"`
+`$ docker run --name celo_cli_container -p 8545:8545 --entrypoint=/celo/start_geth.sh us.gcr.io/celo-testnet/celocli:master "/usr/local/bin/geth" "alfajores" "lightest"`
 
 An interactive shell where the Celo CLI is available can be obtained via the following command. All of the subsequent documentation should be appropriate from this shell.
 
