@@ -259,9 +259,13 @@ exports[`PhoneNumberInput when no defaultCountry renders AutoComplete 1`] = `
                 "borderTopWidth": 1,
                 "borderWidth": 1,
                 "flex": 1,
+                "left": undefined,
+                "marginBottom": 6,
                 "marginHorizontal": 0,
                 "paddingHorizontal": 0,
                 "paddingVertical": 6,
+                "position": "relative",
+                "right": undefined,
               },
             ]
           }

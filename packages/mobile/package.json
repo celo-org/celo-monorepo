@@ -104,6 +104,8 @@
     "react-native-progress": "^3.4.0",
     "react-native-qrcode-svg": "^5.1.2",
     "react-native-restart-android": "^0.0.7",
+    "react-native-safe-area-context": "^0.3.6",
+    "react-native-safe-area-view": "^1.0.0",
     "react-native-screens": "^1.0.0-alpha.22",
     "react-native-secure-key-store": "^2.0.4",
     "react-native-secure-randombytes": "^2.2.3",

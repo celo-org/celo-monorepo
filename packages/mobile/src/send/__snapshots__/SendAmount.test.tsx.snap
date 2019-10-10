@@ -1,7 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`SendAmount renders correctly for request payment confirmation 1`] = `
-<View
+<SafeAreaView
+  forceInset={
+    Object {
+      "bottom": "always",
+    }
+  }
   style={
     Object {
       "backgroundColor": "white",
@@ -12,33 +17,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
   }
 >
   <RCTScrollView
-    automaticallyAdjustContentInsets={false}
-    contentInset={
-      Object {
-        "bottom": 0,
-      }
-    }
-    enableAutomaticScroll={true}
-    enableResetScrollToCoords={true}
-    extraHeight={75}
-    extraScrollHeight={0}
-    getScrollResponder={[Function]}
-    handleOnScroll={[Function]}
-    keyboardDismissMode="interactive"
-    keyboardOpeningTime={250}
     keyboardShouldPersistTaps="always"
-    keyboardSpace={0}
-    onScroll={[Function]}
-    resetKeyboardSpace={[Function]}
-    scrollEventThrottle={1}
-    scrollForExtraHeightOnAndroid={[Function]}
-    scrollIntoView={[Function]}
-    scrollToEnd={[Function]}
-    scrollToFocusedInput={[Function]}
-    scrollToPosition={[Function]}
-    showsVerticalScrollIndicator={true}
-    update={[Function]}
-    viewIsInsideTabBar={false}
   >
     <View>
       <View
@@ -745,5 +724,5 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
