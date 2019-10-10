@@ -1,7 +1,7 @@
 import { IdentityUtils as IdentityUtilsJS } from '@celo/utils/'
 import { scrypt as RNscrypt } from 'react-native-fast-crypto'
 
-async function _calculateHashRN(identifier: string) {
+async function calculateHashRN(identifier: string) {
   const result = await RNscrypt(
     Buffer.from(identifier.normalize('NFKC')),
     Buffer.from(IdentityUtilsJS.SCRYPT_PARAMS.salt.normalize('NFKC')),
@@ -25,7 +25,7 @@ function identityHash(
     throw Error('Attempting to hash an empty identifier')
   }
   const modifiedIdentifier = IdentityUtilsJS.preprocessPrefix(identifier, type)
-  return _calculateHashRN(modifiedIdentifier)
+  return calculateHashRN(modifiedIdentifier)
 }
 
 const IdentifierTypeEnum = IdentityUtilsJS.IdentifierTypeEnum

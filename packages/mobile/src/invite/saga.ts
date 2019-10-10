@@ -13,6 +13,7 @@ import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
+import { IdentityUtils } from 'src/identity/identity'
 import {
   Actions,
   InviteBy,
@@ -36,7 +37,6 @@ import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { dynamicLink } from 'src/utils/dynamicLink'
-import { IdentityUtils } from 'src/utils/identity'
 import Logger from 'src/utils/Logger'
 import { addLocalAccount, isZeroSyncMode, web3 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/web3/saga'

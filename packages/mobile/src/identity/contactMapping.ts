@@ -13,6 +13,7 @@ import {
   FetchPhoneAddressesAction,
   updateE164PhoneNumberAddresses,
 } from 'src/identity/actions'
+import { IdentityUtils } from 'src/identity/identity'
 import {
   AddressToE164NumberType,
   e164NumberToAddressSelector,
@@ -21,7 +22,6 @@ import {
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipient'
 import { getAllContacts } from 'src/utils/contacts'
-import { IdentityUtils } from 'src/utils/identity'
 import Logger from 'src/utils/Logger'
 import { checkContactsPermission } from 'src/utils/permissions'
 import { web3 } from 'src/web3/contracts'

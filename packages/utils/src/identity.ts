@@ -16,25 +16,12 @@ const SCRYPT_PARAMS = {
   dkLen: 32,
 }
 
-function parseIdentifierType(rawType: string): IdentifierTypeEnum {
-  rawType = rawType.toLowerCase()
-  switch (rawType) {
-    case 'phone':
-    case 'phoneNumber':
-    case 'phone_number':
-    case 'phone number':
-      return IdentifierTypeEnum.PHONE_NUMBER
-    default:
-      return IdentifierTypeEnum.PHONE_NUMBER
-  }
-}
-
 function isE164Number(phoneNumber: string) {
   const E164RegEx = /^\+[1-9][0-9]{1,14}$/
   return E164RegEx.test(phoneNumber)
 }
 
-async function _calculateHash(identifier: string) {
+async function calculateHash(identifier: string) {
   return new Promise<string>((resolve) => {
     scrypt(
       Buffer.from(identifier.normalize('NFKC')),
@@ -61,9 +48,9 @@ async function _calculateHash(identifier: string) {
   })
 }
 
-function preprocessPrefix(identifier: string, type: string) {
+function preprocessPrefix(identifier: string, type: IdentifierTypeEnum) {
   let identifierPrefix = ''
-  switch (parseIdentifierType(type)) {
+  switch (type) {
     // identifier is phone number
     case IdentifierTypeEnum.PHONE_NUMBER:
       if (!isE164Number(identifier)) {
@@ -78,13 +65,13 @@ function preprocessPrefix(identifier: string, type: string) {
 
 function identityHash(
   identifier: string,
-  type: string = IdentifierTypeEnum.PHONE_NUMBER
+  type: IdentifierTypeEnum = IdentifierTypeEnum.PHONE_NUMBER
 ): Promise<string> {
   if (!identifier) {
     throw Error('Attempting to hash an empty identifier')
   }
   const modifiedIdentifier = preprocessPrefix(identifier, type)
-  return _calculateHash(modifiedIdentifier)
+  return calculateHash(modifiedIdentifier)
 }
 
 export const IdentityUtils = {

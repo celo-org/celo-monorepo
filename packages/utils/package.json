@@ -18,7 +18,6 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@types/scrypt-js": "^2.0.3",
     "@umpirsky/country-list": "git://github.com/umpirsky/country-list#05fda51",
     "bigi": "^1.1.0",
     "bignumber.js": "^7.2.0",
@@ -36,6 +35,7 @@
     "web3-utils": "1.0.0-beta.37"
   },
   "devDependencies": {
+    "@types/scrypt-js": "^2.0.3",
     "@celo/typescript": "0.0.1",
     "@types/country-data": "^0.0.0",
     "@types/elliptic": "^6.4.9",
