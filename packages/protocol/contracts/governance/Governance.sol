@@ -676,7 +676,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @param txHash The abi encoded keccak256 hash of the hotfix transaction to be whitelisted.
    * @param validatorIndex The index in the validator set of the whitelisting validator.
    */
-  function whitelist(bytes32 txHash, uint256 validatorIndex) external nonReentrant {
+  function whitelistHotfix(bytes32 txHash, uint256 validatorIndex) external nonReentrant {
     if (msg.sender == approver) {
       require(!hotfixes[txHash].approved);
       hotfixes[txHash].approved = true;
@@ -698,7 +698,7 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
     IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
     uint256 epoch = validators.getEpochNumber();
     require(hotfixes[txHash].preparedEpoch < epoch, "hotfix already prepared for this epoch");
-    require(isHotfixWhitelisted(txHash), "hotfix not whitelisted by 2f+1 validators");
+    require(isHotfixPassing(txHash), "hotfix not whitelisted by 2f+1 validators");
     hotfixes[txHash].preparedEpoch = epoch;
     emit HotfixPrepared(txHash, epoch);
   }
@@ -912,14 +912,14 @@ contract Governance is IGovernance, Ownable, Initializable, UsingLockedGold, Ree
    * @param txHash The abi encoded keccak256 hash of the hotfix transaction.
    * @return Whether validator whitelist tally >= validator byztanine quorum (2f+1)
    */
-  function isHotfixWhitelisted(bytes32 txHash) public view returns (bool) {
+  function isHotfixPassing(bytes32 txHash) public view returns (bool) {
     IValidators validators = IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
-    uint256 quorum = validators.byzantineQuorumForCurrentSet();
+    uint256 quorum = validators.getByzantineQuorumForCurrentSet();
 
     uint256 tally = 0;
     for (uint256 idx = 0; idx < validators.numberValidatorsInCurrentSet(); idx++) {
       address validator = validators.validatorAddressFromCurrentSet(idx);
-      if (hotfixes[txHash].whitelist[validator]) {
+      if (hotfixes[txHash].whitelisted[validator]) {
         tally = tally.add(1);
       }
     }

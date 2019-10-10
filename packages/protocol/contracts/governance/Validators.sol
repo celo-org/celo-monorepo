@@ -68,6 +68,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
 
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
 
+  uint256 public numBlocksPerEpoch;
   uint256 public maxGroupSize;
 
   event MinElectableValidatorsSet(
@@ -659,7 +660,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @return The byzantine quorum.
    */
   function getByzantineQuorumForCurrentSet() external view returns (uint256) {
-    return numberValidatorsInCurrentSet().multiply(2).div(3).add(1);
+    return FixidityLib.newFixedFraction(numberValidatorsInCurrentSet().mul(2), 3)
+      .integer().unwrap().add(1); // ceil
   }
 
   /**
@@ -667,7 +669,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @return The epoch number.
    */
   function getEpochNumber() external view returns (uint256) {
-    // TODO: replace 30000 with governance parameter
+    // TODO: replace 30000 with BlockchainParameters.epochLength
     return block.number.div(30000);
   }
 
