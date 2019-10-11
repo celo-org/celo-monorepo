@@ -28399,6 +28399,11 @@ scmp@0.0.3:
   resolved "https://registry.yarnpkg.com/scmp/-/scmp-0.0.3.tgz#3648df2d7294641e7f78673ffc29681d9bad9073"
   integrity sha1-NkjfLXKUZB5/eGc//CloHZutkHM=
 
+scroll-into-view@^1.11.0:
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/scroll-into-view/-/scroll-into-view-1.11.0.tgz#aa1d78a0b9e159bfeb684535d1442dc400722780"
+  integrity sha512-4K1N1fc6oK1rLm/dbjO7/OfoZHprXh0SOG50caIWvHODWZLCLoMzsitbO9qKIG9VwdK/YKcfm67hyHuY+ThnvA==
+
 scrypt-async@^1.2.0:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/scrypt-async/-/scrypt-async-1.3.1.tgz#a11fd6fac981b4b823ee01dee0221169500ddae9"
@@ -33965,7 +33970,6 @@ websocket@^1.0.28:
   dependencies:
     debug "^2.2.0"
     es5-ext "^0.10.50"
-    gulp "^4.0.2"
     nan "^2.14.0"
     typedarray-to-buffer "^3.1.5"
     yaeti "^0.0.6"

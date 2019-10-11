@@ -7,9 +7,10 @@ import { canTrack } from 'src/analytics/analytics'
 import Header from 'src/header/Header.3'
 import { ScreenSizeProvider } from 'src/layout/ScreenSize'
 import Footer from 'src/shared/Footer.3'
-import { scrollTo } from 'src/utils/utils'
 import Sentry, { initSentry } from '../fullstack/sentry'
 import { appWithTranslation } from '../src/i18n'
+import { HEADER_HEIGHT } from 'src/shared/Styles'
+import scrollIntoView from 'scroll-into-view'
 
 config({ ssrReveal: true })
 class MyApp extends App {
@@ -19,10 +20,10 @@ class MyApp extends App {
     }
 
     if (window.location.hash) {
-      setTimeout(() => {
-        scrollTo(window.location.hash.slice(1), 'start')
-      }, 200)
+      hashScroller(window.location.hash)
     }
+
+    window.addEventListener('hashchange', () => hashScroller(window.location.hash))
 
     if (getConfig().publicRuntimeConfig.FLAGS.ENV === 'development') {
       checkH1Count()
@@ -75,4 +76,10 @@ function checkH1Count() {
       )
     }
   }, 500)
+}
+
+function hashScroller(id: string) {
+  const element = document.getElementById(id.replace('#', ''))
+
+  scrollIntoView(element, { time: 200, align: { top: 0.2, topOffset: HEADER_HEIGHT } })
 }
