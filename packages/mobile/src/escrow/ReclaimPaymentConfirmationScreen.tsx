@@ -4,7 +4,8 @@ import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, StyleSheet } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { showError } from 'src/alert/actions'
@@ -111,7 +112,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
     const userHasEnough = fee && fee.isLessThanOrEqualTo(dollarBalance)
 
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <DisconnectBanner />
         <ReviewFrame
           HeaderComponent={this.renderHeader}
@@ -138,7 +139,7 @@ class ReclaimPaymentConfirmationScreen extends React.Component<Props> {
             feeError={asyncFee.error}
           />
         </ReviewFrame>
-      </View>
+      </SafeAreaView>
     )
   }
 

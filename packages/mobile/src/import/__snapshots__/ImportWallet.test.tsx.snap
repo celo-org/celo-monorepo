@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ImportWallet renders correctly 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -11,39 +11,13 @@ exports[`ImportWallet renders correctly 1`] = `
   }
 >
   <RCTScrollView
-    automaticallyAdjustContentInsets={false}
     contentContainerStyle={
       Object {
         "padding": 20,
         "paddingTop": 0,
       }
     }
-    contentInset={
-      Object {
-        "bottom": 0,
-      }
-    }
-    enableAutomaticScroll={true}
-    enableResetScrollToCoords={true}
-    extraHeight={75}
-    extraScrollHeight={0}
-    getScrollResponder={[Function]}
-    handleOnScroll={[Function]}
-    keyboardDismissMode="interactive"
-    keyboardOpeningTime={250}
     keyboardShouldPersistTaps="always"
-    keyboardSpace={0}
-    onScroll={[Function]}
-    resetKeyboardSpace={[Function]}
-    scrollEventThrottle={1}
-    scrollForExtraHeightOnAndroid={[Function]}
-    scrollIntoView={[Function]}
-    scrollToEnd={[Function]}
-    scrollToFocusedInput={[Function]}
-    scrollToPosition={[Function]}
-    showsVerticalScrollIndicator={true}
-    update={[Function]}
-    viewIsInsideTabBar={false}
   >
     <View>
       <View
@@ -242,11 +216,11 @@ exports[`ImportWallet renders correctly 1`] = `
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`ImportWallet renders with an empty wallet 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -499,5 +473,5 @@ exports[`ImportWallet renders with an empty wallet 1`] = `
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
