@@ -469,6 +469,13 @@ contract Election is
     return votes.total.eligible.contains(group);
   }
 
+  /**
+   * @notice Returns the amount of rewards that voters for `group` are due at the end of an epoch.
+   * @param group The group to calculate epoch rewards for.
+   * @param totalEpochRewards The total amount of rewards going to all voters.
+   * @return The amount of rewards that voters for `group` are due at the end of an epoch.
+   * @dev Eligible groups that have received their maximum number of votes cannot receive more.
+   */
   function getGroupEpochRewards(
     address group,
     uint256 totalEpochRewards
@@ -489,6 +496,13 @@ contract Election is
     }
   }
 
+  /**
+   * @notice Distributes epoch rewards to voters for `group` in the form of active votes.
+   * @param group The group whose voters will receive rewards.
+   * @param value The amount of rewards to distribute to voters for the group.
+   * @param lesser The group receiving fewer votes than `group` after the rewards are added.
+   * @param greater The group receiving more votes than `group` after the rewards are added.
+   */
   function distributeEpochRewards(
     address group,
     uint256 value,
@@ -501,6 +515,13 @@ contract Election is
     _distributeEpochRewards(group, value, lesser, greater);
   }
 
+  /**
+   * @notice Distributes epoch rewards to voters for `group` in the form of active votes.
+   * @param group The group whose voters will receive rewards.
+   * @param value The amount of rewards to distribute to voters for the group.
+   * @param lesser The group receiving fewer votes than `group` after the rewards are added.
+   * @param greater The group receiving more votes than `group` after the rewards are added.
+   */
   function _distributeEpochRewards(
     address group,
     uint256 value,

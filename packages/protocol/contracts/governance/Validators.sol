@@ -66,11 +66,13 @@ contract Validators is
     FixidityLib.Fraction commission;
   }
 
+  // Stores the epoch number at which a validator joined a particular group.
   struct MembershipHistoryEntry {
     uint256 epochNumber;
     address group;
   }
 
+  // A circular buffer storing the membership history of a validator.
   struct MembershipHistory {
     uint256 head;
     MembershipHistoryEntry[] entries;
@@ -85,6 +87,7 @@ contract Validators is
     MembershipHistory membershipHistory;
   }
 
+  // Parameters that govern the calculation of validator's score.
   struct ValidatorScoreParameters {
     uint256 exponent;
     FixidityLib.Fraction adjustmentSpeed;
@@ -403,10 +406,19 @@ contract Validators is
     return getLockedGold().getAccountTotalLockedGold(account) >= balanceRequirements.group;
   }
 
+  /**
+   * @notice Returns the parameters that goven how a validator's score is calculated.
+   * @return The parameters that goven how a validator's score is calculated.
+   */
   function getValidatorScoreParameters() external view returns (uint256, uint256) {
     return (validatorScoreParameters.exponent, validatorScoreParameters.adjustmentSpeed.unwrap());
   }
 
+  /**
+   * @notice Returns the group membership history of a validator.
+   * @param account The validator whose membership history to return.
+   * @return The group membership history of a validator.
+   */
   function getMembershipHistory(
     address account
   )
@@ -475,13 +487,21 @@ contract Validators is
     );
   }
 
+  /**
+   * @notice Distributes epoch payments to `validator` and its group.
+   */
   function distributeEpochPayment(address validator) external onlyVm() {
     _distributeEpochPayment(validator);
   }
 
+  /**
+   * @notice Distributes epoch payments to `validator` and its group.
+   */
   function _distributeEpochPayment(address validator) internal {
     address account = getLockedGold().getAccountFromValidator(validator);
     require(isValidator(account));
+    // The group that should be paid is the group that the validator was a member of at the
+    // time it was elected.
     address group = getMembershipInLastEpoch(account);
     // Both the validator and the group must maintain the minimum locked gold balance in order to
     // receive epoch payments.
@@ -931,6 +951,14 @@ contract Validators is
     return true;
   }
 
+  /**
+   * @notice Updates the group membership history of a particular account.
+   * @param account The account whose group membership has changed.
+   * @param group The group that the account is now a member of.
+   * @return True upon success.
+   * @dev Note that this is used to determine a validator's membership at the time of an election,
+   *   and so group changes within an epoch will overwrite eachother.
+   */
   function updateMembershipHistory(address account, address group) private returns (bool) {
     MembershipHistory storage history = validators[account].membershipHistory;
     uint256 epochNumber = getEpochNumber();
@@ -951,6 +979,11 @@ contract Validators is
     }
   }
 
+  /**
+   * @notice Returns the group that `account` was a member of at the end of the last epoch.
+   * @param account The account whose group membership should be returned.
+   * @return The group that `account` was a member of at the end of the last epoch.
+   */
   function getMembershipInLastEpoch(address account) public view returns (address) {
     uint256 epochNumber = getEpochNumber();
     MembershipHistory storage history = validators[account].membershipHistory;

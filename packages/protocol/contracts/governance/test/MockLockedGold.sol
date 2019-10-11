@@ -8,8 +8,7 @@ import "../interfaces/ILockedGold.sol";
  /**
  * @title A mock LockedGold for testing.
  */
-// TODO(asa): Use ILockedGold interface.
-contract MockLockedGold {
+contract MockLockedGold is ILockedGold {
 
   using SafeMath for uint256;
 
