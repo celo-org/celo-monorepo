@@ -15,6 +15,8 @@ import { uniq } from 'lodash'
 import {
   AttestationsContract,
   AttestationsInstance,
+  MockLockedGoldContract,
+  MockLockedGoldInstance,
   MockStableTokenContract,
   MockStableTokenInstance,
   MockValidatorsContract,
@@ -29,6 +31,7 @@ import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 const Attestations: AttestationsContract = artifacts.require('Attestations')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
+const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Random: RandomContract = artifacts.require('Random')
 const Registry: RegistryContract = artifacts.require('Registry')
 
@@ -43,6 +46,7 @@ contract('Attestations', (accounts: string[]) => {
   let otherMockStableToken: MockStableTokenInstance
   let random: RandomInstance
   let mockValidators: MockValidatorsInstance
+  let mockLockedGold: MockLockedGoldInstance
   let registry: RegistryInstance
   const provider = new Web3.providers.HttpProvider('http://localhost:8545')
   const metadataURL = 'https://www.celo.org'
@@ -91,6 +95,13 @@ contract('Attestations', (accounts: string[]) => {
     return accounts[nonIssuerIndex]
   }
 
+  const getValidatingKeyAddress = (address: string) => {
+    const pKey = accountPrivateKeys[accounts.indexOf(address)]
+    const aKey = Buffer.from(pKey.slice(2), 'hex')
+    aKey.write((aKey[0] + 2).toString(16))
+    return privateKeyToAddress('0x' + aKey.toString('hex'))
+  }
+
   const getAttestationKey = (address: string) => {
     const pKey = accountPrivateKeys[accounts.indexOf(address)]
     const aKey = Buffer.from(pKey.slice(2), 'hex')
@@ -127,11 +138,19 @@ contract('Attestations', (accounts: string[]) => {
     attestations = await Attestations.new()
     random = await Random.new()
     mockValidators = await MockValidators.new()
-    await Promise.all(accounts.map((account) => mockValidators.addValidator(account)))
+    await Promise.all(
+      accounts.map((account) => mockValidators.addValidator(getValidatingKeyAddress(account)))
+    )
+    mockLockedGold = await MockLockedGold.new()
+    await Promise.all(
+      accounts.map((account) =>
+        mockLockedGold.delegateValidating(account, getValidatingKeyAddress(account))
+      )
+    )
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Random, random.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
-
+    await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await attestations.initialize(
       registry.address,
       attestationExpirySeconds,

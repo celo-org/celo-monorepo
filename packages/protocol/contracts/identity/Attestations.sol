@@ -10,6 +10,7 @@ import "../common/interfaces/IERC20Token.sol";
 import "../governance/interfaces/IValidators.sol";
 
 import "../common/Initializable.sol";
+import "../governance/UsingLockedGold.sol";
 import "../common/UsingRegistry.sol";
 import "../common/Signatures.sol";
 
@@ -17,7 +18,7 @@ import "../common/Signatures.sol";
 /**
  * @title Contract mapping identifiers to accounts
  */
-contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, ReentrancyGuard {
+contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, ReentrancyGuard, UsingLockedGold {
 
 
   using SafeMath for uint256;
@@ -714,13 +715,14 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
 
     uint256 currentIndex = 0;
     address validator;
+    address issuer;
 
     while (currentIndex < n) {
       seed = keccak256(abi.encodePacked(seed));
       validator = validators[uint256(seed) % validators.length];
-
+      issuer = getAccountFromValidator(validator);
       Attestation storage attestations =
-        state.issuedAttestations[validator];
+        state.issuedAttestations[issuer];
 
       // Attestation issuers can only be added if they haven't already
       if (attestations.status != AttestationStatus.None) {
@@ -731,7 +733,7 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
       attestations.status = AttestationStatus.Incomplete;
       // solhint-disable-next-line not-rely-on-time
       attestations.time = uint128(now);
-      state.issuers.push(validator);
+      state.issuers.push(issuer);
     }
   }
 
