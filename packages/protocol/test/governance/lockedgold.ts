@@ -2,6 +2,7 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
   assertLogMatches,
+  assertLogMatches2,
   assertRevert,
   NULL_ADDRESS,
   timeTravel,
@@ -113,6 +114,34 @@ contract('LockedGold', (accounts: string[]) => {
 
     it('should revert when not called by the owner', async () => {
       await assertRevert(lockedGold.setRegistry(anAddress, { from: nonOwner }))
+    })
+  })
+
+  describe('#setUnlockingPeriod', () => {
+    const newUnlockingPeriod = unlockingPeriod + 1
+    it('should set the unlockingPeriod', async () => {
+      await lockedGold.setUnlockingPeriod(newUnlockingPeriod)
+      assertEqualBN(await lockedGold.unlockingPeriod(), newUnlockingPeriod)
+    })
+
+    it('should emit the UnlockingPeriodSet event', async () => {
+      const resp = await lockedGold.setUnlockingPeriod(newUnlockingPeriod)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertLogMatches2(log, {
+        event: 'UnlockingPeriodSet',
+        args: {
+          period: newUnlockingPeriod,
+        },
+      })
+    })
+
+    it('should revert when the unlockingPeriod is unchanged', async () => {
+      await assertRevert(lockedGold.setUnlockingPeriod(unlockingPeriod))
+    })
+
+    it('should revert when called by anyone other than the owner', async () => {
+      await assertRevert(lockedGold.setUnlockingPeriod(newUnlockingPeriod, { from: nonOwner }))
     })
   })
 
