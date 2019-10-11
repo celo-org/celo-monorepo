@@ -48,35 +48,73 @@ export interface LockedGoldConfig {
  * Contract for handling deposits needed for voting.
  */
 export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
+  /**
+   * Unlocks gold that becomes withdrawable after the unlocking period.
+   * @param value The amount of gold to unlock.
+   */
   unlock: (value: NumberLike) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.unlock,
     tupleParser(parseNumber)
   )
+  /**
+   * Creates an account.
+   */
   createAccount = proxySend(this.kit, this.contract.methods.createAccount)
+  /**
+   * Withdraws a gold that has been unlocked after the unlocking period has passed.
+   * @param index The index of the pending withdrawal to withdraw.
+   */
   withdraw: (index: number) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.withdraw
   )
+  /**
+   * @notice Locks gold to be used for voting.
+   */
   lock = proxySend(this.kit, this.contract.methods.lock)
+  /**
+   * Relocks gold that has been unlocked but not withdrawn.
+   * @param index The index of the pending withdrawal to relock.
+   */
   relock: (index: number) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.relock
   )
 
+  /**
+   * Returns the total amount of locked gold for an account.
+   * @param account The account.
+   * @return The total amount of locked gold for an account.
+   */
   getAccountTotalLockedGold = proxyCall(
     this.contract.methods.getAccountTotalLockedGold,
     undefined,
     toBigNumber
   )
+  /**
+   * Returns the total amount of non-voting locked gold for an account.
+   * @param account The account.
+   * @return The total amount of non-voting locked gold for an account.
+   */
   getAccountNonvotingLockedGold = proxyCall(
     this.contract.methods.getAccountNonvotingLockedGold,
     undefined,
     toBigNumber
   )
+  /**
+   * Returns the voter for the specified account.
+   * @param account The address of the account.
+   * @return The address with which the account can vote.
+   */
   getVoterFromAccount: (account: string) => Promise<Address> = proxyCall(
     this.contract.methods.getVoterFromAccount
   )
+  /**
+   * Returns the validator for the specified account.
+   * @param account The address of the account.
+   * @return The address with which the account can register a validator or group.
+   */
   getValidatorFromAccount: (account: string) => Promise<Address> = proxyCall(
     this.contract.methods.getValidatorFromAccount
   )
@@ -138,6 +176,11 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     )
   }
 
+  /**
+   * Returns the pending withdrawals from unlocked gold for an account.
+   * @param account The address of the account.
+   * @return The value and timestamp for each pending withdrawal.
+   */
   async getPendingWithdrawals(account: string) {
     const withdrawals = await this.contract.methods.getPendingWithdrawals(account).call()
     return zip(
@@ -148,6 +191,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
       withdrawals[0]
     )
   }
+
   private async getParsedSignatureOfAddress(address: Address, signer: string) {
     const hash = Web3.utils.soliditySha3({ type: 'address', value: address })
     const signature = (await this.kit.web3.eth.sign(hash, signer)).slice(2)

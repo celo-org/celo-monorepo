@@ -77,6 +77,10 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
     }
   }
 
+  /**
+   * Returns the lockup periods after deregistering groups and validators.
+   * @return The lockup periods after deregistering groups and validators.
+   */
   async getDeregistrationLockups(): Promise<DeregistrationLockups> {
     const res = await this.contract.methods.getDeregistrationLockups().call()
     return {

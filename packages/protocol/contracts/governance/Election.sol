@@ -164,6 +164,10 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
     return _setElectableValidators(min, max);
   }
 
+  /**
+   * @notice Returns the minimum and maximum number of validators that can be elected.
+   * @return The minimum and maximum number of validators that can be elected.
+   */
   function getElectableValidators() external view returns (uint256, uint256) {
     return (electableValidators.min, electableValidators.max);
   }
@@ -372,6 +376,11 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
     return true;
   }
 
+  /**
+   * @notice Returns the total number of votes cast by an account.
+   * @param account The address of the account.
+   * @return The total number of votes cast by an account.
+   */
   function getTotalVotesByAccount(address account) external view returns (uint256) {
     uint256 total = 0;
     address[] memory groups = votes.groupsVotedFor[account];
@@ -449,6 +458,11 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
     return votes.pending.forGroup[group].total.add(votes.active.forGroup[group].total);
   }
 
+  /**
+   * @notice Returns whether or not a group is eligible to receive votes.
+   * @return Whether or not a group is eligible to receive votes.
+   * @dev Eligible groups that have received their maximum number of votes cannot receive more.
+   */
   function getGroupEligibility(address group) external view returns (bool) {
     return votes.total.eligible.contains(group);
   }
@@ -834,6 +848,11 @@ contract Election is IElection, Ownable, ReentrancyGuard, Initializable, UsingRe
     return (groupIndex, memberElected);
   }
 
+  /**
+   * @notice Randomly permutes an array of addresses.
+   * @param array The array to permute.
+   * @return The permuted array.
+   */
   function shuffleArray(address[] memory array) private view returns (address[] memory) {
     bytes32 r = getRandom().random();
     for (uint256 i = array.length - 1; i > 0; i = i.sub(1)) {

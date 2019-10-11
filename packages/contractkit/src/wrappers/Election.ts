@@ -80,6 +80,11 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     toNumber
   )
 
+  /**
+   * Returns the groups that `account` has voted for.
+   * @param account The address of the account casting votes.
+   * @return The groups that `account` has voted for.
+   */
   getGroupsVotedForByAccount: (account: Address) => Promise<Address[]> = proxyCall(
     this.contract.methods.getGroupsVotedForByAccount
   )
@@ -100,6 +105,9 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     }
   }
 
+  /**
+   * Returns the addresses in the current validator set.
+   */
   async getValidatorSetAddresses(): Promise<string[]> {
     const numberValidators = await this.numberValidatorsInCurrentSet()
 
@@ -112,6 +120,9 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     return Promise.all(validatorAddressPromises)
   }
 
+  /**
+   * Returns the current registered validator groups and their total votes and eligibility.
+   */
   async getValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
     const validators = await this.kit.contracts.getValidators()
     const validatorGroupAddresses = (await validators.getRegisteredValidatorGroups()).map(
@@ -130,11 +141,19 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     }))
   }
 
+  /**
+   * Returns the current eligible validator groups and their total votes.
+   */
   async getEligibleValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
     const res = await this.contract.methods.getTotalVotesForEligibleValidatorGroups().call()
     return zip((a, b) => ({ address: a, votes: new BigNumber(b), eligible: true }), res[0], res[1])
   }
 
+  /**
+   * Marks a group eligible for electing validators.
+   * @param lesser The address of the group that has received fewer votes than this group.
+   * @param greater The address of the group that has received more votes than this group.
+   */
   async markGroupEligible(validatorGroup: Address): Promise<CeloTransactionObject<boolean>> {
     if (this.kit.defaultAccount == null) {
       throw new Error(`missing from at new ValdidatorUtils()`)
@@ -148,6 +167,11 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     return wrapSend(this.kit, this.contract.methods.markGroupEligible(lesser, greater))
   }
 
+  /**
+   * Increments the number of total and pending votes for `group`.
+   * @param validatorGroup The validator group to vote for.
+   * @param value The amount of gold to use to vote.
+   */
   async vote(validatorGroup: Address, value: BigNumber): Promise<CeloTransactionObject<boolean>> {
     if (this.kit.defaultAccount == null) {
       throw new Error(`missing from at new ValdidatorUtils()`)
