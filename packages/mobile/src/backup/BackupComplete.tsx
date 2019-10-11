@@ -4,7 +4,8 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Clipboard, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Clipboard, ScrollView, StyleSheet, Text } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
@@ -51,7 +52,7 @@ class BackupComplete extends React.Component<Props, State> {
   render() {
     const { t, backupCompleted, mnemonic } = this.props
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <ScrollView
           style={styles.questionTextContainer}
           contentContainerStyle={styles.scrollContainer}
@@ -71,7 +72,7 @@ class BackupComplete extends React.Component<Props, State> {
           />
         </ScrollView>
         <Button onPress={this.onDone} text={t('done')} standard={true} type={BtnTypes.PRIMARY} />
-      </View>
+      </SafeAreaView>
     )
   }
 }

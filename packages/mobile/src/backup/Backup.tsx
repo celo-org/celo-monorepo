@@ -60,9 +60,9 @@ export class Backup extends React.Component<Props, State> {
     wordsForBackupQuiz: [],
   }
 
-  componentDidMount() {
-    this.retrieveMnemonic()
+  async componentDidMount() {
     this.props.enterBackupFlow()
+    await this.retrieveMnemonic()
   }
 
   componentWillUnmount() {

@@ -1,13 +1,23 @@
 import firebase from 'react-native-firebase'
 import { DataSnapshot } from 'react-native-firebase/database'
 import { eventChannel } from 'redux-saga'
-import { all, call, cancelled, put, select, spawn, take, takeEvery } from 'redux-saga/effects'
-import { PaymentRequest, PaymentRequestStatuses, updatePaymentRequests } from 'src/account'
+import {
+  all,
+  call,
+  cancelled,
+  put,
+  select,
+  spawn,
+  take,
+  takeEvery,
+  takeLeading,
+} from 'redux-saga/effects'
+import { PaymentRequest, PaymentRequestStatus, updatePaymentRequests } from 'src/account'
 import { showError } from 'src/alert/actions'
 import { Actions as AppActions } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FIREBASE_ENABLED } from 'src/config'
-import { Actions, firebaseAuthorized } from 'src/firebase/actions'
+import { Actions, firebaseAuthorized, UpdatePaymentRequestStatusAction } from 'src/firebase/actions'
 import { initializeAuth, initializeCloudMessaging, setUserLanguage } from 'src/firebase/firebase'
 import Logger from 'src/utils/Logger'
 import { getAccount } from 'src/web3/saga'
@@ -93,7 +103,7 @@ const compareTimestamps = (a: PaymentRequest, b: PaymentRequest) => {
   return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
 }
 
-const onlyRequested = (pr: PaymentRequest) => pr.status === PaymentRequestStatuses.REQUESTED
+const onlyRequested = (pr: PaymentRequest) => pr.status === PaymentRequestStatus.REQUESTED
 
 function* subscribeToPaymentRequests() {
   yield all([call(waitForFirebaseAuth), call(getAccount)])
@@ -120,22 +130,18 @@ function* subscribeToPaymentRequests() {
   }
 }
 
-const updatePaymentRequestStatus = async (id: string, status: PaymentRequestStatuses) => {
-  firebase
-    .database()
-    .ref(`${REQUEST_DB}/${id}`)
-    .update({ status })
+function* updatePaymentRequestStatus({ id, status }: UpdatePaymentRequestStatusAction) {
+  try {
+    Logger.debug(TAG, 'Updating payment request', id, status)
+    yield call(firebase.database().ref(`${REQUEST_DB}/${id}`).update, { status })
+    Logger.debug(TAG, 'Payment request status updated', id)
+  } catch (error) {
+    Logger.error(TAG, `Error while updating payment request ${id} status`, error)
+  }
 }
 
 export function* watchPaymentRequestStatusUpdates() {
-  while (true) {
-    const action = yield take(Actions.PAYMENT_REQUEST_UPDATE_STATUS)
-    try {
-      yield call(updatePaymentRequestStatus, action.id, action.status)
-    } catch (error) {
-      Logger.error(TAG, 'Error while updating payment requests status', error)
-    }
-  }
+  yield takeLeading(Actions.PAYMENT_REQUEST_UPDATE_STATUS, updatePaymentRequestStatus)
 }
 
 export function* syncLanguageSelection({ language }: { language: string }) {

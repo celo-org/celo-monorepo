@@ -7,7 +7,7 @@ import { Countries } from '@celo/utils/src/countries'
 import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import { getRegionCodeFromCountryCode, parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Autocomplete from 'react-native-autocomplete-input'
 
 interface Props {
@@ -124,7 +124,11 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
     }
   }
 
-  renderItem = (countryCode: string) => {
+  keyExtractor = (item: string, index: number) => {
+    return item
+  }
+
+  renderItem = ({ item: countryCode }: { item: string }) => {
     const { displayName, emoji, countryCallingCodes } = this.state.countries.getCountryByCode(
       countryCode
     )
@@ -176,6 +180,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
             inputContainerStyle={[style.borderedBox, style.inputBox, style.inputCountry]}
             listStyle={[style.borderedBox, style.listAutocomplete]}
             data={filteredCountries}
+            keyExtractor={this.keyExtractor}
             defaultValue={countryQuery}
             onChangeText={this.onChangeCountryQuery}
             onEndEditing={this.props.onEndEditingCountryCode}
@@ -260,6 +265,15 @@ const style = StyleSheet.create({
     borderWidth: 1,
     borderTopWidth: 1,
     borderRadius: 3,
+    // Workaround the mess done for iOS in react-native-autocomplete-input :D
+    ...Platform.select({
+      ios: {
+        left: undefined,
+        position: 'relative',
+        right: undefined,
+        marginBottom: 6,
+      },
+    }),
   },
   autoCompleteDropDown: {
     position: 'relative',

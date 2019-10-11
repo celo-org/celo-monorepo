@@ -5,6 +5,7 @@ import { SignTxRequest } from '@celo/utils/src/dappkit'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationParams, NavigationScreenProp } from 'react-navigation'
 import { connect } from 'react-redux'
 import { requestTxSignature } from 'src/dappkit/dappkit'
@@ -78,7 +79,7 @@ class DappKitSignTxScreen extends React.Component<Props, State> {
   render() {
     const { t } = this.props
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.logo}>
             <DappkitExchangeIcon />
@@ -113,7 +114,7 @@ class DappKitSignTxScreen extends React.Component<Props, State> {
             type={BtnTypes.SECONDARY}
           />
         </View>
-      </View>
+      </SafeAreaView>
     )
   }
 }
