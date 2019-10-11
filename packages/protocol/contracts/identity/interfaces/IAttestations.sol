@@ -15,13 +15,13 @@ interface IAttestations {
   function setAttestationExpirySeconds(uint256) external;
 
   function setAccountDataEncryptionKey(bytes calldata) external;
-  function setAttestationKeyAddress(address, uint8, bytes32, bytes32) external;
+  function setAuthorizedAttestor(address, uint8, bytes32, bytes32) external;
   function setMetadataURL(string calldata) external;
   function setWalletAddress(address) external;
   function setAccount(bytes calldata, address) external;
 
-  function getAttestationKeyAddress(address) external view returns (address);
-  function getAccountFromAttestationKeyAddress(address) external view returns (address);
+  function getAuthorizedAttestor(address) external view returns (address);
+  function getAccountFromAuthorizedAttestor(address) external view returns (address);
 
   function getDataEncryptionKey(address) external view returns (bytes memory);
   function getWalletAddress(address) external view returns (address);

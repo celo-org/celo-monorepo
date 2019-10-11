@@ -60,9 +60,9 @@ contract Attestations is
     uint256 value
   );
 
-  event AccountAttestationKeyAddressSet(
+  event AccountAuthorizedAttestorSet(
     address indexed account,
-    address attestationKeyAddress
+    address authorizedAttestor
   );
 
   event AccountDataEncryptionKeySet(
@@ -104,8 +104,8 @@ contract Attestations is
     // The token with which attestation request fees are paid
     address attestationRequestFeeToken;
 
-    // The address of the key with which this account wants to sign attestations for
-    address attestationKeyAddress;
+    // The address of the key with which this account wants to sign attestations
+    address authorizedAttestor;
 
     // The ECDSA public key used to encrypt and decrypt data for this account
     bytes dataEncryptionKey;
@@ -133,8 +133,8 @@ contract Attestations is
   mapping(bytes32 => IdentifierState) identifiers;
   mapping(address => Account) accounts;
 
-  // Mapping of attestationKey addresses to account addresses
-  mapping(address => address) keysToAccount;
+  // Mapping of authorizedAttestor addresses to account addresses
+  mapping(address => address) authorizedAttestors;
 
   // Address of the RequestAttestation precompiled contract.
   // solhint-disable-next-line state-visibility
@@ -547,53 +547,57 @@ contract Attestations is
   }
 
   /**
-   * @notice Setter for the attestation key for an account
-   * @param attestationKeyAddress The attestation key address to set for the account
+   * @notice Setter of the authorized attestor for an account
+   * @param authorizedAttestor The address of the attestor to set for the account
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
-   * @dev v, r, s constitute `attestationKeyAddress`'s signature on `msg.sender`.
+   * @dev v, r, s constitute `authorizedAttestor`'s signature on `msg.sender`.
    */
-  function setAttestationKeyAddress(
-    address attestationKeyAddress,
+  function setAuthorizedAttestor(
+    address authorizedAttestor,
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) public {
+  )
+    public
+  {
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
-    require(signer == attestationKeyAddress, "Incorrect signature");
+    require(signer == authorizedAttestor, "Incorrect signature");
 
-    accounts[msg.sender].attestationKeyAddress = attestationKeyAddress;
-    keysToAccount[attestationKeyAddress] = msg.sender;
-    emit AccountAttestationKeyAddressSet(msg.sender, attestationKeyAddress);
+    accounts[msg.sender].authorizedAttestor = authorizedAttestor;
+    authorizedAttestors[authorizedAttestor] = msg.sender;
+    emit AccountAuthorizedAttestorSet(msg.sender, authorizedAttestor);
   }
 
   /**
-   * @notice Getter for the address of the attestation key for an account
-   * @param account The address of the account to get the attestation key for
-   * @return The address of the attestation key
+   * @notice Getter for the authorized attestor for an account
+   * @param account The address of the account to get the authorized attestor for
+   * @return The address of the authorized attestor
    */
-  function getAttestationKeyAddress(address account) external view returns (address) {
-    return accounts[account].attestationKeyAddress;
+  function getAuthorizedAttestor(address account) external view returns (address) {
+    return accounts[account].authorizedAttestor;
   }
 
   /**
-   * @notice Getter for the address of the account for an attestation key
-   * @param attestationKey The address of the attestation key
-   * @return The address of the account that specified the attestation key
+   * @notice Getter for the address of the account that authorized the attestor
+   * @param authorizedAttestor The address of the attestor
+   * @return The address of the account that specified the attestor
    */
-  function getAccountFromAttestationKeyAddress(address attestationKey)
+  function getAccountFromAuthorizedAttestor(
+    address authorizedAttestor
+  )
     public
     view
     returns (address)
   {
-    address account = keysToAccount[attestationKey];
-    if (account == address(0x0)) {
-      return attestationKey;
+    address account = authorizedAttestors[authorizedAttestor];
+    if (account == address(0)) {
+      return authorizedAttestor;
     } else {
       require(
-        accounts[account].attestationKeyAddress == attestationKey,
-        "The mapped account no longer specifies the attestation key"
+        accounts[account].authorizedAttestor == authorizedAttestor,
+        "The mapped account no longer specifies the attestor"
       );
       return account;
     }
@@ -640,7 +644,7 @@ contract Attestations is
   {
     bytes32 codehash = keccak256(abi.encodePacked(identifier, account));
     address signer = ecrecover(codehash, v, r, s);
-    address issuer = getAccountFromAttestationKeyAddress(signer);
+    address issuer = getAccountFromAuthorizedAttestor(signer);
 
     Attestation storage attestation =
       identifiers[identifier].attestations[account].issuedAttestations[issuer];

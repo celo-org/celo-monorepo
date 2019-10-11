@@ -111,20 +111,20 @@ contract('Attestations', (accounts: string[]) => {
 
   const unlockAttestationKey = async (address: string) => {
     const attestationKey = getAttestationKey(address)
-    const attestationKeyAddress = privateKeyToAddress(attestationKey)
+    const authorizedAttestor = privateKeyToAddress(attestationKey)
     // @ts-ignore
     await web3.eth.personal.importRawKey(attestationKey, 'passphrase')
-    await web3.eth.personal.unlockAccount(attestationKeyAddress, 'passphrase', 1000000)
-    return attestationKeyAddress
+    await web3.eth.personal.unlockAccount(authorizedAttestor, 'passphrase', 1000000)
+    return authorizedAttestor
   }
 
-  const registerAttestationKey = async (address: string) => {
+  const setAuthorizedAttestor = async (address: string) => {
     const attestationKey = getAttestationKey(address)
-    const attestationKeyAddress = privateKeyToAddress(attestationKey)
-    const attestationSig = await getParsedSignatureOfAddress(web3, address, attestationKeyAddress)
+    const authorizedAttestor = privateKeyToAddress(attestationKey)
+    const attestationSig = await getParsedSignatureOfAddress(web3, address, authorizedAttestor)
 
-    return attestations.setAttestationKeyAddress(
-      attestationKeyAddress,
+    return attestations.setAuthorizedAttestor(
+      authorizedAttestor,
       attestationSig.v,
       attestationSig.r,
       attestationSig.s,
@@ -239,36 +239,36 @@ contract('Attestations', (accounts: string[]) => {
     })
   })
 
-  describe('#setAttestationKeyAddress', async () => {
-    let attestationKeyAddress
+  describe('#setAuthorizedAttestor', async () => {
+    let authorizedAttestor
     beforeEach(async () => {
-      attestationKeyAddress = await unlockAttestationKey(caller)
+      authorizedAttestor = await unlockAttestationKey(caller)
     })
 
-    it('should set the attestationKeyAddress with the right signature', async () => {
-      await registerAttestationKey(caller)
-      const result = await attestations.getAttestationKeyAddress(caller)
-      assert.equal(result, attestationKeyAddress)
+    it('should set the authorizedAttestor with the right signature', async () => {
+      await setAuthorizedAttestor(caller)
+      const result = await attestations.getAuthorizedAttestor(caller)
+      assert.equal(result, authorizedAttestor)
     })
 
-    it('should just return the address if no attesation key is mapped', async () => {
-      const result = await attestations.getAccountFromAttestationKeyAddress(caller)
+    it('should just return the account address if no authorized attestor is set', async () => {
+      const result = await attestations.getAccountFromAuthorizedAttestor(caller)
       assert.equal(result, caller)
     })
 
-    it('should retrieve the account address from the attestation key when mapped', async () => {
-      await registerAttestationKey(caller)
-      const result = await attestations.getAccountFromAttestationKeyAddress(attestationKeyAddress)
+    it('should retrieve the account address if authorized attestor is set', async () => {
+      await setAuthorizedAttestor(caller)
+      const result = await attestations.getAccountFromAuthorizedAttestor(authorizedAttestor)
       assert.equal(result, caller)
     })
 
-    it('should emit the AccountAttestationKeyAddressSet event', async () => {
-      const response = await registerAttestationKey(caller)
+    it('should emit the AccountauthorizedAttestorSet event', async () => {
+      const response = await setAuthorizedAttestor(caller)
       assert.lengthOf(response.logs, 1)
       const event = response.logs[0]
       assertLogMatches2(event, {
-        event: 'AccountAttestationKeyAddressSet',
-        args: { account: caller, attestationKeyAddress },
+        event: 'AccountAuthorizedAttestorSet',
+        args: { account: caller, authorizedAttestor },
       })
     })
 
@@ -276,11 +276,11 @@ contract('Attestations', (accounts: string[]) => {
       const attestationSig = await getParsedSignatureOfAddress(
         web3,
         accounts[1],
-        attestationKeyAddress
+        authorizedAttestor
       )
       await assertRevert(
-        attestations.setAttestationKeyAddress(
-          attestationKeyAddress,
+        attestations.setAuthorizedAttestor(
+          authorizedAttestor,
           attestationSig.v,
           attestationSig.r,
           attestationSig.s
@@ -600,11 +600,11 @@ contract('Attestations', (accounts: string[]) => {
       })
     })
 
-    describe('with a mapped attestation key', () => {
+    describe('when an authorized attestor has been set', () => {
       beforeEach(async () => {
         const attestationKey = getAttestationKey(issuer)
         await unlockAttestationKey(issuer)
-        await registerAttestationKey(issuer)
+        await setAuthorizedAttestor(issuer)
         ;({ v, r, s } = attestToIdentifier(phoneNumber, caller, attestationKey))
       })
 
