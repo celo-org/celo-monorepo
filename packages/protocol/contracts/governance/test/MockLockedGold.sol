@@ -26,7 +26,7 @@ contract MockLockedGold is ILockedGold {
     authorizedValidators[account] = validator;
   }
 
-  function getAccountFromValidator(address accountOrValidator) external pure returns (address) {
+  function getAccountFromValidator(address accountOrValidator) external view returns (address) {
     return accountOrValidator;
   }
 
@@ -34,13 +34,13 @@ contract MockLockedGold is ILockedGold {
     address accountOrValidator
   )
     external
-    pure
+    view
     returns (address)
   {
     return accountOrValidator;
   }
 
-  function getAccountFromActiveVoter(address accountOrVoter) external pure returns (address) {
+  function getAccountFromActiveVoter(address accountOrVoter) external view returns (address) {
     return accountOrVoter;
   }
 
