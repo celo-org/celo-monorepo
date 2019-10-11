@@ -1,7 +1,8 @@
+import { eqAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
-import { Address, CeloContract } from '../base'
+import { Address, CeloContract, NULL_ADDRESS } from '../base'
 import { SortedOracles } from '../generated/types/SortedOracles'
-import { BaseWrapper, proxyCall, proxySend, toBigNumber } from './BaseWrapper'
+import { BaseWrapper, CeloTransactionObject, proxyCall, toBigNumber, wrapSend } from './BaseWrapper'
 
 export enum MedianRelation {
   Undefined,
@@ -36,14 +37,28 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    */
   reportExpirySeconds = proxyCall(this.contract.methods.reportExpirySeconds, undefined, toBigNumber)
 
-  report = proxySend(this.kit, this.contract.methods.report)
-  // async report(
-  //   token: Address,
-  //   numerator: string | number,
-  //   denominator: string | number
-  // ): Promise<CeloTransactionObject<boolean>> {
-  //   this.contract.methods.report()
-  // }
+  /**
+   * Updates an oracle value and the median.
+   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   * @param numerator The amount of tokens equal to `denominator` Celo Gold.
+   * @param denominator The amount of Celo Gold that the `numerator` tokens are equal to.
+   */
+  async report(
+    token: Address,
+    numerator: number,
+    denominator: number
+  ): Promise<CeloTransactionObject<void>> {
+    const { lesserKey, greaterKey } = await this.findLesserAndGreaterAfterReport(
+      token,
+      numerator,
+      denominator
+    )
+
+    return wrapSend(
+      this.kit,
+      this.contract.methods.report(token, numerator, denominator, lesserKey, greaterKey)
+    )
+  }
 
   /**
    * Returns current configuration parameters.
@@ -78,4 +93,33 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
       return rates
     }
   )
+
+  private async findLesserAndGreaterAfterReport(
+    token: Address,
+    numerator: number,
+    denominator: number
+  ): Promise<{ lesserKey: Address; greaterKey: Address }> {
+    const currentRates: OracleRate[] = await this.getRates(token)
+    const internalDenominator = new BigNumber(await this.contract.methods.DENOMINATOR().call())
+
+    // This is how the contract calculates the rate from the numerator and denominator.
+    // To figure out where this new report goes in the list, we need to compare this
+    // value with the other rates
+    const value = internalDenominator.times(numerator).div(denominator)
+    let greaterKey = NULL_ADDRESS
+
+    // This leverages the fact that the currentRates are already sorted from
+    // greatest to lowest value
+    for (const rate of currentRates) {
+      if (!eqAddress(rate.address, this.kit.defaultAccount)) {
+        if (rate.rate.isGreaterThanOrEqualTo(value)) {
+          greaterKey = rate.address
+        } else if (rate.rate.isLessThanOrEqualTo(value)) {
+          return { lesserKey: rate.address, greaterKey }
+        }
+      }
+    }
+
+    return { lesserKey: NULL_ADDRESS, greaterKey }
+  }
 }
