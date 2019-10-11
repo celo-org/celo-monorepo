@@ -159,17 +159,19 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
       tobinTaxCache.numerator = uint128(computeTobinTax());
       tobinTaxCache.timestamp = uint128(now); // solhint-disable-line not-rely-on-time
     }
-    return getTobinTax();
+    return (uint256(tobinTaxCache.numerator), TOBIN_TAX_DENOMINATOR);
   }
 
   /**
    * @notice Returns the tobin tax.
-   * @return The tobin tax amount as a fraction along with true if the tax is stale, false otherwise
+   * @return The tobin tax amount as a fraction.
    */
-  function getPossiblyStaleTobinTax() external view returns (uint256, uint256, bool) {
+  function getTobinTax() external view returns (uint256, uint256) {
     // solhint-disable-next-line not-rely-on-time
-    bool stale = now.sub(tobinTaxCache.timestamp) > tobinTaxStalenessThreshold;
-    return (uint256(tobinTaxCache.numerator), TOBIN_TAX_DENOMINATOR, stale);
+    if (now.sub(tobinTaxCache.timestamp) > tobinTaxStalenessThreshold) {
+      return (computeTobinTax(), TOBIN_TAX_DENOMINATOR);
+    }
+    return (uint256(tobinTaxCache.numerator), TOBIN_TAX_DENOMINATOR);
   }
 
   function getTokens() external view returns (address[] memory) {
