@@ -11,9 +11,9 @@ import { parsePhoneNumberFromString } from 'libphonenumber-js'
 import * as React from 'react'
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Autocomplete from 'react-native-autocomplete-input'
-import Logger from 'src/utils/Logger'
+// import Logger from 'src/utils/Logger'
 
-const TAG = 'PhoneNumberInput'
+// const TAG = 'PhoneNumberInput'
 
 interface Props {
   style?: any
@@ -87,7 +87,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
         )
       }
     } catch (error) {
-      Logger.error(TAG, 'Could not request phone', error)
+      // Logger.error(TAG, 'Could not request phone', error)
     }
   }
 
