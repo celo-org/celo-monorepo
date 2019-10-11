@@ -142,15 +142,16 @@ export function* assignAccountFromPrivateKey(key: string) {
     }
 
     let account: string
+
+    // Save the account to a local file on the disk.
+    // This is done for all sync modes, to allow users to switch in to zero sync mode.
+    // If geth is running it has its own mechanism to save the encrypted key in its keystore.
+    account = getAccountAddressFromPrivateKey(key)
+    yield savePrivateKeyToLocalDisk(account, key, pincode)
+
     if (isZeroSyncMode()) {
-      const privateKey = String(key)
       Logger.debug(TAG + '@assignAccountFromPrivateKey', 'Init web3 with private key')
-      addLocalAccount(web3, privateKey)
-      // Save the account to a local file on the disk.
-      // This is only required in Geth free mode because if geth is running
-      // it has its own mechanism to save the encrypted key in its keystore.
-      account = getAccountAddressFromPrivateKey(privateKey)
-      yield savePrivateKeyToLocalDisk(account, privateKey, pincode)
+      addLocalAccount(web3, key)
     } else {
       try {
         // @ts-ignore
