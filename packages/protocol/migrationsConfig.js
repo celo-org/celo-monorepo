@@ -68,8 +68,8 @@ const DefaultConfig = {
     electionThreshold: '0', // no threshold
     maxGroupSize: '70',
 
+    // We register the specified validators split over a number of groups to satisfy maxGroupSize.
     validatorKeys: [],
-    // We register a single validator group during the migration.
     groupName: 'C-Labs',
     groupUrl: 'https://www.celo.org',
   },

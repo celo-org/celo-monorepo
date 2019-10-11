@@ -38,6 +38,7 @@ async function makeMinimumDeposit(lockedGold: LockedGoldInstance, privateKey: st
 }
 
 async function registerValidatorGroup(
+  name: string,
   lockedGold: LockedGoldInstance,
   validators: ValidatorsInstance,
   privateKey: string
@@ -65,7 +66,7 @@ async function registerValidatorGroup(
   // @ts-ignore
   const tx = validators.contract.methods.registerValidatorGroup(
     encodedKey,
-    config.validators.groupName,
+    name,
     config.validators.groupUrl,
     [config.validators.minLockedGoldNoticePeriod]
   )
@@ -146,33 +147,49 @@ module.exports = async (_deployer: any) => {
     )
   }
 
-  console.info('  Registering ValidatorGroup ...')
-  const firstPrivateKey = valKeys[0]
-  const account = await registerValidatorGroup(lockedGold, validators, firstPrivateKey)
-
-  console.info('  Registering Validators ...')
-  await Promise.all(
-    valKeys.map((key) => registerValidator(lockedGold, validators, key, account.address))
-  )
-
-  console.info('  Adding Validators to Validator Group ...')
-  for (const key of valKeys) {
-    const address = generateAccountAddressFromPrivateKey(key.slice(2))
-    // @ts-ignore
-    const addTx = validators.contract.methods.addMember(address)
-    await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
-      to: validators.address,
-    })
+  // Split the validator keys into groups that will fit within the max group size.
+  const valKeyGroups: string[] = []
+  for (let i = 0; i < valKeys.length; i += config.validators.maxGroupSize) {
+    valKeyGroups.push(
+      valKeys.slice(i, Math.min(i + config.validators.maxGroupSize, valKeys.length))
+    )
   }
 
-  console.info('  Voting for Validator Group ...')
-  // Make another deposit so our vote has more weight.
-  const minLockedGoldVotePerValidator = 10000
-  await lockedGold.newCommitment(0, {
-    // @ts-ignore
-    value: new BigNumber(valKeys.length)
-      .times(minLockedGoldVotePerValidator)
-      .times(config.validators.minLockedGoldValue),
-  })
-  await validators.vote(account.address, NULL_ADDRESS, NULL_ADDRESS)
+  for (let [idx, groupKeys] of valKeyGroups.entries()) {
+    // Append an index to the group name if there is more than one group.
+    let groupName: string = config.validators.groupName
+    if (valKeyGroups.length > 1) {
+      groupName += ` (${idx})`
+    }
+
+    console.info(`  Registering Validator Group: ${groupName} ...`)
+    const firstPrivateKey = groupKeys[0]
+    const account = await registerValidatorGroup(groupName, lockedGold, validators, firstPrivateKey)
+
+    console.info('  * Registering Validators ...')
+    await Promise.all(
+      groupKeys.map((key) => registerValidator(lockedGold, validators, key, account.address))
+    )
+
+    console.info('  * Adding Validators to Validator Group ...')
+    for (const key of groupKeys) {
+      const address = generateAccountAddressFromPrivateKey(key.slice(2))
+      // @ts-ignore
+      const addTx = validators.contract.methods.addMember(address)
+      await sendTransactionWithPrivateKey(web3, addTx, account.privateKey, {
+        to: validators.address,
+      })
+    }
+
+    console.info('  * Voting for Validator Group ...')
+    // Make another deposit so our vote has more weight.
+    const minLockedGoldVotePerValidator = 10000
+    await lockedGold.newCommitment(0, {
+      // @ts-ignore
+      value: new BigNumber(groupKeys.length)
+        .times(minLockedGoldVotePerValidator)
+        .times(config.validators.minLockedGoldValue),
+    })
+    await validators.vote(account.address, NULL_ADDRESS, NULL_ADDRESS)
+  }
 }
