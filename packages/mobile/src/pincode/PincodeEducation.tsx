@@ -3,6 +3,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setPincode } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
@@ -69,7 +70,7 @@ class PincodeEducation extends React.Component<Props> {
     const phoneAuth = isPhoneAuthSupported()
 
     return (
-      <View style={style.container}>
+      <SafeAreaView style={style.container}>
         <DevSkipButton nextScreen={Screens.EnterInviteCode} />
         <ScrollView contentContainerStyle={style.scrollContainer}>
           <View>
@@ -119,7 +120,7 @@ class PincodeEducation extends React.Component<Props> {
             />
           )}
         </View>
-      </View>
+      </SafeAreaView>
     )
   }
 }

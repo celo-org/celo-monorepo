@@ -254,7 +254,8 @@ Then install packages:
 
 ```bash
 cd celo-monorepo
-yarn
+yarn # install dependencies and run post-install script
+yarn build # build all packages
 ```
 
 > Note that if you do your checkouts with a different method, Yarn will fail if
@@ -296,8 +297,6 @@ To deploy the app to your connected Android device:
 
 ```bash
 cd packages/mobile
-# install packages
-yarn
 # install app and start dev server
 yarn dev
 ```

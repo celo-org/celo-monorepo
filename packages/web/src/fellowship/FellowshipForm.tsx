@@ -6,7 +6,6 @@ import {
   ErrorMessage,
   Form,
   HolisticField,
-  NameErrorArea,
   styles as formStyles,
   TextInput,
 } from 'src/forms/FormComponents'
@@ -14,7 +13,8 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import Spinner from 'src/shared/Spinner'
+import { colors, fonts, standardStyles } from 'src/styles'
 export class FellowshipForm extends React.Component<I18nProps & ScreenProps> {
   render() {
     const { t, screen } = this.props
@@ -109,12 +109,15 @@ export class FellowshipForm extends React.Component<I18nProps & ScreenProps> {
             >
               <Cell span={Spans.full}>
                 <Button
-                  text={t('submit')}
+                  iconLeft={formState.isLoading && <Spinner size={'small'} color={colors.white} />}
+                  text={!formState.isLoading && t('submit')}
                   kind={BTN.PRIMARY}
                   onPress={onAltSubmit}
                   size={SIZE.big}
                   align={'flex-start'}
+                  disabled={formState.isLoading}
                 />
+
                 {formState.isComplete && (
                   <Text style={[fonts.p, standardStyles.elementalMarginTop]}>
                     {t('form.fellowshipSubmitted')}

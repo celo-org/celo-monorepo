@@ -6,6 +6,7 @@ import * as expressEnforcesSsl from 'express-enforces-ssl'
 import * as helmet from 'helmet'
 import * as next from 'next'
 import nextI18NextMiddleware from 'next-i18next/middleware'
+import { Tables } from '../fullstack/EcoFundFields'
 import Sentry, { initSentry } from '../fullstack/sentry'
 import addToCRM from '../server/addToCRM'
 import ecoFundSubmission from '../server/EcoFundApp'
@@ -84,7 +85,7 @@ function wwwRedirect(req, res, nextAction) {
     const { ideas, email, name, bio, deliverables, resume } = req.body
 
     try {
-      await submitFellowApp({
+      const fellow = await submitFellowApp({
         name,
         email,
         ideas,
@@ -92,7 +93,7 @@ function wwwRedirect(req, res, nextAction) {
         deliverables,
         resume,
       })
-      res.status(204)
+      res.status(204).json({ id: fellow.id })
     } catch (e) {
       Sentry.withScope((scope) => {
         scope.setTag('Service', 'Airtable')
