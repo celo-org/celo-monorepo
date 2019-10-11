@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`BackupIntroduction renders correctly when backup is not too late 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -525,11 +525,11 @@ exports[`BackupIntroduction renders correctly when backup is not too late 1`] = 
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`BackupIntroduction renders correctly when backup too late and delayed 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -968,11 +968,11 @@ exports[`BackupIntroduction renders correctly when backup too late and delayed 1
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;
 
 exports[`BackupIntroduction renders correctly when backup too late and no delay 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -1496,5 +1496,5 @@ exports[`BackupIntroduction renders correctly when backup too late and no delay 
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;

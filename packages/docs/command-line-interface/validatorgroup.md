@@ -20,7 +20,7 @@ _See code: [packages/cli/src/commands/validatorgroup/list.ts](https://github.com
 
 ### Member
 
-Register a new Validator Group
+Manage members of a Validator Group
 
 ```
 USAGE
