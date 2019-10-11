@@ -11,6 +11,7 @@ export enum Screens {
   Account = 'Account',
   Analytics = 'Analytics',
   Backup = 'Backup',
+  CeloLite = 'CeloLite',
   DappKitAccountAuth = 'DappKitAccountAuth',
   DappKitSignTxScreen = 'DappKitSignTxScreen',
   DappKitTxDataScreen = 'DappKitTxDataScreen',

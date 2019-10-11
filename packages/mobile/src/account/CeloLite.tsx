@@ -27,7 +27,7 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-export class Analytics extends React.Component<Props> {
+export class CeloLite extends React.Component<Props> {
   static navigationOptions = () => ({
     ...headerWithCancelButton,
     headerTitle: i18n.t('accountScreen10:celoLite'),
@@ -76,4 +76,4 @@ const style = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   { setZeroSyncMode }
-)(withNamespaces(Namespaces.accountScreen10)(Analytics))
+)(withNamespaces(Namespaces.accountScreen10)(CeloLite))
