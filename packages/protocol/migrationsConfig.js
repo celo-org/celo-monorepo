@@ -11,17 +11,24 @@ const DefaultConfig = {
     attestationExpirySeconds: 60 * 60, // 1 hour,
     attestationRequestFeeInDollars: 0.05,
   },
-  lockedGold: {
-    maxNoticePeriod: 60 * 60 * 24 * 365 * 3, // 3 years
-  },
-  oracles: {
-    reportExpiry: 60 * 60, // 1 hour
+  blockchainParameters: {
+    minimumClientVersion: {
+      major: 1,
+      minor: 8,
+      patch: 23,
+    },
   },
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1,
     updateFrequency: 3600,
     minimumReports: 1,
+  },
+  gasPriceMinimum: {
+    initialMinimum: 10000,
+    targetDensity: 1 / 2,
+    adjustmentSpeed: 1 / 2,
+    proposerFraction: 1 / 2,
   },
   governance: {
     approvalStageDuration: 15 * 60, // 15 minutes
@@ -36,11 +43,14 @@ const DefaultConfig = {
     participationBaselineUpdateFactor: 1 / 5,
     participationBaselineQuorumFactor: 1,
   },
-  gasPriceMinimum: {
-    initialMinimum: 10000,
-    targetDensity: 1 / 2,
-    adjustmentSpeed: 1 / 2,
-    proposerFraction: 1 / 2,
+  lockedGold: {
+    maxNoticePeriod: 60 * 60 * 24 * 365 * 3, // 3 years
+  },
+  oracles: {
+    reportExpiry: 60 * 60, // 1 hour
+  },
+  random: {
+    randomnessBlockRetentionWindow: 256,
   },
   registry: {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
@@ -72,13 +82,6 @@ const DefaultConfig = {
     // We register a single validator group during the migration.
     groupName: 'C-Labs',
     groupUrl: 'https://www.celo.org',
-  },
-  blockchainParameters: {
-    minimumClientVersion: {
-      major: 1,
-      minor: 8,
-      patch: 23,
-    },
   },
 }
 

@@ -1,12 +1,17 @@
 pragma solidity ^0.5.3;
 
 import "./interfaces/IRandom.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
+import "../common/Initializable.sol";
 
 /**
  * @title Provides randomness for verifier selection
  */
-contract Random is IRandom {
+contract Random is IRandom, Ownable, Initializable {
+
+  using SafeMath for uint256;
 
   /* Stores most recent commitment per address */
   mapping(address => bytes32) public commitments;
@@ -19,12 +24,22 @@ contract Random is IRandom {
   uint256 private historyFirst;
   uint256 private historySize;
 
-  function initialize() external {
-    randomnessBlockRetentionWindow = 256;
+  event RandomnessBlockRetentionWindowSet(uint256 value);
+
+  function initialize(uint256 _randomnessBlockRetentionWindow) external initializer {
+    _transferOwnership(msg.sender);
+    require(_randomnessBlockRetentionWindow > 0, "randomnessBlockRetetionWindow cannot be zero");
+    randomnessBlockRetentionWindow = _randomnessBlockRetentionWindow;
   }
 
-  function setRandomnessBlockRetentionWindow(uint value) external {
+  /**
+   * @notice Sets the number of old random blocks whose randomness values can be queried.
+   * @param value Number of old random blocks whose randomness values can be queried.
+   */
+  function setRandomnessBlockRetentionWindow(uint256 value) external onlyOwner {
+    require(value > 0, "randomnessBlockRetetionWindow cannot be zero");
     randomnessBlockRetentionWindow = value;
+    emit RandomnessBlockRetentionWindowSet(value);
   }
 
   /**
@@ -66,24 +81,21 @@ contract Random is IRandom {
     commitments[proposer] = newCommitment;
   }
 
-  function addRandomness(uint bn, bytes32 randomness) internal {
+  function addRandomness(uint blockNumber, bytes32 randomness) internal {
     _random = randomness;
-    history[bn] = randomness;
+    history[blockNumber] = randomness;
     if (historySize == 0) {
       historyFirst = block.number;
       historySize = 1;
-    }
-    else if (historySize > randomnessBlockRetentionWindow) {
+    } else if (historySize > randomnessBlockRetentionWindow) {
       delete history[historyFirst];
       delete history[historyFirst+1];
       historyFirst += 2;
       historySize--;
-    }
-    else if (historySize == randomnessBlockRetentionWindow) {
+    } else if (historySize == randomnessBlockRetentionWindow) {
       delete history[historyFirst];
       historyFirst++;
-    }
-    else /* historySize < randomnessBlockRetentionWindow) */ {
+    } else /* historySize < randomnessBlockRetentionWindow) */ {
       historySize++;
     }
   }
@@ -96,16 +108,21 @@ contract Random is IRandom {
     return _random;
   }
 
-  function getBlockRandomness(uint256 bn) external view returns (bytes32) {
-    return _getBlockRandomness(bn, block.number);
+  /**
+   * @notice Get randomness values of previous blocks.
+   * @param blockNumber The number of block whose randomness value we want to know.
+   */
+  function getBlockRandomness(uint256 blockNumber) external view returns (bytes32) {
+    return _getBlockRandomness(blockNumber, block.number);
   }
 
-  function _getBlockRandomness(uint256 bn, uint256 cur) internal view returns (bytes32) {
-    require(bn <= cur, "Cannot query randomness of future blocks");
-    require(bn > cur - historySize, "Cannot query randomness of old blocks");
-    if (randomnessBlockRetentionWindow < cur) {
-      require(bn > cur - randomnessBlockRetentionWindow, "Cannot query randomness of old blocks");
-    }
-    return history[bn];
+  function _getBlockRandomness(uint256 blockNumber, uint256 cur) internal view returns (bytes32) {
+    require(blockNumber <= cur, "Cannot query randomness of future blocks");
+    require(
+      blockNumber > cur.sub(historySize) &&
+      (randomnessBlockRetentionWindow >= cur ||
+       blockNumber > cur.sub(randomnessBlockRetentionWindow)),
+      "Cannot query randomness older than the stored history");
+    return history[blockNumber];
   }
 }
