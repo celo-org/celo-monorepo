@@ -1,13 +1,12 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
 import LayersIllo from 'src/dev/LayersIllo'
 import { H2, H3, Li } from 'src/fonts/Fonts'
 import StackSection from 'src/dev/StackSection'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import throttle from 'lodash.throttle'
+import { findNodeHandle } from 'react-native'
 
 import { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { fonts, standardStyles, textStyles, colors } from 'src/styles'
@@ -19,14 +18,34 @@ enum Levels {
 
 interface State {
   selection: Levels
+  sticky: boolean
+  currentOffset: number
+  fixedDistance: number
 }
 
-class FullStack extends React.PureComponent<I18nProps, State> {
-  state = { selection: Levels.apps }
+const ACCEPTABLE_MARGIN = 50
 
-  handleScroll = throttle((event) => {
-    debugger
+class FullStack extends React.PureComponent<I18nProps, State> {
+  state = { selection: Levels.apps, sticky: false, currentOffset: 0, fixedDistance: 0 }
+
+  handleScroll = throttle(() => {
+    const element: any = findNodeHandle(this.ref.current)
+    if (!element) {
+      return
+    }
+
+    const currentOffset = element.getBoundingClientRect().top
+
+    const fixedDistance = (element.offsetTop - ACCEPTABLE_MARGIN) * -1
+
+    if (currentOffset < ACCEPTABLE_MARGIN) {
+      this.setState({ sticky: true, fixedDistance })
+    } else {
+      this.setState({ sticky: false, fixedDistance })
+    }
   }, 24)
+
+  ref = React.createRef<View>()
 
   setL1 = () => {
     this.setState({ selection: Levels.apps })
@@ -55,20 +74,31 @@ class FullStack extends React.PureComponent<I18nProps, State> {
     const { t } = this.props
 
     return (
-      <View style={standardStyles.darkBackground}>
-        <GridRow>
-          <Cell span={Spans.half}>
-            <H3 style={textStyles.invert}>{t('stackSubtitle')}</H3>
-            <H2 style={[textStyles.invert, standardStyles.elementalMargin]}>{t('stackTitle')}</H2>
-          </Cell>
-        </GridRow>
+      <View style={[standardStyles.darkBackground]} ref={this.ref}>
         <GridRow allStyle={{ overflow: 'hidden' }}>
           <Cell span={Spans.half}>
-            <View style={{ width: '100%', maxWidth: 400 }}>
-              <Text style={[fonts.p, textStyles.invert, standardStyles.elementalMarginBottom]}>
-                {t('stackDescription')}
-              </Text>
-              <LayersIllo activeLayer={this.state.selection} onSelectLayer={this.setLevel} />
+            <View
+              // @ts-ignore
+              style={
+                this.state.sticky && {
+                  position: 'fixed',
+                  top: ACCEPTABLE_MARGIN,
+                  zIndex: 10,
+                }
+              }
+            >
+              <H3 style={textStyles.invert}>{t('stackSubtitle')}</H3>
+              <H2 style={[textStyles.invert, standardStyles.elementalMargin]}>{t('stackTitle')}</H2>
+
+              <View
+                // @ts-ignore
+                style={{ width: '100%', maxWidth: 400 }}
+              >
+                <Text style={[fonts.p, textStyles.invert, standardStyles.elementalMarginBottom]}>
+                  {t('stackDescription')}
+                </Text>
+                <LayersIllo activeLayer={this.state.selection} onSelectLayer={this.setLevel} />
+              </View>
             </View>
           </Cell>
           <Cell span={Spans.half}>

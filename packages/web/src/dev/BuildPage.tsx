@@ -4,26 +4,24 @@ import Cover from 'src/dev/Cover'
 import DeveloperUpdates from 'src/dev/DeveloperUpdates'
 import Features from 'src/dev/Features'
 
+import FullStack from 'src/dev/FullStack'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, withNamespaces } from 'src/i18n'
-import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import menuItems, { CeloLinks, hashNav } from 'src/shared/menu-items'
-import { standardStyles, textStyles } from 'src/styles'
-import FullStack from 'src/dev/FullStack'
+import menuItems from 'src/shared/menu-items'
 
 class BuildPage extends React.PureComponent<I18nProps> {
   static getInitialProps() {
     return { namespacesRequired: ['common', 'dev'] }
   }
 
-  setLevel = (level: number) => {
-    this.setState({ selection: level })
-  }
-
   render() {
-    const { t } = this.props
     return (
-      <View>
+      <View
+        style={{
+          // @ts-ignore
+          scrollPadding: 20,
+        }}
+      >
         <OpenGraph
           path={menuItems.BUILD.link}
           title={'Build with Celo | Celo Developers'}
@@ -32,7 +30,6 @@ class BuildPage extends React.PureComponent<I18nProps> {
           }
         />
         <Cover />
-
         <FullStack />
         <Features />
         <DeveloperUpdates />
