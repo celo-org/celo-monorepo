@@ -87,8 +87,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
         )
       }
     } catch (error) {
-      // Logger.info(TAG, "Phone doesn't have number set up")
-      Logger.error(TAG, '', error)
+      Logger.error(TAG, 'Could not request phone', error)
     }
   }
 
