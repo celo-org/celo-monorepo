@@ -39,9 +39,11 @@ contract Proxy {
       implementationAddress := sload(implementationPosition)
     }
 
-	if (implementationAddress == address(0)) return;
+    // Avoid checking if address is a contract or executing delegated call when 
+    // implementation address is 0x0
+    if (implementationAddress == address(0)) return;
     
-	require(AddressesHelper.isContract(implementationAddress), "Invalid contract address");
+    require(AddressesHelper.isContract(implementationAddress), "Invalid contract address");
 
     assembly {
       let newCallDataPosition := mload(0x40)
