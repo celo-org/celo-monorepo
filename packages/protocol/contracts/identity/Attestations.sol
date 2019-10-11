@@ -18,7 +18,14 @@ import "../common/Signatures.sol";
 /**
  * @title Contract mapping identifiers to accounts
  */
-contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, ReentrancyGuard, UsingLockedGold {
+contract Attestations is
+  IAttestations,
+  Ownable,
+  Initializable,
+  UsingRegistry,
+  ReentrancyGuard,
+  UsingLockedGold
+{
 
 
   using SafeMath for uint256;
