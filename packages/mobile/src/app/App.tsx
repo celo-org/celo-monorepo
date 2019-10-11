@@ -3,6 +3,7 @@ import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { withNamespaces } from 'react-i18next'
 import { DeviceEventEmitter, Linking, StatusBar, YellowBox } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useScreens } from 'react-native-screens'
 import SplashScreen from 'react-native-splash-screen'
 import { Provider } from 'react-redux'
@@ -75,16 +76,18 @@ export class App extends React.Component {
       // @ts-ignore Apollo doesn't like the typings
       <ApolloProvider client={apolloClient}>
         <Provider store={store}>
-          <PersistGate
-            onBeforeLift={this.hideSplashScreen}
-            loading={<AppLoading />}
-            persistor={persistor}
-          >
-            <StatusBar backgroundColor={colors.white} barStyle="dark-content" />
-            <ErrorBoundary>
-              <WrappedNavigator />
-            </ErrorBoundary>
-          </PersistGate>
+          <SafeAreaProvider>
+            <PersistGate
+              onBeforeLift={this.hideSplashScreen}
+              loading={<AppLoading />}
+              persistor={persistor}
+            >
+              <StatusBar backgroundColor={colors.white} barStyle="dark-content" />
+              <ErrorBoundary>
+                <WrappedNavigator />
+              </ErrorBoundary>
+            </PersistGate>
+          </SafeAreaProvider>
         </Provider>
       </ApolloProvider>
     )

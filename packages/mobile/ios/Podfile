@@ -61,8 +61,13 @@ target 'celo' do
   pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
   pod 'CeloBlockchain', :path => '../../../node_modules/@celo/client/CeloBlockchain.podspec'
   pod 'RNSecureKeyStore', :path => '../../../node_modules/react-native-secure-key-store/ios'
+  pod 'react-native-safe-area-context', :path => '../../../node_modules/react-native-safe-area-context'
 
   pod 'Firebase/Core', '~> 5.20.2'
+  pod 'Firebase/Auth'
+  pod 'Firebase/Storage'
+  pod 'Firebase/Messaging'
+  pod 'Firebase/Database'
   pod 'GoogleUtilities', '~> 5.3.7'
   # pod 'Segment-Firebase', '~> 2.4.0'
 
