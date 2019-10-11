@@ -22,12 +22,14 @@ import {
   Actions,
   getLatestBlock,
   setAccount,
+  setAccountInWeb3Keystore,
   setLatestBlockNumber,
   setPrivateCommentKey,
+  setZeroSyncMode,
   updateWeb3SyncProgress,
 } from 'src/web3/actions'
 import { addLocalAccount, isZeroSyncMode, web3 } from 'src/web3/contracts'
-import { currentAccountSelector } from 'src/web3/selectors'
+import { currentAccountInWeb3KeystoreSelector, currentAccountSelector } from 'src/web3/selectors'
 import { Block } from 'web3/eth/types'
 
 const ETH_PRIVATE_KEY_LENGTH = 64
@@ -104,6 +106,43 @@ export function* waitForWeb3Sync() {
   }
 }
 
+export function* switchToGethFromZeroSync() {
+  const account = yield call(ensureAccountInWeb3Keystore)
+  setZeroSyncMode(false)
+  Logger.debug(
+    TAG + '@ensureAccountInWeb3Keystore',
+    'Importing account from private key to web3 keystore',
+    account
+  )
+}
+
+export function* ensureAccountInWeb3Keystore() {
+  const account = yield select(currentAccountSelector)
+  if (account) {
+    const accountInWeb3Keystore = yield select(currentAccountInWeb3KeystoreSelector)
+    if (!accountInWeb3Keystore) {
+      Logger.debug(
+        TAG + '@ensureAccountInWeb3Keystore',
+        'Importing account from private key to web3 keystore'
+      )
+      // Add account to web3 keystore
+      const pincode = yield call(getPincode)
+      const privateKey: string = yield readPrivateKeyFromLocalDisk(account, pincode)
+      // TODO use function addAccountToWeb3Keystore() once it exists
+      // @ts-ignore
+      const web3Acc = yield call(web3.eth.personal.importRawKey, String(privateKey), pincode)
+      yield put(setAccountInWeb3Keystore(web3Acc))
+      yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
+      return web3Acc
+    } else {
+      // TODO check that account and accountInWeb3Keystore are the same
+      return accountInWeb3Keystore
+    }
+  } else {
+    throw new Error('Account not yet initialized') // TODO(anna) decide how to handle this
+  }
+}
+
 export function* getOrCreateAccount() {
   const account = yield select(currentAccountSelector)
   if (account) {
@@ -154,8 +193,10 @@ export function* assignAccountFromPrivateKey(key: string) {
       addLocalAccount(web3, key)
     } else {
       try {
+        // TODO make this a function addAccountToWeb3Keystore()
         // @ts-ignore
         account = yield call(web3.eth.personal.importRawKey, String(key), pincode)
+        yield put(setAccountInWeb3Keystore(account))
       } catch (e) {
         if (e.toString().includes('account already exists')) {
           account = currentAccount
