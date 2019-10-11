@@ -1,4 +1,6 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
+import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
@@ -9,7 +11,7 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { withNamespaces, WithNamespaces } from 'react-i18next'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
@@ -228,13 +230,15 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     const borderStyle = { borderColor: this.hasError() ? colors.errorRed : colors.dark }
 
     return (
-      <View style={styles.background}>
-        <View>
-          <DisconnectBanner />
-          <KeyboardAwareScrollView
-            contentContainerStyle={styles.transferArea}
-            keyboardShouldPersistTaps={'always'}
-          >
+      <SafeAreaView
+        // Force inset as this screen uses auto focus and KeyboardSpacer padding is initially
+        // incorrect because of that
+        forceInset={{ top: 'never', bottom: 'always' }}
+        style={styles.container}
+      >
+        <DisconnectBanner />
+        <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}>
+          <View style={styles.transferArea}>
             <View style={styles.transferInfo}>
               <Text style={[styles.currencyLabel, fontStyles.bodySmall]}>{maker.tokenText}</Text>
               <TextInput
@@ -297,13 +301,13 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
                 </Text>
               </View>
             </View>
-          </KeyboardAwareScrollView>
+          </View>
           <ExchangeRate
             rate={exchangeRate}
             makerToken={this.state.makerToken}
             showFinePrint={true}
           />
-        </View>
+        </KeyboardAwareScrollView>
         <View style={componentStyles.bottomContainer}>
           <Button
             onPress={this.goToReview}
@@ -314,7 +318,8 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
             type={BtnTypes.PRIMARY}
           />
         </View>
-      </View>
+        <KeyboardSpacer />
+      </SafeAreaView>
     )
   }
 }
@@ -331,6 +336,11 @@ export default componentWithAnalytics(
 )
 
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: colors.background,
+    flex: 1,
+    justifyContent: 'space-between',
+  },
   transferArea: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -349,13 +359,6 @@ const styles = StyleSheet.create({
   },
   currencyLabel: {
     color: colors.darkSecondary,
-  },
-  background: {
-    backgroundColor: colors.background,
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    justifyContent: 'space-between',
   },
   exchangeButtonBackground: {
     justifyContent: 'center',

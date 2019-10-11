@@ -4,15 +4,13 @@ import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import RNGeth from 'react-native-geth'
-import config from 'src/geth/network-config'
+import { DEFAULT_TESTNET } from 'src/config'
+import networkConfig from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
 import FirebaseLogUploader from 'src/utils/LogUploader'
-import { DEFAULT_TESTNET } from 'src/web3/testnets'
 
 let gethLock = false
 let gethInstance: typeof RNGeth | null = null
-const currentNetworkName = DEFAULT_TESTNET
-const currentConfig: any = config[currentNetworkName]
 
 export const FailedToFetchStaticNodesError = new Error(
   'Failed to fetch static nodes from Google storage'
@@ -66,7 +64,7 @@ function getFolder(filePath: string) {
 
 async function createNewGeth(): Promise<typeof RNGeth> {
   Logger.debug('Geth@newGeth', 'Configure and create new Geth')
-  const { nodeDir, syncMode } = currentConfig
+  const { nodeDir, syncMode } = networkConfig
   const genesis: string = await readGenesisBlockFile(nodeDir)
   const networkID: number = GenesisBlockUtils.getChainIdFromGenesis(genesis)
 
@@ -132,7 +130,7 @@ async function initGeth() {
         throw new Error('Geth already running, need to restart app')
       } else if (errorType === ErrorType.CorruptChainData) {
         Logger.warn('Geth@init/startInstance', 'Geth start reported chain data error')
-        attemptGethCorruptionFix(geth)
+        await attemptGethCorruptionFix(geth)
       } else {
         Logger.error('Geth@init/startInstance', 'Unexpected error starting geth', e)
         throw e
@@ -152,7 +150,7 @@ export async function getGeth(): Promise<typeof gethInstance> {
 }
 
 async function ensureStaticNodesInitialized(): Promise<boolean> {
-  const { nodeDir } = currentConfig
+  const { nodeDir } = networkConfig
   if (await staticNodesAlreadyInitialized(nodeDir)) {
     Logger.debug('Geth@maybeInitStaticNodes', 'static nodes already initialized')
     return true
@@ -160,10 +158,10 @@ async function ensureStaticNodesInitialized(): Promise<boolean> {
     Logger.debug('Geth@maybeInitStaticNodes', 'initializing static nodes')
     let enodes: string | null = null
     try {
-      enodes = await StaticNodeUtils.getStaticNodesAsync(currentNetworkName)
+      enodes = await StaticNodeUtils.getStaticNodesAsync(DEFAULT_TESTNET)
     } catch (error) {
       Logger.error(
-        `Failed to get static nodes for network ${currentNetworkName},` +
+        `Failed to get static nodes for network ${DEFAULT_TESTNET},` +
           `the node will not be able to sync with the network till restart`,
         error
       )
@@ -189,7 +187,7 @@ async function stop() {
 }
 
 async function ensureGenesisBlockWritten(): Promise<boolean> {
-  const { nodeDir } = currentConfig
+  const { nodeDir } = networkConfig
   if (await genesisBlockAlreadyWritten(nodeDir)) {
     Logger.debug('Geth@ensureGenesisBlockWritten', 'genesis block already written')
     return true
@@ -197,9 +195,9 @@ async function ensureGenesisBlockWritten(): Promise<boolean> {
     Logger.debug('Geth@ensureGenesisBlockWritten', 'writing genesis block')
     let genesisBlock: string | null = null
     try {
-      genesisBlock = await GenesisBlockUtils.getGenesisBlockAsync(currentNetworkName)
+      genesisBlock = await GenesisBlockUtils.getGenesisBlockAsync(DEFAULT_TESTNET)
     } catch (error) {
-      Logger.error(`Failed to get the genesis block for network ${currentNetworkName}.`, error)
+      Logger.error(`Failed to get the genesis block for network ${DEFAULT_TESTNET}.`, error)
       return false
     }
     if (genesisBlock != null) {
@@ -280,7 +278,7 @@ export async function deleteChainData() {
 }
 
 async function deleteSingleChainData(syncMode: SyncMode) {
-  const { nodeDir } = currentConfig
+  const { nodeDir } = networkConfig
   const chainDataDir = `${getNodeInstancePath(nodeDir)}/${syncMode}chaindata`
   Logger.debug('Geth@deleteSingleChainData', `Going to delete ${chainDataDir}`)
   return deleteFileIfExists(chainDataDir)
@@ -288,7 +286,7 @@ async function deleteSingleChainData(syncMode: SyncMode) {
 
 async function deleteGethLockFile() {
   // Delete the .ipc file or the Geth will think that some other Geth node is using this datadir.
-  const { nodeDir } = currentConfig
+  const { nodeDir } = networkConfig
   const gethLockFile = `${getNodeInstancePath(nodeDir)}/LOCK`
   Logger.info('Geth@deleteGethLockFile', `Deleting ${gethLockFile} for nodeDir ${nodeDir}`)
   return deleteFileIfExists(gethLockFile)

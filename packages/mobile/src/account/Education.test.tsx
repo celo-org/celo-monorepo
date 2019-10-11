@@ -26,10 +26,6 @@ const educationProps = {
   onFinish: jest.fn(),
 }
 
-jest.mock('src/web3/contracts', () => ({
-  isZeroSyncMode: jest.fn().mockReturnValueOnce(false),
-}))
-
 describe('Education', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
