@@ -1,14 +1,16 @@
+import Link from 'next/link'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { I18nProps, withNamespaces } from 'src/i18n'
+import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import Discourse from 'src/icons/Discourse'
+import MediumLogo from 'src/icons/MediumLogo'
+import Octocat from 'src/icons/Octocat'
+import TwiterLogo from 'src/icons/TwitterLogo'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import RingsLight from 'src/logos/RingsLight'
 import Button, { BTN } from 'src/shared/Button.3'
-import MediumLogo from 'src/shared/MediumLogo'
-import menu from 'src/shared/menu-items'
-import RedditLogo from 'src/shared/RedditLogo'
+import menu, { CeloLinks } from 'src/shared/menu-items'
 import Responsive from 'src/shared/Responsive'
-import TwiterLogo from 'src/shared/TwitterLogo'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 const menuItems = [menu.HOME, menu.ABOUT_US, menu.JOBS, menu.BUILD, menu.COMMUNITY]
@@ -51,20 +53,39 @@ export class Footer extends React.PureComponent<Props & I18nProps> {
   }
 }
 
-function Social() {
+const Social = React.memo(function _Social() {
   const height = 30
   return (
     <Responsive medium={styles.social}>
       <View style={[styles.social, styles.socialMobile]}>
         <MediumLogo color={colors.dark} height={height} />
+        <Link href={CeloLinks.gitHub}>
+          <a>
+            <Octocat color={colors.dark} size={height} />
+          </a>
+        </Link>
         <TwiterLogo color={colors.dark} height={height} />
-        <RedditLogo color={colors.dark} height={height} />
+        <Link href={CeloLinks.discourse}>
+          <a>
+            <Discourse color={colors.dark} size={height} />
+          </a>
+        </Link>
       </View>
     </Responsive>
   )
+})
+
+interface NavProps {
+  t: I18nProps['t']
+  isVertical: boolean
+  currentPage?: string
 }
 
-function Navigation({ isVertical, t, currentPage = null }) {
+const Navigation = React.memo(function _Navigation({
+  isVertical,
+  t,
+  currentPage = null,
+}: NavProps) {
   return (
     <Responsive large={styles.menu}>
       <View style={isVertical ? styles.verticalMenu : styles.menuMobile}>
@@ -96,9 +117,9 @@ function Navigation({ isVertical, t, currentPage = null }) {
       </View>
     </Responsive>
   )
-}
+})
 
-function Details({ t }) {
+const Details = React.memo(function _Details({ t }: { t: I18nProps['t'] }) {
   return (
     <View style={styles.details}>
       <Responsive medium={[textStyles.left, styles.detailsText, fonts.legal]}>
@@ -116,12 +137,12 @@ function Details({ t }) {
       </Responsive>
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   social: {
     flexDirection: 'row',
-    maxWidth: 160,
+    maxWidth: 210,
     width: '100%',
     justifyContent: 'space-between',
     marginTop: 30,
@@ -188,4 +209,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces('common')(Footer)
+export default withNamespaces(NameSpaces.common)(Footer)

@@ -1,4 +1,4 @@
-import { CeloEnvArgv, envVar, fetchEnv } from 'src/lib/utils'
+import { CeloEnvArgv, envVar, fetchEnv } from './env-utils'
 
 export function getBlockscoutUrl(argv: CeloEnvArgv) {
   return `https://${argv.celoEnv}-blockscout.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org`

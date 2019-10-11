@@ -25,23 +25,26 @@ import ImportWallet from 'src/import/ImportWallet'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
 import JoinCelo from 'src/invite/JoinCelo'
 import Language from 'src/language/Language'
+import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import TabNavigator from 'src/navigator/TabNavigator'
+import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
 import PaymentRequestListScreen from 'src/paymentRequest/PaymentRequestListScreen'
-import Pincode from 'src/pincode/Pincode'
 import PincodeConfirmation from 'src/pincode/PincodeConfirmation'
+import PincodeEducation from 'src/pincode/PincodeEducation'
+import PincodeSet from 'src/pincode/PincodeSet'
 import QRCode from 'src/qrcode/QRCode'
 import QRScanner from 'src/qrcode/QRScanner'
 import FeeEducation from 'src/send/FeeEducation'
-import RequestConfirmation from 'src/send/RequestConfirmation'
+import Send from 'src/send/Send'
 import SendAmount from 'src/send/SendAmount'
 import SendConfirmation from 'src/send/SendConfirmation'
 import SetClock from 'src/set-clock/SetClock'
 import TransactionReviewScreen from 'src/transactions/TransactionReviewScreen'
-import VerifyEducation from 'src/verify/Education'
 import VerifyInput from 'src/verify/Input'
 import VerifyVerified from 'src/verify/Verified'
 import VerifyVerifying from 'src/verify/Verifying'
+import VerifyEducation from 'src/verify/VerifyPhoneEducation'
 
 export const headerArea = {
   defaultNavigationOptions: {
@@ -65,7 +68,8 @@ const NuxStack = createStackNavigator(
   {
     [Screens.Language]: { screen: Language },
     [Screens.JoinCelo]: { screen: JoinCelo },
-    [Screens.Pincode]: { screen: Pincode },
+    [Screens.PincodeEducation]: { screen: PincodeEducation },
+    [Screens.PincodeSet]: { screen: PincodeSet },
     [Screens.EnterInviteCode]: { screen: EnterInviteCode },
     [Screens.ImportWallet]: { screen: ImportWallet },
     [Screens.ImportContacts]: { screen: ImportContacts },
@@ -83,18 +87,17 @@ const NuxStack = createStackNavigator(
 
 const SendStack = createStackNavigator(
   {
-    // Note, Send isn't in this stack because it's part of the tab navigator
+    [Screens.Send]: { screen: Send },
     [Screens.SendAmount]: { screen: SendAmount },
     [Screens.SendConfirmation]: { screen: SendConfirmation },
-    [Screens.FeeEducation]: { screen: FeeEducation },
-    [Screens.RequestConfirmation]: { screen: RequestConfirmation },
+    [Screens.PaymentRequestConfirmation]: { screen: PaymentRequestConfirmation },
   },
   {
     navigationOptions: {
       header: null,
     },
     ...headerArea,
-    initialRouteName: Screens.SendAmount,
+    initialRouteName: Screens.Send,
   }
 )
 
@@ -113,11 +116,26 @@ const ExchangeStack = createStackNavigator(
   }
 )
 
+const RequestStack = createStackNavigator(
+  {
+    [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
+    [Screens.SendConfirmation]: { screen: SendConfirmation },
+  },
+  {
+    navigationOptions: {
+      header: null,
+    },
+    ...headerArea,
+    initialRouteName: Screens.PaymentRequestListScreen,
+  }
+)
+
 const AppStack = createStackNavigator(
   {
     [Screens.TabNavigator]: { screen: TabNavigator },
     [Stacks.SendStack]: { screen: SendStack },
     [Stacks.ExchangeStack]: { screen: ExchangeStack },
+    [Stacks.RequestStack]: { screen: RequestStack },
     [Screens.Language]: { screen: Language },
     [Screens.Analytics]: { screen: Analytics },
     [Screens.SetClock]: { screen: SetClock },
@@ -126,6 +144,7 @@ const AppStack = createStackNavigator(
     [Screens.Account]: { screen: Account },
     [Screens.Invite]: { screen: Invite },
     [Screens.InviteReview]: { screen: InviteReview },
+    [Screens.SelectLocalCurrency]: { screen: SelectLocalCurrency },
     [Screens.Licenses]: { screen: Licenses },
     [Screens.DollarEducation]: { screen: DollarEducation },
     [Screens.TransactionReview]: { screen: TransactionReviewScreen },
@@ -134,9 +153,9 @@ const AppStack = createStackNavigator(
     [Screens.QRScanner]: { screen: QRScanner },
     [Screens.GoldEducation]: { screen: GoldEducation },
     [Screens.Backup]: { screen: Backup },
-    [Screens.Pincode]: { screen: Pincode },
     [Screens.PaymentRequestListScreen]: { screen: PaymentRequestListScreen },
     [Screens.ReclaimPaymentConfirmationScreen]: { screen: ReclaimPaymentConfirmationScreen },
+    [Screens.FeeEducation]: { screen: FeeEducation },
     ...commonScreens,
   },
   {

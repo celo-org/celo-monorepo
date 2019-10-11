@@ -7,7 +7,7 @@ exports[`ErrorScreen with errorMessage renders correctly 1`] = `
       "alignItems": "center",
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "height": 1334,
+      "height": 1292,
       "justifyContent": "space-between",
       "paddingBottom": 30,
       "paddingHorizontal": 20,
@@ -22,6 +22,7 @@ exports[`ErrorScreen with errorMessage renders correctly 1`] = `
     <Text
       style={
         Object {
+          "color": "#2E3338",
           "fontFamily": "Hind-Light",
           "fontSize": 22,
           "paddingBottom": 20,
@@ -34,6 +35,7 @@ exports[`ErrorScreen with errorMessage renders correctly 1`] = `
     <Text
       style={
         Object {
+          "color": "#2E3338",
           "fontFamily": "Hind-Light",
           "fontSize": 18,
           "textAlign": "center",
@@ -91,6 +93,12 @@ exports[`ErrorScreen with errorMessage renders correctly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -98,17 +106,24 @@ exports[`ErrorScreen with errorMessage renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#42D689",
-            "borderColor": "#42D689",
-            "borderRadius": 3,
-            "borderWidth": 2,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#42D689",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderColor": "#42D689",
+              "borderRadius": 3,
+              "borderWidth": 2,
+            },
+          ]
         }
         testID="ErrorContinueButton"
       >
@@ -155,7 +170,7 @@ exports[`ErrorScreen without errorMessage renders correctly 1`] = `
       "alignItems": "center",
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "height": 1334,
+      "height": 1292,
       "justifyContent": "space-between",
       "paddingBottom": 30,
       "paddingHorizontal": 20,
@@ -170,6 +185,7 @@ exports[`ErrorScreen without errorMessage renders correctly 1`] = `
     <Text
       style={
         Object {
+          "color": "#2E3338",
           "fontFamily": "Hind-Light",
           "fontSize": 22,
           "paddingBottom": 20,
@@ -182,6 +198,7 @@ exports[`ErrorScreen without errorMessage renders correctly 1`] = `
     <Text
       style={
         Object {
+          "color": "#2E3338",
           "fontFamily": "Hind-Light",
           "fontSize": 18,
           "textAlign": "center",
@@ -239,6 +256,12 @@ exports[`ErrorScreen without errorMessage renders correctly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -246,17 +269,24 @@ exports[`ErrorScreen without errorMessage renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#42D689",
-            "borderColor": "#42D689",
-            "borderRadius": 3,
-            "borderWidth": 2,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#42D689",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderColor": "#42D689",
+              "borderRadius": 3,
+              "borderWidth": 2,
+            },
+          ]
         }
         testID="ErrorContinueButton"
       >

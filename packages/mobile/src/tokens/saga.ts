@@ -2,8 +2,9 @@ import { getErc20Balance, getGoldTokenContract, getStableTokenContract } from '@
 import BigNumber from 'bignumber.js'
 import { call, put, take, takeEvery } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { addStandbyTransaction, removeStandbyTransaction } from 'src/transactions/actions'
 import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
@@ -32,6 +33,7 @@ export const tokenFetchFactory = ({
       const account = yield call(getConnectedAccount)
       const tokenContract = yield call(contractGetter, web3)
       const balance = yield call(getErc20Balance, tokenContract, account, web3)
+      CeloAnalytics.track(CustomEventNames.fetch_balance)
       yield put(actionCreator(balance.toString()))
     } catch (error) {
       Logger.error(tag, 'Error fetching balance', error)
@@ -130,9 +132,9 @@ export const tokenTransferFactory = ({
         Logger.error(tag, 'Error transfering token', error)
         yield put(removeStandbyTransaction(txId))
         if (error.message === ErrorMessages.INCORRECT_PIN) {
-          yield put(showError(ErrorMessages.INCORRECT_PIN, ALERT_BANNER_DURATION))
+          yield put(showError(ErrorMessages.INCORRECT_PIN))
         } else {
-          yield put(showError(ErrorMessages.TRANSACTION_FAILED, ALERT_BANNER_DURATION))
+          yield put(showError(ErrorMessages.TRANSACTION_FAILED))
         }
       }
     }

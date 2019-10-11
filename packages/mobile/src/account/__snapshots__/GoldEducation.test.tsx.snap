@@ -32,17 +32,18 @@ exports[`GoldEducation renders correctly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
         onResponderTerminate={[Function]}
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
-        style={
-          Object {
-            "opacity": 1,
-          }
-        }
         testID="Education-goback"
       >
         <Text
@@ -133,6 +134,7 @@ exports[`GoldEducation renders correctly 1`] = `
           style={
             Array [
               Object {
+                "color": "#2E3338",
                 "fontFamily": "Hind-Light",
                 "fontSize": 22,
                 "paddingBottom": 20,
@@ -177,6 +179,7 @@ exports[`GoldEducation renders correctly 1`] = `
           style={
             Array [
               Object {
+                "color": "#2E3338",
                 "fontFamily": "Hind-Light",
                 "fontSize": 22,
                 "paddingBottom": 20,
@@ -221,6 +224,7 @@ exports[`GoldEducation renders correctly 1`] = `
           style={
             Array [
               Object {
+                "color": "#2E3338",
                 "fontFamily": "Hind-Light",
                 "fontSize": 22,
                 "paddingBottom": 20,

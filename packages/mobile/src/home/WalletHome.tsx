@@ -1,5 +1,5 @@
-import SectionHead from '@celo/react-components/components/SectionHead'
-import Touchable from '@celo/react-components/components/Touchable'
+import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
+import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
 import SettingsIcon from '@celo/react-components/icons/Settings'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
@@ -18,13 +18,14 @@ import {
 } from 'react-native'
 import { BoxShadow } from 'react-native-shadow'
 import { connect } from 'react-redux'
-import AccountInfo from 'src/account/AccountInfo'
+import { bindActionCreators } from 'redux'
 import { hideAlert, showMessage } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { exitBackupFlow } from 'src/app/actions'
-import AccountOverview from 'src/components/AccountOverview'
-import { ALERT_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION, SHOW_TESTNET_BANNER } from 'src/config'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
+import CeloDollarsOverview from 'src/home/CeloDollarsOverview'
+import HeaderButton from 'src/home/HeaderButton'
 import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
 import TransactionsList from 'src/home/TransactionsList'
@@ -36,12 +37,15 @@ import { withDispatchAfterNavigate } from 'src/navigator/WithDispatchAfterNaviga
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
+import { isAppConnected } from 'src/redux/selectors'
 import { initializeSentryUserContext } from 'src/sentry/Sentry'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { resetStandbyTransactions } from 'src/transactions/actions'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const SCREEN_WIDTH = variables.width
+const HEADER_ICON_SIZE = 24
+const HEADER_BUTTON_MARGIN = 12
 
 interface StateProps {
   loading: boolean
@@ -49,6 +53,7 @@ interface StateProps {
   activeNotificationCount: number
   callToActNotification: boolean
   recipientCache: NumberToRecipient
+  appConnected: boolean
 }
 
 interface DispatchProps {
@@ -64,38 +69,31 @@ interface DispatchProps {
 
 type Props = StateProps & DispatchProps & WithNamespaces
 
+// Use bindActionCreators to workaround a typescript error with the shorthand syntax with redux-thunk actions
+// see https://github.com/DefinitelyTyped/DefinitelyTyped/issues/37369
+const mapDispatchToProps = (dispatch: any) =>
+  bindActionCreators(
+    {
+      refreshAllBalances,
+      resetStandbyTransactions,
+      initializeSentryUserContext,
+      exitBackupFlow,
+      setLoading,
+      showMessage,
+      hideAlert,
+      importContacts,
+    },
+    dispatch
+  )
+
 const mapStateToProps = (state: RootState): StateProps => ({
   loading: state.home.loading,
   address: currentAccountSelector(state),
   activeNotificationCount: getActiveNotificationCount(state),
   callToActNotification: callToActNotificationSelector(state),
   recipientCache: recipientCacheSelector(state),
+  appConnected: isAppConnected(state),
 })
-
-const Header = () => {
-  return (
-    <>
-      <DisconnectBanner />
-      <AccountInfo />
-      <AccountOverview testID="AccountOverviewInHome" />
-    </>
-  )
-}
-
-const settings = () => {
-  navigate(Screens.Account)
-}
-
-const HeaderIcon = () => (
-  <Touchable
-    borderless={true}
-    hitSlop={{ left: 15, bottom: 15, top: 15, right: 15 }}
-    style={styles.settingsIcon}
-    onPress={settings}
-  >
-    <SettingsIcon color={colors.celoGreen} />
-  </Touchable>
-)
 
 const AnimatedSectionList: SectionList<any> = Animated.createAnimatedComponent(SectionList)
 
@@ -145,13 +143,18 @@ export class WalletHome extends React.Component<Props> {
   componentDidMount() {
     this.props.resetStandbyTransactions()
     this.props.initializeSentryUserContext()
-    this.showTestnetBanner()
     this.importContactsIfNeeded()
+    if (SHOW_TESTNET_BANNER) {
+      this.showTestnetBanner()
+    }
   }
 
-  renderSection = ({ section: { title, bubbleText } }: { section: SectionListData<any> }) => (
-    <SectionHead text={title} bubbleText={bubbleText} />
-  )
+  renderSection = ({ section: { title, bubbleText } }: { section: SectionListData<any> }) => {
+    if (!title) {
+      return null
+    }
+    return <SectionHeadNew text={title} bubbleText={bubbleText} />
+  }
 
   keyExtractor = (_item: any, index: number) => {
     return index.toString()
@@ -170,6 +173,14 @@ export class WalletHome extends React.Component<Props> {
     }
   }
 
+  onPressQrCode = () => {
+    navigate(Screens.QRCode)
+  }
+
+  onPressSettings = () => {
+    navigate(Screens.Account)
+  }
+
   render() {
     const { t, activeNotificationCount, callToActNotification } = this.props
 
@@ -185,7 +196,6 @@ export class WalletHome extends React.Component<Props> {
 
     if (activeNotificationCount > 0 || callToActNotification) {
       sections.push({
-        title: t('notifications'),
         data: [{}],
         renderItem: () => <NotificationBox key={'NotificationBox'} />,
         bubbleText: activeNotificationCount ? activeNotificationCount.toString() : null,
@@ -208,11 +218,24 @@ export class WalletHome extends React.Component<Props> {
             <View style={styles.shadowPlaceholder} />
           </BoxShadow>
         </Animated.View>
-        <View style={[componentStyles.topBar, styles.head]}>
-          <Animated.Text style={[fontStyles.headerTitle, { opacity: this.headerOpacity }]}>
-            {t('wallet')}
-          </Animated.Text>
-          <HeaderIcon />
+        <View style={[componentStyles.topBar, styles.header]}>
+          {this.props.appConnected ? (
+            <Animated.Text style={[fontStyles.headerTitle, { opacity: this.headerOpacity }]}>
+              {t('wallet')}
+            </Animated.Text>
+          ) : (
+            <View style={styles.banner}>
+              <DisconnectBanner />
+            </View>
+          )}
+          <View style={styles.headerRight}>
+            <HeaderButton style={styles.headerButton} onPress={this.onPressQrCode}>
+              <QRCodeBorderlessIcon height={HEADER_ICON_SIZE} color={colors.celoGreen} />
+            </HeaderButton>
+            <HeaderButton style={styles.headerButton} onPress={this.onPressSettings}>
+              <SettingsIcon height={HEADER_ICON_SIZE} color={colors.celoGreen} />
+            </HeaderButton>
+          </View>
         </View>
         <AnimatedSectionList
           onScroll={this.onScroll}
@@ -223,7 +246,7 @@ export class WalletHome extends React.Component<Props> {
           sections={sections}
           stickySectionHeadersEnabled={true}
           renderSectionHeader={this.renderSection}
-          ListHeaderComponent={Header}
+          ListHeaderComponent={CeloDollarsOverview}
           keyExtractor={this.keyExtractor}
         />
       </View>
@@ -237,22 +260,28 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     position: 'relative',
   },
+  banner: { paddingVertical: 15 },
   containerFeed: {
     paddingBottom: 40,
   },
-  settingsIcon: {
-    justifyContent: 'flex-end',
-    margin: 5,
-    position: 'absolute',
-    top: 10,
-    right: 10,
-  },
-  head: {
+  header: {
     backgroundColor: colors.background,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 2,
+  },
+  headerRight: {
+    position: 'absolute',
+    top: 0,
+    right: variables.contentPadding - HEADER_BUTTON_MARGIN,
+    bottom: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerButton: {
+    justifyContent: 'flex-end',
+    margin: HEADER_BUTTON_MARGIN,
   },
   shadowContainer: {
     height: TOP_BAR_HEIGHT,
@@ -272,16 +301,7 @@ export default withDispatchAfterNavigate(
   componentWithAnalytics(
     connect<StateProps, DispatchProps, {}, RootState>(
       mapStateToProps,
-      {
-        refreshAllBalances,
-        resetStandbyTransactions,
-        initializeSentryUserContext,
-        exitBackupFlow,
-        setLoading,
-        showMessage,
-        hideAlert,
-        importContacts,
-      }
+      mapDispatchToProps
     )(withNamespaces(Namespaces.walletFlow5)(WalletHome))
   )
 )

@@ -15,7 +15,7 @@ yarn
 
 If you want to use this tool from anywhere, add an alias to your ~/.bash_profile.
 
-`alias celotooljs="<YOUR_PATH_TO_MONOREPO>/packages/celotool/bin/celotooljs.sh"`
+`alias celotooljs=<YOUR_PATH_TO_MONOREPO>/packages/celotool/bin/celotooljs.sh`
 
 ## Usage
 

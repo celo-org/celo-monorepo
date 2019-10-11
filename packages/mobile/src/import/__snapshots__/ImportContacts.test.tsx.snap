@@ -39,7 +39,11 @@ exports[`ImportContacts Screen renders correctly 1`] = `
   <RCTScrollView
     contentContainerStyle={
       Object {
-        "marginHorizontal": 10,
+        "alignItems": "center",
+        "flex": 1,
+        "justifyContent": "center",
+        "padding": 20,
+        "paddingTop": 0,
       }
     }
   >
@@ -62,8 +66,8 @@ exports[`ImportContacts Screen renders correctly 1`] = `
           style={
             Array [
               Object {
-                "height": 70,
-                "width": 80,
+                "height": 50,
+                "width": 50,
               },
               Object {
                 "alignSelf": "center",
@@ -77,6 +81,7 @@ exports[`ImportContacts Screen renders correctly 1`] = `
           style={
             Array [
               Object {
+                "color": "#2E3338",
                 "fontFamily": "Hind-Light",
                 "fontSize": 22,
                 "paddingBottom": 20,
@@ -91,37 +96,37 @@ exports[`ImportContacts Screen renders correctly 1`] = `
         >
           importContactsPermission.title
         </Text>
-        <View
-          style={
-            Object {
-              "marginVertical": 10,
-            }
-          }
-        >
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-              }
-            }
-          >
-            importContactsPermission.0
-          </Text>
-        </View>
         <Text
           style={
             Array [
               Object {
                 "color": "#2E3338",
                 "fontFamily": "Hind-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
+                "fontSize": 17,
+                "lineHeight": 26,
               },
               Object {
-                "marginVertical": 10,
+                "textAlign": "center",
+              },
+            ]
+          }
+        >
+          importContactsPermission.0
+        </Text>
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 17,
+                "lineHeight": 26,
+              },
+              Object {
+                "textAlign": "center",
+              },
+              Object {
+                "marginTop": 10,
               },
             ]
           }
@@ -160,6 +165,12 @@ exports[`ImportContacts Screen renders correctly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -167,15 +178,22 @@ exports[`ImportContacts Screen renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "#42D689",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "#42D689",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
         testID="importContactsEnable"
       >
@@ -231,6 +249,12 @@ exports[`ImportContacts Screen renders correctly 1`] = `
       <View
         accessible={true}
         isTVSelectable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
         onResponderRelease={[Function]}
@@ -238,15 +262,22 @@ exports[`ImportContacts Screen renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "alignItems": "center",
-            "backgroundColor": "transparent",
-            "borderWidth": 0,
-            "flex": 1,
-            "height": 50,
-            "justifyContent": "center",
-            "opacity": 1,
-          }
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "justifyContent": "center",
+            },
+            Object {
+              "backgroundColor": "transparent",
+            },
+            Object {
+              "height": 50,
+            },
+            Object {
+              "borderWidth": 0,
+            },
+          ]
         }
         testID="importContactsSkip"
       >
@@ -277,7 +308,7 @@ exports[`ImportContacts Screen renders correctly 1`] = `
               ]
             }
           >
-            skip
+            global:skip
           </Text>
         </View>
       </View>

@@ -1,37 +1,67 @@
 import colors from '@celo/react-components/styles/colors'
 import BigNumber from 'bignumber.js'
-import { CURRENCY_ENUM, WEI_PER_CELO } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM, WEI_PER_CELO } from 'src/geth/consts'
+
 const numeral = require('numeral')
 
-// Returns a localized string that represents the number with two decimal points. The input value is parsed without consideration for the current numeral locale, i.e. it uses `.` for the decimal separator as JS usually does
-export const getMoneyDisplayValue = (value: number | string | BigNumber, decimals: number = 2) => {
-  return numeral(roundedDownNumber(value, decimals)).format('0,0.' + '0'.repeat(decimals))
+// Returns a localized string that represents the number with the right decimal points.
+// The input value is parsed without consideration for the current numeral locale, i.e. it uses `.` for the decimal separator as JS usually does
+export const getMoneyDisplayValue = (
+  value: BigNumber.Value,
+  currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR,
+  includeSymbol: boolean = false
+): string => {
+  const decimals = CURRENCIES[currency].displayDecimals
+  const symbol = CURRENCIES[currency].symbol
+  const formattedValue = numeral(roundDown(value, decimals).toNumber()).format(
+    '0,0.' + '0'.repeat(decimals)
+  )
+  return includeSymbol ? symbol + formattedValue : formattedValue
 }
 
 // like getMoneyDisplayValue but only returns cents if they are sigificant
-export const getCentAwareMoneyDisplay = (value: number | string | BigNumber) => {
-  return numeral(roundedDownNumber(value)).format('0,0[.]00')
+export const getCentAwareMoneyDisplay = (value: BigNumber.Value): string => {
+  return numeral(roundDown(value).toNumber()).format('0,0[.]00')
 }
 
-// Returns a localized string that represents the number with four decimal points
-export const getMoneyFeeyDisplayValueFromBigNum = (value: BigNumber) => {
-  return roundedUpNumber(value, 4).toString()
-}
-
-export const getExchangeDisplayValueFromBigNum = (value: BigNumber) => {
+export const getExchangeRateDisplayValue = (value: BigNumber): string => {
   return numeral(value.toNumber()).format('0[.][0000]')
 }
 
-export const divideByWei = (value: number | string, decimals: number = 2) => {
-  const bn = new BigNumber(value)
-  return bn.div(WEI_PER_CELO).decimalPlaces(decimals)
+export const getFeeDisplayValue = (value: BigNumber.Value | null | undefined): string => {
+  return value ? numeral(BigNumber.max(value, 0.001).toNumber()).format('0[.][0000]') : ''
 }
 
-export function roundedDownNumber(value: BigNumber.Value, decimals: number = 2) {
+/**
+ * More precise getFeeDisplayValue with built in rounding
+ * Used for small Network Fees
+ * @param value fee amount
+ * @param precise true if additional precision to 6 digits for <0.001 needed
+ */
+export const getNetworkFeeDisplayValue = (
+  value: BigNumber.Value,
+  precise: boolean = false
+): string => {
+  const roundedNumber = new BigNumber(value)
+  if (precise && roundedNumber.isLessThan(0.000001)) {
+    return '<0.000001'
+  } else if (roundedNumber.isLessThan(0.001)) {
+    return precise ? numeral(roundUp(value, 6).toNumber()).format('0[.][000000]') : '<0.001'
+  } else {
+    return numeral(roundUp(value, 3).toNumber()).format('0[.][000]')
+  }
+}
+
+export const divideByWei = (value: BigNumber.Value, decimals?: number) => {
+  const bn = new BigNumber(value).div(WEI_PER_CELO)
+  return decimals ? bn.decimalPlaces(decimals) : bn
+}
+
+export function roundDown(value: BigNumber.Value, decimals: number = 2): BigNumber {
   return new BigNumber(value).decimalPlaces(decimals, BigNumber.ROUND_DOWN)
 }
 
-export function roundedUpNumber(value: BigNumber.Value, decimals: number = 2) {
+export function roundUp(value: BigNumber.Value, decimals: number = 2): BigNumber {
   return new BigNumber(value).decimalPlaces(decimals, BigNumber.ROUND_UP)
 }
 
@@ -42,4 +72,14 @@ export const getCurrencyColor = (currencyType: CURRENCY_ENUM): string => {
     case CURRENCY_ENUM.GOLD:
       return colors.celoGold
   }
+}
+
+export const getBalanceColor = (accountBalance: BigNumber): string => {
+  if (accountBalance.isGreaterThan(0)) {
+    return colors.celoGreen
+  }
+  if (accountBalance.isLessThan(0)) {
+    return colors.errorRed
+  }
+  return colors.dark
 }

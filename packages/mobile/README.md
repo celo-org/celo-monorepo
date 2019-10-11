@@ -1,5 +1,12 @@
 # Mobile (Celo Wallet)
 
+## Overview
+
+This is a wallet application for the [Celo platform].
+It's a self-soverign wallet that enables anyone to onboard onto the Celo network, manage their currencies, and send payments.
+
+![](https://storage.googleapis.com/celo-website/docs/wallet-preview.png)
+
 ## Architecture
 
 The app uses [React Native][react native] and a geth [light node][light node].
@@ -94,7 +101,7 @@ before rebuilding the app. Note that this will assume the testnets have a corres
 
 To execute the suite of tests, run `yarn test`
 
-## Snapshot testing
+### Snapshot testing
 
 We use Jest [snapshot testing][jest] to assert that no intentional changes to the
 component tree have been made without explicit developer intention. See an
@@ -109,7 +116,7 @@ react components. It allows for deep rendering and interaction with the rendered
 tree to assert proper reactions to user interaction and input. See an example at
 [`src/send/SendAmount.test.tsx`] or read more about the [docs][rntl-docs]
 
-## Saga testing
+### Saga testing
 
 We use [redux-saga-test-plan][redux-saga-test-plan] to test complex sagas.
 See [`src/identity/verification.test.ts`] for an example.
@@ -133,11 +140,41 @@ Next, the VM snapshot settings should be modified:
 For information on how to run and extend the e2e tests, refer to the
 [e2e readme][e2e readme].
 
+## Building APKs / Bundles
+
+The app can be build via the command line or in Android Studio.
+For an exact set of commands, refer to the lanes in `fastlane/FastFile`.
+For convinience, the basic are described below:
+
+### Creating a fake keystore
+
+If you have not yet created a keystore, one will be required to generate a release APKs / bundles:
+
+```sh
+cd android/app
+keytool -genkey -v -keystore celo-release-key.keystore -alias celo-key-alias -storepass celoFakeReleaseStorePass -keypass celoFakeReleaseKeyPass -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+export CELO_RELEASE_STORE_PASSWORD=celoFakeReleaseStorePass
+export CELO_RELEASE_KEY_PASSWORD=celoFakeReleaseKeyPass
+```
+
+### Building an APK or Bundle
+
+```sh
+cd android/
+./gradlew clean
+./gradlew bundle{YOUR_BUILDING_VARIANT}JsAndAssets
+# For an APK:
+./gradlew assemble{YOUR_BUILDING_VARIANT} -x bundle{YOUR_BUILDING_VARIANT}JsAndAssets
+# Or for a bundle:
+./gradlew bundle{YOUR_BUILDING_VARIANT} -x bundle{YOUR_BUILDING_VARIANT}JsAndAssets
+```
+
+Where `YOUR_BUILD_VARIANT` can be any of the app's build variants, such as debug or release.
+
 ## Generating GraphQL Types
 
 We're using [GraphQL Code Generator][graphql code generator] to properly type
-GraphQL queries. If you make a change to a query, run `yarn run gen-types` to
-update the typings in the `typings` directory.
+GraphQL queries. If you make a change to a query, run `yarn build:gen-graphql-types` to update the typings in the `typings` directory.
 
 ## Troubleshooting
 
@@ -162,6 +199,7 @@ $ adb kill-server && adb start-server
 * daemon started successfully
 ```
 
+[celo platform]: https://celo.org
 [`src/components/bottombutton.test.tsx`]: ./src/components/BottomButton.test.tsx
 [detox]: https://github.com/wix/Detox
 [e2e readme]: ./e2e/README.md

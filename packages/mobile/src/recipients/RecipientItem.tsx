@@ -2,7 +2,8 @@ import ContactCircle from '@celo/react-components/components/ContactCircle'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
+import { Image, StyleSheet, Text, TouchableHighlight, View } from 'react-native'
+import { unknownUserIcon } from 'src/images/Images'
 import { getRecipientThumbnail, Recipient, RecipientKind } from 'src/recipients/recipient'
 
 interface Props {
@@ -15,14 +16,8 @@ class RecipientItem extends React.PureComponent<Props> {
     this.props.onSelectRecipient(this.props.recipient)
   }
 
-  displayInitials = (recipientKind: RecipientKind) => {
-    if (recipientKind && recipientKind === RecipientKind.Address) {
-      return '0x'
-    }
-    if (recipientKind && recipientKind === RecipientKind.MobileNumber) {
-      return '#'
-    }
-    return null
+  isUnknown = (recipientKind: RecipientKind) => {
+    return recipientKind === RecipientKind.Address || recipientKind === RecipientKind.MobileNumber
   }
 
   render() {
@@ -37,8 +32,9 @@ class RecipientItem extends React.PureComponent<Props> {
             thumbnailPath={getRecipientThumbnail(recipient)}
             address={recipient.address}
             size={40}
-            displayInitials={this.displayInitials(recipient.kind)}
-          />
+          >
+            <Image source={unknownUserIcon} style={style.image} />
+          </ContactCircle>
           <View style={style.nameContainer}>
             <Text
               numberOfLines={1}
@@ -82,6 +78,12 @@ const style = StyleSheet.create({
     lineHeight: 41,
     alignSelf: 'center',
     paddingHorizontal: 10,
+  },
+  image: {
+    height: 40,
+    width: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   phone: {
     textAlign: 'right',

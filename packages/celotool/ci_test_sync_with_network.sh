@@ -38,7 +38,7 @@ test_ultralight_sync () {
     # Get the epoch size by sourcing this file
     source ${CELO_MONOREPO_DIR}/.env.${NETWORK_NAME}
     # Verify what happened by reading the logs.
-    ${CELO_MONOREPO_DIR}/node_modules/.bin/mocha -r ts-node/register ${CELO_MONOREPO_DIR}/packages/celotool/geth_tests/verify_ultralight_geth_logs.ts --gethlogfile ${GETH_LOG_FILE} --epoch ${EPOCH}
+    ${CELO_MONOREPO_DIR}/node_modules/.bin/mocha -r ts-node/register ${CELO_MONOREPO_DIR}/packages/celotool/src/e2e-tests/verify_ultralight_geth_logs.ts --gethlogfile ${GETH_LOG_FILE} --epoch ${EPOCH}
 }
 
 # Some code in celotool requires this file to contain the MNEMONOIC.
@@ -56,10 +56,9 @@ geth_tests/network_sync_test.sh ${NETWORK_NAME} full && echo
 geth_tests/network_sync_test.sh ${NETWORK_NAME} light && echo
 test_ultralight_sync ${NETWORK_NAME} && echo
 
-#TODO(Kobi): disabled until alfajoresstaging is upgraded with BLS
-#export NETWORK_NAME="alfajoresstaging"
-#geth_tests/network_sync_test.sh ${NETWORK_NAME} full && echo
+export NETWORK_NAME="alfajoresstaging"
+geth_tests/network_sync_test.sh ${NETWORK_NAME} full && echo
 # This is broken, I am not sure why, therefore, commented for now.
 # geth_tests/network_sync_test.sh ${NETWORK_NAME} fast && echo
-#geth_tests/network_sync_test.sh ${NETWORK_NAME} light && echo
-#test_ultralight_sync ${NETWORK_NAME} && echo
+geth_tests/network_sync_test.sh ${NETWORK_NAME} light && echo
+test_ultralight_sync ${NETWORK_NAME} && echo

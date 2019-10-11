@@ -1,28 +1,12 @@
 /* tslint:disable:no-console */
-import { sortedOraclesRegistryId } from '@celo/protocol/lib/registry-utils'
-import {
-  deployProxyAndImplementation,
-  getDeployedProxiedContract,
-  setInRegistry,
-} from '@celo/protocol/lib/web3-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { RegistryInstance, SortedOraclesInstance } from 'types'
+import { SortedOraclesInstance } from 'types'
 
-const initializeArgs = async (): Promise<[number]> => {
-  return [config.oracles.reportExpiry]
-}
-
-module.exports = deployProxyAndImplementation<SortedOraclesInstance>(
+module.exports = deploymentForCoreContract<SortedOraclesInstance>(
   web3,
   artifacts,
-  'SortedOracles',
-  initializeArgs,
-  async (sortedOracles: SortedOraclesInstance) => {
-    const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
-      'Registry',
-      artifacts
-    )
-
-    await setInRegistry(sortedOracles, registry, sortedOraclesRegistryId)
-  }
+  CeloContractName.SortedOracles,
+  async () => [config.oracles.reportExpiry]
 )

@@ -3,11 +3,11 @@ import {
   addCeloEnvMiddleware,
   CeloEnvArgv,
   envVar,
-  execCmdWithExitOnFailure,
   fetchEnv,
   fetchEnvOrFallback,
   getEnvFile,
-} from 'src/lib/utils'
+} from 'src/lib/env-utils'
+import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import { Arguments, Argv } from 'yargs'
 
 export const command = 'links <resource>'

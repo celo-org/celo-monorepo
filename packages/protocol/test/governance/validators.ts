@@ -1,4 +1,4 @@
-import { bondedDepositsRegistryId } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertContainSubset,
   assertEqualBN,
@@ -7,17 +7,21 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
-  MockBondedDepositsContract,
-  MockBondedDepositsInstance,
+  MockLockedGoldContract,
+  MockLockedGoldInstance,
+  MockRandomContract,
+  MockRandomInstance,
   RegistryContract,
   RegistryInstance,
   ValidatorsContract,
   ValidatorsInstance,
 } from 'types'
+import { toFixed } from '@celo/utils/lib/fixidity'
 
 const Validators: ValidatorsContract = artifacts.require('Validators')
-const MockBondedDeposits: MockBondedDepositsContract = artifacts.require('MockBondedDeposits')
+const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Registry: RegistryContract = artifacts.require('Registry')
+const Random: MockRandomContract = artifacts.require('MockRandom')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
@@ -45,7 +49,9 @@ const parseValidatorGroupParams = (groupParams: any) => {
 contract('Validators', (accounts: string[]) => {
   let validators: ValidatorsInstance
   let registry: RegistryInstance
-  let mockBondedDeposits: MockBondedDepositsInstance
+  let mockLockedGold: MockLockedGoldInstance
+  let random: MockRandomInstance
+
   // A random 64 byte hex string.
   const publicKey =
     'ea0733ad275e2b9e05541341a97ee82678c58932464fad26164657a111a7e37a9fa0300266fb90e2135a1f1512350cb4e985488a88809b14e3cbe415e76e82b2'
@@ -60,25 +66,31 @@ contract('Validators', (accounts: string[]) => {
   const minElectableValidators = new BigNumber(4)
   const maxElectableValidators = new BigNumber(6)
   const registrationRequirement = { value: new BigNumber(100), noticePeriod: new BigNumber(60) }
+  const electionThreshold = new BigNumber(0)
+  const maxGroupSize = 10
   const identifier = 'test-identifier'
   const name = 'test-name'
   const url = 'test-url'
   beforeEach(async () => {
     validators = await Validators.new()
-    mockBondedDeposits = await MockBondedDeposits.new()
+    mockLockedGold = await MockLockedGold.new()
+    random = await Random.new()
     registry = await Registry.new()
-    await registry.setAddressFor(bondedDepositsRegistryId, mockBondedDeposits.address)
+    await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
+    await registry.setAddressFor(CeloContractName.Random, random.address)
     await validators.initialize(
       registry.address,
       minElectableValidators,
       maxElectableValidators,
       registrationRequirement.value,
-      registrationRequirement.noticePeriod
+      registrationRequirement.noticePeriod,
+      maxGroupSize,
+      electionThreshold
     )
   })
 
   const registerValidator = async (validator: string) => {
-    await mockBondedDeposits.setBondedDeposit(
+    await mockLockedGold.setLockedCommitment(
       validator,
       registrationRequirement.noticePeriod,
       registrationRequirement.value
@@ -89,13 +101,13 @@ contract('Validators', (accounts: string[]) => {
       url,
       // @ts-ignore bytes type
       publicKeysData,
-      registrationRequirement.noticePeriod,
+      [registrationRequirement.noticePeriod],
       { from: validator }
     )
   }
 
   const registerValidatorGroup = async (group: string) => {
-    await mockBondedDeposits.setBondedDeposit(
+    await mockLockedGold.setLockedCommitment(
       group,
       registrationRequirement.noticePeriod,
       registrationRequirement.value
@@ -104,7 +116,7 @@ contract('Validators', (accounts: string[]) => {
       identifier,
       name,
       url,
-      registrationRequirement.noticePeriod,
+      [registrationRequirement.noticePeriod],
       { from: group }
     )
   }
@@ -147,15 +159,31 @@ contract('Validators', (accounts: string[]) => {
           minElectableValidators,
           maxElectableValidators,
           registrationRequirement.value,
-          registrationRequirement.noticePeriod
+          registrationRequirement.noticePeriod,
+          maxGroupSize,
+          electionThreshold
         )
       )
     })
   })
 
+  describe('#setElectionThreshold', () => {
+    it('should set the election threshold', async () => {
+      const threshold = toFixed(1 / 10)
+      await validators.setElectionThreshold(threshold)
+      const result = await validators.getElectionThreshold()
+      assertEqualBN(result, threshold)
+    })
+
+    it('should revert when the threshold is larger than 100%', async () => {
+      const threshold = toFixed(new BigNumber('2'))
+      await assertRevert(validators.setElectionThreshold(threshold))
+    })
+  })
+
   describe('#setMinElectableValidators', () => {
     const newMinElectableValidators = minElectableValidators.plus(1)
-    it('should set the minimum deposit', async () => {
+    it('should set the minimum elected validators', async () => {
       await validators.setMinElectableValidators(newMinElectableValidators)
       assertEqualBN(await validators.minElectableValidators(), newMinElectableValidators)
     })
@@ -193,7 +221,7 @@ contract('Validators', (accounts: string[]) => {
 
   describe('#setMaxElectableValidators', () => {
     const newMaxElectableValidators = maxElectableValidators.plus(1)
-    it('should set the minimum deposit', async () => {
+    it('should set the maximum elected validators', async () => {
       await validators.setMaxElectableValidators(newMaxElectableValidators)
       assertEqualBN(await validators.maxElectableValidators(), newMaxElectableValidators)
     })
@@ -222,6 +250,30 @@ contract('Validators', (accounts: string[]) => {
       await assertRevert(
         validators.setMaxElectableValidators(newMaxElectableValidators, { from: nonOwner })
       )
+    })
+  })
+
+  describe('#setMaxGroupSize', () => {
+    const newMaxGroupSize = 11
+    it('should set the maximum group size', async () => {
+      await validators.setMaxGroupSize(newMaxGroupSize)
+      assertEqualBN(await validators.maxGroupSize(), newMaxGroupSize)
+    })
+
+    it('should emit the MaxElectableValidatorsSet event', async () => {
+      const resp = await validators.setMaxGroupSize(newMaxGroupSize)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'MaxGroupSizeSet',
+        args: {
+          maxGroupSize: new BigNumber(newMaxGroupSize),
+        },
+      })
+    })
+
+    it('should revert when called by anyone other than the owner', async () => {
+      await assertRevert(validators.setMaxGroupSize(newMaxGroupSize, { from: nonOwner }))
     })
   })
 
@@ -268,7 +320,7 @@ contract('Validators', (accounts: string[]) => {
   describe('#registerValidator', () => {
     const validator = accounts[0]
     beforeEach(async () => {
-      await mockBondedDeposits.setBondedDeposit(
+      await mockLockedGold.setLockedCommitment(
         validator,
         registrationRequirement.noticePeriod,
         registrationRequirement.value
@@ -282,7 +334,7 @@ contract('Validators', (accounts: string[]) => {
         url,
         // @ts-ignore bytes type
         publicKeysData,
-        registrationRequirement.noticePeriod
+        [registrationRequirement.noticePeriod]
       )
       assert.isTrue(await validators.isValidator(validator))
     })
@@ -294,7 +346,7 @@ contract('Validators', (accounts: string[]) => {
         url,
         // @ts-ignore bytes type
         publicKeysData,
-        registrationRequirement.noticePeriod
+        [registrationRequirement.noticePeriod]
       )
       assert.deepEqual(await validators.getRegisteredValidators(), [validator])
     })
@@ -306,7 +358,7 @@ contract('Validators', (accounts: string[]) => {
         url,
         // @ts-ignore bytes type
         publicKeysData,
-        registrationRequirement.noticePeriod
+        [registrationRequirement.noticePeriod]
       )
       const parsedValidator = parseValidatorParams(await validators.getValidator(validator))
       assert.equal(parsedValidator.identifier, identifier)
@@ -322,7 +374,7 @@ contract('Validators', (accounts: string[]) => {
         url,
         // @ts-ignore bytes type
         publicKeysData,
-        registrationRequirement.noticePeriod
+        [registrationRequirement.noticePeriod]
       )
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
@@ -338,6 +390,79 @@ contract('Validators', (accounts: string[]) => {
       })
     })
 
+    describe('when multiple commitment notice periods are provided', () => {
+      it('should accept a sufficient combination of commitments as stake', async () => {
+        // create registrationRequirement.value different locked commitments each
+        // with value 1 and unique noticePeriods greater than registrationRequirement.noticePeriod
+        const commitmentCount = registrationRequirement.value
+        const noticePeriods = []
+        for (let i = 1; i <= commitmentCount.toNumber(); i++) {
+          const noticePeriod = registrationRequirement.noticePeriod.plus(i)
+          noticePeriods.push(noticePeriod)
+          await mockLockedGold.setLockedCommitment(validator, noticePeriod, 1)
+        }
+
+        await validators.registerValidator(
+          identifier,
+          name,
+          url,
+          // @ts-ignore bytes type
+          publicKeysData,
+          noticePeriods
+        )
+        assert.deepEqual(await validators.getRegisteredValidators(), [validator])
+      })
+
+      it('should revert when the combined commitment value is insufficient with all valid notice periods', async () => {
+        // create registrationRequirement.value - 1 different locked commitments each
+        // with value 1 and valid noticePeriods
+        const commitmentCount = registrationRequirement.value.minus(1)
+        const noticePeriods = []
+        for (let i = 1; i <= commitmentCount.toNumber(); i++) {
+          const noticePeriod = registrationRequirement.noticePeriod.plus(i)
+          noticePeriods.push(noticePeriod)
+          await mockLockedGold.setLockedCommitment(validator, noticePeriod, 1)
+        }
+
+        await assertRevert(
+          validators.registerValidator(
+            identifier,
+            name,
+            url,
+            // @ts-ignore bytes type
+            publicKeysData,
+            noticePeriods
+          )
+        )
+      })
+
+      it('should revert when the combined commitment value of valid notice periods is insufficient', async () => {
+        // create registrationRequirement.value different locked commitments each
+        // with value 1, but with one noticePeriod that is less than
+        // registrationRequirement.noticePeriod
+        const commitmentCount = registrationRequirement.value.minus(1)
+        const invalidNoticePeriod = registrationRequirement.noticePeriod.minus(1)
+        const noticePeriods = [invalidNoticePeriod]
+        await mockLockedGold.setLockedCommitment(validator, invalidNoticePeriod, 1)
+        for (let i = 1; i < commitmentCount.toNumber(); i++) {
+          const noticePeriod = registrationRequirement.noticePeriod.plus(i)
+          noticePeriods.push(noticePeriod)
+          await mockLockedGold.setLockedCommitment(validator, noticePeriod, 1)
+        }
+
+        await assertRevert(
+          validators.registerValidator(
+            identifier,
+            name,
+            url,
+            // @ts-ignore bytes type
+            publicKeysData,
+            noticePeriods
+          )
+        )
+      })
+    })
+
     describe('when the account is already a registered validator', () => {
       beforeEach(async () => {
         await validators.registerValidator(
@@ -346,7 +471,7 @@ contract('Validators', (accounts: string[]) => {
           url,
           // @ts-ignore bytes type
           publicKeysData,
-          registrationRequirement.noticePeriod
+          [registrationRequirement.noticePeriod]
         )
       })
 
@@ -358,7 +483,7 @@ contract('Validators', (accounts: string[]) => {
             url,
             // @ts-ignore bytes type
             publicKeysData,
-            registrationRequirement.noticePeriod
+            [registrationRequirement.noticePeriod]
           )
         )
       })
@@ -366,12 +491,9 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the account is already a registered validator group', () => {
       beforeEach(async () => {
-        await validators.registerValidatorGroup(
-          identifier,
-          name,
-          url,
-          registrationRequirement.noticePeriod
-        )
+        await validators.registerValidatorGroup(identifier, name, url, [
+          registrationRequirement.noticePeriod,
+        ])
       })
 
       it('should revert', async () => {
@@ -382,7 +504,7 @@ contract('Validators', (accounts: string[]) => {
             url,
             // @ts-ignore bytes type
             publicKeysData,
-            registrationRequirement.noticePeriod
+            [registrationRequirement.noticePeriod]
           )
         )
       })
@@ -390,7 +512,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the account does not meet the registration requirements', () => {
       beforeEach(async () => {
-        await mockBondedDeposits.setBondedDeposit(
+        await mockLockedGold.setLockedCommitment(
           validator,
           registrationRequirement.noticePeriod,
           registrationRequirement.value.minus(1)
@@ -405,7 +527,7 @@ contract('Validators', (accounts: string[]) => {
             url,
             // @ts-ignore bytes type
             publicKeysData,
-            registrationRequirement.noticePeriod
+            [registrationRequirement.noticePeriod]
           )
         )
       })
@@ -502,7 +624,7 @@ contract('Validators', (accounts: string[]) => {
             beforeEach(async () => {
               const voter = accounts[2]
               const weight = 10
-              await mockBondedDeposits.setWeight(voter, weight)
+              await mockLockedGold.setWeight(voter, weight)
               await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS, { from: voter })
             })
 
@@ -632,7 +754,7 @@ contract('Validators', (accounts: string[]) => {
             beforeEach(async () => {
               const voter = accounts[2]
               const weight = 10
-              await mockBondedDeposits.setWeight(voter, weight)
+              await mockLockedGold.setWeight(voter, weight)
               await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS, { from: voter })
             })
 
@@ -724,7 +846,7 @@ contract('Validators', (accounts: string[]) => {
           beforeEach(async () => {
             const voter = accounts[2]
             const weight = 10
-            await mockBondedDeposits.setWeight(voter, weight)
+            await mockLockedGold.setWeight(voter, weight)
             await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS, { from: voter })
           })
 
@@ -750,7 +872,7 @@ contract('Validators', (accounts: string[]) => {
   describe('#registerValidatorGroup', () => {
     const group = accounts[0]
     beforeEach(async () => {
-      await mockBondedDeposits.setBondedDeposit(
+      await mockLockedGold.setLockedCommitment(
         group,
         registrationRequirement.noticePeriod,
         registrationRequirement.value
@@ -758,32 +880,23 @@ contract('Validators', (accounts: string[]) => {
     })
 
     it('should mark the account as a validator group', async () => {
-      await validators.registerValidatorGroup(
-        identifier,
-        name,
-        url,
-        registrationRequirement.noticePeriod
-      )
+      await validators.registerValidatorGroup(identifier, name, url, [
+        registrationRequirement.noticePeriod,
+      ])
       assert.isTrue(await validators.isValidatorGroup(group))
     })
 
     it('should add the account to the list of validator groups', async () => {
-      await validators.registerValidatorGroup(
-        identifier,
-        name,
-        url,
-        registrationRequirement.noticePeriod
-      )
+      await validators.registerValidatorGroup(identifier, name, url, [
+        registrationRequirement.noticePeriod,
+      ])
       assert.deepEqual(await validators.getRegisteredValidatorGroups(), [group])
     })
 
     it('should set the validator group identifier, name, and url', async () => {
-      await validators.registerValidatorGroup(
-        identifier,
-        name,
-        url,
-        registrationRequirement.noticePeriod
-      )
+      await validators.registerValidatorGroup(identifier, name, url, [
+        registrationRequirement.noticePeriod,
+      ])
       const parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
       assert.equal(parsedGroup.identifier, identifier)
       assert.equal(parsedGroup.name, name)
@@ -791,12 +904,9 @@ contract('Validators', (accounts: string[]) => {
     })
 
     it('should emit the ValidatorGroupRegistered event', async () => {
-      const resp = await validators.registerValidatorGroup(
-        identifier,
-        name,
-        url,
-        registrationRequirement.noticePeriod
-      )
+      const resp = await validators.registerValidatorGroup(identifier, name, url, [
+        registrationRequirement.noticePeriod,
+      ])
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertContainSubset(log, {
@@ -817,41 +927,32 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(
-          validators.registerValidatorGroup(
-            identifier,
-            name,
-            url,
-            registrationRequirement.noticePeriod
-          )
+          validators.registerValidatorGroup(identifier, name, url, [
+            registrationRequirement.noticePeriod,
+          ])
         )
       })
     })
 
     describe('when the account is already a registered validator group', () => {
       beforeEach(async () => {
-        await validators.registerValidatorGroup(
-          identifier,
-          name,
-          url,
-          registrationRequirement.noticePeriod
-        )
+        await validators.registerValidatorGroup(identifier, name, url, [
+          registrationRequirement.noticePeriod,
+        ])
       })
 
       it('should revert', async () => {
         await assertRevert(
-          validators.registerValidatorGroup(
-            identifier,
-            name,
-            url,
-            registrationRequirement.noticePeriod
-          )
+          validators.registerValidatorGroup(identifier, name, url, [
+            registrationRequirement.noticePeriod,
+          ])
         )
       })
     })
 
     describe('when the account does not meet the registration requirements', () => {
       beforeEach(async () => {
-        await mockBondedDeposits.setBondedDeposit(
+        await mockLockedGold.setLockedCommitment(
           group,
           registrationRequirement.noticePeriod,
           registrationRequirement.value.minus(1)
@@ -860,12 +961,9 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(
-          validators.registerValidatorGroup(
-            identifier,
-            name,
-            url,
-            registrationRequirement.noticePeriod
-          )
+          validators.registerValidatorGroup(identifier, name, url, [
+            registrationRequirement.noticePeriod,
+          ])
         )
       })
     })
@@ -958,6 +1056,14 @@ contract('Validators', (accounts: string[]) => {
       await assertRevert(validators.addMember(accounts[2]))
     })
 
+    it('should revert when trying to add too many members to group', async () => {
+      await validators.setMaxGroupSize(1)
+      await validators.addMember(validator)
+      await registerValidator(accounts[2])
+      await validators.affiliate(group, { from: accounts[2] })
+      await assertRevert(validators.addMember(accounts[2]))
+    })
+
     describe('when the validator has not affiliated themselves with the group', () => {
       beforeEach(async () => {
         await validators.deaffiliate({ from: validator })
@@ -1022,7 +1128,7 @@ contract('Validators', (accounts: string[]) => {
         beforeEach(async () => {
           const voter = accounts[2]
           const weight = 10
-          await mockBondedDeposits.setWeight(voter, weight)
+          await mockLockedGold.setWeight(voter, weight)
           await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS, { from: voter })
         })
 
@@ -1108,7 +1214,7 @@ contract('Validators', (accounts: string[]) => {
     const group = accounts[2]
     beforeEach(async () => {
       await registerValidatorGroupWithMembers(group, [validator])
-      await mockBondedDeposits.setWeight(voter, weight)
+      await mockLockedGold.setWeight(voter, weight)
     })
 
     it("should set the voter's vote", async () => {
@@ -1166,7 +1272,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the account voting is frozen', () => {
       beforeEach(async () => {
-        await mockBondedDeposits.setVotingFrozen(voter)
+        await mockLockedGold.setVotingFrozen(voter)
       })
 
       it('should revert', async () => {
@@ -1176,7 +1282,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when the account has no weight', () => {
       beforeEach(async () => {
-        await mockBondedDeposits.setWeight(voter, NULL_ADDRESS)
+        await mockLockedGold.setWeight(voter, NULL_ADDRESS)
       })
 
       it('should revert', async () => {
@@ -1201,7 +1307,7 @@ contract('Validators', (accounts: string[]) => {
     const group = accounts[2]
     beforeEach(async () => {
       await registerValidatorGroupWithMembers(group, [validator])
-      await mockBondedDeposits.setWeight(voter, weight)
+      await mockLockedGold.setWeight(voter, weight)
       await validators.vote(group, NULL_ADDRESS, NULL_ADDRESS)
     })
 
@@ -1263,17 +1369,19 @@ contract('Validators', (accounts: string[]) => {
     const validator6 = accounts[8]
     const validator7 = accounts[9]
 
+    const hash1 = '0xa5b9d60f32436310afebcfda832817a68921beb782fabf7915cc0460b443116a'
+    const hash2 = '0xa832817a68921b10afebcfd0460b443116aeb782fabf7915cca5b9d60f324363'
+
     // If voterN votes for groupN:
     //   group1 gets 20 votes per member
     //   group2 gets 25 votes per member
     //   group3 gets 30 votes per member
-    // The ordering of the returned validators should be from group with most votes to group,
-    // with fewest votes, and within each group, members are elected from first to last.
+    // We cannot make any guarantee with respect to their ordering.
     const voter1 = { address: accounts[0], weight: 80 }
     const voter2 = { address: accounts[1], weight: 50 }
     const voter3 = { address: accounts[2], weight: 30 }
-    const assertAddressesEqual = (actual: string[], expected: string[]) => {
-      assert.deepEqual(actual.map((x) => x.toLowerCase()), expected.map((x) => x.toLowerCase()))
+    const assertSameAddresses = (actual: string[], expected: string[]) => {
+      assert.sameMembers(actual.map((x) => x.toLowerCase()), expected.map((x) => x.toLowerCase()))
     }
 
     beforeEach(async () => {
@@ -1287,8 +1395,9 @@ contract('Validators', (accounts: string[]) => {
       await registerValidatorGroupWithMembers(group3, [validator7])
 
       for (const voter of [voter1, voter2, voter3]) {
-        await mockBondedDeposits.setWeight(voter.address, voter.weight)
+        await mockLockedGold.setWeight(voter.address, voter.weight)
       }
+      await random.revealAndCommit(hash1, hash1, NULL_ADDRESS)
     })
 
     describe('when a single group has >= minElectableValidators as members and received votes', () => {
@@ -1297,7 +1406,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it("should return that group's member list", async () => {
-        assertAddressesEqual(await validators.getValidators(), [
+        assertSameAddresses(await validators.getValidators(), [
           validator1,
           validator2,
           validator3,
@@ -1314,7 +1423,7 @@ contract('Validators', (accounts: string[]) => {
       })
 
       it('should return maxElectableValidators elected validators', async () => {
-        assertAddressesEqual(await validators.getValidators(), [
+        assertSameAddresses(await validators.getValidators(), [
           validator1,
           validator2,
           validator3,
@@ -1325,16 +1434,33 @@ contract('Validators', (accounts: string[]) => {
       })
     })
 
+    describe('when different random values are provided', () => {
+      beforeEach(async () => {
+        await validators.vote(group1, NULL_ADDRESS, NULL_ADDRESS, { from: voter1.address })
+        await validators.vote(group2, NULL_ADDRESS, group1, { from: voter2.address })
+        await validators.vote(group3, NULL_ADDRESS, group2, { from: voter3.address })
+      })
+
+      it('should return different results', async () => {
+        await random.revealAndCommit(hash1, hash1, NULL_ADDRESS)
+        const valsWithHash1 = (await validators.getValidators()).map((x) => x.toLowerCase())
+        await random.revealAndCommit(hash2, hash2, NULL_ADDRESS)
+        const valsWithHash2 = (await validators.getValidators()).map((x) => x.toLowerCase())
+        assert.sameMembers(valsWithHash1, valsWithHash2)
+        assert.notDeepEqual(valsWithHash1, valsWithHash2)
+      })
+    })
+
     describe('when a group receives enough votes for > n seats but only has n members', () => {
       beforeEach(async () => {
-        await mockBondedDeposits.setWeight(voter3.address, 1000)
+        await mockLockedGold.setWeight(voter3.address, 1000)
         await validators.vote(group3, NULL_ADDRESS, NULL_ADDRESS, { from: voter3.address })
         await validators.vote(group1, NULL_ADDRESS, group3, { from: voter1.address })
         await validators.vote(group2, NULL_ADDRESS, group1, { from: voter2.address })
       })
 
       it('should elect only n members from that group', async () => {
-        assertAddressesEqual(await validators.getValidators(), [
+        assertSameAddresses(await validators.getValidators(), [
           validator7,
           validator1,
           validator2,
@@ -1348,14 +1474,14 @@ contract('Validators', (accounts: string[]) => {
     describe('when an account has delegated validating to another address', () => {
       const validatingDelegate = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
       beforeEach(async () => {
-        await mockBondedDeposits.delegateValidating(validator3, validatingDelegate)
+        await mockLockedGold.delegateValidating(validator3, validatingDelegate)
         await validators.vote(group1, NULL_ADDRESS, NULL_ADDRESS, { from: voter1.address })
         await validators.vote(group2, NULL_ADDRESS, group1, { from: voter2.address })
         await validators.vote(group3, NULL_ADDRESS, group2, { from: voter3.address })
       })
 
       it('should return the validating delegate in place of the account', async () => {
-        assertAddressesEqual(await validators.getValidators(), [
+        assertSameAddresses(await validators.getValidators(), [
           validator1,
           validator2,
           validatingDelegate,
@@ -1374,6 +1500,27 @@ contract('Validators', (accounts: string[]) => {
 
       it('should revert', async () => {
         await assertRevert(validators.getValidators())
+      })
+    })
+
+    describe('when election threshold is set to 20%', () => {
+      beforeEach(async () => {
+        const threshold = toFixed(1 / 5)
+        await validators.setElectionThreshold(threshold)
+        await validators.vote(group1, NULL_ADDRESS, NULL_ADDRESS, { from: voter1.address })
+        await validators.vote(group2, NULL_ADDRESS, group1, { from: voter2.address })
+        await validators.vote(group3, NULL_ADDRESS, group2, { from: voter3.address })
+      })
+
+      it('should return the elected validators from two largest parties', async () => {
+        assertSameAddresses(await validators.getValidators(), [
+          validator1,
+          validator2,
+          validator3,
+          validator4,
+          validator5,
+          validator6,
+        ])
       })
     })
   })

@@ -1,14 +1,17 @@
-pragma solidity ^0.5.8;
+pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
-import "./UsingBondedDeposits.sol";
+import "./UsingLockedGold.sol";
 import "./interfaces/IValidators.sol";
+
+import "../identity/interfaces/IRandom.sol";
+
 import "../common/Initializable.sol";
-import "../common/FractionUtil.sol";
+import "../common/FixidityLib.sol";
 import "../common/linkedlists/AddressLinkedList.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 
@@ -16,13 +19,16 @@ import "../common/linkedlists/AddressSortedLinkedList.sol";
 /**
  * @title A contract for registering and electing Validator Groups and Validators.
  */
-contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, UsingBondedDeposits {
+contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, UsingLockedGold {
 
+  using FixidityLib for FixidityLib.Fraction;
   using AddressLinkedList for LinkedList.List;
   using AddressSortedLinkedList for SortedLinkedList.List;
   using SafeMath for uint256;
-  using FractionUtil for FractionUtil.Fraction;
   using BytesLib for bytes;
+
+  // Address of the getValidator precompiled contract
+  address constant public GET_VALIDATOR_ADDRESS = address(0xfa);
 
   // TODO(asa): These strings should be modifiable
   struct ValidatorGroup {
@@ -41,7 +47,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     address affiliation;
   }
 
-  struct BondedDeposit {
+  struct LockedGoldCommitment {
     uint256 noticePeriod;
     uint256 value;
   }
@@ -54,18 +60,30 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   address[] private _validators;
   SortedLinkedList.List private votes;
   // TODO(asa): Support different requirements for groups vs. validators.
-  BondedDeposit private registrationRequirement;
+  LockedGoldCommitment private registrationRequirement;
   uint256 public minElectableValidators;
   uint256 public maxElectableValidators;
+  FixidityLib.Fraction electionThreshold;
+  uint256 totalVotes; // keeps track of total weight of accounts that have active votes
 
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
+
+  uint256 public maxGroupSize;
 
   event MinElectableValidatorsSet(
     uint256 minElectableValidators
   );
 
+  event ElectionThresholdSet(
+    uint256 electionThreshold
+  );
+
   event MaxElectableValidatorsSet(
     uint256 maxElectableValidators
+  );
+
+  event MaxGroupSizeSet(
+    uint256 maxGroupSize
   );
 
   event RegistrationRequirementSet(
@@ -142,9 +160,11 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param registryAddress The address of the registry contract.
    * @param _minElectableValidators The minimum number of validators that can be elected.
    * @param _maxElectableValidators The maximum number of validators that can be elected.
-   * @param requirementValue The minimum bonded deposit value to register a group or validator.
-   * @param requirementNoticePeriod The minimum bonded deposit notice period to register a group or
-   *   validator.
+   * @param requirementValue The minimum Locked Gold commitment value to register a group or
+       validator.
+   * @param requirementNoticePeriod The minimum Locked Gold commitment notice period to register
+   *    a group or validator.
+   * @param threshold The minimum ratio of votes a group needs before its members can be elected.
    * @dev Should be called only once.
    */
   function initialize(
@@ -152,7 +172,9 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     uint256 _minElectableValidators,
     uint256 _maxElectableValidators,
     uint256 requirementValue,
-    uint256 requirementNoticePeriod
+    uint256 requirementNoticePeriod,
+    uint256 _maxGroupSize,
+    uint256 threshold
   )
     external
     initializer
@@ -160,10 +182,12 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(_minElectableValidators > 0 && _maxElectableValidators >= _minElectableValidators);
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
+    setElectionThreshold(threshold);
     minElectableValidators = _minElectableValidators;
     maxElectableValidators = _maxElectableValidators;
     registrationRequirement.value = requirementValue;
     registrationRequirement.noticePeriod = requirementNoticePeriod;
+    setMaxGroupSize(_maxGroupSize);
   }
 
   /**
@@ -210,9 +234,28 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   }
 
   /**
+   * @notice Changes the maximum group size.
+   * @param _maxGroupSize The maximum number of validators for each group.
+   * @return True upon success.
+   */
+  function setMaxGroupSize(
+    uint256 _maxGroupSize
+  )
+    public
+    onlyOwner
+    returns (bool)
+  {
+    require(_maxGroupSize > 0);
+    maxGroupSize = _maxGroupSize;
+    emit MaxGroupSizeSet(_maxGroupSize);
+    return true;
+  }
+
+  /**
    * @notice Updates the minimum bonding requirements to register a validator group or validator.
-   * @param value The minimum bonded deposit value to register a group or validator.
-   * @param noticePeriod The minimum bonded deposit notice period to register a group or validator.
+   * @param value The minimum Locked Gold commitment value to register a group or validator.
+   * @param noticePeriod The minimum Locked Gold commitment notice period to register a group or
+   *   validator.
    * @return True upon success.
    * @dev The new requirement is only enforced for future validator or group registrations.
    */
@@ -235,12 +278,40 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   }
 
   /**
+   * @notice Sets the election threshold.
+   * @param threshold Election threshold as unwrapped Fraction.
+   * @return True upon success.
+   */
+  function setElectionThreshold(uint256 threshold)
+    public
+    onlyOwner
+    returns (bool)
+  {
+    electionThreshold = FixidityLib.wrap(threshold);
+    require(
+      electionThreshold.lt(FixidityLib.fixed1()),
+      "Election threshold must be lower than 100%"
+    );
+    emit ElectionThresholdSet(threshold);
+    return true;
+  }
+
+  /**
+   * @notice Gets the election threshold.
+   * @return Threshold value as unwrapped fraction.
+   */
+  function getElectionThreshold() external view returns (uint256) {
+    return electionThreshold.unwrap();
+  }
+
+
+  /**
    * @notice Registers a validator unaffiliated with any validator group.
    * @param identifier An identifier for this validator.
    * @param name A name for the validator.
    * @param url A URL for the validator.
-   * @param noticePeriod The notice period of the bonded deposit that meets the requirements for
-   *   validator registration.
+   * @param noticePeriods The notice periods of the Locked Gold commitments that
+   *   cumulatively meet the requirements for validator registration.
    * @param publicKeysData Comprised of three tightly-packed elements:
    *    - publicKey - The public key that the validator is using for consensus, should match
    *      msg.sender. 64 bytes.
@@ -256,7 +327,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     string calldata name,
     string calldata url,
     bytes calldata publicKeysData,
-    uint256 noticePeriod
+    uint256[] calldata noticePeriods
   )
     external
     nonReentrant
@@ -269,12 +340,12 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
       // secp256k1 public key + BLS public key + BLS proof of possession
       publicKeysData.length == (64 + 48 + 96)
     );
-    bytes memory proofOfPossessionBytes = publicKeysData.slice(64, 48 + 96);
-    // TODO(Kobi): Should call checkProofOfPossession once the input is generated correctly.
+    // Use the proof of possession bytes
+    require(checkProofOfPossession(publicKeysData.slice(64, 48 + 96)));
 
     address account = getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
-    require(meetsRegistrationRequirements(account, noticePeriod));
+    require(meetsRegistrationRequirements(account, noticePeriods));
 
     Validator memory validator = Validator(identifier, name, url, publicKeysData, address(0));
     validators[account] = validator;
@@ -350,8 +421,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @param identifier A identifier for this validator group.
    * @param name A name for the validator group.
    * @param url A URL for the validator group.
-   * @param noticePeriod The notice period of the bonded deposit that meets the requirements for
-   *   validator registration.
+   * @param noticePeriods The notice periods of the Locked Gold commitments that
+   *   cumulatively meet the requirements for validator registration.
    * @return True upon success.
    * @dev Fails if the account is already a validator or validator group.
    * @dev Fails if the account does not have sufficient weight.
@@ -360,7 +431,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     string calldata identifier,
     string calldata name,
     string calldata url,
-    uint256 noticePeriod
+    uint256[] calldata noticePeriods
   )
     external
     nonReentrant
@@ -369,7 +440,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(bytes(identifier).length > 0 && bytes(name).length > 0 && bytes(url).length > 0);
     address account = getAccountFromValidator(msg.sender);
     require(!isValidator(account) && !isValidatorGroup(account));
-    require(meetsRegistrationRequirements(account, noticePeriod));
+    require(meetsRegistrationRequirements(account, noticePeriods));
     ValidatorGroup storage group = groups[account];
     group.identifier = identifier;
     group.name = name;
@@ -406,6 +477,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(isValidatorGroup(account) && isValidator(validator));
     ValidatorGroup storage group = groups[account];
     require(validators[validator].affiliation == account && !group.members.contains(validator));
+    require(group.members.numElements < maxGroupSize, "Maximum group size exceeded");
     group.members.push(validator);
     emit ValidatorGroupMemberAdded(account, validator);
     return true;
@@ -478,6 +550,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     require(voters[account] == address(0));
     uint256 weight = getAccountWeight(account);
     require(weight > 0);
+    totalVotes = totalVotes.add(weight);
     if (votes.contains(group)) {
       votes.update(
         group,
@@ -519,6 +592,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     address group = voters[account];
     require(group != address(0));
     uint256 weight = getAccountWeight(account);
+    totalVotes = totalVotes.sub(weight);
     // If the group we had previously voted on removed all its members it is no longer eligible
     // to receive votes and we don't have to worry about removing our vote.
     if (votes.contains(group)) {
@@ -539,6 +613,45 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     voters[account] = address(0);
     emit ValidatorGroupVoteRevoked(account, group, weight);
     return true;
+  }
+
+  function validatorAddressFromCurrentSet(uint256 index) external view returns (address) {
+    address validatorAddress;
+    assembly {
+      let newCallDataPosition := mload(0x40)
+      mstore(newCallDataPosition, index)
+      let success := staticcall(
+        5000,
+        0xfa,
+        newCallDataPosition,
+        32,
+        0,
+        0
+      )
+      returndatacopy(add(newCallDataPosition, 64), 0, 32)
+      validatorAddress := mload(add(newCallDataPosition, 64))
+    }
+
+    return validatorAddress;
+  }
+
+  function numberValidatorsInCurrentSet() external view returns (uint256) {
+    uint256 numberValidators;
+    assembly {
+      let success := staticcall(
+        5000,
+        0xf9,
+        0,
+        0,
+        0,
+        0
+      )
+      let returnData := mload(0x40)
+      returndatacopy(returnData, 0, 32)
+      numberValidators := mload(returnData)
+    }
+
+    return numberValidators;
   }
 
   /**
@@ -605,8 +718,8 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   }
 
   /**
-   * @notice Returns the bonded deposit requirements to register a validator or group.
-   * @return The minimum value and notice period for the bonded deposit.
+   * @notice Returns the Locked Gold commitment requirements to register a validator or group.
+   * @return The minimum value and notice period for the Locked Gold commitment.
    */
   function getRegistrationRequirement() external view returns (uint256, uint256) {
     return (registrationRequirement.value, registrationRequirement.noticePeriod);
@@ -659,18 +772,26 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
     if (numElectionGroups > votes.list.numElements) {
       numElectionGroups = votes.list.numElements;
     }
+    require(numElectionGroups > 0, "No votes have been cast");
     address[] memory electionGroups = votes.list.headN(numElectionGroups);
     // Holds the number of members elected for each of the eligible validator groups.
     uint256[] memory numMembersElected = new uint256[](electionGroups.length);
     uint256 totalNumMembersElected = 0;
     bool memberElectedInRound = true;
+
     // Assign a number of seats to each validator group.
     while (totalNumMembersElected < maxElectableValidators && memberElectedInRound) {
       memberElectedInRound = false;
       uint256 groupIndex = 0;
-      FractionUtil.Fraction memory maxN = FractionUtil.Fraction(0, 1);
+      FixidityLib.Fraction memory maxN = FixidityLib.wrap(0);
       for (uint256 i = 0; i < electionGroups.length; i = i.add(1)) {
         bool isWinningestGroupInRound = false;
+        uint256 numVotes = votes.getValue(electionGroups[i]);
+        FixidityLib.Fraction memory percentVotes = FixidityLib.newFixedFraction(
+          numVotes,
+          totalVotes
+        );
+        if (percentVotes.lt(electionThreshold)) break;
         (maxN, isWinningestGroupInRound) = dHondt(maxN, electionGroups[i], numMembersElected[i]);
         if (isWinningestGroupInRound) {
           memberElectedInRound = true;
@@ -697,6 +818,14 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
         totalNumMembersElected = totalNumMembersElected.add(1);
       }
     }
+    // Shuffle the validator set using validator-supplied entropy
+    IRandom random = IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
+    bytes32 r = random.random();
+    for (uint256 i = electedValidators.length - 1; i > 0; i = i.sub(1)) {
+      uint256 j = uint256(r) % (i + 1);
+      (electedValidators[i], electedValidators[j]) = (electedValidators[j], electedValidators[i]);
+      r = keccak256(abi.encodePacked(r));
+    }
     return electedValidators;
   }
   /* solhint-enable code-complexity */
@@ -722,22 +851,28 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   /**
    * @notice Returns whether an account meets the requirements to register a validator or group.
    * @param account The account.
-   * @param noticePeriod The notice period of the bonded deposit that meets the requirements.
+   * @param noticePeriods An array of notice periods of the Locked Gold commitments
+   *   that cumulatively meet the requirements for validator registration.
    * @return Whether an account meets the requirements to register a validator or group.
    */
   function meetsRegistrationRequirements(
     address account,
-    uint256 noticePeriod
+    uint256[] memory noticePeriods
   )
     public
     view
     returns (bool)
   {
-    uint256 value = getBondedDepositValue(account, noticePeriod);
-    return (
-      value >= registrationRequirement.value &&
-      noticePeriod >= registrationRequirement.noticePeriod
-    );
+    uint256 lockedValueSum = 0;
+    for (uint256 i = 0; i < noticePeriods.length; i = i.add(1)) {
+      if (noticePeriods[i] >= registrationRequirement.noticePeriod) {
+        lockedValueSum = lockedValueSum.add(getLockedCommitmentValue(account, noticePeriods[i]));
+        if (lockedValueSum >= registrationRequirement.value) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**
@@ -781,7 +916,7 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
   /**
    * @notice De-affiliates a validator, removing it from the group for which it is a member.
    * @param validator The validator to deaffiliate from their affiliated validator group.
-   * @param validatorAccount The BondedDeposits account of the validator.
+   * @param validatorAccount The LockedGold account of the validator.
    * @return True upon success.
    */
   function _deaffiliate(
@@ -810,22 +945,21 @@ contract Validators is IValidators, Ownable, ReentrancyGuard, Initializable, Usi
    * @return The new `maxN` and whether or not the group should win a seat in this round thus far.
    */
   function dHondt(
-    FractionUtil.Fraction memory maxN,
+    FixidityLib.Fraction memory maxN,
     address groupAddress,
     uint256 numMembersElected
   )
     private
     view
-    returns (FractionUtil.Fraction memory, bool)
+    returns (FixidityLib.Fraction memory, bool)
   {
     ValidatorGroup storage group = groups[groupAddress];
     // Only consider groups with members left to be elected.
     if (group.members.numElements > numMembersElected) {
-      FractionUtil.Fraction memory n = FractionUtil.Fraction(
-        votes.getValue(groupAddress),
-        numMembersElected.add(1)
+      FixidityLib.Fraction memory n = FixidityLib.newFixed(votes.getValue(groupAddress)).divide(
+        FixidityLib.newFixed(numMembersElected.add(1))
       );
-      if (n.isGreaterThan(maxN)) {
+      if (n.gt(maxN)) {
         return (n, true);
       }
     }

@@ -7,7 +7,7 @@ import { Web3Utils } from './src/web3-utils'
 
 export {
   Attestations,
-  BondedDeposits,
+  LockedGold,
   Escrow,
   Exchange,
   GasCurrencyWhitelist,

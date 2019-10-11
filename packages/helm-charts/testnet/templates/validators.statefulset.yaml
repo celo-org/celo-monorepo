@@ -25,6 +25,7 @@ spec:
   - metadata:
       name: data
     spec:
+      {{ if .Values.geth.ssd_disks }}storageClassName: ssd{{ end }}
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
@@ -122,6 +123,10 @@ spec:
           ACCOUNT_ADDRESS=`cat /root/.celo/address`
           RID=`cat /root/.celo/replica_id`
           FAULTY_NODE_FLAGS=`if [ "$RID" -lt "$FAULTY_NODES" ]; then echo -n "--istanbul.faultymode $FAULTY_NODE_TYPE"; fi`
+          PING_IP_FROM_PACKET_FLAG=""
+          [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"
+          IN_MEMORY_DISCOVERY_TABLE_FLAG=""
+          [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
           geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
             --password=/root/.celo/account/accountSecret \
@@ -129,7 +134,7 @@ spec:
             --mine \
             --rpc \
             --rpcaddr 0.0.0.0 \
-            --rpcapi=eth,net,web3,debug{{ if .Values.geth.admin_rpc_enabled }},admin{{ end }} \
+            --rpcapi=eth,net,web3,debug \
             --rpccorsdomain='*' \
             --rpcvhosts=* \
             --ws \
@@ -148,8 +153,12 @@ spec:
             --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
             ${FAULTY_NODE_FLAGS} \
             --istanbul.blockperiod={{ .Values.geth.blocktime }} \
+            --istanbul.requesttimeout={{ .Values.geth.istanbulrequesttimeout }} \
             --maxpeers={{ mul 2 (add .Values.geth.validators .Values.geth.tx_nodes) }} \
-            --nat=extip:`cat /root/.celo/ipAddress`
+            --nat=extip:`cat /root/.celo/ipAddress` \
+            --metrics \
+            ${PING_IP_FROM_PACKET_FLAG} \
+            ${IN_MEMORY_DISCOVERY_TABLE_FLAG}
         env:
         - name: POD_IP
           valueFrom:
@@ -176,6 +185,10 @@ spec:
           value: {{ .Values.geth.faultyValidatorType | quote }}
         - name: STATIC_IPS_FOR_GETH_NODES
           value: "{{ default false .Values.geth.static_ips }}"
+        - name: PING_IP_FROM_PACKET
+          value: "{{ default false .Values.geth.ping_ip_from_packet }}"
+        - name: IN_MEMORY_DISCOVERY_TABLE
+          value: "{{ default "false" .Values.geth.in_memory_discovery_table }}"
         ports:
         - name: discovery-udp
           containerPort: 30303
@@ -196,6 +209,8 @@ spec:
         - name: account
           mountPath: /root/.celo/account
           readOnly: true
+{{ include "celo.geth-exporter-container" .  | indent 6 }}
+{{ include "celo.prom-to-sd-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "geth" "metricsPort" "9200" "metricsPath" "filteredmetrics" "containerNameLabel" "validators" )  | indent 6 }}
       volumes:
       - name: data
         emptyDir: {}

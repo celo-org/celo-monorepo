@@ -60,9 +60,8 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
   yield call(getConnectedUnlockedAccount)
   const rawTxs = yield Promise.all(
     action.request.txs.map(async (tx) => {
-      const signedTx = await web3.eth.signTransaction({
+      const params: any = {
         from: tx.from,
-        to: tx.to,
         gasPrice: '0',
         gas: tx.estimatedGas,
         data: tx.txData,
@@ -70,7 +69,11 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
         value: tx.value,
         // @ts-ignore
         gasCurrency: action.request.gasCurrency,
-      })
+      }
+      if (tx.to) {
+        params.to = tx.to
+      }
+      const signedTx = await web3.eth.signTransaction(params)
       return signedTx.raw
     })
   )

@@ -116,18 +116,16 @@ contract('Proxy', (accounts: string[]) => {
       assert.equal(events[0].event, 'ImplementationSet')
     })
 
-    it('should not allow a non-owner to set an implementation', async () => {
+    it('should not allow a non-owner to set an implementation', async () =>
       assertRevert(
-        // @ts-ignore
         proxy._setAndInitializeImplementation(hasInitializer.address, initializeData(42), {
           from: accounts[1],
         })
-      )
-    })
+      ))
 
     it('should not allow for a call to `initialize` after initialization', async () => {
       await proxy._setAndInitializeImplementation(hasInitializer.address, initializeData(42))
-      assertRevert(proxiedHasInitializer.initialize(43))
+      await assertRevert(proxiedHasInitializer.initialize(43))
     })
   })
 

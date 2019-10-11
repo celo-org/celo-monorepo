@@ -26,12 +26,6 @@ spec:
       - name: transaction-metrics-exporter
         image: {{ required "A valid image repository required!" .Values.imageRepository }}:{{ required "A valid image tag required!" .Values.imageTag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
-        command:
-          - "bash"
-          - "-c"
-          - 'cd /celo-monorepo/packages/transaction-metrics-exporter &&
-             yarn run setup-sdk-environment {{ .Values.environment }} &&
-             yarn run start'
         env:
           - name: WEB3_PROVIDER
             value: ws://tx-nodes:8546
