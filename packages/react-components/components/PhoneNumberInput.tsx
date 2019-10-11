@@ -3,12 +3,17 @@ import ValidatedTextInput, {
   PhoneValidatorProps,
 } from '@celo/react-components/components/ValidatedTextInput'
 import colors from '@celo/react-components/styles/colors'
+import SmsRetriever from '@celo/react-native-sms-retriever'
 import { Countries } from '@celo/utils/src/countries'
 import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import { getRegionCodeFromCountryCode, parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
+import { parsePhoneNumberFromString } from 'libphonenumber-js'
 import * as React from 'react'
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Autocomplete from 'react-native-autocomplete-input'
+import Logger from 'src/utils/Logger'
+
+const TAG = 'PhoneNumberInput'
 
 interface Props {
   style?: any
@@ -35,6 +40,7 @@ interface State {
   regionCode: string
   phoneNumber: string
   countries: Countries
+  country?: string
 }
 
 export default class PhoneNumberInput extends React.Component<Props, State> {
@@ -63,6 +69,34 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
     if (this.props.defaultPhoneNumber) {
       this.onChangePhoneNumber(this.props.defaultPhoneNumber)
     }
+  }
+
+  async triggerPhoneNumberRequest() {
+    try {
+      const phone = await SmsRetriever.requestPhoneNumber()
+      const phoneNumber = parsePhoneNumberFromString(phone, undefined)
+      if (phoneNumber) {
+        this.setState({
+          phoneNumber: phoneNumber.nationalNumber.toString(),
+        })
+
+        this.onChangeCountryQuery(
+          this.state.countries.getCountryByPhoneCountryCode(
+            '+' + phoneNumber.countryCallingCode.toString()
+          ).displayName
+        )
+      }
+    } catch (error) {
+      // Logger.info(TAG, "Phone doesn't have number set up")
+      Logger.error(TAG, '', error)
+    }
+  }
+
+  async onCountryFocus() {
+    if (this.props.onInputFocus) {
+      await this.props.onInputFocus()
+    }
+    await this.triggerPhoneNumberRequest()
   }
 
   onChangeCountryQuery = (countryQuery: string) => {
@@ -156,7 +190,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
       {...props}
       value={this.state.countryQuery}
       underlineColorAndroid="transparent"
-      onFocus={this.props.onInputFocus}
+      onFocus={this.onCountryFocus}
       placeholderTextColor={colors.inactive}
     />
   )
