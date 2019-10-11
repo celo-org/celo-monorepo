@@ -15,6 +15,7 @@
     "build:ts": "tsc --noEmit",
     "build:metro": "echo 'NOT WORKING RIGHT NOW'",
     "build:gen-graphql-types": "gql-gen --schema http://localhost:8080/graphql --template graphql-codegen-typescript-template --out ./typings/ 'src/**/*.tsx'",
+    "predev": "./scripts/pre-dev.sh",
     "dev": "react-native run-android --appIdSuffix \"debug\"",
     "dev:show-menu": "adb devices | grep '\t' | awk '{print $1}' | sed 's/\\s//g' | xargs -I {} adb -s {} shell input keyevent 82",
     "dev:clear-data": "adb shell pm clear org.celo.mobile.debug",
