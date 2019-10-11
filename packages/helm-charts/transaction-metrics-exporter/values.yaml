@@ -1,1 +1,3 @@
 imagePullPolicy: IfNotPresent
+
+web3Provider: ws://tx-nodes:8546

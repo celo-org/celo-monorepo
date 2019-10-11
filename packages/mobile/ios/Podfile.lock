@@ -6,11 +6,23 @@ PODS:
     - Fabric (~> 1.10.2)
   - DoubleConversion (1.1.6)
   - Fabric (1.10.2)
+  - Firebase/Auth (5.20.2):
+    - Firebase/CoreOnly
+    - FirebaseAuth (= 5.4.2)
   - Firebase/Core (5.20.2):
     - Firebase/CoreOnly
     - FirebaseAnalytics (= 5.8.1)
   - Firebase/CoreOnly (5.20.2):
     - FirebaseCore (= 5.4.1)
+  - Firebase/Database (5.20.2):
+    - Firebase/CoreOnly
+    - FirebaseDatabase (= 5.1.1)
+  - Firebase/Messaging (5.20.2):
+    - Firebase/CoreOnly
+    - FirebaseMessaging (= 3.5.0)
+  - Firebase/Storage (5.20.2):
+    - Firebase/CoreOnly
+    - FirebaseStorage (= 3.1.1)
   - FirebaseAnalytics (5.8.1):
     - FirebaseCore (~> 5.4)
     - FirebaseInstanceID (~> 3.8)
@@ -20,13 +32,36 @@ PODS:
     - GoogleUtilities/Network (~> 5.2)
     - "GoogleUtilities/NSData+zlib (~> 5.2)"
     - nanopb (~> 0.3)
+  - FirebaseAnalyticsInterop (1.4.0)
+  - FirebaseAuth (5.4.2):
+    - FirebaseAuthInterop (~> 1.0)
+    - FirebaseCore (~> 5.2)
+    - GoogleUtilities/Environment (~> 5.2)
+    - GTMSessionFetcher/Core (~> 1.1)
+  - FirebaseAuthInterop (1.0.0)
   - FirebaseCore (5.4.1):
     - GoogleUtilities/Environment (~> 5.2)
     - GoogleUtilities/Logger (~> 5.2)
+  - FirebaseDatabase (5.1.1):
+    - FirebaseAuthInterop (~> 1.0)
+    - FirebaseCore (~> 5.2)
+    - leveldb-library (~> 1.18)
   - FirebaseInstanceID (3.8.1):
     - FirebaseCore (~> 5.2)
     - GoogleUtilities/Environment (~> 5.2)
     - GoogleUtilities/UserDefaults (~> 5.2)
+  - FirebaseMessaging (3.5.0):
+    - FirebaseAnalyticsInterop (~> 1.1)
+    - FirebaseCore (~> 5.2)
+    - FirebaseInstanceID (~> 3.6)
+    - GoogleUtilities/Environment (~> 5.3)
+    - GoogleUtilities/Reachability (~> 5.3)
+    - GoogleUtilities/UserDefaults (~> 5.3)
+    - Protobuf (~> 3.1)
+  - FirebaseStorage (3.1.1):
+    - FirebaseAuthInterop (~> 1.0)
+    - FirebaseCore (~> 5.2)
+    - GTMSessionFetcher/Core (~> 1.1)
   - Folly (2018.10.22.00):
     - boost-for-react-native
     - DoubleConversion
@@ -69,20 +104,23 @@ PODS:
   - GoogleUtilities/SwizzlerTestHelpers (5.3.7)
   - GoogleUtilities/UserDefaults (5.3.7):
     - GoogleUtilities/Logger
+  - GTMSessionFetcher/Core (1.2.2)
+  - leveldb-library (1.22)
   - nanopb (0.3.901):
     - nanopb/decode (= 0.3.901)
     - nanopb/encode (= 0.3.901)
   - nanopb/decode (0.3.901)
   - nanopb/encode (0.3.901)
+  - Protobuf (3.9.2)
   - React (0.59.10):
     - React/Core (= 0.59.10)
-  - react-native-camera (1.13.1):
+  - react-native-camera (2.9.0):
     - React
-    - react-native-camera/RCT (= 1.13.1)
-    - react-native-camera/RN (= 1.13.1)
-  - react-native-camera/RCT (1.13.1):
+    - react-native-camera/RCT (= 2.9.0)
+    - react-native-camera/RN (= 2.9.0)
+  - react-native-camera/RCT (2.9.0):
     - React
-  - react-native-camera/RN (1.13.1):
+  - react-native-camera/RN (2.9.0):
     - React
   - react-native-config (0.11.7):
     - React
@@ -96,6 +134,8 @@ PODS:
   - react-native-mail (3.0.7):
     - React
   - react-native-netinfo (2.0.4):
+    - React
+  - react-native-safe-area-context (0.3.6):
     - React
   - react-native-splash-screen (3.1.1):
     - React
@@ -209,7 +249,11 @@ PODS:
 DEPENDENCIES:
   - "CeloBlockchain (from `../../../node_modules/@celo/client/CeloBlockchain.podspec`)"
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
+  - Firebase/Auth
   - Firebase/Core (~> 5.20.2)
+  - Firebase/Database
+  - Firebase/Messaging
+  - Firebase/Storage
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/GLog.podspec`)
   - GoogleUtilities (~> 5.3.7)
@@ -220,6 +264,7 @@ DEPENDENCIES:
   - react-native-keep-awake (from `../../../node_modules/react-native-keep-awake`)
   - react-native-mail (from `../../../node_modules/react-native-mail`)
   - "react-native-netinfo (from `../../../node_modules/@react-native-community/netinfo`)"
+  - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - react-native-splash-screen (from `../../../node_modules/react-native-splash-screen`)
   - react-native-udp (from `../../../node_modules/react-native-udp`)
   - react-native-version-check (from `../../../node_modules/react-native-version-check`)
@@ -260,11 +305,20 @@ SPEC REPOS:
     - Fabric
     - Firebase
     - FirebaseAnalytics
+    - FirebaseAnalyticsInterop
+    - FirebaseAuth
+    - FirebaseAuthInterop
     - FirebaseCore
+    - FirebaseDatabase
     - FirebaseInstanceID
+    - FirebaseMessaging
+    - FirebaseStorage
     - GoogleAppMeasurement
     - GoogleUtilities
+    - GTMSessionFetcher
+    - leveldb-library
     - nanopb
+    - Protobuf
     - Segment-Firebase
     - Sentry
 
@@ -293,6 +347,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-mail"
   react-native-netinfo:
     :path: "../../../node_modules/@react-native-community/netinfo"
+  react-native-safe-area-context:
+    :path: "../../../node_modules/react-native-safe-area-context"
   react-native-splash-screen:
     :path: "../../../node_modules/react-native-splash-screen"
   react-native-udp:
@@ -337,21 +393,31 @@ SPEC CHECKSUMS:
   Fabric: 706c8b8098fff96c33c0db69cbf81f9c551d0d74
   Firebase: 0c8cf33f266410c61ab3e2265cfa412200351d9c
   FirebaseAnalytics: ece1aa57a4f43c64d53a648b5a5e05151aae947b
+  FirebaseAnalyticsInterop: d48b6ab67bcf016a05e55b71fc39c61c0cb6b7f3
+  FirebaseAuth: dd7bbf03a5aee0eafb3a1aee4d2812bd74bac890
+  FirebaseAuthInterop: 0ffa57668be100582bb7643d4fcb7615496c41fc
   FirebaseCore: f1a9a8be1aee4bf71a2fc0f4096df6788bdfda61
+  FirebaseDatabase: 2c15b0ea6f2c6eb5e57413f9d6340f1e50b81ae3
   FirebaseInstanceID: a122b0c258720cf250551bb2bedf48c699f80d90
+  FirebaseMessaging: 4235f949ce1c4e827aeb19705ba5c53f9b85aa10
+  FirebaseStorage: 6162ef4322502b818d9de0ec552f5226d283de43
   Folly: de497beb10f102453a1afa9edbf8cf8a251890de
   glog: aefd1eb5dda2ab95ba0938556f34b98e2da3a60d
   GoogleAppMeasurement: ffe513e90551844a739e7bcbb1d2aca1c28a4338
   GoogleUtilities: 111a012f4c3a29c9e7c954c082fafd6ee3c999c0
+  GTMSessionFetcher: 61bb0f61a4cb560030f1222021178008a5727a23
+  leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
+  Protobuf: 67fb42ba613def994e61854de2b3164f13790cc4
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
-  react-native-camera: b322bc25f47536219473c6d00c666d221f7f2695
+  react-native-camera: 571e4cfe70e7021e9077c1699a53e659db971f96
   react-native-config: 8f6b2b9e017f6a5e92a97353c768e19e67294bb1
   react-native-contacts: 348958bb7da4399040b1eb45bfb7f6af08e61412
   react-native-geth: 8ec5ada8b9c69eea6a515fdfe784878a625c9b6e
   react-native-keep-awake: abcf6d09d0cc5fe45df4a56a9382e25d10cff8b6
   react-native-mail: 021d8ee60e374609f5689ef354dc8e36839a9ba6
   react-native-netinfo: 1ea4efa22c02519ac8043ac3f000062a4e320795
+  react-native-safe-area-context: e380a6f783ccaec848e2f3cc8eb205a62362950d
   react-native-splash-screen: 353334c5ae82d8c74501ea7cbb916cb7cb20c8bf
   react-native-udp: 54a1aa9bf5c0824f930b1ba6dbfb3fd3e733bba9
   react-native-version-check: 901616b6d258b385628120441bd0b285b24c7be1
@@ -372,6 +438,6 @@ SPEC CHECKSUMS:
   SentryReactNative: 07237139c00366ea2e75ae3e5c566e7a71c27a90
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: ea805529954e50e03bce5f08a80fc13ef245de6e
+PODFILE CHECKSUM: 74a2f21d73b361a2ed26a15896af8f4d70b123e0
 
 COCOAPODS: 1.7.5

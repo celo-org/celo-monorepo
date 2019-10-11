@@ -50,6 +50,7 @@ import cl.json.RNSharePackage;
 import cl.json.ShareApplication;
 import com.rninstallreferrer.RNInstallReferrerPackage;
 import com.reactlibrary.securekeystore.RNSecureKeyStorePackage;
+import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 
 import android.util.Log;
 
@@ -111,7 +112,8 @@ public class MainApplication extends Application implements ShareApplication, Re
               new RNRestartAndroidPackage(),
               new RNSmsRetrieverPackage(),
               new RNSharePackage(),
-              new RNSecureKeyStorePackage()
+              new RNSecureKeyStorePackage(),
+              new SafeAreaContextPackage()
               // Disabled due to dex count
               // new RNScreensPackage(),
       };

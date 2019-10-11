@@ -1,8 +1,7 @@
 import { stringToBoolean } from '@celo/utils/src/parsing'
+import BigNumber from 'bignumber.js'
 import Config from 'react-native-config'
-import config from 'src/geth/network-config'
-import { Testnets } from 'src/web3/testnets'
-// if I use @celo/utils breaks all the tests for some reason
+import { GethSyncMode } from 'src/geth/consts'
 // tslint:disable-next-line
 import * as secretsFile from '../secrets.json'
 
@@ -51,8 +50,8 @@ export const FIREBASE_ENABLED = stringToBoolean(Config.FIREBASE_ENABLED || 'true
 
 // We need to fallback to `integration` for testing under jest where
 // react-native-config is undefined.
-export const DEFAULT_TESTNET: Testnets = Config.DEFAULT_TESTNET || 'integration'
-export const BLOCKCHAIN_API_URL = config[DEFAULT_TESTNET].blockchainApiUrl
+export const DEFAULT_TESTNET = Config.DEFAULT_TESTNET || 'integration'
+export const DEFAULT_INFURA_URL = `https://${DEFAULT_TESTNET}-infura.celo-testnet.org/`
 
 export const SEGMENT_API_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SEGMENT_API_KEY')
 export const FIREBASE_WEB_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'FIREBASE_WEB_KEY')
@@ -69,3 +68,7 @@ export const SHOW_TESTNET_BANNER = stringToBoolean(Config.SHOW_TESTNET_BANNER ||
 // The minimum allowed value for a transaction such as a transfer
 export const DOLLAR_TRANSACTION_MIN_AMOUNT = 0.01
 export const GOLD_TRANSACTION_MIN_AMOUNT = 0.001
+
+export const DEFAULT_SYNC_MODE: GethSyncMode = Config.DEFAULT_SYNC_MODE
+  ? new BigNumber(Config.DEFAULT_SYNC_MODE).toNumber()
+  : GethSyncMode.Ultralight

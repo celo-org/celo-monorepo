@@ -1,11 +1,13 @@
 import TextInput from '@celo/react-components/components/TextInput'
-import ValidatedTextInput from '@celo/react-components/components/ValidatedTextInput'
+import ValidatedTextInput, {
+  PhoneValidatorProps,
+} from '@celo/react-components/components/ValidatedTextInput'
 import colors from '@celo/react-components/styles/colors'
 import { Countries } from '@celo/utils/src/countries'
 import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import { getRegionCodeFromCountryCode, parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as React from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Autocomplete from 'react-native-autocomplete-input'
 
 interface Props {
@@ -192,7 +194,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
         <View style={[style.phoneNumberContainer, style.borderedBox]}>
           <Text style={style.phoneCountryCode}>{countryCallingCode}</Text>
           <View style={style.line} />
-          <ValidatedTextInput
+          <ValidatedTextInput<PhoneValidatorProps>
             style={[style.inputBox, style.phoneNumberInput]}
             placeholderTextColor={colors.inactive}
             onChangeText={this.onChangePhoneNumber}
@@ -258,6 +260,15 @@ const style = StyleSheet.create({
     borderWidth: 1,
     borderTopWidth: 1,
     borderRadius: 3,
+    // Workaround the mess done for iOS in react-native-autocomplete-input :D
+    ...Platform.select({
+      ios: {
+        left: undefined,
+        position: 'relative',
+        right: undefined,
+        marginBottom: 6,
+      },
+    }),
   },
   autoCompleteDropDown: {
     position: 'relative',
