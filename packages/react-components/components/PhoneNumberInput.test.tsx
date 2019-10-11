@@ -49,7 +49,7 @@ describe('PhoneNumberInput', () => {
         const instance = numberInput.instance()
 
         // @ts-ignore
-        const renderedItem = shallow(instance.renderItem('GB'))
+        const renderedItem = shallow(instance.renderItem({ item: 'GB' }))
         expect(
           renderedItem
             .find(Text)
