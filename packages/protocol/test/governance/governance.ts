@@ -9,7 +9,7 @@ import {
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { toFixed, multiply, fixed1 } from '@celo/utils/lib/fixidity'
+import { fixed1, multiply, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { keccak256 } from 'ethereumjs-util'
 import {
@@ -1852,116 +1852,174 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe('#whitelist()', () => {
+  describe.only('#whitelistHotfix()', () => {
     beforeEach(async () => {
       await mockValidators.addValidator(accounts[2])
       await mockValidators.addValidator(accounts[3])
     })
 
-    it('should revert if the validator address index does not match msg.sender', async () => {
-      // @ts-ignore bytes type
-      await assertRevert(governance.whitelist(proposalHash, 0, { from: accounts[3] }))
-    })
-
-    it('should increment the hotfix record vote tally', async () => {
-      // @ts-ignore bytes type
-      await governance.whitelist(proposalHash, 1, { from: accounts[3] })
-      // @ts-ignore bytes type
-      const [tally, , ,] = await governance.getHotfixRecord.call(proposalHashStr)
-      assertEqualBN(tally, new BigNumber(1))
-    })
-
-    it('should set the hotfix record epoch', async () => {
-      // @ts-ignore bytes type
-      await governance.whitelist(proposalHash, 1, { from: accounts[3] })
-      // @ts-ignore bytes type
-      const [, epoch, ,] = await governance.getHotfixRecord.call(proposalHashStr)
-      // TODO: add epoch number to utils library
-      const currEpoch = Math.floor((await web3.eth.getBlockNumber()) / 30000)
-      assertEqualBN(epoch, currEpoch)
-    })
-
-    it('UNIMPL: should reset hotfix record vote tally when epoch elapses', async () => {
-      // TODO: timeTravel by number of blocks reliably
-    })
-
     it('should mark the hotfix record approved when called by approver', async () => {
-      // @ts-ignore bytes type
-      await governance.whitelist(proposalHash, 0, { from: approver })
-      // @ts-ignore bytes type
-      const [, , approved] = await governance.getHotfixRecord.call(proposalHashStr)
+      await governance.whitelistHotfix(proposalHashStr, 0, { from: approver })
+      const [approved, ,] = await governance.getHotfixRecord.call(proposalHashStr)
       assert.isTrue(approved)
     })
 
+    it('should revert when called by approver twice', async () => {
+      await governance.whitelistHotfix(proposalHashStr, 0, { from: approver })
+      await assertRevert(governance.whitelistHotfix(proposalHashStr, 0, { from: approver }))
+    })
+
+    it('should revert if the validator address index does not match msg.sender', async () => {
+      await assertRevert(governance.whitelistHotfix(proposalHashStr, 0, { from: accounts[3] }))
+    })
+
+    it('should revert if called by a non-validator, non-approver', async () => {
+      await assertRevert(governance.whitelistHotfix(proposalHashStr, 1, { from: accounts[4] }))
+    })
+
     it('should emit the HotfixWhitelist event', async () => {
-      // @ts-ignore bytes type
-      const resp = await governance.whitelist(proposalHash, 1, { from: accounts[3] })
+      const resp = await governance.whitelistHotfix(proposalHashStr, 1, { from: accounts[3] })
       assert.equal(resp.logs.length, 1)
       const log = resp.logs[0]
       assertLogMatches2(log, {
         event: 'HotfixWhitelisted',
         args: {
-          whitelister: accounts[3],
           txHash: matchAny,
+          whitelister: accounts[3],
         },
       })
       assert.isTrue(Buffer.from(stripHexEncoding(log.args.txHash), 'hex').equals(proposalHash))
     })
 
-    it('should revert if called by a non-validator, non-approver', async () => {
-      // @ts-ignore bytes type
-      await assertRevert(governance.whitelist(proposalHash, 1, { from: accounts[4] }))
+    it('should revert when called by the same validator twice', async () => {
+      await governance.whitelistHotfix(proposalHashStr, 1, { from: accounts[3] })
+      await assertRevert(governance.whitelistHotfix(proposalHashStr, 1, { from: accounts[3] }))
     })
   })
 
-  describe('#hotfix()', () => {
-    describe('when the hotfix is approved and whitelisted', () => {
+  describe.only('#isHotfixPassing', () => {
+    beforeEach(async () => {
+      await mockValidators.addValidator(accounts[2])
+      await mockValidators.addValidator(accounts[3])
+      await mockValidators.setByzantineQuorumForCurrentSet(2)
+    })
+
+    it('should return false when hotfix has not been whitelisted', async () => {
+      const passing = await governance.isHotfixPassing.call(proposalHashStr)
+      assert.isFalse(passing)
+    })
+
+    it('should return false when hotfix has been whitelisted but not by quorum', async () => {
+      await governance.whitelistHotfix(proposalHashStr, 0, { from: accounts[2] })
+      const passing = await governance.isHotfixPassing.call(proposalHashStr)
+      assert.isFalse(passing)
+    })
+
+    it('should return true when hotfix is whitelisted by quorum', async () => {
+      await governance.whitelistHotfix(proposalHashStr, 0, { from: accounts[2] })
+      await governance.whitelistHotfix(proposalHashStr, 1, { from: accounts[3] })
+      const passing = await governance.isHotfixPassing.call(proposalHashStr)
+      assert.isTrue(passing)
+    })
+  })
+
+  describe.only('#prepareHotfix()', () => {
+    beforeEach(async () => {
+      await mockValidators.setByzantineQuorumForCurrentSet(1)
+      await mockValidators.addValidator(accounts[2])
+    })
+
+    it('should revert when epoch == preparedEpoch (zero)', async () => {
+      await mockValidators.setEpochNumber(0)
+      await assertRevert(governance.prepareHotfix(proposalHashStr))
+    })
+
+    it('should revert when hotfix is not passing', async () => {
+      await mockValidators.setEpochNumber(1)
+      await assertRevert(governance.prepareHotfix(proposalHashStr))
+    })
+
+    describe('when hotfix is passing', () => {
       beforeEach(async () => {
-        await mockValidators.addValidator(accounts[2])
-        // @ts-ignore bytes type
-        await governance.whitelist(proposalHash, 0, { from: accounts[2] })
-        // @ts-ignore bytes type
-        await governance.whitelist(proposalHash, 0, { from: approver })
+        await mockValidators.setEpochNumber(1)
+        await governance.whitelistHotfix(proposalHashStr, 0, { from: accounts[2] })
       })
 
-      it('should execute the proposal', async () => {
-        await governance.hotfix(
-          [transactionSuccess1.value],
-          [transactionSuccess1.destination],
-          // @ts-ignore bytes type
-          transactionSuccess1.data,
-          [transactionSuccess1.data.length]
-        )
+      it('should mark the hotfix record prepared epoch', async () => {
+        await governance.prepareHotfix(proposalHashStr)
+        const [, , preparedEpoch] = await governance.getHotfixRecord.call(proposalHashStr)
+        assertEqualBN(preparedEpoch, 1)
+      })
+
+      it('should emit the HotfixPrepared event', async () => {
+        const resp = await governance.prepareHotfix(proposalHashStr)
+        assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        assertLogMatches2(log, {
+          event: 'HotfixPrepared',
+          args: {
+            txHash: matchAny,
+            epoch: 1,
+          },
+        })
+        assert.isTrue(Buffer.from(stripHexEncoding(log.args.txHash), 'hex').equals(proposalHash))
+      })
+
+      it('should revert when epoch == preparedEpoch (non-zero)', async () => {
+        await governance.prepareHotfix(proposalHashStr)
+        await assertRevert(governance.prepareHotfix(proposalHashStr))
+      })
+
+      it('should succeed for epoch != preparedEpoch (non-zero)', async () => {
+        await governance.prepareHotfix(proposalHashStr)
+        await mockValidators.setEpochNumber(2)
+        await governance.prepareHotfix(proposalHashStr)
+      })
+    })
+  })
+
+  describe.only('#executeHotfix()', () => {
+    const executeHotfixTx = () =>
+      governance.executeHotfix(
+        [transactionSuccess1.value],
+        [transactionSuccess1.destination],
+        // @ts-ignore bytes type
+        transactionSuccess1.data,
+        [transactionSuccess1.data.length]
+      )
+
+    it('should revert when hotfix not approved', async () => {
+      await assertRevert(executeHotfixTx())
+    })
+
+    it('should revert when hotfix not prepared for current epoch', async () => {
+      await mockValidators.setEpochNumber(1)
+      await governance.whitelistHotfix(proposalHashStr, 0, { from: approver })
+      await assertRevert(executeHotfixTx())
+    })
+
+    describe('when hotfix is approved and prepared for current epoch', () => {
+      beforeEach(async () => {
+        await governance.whitelistHotfix(proposalHashStr, 0, { from: approver })
+        await mockValidators.setEpochNumber(2)
+        await mockValidators.addValidator(accounts[2])
+        await governance.whitelistHotfix(proposalHashStr, 0, { from: accounts[2] })
+        await governance.prepareHotfix(proposalHashStr)
+      })
+
+      it('should execute the hotfix tx', async () => {
+        await executeHotfixTx()
         assert.equal(await testTransactions.getValue(1).valueOf(), 1)
       })
 
-      it('should not be executable again', async () => {
-        await governance.hotfix(
-          [transactionSuccess1.value],
-          [transactionSuccess1.destination],
-          // @ts-ignore bytes type
-          transactionSuccess1.data,
-          [transactionSuccess1.data.length]
-        )
-        await assertRevert(
-          governance.hotfix(
-            [transactionSuccess1.value],
-            [transactionSuccess1.destination],
-            // @ts-ignore bytes type
-            transactionSuccess1.data,
-            [transactionSuccess1.data.length]
-          )
-        )
+      it('should mark the hotfix record as completed', async () => {
+        await executeHotfixTx()
+        const [, completed, ] = await governance.getHotfixRecord.call(proposalHashStr)
+        assert.isTrue(completed)
       })
 
       it('should emit the HotfixExecuted event', async () => {
-        const resp = await governance.hotfix(
-          [transactionSuccess1.value],
-          [transactionSuccess1.destination],
-          // @ts-ignore bytes type
-          transactionSuccess1.data,
-          [transactionSuccess1.data.length]
-        )
+        const resp = await executeHotfixTx()
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
         assertLogMatches2(log, {
@@ -1972,42 +2030,12 @@ contract('Governance', (accounts: string[]) => {
         })
         assert.isTrue(Buffer.from(stripHexEncoding(log.args.txHash), 'hex').equals(proposalHash))
       })
-    })
 
-    it('should revert when the hotfix is not approved', async () => {
-      await mockValidators.addValidator(accounts[2])
-      // @ts-ignore bytes type
-      await governance.whitelist(proposalHash, 0, { from: accounts[2] })
-
-      await assertRevert(
-        governance.hotfix(
-          [transactionSuccess1.value],
-          [transactionSuccess1.destination],
-          // @ts-ignore bytes type
-          transactionSuccess1.data,
-          [transactionSuccess1.data.length]
-        )
-      )
-    })
-
-    it('should revert when the hotfix is not whitelisted by 2f+1 validators', async () => {
-      await mockValidators.addValidator(accounts[2])
-      await mockValidators.addValidator(accounts[3])
-      // @ts-ignore bytes type
-      await governance.whitelist(proposalHash, 0, { from: accounts[2] })
-      // @ts-ignore bytes type
-      await governance.whitelist(proposalHash, 0, { from: approver })
-
-      await assertRevert(
-        governance.hotfix(
-          [transactionSuccess1.value],
-          [transactionSuccess1.destination],
-          // @ts-ignore bytes type
-          transactionSuccess1.data,
-          [transactionSuccess1.data.length]
-        )
-      )
-    })
+      it('should not be callable again', async () => {
+        await executeHotfixTx()
+        await assertRevert(executeHotfixTx())  
+      })
+    })  
   })
 
   describe('#isVoting()', () => {

@@ -10,6 +10,8 @@ contract MockValidators is IValidators {
   mapping(address => bool) private _isValidating;
   mapping(address => bool) private _isVoting;
   address[] private validators;
+  uint256 private quorum;
+  uint256 private epoch;
 
   function isValidating(address account) external view returns (bool) {
     return _isValidating[account];
@@ -41,5 +43,21 @@ contract MockValidators is IValidators {
 
   function numberValidatorsInCurrentSet() external view returns (uint256) {
     return validators.length;
+  }
+
+  function getByzantineQuorumForCurrentSet() external view returns (uint256) {
+    return quorum;
+  }
+
+  function setByzantineQuorumForCurrentSet(uint256 q) external {
+    quorum = q;
+  }
+
+  function getEpochNumber() external view returns (uint256) {
+    return epoch;
+  }
+
+  function setEpochNumber(uint256 e) external {
+    epoch = e;
   }
 }
