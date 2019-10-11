@@ -155,7 +155,7 @@ module.exports = async (_deployer: any) => {
     )
   }
 
-  for (let [idx, groupKeys] of valKeyGroups.entries()) {
+  for (const [idx, groupKeys] of valKeyGroups.entries()) {
     // Append an index to the group name if there is more than one group.
     let groupName: string = config.validators.groupName
     if (valKeyGroups.length > 1) {
