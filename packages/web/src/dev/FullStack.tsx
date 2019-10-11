@@ -1,15 +1,17 @@
+import throttle from 'lodash.throttle'
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { findNodeHandle, StyleSheet, Text, View } from 'react-native'
 import LayersIllo from 'src/dev/LayersIllo'
-import { H2, H3, Li } from 'src/fonts/Fonts'
 import StackSection from 'src/dev/StackSection'
+import { H2, H3, Li } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import throttle from 'lodash.throttle'
-import { findNodeHandle } from 'react-native'
-
+import { scrollTo } from 'src/utils/utils'
 import { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { fonts, standardStyles, textStyles, colors } from 'src/styles'
+import { HEADER_HEIGHT } from 'src/shared/Styles'
+import { withScreenSize, ScreenProps, ScreenSizes } from 'src/layout/ScreenSize'
+
 enum Levels {
   apps,
   contracts,
@@ -19,47 +21,81 @@ enum Levels {
 interface State {
   selection: Levels
   sticky: boolean
-  currentOffset: number
-  fixedDistance: number
 }
 
-const ACCEPTABLE_MARGIN = 50
+const GLASS_CEILING = 160
 
-class FullStack extends React.PureComponent<I18nProps, State> {
-  state = { selection: Levels.apps, sticky: false, currentOffset: 0, fixedDistance: 0 }
+class FullStack extends React.PureComponent<I18nProps & ScreenProps, State> {
+  state = { selection: Levels.apps, sticky: false }
+
+  ref = React.createRef<View>()
 
   handleScroll = throttle(() => {
+    if (!(this.props.screen === ScreenSizes.DESKTOP)) {
+      this.setState({ sticky: false })
+      return
+    }
+
     const element: any = findNodeHandle(this.ref.current)
     if (!element) {
       return
     }
+    const clientRect: DOMRect = element.getBoundingClientRect()
+    const currentOffset = clientRect.top
 
-    const currentOffset = element.getBoundingClientRect().top
+    if (currentOffset < HEADER_HEIGHT) {
+      requestAnimationFrame(() => {
+        const third = clientRect.height / 3
 
-    const fixedDistance = (element.offsetTop - ACCEPTABLE_MARGIN) * -1
+        const amountPastGlassTop = clientRect.y - HEADER_HEIGHT
+        const hardTop = GLASS_CEILING
 
-    if (currentOffset < ACCEPTABLE_MARGIN) {
-      this.setState({ sticky: true, fixedDistance })
+        const highestOffScreen = hardTop + amountPastGlassTop < 0
+        const shouldTurnOnLevelOne = hardTop + third + amountPastGlassTop < 0
+
+        if (shouldTurnOnLevelOne) {
+          this.setL1()
+        } else if (highestOffScreen) {
+          this.setL2()
+        } else {
+          this.setL3()
+        }
+      })
+
+      this.setState({ sticky: true })
     } else {
-      this.setState({ sticky: false, fixedDistance })
+      this.setState({ sticky: false })
     }
   }, 24)
 
-  ref = React.createRef<View>()
-
-  setL1 = () => {
+  setL3 = () => {
     this.setState({ selection: Levels.apps })
   }
 
   setL2 = () => {
     this.setState({ selection: Levels.contracts })
   }
-  setL3 = () => {
+
+  setL1 = () => {
     this.setState({ selection: Levels.blockchains })
   }
 
   setLevel = (level: Levels) => {
     this.setState({ selection: level })
+  }
+
+  scrollTo = (level: Levels) => {
+    switch (level) {
+      case Levels.apps:
+        scrollTo(hashNav.build.applications)
+        break
+      case Levels.contracts:
+        scrollTo(hashNav.build.contracts)
+        break
+      case Levels.blockchains:
+        scrollTo(hashNav.build.blockchain)
+        break
+    }
   }
 
   componentDidMount() {
@@ -71,41 +107,36 @@ class FullStack extends React.PureComponent<I18nProps, State> {
   }
 
   render() {
-    const { t } = this.props
-
+    const { t, screen } = this.props
+    const isDesktop = screen === ScreenSizes.DESKTOP
     return (
-      <View style={[standardStyles.darkBackground]} ref={this.ref}>
-        <GridRow allStyle={{ overflow: 'hidden' }}>
-          <Cell span={Spans.half}>
-            <View
-              // @ts-ignore
-              style={
-                this.state.sticky && {
-                  position: 'fixed',
-                  top: ACCEPTABLE_MARGIN,
-                  zIndex: 10,
-                }
-              }
-            >
-              <H3 style={textStyles.invert}>{t('stackSubtitle')}</H3>
-              <H2 style={[textStyles.invert, standardStyles.elementalMargin]}>{t('stackTitle')}</H2>
-
-              <View
-                // @ts-ignore
-                style={{ width: '100%', maxWidth: 400 }}
-              >
+      <View style={standardStyles.darkBackground} ref={this.ref}>
+        <GridRow tabletStyle={styles.tabletContainer} allStyle={styles.container}>
+          <Cell span={Spans.half} tabletSpan={Spans.full}>
+            <View style={this.state.sticky && styles.sticky}>
+              <View style={styles.illoContainer}>
+                <H3 style={textStyles.invert}>{t('stackSubtitle')}</H3>
+                <H2 style={[textStyles.invert, standardStyles.elementalMargin]}>
+                  {t('stackTitle')}
+                </H2>
                 <Text style={[fonts.p, textStyles.invert, standardStyles.elementalMarginBottom]}>
                   {t('stackDescription')}
                 </Text>
-                <LayersIllo activeLayer={this.state.selection} onSelectLayer={this.setLevel} />
+                {isDesktop && (
+                  <LayersIllo activeLayer={this.state.selection} onSelectLayer={this.setLevel} />
+                )}
               </View>
             </View>
           </Cell>
-          <Cell span={Spans.half}>
+          <Cell
+            span={Spans.half}
+            tabletSpan={Spans.three4th}
+            style={isDesktop && styles.stackContainer}
+          >
             <StackSection
               onPress={this.setL1}
               id={hashNav.build.applications}
-              isSelected={this.state.selection === Levels.apps}
+              isSelected={this.state.selection === Levels.apps || !isDesktop}
               title={t('mobile.title')}
               text={t('mobile.text')}
               buttonOne={{ title: t('installWallet'), href: CeloLinks.walletApp }}
@@ -119,7 +150,7 @@ class FullStack extends React.PureComponent<I18nProps, State> {
             <StackSection
               onPress={this.setL2}
               id={hashNav.build.contracts}
-              isSelected={this.state.selection === Levels.contracts}
+              isSelected={this.state.selection === Levels.contracts || !isDesktop}
               title={t('protocol.title')}
               text={t('protocol.text')}
               buttonOne={{ title: t('readMore'), href: CeloLinks.docsOverview }}
@@ -132,7 +163,7 @@ class FullStack extends React.PureComponent<I18nProps, State> {
             <StackSection
               onPress={this.setL3}
               id={hashNav.build.blockchain}
-              isSelected={this.state.selection === Levels.blockchains}
+              isSelected={this.state.selection === Levels.blockchains || !isDesktop}
               title={t('proof.title')}
               text={t('proof.text')}
               buttonOne={{ title: t('readMore'), href: CeloLinks.docsOverview }}
@@ -149,6 +180,17 @@ class FullStack extends React.PureComponent<I18nProps, State> {
   }
 }
 
-export default withNamespaces('dev')(FullStack)
+export default withScreenSize(withNamespaces('dev')(FullStack))
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  container: { overflow: 'hidden', flexWrap: 'wrap' },
+  tabletContainer: { justifyContent: 'flex-end' },
+  sticky: {
+    // @ts-ignore
+    position: 'fixed',
+    top: HEADER_HEIGHT,
+    zIndex: 10,
+  },
+  illoContainer: { width: '100%', maxWidth: 400 },
+  stackContainer: { paddingTop: GLASS_CEILING },
+})

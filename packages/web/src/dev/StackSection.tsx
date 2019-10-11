@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { Ul } from 'src/fonts/Fonts'
-import { ScreenProps, withScreenSize } from 'src/layout/ScreenSize'
+import { ScreenProps, withScreenSize, ScreenSizes } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import { fonts, standardStyles, textStyles, colors } from 'src/styles'
 import OvalCoin from 'src/shared/OvalCoin'
@@ -23,36 +23,34 @@ interface Props {
   isSelected: boolean
 }
 
+const TRANS_DURATION = 500
+
 export default withScreenSize(
   React.memo(function StackSection(props: Props & ScreenProps) {
-    const { title, text, buttonOne, buttonTwo, children, onPress, isSelected } = props
+    const { title, text, buttonOne, buttonTwo, children, onPress, isSelected, screen } = props
     return (
       <View
         nativeID={props.id}
-        style={{
-          flexDirection: 'row',
-          flex: 1,
-          width: '100%',
-          justifyContent: 'space-between',
-          marginVertical: 20,
-        }}
+        // @ts-ignore
+        style={[styles.container, styles.fade, isSelected ? styles.bright : styles.dim]}
       >
-        <View style={{ width: '100%', maxWidth: 400 }}>
+        <View style={styles.content}>
           <Text
             onPress={onPress}
             style={[fonts.h5, standardStyles.elementalMarginBottom, textStyles.invert]}
           >
-            {isSelected && (
-              <View style={{ position: 'absolute', transform: [{ translateX: -30 }] }}>
+            {screen === ScreenSizes.DESKTOP && (
+              <View style={[styles.coin, isSelected ? styles.bright : styles.off]}>
                 <OvalCoin color={colors.primary} size={15} />
               </View>
             )}
+
             {title}
           </Text>
           <Text style={[fonts.p, textStyles.invert]}>{text}</Text>
           <Ul style={styles.list}>{children}</Ul>
         </View>
-        <View style={{ marginHorizontal: 10 }}>
+        <View style={styles.buttonArea}>
           <Button
             text={buttonOne.title}
             kind={BTN.PRIMARY}
@@ -76,12 +74,24 @@ export default withScreenSize(
 )
 
 const styles = StyleSheet.create({
-  content: {
+  container: {
+    flexDirection: 'row',
+    flex: 1,
+    width: '100%',
     justifyContent: 'space-between',
+    marginVertical: 20,
+  },
+  fade: {
+    transitionDuration: '500ms',
+    transitionProperty: 'opacity',
+  },
+  content: {
+    flex: 1,
+    maxWidth: 400,
   },
   buttonArea: {
-    alignItems: 'center',
-    flex: 1,
+    marginTop: 45,
+    marginHorizontal: 10,
   },
   separator: {
     marginVertical: 10,
@@ -96,4 +106,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
   },
+  coin: {
+    transitionProperty: 'opacity',
+    transitionDuration: `${TRANS_DURATION}ms`,
+    transform: [{ translateX: -30 }],
+    position: 'absolute',
+  },
+  bright: { opacity: 1 },
+  dim: { opacity: 0.6 },
+  off: { opacity: 0 },
 })
