@@ -121,7 +121,7 @@ contract Random is IRandom, Ownable, Initializable {
     require(
       blockNumber > cur.sub(historySize) &&
       (randomnessBlockRetentionWindow >= cur ||
-       blockNumber > cur.sub(randomnessBlockRetentionWindow)),
+      blockNumber > cur.sub(randomnessBlockRetentionWindow)),
       "Cannot query randomness older than the stored history");
     return history[blockNumber];
   }
