@@ -731,6 +731,11 @@ contract Validators is
     return 0;
   }
 
+  /**
+   * @notice Returns the timestamp of the last time this account deregistered a validator or group.
+   * @param account The account to query.
+   * @return The timestamp of the last time this account deregistered a validator or group.
+   */
   function getDeregistrationTimestamps(address account) external view returns (uint256, uint256) {
     return (deregistrationTimestamps[account].group, deregistrationTimestamps[account].validator);
   }

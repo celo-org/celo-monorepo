@@ -86,6 +86,11 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     toBigNumber
   )
 
+  /**
+   * Returns the groups that `account` has voted for.
+   * @param account The address of the account casting votes.
+   * @return The groups that `account` has voted for.
+   */
   getGroupsVotedForByAccount: (account: Address) => Promise<Address[]> = proxyCall(
     this.contract.methods.getGroupsVotedForByAccount
   )
@@ -106,6 +111,9 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     }
   }
 
+  /**
+   * Returns the addresses in the current validator set.
+   */
   async getValidatorSetAddresses(): Promise<string[]> {
     const numberValidators = await this.numberValidatorsInCurrentSet()
 
@@ -118,6 +126,9 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     return Promise.all(validatorAddressPromises)
   }
 
+  /**
+   * Returns the current registered validator groups and their total votes and eligibility.
+   */
   async getValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
     const validators = await this.kit.contracts.getValidators()
     const validatorGroupAddresses = (await validators.getRegisteredValidatorGroups()).map(
@@ -136,11 +147,19 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     }))
   }
 
+  /**
+   * Returns the current eligible validator groups and their total votes.
+   */
   async getEligibleValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
     const res = await this.contract.methods.getTotalVotesForEligibleValidatorGroups().call()
     return zip((a, b) => ({ address: a, votes: new BigNumber(b), eligible: true }), res[0], res[1])
   }
 
+  /**
+   * Increments the number of total and pending votes for `group`.
+   * @param validatorGroup The validator group to vote for.
+   * @param value The amount of gold to use to vote.
+   */
   async vote(validatorGroup: Address, value: BigNumber): Promise<CeloTransactionObject<boolean>> {
     if (this.kit.defaultAccount == null) {
       throw new Error(`missing from at new ValdidatorUtils()`)
