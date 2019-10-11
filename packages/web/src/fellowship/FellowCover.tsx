@@ -20,7 +20,7 @@ function FellowCover({ t, isMobile }: I18nProps & ScreenProps) {
             <Button
               kind={BTN.NAKED}
               size={SIZE.normal}
-              text={t('contribute.button')}
+              text={t('coverBtn')}
               target={'_cfp'}
               href={'https://medium.com/celohq/call-for-proposals-the-celo-fellowship-3c43b06b10f9'}
             />
