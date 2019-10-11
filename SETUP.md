@@ -55,11 +55,14 @@ Install `nvm` (allows you to manage multiple versions of Node), Node 8 and `yarn
 
 ```bash
 brew install nvm
+
 # follow the instructions from the command above to edit your .bash_profile
 # then restart the terminal
+nvm install 8
 nvm install 10
 nvm alias default 10
 brew install yarn
+npm install -g typescript
 ```
 
 #### Java
@@ -112,7 +115,7 @@ sdkmanager 'platforms;android-28'
 
 We use Yarn to build all of the [celo-monorepo] repo.
 
-Install `nvm` (allows you to manage multiple versions of Node), Node 8 and `yarn`:
+Install `nvm` (allows you to manage multiple versions of Node), Node 8, Node 10 and `yarn`:
 
 ```bash
 # Installing Node
@@ -125,12 +128,16 @@ source ~/.bashrc
 
 # Setting up the right version of Nvm
 nvm install 8
-nvm alias default 8
+nvm install 10
+nvm alias default 10
 
 # Installing Yarn - https://yarnpkg.com/en/docs/install#debian-stable
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 sudo apt-get update && sudo apt-get install yarn
+
+# Install typescript
+npm install -g typescript
 ```
 
 #### Installing OpenJDK 8
@@ -211,9 +218,9 @@ Run the emulator with:
 emulator -avd Nexus_5X_API_28
 ```
 
-#### Optional: Genymotion
+#### Optional: Install Genymotion Emulator Manager
 
-Optionally, as alternative to other emulators you can install Genymotion, a nice emulator manager:
+Optionally, as alternative to other emulators you can install Genymotion
 
 ##### MacOS
 
