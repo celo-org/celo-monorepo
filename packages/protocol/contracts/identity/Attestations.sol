@@ -11,6 +11,7 @@ import "../governance/interfaces/IValidators.sol";
 
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
+import "../common/Signatures.sol";
 
 
 /**
@@ -49,6 +50,11 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   event AttestationRequestFeeSet(
     address indexed token,
     uint256 value
+  );
+
+  event AccountAttestationKeyAddressSet(
+    address indexed account,
+    address attestationKeyAddress
   );
 
   event AccountDataEncryptionKeySet(
@@ -90,6 +96,9 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     // The token with which attestation request fees are paid
     address attestationRequestFeeToken;
 
+    // The address of the key with which this account wants to sign attestations for
+    address attestationKeyAddress;
+
     // The ECDSA public key used to encrypt and decrypt data for this account
     bytes dataEncryptionKey;
 
@@ -115,6 +124,9 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
 
   mapping(bytes32 => IdentifierState) identifiers;
   mapping(address => Account) accounts;
+
+  // Mapping of attestationKey addresses to account addresses
+  mapping(address => address) keysToAccount;
 
   // Address of the RequestAttestation precompiled contract.
   // solhint-disable-next-line state-visibility
@@ -527,6 +539,59 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   }
 
   /**
+   * @notice Setter for the attestation key for an account
+   * @param attestationKeyAddress The attestation key address to set for the account
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev v, r, s constitute `attestationKeyAddress`'s signature on `msg.sender`.
+   */
+  function setAttestationKeyAddress(
+    address attestationKeyAddress,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) public {
+    address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
+    require(signer == attestationKeyAddress, "Incorrect signature");
+
+    accounts[msg.sender].attestationKeyAddress = attestationKeyAddress;
+    keysToAccount[attestationKeyAddress] = msg.sender;
+    emit AccountAttestationKeyAddressSet(msg.sender, attestationKeyAddress);
+  }
+
+  /**
+   * @notice Getter for the address of the attestation key for an account
+   * @param account The address of the account to get the attestation key for
+   * @return The address of the attestation key
+   */
+  function getAttestationKeyAddress(address account) external view returns (address) {
+    return accounts[account].attestationKeyAddress;
+  }
+
+  /**
+   * @notice Getter for the address of the account for an attestation key
+   * @param attestationKey The address of the attestation key
+   * @return The address of the account that specified the attestation key
+   */
+  function getAccountFromAttestationKeyAddress(address attestationKey)
+    public
+    view
+    returns (address)
+  {
+    address account = keysToAccount[attestationKey];
+    if (account == address(0x0)) {
+      return attestationKey;
+    } else {
+      require(
+        accounts[account].attestationKeyAddress == attestationKey,
+        "The mapped account no longer specifies the attestation key"
+      );
+      return account;
+    }
+  }
+
+  /**
    * @notice Setter for the wallet address for an account
    * @param walletAddress The wallet address to set for the account
    */
@@ -566,7 +631,8 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
     returns (address)
   {
     bytes32 codehash = keccak256(abi.encodePacked(identifier, account));
-    address issuer = ecrecover(codehash, v, r, s);
+    address signer = ecrecover(codehash, v, r, s);
+    address issuer = getAccountFromAttestationKeyAddress(signer);
 
     Attestation storage attestation =
       identifiers[identifier].attestations[account].issuedAttestations[issuer];
