@@ -15,7 +15,7 @@ export enum colors {
   primary = '#35D07F',
   primaryPress = '#0FB972',
   primaryHover = '#4CDD91',
-  inactive = 'rgba(69, 214, 138, 0.5)',
+  inactive = 'rgba(69, 214, 138, 0.7)',
 
   orange = '#FFB765',
   error = '#FF7F6D',

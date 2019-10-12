@@ -39,6 +39,7 @@ type NakedProps = {
 } & AllButtonProps
 
 type PrimaryProps = {
+  onDarkBackground?: boolean
   size?: SIZE
   kind: BTN.PRIMARY | BTN.SECONDARY | BTN.TERTIARY
 } & AllButtonProps
@@ -157,10 +158,11 @@ interface Props {
   style?: TextStyle
   href?: string
   target?: string
+  onDarkBackground?: boolean
 }
 
 function ButtonPrimary(props: Props) {
-  const { children, status, size, style, href, target } = props
+  const { children, status, size, style, href, target, onDarkBackground } = props
   return (
     <Text
       href={href}
@@ -173,7 +175,9 @@ function ButtonPrimary(props: Props) {
         sizeStyle(size),
         primaryStyles[status],
         textStyles.medium,
-        primaryStyles.text,
+        status === BTNStates.disabled && onDarkBackground
+          ? primaryStyles.darkText
+          : primaryStyles.text,
         style,
         status === BTNStates.disabled && baseStyles.notAllowed,
       ]}
@@ -387,6 +391,9 @@ const primaryStyles = StyleSheet.create({
     borderColor: colors.inactive,
     borderRadius,
     borderWidth,
+  },
+  darkText: {
+    color: colors.dark,
   },
   text: {
     color: colors.white,

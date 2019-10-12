@@ -9,18 +9,28 @@ interface RadioProps {
   selected: boolean
   icon?: React.ReactNode
   label: string
+  labelColor?: colors
   onValueSelected: (x: any) => void
   value: any
+  colorWhenSelected?: colors
 }
 
-export function Radio({ selected, label, icon, onValueSelected, value }: RadioProps) {
+export function Radio({
+  selected,
+  label,
+  labelColor,
+  icon,
+  onValueSelected,
+  value,
+  colorWhenSelected,
+}: RadioProps) {
   const onSelect = () => onValueSelected(value)
   return (
     <TouchableOpacity onPress={onSelect}>
       <View style={styles.radioRow}>
-        <RadioIcon selected={selected} />
+        <RadioIcon selected={selected} colorWhenSelected={colorWhenSelected} />
         <View style={styles.radioSpacer}>{icon || null}</View>
-        <Text style={fonts.p} accessibilityRole="label">
+        <Text style={[fonts.p, labelColor && { color: labelColor }]} accessibilityRole="label">
           {label}
         </Text>
       </View>

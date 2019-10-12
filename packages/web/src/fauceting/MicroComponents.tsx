@@ -97,6 +97,7 @@ export function ButtonWithFeedback({
       kind={isNotStarted ? BTN.PRIMARY : BTN.SECONDARY}
       text={buttonText({ requestState, t, isFaucet })}
       onPress={onSubmit}
+      onDarkBackground={!isFaucet}
       iconLeft={icon}
       align={'flex-start'}
       style={!isFaucet && isEnded && [textStyles.invert, styles.message]}
