@@ -7,6 +7,7 @@ interface IAttestations {
 
   function setAttestationRequestFee(address, uint256) external;
   function request(bytes32, uint256, address) external;
+  function revealIssuers(bytes32) external;
   function reveal(bytes32, bytes calldata, address, bool) external;
   function complete(bytes32, uint8, bytes32, bytes32) external;
   function revoke(bytes32, uint256) external;
@@ -23,6 +24,7 @@ interface IAttestations {
   function getWalletAddress(address) external view returns (address);
   function getMetadataURL(address) external view returns (string memory);
 
+  function getActiveAttestationRequest(bytes32, address) external view returns (uint128, uint128);
   function getAttestationRequestFee(address) external view returns (uint256);
 
   function lookupAccountsForIdentifier(bytes32) external view returns (address[] memory);
@@ -33,7 +35,7 @@ interface IAttestations {
   )
     external
     view
-    returns (uint64, uint64);
+    returns (uint32, uint32);
 
   function getAttestationState(
     bytes32,

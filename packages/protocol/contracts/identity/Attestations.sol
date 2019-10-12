@@ -22,8 +22,16 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   using SafeMath for uint256;
   using SafeMath for uint128;
   using SafeMath for uint96;
+  using SafeMath for uint32;
 
   event AttestationsRequested(
+    bytes32 indexed identifier,
+    address indexed account,
+    uint256 attestationsRequested,
+    address attestationRequestFeeToken
+  );
+
+  event AttestationIssuersRevealed(
     bytes32 indexed identifier,
     address indexed account,
     uint256 attestationsRequested,
@@ -99,18 +107,28 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
 
   // Stores attestations state for a single (identifier, account address) pair.
   struct AttestationsMapping {
+    uint32 requested;
     // Number of completed attestations
-    uint64 completed;
+    uint32 completed;
     // List of issuers responsible for attestations
     address[] issuers;
     // State of each attestation keyed by issuer
     mapping(address => Attestation) issuedAttestations;
   }
 
+  struct AttestationRequest {
+    // The block at which the attestations were requested
+    uint128 blockNumber;
+
+    // The number of attestations that were requested
+    uint128 attestationsRequested;
+  }
+
   struct IdentifierState {
     // All account addresses associated with this identifier
     address[] accounts;
     mapping(address => AttestationsMapping) attestations;
+    mapping(address => AttestationRequest) requests;
   }
 
   mapping(bytes32 => IdentifierState) identifiers;
@@ -181,6 +199,8 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
 
     require(attestationsRequested > 0, "You have to request at least 1 attestation");
 
+    IdentifierState storage state = identifiers[identifier];
+
     if (accounts[msg.sender].attestationRequestFeeToken != address(0x0)) {
       require(
         !isAttestationTimeValid(accounts[msg.sender].mostRecentAttestationRequest) ||
@@ -189,13 +209,22 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
       );
     }
 
+    if(state.requests[msg.sender].blockNumber != 0)
+    require(
+      !isAttestationTimeValid(accounts[msg.sender].mostRecentAttestationRequest),
+      "Currently active attestation request that has to be revealed first"
+    );
+
+    state.requests[msg.sender].blockNumber = uint128(block.number);
+    state.requests[msg.sender].attestationsRequested = uint128(attestationsRequested);
+
     // solhint-disable-next-line not-rely-on-time
     accounts[msg.sender].mostRecentAttestationRequest = uint96(now);
     accounts[msg.sender].attestationRequestFeeToken = attestationRequestFeeToken;
 
-    IdentifierState storage state = identifiers[identifier];
-
-    addIncompleteAttestations(attestationsRequested, state.attestations[msg.sender]);
+    state.attestations[msg.sender].requested = uint32(
+      state.attestations[msg.sender].requested.add(attestationsRequested)
+    );
 
     emit AttestationsRequested(
       identifier,
@@ -203,6 +232,34 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
       attestationsRequested,
       attestationRequestFeeToken
     );
+  }
+
+  /**
+   * @notice Reveals the issuers for the most recent attestation request.
+   * @param identifier The hash of the identifier to be attested.
+   */
+  function revealIssuers(bytes32 identifier) external {
+    IdentifierState storage state = identifiers[identifier];
+
+    require(
+      state.requests[msg.sender].blockNumber != 0,
+      "No active attestation request to reveal issuers for"
+    );
+
+    addIncompleteAttestations(
+      state.requests[msg.sender].attestationsRequested,
+      state.attestations[msg.sender]
+    );
+
+    emit AttestationIssuersRevealed(
+      identifier,
+      msg.sender,
+      state.requests[msg.sender].attestationsRequested,
+      accounts[msg.sender].attestationRequestFeeToken
+    );
+
+    state.requests[msg.sender].blockNumber = 0;
+    state.requests[msg.sender].attestationsRequested = 0;
   }
 
   /**
@@ -332,6 +389,26 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   }
 
   /**
+   * @notice Returns the current active attestation request for an identifier/account pair, if any
+   * @param identifier Hash of the identifier.
+   * @param account Address of the account
+   * @return [Block numbr at which was requested, Number of requests]
+   */
+  function getActiveAttestationRequest(
+    bytes32 identifier,
+    address account
+  )
+    external
+    view
+    returns (uint128, uint128)
+  {
+    return (
+      identifiers[identifier].requests[account].blockNumber,
+      identifiers[identifier].requests[account].attestationsRequested
+    );
+  }
+
+  /**
    * @notice Returns attestation issuers for a identifier/account pair
    * @param identifier Hash of the identifier.
    * @param account Address of the account
@@ -360,11 +437,11 @@ contract Attestations is IAttestations, Ownable, Initializable, UsingRegistry, R
   )
     external
     view
-    returns (uint64, uint64)
+    returns (uint32, uint32)
   {
     return (
       identifiers[identifier].attestations[account].completed,
-      uint64(identifiers[identifier].attestations[account].issuers.length)
+      identifiers[identifier].attestations[account].requested
     );
   }
 
