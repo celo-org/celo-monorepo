@@ -1,3 +1,7 @@
+// NOTE: removing this import results in `yarn build` failures in Dockerfiles
+// after the move to node 10. This allows types to be inferred without
+// referencing '@celo/utils/node_modules/bignumber.js'
+import _ from 'bignumber.js'
 import { Address } from '../base'
 import { GoldToken } from '../generated/types/GoldToken'
 import { BaseWrapper, proxyCall, proxySend, toBigNumber, toNumber } from './BaseWrapper'
@@ -44,6 +48,20 @@ export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
    * @return True if the transaction succeeds.
    */
   approve = proxySend(this.kit, this.contract.methods.approve)
+  /**
+   * Increases the allowance of another user.
+   * @param spender The address which is being approved to spend Celo Gold.
+   * @param value The increment of the amount of Celo Gold approved to the spender.
+   * @returns true if success.
+   */
+  increaseAllowance = proxySend(this.kit, this.contract.methods.increaseAllowance)
+  /**
+   * Decreases the allowance of another user.
+   * @param spender The address which is being approved to spend Celo Gold.
+   * @param value The decrement of the amount of Celo Gold approved to the spender.
+   * @returns true if success.
+   */
+  decreaseAllowance = proxySend(this.kit, this.contract.methods.decreaseAllowance)
 
   /**
    * Transfers Celo Gold from one address to another with a comment.

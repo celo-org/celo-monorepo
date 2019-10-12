@@ -25,7 +25,7 @@
     "build": "tsc -b .",
     "docs": "yarn oclif-dev readme --multi --dir=../docs/command-line-interface && yarn prettier ../docs/command-line-interface/*.md --write",
     "lint": "tslint -c tslint.json --project tsconfig.json",
-    "prepublishOnly": "yarn run build && oclif-dev manifest && oclif-dev readme",
+    "prepack": "yarn run build && oclif-dev manifest && oclif-dev readme",
     "test": "TZ=UTC jest"
   },
   "dependencies": {
@@ -77,11 +77,14 @@
       "account": {
         "description": "Manage your account, send and receive Celo Gold and Celo Dollars"
       },
-      "bonds": {
-        "description": "Manage Locked Gold to participate in governance and earn rewards"
-      },
       "config": {
         "description": "Configure CLI options which persist across commands"
+      },
+      "exchange": {
+        "description": "Commands for interacting with the Exchange"
+      },
+      "lockedgold": {
+        "description": "Manage Locked Gold to participate in governance and earn rewards"
       },
       "node": {
         "description": "Manage your full node"
@@ -91,9 +94,6 @@
       },
       "validatorgroup": {
         "description": "View validator group information and cast votes"
-      },
-      "exchange": {
-        "description": "Commands for interacting with the Exchange"
       }
     },
     "bin": "celocli",

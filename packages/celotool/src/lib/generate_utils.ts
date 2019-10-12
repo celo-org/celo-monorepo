@@ -103,6 +103,12 @@ export const getValidators = (mnemonic: string, n: number) => {
   })
 }
 
+export const getAddressFromEnv = (accountType: AccountType, n: number) => {
+  const mnemonic = fetchEnv(envVar.MNEMONIC)
+  const privateKey = generatePrivateKey(mnemonic, accountType, n)
+  return privateKeyToAddress(privateKey)
+}
+
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const validatorEnv = fetchEnv(envVar.VALIDATORS)

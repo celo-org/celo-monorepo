@@ -53,6 +53,11 @@ variable geth_verbosity {
   description = "Verbosity of the tx-nodes"
 }
 
+variable in_memory_discovery_table {
+  type        = bool
+  description = "Specifies whether to use an in memory discovery table"
+}
+
 variable network_id {
   type        = number
   description = "The network ID number"

@@ -46,7 +46,11 @@ export function getNexmoClient() {
   return nexmoClient
 }
 
-export async function sendSmsWithNexmo(countryCode: string, phoneNumber: string, message: string) {
+export async function sendSmsWithNexmo(
+  countryCode: string,
+  phoneNumber: string,
+  message: string
+): Promise<void> {
   const client = getNexmoClient()
   return new Promise((resolve, reject) => {
     client.message.sendSms(

@@ -30,11 +30,11 @@ export default class ImagePanes extends React.PureComponent {
                 <Image
                   style={styles.image}
                   resizeMode="cover"
-                  source={{ uri: require('./laurance-joe.jpg') }}
+                  source={{ uri: require('./berlinOffice.jpg') }}
                 />
               </AspectRatio>
               <Text style={[fonts.legal, textStyles.caption]}>
-                Joe completing the Gold Book of Values, a reflection on wholeness
+                The Berlin office practicing Holocracy by going over project tensions
               </Text>
             </View>
           </Fade>

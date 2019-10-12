@@ -40,7 +40,7 @@ const DefaultConfig = {
     initialMinimum: 10000,
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
-    infrastructureFraction: 1 / 2,
+    proposerFraction: 1 / 2,
   },
   registry: {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
@@ -66,12 +66,19 @@ const DefaultConfig = {
     minLockedGoldValue: '1000000000000000000', // 1 gold
     minLockedGoldNoticePeriod: 60 * 24 * 60 * 60, // 60 days
     electionThreshold: '0', // no threshold
-    maxGroupSize: '30',
+    maxGroupSize: '70',
 
     validatorKeys: [],
     // We register a single validator group during the migration.
     groupName: 'C-Labs',
     groupUrl: 'https://www.celo.org',
+  },
+  blockchainParameters: {
+    minimumClientVersion: {
+      major: 1,
+      minor: 8,
+      patch: 23,
+    },
   },
 }
 

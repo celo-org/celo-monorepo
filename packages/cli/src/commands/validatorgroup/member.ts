@@ -5,7 +5,7 @@ import { displaySendTx } from '../../utils/cli'
 import { Args, Flags } from '../../utils/command'
 
 export default class ValidatorGroupRegister extends BaseCommand {
-  static description = 'Register a new Validator Group'
+  static description = 'Manage members of a Validator Group'
 
   static flags = {
     ...BaseCommand.flags,
