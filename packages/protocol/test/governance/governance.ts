@@ -2014,7 +2014,7 @@ contract('Governance', (accounts: string[]) => {
 
       it('should mark the hotfix record as completed', async () => {
         await executeHotfixTx()
-        const [, completed, ] = await governance.getHotfixRecord.call(proposalHashStr)
+        const [, completed] = await governance.getHotfixRecord.call(proposalHashStr)
         assert.isTrue(completed)
       })
 
@@ -2033,9 +2033,9 @@ contract('Governance', (accounts: string[]) => {
 
       it('should not be callable again', async () => {
         await executeHotfixTx()
-        await assertRevert(executeHotfixTx())  
+        await assertRevert(executeHotfixTx())
       })
-    })  
+    })
   })
 
   describe('#isVoting()', () => {
