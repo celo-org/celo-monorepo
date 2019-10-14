@@ -58,7 +58,6 @@ export const reducer = (
         accountInWeb3Keystore: action.address,
       }
     case Actions.SET_IS_ZERO_SYNC:
-      yield call(waitWeb3LastBlock)
       return {
         ...state,
         zeroSyncMode: action.zeroSyncMode,

@@ -4,7 +4,7 @@ import * as Crypto from 'crypto'
 import { generateMnemonic, mnemonicToSeedHex } from 'react-native-bip39'
 import * as RNFS from 'react-native-fs'
 import { REHYDRATE } from 'redux-persist/es/constants'
-import { call, delay, put, race, select, take } from 'redux-saga/effects'
+import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime } from 'src/account/actions'
 import { getPincode } from 'src/account/saga'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -23,6 +23,7 @@ import {
   getLatestBlock,
   setAccount,
   setAccountInWeb3Keystore,
+  SetIsZeroSyncAction,
   setLatestBlockNumber,
   setPrivateCommentKey,
   setZeroSyncMode,
@@ -104,23 +105,6 @@ export function* waitForWeb3Sync() {
     navigateToError('errorDuringSync')
     return false
   }
-}
-
-export function* switchToGethFromZeroSync() {
-  Logger.debug(TAG + 'Switching to geth from zero sync..')
-  const account = yield call(ensureAccountInWeb3Keystore)
-  setZeroSyncMode(false)
-  Logger.debug(
-    TAG + '@switchToGethFromZeroSync',
-    'Importing account from private key to web3 keystore',
-    account
-  )
-}
-
-export function* switchToZeroSyncFromGeth() {
-  Logger.debug(TAG + 'Switching to zero sync from geth..')
-  setZeroSyncMode(true)
-  // TODO write
 }
 
 export function* ensureAccountInWeb3Keystore() {
@@ -392,4 +376,37 @@ export function* getConnectedUnlockedAccount() {
   } else {
     throw new Error(ErrorMessages.INCORRECT_PIN)
   }
+}
+
+export function* switchToGethFromZeroSync() {
+  Logger.debug(TAG + 'Switching to geth from zero sync..')
+  const account = yield call(ensureAccountInWeb3Keystore)
+  setZeroSyncMode(false)
+  Logger.debug(
+    TAG + '@switchToGethFromZeroSync',
+    'Importing account from private key to web3 keystore',
+    account
+  )
+}
+
+export function* switchToZeroSyncFromGeth() {
+  Logger.debug(TAG + 'Switching to zero sync from geth..')
+  setZeroSyncMode(true)
+  // TODO write
+}
+
+export function* switchZeroSyncMode(action: SetIsZeroSyncAction) {
+  if (action.zeroSyncMode) {
+    yield call(switchToGethFromZeroSync)
+  } else {
+    yield call(switchToZeroSyncFromGeth)
+  }
+}
+
+export function* watchZeroSyncMode() {
+  yield takeLatest(Actions.SET_IS_ZERO_SYNC, switchZeroSyncMode)
+}
+
+export function* syncModeSaga() {
+  yield spawn(watchZeroSyncMode)
 }
