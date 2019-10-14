@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import { I18nProps, NameSpaces, withNamespaces, Trans } from 'src/i18n'
 import Discourse from 'src/icons/Discourse'
 import MediumLogo from 'src/icons/MediumLogo'
 import Octocat from 'src/icons/Octocat'
@@ -132,12 +132,23 @@ const Details = React.memo(function _Details({ t }: { t: I18nProps['t'] }) {
       <Responsive medium={[textStyles.left, styles.detailsText, fonts.legal]}>
         <Text style={[textStyles.center, styles.detailsText, fonts.legal]}>{t('disclaimer')}</Text>
       </Responsive>
+      <Responsive medium={[textStyles.left, styles.detailsText, fonts.legal]}>
+        <Text style={[textStyles.center, styles.detailsText, fonts.legal]}>
+          <Trans i18nKey={'footerReadMoreTerms'}>
+            <LinkButon>Terms of Service</LinkButon>
+          </Trans>
+        </Text>
+      </Responsive>
       <Responsive medium={[textStyles.left, fonts.legal]}>
         <Text style={[textStyles.center, fonts.legal]}>{t('copyRight')}</Text>
       </Responsive>
     </View>
   )
 })
+
+function LinkButon({ children }) {
+  return <Button kind={BTN.INLINE} href={menu.TERMS.link} text={children} style={fonts.legal} />
+}
 
 const styles = StyleSheet.create({
   social: {

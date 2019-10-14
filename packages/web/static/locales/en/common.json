@@ -23,5 +23,6 @@
   "cookiesAgree": "agree",
   "cookiesDisagree": "disagree",
   "trueGold": ["真金不怕火煉", "True gold fears no fire"],
-  "copyRight": "Designed & Built by C Labs, © Celo 2019"
+  "copyRight": "Designed & Built by C Labs, © Celo 2019",
+  "footerReadMoreTerms": "Read more in <0>Celo Terms of Service</0>"
 }
