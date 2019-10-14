@@ -1,8 +1,11 @@
 import { AccountArgv } from '@celo/celotool/src/cmds/account'
 import { portForwardAnd } from '@celo/celotool/src/lib/port_forward'
 import { CeloContract, newKit } from '@celo/contractkit'
-import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
-import { ActionableAttestation, decodeAttestationCode } from '@celo/walletkit'
+import {
+  ActionableAttestation,
+  AttestationsWrapper,
+} from '@celo/contractkit/lib/wrappers/Attestations'
+import { decodeAttestationCode } from '@celo/walletkit'
 import prompts from 'prompts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import * as yargs from 'yargs'
