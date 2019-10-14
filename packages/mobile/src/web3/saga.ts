@@ -396,6 +396,7 @@ export function* switchToZeroSyncFromGeth() {
 }
 
 export function* switchZeroSyncMode(action: SetIsZeroSyncAction) {
+  Logger.debug(TAG + '@switchZeroSyncMode', `with action payload ${action}`)
   if (action.zeroSyncMode) {
     yield call(switchToGethFromZeroSync)
   } else {
