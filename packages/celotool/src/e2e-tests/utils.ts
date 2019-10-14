@@ -240,7 +240,7 @@ export async function addSentryPeer(gethBinaryPath: string, instance: GethInstan
       getDatadir(instance),
       'attach',
       '--exec',
-      `admin.addSentry('${instance.sentries[0]!}', '${instance.sentries[1]!}')`,
+      `istanbul.addSentry('${instance.sentries[0]!}', '${instance.sentries[1]!}')`,
     ])
   }
 }
@@ -310,7 +310,7 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
       '--rpc',
       '--rpcport',
       rpcport.toString(),
-      '--rpcapi=eth,net,web3,debug,admin,personal'
+      '--rpcapi=eth,net,web3,debug,admin,personal,istanbul'
     )
   }
 
@@ -337,12 +337,12 @@ export async function startGeth(gethBinaryPath: string, instance: GethInstanceCo
     gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
 
     if (isProxied) {
-      gethArgs.push('--proxied')
+      gethArgs.push('--istanbul.proxied')
     }
   } else if (isSentry) {
     gethArgs.push('--sentry')
     if (sentryport) {
-      gethArgs.push('--proxyport')
+      gethArgs.push('--proxiedvalidatorport')
       gethArgs.push(sentryport.toString())
     }
     gethArgs.push(`--nodekeyhex=${privateKey}`)
@@ -525,7 +525,8 @@ export function getContext(gethConfig: GethTestConfig) {
       await initAndStartGeth(gethBinaryPath, instance)
     }
 
-    await sleep(600)
+    // Give validators time to connect to each other
+    await sleep(60)
 
     if (gethConfig.migrate || gethConfig.migrateTo) {
       await migrateContracts(validatorPrivateKeys, gethConfig.migrateTo)

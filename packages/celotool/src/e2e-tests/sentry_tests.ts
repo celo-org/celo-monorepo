@@ -56,7 +56,7 @@ describe('sentry tests', function(this: any) {
     // Restart validator nodes.
     await hooks.restart()
     // Give validators time to connect to eachother.
-    await sleep(600)
+    await sleep(60)
   })
 
   it('dummy test', async () => {
